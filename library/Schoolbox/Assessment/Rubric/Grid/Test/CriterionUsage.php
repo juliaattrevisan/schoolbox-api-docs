@@ -13,7 +13,7 @@ use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
 
 /**
- * @covers \Schoolbox\Assessment\Rubric\Grid\CriterionUsage
+ * @covers \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage
  * @codeCoverageIgnore
  */
 class CriterionUsage extends TestCase
@@ -26,7 +26,7 @@ class CriterionUsage extends TestCase
     public function getTestRetrieveDescriptorData(): iterable
     {
         $criterion      = (new RowSet\Indicator())->setId(1)->setName('Criterion 1');
-        $criterionUsage = new RubricGrid\CriterionUsage($criterion);
+        $criterionUsage = new RubricGrid\IndicatorUsage($criterion);
 
         $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
         $level2 = (new RubricGrid\Level())->setId(2)->setName('Level 2');
@@ -56,14 +56,14 @@ class CriterionUsage extends TestCase
 
     /**
      * @dataProvider getTestRetrieveDescriptorData
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::retrieveDescriptor
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::retrieveDescriptor
      *
-     * @param RubricGrid\CriterionUsage  $criterionUsage
+     * @param RubricGrid\IndicatorUsage  $criterionUsage
      * @param int                        $levelIndex
      * @param null|RubricGrid\Descriptor $expected
      */
     public function testRetrieveDescriptor(
-        RubricGrid\CriterionUsage $criterionUsage,
+        RubricGrid\IndicatorUsage $criterionUsage,
         int $levelIndex,
         ?RubricGrid\Descriptor $expected
     ): void {
@@ -79,7 +79,7 @@ class CriterionUsage extends TestCase
     public function getTestCalculateMaxValueDataFromDescriptors(): iterable
     {
         $criterion1      = (new RowSet\Indicator())->setId(1)->setName('Criterion 1');
-        $criterionUsage1 = new RubricGrid\CriterionUsage($criterion1);
+        $criterionUsage1 = new RubricGrid\IndicatorUsage($criterion1);
 
         $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
         $level2 = (new RubricGrid\Level())->setId(2)->setName('Level 2');
@@ -103,13 +103,13 @@ class CriterionUsage extends TestCase
 
 
         $criterion2      = (new RowSet\Indicator())->setId(2)->setName('Criterion 2');
-        $criterionUsage2 = new RubricGrid\CriterionUsage($criterion2);
+        $criterionUsage2 = new RubricGrid\IndicatorUsage($criterion2);
 
         yield 'criterion 2: no descriptors' => [$criterionUsage2, null];
 
 
         $criterion3      = (new RowSet\Indicator())->setId(3)->setName('Criterion 3');
-        $criterionUsage3 = new RubricGrid\CriterionUsage($criterion3);
+        $criterionUsage3 = new RubricGrid\IndicatorUsage($criterion3);
 
         $descriptor6 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.1');
         $descriptor7 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.2')->setMaxValue(null);
@@ -123,13 +123,13 @@ class CriterionUsage extends TestCase
 
     /**
      * @dataProvider getTestCalculateMaxValueDataFromDescriptors
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::calculateMaxValueFromDescriptors
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::calculateMaxValueFromDescriptors
      *
-     * @param RubricGrid\CriterionUsage $criterionUsage
+     * @param RubricGrid\IndicatorUsage $criterionUsage
      * @param float|null                $expected
      */
     public function testCalculateMaxValueFromDescriptors(
-        RubricGrid\CriterionUsage $criterionUsage,
+        RubricGrid\IndicatorUsage $criterionUsage,
         ?float $expected
     ): void {
         $this->assertSame($expected, $criterionUsage->calculateMaxValueFromDescriptors());
@@ -145,7 +145,7 @@ class CriterionUsage extends TestCase
     {
         // Ascending: [0, 2, 4, 6, 8] => [0, 1..2, 3..4, 5..6, 7..8]
         $criterion       = (new RowSet\Indicator())->setId(1)->setName('Criterion');
-        $criterionUsage1 = new RubricGrid\CriterionUsage($criterion);
+        $criterionUsage1 = new RubricGrid\IndicatorUsage($criterion);
 
         $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
         $level2 = (new RubricGrid\Level())->setId(2)->setName('Level 2');
@@ -174,7 +174,7 @@ class CriterionUsage extends TestCase
 
 
         // Descending: [8, 6, 4, 2, 0] => [7..8, 5..6, 3..4, 1..2, 0]
-        $criterionUsage2 = new RubricGrid\CriterionUsage($criterion);
+        $criterionUsage2 = new RubricGrid\IndicatorUsage($criterion);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 2.1')->setMaxValue(8);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 2.2')->setMaxValue(6);
@@ -196,7 +196,7 @@ class CriterionUsage extends TestCase
 
 
         // Asc, skip null before: [0, null, 5, 10] => [0, null, 1..5, 6..10]
-        $criterionUsage3 = new RubricGrid\CriterionUsage($criterion);
+        $criterionUsage3 = new RubricGrid\IndicatorUsage($criterion);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.1')->setMaxValue(0);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.2')->setMaxValue(null);
@@ -215,7 +215,7 @@ class CriterionUsage extends TestCase
 
 
         // Asc, skip null after: [0, 5, null, 10] => [0, 1..5, null, 6..10]
-        $criterionUsage4 = new RubricGrid\CriterionUsage($criterion);
+        $criterionUsage4 = new RubricGrid\IndicatorUsage($criterion);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 4.1')->setMaxValue(0);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 4.2')->setMaxValue(5);
@@ -234,7 +234,7 @@ class CriterionUsage extends TestCase
 
 
         // Asc, skip null at start: [null, 5, 10] => [null, 5, 6..10]
-        $criterionUsage5 = new RubricGrid\CriterionUsage($criterion);
+        $criterionUsage5 = new RubricGrid\IndicatorUsage($criterion);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 5.1')->setMaxValue(null);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 5.2')->setMaxValue(5);
@@ -250,7 +250,7 @@ class CriterionUsage extends TestCase
 
 
         // Desc, skip null before: [10, null, 5, 0] => [6..10, null, 1..5, 0]
-        $criterionUsage6 = new RubricGrid\CriterionUsage($criterion);
+        $criterionUsage6 = new RubricGrid\IndicatorUsage($criterion);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 6.1')->setMaxValue(10);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 6.2')->setMaxValue(null);
@@ -269,7 +269,7 @@ class CriterionUsage extends TestCase
 
 
         // Desc, skip null after: [10, 5, null, 0] => [6..10, 1..5, null, 0]
-        $criterionUsage7 = new RubricGrid\CriterionUsage($criterion);
+        $criterionUsage7 = new RubricGrid\IndicatorUsage($criterion);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 7.1')->setMaxValue(10);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 7.2')->setMaxValue(5);
@@ -288,7 +288,7 @@ class CriterionUsage extends TestCase
 
 
         // Asc+Desc: [0, 4, 8, 3, 0]  => [0, 1..4, 5..8, 1..3, 0] (use highest max below this max)
-        $criterionUsage8 = new RubricGrid\CriterionUsage($criterion);
+        $criterionUsage8 = new RubricGrid\IndicatorUsage($criterion);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 8.1')->setMaxValue(0);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 8.2')->setMaxValue(4);
@@ -310,7 +310,7 @@ class CriterionUsage extends TestCase
 
 
         // Fibonacci: [1, 1, 2, 3, 5, 8] => [1, 1, 2, 3, 4..5, 6..8]
-        $criterionUsage9 = new RubricGrid\CriterionUsage($criterion);
+        $criterionUsage9 = new RubricGrid\IndicatorUsage($criterion);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.1')->setMaxValue(1);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.2')->setMaxValue(1);
@@ -335,7 +335,7 @@ class CriterionUsage extends TestCase
 
 
         // All null: [null, null, null, null, null] => [null, null, null, null, null]
-        $criterionUsage10 = new RubricGrid\CriterionUsage($criterion);
+        $criterionUsage10 = new RubricGrid\IndicatorUsage($criterion);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.1')->setMaxValue(null);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.2')->setMaxValue(null);
@@ -357,7 +357,7 @@ class CriterionUsage extends TestCase
 
 
         // Only one descriptor: [5] => [5]
-        $criterionUsage11 = new RubricGrid\CriterionUsage($criterion);
+        $criterionUsage11 = new RubricGrid\IndicatorUsage($criterion);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.1')->setMaxValue(5);
 
@@ -369,14 +369,14 @@ class CriterionUsage extends TestCase
 
     /**
      * @dataProvider getTestApplyDescriptorMinValuesData
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::applyDescriptorMinValues
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::applyDescriptorMinValues
      *
-     * @param RubricGrid\CriterionUsage $criterionUsage
+     * @param RubricGrid\IndicatorUsage $criterionUsage
      * @param int                       $levelIndex
      * @param float|null                $expected
      */
     public function testApplyDescriptorMinValues(
-        RubricGrid\CriterionUsage $criterionUsage,
+        RubricGrid\IndicatorUsage $criterionUsage,
         int $levelIndex,
         ?float $expected
     ): void {
@@ -406,7 +406,7 @@ class CriterionUsage extends TestCase
         $level5 = (new RubricGrid\Level())->setId(5)->setName('Level 5');
         $level6 = (new RubricGrid\Level())->setId(6)->setName('Level 6');
 
-        $criterionUsage = new RubricGrid\CriterionUsage($criterion);
+        $criterionUsage = new RubricGrid\IndicatorUsage($criterion);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.1')->setMaxValue(1);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.2')->setMaxValue(1);
@@ -433,14 +433,14 @@ class CriterionUsage extends TestCase
 
     /**
      * @dataProvider getTestApplyDescriptorMinValuesWithoutValueRange
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\CriterionUsage::applyDescriptorMinValues
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::applyDescriptorMinValues
      *
-     * @param RubricGrid\CriterionUsage $criterionUsage
+     * @param RubricGrid\IndicatorUsage $criterionUsage
      * @param int                       $levelIndex
      * @param float|null                $expected
      */
     public function testApplyDescriptorMinValuesWithoutValueRange(
-        RubricGrid\CriterionUsage $criterionUsage,
+        RubricGrid\IndicatorUsage $criterionUsage,
         int $levelIndex,
         ?float $expected
     ): void {

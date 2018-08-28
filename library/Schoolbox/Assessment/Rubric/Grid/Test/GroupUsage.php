@@ -55,13 +55,13 @@ class GroupUsage extends TestCase
 
         // Group and criterion usage
         $groupUsage1                                             = (new RubricGrid\CapabilityUsage($group1))->setMaxValue(15);
-        $criterionUsage1                                         = new RubricGrid\CriterionUsage($criterion1);
-        $criterionUsage2                                         = new RubricGrid\CriterionUsage($criterion2);
+        $criterionUsage1                                         = new RubricGrid\IndicatorUsage($criterion1);
+        $criterionUsage2                                         = new RubricGrid\IndicatorUsage($criterion2);
         $groupUsage1->getIndicatorUsages()[$criterion1->getId()] = $criterionUsage1;
         $groupUsage1->getIndicatorUsages()[$criterion2->getId()] = $criterionUsage2;
 
         $groupUsage2                                             = (new RubricGrid\CapabilityUsage($group1))->setMaxValue(15);
-        $criterionUsage6                                         = new RubricGrid\CriterionUsage($criterion6);
+        $criterionUsage6                                         = new RubricGrid\IndicatorUsage($criterion6);
         $groupUsage2->getIndicatorUsages()[$criterion6->getId()] = $criterionUsage6;
 
         yield 'group usage 1, criterion 1: in use'            => [$groupUsage1, $criterion1, $criterionUsage1];
@@ -80,12 +80,12 @@ class GroupUsage extends TestCase
      *
      * @param RubricGrid\CapabilityUsage     $groupUsage
      * @param RowSet\Indicator               $criterion
-     * @param null|RubricGrid\CriterionUsage $expected
+     * @param null|RubricGrid\IndicatorUsage $expected
      */
     public function testRetrieveCriterionUsage(
         RubricGrid\CapabilityUsage $groupUsage,
         RowSet\Indicator $criterion,
-        ?RubricGrid\CriterionUsage $expected
+        ?RubricGrid\IndicatorUsage $expected
     ): void
     {
         $this->assertSame($expected, $groupUsage->retrieveIndicatorUsage($criterion));
@@ -116,28 +116,28 @@ class GroupUsage extends TestCase
 
 
         $groupUsage2                                             = new RubricGrid\CapabilityUsage($group);
-        $groupUsage2->getIndicatorUsages()[$criterion1->getId()] = new RubricGrid\CriterionUsage($criterion1);
+        $groupUsage2->getIndicatorUsages()[$criterion1->getId()] = new RubricGrid\IndicatorUsage($criterion1);
 
         yield 'Group 1 used' => [$groupUsage2, [$criterion1, $criterion2, $criterion3]];
 
 
         $groupUsage3                                             = new RubricGrid\CapabilityUsage($group);
-        $groupUsage3->getIndicatorUsages()[$criterion3->getId()] = new RubricGrid\CriterionUsage($criterion3);
+        $groupUsage3->getIndicatorUsages()[$criterion3->getId()] = new RubricGrid\IndicatorUsage($criterion3);
 
         yield 'Group 3 used' => [$groupUsage3, [$criterion3, $criterion1, $criterion2]];
 
 
         $groupUsage4                                             = new RubricGrid\CapabilityUsage($group);
-        $groupUsage4->getIndicatorUsages()[$criterion3->getId()] = new RubricGrid\CriterionUsage($criterion3);
-        $groupUsage4->getIndicatorUsages()[$criterion2->getId()] = new RubricGrid\CriterionUsage($criterion2);
+        $groupUsage4->getIndicatorUsages()[$criterion3->getId()] = new RubricGrid\IndicatorUsage($criterion3);
+        $groupUsage4->getIndicatorUsages()[$criterion2->getId()] = new RubricGrid\IndicatorUsage($criterion2);
 
         yield 'Group 3, 2 used' => [$groupUsage4, [$criterion3, $criterion2, $criterion1]];
 
 
         $groupUsage5                                             = new RubricGrid\CapabilityUsage($group);
-        $groupUsage5->getIndicatorUsages()[$criterion1->getId()] = new RubricGrid\CriterionUsage($criterion1);
-        $groupUsage5->getIndicatorUsages()[$criterion3->getId()] = new RubricGrid\CriterionUsage($criterion3);
-        $groupUsage5->getIndicatorUsages()[$criterion2->getId()] = new RubricGrid\CriterionUsage($criterion2);
+        $groupUsage5->getIndicatorUsages()[$criterion1->getId()] = new RubricGrid\IndicatorUsage($criterion1);
+        $groupUsage5->getIndicatorUsages()[$criterion3->getId()] = new RubricGrid\IndicatorUsage($criterion3);
+        $groupUsage5->getIndicatorUsages()[$criterion2->getId()] = new RubricGrid\IndicatorUsage($criterion2);
 
         yield 'Group 1, 3, 2 used' => [$groupUsage5, [$criterion1, $criterion3, $criterion2]];
     }
@@ -179,25 +179,25 @@ class GroupUsage extends TestCase
         $group->getIndicators()[$criterion4->getId()] = $criterion4;
 
         // Criterion usage 1: max is 7
-        $criterionUsage1 = new RubricGrid\CriterionUsage($criterion1);
+        $criterionUsage1 = new RubricGrid\IndicatorUsage($criterion1);
         $criterionUsage1->getDescriptors()[0] = new RubricGrid\Descriptor();
         $criterionUsage1->getDescriptors()[1] = (new RubricGrid\Descriptor())->setMaxValue(3);
         $criterionUsage1->getDescriptors()[2] = (new RubricGrid\Descriptor())->setMaxValue(5);
         $criterionUsage1->getDescriptors()[3] = (new RubricGrid\Descriptor())->setMaxValue(7);
 
         // Criterion usage 2: max is 0 (no descriptors with marks)
-        $criterionUsage2 = new RubricGrid\CriterionUsage($criterion2);
+        $criterionUsage2 = new RubricGrid\IndicatorUsage($criterion2);
         $criterionUsage2->getDescriptors()[1] = new RubricGrid\Descriptor();
         $criterionUsage2->getDescriptors()[2] = new RubricGrid\Descriptor();
 
         // Criterion usage 2: max is 8
-        $criterionUsage3 = new RubricGrid\CriterionUsage($criterion3);
+        $criterionUsage3 = new RubricGrid\IndicatorUsage($criterion3);
         $criterionUsage3->getDescriptors()[1] = (new RubricGrid\Descriptor())->setMaxValue(8);
         $criterionUsage3->getDescriptors()[2] = (new RubricGrid\Descriptor())->setMaxValue(5);
         $criterionUsage3->getDescriptors()[3] = (new RubricGrid\Descriptor())->setMaxValue(2);
 
         // Criterion usage 4: max is 0 (no descriptors)
-        $criterionUsage4 = new RubricGrid\CriterionUsage($criterion4);
+        $criterionUsage4 = new RubricGrid\IndicatorUsage($criterion4);
 
 
         $groupUsage1 = new RubricGrid\CapabilityUsage($group);

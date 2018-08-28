@@ -138,9 +138,9 @@ class Grid
      * doesn't use it.
      *
      * @param Indicator $indicator
-     * @return null|CriterionUsage
+     * @return null|IndicatorUsage
      */
-    public function retrieveIndicatorUsage(Indicator $indicator): ?CriterionUsage
+    public function retrieveIndicatorUsage(Indicator $indicator): ?IndicatorUsage
     {
         foreach ($this->capabilityUsages as $capabilityUsage) {
             $criterionUsage = $capabilityUsage->retrieveIndicatorUsage($indicator);

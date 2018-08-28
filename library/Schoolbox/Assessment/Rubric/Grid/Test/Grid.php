@@ -60,14 +60,14 @@ class Grid extends TestCase
 
         // Group and criterion usage
         $groupUsage1                                             = (new RubricGrid\CapabilityUsage($group1))->setMaxValue(15);
-        $criterionUsage1                                         = new RubricGrid\CriterionUsage($criterion1);
-        $criterionUsage2                                         = new RubricGrid\CriterionUsage($criterion2);
+        $criterionUsage1                                         = new RubricGrid\IndicatorUsage($criterion1);
+        $criterionUsage2                                         = new RubricGrid\IndicatorUsage($criterion2);
         $groupUsage1->getIndicatorUsages()[$criterion1->getId()] = $criterionUsage1;
         $groupUsage1->getIndicatorUsages()[$criterion2->getId()] = $criterionUsage2;
         $grid->getCapabilityUsages()[$group1->getId()]           = $groupUsage1;
 
         $groupUsage2                                             = (new RubricGrid\CapabilityUsage($group2))->setMaxValue(15);
-        $criterionUsage6                                         = new RubricGrid\CriterionUsage($criterion6);
+        $criterionUsage6                                         = new RubricGrid\IndicatorUsage($criterion6);
         $groupUsage2->getIndicatorUsages()[$criterion6->getId()] = $criterionUsage6;
         $grid->getCapabilityUsages()[$group2->getId()]           = $groupUsage2;
 
@@ -134,14 +134,14 @@ class Grid extends TestCase
 
         // Group and criterion usage
         $groupUsage1                                             = (new RubricGrid\CapabilityUsage($group1))->setMaxValue(15);
-        $criterionUsage1                                         = new RubricGrid\CriterionUsage($criterion1);
-        $criterionUsage2                                         = new RubricGrid\CriterionUsage($criterion2);
+        $criterionUsage1                                         = new RubricGrid\IndicatorUsage($criterion1);
+        $criterionUsage2                                         = new RubricGrid\IndicatorUsage($criterion2);
         $groupUsage1->getIndicatorUsages()[$criterion1->getId()] = $criterionUsage1;
         $groupUsage1->getIndicatorUsages()[$criterion2->getId()] = $criterionUsage2;
         $grid->getCapabilityUsages()[$group1->getId()]           = $groupUsage1;
 
         $groupUsage2                                             = (new RubricGrid\CapabilityUsage($group2))->setMaxValue(15);
-        $criterionUsage6                                         = new RubricGrid\CriterionUsage($criterion6);
+        $criterionUsage6                                         = new RubricGrid\IndicatorUsage($criterion6);
         $groupUsage2->getIndicatorUsages()[$criterion6->getId()] = $criterionUsage6;
         $grid->getCapabilityUsages()[$group2->getId()]           = $groupUsage2;
 
@@ -164,12 +164,12 @@ class Grid extends TestCase
      *
      * @param RubricGrid\Grid                $grid
      * @param RowSet\Indicator               $criterion
-     * @param null|RubricGrid\CriterionUsage $expected
+     * @param null|RubricGrid\IndicatorUsage $expected
      */
     public function testRetrieveCriterionUsage(
         RubricGrid\Grid $grid,
         RowSet\Indicator $criterion,
-        ?RubricGrid\CriterionUsage $expected
+        ?RubricGrid\IndicatorUsage $expected
     ): void {
         $this->assertSame($expected, $grid->retrieveIndicatorUsage($criterion));
     }
@@ -209,13 +209,13 @@ class Grid extends TestCase
         $group3->getIndicators()[$criterion9->getId()] = $criterion9;
 
         $groupUsage1                                             = (new RubricGrid\CapabilityUsage($group1))->setMaxValue(15);
-        $criterionUsage1                                         = new RubricGrid\CriterionUsage($criterion1);
-        $criterionUsage2                                         = new RubricGrid\CriterionUsage($criterion2);
+        $criterionUsage1                                         = new RubricGrid\IndicatorUsage($criterion1);
+        $criterionUsage2                                         = new RubricGrid\IndicatorUsage($criterion2);
         $groupUsage1->getIndicatorUsages()[$criterion1->getId()] = $criterionUsage1;
         $groupUsage1->getIndicatorUsages()[$criterion2->getId()] = $criterionUsage2;
 
         $groupUsage2                                             = (new RubricGrid\CapabilityUsage($group2))->setMaxValue(3);
-        $criterionUsage6                                         = new RubricGrid\CriterionUsage($criterion6);
+        $criterionUsage6                                         = new RubricGrid\IndicatorUsage($criterion6);
         $groupUsage2->getIndicatorUsages()[$criterion6->getId()] = $criterionUsage6;
 
         $dueWork = new DueWork();

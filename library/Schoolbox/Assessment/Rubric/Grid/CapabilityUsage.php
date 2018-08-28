@@ -26,7 +26,7 @@ class CapabilityUsage
 
 
     /**
-     * @var GenericCollection|CriterionUsage[]
+     * @var GenericCollection|IndicatorUsage[]
      */
     private $indicatorUsages;
 
@@ -47,7 +47,7 @@ class CapabilityUsage
     public function __construct(Capability $group)
     {
         $this->capability      = $group;
-        $this->indicatorUsages = new GenericCollection(CriterionUsage::class);
+        $this->indicatorUsages = new GenericCollection(IndicatorUsage::class);
     }
 
 
@@ -63,8 +63,8 @@ class CapabilityUsage
     {
         $seenIndicators = [];
         foreach ($this->getIndicatorUsages() as $indicatorUsage) {
-            $seenIndicators[$indicatorUsage->getCriterion()->getId()] = true;
-            yield $indicatorUsage->getCriterion();
+            $seenIndicators[$indicatorUsage->getIndicator()->getId()] = true;
+            yield $indicatorUsage->getIndicator();
         }
 
         foreach ($this->getCapability()->getIndicators() as $criterion) {
@@ -80,12 +80,12 @@ class CapabilityUsage
      * doesn't use it.
      *
      * @param Indicator $indicator
-     * @return null|CriterionUsage
+     * @return null|IndicatorUsage
      */
-    public function retrieveIndicatorUsage(Indicator $indicator): ?CriterionUsage
+    public function retrieveIndicatorUsage(Indicator $indicator): ?IndicatorUsage
     {
         foreach ($this->indicatorUsages as $indicatorUsage) {
-            if ($indicatorUsage->getCriterion()->getId() === $indicator->getId()) {
+            if ($indicatorUsage->getIndicator()->getId() === $indicator->getId()) {
                 return $indicatorUsage;
             }
         }
@@ -124,7 +124,7 @@ class CapabilityUsage
 
 
     /**
-     * @return GenericCollection|CriterionUsage[]
+     * @return GenericCollection|IndicatorUsage[]
      */
     public function getIndicatorUsages(): GenericCollection
     {
@@ -133,7 +133,7 @@ class CapabilityUsage
 
 
     /**
-     * @param GenericCollection|CriterionUsage[] $indicatorUsages
+     * @param GenericCollection|IndicatorUsage[] $indicatorUsages
      * @return static
      */
     public function setIndicatorUsages(GenericCollection $indicatorUsages): self

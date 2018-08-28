@@ -16,12 +16,12 @@ use Schoolbox\GenericCollection;
  *
  * Represented on the rubric grid as a single row.
  */
-class CriterionUsage
+class IndicatorUsage
 {
     /**
      * @var Indicator
      */
-    private $criterion;
+    private $indicator;
 
 
     /**
@@ -33,11 +33,11 @@ class CriterionUsage
     /**
      * Constructor
      *
-     * @param Indicator $criterion
+     * @param Indicator $indicator
      */
-    public function __construct(Indicator $criterion)
+    public function __construct(Indicator $indicator)
     {
-        $this->criterion   = $criterion;
+        $this->indicator   = $indicator;
         $this->descriptors = new GenericCollection(Descriptor::class);
     }
 
@@ -189,9 +189,9 @@ class CriterionUsage
     /**
      * @return Indicator
      */
-    public function getCriterion(): Indicator
+    public function getIndicator(): Indicator
     {
-        return $this->criterion;
+        return $this->indicator;
     }
 
 

@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
-use Schoolbox\Assessment\Rubric\Grid\CriterionUsage;
+use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 
 /**
  * Marking of a group within a marked rubric grid.
@@ -19,7 +19,7 @@ use Schoolbox\Assessment\Rubric\Grid\CriterionUsage;
 class CriterionMark
 {
     /**
-     * @var CriterionUsage
+     * @var IndicatorUsage
      */
     private $criterionUsage;
 
@@ -33,9 +33,9 @@ class CriterionMark
     /**
      * Constructor
      *
-     * @param CriterionUsage $criterionUsage
+     * @param IndicatorUsage $criterionUsage
      */
-    public function __construct(CriterionUsage $criterionUsage)
+    public function __construct(IndicatorUsage $criterionUsage)
     {
         $this->criterionUsage = $criterionUsage;
     }
@@ -56,9 +56,9 @@ class CriterionMark
 
 
     /**
-     * @return CriterionUsage
+     * @return IndicatorUsage
      */
-    public function getCriterionUsage(): CriterionUsage
+    public function getCriterionUsage(): IndicatorUsage
     {
         return $this->criterionUsage;
     }

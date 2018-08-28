@@ -459,7 +459,7 @@ class RubricMapper
                     continue;
                 }
 
-                $criterionUsage = new \Schoolbox\Assessment\Rubric\Grid\CriterionUsage($criterion);
+                $criterionUsage = new \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage($criterion);
 
                 // Add descriptors, and apply min value
                 $levelIndex = 0;
@@ -568,7 +568,7 @@ class RubricMapper
 
             $criterionSequence = 1;
             foreach ($groupUsage->getIndicatorUsages() as $criterionUsage) {
-                $criterionModel      = $criterionModels[$criterionUsage->getCriterion()->getId()];
+                $criterionModel      = $criterionModels[$criterionUsage->getIndicator()->getId()];
                 $criterionUsageModel = $criterionUsageMapper->createModel()
                     ->setSubmissionBox($submissionBox)
                     ->setCriterion($criterionModel)

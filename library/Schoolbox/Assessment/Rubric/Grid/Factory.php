@@ -129,7 +129,7 @@ class Factory
             }
 
 
-            $criterionUsage = new CriterionUsage($criterion);
+            $criterionUsage = new IndicatorUsage($criterion);
 
             foreach ($levelCache as $levelSequence => $level) {
 
