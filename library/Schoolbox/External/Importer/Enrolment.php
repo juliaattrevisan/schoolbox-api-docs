@@ -24,6 +24,11 @@ use Schoolbox\UserMapper;
 class Enrolment extends AbstractImporter
 {
     /**
+     * @var \Alaress\Database\Connector\IConnector
+     */
+    private $externalDb;
+
+    /**
      * @var Reader
      */
     protected $csvReader;
@@ -62,6 +67,7 @@ class Enrolment extends AbstractImporter
      */
     protected function setup()
     {
+        $this->externalDb      = \Schoolbox\Database\Factory::getInstanceExternal();
         $this->userMapper      = new UserMapper();
         $this->classMapper     = new ClassEntryMapper();
         $this->enrolmentMapper = new ClassInvolvementMapper();
@@ -124,6 +130,7 @@ class Enrolment extends AbstractImporter
         // * Enrolment: delete all existing and re-insert
         $result         = $this->parse();
         $createdClasses = [];
+
         foreach ($result as $enrolment) {
             $class = $enrolment->getClass();
 
@@ -140,17 +147,23 @@ class Enrolment extends AbstractImporter
                     }
                     $enrolment->setClass($class);
                 }
-
-                if ($this->enrolmentMapper->save($enrolment)) {
-                } else {
-                    $this->log->error('Could not save enrolment!');
-                }
+                $user = $enrolment->getUser();
+                $enrolmentItems[] = "(NULL, '".$class->getId()."', '".$user->getId()."')";
             } else {
                 if (!$class->getId()) {
                     if (!isset($createdClasses[$class->getCode()])) {
                         $createdClasses[$class->getCode()] = true;
                     }
                 }
+            }
+        }
+        if ($this->performUpdate && count($enrolmentItems) > 0) {
+            $fullQuery = 'INSERT INTO class_user (id, class_id, user_id) VALUES ' . implode($enrolmentItems, ',') . ';';
+            try {
+                // Manual bulk insert into the DB of "$fullquery"
+                $this->externalDb->executeQuery($fullQuery);
+            } catch (Exception $e) {
+                $this->log->error(sprintf("Could not save enrolment! %s", $e->getMessage()));
             }
         }
     }
