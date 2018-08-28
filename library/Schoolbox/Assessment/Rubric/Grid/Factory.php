@@ -72,7 +72,7 @@ class Factory
 
 
             // Can this group's name be set?
-            if ($group->isInUseExcluding($grid->getAssessment())) {
+            if (!$group->isInUseExcluding($grid->getAssessment())) {
                 $group->setName($groupName);
             }
 
@@ -102,7 +102,7 @@ class Factory
 
 
             // Can this criterion's name be set?
-            if ($criterion->isInUseExcluding($grid->getAssessment())) {
+            if (!$criterion->isInUseExcluding($grid->getAssessment())) {
                 $criterion->setName($criterionName);
             }
 
