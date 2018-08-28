@@ -57,10 +57,15 @@ class Criterion
     /**
      * Is this criterion in use on any existing assessment?
      *
+     * @param null|IAssessable $exclusion If set, assessment to exclude from
+     *                                    usage check
      * @return bool
      */
-    public function isInUse(): bool
+    public function isInUse(?IAssessable $exclusion = null): bool
     {
+        if ($exclusion) {
+            return $this->isInUseExcluding($exclusion);
+        }
         return \count($this->usage) > 0;
     }
 

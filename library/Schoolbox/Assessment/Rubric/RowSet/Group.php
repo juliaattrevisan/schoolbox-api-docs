@@ -91,10 +91,15 @@ class Group
     /**
      * Are any of the criteria in this group in use?
      *
+     * @param null|IAssessable $exclusion If set, assessment to exclude from
+     *                                    usage check
      * @return bool
      */
-    public function isInUse(): bool
+    public function isInUse(?IAssessable $exclusion = null): bool
     {
+        if ($exclusion) {
+            return $this->isInUseExcluding($exclusion);
+        }
         foreach ($this->criteria as $criterion) {
             if ($criterion->isInUse()) {
                 return true;
