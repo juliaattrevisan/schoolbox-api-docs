@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
-use Schoolbox\Assessment\Rubric\RowSet\Criterion;
+use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\GenericCollection;
@@ -137,10 +137,10 @@ class Grid
      * Return the criterion usage for a given criterion, or null if this grid
      * doesn't use it.
      *
-     * @param Criterion $criterion
+     * @param Indicator $criterion
      * @return null|CriterionUsage
      */
-    public function retrieveCriterionUsage(Criterion $criterion): ?CriterionUsage
+    public function retrieveCriterionUsage(Indicator $criterion): ?CriterionUsage
     {
         foreach ($this->groupUsages as $groupUsage) {
             $criterionUsage = $groupUsage->retrieveCriterionUsage($criterion);
@@ -180,7 +180,7 @@ class Grid
      * Iterates each criterion in the grid for the given group.
      *
      * @param Capability $group
-     * @return iterable|Criterion[]
+     * @return iterable|Indicator[]
      */
     public function iterateCriteria(Capability $group): iterable
     {

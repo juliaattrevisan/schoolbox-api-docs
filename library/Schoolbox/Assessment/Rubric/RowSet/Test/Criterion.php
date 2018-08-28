@@ -9,12 +9,12 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\RowSet\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Assessment\Rubric\RowSet\Criterion as RubricCriterion;
+use Schoolbox\Assessment\Rubric\RowSet\Indicator as RubricCriterion;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 
 /**
- * @covers \Schoolbox\Assessment\Rubric\RowSet\Criterion
+ * @covers \Schoolbox\Assessment\Rubric\RowSet\Indicator
  */
 class Criterion extends TestCase
 {
@@ -37,7 +37,7 @@ class Criterion extends TestCase
 
     /**
      * @dataProvider getTestIsInUseData
-     * @covers \Schoolbox\Assessment\Rubric\RowSet\Criterion::isInUse
+     * @covers \Schoolbox\Assessment\Rubric\RowSet\Indicator::isInUse
      *
      * @param RubricCriterion $criterion
      * @param bool            $expected
@@ -81,7 +81,7 @@ class Criterion extends TestCase
 
     /**
      * @dataProvider getTestIsInUseExcludingData
-     * @covers \Schoolbox\Assessment\Rubric\RowSet\Criterion::isInUseExcluding
+     * @covers \Schoolbox\Assessment\Rubric\RowSet\Indicator::isInUseExcluding
      *
      * @param RubricCriterion $criterion
      * @param IAssessable     $assessment

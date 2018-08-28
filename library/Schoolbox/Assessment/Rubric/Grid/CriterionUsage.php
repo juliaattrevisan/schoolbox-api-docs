@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
-use Schoolbox\Assessment\Rubric\RowSet\Criterion;
+use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\GenericCollection;
 
 /**
@@ -19,7 +19,7 @@ use Schoolbox\GenericCollection;
 class CriterionUsage
 {
     /**
-     * @var Criterion
+     * @var Indicator
      */
     private $criterion;
 
@@ -33,9 +33,9 @@ class CriterionUsage
     /**
      * Constructor
      *
-     * @param Criterion $criterion
+     * @param Indicator $criterion
      */
-    public function __construct(Criterion $criterion)
+    public function __construct(Indicator $criterion)
     {
         $this->criterion   = $criterion;
         $this->descriptors = new GenericCollection(Descriptor::class);
@@ -187,9 +187,9 @@ class CriterionUsage
 
 
     /**
-     * @return Criterion
+     * @return Indicator
      */
-    public function getCriterion(): Criterion
+    public function getCriterion(): Indicator
     {
         return $this->criterion;
     }

@@ -58,7 +58,7 @@ class Factory
 
             // Add criteria
             foreach ($postedGroup['items'] ?? [] as $tempCriterionId => $postedCriterion) {
-                $criterion                                = (new Criterion())
+                $criterion                                = (new Indicator())
                     ->setId($postedCriterion['id'])
                     ->setName($postedCriterion['name'] ?? '')
                     ->setCurriculumNodes(

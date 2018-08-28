@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\RowSet\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Assessment\Rubric\RowSet\Criterion;
+use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet as RubricRowSet;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -78,12 +78,12 @@ class RowSet extends TestCase
 
         $group1 = (new Capability())->setId(3);
         $group1->getIndicators()
-               ->add(new Criterion())
-               ->add((new Criterion())->setId(5))
-               ->add((new Criterion())->setId(6))
-               ->add((new Criterion())->setId(7))
-               ->add((new Criterion())->setId(8))
-               ->add((new Criterion())->setId(9));
+               ->add(new Indicator())
+               ->add((new Indicator())->setId(5))
+               ->add((new Indicator())->setId(6))
+               ->add((new Indicator())->setId(7))
+               ->add((new Indicator())->setId(8))
+               ->add((new Indicator())->setId(9));
         $rowSet->getCapabilities()
                ->add($group1);
         yield 'one group, many criteria' => [$rowSet, [5, 6, 7, 8, 9]];
@@ -91,20 +91,20 @@ class RowSet extends TestCase
         $rowSet = new RubricRowSet(new Folder());
         $group1 = (new Capability())->setId(3);
         $group1->getIndicators()
-               ->add(new Criterion())
-               ->add((new Criterion())->setId(5))
-               ->add((new Criterion())->setId(6))
-               ->add((new Criterion())->setId(7))
-               ->add((new Criterion())->setId(8))
-               ->add((new Criterion())->setId(9));
+               ->add(new Indicator())
+               ->add((new Indicator())->setId(5))
+               ->add((new Indicator())->setId(6))
+               ->add((new Indicator())->setId(7))
+               ->add((new Indicator())->setId(8))
+               ->add((new Indicator())->setId(9));
         $group2 = (new Capability())->setId(10);
         $group2->getIndicators()
-               ->add(new Criterion())
-               ->add((new Criterion())->setId(5))
-               ->add((new Criterion())->setId(16))
-               ->add((new Criterion())->setId(17))
-               ->add((new Criterion())->setId(18))
-               ->add((new Criterion())->setId(19));
+               ->add(new Indicator())
+               ->add((new Indicator())->setId(5))
+               ->add((new Indicator())->setId(16))
+               ->add((new Indicator())->setId(17))
+               ->add((new Indicator())->setId(18))
+               ->add((new Indicator())->setId(19));
         $group3 = (new Capability())->setId(12);
         $rowSet->getCapabilities()
                ->add($group1)

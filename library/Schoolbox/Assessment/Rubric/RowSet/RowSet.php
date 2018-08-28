@@ -69,9 +69,9 @@ class RowSet
      * Retrieves an indicator by its ID.
      *
      * @param int $indicatorId
-     * @return null|Criterion
+     * @return null|Indicator
      */
-    public function retrieveIndicator(int $indicatorId): ?Criterion
+    public function retrieveIndicator(int $indicatorId): ?Indicator
     {
         foreach ($this->capabilities as $capability) {
             $indicator = $capability->retrieveIndicator($indicatorId);

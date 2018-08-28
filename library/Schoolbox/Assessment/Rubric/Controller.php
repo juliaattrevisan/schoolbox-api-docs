@@ -151,7 +151,7 @@ class Controller extends BaseController
                 ->setName($groupName);
 
             // Don't have to save anything yet
-            $criterion = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())
+            $criterion = (new \Schoolbox\Assessment\Rubric\RowSet\Indicator())
                 ->setId($criterionModel->getId())
                 ->setName($critName);
 

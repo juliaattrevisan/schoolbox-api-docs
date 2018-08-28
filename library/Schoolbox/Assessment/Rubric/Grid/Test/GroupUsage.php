@@ -29,16 +29,16 @@ class GroupUsage extends TestCase
         $group1     = (new RowSet\Capability())->setId(1)->setName('Group 1');
         $group2     = (new RowSet\Capability())->setId(2)->setName('Group 2');
         $group3     = (new RowSet\Capability())->setId(3)->setName('Group 3');
-        $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
-        $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
-        $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
-        $criterion4 = (new RowSet\Criterion())->setId(4)->setName('Criterion 2.1');
-        $criterion5 = (new RowSet\Criterion())->setId(5)->setName('Criterion 2.1');
-        $criterion6 = (new RowSet\Criterion())->setId(6)->setName('Criterion 2.2');
-        $criterion7 = (new RowSet\Criterion())->setId(7)->setName('Criterion 3.3');
-        $criterion8 = (new RowSet\Criterion())->setId(8)->setName('Criterion 3.2');
-        $criterion9 = (new RowSet\Criterion())->setId(9)->setName('Criterion 3.3');
-        $criterion0 = (new RowSet\Criterion())->setId(10)->setName('Criterion 4.1');
+        $criterion1 = (new RowSet\Indicator())->setId(1)->setName('Criterion 1.1');
+        $criterion2 = (new RowSet\Indicator())->setId(2)->setName('Criterion 1.2');
+        $criterion3 = (new RowSet\Indicator())->setId(3)->setName('Criterion 1.3');
+        $criterion4 = (new RowSet\Indicator())->setId(4)->setName('Criterion 2.1');
+        $criterion5 = (new RowSet\Indicator())->setId(5)->setName('Criterion 2.1');
+        $criterion6 = (new RowSet\Indicator())->setId(6)->setName('Criterion 2.2');
+        $criterion7 = (new RowSet\Indicator())->setId(7)->setName('Criterion 3.3');
+        $criterion8 = (new RowSet\Indicator())->setId(8)->setName('Criterion 3.2');
+        $criterion9 = (new RowSet\Indicator())->setId(9)->setName('Criterion 3.3');
+        $criterion0 = (new RowSet\Indicator())->setId(10)->setName('Criterion 4.1');
 
         $group1->getIndicators()[$criterion1->getId()] = $criterion1;
         $group1->getIndicators()[$criterion2->getId()] = $criterion2;
@@ -79,12 +79,12 @@ class GroupUsage extends TestCase
      * @covers \Schoolbox\Assessment\Rubric\Grid\GroupUsage::retrieveCriterionUsage
      *
      * @param RubricGrid\GroupUsage          $groupUsage
-     * @param RowSet\Criterion         $criterion
+     * @param RowSet\Indicator               $criterion
      * @param null|RubricGrid\CriterionUsage $expected
      */
     public function testRetrieveCriterionUsage(
         RubricGrid\GroupUsage $groupUsage,
-        RowSet\Criterion $criterion,
+        RowSet\Indicator $criterion,
         ?RubricGrid\CriterionUsage $expected
     ): void
     {
@@ -101,9 +101,9 @@ class GroupUsage extends TestCase
     {
         // Default rowset
         $group      = (new RowSet\Capability())->setId(1)->setName('Group 1');
-        $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
-        $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
-        $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
+        $criterion1 = (new RowSet\Indicator())->setId(1)->setName('Criterion 1.1');
+        $criterion2 = (new RowSet\Indicator())->setId(2)->setName('Criterion 1.2');
+        $criterion3 = (new RowSet\Indicator())->setId(3)->setName('Criterion 1.3');
 
         $group->getIndicators()[$criterion1->getId()] = $criterion1;
         $group->getIndicators()[$criterion2->getId()] = $criterion2;
@@ -168,10 +168,10 @@ class GroupUsage extends TestCase
     public function getTestCalculateMaxValueFromCriteriaData(): iterable
     {
         $group      = (new RowSet\Capability())->setId(1)->setName('Group 1');
-        $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
-        $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
-        $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
-        $criterion4 = (new RowSet\Criterion())->setId(4)->setName('Criterion 1.4');
+        $criterion1 = (new RowSet\Indicator())->setId(1)->setName('Criterion 1.1');
+        $criterion2 = (new RowSet\Indicator())->setId(2)->setName('Criterion 1.2');
+        $criterion3 = (new RowSet\Indicator())->setId(3)->setName('Criterion 1.3');
+        $criterion4 = (new RowSet\Indicator())->setId(4)->setName('Criterion 1.4');
 
         $group->getIndicators()[$criterion1->getId()] = $criterion1;
         $group->getIndicators()[$criterion2->getId()] = $criterion2;

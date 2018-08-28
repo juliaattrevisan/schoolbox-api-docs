@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\RowSet\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Assessment\Rubric\RowSet\Criterion;
+use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\Capability as RubricGroup;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -31,12 +31,12 @@ class Group extends TestCase
 
         $group = (new RubricGroup())->setId(3);
         $group->getIndicators()
-              ->add(new Criterion())
-              ->add((new Criterion())->setId(9))
-              ->add((new Criterion())->setId(8))
-              ->add((new Criterion())->setId(7))
-              ->add((new Criterion())->setId(5))
-              ->add((new Criterion())->setId(6));
+              ->add(new Indicator())
+              ->add((new Indicator())->setId(9))
+              ->add((new Indicator())->setId(8))
+              ->add((new Indicator())->setId(7))
+              ->add((new Indicator())->setId(5))
+              ->add((new Indicator())->setId(6));
         yield 'multiple criteria' => [$group, [5, 6, 7, 8, 9,]];
     }
 
@@ -66,11 +66,11 @@ class Group extends TestCase
 
         $group = (new RubricGroup())->setId(3);
         $group->getIndicators()
-              ->add((new Criterion())->setId(9));
+              ->add((new Indicator())->setId(9));
         yield 'one criterion, none in use' => [$group, false];
 
         $group = (new RubricGroup())->setId(3);
-        $criterion = (new Criterion())->setId(9);
+        $criterion = (new Indicator())->setId(9);
         $criterion->getUsage()
                   ->add((new Task())->setId(1));
         $group->getIndicators()->add($criterion);
@@ -78,29 +78,29 @@ class Group extends TestCase
 
         $group = (new RubricGroup())->setId(3);
         $group->getIndicators()
-              ->add((new Criterion())->setId(9))
-              ->add((new Criterion())->setId(10))
-              ->add((new Criterion())->setId(11));
+              ->add((new Indicator())->setId(9))
+              ->add((new Indicator())->setId(10))
+              ->add((new Indicator())->setId(11));
         yield 'three criteria, none in use' => [$group, false];
 
         $group = (new RubricGroup())->setId(3);
-        $criterion = (new Criterion())->setId(9);
+        $criterion = (new Indicator())->setId(9);
         $criterion->getUsage()
                   ->add((new Task())->setId(1));
         $group->getIndicators()
               ->add($criterion)
-              ->add((new Criterion())->setId(10))
-              ->add((new Criterion())->setId(11));
+              ->add((new Indicator())->setId(10))
+              ->add((new Indicator())->setId(11));
         yield 'three criteria, one in use' => [$group, true];
 
         $group = (new RubricGroup())->setId(3);
-        $criterion1 = (new Criterion())->setId(9);
+        $criterion1 = (new Indicator())->setId(9);
         $criterion1->getUsage()
                    ->add((new Task())->setId(1));
-        $criterion2 = (new Criterion())->setId(10);
+        $criterion2 = (new Indicator())->setId(10);
         $criterion2->getUsage()
                    ->add((new Task())->setId(2));
-        $criterion3 = (new Criterion())->setId(11);
+        $criterion3 = (new Indicator())->setId(11);
         $criterion3->getUsage()
                    ->add((new Task())->setId(3));
         $group->getIndicators()
@@ -141,11 +141,11 @@ class Group extends TestCase
 
         $group = (new RubricGroup())->setId(3);
         $group->getIndicators()
-              ->add((new Criterion())->setId(9));
+              ->add((new Indicator())->setId(9));
         yield 'one criterion, none in use' => [$group, $task1, false];
 
         $group = (new RubricGroup())->setId(3);
-        $criterion = (new Criterion())->setId(9);
+        $criterion = (new Indicator())->setId(9);
         $criterion->getUsage()
                   ->add($task1);
         $group->getIndicators()->add($criterion);
@@ -154,30 +154,30 @@ class Group extends TestCase
 
         $group = (new RubricGroup())->setId(3);
         $group->getIndicators()
-              ->add((new Criterion())->setId(9))
-              ->add((new Criterion())->setId(10))
-              ->add((new Criterion())->setId(11));
+              ->add((new Indicator())->setId(9))
+              ->add((new Indicator())->setId(10))
+              ->add((new Indicator())->setId(11));
         yield 'three criteria, none in use' => [$group, $task1, false];
 
         $group = (new RubricGroup())->setId(3);
-        $criterion = (new Criterion())->setId(9);
+        $criterion = (new Indicator())->setId(9);
         $criterion->getUsage()
                   ->add($task1);
         $group->getIndicators()
               ->add($criterion)
-              ->add((new Criterion())->setId(10))
-              ->add((new Criterion())->setId(11));
+              ->add((new Indicator())->setId(10))
+              ->add((new Indicator())->setId(11));
         yield 'three criteria, one in use, match' => [$group, $task1, false];
         yield 'three criteria, one in use, no match' => [$group, $task2, true];
 
         $group = (new RubricGroup())->setId(3);
-        $criterion1 = (new Criterion())->setId(9);
+        $criterion1 = (new Indicator())->setId(9);
         $criterion1->getUsage()
                    ->add($task1);
-        $criterion2 = (new Criterion())->setId(10);
+        $criterion2 = (new Indicator())->setId(10);
         $criterion2->getUsage()
                    ->add($task2);
-        $criterion3 = (new Criterion())->setId(11);
+        $criterion3 = (new Indicator())->setId(11);
         $criterion3->getUsage()
                    ->add($task3);
         $group->getIndicators()

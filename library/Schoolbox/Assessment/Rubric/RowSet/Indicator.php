@@ -14,9 +14,9 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
- * A criterion within a rubric rowset.
+ * An indicator within a rubric rowset.
  */
-class Criterion
+class Indicator
 {
     use Id;
     use HasCurriculumNodes;
@@ -38,7 +38,7 @@ class Criterion
 
 
     /**
-     * Assessments which are using this criterion.
+     * Assessments which are using this indicator.
      *
      * @var GenericCollection|IAssessable[]
      */
@@ -55,7 +55,7 @@ class Criterion
 
 
     /**
-     * Is this criterion in use on any existing assessment?
+     * Is this indicator in use on any existing assessment?
      *
      * @param null|IAssessable $exclusion If set, assessment to exclude from
      *                                    usage check
@@ -71,7 +71,7 @@ class Criterion
 
 
     /**
-     * Is this criterion in use on any existing assessment, excluding one
+     * Is this indicator in use on any existing assessment, excluding one
      * particular assessment?
      *
      * @param IAssessable $exclusion Assessment to exclude from usage check

@@ -25,7 +25,7 @@ class CriterionUsage extends TestCase
      */
     public function getTestRetrieveDescriptorData(): iterable
     {
-        $criterion      = (new RowSet\Criterion())->setId(1)->setName('Criterion 1');
+        $criterion      = (new RowSet\Indicator())->setId(1)->setName('Criterion 1');
         $criterionUsage = new RubricGrid\CriterionUsage($criterion);
 
         $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
@@ -78,7 +78,7 @@ class CriterionUsage extends TestCase
      */
     public function getTestCalculateMaxValueDataFromDescriptors(): iterable
     {
-        $criterion1      = (new RowSet\Criterion())->setId(1)->setName('Criterion 1');
+        $criterion1      = (new RowSet\Indicator())->setId(1)->setName('Criterion 1');
         $criterionUsage1 = new RubricGrid\CriterionUsage($criterion1);
 
         $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
@@ -102,13 +102,13 @@ class CriterionUsage extends TestCase
         yield 'criterion 1: descriptors' => [$criterionUsage1, 8];
 
 
-        $criterion2      = (new RowSet\Criterion())->setId(2)->setName('Criterion 2');
+        $criterion2      = (new RowSet\Indicator())->setId(2)->setName('Criterion 2');
         $criterionUsage2 = new RubricGrid\CriterionUsage($criterion2);
 
         yield 'criterion 2: no descriptors' => [$criterionUsage2, null];
 
 
-        $criterion3      = (new RowSet\Criterion())->setId(3)->setName('Criterion 3');
+        $criterion3      = (new RowSet\Indicator())->setId(3)->setName('Criterion 3');
         $criterionUsage3 = new RubricGrid\CriterionUsage($criterion3);
 
         $descriptor6 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.1');
@@ -144,7 +144,7 @@ class CriterionUsage extends TestCase
     public function getTestApplyDescriptorMinValuesData(): iterable
     {
         // Ascending: [0, 2, 4, 6, 8] => [0, 1..2, 3..4, 5..6, 7..8]
-        $criterion       = (new RowSet\Criterion())->setId(1)->setName('Criterion');
+        $criterion       = (new RowSet\Indicator())->setId(1)->setName('Criterion');
         $criterionUsage1 = new RubricGrid\CriterionUsage($criterion);
 
         $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
@@ -397,7 +397,7 @@ class CriterionUsage extends TestCase
         // Test using the Fibonacci sequence
         // Fibonacci: [1, 1, 2, 3, 5, 8] => [1, 1, 2, 3, 4..5, 6..8]
 
-        $criterion = (new RowSet\Criterion())->setId(1)->setName('Criterion');
+        $criterion = (new RowSet\Indicator())->setId(1)->setName('Criterion');
 
         $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
         $level2 = (new RubricGrid\Level())->setId(2)->setName('Level 2');

@@ -144,7 +144,7 @@ class RubricMapper
                     }
                 }
             }
-            $groups[$groupId]->getIndicators()[$criterionId] = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())
+            $groups[$groupId]->getIndicators()[$criterionId] = (new \Schoolbox\Assessment\Rubric\RowSet\Indicator())
                 ->setId($criterionId)
                 ->setName($criterionModel->getName())
                 ->setCurriculumNodes($criterionModel->getCurriculumNodes());

@@ -41,7 +41,7 @@ class Capability
 
 
     /**
-     * @var GenericCollection|Criterion[]
+     * @var GenericCollection|Indicator[]
      */
     private $indicators;
 
@@ -59,7 +59,7 @@ class Capability
      */
     public function __construct()
     {
-        $this->indicators = new GenericCollection(Criterion::class);
+        $this->indicators = new GenericCollection(Indicator::class);
         $this->usage      = new GenericCollection(IAssessable::class);
     }
 
@@ -68,9 +68,9 @@ class Capability
      * Retrieves an indicator by its ID.
      *
      * @param int $indicatorId
-     * @return null|Criterion
+     * @return null|Indicator
      */
-    public function retrieveIndicator(int $indicatorId): ?Criterion
+    public function retrieveIndicator(int $indicatorId): ?Indicator
     {
         return $this->indicators->getBy('id', $indicatorId);
     }
@@ -169,7 +169,7 @@ class Capability
 
 
     /**
-     * @return GenericCollection|Criterion[]
+     * @return GenericCollection|Indicator[]
      */
     public function getIndicators(): GenericCollection
     {
@@ -178,7 +178,7 @@ class Capability
 
 
     /**
-     * @param GenericCollection|Criterion[] $indicators
+     * @param GenericCollection|Indicator[] $indicators
      * @return static
      */
     public function setIndicators(GenericCollection $indicators): self
