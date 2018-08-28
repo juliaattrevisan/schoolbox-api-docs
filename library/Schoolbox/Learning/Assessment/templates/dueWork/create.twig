@@ -239,7 +239,7 @@
                 function () {
 
                     // Calculate total for this descriptor's group
-                    calculateGroupTotal($(this).closest('[data-group]').data('group'));
+                    assignGroupTotal($(this).closest('[data-group]').attr('data-group'));
 
                     // Then calculate the entire grid total
                     calculateGridTotal();
@@ -262,11 +262,11 @@
                 // List of all groups, no duplicates
                 var groupIdentifiers = new Set(
                     $grid.find('[data-group]')
-                        .map(function() { return $(this).data('group'); })
+                        .map(function() { return $(this).attr('data-group'); })
                         .toArray()
                 );
                 groupIdentifiers.forEach(function (groupIdentifier) {
-                    calculateGroupTotal(groupIdentifier)
+                    assignGroupTotal(groupIdentifier)
                 });
                 calculateGridTotal();
             }
@@ -278,6 +278,37 @@
              *
              * @param groupIdentifier The value of this row's data-group attribute
              */
+            function assignGroupTotal(groupIdentifier) {
+                var $inputEl = $("[data-group-max-value-row][data-group='" + groupIdentifier + "']").find("input");
+                $inputEl.val(calculateGroupTotal(groupIdentifier));
+            }
+
+
+            /**
+             * Calculates the assessment's max available marks from the rubric grid,
+             * and fills the max mark input with that value.
+             *
+             * Now uses the defined max value for each group, instead of the max
+             * descriptor value for each criterion.
+             */
+            function calculateGridTotal() {
+                var max = 0;
+
+                // iterate the grid, and sum the max of each row
+                $grid.find('[data-group-max-value]').each(function () {
+                    var i = parseFloat($(this).val());
+                    if (!isNaN(i)) {
+                        max += i;
+                    }
+                });
+
+                max = parseFloat(max.toFixed(2));
+
+                // Set and validate the max mark
+                $('#maxMark').val(max).valid();
+            }
+
+
             function calculateGroupTotal(groupIdentifier) {
                 var $thisMaxValueInput = $(),
                     groupMax = 0;
@@ -311,33 +342,23 @@
                     groupMax += rowMax;
                 });
 
-                $thisMaxValueInput.val(groupMax);
+                return groupMax;
             }
 
+            $("[data-group-max-value]").change(function() {
+                $(this).attr("data-customised", true);
+                // TODO don't use a class for this (or any of the others)
+                // TODO only reenable if values are not the same...
+                $(this).next(".use-criterion-values").removeAttr("disabled");
+            });
 
-            /**
-             * Calculates the assessment's max available marks from the rubric grid,
-             * and fills the max mark input with that value.
-             *
-             * Now uses the defined max value for each group, instead of the max
-             * descriptor value for each criterion.
-             */
-            function calculateGridTotal() {
-                var max = 0;
-
-                // iterate the grid, and sum the max of each row
-                $grid.find('[data-group-max-value]').each(function () {
-                    var i = parseFloat($(this).val());
-                    if (!isNaN(i)) {
-                        max += i;
-                    }
-                });
-
-                max = parseFloat(max.toFixed(2));
-
-                // Set and validate the max mark
-                $('#maxMark').val(max).valid();
-            }
+            $(".use-criterion-values").click(function() {
+                $(this).prev("[data-group-max-value]").removeAttr("data-customised");
+                var groupIdentifier = $(this).closest("[data-group]").attr("data-group");
+                $(this).prev("[data-group-max-value]").val(calculateGroupTotal(groupIdentifier));
+                // TODO only disable if values are the same...
+                $(this).attr("disabled", true);
+            });
         }
 
         // Init the entire grid on document.ready
