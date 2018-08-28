@@ -474,6 +474,14 @@ class ImpressionsConversionsOpens
             'articleId' => $article->getId()
         ]);
 
+        $initialConditions = [
+            Mapper::TYPE_CONVERSION => 0,
+            Mapper::TYPE_IMPRESSION => 0,
+            Mapper::TYPE_OPEN => 0,
+            'num' => 0,
+            'start' => null
+        ];
+
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $initialConditions[$row['type']] = $row['num'];
             $initialConditions['start'] = $row['start'];
