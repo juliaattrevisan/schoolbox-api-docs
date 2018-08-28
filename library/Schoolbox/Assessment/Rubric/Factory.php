@@ -68,10 +68,11 @@ class Factory
      *
      * @param array $formData
      * @param bool  $includeEmptyCriteria
+     * @param bool $markPerCap
      * @param bool  $usesMarkRange
      * @return Rubric
      */
-    public function buildFromPostData(array $formData, bool $includeEmptyCriteria, bool $usesMarkRange)
+    public function buildFromPostData(array $formData, bool $markPerCap, bool $usesMarkRange,  bool $includeEmptyCriteria)
     {
         // we're only going to take the first one... this could be converted to foreach easily enough
         $rubricData = reset($formData);
@@ -104,7 +105,16 @@ class Factory
         foreach ($groups as $groupId => $groupData) {
             $groupName     = $groupData['name'];
             $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
-            $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
+            // TODO this fails on import of an old rubric CSV that doesn't have max points field - it shouldn't
+            // TODO need to get rowMaxSum
+            // For now placeholder
+            $rowMaxSum = 16;
+            if ((new ValidCapabilityMax())->isSatisifedBy($groupMaxValue, $markPerCap, $rowMaxSum)) {
+                $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
+            } else {
+                throw new InvalidArgumentException("provide capability maximum points between 0 and " . $rowMaxSum);
+            }
+
         }
 
         foreach ($criteria as $criterionId => $criterion) {

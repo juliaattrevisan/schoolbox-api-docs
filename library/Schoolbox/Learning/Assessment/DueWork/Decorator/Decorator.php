@@ -110,11 +110,9 @@ class Decorator implements DecoratorInterface
             $assessment->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
         } // Otherwise let the existing setting persist
 
-
-
         if($this->getUseRubric()){
             /** @var DueWorkRubric $rubric */
-            $rubric = (new RubricFactory(new DueWorkRubric()))->buildFromPostData($this->getRubricData(), false, $assessment->getUseMarkRange());
+            $rubric = (new RubricFactory(new DueWorkRubric()))->buildFromPostData($this->getRubricData(), $this->getMarkPerCapability(), $assessment->getUseMarkRange(), false);
             $assessment->setRubric($rubric);
 
             // TODO validate here??
