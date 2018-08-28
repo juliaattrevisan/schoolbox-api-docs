@@ -59,13 +59,24 @@ class Factory
         $groupCache = [];
         foreach ($groups as $groupData) {
             // This group must exist in order for it to be saved
-            $groupId = (int)$groupData['id'];
+            $groupId   = (int)$groupData['id'];
+            $groupName = $groupData['name'];
             if (!$groupId) {
                 continue;
             }
             $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
             $group         = $grid->getRowSet()->retrieveGroup($groupId);
-            $groupUsage    = (new GroupUsage($group))->setMaxValue($groupMaxValue);
+
+            // If $group is null, then that's a problem; we're trying to save
+            // usage for a group which doesn't exist
+
+
+            // Can this group's name be set?
+            if ($group->isInUseExcluding($grid->getAssessment())) {
+                $group->setName($groupName);
+            }
+
+            $groupUsage = (new GroupUsage($group))->setMaxValue($groupMaxValue);
 
             $groupCache[$groupId]             = $group;
             $grid->getGroupUsages()[$groupId] = $groupUsage;
@@ -76,6 +87,7 @@ class Factory
         foreach ($criteria as $criterionData) {
             $groupId          = (int)$criterionData['groupId'];
             $criterionId      = (int)$criterionData['id'];
+            $criterionName    = $criterionData['name'];
             $criterionEnabled = isset($criterionData['on']) && $criterionData['on'];
             if (!$criterionEnabled) {
                 continue;
@@ -87,6 +99,14 @@ class Factory
 
             // If $criterion is null, then that's a problem; we're trying to
             // save usage for a criterion which doesn't exist
+
+
+            // Can this criterion's name be set?
+            if ($criterion->isInUseExcluding($grid->getAssessment())) {
+                $criterion->setName($criterionName);
+            }
+
+
             $criterionUsage = new CriterionUsage($criterion);
 
             foreach ($levelCache as $levelSequence => $level) {
