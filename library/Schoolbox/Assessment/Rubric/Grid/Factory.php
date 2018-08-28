@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid;
 
 use InvalidArgumentException;
-use Schoolbox\Assessment\Rubric\RowSet\Group;
+use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\ValidCapabilityMax;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
@@ -69,7 +69,7 @@ class Factory
 
 
         // cache groups
-        /** @var Group[] $groupCache */
+        /** @var Capability[] $groupCache */
         $groupCache = [];
         foreach ($groups as $groupData) {
             // This group must exist and be in use in order for it to be saved
@@ -117,7 +117,7 @@ class Factory
 
             // spawn
             $group     = $groupCache[$groupId];
-            $criterion = $group->retrieveCriterion($criterionId);
+            $criterion = $group->retrieveIndicator($criterionId);
 
             // If $criterion is null, then that's a problem; we're trying to
             // save usage for a criterion which doesn't exist

@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid;
 
 use Schoolbox\Assessment\Rubric\RowSet\Criterion;
-use Schoolbox\Assessment\Rubric\RowSet\Group;
+use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\GenericCollection;
 
 /**
@@ -20,7 +20,7 @@ use Schoolbox\GenericCollection;
 class GroupUsage
 {
     /**
-     * @var Group
+     * @var Capability
      */
     private $group;
 
@@ -42,9 +42,9 @@ class GroupUsage
     /**
      * Constructor
      *
-     * @param Group $group
+     * @param Capability $group
      */
-    public function __construct(Group $group)
+    public function __construct(Capability $group)
     {
         $this->group           = $group;
         $this->criterionUsages = new GenericCollection(CriterionUsage::class);
@@ -67,7 +67,7 @@ class GroupUsage
             yield $criterionUsage->getCriterion();
         }
 
-        foreach ($this->getGroup()->getCriteria() as $criterion) {
+        foreach ($this->getGroup()->getIndicators() as $criterion) {
             if (!isset($seenCriteria[$criterion->getId()])) {
                 yield $criterion;
             }
@@ -115,9 +115,9 @@ class GroupUsage
 
 
     /**
-     * @return Group
+     * @return Capability
      */
-    public function getGroup(): Group
+    public function getGroup(): Capability
     {
         return $this->group;
     }

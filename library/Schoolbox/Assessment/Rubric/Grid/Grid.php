@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid;
 
 use Schoolbox\Assessment\Rubric\RowSet\Criterion;
-use Schoolbox\Assessment\Rubric\RowSet\Group;
+use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -119,10 +119,10 @@ class Grid
      * Return the group usage for a given group, or null if this grid doesn't
      * use it.
      *
-     * @param Group $group
+     * @param Capability $group
      * @return null|GroupUsage
      */
-    public function retrieveGroupUsage(Group $group): ?GroupUsage
+    public function retrieveGroupUsage(Capability $group): ?GroupUsage
     {
         foreach ($this->groupUsages as $groupUsage) {
             if ($groupUsage->getGroup()->getId() === $group->getId()) {
@@ -158,7 +158,7 @@ class Grid
      *
      * First iterates all groups in use, then all groups not in use.
      *
-     * @return iterable|Group[]
+     * @return iterable|Capability[]
      */
     public function iterateGroups(): iterable
     {
@@ -179,13 +179,13 @@ class Grid
     /**
      * Iterates each criterion in the grid for the given group.
      *
-     * @param Group $group
+     * @param Capability $group
      * @return iterable|Criterion[]
      */
-    public function iterateCriteria(Group $group): iterable
+    public function iterateCriteria(Capability $group): iterable
     {
         $groupUsage = $this->retrieveGroupUsage($group);
-        return $groupUsage ? $groupUsage->iterateCriteria() : $group->getCriteria();
+        return $groupUsage ? $groupUsage->iterateCriteria() : $group->getIndicators();
     }
 
 

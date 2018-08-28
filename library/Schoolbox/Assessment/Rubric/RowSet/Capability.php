@@ -14,9 +14,9 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
- * A group within a rubric rowset.
+ * A capability within a rubric rowset.
  */
-class Group
+class Capability
 {
     use Id;
     use HasCurriculumNodes;
@@ -29,10 +29,11 @@ class Group
 
 
     /**
-     * Does this group belong to the course level of its assessment context?
+     * Does this capability belong to the course level of its assessment
+     * context?
      *
-     * For rowsets which are part of a unit: it's possible for a group to come
-     * from the unit's course, but still be part of the unit's rowset.
+     * For rowsets which are part of a unit: it's possible for a capability to
+     * come from the unit's course, but still be part of the unit's rowset.
      *
      * @var bool
      */
@@ -42,7 +43,7 @@ class Group
     /**
      * @var GenericCollection|Criterion[]
      */
-    private $criteria;
+    private $indicators;
 
 
     /**
@@ -58,38 +59,38 @@ class Group
      */
     public function __construct()
     {
-        $this->criteria = new GenericCollection(Criterion::class);
-        $this->usage    = new GenericCollection(IAssessable::class);
+        $this->indicators = new GenericCollection(Criterion::class);
+        $this->usage      = new GenericCollection(IAssessable::class);
     }
 
 
     /**
-     * Retrieves a criterion by its ID.
+     * Retrieves an indicator by its ID.
      *
-     * @param int $criterionId
+     * @param int $indicatorId
      * @return null|Criterion
      */
-    public function retrieveCriterion(int $criterionId): ?Criterion
+    public function retrieveIndicator(int $indicatorId): ?Criterion
     {
-        return $this->criteria->getBy('id', $criterionId);
+        return $this->indicators->getBy('id', $indicatorId);
     }
 
 
     /**
-     * Retrieve the ID of all criteria in this group.
+     * Retrieve the ID of all indicators in this group.
      *
      * @return array|int[]
      */
-    public function retrieveCriterionIds(): array
+    public function retrieveIndicatorIds(): array
     {
-        $result = array_unique(array_filter($this->criteria->getPropertyValues('id')));
+        $result = array_unique(array_filter($this->indicators->getPropertyValues('id')));
         sort($result);
         return $result;
     }
 
 
     /**
-     * Are any of the criteria in this group in use?
+     * Are any of the indicators in this capability in use?
      *
      * @param null|IAssessable $exclusion If set, assessment to exclude from
      *                                    usage check
@@ -100,8 +101,8 @@ class Group
         if ($exclusion) {
             return $this->isInUseExcluding($exclusion);
         }
-        foreach ($this->criteria as $criterion) {
-            if ($criterion->isInUse()) {
+        foreach ($this->indicators as $indicator) {
+            if ($indicator->isInUse()) {
                 return true;
             }
         }
@@ -110,7 +111,7 @@ class Group
 
 
     /**
-     * Is this group in use on any existing assessment, excluding one
+     * Is this capability in use on any existing assessment, excluding one
      * particular assessment?
      *
      * @param IAssessable $exclusion Assessment to exclude from usage check
@@ -118,8 +119,8 @@ class Group
      */
     public function isInUseExcluding(IAssessable $exclusion): bool
     {
-        foreach ($this->criteria as $criterion) {
-            if ($criterion->isInUseExcluding($exclusion)) {
+        foreach ($this->indicators as $indicator) {
+            if ($indicator->isInUseExcluding($exclusion)) {
                 return true;
             }
         }
@@ -170,19 +171,19 @@ class Group
     /**
      * @return GenericCollection|Criterion[]
      */
-    public function getCriteria(): GenericCollection
+    public function getIndicators(): GenericCollection
     {
-        return $this->criteria;
+        return $this->indicators;
     }
 
 
     /**
-     * @param GenericCollection|Criterion[] $criteria
+     * @param GenericCollection|Criterion[] $indicators
      * @return static
      */
-    public function setCriteria(GenericCollection $criteria): self
+    public function setIndicators(GenericCollection $indicators): self
     {
-        $this->criteria = $criteria;
+        $this->indicators = $indicators;
         return $this;
     }
 

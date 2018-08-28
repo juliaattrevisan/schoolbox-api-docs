@@ -103,8 +103,8 @@ class RubricMapper
         $folder = $context->getBaseContext()->getFolder();
 
         // Criteria contains groups too: inside-out them
-        /** @var GenericCollection|\Schoolbox\Assessment\Rubric\RowSet\Group[] $groups */
-        $groups          = new GenericCollection(\Schoolbox\Assessment\Rubric\RowSet\Group::class);
+        /** @var GenericCollection|\Schoolbox\Assessment\Rubric\RowSet\Capability[] $groups */
+        $groups          = new GenericCollection(\Schoolbox\Assessment\Rubric\RowSet\Capability::class);
         $criterionModels = CriterionMapper::getInstance()->findForFolder($folder->getId());
 
         // Unit-specs have their course spec's criteria as well
@@ -130,7 +130,7 @@ class RubricMapper
             $groupId       = $groupModel->getId();
             $criterionId   = $criterionModel->getId();
             if (!isset($groups[$groupId])) {
-                $groups[$groupId] = (new \Schoolbox\Assessment\Rubric\RowSet\Group())
+                $groups[$groupId] = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
                     ->setId($groupId)
                     ->setName($groupModel->getName())
                     ->setIsCourseLevel($isCourseGroup)
@@ -144,14 +144,14 @@ class RubricMapper
                     }
                 }
             }
-            $groups[$groupId]->getCriteria()[$criterionId] = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())
+            $groups[$groupId]->getIndicators()[$criterionId] = (new \Schoolbox\Assessment\Rubric\RowSet\Criterion())
                 ->setId($criterionId)
                 ->setName($criterionModel->getName())
                 ->setCurriculumNodes($criterionModel->getCurriculumNodes());
 
             if ($getUsages) {
                 foreach (CriterionUsageMapper::getInstance()->findCriterionUsage($criterionId) as $criterionUsage) {
-                    $groups[$groupId]->getCriteria()[$criterionId]->getUsage()[$criterionUsage['id']]
+                    $groups[$groupId]->getIndicators()[$criterionId]->getUsage()[$criterionUsage['id']]
                         = (new DueWork\Model())
                             ->setId($criterionUsage['id'])
                             ->setTitle($criterionUsage['title']);
@@ -263,7 +263,7 @@ class RubricMapper
 
             // Set each criterion in the group aside to be persisted
             $criterionNamesUsed = [];
-            foreach ($group->getCriteria() as $criterion) {
+            foreach ($group->getIndicators() as $criterion) {
                 $existingCriterion = null;
                 $criterionId       = $criterion->getId();
                 $criterionModel    = null;
@@ -537,7 +537,7 @@ class RubricMapper
                 ->setName($group->getName());
             $groupModels[$groupId] = $groupModel;
 
-            foreach ($group->getCriteria() as $criterion) {
+            foreach ($group->getIndicators() as $criterion) {
                 $criterionId = $criterion->getId();
                 if (!$criterionId) {
                     continue;

@@ -49,7 +49,7 @@ class Factory
 
         // Add groups
         foreach ($postData as $tempGroupId => $postedGroup) {
-            $group = (new Group())
+            $group = (new Capability())
                 ->setId($postedGroup['id'])
                 ->setName($postedGroup['name'] ?? '')
                 ->setCurriculumNodes(
@@ -58,13 +58,13 @@ class Factory
 
             // Add criteria
             foreach ($postedGroup['items'] ?? [] as $tempCriterionId => $postedCriterion) {
-                $criterion = (new Criterion())
+                $criterion                                = (new Criterion())
                     ->setId($postedCriterion['id'])
                     ->setName($postedCriterion['name'] ?? '')
                     ->setCurriculumNodes(
                         $this->nodeMapper->findByColumn('id', $postedCriterion['curriculumCode'])
                     );
-                $group->getCriteria()[$tempCriterionId] = $criterion;
+                $group->getIndicators()[$tempCriterionId] = $criterion;
             }
 
 

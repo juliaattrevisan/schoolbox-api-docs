@@ -36,7 +36,7 @@ class RowSet
     /**
      * The groups which comprise this row set.
      *
-     * @var Group[]|GenericCollection
+     * @var Capability[]|GenericCollection
      */
     private $capabilities;
 
@@ -49,7 +49,7 @@ class RowSet
     public function __construct(AssessmentContext $context)
     {
         $this->context      = $context;
-        $this->capabilities = new GenericCollection(Group::class);
+        $this->capabilities = new GenericCollection(Capability::class);
     }
 
 
@@ -57,9 +57,9 @@ class RowSet
      * Retrieves a capability by its ID.
      *
      * @param int $capabilityId
-     * @return null|Group
+     * @return null|Capability
      */
-    public function retrieveCapability(int $capabilityId): ?Group
+    public function retrieveCapability(int $capabilityId): ?Capability
     {
         return $this->capabilities->getBy('id', $capabilityId);
     }
@@ -74,7 +74,7 @@ class RowSet
     public function retrieveIndicator(int $indicatorId): ?Criterion
     {
         foreach ($this->capabilities as $capability) {
-            $indicator = $capability->retrieveCriterion($indicatorId);
+            $indicator = $capability->retrieveIndicator($indicatorId);
             if ($indicator) {
                 return $indicator;
             }
@@ -105,7 +105,7 @@ class RowSet
     {
         $indicatorIds = [];
         foreach ($this->capabilities as $capability) {
-            $indicatorIds = array_merge($indicatorIds, $capability->retrieveCriterionIds());
+            $indicatorIds = array_merge($indicatorIds, $capability->retrieveIndicatorIds());
         }
         $result = array_unique(array_filter($indicatorIds));
         sort($result);
@@ -123,7 +123,7 @@ class RowSet
 
 
     /**
-     * @return Group[]|GenericCollection
+     * @return Capability[]|GenericCollection
      */
     public function getCapabilities(): GenericCollection
     {
@@ -132,7 +132,7 @@ class RowSet
 
 
     /**
-     * @param Group[]|GenericCollection $capabilities
+     * @param Capability[]|GenericCollection $capabilities
      * @return static
      */
     public function setCapabilities(GenericCollection $capabilities): self

@@ -10,7 +10,7 @@ namespace Schoolbox\Assessment\Rubric\RowSet\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\RowSet\Criterion;
-use Schoolbox\Assessment\Rubric\RowSet\Group;
+use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet as RubricRowSet;
 use Schoolbox\Resource\Folder\Model as Folder;
 
@@ -31,12 +31,12 @@ class RowSet extends TestCase
 
         $rowSet = new RubricRowSet(new Folder());
         $rowSet->getCapabilities()
-               ->add(new Group())
-               ->add((new Group())->setId(3))
-               ->add((new Group())->setId(5))
-               ->add((new Group())->setId(5))
-               ->add((new Group())->setId(6))
-               ->add((new Group())->setId(1));
+               ->add(new Capability())
+               ->add((new Capability())->setId(3))
+               ->add((new Capability())->setId(5))
+               ->add((new Capability())->setId(5))
+               ->add((new Capability())->setId(6))
+               ->add((new Capability())->setId(1));
         yield 'multiple groups' => [$rowSet, [1, 3, 5, 6,]];
     }
 
@@ -66,18 +66,18 @@ class RowSet extends TestCase
 
         $rowSet = new RubricRowSet(new Folder());
         $rowSet->getCapabilities()
-               ->add(new Group())
-               ->add((new Group())->setId(3))
-               ->add((new Group())->setId(5))
-               ->add((new Group())->setId(5))
-               ->add((new Group())->setId(6))
-               ->add((new Group())->setId(1));
+               ->add(new Capability())
+               ->add((new Capability())->setId(3))
+               ->add((new Capability())->setId(5))
+               ->add((new Capability())->setId(5))
+               ->add((new Capability())->setId(6))
+               ->add((new Capability())->setId(1));
         yield 'multiple groups, no criteria' => [$rowSet, []];
 
         $rowSet = new RubricRowSet(new Folder());
 
-        $group1 = (new Group())->setId(3);
-        $group1->getCriteria()
+        $group1 = (new Capability())->setId(3);
+        $group1->getIndicators()
                ->add(new Criterion())
                ->add((new Criterion())->setId(5))
                ->add((new Criterion())->setId(6))
@@ -89,23 +89,23 @@ class RowSet extends TestCase
         yield 'one group, many criteria' => [$rowSet, [5, 6, 7, 8, 9]];
 
         $rowSet = new RubricRowSet(new Folder());
-        $group1 = (new Group())->setId(3);
-        $group1->getCriteria()
+        $group1 = (new Capability())->setId(3);
+        $group1->getIndicators()
                ->add(new Criterion())
                ->add((new Criterion())->setId(5))
                ->add((new Criterion())->setId(6))
                ->add((new Criterion())->setId(7))
                ->add((new Criterion())->setId(8))
                ->add((new Criterion())->setId(9));
-        $group2 = (new Group())->setId(10);
-        $group2->getCriteria()
+        $group2 = (new Capability())->setId(10);
+        $group2->getIndicators()
                ->add(new Criterion())
                ->add((new Criterion())->setId(5))
                ->add((new Criterion())->setId(16))
                ->add((new Criterion())->setId(17))
                ->add((new Criterion())->setId(18))
                ->add((new Criterion())->setId(19));
-        $group3 = (new Group())->setId(12);
+        $group3 = (new Capability())->setId(12);
         $rowSet->getCapabilities()
                ->add($group1)
                ->add($group2)

@@ -26,9 +26,9 @@ class GroupUsage extends TestCase
     public function getTestRetrieveCriterionUsageData(): iterable
     {
         // Default rowset
-        $group1     = (new RowSet\Group())->setId(1)->setName('Group 1');
-        $group2     = (new RowSet\Group())->setId(2)->setName('Group 2');
-        $group3     = (new RowSet\Group())->setId(3)->setName('Group 3');
+        $group1     = (new RowSet\Capability())->setId(1)->setName('Group 1');
+        $group2     = (new RowSet\Capability())->setId(2)->setName('Group 2');
+        $group3     = (new RowSet\Capability())->setId(3)->setName('Group 3');
         $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
         $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
         $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
@@ -40,17 +40,17 @@ class GroupUsage extends TestCase
         $criterion9 = (new RowSet\Criterion())->setId(9)->setName('Criterion 3.3');
         $criterion0 = (new RowSet\Criterion())->setId(10)->setName('Criterion 4.1');
 
-        $group1->getCriteria()[$criterion1->getId()] = $criterion1;
-        $group1->getCriteria()[$criterion2->getId()] = $criterion2;
-        $group1->getCriteria()[$criterion3->getId()] = $criterion3;
+        $group1->getIndicators()[$criterion1->getId()] = $criterion1;
+        $group1->getIndicators()[$criterion2->getId()] = $criterion2;
+        $group1->getIndicators()[$criterion3->getId()] = $criterion3;
 
-        $group2->getCriteria()[$criterion4->getId()] = $criterion4;
-        $group2->getCriteria()[$criterion5->getId()] = $criterion5;
-        $group2->getCriteria()[$criterion6->getId()] = $criterion6;
+        $group2->getIndicators()[$criterion4->getId()] = $criterion4;
+        $group2->getIndicators()[$criterion5->getId()] = $criterion5;
+        $group2->getIndicators()[$criterion6->getId()] = $criterion6;
 
-        $group3->getCriteria()[$criterion7->getId()] = $criterion7;
-        $group3->getCriteria()[$criterion8->getId()] = $criterion8;
-        $group3->getCriteria()[$criterion9->getId()] = $criterion9;
+        $group3->getIndicators()[$criterion7->getId()] = $criterion7;
+        $group3->getIndicators()[$criterion8->getId()] = $criterion8;
+        $group3->getIndicators()[$criterion9->getId()] = $criterion9;
 
 
         // Group and criterion usage
@@ -100,14 +100,14 @@ class GroupUsage extends TestCase
     public function getTestIterateCriteriaData(): iterable
     {
         // Default rowset
-        $group      = (new RowSet\Group())->setId(1)->setName('Group 1');
+        $group      = (new RowSet\Capability())->setId(1)->setName('Group 1');
         $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
         $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
         $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
 
-        $group->getCriteria()[$criterion1->getId()] = $criterion1;
-        $group->getCriteria()[$criterion2->getId()] = $criterion2;
-        $group->getCriteria()[$criterion3->getId()] = $criterion3;
+        $group->getIndicators()[$criterion1->getId()] = $criterion1;
+        $group->getIndicators()[$criterion2->getId()] = $criterion2;
+        $group->getIndicators()[$criterion3->getId()] = $criterion3;
 
 
         $groupUsage1 = new RubricGrid\GroupUsage($group);
@@ -167,16 +167,16 @@ class GroupUsage extends TestCase
      */
     public function getTestCalculateMaxValueFromCriteriaData(): iterable
     {
-        $group      = (new RowSet\Group())->setId(1)->setName('Group 1');
+        $group      = (new RowSet\Capability())->setId(1)->setName('Group 1');
         $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
         $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
         $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
         $criterion4 = (new RowSet\Criterion())->setId(4)->setName('Criterion 1.4');
 
-        $group->getCriteria()[$criterion1->getId()] = $criterion1;
-        $group->getCriteria()[$criterion2->getId()] = $criterion2;
-        $group->getCriteria()[$criterion3->getId()] = $criterion3;
-        $group->getCriteria()[$criterion4->getId()] = $criterion4;
+        $group->getIndicators()[$criterion1->getId()] = $criterion1;
+        $group->getIndicators()[$criterion2->getId()] = $criterion2;
+        $group->getIndicators()[$criterion3->getId()] = $criterion3;
+        $group->getIndicators()[$criterion4->getId()] = $criterion4;
 
         // Criterion usage 1: max is 7
         $criterionUsage1 = new RubricGrid\CriterionUsage($criterion1);

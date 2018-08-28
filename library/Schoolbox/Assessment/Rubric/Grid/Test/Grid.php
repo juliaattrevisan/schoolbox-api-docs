@@ -29,9 +29,9 @@ class Grid extends TestCase
     {
         // Default rowset
         $rowSet     = new Rowset\RowSet(new Folder());
-        $group1     = (new RowSet\Group())->setId(1)->setName('Group 1');
-        $group2     = (new RowSet\Group())->setId(2)->setName('Group 2');
-        $group3     = (new RowSet\Group())->setId(3)->setName('Group 3');
+        $group1     = (new RowSet\Capability())->setId(1)->setName('Group 1');
+        $group2     = (new RowSet\Capability())->setId(2)->setName('Group 2');
+        $group3     = (new RowSet\Capability())->setId(3)->setName('Group 3');
         $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
         $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
         $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
@@ -43,17 +43,17 @@ class Grid extends TestCase
         $criterion9 = (new RowSet\Criterion())->setId(9)->setName('Criterion 3.3');
         $criterion0 = (new RowSet\Criterion())->setId(10)->setName('Criterion 4.1');
 
-        $group1->getCriteria()[$criterion1->getId()] = $criterion1;
-        $group1->getCriteria()[$criterion2->getId()] = $criterion2;
-        $group1->getCriteria()[$criterion3->getId()] = $criterion3;
+        $group1->getIndicators()[$criterion1->getId()] = $criterion1;
+        $group1->getIndicators()[$criterion2->getId()] = $criterion2;
+        $group1->getIndicators()[$criterion3->getId()] = $criterion3;
 
-        $group2->getCriteria()[$criterion4->getId()] = $criterion4;
-        $group2->getCriteria()[$criterion5->getId()] = $criterion5;
-        $group2->getCriteria()[$criterion6->getId()] = $criterion6;
+        $group2->getIndicators()[$criterion4->getId()] = $criterion4;
+        $group2->getIndicators()[$criterion5->getId()] = $criterion5;
+        $group2->getIndicators()[$criterion6->getId()] = $criterion6;
 
-        $group3->getCriteria()[$criterion7->getId()] = $criterion7;
-        $group3->getCriteria()[$criterion8->getId()] = $criterion8;
-        $group3->getCriteria()[$criterion9->getId()] = $criterion9;
+        $group3->getIndicators()[$criterion7->getId()] = $criterion7;
+        $group3->getIndicators()[$criterion8->getId()] = $criterion8;
+        $group3->getIndicators()[$criterion9->getId()] = $criterion9;
 
         $dueWork = new DueWork();
         $grid    = new RubricGrid\Grid($dueWork, $rowSet);
@@ -82,12 +82,12 @@ class Grid extends TestCase
      * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::retrieveGroupUsage
      *
      * @param RubricGrid\Grid            $grid
-     * @param RowSet\Group               $group
+     * @param RowSet\Capability          $group
      * @param null|RubricGrid\GroupUsage $expected
      */
     public function testRetrieveGroupUsage(
         RubricGrid\Grid $grid,
-        RowSet\Group $group,
+        RowSet\Capability $group,
         ?RubricGrid\GroupUsage $expected
     ): void {
         $this->assertSame($expected, $grid->retrieveGroupUsage($group));
@@ -103,9 +103,9 @@ class Grid extends TestCase
     {
         // Default rowset
         $rowSet     = new Rowset\RowSet(new Folder());
-        $group1     = (new RowSet\Group())->setId(1)->setName('Group 1');
-        $group2     = (new RowSet\Group())->setId(2)->setName('Group 2');
-        $group3     = (new RowSet\Group())->setId(3)->setName('Group 3');
+        $group1     = (new RowSet\Capability())->setId(1)->setName('Group 1');
+        $group2     = (new RowSet\Capability())->setId(2)->setName('Group 2');
+        $group3     = (new RowSet\Capability())->setId(3)->setName('Group 3');
         $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
         $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
         $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
@@ -117,17 +117,17 @@ class Grid extends TestCase
         $criterion9 = (new RowSet\Criterion())->setId(9)->setName('Criterion 3.3');
         $criterion0 = (new RowSet\Criterion())->setId(10)->setName('Criterion 4.1');
 
-        $group1->getCriteria()[$criterion1->getId()] = $criterion1;
-        $group1->getCriteria()[$criterion2->getId()] = $criterion2;
-        $group1->getCriteria()[$criterion3->getId()] = $criterion3;
+        $group1->getIndicators()[$criterion1->getId()] = $criterion1;
+        $group1->getIndicators()[$criterion2->getId()] = $criterion2;
+        $group1->getIndicators()[$criterion3->getId()] = $criterion3;
 
-        $group2->getCriteria()[$criterion4->getId()] = $criterion4;
-        $group2->getCriteria()[$criterion5->getId()] = $criterion5;
-        $group2->getCriteria()[$criterion6->getId()] = $criterion6;
+        $group2->getIndicators()[$criterion4->getId()] = $criterion4;
+        $group2->getIndicators()[$criterion5->getId()] = $criterion5;
+        $group2->getIndicators()[$criterion6->getId()] = $criterion6;
 
-        $group3->getCriteria()[$criterion7->getId()] = $criterion7;
-        $group3->getCriteria()[$criterion8->getId()] = $criterion8;
-        $group3->getCriteria()[$criterion9->getId()] = $criterion9;
+        $group3->getIndicators()[$criterion7->getId()] = $criterion7;
+        $group3->getIndicators()[$criterion8->getId()] = $criterion8;
+        $group3->getIndicators()[$criterion9->getId()] = $criterion9;
 
         $dueWork = new DueWork();
         $grid    = new RubricGrid\Grid($dueWork, $rowSet);
@@ -183,9 +183,9 @@ class Grid extends TestCase
     public function getTestCalculateMaxValueDataFromGroups(): iterable
     {
         $rowSet     = new Rowset\RowSet(new Folder());
-        $group1     = (new RowSet\Group())->setId(1)->setName('Group 1');
-        $group2     = (new RowSet\Group())->setId(2)->setName('Group 2');
-        $group3     = (new RowSet\Group())->setId(3)->setName('Group 3');
+        $group1     = (new RowSet\Capability())->setId(1)->setName('Group 1');
+        $group2     = (new RowSet\Capability())->setId(2)->setName('Group 2');
+        $group3     = (new RowSet\Capability())->setId(3)->setName('Group 3');
         $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
         $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
         $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
@@ -196,17 +196,17 @@ class Grid extends TestCase
         $criterion8 = (new RowSet\Criterion())->setId(8)->setName('Criterion 3.2');
         $criterion9 = (new RowSet\Criterion())->setId(9)->setName('Criterion 3.3');
 
-        $group1->getCriteria()[$criterion1->getId()] = $criterion1;
-        $group1->getCriteria()[$criterion2->getId()] = $criterion2;
-        $group1->getCriteria()[$criterion3->getId()] = $criterion3;
+        $group1->getIndicators()[$criterion1->getId()] = $criterion1;
+        $group1->getIndicators()[$criterion2->getId()] = $criterion2;
+        $group1->getIndicators()[$criterion3->getId()] = $criterion3;
 
-        $group2->getCriteria()[$criterion4->getId()] = $criterion4;
-        $group2->getCriteria()[$criterion5->getId()] = $criterion5;
-        $group2->getCriteria()[$criterion6->getId()] = $criterion6;
+        $group2->getIndicators()[$criterion4->getId()] = $criterion4;
+        $group2->getIndicators()[$criterion5->getId()] = $criterion5;
+        $group2->getIndicators()[$criterion6->getId()] = $criterion6;
 
-        $group3->getCriteria()[$criterion7->getId()] = $criterion7;
-        $group3->getCriteria()[$criterion8->getId()] = $criterion8;
-        $group3->getCriteria()[$criterion9->getId()] = $criterion9;
+        $group3->getIndicators()[$criterion7->getId()] = $criterion7;
+        $group3->getIndicators()[$criterion8->getId()] = $criterion8;
+        $group3->getIndicators()[$criterion9->getId()] = $criterion9;
 
         $groupUsage1                                             = (new RubricGrid\GroupUsage($group1))->setMaxValue(15);
         $criterionUsage1                                         = new RubricGrid\CriterionUsage($criterion1);
@@ -264,9 +264,9 @@ class Grid extends TestCase
 
 
         $rowSet     = new Rowset\RowSet(new Folder());
-        $group1     = (new RowSet\Group())->setId(1)->setName('Group 1');
-        $group2     = (new RowSet\Group())->setId(2)->setName('Group 2');
-        $group3     = (new RowSet\Group())->setId(3)->setName('Group 3');
+        $group1     = (new RowSet\Capability())->setId(1)->setName('Group 1');
+        $group2     = (new RowSet\Capability())->setId(2)->setName('Group 2');
+        $group3     = (new RowSet\Capability())->setId(3)->setName('Group 3');
         $criterion1 = (new RowSet\Criterion())->setId(1)->setName('Criterion 1.1');
         $criterion2 = (new RowSet\Criterion())->setId(2)->setName('Criterion 1.2');
         $criterion3 = (new RowSet\Criterion())->setId(3)->setName('Criterion 1.3');
@@ -277,17 +277,17 @@ class Grid extends TestCase
         $criterion8 = (new RowSet\Criterion())->setId(8)->setName('Criterion 3.2');
         $criterion9 = (new RowSet\Criterion())->setId(9)->setName('Criterion 3.3');
 
-        $group1->getCriteria()[$criterion1->getId()] = $criterion1;
-        $group1->getCriteria()[$criterion2->getId()] = $criterion2;
-        $group1->getCriteria()[$criterion3->getId()] = $criterion3;
+        $group1->getIndicators()[$criterion1->getId()] = $criterion1;
+        $group1->getIndicators()[$criterion2->getId()] = $criterion2;
+        $group1->getIndicators()[$criterion3->getId()] = $criterion3;
 
-        $group2->getCriteria()[$criterion4->getId()] = $criterion4;
-        $group2->getCriteria()[$criterion5->getId()] = $criterion5;
-        $group2->getCriteria()[$criterion6->getId()] = $criterion6;
+        $group2->getIndicators()[$criterion4->getId()] = $criterion4;
+        $group2->getIndicators()[$criterion5->getId()] = $criterion5;
+        $group2->getIndicators()[$criterion6->getId()] = $criterion6;
 
-        $group3->getCriteria()[$criterion7->getId()] = $criterion7;
-        $group3->getCriteria()[$criterion8->getId()] = $criterion8;
-        $group3->getCriteria()[$criterion9->getId()] = $criterion9;
+        $group3->getIndicators()[$criterion7->getId()] = $criterion7;
+        $group3->getIndicators()[$criterion8->getId()] = $criterion8;
+        $group3->getIndicators()[$criterion9->getId()] = $criterion9;
 
         $rowSet->getCapabilities()[$group1->getId()] = $group1;
         $rowSet->getCapabilities()[$group2->getId()] = $group2;

@@ -146,7 +146,7 @@ class Controller extends BaseController
 
             $criterionModel = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $critName, $groupName);
 
-            $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())
+            $group = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
                 ->setId($criterionModel->getGroup()->getId())
                 ->setName($groupName);
 
@@ -171,7 +171,7 @@ class Controller extends BaseController
             $groupName = $post->get('name');
 
             // Next step: figure out what gets passed in
-            $group = (new \Schoolbox\Assessment\Rubric\RowSet\Group())
+            $group = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
 //                ->setId(rand(1, PHP_INT_MAX))
                 ->setName($groupName);
 
