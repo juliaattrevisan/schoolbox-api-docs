@@ -55,8 +55,17 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
+use Alaress\Database\Connector\IConnector;
+
 class External_Liss_Server
 {
+    /** @var IConnector */
+    private $db;
+
+    public function __construct(IConnector $db)
+    {
+        $this->db = $db;
+    }
     /**
      * Default logging message when attempting to use liss with a non-schoolbox connector
      */
@@ -251,22 +260,32 @@ class External_Liss_Server
             $classInvolvementMapper->truncate();
 
             $allData = $message->params[1]->me['array'];
+            $classAll = $classEntryMapper->findAll();
+            foreach($classAll as $class){
+                /* @var ClassEntry $class */
+                $indexedClass[$class->getCode()] = $class;
+            }
 
+            $queryItems = array();
             foreach ($allData as $currentData) {
                 $struct = $currentData->me['struct'];
 
                 try {
                     $user = $userMapper->findByExternalId(trim((string)$struct['StudentId']->me['string']));
-
-                    /** @var ClassEntry $class */
-                    $class = $classEntryMapper->findOneByColumn('code', trim((string)$struct['ClassCode']->me['string']));
-
-                    $classInvolvement = $classInvolvementMapper->createModel();
-                    $classInvolvement->setClass($class);
-                    $classInvolvement->setUser($user);
-                    $classInvolvementMapper->save($classInvolvement);
+                    $class = $indexedClass[trim((string)$struct['ClassCode']->me['string'])];
+                    $queryItems[] = "(NULL, '".$class->getId()."', '".$user->getId()."')";
                 } catch (MapperException $e) {
-                    $log->warning(sprintf("publishClassMemberships: Failed to put student %d in %s: %s", trim((string)$struct['StudentId']->me['string']), trim((string)$struct['ClassCode']->me['string']), $e->getMessage()));
+                    $log->warning(sprintf("publishClassMemberships: Failed to put student %s in %s: %s", trim((string)$struct['StudentId']->me['string']), trim((string)$struct['ClassCode']->me['string']), $e->getMessage()));
+                }
+            }
+
+            if (count($queryItems) > 0) {
+                $fullQuery = 'INSERT INTO class_user (id, class_id, user_id) VALUES ' . implode($queryItems, ',') . ';';
+                try {
+                    // Manual bulk insert into the DB of "$fullquery"
+                    $this->db->executeQuery($fullQuery);
+                } catch (Exception $e) {
+                    $log->error(sprintf("publishClassMemberships: Failed to save class memberships: %s", $e->getMessage()));
                 }
             }
 
