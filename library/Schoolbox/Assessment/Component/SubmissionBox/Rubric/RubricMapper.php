@@ -532,21 +532,28 @@ class RubricMapper
         $groupMapper          = GroupMapper::getInstance();
         $criterionUsageModels = $criterionUsageMapper->createCollection();
         $groupUsageModels     = $groupUsageMapper->createCollection();
+        $criterionModels      = $criterionMapper->createCollection();
+        $groupModels          = $groupMapper->createCollection();
         $descriptorModels     = $descriptorMapper->createCollection();
         $criterionUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
         $groupUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
         $groupSequence = 1;
         foreach ($grid->getGroupUsages() as $groupUsage) {
+            $groupModel = $groupMapper->createModel($groupUsage->getGroup()->getId());
+            $groupModels->add($groupModel);
+
             $groupUsageModel = $groupUsageMapper->createModel()
                 ->setSubmissionBox($submissionBox)
-                ->setGroup($groupMapper->createModel($groupUsage->getGroup()->getId()))
+                ->setGroup($groupModel)
                 ->setMaxValue($groupUsage->getMaxValue())
                 ->setSequence($groupSequence++);
             $groupUsageModels->add($groupUsageModel);
 
             $criterionSequence = 1;
             foreach ($groupUsage->getCriterionUsages() as $criterionUsage) {
-                $criterionModel      = $criterionMapper->createModel($criterionUsage->getCriterion()->getId());
+                $criterionModel = $criterionMapper->createModel($criterionUsage->getCriterion()->getId());
+                $criterionModels->add($criterionModel);
+
                 $criterionUsageModel = $criterionUsageMapper->createModel()
                     ->setSubmissionBox($submissionBox)
                     ->setCriterion($criterionModel)
@@ -570,6 +577,8 @@ class RubricMapper
             }
         }
 
+        $groupMapper->save($groupModels);
+        $criterionMapper->save($criterionModels);
         $groupUsageMapper->save($groupUsageModels);
         $criterionUsageMapper->save($criterionUsageModels);
         $descriptorMapper->save($descriptorModels);
