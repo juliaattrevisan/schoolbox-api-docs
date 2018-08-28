@@ -499,13 +499,13 @@ class RubricMapper
         // (The answer exists: merge SA-6405)
         $levelMapper         = LevelMapper::getInstance();
         $descriptorMapper    = DescriptorMapper::getInstance();
-        $criterionMapper     = CriterionMapper::getInstance();
-        $groupMapper         = GroupMapper::getInstance();
+        $indicatorMapper     = CriterionMapper::getInstance();
+        $capabilityMapper    = GroupMapper::getInstance();
         $existingLevelIds    = $levelMapper->findIdsByColumn('box_id', $submissionBox->getId());
         $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
 
 
-        // first, persist the row and column headers (criteria and levels, respectively)
+        // First, persist the levels
         $levelModels   = $levelMapper->createCollection();
         $levelSequence = 1;
         foreach ($grid->getLevels() as $level) {
@@ -523,63 +523,64 @@ class RubricMapper
         }
 
 
-        // Persist groups/criteria
-        $criterionModels = $criterionMapper->createCollection();
-        $groupModels     = $groupMapper->createCollection();
-        foreach ($grid->getRowSet()->getCapabilities() as $group) {
-            $groupId = $group->getId();
-            if (!$groupId) {
+        // Persist capabilities+indicators
+        $indicatorModels  = $indicatorMapper->createCollection();
+        $capabilityModels = $capabilityMapper->createCollection();
+        foreach ($grid->getRowSet()->getCapabilities() as $capability) {
+            $capabilityId = $capability->getId();
+            if (!$capabilityId) {
                 continue;
             }
-            $groupModel = $groupMapper->findById($groupId)
-                ->setName($group->getName());
-            $groupModels[$groupId] = $groupModel;
+            $capabilityModel = $capabilityMapper->findById($capabilityId)
+                ->setName($capability->getName());
+            $capabilityModels[$capabilityId] = $capabilityModel;
 
-            foreach ($group->getIndicators() as $criterion) {
-                $criterionId = $criterion->getId();
-                if (!$criterionId) {
+            foreach ($capability->getIndicators() as $indicator) {
+                $indicatorId = $indicator->getId();
+                if (!$indicatorId) {
                     continue;
                 }
-                $criterionModel = $criterionMapper->findById($criterionId)
-                    ->setName($criterion->getName());
-                $criterionModels[$criterionId] = $criterionModel;
+                $indicatorModel                = $indicatorMapper->findById($indicatorId)
+                    ->setName($indicator->getName());
+                $indicatorModels[$indicatorId] = $indicatorModel;
             }
         }
 
 
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
-        $criterionUsageMapper = CriterionUsageMapper::getInstance();
-        $groupUsageMapper     = GroupUsageMapper::getInstance();
-        $criterionUsageModels = $criterionUsageMapper->createCollection();
-        $groupUsageModels     = $groupUsageMapper->createCollection();
-        $descriptorModels     = $descriptorMapper->createCollection();
-        $criterionUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
-        $groupUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
-        $groupSequence = 1;
-        foreach ($grid->getCapabilityUsages() as $groupUsage) {
-            $groupUsageModel = $groupUsageMapper->createModel()
-                ->setSubmissionBox($submissionBox)
-                ->setGroup($groupModels[$groupUsage->getCapability()->getId()])
-                ->setMaxValue($groupUsage->getMaxValue())
-                ->setSequence($groupSequence++);
-            $groupUsageModels->add($groupUsageModel);
+        $indicatorUsageMapper  = CriterionUsageMapper::getInstance();
+        $capabilityUsageMapper = GroupUsageMapper::getInstance();
+        $indicatorUsageModels  = $indicatorUsageMapper->createCollection();
+        $capabilityUsageModels = $capabilityUsageMapper->createCollection();
+        $descriptorModels      = $descriptorMapper->createCollection();
+        $capabilitySequence    = 1;
+        $indicatorUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
+        $capabilityUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
 
-            $criterionSequence = 1;
-            foreach ($groupUsage->getIndicatorUsages() as $criterionUsage) {
-                $criterionModel      = $criterionModels[$criterionUsage->getIndicator()->getId()];
-                $criterionUsageModel = $criterionUsageMapper->createModel()
+        foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
+            $capabilityUsageModel = $capabilityUsageMapper->createModel()
+                ->setSubmissionBox($submissionBox)
+                ->setGroup($capabilityModels[$capabilityUsage->getCapability()->getId()])
+                ->setMaxValue($capabilityUsage->getMaxValue())
+                ->setSequence($capabilitySequence++);
+            $capabilityUsageModels->add($capabilityUsageModel);
+
+            $indicatorSequence = 1;
+            foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+                $indicatorModel      = $indicatorModels[$indicatorUsage->getIndicator()->getId()];
+                $indicatorUsageModel = $indicatorUsageMapper->createModel()
                     ->setSubmissionBox($submissionBox)
-                    ->setCriterion($criterionModel)
-                    ->setSequence($criterionSequence++);
-                $criterionUsageModels->add($criterionUsageModel);
+                    ->setCriterion($indicatorModel)
+                    ->setSequence($indicatorSequence++);
+                $indicatorUsageModels->add($indicatorUsageModel);
 
                 // Descriptors
                 foreach ($grid->getLevels() as $levelIndex => $level) {
-                    $descriptor = $criterionUsage->retrieveDescriptor($levelIndex);
+                    $descriptor = $indicatorUsage->retrieveDescriptor($levelIndex);
                     if ($descriptor) {
                         $descriptorModel = $descriptorMapper->createModel()
                             ->setId($descriptor->getId())
-                            ->setCriterion($criterionModel)
+                            ->setCriterion($indicatorModel)
                             ->setLevel($levelMapper->createModel($level->getId()))
                             // One day: set min value here
                             ->setMaxValue($descriptor->getMaxValue())
@@ -590,10 +591,10 @@ class RubricMapper
             }
         }
 
-        $groupMapper->save($groupModels);
-        $criterionMapper->save($criterionModels);
-        $groupUsageMapper->save($groupUsageModels);
-        $criterionUsageMapper->save($criterionUsageModels);
+        $capabilityMapper->save($capabilityModels);
+        $indicatorMapper->save($indicatorModels);
+        $capabilityUsageMapper->save($capabilityUsageModels);
+        $indicatorUsageMapper->save($indicatorUsageModels);
         $descriptorMapper->save($descriptorModels);
 
 
