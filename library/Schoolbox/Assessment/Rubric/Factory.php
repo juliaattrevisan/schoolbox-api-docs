@@ -109,7 +109,7 @@ class Factory
             if ((new ValidCapabilityMax())->isSatisifedBy($groupMaxValue, $markPerCap)) {
                 $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
             } else {
-                throw new InvalidArgumentException("provide capability maximum points great than or equal to 0");
+                throw new InvalidArgumentException("provide capability maximum points greater than or equal to 0");
             }
 
         }
