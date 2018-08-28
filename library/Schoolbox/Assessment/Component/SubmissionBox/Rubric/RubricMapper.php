@@ -185,168 +185,165 @@ class RubricMapper
         ?IAssessable $allowModifyExclusion = null
     ): void {
         // Where does this go?
-        $folder                  = $rowSet->getContext()->getBaseContext()->getFolder();
+        $folder                   = $rowSet->getContext()->getBaseContext()->getFolder();
 
         // Required mappers
-        $groupMapper             = GroupMapper::getInstance();
-        $criterionMapper         = CriterionMapper::getInstance();
-        $errorMapper             = ErrorMapper::getInstance();
+        $capabilityMapper         = GroupMapper::getInstance();
+        $indicatorMapper          = CriterionMapper::getInstance();
+        $errorMapper              = ErrorMapper::getInstance();
 
         // Existing data
-        $existingRowSet          = $this->retrieveRowSet($rowSet->getContext(), true);
-        $existingGroupIds        = $existingRowSet->retrieveCapabilityIds();
-        $existingCriterionIds    = $existingRowSet->retrieveIndicatorIds();
-        $existingGroupModels     = $groupMapper->findByColumn('id', $existingGroupIds);
-        $existingCriterionModels = $criterionMapper->findByColumn('id', $existingCriterionIds);
+        $existingRowSet           = $this->retrieveRowSet($rowSet->getContext(), true);
+        $existingCapabilityIds    = $existingRowSet->retrieveCapabilityIds();
+        $existingIndicatorIds     = $existingRowSet->retrieveIndicatorIds();
+        $existingCapabilityModels = $capabilityMapper->findByColumn('id', $existingCapabilityIds);
+        $existingIndicatorModels  = $indicatorMapper->findByColumn('id', $existingIndicatorIds);
 
         // New data
-        $newGroupIds             = $rowSet->retrieveCapabilityIds();
-        $newCriterionIds         = $rowSet->retrieveIndicatorIds();
-        $newGroupModels          = $groupMapper->createCollection();
-        $newCriterionModels      = $criterionMapper->createCollection();
+        $newCapabilityIds         = $rowSet->retrieveCapabilityIds();
+        $newIndicatorIds          = $rowSet->retrieveIndicatorIds();
+        $newCapabilityModels      = $capabilityMapper->createCollection();
+        $newIndicatorModels       = $indicatorMapper->createCollection();
 
         // Track names used
-        $groupNamesUsed          = [];
+        $capabilityNamesUsed      = [];
 
 
-        // Process groups+criteria into models
-        foreach ($rowSet->getCapabilities() as $group) {
-            // Set the group aside to be persisted
-            $existingGroup = null;
-            $groupId       = $group->getId();
-            $groupModel    = null;
-            if ($groupId) {
-                $existingGroup = $existingRowSet->retrieveCapability($group->getId());
-                $groupModel    = $existingGroupModels[$groupId] ?? null;
+        // Process capabilities+indicators into models
+        foreach ($rowSet->getCapabilities() as $capability) {
+            // Set the capability aside to be persisted
+            $existingCapability = null;
+            $capabilityId       = $capability->getId();
+            $capabilityModel    = null;
+            if ($capabilityId) {
+                $existingCapability = $existingRowSet->retrieveCapability($capability->getId());
+                $capabilityModel    = $existingCapabilityModels[$capabilityId] ?? null;
             }
 
-            // If the group model doesn't exist yet: create it
-            // (New groups may never be course-level, they are always created
-            //  on the unit)
-            if (!$groupModel) {
-                $groupModel = $groupMapper->createModel()
-                    ->setId($groupId)
+            // If the capability model doesn't exist yet: create it
+            // (New capabilities may never be course-level, they are always
+            //  created on the unit)
+            if (!$capabilityModel) {
+                $capabilityModel = $capabilityMapper->createModel()
+                    ->setId($capabilityId)
                     ->setParentId($folder->getId())
                     ->setParentType(Group::PARENT_TYPE_CATEGORY);
             }
 
             // Validate whether name can be changed
             $allowNameChange = true;
-            if ($existingGroup && !$allowModifyUsed && $existingGroup->isInUse($allowModifyExclusion)) {
+            if ($existingCapability && !$allowModifyUsed && $existingCapability->isInUse($allowModifyExclusion)) {
                 $allowNameChange = false;
             }
             if ($allowNameChange) {
-                $groupModel->setName($group->getName());
+                $capabilityModel->setName($capability->getName());
             }
 
-            // Validate if this name has already been used by a group whose
+            // Validate if this name has already been used by a capability whose
             // name can be changed
-            $normalizedName = $this->normaliseForComparison($group->getName());
-            if (isset($groupNamesUsed[$normalizedName])) {
-                $groupNamesUsed[$normalizedName] = $groupNamesUsed[$normalizedName] || $allowNameChange;
-                if ($groupNamesUsed[$normalizedName]) {
-                    // this is used by a group which is allowed to change:
+            $normalizedName = $this->normaliseForComparison($capability->getName());
+            if (isset($capabilityNamesUsed[$normalizedName])) {
+                $capabilityNamesUsed[$normalizedName] = $capabilityNamesUsed[$normalizedName] || $allowNameChange;
+                if ($capabilityNamesUsed[$normalizedName]) {
+                    // this is used by a capability which is allowed to change:
                     // invalidate
                     throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
                 }
             } else {
-                $groupNamesUsed[$normalizedName] = $allowNameChange;
+                $capabilityNamesUsed[$normalizedName] = $allowNameChange;
             }
 
             // Validate whether curriculum code can be changed
             if ($persistCurriculum) {
-                $groupModel->setCurriculumNodes($group->getCurriculumNodes());
+                $capabilityModel->setCurriculumNodes($capability->getCurriculumNodes());
             }
 
-            // Add group to list
-            $newGroupModels->add($groupModel);
+            // Add capability to list
+            $newCapabilityModels->add($capabilityModel);
 
-            // Set each criterion in the group aside to be persisted
-            $criterionNamesUsed = [];
-            foreach ($group->getIndicators() as $criterion) {
-                $existingCriterion = null;
-                $criterionId       = $criterion->getId();
-                $criterionModel    = null;
-                if ($criterionId) {
-                    $existingCriterion = $existingRowSet->retrieveIndicator($criterionId);
-                    $criterionModel    = $existingCriterionModels[$criterionId] ?? null;
+            // Set each indicator in the capability aside to be persisted
+            $indicatorNamesUsed = [];
+            foreach ($capability->getIndicators() as $indicator) {
+                $existingIndicator = null;
+                $indicatorId       = $indicator->getId();
+                $indicatorModel    = null;
+                if ($indicatorId) {
+                    $existingIndicator = $existingRowSet->retrieveIndicator($indicatorId);
+                    $indicatorModel    = $existingIndicatorModels[$indicatorId] ?? null;
                 }
 
-                // If the criterion model doesn't exist yet: create it
-                if (!$criterionModel) {
-                    $criterionModel = $criterionMapper->createModel()
-                        ->setId($criterionId)
-                        ->setGroup($groupModel);
+                // If the indicator model doesn't exist yet: create it
+                if (!$indicatorModel) {
+                    $indicatorModel = $indicatorMapper->createModel()
+                        ->setId($indicatorId)
+                        ->setGroup($capabilityModel);
                 }
 
                 // Validate whether name can be changed
                 $allowNameChange = true;
-                if ($existingCriterion && !$allowModifyUsed && $existingCriterion->isInUse($allowModifyExclusion)) {
+                if ($existingIndicator && !$allowModifyUsed && $existingIndicator->isInUse($allowModifyExclusion)) {
                     $allowNameChange = false;
                 }
                 if ($allowNameChange) {
-                    $criterionModel->setName($criterion->getName());
+                    $indicatorModel->setName($indicator->getName());
                 }
 
-                // Validate if this name has already been used by a criterion
+                // Validate if this name has already been used by a indicator
                 // whose name can be changed
-                $normalizedName = $this->normaliseForComparison($criterion->getName());
-                if (isset($criterionNamesUsed[$normalizedName])) {
-                    $criterionNamesUsed[$normalizedName] = $criterionNamesUsed[$normalizedName] || $allowNameChange;
-                    if ($criterionNamesUsed[$normalizedName]) {
-                        // this is used by a criterion which is allowed to
+                $normalizedName = $this->normaliseForComparison($indicator->getName());
+                if (isset($indicatorNamesUsed[$normalizedName])) {
+                    $indicatorNamesUsed[$normalizedName] = $indicatorNamesUsed[$normalizedName] || $allowNameChange;
+                    if ($indicatorNamesUsed[$normalizedName]) {
+                        // this is used by a indicator which is allowed to
                         // change: invalidate
                         throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
                     }
                 } else {
-                    $criterionNamesUsed[$normalizedName] = $allowNameChange;
+                    $indicatorNamesUsed[$normalizedName] = $allowNameChange;
                 }
 
                 // Validate whether curriculum code can be changed
                 if ($persistCurriculum) {
-                    $criterionModel->setCurriculumNodes($criterion->getCurriculumNodes());
+                    $indicatorModel->setCurriculumNodes($indicator->getCurriculumNodes());
                 }
 
-                // Add criterion to list
-                $newCriterionModels->add($criterionModel);
+                // Add indicator to list
+                $newIndicatorModels->add($indicatorModel);
             }
         }
 
 
-        // Validate whether groups marked for deletion may actually be removed
-        $deletedGroupIds     = array_diff($existingGroupIds, $newGroupIds);
-        $deletedCriterionIds = array_diff($existingCriterionIds, $newCriterionIds);
+        // Validate whether capabilities/indicators marked for deletion may
+        // actually be removed
+        $deletedCapabilityIds = array_diff($existingCapabilityIds, $newCapabilityIds);
+        $deletedIndicatorIds  = array_diff($existingIndicatorIds, $newIndicatorIds);
         if (!$allowModifyUsed) {
-            // Validate deleted groups aren't in use
-            foreach ($deletedGroupIds as $deletedGroupId) {
-                // validate this isn't in use
-                $existingGroup = $existingRowSet->retrieveCapability($deletedGroupId);
-                if ($existingGroup && $existingGroup->isInUse($allowModifyExclusion)) {
-                    // throw exception
+            // Validate deleted capabilities aren't in use
+            foreach ($deletedCapabilityIds as $deletedCapabilityId) {
+                $existingCapability = $existingRowSet->retrieveCapability($deletedCapabilityId);
+                if ($existingCapability && $existingCapability->isInUse($allowModifyExclusion)) {
                     throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
                 }
             }
 
-            // Validate deleted criteria aren't in use
-            foreach ($deletedCriterionIds as $deletedCriterionId) {
-                // validate this isn't in use
-                $existingCriterion = $existingRowSet->retrieveIndicator($deletedCriterionId);
-                if ($existingCriterion && $existingCriterion->isInUse($allowModifyExclusion)) {
-                    // throw exception
+            // Validate deleted indicators aren't in use
+            foreach ($deletedIndicatorIds as $deletedIndicatorId) {
+                $existingIndicator = $existingRowSet->retrieveIndicator($deletedIndicatorId);
+                if ($existingIndicator && $existingIndicator->isInUse($allowModifyExclusion)) {
                     throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
                 }
             }
         }
 
 
-        // Save new groups+criteria
-        $groupMapper->save($newGroupModels);
-        $criterionMapper->save($newCriterionModels);
+        // Save new capabilities+indicators
+        $capabilityMapper->save($newCapabilityModels);
+        $indicatorMapper->save($newIndicatorModels);
 
 
-        // Tidy up unsaved groups+criteria
-        $this->tidyUp($criterionMapper, ['id' => $deletedCriterionIds], []);
-        $this->tidyUp($groupMapper, ['id' => $deletedGroupIds], []);
+        // Tidy up unsaved capabilities+indicators
+        $this->tidyUp($indicatorMapper, ['id' => $deletedIndicatorIds], []);
+        $this->tidyUp($capabilityMapper, ['id' => $deletedCapabilityIds], []);
     }
 
 
