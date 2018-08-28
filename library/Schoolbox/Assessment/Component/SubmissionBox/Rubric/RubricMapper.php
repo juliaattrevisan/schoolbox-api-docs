@@ -232,7 +232,7 @@ class RubricMapper
 
             // Validate whether name can be changed
             $allowNameChange = true;
-            if ($existingGroup && !$allowModifyUsed && $existingGroup->isInUse()) {
+            if ($existingGroup && !$allowModifyUsed && $existingGroup->isInUse($allowModifyExclusion)) {
                 $allowNameChange = false;
             }
             if ($allowNameChange) {
@@ -281,7 +281,7 @@ class RubricMapper
 
                 // Validate whether name can be changed
                 $allowNameChange = true;
-                if ($existingCriterion && !$allowModifyUsed && $existingCriterion->isInUse()) {
+                if ($existingCriterion && !$allowModifyUsed && $existingCriterion->isInUse($allowModifyExclusion)) {
                     $allowNameChange = false;
                 }
                 if ($allowNameChange) {
@@ -321,7 +321,7 @@ class RubricMapper
             foreach ($deletedGroupIds as $deletedGroupId) {
                 // validate this isn't in use
                 $existingGroup = $existingRowSet->retrieveGroup($deletedGroupId);
-                if ($existingGroup && $existingGroup->isInUse()) {
+                if ($existingGroup && $existingGroup->isInUse($allowModifyExclusion)) {
                     // throw exception
                     throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
                 }
@@ -331,7 +331,7 @@ class RubricMapper
             foreach ($deletedCriterionIds as $deletedCriterionId) {
                 // validate this isn't in use
                 $existingCriterion = $existingRowSet->retrieveCriterion($deletedCriterionId);
-                if ($existingCriterion && $existingCriterion->isInUse()) {
+                if ($existingCriterion && $existingCriterion->isInUse($allowModifyExclusion)) {
                     // throw exception
                     throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
                 }
