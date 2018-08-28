@@ -55,11 +55,11 @@ class RowSet extends TestCase
 
 
     /**
-     * Data provider for `testRetrieveCriterionIds`.
+     * Data provider for `testRetrieveIndicatorIds`.
      *
      * @return iterable
      */
-    public function getTestRetrieveCriterionIdsData(): iterable
+    public function getTestRetrieveIndicatorIdsData(): iterable
     {
         $rowSet = new RubricRowSet(new Folder());
         yield 'no capabilities' => [$rowSet, []];
@@ -115,13 +115,13 @@ class RowSet extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveCriterionIdsData
+     * @dataProvider getTestRetrieveIndicatorIdsData
      * @covers \Schoolbox\Assessment\Rubric\RowSet\RowSet::retrieveIndicatorIds
      *
      * @param RubricRowSet $rowSet
      * @param array        $expected
      */
-    public function testRetrieveCriterionIds(RubricRowSet $rowSet, array $expected): void
+    public function testRetrieveIndicatorIds(RubricRowSet $rowSet, array $expected): void
     {
         $this->assertEquals($expected, $rowSet->retrieveIndicatorIds());
     }

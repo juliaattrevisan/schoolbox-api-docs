@@ -47,7 +47,7 @@ class Capability
 
 
     /**
-     * Assessments which are using this group.
+     * Assessments which are using this capability.
      *
      * @var GenericCollection|IAssessable[]
      */
@@ -77,7 +77,7 @@ class Capability
 
 
     /**
-     * Retrieve the ID of all indicators in this group.
+     * Retrieve the ID of all indicators in this capability.
      *
      * @return array|int[]
      */

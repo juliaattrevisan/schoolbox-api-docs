@@ -14,12 +14,12 @@ use Schoolbox\Learning\AssessmentContext;
 /**
  * A rubric row set.
  *
- * This is a representation of the groups (and their constituent criteria)
+ * This is a representation of the capabilities (and their constituent indicators)
  * which are available to an assessment context.
  *
  * It contains:
  * * an assessment context (in practise, always a folder)
- * * a set of rubric groups
+ * * a set of rubric capabilities
  */
 class RowSet
 {
@@ -34,7 +34,7 @@ class RowSet
 
 
     /**
-     * The groups which comprise this row set.
+     * The capabilities which comprise this row set.
      *
      * @var Capability[]|GenericCollection
      */

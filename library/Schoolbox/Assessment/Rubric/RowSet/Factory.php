@@ -47,28 +47,28 @@ class Factory
     {
         $rowSet = new RowSet($assessmentContext);
 
-        // Add groups
-        foreach ($postData as $tempGroupId => $postedGroup) {
-            $group = (new Capability())
-                ->setId($postedGroup['id'])
-                ->setName($postedGroup['name'] ?? '')
+        // Add capabilities
+        foreach ($postData as $tempCapabilityId => $postedCapability) {
+            $capability = (new Capability())
+                ->setId($postedCapability['id'])
+                ->setName($postedCapability['name'] ?? '')
                 ->setCurriculumNodes(
-                    $this->nodeMapper->findByColumn('id', $postedGroup['curriculumCode'])
+                    $this->nodeMapper->findByColumn('id', $postedCapability['curriculumCode'])
                 );
 
-            // Add criteria
-            foreach ($postedGroup['items'] ?? [] as $tempCriterionId => $postedCriterion) {
-                $criterion                                = (new Indicator())
-                    ->setId($postedCriterion['id'])
-                    ->setName($postedCriterion['name'] ?? '')
+            // Add indicators
+            foreach ($postedCapability['items'] ?? [] as $tempIndicatorId => $postedIndicator) {
+                $indicator = (new Indicator())
+                    ->setId($postedIndicator['id'])
+                    ->setName($postedIndicator['name'] ?? '')
                     ->setCurriculumNodes(
-                        $this->nodeMapper->findByColumn('id', $postedCriterion['curriculumCode'])
+                        $this->nodeMapper->findByColumn('id', $postedIndicator['curriculumCode'])
                     );
-                $group->getIndicators()[$tempCriterionId] = $criterion;
+                $capability->getIndicators()[$tempIndicatorId] = $indicator;
             }
 
 
-            $rowSet->getCapabilities()[$tempGroupId] = $group;
+            $rowSet->getCapabilities()[$tempCapabilityId] = $capability;
         }
 
         return $rowSet;
