@@ -105,14 +105,11 @@ class Factory
         foreach ($groups as $groupId => $groupData) {
             $groupName     = $groupData['name'];
             $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
-            // TODO this fails on import of an old rubric CSV that doesn't have max points field - it shouldn't
-            // TODO need to get rowMaxSum
-            // For now placeholder
-            $rowMaxSum = 16;
-            if ((new ValidCapabilityMax())->isSatisifedBy($groupMaxValue, $markPerCap, $rowMaxSum)) {
+
+            if ((new ValidCapabilityMax())->isSatisifedBy($groupMaxValue, $markPerCap)) {
                 $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
             } else {
-                throw new InvalidArgumentException("provide capability maximum points between 0 and " . $rowMaxSum);
+                throw new InvalidArgumentException("provide capability maximum points great than or equal to 0");
             }
 
         }
