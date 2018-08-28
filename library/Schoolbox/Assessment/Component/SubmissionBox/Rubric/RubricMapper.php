@@ -99,66 +99,66 @@ class RubricMapper
     {
         $rowSet = new RowSet($context);
 
-        // Load the groups and criteria for this context
+        // Load the capabilities and indicators for this context
         $folder = $context->getBaseContext()->getFolder();
 
-        // Criteria contains groups too: inside-out them
-        /** @var GenericCollection|\Schoolbox\Assessment\Rubric\RowSet\Capability[] $groups */
-        $groups          = new GenericCollection(\Schoolbox\Assessment\Rubric\RowSet\Capability::class);
-        $criterionModels = CriterionMapper::getInstance()->findForFolder($folder->getId());
+        // Capability contains indicators too: inside-out them
+        /** @var GenericCollection|\Schoolbox\Assessment\Rubric\RowSet\Capability[] $capabilities */
+        $capabilities    = new GenericCollection(\Schoolbox\Assessment\Rubric\RowSet\Capability::class);
+        $indicatorModels = CriterionMapper::getInstance()->findForFolder($folder->getId());
 
-        // Unit-specs have their course spec's criteria as well
+        // Unit-specs have their course spec's capabilities/indicators as well
         $courseSpecFolderId = null;
         if ($folder->hasUnitSpecification()) {
             $courseSpecFolderId = (int)$folder->getParent()->getId();
-            $criterionModels    = CriterionMapper::getInstance()->findForFolder($courseSpecFolderId)
-                                                                ->merge($criterionModels);
+            $indicatorModels    = CriterionMapper::getInstance()->findForFolder($courseSpecFolderId)
+                                                                ->merge($indicatorModels);
         }
 
         // This is how it SHOULD work...
 //        if ($context instanceof UnitSpecification) {
-//            $criterionModels = $criterionModels->merge(
+//            $indicatorModels = $indicatorModels->merge(
 //                CriterionMapper::getInstance()->findForFolder(
 //                    $context->getCourse()->getFolder()->getId()
 //                )
 //            );
 //        }
 
-        foreach ($criterionModels as $criterionModel) {
-            $groupModel    = $criterionModel->getGroup();
-            $isCourseGroup = $groupModel->getParentId() === $courseSpecFolderId;
-            $groupId       = $groupModel->getId();
-            $criterionId   = $criterionModel->getId();
-            if (!isset($groups[$groupId])) {
-                $groups[$groupId] = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
-                    ->setId($groupId)
-                    ->setName($groupModel->getName())
-                    ->setIsCourseLevel($isCourseGroup)
-                    ->setCurriculumNodes($groupModel->getCurriculumNodes());
+        foreach ($indicatorModels as $indicatorModel) {
+            $capabilityModel    = $indicatorModel->getGroup();
+            $isCourseCapability = $capabilityModel->getParentId() === $courseSpecFolderId;
+            $capabilityId       = $capabilityModel->getId();
+            $indicatorId        = $indicatorModel->getId();
+            if (!isset($capabilities[$capabilityId])) {
+                $capabilities[$capabilityId] = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
+                    ->setId($capabilityId)
+                    ->setName($capabilityModel->getName())
+                    ->setIsCourseLevel($isCourseCapability)
+                    ->setCurriculumNodes($capabilityModel->getCurriculumNodes());
 
                 if ($getUsages) {
-                    foreach (CriterionUsageMapper::getInstance()->findGroupUsage($groupId) as $groupUsage) {
-                        $groups[$groupId]->getUsage()[$groupUsage['id']] = (new DueWork\Model())
-                            ->setId($groupUsage['id'])
-                            ->setTitle($groupUsage['title']);
+                    foreach (CriterionUsageMapper::getInstance()->findGroupUsage($capabilityId) as $capabilityUsage) {
+                        $capabilities[$capabilityId]->getUsage()[$capabilityUsage['id']] = (new DueWork\Model())
+                            ->setId($capabilityUsage['id'])
+                            ->setTitle($capabilityUsage['title']);
                     }
                 }
             }
-            $groups[$groupId]->getIndicators()[$criterionId] = (new \Schoolbox\Assessment\Rubric\RowSet\Indicator())
-                ->setId($criterionId)
-                ->setName($criterionModel->getName())
-                ->setCurriculumNodes($criterionModel->getCurriculumNodes());
+            $capabilities[$capabilityId]->getIndicators()[$indicatorId] = (new \Schoolbox\Assessment\Rubric\RowSet\Indicator())
+                ->setId($indicatorId)
+                ->setName($indicatorModel->getName())
+                ->setCurriculumNodes($indicatorModel->getCurriculumNodes());
 
             if ($getUsages) {
-                foreach (CriterionUsageMapper::getInstance()->findCriterionUsage($criterionId) as $criterionUsage) {
-                    $groups[$groupId]->getIndicators()[$criterionId]->getUsage()[$criterionUsage['id']]
+                foreach (CriterionUsageMapper::getInstance()->findCriterionUsage($indicatorId) as $indicatorUsage) {
+                    $capabilities[$capabilityId]->getIndicators()[$indicatorId]->getUsage()[$indicatorUsage['id']]
                         = (new DueWork\Model())
-                            ->setId($criterionUsage['id'])
-                            ->setTitle($criterionUsage['title']);
+                            ->setId($indicatorUsage['id'])
+                            ->setTitle($indicatorUsage['title']);
                 }
             }
         }
-        $rowSet->setCapabilities($groups);
+        $rowSet->setCapabilities($capabilities);
 
         return $rowSet;
     }
