@@ -475,7 +475,7 @@ class RubricMapper
                 $groupUsage->getCriterionUsages()[$criterionId] = $criterionUsage;
             }
 
-            $grid->getGroupUsages()[$groupId] = $groupUsage;
+            $grid->getCapabilityUsages()[$groupId] = $groupUsage;
         }
 
         return $grid;
@@ -558,7 +558,7 @@ class RubricMapper
         $criterionUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
         $groupUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
         $groupSequence = 1;
-        foreach ($grid->getGroupUsages() as $groupUsage) {
+        foreach ($grid->getCapabilityUsages() as $groupUsage) {
             $groupUsageModel = $groupUsageMapper->createModel()
                 ->setSubmissionBox($submissionBox)
                 ->setGroup($groupModels[$groupUsage->getGroup()->getId()])

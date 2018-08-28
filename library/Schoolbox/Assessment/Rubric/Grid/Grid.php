@@ -53,7 +53,7 @@ class Grid
      *
      * @var GroupUsage[]|GenericCollection
      */
-    private $groupUsages;
+    private $capabilityUsages;
 
 
     /**
@@ -74,10 +74,10 @@ class Grid
      */
     public function __construct(IAssessable $assessment, RowSet $rowSet)
     {
-        $this->assessment  = $assessment;
-        $this->rowSet      = $rowSet;
-        $this->groupUsages = new GenericCollection(GroupUsage::class);
-        $this->levels      = new GenericCollection(Level::class);
+        $this->assessment       = $assessment;
+        $this->rowSet           = $rowSet;
+        $this->capabilityUsages = new GenericCollection(GroupUsage::class);
+        $this->levels           = new GenericCollection(Level::class);
     }
 
 
@@ -102,13 +102,13 @@ class Grid
      *
      * @return float
      */
-    public function calculateMaxValueFromGroups(): float
+    public function calculateMaxValueFromCapabilities(): float
     {
         $maxValues = [];
-        foreach ($this->groupUsages as $groupUsage) {
-            $groupUsageMaxValue = $groupUsage->getMaxValue();
-            if (null !== $groupUsageMaxValue) {
-                $maxValues[] = $groupUsageMaxValue;
+        foreach ($this->capabilityUsages as $capabilityUsage) {
+            $capabilityUsageMaxValue = $capabilityUsage->getMaxValue();
+            if (null !== $capabilityUsageMaxValue) {
+                $maxValues[] = $capabilityUsageMaxValue;
             }
         }
         return !empty($maxValues) ? array_sum($maxValues) : 0;
@@ -119,14 +119,14 @@ class Grid
      * Return the group usage for a given group, or null if this grid doesn't
      * use it.
      *
-     * @param Capability $group
+     * @param Capability $capability
      * @return null|GroupUsage
      */
-    public function retrieveGroupUsage(Capability $group): ?GroupUsage
+    public function retrieveCapabilityUsage(Capability $capability): ?GroupUsage
     {
-        foreach ($this->groupUsages as $groupUsage) {
-            if ($groupUsage->getGroup()->getId() === $group->getId()) {
-                return $groupUsage;
+        foreach ($this->capabilityUsages as $capabilityUsage) {
+            if ($capabilityUsage->getGroup()->getId() === $capability->getId()) {
+                return $capabilityUsage;
             }
         }
         return null;
@@ -137,13 +137,13 @@ class Grid
      * Return the criterion usage for a given criterion, or null if this grid
      * doesn't use it.
      *
-     * @param Indicator $criterion
+     * @param Indicator $indicator
      * @return null|CriterionUsage
      */
-    public function retrieveCriterionUsage(Indicator $criterion): ?CriterionUsage
+    public function retrieveIndicatorUsage(Indicator $indicator): ?CriterionUsage
     {
-        foreach ($this->groupUsages as $groupUsage) {
-            $criterionUsage = $groupUsage->retrieveCriterionUsage($criterion);
+        foreach ($this->capabilityUsages as $capabilityUsage) {
+            $criterionUsage = $capabilityUsage->retrieveCriterionUsage($indicator);
             if ($criterionUsage) {
                 return $criterionUsage;
             }
@@ -160,17 +160,17 @@ class Grid
      *
      * @return iterable|Capability[]
      */
-    public function iterateGroups(): iterable
+    public function iterateCapabilities(): iterable
     {
-        $seenGroups = [];
-        foreach ($this->groupUsages as $groupUsage) {
-            $seenGroups[$groupUsage->getGroup()->getId()] = true;
-            yield $groupUsage->getGroup();
+        $seenCapabilities = [];
+        foreach ($this->capabilityUsages as $capabilityUsage) {
+            $seenCapabilities[$capabilityUsage->getGroup()->getId()] = true;
+            yield $capabilityUsage->getGroup();
         }
 
-        foreach ($this->rowSet->getCapabilities() as $group) {
-            if (!isset($seenGroups[$group->getId()])) {
-                yield $group;
+        foreach ($this->rowSet->getCapabilities() as $capability) {
+            if (!isset($seenCapabilities[$capability->getId()])) {
+                yield $capability;
             }
         }
     }
@@ -179,13 +179,13 @@ class Grid
     /**
      * Iterates each criterion in the grid for the given group.
      *
-     * @param Capability $group
+     * @param Capability $capability
      * @return iterable|Indicator[]
      */
-    public function iterateCriteria(Capability $group): iterable
+    public function iterateIndicators(Capability $capability): iterable
     {
-        $groupUsage = $this->retrieveGroupUsage($group);
-        return $groupUsage ? $groupUsage->iterateCriteria() : $group->getIndicators();
+        $capabilityUsage = $this->retrieveCapabilityUsage($capability);
+        return $capabilityUsage ? $capabilityUsage->iterateCriteria() : $capability->getIndicators();
     }
 
 
@@ -210,19 +210,19 @@ class Grid
     /**
      * @return GroupUsage[]|GenericCollection
      */
-    public function getGroupUsages(): GenericCollection
+    public function getCapabilityUsages(): GenericCollection
     {
-        return $this->groupUsages;
+        return $this->capabilityUsages;
     }
 
 
     /**
-     * @param GroupUsage[]|GenericCollection $groupUsages
+     * @param GroupUsage[]|GenericCollection $capabilityUsages
      * @return static
      */
-    public function setGroupUsages(GenericCollection $groupUsages): self
+    public function setCapabilityUsages(GenericCollection $capabilityUsages): self
     {
-        $this->groupUsages = $groupUsages;
+        $this->capabilityUsages = $capabilityUsages;
         return $this;
     }
 

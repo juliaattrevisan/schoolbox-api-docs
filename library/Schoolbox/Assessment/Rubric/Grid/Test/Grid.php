@@ -64,12 +64,12 @@ class Grid extends TestCase
         $criterionUsage2                                         = new RubricGrid\CriterionUsage($criterion2);
         $groupUsage1->getCriterionUsages()[$criterion1->getId()] = $criterionUsage1;
         $groupUsage1->getCriterionUsages()[$criterion2->getId()] = $criterionUsage2;
-        $grid->getGroupUsages()[$group1->getId()]                = $groupUsage1;
+        $grid->getCapabilityUsages()[$group1->getId()]           = $groupUsage1;
 
         $groupUsage2                                             = (new RubricGrid\GroupUsage($group2))->setMaxValue(15);
         $criterionUsage6                                         = new RubricGrid\CriterionUsage($criterion6);
         $groupUsage2->getCriterionUsages()[$criterion6->getId()] = $criterionUsage6;
-        $grid->getGroupUsages()[$group2->getId()]                = $groupUsage2;
+        $grid->getCapabilityUsages()[$group2->getId()]           = $groupUsage2;
 
         yield 'group 1: in use' => [$grid, $group1, $groupUsage1];
         yield 'group 2: in use' => [$grid, $group2, $groupUsage2];
@@ -79,7 +79,7 @@ class Grid extends TestCase
 
     /**
      * @dataProvider getTestRetrieveGroupUsageData
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::retrieveGroupUsage
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::retrieveCapabilityUsage
      *
      * @param RubricGrid\Grid            $grid
      * @param RowSet\Capability          $group
@@ -90,7 +90,7 @@ class Grid extends TestCase
         RowSet\Capability $group,
         ?RubricGrid\GroupUsage $expected
     ): void {
-        $this->assertSame($expected, $grid->retrieveGroupUsage($group));
+        $this->assertSame($expected, $grid->retrieveCapabilityUsage($group));
     }
 
 
@@ -138,12 +138,12 @@ class Grid extends TestCase
         $criterionUsage2                                         = new RubricGrid\CriterionUsage($criterion2);
         $groupUsage1->getCriterionUsages()[$criterion1->getId()] = $criterionUsage1;
         $groupUsage1->getCriterionUsages()[$criterion2->getId()] = $criterionUsage2;
-        $grid->getGroupUsages()[$group1->getId()]                = $groupUsage1;
+        $grid->getCapabilityUsages()[$group1->getId()]           = $groupUsage1;
 
         $groupUsage2                                             = (new RubricGrid\GroupUsage($group2))->setMaxValue(15);
         $criterionUsage6                                         = new RubricGrid\CriterionUsage($criterion6);
         $groupUsage2->getCriterionUsages()[$criterion6->getId()] = $criterionUsage6;
-        $grid->getGroupUsages()[$group2->getId()]                = $groupUsage2;
+        $grid->getCapabilityUsages()[$group2->getId()]           = $groupUsage2;
 
         yield 'criterion 1.1: in use'     => [$grid, $criterion1, $criterionUsage1];
         yield 'criterion 1.2: in use'     => [$grid, $criterion2, $criterionUsage2];
@@ -160,7 +160,7 @@ class Grid extends TestCase
 
     /**
      * @dataProvider getTestRetrieveCriterionUsageData
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::retrieveCriterionUsage
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::retrieveIndicatorUsage
      *
      * @param RubricGrid\Grid                $grid
      * @param RowSet\Indicator               $criterion
@@ -171,7 +171,7 @@ class Grid extends TestCase
         RowSet\Indicator $criterion,
         ?RubricGrid\CriterionUsage $expected
     ): void {
-        $this->assertSame($expected, $grid->retrieveCriterionUsage($criterion));
+        $this->assertSame($expected, $grid->retrieveIndicatorUsage($criterion));
     }
 
 
@@ -225,15 +225,15 @@ class Grid extends TestCase
 
 
         // Add descriptors
-        $grid2 = new RubricGrid\Grid($dueWork, $rowSet);
-        $grid2->getGroupUsages()[$group1->getId()] = $groupUsage1;
+        $grid2                                          = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid2->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
 
         yield 'one group usage' => [$grid2, 15];
 
 
-        $grid3 = new RubricGrid\Grid($dueWork, $rowSet);
-        $grid3->getGroupUsages()[$group1->getId()] = $groupUsage1;
-        $grid3->getGroupUsages()[$group2->getId()] = $groupUsage2;
+        $grid3                                          = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid3->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
+        $grid3->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
 
         yield 'two group usages' => [$grid3, 18];
     }
@@ -241,14 +241,14 @@ class Grid extends TestCase
 
     /**
      * @dataProvider getTestCalculateMaxValueDataFromGroups
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::calculateMaxValueFromGroups
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::calculateMaxValueFromCapabilities
      *
      * @param RubricGrid\Grid $grid
      * @param float|null      $expected
      */
     public function testCalculateMaxValueFromGroups(RubricGrid\Grid $grid, ?float $expected): void
     {
-        $this->assertSame($expected, $grid->calculateMaxValueFromGroups());
+        $this->assertSame($expected, $grid->calculateMaxValueFromCapabilities());
     }
 
 
@@ -304,32 +304,32 @@ class Grid extends TestCase
         yield 'No groups used' => [$grid1, [$group1, $group2, $group3]];
 
 
-        $grid2 = new RubricGrid\Grid($dueWork, $rowSet);
-        $grid2->getGroupUsages()[$group2->getId()] = $groupUsage2;
+        $grid2                                          = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid2->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
 
         yield 'Group 2 used' => [$grid2, [$group2, $group1, $group3]];
 
 
-        $grid3 = new RubricGrid\Grid($dueWork, $rowSet);
-        $grid3->getGroupUsages()[$group3->getId()] = $groupUsage3;
-        $grid3->getGroupUsages()[$group2->getId()] = $groupUsage2;
+        $grid3                                          = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid3->getCapabilityUsages()[$group3->getId()] = $groupUsage3;
+        $grid3->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
 
 
         yield 'Group 3, 2 used' => [$grid3, [$group3, $group2, $group1]];
 
 
-        $grid4 = new RubricGrid\Grid($dueWork, $rowSet);
-        $grid4->getGroupUsages()[$group1->getId()] = $groupUsage1;
-        $grid4->getGroupUsages()[$group3->getId()] = $groupUsage3;
-        $grid4->getGroupUsages()[$group2->getId()] = $groupUsage2;
+        $grid4                                          = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid4->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
+        $grid4->getCapabilityUsages()[$group3->getId()] = $groupUsage3;
+        $grid4->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
 
         yield 'Group 1, 3, 2 used' => [$grid4, [$group1, $group3, $group2]];
 
 
-        $grid5 = new RubricGrid\Grid($dueWork, $rowSet);
-        $grid5->getGroupUsages()[$group3->getId()] = $groupUsage3;
-        $grid5->getGroupUsages()[$group2->getId()] = $groupUsage2;
-        $grid5->getGroupUsages()[$group1->getId()] = $groupUsage1;
+        $grid5                                          = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid5->getCapabilityUsages()[$group3->getId()] = $groupUsage3;
+        $grid5->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
+        $grid5->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
 
         yield 'Group 3, 2, 1 used' => [$grid5, [$group3, $group2, $group1]];
     }
@@ -337,7 +337,7 @@ class Grid extends TestCase
 
     /**
      * @dataProvider getTestIterateGroupsData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Grid::iterateGroups
+     * @covers \Schoolbox\Assessment\Rubric\Grid\Grid::iterateCapabilities
      *
      * @param RubricGrid\Grid $grid
      * @param array           $expected
@@ -345,7 +345,7 @@ class Grid extends TestCase
     public function testIterateGroups(RubricGrid\Grid $grid, array $expected): void
     {
         $actual = [];
-        foreach ($grid->iterateGroups() as $group) {
+        foreach ($grid->iterateCapabilities() as $group) {
             $actual[] = $group;
         }
         $this->assertSame($expected, $actual);

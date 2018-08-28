@@ -100,8 +100,8 @@ class Factory
             }
 
 
-            $groupCache[$groupId]             = $group;
-            $grid->getGroupUsages()[$groupId] = $groupUsage;
+            $groupCache[$groupId]                  = $group;
+            $grid->getCapabilityUsages()[$groupId] = $groupUsage;
         }
 
 
@@ -151,13 +151,13 @@ class Factory
                 }
             }
 
-            $groupUsage = $grid->retrieveGroupUsage($group);
+            $groupUsage = $grid->retrieveCapabilityUsage($group);
             $groupUsage->getCriterionUsages()[$criterionId] = $criterionUsage;
         }
 
         // Calculate max values for each group usage.
         // If no value was passed: use calculated value
-        foreach ($grid->getGroupUsages() as $groupUsage) {
+        foreach ($grid->getCapabilityUsages() as $groupUsage) {
             $groupMaxValue = $groupUsage->getMaxValue();
             if (null === $groupMaxValue) {
                 $groupUsage->setMaxValue($groupUsage->calculateMaxValueFromCriteria());
