@@ -225,7 +225,7 @@ $(function() {
                 </fieldset>
                 #}
 
-                {% for group in rowSet.groups %}
+                {% for group in rowSet.capabilities %}
                     <fieldset class='content' data-rubric-group-row="{{ group.id }}">
                         <div class="{{ groupColumn }} columns">
                             <h3>
@@ -245,7 +245,7 @@ $(function() {
                             <h3>{{ locale.rubricCriterion.properPlural }}</h3>
                             <ul class="information-list">
 
-                                {% for criterion in group.criteria %}
+                                {% for criterion in group.indicators %}
                                     {% include '@rubricCriteria/sub/criterion.twig' with {
                                         group:                    group,
                                         criterion:                criterion,
