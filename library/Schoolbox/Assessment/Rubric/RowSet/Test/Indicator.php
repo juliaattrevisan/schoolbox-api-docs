@@ -9,14 +9,14 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\RowSet\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Assessment\Rubric\RowSet\Indicator as RubricCriterion;
+use Schoolbox\Assessment\Rubric\RowSet\Indicator as RubricIndicator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 
 /**
  * @covers \Schoolbox\Assessment\Rubric\RowSet\Indicator
  */
-class Criterion extends TestCase
+class Indicator extends TestCase
 {
     /**
      * Data provider for `testIsInUse`.
@@ -25,13 +25,13 @@ class Criterion extends TestCase
      */
     public function getTestIsInUseData(): iterable
     {
-        $criterion = (new RubricCriterion())->setId(3);
-        yield 'none in use' => [$criterion, false];
+        $indicator = (new RubricIndicator())->setId(3);
+        yield 'none in use' => [$indicator, false];
 
-        $criterion = (new RubricCriterion())->setId(3);
-        $criterion->getUsage()
+        $indicator = (new RubricIndicator())->setId(3);
+        $indicator->getUsage()
                   ->add((new Task())->setId(1));
-        yield 'one in use' => [$criterion, true];
+        yield 'one in use' => [$indicator, true];
     }
 
 
@@ -39,12 +39,12 @@ class Criterion extends TestCase
      * @dataProvider getTestIsInUseData
      * @covers \Schoolbox\Assessment\Rubric\RowSet\Indicator::isInUse
      *
-     * @param RubricCriterion $criterion
+     * @param RubricIndicator $indicator
      * @param bool            $expected
      */
-    public function testIsInUse(RubricCriterion $criterion, bool $expected): void
+    public function testIsInUse(RubricIndicator $indicator, bool $expected): void
     {
-        $this->assertEquals($expected, $criterion->isInUse());
+        $this->assertEquals($expected, $indicator->isInUse());
     }
 
 
@@ -60,22 +60,22 @@ class Criterion extends TestCase
         $task3 = (new Task())->setId(3);
         $task4 = (new Task())->setId(4);
 
-        $criterion = (new RubricCriterion())->setId(3);
-        yield 'none in use' => [$criterion, $task1, false];
+        $indicator = (new RubricIndicator())->setId(3);
+        yield 'none in use' => [$indicator, $task1, false];
 
-        $criterion = (new RubricCriterion())->setId(3);
-        $criterion->getUsage()
+        $indicator = (new RubricIndicator())->setId(3);
+        $indicator->getUsage()
                   ->add($task1);
-        yield 'one in use, match' => [$criterion, $task1, false];
-        yield 'one in use, no match' => [$criterion, $task2, true];
+        yield 'one in use, match' => [$indicator, $task1, false];
+        yield 'one in use, no match' => [$indicator, $task2, true];
 
-        $criterion = (new RubricCriterion())->setId(3);
-        $criterion->getUsage()
+        $indicator = (new RubricIndicator())->setId(3);
+        $indicator->getUsage()
                   ->add($task1)
                   ->add($task2)
                   ->add($task3);
-        yield 'three in use, match' => [$criterion, $task1, true];
-        yield 'three in use, no match' => [$criterion, $task4, true];
+        yield 'three in use, match' => [$indicator, $task1, true];
+        yield 'three in use, no match' => [$indicator, $task4, true];
     }
 
 
@@ -83,16 +83,16 @@ class Criterion extends TestCase
      * @dataProvider getTestIsInUseExcludingData
      * @covers \Schoolbox\Assessment\Rubric\RowSet\Indicator::isInUseExcluding
      *
-     * @param RubricCriterion $criterion
+     * @param RubricIndicator $indicator
      * @param IAssessable     $assessment
      * @param bool            $expected
      */
     public function testIsInUseExcluding(
-        RubricCriterion $criterion,
+        RubricIndicator $indicator,
         IAssessable $assessment,
         bool $expected
     ): void
     {
-        $this->assertEquals($expected, $criterion->isInUseExcluding($assessment));
+        $this->assertEquals($expected, $indicator->isInUseExcluding($assessment));
     }
 }

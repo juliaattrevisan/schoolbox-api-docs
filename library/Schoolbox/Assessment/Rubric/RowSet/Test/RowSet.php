@@ -20,14 +20,14 @@ use Schoolbox\Resource\Folder\Model as Folder;
 class RowSet extends TestCase
 {
     /**
-     * Data provider for `testRetrieveGroupIds`.
+     * Data provider for `testRetrieveCapabilityIds`.
      *
      * @return iterable
      */
-    public function getTestRetrieveGroupIdsData(): iterable
+    public function getTestRetrieveCapabilityIdsData(): iterable
     {
         $rowSet = new RubricRowSet(new Folder());
-        yield 'no groups' => [$rowSet, []];
+        yield 'no capabilities' => [$rowSet, []];
 
         $rowSet = new RubricRowSet(new Folder());
         $rowSet->getCapabilities()
@@ -37,18 +37,18 @@ class RowSet extends TestCase
                ->add((new Capability())->setId(5))
                ->add((new Capability())->setId(6))
                ->add((new Capability())->setId(1));
-        yield 'multiple groups' => [$rowSet, [1, 3, 5, 6,]];
+        yield 'multiple capabilities' => [$rowSet, [1, 3, 5, 6,]];
     }
 
 
     /**
-     * @dataProvider getTestRetrieveGroupIdsData
+     * @dataProvider getTestRetrieveCapabilityIdsData
      * @covers \Schoolbox\Assessment\Rubric\RowSet\RowSet::retrieveCapabilityIds
      *
      * @param RubricRowSet $rowSet
      * @param array        $expected
      */
-    public function testRetrieveGroupIds(RubricRowSet $rowSet, array $expected): void
+    public function testRetrieveCapabilityIds(RubricRowSet $rowSet, array $expected): void
     {
         $this->assertEquals($expected, $rowSet->retrieveCapabilityIds());
     }
@@ -62,7 +62,7 @@ class RowSet extends TestCase
     public function getTestRetrieveCriterionIdsData(): iterable
     {
         $rowSet = new RubricRowSet(new Folder());
-        yield 'no groups' => [$rowSet, []];
+        yield 'no capabilities' => [$rowSet, []];
 
         $rowSet = new RubricRowSet(new Folder());
         $rowSet->getCapabilities()
@@ -72,12 +72,12 @@ class RowSet extends TestCase
                ->add((new Capability())->setId(5))
                ->add((new Capability())->setId(6))
                ->add((new Capability())->setId(1));
-        yield 'multiple groups, no criteria' => [$rowSet, []];
+        yield 'multiple capabilities, no criteria' => [$rowSet, []];
 
         $rowSet = new RubricRowSet(new Folder());
 
-        $group1 = (new Capability())->setId(3);
-        $group1->getIndicators()
+        $capability1 = (new Capability())->setId(3);
+        $capability1->getIndicators()
                ->add(new Indicator())
                ->add((new Indicator())->setId(5))
                ->add((new Indicator())->setId(6))
@@ -85,32 +85,32 @@ class RowSet extends TestCase
                ->add((new Indicator())->setId(8))
                ->add((new Indicator())->setId(9));
         $rowSet->getCapabilities()
-               ->add($group1);
-        yield 'one group, many criteria' => [$rowSet, [5, 6, 7, 8, 9]];
+               ->add($capability1);
+        yield 'one capability, many criteria' => [$rowSet, [5, 6, 7, 8, 9]];
 
         $rowSet = new RubricRowSet(new Folder());
-        $group1 = (new Capability())->setId(3);
-        $group1->getIndicators()
+        $capability1 = (new Capability())->setId(3);
+        $capability1->getIndicators()
                ->add(new Indicator())
                ->add((new Indicator())->setId(5))
                ->add((new Indicator())->setId(6))
                ->add((new Indicator())->setId(7))
                ->add((new Indicator())->setId(8))
                ->add((new Indicator())->setId(9));
-        $group2 = (new Capability())->setId(10);
-        $group2->getIndicators()
+        $capability2 = (new Capability())->setId(10);
+        $capability2->getIndicators()
                ->add(new Indicator())
                ->add((new Indicator())->setId(5))
                ->add((new Indicator())->setId(16))
                ->add((new Indicator())->setId(17))
                ->add((new Indicator())->setId(18))
                ->add((new Indicator())->setId(19));
-        $group3 = (new Capability())->setId(12);
+        $capability3 = (new Capability())->setId(12);
         $rowSet->getCapabilities()
-               ->add($group1)
-               ->add($group2)
-               ->add($group3);
-        yield 'many groups, many criteria' => [$rowSet, [5, 6, 7, 8, 9, 16, 17, 18, 19,]];
+               ->add($capability1)
+               ->add($capability2)
+               ->add($capability3);
+        yield 'many capabilities, many criteria' => [$rowSet, [5, 6, 7, 8, 9, 16, 17, 18, 19,]];
     }
 
 
