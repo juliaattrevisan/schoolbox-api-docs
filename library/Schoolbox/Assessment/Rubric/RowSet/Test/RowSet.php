@@ -30,7 +30,7 @@ class RowSet extends TestCase
         yield 'no groups' => [$rowSet, []];
 
         $rowSet = new RubricRowSet(new Folder());
-        $rowSet->getGroups()
+        $rowSet->getCapabilities()
                ->add(new Group())
                ->add((new Group())->setId(3))
                ->add((new Group())->setId(5))
@@ -43,14 +43,14 @@ class RowSet extends TestCase
 
     /**
      * @dataProvider getTestRetrieveGroupIdsData
-     * @covers \Schoolbox\Assessment\Rubric\RowSet\RowSet::retrieveGroupIds
+     * @covers \Schoolbox\Assessment\Rubric\RowSet\RowSet::retrieveCapabilityIds
      *
      * @param RubricRowSet $rowSet
      * @param array        $expected
      */
     public function testRetrieveGroupIds(RubricRowSet $rowSet, array $expected): void
     {
-        $this->assertEquals($expected, $rowSet->retrieveGroupIds());
+        $this->assertEquals($expected, $rowSet->retrieveCapabilityIds());
     }
 
 
@@ -65,7 +65,7 @@ class RowSet extends TestCase
         yield 'no groups' => [$rowSet, []];
 
         $rowSet = new RubricRowSet(new Folder());
-        $rowSet->getGroups()
+        $rowSet->getCapabilities()
                ->add(new Group())
                ->add((new Group())->setId(3))
                ->add((new Group())->setId(5))
@@ -84,7 +84,7 @@ class RowSet extends TestCase
                ->add((new Criterion())->setId(7))
                ->add((new Criterion())->setId(8))
                ->add((new Criterion())->setId(9));
-        $rowSet->getGroups()
+        $rowSet->getCapabilities()
                ->add($group1);
         yield 'one group, many criteria' => [$rowSet, [5, 6, 7, 8, 9]];
 
@@ -106,7 +106,7 @@ class RowSet extends TestCase
                ->add((new Criterion())->setId(18))
                ->add((new Criterion())->setId(19));
         $group3 = (new Group())->setId(12);
-        $rowSet->getGroups()
+        $rowSet->getCapabilities()
                ->add($group1)
                ->add($group2)
                ->add($group3);
@@ -116,13 +116,13 @@ class RowSet extends TestCase
 
     /**
      * @dataProvider getTestRetrieveCriterionIdsData
-     * @covers \Schoolbox\Assessment\Rubric\RowSet\RowSet::retrieveCriterionIds
+     * @covers \Schoolbox\Assessment\Rubric\RowSet\RowSet::retrieveIndicatorIds
      *
      * @param RubricRowSet $rowSet
      * @param array        $expected
      */
     public function testRetrieveCriterionIds(RubricRowSet $rowSet, array $expected): void
     {
-        $this->assertEquals($expected, $rowSet->retrieveCriterionIds());
+        $this->assertEquals($expected, $rowSet->retrieveIndicatorIds());
     }
 }

@@ -289,9 +289,9 @@ class Grid extends TestCase
         $group3->getCriteria()[$criterion8->getId()] = $criterion8;
         $group3->getCriteria()[$criterion9->getId()] = $criterion9;
 
-        $rowSet->getGroups()[$group1->getId()] = $group1;
-        $rowSet->getGroups()[$group2->getId()] = $group2;
-        $rowSet->getGroups()[$group3->getId()] = $group3;
+        $rowSet->getCapabilities()[$group1->getId()] = $group1;
+        $rowSet->getCapabilities()[$group2->getId()] = $group2;
+        $rowSet->getCapabilities()[$group3->getId()] = $group3;
 
 
         $groupUsage1 = new RubricGrid\GroupUsage($group1);

@@ -168,7 +168,7 @@ class Grid
             yield $groupUsage->getGroup();
         }
 
-        foreach ($this->rowSet->getGroups() as $group) {
+        foreach ($this->rowSet->getCapabilities() as $group) {
             if (!isset($seenGroups[$group->getId()])) {
                 yield $group;
             }

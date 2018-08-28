@@ -68,7 +68,7 @@ class Factory
             }
 
 
-            $rowSet->getGroups()[$tempGroupId] = $group;
+            $rowSet->getCapabilities()[$tempGroupId] = $group;
         }
 
         return $rowSet;

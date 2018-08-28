@@ -82,7 +82,7 @@ class Factory
                 continue;
             }
             $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
-            $group         = $grid->getRowSet()->retrieveGroup($groupId);
+            $group         = $grid->getRowSet()->retrieveCapability($groupId);
 
             // If $group is null, then that's a problem; we're trying to save
             // usage for a group which doesn't exist

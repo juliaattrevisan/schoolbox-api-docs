@@ -123,8 +123,8 @@ class Controller extends BaseController
     private function buildTwigDataForForm(RowSet $rowSet): array
     {
         $folder   = $rowSet->getContext()->getBaseContext()->getFolder();
-        $groupIds = $rowSet->retrieveGroupIds();
-        $critIds  = $rowSet->retrieveCriterionIds();
+        $groupIds = $rowSet->retrieveCapabilityIds();
+        $critIds  = $rowSet->retrieveIndicatorIds();
         return [
             'folder'                   => $folder,
             'rowSet'                   => $rowSet,

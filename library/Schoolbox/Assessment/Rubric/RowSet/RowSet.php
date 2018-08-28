@@ -38,7 +38,7 @@ class RowSet
      *
      * @var Group[]|GenericCollection
      */
-    private $groups;
+    private $capabilities;
 
 
     /**
@@ -48,35 +48,35 @@ class RowSet
      */
     public function __construct(AssessmentContext $context)
     {
-        $this->context = $context;
-        $this->groups  = new GenericCollection(Group::class);
+        $this->context      = $context;
+        $this->capabilities = new GenericCollection(Group::class);
     }
 
 
     /**
-     * Retrieves a group by its ID.
+     * Retrieves a capability by its ID.
      *
-     * @param int $groupId
+     * @param int $capabilityId
      * @return null|Group
      */
-    public function retrieveGroup(int $groupId): ?Group
+    public function retrieveCapability(int $capabilityId): ?Group
     {
-        return $this->groups->getBy('id', $groupId);
+        return $this->capabilities->getBy('id', $capabilityId);
     }
 
 
     /**
-     * Retrieves a criterion by its ID.
+     * Retrieves an indicator by its ID.
      *
-     * @param int $criterionId
+     * @param int $indicatorId
      * @return null|Criterion
      */
-    public function retrieveCriterion(int $criterionId): ?Criterion
+    public function retrieveIndicator(int $indicatorId): ?Criterion
     {
-        foreach ($this->groups as $group) {
-            $criterion = $group->retrieveCriterion($criterionId);
-            if ($criterion) {
-                return $criterion;
+        foreach ($this->capabilities as $capability) {
+            $indicator = $capability->retrieveCriterion($indicatorId);
+            if ($indicator) {
+                return $indicator;
             }
         }
         return null;
@@ -84,30 +84,30 @@ class RowSet
 
 
     /**
-     * Retrieve the ID of all groups in this row set.
+     * Retrieve the ID of all capabilities in this row set.
      *
      * @return array|int[]
      */
-    public function retrieveGroupIds(): array
+    public function retrieveCapabilityIds(): array
     {
-        $result = array_unique(array_filter($this->groups->getPropertyValues('id')));
+        $result = array_unique(array_filter($this->capabilities->getPropertyValues('id')));
         sort($result);
         return $result;
     }
 
 
     /**
-     * Retrieve the ID of all criteria in this row set.
+     * Retrieve the ID of all indicators in this row set.
      *
      * @return array|int[]
      */
-    public function retrieveCriterionIds(): array
+    public function retrieveIndicatorIds(): array
     {
-        $criterionIds = [];
-        foreach ($this->groups as $group) {
-            $criterionIds = array_merge($criterionIds, $group->retrieveCriterionIds());
+        $indicatorIds = [];
+        foreach ($this->capabilities as $capability) {
+            $indicatorIds = array_merge($indicatorIds, $capability->retrieveCriterionIds());
         }
-        $result = array_unique(array_filter($criterionIds));
+        $result = array_unique(array_filter($indicatorIds));
         sort($result);
         return $result;
     }
@@ -125,19 +125,19 @@ class RowSet
     /**
      * @return Group[]|GenericCollection
      */
-    public function getGroups(): GenericCollection
+    public function getCapabilities(): GenericCollection
     {
-        return $this->groups;
+        return $this->capabilities;
     }
 
 
     /**
-     * @param Group[]|GenericCollection $groups
+     * @param Group[]|GenericCollection $capabilities
      * @return static
      */
-    public function setGroups(GenericCollection $groups): self
+    public function setCapabilities(GenericCollection $capabilities): self
     {
-        $this->groups = $groups;
+        $this->capabilities = $capabilities;
         return $this;
     }
 }

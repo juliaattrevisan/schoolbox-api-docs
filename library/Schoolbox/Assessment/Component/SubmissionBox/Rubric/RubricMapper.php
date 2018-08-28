@@ -158,7 +158,7 @@ class RubricMapper
                 }
             }
         }
-        $rowSet->setGroups($groups);
+        $rowSet->setCapabilities($groups);
 
         return $rowSet;
     }
@@ -194,14 +194,14 @@ class RubricMapper
 
         // Existing data
         $existingRowSet          = $this->retrieveRowSet($rowSet->getContext(), true);
-        $existingGroupIds        = $existingRowSet->retrieveGroupIds();
-        $existingCriterionIds    = $existingRowSet->retrieveCriterionIds();
+        $existingGroupIds        = $existingRowSet->retrieveCapabilityIds();
+        $existingCriterionIds    = $existingRowSet->retrieveIndicatorIds();
         $existingGroupModels     = $groupMapper->findByColumn('id', $existingGroupIds);
         $existingCriterionModels = $criterionMapper->findByColumn('id', $existingCriterionIds);
 
         // New data
-        $newGroupIds             = $rowSet->retrieveGroupIds();
-        $newCriterionIds         = $rowSet->retrieveCriterionIds();
+        $newGroupIds             = $rowSet->retrieveCapabilityIds();
+        $newCriterionIds         = $rowSet->retrieveIndicatorIds();
         $newGroupModels          = $groupMapper->createCollection();
         $newCriterionModels      = $criterionMapper->createCollection();
 
@@ -210,13 +210,13 @@ class RubricMapper
 
 
         // Process groups+criteria into models
-        foreach ($rowSet->getGroups() as $group) {
+        foreach ($rowSet->getCapabilities() as $group) {
             // Set the group aside to be persisted
             $existingGroup = null;
             $groupId       = $group->getId();
             $groupModel    = null;
             if ($groupId) {
-                $existingGroup = $existingRowSet->retrieveGroup($group->getId());
+                $existingGroup = $existingRowSet->retrieveCapability($group->getId());
                 $groupModel    = $existingGroupModels[$groupId] ?? null;
             }
 
@@ -268,7 +268,7 @@ class RubricMapper
                 $criterionId       = $criterion->getId();
                 $criterionModel    = null;
                 if ($criterionId) {
-                    $existingCriterion = $existingRowSet->retrieveCriterion($criterionId);
+                    $existingCriterion = $existingRowSet->retrieveIndicator($criterionId);
                     $criterionModel    = $existingCriterionModels[$criterionId] ?? null;
                 }
 
@@ -320,7 +320,7 @@ class RubricMapper
             // Validate deleted groups aren't in use
             foreach ($deletedGroupIds as $deletedGroupId) {
                 // validate this isn't in use
-                $existingGroup = $existingRowSet->retrieveGroup($deletedGroupId);
+                $existingGroup = $existingRowSet->retrieveCapability($deletedGroupId);
                 if ($existingGroup && $existingGroup->isInUse($allowModifyExclusion)) {
                     // throw exception
                     throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
@@ -330,7 +330,7 @@ class RubricMapper
             // Validate deleted criteria aren't in use
             foreach ($deletedCriterionIds as $deletedCriterionId) {
                 // validate this isn't in use
-                $existingCriterion = $existingRowSet->retrieveCriterion($deletedCriterionId);
+                $existingCriterion = $existingRowSet->retrieveIndicator($deletedCriterionId);
                 if ($existingCriterion && $existingCriterion->isInUse($allowModifyExclusion)) {
                     // throw exception
                     throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
@@ -441,7 +441,7 @@ class RubricMapper
             /** @var GroupUsage $groupUsageModel */
             $groupModel = $groupUsageModel->getGroup();
             $groupId    = $groupModel->getId();
-            $group      = $grid->getRowSet()->retrieveGroup($groupId);
+            $group      = $grid->getRowSet()->retrieveCapability($groupId);
             if (!$group) {
                 continue;
             }
@@ -454,7 +454,7 @@ class RubricMapper
                 /** @var CriterionUsage $criterionUsageModel */
                 $criterionModel = $criterionUsageModel->getCriterion();
                 $criterionId    = $criterionModel->getId();
-                $criterion      = $grid->getRowSet()->retrieveCriterion($criterionId);
+                $criterion      = $grid->getRowSet()->retrieveIndicator($criterionId);
                 if (!$criterion) {
                     continue;
                 }
@@ -528,7 +528,7 @@ class RubricMapper
         // Persist groups/criteria
         $criterionModels = $criterionMapper->createCollection();
         $groupModels     = $groupMapper->createCollection();
-        foreach ($grid->getRowSet()->getGroups() as $group) {
+        foreach ($grid->getRowSet()->getCapabilities() as $group) {
             $groupId = $group->getId();
             if (!$groupId) {
                 continue;
