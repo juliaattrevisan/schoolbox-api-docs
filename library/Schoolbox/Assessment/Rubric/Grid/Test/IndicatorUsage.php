@@ -16,7 +16,7 @@ use Schoolbox\Assessment\Rubric\RowSet;
  * @covers \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage
  * @codeCoverageIgnore
  */
-class CriterionUsage extends TestCase
+class IndicatorUsage extends TestCase
 {
     /**
      * Data provider for `testRetrieveDescriptor`.

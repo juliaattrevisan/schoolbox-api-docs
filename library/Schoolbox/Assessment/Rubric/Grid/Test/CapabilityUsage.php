@@ -16,7 +16,7 @@ use Schoolbox\Assessment\Rubric\RowSet;
  * @covers \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage
  * @codeCoverageIgnore
  */
-class GroupUsage extends TestCase
+class CapabilityUsage extends TestCase
 {
     /**
      * Data provider for `testRetrieveCriterionUsage`
