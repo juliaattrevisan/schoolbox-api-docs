@@ -388,6 +388,17 @@
 
                 $closestMaxMarkInput.removeAttr("data-customised");
             });
+
+            $("[data-group-max-value]").each(function() {
+                $(this).rules("add", {
+                    number: true,
+                    positiveNumber: true,
+                    messages: {
+                        number: "Maximum capability points must be a numeric value",
+                        positiveNumber: "Maximum capability points must be greater than or equal to 0"
+                    }
+                });
+            });
         }
 
         // Init the entire grid on document.ready
