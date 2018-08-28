@@ -637,7 +637,7 @@ class ImpressionsConversionsOpens
 
 
     /**
-     * Calculate a integer percentage
+     * Calculate a integer percentage, but you can specify precision
      *
      * @param null|int $numerator
      * @param null|int $denominator
@@ -674,17 +674,36 @@ class ImpressionsConversionsOpens
     /**
      * Calculate Conversion ratios for each referrer type
      *
+     * $breakdown = [
+     *     'conversion' => [
+     *         'dashboard' => 12,
+     *         'homepage' => 34,
+     *         ...
+     *     ],
+     *     'impression' => [
+     *         'dashboard' => 12,
+     *         'homepage' => 34,
+     *         ...
+     *     ],
+     *     'open' => [
+     *         'dashboard' => 12,
+     *         'homepage' => 34,
+     *         ...
+     *     ]
+     * ]
+     *
      * @param array $breakdown
      * @return array
      */
     private function calculateReferrerRatios(array $breakdown): array
     {
-        $referrers = Mapper::REFERRERS;
-
         $referrerRatio = [];
 
-        foreach ($referrers as $referrer) {
-            $referrerRatio[$referrer] = $this->percentage($breakdown[Mapper::TYPE_CONVERSION][$referrer], $breakdown[Mapper::TYPE_IMPRESSION][$referrer]);
+        foreach (Mapper::REFERRERS as $referrer) {
+            $numConversions = $breakdown[Mapper::TYPE_CONVERSION][$referrer];
+            $numImpressions = $breakdown[Mapper::TYPE_IMPRESSION][$referrer];
+
+            $referrerRatio[$referrer] = $this->calculateConversionRatio($numConversions, $numImpressions);
         }
 
         return $referrerRatio;
