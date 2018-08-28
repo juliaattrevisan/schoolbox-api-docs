@@ -115,9 +115,6 @@ class Decorator implements DecoratorInterface
 
 
         if ($this->getUseRubric()) {
-
-            // TODO persist the new rowset before attempting to save it
-
             $gridFactory  = new GridFactory();
             $existingGrid = new Grid(
                 $assessment,
