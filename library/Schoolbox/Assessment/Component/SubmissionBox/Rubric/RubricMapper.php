@@ -786,8 +786,7 @@ class RubricMapper
         }
 
         /** @var Rubric $rubric */
-        // TODO fix this up once rebazed onto CSV stuff
-        $rubric = $this->factory->buildFromPostData([0 => $postdata], $markperCap, true);
+        $rubric = $this->factory->buildFromPostData([0 => $postdata], $markPerCapability, true);
 
         return [$rubric, $markPerCapability, $useMarkRange];
     }
