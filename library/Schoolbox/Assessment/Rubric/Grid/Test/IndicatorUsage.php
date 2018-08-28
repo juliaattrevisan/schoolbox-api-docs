@@ -25,8 +25,8 @@ class IndicatorUsage extends TestCase
      */
     public function getTestRetrieveDescriptorData(): iterable
     {
-        $criterion      = (new RowSet\Indicator())->setId(1)->setName('Criterion 1');
-        $criterionUsage = new RubricGrid\IndicatorUsage($criterion);
+        $indicator      = (new RowSet\Indicator())->setId(1)->setName('Indicator 1');
+        $indicatorUsage = new RubricGrid\IndicatorUsage($indicator);
 
         $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
         $level2 = (new RubricGrid\Level())->setId(2)->setName('Level 2');
@@ -40,17 +40,17 @@ class IndicatorUsage extends TestCase
         $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.4')->setMaxValue(6);
         $descriptor5 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.5')->setMaxValue(8);
 
-        $criterionUsage->getDescriptors()[$level1->getId()] = $descriptor1;
-        $criterionUsage->getDescriptors()[$level2->getId()] = $descriptor2;
-        $criterionUsage->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage->getDescriptors()[$level3->getId()] = $descriptor3;
         // level 4: not set
-        $criterionUsage->getDescriptors()[$level5->getId()] = $descriptor5;
+        $indicatorUsage->getDescriptors()[$level5->getId()] = $descriptor5;
 
-        yield 'descriptor 1: set'     => [$criterionUsage, $level1->getId(), $descriptor1];
-        yield 'descriptor 2: set'     => [$criterionUsage, $level2->getId(), $descriptor2];
-        yield 'descriptor 3: set'     => [$criterionUsage, $level3->getId(), $descriptor3];
-        yield 'descriptor 4: not set' => [$criterionUsage, $level4->getId(), null];
-        yield 'descriptor 5: set'     => [$criterionUsage, $level5->getId(), $descriptor5];
+        yield 'descriptor 1: set'     => [$indicatorUsage, $level1->getId(), $descriptor1];
+        yield 'descriptor 2: set'     => [$indicatorUsage, $level2->getId(), $descriptor2];
+        yield 'descriptor 3: set'     => [$indicatorUsage, $level3->getId(), $descriptor3];
+        yield 'descriptor 4: not set' => [$indicatorUsage, $level4->getId(), null];
+        yield 'descriptor 5: set'     => [$indicatorUsage, $level5->getId(), $descriptor5];
     }
 
 
@@ -58,16 +58,16 @@ class IndicatorUsage extends TestCase
      * @dataProvider getTestRetrieveDescriptorData
      * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::retrieveDescriptor
      *
-     * @param RubricGrid\IndicatorUsage  $criterionUsage
+     * @param RubricGrid\IndicatorUsage  $indicatorUsage
      * @param int                        $levelIndex
      * @param null|RubricGrid\Descriptor $expected
      */
     public function testRetrieveDescriptor(
-        RubricGrid\IndicatorUsage $criterionUsage,
+        RubricGrid\IndicatorUsage $indicatorUsage,
         int $levelIndex,
         ?RubricGrid\Descriptor $expected
     ): void {
-        $this->assertSame($expected, $criterionUsage->retrieveDescriptor($levelIndex));
+        $this->assertSame($expected, $indicatorUsage->retrieveDescriptor($levelIndex));
     }
 
 
@@ -78,8 +78,8 @@ class IndicatorUsage extends TestCase
      */
     public function getTestCalculateMaxValueDataFromDescriptors(): iterable
     {
-        $criterion1      = (new RowSet\Indicator())->setId(1)->setName('Criterion 1');
-        $criterionUsage1 = new RubricGrid\IndicatorUsage($criterion1);
+        $indicator1      = (new RowSet\Indicator())->setId(1)->setName('Indicator 1');
+        $indicatorUsage1 = new RubricGrid\IndicatorUsage($indicator1);
 
         $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
         $level2 = (new RubricGrid\Level())->setId(2)->setName('Level 2');
@@ -93,31 +93,31 @@ class IndicatorUsage extends TestCase
         $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.4')->setMaxValue(6);
         $descriptor5 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.5')->setMaxValue(8);
 
-        $criterionUsage1->getDescriptors()[$level1->getId()] = $descriptor1;
-        $criterionUsage1->getDescriptors()[$level2->getId()] = $descriptor2;
-        $criterionUsage1->getDescriptors()[$level3->getId()] = $descriptor3;
-        $criterionUsage1->getDescriptors()[$level4->getId()] = $descriptor4;
-        $criterionUsage1->getDescriptors()[$level5->getId()] = $descriptor5;
+        $indicatorUsage1->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage1->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage1->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage1->getDescriptors()[$level4->getId()] = $descriptor4;
+        $indicatorUsage1->getDescriptors()[$level5->getId()] = $descriptor5;
 
-        yield 'criterion 1: descriptors' => [$criterionUsage1, 8];
-
-
-        $criterion2      = (new RowSet\Indicator())->setId(2)->setName('Criterion 2');
-        $criterionUsage2 = new RubricGrid\IndicatorUsage($criterion2);
-
-        yield 'criterion 2: no descriptors' => [$criterionUsage2, null];
+        yield 'indicator 1: descriptors' => [$indicatorUsage1, 8];
 
 
-        $criterion3      = (new RowSet\Indicator())->setId(3)->setName('Criterion 3');
-        $criterionUsage3 = new RubricGrid\IndicatorUsage($criterion3);
+        $indicator2      = (new RowSet\Indicator())->setId(2)->setName('Indicator 2');
+        $indicatorUsage2 = new RubricGrid\IndicatorUsage($indicator2);
+
+        yield 'indicator 2: no descriptors' => [$indicatorUsage2, null];
+
+
+        $indicator3      = (new RowSet\Indicator())->setId(3)->setName('Indicator 3');
+        $indicatorUsage3 = new RubricGrid\IndicatorUsage($indicator3);
 
         $descriptor6 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.1');
         $descriptor7 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.2')->setMaxValue(null);
 
-        $criterionUsage1->getDescriptors()[$level1->getId()] = $descriptor6;
-        $criterionUsage1->getDescriptors()[$level2->getId()] = $descriptor7;
+        $indicatorUsage1->getDescriptors()[$level1->getId()] = $descriptor6;
+        $indicatorUsage1->getDescriptors()[$level2->getId()] = $descriptor7;
 
-        yield 'criterion 3: no non-null descriptors' => [$criterionUsage3, null];
+        yield 'indicator 3: no non-null descriptors' => [$indicatorUsage3, null];
     }
 
 
@@ -125,14 +125,14 @@ class IndicatorUsage extends TestCase
      * @dataProvider getTestCalculateMaxValueDataFromDescriptors
      * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::calculateMaxValueFromDescriptors
      *
-     * @param RubricGrid\IndicatorUsage $criterionUsage
+     * @param RubricGrid\IndicatorUsage $indicatorUsage
      * @param float|null                $expected
      */
     public function testCalculateMaxValueFromDescriptors(
-        RubricGrid\IndicatorUsage $criterionUsage,
+        RubricGrid\IndicatorUsage $indicatorUsage,
         ?float $expected
     ): void {
-        $this->assertSame($expected, $criterionUsage->calculateMaxValueFromDescriptors());
+        $this->assertSame($expected, $indicatorUsage->calculateMaxValueFromDescriptors());
     }
 
 
@@ -144,8 +144,8 @@ class IndicatorUsage extends TestCase
     public function getTestApplyDescriptorMinValuesData(): iterable
     {
         // Ascending: [0, 2, 4, 6, 8] => [0, 1..2, 3..4, 5..6, 7..8]
-        $criterion       = (new RowSet\Indicator())->setId(1)->setName('Criterion');
-        $criterionUsage1 = new RubricGrid\IndicatorUsage($criterion);
+        $indicator       = (new RowSet\Indicator())->setId(1)->setName('Indicator');
+        $indicatorUsage1 = new RubricGrid\IndicatorUsage($indicator);
 
         $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
         $level2 = (new RubricGrid\Level())->setId(2)->setName('Level 2');
@@ -160,21 +160,21 @@ class IndicatorUsage extends TestCase
         $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.4')->setMaxValue(6);
         $descriptor5 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.5')->setMaxValue(8);
 
-        $criterionUsage1->getDescriptors()[$level1->getId()] = $descriptor1;
-        $criterionUsage1->getDescriptors()[$level2->getId()] = $descriptor2;
-        $criterionUsage1->getDescriptors()[$level3->getId()] = $descriptor3;
-        $criterionUsage1->getDescriptors()[$level4->getId()] = $descriptor4;
-        $criterionUsage1->getDescriptors()[$level5->getId()] = $descriptor5;
+        $indicatorUsage1->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage1->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage1->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage1->getDescriptors()[$level4->getId()] = $descriptor4;
+        $indicatorUsage1->getDescriptors()[$level5->getId()] = $descriptor5;
 
-        yield 'Ascending 0' => [$criterionUsage1, $level1->getId(), 0];
-        yield 'Ascending 2' => [$criterionUsage1, $level2->getId(), 1];
-        yield 'Ascending 4' => [$criterionUsage1, $level3->getId(), 3];
-        yield 'Ascending 6' => [$criterionUsage1, $level4->getId(), 5];
-        yield 'Ascending 8' => [$criterionUsage1, $level5->getId(), 7];
+        yield 'Ascending 0' => [$indicatorUsage1, $level1->getId(), 0];
+        yield 'Ascending 2' => [$indicatorUsage1, $level2->getId(), 1];
+        yield 'Ascending 4' => [$indicatorUsage1, $level3->getId(), 3];
+        yield 'Ascending 6' => [$indicatorUsage1, $level4->getId(), 5];
+        yield 'Ascending 8' => [$indicatorUsage1, $level5->getId(), 7];
 
 
         // Descending: [8, 6, 4, 2, 0] => [7..8, 5..6, 3..4, 1..2, 0]
-        $criterionUsage2 = new RubricGrid\IndicatorUsage($criterion);
+        $indicatorUsage2 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 2.1')->setMaxValue(8);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 2.2')->setMaxValue(6);
@@ -182,113 +182,113 @@ class IndicatorUsage extends TestCase
         $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 2.4')->setMaxValue(2);
         $descriptor5 = (new RubricGrid\Descriptor())->setDescription('Descriptor 2.5')->setMaxValue(0);
 
-        $criterionUsage2->getDescriptors()[$level1->getId()] = $descriptor1;
-        $criterionUsage2->getDescriptors()[$level2->getId()] = $descriptor2;
-        $criterionUsage2->getDescriptors()[$level3->getId()] = $descriptor3;
-        $criterionUsage2->getDescriptors()[$level4->getId()] = $descriptor4;
-        $criterionUsage2->getDescriptors()[$level5->getId()] = $descriptor5;
+        $indicatorUsage2->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage2->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage2->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage2->getDescriptors()[$level4->getId()] = $descriptor4;
+        $indicatorUsage2->getDescriptors()[$level5->getId()] = $descriptor5;
 
-        yield 'Descending 8' => [$criterionUsage2, $level1->getId(), 7];
-        yield 'Descending 6' => [$criterionUsage2, $level2->getId(), 5];
-        yield 'Descending 4' => [$criterionUsage2, $level3->getId(), 3];
-        yield 'Descending 2' => [$criterionUsage2, $level4->getId(), 1];
-        yield 'Descending 0' => [$criterionUsage2, $level5->getId(), 0];
+        yield 'Descending 8' => [$indicatorUsage2, $level1->getId(), 7];
+        yield 'Descending 6' => [$indicatorUsage2, $level2->getId(), 5];
+        yield 'Descending 4' => [$indicatorUsage2, $level3->getId(), 3];
+        yield 'Descending 2' => [$indicatorUsage2, $level4->getId(), 1];
+        yield 'Descending 0' => [$indicatorUsage2, $level5->getId(), 0];
 
 
         // Asc, skip null before: [0, null, 5, 10] => [0, null, 1..5, 6..10]
-        $criterionUsage3 = new RubricGrid\IndicatorUsage($criterion);
+        $indicatorUsage3 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.1')->setMaxValue(0);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.2')->setMaxValue(null);
         $descriptor3 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.3')->setMaxValue(5);
         $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.4')->setMaxValue(10);
 
-        $criterionUsage3->getDescriptors()[$level1->getId()] = $descriptor1;
-        $criterionUsage3->getDescriptors()[$level2->getId()] = $descriptor2;
-        $criterionUsage3->getDescriptors()[$level3->getId()] = $descriptor3;
-        $criterionUsage3->getDescriptors()[$level4->getId()] = $descriptor4;
+        $indicatorUsage3->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage3->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage3->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage3->getDescriptors()[$level4->getId()] = $descriptor4;
 
-        yield 'Ascending skip-null-before 0'    => [$criterionUsage3, $level1->getId(), 0];
-        yield 'Ascending skip-null-before 5'    => [$criterionUsage3, $level2->getId(), null];
-        yield 'Ascending skip-null-before null' => [$criterionUsage3, $level3->getId(), 1];
-        yield 'Ascending skip-null-before 10'   => [$criterionUsage3, $level4->getId(), 6];
+        yield 'Ascending skip-null-before 0'    => [$indicatorUsage3, $level1->getId(), 0];
+        yield 'Ascending skip-null-before 5'    => [$indicatorUsage3, $level2->getId(), null];
+        yield 'Ascending skip-null-before null' => [$indicatorUsage3, $level3->getId(), 1];
+        yield 'Ascending skip-null-before 10'   => [$indicatorUsage3, $level4->getId(), 6];
 
 
         // Asc, skip null after: [0, 5, null, 10] => [0, 1..5, null, 6..10]
-        $criterionUsage4 = new RubricGrid\IndicatorUsage($criterion);
+        $indicatorUsage4 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 4.1')->setMaxValue(0);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 4.2')->setMaxValue(5);
         $descriptor3 = (new RubricGrid\Descriptor())->setDescription('Descriptor 4.3')->setMaxValue(null);
         $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 4.4')->setMaxValue(10);
 
-        $criterionUsage4->getDescriptors()[$level1->getId()] = $descriptor1;
-        $criterionUsage4->getDescriptors()[$level2->getId()] = $descriptor2;
-        $criterionUsage4->getDescriptors()[$level3->getId()] = $descriptor3;
-        $criterionUsage4->getDescriptors()[$level4->getId()] = $descriptor4;
+        $indicatorUsage4->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage4->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage4->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage4->getDescriptors()[$level4->getId()] = $descriptor4;
 
-        yield 'Ascending skip-null-after 0'    => [$criterionUsage4, $level1->getId(), 0];
-        yield 'Ascending skip-null-after 5'    => [$criterionUsage4, $level2->getId(), 1];
-        yield 'Ascending skip-null-after null' => [$criterionUsage4, $level3->getId(), null];
-        yield 'Ascending skip-null-after 10'   => [$criterionUsage4, $level4->getId(), 6];
+        yield 'Ascending skip-null-after 0'    => [$indicatorUsage4, $level1->getId(), 0];
+        yield 'Ascending skip-null-after 5'    => [$indicatorUsage4, $level2->getId(), 1];
+        yield 'Ascending skip-null-after null' => [$indicatorUsage4, $level3->getId(), null];
+        yield 'Ascending skip-null-after 10'   => [$indicatorUsage4, $level4->getId(), 6];
 
 
         // Asc, skip null at start: [null, 5, 10] => [null, 5, 6..10]
-        $criterionUsage5 = new RubricGrid\IndicatorUsage($criterion);
+        $indicatorUsage5 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 5.1')->setMaxValue(null);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 5.2')->setMaxValue(5);
         $descriptor3 = (new RubricGrid\Descriptor())->setDescription('Descriptor 5.3')->setMaxValue(10);
 
-        $criterionUsage5->getDescriptors()[$level1->getId()] = $descriptor1;
-        $criterionUsage5->getDescriptors()[$level2->getId()] = $descriptor2;
-        $criterionUsage5->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage5->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage5->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage5->getDescriptors()[$level3->getId()] = $descriptor3;
 
-        yield 'Ascending skip-null-start null' => [$criterionUsage5, $level1->getId(), null];
-        yield 'Ascending skip-null-start 5'    => [$criterionUsage5, $level2->getId(), 5];
-        yield 'Ascending skip-null-start 10'   => [$criterionUsage5, $level3->getId(), 6];
+        yield 'Ascending skip-null-start null' => [$indicatorUsage5, $level1->getId(), null];
+        yield 'Ascending skip-null-start 5'    => [$indicatorUsage5, $level2->getId(), 5];
+        yield 'Ascending skip-null-start 10'   => [$indicatorUsage5, $level3->getId(), 6];
 
 
         // Desc, skip null before: [10, null, 5, 0] => [6..10, null, 1..5, 0]
-        $criterionUsage6 = new RubricGrid\IndicatorUsage($criterion);
+        $indicatorUsage6 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 6.1')->setMaxValue(10);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 6.2')->setMaxValue(null);
         $descriptor3 = (new RubricGrid\Descriptor())->setDescription('Descriptor 6.3')->setMaxValue(5);
         $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 6.4')->setMaxValue(0);
 
-        $criterionUsage6->getDescriptors()[$level1->getId()] = $descriptor1;
-        $criterionUsage6->getDescriptors()[$level2->getId()] = $descriptor2;
-        $criterionUsage6->getDescriptors()[$level3->getId()] = $descriptor3;
-        $criterionUsage6->getDescriptors()[$level4->getId()] = $descriptor4;
+        $indicatorUsage6->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage6->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage6->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage6->getDescriptors()[$level4->getId()] = $descriptor4;
 
-        yield 'Descending skip-null-before 0'    => [$criterionUsage6, $level1->getId(), 6];
-        yield 'Descending skip-null-before 5'    => [$criterionUsage6, $level2->getId(), null];
-        yield 'Descending skip-null-before null' => [$criterionUsage6, $level3->getId(), 1];
-        yield 'Descending skip-null-before 10'   => [$criterionUsage6, $level4->getId(), 0];
+        yield 'Descending skip-null-before 0'    => [$indicatorUsage6, $level1->getId(), 6];
+        yield 'Descending skip-null-before 5'    => [$indicatorUsage6, $level2->getId(), null];
+        yield 'Descending skip-null-before null' => [$indicatorUsage6, $level3->getId(), 1];
+        yield 'Descending skip-null-before 10'   => [$indicatorUsage6, $level4->getId(), 0];
 
 
         // Desc, skip null after: [10, 5, null, 0] => [6..10, 1..5, null, 0]
-        $criterionUsage7 = new RubricGrid\IndicatorUsage($criterion);
+        $indicatorUsage7 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 7.1')->setMaxValue(10);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 7.2')->setMaxValue(5);
         $descriptor3 = (new RubricGrid\Descriptor())->setDescription('Descriptor 7.3')->setMaxValue(null);
         $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 7.4')->setMaxValue(0);
 
-        $criterionUsage7->getDescriptors()[$level1->getId()] = $descriptor1;
-        $criterionUsage7->getDescriptors()[$level2->getId()] = $descriptor2;
-        $criterionUsage7->getDescriptors()[$level3->getId()] = $descriptor3;
-        $criterionUsage7->getDescriptors()[$level4->getId()] = $descriptor4;
+        $indicatorUsage7->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage7->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage7->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage7->getDescriptors()[$level4->getId()] = $descriptor4;
 
-        yield 'Descending skip-null-after 0'    => [$criterionUsage7, $level1->getId(), 6];
-        yield 'Descending skip-null-after 5'    => [$criterionUsage7, $level2->getId(), 1];
-        yield 'Descending skip-null-after null' => [$criterionUsage7, $level3->getId(), null];
-        yield 'Descending skip-null-after 10'   => [$criterionUsage7, $level4->getId(), 0];
+        yield 'Descending skip-null-after 0'    => [$indicatorUsage7, $level1->getId(), 6];
+        yield 'Descending skip-null-after 5'    => [$indicatorUsage7, $level2->getId(), 1];
+        yield 'Descending skip-null-after null' => [$indicatorUsage7, $level3->getId(), null];
+        yield 'Descending skip-null-after 10'   => [$indicatorUsage7, $level4->getId(), 0];
 
 
         // Asc+Desc: [0, 4, 8, 3, 0]  => [0, 1..4, 5..8, 1..3, 0] (use highest max below this max)
-        $criterionUsage8 = new RubricGrid\IndicatorUsage($criterion);
+        $indicatorUsage8 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 8.1')->setMaxValue(0);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 8.2')->setMaxValue(4);
@@ -296,21 +296,21 @@ class IndicatorUsage extends TestCase
         $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 8.4')->setMaxValue(3);
         $descriptor5 = (new RubricGrid\Descriptor())->setDescription('Descriptor 8.5')->setMaxValue(0);
 
-        $criterionUsage8->getDescriptors()[$level1->getId()] = $descriptor1;
-        $criterionUsage8->getDescriptors()[$level2->getId()] = $descriptor2;
-        $criterionUsage8->getDescriptors()[$level3->getId()] = $descriptor3;
-        $criterionUsage8->getDescriptors()[$level4->getId()] = $descriptor4;
-        $criterionUsage8->getDescriptors()[$level5->getId()] = $descriptor5;
+        $indicatorUsage8->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage8->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage8->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage8->getDescriptors()[$level4->getId()] = $descriptor4;
+        $indicatorUsage8->getDescriptors()[$level5->getId()] = $descriptor5;
 
-        yield 'Asc+Desc 0 (start)' => [$criterionUsage8, $level1->getId(), 0];
-        yield 'Asc+Desc 4'         => [$criterionUsage8, $level2->getId(), 1];
-        yield 'Asc+Desc 8'         => [$criterionUsage8, $level3->getId(), 5];
-        yield 'Asc+Desc 3'         => [$criterionUsage8, $level4->getId(), 1];
-        yield 'Asc+Desc 0 (end)'   => [$criterionUsage8, $level5->getId(), 0];
+        yield 'Asc+Desc 0 (start)' => [$indicatorUsage8, $level1->getId(), 0];
+        yield 'Asc+Desc 4'         => [$indicatorUsage8, $level2->getId(), 1];
+        yield 'Asc+Desc 8'         => [$indicatorUsage8, $level3->getId(), 5];
+        yield 'Asc+Desc 3'         => [$indicatorUsage8, $level4->getId(), 1];
+        yield 'Asc+Desc 0 (end)'   => [$indicatorUsage8, $level5->getId(), 0];
 
 
         // Fibonacci: [1, 1, 2, 3, 5, 8] => [1, 1, 2, 3, 4..5, 6..8]
-        $criterionUsage9 = new RubricGrid\IndicatorUsage($criterion);
+        $indicatorUsage9 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.1')->setMaxValue(1);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.2')->setMaxValue(1);
@@ -319,23 +319,23 @@ class IndicatorUsage extends TestCase
         $descriptor5 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.5')->setMaxValue(5);
         $descriptor6 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.4')->setMaxValue(8);
 
-        $criterionUsage9->getDescriptors()[$level1->getId()] = $descriptor1;
-        $criterionUsage9->getDescriptors()[$level2->getId()] = $descriptor2;
-        $criterionUsage9->getDescriptors()[$level3->getId()] = $descriptor3;
-        $criterionUsage9->getDescriptors()[$level4->getId()] = $descriptor4;
-        $criterionUsage9->getDescriptors()[$level5->getId()] = $descriptor5;
-        $criterionUsage9->getDescriptors()[$level6->getId()] = $descriptor6;
+        $indicatorUsage9->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage9->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage9->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage9->getDescriptors()[$level4->getId()] = $descriptor4;
+        $indicatorUsage9->getDescriptors()[$level5->getId()] = $descriptor5;
+        $indicatorUsage9->getDescriptors()[$level6->getId()] = $descriptor6;
 
-        yield 'Fibonacci 1 (1)' => [$criterionUsage9, $level1->getId(), 1];
-        yield 'Fibonacci 2 (1)' => [$criterionUsage9, $level2->getId(), 1];
-        yield 'Fibonacci 3 (2)' => [$criterionUsage9, $level3->getId(), 2];
-        yield 'Fibonacci 4 (3)' => [$criterionUsage9, $level4->getId(), 3];
-        yield 'Fibonacci 5 (5)' => [$criterionUsage9, $level5->getId(), 4];
-        yield 'Fibonacci 6 (8)' => [$criterionUsage9, $level6->getId(), 6];
+        yield 'Fibonacci 1 (1)' => [$indicatorUsage9, $level1->getId(), 1];
+        yield 'Fibonacci 2 (1)' => [$indicatorUsage9, $level2->getId(), 1];
+        yield 'Fibonacci 3 (2)' => [$indicatorUsage9, $level3->getId(), 2];
+        yield 'Fibonacci 4 (3)' => [$indicatorUsage9, $level4->getId(), 3];
+        yield 'Fibonacci 5 (5)' => [$indicatorUsage9, $level5->getId(), 4];
+        yield 'Fibonacci 6 (8)' => [$indicatorUsage9, $level6->getId(), 6];
 
 
         // All null: [null, null, null, null, null] => [null, null, null, null, null]
-        $criterionUsage10 = new RubricGrid\IndicatorUsage($criterion);
+        $indicatorUsage10 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.1')->setMaxValue(null);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.2')->setMaxValue(null);
@@ -343,27 +343,27 @@ class IndicatorUsage extends TestCase
         $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.4')->setMaxValue(null);
         $descriptor5 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.5')->setMaxValue(null);
 
-        $criterionUsage10->getDescriptors()[$level1->getId()] = $descriptor1;
-        $criterionUsage10->getDescriptors()[$level2->getId()] = $descriptor2;
-        $criterionUsage10->getDescriptors()[$level3->getId()] = $descriptor3;
-        $criterionUsage10->getDescriptors()[$level4->getId()] = $descriptor4;
-        $criterionUsage10->getDescriptors()[$level5->getId()] = $descriptor5;
+        $indicatorUsage10->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage10->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage10->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage10->getDescriptors()[$level4->getId()] = $descriptor4;
+        $indicatorUsage10->getDescriptors()[$level5->getId()] = $descriptor5;
 
-        yield 'Null 1 (null)' => [$criterionUsage10, $level1->getId(), null];
-        yield 'Null 2 (null)' => [$criterionUsage10, $level2->getId(), null];
-        yield 'Null 3 (null)' => [$criterionUsage10, $level3->getId(), null];
-        yield 'Null 4 (null)' => [$criterionUsage10, $level4->getId(), null];
-        yield 'Null 5 (null)' => [$criterionUsage10, $level5->getId(), null];
+        yield 'Null 1 (null)' => [$indicatorUsage10, $level1->getId(), null];
+        yield 'Null 2 (null)' => [$indicatorUsage10, $level2->getId(), null];
+        yield 'Null 3 (null)' => [$indicatorUsage10, $level3->getId(), null];
+        yield 'Null 4 (null)' => [$indicatorUsage10, $level4->getId(), null];
+        yield 'Null 5 (null)' => [$indicatorUsage10, $level5->getId(), null];
 
 
         // Only one descriptor: [5] => [5]
-        $criterionUsage11 = new RubricGrid\IndicatorUsage($criterion);
+        $indicatorUsage11 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 10.1')->setMaxValue(5);
 
-        $criterionUsage11->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage11->getDescriptors()[$level1->getId()] = $descriptor1;
 
-        yield 'Single Descriptor' => [$criterionUsage11, $level1->getId(), 5];
+        yield 'Single Descriptor' => [$indicatorUsage11, $level1->getId(), 5];
     }
 
 
@@ -371,17 +371,17 @@ class IndicatorUsage extends TestCase
      * @dataProvider getTestApplyDescriptorMinValuesData
      * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::applyDescriptorMinValues
      *
-     * @param RubricGrid\IndicatorUsage $criterionUsage
+     * @param RubricGrid\IndicatorUsage $indicatorUsage
      * @param int                       $levelIndex
      * @param float|null                $expected
      */
     public function testApplyDescriptorMinValues(
-        RubricGrid\IndicatorUsage $criterionUsage,
+        RubricGrid\IndicatorUsage $indicatorUsage,
         int $levelIndex,
         ?float $expected
     ): void {
-        $criterionUsage->applyDescriptorMinValues(true);
-        $descriptor = $criterionUsage->retrieveDescriptor($levelIndex);
+        $indicatorUsage->applyDescriptorMinValues(true);
+        $descriptor = $indicatorUsage->retrieveDescriptor($levelIndex);
         $this->assertNotNull($descriptor);
         $this->assertSame($expected, $descriptor->getMinValue());
     }
@@ -397,7 +397,7 @@ class IndicatorUsage extends TestCase
         // Test using the Fibonacci sequence
         // Fibonacci: [1, 1, 2, 3, 5, 8] => [1, 1, 2, 3, 4..5, 6..8]
 
-        $criterion = (new RowSet\Indicator())->setId(1)->setName('Criterion');
+        $indicator = (new RowSet\Indicator())->setId(1)->setName('Indicator');
 
         $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
         $level2 = (new RubricGrid\Level())->setId(2)->setName('Level 2');
@@ -406,7 +406,7 @@ class IndicatorUsage extends TestCase
         $level5 = (new RubricGrid\Level())->setId(5)->setName('Level 5');
         $level6 = (new RubricGrid\Level())->setId(6)->setName('Level 6');
 
-        $criterionUsage = new RubricGrid\IndicatorUsage($criterion);
+        $indicatorUsage = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.1')->setMaxValue(1);
         $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.2')->setMaxValue(1);
@@ -415,19 +415,19 @@ class IndicatorUsage extends TestCase
         $descriptor5 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.5')->setMaxValue(5);
         $descriptor6 = (new RubricGrid\Descriptor())->setDescription('Descriptor 9.4')->setMaxValue(8);
 
-        $criterionUsage->getDescriptors()[$level1->getId()] = $descriptor1;
-        $criterionUsage->getDescriptors()[$level2->getId()] = $descriptor2;
-        $criterionUsage->getDescriptors()[$level3->getId()] = $descriptor3;
-        $criterionUsage->getDescriptors()[$level4->getId()] = $descriptor4;
-        $criterionUsage->getDescriptors()[$level5->getId()] = $descriptor5;
-        $criterionUsage->getDescriptors()[$level6->getId()] = $descriptor6;
+        $indicatorUsage->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage->getDescriptors()[$level4->getId()] = $descriptor4;
+        $indicatorUsage->getDescriptors()[$level5->getId()] = $descriptor5;
+        $indicatorUsage->getDescriptors()[$level6->getId()] = $descriptor6;
 
-        yield 'Fibonacci 1 (1)' => [$criterionUsage, $level1->getId(), 1];
-        yield 'Fibonacci 2 (1)' => [$criterionUsage, $level2->getId(), 1];
-        yield 'Fibonacci 3 (2)' => [$criterionUsage, $level3->getId(), 2];
-        yield 'Fibonacci 4 (3)' => [$criterionUsage, $level4->getId(), 3];
-        yield 'Fibonacci 5 (5)' => [$criterionUsage, $level5->getId(), 5];
-        yield 'Fibonacci 6 (8)' => [$criterionUsage, $level6->getId(), 8];
+        yield 'Fibonacci 1 (1)' => [$indicatorUsage, $level1->getId(), 1];
+        yield 'Fibonacci 2 (1)' => [$indicatorUsage, $level2->getId(), 1];
+        yield 'Fibonacci 3 (2)' => [$indicatorUsage, $level3->getId(), 2];
+        yield 'Fibonacci 4 (3)' => [$indicatorUsage, $level4->getId(), 3];
+        yield 'Fibonacci 5 (5)' => [$indicatorUsage, $level5->getId(), 5];
+        yield 'Fibonacci 6 (8)' => [$indicatorUsage, $level6->getId(), 8];
     }
 
 
@@ -435,17 +435,17 @@ class IndicatorUsage extends TestCase
      * @dataProvider getTestApplyDescriptorMinValuesWithoutValueRange
      * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::applyDescriptorMinValues
      *
-     * @param RubricGrid\IndicatorUsage $criterionUsage
+     * @param RubricGrid\IndicatorUsage $indicatorUsage
      * @param int                       $levelIndex
      * @param float|null                $expected
      */
     public function testApplyDescriptorMinValuesWithoutValueRange(
-        RubricGrid\IndicatorUsage $criterionUsage,
+        RubricGrid\IndicatorUsage $indicatorUsage,
         int $levelIndex,
         ?float $expected
     ): void {
-        $criterionUsage->applyDescriptorMinValues(false);
-        $descriptor = $criterionUsage->retrieveDescriptor($levelIndex);
+        $indicatorUsage->applyDescriptorMinValues(false);
+        $descriptor = $indicatorUsage->retrieveDescriptor($levelIndex);
         $this->assertNotNull($descriptor);
         $this->assertSame($expected, $descriptor->getMinValue());
     }

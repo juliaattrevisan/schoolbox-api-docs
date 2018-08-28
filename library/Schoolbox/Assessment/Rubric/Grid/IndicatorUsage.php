@@ -12,7 +12,7 @@ use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\GenericCollection;
 
 /**
- * Usage of a criterion within a rubric grid.
+ * Usage of a indicator within a rubric grid.
  *
  * Represented on the rubric grid as a single row.
  */
@@ -43,7 +43,7 @@ class IndicatorUsage
 
 
     /**
-     * Return the descriptor for a given level, or null if this criterion
+     * Return the descriptor for a given level, or null if this indicator
      * doesn't use it.
      *
      * @param int $levelIndex
@@ -56,7 +56,7 @@ class IndicatorUsage
 
 
     /**
-     * What's the max value for this criterion in the grid?
+     * What's the max value for this indicator in the grid?
      *
      * Inferred from its descriptors; the highest value descriptor is the max
      * value.
@@ -77,7 +77,7 @@ class IndicatorUsage
 
 
     /**
-     * Apply the min values for all the descriptors in this criterion.
+     * Apply the min values for all the descriptors in this indicator.
      *
      * @param bool $useValueRanges Does the rubric grid this is a part of even
      *                             use value ranges?

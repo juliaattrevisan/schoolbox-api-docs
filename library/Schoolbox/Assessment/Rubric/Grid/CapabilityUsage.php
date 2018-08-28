@@ -52,10 +52,10 @@ class CapabilityUsage
 
 
     /**
-     * Iterates each criterion in this usage object's group, whether in use or
+     * Iterates each indicator in this usage object's group, whether in use or
      * not.
      *
-     * First iterates all criteria in use, then all criteria not in use.
+     * First iterates all indicators in use, then all indicators not in use.
      *
      * @return iterable|Indicator[]
      */
@@ -67,16 +67,16 @@ class CapabilityUsage
             yield $indicatorUsage->getIndicator();
         }
 
-        foreach ($this->getCapability()->getIndicators() as $criterion) {
-            if (!isset($seenIndicators[$criterion->getId()])) {
-                yield $criterion;
+        foreach ($this->getCapability()->getIndicators() as $indicator) {
+            if (!isset($seenIndicators[$indicator->getId()])) {
+                yield $indicator;
             }
         }
     }
 
 
     /**
-     * Return the criterion usage for a given criterion, or null if this group
+     * Return the indicator usage for a given indicator, or null if this group
      * doesn't use it.
      *
      * @param Indicator $indicator
@@ -97,7 +97,7 @@ class CapabilityUsage
      * What's the inferred max value for this group?
      *
      * Differs from `getMaxValue` in that this is the inferred value from this
-     * group's criteria, instead of the actually set value.
+     * group's indicators, instead of the actually set value.
      *
      * @return float
      */

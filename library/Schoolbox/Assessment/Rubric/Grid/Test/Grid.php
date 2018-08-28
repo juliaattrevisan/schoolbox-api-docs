@@ -32,43 +32,43 @@ class Grid extends TestCase
         $group1     = (new RowSet\Capability())->setId(1)->setName('Group 1');
         $group2     = (new RowSet\Capability())->setId(2)->setName('Group 2');
         $group3     = (new RowSet\Capability())->setId(3)->setName('Group 3');
-        $criterion1 = (new RowSet\Indicator())->setId(1)->setName('Criterion 1.1');
-        $criterion2 = (new RowSet\Indicator())->setId(2)->setName('Criterion 1.2');
-        $criterion3 = (new RowSet\Indicator())->setId(3)->setName('Criterion 1.3');
-        $criterion4 = (new RowSet\Indicator())->setId(4)->setName('Criterion 2.1');
-        $criterion5 = (new RowSet\Indicator())->setId(5)->setName('Criterion 2.1');
-        $criterion6 = (new RowSet\Indicator())->setId(6)->setName('Criterion 2.2');
-        $criterion7 = (new RowSet\Indicator())->setId(7)->setName('Criterion 3.3');
-        $criterion8 = (new RowSet\Indicator())->setId(8)->setName('Criterion 3.2');
-        $criterion9 = (new RowSet\Indicator())->setId(9)->setName('Criterion 3.3');
-        $criterion0 = (new RowSet\Indicator())->setId(10)->setName('Criterion 4.1');
+        $indicator1 = (new RowSet\Indicator())->setId(1)->setName('Indicator 1.1');
+        $indicator2 = (new RowSet\Indicator())->setId(2)->setName('Indicator 1.2');
+        $indicator3 = (new RowSet\Indicator())->setId(3)->setName('Indicator 1.3');
+        $indicator4 = (new RowSet\Indicator())->setId(4)->setName('Indicator 2.1');
+        $indicator5 = (new RowSet\Indicator())->setId(5)->setName('Indicator 2.1');
+        $indicator6 = (new RowSet\Indicator())->setId(6)->setName('Indicator 2.2');
+        $indicator7 = (new RowSet\Indicator())->setId(7)->setName('Indicator 3.3');
+        $indicator8 = (new RowSet\Indicator())->setId(8)->setName('Indicator 3.2');
+        $indicator9 = (new RowSet\Indicator())->setId(9)->setName('Indicator 3.3');
+        $indicator0 = (new RowSet\Indicator())->setId(10)->setName('Indicator 4.1');
 
-        $group1->getIndicators()[$criterion1->getId()] = $criterion1;
-        $group1->getIndicators()[$criterion2->getId()] = $criterion2;
-        $group1->getIndicators()[$criterion3->getId()] = $criterion3;
+        $group1->getIndicators()[$indicator1->getId()] = $indicator1;
+        $group1->getIndicators()[$indicator2->getId()] = $indicator2;
+        $group1->getIndicators()[$indicator3->getId()] = $indicator3;
 
-        $group2->getIndicators()[$criterion4->getId()] = $criterion4;
-        $group2->getIndicators()[$criterion5->getId()] = $criterion5;
-        $group2->getIndicators()[$criterion6->getId()] = $criterion6;
+        $group2->getIndicators()[$indicator4->getId()] = $indicator4;
+        $group2->getIndicators()[$indicator5->getId()] = $indicator5;
+        $group2->getIndicators()[$indicator6->getId()] = $indicator6;
 
-        $group3->getIndicators()[$criterion7->getId()] = $criterion7;
-        $group3->getIndicators()[$criterion8->getId()] = $criterion8;
-        $group3->getIndicators()[$criterion9->getId()] = $criterion9;
+        $group3->getIndicators()[$indicator7->getId()] = $indicator7;
+        $group3->getIndicators()[$indicator8->getId()] = $indicator8;
+        $group3->getIndicators()[$indicator9->getId()] = $indicator9;
 
         $dueWork = new DueWork();
         $grid    = new RubricGrid\Grid($dueWork, $rowSet);
 
-        // Group and criterion usage
+        // Group and indicator usage
         $groupUsage1                                             = (new RubricGrid\CapabilityUsage($group1))->setMaxValue(15);
-        $criterionUsage1                                         = new RubricGrid\IndicatorUsage($criterion1);
-        $criterionUsage2                                         = new RubricGrid\IndicatorUsage($criterion2);
-        $groupUsage1->getIndicatorUsages()[$criterion1->getId()] = $criterionUsage1;
-        $groupUsage1->getIndicatorUsages()[$criterion2->getId()] = $criterionUsage2;
+        $indicatorUsage1                                         = new RubricGrid\IndicatorUsage($indicator1);
+        $indicatorUsage2                                         = new RubricGrid\IndicatorUsage($indicator2);
+        $groupUsage1->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
+        $groupUsage1->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
         $grid->getCapabilityUsages()[$group1->getId()]           = $groupUsage1;
 
         $groupUsage2                                             = (new RubricGrid\CapabilityUsage($group2))->setMaxValue(15);
-        $criterionUsage6                                         = new RubricGrid\IndicatorUsage($criterion6);
-        $groupUsage2->getIndicatorUsages()[$criterion6->getId()] = $criterionUsage6;
+        $indicatorUsage6                                         = new RubricGrid\IndicatorUsage($indicator6);
+        $groupUsage2->getIndicatorUsages()[$indicator6->getId()] = $indicatorUsage6;
         $grid->getCapabilityUsages()[$group2->getId()]           = $groupUsage2;
 
         yield 'group 1: in use' => [$grid, $group1, $groupUsage1];
@@ -95,128 +95,128 @@ class Grid extends TestCase
 
 
     /**
-     * Data provider for `testRetrieveCriterionUsage`.
+     * Data provider for `testRetrieveIndicatorUsage`.
      *
      * @return iterable
      */
-    public function getTestRetrieveCriterionUsageData(): iterable
+    public function getTestRetrieveIndicatorUsageData(): iterable
     {
         // Default rowset
         $rowSet     = new Rowset\RowSet(new Folder());
         $group1     = (new RowSet\Capability())->setId(1)->setName('Group 1');
         $group2     = (new RowSet\Capability())->setId(2)->setName('Group 2');
         $group3     = (new RowSet\Capability())->setId(3)->setName('Group 3');
-        $criterion1 = (new RowSet\Indicator())->setId(1)->setName('Criterion 1.1');
-        $criterion2 = (new RowSet\Indicator())->setId(2)->setName('Criterion 1.2');
-        $criterion3 = (new RowSet\Indicator())->setId(3)->setName('Criterion 1.3');
-        $criterion4 = (new RowSet\Indicator())->setId(4)->setName('Criterion 2.1');
-        $criterion5 = (new RowSet\Indicator())->setId(5)->setName('Criterion 2.1');
-        $criterion6 = (new RowSet\Indicator())->setId(6)->setName('Criterion 2.2');
-        $criterion7 = (new RowSet\Indicator())->setId(7)->setName('Criterion 3.3');
-        $criterion8 = (new RowSet\Indicator())->setId(8)->setName('Criterion 3.2');
-        $criterion9 = (new RowSet\Indicator())->setId(9)->setName('Criterion 3.3');
-        $criterion0 = (new RowSet\Indicator())->setId(10)->setName('Criterion 4.1');
+        $indicator1 = (new RowSet\Indicator())->setId(1)->setName('Indicator 1.1');
+        $indicator2 = (new RowSet\Indicator())->setId(2)->setName('Indicator 1.2');
+        $indicator3 = (new RowSet\Indicator())->setId(3)->setName('Indicator 1.3');
+        $indicator4 = (new RowSet\Indicator())->setId(4)->setName('Indicator 2.1');
+        $indicator5 = (new RowSet\Indicator())->setId(5)->setName('Indicator 2.1');
+        $indicator6 = (new RowSet\Indicator())->setId(6)->setName('Indicator 2.2');
+        $indicator7 = (new RowSet\Indicator())->setId(7)->setName('Indicator 3.3');
+        $indicator8 = (new RowSet\Indicator())->setId(8)->setName('Indicator 3.2');
+        $indicator9 = (new RowSet\Indicator())->setId(9)->setName('Indicator 3.3');
+        $indicator0 = (new RowSet\Indicator())->setId(10)->setName('Indicator 4.1');
 
-        $group1->getIndicators()[$criterion1->getId()] = $criterion1;
-        $group1->getIndicators()[$criterion2->getId()] = $criterion2;
-        $group1->getIndicators()[$criterion3->getId()] = $criterion3;
+        $group1->getIndicators()[$indicator1->getId()] = $indicator1;
+        $group1->getIndicators()[$indicator2->getId()] = $indicator2;
+        $group1->getIndicators()[$indicator3->getId()] = $indicator3;
 
-        $group2->getIndicators()[$criterion4->getId()] = $criterion4;
-        $group2->getIndicators()[$criterion5->getId()] = $criterion5;
-        $group2->getIndicators()[$criterion6->getId()] = $criterion6;
+        $group2->getIndicators()[$indicator4->getId()] = $indicator4;
+        $group2->getIndicators()[$indicator5->getId()] = $indicator5;
+        $group2->getIndicators()[$indicator6->getId()] = $indicator6;
 
-        $group3->getIndicators()[$criterion7->getId()] = $criterion7;
-        $group3->getIndicators()[$criterion8->getId()] = $criterion8;
-        $group3->getIndicators()[$criterion9->getId()] = $criterion9;
+        $group3->getIndicators()[$indicator7->getId()] = $indicator7;
+        $group3->getIndicators()[$indicator8->getId()] = $indicator8;
+        $group3->getIndicators()[$indicator9->getId()] = $indicator9;
 
         $dueWork = new DueWork();
         $grid    = new RubricGrid\Grid($dueWork, $rowSet);
 
-        // Group and criterion usage
+        // Group and indicator usage
         $groupUsage1                                             = (new RubricGrid\CapabilityUsage($group1))->setMaxValue(15);
-        $criterionUsage1                                         = new RubricGrid\IndicatorUsage($criterion1);
-        $criterionUsage2                                         = new RubricGrid\IndicatorUsage($criterion2);
-        $groupUsage1->getIndicatorUsages()[$criterion1->getId()] = $criterionUsage1;
-        $groupUsage1->getIndicatorUsages()[$criterion2->getId()] = $criterionUsage2;
+        $indicatorUsage1                                         = new RubricGrid\IndicatorUsage($indicator1);
+        $indicatorUsage2                                         = new RubricGrid\IndicatorUsage($indicator2);
+        $groupUsage1->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
+        $groupUsage1->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
         $grid->getCapabilityUsages()[$group1->getId()]           = $groupUsage1;
 
         $groupUsage2                                             = (new RubricGrid\CapabilityUsage($group2))->setMaxValue(15);
-        $criterionUsage6                                         = new RubricGrid\IndicatorUsage($criterion6);
-        $groupUsage2->getIndicatorUsages()[$criterion6->getId()] = $criterionUsage6;
+        $indicatorUsage6                                         = new RubricGrid\IndicatorUsage($indicator6);
+        $groupUsage2->getIndicatorUsages()[$indicator6->getId()] = $indicatorUsage6;
         $grid->getCapabilityUsages()[$group2->getId()]           = $groupUsage2;
 
-        yield 'criterion 1.1: in use'     => [$grid, $criterion1, $criterionUsage1];
-        yield 'criterion 1.2: in use'     => [$grid, $criterion2, $criterionUsage2];
-        yield 'criterion 1.3: not in use' => [$grid, $criterion3, null];
-        yield 'criterion 2.1: not in use' => [$grid, $criterion4, null];
-        yield 'criterion 2.2: not in use' => [$grid, $criterion5, null];
-        yield 'criterion 2.3: in use'     => [$grid, $criterion6, $criterionUsage6];
-        yield 'criterion 3.1: not in use' => [$grid, $criterion7, null];
-        yield 'criterion 3.2: not in use' => [$grid, $criterion8, null];
-        yield 'criterion 3.3: not in use' => [$grid, $criterion9, null];
-        yield 'criterion 4.1: not in use' => [$grid, $criterion0, null];
+        yield 'indicator 1.1: in use'     => [$grid, $indicator1, $indicatorUsage1];
+        yield 'indicator 1.2: in use'     => [$grid, $indicator2, $indicatorUsage2];
+        yield 'indicator 1.3: not in use' => [$grid, $indicator3, null];
+        yield 'indicator 2.1: not in use' => [$grid, $indicator4, null];
+        yield 'indicator 2.2: not in use' => [$grid, $indicator5, null];
+        yield 'indicator 2.3: in use'     => [$grid, $indicator6, $indicatorUsage6];
+        yield 'indicator 3.1: not in use' => [$grid, $indicator7, null];
+        yield 'indicator 3.2: not in use' => [$grid, $indicator8, null];
+        yield 'indicator 3.3: not in use' => [$grid, $indicator9, null];
+        yield 'indicator 4.1: not in use' => [$grid, $indicator0, null];
     }
 
 
     /**
-     * @dataProvider getTestRetrieveCriterionUsageData
+     * @dataProvider getTestRetrieveIndicatorUsageData
      * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::retrieveIndicatorUsage
      *
      * @param RubricGrid\Grid                $grid
-     * @param RowSet\Indicator               $criterion
+     * @param RowSet\Indicator               $indicator
      * @param null|RubricGrid\IndicatorUsage $expected
      */
-    public function testRetrieveCriterionUsage(
+    public function testRetrieveIndicatorUsage(
         RubricGrid\Grid $grid,
-        RowSet\Indicator $criterion,
+        RowSet\Indicator $indicator,
         ?RubricGrid\IndicatorUsage $expected
     ): void {
-        $this->assertSame($expected, $grid->retrieveIndicatorUsage($criterion));
+        $this->assertSame($expected, $grid->retrieveIndicatorUsage($indicator));
     }
 
 
     /**
-     * Data provider for `testCalculateMaxValueFromGroups`
+     * Data provider for `testCalculateMaxValueFromCapabilities`
      *
      * @return iterable
      */
-    public function getTestCalculateMaxValueDataFromGroups(): iterable
+    public function getTestCalculateMaxValueDataFromCapabilities(): iterable
     {
         $rowSet     = new Rowset\RowSet(new Folder());
         $group1     = (new RowSet\Capability())->setId(1)->setName('Group 1');
         $group2     = (new RowSet\Capability())->setId(2)->setName('Group 2');
         $group3     = (new RowSet\Capability())->setId(3)->setName('Group 3');
-        $criterion1 = (new RowSet\Indicator())->setId(1)->setName('Criterion 1.1');
-        $criterion2 = (new RowSet\Indicator())->setId(2)->setName('Criterion 1.2');
-        $criterion3 = (new RowSet\Indicator())->setId(3)->setName('Criterion 1.3');
-        $criterion4 = (new RowSet\Indicator())->setId(4)->setName('Criterion 2.1');
-        $criterion5 = (new RowSet\Indicator())->setId(5)->setName('Criterion 2.1');
-        $criterion6 = (new RowSet\Indicator())->setId(6)->setName('Criterion 2.2');
-        $criterion7 = (new RowSet\Indicator())->setId(7)->setName('Criterion 3.3');
-        $criterion8 = (new RowSet\Indicator())->setId(8)->setName('Criterion 3.2');
-        $criterion9 = (new RowSet\Indicator())->setId(9)->setName('Criterion 3.3');
+        $indicator1 = (new RowSet\Indicator())->setId(1)->setName('Indicator 1.1');
+        $indicator2 = (new RowSet\Indicator())->setId(2)->setName('Indicator 1.2');
+        $indicator3 = (new RowSet\Indicator())->setId(3)->setName('Indicator 1.3');
+        $indicator4 = (new RowSet\Indicator())->setId(4)->setName('Indicator 2.1');
+        $indicator5 = (new RowSet\Indicator())->setId(5)->setName('Indicator 2.1');
+        $indicator6 = (new RowSet\Indicator())->setId(6)->setName('Indicator 2.2');
+        $indicator7 = (new RowSet\Indicator())->setId(7)->setName('Indicator 3.3');
+        $indicator8 = (new RowSet\Indicator())->setId(8)->setName('Indicator 3.2');
+        $indicator9 = (new RowSet\Indicator())->setId(9)->setName('Indicator 3.3');
 
-        $group1->getIndicators()[$criterion1->getId()] = $criterion1;
-        $group1->getIndicators()[$criterion2->getId()] = $criterion2;
-        $group1->getIndicators()[$criterion3->getId()] = $criterion3;
+        $group1->getIndicators()[$indicator1->getId()] = $indicator1;
+        $group1->getIndicators()[$indicator2->getId()] = $indicator2;
+        $group1->getIndicators()[$indicator3->getId()] = $indicator3;
 
-        $group2->getIndicators()[$criterion4->getId()] = $criterion4;
-        $group2->getIndicators()[$criterion5->getId()] = $criterion5;
-        $group2->getIndicators()[$criterion6->getId()] = $criterion6;
+        $group2->getIndicators()[$indicator4->getId()] = $indicator4;
+        $group2->getIndicators()[$indicator5->getId()] = $indicator5;
+        $group2->getIndicators()[$indicator6->getId()] = $indicator6;
 
-        $group3->getIndicators()[$criterion7->getId()] = $criterion7;
-        $group3->getIndicators()[$criterion8->getId()] = $criterion8;
-        $group3->getIndicators()[$criterion9->getId()] = $criterion9;
+        $group3->getIndicators()[$indicator7->getId()] = $indicator7;
+        $group3->getIndicators()[$indicator8->getId()] = $indicator8;
+        $group3->getIndicators()[$indicator9->getId()] = $indicator9;
 
         $groupUsage1                                             = (new RubricGrid\CapabilityUsage($group1))->setMaxValue(15);
-        $criterionUsage1                                         = new RubricGrid\IndicatorUsage($criterion1);
-        $criterionUsage2                                         = new RubricGrid\IndicatorUsage($criterion2);
-        $groupUsage1->getIndicatorUsages()[$criterion1->getId()] = $criterionUsage1;
-        $groupUsage1->getIndicatorUsages()[$criterion2->getId()] = $criterionUsage2;
+        $indicatorUsage1                                         = new RubricGrid\IndicatorUsage($indicator1);
+        $indicatorUsage2                                         = new RubricGrid\IndicatorUsage($indicator2);
+        $groupUsage1->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
+        $groupUsage1->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
 
         $groupUsage2                                             = (new RubricGrid\CapabilityUsage($group2))->setMaxValue(3);
-        $criterionUsage6                                         = new RubricGrid\IndicatorUsage($criterion6);
-        $groupUsage2->getIndicatorUsages()[$criterion6->getId()] = $criterionUsage6;
+        $indicatorUsage6                                         = new RubricGrid\IndicatorUsage($indicator6);
+        $groupUsage2->getIndicatorUsages()[$indicator6->getId()] = $indicatorUsage6;
 
         $dueWork = new DueWork();
         $grid1   = new RubricGrid\Grid($dueWork, $rowSet);
@@ -240,26 +240,26 @@ class Grid extends TestCase
 
 
     /**
-     * @dataProvider getTestCalculateMaxValueDataFromGroups
+     * @dataProvider getTestCalculateMaxValueDataFromCapabilities
      * @covers       \Schoolbox\Assessment\Rubric\Grid\Grid::calculateMaxValueFromCapabilities
      *
      * @param RubricGrid\Grid $grid
      * @param float|null      $expected
      */
-    public function testCalculateMaxValueFromGroups(RubricGrid\Grid $grid, ?float $expected): void
+    public function testCalculateMaxValueFromCapabilities(RubricGrid\Grid $grid, ?float $expected): void
     {
         $this->assertSame($expected, $grid->calculateMaxValueFromCapabilities());
     }
 
 
     /**
-     * Data provider for `testIterateGroups`.
+     * Data provider for `testIterateCapabilities`.
      *
      * @return iterable
      */
-    public function getTestIterateGroupsData(): iterable
+    public function getTestIterateCapabilitiesData(): iterable
     {
-        // rowset has three groups
+        // rowset has three capabilities
         // try grids with: none, one, all
 
 
@@ -267,27 +267,27 @@ class Grid extends TestCase
         $group1     = (new RowSet\Capability())->setId(1)->setName('Group 1');
         $group2     = (new RowSet\Capability())->setId(2)->setName('Group 2');
         $group3     = (new RowSet\Capability())->setId(3)->setName('Group 3');
-        $criterion1 = (new RowSet\Indicator())->setId(1)->setName('Criterion 1.1');
-        $criterion2 = (new RowSet\Indicator())->setId(2)->setName('Criterion 1.2');
-        $criterion3 = (new RowSet\Indicator())->setId(3)->setName('Criterion 1.3');
-        $criterion4 = (new RowSet\Indicator())->setId(4)->setName('Criterion 2.1');
-        $criterion5 = (new RowSet\Indicator())->setId(5)->setName('Criterion 2.1');
-        $criterion6 = (new RowSet\Indicator())->setId(6)->setName('Criterion 2.2');
-        $criterion7 = (new RowSet\Indicator())->setId(7)->setName('Criterion 3.3');
-        $criterion8 = (new RowSet\Indicator())->setId(8)->setName('Criterion 3.2');
-        $criterion9 = (new RowSet\Indicator())->setId(9)->setName('Criterion 3.3');
+        $indicator1 = (new RowSet\Indicator())->setId(1)->setName('Indicator 1.1');
+        $indicator2 = (new RowSet\Indicator())->setId(2)->setName('Indicator 1.2');
+        $indicator3 = (new RowSet\Indicator())->setId(3)->setName('Indicator 1.3');
+        $indicator4 = (new RowSet\Indicator())->setId(4)->setName('Indicator 2.1');
+        $indicator5 = (new RowSet\Indicator())->setId(5)->setName('Indicator 2.1');
+        $indicator6 = (new RowSet\Indicator())->setId(6)->setName('Indicator 2.2');
+        $indicator7 = (new RowSet\Indicator())->setId(7)->setName('Indicator 3.3');
+        $indicator8 = (new RowSet\Indicator())->setId(8)->setName('Indicator 3.2');
+        $indicator9 = (new RowSet\Indicator())->setId(9)->setName('Indicator 3.3');
 
-        $group1->getIndicators()[$criterion1->getId()] = $criterion1;
-        $group1->getIndicators()[$criterion2->getId()] = $criterion2;
-        $group1->getIndicators()[$criterion3->getId()] = $criterion3;
+        $group1->getIndicators()[$indicator1->getId()] = $indicator1;
+        $group1->getIndicators()[$indicator2->getId()] = $indicator2;
+        $group1->getIndicators()[$indicator3->getId()] = $indicator3;
 
-        $group2->getIndicators()[$criterion4->getId()] = $criterion4;
-        $group2->getIndicators()[$criterion5->getId()] = $criterion5;
-        $group2->getIndicators()[$criterion6->getId()] = $criterion6;
+        $group2->getIndicators()[$indicator4->getId()] = $indicator4;
+        $group2->getIndicators()[$indicator5->getId()] = $indicator5;
+        $group2->getIndicators()[$indicator6->getId()] = $indicator6;
 
-        $group3->getIndicators()[$criterion7->getId()] = $criterion7;
-        $group3->getIndicators()[$criterion8->getId()] = $criterion8;
-        $group3->getIndicators()[$criterion9->getId()] = $criterion9;
+        $group3->getIndicators()[$indicator7->getId()] = $indicator7;
+        $group3->getIndicators()[$indicator8->getId()] = $indicator8;
+        $group3->getIndicators()[$indicator9->getId()] = $indicator9;
 
         $rowSet->getCapabilities()[$group1->getId()] = $group1;
         $rowSet->getCapabilities()[$group2->getId()] = $group2;
@@ -301,7 +301,7 @@ class Grid extends TestCase
         $dueWork = new DueWork();
         $grid1   = new RubricGrid\Grid($dueWork, $rowSet);
 
-        yield 'No groups used' => [$grid1, [$group1, $group2, $group3]];
+        yield 'No capabilities used' => [$grid1, [$group1, $group2, $group3]];
 
 
         $grid2                                          = new RubricGrid\Grid($dueWork, $rowSet);
@@ -336,13 +336,13 @@ class Grid extends TestCase
 
 
     /**
-     * @dataProvider getTestIterateGroupsData
+     * @dataProvider getTestIterateCapabilitiesData
      * @covers \Schoolbox\Assessment\Rubric\Grid\Grid::iterateCapabilities
      *
      * @param RubricGrid\Grid $grid
      * @param array           $expected
      */
-    public function testIterateGroups(RubricGrid\Grid $grid, array $expected): void
+    public function testIterateCapabilities(RubricGrid\Grid $grid, array $expected): void
     {
         $actual = [];
         foreach ($grid->iterateCapabilities() as $group) {

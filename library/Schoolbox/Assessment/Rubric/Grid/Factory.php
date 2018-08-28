@@ -31,8 +31,8 @@ class Factory
         // we're only going to take the first one... this could be converted to foreach easily enough
         $rubricData  = reset($postData);
         $levels      = $rubricData['level']      ?: [];
-        $groups      = $rubricData['group']      ?: [];
-        $criteria    = $rubricData['criterion']  ?: [];
+        $capabilities      = $rubricData['group']      ?: [];
+        $indicators    = $rubricData['indicator']  ?: [];
         $descriptors = $rubricData['descriptor'] ?: [];
         $assessment  = $grid->getAssessment();
         $markPerCap  = $assessment instanceof DueWork && $assessment->getMarkPerCapability();
@@ -55,7 +55,7 @@ class Factory
         }
 
 
-        // Must assume that all groups in formdata exist
+        // Must assume that all capabilities in formdata exist
         // They will because the group was created when sending to the form
 
 
@@ -68,10 +68,10 @@ class Factory
         }
 
 
-        // cache groups
+        // cache capabilities
         /** @var Capability[] $groupCache */
         $groupCache = [];
-        foreach ($groups as $groupData) {
+        foreach ($capabilities as $groupData) {
             // This group must exist and be in use in order for it to be saved
             $groupId   = (int)$groupData['id'];
             $groupName = $groupData['name'];
@@ -105,45 +105,45 @@ class Factory
         }
 
 
-        // Cache criteria
-        foreach ($criteria as $criterionData) {
-            $groupId          = (int)$criterionData['groupId'];
-            $criterionId      = (int)$criterionData['id'];
-            $criterionName    = $criterionData['name'];
-            $criterionEnabled = isset($criterionData['on']) && $criterionData['on'];
-            if (!$criterionEnabled) {
+        // Cache indicators
+        foreach ($indicators as $indicatorData) {
+            $groupId          = (int)$indicatorData['groupId'];
+            $indicatorId      = (int)$indicatorData['id'];
+            $indicatorName    = $indicatorData['name'];
+            $indicatorEnabled = isset($indicatorData['on']) && $indicatorData['on'];
+            if (!$indicatorEnabled) {
                 continue;
             }
 
             // spawn
             $group     = $groupCache[$groupId];
-            $criterion = $group->retrieveIndicator($criterionId);
+            $indicator = $group->retrieveIndicator($indicatorId);
 
-            // If $criterion is null, then that's a problem; we're trying to
-            // save usage for a criterion which doesn't exist
+            // If $indicator is null, then that's a problem; we're trying to
+            // save usage for a indicator which doesn't exist
 
 
-            // Can this criterion's name be set?
-            if (!$criterion->isInUseExcluding($grid->getAssessment())) {
-                $criterion->setName($criterionName);
+            // Can this indicator's name be set?
+            if (!$indicator->isInUseExcluding($grid->getAssessment())) {
+                $indicator->setName($indicatorName);
             }
 
 
-            $criterionUsage = new IndicatorUsage($criterion);
+            $indicatorUsage = new IndicatorUsage($indicator);
 
             foreach ($levelCache as $levelSequence => $level) {
 
-                if (empty($descriptors[$criterionId][$levelSequence])) {
+                if (empty($descriptors[$indicatorId][$levelSequence])) {
                     continue;
                 }
 
-                $descriptor      = $descriptors[$criterionId][$levelSequence];
+                $descriptor      = $descriptors[$indicatorId][$levelSequence];
                 $descriptorId    = $descriptor['id'] ?? null;
                 $descriptorText  = $descriptor['text'];
                 $descriptorValue = $descriptor['points'];
 
                 if ('' !== $descriptorText || '' !== $descriptorValue) {
-                    $criterionUsage->getDescriptors()[$levelSequence] =
+                    $indicatorUsage->getDescriptors()[$levelSequence] =
                         (new Descriptor())
                             ->setId($descriptorId)
                             ->setDescription($descriptorText)
@@ -152,7 +152,7 @@ class Factory
             }
 
             $groupUsage                                     = $grid->retrieveCapabilityUsage($group);
-            $groupUsage->getIndicatorUsages()[$criterionId] = $criterionUsage;
+            $groupUsage->getIndicatorUsages()[$indicatorId] = $indicatorUsage;
         }
 
         // Calculate max values for each group usage.

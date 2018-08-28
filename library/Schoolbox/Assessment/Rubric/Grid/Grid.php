@@ -47,9 +47,9 @@ class Grid
 
 
     /**
-     * The groups that are actually in use on the rubric grid.
+     * The capabilities that are actually in use on the rubric grid.
      *
-     * Each group's criterion usage is a row on the rubric grid.
+     * Each group's indicator usage is a row on the rubric grid.
      *
      * @var CapabilityUsage[]|GenericCollection
      */
@@ -134,7 +134,7 @@ class Grid
 
 
     /**
-     * Return the criterion usage for a given criterion, or null if this grid
+     * Return the indicator usage for a given indicator, or null if this grid
      * doesn't use it.
      *
      * @param Indicator $indicator
@@ -143,9 +143,9 @@ class Grid
     public function retrieveIndicatorUsage(Indicator $indicator): ?IndicatorUsage
     {
         foreach ($this->capabilityUsages as $capabilityUsage) {
-            $criterionUsage = $capabilityUsage->retrieveIndicatorUsage($indicator);
-            if ($criterionUsage) {
-                return $criterionUsage;
+            $indicatorUsage = $capabilityUsage->retrieveIndicatorUsage($indicator);
+            if ($indicatorUsage) {
+                return $indicatorUsage;
             }
         }
         return null;
@@ -156,7 +156,7 @@ class Grid
      * Iterates each group in the grid's rowset, whether this grid uses them
      * or not.
      *
-     * First iterates all groups in use, then all groups not in use.
+     * First iterates all capabilities in use, then all capabilities not in use.
      *
      * @return iterable|Capability[]
      */
@@ -177,7 +177,7 @@ class Grid
 
 
     /**
-     * Iterates each criterion in the grid for the given group.
+     * Iterates each indicator in the grid for the given group.
      *
      * @param Capability $capability
      * @return iterable|Indicator[]
