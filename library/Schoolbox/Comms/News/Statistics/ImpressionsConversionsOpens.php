@@ -231,29 +231,19 @@ class ImpressionsConversionsOpens
             ]
         ]);
 
-        /* First open
-         */
-        $firstOpen = null;
-
-        if ($statistics->count()) {
-            $firstOpen = $statistics->first()->getCreatedAt();
-        }
-
         /* Aggregate from daily statistics
          */
         $summary = $this->summariseDailyStatistics($statistics);
 
-        /* Calculate overall conversion ratio
+        /* First open (a specific alteration for this data set)
          */
-        $conversionRatio = $this->calculateConversionRatio($summary['numConversions'], $summary['numImpressions']);
+        $summary['date'] = null;
 
-        return [
-            'date' => $firstOpen,
-            'breakdown' => $summary['breakdown'],
-            'numConversions' => $summary['numConversions'],
-            'numImpressions' => $summary['numImpressions'],
-            'conversionRatio' => $conversionRatio
-        ];
+        if ($statistics->count()) {
+            $summary['date'] = $statistics->first()->getCreatedAt();
+        }
+
+        return $summary;
     }
 
 
@@ -290,21 +280,7 @@ class ImpressionsConversionsOpens
         $historic = [];
 
         foreach ($stack as $date => $statistics) {
-            $summary = $this->summariseDailyStatistics(new Collection($statistics));
-
-            /* Calculate overall conversion ratio
-             */
-            $conversionRatio = $this->calculateConversionRatio($summary['numConversions'], $summary['numImpressions']);
-
-            $daily = [
-                'date' => $summary['date'],
-                'breakdown' => $summary['breakdown'],
-                'numConversions' => $summary['numConversions'],
-                'numImpressions' => $summary['numImpressions'],
-                'conversionRatio' => $conversionRatio
-            ];
-
-            $historic[] = $daily;
+            $historic[] = $this->summariseDailyStatistics(new Collection($statistics));
         }
 
         return $historic;
