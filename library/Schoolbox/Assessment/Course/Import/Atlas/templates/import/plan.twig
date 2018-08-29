@@ -42,9 +42,13 @@
                                   data-show-count="- {{ attachmentCount }}"> selected</span>
                         </p>
                     {% endif %}
-                    {% if enableAttachmentImport and not hasContent %}
+                    {% if not hasContent %}
                         <p class="meta" data-unit-meta="{{ unit.id }}">
-                            No assessments or attachments
+                            {% if enableAttachmentImport %}
+                                No assessments or attachments
+                            {% else %}
+                                No assessments
+                            {% endif %}
                         </p>
                     {% endif %}
                 </div>
