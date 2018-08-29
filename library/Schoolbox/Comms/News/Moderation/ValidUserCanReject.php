@@ -33,20 +33,11 @@ class ValidUserCanReject
     {
         $isCommsOfficer = (new ValidUserIsCommsOfficer())->isSatisfiedBy($user);
 
-        /* Comms Officers don't need to reject their own articles
-         * Unless there's some overriding desire to be self-analytical
-         * (maybe that's a thing, idk)
+        /* Comms Officers can reject anyone's articles, even their own
          *
          * Can only reject articles that were submitted for moderation
          * thus preventing you from rejecting drafts
          */
-        if ($isCommsOfficer && $article->isSubmitted()) {
-            return !($article->getAuthor()->getId() === $user->getId());
-        }
-
-        /* Anyone else cannot reject articles at any other time
-         * Only Comms Officers can reject articles
-         */
-        return false;
+        return $isCommsOfficer && $article->isSubmitted();
     }
 }
