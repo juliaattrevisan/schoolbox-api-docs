@@ -193,8 +193,8 @@ if (is_numeric($_GET['eventID'])) {
     $page->setVar(
         array(
             'EVENT_ID'             => '',
-            'EVENT_USER_ID'        => $currentUser->getId(),
-            'EVENT_AUTHOR_ID'      => $_SESSION['user']->getId(),
+            'EVENT_USER_ID'        => $selectedUser->getId(),
+            'EVENT_AUTHOR_ID'      => $currentUser->getId(),
             'EVENT_TITLE'          => isset($_GET['title']) ? $_GET['title'] : '',
             'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? '1' : '0',
             'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
