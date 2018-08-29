@@ -566,7 +566,8 @@ class Calendar extends DeprecatedModel
             $filter_query = " AND ($filter_query)";
         }
 
-        $attendance_query = "OR (event_attendance.user_id = '{$user->getId()}')";
+        $attendance_query = "OR (event_attendance.user_id = '{$user->getId()}' 
+            AND event_attendance.status = '". EventModel::ATTENDANCE_STATUS_APPROVED ."' )";
 
         $access_query = "AND (
             (access = " . EventModel::ACCESS_PERSONAL . " AND owner = '{$user->getId()}')
