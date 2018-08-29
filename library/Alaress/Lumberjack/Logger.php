@@ -96,8 +96,6 @@ class Logger implements LoggerInterface {
      */
     private function setLevel($level)
     {
-
-
         // attach STDOUT
         if(is_resource($this->out)) {
             $handler = new StreamHandler($this->out, $level);
