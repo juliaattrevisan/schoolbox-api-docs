@@ -75,7 +75,8 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
             'articles' => $articles,
-            'recentArticles' => $lists->getRecentlyAccepted(),
+            'recentlyAcceptedArticles' => $lists->getRecentlyAccepted(),
+            'recentlyRejectedArticles' => $lists->getRecentlyRejected(),
             'moderationRequired' => $moderationRequired
         ])->setTitle('Moderation List'));
     }
