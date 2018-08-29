@@ -18,6 +18,15 @@ use Twig\Error\LoaderError;
 
 class Module extends \Alaress\Module\Module
 {
+    /**
+     * Is attachment import enabled?
+     *
+     * Keep it disabled until/unless the Atlas API allows file download with
+     * the credentials provided to it.
+     */
+    public const ENABLE_ATTACHMENT_IMPORT = false;
+
+
     /** @var string */
     protected $basename = 'courseImportAtlas';
 
