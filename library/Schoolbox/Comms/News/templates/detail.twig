@@ -283,6 +283,11 @@
                 {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {articleId: article.id}) %}
 
                 {% if rejectRoute %}
+                    {% if article.isPublished %}
+                        {% set verb = 'Unpublish' %}
+                    {% else %}
+                        {% set verb = 'Reject' %}
+                    {% endif %}
                     <script>
                         $(function() {
                             $('#actionButtons').on('click', 'a[data-reject]', function(event) {
@@ -293,14 +298,14 @@
                                 var title = $element.attr('data-reject');
 
                                 $element.confirmDialog({
-                                    header: 'Reject ' + title,
+                                    header: '{{ verb }} ' + title,
                                     format: 'html',
-                                    text: 'Provide brief feedback for rejecting this article to help the author improve their content. <textarea id="rejectedReason" rows="5"></textarea>',
-                                    confirmLabel: 'Reject',
+                                    text: 'Provide brief feedback for {{ verb|lower }}ing this article to help the author improve their content. <textarea id="rejectedReason" rows="5"></textarea>',
+                                    confirmLabel: '{{ verb }}',
                                     cancelLabel: 'Cancel',
                                     confirmEvent: function() {
                                         $toast.toastActivate({
-                                            text: 'Rejecting ' + title
+                                            text: '{{ verb }}ing ' + title
                                         });
 
                                         $.ajax({
@@ -310,7 +315,7 @@
                                             dataType: 'json'
                                         }).success(function (response) {
                                             $toast.toastTimeout({
-                                                text: title + ' was rejected',
+                                                text: title + ' was {{ verb|lower }}',
                                                 css: 'success'
                                             });
 
@@ -328,7 +333,7 @@
                             });
                         });
                     </script>
-                    <li><a class="icon-undo" href="{{ rejectRoute }}" title="Reject this article" data-reject="{{ article.title }}">Reject</a></li>
+                    <li><a class="icon-undo" href="{{ rejectRoute }}" title="{{ verb }} this article" data-reject="{{ article.title }}">{{ verb }}</a></li>
                 {% endif %}
             {% endif %}
 
