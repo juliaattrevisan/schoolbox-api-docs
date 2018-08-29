@@ -853,7 +853,7 @@ class RubricMapper
             // TODO we probably DO need to know the descriptor row sums for the default capability max??
             $max = $markType === "Total Mark" ? $capabilityMax : 100;
 
-            if ((new ValidCapabilityMark())->isValid($customMark, $capabilityMax, $markType)) {
+            if ((new ValidCapabilityMark())->isSatisifedBy($customMark, $capabilityMax, $markType)) {
                 // Save the custom mark if provided; otherwise just 0
                 $groupMarksToSave[$groupId]->setValue($customMark ?? 0);
             } else {
