@@ -1147,8 +1147,6 @@ class Controller extends Assessment\Controller
             throw new \InvalidArgumentException("Rubric unspecified");
         }
 
-        $data['rubric'] = $dueWork->getRubric()->toContext();
-
         $rubricZone = new Zone('rubric');
         // JS file.type isn't set reliably enough to use text/csv mime filter
         $rubricZone->setFileVar('rb_attach[]')->setAttachPrompt('Import a rubric');//->setMimeFilter('text/csv');

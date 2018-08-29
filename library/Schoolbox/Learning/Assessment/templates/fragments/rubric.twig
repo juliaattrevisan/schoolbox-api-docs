@@ -2,7 +2,6 @@
 Usage:
 
 {% include '@learningAssessment/fragments/rubric.twig' with {
-    rubric:           array,
     rubricAttachZone: array,
     resultSets:       array,
     rubricHasMarks:   bool
@@ -356,7 +355,6 @@ Usage:
         </div>
         <div class="small-12 columns no-pad">
             {% include '@rubric/grid-csv.twig' with {
-                rubric: rubric,
                 rubricGrid: rubricGrid,
                 attachzone: rubricAttachZone,
                 folderId: assessment.context.folder.id,
