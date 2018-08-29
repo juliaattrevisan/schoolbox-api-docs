@@ -52,7 +52,7 @@ abstract class WorkNotifier implements Serializable {
     {
         // lazyload
         if (empty($this->log)) {
-            $this->log = new Logger(null);
+            $this->log = new Logger(STDOUT, STDERR);
         }
         return $this->log;
     }

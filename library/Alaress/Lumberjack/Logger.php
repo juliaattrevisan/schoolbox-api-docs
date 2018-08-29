@@ -11,6 +11,7 @@ namespace Alaress\Lumberjack;
 
 
 use Monolog\Handler\HandlerInterface;
+use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as Monologger;
 use Monolog\Processor\MemoryPeakUsageProcessor;
@@ -106,6 +107,11 @@ class Logger implements LoggerInterface {
         if(is_resource($this->err)) {
             $handler = new StreamHandler($this->err, max(Monologger::CRITICAL, $level));
             $handler->setFormatter(new TtyFormatter($this->out, $this->porcelain, true));
+            $this->pushHandler($handler);
+        }
+
+        if($this->out === null && $this->err === null) {
+            $handler = new NullHandler($level);
             $this->pushHandler($handler);
         }
 
