@@ -99,7 +99,7 @@
         })
 
         // Update the input val when manually assigning grades from descriptor vals
-        $(".use-descriptor-values").on('click', function(e) {
+        $("[data-use-descriptor-values]").on('click', function(e) {
             e.preventDefault();
             if (!$status.find(markInputSelector).attr('data-customised')) {
                 refreshAssignFromRubricInput();

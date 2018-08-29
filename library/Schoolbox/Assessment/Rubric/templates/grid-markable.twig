@@ -204,7 +204,7 @@
 
                         {% if group.rowMaxSum > 0 %}
                             {# TODO these need to be the descriptor sum! #}
-                            <button class="use-descriptor-values">Assign <span class="descriptor-sum" data-group-descriptor-sum>
+                            <button class="[data-use-descriptor-values]">Assign <span class="descriptor-sum" data-group-descriptor-sum>
                                 {% if markSchemeName == 'TotalMarkFractional' %}
                                     {{ group.scaledMark }}
 
@@ -287,9 +287,9 @@
                 }
 
                 if (displayedMark === customMark) {
-                    $(this).find(".use-descriptor-values").prop("disabled", true);
+                    $(this).find("[data-use-descriptor-values]").prop("disabled", true);
                 } else {
-                    $(this).find(".use-descriptor-values").prop("disabled", false);
+                    $(this).find("[data-use-descriptor-values]").prop("disabled", false);
                 }
             })
         }
@@ -499,7 +499,7 @@
         }
 
         // Overwrite any custom mark in the capability mark field with the scaled mark calculated from descriptor values
-        $(".use-descriptor-values").click(function(e) {
+        $("[data-use-descriptor-values]").click(function(e) {
             var $button = $(e.target);
             var $gradeInput = $button.siblings('[data-group-mark]');
             var rubricId = $button.closest('[data-group-summary]').attr('data-rubric-id');
