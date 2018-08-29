@@ -70,8 +70,9 @@ class Controller extends BaseController
             $this->buildHtmlOutput(
                 '@courseImportAtlas/import.twig',
                 [
-                    'isValidFacultyRoot' => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
-                    'returnUrl'          => [
+                    'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
+                    'isValidFacultyRoot'     => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
+                    'returnUrl'              => [
                         'key'   => Redirect::RETURN_URL,
                         'value' => [
                             'raw'     => Redirect::decode($returnUrl),
@@ -162,9 +163,10 @@ class Controller extends BaseController
             $this->buildUnthemedHtmlOutput(
                 '@courseImportAtlas/import/plan.twig',
                 [
-                    'curriculum'         => $curriculumPlan,
-                    'previousPost'       => $previousPost,
-                    'attachmentDefaults' => $this->importer->buildDefaultSettingsForAttachments($curriculumPlan),
+                    'curriculum'             => $curriculumPlan,
+                    'previousPost'           => $previousPost,
+                    'attachmentDefaults'     => $this->importer->buildDefaultSettingsForAttachments($curriculumPlan),
+                    'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
                 ]
             )
         );
@@ -199,9 +201,10 @@ class Controller extends BaseController
             $this->buildUnthemedHtmlOutput(
                 '@courseImportAtlas/import/facultySelector.twig',
                 [
-                    'curriculum' => $curriculumPlan,
-                    'isValidFacultyRoot' => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
-                    'previousPost' => $previousPost,
+                    'curriculum'             => $curriculumPlan,
+                    'isValidFacultyRoot'     => $this->courseSpecMapper->isConfiguredFacultyRootValid(),
+                    'previousPost'           => $previousPost,
+                    'enableAttachmentImport' => Module::ENABLE_ATTACHMENT_IMPORT,
                 ]
             )
         );
