@@ -1111,22 +1111,7 @@ class Controller extends Assessment\Controller
         }
         $assessment->setRubric($rubric);
 
-
-        // TODO remove or update this to not use old rubric object
         $data = array_merge($data, $this->generateRubricTwigData($assessment));
-        unset($data['rubric']);
-
-
-        // Ideally, the rubric grid can be used as is without Twig-wrangling
-        $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, true);
-        if (\count($rubricGrid->getLevels()) === 0) {
-            // Two fake levels
-            $rubricGrid->getLevels()
-                       ->add(new Level())
-                       ->add(new Level());
-        }
-        $data['rubricGrid'] = $rubricGrid;
-
 
         // ...and scene.
         return $data;
@@ -1179,6 +1164,16 @@ class Controller extends Assessment\Controller
         else {
             $data['rubricHasMarks'] = false;
         }
+
+        // The rubric grid can be used as is without Twig-wrangling
+        $rubricGrid = $this->rubricMapper->retrieveGrid($dueWork, true);
+        if (\count($rubricGrid->getLevels()) === 0) {
+            // Two fake levels
+            $rubricGrid->getLevels()
+                       ->add(new Level())
+                       ->add(new Level());
+        }
+        $data['rubricGrid'] = $rubricGrid;
 
         return $data;
     }
