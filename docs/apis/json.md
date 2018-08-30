@@ -28,6 +28,7 @@ To implement, declare your model class as follows:
 use Alaress\Json\Serializable;
 use Alaress\Json\SerializeTrait;
 use Alaress\Json\Linkable;
+use Schoolbox\Json\Api\AuraLink;
 
 class MyModel implements Serializable, Linkable
 {
@@ -44,7 +45,7 @@ class MyModel implements Serializable, Linkable
     public function getJsonApiLinks(): array
     {
         return [
-            'self' => [ 'example.getEntity', [ 'id' => $this->getId() ] ],
+            'self' => new AuraLink('example.getEntity', [ 'id' => $this->getId() ]),
         ];
     }
 
