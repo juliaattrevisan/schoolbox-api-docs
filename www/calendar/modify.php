@@ -27,6 +27,8 @@ $page->setBlock(TEMPLATE_content, 'event_group_drop', 'event_group_drop_block');
 $page->setBlock(TEMPLATE_content, 'type_select', 'type_select_block');
 $page->setBlock(TEMPLATE_content, 'type_no_select', 'type_no_select_block');
 
+$currentUser = $_SESSION['user'];
+
 if (isset($_GET['userId']) && is_numeric($_GET['userId'])) {
     try {
         $userMapper = new UserMapper();
@@ -35,7 +37,7 @@ if (isset($_GET['userId']) && is_numeric($_GET['userId'])) {
         error(31);
     }
 } else {
-    $selectedUser = $_SESSION['user'];
+    $selectedUser = $currentUser;
 }
 
 /* Modify existing event
@@ -54,7 +56,7 @@ if (is_numeric($_GET['eventID'])) {
      */
     $eventAccess = new Access(new FolderAccess());
 
-    if ($eventAccess->checkExisting($selectedUser, $event) == false) {
+    if ($eventAccess->checkExisting($currentUser, $event) == false) {
         error(34);
     }
 
@@ -192,7 +194,7 @@ if (is_numeric($_GET['eventID'])) {
         array(
             'EVENT_ID'             => '',
             'EVENT_USER_ID'        => $selectedUser->getId(),
-            'EVENT_AUTHOR_ID'      => $_SESSION['user']->getId(),
+            'EVENT_AUTHOR_ID'      => $currentUser->getId(),
             'EVENT_TITLE'          => isset($_GET['title']) ? $_GET['title'] : '',
             'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? '1' : '0',
             'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
@@ -266,7 +268,7 @@ $groupHandler = new \Group();
 
 /* Possible options, based on current user's involvement
  */
-$possibleFolderList = $groupHandler->involvedInCategoryList($selectedUser->getId(), true, WRITE_ACCESS);
+$possibleFolderList = $groupHandler->involvedInCategoryList($currentUser->getId(), true, WRITE_ACCESS);
 
 /* Ones that it's already in, from previous selections
  */
