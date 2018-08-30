@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
+use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
@@ -73,6 +74,37 @@ class MarkedGrid
     public function getGrid(): Grid
     {
         return $this->grid;
+    }
+
+
+    /**
+     * Returns an iterator over capability usages.
+     *
+     * @return iterable|CapabilityUsage[]
+     */
+    public function iterateCapabilityUsages(): iterable
+    {
+        return $this->grid->getCapabilityUsages();
+    }
+
+
+    /**
+     * Retrieve a capability mark for a capability usage, if one exists.
+     *
+     * @param CapabilityUsage $capabilityUsage
+     * @return null|CapabilityMark
+     */
+    public function retrieveCapabilityMark(CapabilityUsage $capabilityUsage): ?CapabilityMark
+    {
+        foreach ($this->capabilityMarks as $capabilityMark) {
+            // TODO capability usage should have its own ID
+            if ($capabilityMark->getCapabilityUsage()->getCapability()->getId()
+                === $capabilityUsage->getCapability()->getId()
+            ) {
+                return $capabilityMark;
+            }
+        }
+        return null;
     }
 
 

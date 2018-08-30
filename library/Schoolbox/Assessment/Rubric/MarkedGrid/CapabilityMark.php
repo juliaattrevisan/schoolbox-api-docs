@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
+use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
 
 /**
@@ -54,6 +55,19 @@ class CapabilityMark
     public function getCapabilityUsage(): CapabilityUsage
     {
         return $this->capabilityUsage;
+    }
+
+
+    /**
+     * Iterates the list of indicator usages?
+     *
+     * @return iterable|IndicatorUsage[]
+     */
+    public function iterateIndicatorUsages(): iterable
+    {
+        foreach ($this->indicatorMarks as $indicatorMark) {
+            yield $indicatorMark->getIndicatorUsage();
+        }
     }
 
 
