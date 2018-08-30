@@ -39,9 +39,9 @@ class MarkedGrid
 
 
     /**
-     * @var GenericCollection|DescriptorMark[]
+     * @var GenericCollection|CapabilityMark[]
      */
-    private $marks;
+    private $capabilityMarks;
 
 
     /**
@@ -52,9 +52,9 @@ class MarkedGrid
      */
     public function __construct(IFeedback $feedback, Grid $grid)
     {
-        $this->feedback = $feedback;
-        $this->grid     = $grid;
-        $this->marks    = new GenericCollection(DescriptorMark::class);
+        $this->feedback        = $feedback;
+        $this->grid            = $grid;
+        $this->capabilityMarks = new GenericCollection(CapabilityMark::class);
     }
 
 
@@ -77,21 +77,21 @@ class MarkedGrid
 
 
     /**
-     * @return DescriptorMark[]|GenericCollection
+     * @return CapabilityMark[]|GenericCollection
      */
-    public function getMarks(): GenericCollection
+    public function getCapabilityMarks(): GenericCollection
     {
-        return $this->marks;
+        return $this->capabilityMarks;
     }
 
 
     /**
-     * @param DescriptorMark[]|GenericCollection $marks
+     * @param CapabilityMark[]|GenericCollection $capabilityMarks
      * @return static
      */
-    public function setMarks(GenericCollection $marks): self
+    public function setCapabilityMarks(GenericCollection $capabilityMarks): self
     {
-        $this->marks = $marks;
+        $this->capabilityMarks = $capabilityMarks;
         return $this;
     }
 }
