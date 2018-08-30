@@ -158,8 +158,12 @@ class SSO
     {
         $formParams = array_merge($conf, [
             'prod_menu' => $prodMenu ? 'Y' : 'N',
-            'deep_link' => json_encode($deepLink),
         ]);
+
+        // Don't pass a deep-link param is no deep-link is being requested
+        if (!empty($deepLink)) {
+            $formParams['deep_link'] = \json_encode($deepLink);
+        }
 
         $response       = $client->request('POST', "{$this->server}?returnType=json", ['form_params' => $formParams]);
         $responseString = $response->getBody()->getContents();
@@ -219,7 +223,8 @@ class SSO
      */
     private function getV1Token(GuzzleHttp\Client $client, array $conf, array $deepLinkV1 = null): string
     {
-        if (null !== $deepLinkV1) {
+        // Don't include a deep-link arg if no deep-link is being requested
+        if (\is_array($deepLinkV1) && !empty($deepLinkV1)) {
             $conf['deep_link'] = 'index.cfm?' . http_build_query($deepLinkV1);
         }
         $query = http_build_query($conf);
