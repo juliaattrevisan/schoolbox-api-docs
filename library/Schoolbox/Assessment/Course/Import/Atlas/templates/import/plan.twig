@@ -5,7 +5,7 @@
 <ul class="information-list card-selectable threaded expandable-card" id="unit-list">
     {% for unit in curriculum.units %}
         {% set assessmentCount = unit.assessments|length %}
-        {% set attachmentCount = unit.attachments|length %}
+        {% set attachmentCount = enableAttachmentImport ? unit.attachments|length : 0 %}
         {% set hasContent      = assessmentCount > 0 or attachmentCount > 0 %}
         <li class="actions-small-1">
             <div class="list-item no-pad {% if not hasContent %}unit-empty{% endif %}">
@@ -44,7 +44,11 @@
                     {% endif %}
                     {% if not hasContent %}
                         <p class="meta" data-unit-meta="{{ unit.id }}">
-                            No assessments or attachments
+                            {% if enableAttachmentImport %}
+                                No assessments or attachments
+                            {% else %}
+                                No assessments
+                            {% endif %}
                         </p>
                     {% endif %}
                 </div>
@@ -56,7 +60,13 @@
         {% if not hasContent %}
             <li class="child hide" data-collapse-state="collapsed" data-collapsable="unit-{{ unit.id }}">
                 <div class="empty-state">
-                    <p>This unit has no assessments or attachments.</p>
+                    <p>
+                        {% if enableAttachmentImport %}
+                            This unit has no assessments or attachments.
+                        {% else %}
+                            This unit has no assessments.
+                        {% endif %}
+                    </p>
                 </div>
             </li>
         {% endif %}
