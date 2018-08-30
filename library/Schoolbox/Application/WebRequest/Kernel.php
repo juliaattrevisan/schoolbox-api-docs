@@ -253,7 +253,7 @@ class Kernel extends \Alaress\Application\Kernel
             /** @var OutputInterface $output */
             $output = $response->content->get();
             if (!$output instanceof OutputInterface) {
-                if (is_array($output) || empty($output)) {
+                if (is_array($output)) {
                     // Figure out output type.
                     // In order of preference, output type is:
                     // * set in the response content
@@ -270,6 +270,8 @@ class Kernel extends \Alaress\Application\Kernel
                     // Create a different output type (Sitepage, JSON, whatever) based on a
                     // route param, defaulting to HTML
                     $output = $this->di->get("webOutput:$format");
+                } elseif (null === $output) {
+                    $output = $this->di->get("webOutput:noContent");
                 } else {
                     // Maybe it has a __toString method, or it IS actually a string.
                     // Ram it into the base output type.

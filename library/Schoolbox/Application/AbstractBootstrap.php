@@ -335,6 +335,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $di->set('webOutput:json', $di->lazyNew(Output\Json::class));
         $di->set('webOutput:file', $di->lazyNew(Output\File::class));
         $di->set('webOutput:stream', $di->lazyNew(Output\Stream::class));
+        $di->set('webOutput:noContent', $di->lazyNew(Output\NoContent::class));
         $di->set('webOutput:xml', $di->lazyNew(Output\Xml::class));
 
         // Template engine and functions
