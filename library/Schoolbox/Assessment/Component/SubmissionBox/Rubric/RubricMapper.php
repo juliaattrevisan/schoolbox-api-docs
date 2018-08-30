@@ -800,7 +800,7 @@ class RubricMapper
      *                             val = [value: what's its value? (only if set manually)]
      * @param int     $returnId    Feedback
      */
-    public function saveForFeedback(array $descriptors, array $groups, int $returnId): void
+    public function saveForFeedback(array $descriptors, array $groups, string $markType, int $returnId): void
     {
         $groupMapper     = GroupMapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();

@@ -9,6 +9,9 @@
 
 {% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
 
+{# Post mark type so we can determine how to validate discretionary capability mark #}
+<input type="hidden" name="markType" value="{{ markSchemeName }}"/>
+
 <div class="scrollable">
     <table class="rb markable stack-for-medium-down" id="{{ rubricId }}">
 
@@ -158,6 +161,11 @@
                         <input type="hidden"
                                data-db-mark
                                value="{{ group.mark }}"
+                               name="{{ formField }}[groups][{{ group.id }}][value]">
+
+                        {# This is the maximum capability mark, which wouldn't get POSTed otherwise #}
+                        <input type="hidden"
+                               value="{{ group.max }}"
                                name="{{ formField }}[groups][{{ group.id }}][value]">
 
                         <label for="group-{{ group.id }}-mark">{{ locale.rubricGroup.proper }} mark</label>
