@@ -59,9 +59,8 @@
 	}
 
 	img{
-		width: (3 * rem-calc($base-font-size));
-		@media #{$medium-up} {
-			width: (4 * rem-calc($base-font-size));
+		@media #{$medium-down} {
+			width: (3 * rem-calc($base-font-size));
 		}
 	}
 
