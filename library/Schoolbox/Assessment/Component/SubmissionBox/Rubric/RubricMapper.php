@@ -800,6 +800,7 @@ class RubricMapper
      *                             val = [value: what's its value? (only if set manually)]
      * @param string $markType
      * @param int     $returnId    Feedback
+     * @throws \InvalidArgumentException
      */
     public function saveForFeedback(array $descriptors, array $customGroupMarks, string $markType, int $returnId): void
     {
