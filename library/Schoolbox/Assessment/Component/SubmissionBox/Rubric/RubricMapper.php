@@ -796,11 +796,12 @@ class RubricMapper
      *
      * @param array[] $descriptors key = descriptor.id
      *                             val = [selected: is it selected?, value: what's its value?]
-     * @param array[] $groups      key = group.id
+     * @param array[] $customGroupMarks      key = group.id
      *                             val = [value: what's its value? (only if set manually)]
+     * @param string $markType
      * @param int     $returnId    Feedback
      */
-    public function saveForFeedback(array $descriptors, array $groups, string $markType, int $returnId): void
+    public function saveForFeedback(array $descriptors, array $customGroupMarks, string $markType, int $returnId): void
     {
         $groupMapper     = GroupMapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();
@@ -820,10 +821,6 @@ class RubricMapper
         // - optionally, marks from the custom mark-per-cap input fields (only if mark-per-cap is enabled. may be empty array)
         // - optionally, selected descriptor values (may be empty array)
 
-        $customGroupMarks = array_map(function($group) {
-            return $group['value'];
-        }, $groups);
-
         $selectedDescriptors = [];
         foreach ($descriptors as $id => $descriptor) {
             if (!empty($descriptor['selected'])) {
@@ -834,30 +831,26 @@ class RubricMapper
         $returnedWork     = $returnedWorkMapper->findById($returnId);
 
         // Pass 1.5: is a custom max mark for the group set?
-        foreach ($customGroupMarks as $groupId => $customMark) {
-            // Find a record for its group
-            $group = $groupMapper->findById($groupId);
+        foreach ($customGroupMarks as $groupId => $markData) {
 
-            // If it doesn't exist: make a new one
-            if (!$groupMarksToSave[$groupId]) {
-                $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
-                    ->setSubmissionReturn($returnedWork)
-                    ->setGroup($group)
-                    ->setValid(true);
-            }
+            if ((new ValidCapabilityMark())->isSatisifedBy($markData['customMark'], $markData['max'], $markType)) {
+                // Find a record for its group
+                $group = $groupMapper->findById($groupId);
 
-            // TODO halp why
-            $capabilityMax = $group->calculateMax();
+                // If it doesn't exist: make a new one
+                // TODO under what circumstance would it be possible to mark a group that doesn't exist??
+                if (!$groupMarksToSave[$groupId]) {
+                    $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
+                        ->setSubmissionReturn($returnedWork)
+                        ->setGroup($group)
+                        ->setValid(true);
+                }
 
-            // Percentage mark types (Letter Grade and Percentage) are always sent to the backend as values between 0-100
-            // TODO we probably DO need to know the descriptor row sums for the default capability max??
-            $max = $markType === "Total Mark" ? $capabilityMax : 100;
-
-            if ((new ValidCapabilityMark())->isSatisifedBy($customMark, $capabilityMax, $markType)) {
                 // Save the custom mark if provided; otherwise just 0
-                $groupMarksToSave[$groupId]->setValue($customMark ?? 0);
+                $groupMarksToSave[$groupId]->setValue($markData['customMark']);
             } else {
-                throw new \InvalidArgumentException("Capability mark must be between 0 and " . $max);
+                // TODO handle this somewhere else?
+                throw new \InvalidArgumentException("Capability mark must be between 0 and " . $markData['max']);
             }
         }
 
