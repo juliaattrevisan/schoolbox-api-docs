@@ -25,9 +25,9 @@ class CapabilityMark
 
 
     /**
-     * @var GenericCollection|DescriptorMark[]
+     * @var GenericCollection|IndicatorMark[]
      */
-    private $descriptorMarks;
+    private $indicatorMarks;
 
 
     /**
@@ -44,6 +44,7 @@ class CapabilityMark
     public function __construct(CapabilityUsage $capabilityUsage)
     {
         $this->capabilityUsage = $capabilityUsage;
+        $this->indicatorMarks  = new GenericCollection(IndicatorMark::class);
     }
 
 
@@ -57,21 +58,21 @@ class CapabilityMark
 
 
     /**
-     * @return GenericCollection|DescriptorMark[]
+     * @return GenericCollection
      */
-    public function getDescriptorMarks(): GenericCollection
+    public function getIndicatorMarks(): GenericCollection
     {
-        return $this->descriptorMarks;
+        return $this->indicatorMarks;
     }
 
 
     /**
-     * @param GenericCollection|DescriptorMark[] $descriptorMarks
+     * @param GenericCollection $indicatorMarks
      * @return static
      */
-    public function setDescriptorMarks(GenericCollection $descriptorMarks): self
+    public function setIndicatorMarks(GenericCollection $indicatorMarks): self
     {
-        $this->descriptorMarks = $descriptorMarks;
+        $this->indicatorMarks = $indicatorMarks;
         return $this;
     }
 
