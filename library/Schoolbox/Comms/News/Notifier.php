@@ -15,6 +15,8 @@ use Schoolbox\Comms\News\Audience\BusinessRules;
 use Schoolbox\Comms\News\Audience\IUserResolver;
 use Schoolbox\Comms\News\Audience\RelationshipFilterer;
 use Schoolbox\Comms\News\Audience\UserResolver;
+use Schoolbox\Comms\News\Moderation\UserResolver as ModeratorResolver;
+use Schoolbox\Comms\News\Moderation\IUserResolver as IModeratorResolver;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -44,6 +46,9 @@ class Notifier extends AbstractModuleNotifier
     /** @var IUserResolver */
     private $audienceResolver;
 
+    /** @var iModeratorResolver */
+    private $moderatorResolver;
+
 
     /**
      * @param \Aura\Di\ContainerInterface $di
@@ -72,9 +77,15 @@ class Notifier extends AbstractModuleNotifier
             'audienceMapper'       => $mf->getLazy(\Schoolbox\Comms\News\Audience\Mapper::class),
         ]);
 
+        $moderatorResolver = $di->lazyNew(ModeratorResolver::class, [
+            'audienceMapper'       => $mf->getLazy(\Schoolbox\Comms\News\Audience\Mapper::class),
+            'userAccessMapper'     => $mf->getLazy(UserAccessMapper::class)
+        ]);
+
         return [
-            'setMapper'           => $mf->getLazy(Mapper::class),
-            'setAudienceResolver' => $userResolver
+            'setMapper'            => $mf->getLazy(Mapper::class),
+            'setAudienceResolver'  => $userResolver,
+            'setModeratorResolver' => $moderatorResolver
         ];
     }
 
@@ -105,6 +116,13 @@ class Notifier extends AbstractModuleNotifier
         $this->audienceResolver = $audienceResolver;
     }
 
+    /**
+     * @param IModeratorResolver $moderatorResolver
+     */
+    public function setModeratorResolver(IModeratorResolver $moderatorResolver)
+    {
+        $this->moderatorResolver = $moderatorResolver;
+    }
 
     /**
      * Objectives of this method: if the request
@@ -137,10 +155,16 @@ class Notifier extends AbstractModuleNotifier
 
         $diff = $bundle->getEvent()->getDiff();
 
+        // if draft, return
+        // TODO: isDraft is false, when auto-saving awaiting-approval article
+        if ($article->isDraft()) {
+            return;
+        }
+
+        // TODO: this is not actually triggered at the moment
         if (isset($diff['rejectedAt'])) {
             $bundle->attach(self::TRIGGER_REJECTED, self::IMMEDIATELY);
         }
-
 
         //// when an article is not yet accepted ////
 
@@ -202,7 +226,7 @@ class Notifier extends AbstractModuleNotifier
         $articleId = $article->getId();
         $bob->setTitle(self::PATTERN_POSTED_TITLE)
             ->setHref(sprintf(self::PATTERN_POSTED_HREF, $articleId))
-            ->addTopic("news.$articleId.posted");
+            ->addTopic("news.$articleId." . self::TRIGGER_POSTED);
 
         // Empty params for completeness?
         $bob->setParams([
@@ -237,10 +261,10 @@ class Notifier extends AbstractModuleNotifier
                 'title' => new Param($article->getTitle())
             ])
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
-            ->addTopic("news.{$article->getId()}.submitted")
+            ->addTopic("news.{$article->getId()}." . self::TRIGGER_SUBMITTED)
         ;
 
-        foreach ($this->audienceResolver->findModeratorsForArticle($article->getId()) as $modId) {
+        foreach ($this->moderatorResolver->findModeratorsForArticle($article->getId()) as $modId) {
             $envelope->targetToUser($modId, $bob->build());
         }
 
@@ -268,7 +292,7 @@ class Notifier extends AbstractModuleNotifier
                 'title' => new Param($article->getTitle())
             ])
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
-            ->addTopic("news.{$article->getId()}.rejected")
+            ->addTopic("news.{$article->getId()}." . self::TRIGGER_REJECTED)
         ;
 
         $envelope->targetToUser($article->getAuthor()->getId(), $bob->build());
@@ -392,7 +416,7 @@ class Notifier extends AbstractModuleNotifier
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
-            ->addTopic("news.$articleId.posted")
+            ->addTopic("news.$articleId." . self::TRIGGER_POSTED)
             // body and byline are optional, but recommended since they render out in emails
             ->setMeta(array(
                 'title'  => $heading,

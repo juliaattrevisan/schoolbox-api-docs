@@ -19,13 +19,4 @@ interface IUserResolver
      */
     public function findUsersForArticle(int $articleId): array;
 
-
-    /**
-     * Returns the ids of users who are capable of moderating this article
-     *
-     * @param int $articleId
-     * @return int[]
-     */
-    public function findModeratorsForArticle(int $articleId): array;
-
 }

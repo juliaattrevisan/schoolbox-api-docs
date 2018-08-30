@@ -12,3 +12,7 @@ SELECT ms.id, r.id, 'MU,DI,IN,MO,EM', 'IN,MO,EM'
 FROM groups r, msg_source ms
 WHERE ms.namespace = 5
 AND ms.key IN ('submitted', 'rejected');
+
+UPDATE msg_source SET description = 'somebody posts news'
+WHERE namespace = 5
+AND `key` = 'posted';

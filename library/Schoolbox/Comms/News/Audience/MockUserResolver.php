@@ -47,21 +47,6 @@ class MockUserResolver implements IUserResolver
         10 => [88,89,20,36,123,124,128],
     ];
 
-    public const ARTICLE_MODERATORS = [
-        0  => [13,19],
-        1  => [13,19],
-        2  => [13,19,151],
-        3  => [13,19,151],
-        4  => [13,19,151],
-        5  => [13,19,151],
-        6  => [13,19],
-        7  => [13,19],
-        8  => [13,19],
-        9  => [13,19],
-        10 => [13,19,247],
-    ];
-
-
     /**
      * @inheritdoc
      */
@@ -69,19 +54,6 @@ class MockUserResolver implements IUserResolver
     {
         return $this->findUsers($articleId, self::ARTICLE_AUDIENCES);
     }
-
-
-    /**
-     * Returns the ids of users who are capable of moderating this article
-     *
-     * @param int $articleId
-     * @return int[]
-     */
-    public function findModeratorsForArticle(int $articleId): array
-    {
-        return $this->findUsers($articleId, self::ARTICLE_MODERATORS);
-    }
-
 
     /**
      * @param int   $articleId
@@ -96,6 +68,5 @@ class MockUserResolver implements IUserResolver
         return $dataset[$this->defaultSet];
 
     }
-
 
 }
