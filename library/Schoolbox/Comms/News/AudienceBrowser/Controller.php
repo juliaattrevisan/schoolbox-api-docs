@@ -14,6 +14,7 @@ use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\RoleMapper;
@@ -22,6 +23,9 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
+
+    /** @var IConnector */
+    private $db;
 
     /**
      * @var CampusMapper
@@ -66,6 +70,8 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     *
+     * @param IConnector            $db
      * @param CampusMapper          $campusMapper
      * @param RoleMapper            $roleMapper
      * @param HouseMapper           $houseMapper
@@ -76,6 +82,7 @@ class Controller extends Base
      * @param RoleAccessMapper      $roleAccessMapper
      */
     public function __construct(
+        IConnector $db,
         CampusMapper $campusMapper,
         RoleMapper $roleMapper,
         HouseMapper $houseMapper,
@@ -85,6 +92,7 @@ class Controller extends Base
         Audience\Mapper $audienceMapper,
         RoleAccessMapper $roleAccessMapper
     ) {
+        $this->db = $db;
         $this->campusMapper = $campusMapper;
         $this->roleMapper = $roleMapper;
         $this->houseMapper = $houseMapper;
@@ -114,8 +122,9 @@ class Controller extends Base
 
         $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());
 
+        $escapedKeyword = $this->db->escapeForLike($this->getRequest()->query['query']);
         $statement->execute([
-            'keyword' => "%{$this->getRequest()->query['query']}%",
+            'keyword' => "%{$escapedKeyword}%",
         ]);
 
         /* Set up the RELATIONSHIP_SELF variant first then add Parents and Teachers modifiers
