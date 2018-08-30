@@ -11,17 +11,17 @@ namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 
 /**
- * Marking of a group within a marked rubric grid.
+ * Marking of an indicator within a marked rubric grid.
  *
  * Represented on the marked grid as a single row, which may or may not have a
  * single marked descriptor.
  */
-class CriterionMark
+class IndicatorMark
 {
     /**
      * @var IndicatorUsage
      */
-    private $criterionUsage;
+    private $indicatorUsage;
 
 
     /**
@@ -33,16 +33,16 @@ class CriterionMark
     /**
      * Constructor
      *
-     * @param IndicatorUsage $criterionUsage
+     * @param IndicatorUsage $indicatorUsage
      */
-    public function __construct(IndicatorUsage $criterionUsage)
+    public function __construct(IndicatorUsage $indicatorUsage)
     {
-        $this->criterionUsage = $criterionUsage;
+        $this->indicatorUsage = $indicatorUsage;
     }
 
 
     /**
-     * What's the value for this criterion's mark?
+     * What's the value for this indicator's mark?
      *
      * @return float|null
      */
@@ -58,9 +58,9 @@ class CriterionMark
     /**
      * @return IndicatorUsage
      */
-    public function getCriterionUsage(): IndicatorUsage
+    public function getIndicatorUsage(): IndicatorUsage
     {
-        return $this->criterionUsage;
+        return $this->indicatorUsage;
     }
 
 

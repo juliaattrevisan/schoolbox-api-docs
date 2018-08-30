@@ -12,16 +12,16 @@ use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\GenericCollection;
 
 /**
- * Marking of a group within a marked rubric grid.
+ * Marking of a capability within a marked rubric grid.
  *
  * Represented on the marked grid as a collection of rows.
  */
-class GroupMark
+class CapabilityMark
 {
     /**
      * @var CapabilityUsage
      */
-    private $groupUsage;
+    private $capabilityUsage;
 
 
     /**
@@ -39,20 +39,20 @@ class GroupMark
     /**
      * Constructor
      *
-     * @param CapabilityUsage $groupUsage
+     * @param CapabilityUsage $capabilityUsage
      */
-    public function __construct(CapabilityUsage $groupUsage)
+    public function __construct(CapabilityUsage $capabilityUsage)
     {
-        $this->groupUsage = $groupUsage;
+        $this->capabilityUsage = $capabilityUsage;
     }
 
 
     /**
      * @return CapabilityUsage
      */
-    public function getGroupUsage(): CapabilityUsage
+    public function getCapabilityUsage(): CapabilityUsage
     {
-        return $this->groupUsage;
+        return $this->capabilityUsage;
     }
 
 

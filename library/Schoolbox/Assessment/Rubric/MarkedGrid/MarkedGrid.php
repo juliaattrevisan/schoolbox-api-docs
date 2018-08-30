@@ -22,7 +22,7 @@ use Schoolbox\Learning\Assessment\IFeedback;
  * * a feedback to which this is assigned (in practise, always a due work
  *   feedback as the grid may only exist on a due work)
  * * a grid
- * * a set of marked groups, which in turn contain marked descriptors
+ * * a set of marked capabilities, which in turn contain marked indicators
  */
 class MarkedGrid
 {
