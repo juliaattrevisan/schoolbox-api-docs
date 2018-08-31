@@ -261,10 +261,7 @@ class External_Liss_Server
 
             $allData = $message->params[1]->me['array'];
             $classAll = $classEntryMapper->findAll();
-            foreach($classAll as $class){
-                /* @var ClassEntry $class */
-                $indexedClass[$class->getCode()] = $class;
-            }
+            $classAll->indexBy('code');
 
             $queryItems = array();
             foreach ($allData as $currentData) {
