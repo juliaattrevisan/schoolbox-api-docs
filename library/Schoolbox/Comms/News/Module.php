@@ -19,7 +19,9 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -46,17 +48,15 @@ class Module extends BaseModule
             new Rule\IsLoggedIn()
         );
 
-        /* Any staff can see the form
+        /* The current user modify the article
+         * Supers, Comms Officers, Article Authors
          */
-        $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
-        );
-
-        /* Anyone can receive data from the form
-         */
-        $postPerms = new Rule\All(
-            new Rule\IsLoggedIn()
-        );
+        $modifyPerms = new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Authorizer\Rule\IsAuthorOrModerator($this->getNewsMapper())
+            );
+        });
 
         $preloadArticle = function ($params) {
             return $this->preloadArticle($params);
@@ -64,25 +64,25 @@ class Module extends BaseModule
 
         /* Create news article
          */
-        $this->register('GET', '/create', 'getCreate', $getPerms);
-        $this->register('POST', '/create', 'postCreate', $postPerms);
+        $this->register('GET', '/create', 'getCreate', $viewPerms);
+        $this->register('POST', '/create', 'postCreate', $viewPerms);
 
         /* Update news article
          */
-        $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $getPerms, $preloadArticle);
-        $this->register('POST', '/{articleId:\d+}', 'postUpdate', $getPerms, $preloadArticle);
+        $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $modifyPerms, $preloadArticle);
+        $this->register('POST', '/{articleId:\d+}', 'postUpdate', $modifyPerms, $preloadArticle);
 
         /* View news article
          */
-        $this->register('GET', '/{articleId:\d+}', 'getDetail', null, $preloadArticle);
+        $this->register('GET', '/{articleId:\d+}', 'getDetail', $viewPerms, $preloadArticle);
 
         /* Delete article
          */
-        $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', null, $preloadArticle);
+        $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', $modifyPerms, $preloadArticle);
 
         /* (async) Get a list of topics to chooze
          */
-        $this->register('GET', '/topics', 'getTopics', $getPerms);
+        $this->register('GET', '/topics', 'getTopics', $viewPerms);
 
         /* (async) Get a list of articles audienced to me, by topic
          */
