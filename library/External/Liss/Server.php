@@ -42,7 +42,6 @@ use Schoolbox\Calendar\EventRelations;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
-use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
@@ -62,9 +61,15 @@ class External_Liss_Server
     /** @var IConnector */
     private $externalDb;
 
+    /** @var Logger */
+    private $log;
+
     public function __construct(IConnector $externalDb)
     {
         $this->externalDb = $externalDb;
+
+        $logFile = fopen(Cfg::get('logs_dir') . '/liss.log', 'a');
+        $this->log = new Logger($logFile, $logFile, Monolog\Logger::INFO, [], true);
     }
     /**
      * Default logging message when attempting to use liss with a non-schoolbox connector
@@ -95,15 +100,13 @@ class External_Liss_Server
      * @throws MapperException
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    static public function getCycle()
+    public function getCycle()
     {
-        $log = self::log();
-
         /* Requires schoolbox connector
          */
-        if (!self::isSchoolboxConnector()) {
-            $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
+        if (!$this->isSchoolboxConnector()) {
+            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
+            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
         $cycleMapper = new TimetableCycleMapper();
@@ -113,9 +116,9 @@ class External_Liss_Server
              */
             $cycle = $cycleMapper->findById(1);
 
-            $log->info("publishBellTimes: Defaulting to using first existing timetable cycle");
+            $this->log()->info("publishBellTimes: Defaulting to using first existing timetable cycle");
         } catch (MapperException $e) {
-            $log->warning("publishBellTimes: Failed to find existing cycle, automatically creating one");
+            $this->log()->warning("publishBellTimes: Failed to find existing cycle, automatically creating one");
 
             $cycle = $cycleMapper->createModel();
             $cycle->setTitle('Main Timetable');
@@ -160,37 +163,37 @@ class External_Liss_Server
         new xmlrpc_server(
             [
                 'liss.getRooms' => [
-                    'function' => 'External_Liss_Server::getRooms'
+                    'function' => [$this,'getRooms'],
                 ],
                 'liss.getHello' => [
-                    'function' => 'External_Liss_Server::getRooms'
+                    'function' => [$this,'getRooms'],
                 ],
                 'liss.publishStudents' => [
-                    'function' => 'External_Liss_Server::publishStudents',
+                    'function' => [$this,'publishStudents'],
                 ],
                 'liss.publishTeachers' => [
-                    'function' => 'External_Liss_Server::publishTeachers',
+                    'function' => [$this,'publishTeachers'],
                 ],
                 'liss.publishCalendar' => [
-                    'function' => 'External_Liss_Server::publishCalendar',
+                    'function' => [$this, 'publishCalendar'], 
                 ],
                 'liss.publishRooms' => [
-                    'function' => 'External_Liss_Server::publishRooms',
+                    'function' => [$this, 'publishRooms'],
                 ],
                 'liss.publishBellTimes' => [
-                    'function' => 'External_Liss_Server::publishBellTimes',
+                    'function' => [$this, 'publishBellTimes'], 
                 ],
                 'liss.publishClasses' => [
-                    'function' => 'External_Liss_Server::publishClasses',
+                    'function' => [$this, 'publishClasses'],
                 ],
                 'liss.publishClassMemberships' => [
-                    'function' => 'External_Liss_Server::publishClassMemberships',
+                    'function' => [$this, 'publishClassMemberships'],
                 ],
                 'liss.publishTimetable' => [
-                    'function' => 'External_Liss_Server::publishTimetable',
+                    'function' => [$this, 'publishTimetable'],
                 ],
                 'liss.publishDailyData' => [
-                    'function' => 'External_Liss_Server::publishDailyData'
+                    'function' => [$this, 'publishDailyData'],
                 ],
             ]
         );
@@ -198,13 +201,12 @@ class External_Liss_Server
 
 
     /**
-     * Spawn a log message
+     * Get the logger
      * @return Logger
      */
-    static public function log()
+    public function log()
     {
-        $logFile = fopen(Cfg::get('logs_dir') . '/liss.log', 'a');
-        return $log = new Logger($logFile, $logFile, Monolog\Logger::INFO, [], true);
+        return $this->log;
     }
 
 
@@ -221,13 +223,11 @@ class External_Liss_Server
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
      */
-    static public function getRooms(xmlrpcmsg $message)
+    public function getRooms(xmlrpcmsg $message)
     {
-        $log = self::log();
+        $this->log()->info("getRooms: unable to process request, not implemented");
 
-        $log->info("getRooms: unable to process request, not implemented");
-
-        return self::generateResponse('got rooms');
+        return $this->generateResponse('got rooms');
     }
 
 
@@ -238,21 +238,21 @@ class External_Liss_Server
      * @return xmlrpcresp
      * @throws PDOException
      */
-    static public function publishClassMemberships(xmlrpcmsg $message)
+    public function publishClassMemberships(xmlrpcmsg $message)
     {
-        $log = self::log();
+
 
         /* Requires schoolbox connector
          */
-        if (!self::isSchoolboxConnector()) {
-            $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
+        if (!$this->isSchoolboxConnector()) {
+            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
+            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
-            $log->info("publishClassMemberships: processing request");
+            $this->log()->info("publishClassMemberships: processing request");
             $classInvolvementMapper = new ClassInvolvementMapper();
             $classEntryMapper = new ClassEntryMapper();
             $userMapper = new UserMapper();
@@ -269,10 +269,10 @@ class External_Liss_Server
 
                 try {
                     $user = $userMapper->findByExternalId(trim((string)$struct['StudentId']->me['string']));
-                    $class = $indexedClass[trim((string)$struct['ClassCode']->me['string'])];
+                    $class = $classAll[trim((string)$struct['ClassCode']->me['string'])];
                     $queryItems[] = "(NULL, '".$class->getId()."', '".$user->getId()."')";
                 } catch (MapperException $e) {
-                    $log->warning(sprintf("publishClassMemberships: Failed to put student %s in %s: %s", trim((string)$struct['StudentId']->me['string']), trim((string)$struct['ClassCode']->me['string']), $e->getMessage()));
+                    $this->log()->warning(sprintf("publishClassMemberships: Failed to put student %s in %s: %s", trim((string)$struct['StudentId']->me['string']), trim((string)$struct['ClassCode']->me['string']), $e->getMessage()));
                 }
             }
 
@@ -282,16 +282,16 @@ class External_Liss_Server
                     // Manual bulk insert into the DB of "$fullquery"
                     $this->externalDb->executeQuery($fullQuery);
                 } catch (Exception $e) {
-                    $log->error(sprintf("publishClassMemberships: Failed to save class memberships: %s", $e->getMessage()));
+                    $this->log()->error(sprintf("publishClassMemberships: Failed to save class memberships: %s", $e->getMessage()));
                 }
             }
 
-            $log->info("publishClassMemberships: completed request");
+            $this->log()->info("publishClassMemberships: completed request");
 
-            return self::generateResponse('Class Memberships imported');
+            return $this->generateResponse('Class Memberships imported');
         }
 
-        return self::generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
     }
 
     /**
@@ -300,32 +300,32 @@ class External_Liss_Server
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
      */
-    static public function publishTeachers(xmlrpcmsg $message)
+    public function publishTeachers(xmlrpcmsg $message)
     {
-        $log = self::log();
+
 
         /* Requires schoolbox connector
          */
-        if (!self::isSchoolboxConnector()) {
-            $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
+        if (!$this->isSchoolboxConnector()) {
+            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
+            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
              */
-            $log->info("publishTeachers: unable to process request, not implemented");
+            $this->log()->info("publishTeachers: unable to process request, not implemented");
 
             /* Log data for use */
             $allData = $message->params[1]->me['array'];
-            $log->info("publishTeachers: " . json_encode($allData));
+            $this->log()->info("publishTeachers: " . json_encode($allData));
 
-            return self::generateResponse('Teachers Imported');
+            return $this->generateResponse('Teachers Imported');
         }
 
-        return self::generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
     }
 
     /**
@@ -334,32 +334,32 @@ class External_Liss_Server
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
      */
-    static public function publishStudents(xmlrpcmsg $message)
+    public function publishStudents(xmlrpcmsg $message)
     {
-        $log = self::log();
+
 
         /* Requires schoolbox connector
          */
-        if (!self::isSchoolboxConnector()) {
-            $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
+        if (!$this->isSchoolboxConnector()) {
+            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
+            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
              */
-            $log->info("publishStudents: unable to process request, not implemented");
+            $this->log()->info("publishStudents: unable to process request, not implemented");
 
             /* Log data for use */
             $allData = $message->params[1]->me['array'];
-            $log->info("publishStudents: " . json_encode($allData));
+            $this->log()->info("publishStudents: " . json_encode($allData));
 
-            return self::generateResponse('Students Imported');
+            return $this->generateResponse('Students Imported');
         }
 
-        return self::generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
     }
 
     /**
@@ -368,32 +368,32 @@ class External_Liss_Server
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
      */
-    static public function publishCalendar(xmlrpcmsg $message)
+    public function publishCalendar(xmlrpcmsg $message)
     {
-        $log = self::log();
+
 
         /* Requires schoolbox connector
          */
-        if (!self::isSchoolboxConnector()) {
-            $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
+        if (!$this->isSchoolboxConnector()) {
+            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
+            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
              */
-            $log->info("publishCalendar: unable to process request, not implemented");
+            $this->log()->info("publishCalendar: unable to process request, not implemented");
 
             /* Log data for use */
             $allData = $message->params[1]->me['array'];
-            $log->info("publishCalendar: " . json_encode($allData));
+            $this->log()->info("publishCalendar: " . json_encode($allData));
 
-            return self::generateResponse('Calendar Imported');
+            return $this->generateResponse('Calendar Imported');
         }
 
-        return self::generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
     }
 
     /**
@@ -402,33 +402,33 @@ class External_Liss_Server
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
      */
-    static public function publishRooms(xmlrpcmsg $message)
+    public function publishRooms(xmlrpcmsg $message)
     {
-        $log = self::log();
+
 
         /* Requires schoolbox connector
          */
-        if (!self::isSchoolboxConnector()) {
-            $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
+        if (!$this->isSchoolboxConnector()) {
+            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
+            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
              */
 
-            $log->info("publishRooms: unable to process request, not implemented");
+            $this->log()->info("publishRooms: unable to process request, not implemented");
 
             /* Log data for use */
             $allData = $message->params[1]->me['array'];
-            $log->info("publishRooms: " . json_encode($allData));
+            $this->log()->info("publishRooms: " . json_encode($allData));
 
-            return self::generateResponse('Rooms Imported');
+            return $this->generateResponse('Rooms Imported');
         }
 
-        return self::generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
     }
 
 
@@ -440,22 +440,22 @@ class External_Liss_Server
      * @throws MapperException
      * @throws PDOException
      */
-    static public function publishClasses(xmlrpcmsg $message)
+    public function publishClasses(xmlrpcmsg $message)
     {
-        $log = self::log();
+
 
         /* Requires schoolbox connector
          */
-        if (!self::isSchoolboxConnector()) {
-            $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
+        if (!$this->isSchoolboxConnector()) {
+            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
+            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
 
-            $log->info("publishClasses: processing request");
+            $this->log()->info("publishClasses: processing request");
 
             /* Truncate everything before re-adding
              */
@@ -477,12 +477,12 @@ class External_Liss_Server
                 $classCount++;
             }
 
-            $log->info(sprintf("publishClasses: completed adding %d classes", $classCount));
+            $this->log()->info(sprintf("publishClasses: completed adding %d classes", $classCount));
 
-            return self::generateResponse('Classes Imported');
+            return $this->generateResponse('Classes Imported');
         }
 
-        return self::generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
     }
 
     /**
@@ -493,22 +493,22 @@ class External_Liss_Server
      * @throws PDOException
      * @throws \Schoolbox\Mapper\Exception
      */
-    static public function publishTimetable(xmlrpcmsg $message)
+    public function publishTimetable(xmlrpcmsg $message)
     {
-        $log = self::log();
+
 
         /* Requires schoolbox connector
          */
-        if (!self::isSchoolboxConnector()) {
-            $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
+        if (!$this->isSchoolboxConnector()) {
+            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
+            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
 
-            $log->info("publishTimetable: processing request");
+            $this->log()->info("publishTimetable: processing request");
 
             $timetablePeriodMapper = new TimetablePeriodMapper();
             $classEntryMapper = new ClassEntryMapper();
@@ -563,25 +563,25 @@ class External_Liss_Server
 
                     /* These ones are broken */
                     if ($allPeriods->count() == 0) {
-                        $log->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)$struct['DayNumber']->me['i4']), trim((string)$struct['Period']->me['string'])));
+                        $this->log()->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)$struct['DayNumber']->me['i4']), trim((string)$struct['Period']->me['string'])));
                     }
 
                     if ($allClasses->count() == 0) {
-                        $log->warning(sprintf("publishTimetable: Failed to find class %s", trim($struct['ClassCode']->me['string'])));
+                        $this->log()->warning(sprintf("publishTimetable: Failed to find class %s", trim($struct['ClassCode']->me['string'])));
                     }
 
                     if ($allTeachers->count() == 0) {
-                        $log->warning(sprintf("publishTimetable: Failed to find teacher %s", trim($struct['TeacherCode']->me['string'])));
+                        $this->log()->warning(sprintf("publishTimetable: Failed to find teacher %s", trim($struct['TeacherCode']->me['string'])));
                     }
                 }
             }
 
-            $log->info("publishTimetable: completed request");
+            $this->log()->info("publishTimetable: completed request");
 
-            return self::generateResponse('Timetable Imported');
+            return $this->generateResponse('Timetable Imported');
         }
 
-        return self::generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
     }
 
 
@@ -594,21 +594,21 @@ class External_Liss_Server
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    static public function publishBellTimes(xmlrpcmsg $message)
+    public function publishBellTimes(xmlrpcmsg $message)
     {
-        $log = self::log();
+
 
         /* Requires schoolbox connector
          */
-        if (!self::isSchoolboxConnector()) {
-            $log->info(self::WRONG_CONNECTOR_MESSAGE);
-            return self::generateResponse(self::WRONG_CONNECTOR_MESSAGE);
+        if (!$this->isSchoolboxConnector()) {
+            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
+            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log, new ConfigLoader());
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, new ConfigLoader());
 
         if ($authenticator->isAuthenticated()) {
-            $log->info("publishBellTimes: processing request");
+            $this->log()->info("publishBellTimes: processing request");
             $cycle = External_Liss_Server::getCycle();
 
             $allData = $message->params[2]->me['array'];
@@ -647,7 +647,7 @@ class External_Liss_Server
 
             $collection->reindex();
 
-            $log->info(sprintf("publishBellTimes: Collated %d days and %d periods into timetable structure", $collection->count(), $collection->first()->count()));
+            $this->log()->info(sprintf("publishBellTimes: Collated %d days and %d periods into timetable structure", $collection->count(), $collection->first()->count()));
 
             foreach ($collection as $dayCollection) {
                 $i = 0;
@@ -660,12 +660,12 @@ class External_Liss_Server
                 }
             }
 
-            $log->info(sprintf("publishBellTimes: Saved timetable periods, process completed", $collection->count()));
+            $this->log()->info(sprintf("publishBellTimes: Saved timetable periods, process completed", $collection->count()));
 
-            return self::generateResponse('BellTimes Imported');
+            return $this->generateResponse('BellTimes Imported');
         }
 
-        return self::generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
     }
 
 
@@ -681,9 +681,9 @@ class External_Liss_Server
      * @throws MapperException\Deleted
      * @throws PDOException
      */
-    static public function publishDailyData(xmlrpcmsg $message)
+    public function publishDailyData(xmlrpcmsg $message)
     {
-        $log = self::log();
+
 
         $configLoader = new ConfigLoader();
         $helper = new PublishDailyDataHelper($configLoader);
@@ -707,13 +707,13 @@ class External_Liss_Server
             $author = $userMapper->findById($configLoader->get('external_liss_calendar_owner'));
 
         } catch (MapperException $e) {
-            $log->critical(self::MISSING_CALENDAR_OWNER);
-            return self::generateResponse(self::MISSING_CALENDAR_OWNER);
+            $this->log()->critical(self::MISSING_CALENDAR_OWNER);
+            return $this->generateResponse(self::MISSING_CALENDAR_OWNER);
         }
 
         /* Have an owner - continue normally
          */
-        $authenticator = new External_Liss_Authenticator($message->params[0], $log, $configLoader);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $configLoader);
 
         if ($authenticator->isAuthenticated()) {
             /* Delete all previous versions of events using the same source
@@ -732,8 +732,8 @@ class External_Liss_Server
                 $eventType = $allEventTypes->first();
 
             } else {
-                $log->critical(self::NO_EVENT_TYPES);
-                return self::generateResponse(self::NO_EVENT_TYPES);
+                $this->log()->critical(self::NO_EVENT_TYPES);
+                return $this->generateResponse(self::NO_EVENT_TYPES);
             }
 
             /* Save it specifically for this user without mass reset which
@@ -770,11 +770,11 @@ class External_Liss_Server
                 /* Skip events that don't have a type
                  */
                 if (!strlen($currentEvent['type'])) {
-                    $log->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['guid']}\": no type");
+                    $this->log()->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['guid']}\": no type");
 
                     if ($includePayloadInLogging) {
-                        $log->warning("Payload for guid \"{$currentEvent['guid']}\": " . json_encode($currentEvent));
-                        $log->warning('');
+                        $this->log()->warning("Payload for guid \"{$currentEvent['guid']}\": " . json_encode($currentEvent));
+                        $this->log()->warning('');
                     }
 
                     $skipCount['noType']++;
@@ -786,11 +786,11 @@ class External_Liss_Server
                 /* Skip events that have a particular type
                  */
                 if (in_array($currentEvent['type'], $exclusions)) {
-                    $log->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['guid']}\": has excluded type \"{$currentEvent['type']}\"");
+                    $this->log()->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['guid']}\": has excluded type \"{$currentEvent['type']}\"");
 
                     if ($includePayloadInLogging) {
-                        $log->warning("Payload for guid \"{$currentEvent['guid']}\": " . json_encode($currentEvent));
-                        $log->warning('');
+                        $this->log()->warning("Payload for guid \"{$currentEvent['guid']}\": " . json_encode($currentEvent));
+                        $this->log()->warning('');
                     }
 
                     $skipCount['invalidType']++;
@@ -803,7 +803,7 @@ class External_Liss_Server
                  * This supposedly never happens, but I don't trust
                  */
                 if (!strlen(trim($currentEvent['classCode']))) {
-                    $log->warning("Skipping {$currentEvent['className']} ({$currentEvent['guid']}): no class codes provided");
+                    $this->log()->warning("Skipping {$currentEvent['className']} ({$currentEvent['guid']}): no class codes provided");
                     $skipCount['noClassCode']++;
                     $skipCount['total']++;
 
@@ -850,7 +850,7 @@ class External_Liss_Server
 
                     $eventRelations->saveFolderRelation($event, [$folder->getId()]);
                     $helper->saveEventSource($event, $currentEvent['guid']);
-                    $log->info(sprintf("Processed homepage event \"%s\" with guid \"%s\", %s - %s", $event->getTitle(), $currentEvent['guid'], $event->getStartDateTime()->getDatabase(), $event->getEndDateTime()->getDatabase()));
+                    $this->log()->info(sprintf("Processed homepage event \"%s\" with guid \"%s\", %s - %s", $event->getTitle(), $currentEvent['guid'], $event->getStartDateTime()->getDatabase(), $event->getEndDateTime()->getDatabase()));
 
                     $instancesHomepageCreated++;
                 } else {
@@ -873,17 +873,17 @@ class External_Liss_Server
                             $eventRelations->savePersonalRelation($event);
                             $helper->saveEventSource($event, $currentEvent['guid']);
 
-                            $log->info(sprintf("Processed personal event \"%s\" with guid \"%s\" for user \"%s\", %s - %s", $event->getTitle(), $currentEvent['guid'], $currentExternalId, $event->getStartDateTime()->getDatabase(), $event->getEndDateTime()->getDatabase()));
+                            $this->log()->info(sprintf("Processed personal event \"%s\" with guid \"%s\" for user \"%s\", %s - %s", $event->getTitle(), $currentEvent['guid'], $currentExternalId, $event->getStartDateTime()->getDatabase(), $event->getEndDateTime()->getDatabase()));
 
                             $instancesPersonalCreated++;
                         } catch (MapperException $e) {
-                            $log->warning(sprintf("Skipping event \"%s\" with guid \"%s\" for user \"%s\": no Schoolbox account found for external id \"%s\"",
+                            $this->log()->warning(sprintf("Skipping event \"%s\" with guid \"%s\" for user \"%s\": no Schoolbox account found for external id \"%s\"",
                                 $event->getTitle(), $currentEvent['guid'], $currentExternalId, $currentExternalId
                             ));
 
                             if ($includePayloadInLogging) {
-                                $log->warning("Payload for guid \"{$currentEvent['guid']}\": " . json_encode($currentEvent));
-                                $log->warning('');
+                                $this->log()->warning("Payload for guid \"{$currentEvent['guid']}\": " . json_encode($currentEvent));
+                                $this->log()->warning('');
                             }
 
                             /* Number of occurrences of an unknown user
@@ -903,12 +903,12 @@ class External_Liss_Server
              */
             $processed = $total-$skipCount['total'];
 
-            $log->info("Total Processed: {$processed}/{$total}");
-            $log->info("Total Skipped: {$skipCount['total']}/{$total}");
-            $log->info("Skipped (no class code): {$skipCount['noClassCode']}/{$skipCount['total']}");
-            $log->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
-            $log->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
-            $log->info("Unknown user assignations: {$skipCount['unknownUser']}");
+            $this->log()->info("Total Processed: {$processed}/{$total}");
+            $this->log()->info("Total Skipped: {$skipCount['total']}/{$total}");
+            $this->log()->info("Skipped (no class code): {$skipCount['noClassCode']}/{$skipCount['total']}");
+            $this->log()->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
+            $this->log()->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
+            $this->log()->info("Unknown user assignations: {$skipCount['unknownUser']}");
 
             /* A list of all the unknown user ids
              */
@@ -919,24 +919,24 @@ class External_Liss_Server
 
                 $unknownUserIds = implode(', ', $unknownUserIds);
 
-                $log->info("Unknown user ids: {$unknownUserIds}");
+                $this->log()->info("Unknown user ids: {$unknownUserIds}");
             }
 
-            $log->info("----------------------------------------------");
+            $this->log()->info("----------------------------------------------");
 
             /* Number of instances created
              */
             $totalInstances = $instancesPersonalCreated + $instancesHomepageCreated;
 
-            $log->info("Event Instances Spawned: {$totalInstances}. This should match event_source record count for this source.");
-            $log->info("Personal Instances: {$instancesPersonalCreated}");
-            $log->info("Homepage Instances: {$instancesHomepageCreated}");
-            $log->info('');
+            $this->log()->info("Event Instances Spawned: {$totalInstances}. This should match event_source record count for this source.");
+            $this->log()->info("Personal Instances: {$instancesPersonalCreated}");
+            $this->log()->info("Homepage Instances: {$instancesHomepageCreated}");
+            $this->log()->info('');
 
-            return self::generateResponse('Daily Data Imported');
+            return $this->generateResponse('Daily Data Imported');
         }
 
-        return self::generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
     }
 
     /**
@@ -944,7 +944,7 @@ class External_Liss_Server
      *
      * @return bool
      */
-    static private function isSchoolboxConnector()
+    private function isSchoolboxConnector()
     {
         $config = new ConfigLoader();
         $connector = $config->get('external_type');
@@ -958,7 +958,7 @@ class External_Liss_Server
      * @param $message
      * @return xmlrpcresp
      */
-    static private function generateResponse($message)
+    private function generateResponse($message)
     {
         return new xmlrpcresp(new xmlrpcval($message, 'string'));
     }
