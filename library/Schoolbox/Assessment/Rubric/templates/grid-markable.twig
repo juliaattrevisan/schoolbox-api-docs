@@ -274,6 +274,51 @@
         var $rb = $('#{{ rubricId }}');
         var markType = $rb.find("[data-final-summary]").attr("data-mark-type");
 
+        $("[data-feedback-form]").validate(
+            {
+                errorPlacement: function (error, element) {
+                    var $nextEl = element.next("button");
+                    error.insertAfter($nextEl);
+                }
+            }
+        );
+
+        // Add validation rules for per-capability marks
+        $("[data-group-mark]").each(function() {
+
+            // TODO not sure how to validate the letter grade dropdown, so skip it for now
+            if (markType !== 'LetterGrade') {
+
+                // Percentage and total mark types must be numeric
+                $(this).rules('add', {
+                    number: true
+                });
+
+                // If percentage mark type, range is between 0 and 100
+                if (markType === 'Percentage') {
+                    $(this).rules('add', {
+                        range: [0, 100]
+                    });
+                } else if (markType === "TotalMarkFractional") {
+                    // Otherwise, range is between 0 and capability max
+                    var capMax = $(this).closest("[data-group-summary]").attr("data-max");
+
+                    // TODO capMax seems to be using the validation for the most recently added item rather than having unique ones for each cap - why?
+                    $(this).rules('add', {
+                        range: [0, parseFloat(capMax)]
+                    });
+                }
+
+            }
+        });
+
+        function revalidateCapMarks() {
+            $("[data-group-mark]").each(function() {
+                $(this).valid();
+            });
+        }
+
+
         // Disable Assign From Descriptors if value hasn't changed
         function disableEnableAssignFromDescs() {
             var $groups = $rb.find("[data-group-summary]");
@@ -468,7 +513,6 @@
 
             parseFraction(rubricSummary, e.namespace);
             disableEnableAssignFromDescs();
-
         });
 
         // Custom marks reach us as either a scaled numeric mark or a percentage. Turn them into an unscaled raw mark for data-mark
@@ -549,6 +593,7 @@
 
             parseFraction(rubricSummary, e.namespace);
             disableEnableAssignFromDescs();
+            revalidateCapMarks();
         })
 
 
@@ -737,44 +782,6 @@
             });
 
         }
-
-        $("[data-feedback-form]").validate(
-            {
-                errorPlacement: function (error, element) {
-                    var $nextEl = element.next("button");
-                    error.insertAfter($nextEl);
-                }
-            }
-        );
-
-        // Add validation rules for per-capability marks
-        $("[data-group-mark]").each(function() {
-
-            // TODO not sure how to validate the letter grade dropdown, so skip it for now
-            if (markType !== 'LetterGrade') {
-
-                // Percentage and total mark types must be numeric
-                $(this).rules('add', {
-                    number: true
-                });
-
-                // If percentage mark type, range is between 0 and 100
-                if (markType === 'Percentage') {
-                    $(this).rules('add', {
-                        range: [0, 100]
-                    });
-                } else if (markType === "TotalMarkFractional") {
-                    // Otherwise, range is between 0 and capability max
-                    var capMax = $(this).closest("[data-group-summary]").attr("data-max");
-
-                    // TODO capMax seems to be using the validation for the most recently added item rather than having unique ones for each cap - why?
-                    $(this).rules('add', {
-                        range: [0, parseFloat(capMax)]
-                    });
-                }
-
-            }
-        })
 
     });
 </script>
