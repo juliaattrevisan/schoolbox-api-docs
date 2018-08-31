@@ -176,7 +176,8 @@ class Controller extends Base
         $assessmentsPerFolder = $this->assessmentMapperProxy
             ->findAllByStudent($viewee, false, $term)
             ->filter(function (IAssessable $a) use ($viewee) {
-                return $a->isParticipant($viewee);
+                $isPublished = $a->getParticipant($viewee)->getPublishDate()->getUnixTimeStamp() <= \Alaress_Date_Format::now()->getUnixTimeStamp();
+                return $a->isParticipant($viewee) && $isPublished;
             })
             ->groupByCallback(function (IAssessable $assessment) {
                 return $assessment->getBaseContext()->getFolder()->getId();
