@@ -148,7 +148,36 @@
                         </div>
 
                         <div v-show="pageShow.intersect">
-                            Intersect stuff here
+                            <p class="meta"></p>
+                            <div class="small-12 medium-6 columns checklist">
+                                <legend>
+                                    <select>
+                                        <option value="" v-for="audienceOption in this.audienceOptions">
+                                            ${ audienceOption.name }
+                                        </option>
+                                    </select>
+                                </legend>
+                                <input type="checkbox" id="roleAll" value="6" name="" data-select-all="" data-select-all-for-group="role">
+                                <label for="roleAll" class="checkbox-label">Select all</label>
+
+                                <input type="checkbox" id="role1" value="1" name="group[]" data-select-all-group="role" v-model="intersectListPrimary">
+                                <label for="role1" class="checkbox-label">Administration</label>
+                            </div>
+                            <div class="small-12 medium-6 columns checklist">
+                                <legend>
+                                    <select>
+                                        <option value="" v-for="audienceOption in this.audienceOptions">
+                                            ${ audienceOption.name }
+                                        </option>
+                                    </select>
+                                </legend>
+                                <input type="checkbox" id="campusAll" value="6" name="" data-select-all="" data-select-all-for-group="campus">
+                                <label for="campusAll" class="checkbox-label">Select all</label>
+
+                                <input type="checkbox" id="campus1" value="1" name="campus[]" data-select-all-group="campus" v-model="intersectListSecondary">
+                                <label for="campus1" class="checkbox-label">Senior</label>
+                            </div>
+                            <button class="button submit" @click.prevent="addAudienceAdvanced" :disabled="!submitEnableAdvanced">Add</button>
                         </div>
 
                     </div>
@@ -440,6 +469,9 @@
             // Read users will not see the write options even if this is set to true (because of twig conditionals), this just makes the experience easier
             // for read users
             writeOnly: {{ (user.role.staff) ? 'true' : 'false' }},
+
+            intersectListPrimary: [],
+            intersectListSecondary: []
         },
         methods: {
             /**
@@ -550,6 +582,14 @@
                 $('#audience-browse').foundation('reveal', 'close');
             },
 
+            addAudienceAdvanced: function () {
+                // Add to selectize
+                $('#audience-search').data('selectize').refreshItems();
+
+                // Close modal
+                $('#audience-browse').foundation('reveal', 'close');
+            },
+
             /**
              * Show the page specified, hiding the other
              * @param page
@@ -597,6 +637,9 @@
              */
             submitEnable: function () {
                 return !!(this.audienceListChecked.length && (this.includeUsers || this.includeParents || this.includeTeachers));
+            },
+            submitEnableAdvanced: function () {
+                return !!(this.intersectListPrimary.length && this.intersectListSecondary.length);
             }
         }
     });
