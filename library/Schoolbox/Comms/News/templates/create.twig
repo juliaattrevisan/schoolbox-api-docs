@@ -94,7 +94,14 @@
 
                     {# the modal #}
                     <div data-reveal id="audience-browse" class="reveal-modal">
-                        <h2>Browse Audience</h2>
+                        <div class="audience-browse-head">
+                            <h2>Browse Audience</h2>
+                            <small class="advanced-toggle">
+                                <a href="#" :class="{ active: pageShow.index || pageShow.valueSelect }" @click.prevent="showPage('index')">Simple</a>
+                                |
+                                <a href="#" :class="{ active: pageShow.intersect }" @click.prevent="showPage('intersect')">Advanced</a>
+                            </small>
+                        </div>
                         <a class="close-reveal-modal" aria-label="Close">×</a>
 
                         <div v-show="pageShow.index">
@@ -138,6 +145,10 @@
                             </fieldset>
 
                             <button class="button submit" @click.prevent="addAudience" :disabled="!submitEnable">Add</button>
+                        </div>
+
+                        <div v-show="pageShow.intersect">
+                            Intersect stuff here
                         </div>
 
                     </div>
@@ -397,7 +408,8 @@
             // Modal sections showing and hiding
             pageShow: {
                 'index': true,
-                'valueSelect': false
+                'valueSelect': false,
+                'intersect': false
             },
 
             // The option selected by the user from the initial modal screen
@@ -589,3 +601,22 @@
         }
     });
 </script>
+
+<style>
+    .active {
+        font-weight: bold;
+    }
+
+    .audience-browse-head {
+        position: relative;
+    }
+
+    .audience-browse-head h2 {
+        display: inline-block;
+    }
+
+    .advanced-toggle {
+        position: absolute;
+        right: 0;
+    }
+</style>
