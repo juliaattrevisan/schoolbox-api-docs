@@ -15,6 +15,13 @@ table.rb {
         }
 
         .rb-group-summary {
+            label {
+                display: block;
+                &.error {
+                    width: 100%;
+                    margin-bottom: 0; // Don't need you
+                }
+            }
             .groupMark {
                 width: 5rem;
                 display: inline-block;
