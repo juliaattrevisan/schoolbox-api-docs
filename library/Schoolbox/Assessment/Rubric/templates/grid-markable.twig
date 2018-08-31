@@ -738,7 +738,7 @@
 
         }
 
-        // TODO I don't think there's any validation on this form? need to call validate() on it
+        $("[data-feedback-form]").validate();
 
         // Add validation rules for per-capability marks
         $("[data-group-mark]").each(function() {
