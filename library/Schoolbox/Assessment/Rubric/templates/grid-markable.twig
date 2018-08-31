@@ -738,7 +738,14 @@
 
         }
 
-        $("[data-feedback-form]").validate();
+        $("[data-feedback-form]").validate(
+            {
+                errorPlacement: function (error, element) {
+                    var $nextEl = element.next("button");
+                    error.insertAfter($nextEl);
+                }
+            }
+        );
 
         // Add validation rules for per-capability marks
         $("[data-group-mark]").each(function() {
