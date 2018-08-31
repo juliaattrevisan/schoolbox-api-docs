@@ -87,7 +87,6 @@ table.rb {
     td, th {
         border-left: 1px solid $body-bg;
         transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
-        position: relative;
         &:hover {
             input[type=text], input[type=number], textarea {
                 border-color: $input-border-color;
