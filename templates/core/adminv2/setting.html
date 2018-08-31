@@ -160,21 +160,21 @@
                             <!-- END setting_type_html -->
 
                             <!-- BEGIN setting_type_resource -->
-                            <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
-                            <a href="#" class="button" data-interaction="homepage_selector" data-input_name="{SETTING_NAME}">Select Source</a>
+                            <div>
+                                <input id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} type="text" name="{SETTING_NAME}" value="{SETTING_VALUE}" />
+                                <a href="#" class="button" data-interaction="homepage_selector" data-input_name="{SETTING_NAME}">Select Source</a>
+                            </div>
                             <!-- END setting_type_resource -->
 
                             <!-- BEGIN setting_type_boolean -->
-                            <fieldset tabindex="0">
-                                <div class="switch">
-                                    <input name="{SETTING_NAME}" value="0" type="hidden">
-                                    <input id="{SETTING_NAME}" name="{SETTING_NAME}" {SETTING_CHECKED} value="1" type="checkbox">
-                                    <label for="{SETTING_NAME}">
-                                        <span>On</span>
-                                        <span>Off</span>
-                                    </label>
-                                </div>
-                            </fieldset>
+                            <div class="switch">
+                                <input name="{SETTING_NAME}" value="0" type="hidden">
+                                <input id="{SETTING_NAME}" name="{SETTING_NAME}" {SETTING_CHECKED} value="1" type="checkbox">
+                                <label for="{SETTING_NAME}">
+                                    <span>On</span>
+                                    <span>Off</span>
+                                </label>
+                            </div>
                             <!-- END setting_type_boolean -->
 
                             <!-- BEGIN setting_type_select -->
@@ -186,7 +186,9 @@
                             <!-- END setting_type_select -->
 
                             <!-- BEGIN setting_type_colour -->
-                            <input type="text" value="{SETTING_VALUE}" name="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} data-colour-picker />
+                            <div>
+                                <input type="text" value="{SETTING_VALUE}" name="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} data-colour-picker />
+                            </div>
                             <!-- END setting_type_colour -->
 
                             <!-- BEGIN setting_type_file -->
