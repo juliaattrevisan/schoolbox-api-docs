@@ -151,31 +151,33 @@
                             <p class="meta"></p>
                             <div class="small-12 medium-6 columns checklist">
                                 <legend>
-                                    <select>
-                                        <option value="" v-for="audienceOption in this.audienceOptions">
+                                    <select @change="updateIntsersectList('primary')" v-model="intersect.primary">
+                                        <option :value="audienceOption" v-for="audienceOption in this.audienceOptions">
                                             ${ audienceOption.name }
                                         </option>
                                     </select>
                                 </legend>
-                                <input type="checkbox" id="roleAll" value="6" name="" data-select-all="" data-select-all-for-group="role">
+                                <input type="checkbox" id="roleAll" value="6" name="" data-select-all data-select-all-for-group="role">
                                 <label for="roleAll" class="checkbox-label">Select all</label>
-
-                                <input type="checkbox" id="role1" value="1" name="group[]" data-select-all-group="role" v-model="intersectListPrimary">
-                                <label for="role1" class="checkbox-label">Administration</label>
+                                <slot v-for="item in audienceListItemsIntersect.primary">
+                                    <input type="checkbox" id="role1" value="1" name="group[]" data-select-all-group="role" v-model="intersectList.primary">
+                                    <label for="role1" class="checkbox-label">${ item.self.name }</label>
+                                </slot>
                             </div>
                             <div class="small-12 medium-6 columns checklist">
                                 <legend>
-                                    <select>
-                                        <option value="" v-for="audienceOption in this.audienceOptions">
+                                    <select @change="updateIntsersectList('secondary')" v-model="intersect.secondary">
+                                        <option :value="audienceOption" v-for="audienceOption in this.audienceOptions">
                                             ${ audienceOption.name }
                                         </option>
                                     </select>
                                 </legend>
                                 <input type="checkbox" id="campusAll" value="6" name="" data-select-all="" data-select-all-for-group="campus">
                                 <label for="campusAll" class="checkbox-label">Select all</label>
-
-                                <input type="checkbox" id="campus1" value="1" name="campus[]" data-select-all-group="campus" v-model="intersectListSecondary">
-                                <label for="campus1" class="checkbox-label">Senior</label>
+                                <slot v-for="item in audienceListItemsIntersect.secondary">
+                                    <input type="checkbox" id="role1" value="1" name="group[]" data-select-all-group="role" v-model="intersectList.secondary">
+                                    <label for="role1" class="checkbox-label">${ item.self.name }</label>
+                                </slot>
                             </div>
                             <button class="button submit" @click.prevent="addAudienceAdvanced" :disabled="!submitEnableAdvanced">Add</button>
                         </div>
@@ -446,6 +448,10 @@
 
             // The list of options populated by ajax after the user selects an initial option
             audienceListItems: [],
+            audienceListItemsIntersect: {
+                'primary': [],
+                'secondary': []
+            },
 
             // The checked state of the above list items
             audienceListChecked: [],
@@ -470,8 +476,15 @@
             // for read users
             writeOnly: {{ (user.role.staff) ? 'true' : 'false' }},
 
-            intersectListPrimary: [],
-            intersectListSecondary: []
+            intersect: {
+                'primary': [],
+                'secondary': []
+            },
+
+            intersectList: {
+                'primary': [],
+                'secondary': []
+            }
         },
         methods: {
             /**
@@ -629,6 +642,29 @@
 
                 // Remove from vue list
                 this.selectedAudienceItems.splice(this.selectedAudienceItems.indexOf(item), 1);
+            },
+
+            updateIntsersectList: function(list) {
+                var self = this;
+                var audienceOption = self.intersect[list];
+
+                // Try for cached list
+                if (self.cachedOptions[audienceOption.id] !== undefined) {
+                    //this.populateAudienceList(self.cachedOptions[audienceOption.id]);
+                    self.audienceListItemsIntersect[list] = self.cachedOptions[audienceOption.id];
+                } else { // Nope, ajax time
+                    // Request a list of options with the uri listed in the object above
+                    axios.get(audienceOption.ajax).then(function(response) {
+                        //self.populateAudienceList(response.data.data);
+                        self.audienceListItemsIntersect[list] = response.data.data;
+
+                        // Cache the options
+                        self.cachedOptions[audienceOption.id] = response.data.data;
+
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                }
             }
         },
         computed: {
@@ -639,7 +675,7 @@
                 return !!(this.audienceListChecked.length && (this.includeUsers || this.includeParents || this.includeTeachers));
             },
             submitEnableAdvanced: function () {
-                return !!(this.intersectListPrimary.length && this.intersectListSecondary.length);
+                return !!(this.intersectList.primary.length && this.intersectList.secondary.length);
             }
         }
     });
