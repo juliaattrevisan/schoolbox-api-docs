@@ -99,7 +99,7 @@
                             <small class="advanced-toggle">
                                 <a href="#" :class="{ active: pageShow.index || pageShow.valueSelect }" @click.prevent="showPage('index')">Simple</a>
                                 |
-                                <a href="#" :class="{ active: pageShow.intersect }" @click.prevent="showPage('intersect')">Advanced</a>
+                                <a href="#" :class="{ active: pageShow.intersect }" @click.prevent="advancedToggle()">Advanced</a>
                             </small>
                         </div>
                         <a class="close-reveal-modal" aria-label="Close">×</a>
@@ -272,6 +272,62 @@
 
     });
 
+    var audienceOptions = {
+        {% if user.role.staff %}
+        'campus': {
+            id: 'campus',
+            name: 'Campus',
+            namePlural: 'Campuses',
+            icon: 'location',
+            selfModifier: 'Students in campus',
+            ajax: '/comms/news/audiencebrowser/campuses'
+        },
+        'role': {
+            id: 'role',
+            name: 'Role',
+            namePlural: 'Roles',
+            icon: 'staff-students',
+            selfModifier: 'Users in role',
+            ajax: '/comms/news/audiencebrowser/roles'
+        },
+        'school_house': {
+            id: 'school_house',
+            name: 'House',
+            namePlural: 'Houses',
+            icon: 'home',
+            selfModifier: 'House members',
+            ajax: '/comms/news/audiencebrowser/houses'
+        },
+        'year': {
+            id: 'year',
+            name: 'Year Level',
+            namePlural: 'Year Levels',
+            icon: 'teacher',
+            selfModifier: 'Students in year level/s',
+            ajax: '/comms/news/audiencebrowser/yearlevels'
+        },
+        {% endif %}
+        'folder': {
+            id: 'folder',
+            name: 'Class/Group',
+            namePlural: 'Classes & Groups',
+            icon: 'group',
+            selfModifier: 'Class/group members',
+            ajax: '/comms/news/audiencebrowser/folders'
+        },
+        {% if user.role.staff %}
+        'pastoral_group': {
+            id: 'pastoral_group',
+            name: 'Pastoral Group',
+            namePlural: 'Pastoral Groups',
+            icon: 'pastoral',
+            selfModifier: 'Group members',
+            ajax: '/comms/news/audiencebrowser/pastoralgroups'
+        }
+        {% endif %}
+    };
+
+
     var app = new Vue({
         el: '#audience-select-container',
         delimiters: ['${', '}'],
@@ -381,60 +437,7 @@
         },
         data: {
             // The set of options on the initial modal screen
-            audienceOptions: {
-                {% if user.role.staff %}
-                'campus': {
-                    id: 'campus',
-                    name: 'Campus',
-                    namePlural: 'Campuses',
-                    icon: 'location',
-                    selfModifier: 'Students in campus',
-                    ajax: '/comms/news/audiencebrowser/campuses'
-                },
-                'role': {
-                    id: 'role',
-                    name: 'Role',
-                    namePlural: 'Roles',
-                    icon: 'staff-students',
-                    selfModifier: 'Users in role',
-                    ajax: '/comms/news/audiencebrowser/roles'
-                },
-                'school_house': {
-                    id: 'school_house',
-                    name: 'House',
-                    namePlural: 'Houses',
-                    icon: 'home',
-                    selfModifier: 'House members',
-                    ajax: '/comms/news/audiencebrowser/houses'
-                },
-                'year': {
-                    id: 'year',
-                    name: 'Year Level',
-                    namePlural: 'Year Levels',
-                    icon: 'teacher',
-                    selfModifier: 'Students in year level/s',
-                    ajax: '/comms/news/audiencebrowser/yearlevels'
-                },
-                {% endif %}
-                'folder': {
-                    id: 'folder',
-                    name: 'Class/Group',
-                    namePlural: 'Classes & Groups',
-                    icon: 'group',
-                    selfModifier: 'Class/group members',
-                    ajax: '/comms/news/audiencebrowser/folders'
-                },
-                {% if user.role.staff %}
-                'pastoral_group': {
-                    id: 'pastoral_group',
-                    name: 'Pastoral Group',
-                    namePlural: 'Pastoral Groups',
-                    icon: 'pastoral',
-                    selfModifier: 'Group members',
-                    ajax: '/comms/news/audiencebrowser/pastoralgroups'
-                }
-                {% endif %}
-            },
+            audienceOptions: audienceOptions,
 
             // Modal sections showing and hiding
             pageShow: {
@@ -476,15 +479,21 @@
             // for read users
             writeOnly: {{ (user.role.staff) ? 'true' : 'false' }},
 
+            // The selected intersect groups
+            // Default to campus and role
             intersect: {
+                'primary': audienceOptions.role,
+                'secondary': audienceOptions.campus
+            },
+
+            // The models for the checkboxes
+            intersectList: {
                 'primary': [],
                 'secondary': []
             },
 
-            intersectList: {
-                'primary': [],
-                'secondary': []
-            }
+            // Just a marker to check if advanced has been clicked for (need to load defaults on first click)
+            hasLoadedAdvanced: false
         },
         methods: {
             /**
@@ -644,6 +653,27 @@
                 this.selectedAudienceItems.splice(this.selectedAudienceItems.indexOf(item), 1);
             },
 
+            /**
+             * Clicking the 'advanced' tab
+             */
+            advancedToggle: function() {
+                if (!this.hasLoadedAdvanced) {
+                    // Load the defaults
+                    this.updateIntsersectList('primary');
+                    this.updateIntsersectList('secondary');
+                } else {
+                    // Update the marker
+                    this.hasLoadedAdvanced = true;
+                }
+
+                // Show the page always
+                this.showPage('intersect');
+            },
+
+            /**
+             * Update an intersect list with possible options
+             * @param list 'primary' or 'secondary'
+             */
             updateIntsersectList: function(list) {
                 var self = this;
                 var audienceOption = self.intersect[list];
