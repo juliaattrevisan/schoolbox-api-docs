@@ -28,6 +28,7 @@ use Aura\Di;
 use GuzzleHttp;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\BusinessRules;
 use Schoolbox\Comms\News\Audience\Mapper as AudienceMapper;
 use Schoolbox\Comms\News\Audience\RelationshipFilterer;
@@ -333,6 +334,31 @@ abstract class AbstractBootstrap implements BootstrapInterface
             return $sitepage;
         }));
 
+
+        $di->set(
+            'articleResolver',
+            $di->lazy(
+                function() use ($di) {
+                    $articleResolver = new ArticleResolver(
+                        new BusinessRules(),
+                        $di->get('databaseInternal'),
+                        $di->get('mapperFactory')->get(UserAccessMapper::class),
+                        $di->get('mapperFactory')->get(FolderMapper::class),
+                        $di->get('externalUser'),
+                        new RelationshipFilterer(
+                            $di->get('databaseInternal'),
+                            $di->get('mapperFactory')->get(UserMapper::class),
+                            $di->get('externalUser'),
+                            $di->get('mapperFactory')->get(FolderMapper::class),
+                            $di->get('externalClass'),
+                            $di->get('mapperFactory')->get(UserAccessMapper::class)
+                        )
+                    );
+
+                    return $articleResolver;
+                }
+            )
+        );
 
         $di->set(
             'userResolver',
