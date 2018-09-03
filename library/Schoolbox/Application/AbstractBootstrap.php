@@ -28,6 +28,10 @@ use Aura\Di;
 use GuzzleHttp;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\BusinessRules;
+use Schoolbox\Comms\News\Audience\Mapper as AudienceMapper;
+use Schoolbox\Comms\News\Audience\RelationshipFilterer;
+use Schoolbox\Comms\News\Audience\UserResolver;
 use Schoolbox\External\Connector\CompositeSync;
 use Schoolbox\External\Connector\CustomSync;
 use Schoolbox\External\Connector\ICommunityPortal;
@@ -328,6 +332,32 @@ abstract class AbstractBootstrap implements BootstrapInterface
             $sitepage->setDi($di);
             return $sitepage;
         }));
+
+
+        $di->set(
+            'userResolver',
+            $di->lazy(
+                function() use ($di) {
+                    $userResolver = new UserResolver(
+                        new BusinessRules(),
+                        $di->get('databaseInternal'),
+                        $di->get('externalClass'),
+                        new RelationshipFilterer(
+                            $di->get('databaseInternal'),
+                            $di->get('mapperFactory')->get(UserMapper::class),
+                            $di->get('externalUser'),
+                            $di->get('mapperFactory')->get(FolderMapper::class),
+                            $di->get('externalClass'),
+                            $di->get('mapperFactory')->get(UserAccessMapper::class)
+                        ),
+                        $di->get('mapperFactory')->get(AudienceMapper::class)
+                    );
+
+                    return $userResolver;
+                }
+            )
+        );
+
 
         // Web output class - currently uses Sitepage
         $di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
