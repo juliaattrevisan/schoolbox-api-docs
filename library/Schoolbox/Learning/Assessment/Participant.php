@@ -98,6 +98,8 @@ class Participant
         try {
             return $this->plan->getAssessable()->isResponseRequired($this);
         } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            trigger_error($e->getMessage());
             return null;
         }
     }
@@ -118,6 +120,8 @@ class Participant
         try {
             return $this->plan->getAssessable()->isFeedbackRequired($this);
         } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            trigger_error($e->getMessage());
             return null;
         }
     }
@@ -134,6 +138,8 @@ class Participant
         try {
             return $this->plan->getAssessable()->isReviewComplete($this);
         } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            trigger_error($e->getMessage());
             return null;
         }
     }
@@ -153,6 +159,8 @@ class Participant
         try {
             return $this->plan->getAssessable()->hasSubmittedResponse($this);
         } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            trigger_error($e->getMessage());
             return null;
         }
     }
@@ -172,6 +180,8 @@ class Participant
         try {
             return $this->plan->getAssessable()->hasPublishedFeedback($this);
         } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            trigger_error($e->getMessage());
             return null;
         }
     }
