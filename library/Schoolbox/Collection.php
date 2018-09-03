@@ -9,13 +9,14 @@
 
 namespace Schoolbox;
 
+use Alaress\Json\Decorator\IDecorator;
 use ArrayAccess;
 use InvalidArgumentException;
 use ArrayIterator;
 use ICollection;
 use JsonSerializable;
 
-class Collection implements ICollection, JsonSerializable, ArrayAccess
+class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
 {
     /** @var array */
     protected $stack = array();
@@ -900,18 +901,6 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
 
 
     /**
-     * Specify data which should be serialized to JSON. Currently, attempts to
-     * serialize all items within the stack.
-     *
-     * @return array
-     */
-    public function jsonSerialize()
-    {
-        return $this->getStack();
-    }
-
-
-    /**
      * Indexes the collection by the given column.
      * Be careful! The property indicated by $column should contain unique values. If not, earlier values will be overwritten.
      *
@@ -980,6 +969,44 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
             $newCollection->stack[$idx] = $item;
         }
         return $newCollection;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        // this happens to be ignored by this particular implementation
+        return [];
+    }
+
+
+    /**
+     * Specify data which should be serialized to JSON. Currently, attempts to
+     * serialize all items within the stack.
+     *
+     * @param IDecorator[] $decorators
+     * @return array
+     */
+    public function jsonSerialize(IDecorator... $decorators)
+    {
+        if (\count($decorators) === 0) {
+            return $this->getStack();
+        }
+
+        // if a map is specified, we want to explicitly pass it through to sub-objects where possible
+
+        $json = [];
+
+        foreach ($this as $key => $value) {
+            foreach ($decorators as $decorator) {
+                $json[$key] = $decorator->decorate($json[$key] ?: [], $value);
+            }
+
+        }
+
+        return $json;
     }
 
 }

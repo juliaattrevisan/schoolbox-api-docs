@@ -92,7 +92,9 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('author', 'a')},
                 {$this->getJoinColumnString('comms_news_article_topic', 'topics')},
                 {$this->getJoinColumnString('moderator', 'm')},
-                {$this->getJoinColumnString('rejector', 'r')}
+                {$this->getJoinColumnString('rejector', 'r')},
+                {$this->getJoinColumnString('featureImage', 'fi')},
+                {$this->getJoinColumnString('featureImage.allowedFileExtension', 'afe')}
         ";
     }
 
@@ -111,6 +113,8 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN {$this->getJoinSql('author', null, 'a', true)}
             LEFT JOIN {$this->getJoinSql('moderator', null, 'm', true)}
             LEFT JOIN {$this->getJoinSql('rejector', null, 'r', true)}
+            LEFT JOIN {$this->getJoinSql('featureImage', null, 'fi')}
+            LEFT JOIN {$this->getJoinSql('featureImage.allowedFileExtension', 'fi', 'afe', true)}
         ";
     }
 
@@ -153,6 +157,16 @@ class Mapper extends \Schoolbox\Mapper
 
                 if ($rejector) {
                     $article->setRejectedBy($rejector);
+                }
+
+                /** @var Storage\Model $featureImage */
+                $featureImage = $this->hydrateJoin($row, 'featureImage', 'fi');
+
+                /** @var \Schoolbox\File\Mimetype $mime */
+                $mime         = $this->hydrateJoin($row, 'featureImage.allowedFileExtension', 'afe');
+
+                if ($featureImage) {
+                    $article->setFeatureImage($featureImage->setMimetype($mime));
                 }
             }
 

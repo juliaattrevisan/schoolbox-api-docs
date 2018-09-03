@@ -10,12 +10,14 @@
 
 namespace Schoolbox;
 
+use Alaress\Json\Linkable;
+use Alaress\Json\SerializeTrait;
 use House;
 use HouseResidential;
-use JsonSerializable;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
+use Schoolbox\Json\Api\SitePageLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -23,11 +25,12 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use DomainException;
 
-class User implements JsonSerializable, ISoftDeletable
+class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 {
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+    use SerializeTrait;
 
     /** @var int */
     private $id;
@@ -1263,20 +1266,6 @@ class User implements JsonSerializable, ISoftDeletable
         return $this->emailRecipients;
     }
 
-    /**
-     * Specify data which should be serialized to JSON
-     *
-     * @return array
-     */
-    public function jsonSerialize()
-    {
-        return array(
-            'id'        => $this->getId(),
-            'title'     => $this->getTitle(),
-            'firstname' => $this->getFirstname(),
-            'lastname'  => $this->getLastname(),
-        );
-    }
 
     /**
      * @param Collection|self[] $linkedUser
@@ -1367,4 +1356,30 @@ class User implements JsonSerializable, ISoftDeletable
         $this->children->replaceWith($children);
         return $this;
     }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'id',
+            'title',
+            'firstname',
+            'lastname'
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getJsonApiLinks(): array
+    {
+        return [
+            'profile' => new SitePageLink("/search/user/{$this->getId()}"),
+        ];
+    }
+
 }

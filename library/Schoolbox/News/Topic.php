@@ -9,11 +9,13 @@
 
 namespace Schoolbox\News;
 
+use Alaress\Json\SerializeTrait;
 use Schoolbox\Mapper\Traits\Model\Id;
 
-class Topic implements \JsonSerializable
+class Topic implements \Alaress\Json\Serializable
 {
     use Id;
+    use SerializeTrait;
 
     /** @var string */
     private $name;
@@ -42,21 +44,6 @@ class Topic implements \JsonSerializable
         }
 
         return $this;
-    }
-
-
-    /**
-     * Serialized representation
-     *
-     * @return array|mixed
-     */
-    public function jsonSerialize()
-    {
-        return [
-            'id' => $this->getId(),
-            'name' => $this->getName(),
-            'sequence' => $this->getSequence()
-        ];
     }
 
 
@@ -106,4 +93,18 @@ class Topic implements \JsonSerializable
     {
         return $this->sequence;
     }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'id',
+            'name',
+            'sequence',
+        ];
+    }
+
 }

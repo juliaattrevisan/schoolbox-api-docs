@@ -9,11 +9,14 @@
 
 namespace Schoolbox\Comms\News\Policy;
 
+use Alaress\Json\SerializeTrait;
 use Schoolbox\Mapper\Traits\Model\Id;
 
-class Model
+class Model implements \Alaress\Json\Serializable
 {
     use Id;
+    use SerializeTrait;
+
 
     /**
      * A unique identifier (not the primary key) that identifies this input element
@@ -70,4 +73,17 @@ class Model
         $this->value = $value;
         return $this;
     }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'identifier',
+            'value'
+        ];
+    }
+
 }

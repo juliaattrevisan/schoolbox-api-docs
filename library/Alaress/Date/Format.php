@@ -13,10 +13,13 @@
  * @version     SVN: $Id$
  */
 use Alaress\Date\IClock;
+use Alaress\Json\SerializeTrait;
 use Jenssegers\Date\Date as LaravelDate;
 
-class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, IComparable
+class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, IComparable, \Alaress\Json\Serializable
 {
+    use SerializeTrait;
+
     /**
      * @var static
      */
@@ -1916,6 +1919,19 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     public function __clone() {
         $this->datetime = clone $this->datetime;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'database',
+            'unixTimestamp',
+            'local'
+        ];
     }
 
 }

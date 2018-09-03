@@ -9,8 +9,11 @@
 
 namespace Schoolbox\Comms\News;
 
+use Alaress\Json\Linkable;
+use Alaress\Json\SerializeTrait;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Json\Api\AuraLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -20,7 +23,7 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Alaress_Date_Format;
 
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 {
     // The discrete, atomic states this article may be in.
     // It is quite valid for composite states to be composed of 2+ more atomic states. eg isAccepted = [AWAITING_PUBLICATION|PUBLISHED|EXPIRED]
@@ -36,6 +39,8 @@ class Model implements ISoftDeletable
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+    use SerializeTrait;
+
 
     /**
      * Title of the article
@@ -550,4 +555,38 @@ class Model implements ISoftDeletable
         $this->rejectedReason = $rejectedReason;
         return $this;
     }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'id',
+            'title',
+            'blurb',
+            'body',
+            'author',
+            'featureImage',
+            'publishAt',
+            'topics' => [
+                'name',
+                'slug',
+            ]
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getJsonApiLinks(): array
+    {
+        return [
+            'self'   => new AuraLink('commsNews.getDetail', [ 'articleId' => $this->getId() ]),
+            'update' => new AuraLink('commsNews.getUpdate', [ 'articleId' => $this->getId() ]),
+        ];
+    }
+
 }

@@ -7,11 +7,14 @@
 
 namespace Schoolbox\Resource\Storage;
 
+use Alaress\Json\Linkable;
+use Alaress\Json\SerializeTrait;
 use Alaress_Date_Format;
 use League\Flysystem\File;
 use League\Flysystem\FileNotFoundException;
 use RuntimeException;
 use Schoolbox\File\Mimetype;
+use Schoolbox\Json\Api\SitePageLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 
 /**
@@ -22,9 +25,10 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
  *
  * @package Schoolbox\Resource\Storage
  */
-class Model extends File implements IStorage
+class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkable
 {
     use CreatedAtDate;
+    use SerializeTrait;
 
     /** @var string $filename */
     protected $filename;
@@ -46,6 +50,7 @@ class Model extends File implements IStorage
 
     /** @var string $extension */
     protected $extension;
+
 
     /**
      * @return string
@@ -274,6 +279,31 @@ class Model extends File implements IStorage
         }
 
         return $size;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'hash',
+            'size',
+            'mime'
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getJsonApiLinks(): array
+    {
+        return [
+            'fetch' => new SitePageLink("/storage/fetch.php?hash={$this->getHash()}"),
+            'image' => new SitePageLink("/storage/image.php?hash={$this->getHash()}"),
+        ];
     }
 
 }
