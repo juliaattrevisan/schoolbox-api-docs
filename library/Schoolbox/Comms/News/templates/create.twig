@@ -157,11 +157,11 @@
                                         </option>
                                     </select>
                                 </legend>
-                                <input type="checkbox" id="roleAll" value="6" name="" data-select-all data-select-all-for-group="role">
-                                <label for="roleAll" class="checkbox-label">Select all</label>
-                                <slot v-for="item in audienceListItemsIntersect.primary">
-                                    <input type="checkbox" id="role1" value="1" name="group[]" data-select-all-group="role" v-model="intersectList.primary">
-                                    <label for="role1" class="checkbox-label">${ item.self.name }</label>
+                                <input type="checkbox" id="primary-all" v-model="selectAll.primary" @change="toggleSelectAll('primary')">
+                                <label for="primary-all" class="checkbox-label">Select all</label>
+                                <slot v-for="(item, index) in audienceListItemsIntersect.primary">
+                                    <input type="checkbox" :id="'primary-' + index" :value="item.self.id" v-model="intersectList.primary">
+                                    <label :for="'primary-' + index" class="checkbox-label">${ item.self.name }</label>
                                 </slot>
                             </div>
                             <div class="small-12 medium-6 columns checklist">
@@ -172,11 +172,11 @@
                                         </option>
                                     </select>
                                 </legend>
-                                <input type="checkbox" id="campusAll" value="6" name="" data-select-all="" data-select-all-for-group="campus">
-                                <label for="campusAll" class="checkbox-label">Select all</label>
-                                <slot v-for="item in audienceListItemsIntersect.secondary">
-                                    <input type="checkbox" id="role1" value="1" name="group[]" data-select-all-group="role" v-model="intersectList.secondary">
-                                    <label for="role1" class="checkbox-label">${ item.self.name }</label>
+                                <input type="checkbox" id="secondary-all" v-model="selectAll.secondary" @change="toggleSelectAll('secondary')">
+                                <label for="secondary-all" class="checkbox-label">Select all</label>
+                                <slot v-for="(item, index) in audienceListItemsIntersect.secondary">
+                                    <input type="checkbox" :id="'secondary-' + index" :value="item.self.id" v-model="intersectList.secondary">
+                                    <label :for="'secondary-' + index" class="checkbox-label">${ item.self.name }</label>
                                 </slot>
                             </div>
                             <button class="button submit" @click.prevent="addAudienceIntersect" :disabled="!submitEnableAdvanced">Add</button>
@@ -235,6 +235,7 @@
 <script src="/javascript/shared/comms/draft.js"></script>
 <script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 <script>
     'use strict';
@@ -269,7 +270,6 @@
             value: {{ article.topics|json_encode|raw }},
             multiple: true
         });
-
     });
 
     var audienceOptions = {
@@ -493,7 +493,12 @@
             },
 
             // Just a marker to check if advanced has been clicked for (need to load defaults on first click)
-            hasLoadedAdvanced: false
+            hasLoadedAdvanced: false,
+
+            selectAll: {
+                'primary': false,
+                'secondary': false
+            },
         },
         methods: {
             /**
@@ -678,6 +683,9 @@
                 var self = this;
                 var audienceOption = self.intersect[list];
 
+                // Reset select all
+                self.selectAll[list] = false;
+
                 // Try for cached list
                 if (self.cachedOptions[audienceOption.id] !== undefined) {
                     //this.populateAudienceList(self.cachedOptions[audienceOption.id]);
@@ -694,6 +702,23 @@
                     }).catch(function (error) {
                         console.log(error);
                     });
+                }
+            },
+
+            /**
+             * Select all
+             * @param list 'primary' or 'secondary'
+             */
+            toggleSelectAll: function(list) {
+                var self = this;
+                self.intersectList[list] = [];
+
+                // Get ready for something wild...
+                if (self.selectAll[list]) {
+                    // Loop the possible options and add them to the list of checked options (intersectList)
+                    for (var option in this.cachedOptions[this.intersect[list].id]) {
+                        self.intersectList[list].push(self.cachedOptions[this.intersect[list].id][option].self.id);
+                    }
                 }
             }
         },
