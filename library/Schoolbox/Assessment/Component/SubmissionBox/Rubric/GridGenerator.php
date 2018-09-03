@@ -44,13 +44,19 @@ class GridGenerator
         $this->student = $student;
     }
 
+
     /**
+     * @param array $selectedGroups      key: group ID, value: group's value
      * @param array $selectedDescriptors key: descriptor ID, value: descriptor's value
      *
      * @return Rubric
      */
-    private function applyMark(array $selectedDescriptors): Rubric
+    private function applyDescriptorMarks(array $selectedGroups, array $selectedDescriptors): Rubric
     {
+        foreach ($this->grid->getAllGroups() as $group) {
+            $group->setSelectedValue($selectedGroups[$group->getId()]);
+        }
+
         foreach ($this->grid->getAllDescriptors() as $descriptor) {
             $selected = \array_key_exists($descriptor->getId(), $selectedDescriptors);
             $descriptor->setSelected($selected);
@@ -81,12 +87,15 @@ class GridGenerator
         // retrieve marks (descriptor selections for student)
         $query = "
             SELECT
-                rm.descriptor_id,
-                rm.value
-            FROM rubric_mark rm
-            LEFT JOIN submission_return sr ON sr.id = rm.return_id
-            WHERE rm.valid = TRUE
-            AND rm.return_id = (
+                rgm.rubric_group_id AS group_id,
+                rgm.value           AS group_value,
+                rdm.descriptor_id,
+                rdm.value           AS descriptor_value
+            FROM rubric_descriptor_mark rdm
+            LEFT JOIN rubric_group_mark rgm ON rdm.rubric_group_mark_id = rgm.id
+            LEFT JOIN submission_return sr ON sr.id = rgm.return_id
+            WHERE rdm.valid = TRUE
+            AND rgm.return_id = (
               SELECT sr.id
               FROM submission_return sr
               WHERE $whereClause
@@ -97,13 +106,19 @@ class GridGenerator
 
         $statement = $this->rubricMapper->getDatabase()->query($query, $pb->getParams());
 
+        $groupIds      = [];
         $descriptorIds = [];
 
         foreach ($statement as $row) {
-            $descriptorIds[(int)$row['descriptor_id']] = isset($row['value']) ? (float)$row['value'] : null;
+            $groupIds[(int)$row['group_id']] = isset($row['group_value'])
+                ? (float)$row['group_value']
+                : null;
+            $descriptorIds[(int)$row['descriptor_id']] = isset($row['descriptor_value'])
+                ? (float)$row['descriptor_value']
+                : null;
         }
 
-        return $this->applyMark($descriptorIds);
+        return $this->applyDescriptorMarks($groupIds, $descriptorIds);
     }
 
 

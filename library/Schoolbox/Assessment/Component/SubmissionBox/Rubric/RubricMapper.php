@@ -794,22 +794,31 @@ class RubricMapper
     /**
      * Save rubrics selections for a particular feedback.
      *
-     * @param bool[] $descriptors key = descriptor.id, val = whether it is checked
-     * @param int    $returnId    Feedback
+     * @param array[] $descriptors key = descriptor.id
+     *                             val = [selected: is it selected?, value: what's its value?]
+     * @param array[] $groups      key = group.id
+     *                             val = [value: what's its value? (only if set manually)]
+     * @param int     $returnId    Feedback
      */
-    public function saveForFeedback(array $descriptors, $returnId)
+    public function saveForFeedback(array $descriptors, array $groups, int $returnId): void
     {
-        $descriptorMapper = DescriptorMapper::getInstance();
-        $markMapper       = MarkMapper::getInstance();
-
-        $returnedWorkMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
+        $descriptorMapper     = DescriptorMapper::getInstance();
+        $descriptorMarkMapper = DescriptorMarkMapper::getInstance();
+        $groupMarkMapper      = GroupMarkMapper::getInstance();
+        $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
 
         // Blow away any previous descriptor records with the feedback
-        $markMapper->deleteFeedbackMarks($returnId);
+        $descriptorMarkMapper->deleteFeedbackMarks($returnId);
+        $groupMarkMapper->deleteFeedbackMarks($returnId);
 
-        $marksToSave = $markMapper->createCollection();
+        $groupMarksToSave      = $groupMarkMapper->createCollection();
+        $descriptorMarksToSave = $descriptorMarkMapper->createCollection();
 
         // What actually got saved?
+        $selectedGroups = [];
+        foreach ($groups as $id => $group) {
+            $selectedGroups[$id] = $group['value'];
+        }
         $selectedDescriptors = [];
         foreach ($descriptors as $id => $descriptor) {
             if (!empty($descriptor['selected'])) {
@@ -818,22 +827,64 @@ class RubricMapper
         }
 
         $descriptorModels = $descriptorMapper->findByColumn('id', array_keys($selectedDescriptors));
+        $returnedWork     = $returnedWorkMapper->findById($returnId);
+
+        // Pass 1: build set of group marks
         foreach ($selectedDescriptors as $descriptorId => $value) {
 
             // If this isn't set: this is an issue
             $descriptor = $descriptorModels[$descriptorId];
 
-            $marksToSave->add(
-                $markMapper->createModel()
-                           ->setSubmissionReturn($returnedWorkMapper->createModel($returnId))
-                           ->setDescriptor($descriptor)
-                           ->setValid(true)
-                           // Take value from form preferentially, then descriptor
-                           ->setValue($value ?? $descriptor->getMaxValue())
+            // Find a record for its group
+            // If it doesn't exist: make a new one
+            $group   = $descriptor->getCriterion()->getGroup();
+            $groupId = $group->getId();
+            if (!$groupMarksToSave[$groupId]) {
+                $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
+                    ->setSubmissionReturn($returnedWork)
+                    ->setGroup($group)
+                    ->setValid(true);
+            }
+
+            // Now set its value to the sum of the descriptors for this group to date
+            $savedValue = $value ?? $descriptor->getMaxValue();
+            if (null !== $savedValue) {
+                $groupMarksToSave[$groupId]->setValue($groupMarksToSave[$groupId]->getValue() + $savedValue);
+            }
+        }
+
+        // Pass 1.5: is a custom max mark for the group set?
+        // TODO figure out how to scale this, it's not scaled for % mark
+        foreach ($selectedGroups as $groupId => $value) {
+            if (null !== $value) {
+                $groupMarksToSave[$groupId]->setValue($value);
+            }
+        }
+
+        // Pass 2: build set of descriptor marks
+        foreach ($selectedDescriptors as $descriptorId => $value) {
+
+            // If this isn't set: this is an issue
+            $descriptor = $descriptorModels[$descriptorId];
+
+            // Find the record for its group
+            $groupId = $descriptor->getCriterion()->getGroup()->getId();
+
+            // Save the descriptor group
+            // Take value from form preferentially, then descriptor
+            $savedValue = $value ?? $descriptor->getMaxValue();
+            $descriptorMarksToSave->add(
+                $descriptorMarkMapper->createModel()
+                    ->setGroupMark($groupMarksToSave[$groupId])
+                    ->setDescriptor($descriptor)
+                    ->setValid(true)
+                    ->setValue($savedValue)
             );
         }
 
-        $markMapper->save($marksToSave);
+        // Save marks for groups as well
+        $groupMarkMapper->save($groupMarksToSave);
+        $descriptorMarkMapper->save($descriptorMarksToSave);
     }
 
     /**
@@ -849,20 +900,38 @@ class RubricMapper
         if ($sourceReturnId === $destinationReturnId) {
             return;
         }
-        $markMapper        = MarkMapper::getInstance();
-        $sourceMarks       = $markMapper->findByColumnList(['return_id' => $sourceReturnId]);
-        $destinationMarks  = $markMapper->createCollection();
-        $destinationReturn = SubmissionBox\ReturnedWorkMapper::getInstance()->createModel($destinationReturnId);
+        $groupMarkMapper            = GroupMarkMapper::getInstance();
+        $descriptorMarkMapper       = DescriptorMarkMapper::getInstance();
+        $sourceDescriptorMarks      = $descriptorMarkMapper->findByColumn('g.return_id', $sourceReturnId);
+        $destinationGroupMarks      = $groupMarkMapper->createCollection();
+        $destinationDescriptorMarks = $descriptorMarkMapper->createCollection();
+        $destinationReturn          = SubmissionBox\ReturnedWorkMapper::getInstance()->createModel($destinationReturnId);
 
-        foreach ($sourceMarks as $sourceDescriptor) {
-            $destinationMarks->add(
-                $markMapper->createModel()
-                    ->setDescriptor($sourceDescriptor->getDescriptor())
+        foreach ($sourceDescriptorMarks as $sourceDescriptor) {
+
+            // Is this group marks set?
+            $sourceGroupMark = $sourceDescriptor->getGroupMark();
+            $group           = $sourceGroupMark->getGroup();
+            $groupId         = $group->getId();
+            if (!$destinationGroupMarks[$groupId]) {
+                $destinationGroupMarks[$groupId] = $groupMarkMapper->createModel()
+                    ->setGroup($group)
                     ->setSubmissionReturn($destinationReturn)
+                    ->setValue($sourceGroupMark->getValue())
+                    ->setValid($sourceGroupMark->isValid());
+            }
+
+            $destinationDescriptorMarks->add(
+                $descriptorMarkMapper->createModel()
+                    ->setGroupMark($destinationGroupMarks[$groupId])
+                    ->setDescriptor($sourceDescriptor->getDescriptor())
+//                    ->setSubmissionReturn($destinationReturn)
+                    ->setValue($sourceDescriptor->getValue())
                     ->setValid($sourceDescriptor->isValid())
             );
         }
-        $markMapper->save($destinationMarks);
+        $groupMarkMapper->save($destinationGroupMarks);
+        $descriptorMarkMapper->save($destinationDescriptorMarks);
     }
 
     /**
@@ -1042,7 +1111,7 @@ class RubricMapper
      */
     protected function invalidateDescriptorMarks(Collection $descriptors)
     {
-        $markMapper    = MarkMapper::getInstance();
+        $markMapper    = DescriptorMarkMapper::getInstance();
         $descriptorIds = $descriptors->getColumnValues('id');
         $columnList    = [
             'descriptor_id' => $descriptorIds,
@@ -1133,24 +1202,25 @@ class RubricMapper
 
         $stmt = $this->database->prepare("
             SELECT rg.name AS grouping, rc.name, a.id, a.title, rd.description
-            FROM assessment         a
-            JOIN submission_box    sb ON  a.id = sb.assessment_id
-            JOIN rubric_level      rl ON sb.id = rl.box_id
-            JOIN rubric_descriptor rd ON rl.id = rd.level_id
-            JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
-            JOIN rubric_group      rg ON rg.id = rc.rubric_group_id
-            JOIN rubric_mark       rm ON rd.id = rm.descriptor_id
-            JOIN submission_return sr ON sr.id = rm.return_id
+            FROM assessment              a
+            JOIN submission_box         sb ON  a.id = sb.assessment_id
+            JOIN rubric_level           rl ON sb.id = rl.box_id
+            JOIN rubric_descriptor      rd ON rl.id = rd.level_id
+            JOIN rubric_criterion       rc ON rc.id = rd.criterion_id
+            JOIN rubric_group           rg ON rg.id = rc.rubric_group_id
+            JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
+            JOIN submission_return      sr ON sr.id = rgm.return_id
             JOIN (
                 SELECT a.id AS 'a.id', rc.id AS 'rc.id', max(sr.published_at) AS 'sr.max_published_at'
-                FROM rubric_mark       rm
-                JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id
-                JOIN rubric_criterion  rc ON rc.id = rd.criterion_id
-                JOIN rubric_group      rg ON rg.id = rc.rubric_group_id
-                JOIN rubric_level      rl ON rl.id = rd.level_id
-                JOIN submission_box    sb ON sb.id = rl.box_id
-                JOIN assessment         a ON  a.id = sb.assessment_id
-                JOIN submission_return sr ON sr.id = rm.return_id
+                FROM rubric_descriptor_mark rm
+                JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id
+                JOIN rubric_criterion       rc ON rc.id = rd.criterion_id
+                JOIN rubric_group           rg ON rg.id = rc.rubric_group_id
+                JOIN rubric_level           rl ON rl.id = rd.level_id
+                JOIN submission_box         sb ON sb.id = rl.box_id
+                JOIN assessment              a ON  a.id = sb.assessment_id
+                JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
+                JOIN submission_return      sr ON sr.id = rgm.return_id
                 WHERE {$where}
                 GROUP BY sb.assessment_id, rd.criterion_id
             ) t ON `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `sr`.`published_at` = `t`.`sr.max_published_at`
@@ -1456,13 +1526,14 @@ class RubricMapper
         // 1. Get latest published student marks
         $stmt = $this->database->prepare("
             SELECT sr.owner, sb.id AS 'sb.id', rc.id AS 'rc.id', rm.value AS 'mark'
-            FROM rubric_mark rm
-            JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
-            JOIN rubric_criterion  rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
-            JOIN rubric_group      rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
-            JOIN submission_return sr ON sr.id = rm.return_id
-            JOIN submission_box sb    ON sb.id = sr.box_id
-            JOIN assessment a         ON  a.id = sb.assessment_id
+            FROM rubric_descriptor_mark rm
+            JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
+            JOIN rubric_criterion       rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+            JOIN rubric_group           rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
+            JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
+            JOIN submission_return      sr ON sr.id = rgm.return_id
+            JOIN submission_box         sb ON sb.id = sr.box_id
+            JOIN assessment              a ON  a.id = sb.assessment_id
             JOIN (
                 -- ^Changed from LEFT JOIN to JOIN to allow filter out deleted feedbacks 
                 -- Get the latest published marks
@@ -1471,13 +1542,14 @@ class RubricMapper
                     sr.id AS r_id,
                     sr.owner AS 'student_id',
                     sr.box_id AS 'sb_id'
-                FROM rubric_mark rm
-                JOIN rubric_descriptor rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
-                JOIN rubric_criterion  rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
-                JOIN rubric_group      rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
-                JOIN submission_return sr ON sr.id = rm.return_id
-                JOIN submission_box sb    ON sb.id = sr.box_id
-                JOIN assessment a         ON  a.id = sb.assessment_id
+                FROM rubric_descriptor_mark rm
+                JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
+                JOIN rubric_criterion       rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+                JOIN rubric_group           rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
+                JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
+                JOIN submission_return      sr ON sr.id = rgm.return_id
+                JOIN submission_box         sb ON sb.id = sr.box_id
+                JOIN assessment              a ON  a.id = sb.assessment_id
                 WHERE {$whereClauseInner}
                 AND rm.valid
                 AND sr.published_at IS NOT NULL

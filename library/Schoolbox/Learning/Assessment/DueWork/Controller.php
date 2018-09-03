@@ -165,7 +165,7 @@ class Controller extends Assessment\Controller
             'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment'     => $assessment,
             'download'       => $this->hasDownloadableSubmissionFiles($assessment),
-            'rubricMarks'    => Rubric\MarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
+            'rubricMarks'    => Rubric\DescriptorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
             'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
         ];
 
@@ -1154,7 +1154,7 @@ class Controller extends Assessment\Controller
         if($dueWork->getRubric()->getSubmissionBox() instanceof SubmissionBox ) {
             $levelIds = Rubric\LevelMapper::getInstance()->findIdsByColumn('box_id', $dueWork->getRubric()->getSubmissionBox()->getId());
             $descriptorIds = Rubric\DescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
-            $countMarkIds = Rubric\MarkMapper::getInstance()->countByColumnList([
+            $countMarkIds = Rubric\DescriptorMarkMapper::getInstance()->countByColumnList([
                 'descriptor_id' => $descriptorIds,
                 'valid'         => true
             ]);

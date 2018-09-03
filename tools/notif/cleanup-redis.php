@@ -44,7 +44,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         Rubric\CriterionMapper::getInstance(),
         Rubric\DescriptorMapper::getInstance(),
         Rubric\LevelMapper::getInstance(),
-        Rubric\MarkMapper::getInstance(),
+        Rubric\DescriptorMarkMapper::getInstance(),
         Rubric\ResultMapper::getInstance(),
         Rubric\CriterionUsageMapper::getInstance(),
     ];

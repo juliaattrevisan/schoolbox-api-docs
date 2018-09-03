@@ -1,9 +1,7 @@
 <?php
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright Copyright 2018, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
@@ -13,29 +11,36 @@ use Schoolbox\Mapper\Traits\Model\Id;
 
 
 /**
- * Class Mark
- *
- * Semantically, this class should really be named Selection or similar, but for the sake of matching the db table, mark it is...
- *
- * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
+ * Model for marks on a rubric group.
  */
-class Mark
+class GroupMark
 {
     use Id;
 
-    /** @var null|ReturnedWork */
+
+    /**
+     * @var null|ReturnedWork
+     */
     private $submissionReturn;
 
-    /** @var Descriptor */
-    private $descriptor;
 
-    /** @var bool */
+    /**
+     * @var Group
+     */
+    private $group;
+
+
+    /**
+     * @var bool
+     */
     private $valid;
+
 
     /**
      * @var float|null
      */
     private $value;
+
 
     /**
      * @return null|ReturnedWork
@@ -45,60 +50,67 @@ class Mark
         return $this->submissionReturn;
     }
 
+
     /**
      * @param null|ReturnedWork $submissionReturn
      * @return $this
      */
-    public function setSubmissionReturn(?ReturnedWork $submissionReturn)
+    public function setSubmissionReturn(?ReturnedWork $submissionReturn): self
     {
         $this->submissionReturn = $submissionReturn;
         return $this;
     }
 
-    /**
-     * @return Descriptor
-     */
-    public function getDescriptor()
-    {
-        return $this->descriptor;
-    }
 
     /**
-     * @param Descriptor $descriptor
+     * @return Group
+     */
+    public function getGroup(): Group
+    {
+        return $this->group;
+    }
+
+
+    /**
+     * @param Group $group
      * @return static
      */
-    public function setDescriptor(Descriptor $descriptor)
+    public function setGroup(Group $group): self
     {
-        $this->descriptor = $descriptor;
+        $this->group = $group;
         return $this;
     }
 
+
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return $this->valid;
     }
+
 
     /**
      * @deprecated Mapper method only
      * @return bool
      */
-    public function getValid()
+    public function getValid(): bool
     {
         return $this->isValid();
     }
+
 
     /**
      * @param boolean $valid
      * @return static
      */
-    public function setValid($valid)
+    public function setValid($valid): self
     {
         $this->valid = $valid;
         return $this;
     }
+
 
     /**
      * @return float|null
@@ -107,6 +119,7 @@ class Mark
     {
         return $this->value;
     }
+
 
     /**
      * @param float|null $value

@@ -18,14 +18,15 @@ use Schoolbox\Mapper;
 use Schoolbox\User;
 
 /**
- * Class MarkMapper
+ * Class DescriptorMarkMapper
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
- * @method Mark hydrate(array $row, $alias = '', $callback = null)
- * @method Mark createModel($idValue = null)
- * @method GenericCollection|Mark[] findByColumnList($columnList, $options = array())
+ * @method DescriptorMark hydrate(array $row, $alias = '', $callback = null)
+ * @method DescriptorMark createModel($idValue = null)
+ * @method GenericCollection|DescriptorMark[] findByColumnList($columnList, $options = array())
+ * @method GenericCollection|DescriptorMark[] findByColumn($columnName, $columnValue, $options = [])
  */
-class MarkMapper extends Mapper
+class DescriptorMarkMapper extends Mapper
 {
 
     /**
@@ -35,14 +36,34 @@ class MarkMapper extends Mapper
      */
     protected function mapping()
     {
-        $this->hasTable('rubric_mark');
-        $this->hasModel(Mark::class);
+        $this->hasTable('rubric_descriptor_mark');
+        $this->hasModel(DescriptorMark::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
         $this->uses('value', self::TYPE_DECIMAL);
-        $this->joins('return_id', ReturnedWorkMapper::class, 'id', self::TYPE_MODEL, null, 'submissionReturn', 'submission_return');
-        $this->joins('descriptor_id', DescriptorMapper::class, 'id', null, null, null, 'descriptor');
+        $this->joins(
+            'rubric_group_mark_id',
+            GroupMarkMapper::class,
+            'id',
+            self::TYPE_MODEL,
+            null,
+            'groupMark',
+            'group_mark'
+        );
+
+        // This join is deprecated; join through group_mark.submission_return
+//        $this->joins('return_id', ReturnedWorkMapper::class, 'id', self::TYPE_MODEL, null, 'submissionReturn', 'submission_return');
+
+        $this->joins(
+            'descriptor_id',
+            DescriptorMapper::class,
+            'id',
+            null,
+            null,
+            null,
+            'descriptor'
+        );
 
         // This is NOT a soft-delete column. It specifically relates to when a teacher alters a rubric's structure,
         // hence marks already given are invalid because they take their value from the rubric descriptor.
@@ -57,10 +78,12 @@ class MarkMapper extends Mapper
     {
         return "
             SELECT  {$this->getColumnString()},
-                    {$this->getJoinColumnString('submission_return', 'r')},
+                    {$this->getJoinColumnString('group_mark', 'g')},
+                    {$this->getJoinColumnString('group_mark.submission_return', 'r')},
                     {$this->getJoinColumnString('descriptor', 'd')}
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('submission_return', '', 'r')}
+            LEFT JOIN {$this->getJoinSql('group_mark', '', 'g')}
+            LEFT JOIN {$this->getJoinSql('group_mark.submission_return', 'g', 'r')}
             LEFT JOIN {$this->getJoinSql('descriptor', '', 'd')}
         ";
     }
@@ -68,12 +91,14 @@ class MarkMapper extends Mapper
 
     /**
      * @param PDOStatement $statement
-     * @return Collection|Mark[]
+     * @return Collection|DescriptorMark[]
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /** @var GroupMarkMapper $groupMarkMapper */
+        $groupMarkMapper = $this->getJoinMapper('group_mark');
         /** @var ReturnedWorkMapper $submissionReturnMapper */
-        $submissionReturnMapper = $this->getJoinMapper('submission_return');
+        $submissionReturnMapper = $this->getJoinMapper('group_mark.submission_return');
         $marks = $this->createCollection();
         $descriptors = $this->getJoinMapper('descriptor')->createCollection();
 
@@ -88,8 +113,11 @@ class MarkMapper extends Mapper
             /** @var Descriptor $descriptor */
             $descriptor = $descriptors->getOffset($descriptorId);
 
+            $groupMark = $groupMarkMapper->hydrate($r, 'g');
+            $groupMark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
+
             $mark = $this->hydrate($r);
-            $mark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
+            $mark->setGroupMark($groupMark);
             $mark->setDescriptor($descriptor);
             $marks->add($mark);
         }
@@ -100,14 +128,16 @@ class MarkMapper extends Mapper
     /**
      * This will HARD-DELETE all previously given marks with the feedback.
      *
-     * @param int  $returnId
+     * @param int $returnId
      * @return int
      */
-    public function deleteFeedbackMarks($returnId)
+    public function deleteFeedbackMarks($returnId): int
     {
         $query = "
-            DELETE FROM rubric_mark 
-                WHERE return_id = :return_id;
+            DELETE     rdm
+            FROM       rubric_descriptor_mark rdm
+            INNER JOIN rubric_group_mark rgm on rdm.rubric_group_mark_id = rgm.id
+            WHERE      rgm.return_id = :return_id;
         ";
 
         $statement = $this->database->prepare($query);
@@ -128,7 +158,7 @@ class MarkMapper extends Mapper
     {
         $query = "
             SELECT            sr.owner AS student_id, COUNT(rm.id)
-            FROM              rubric_mark rm
+            FROM              rubric_descriptor_mark rm
             INNER JOIN        rubric_descriptor rd ON rd.id = rm.descriptor_id
             INNER JOIN        rubric_level rl ON rl.id = rd.level_id
             INNER JOIN        submission_box sb ON sb.id = rl.box_id

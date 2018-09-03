@@ -36,6 +36,13 @@ class Group implements Twiggable, Calculable
      */
     protected $maxValue;
 
+    /**
+     * The actual value of the group, as given when marking the rubric.
+     *
+     * @var null|float
+     */
+    protected $selectedValue;
+
     /** @var Criterion[]|CalculableAggregator */
     protected $criteria;
 
@@ -48,14 +55,16 @@ class Group implements Twiggable, Calculable
      * @param int|null    $id
      * @param string|null $name
      * @param float|null  $maxValue
+     * @param float|null  $selectedValue
      * @param bool|null   $readOnly
      */
-    public function __construct($id = null, $name = '', $maxValue = null, $readOnly = false)
+    public function __construct($id = null, $name = '', $maxValue = null, $selectedValue = null, $readOnly = false)
     {
         $this->setName($name);
         $this->setId($id);
         $this->setReadOnly($readOnly);
         $this->maxValue = $maxValue;
+        $this->selectedValue = $selectedValue;
         $this->criteria = new CalculableAggregator();
     }
 
@@ -130,6 +139,26 @@ class Group implements Twiggable, Calculable
 
 
     /**
+     * @return float|null
+     */
+    public function getSelectedValue(): ?float
+    {
+        return $this->selectedValue;
+    }
+
+
+    /**
+     * @param float|null $selectedValue
+     * @return static
+     */
+    public function setSelectedValue(?float $selectedValue): self
+    {
+        $this->selectedValue = $selectedValue;
+        return $this;
+    }
+
+
+    /**
      * @return Criterion[]
      */
     protected function getCriteria()
@@ -196,12 +225,18 @@ class Group implements Twiggable, Calculable
 
 
     /**
-     * The sum of the descriptor values selected at marking time
+     * Either:
+     * - The mark-per-group value given at marking time
+     * - Otherwise, the sum of the descriptor values selected at marking time
      *
      * @return float
      */
     public function calculateMark()
     {
+        if (null !== $this->selectedValue) {
+            return $this->selectedValue;
+        }
+
         $sum = 0;
 
         foreach ($this->criteria as $crit) {
@@ -257,16 +292,16 @@ class Group implements Twiggable, Calculable
     public function toContext()
     {
         $context = [
-            'id'         => $this->getId(),
-            'name'       => $this->getName(),
-            'mark'        => $this->calculateMark(),
-            'scaledMark'  => $this->calculateScaledMark(),
-            'max'         => $this->calculateMax(),
-            'percentage'  => $this->getPercentage(),
-            'rowMaxSum'   => $this->calculateRowMaxSum(),
+            'id'                => $this->getId(),
+            'name'              => $this->getName(),
+            'mark'              => $this->calculateMark(),
+            'scaledMark'        => $this->calculateScaledMark(),
+            'max'               => $this->calculateMax(),
+            'percentage'        => $this->getPercentage(),
+            'rowMaxSum'         => $this->calculateRowMaxSum(),
             'humanReadableMark' => $this->getHumanReadableMark(),
-            'used'       => $this->isReadOnly(),
-            'criteria'   => [],
+            'used'              => $this->isReadOnly(),
+            'criteria'          => [],
         ];
 
         foreach ($this->criteria as $criterion) {
