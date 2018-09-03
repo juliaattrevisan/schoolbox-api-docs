@@ -8,6 +8,9 @@
  */
 namespace Schoolbox\Comms\News\Statistics\Scale;
 
+use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+
+
 class Month extends Base
 {
 
@@ -30,7 +33,7 @@ class Month extends Base
      */
     public function getInterval(): int
     {
-        return 31*24*60;
+        return ImpressionsConversionsOpens::PERIOD_LENGTH*24*60;
     }
 
 

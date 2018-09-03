@@ -25,7 +25,7 @@ class ImpressionsConversionsOpens
     /**
      * Number of days in this period
      */
-    public const PERIOD_LENGTH = 30;
+    public const PERIOD_LENGTH = 300;
 
     /**
      * @var IConnector
@@ -539,13 +539,23 @@ class ImpressionsConversionsOpens
         ];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data[$row['type']][$row['datetime']] = [ (int)$row['timestamp'], (int)$row['num'], $row['datetime']];
+            $data[$row['type']][$row['datetime']] = [
+                (int)$row['timestamp'],
+                (int)$row['num'],
+                $row['datetime']
+            ];
         }
 
         /* Format it for highcharts to understand
          */
         foreach ([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION, Mapper::TYPE_OPEN] as $type) {
             $data[$type] = array_values($data[$type]);
+
+            /* TODO: Sort to eliminate anomolous ordering
+             * Sort them as well. Sometimes data points are added that don't fall within the prescribed
+             * set of keys produced by generateDateRange(). First encountered setting the period to be
+             * longer than 30 days and using the Month scale option.
+             */
         }
 
         return $data;
