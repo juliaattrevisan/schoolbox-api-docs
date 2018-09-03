@@ -68,11 +68,14 @@ class Module extends BaseModule
         $this->register('POST', '/create', 'postCreate', $viewPerms);
 
         /* Update news article
+         * TODO: SA-7312, check draft, publication, author status
+         * TODO: SA-7312, check whether user can POST
          */
         $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $modifyPerms, $preloadArticle);
         $this->register('POST', '/{articleId:\d+}', 'postUpdate', $modifyPerms, $preloadArticle);
 
         /* View news article
+         * TODO: SA-7312, check draft, publication, author status
          */
         $this->register('GET', '/{articleId:\d+}', 'getDetail', $viewPerms, $preloadArticle);
 
@@ -94,7 +97,7 @@ class Module extends BaseModule
 
         /* Find out who will receive this article
          */
-        $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $viewPerms, $preloadArticle);
+        $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $modifyPerms, $preloadArticle);
 
         /* Index of articles audienced to you
          */
