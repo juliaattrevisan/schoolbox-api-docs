@@ -55,7 +55,7 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Authorizer\Rule\IsAuthorOrModerator($this->getNewsMapper())
-//                    new Authorizer\Rule\IsPubliclyAccessible($this->getNewsMapper())
+//                    new Authorizer\Rule\IsPubliclyReadable($this->getNewsMapper())
                 )
             );
         });
