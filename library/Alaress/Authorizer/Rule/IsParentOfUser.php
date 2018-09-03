@@ -69,7 +69,7 @@ class IsParentOfUser implements IAuthorizationRule
         $child->loadParents();
 
         if ($user instanceof User) {
-            $user->isParentOf($child);
+            return $user->isParentOf($child);
         }
         throw new Unauthorized();
     }
