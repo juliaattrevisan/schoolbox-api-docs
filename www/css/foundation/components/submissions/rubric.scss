@@ -43,6 +43,12 @@ table.rb {
                 }
             }
         }
+
+        input[type='tel'] {
+            border-color: $input-border-color;
+            background-color: $container-bg;
+        }
+
     }
 
     label {
@@ -67,7 +73,7 @@ table.rb {
         white-space: nowrap;
         line-height: 2.75rem;
     }
-    input[type=text], input[type=number] {
+    input[type=text], input[type=tel] {
         + label.rb-readonly {
             padding-left: 2.6125rem;
         }
@@ -88,7 +94,7 @@ table.rb {
         border-left: 1px solid $body-bg;
         transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
         &:hover {
-            input[type=text], input[type=number], textarea {
+            input[type=text], input[type=tel], textarea {
                 border-color: $input-border-color;
                 background-color: $container-bg;
             }
@@ -115,7 +121,7 @@ table.rb {
             background-color: $container-bg;
         }
     }
-    textarea, input[type=text], input[type=number] {
+    textarea, input[type=text], input[type=tel] {
         border-color: transparent;
         background-color: transparent;
         &:focus {
@@ -138,7 +144,7 @@ table.rb {
         padding-left: 0;
         padding-right: 0;
         width: 0;
-        input[type=text], input[type=number], textarea {
+        input[type=text], input[type=tel], textarea {
             opacity: 0;
             /* far out! */
             width: 0 !important;
@@ -162,7 +168,7 @@ table.rb {
         &:hover {
             cursor: pointer;
         }
-        input[type=text], input[type=number], textarea {
+        input[type=text], input[type=tel], textarea {
             opacity: 0;
             /* far out! */
             height: 0 !important;

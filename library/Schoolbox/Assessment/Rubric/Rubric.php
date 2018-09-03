@@ -103,15 +103,23 @@ class Rubric implements Twiggable
      * @param Criteria\Criterion $criterion
      * @param Competency\Level   $level
      * @param Descriptor         $descriptor
+     * @param boolean            $usesMarkRange
      * @return self
+     * @throws InvalidArgumentException
      */
     public function putDescriptor(
         Criteria\Group     $group,
         Criteria\Criterion $criterion,
         Competency\Level   $level,
-        Descriptor         $descriptor
+        Descriptor         $descriptor,
+        bool               $usesMarkRange
     )
     {
+        // Are we using a mark range AND have a decimal descriptor val? Can't do dat!
+        if (! (new ValidDescriptor($usesMarkRange))->isSatisfiedBy($descriptor) ) {
+            throw new InvalidArgumentException("disable Mark Range to use decimal places in descriptor point values");
+        }
+
         // ensure both the group and the level exist
         $this->putGroup($group);
         $this->putLevel($level);
@@ -139,10 +147,6 @@ class Rubric implements Twiggable
      */
     public function putGroup(Criteria\Group $group)
     {
-        if (!$group instanceof Criteria\Group) {
-            throw new InvalidArgumentException("Invalid Group given");
-        }
-
         $this->criteriaGroups->attach($group);
         return $this;
     }
@@ -165,10 +169,6 @@ class Rubric implements Twiggable
      */
     public function putLevel(Competency\Level $level)
     {
-        if (!$level instanceof Competency\Level) {
-            throw new InvalidArgumentException("Invalid Level given");
-        }
-
         $this->levels->attach($level);
         return $this;
     }

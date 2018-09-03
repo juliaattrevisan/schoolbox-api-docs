@@ -68,9 +68,10 @@ class Factory
      *
      * @param array $formData
      * @param bool  $includeEmptyCriteria
+     * @param bool  $usesMarkRange
      * @return Rubric
      */
-    public function buildFromPostData(array $formData, $includeEmptyCriteria)
+    public function buildFromPostData(array $formData, bool $includeEmptyCriteria, bool $usesMarkRange)
     {
         // we're only going to take the first one... this could be converted to foreach easily enough
         $rubricData = reset($formData);
@@ -141,19 +142,19 @@ class Factory
                 }
 
                 $descriptor      = $descriptors[$criterionId][$levelSequence];
-                $descriptorId    = isset($descriptor['id']) ? $descriptor['id'] : null;
+                $descriptorId    = $descriptor['id'] ?? null;
                 $descriptorText  = $descriptor['text'];
                 $descriptorValue = $descriptor['points'];
 
                 if (strlen($descriptorText) || strlen($descriptorValue)) {
                     $d = new Descriptor($descriptorText, $descriptorValue, $descriptorId);
-                    try {
-                        $rubric->putDescriptor($g, $c, $l, $d);
-                    } catch (InvalidArgumentException $e) {
-                        echo "Unable to put descriptor";
-                    }
+                    $rubric->putDescriptor($g, $c, $l, $d, $usesMarkRange);
                 }
 
+            }
+
+            if (! (new ValidDescriptorRow($usesMarkRange))->isSatisfiedBy($c->getAllDescriptors()) ) {
+                throw new InvalidArgumentException("only use descriptor values that form an ascending or descending sequence within a row");
             }
 
         }

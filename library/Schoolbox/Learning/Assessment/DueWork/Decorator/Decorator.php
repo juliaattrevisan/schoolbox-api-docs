@@ -114,7 +114,7 @@ class Decorator implements DecoratorInterface
 
         if($this->getUseRubric()){
             /** @var DueWorkRubric $rubric */
-            $rubric = (new RubricFactory(new DueWorkRubric()))->buildFromPostData($this->getRubricData(), false);
+            $rubric = (new RubricFactory(new DueWorkRubric()))->buildFromPostData($this->getRubricData(), false, $assessment->getUseMarkRange());
             $assessment->setRubric($rubric);
 
             $markMax = $rubric->calculateMax();
