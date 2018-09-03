@@ -10,7 +10,6 @@ namespace Schoolbox\Comms\News\Statistics\Scale;
 
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 
-
 class Month extends Base
 {
 
