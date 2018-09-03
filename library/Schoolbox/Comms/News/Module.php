@@ -19,9 +19,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -40,13 +38,27 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Anyone can see the form
-        /* For viewing articles you just need to be logged in and controller,
-         * I suppose, deals with whether you are in the audience
+
+        /* Anyone can spawn new articles, visit the archive or index
          */
-        $viewPerms = new Rule\All(
-            new Rule\IsLoggedIn()
-        );
+        $viewPerms = new Rule\LazyCallback(function() {
+            return new Rule\All(
+                new Rule\IsLoggedIn()
+            );
+        });
+
+        /* For reading articles, you need to be logged in and be either the Author;
+         * or the article is publicly accessible
+         */
+        $readerPerms = new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Authorizer\Rule\IsAuthorOrModerator($this->getNewsMapper())
+//                    new Authorizer\Rule\IsPubliclyAccessible($this->getNewsMapper())
+                )
+            );
+        });
 
         /* The current user modify the article
          * Supers, Comms Officers, Article Authors
@@ -67,25 +79,24 @@ class Module extends BaseModule
         $this->register('GET', '/create', 'getCreate', $viewPerms);
         $this->register('POST', '/create', 'postCreate', $viewPerms);
 
+        /* (async) Get a list of topics to chooze
+         */
+        $this->register('GET', '/topics', 'getTopics', $viewPerms);
+
         /* Update news article
-         * TODO: SA-7312, check draft, publication, author status
          * TODO: SA-7312, check whether user can POST
          */
         $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $modifyPerms, $preloadArticle);
         $this->register('POST', '/{articleId:\d+}', 'postUpdate', $modifyPerms, $preloadArticle);
 
-        /* View news article
-         * TODO: SA-7312, check draft, publication, author status
-         */
-        $this->register('GET', '/{articleId:\d+}', 'getDetail', $viewPerms, $preloadArticle);
-
         /* Delete article
          */
         $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', $modifyPerms, $preloadArticle);
 
-        /* (async) Get a list of topics to chooze
+        /* View news article
+         * TODO: SA-7312, check draft, publication, author status
          */
-        $this->register('GET', '/topics', 'getTopics', $viewPerms);
+        $this->register('GET', '/{articleId:\d+}', 'getDetail', $readerPerms, $preloadArticle);
 
         /* (async) Get a list of articles audienced to me, by topic
          */
