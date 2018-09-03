@@ -9,7 +9,7 @@
 namespace Schoolbox\Assessment\Rubric;
 
 
-class ValidDescriptor
+class ValidDescriptor extends \Alaress\Specification\Base
 {
     private $usesMarkRange;
 
@@ -19,9 +19,9 @@ class ValidDescriptor
     }
 
 
-    public function isSatisfiedBy(Descriptor $descriptor) : bool
+    public function isSatisfiedBy($descriptor) : bool
     {
-        return !($this->usesMarkRange && $this->hasDecimals($descriptor));
+        return $descriptor instanceof Descriptor && !($this->usesMarkRange && $this->hasDecimals($descriptor));
     }
 
     private function hasDecimals(Descriptor $descriptor) : bool

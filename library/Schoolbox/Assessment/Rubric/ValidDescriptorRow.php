@@ -10,7 +10,7 @@ namespace Schoolbox\Assessment\Rubric;
 
 use Schoolbox\Collection;
 
-class ValidDescriptorRow
+class ValidDescriptorRow extends \Alaress\Specification\Base
 {
     private $usesMarkRange;
 
