@@ -1024,6 +1024,11 @@ class User implements JsonSerializable, ISoftDeletable
                 return true;
             }
         }
+        foreach ($parent->children as $currentChild) {
+            if ($currentChild->getId() == $this->getId()) {
+                return true;
+            }
+        }
         return false;
     }
 
