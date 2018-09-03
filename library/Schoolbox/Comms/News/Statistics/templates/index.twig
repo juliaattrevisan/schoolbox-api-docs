@@ -63,20 +63,30 @@
     </div>
 </div>
 
-{% if historic|length %}
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Historic Dailies</h2>
-        <p class="meta">Daily cumulative statistics from all time.</p>
+{# Historical Dailies: temporarily disabled
+ #
+ # This seems to confuse people a lot, and there's a lot of numbers here
+ # We'd need to design the way we present this information, either as a
+ # line graph or as a series of tables as per below
+ #
+ # We also don't know the utility of this information yet. Regardless, we
+ # continue to capture enough data points to show this kind of information
+ # such that we can enable/re-present this later.
+ #}
+{#{% if historic|length %}#}
+{#<div class="row">#}
+    {#<div class="small-12 island">#}
+        {#<h2 class="subheader">Historic Dailies</h2>#}
+        {#<p class="meta">Daily cumulative statistics from all time.</p>#}
 
-        {% for daily in historic %}
-        <section>
-            {% include '@commsNewsStatistics/cumulative-historic.twig' with {
-                cumulative: daily
-            } %}
-        </section>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
+        {#{% for daily in historic %}#}
+        {#<section>#}
+            {#{% include '@commsNewsStatistics/cumulative-historic.twig' with {#}
+                {#cumulative: daily#}
+            {#} %}#}
+        {#</section>#}
+        {#{% endfor %}#}
+    {#</div>#}
+{#</div>#}
+{#{% endif %}#}
 
