@@ -837,6 +837,29 @@ class Controller extends Base
 
         $articles = $this->newsMapper->findByColumn('author_id', $this->getUser()->getId(), $args);
 
+        $map = [
+            'id',
+            'title',
+            'featureImage',
+            'publishAt' => [
+                'long',
+                'relativeTime'
+            ],
+            'topics' => [
+                'name',
+                'slug',
+            ],
+            'status',
+            'statusDate' => [
+                'long',
+                'relativeTime'
+            ]
+        ];
+
+        $articles = $articles->jsonSerialize(
+            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()))
+        );
+
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
     }
 
