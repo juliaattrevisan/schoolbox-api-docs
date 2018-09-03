@@ -11,34 +11,106 @@ var validateOptions = {
             number: true,
             min: 0
         },
-        publishDate: {
-            required: true,
-            datepickerDate: true
-        },
-        publishTime: {
-            required: true,
-            timepickerTime: true
-        },
-        dueDate: {
-            required: true,
-            datepickerDate: true
-        },
-        dueTime: {
-            required: true,
-            timepickerTime: true
-        }
     },
     messages: {
-        weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should zero or greater'
+        weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should be zero or greater',
+    },
+    errorPlacement: function(error, element) {
+        if ($(element).attr("data-criterion-name")) {
+            error.insertAfter($(element).next("label.checkbox-label"));
+        } else {
+            error.insertAfter(element);
+        }
     }
 };
+
+function initDecimalDescsValidation() {
+
+    function attachValidationRules() {
+        // Validate decimal places on each descriptor
+        // Only validate digits (i.e. string contains only numbers, no decimal places) if mark range is on
+        // Always validate it's numeric
+        $("[data-descriptor-value]").each(function() {
+            $(this).rules("add", {
+                number: true,
+                digits: {
+                    depends: function() {
+                        return $("#useMarkRange").is(":checked");
+                    }
+                },
+                messages: {
+                    digits: "You cannot have descriptors with decimal places if using mark range"
+                }
+            });
+        });
+
+        // Validate all rows of descriptors
+        $("[data-criterion-name]").each(function() {
+            $(this).rules("add", { descriptorsAreMonotonic: true });
+        });
+    }
+
+    function reValidate() {
+        $("[data-descriptor-value]").each(function() {
+            $(this).valid();
+        });
+        $("[data-criterion-name]").each(function() {
+            $(this).valid();
+        });
+    }
+
+    // on load
+    attachValidationRules();
+
+    // on change of mark range setting
+    $("#useMarkRange").change(function() {
+        reValidate();
+    });
+
+
+    // Attach listener to run monotonicity validation on a descriptor row every time one of the contained descriptor values change
+    $("[data-descriptor-value]").change(function() {
+        var $changedDescriptor = $(this);
+        var $closestDescRow = $changedDescriptor.closest("[data-descriptor]").prevAll("th").find("[data-criterion-name]");
+        $closestDescRow.valid();
+    });
+
+
+    var moConfig = { attributes: false, childList: true, characterData: false };
+
+    // on change of number of levels
+    var levelObserver = new MutationObserver(attachValidationRules);
+    $("tr[data-group]").each(function() {
+        levelObserver.observe(this, moConfig);
+    });
+
+    // on change of number of indicators/capabilities
+    var indicatorObserver = new MutationObserver(attachValidationRules);
+    $("table[data-rubric] tbody").each(function() {
+        indicatorObserver.observe(this, moConfig);
+    });
+
+    // on change of checked indicators
+    $("[data-criterion-name]").change(function() {
+        var $indicatorCheckbox = $(this);
+       if ($indicatorCheckbox.is(":checked")) {
+           $("[data-descriptor]").each(function() {
+               $(this).find("label.error").show();
+           });
+       } else {
+           $("[data-descriptor]").each(function() {
+               $(this).find("label.error").hide();
+           });
+       }
+    });
+}
+
 
 /**
  * These rules must be applied right before submit as to take into account things
  * that have been changed via JS.
  */
 var beforeSubmit = function() {
-
     var publishDate = $('input[name="publishDate"]'),
         publishTime = $('input[name="publishTime"]'),
         openDate = $('input[name="openDate"]'),
@@ -51,6 +123,9 @@ var beforeSubmit = function() {
 
     var openVisible = openDate.is(':visible'),
         closeVisible = closeDate.is(':visible');
+
+    // have to do this again since its not in validateOptions and the plugin clears+reapplys rules on submit
+    initDecimalDescsValidation();
 
     if (openVisible && closeVisible) {
 
@@ -159,6 +234,7 @@ var beforeSubmit = function() {
                 number: messageCallback,
                 greaterThanZero: messageCallback
             }
-        })
+        });
     }
+
 };

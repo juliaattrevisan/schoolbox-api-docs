@@ -54,8 +54,7 @@
     <th class="rb-group-summary" data-group-max-value-cell colspan="{{ rubric.levels|length + 3 }}">
         <label>
             Maximum points for {{ locale.translate('rubricGroup') }}
-            <input type="number"
-                   min="0"
+            <input type="tel"
                    value="{{ group.max }}"
                    name="{{ groupInput }}[maxValue]"
                    data-group-max-value

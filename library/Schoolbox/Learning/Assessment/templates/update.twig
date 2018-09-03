@@ -34,6 +34,7 @@
 
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next]').mage({
+            initValidation: initDecimalDescsValidation,
             validateOptions: validateOptions,
             beforeSubmit: beforeSubmit,
             onXhrDone: function (data) {
@@ -56,7 +57,9 @@
                         });
                 }
             });
-        })
+        });
+
+
     });
 </script>
 

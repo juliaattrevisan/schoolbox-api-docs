@@ -79,6 +79,10 @@ table.rb {
         }
     }
     label {
+        // Prevent validation errors from making cells enormous
+        &.error {
+            max-width: 11rem;
+        }
         margin: 0;
     }
     tbody th:first-of-type {
@@ -206,6 +210,7 @@ table.rb {
         top: 15px !important;
     }
 }
+
 .rb-no-cell {
     background-color: $body-bg;
     color: contrast-bg();
