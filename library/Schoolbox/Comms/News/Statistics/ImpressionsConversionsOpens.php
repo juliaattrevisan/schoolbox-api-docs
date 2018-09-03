@@ -17,7 +17,7 @@ namespace Schoolbox\Comms\News\Statistics;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
-use Schoolbox\Comms\News\Statistics\Accuracy\Factory;
+use Schoolbox\Comms\News\Statistics\Scale\Factory;
 
 class ImpressionsConversionsOpens
 {
@@ -398,15 +398,15 @@ class ImpressionsConversionsOpens
      * Fetch data set separately from its previous home in fetchInteractionReferrers()
      *
      * @param News\Model  $article
-     * @param string $accuracy
+     * @param string $scale
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function fetchConversionRatio(News\Model $article, string $accuracy): array
+    public function fetchConversionRatio(News\Model $article, string $scale): array
     {
         /* Determine a sane value
          */
-        $strat = (new Factory())->produce($accuracy);
+        $strat = (new Factory())->produce($scale);
 
         /* Get all the timestamps that have content - because of the way highcharts stacks its data
          * I need to initialise the container with all the possibilities and stack categorised data in-order
@@ -501,16 +501,16 @@ class ImpressionsConversionsOpens
      * Get Conversion and Impressions vs Time
      *
      * @param News\Model  $article
-     * @param null|string $accuracy
+     * @param null|string $scale
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function fetchConversions(News\Model $article, ?string $accuracy): array
+    public function fetchConversions(News\Model $article, ?string $scale): array
     {
 
         /* Determine a sane value
          */
-        $strat = (new Factory())->produce($accuracy);
+        $strat = (new Factory())->produce($scale);
 
         $statement = $this->database->prepareQuery("
             SELECT

@@ -48,15 +48,15 @@
         <section class="content">
             {% include '@commsNewsStatistics/interactions-chronological.twig' with {
                 article: article,
-                accuracies: accuracies,
-                accuracy: accuracy,
+                scaleOptions: scaleOptions,
+                scale: scale,
                 interactions: interactions,
                 conversionRatio: conversionRatio
             } %}
 
             {% include '@commsNewsStatistics/referrer-chronological.twig' with {
                 article: article,
-                accuracy: accuracy,
+                scale: scale,
                 series: series
             } %}
         </section>

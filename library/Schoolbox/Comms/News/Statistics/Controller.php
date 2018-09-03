@@ -60,7 +60,7 @@ class Controller extends Base
     public function getOverview(News\Model $article)
     {
         $impressionsConversionsOpens = new ImpressionsConversionsOpens($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
-        $accuracy = News\Statistics\Accuracy\Factory::assertAccuracy($this->getRequest()->query['accuracy']);
+        $scale = News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
             'article' => $article,
@@ -81,10 +81,10 @@ class Controller extends Base
              */
             'roleTypeDemographic' => $impressionsConversionsOpens->fetchRoleTypeDemographic($article),
 
-            /* Accuracy selector
+            /* Scale selector
              */
-            'accuracies' => News\Statistics\Accuracy\Factory::ACCURACIES,
-            'accuracy' => $accuracy,
+            'scaleOptions' => News\Statistics\Scale\Factory::SCALE_OPTIONS,
+            'scale' => $scale,
 
             /* Interaction Referrers This Period
              */
@@ -99,7 +99,7 @@ class Controller extends Base
 
     /**
      * Get the json payload to populate "Conversions, Impressions vs Time" graph so that
-     * when you change accuracy, only the graph updates, instead of the whole page kek
+     * when you change scale, only the graph updates, instead of the whole page kek
      *
      * @api GET /comms/news/statistics/{articleId}/interactions
      *
@@ -109,14 +109,14 @@ class Controller extends Base
     public function getInteractionsVsTime(News\Model $article)
     {
         $impressionsConversionsOpens = new ImpressionsConversionsOpens($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
-        $accuracy = News\Statistics\Accuracy\Factory::assertAccuracy($this->getRequest()->query['accuracy']);
+        $scale = News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']);
 
         /* Conversions and Impressions vs Time,
          * Conversion Ratio vs Time
          */
         $output = [
-            'interactions' => $impressionsConversionsOpens->fetchConversions($article, $accuracy),
-            'conversionRatio' => $impressionsConversionsOpens->fetchConversionRatio($article, $accuracy),
+            'interactions' => $impressionsConversionsOpens->fetchConversions($article, $scale),
+            'conversionRatio' => $impressionsConversionsOpens->fetchConversionRatio($article, $scale),
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($output));

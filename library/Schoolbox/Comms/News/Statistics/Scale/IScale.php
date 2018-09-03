@@ -1,21 +1,21 @@
 <?php
 /**
- * IAccuracy
+ * IScale
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Statistics\Accuracy;
+namespace Schoolbox\Comms\News\Statistics\Scale;
 
 use Alaress_Date_Format;
 
-interface IAccuracy
+interface IScale
 {
 
     /**
-     * Get the sql representing the accuracy of each strategy's setting
+     * Get the sql representing the aggregation of each strategy's setting
      *
      * @return string
      */

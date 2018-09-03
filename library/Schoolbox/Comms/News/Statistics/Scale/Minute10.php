@@ -1,14 +1,14 @@
 <?php
 /**
- * Day
+ * Minute10
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Comms\News\Statistics\Accuracy;
+namespace Schoolbox\Comms\News\Statistics\Scale;
 
-class Day extends Base
+class Minute10 extends Base
 {
 
     /**
@@ -16,10 +16,10 @@ class Day extends Base
      */
     public function getSql(): string
     {
-        return "
-            CONCAT(SUBSTRING(occurs_at FROM 1 FOR 11), '00:00:00') AS datetime,
-            1000*UNIX_TIMESTAMP(CONCAT(SUBSTRING(occurs_at FROM 1 FOR 11), '00:00:00')) AS timestamp,
-        ";
+        return '
+            FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(occurs_at)/(10*60))*(10*60)) AS datetime,
+            1000*FLOOR(UNIX_TIMESTAMP(occurs_at)/(10*60))*(10*60) AS timestamp,
+        ';
     }
 
 
@@ -30,6 +30,6 @@ class Day extends Base
      */
     public function getInterval(): int
     {
-        return 24 * 60;
+        return 10;
     }
 }

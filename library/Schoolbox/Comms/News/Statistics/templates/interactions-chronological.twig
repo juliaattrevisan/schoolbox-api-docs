@@ -2,8 +2,8 @@
  # Conversions, Impressions vs Time
  #
  # @param News\Model $article
- # @param array accuracies
- # @param string accuracy
+ # @param array scaleOptions
+ # @param string scale
  # @param array interactions
  # @param array conversionRatio
  #}
@@ -11,13 +11,13 @@
     $(function() {
 
         /**
-         * Reloads the graph with the selected accuracy
+         * Reloads the graph with the selected scale
          *
          * @param url
-         * @param accuracy
+         * @param scale
          */
-        function reloadInteractionsVsTime(url, accuracy) {
-            $.getJSON(url, {accuracy: accuracy}, function (data) {
+        function reloadInteractionsVsTime(url, scale) {
+            $.getJSON(url, {scale: scale}, function (data) {
                 var chart = new Highcharts.Chart({
                     chart: {
                         height: 500,
@@ -133,10 +133,10 @@
         }
 
         {# Load initially #}
-        reloadInteractionsVsTime("{{ routeLookupIfAuthorized('commsNewsStatistics.getInteractionsVsTime', {articleId: article.id}) }}", $('#accuracy').val());
+        reloadInteractionsVsTime("{{ routeLookupIfAuthorized('commsNewsStatistics.getInteractionsVsTime', {articleId: article.id}) }}", $('#scale').val());
 
         {# Reload upon selection #}
-        $('#accuracy').on('change', function (event) {
+        $('#scale').on('change', function (event) {
             event.preventDefault();
 
             reloadInteractionsVsTime("{{ routeLookupIfAuthorized('commsNewsStatistics.getInteractionsVsTime', {articleId: article.id}) }}", $(this).val());
@@ -145,12 +145,12 @@
 </script>
 
 <section class="content">
-    <label for="accuracy">Accuracy</label>
+    <label for="scale">Scale</label>
     <p class="meta">Change the way the graph condenses data.</p>
 
-    <select id="accuracy">
-        {% for value, label in accuracies %}
-            <option value="{{ value }}" {% if value == accuracy %}selected="selected"{% endif %}>{{ value }}</option>
+    <select id="scale">
+        {% for value, label in scaleOptions %}
+            <option value="{{ value }}" {% if value == scale %}selected="selected"{% endif %}>{{ value }}</option>
         {% endfor %}
     </select>
 </section>

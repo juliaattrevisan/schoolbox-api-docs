@@ -7,9 +7,9 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Statistics\Accuracy;
+namespace Schoolbox\Comms\News\Statistics\Scale;
 
-abstract class Base implements IAccuracy
+abstract class Base implements IScale
 {
 
     /**

@@ -6,7 +6,7 @@
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Comms\News\Statistics\Accuracy;
+namespace Schoolbox\Comms\News\Statistics\Scale;
 
 class Month extends Base
 {

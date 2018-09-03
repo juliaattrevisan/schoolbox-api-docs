@@ -7,25 +7,25 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Statistics\Accuracy;
+namespace Schoolbox\Comms\News\Statistics\Scale;
 
 class Factory
 {
 
     /**
-     * The allowed accuracies for a user to choose
+     * The allowed scaleOptions for a user to choose
      *
-     * This controls how timestamps are grouped together, this increasing or decreasing the accuracy
+     * This controls how timestamps are grouped together, this increasing or decreasing the scale
      * of the dataset in exchange for perhaps more meaningful interpretations.
      *
-     * For example, 60 seconds (accuracy=60) might be too granular for some people.
-     * Such might prefer collating five minutes worth of data instead (accuracy=300)
+     * For example, 60 seconds (scale=60) might be too granular for some people.
+     * Such might prefer collating five minutes worth of data instead (scale=300)
      *
-     * Events that occur within $accuracy seconds of each other are aggregated together.
+     * Events that occur within $scale seconds of each other are aggregated together.
      *
      * @var array
      */
-    public const ACCURACIES = [
+    public const SCALE_OPTIONS = [
         '10min'     => 10,
         '30min'     => 30,
         'hour'      => 60,
@@ -35,33 +35,33 @@ class Factory
 
 
     /**
-     * Default accuracy when the specified one doesn't exist
+     * Default scale when the specified one doesn't exist
      */
-    private const DEFAULT_ACCURACY = 'day';
+    private const DEFAULT_SCALE = 'day';
 
     /**
      * Enforce a default value
      *
-     * @param $accuracy
+     * @param $scale
      * @return string
      */
-    public static function assertAccuracy(?string $accuracy): string
+    public static function assertScale(?string $scale): string
     {
-        if ((null === $accuracy) || ('' === $accuracy)) {
-            return self::DEFAULT_ACCURACY;
+        if ((null === $scale) || ('' === $scale)) {
+            return self::DEFAULT_SCALE;
         }
 
-        return array_key_exists($accuracy, self::ACCURACIES) ? $accuracy : self::DEFAULT_ACCURACY;
+        return array_key_exists($scale, self::SCALE_OPTIONS) ? $scale : self::DEFAULT_SCALE;
     }
 
 
     /**
-     * @param null|string $accuracy
-     * @return IAccuracy
+     * @param null|string $scale
+     * @return IScale
      */
-    public function produce(?string $accuracy): IAccuracy
+    public function produce(?string $scale): IScale
     {
-        switch ($accuracy) {
+        switch ($scale) {
             case '10min':
                 return new Minute10();
             case '30min':
