@@ -19,7 +19,7 @@ class ValidDescriptor
     }
 
 
-    public function isSatisifedBy(Descriptor $descriptor) : bool
+    public function isSatisfiedBy(Descriptor $descriptor) : bool
     {
         return !($this->usesMarkRange && $this->hasDecimals($descriptor));
     }

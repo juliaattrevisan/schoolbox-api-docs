@@ -24,7 +24,7 @@ class ValidDescriptorRow
      * @param Collection|Descriptor[] $descriptorRow
      * @return bool
      */
-    public function isSatisifedBy($descriptorRow) : bool
+    public function isSatisfiedBy($descriptorRow) : bool
     {
         // We only enforce monotonicity if mark range is in use
         if ($this->usesMarkRange) {
