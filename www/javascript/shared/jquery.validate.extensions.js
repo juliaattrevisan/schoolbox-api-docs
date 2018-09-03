@@ -327,9 +327,6 @@
             // then simplify array to just the desc values
             var allDescriptorsWithValues = descriptorList.filter(hasDescValue).map(function (descriptor) {return $(descriptor).val();});
 
-            // TODO this will need to either
-            // - parse strings to get numeric values out
-            // - validate that the entered values are only numeric (need another validation function for this)
             var prevVal, prevDiff = null;
             $(allDescriptorsWithValues).each(function(index, currentDescriptorValue) {
                 // Not the first item?
