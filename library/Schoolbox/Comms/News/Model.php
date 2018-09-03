@@ -311,6 +311,19 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
 
     /**
+     * This article has Sharing enabled
+     *
+     * TODO: This is currently a stub until Shares gets built; defaults to false for now
+     *
+     * @return bool
+     */
+    public function isShareable(): bool
+    {
+        return false;
+    }
+
+
+    /**
      * @param Alaress_Date_Format|null $now
      * @return string
      */
@@ -357,7 +370,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
     /* Getters/Setters
      */
-
 
     /**
      * @return null|string
