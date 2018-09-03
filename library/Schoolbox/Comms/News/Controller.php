@@ -835,7 +835,7 @@ class Controller extends Base
             ]
         ];
 
-        $articles = $this->newsMapper->findByColumn('author_id', $_SESSION['user']->getId(), $args);
+        $articles = $this->newsMapper->findByColumn('author_id', $this->getUser()->getId(), $args);
 
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
     }
