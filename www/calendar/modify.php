@@ -270,6 +270,15 @@ $groupHandler = new \Group();
  */
 $possibleFolderList = $groupHandler->involvedInCategoryList($currentUser->getId(), true, WRITE_ACCESS);
 
+/* Need these to intersect this with groups the calendar user is already in later
+*/
+$calendarUserFolders = $groupHandler->involvedInCategoryList($selectedUser->getId(), true, READ_ACCESS);
+$calendarUserFolderIds = [];
+
+foreach ($calendarUserFolders as $current) {
+    $calendarUserFolderIds[] = $current['id'];
+}
+
 /* Ones that it's already in, from previous selections
  */
 $alreadyInFolderList = $event->getCategoryCollection();
@@ -307,10 +316,12 @@ $allFolderList = array();
  */
 $previousInvolvement = array();
 
-/* Ones that you could possibly tick
+/* Ones that you could possibly tick (intersect of write level of logged in user and read level of calendar user)
  */
 foreach ($possibleFolderList as $current) {
-    $allFolderList[$current['id']] = $current;
+    if (in_array($current['id'], $calendarUserFolderIds, false)) {
+        $allFolderList[$current['id']] = $current;
+    }
 }
 
 /* Ones that have been ticked in the past
