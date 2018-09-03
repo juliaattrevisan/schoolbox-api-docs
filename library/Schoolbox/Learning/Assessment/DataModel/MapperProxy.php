@@ -947,6 +947,7 @@ class MapperProxy
         return $this->translator->translateToDomainModel($subModel);
     }
 
+
     /**
      * Translates a collection of data models to a domain object.
      *
@@ -957,18 +958,14 @@ class MapperProxy
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      * @throws LogicException If cyclic graph detected during translation
+     * @throws UnexpectedValueException If $dataModel wasn't able to be translated
      */
     public function translateToDomainModelCollection(Collection $dataModels)
     {
         $domainObjects = $this->createCollection();
         foreach ($dataModels as $idx => $dataModel) {
             if ($dataModel instanceof Model) {
-                try {
-                    $domainObjects[$idx] = $this->translateToDomainModel($dataModel);
-                } catch (\UnexpectedValueException $e) {
-                    // Broken object from database - not much I can do but...
-                    continue;
-                }
+                $domainObjects[$idx] = $this->translateToDomainModel($dataModel);
             }
         }
         return $domainObjects;
