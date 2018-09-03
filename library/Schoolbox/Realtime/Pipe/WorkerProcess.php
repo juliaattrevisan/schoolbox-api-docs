@@ -15,6 +15,7 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use Alaress\WorkerCrew\Worker\PipeWriter;
+use Aura\Di\Exception\ReflectionFailure;
 use ErrorException;
 use InvalidArgumentException;
 use PDOException;
@@ -22,6 +23,7 @@ use Predis\PredisException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
+use Schoolbox\Di\Configurator;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\MessageList\IListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
@@ -35,6 +37,9 @@ class WorkerProcess extends AbstractProcess
     /** @var IListFactory */
     private $factory;
 
+    /** @var Configurator */
+    private $configurator;
+
 
     /**
      * @param LoopInterface             $loop
@@ -42,11 +47,13 @@ class WorkerProcess extends AbstractProcess
      * @param PipeWriter                $writer
      * @param DispatchStrategyInterface $strat
      * @param IListFactory              $factory
+     * @param Configurator              $configurator
      */
-    public function __construct($loop, $log, $writer, $strat, IListFactory $factory)
+    public function __construct($loop, $log, $writer, $strat, IListFactory $factory, Configurator $configurator)
     {
         parent::__construct($loop, $log, $writer, $strat);
         $this->factory = $factory;
+        $this->configurator = $configurator;
     }
 
 
@@ -145,7 +152,10 @@ class WorkerProcess extends AbstractProcess
         }
 
         try {
-            $this->getNotifier($callback)->enableLogging($this->log, true);
+            // overwrite the serialized thing with a real version
+            $callback[0] = $this->getNotifier($callback);
+            $callback[0]->enableLogging($this->log, true);
+
         } catch (InvalidArgumentException $e) {
             // ignore this
         }
@@ -187,7 +197,18 @@ class WorkerProcess extends AbstractProcess
     private function getNotifier(callable $callback)
     {
         if (is_array($callback) && isset($callback[0]) && $callback[0] instanceof ModuleNotifierInterface) {
-            return $callback[0];
+
+            $notifierClassName = get_class($callback[0]);
+
+            try {
+                // return a new, shiny instance of this class, correctly configured
+                $this->configurator->configureClass($notifierClassName);
+                return $this->configurator->newInstance($notifierClassName);
+
+            } catch (ReflectionFailure $e) {
+                // kennet configure? ok, just return as-is
+                return $callback[0];
+            }
         }
 
         throw new InvalidArgumentException('Callback is not a notifier');

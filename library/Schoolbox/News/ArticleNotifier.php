@@ -24,6 +24,10 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Url;
 
+/**
+ * @deprecated 18.1 Retained to ensure notif payloads in redis can still be processed after a major update
+ * @see \Schoolbox\Comms\News\Notifier
+ */
 class ArticleNotifier extends AbstractModuleNotifier
 {
 

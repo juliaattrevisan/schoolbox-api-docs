@@ -10,6 +10,18 @@ namespace Schoolbox\Comms\News\Audience;
 
 class MockUserResolver implements IUserResolver
 {
+    /** @var int */
+    private $defaultSet;
+
+
+    /**
+     * @param int $defaultSet
+     */
+    public function __construct(int $defaultSet = 0)
+    {
+        $this->defaultSet = $defaultSet;
+    }
+
     // Maps article ids to user ids
     // 1 => [ [role:3]^s && [year:10]^s ]^s
     // 2 => [user:3]^s || [user:10]^s || [user:151]^s || [user:230]^s
@@ -22,6 +34,7 @@ class MockUserResolver implements IUserResolver
     // 9 => [ [class:ENG34]^s && [role:teachers]^s ]^s
     //10 => [ [school_house:3]^s && [year:10]^s ]^p
     public const ARTICLE_AUDIENCES = [
+        0 => [],
         1 => [10,15,17,31,222,223,224,225,226,227,228],
         2 => [3,10,151,230],
         3 => [74,75],
@@ -34,15 +47,26 @@ class MockUserResolver implements IUserResolver
         10 => [88,89,20,36,123,124,128],
     ];
 
-
     /**
      * @inheritdoc
      */
     public function findUsersForArticle(int $articleId): array
     {
-        if (\array_key_exists($articleId, self::ARTICLE_AUDIENCES)) {
-            return self::ARTICLE_AUDIENCES[$articleId];
-        }
-        return [];
+        return $this->findUsers($articleId, self::ARTICLE_AUDIENCES);
     }
+
+    /**
+     * @param int   $articleId
+     * @param array $dataset
+     * @return int[]
+     */
+    private function findUsers(int $articleId, array $dataset): array
+    {
+        if (\array_key_exists($articleId, $dataset)) {
+            return $dataset[$articleId];
+        }
+        return $dataset[$this->defaultSet];
+
+    }
+
 }

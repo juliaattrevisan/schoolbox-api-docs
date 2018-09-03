@@ -11,6 +11,7 @@ use Aura\Di;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Di\Configurator;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\MessageList\ListFactory;
 
@@ -48,8 +49,10 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
     $listFactory = new ListFactory(INSTANCE_ID, $redis);
 
+    $configurator = new Configurator($di);
+
     // create a new worker; we don't need to store the instance, it'll be held within the loop
-    new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, $log, $writer, $strat, $listFactory);
+    new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, $log, $writer, $strat, $listFactory, $configurator);
 });
 
 // yup. that's all you need to do.

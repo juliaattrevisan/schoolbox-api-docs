@@ -25,11 +25,13 @@ use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
 use Schoolbox\Column\Model as ModelColumn;
 use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Di\Configurator;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Performance\DevMonitor;
 use Schoolbox\Mapper\Performance\IMonitor;
 use Schoolbox\Mapper\Performance\LiveMonitor;
 use Schoolbox\Realtime\Schedule\Broker;
+use Schoolbox\Realtime\Schedule\Event\NotifierInflector;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
 use Schoolbox\Realtime\Schedule\Trigger\Propagator;
@@ -656,9 +658,12 @@ abstract class Mapper implements IMapper, Serializable
                         Propagator::class, [
                             'splitter'   => $this->getDi()->lazyNew(
                                 Splitter::class, [
-                                    'conf'    => $this->getDi()->lazyGet('config'),
-                                    'di'      => $this->getDi(),
-                                    'factory' => $this->getDi()->lazyNew(TriggerFactoryFactory::class, [true]),
+                                    'inflector' => $this->getDi()->lazyNew(NotifierInflector::class, [
+                                        'configurator' => $this->getDi()->lazyNew(Configurator::class, [
+                                            'di' => $this->getDi()
+                                        ])
+                                    ]),
+                                    'factory'   => $this->getDi()->lazyNew(TriggerFactoryFactory::class, [true]),
                                 ]
                             ),
                             'redis'      => $this->getDi()->lazyGet('redis'),

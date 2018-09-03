@@ -18,4 +18,5 @@ interface IUserResolver
      * @return int[]
      */
     public function findUsersForArticle(int $articleId): array;
+
 }

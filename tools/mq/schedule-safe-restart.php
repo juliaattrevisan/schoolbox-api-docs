@@ -16,12 +16,14 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\Stomp;
 use React\Stomp\Protocol\Frame;
+use Schoolbox\Di\Configurator;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Realtime\Schedule\Broker;
 use Schoolbox\Realtime\Schedule\Event\Event;
+use Schoolbox\Realtime\Schedule\Event\NotifierInflector;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 use Schoolbox\Realtime\Schedule\ScheduleException;
@@ -327,15 +329,12 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
     try {
         $event = extractEvent($input);
 
-        /** @var IConfigLoader $conf */
-        $conf  = $di->get('config');
-
         /** @var Redis|ClientInterface $redis */
         $redis = $di->get('redis');
 
         $amqp  = Connector::getInstance();
 
-        $splitter = new Splitter($conf, $di, new TriggerFactoryFactory(true));
+        $splitter = new Splitter(new NotifierInflector(new Configurator($di)), new TriggerFactoryFactory(true));
 
         $instanceId = INSTANCE_ID;
 
