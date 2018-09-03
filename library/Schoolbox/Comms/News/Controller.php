@@ -14,14 +14,10 @@ use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
 use Alaress\Web\Output\Html;
 use Aura\Router\Exception\RouteNotFound;
-use External_Class;
-use External_User;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Comms\News\Audience\BusinessRules;
-use Schoolbox\Comms\News\Audience\RelationshipFilterer;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
@@ -31,7 +27,6 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -83,29 +78,14 @@ class Controller extends Base
     private $databaseInternal;
 
     /**
-     * @var Folder\Mapper
+     * @var Mapper
      */
     private $folderMapper;
-
-    /**
-     * @var Access\UserAccessMapper
-     */
-    private $userAccessMapper;
 
     /**
      * @var UserMapper
      */
     private $userMapper;
-
-    /**
-     * @var External_User
-     */
-    private $externalUser;
-
-    /**
-     * @var External_Class
-     */
-    private $externalClass;
 
     /**
      * @var Audience\Mapper
@@ -117,25 +97,32 @@ class Controller extends Base
      */
     private $roleAccessMapper;
 
+    /**
+     * @var Audience\ArticleResolver
+     */
+    private $articleResolver;
+
+    /**
+     * @var Audience\UserResolver
+     */
+    private $userResolver;
+
 
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper             $errorMapper
-     * @param Mapper                  $newsMapper
-     * @param Policy\Mapper           $policyMapper
-     * @param TopicMapper             $topicMapper
-     * @param SaveForLater\Mapper     $saveForLaterMapper
-     * @param Statistics\Mapper       $statisticsMapper
+     * @param ErrorMapper                  $errorMapper
+     * @param Mapper                       $newsMapper
+     * @param Policy\Mapper                $policyMapper
+     * @param TopicMapper                  $topicMapper
+     * @param SaveForLater\Mapper          $saveForLaterMapper
+     * @param Statistics\Mapper            $statisticsMapper
      * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
-     * @param IConnector              $databaseInternal
-     * @param Folder\Mapper           $folderMapper
-     * @param Access\UserAccessMapper $userAccessMapper
-     * @param UserMapper              $userMapper
-     * @param External_User           $externalUser
-     * @param External_Class          $externalClass
-     * @param Audience\Mapper         $audienceMapper
-     * @param RoleAccessMapper        $roleAccessMapper
+     * @param Audience\Mapper              $audienceMapper
+     * @param RoleAccessMapper             $roleAccessMapper
+     * @param Folder\Mapper                $folderMapper
+     * @param Audience\ArticleResolver     $articleResolver
+     * @param Audience\UserResolver        $userResolver
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -145,14 +132,11 @@ class Controller extends Base
         SaveForLater\Mapper $saveForLaterMapper,
         Statistics\Mapper $statisticsMapper,
         Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
-        IConnector $databaseInternal,
-        Folder\Mapper $folderMapper,
-        Access\UserAccessMapper $userAccessMapper,
-        UserMapper $userMapper,
-        External_User $externalUser,
-        External_Class $externalClass,
         Audience\Mapper $audienceMapper,
-        RoleAccessMapper $roleAccessMapper
+        RoleAccessMapper $roleAccessMapper,
+        Folder\Mapper $folderMapper,
+        Audience\ArticleResolver $articleResolver,
+        Audience\UserResolver $userResolver
     ) {
         $this->errorMapper = $errorMapper;
         $this->newsMapper = $newsMapper;
@@ -163,15 +147,12 @@ class Controller extends Base
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
         $this->audienceMapper = $audienceMapper;
         $this->roleAccessMapper = $roleAccessMapper;
+        $this->folderMapper = $folderMapper;
 
         /* Hyperdrive injection
          */
-        $this->databaseInternal = $databaseInternal;
-        $this->folderMapper = $folderMapper;
-        $this->userAccessMapper = $userAccessMapper;
-        $this->userMapper = $userMapper;
-        $this->externalUser = $externalUser;
-        $this->externalClass = $externalClass;
+        $this->articleResolver = $articleResolver;
+        $this->userResolver = $userResolver;
     }
 
 
@@ -948,11 +929,7 @@ class Controller extends Base
             $this->statisticsMapper,
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
-            $this->folderMapper,
-            $this->userAccessMapper,
-            $this->userMapper,
-            $this->externalUser,
-            $this->externalClass
+            $this->articleResolver
         ))->findForTopic(
             $urlPrefix,
             $params,
@@ -987,20 +964,7 @@ class Controller extends Base
      */
     public function getRecipients(Model $article)
     {
-        $userIds = (new Audience\UserResolver(
-            new BusinessRules(),
-            $this->databaseInternal,
-            $this->externalClass,
-            new RelationshipFilterer(
-                $this->databaseInternal,
-                $this->userMapper,
-                $this->externalUser,
-                $this->folderMapper,
-                $this->externalClass,
-                $this->userAccessMapper
-            ),
-            $this->audienceMapper
-        ))->findUsersForArticle($article->getId());
+        $userIds = $this->userResolver->findUsersForArticle($article->getId());
 
         if (\count($userIds)) {
             $users = $this->userMapper->findByColumn('id', $userIds)->sortBy('lastname', 'asc');

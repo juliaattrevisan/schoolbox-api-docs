@@ -19,7 +19,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -186,17 +185,12 @@ class Module extends BaseModule
             'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(Statistics\Cumulative\Mapper::class),
             'audienceMapper' => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
             'roleAccessMapper' => $this->getMapperFactory()->getLazy(Access\RoleAccessMapper::class),
+            'folderMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Resource\Folder\Mapper::class),
 
             /* Hyperdrive injection
              */
-            'databaseInternal' => $injector->lazy(function () {
-                return $this->getInjector()->get('databaseInternal');
-            }),
-            'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
-            'userAccessMapper' => $this->getMapperFactory()->getLazy(Access\UserAccessMapper::class),
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'externalUser' => $injector->lazyGet('externalUser'),
-            'externalClass' => $injector->lazyGet('externalClass'),
+            'articleResolver' => $injector->lazyGet('articleResolver'),
+            'userResolver' => $injector->lazyGet('userResolver'),
         ];
     }
 

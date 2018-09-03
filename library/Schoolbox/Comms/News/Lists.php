@@ -21,6 +21,7 @@ use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\BusinessRules;
 use Schoolbox\Comms\News\Audience\RelationshipFilterer;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\News\Article;
 use Schoolbox\News\Topic;
 use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder;
@@ -69,29 +70,9 @@ class Lists
     private $databaseInternal;
 
     /**
-     * @var Folder\Mapper
+     * @var ArticleResolver
      */
-    private $folderMapper;
-
-    /**
-     * @var Access\UserAccessMapper
-     */
-    private $userAccessMapper;
-
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-    /**
-     * @var External_User
-     */
-    private $externalUser;
-
-    /**
-     * @var External_Class
-     */
-    private $externalClass;
+    private $articleResolver;
 
 
     /**
@@ -104,11 +85,7 @@ class Lists
      * @param Statistics\Mapper            $statisticsMapper
      * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
      * @param IConnector                   $databaseInternal
-     * @param Folder\Mapper                $folderMapper
-     * @param Access\UserAccessMapper      $userAccessMapper
-     * @param UserMapper                   $userMapper
-     * @param External_User                $externalUser
-     * @param External_Class               $externalClass
+     * @param ArticleResolver              $articleResolver
      */
     public function __construct(
         int $defaultLimit,
@@ -118,11 +95,7 @@ class Lists
         Statistics\Mapper $statisticsMapper,
         Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
-        Folder\Mapper $folderMapper,
-        Access\UserAccessMapper $userAccessMapper,
-        UserMapper $userMapper,
-        External_User $externalUser,
-        External_Class $externalClass
+        ArticleResolver $articleResolver
     ) {
         $this->defaultLimit = $defaultLimit;
         $this->newsMapper = $newsMapper;
@@ -133,12 +106,8 @@ class Lists
 
         /* Hyperdrive injection
          */
+        $this->articleResolver = $articleResolver;
         $this->databaseInternal = $databaseInternal;
-        $this->folderMapper = $folderMapper;
-        $this->userAccessMapper = $userAccessMapper;
-        $this->userMapper = $userMapper;
-        $this->externalUser = $externalUser;
-        $this->externalClass = $externalClass;
     }
 
 
@@ -185,31 +154,15 @@ class Lists
          */
         $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
-        $articleResolver = new ArticleResolver(
-            new BusinessRules(),
-            $this->databaseInternal,
-            $this->userAccessMapper,
-            $this->folderMapper,
-            $this->externalUser,
-            new RelationshipFilterer(
-                $this->databaseInternal,
-                $this->userMapper,
-                $this->externalUser,
-                $this->folderMapper,
-                $this->externalClass,
-                $this->userAccessMapper
-            )
-        );
-
         /* Articles that were audienced to $user
          */
-        $articleIdsForUser = $articleResolver->findArticlesForUser($user);
+        $articleIdsForUser = $this->articleResolver->findArticlesForUser($user);
 
         /* Limit to the $params->getFolderId() value, if one was specified
          * This limits you to the articles you can see in a given topic, for a specified homepage
          */
         if ($params->getFolderId()) {
-            $homepageArticleIds = $articleResolver->findArticlesForAudience(Audience\Model::ENTITY_TYPE_FOLDER, $params->getFolderId(), Audience\Model::RELATIONSHIP_SELF);
+            $homepageArticleIds = $this->articleResolver->findArticlesForAudience(Audience\Model::ENTITY_TYPE_FOLDER, $params->getFolderId(), Audience\Model::RELATIONSHIP_SELF);
 
             $articleIdsForUser = array_intersect($articleIdsForUser, $homepageArticleIds);
         }
