@@ -193,11 +193,9 @@ class SitePage extends Page
             $filename = rtrim(implode("/", $path), '/');
 
             if (is_file(WEB_root . '/' . $filename . '.php') && $execute) {
-                $this->nameTransaction('/' . $filename . '.php');
                 include(WEB_root . '/' . $filename . '.php');
                 return true;
             } elseif (is_file(WEB_root . '/' . $filename . '/index.php') && $execute) {
-                $this->nameTransaction('/' . $filename . '/index.php');
                 include(WEB_root . '/' . $filename . '/index.php');
                 return true;
             } elseif (is_file($this->templateRoot . '/' . $this->getTemplate($filename . '.html'))) {
@@ -214,22 +212,6 @@ class SitePage extends Page
 
         $this->pageNotFound();
         return false;
-    }
-
-
-    /**
-     * Sets the name of this page load for New Relic reporting.
-     *
-     * Usually, the name will be the file included via $this->loadContent(), so
-     * we can see which file was requested.
-     *
-     * @param string $name
-     */
-    protected function nameTransaction($name)
-    {
-        if (extension_loaded('newrelic')) {
-            newrelic_name_transaction($name);
-        }
     }
 
     /**

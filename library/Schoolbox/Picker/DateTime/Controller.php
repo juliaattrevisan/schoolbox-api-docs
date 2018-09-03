@@ -96,10 +96,6 @@ class Controller extends Base
             // if parsing the given date failed we still have to respond with a picker, so falling back
             // to the current date is the only recourse. We do, however, log the failure if possible.
             $date = Alaress_Date_Format::now();
-
-            if (function_exists('newrelic_notice_error')) {
-                newrelic_notice_error('Failed to parse date in picker init', $e);
-            }
         }
 
         $timetableVars = [];
