@@ -355,13 +355,5 @@
         return valid;
     }, "Descriptor values must be an ascending or descending sequence");
 
-    $.validator.addMethod('noDecimalPlacesWithMarkRange', function(value, descriptorEl) {
-        var descHasDecimals = $(descriptorEl).val().match(/\.\d+$/);
-        if ($("#useMarkRange").is(":checked") && descHasDecimals) {
-            return false;
-        }
-        return true;
-    }, "You cannot have descriptors with decimal places if using mark range");
-
 
 }(jQuery));

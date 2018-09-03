@@ -28,8 +28,20 @@ function initDecimalDescsValidation() {
 
     function attachValidationRules() {
         // Validate decimal places on each descriptor
+        // Only validate digits (i.e. string contains only numbers, no decimal places) if mark range is on
+        // Always validate it's numeric
         $("[data-descriptor-value]").each(function() {
-            $(this).rules("add", { noDecimalPlacesWithMarkRange: true, number: true });
+            $(this).rules("add", {
+                number: true,
+                digits: {
+                    depends: function() {
+                        return $("#useMarkRange").is(":checked");
+                    }
+                },
+                messages: {
+                    digits: "You cannot have descriptors with decimal places if using mark range"
+                }
+            });
         });
 
         // Validate all rows of descriptors
