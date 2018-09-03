@@ -65,20 +65,11 @@ class IsParentOfUser implements IAuthorizationRule
             throw new Base(sprintf('Key "%s" not in route params', $this->paramsKey));
         }
         $userId = $params[$this->paramsKey];
+        $child = $this->userMapper->findById($userId);
+        $child->loadParents();
 
-        // TODO consider using session children instead of external DB call
         if ($user instanceof User) {
-            $externalChildren = $this->externalDb->getEnrolledStudents($user->getExternalId()) ?: array();
-            $externalChildIds = array();
-            foreach ($externalChildren as $externalChild) {
-                $externalChildIds[] = $externalChild['RelatedID'];
-            }
-            foreach ($this->userMapper->findByColumn('synergy_id', $externalChildIds) as $child) {
-                /** @var User $child */
-                if ($child->getId() == $userId) {
-                    return true;
-                }
-            }
+            $user->isParentOf($child);
         }
         throw new Unauthorized();
     }
