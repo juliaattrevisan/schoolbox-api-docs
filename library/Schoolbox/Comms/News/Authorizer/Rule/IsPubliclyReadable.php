@@ -12,6 +12,7 @@ namespace Schoolbox\Comms\News\Authorizer\Rule;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use InvalidArgumentException;
+use Schoolbox\Comms\News\Audience\UserResolver;
 use Schoolbox\Comms\News\Mapper;
 use Schoolbox\Comms\News\ValidArticleIsPubliclyReadable;
 use Schoolbox\User;
@@ -24,14 +25,21 @@ class IsPubliclyReadable implements IAuthorizationRule
      */
     private $mapper;
 
+    /**
+     * @var UserResolver
+     */
+    private $userResolver;
 
     /**
-     * CanModify constructor.
-     * @param Mapper $mapper
+     * IsPubliclyReadable constructor.
+     *
+     * @param Mapper       $mapper
+     * @param UserResolver $userResolver
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, UserResolver $userResolver)
     {
         $this->mapper = $mapper;
+        $this->userResolver = $userResolver;
     }
 
 
@@ -44,10 +52,10 @@ class IsPubliclyReadable implements IAuthorizationRule
      * @throws InvalidArgumentException
      * @throws Unauthorized
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \UnexpectedValueException
+     * @throws \UnderflowException
      */
     public function authorize(array $params = [], User $user = null): bool
     {
@@ -57,7 +65,7 @@ class IsPubliclyReadable implements IAuthorizationRule
 
         $article = $this->mapper->findById($params['articleId']);
 
-        if (!(new ValidArticleIsPubliclyReadable())->isSatisfiedBy($user, $article)) {
+        if (!(new ValidArticleIsPubliclyReadable($this->userResolver))->isSatisfiedBy($user, $article)) {
             throw new Unauthorized('This user cannot read article contents');
         }
 

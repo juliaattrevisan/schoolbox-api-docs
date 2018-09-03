@@ -53,8 +53,8 @@ class Module extends BaseModule
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
-                    new Authorizer\Rule\IsAuthorOrModerator($this->getNewsMapper())
-//                    new Authorizer\Rule\IsPubliclyReadable($this->getNewsMapper())
+                    new Authorizer\Rule\IsAuthorOrModerator($this->getNewsMapper()),
+                    new Authorizer\Rule\IsPubliclyReadable($this->getNewsMapper(), $this->getInjector()->get('userResolver'))
                 )
             );
         });

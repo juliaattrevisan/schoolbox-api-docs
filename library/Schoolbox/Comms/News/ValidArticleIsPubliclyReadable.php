@@ -9,10 +9,25 @@
 
 namespace Schoolbox\Comms\News;
 
+use Schoolbox\Comms\News\Audience\UserResolver;
 use Schoolbox\User;
 
 class ValidArticleIsPubliclyReadable
 {
+    /**
+     * @var UserResolver
+     */
+    private $userResolver;
+
+    /**
+     * ValidArticleIsPubliclyReadable constructor.
+     * @param UserResolver $userResolver
+     */
+    public function __construct(UserResolver $userResolver)
+    {
+        $this->userResolver = $userResolver;
+    }
+
 
     /**
      * This prevents articles in draft/moderation phases from being seen.
@@ -28,6 +43,9 @@ class ValidArticleIsPubliclyReadable
      * @param User  $user
      * @param Model $article
      * @return bool
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     public function isSatisfiedBy(User $user, Model $article): bool
     {
@@ -41,6 +59,11 @@ class ValidArticleIsPubliclyReadable
 
             /* If you are in its audience, you can see it
              */
+            $audiencedUsers = $this->userResolver->findUsersForArticle($article->getId());
+
+            if (\in_array($user->getId(), $audiencedUsers, false)) {
+                return true;
+            }
 
             /* If it's shareable, you can see it
              */
