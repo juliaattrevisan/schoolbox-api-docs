@@ -319,7 +319,6 @@
                     );
                 })
                 .fail(function (xhr) {
-                    console.log(xhr.responseText);
                     toast.call($participant, xhr.responseText, false, false);
                 })
                 .always(function () {
