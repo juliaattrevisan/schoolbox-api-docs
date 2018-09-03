@@ -46,6 +46,7 @@ class UserResolver implements IUserResolver
      * @param int $articleId
      * @throws \Schoolbox\Mapper\Exception
      * @return array
+     * @todo Add logic to handle the case when an article 1) does not exist, and 2) has 0 audience segments. See SA-6839
      */
     public function findModeratorsForArticle(int $articleId): array
     {
