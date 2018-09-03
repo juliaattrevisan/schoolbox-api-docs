@@ -44,11 +44,11 @@
                             <div class="list-item">
                                 <div class="small-12 card">
 
-                                    <a :href="'/comms/news/' + article.id" v-if="article.featureImage">
-                                        <img :src="'/storage/image.php?hash=' + article.featureImage.hash + '&size=square64'">
+                                    <a :href="article._links.self.href" v-if="article.featureImage">
+                                        <img :src="article.featureImage._links.image.href + '&size=square64'">
                                     </a>
 
-                                    <h3><a :href="'/comms/news/' + article.id">${ article.title }</a></h3>
+                                    <h3><a :href="article._links.self.href">${ article.title }</a></h3>
 
                                     <p class="meta">
                                         <b>${ article.status }</b>
@@ -58,7 +58,7 @@
                                 </div>
                             </div>
                             <nav>
-                                <a :href="'/comms/news/' + article.id + '/update'" class="icon-modify no-text" title="Modify this article"></a>
+                                <a :href="article._links.update.href" class="icon-modify no-text" title="Modify this article"></a>
                             </nav>
                         </li>
                     </ul>
