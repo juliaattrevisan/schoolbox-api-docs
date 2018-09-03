@@ -338,6 +338,7 @@ class Controller extends Base
                 AssessmentFilters\TemporalState\Definition::KEY_OPEN,
                 AssessmentFilters\TemporalState\Definition::KEY_OVERDUE,
                 AssessmentFilters\TemporalState\Definition::KEY_CLOSED,
+                AssessmentFilters\TemporalState\Definition::KEY_CUSTOM_PUBLISH_DATE,
             ]
         ];
         $assessments = $this->findByFiltersWithParticipants($filters, $viewee, false);
@@ -412,6 +413,7 @@ class Controller extends Base
                 AssessmentFilters\TemporalState\Definition::KEY_OPEN,
                 AssessmentFilters\TemporalState\Definition::KEY_OVERDUE,
                 AssessmentFilters\TemporalState\Definition::KEY_CLOSED,
+                AssessmentFilters\TemporalState\Definition::KEY_CUSTOM_PUBLISH_DATE,
             ]
         ]);
 
@@ -627,13 +629,12 @@ class Controller extends Base
     private function findByFiltersWithParticipants(array $filters, User $viewee, bool $loadOtherParticipantInteractions)
     {
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
-
         // Fetch assessments & participants
         $user        = $loadOtherParticipantInteractions ? null : $viewee;
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
         $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $user)
                                                    ->filter(function (IAssessable $a) use ($viewee) {
-                                                       return $a->isParticipant($viewee) && $a->isPublished();
+                                                       return $a->isParticipant($viewee) && !$a->getParticipantIfExtant($viewee)->getPublishDate()->isFuture();
                                                    });
         return $assessments;
     }

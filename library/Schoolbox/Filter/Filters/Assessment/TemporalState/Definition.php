@@ -20,6 +20,7 @@ use Schoolbox\Filter;
  * □ Open        (open    <= now < late)
  * □ Overdue     (late    <= now < close)
  * □ Closed      (close   <= now )
+ * □ Custom Plan (customPublishDate <= now)
  */
 class Definition extends Filter\AbstractDefinition
 {
@@ -32,6 +33,7 @@ class Definition extends Filter\AbstractDefinition
     const KEY_OPEN = 'open';
     const KEY_OVERDUE = 'overdue';
     const KEY_CLOSED = 'closed';
+    const KEY_CUSTOM_PUBLISH_DATE = 'customPublishDate';
 
 
     /** @var Collection|string[] */
@@ -97,6 +99,9 @@ class Definition extends Filter\AbstractDefinition
         }
         if (self::KEY_CLOSED === $key) {
             return 'Closed';
+        }
+        if (self::KEY_CUSTOM_PUBLISH_DATE === $key) {
+            return 'Custom Plan Publish Date';
         }
         throw new \InvalidArgumentException("Unknown TemporalState key: $key");
     }
