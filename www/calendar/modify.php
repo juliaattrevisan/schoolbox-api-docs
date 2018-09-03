@@ -27,6 +27,7 @@ $page->setBlock(TEMPLATE_content, 'event_group_drop', 'event_group_drop_block');
 $page->setBlock(TEMPLATE_content, 'type_select', 'type_select_block');
 $page->setBlock(TEMPLATE_content, 'type_no_select', 'type_no_select_block');
 
+/** @var Schoolbox\User  $currentUser */
 $currentUser = $_SESSION['user'];
 
 if (isset($_GET['userId']) && is_numeric($_GET['userId'])) {
@@ -268,15 +269,23 @@ $groupHandler = new \Group();
 
 /* Possible options, based on current user's involvement
  */
-$possibleFolderList = $groupHandler->involvedInCategoryList($currentUser->getId(), true, WRITE_ACCESS);
+$currentUserFolderList = $groupHandler->involvedInCategoryList($currentUser->getId(), true, WRITE_ACCESS);
+$currentUserFolderIds = [];
 
-/* Need these to intersect this with groups the calendar user is already in later
-*/
-$calendarUserFolders = $groupHandler->involvedInCategoryList($selectedUser->getId(), true, READ_ACCESS);
-$calendarUserFolderIds = [];
+foreach ($currentUserFolderList as $current) {
+    $currentUserFolderIds[] = $current['id'];
+}
 
-foreach ($calendarUserFolders as $current) {
-    $calendarUserFolderIds[] = $current['id'];
+$calendarUserFolderList = $groupHandler->involvedInCategoryList($selectedUser->getId(), true, READ_ACCESS);
+
+/* Unset items that are not in the current users write list */
+if (!$currentUser->isSuperuser()) {
+    foreach ($calendarUserFolderList as $key => $value) {
+        if (!in_array($value['id'], $currentUserFolderIds, false)) {
+            unset($calendarUserFolderList[$key]);
+        }
+    }
+
 }
 
 /* Ones that it's already in, from previous selections
@@ -318,10 +327,8 @@ $previousInvolvement = array();
 
 /* Ones that you could possibly tick (intersect of write level of logged in user and read level of calendar user)
  */
-foreach ($possibleFolderList as $current) {
-    if (in_array($current['id'], $calendarUserFolderIds, false)) {
-        $allFolderList[$current['id']] = $current;
-    }
+foreach ($calendarUserFolderList as $current) {
+    $allFolderList[$current['id']] = $current;
 }
 
 /* Ones that have been ticked in the past
@@ -343,35 +350,40 @@ $allFolderList = array_values($allFolderList);
 
 /* Group checkbox array when using Group Event Level
  */
-foreach ($allFolderList as $currentFolder) {
-    $alreadyInCategory = $event->getCategoryCollection()->getBy('categoryId', $currentFolder['id']) || in_array($currentFolder['id'], $previousInvolvement);
-    $fromHomepage      = (($_GET['level'] == 2) && ($_GET['homepageId'] == $currentFolder['id']));
+if(\count($allFolderList)) {
+    foreach ($allFolderList as $currentFolder) {
+        $alreadyInCategory = $event->getCategoryCollection()->getBy('categoryId', $currentFolder['id']) || in_array($currentFolder['id'], $previousInvolvement);
+        $fromHomepage      = (($_GET['level'] == 2) && ($_GET['homepageId'] == $currentFolder['id']));
 
-    /* If you have already chosen these categories, or if it's specified
-     * from a homepage via Group Calendar > Add Event
-     */
-    if ($alreadyInCategory || $fromHomepage) {
-        $selected = 'checked="checked"';
-    } else {
-        $selected = '';
+        /* If you have already chosen these categories, or if it's specified
+         * from a homepage via Group Calendar > Add Event
+         */
+        if ($alreadyInCategory || $fromHomepage) {
+            $selected = 'checked="checked"';
+        } else {
+            $selected = '';
+        }
+
+        $codeString = "";
+
+        if($currentFolder['code'] !== null) {
+            $codeString = ' ('.$currentFolder['code'].')';
+        }
+
+        $page->setVar(
+            array(
+                'EVENT_GROUP_ID'          => $currentFolder['id'],
+                'EVENT_GROUP_NAME'        => $currentFolder['name'].$codeString,
+                'EVENT_GROUP_ID_SELECTED' => $selected
+            )
+        );
+
+        $page->parse('event_group_drop_block', 'event_group_drop', true);
     }
-
-    $codeString = "";
-
-    if($currentFolder['code'] !== null) {
-        $codeString = ' ('.$currentFolder['code'].')';
-    }
-
-    $page->setVar(
-        array(
-            'EVENT_GROUP_ID'          => $currentFolder['id'],
-            'EVENT_GROUP_NAME'        => $currentFolder['name'].$codeString,
-            'EVENT_GROUP_ID_SELECTED' => $selected
-        )
-    );
-
-    $page->parse('event_group_drop_block', 'event_group_drop', true);
+} else {
+    $page->setVar('event_group_drop_block', '');
 }
+
 
 /* Render all the dropdowns
  */
@@ -386,7 +398,7 @@ $campusList   = $campusMapper->getAvailableCampusesForUser($selectedUser);
  */
 $page->dropDown(
     'event_level_drop',
-    new \Schoolbox\Calendar\EventLevelCollection($possibleFolderList, $campusList),
+    new \Schoolbox\Calendar\EventLevelCollection($calendarUserFolderList, $campusList),
     $defaultAccessLevel,
     TEMPLATE_content,
     array(
