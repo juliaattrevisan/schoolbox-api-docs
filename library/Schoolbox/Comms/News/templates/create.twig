@@ -105,7 +105,7 @@
                         <a class="close-reveal-modal" aria-label="Close">×</a>
 
                         <div v-show="pageShow.index">
-                            <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions">
+                            <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions.base">
                                 <button class="button-block" @click="changePage(audienceOption)">
                                     <i :class="'icon-' + audienceOption.icon"></i>
                                     ${ audienceOption.namePlural }
@@ -151,8 +151,8 @@
                             <p class="meta">Use the two columns below to create an intersection audience segment. E.g. Parents in the Senior Campus</p>
                             <div class="small-12 medium-6 columns checklist">
                                 <legend>
-                                    <select @change="updateIntsersectList('primary')" v-model="intersect.primary">
-                                        <option :value="audienceOption" v-for="audienceOption in this.audienceOptions">
+                                    <select @change="updateIntersectList('primary')" v-model="intersect.primary">
+                                        <option :value="audienceOption" v-for="audienceOption in audienceOptions.intersect.primary">
                                             ${ audienceOption.name }
                                         </option>
                                     </select>
@@ -166,8 +166,8 @@
                             </div>
                             <div class="small-12 medium-6 columns checklist">
                                 <legend>
-                                    <select @change="updateIntsersectList('secondary')" v-model="intersect.secondary">
-                                        <option :value="audienceOption" v-for="audienceOption in this.audienceOptions">
+                                    <select @change="updateIntersectList('secondary')" v-model="intersect.secondary">
+                                        <option :value="audienceOption" v-for="audienceOption in audienceOptions.intersect.secondary">
                                             ${ audienceOption.name }
                                         </option>
                                     </select>
@@ -436,8 +436,14 @@
             });
         },
         data: {
-            // The set of options on the initial modal screen
-            audienceOptions: audienceOptions,
+            // The audience groups
+            audienceOptions: {
+                base: Object.assign({}, audienceOptions),
+                intersect: {
+                    'primary': Object.assign({}, audienceOptions),
+                    'secondary': Object.assign({}, audienceOptions)
+                }
+            },
 
             // Modal sections showing and hiding
             pageShow: {
@@ -519,7 +525,7 @@
              */
             openBrowseModalRead: function () {
                 this.resetModal();
-                this.changePage(this.audienceOptions.folder);
+                this.changePage(this.audienceOptions.base.folder);
 
                 // Open the modal
                 $('#audience-browse').foundation('reveal', 'open');
@@ -664,8 +670,8 @@
             advancedToggle: function() {
                 if (!this.hasLoadedAdvanced) {
                     // Load the defaults
-                    this.updateIntsersectList('primary');
-                    this.updateIntsersectList('secondary');
+                    this.updateIntersectList('primary');
+                    this.updateIntersectList('secondary');
                 } else {
                     // Update the marker
                     this.hasLoadedAdvanced = true;
@@ -679,12 +685,24 @@
              * Update an intersect list with possible options
              * @param list 'primary' or 'secondary'
              */
-            updateIntsersectList: function(list) {
+            updateIntersectList: function(list) {
                 var self = this;
                 var audienceOption = self.intersect[list];
 
                 // Reset select all
                 self.selectAll[list] = false;
+
+                // Urgh
+                var otherList;
+                if (list === 'primary') {
+                    otherList = 'secondary';
+                } else {
+                    otherList = 'primary'
+                }
+
+                // Remove this option from the other dropdown
+                self.audienceOptions.intersect[otherList] = Object.assign({}, audienceOptions);
+                Vue.delete(self.audienceOptions.intersect[otherList], audienceOption.id);
 
                 // Try for cached list
                 if (self.cachedOptions[audienceOption.id] !== undefined) {
