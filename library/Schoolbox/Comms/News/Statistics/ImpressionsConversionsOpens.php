@@ -25,7 +25,7 @@ class ImpressionsConversionsOpens
     /**
      * Number of days in this period
      */
-    public const PERIOD_LENGTH = 300;
+    public const PERIOD_LENGTH = 30;
 
     /**
      * @var IConnector
@@ -551,11 +551,17 @@ class ImpressionsConversionsOpens
         foreach ([Mapper::TYPE_CONVERSION, Mapper::TYPE_IMPRESSION, Mapper::TYPE_OPEN] as $type) {
             $data[$type] = array_values($data[$type]);
 
-            /* TODO: Sort to eliminate anomolous ordering
-             * Sort them as well. Sometimes data points are added that don't fall within the prescribed
-             * set of keys produced by generateDateRange(). First encountered setting the period to be
-             * longer than 30 days and using the Month scale option.
+            /* Sort to eliminate anomolous ordering
+             *
+             * Sometimes data points are added that don't fall within the prescribed set of keys produced by
+             * generateDateRange() and are added to the end of the stack, out of order with everything else
+             *
+             * First encountered setting the period to be longer than 30 days and using the Month scale
+             * option but may occur if we misconfigured something
              */
+            usort($data[$type], function($a, $b) {
+                return $a[0] < $b[0];
+            });
         }
 
         return $data;
