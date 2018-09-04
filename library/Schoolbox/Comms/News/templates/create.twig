@@ -327,7 +327,6 @@
         {% endif %}
     };
 
-
     var app = new Vue({
         el: '#audience-select-container',
         delimiters: ['${', '}'],
@@ -352,64 +351,73 @@
                         // Selectize doesn't give us all the data of the selected item, find the item in the full list -_-
                         var selectedItem = this.options[value];
 
-                        // Loop through the current audience items and check for an item with the same name and entityType to append to
-                        var baseItemKey;
-                        for (var selectedAudienceItem in vue.selectedAudienceItems) {
-                            if (
-                                vue.selectedAudienceItems[selectedAudienceItem].name === selectedItem.name &&
-                                vue.selectedAudienceItems[selectedAudienceItem].entityType === selectedItem.entityType
-                            ) {
-
-                                baseItemKey = selectedAudienceItem;
-                            }
-                        }
-
-                        if (baseItemKey) {
-                            var baseItem  = vue.selectedAudienceItems[baseItemKey];
-
-                            // Add the modifier to the object
-                            baseItem[selectedItem.modifierOriginal] = true;
-
-                            // Create the new modifier summary based on what modifiers are set
-                            var modifierSummary;
-
-                            if (
-                                baseItem.self &&
-                                baseItem.parents_of &&
-                                baseItem.teachers_of
-                            ) {
-                                modifierSummary = '(Inc. teachers & parents of students)';
-                            } else if (
-                                baseItem.self &&
-                                baseItem.parents_of
-                            ) {
-                                modifierSummary = '(Inc. parents of students)';
-                            } else if (
-                                baseItem.self &&
-                                baseItem.teachers_of
-                            ) {
-                                modifierSummary = '(Inc. teachers of students)';
-                            } else if (
-                                baseItem.parents_of &&
-                                baseItem.teachers_of
-                            ) {
-                                modifierSummary = '(Teachers & parents of students only)'
+                        if (!selectedItem.intersect) {
+                            // Loop through the current audience items and check for an item with the same name and entityType to append to
+                            var baseItemKey;
+                            for (var selectedAudienceItem in vue.selectedAudienceItems) {
+                                if (
+                                    vue.selectedAudienceItems[selectedAudienceItem].name === selectedItem.name &&
+                                    vue.selectedAudienceItems[selectedAudienceItem].entityType === selectedItem.entityType
+                                ) {
+                                    baseItemKey = selectedAudienceItem;
+                                }
                             }
 
-                            vue.$set(vue.selectedAudienceItems[baseItemKey], 'modifier', modifierSummary)
+                            if (baseItemKey) {
+                                var baseItem = vue.selectedAudienceItems[baseItemKey];
+
+                                // Add the modifier to the object
+                                baseItem[selectedItem.modifierOriginal] = true;
+
+                                // Create the new modifier summary based on what modifiers are set
+                                var modifierSummary;
+
+                                if (
+                                    baseItem.self &&
+                                    baseItem.parents_of &&
+                                    baseItem.teachers_of
+                                ) {
+                                    modifierSummary = '(Inc. teachers & parents of students)';
+                                } else if (
+                                    baseItem.self &&
+                                    baseItem.parents_of
+                                ) {
+                                    modifierSummary = '(Inc. parents of students)';
+                                } else if (
+                                    baseItem.self &&
+                                    baseItem.teachers_of
+                                ) {
+                                    modifierSummary = '(Inc. teachers of students)';
+                                } else if (
+                                    baseItem.parents_of &&
+                                    baseItem.teachers_of
+                                ) {
+                                    modifierSummary = '(Teachers & parents of students only)'
+                                }
+
+                                vue.$set(vue.selectedAudienceItems[baseItemKey], 'modifier', modifierSummary)
+                            } else {
+                                // Create a new block
+                                var newBlock = {
+                                    id: selectedItem.id,
+                                    name: selectedItem.name,
+                                    entityType: selectedItem.entityType
+                                };
+
+                                if (selectedItem.modifier !== '') {
+                                    newBlock['modifier'] = '(' + selectedItem.modifier + ' only)';
+                                }
+
+                                newBlock[selectedItem.modifierOriginal] = true;
+                                vue.selectedAudienceItems.push(newBlock);
+                            }
                         } else {
-                            // Create a new block
                             var newBlock = {
                                 id: selectedItem.id,
-                                name: selectedItem.name,
-                                entityType: selectedItem.entityType
+                                name: 'Combination',
+                                entityType: 'Parents, Students',
+                                modifier: 'French 9A, English 3 4'
                             };
-
-                            if (selectedItem.modifier !== '') {
-                                newBlock['modifier'] = '(' + selectedItem.modifier + ' only)';
-                            }
-
-                            newBlock[selectedItem.modifierOriginal] = true;
                             vue.selectedAudienceItems.push(newBlock);
                         }
 
@@ -617,6 +625,21 @@
 
             addAudienceIntersect: function () {
                 // Add to selectize
+                var intersectOption = {
+                    id: btoa(JSON.stringify({
+                        type: 'composite',
+                        value: [
+                            {
+                                type: 'folder',
+                                id: 3
+                            }
+                        ]
+                    })),
+                    intersect: true // Used in selectize onItemAdd to work out how to display the segment brick
+                };
+
+                $('#audience-search').data('selectize').addOption(intersectOption);
+                $('#audience-search').data('selectize').addItem(intersectOption.id);
                 $('#audience-search').data('selectize').refreshItems();
 
                 // Close modal
