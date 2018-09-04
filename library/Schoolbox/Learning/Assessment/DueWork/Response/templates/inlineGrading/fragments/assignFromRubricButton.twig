@@ -9,44 +9,105 @@
 
         // cache this stuff, it doesn't change
         var $status                 = $('#assessment-status'),
-            $markInput              = $status.find('[data-mark-input]'),
+            markInputSelector      = '[data-mark-input]',
             $assignFromRubricButton = $('#use-rubric-value'),
             $rb                     = $('#rb-{{ rubricContext.rubric.id }}'),
-            $finalSummary           = $rb.find('[data-final-summary]');
+            finalSummarySelector    = '[data-final-summary]',
+            markType = $rb.find("[data-final-summary]").data("mark-type");
 
 
-        function refreshAssignFromRubricButton() {
-            var currentRubricValue = $.trim($finalSummary.text());
-            var currentMarkInput   = $markInput.val();
+        // Mark entered in the overall mark field
+        var currentMarkInput   = $status.find(markInputSelector).val();
 
-            $assignFromRubricButton.prop('disabled', currentRubricValue === currentMarkInput);
+        // Disable the button if the rubric value is same as input value
+        $assignFromRubricButton.prop('disabled', getRubricSum() == currentMarkInput);
+
+        // Dynamically insert the rubric mark into the button on page load
+        updateButtonMark();
+
+        function refreshAssignFromRubricInput() {
+            // Current calculated rubric total
+            var rubricSum = getRubricSum();
+
+            // Mark entered in the overall mark field
+            var currentMarkInput   = $status.find(markInputSelector).val();
+
+            // Update the mark input field with current rubric total if the total is different from the input val
+            // but ONLY if we haven't already customised the mark - don't clobber!
+            if ( rubricSum !== currentMarkInput && (!$status.find(markInputSelector).attr('data-customised')) ) {
+                $status.find(markInputSelector).val(rubricSum); // Input val
+            }
+
+            updateButtonMark();
         }
 
+        function updateButtonMark() {
+            // Current calculated rubric total
+            var rubricSum = getRubricSum();
 
-        {##
-         # Use the rubric value in the mark input field
-         #
-         # Disabled upon load, since values are the same
-         # at this point in time. Also disables when copying
-         # the rubric mark value in.
-         #}
+            if (markType === 'Percentage') {
+                $("[data-rubric-sum]").text(rubricSum + "%");
+            } else {
+                $("[data-rubric-sum]").text(rubricSum);
+            }
+
+            // Mark entered in the overall mark field
+            var currentMarkInput   = $status.find(markInputSelector).val();
+            // Disable the button if the rubric value is same as input value
+            $assignFromRubricButton.prop('disabled', rubricSum == currentMarkInput);
+        }
+
+        function getRubricSum() {
+            // Current calculated rubric total
+            var rubricTotalText = $rb.find(finalSummarySelector).text();
+            var rubricSum = $.trim(rubricTotalText);
+
+            // Extract the actual mark bit
+            switch(markType) {
+                case 'TotalMarkFractional':
+                    // Total mark is shown as x / y so extract the x
+                    rubricSum = rubricTotalText.replace(/\s*\/\s*\d*/, "");
+                    break;
+                case 'Percentage':
+                    // Remove the trailing whitespace and % symbol
+                    rubricSum = rubricTotalText.replace(/\s*%/, "");
+                    break;
+            }
+
+            return $.trim(rubricSum);
+        }
+
+        // Update the input val when manually assigning grade from rubric
         $assignFromRubricButton.on('click', function(e) {
+            // reset customisation state, like we do for cap inputs
+            $status.find(markInputSelector).removeAttr('data-customised');
 
             e.preventDefault();
-            $(this).prop('disabled', true);
-
-            $status
-                .find('[data-mark-input]')
-                .val($.trim($finalSummary.text()))
-                .change();
+            refreshAssignFromRubricInput();
         });
 
-        // listen for this
-        $rb.on('change', '[data-rubric], [data-rubric-group]', refreshAssignFromRubricButton);
-        $markInput.on('change', refreshAssignFromRubricButton);
+        $status.find(markInputSelector).change(function() {
+            // Did we manually change the overall grade? Record that it's customised
+            $status.find(markInputSelector).attr('data-customised', true);
 
-        // do it on pageload anyway
-        refreshAssignFromRubricButton();
+            var rubricSum = getRubricSum();
+
+            // Mark entered in the overall mark field
+            var currentMarkInput   = $status.find(markInputSelector).val();
+            // Disable the button if the rubric value is same as input value
+            $assignFromRubricButton.prop('disabled', rubricSum == currentMarkInput);
+        })
+
+        // Update the input val when manually assigning grades from descriptor vals
+        $(".use-descriptor-values").on('click', function(e) {
+            e.preventDefault();
+            if (!$status.find(markInputSelector).attr('data-customised')) {
+                refreshAssignFromRubricInput();
+            }
+        });
+
+        // Update the input val when any of these inputs change
+        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-mark]', refreshAssignFromRubricInput);
     });
 </script>
-<p><button id="use-rubric-value" class="full-width">Assign {{ locale.grades.proper }} from Rubric</button></p>
+<p><button id="use-rubric-value" class="full-width">Assign <span data-rubric-sum></span> from Rubric</button></p>

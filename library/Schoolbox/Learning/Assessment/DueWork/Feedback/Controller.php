@@ -199,8 +199,9 @@ class Controller extends Base
 
         // Did we just give some rubric marks?
         if (\is_array($post['rubric'])) {
+            // First arg needs to default to array
             $this->rubricMapper->saveForFeedback(
-                $post['rubric']['descriptors'],
+                $post['rubric']['descriptors'] ?? [],
                 $post['rubric']['groups'] ?? [],
                 $feedback->getId()
             );

@@ -18,7 +18,7 @@ table.rb {
             label {
                 width: 7rem;
             }
-            .groupMax {
+            .groupMark {
                 width: 5rem;
                 display: inline-block;
             }
@@ -304,6 +304,10 @@ table.rb {
 
 .descriptor-sum {
     font-weight: bold;
+}
+
+select.letter-grade-select {
+    margin-bottom: 0;
 }
 
 @media #{$medium-down} {

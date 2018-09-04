@@ -122,7 +122,6 @@
          * Set up listeners
          */
         function setupListeners() {
-            // TODO attach onFeedbackChanged to dropdown
             $(config.assessmentList)
                 .on('keydown paste keypress', 'textarea', timeoutUpdate)
                 .on('change', ':input', timeoutUpdate)
@@ -165,7 +164,6 @@
                     data:  formData,
                     type: 'post'
                 }).done(function (response) {
-
                     // Have we inserted feedback meta message into action bar ?
                     if ($actionBar.find('[data-feedback-attach-info]').length) {
                         $btnPublish.text(config.publishText).addClass('hide');

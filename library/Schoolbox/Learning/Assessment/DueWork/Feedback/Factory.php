@@ -196,11 +196,11 @@ class Factory
 
                 // verify normalisation, then sanitise the output
                 $norm = $scheme->getNormalisedMark($postMark);
-                $sane = $scheme->getHumanReadableMark($norm);
+                $humanReadableMark = $scheme->getHumanReadableMark($norm);
 
                 $feedback
                     ->setNormalisedMark($norm)
-                    ->setHumanReadableMark($sane);
+                    ->setHumanReadableMark($humanReadableMark);
             }
             catch (\InvalidArgumentException $e) {
                 $code = \DueWork_ErrorMapper::getInstance()->findOneByColumn('display_as', $postMark);
@@ -211,6 +211,8 @@ class Factory
             }
         }
         else {
+            // TODO what on EARTH is going on here? what is this "special case"?
+
             //If mark is set to empty string this is a special case
             //TODO potentially the mark post var may not have been set, we may lose the mark in this case so we should
             //test the existence of the post var as well
