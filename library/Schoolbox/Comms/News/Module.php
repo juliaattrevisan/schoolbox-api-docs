@@ -46,7 +46,7 @@ class Module extends BaseModule
             );
         });
 
-        /* For reading articles, you need to be logged in and be either the Author;
+        /* For reading articles, you need to be logged in and be either the Author/Moderator;
          * or the article is publicly accessible
          */
         $readerPerms = new Rule\LazyCallback(function () {
@@ -92,7 +92,6 @@ class Module extends BaseModule
         $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', $modifyPerms, $preloadArticle);
 
         /* View news article
-         * TODO: SA-7312, check draft, publication, author status
          */
         $this->register('GET', '/{articleId:\d+}', 'getDetail', $readerPerms, $preloadArticle);
 
