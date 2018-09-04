@@ -186,7 +186,7 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      *
      * @var string
      */
-    private $calendarView;
+    private $calendarView = 'month';
 
     /**
      * A Collection of User objects who should be receiving email
