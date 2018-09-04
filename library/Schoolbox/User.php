@@ -1017,19 +1017,9 @@ class User implements JsonSerializable, ISoftDeletable
      * @param  User $parent
      * @return bool
      */
-    public function isChildOf(User $parent)
+    public function isChildOf(User $parent): bool
     {
-        foreach ($this->getParents() as $childParent) {
-            if ($childParent->getId() == $parent->getId()) {
-                return true;
-            }
-        }
-        foreach ($parent->children as $currentChild) {
-            if ($currentChild->getId() == $this->getId()) {
-                return true;
-            }
-        }
-        return false;
+        return $parent->isParentOf($this);
     }
 
 
