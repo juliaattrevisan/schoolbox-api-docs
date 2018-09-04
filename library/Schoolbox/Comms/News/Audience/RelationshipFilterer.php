@@ -183,24 +183,31 @@ class RelationshipFilterer
 
         $students = $this->userMapper->findByPredicates($pb);
 
-        $teacherExternalIds = [];
-        $allFolders         = $this->folderMapper->createCollection();
+        $allFolders = $this->folderMapper->createCollection();
         foreach ($students as $student) {
             // Find all folders where the user is a class student or learner-only.
             $allFolders = $allFolders->mergeUnique($this->folderMapper->findForUser($student, true, UserAccess::ACCESS_READ, true), 'id');
         }
-        // Then find the teachers of these classes from synergetic.
-        $folderIds = [];
+
+        // Students are not in any groups/classes?
+        if (!$allFolders->count()) {
+            // Then they have no teachers
+            return [];
+        }
+
+        // Find all class codes these students are in.
+        $classCodes = [];
+        $folderIds  = [];
         foreach ($allFolders as $folder) {
             $folderIds[] = $folder->getId();
             foreach ($folder->getCodes() as $code) {
-                /** @noinspection SlowArrayOperationsInLoopInspection */
-                $teacherExternalIds = \array_merge($teacherExternalIds, $this->externalClass->getTeacherName($code->getCode()));
+                $classCodes[] = $code->getCode();
             }
         }
-        if (!\count($folderIds)) {
-            return [];
-        }
+
+        // Then find the teachers of these classes from synergetic.
+        $teacherExternalIds = $this->externalClass->getTeacherName(\implode(',', \array_unique($classCodes)));
+
         $instructorIds = $this->userAccessMapper->findScalarByPredicates(
             'uid',
             $this->userAccessMapper->getPredicateBuilder()
@@ -209,6 +216,7 @@ class RelationshipFilterer
                                    ->equals('type', UserAccess::ACCESS_WRITE)
         );
 
+        // No class teachers or group instructors?
         if (!\count($teacherExternalIds) && !\count($instructorIds)) {
             return [];
         }
