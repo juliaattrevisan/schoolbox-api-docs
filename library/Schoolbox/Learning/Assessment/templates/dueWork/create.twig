@@ -371,11 +371,13 @@
                 $(this).attr("data-customised", true);
             });
 
-            $(".use-criterion-values").click(function() {
-                // TODO why does clicking this button seem to submit the form?!
+            $(".use-criterion-values").click(function($e) {
+                $e.preventDefault();
                 var $closestMaxMarkInput = $(this).prev("[data-group-max-value]");
                 var groupIdentifier = $(this).closest("[data-group]").attr("data-group");
                 var groupTotal = calculateGroupTotal(groupIdentifier);
+
+                $(this).prev("[data-group-max-value]").val(groupTotal);
 
                 // Only disable if mark is the same (which it always should be in this case, but...be safe)
                 if (groupTotal == $closestMaxMarkInput.val()) {
@@ -385,7 +387,6 @@
                 }
 
                 $closestMaxMarkInput.removeAttr("data-customised");
-                $(this).prev("[data-group-max-value]").val(groupTotal);
             });
         }
 
