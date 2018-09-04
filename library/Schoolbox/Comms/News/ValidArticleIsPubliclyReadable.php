@@ -40,14 +40,15 @@ class ValidArticleIsPubliclyReadable
      *
      * Otherwise, you can't see it.
      *
-     * @param User  $user
-     * @param Model $article
+     * @param User       $user
+     * @param Model      $article
+     * @param array|null $audiencedUsers
      * @return bool
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function isSatisfiedBy(User $user, Model $article): bool
+    public function isSatisfiedBy(User $user, Model $article, array $audiencedUsers = null): bool
     {
         $isPublished = $article->isPublished();
         $isExpired = $article->isExpired();
@@ -58,8 +59,11 @@ class ValidArticleIsPubliclyReadable
         if ($isPublished || $isExpired) {
 
             /* If you are in its audience, you can see it
+             * Use the list specified in the signature, or determine this list if otherwise omitted
              */
-            $audiencedUsers = $this->userResolver->findUsersForArticle($article->getId());
+            if (!\is_array($audiencedUsers)) {
+                $audiencedUsers = $this->userResolver->findUsersForArticle($article->getId());
+            }
 
             if (\in_array($user->getId(), $audiencedUsers, false)) {
                 return true;
