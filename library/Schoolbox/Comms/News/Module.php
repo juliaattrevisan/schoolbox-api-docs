@@ -83,7 +83,6 @@ class Module extends BaseModule
         $this->register('GET', '/topics', 'getTopics', $viewPerms);
 
         /* Update news article
-         * TODO: SA-7312, check whether user can POST
          */
         $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $modifyPerms, $preloadArticle);
         $this->register('POST', '/{articleId:\d+}', 'postUpdate', $modifyPerms, $preloadArticle);
