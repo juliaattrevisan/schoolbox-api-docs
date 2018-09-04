@@ -35,7 +35,7 @@ function initDecimalDescsValidation() {
         $("[data-descriptor-value]").each(function() {
             $(this).rules("add", {
                 number: true,
-                positiveNumber: true,
+                min: 0,
                 digits: {
                     depends: function() {
                         return $("#useMarkRange").is(":checked");
