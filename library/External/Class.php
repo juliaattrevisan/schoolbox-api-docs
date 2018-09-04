@@ -53,7 +53,12 @@ class External_Class implements External_ClassInterface{
         return $result;
     }
 
-	public function getTeacherName ($classCode) {
+
+    /**
+     * @inheritdoc
+     */
+    public function getTeacherName(string $classCode): array
+    {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
 	}
 

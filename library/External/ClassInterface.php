@@ -28,11 +28,11 @@ interface External_ClassInterface {
     public function getStudents(string $classCode): array;
 
     /**
-     * Returns a list of *THE IDs OF* teachers that are associated
+     * Returns a list of *THE EXTERNAL IDs* of teachers that are associated
      * with a class (method is misnamed)
      *
-     * @param $classCode
-     * @return array
+     * @param string $classCode  CSV list of class codes to find students in. eg 'ABC123' or 'ABC123,XYZ456'
+     * @return string[]
      */
-    public function getTeacherName($classCode);
+    public function getTeacherName(string $classCode): array;
 }

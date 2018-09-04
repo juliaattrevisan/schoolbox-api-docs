@@ -94,14 +94,9 @@ class External_Schoolpro_Class implements External_ClassInterface
     }
 
     /**
-     * Get the class' teacher's name
-     *
-     * Wait, what - it returns a list of unique teacher externalIds...?
-     *
-     * @param $classCode
-     * @return array|bool
+     * @inheritdoc
      */
-    public function getTeacherName($classCode)
+    public function getTeacherName(string $classCode): array
     {
         $allTeachers = [];
         $allClassCodes = explode(',', $classCode);

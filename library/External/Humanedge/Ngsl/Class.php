@@ -91,7 +91,7 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
     /**
      * @inheritDoc
      */
-    public function getTeacherName($classCode)
+    public function getTeacherName(string $classCode): array
     {
         $coreRoomJoin  = ($this->requireClassTeachersHaveRooms ? 'INNER JOIN tblRoom r on a.RoomID = r.ID' : '');
         $electRoomJoin = ($this->requireClassTeachersHaveRooms ? 'INNER JOIN tblRoom r on b.RoomID = r.ID' : '');

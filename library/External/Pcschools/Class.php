@@ -59,14 +59,9 @@ class External_Pcschools_Class implements External_ClassInterface
     }
 
     /**
-     * Returns a list of *THE IDs OF* teachers that are associated
-     * with a class (method is misnamed)
-     *
-     * @param $classCode
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function getTeacherName($classCodes)
+    public function getTeacherName(string $classCodes): array
     {
         $query = $this->getTimefileFilter($classCodes);
         

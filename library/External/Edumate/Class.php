@@ -68,12 +68,10 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
 
     /**
-     * Returns a list of *THE IDs OF* teachers that are associated with a class (method is misnamed)
-     *
-     * @param $classCode
-     * @return array
+     * @inheritdoc
      */
-    public function getTeacherName($classCode) {
+    public function getTeacherName(string $classCode): array
+    {
 
         // Setup handling multiple codes
         $codes = explode(',', $classCode);

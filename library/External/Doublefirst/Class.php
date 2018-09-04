@@ -98,21 +98,18 @@ class External_Doublefirst_Class implements External_ClassInterface
     }
 
     /**
-     * Retrieve teacher external IDs for a particular class (great function naming)
-     * @param $subCode
-     * @param null $user
-     * @return array
+     * @inheritdoc
      */
-    public function getTeacherName($subCode, $user = null)
+    public function getTeacherName(string $classCode): array
     {
-        if (!$subCode) {
+        if (!$classCode) {
             /* Dont bother if you got no code */
             return [];
         }
 
         $year = date("Y");
 
-        $classQuery = $this->getClassCodeQuery($subCode);
+        $classQuery = $this->getClassCodeQuery($classCode);
 
         $query =
             "

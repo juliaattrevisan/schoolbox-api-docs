@@ -128,10 +128,10 @@ class External_Synergetic_Class implements External_ClassInterface
     /**
      * @inheritdoc
      */
-    public function getTeacherName($subCode)
+    public function getTeacherName(string $classCode): array
     {
         $teachers   = [];
-        $classQuery = $this->getClassCodeQuery($subCode);
+        $classQuery = $this->getClassCodeQuery($classCode);
 
         // TODO: Inject $_SESSION['user'], short term to get this working without arch changes
         /** @var Schoolbox\User $sessionUser */

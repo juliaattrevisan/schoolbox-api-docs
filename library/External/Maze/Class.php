@@ -129,13 +129,12 @@ class External_Maze_Class implements External_ClassInterface {
 		return $studentList;
 	}
 
-	/**
-	 * Returns a list of *THE IDs OF* teachers that are associated with a class (method is misnamed)
-	 *
-	 * @param $classCode
-	 * @return array
-	 */
-	public function getTeacherName($classCode) {
+
+    /**
+     * @inheritdoc
+     */
+    public function getTeacherName(string $classCode): array
+    {
 		$ttPeriod = $this->getHelper()->getCurrentTTPERIOD();
 
 		/* Assume Schoolbox $classCodes are in the format: '07SCI-1'

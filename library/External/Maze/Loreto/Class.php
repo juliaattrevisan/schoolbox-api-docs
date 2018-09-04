@@ -13,12 +13,10 @@
 class External_Maze_Loreto_Class extends External_Maze_Class {
 
 	/**
-	 * Returns a list of *THE IDs OF* teachers that are associated with a class (method is misnamed)
-	 *
-	 * @param $classCode
-	 * @return array
+	 * @inheritdoc
 	 */
-	public function getTeacherName($classCode) {
+	public function getTeacherName(string $classCode): array
+    {
 		$ttPeriod = $this->getHelper()->getCurrentTTPERIOD();
 
 		/* Assume Schoolbox $classCodes are in the format: '07SCI-1'
