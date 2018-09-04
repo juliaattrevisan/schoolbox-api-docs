@@ -265,22 +265,14 @@ if ($event->getType()->isTaskType()) {
 
 /* Only provide Group option if groups have been defined
  */
-//$groupHandler = new \Group();
 $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
 
 /* Possible options, based on current user's involvement.
  */
-//$currentUserFolderList = $groupHandler->involvedInCategoryList($currentUser->getId(), true, WRITE_ACCESS);
-$currentUserFolderList = $folderMapper->findForUser($currentUser, true, UserAccess::ACCESS_WRITE);
-$currentUserFolderIds  = [];
-
-foreach ($currentUserFolderList as $current) {
-    $currentUserFolderIds[] = $current->getId();
-}
+$currentUserFolderIds = $folderMapper->findFolderIdsForUser($currentUser, true, UserAccess::ACCESS_WRITE);
 
 /* Possible options, based on calendar user's involvement. Will intersect with current user
  */
-//$calendarUserFolderList = $groupHandler->involvedInCategoryList($selectedUser->getId(), true, READ_ACCESS);
 $calendarUserFolderList = $folderMapper->findForUser($_SESSION['user'], true, UserAccess::ACCESS_WRITE);
 
 /* Ones that it's already in, from previous selections
@@ -305,7 +297,7 @@ if (isset($_GET['homepageId']) && !in_array($_GET['homepageId'], $tempFolderIds)
     }
 }
 
-$allFolders   = $folderMapper->findByColumnList(array('id' => $tempFolderIds));
+$allFolders = $folderMapper->findByColumnList(array('id' => $tempFolderIds));
 
 /**
  * Dedupe and make synonymous
@@ -338,16 +330,16 @@ foreach ($allFolders as $currentFolder) {
     $previousInvolvement[] = $currentFolder->getId();
 }
 
-///* Just get the values
-// */
-//$allFolderList = array_values($allFolderList);
-
 /* Group checkbox array when using Group Event Level
  */
 if(\count($allFolderList)) {
 
     // Order by title
-//    $allFolderList->sortBy('title', 'asc');
+    $allFolderList->sortByCallback(
+        function(Schoolbox\Resource\Folder\Model $a, Schoolbox\Resource\Folder\Model $b) {
+            return strnatcasecmp($a->getTitle(), $b->getTitle());
+        }
+    );
 
     foreach ($allFolderList as $currentFolder) {
         $folderId          = $currentFolder->getId();
@@ -362,12 +354,6 @@ if(\count($allFolderList)) {
         } else {
             $selected = '';
         }
-
-//        $codeString = "";
-//
-//        if($currentFolder['code'] !== null) {
-//            $codeString = ' ('.$currentFolder['code'].')';
-//        }
 
         $page->setVar(
             array(
