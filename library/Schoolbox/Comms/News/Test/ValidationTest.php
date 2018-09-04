@@ -10,11 +10,14 @@
 namespace Schoolbox\Comms\News\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Comms\News\Audience\MockUserResolver;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\ValidArticle;
+use Schoolbox\Comms\News\ValidArticleIsPubliclyReadable;
 use Schoolbox\Comms\News\ValidBroadcast;
 use Schoolbox\Comms\News\ValidDateOffset;
+use Schoolbox\User;
 
 
 class ValidationTest extends TestCase
@@ -288,6 +291,158 @@ class ValidationTest extends TestCase
                 (new Policy\Model())->setValue('@#(O$%&U@(*$U(@JKO$HJO@#H$(*@#YU( 9284 2894 y9284 y928y97&$(!@&$'),
                 false
             ],
+        ];
+    }
+
+
+    /**
+     * Find out whether $user can see $article contents
+     *
+     * @dataProvider provider_validAccessibility
+     * @param User  $user
+     * @param Model $article
+     * @param array $audiencedUsers
+     * @param       $expected
+     */
+    public function testValidAccessibility(User $user, Model $article, array $audiencedUsers, $expected)
+    {
+        $userResolver = new MockUserResolver();
+        $validation = new ValidArticleIsPubliclyReadable($userResolver);
+
+        $this->assertEquals($expected, $validation->isSatisfiedBy($user, $article, $audiencedUsers));
+    }
+
+
+    /**
+     * Data provider for testValidAccessibility
+     *
+     * @return array
+     */
+    public function provider_validAccessibility(): array
+    {
+        $userResolver = new MockUserResolver();
+
+        $user3 = (new User())->setId(3);
+        $user12345 = (new User())->setId(12345);
+
+        /* Published, but not expired, article
+         *
+         * Submitted is set
+         * Accepted date is set
+         * Publish date in the past
+         * Expiry date in the future
+         * User is in audience
+         */
+        $articleValid1 = (new Model())
+            ->setSubmittedAt(\Alaress_Date_Format::now()->addDays(-10))
+            ->setAcceptedAt(\Alaress_Date_Format::now())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(-1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        /* Published and expired article
+         *
+         * Submitted is set
+         * Accepted date is set
+         * Publish date in the past
+         * Expiry date in the past
+         * User is in audience
+         */
+        $articleValid2 = (new Model())
+            ->setSubmittedAt(\Alaress_Date_Format::now()->addDays(-10))
+            ->setAcceptedAt(\Alaress_Date_Format::now())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(-1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        /* Submitted is NOT set
+         * Accepted date is set
+         * Publish date in the past
+         * Expiry date in the future
+         * User is in audience
+         */
+        $article1 = (new Model())
+            ->setAcceptedAt(\Alaress_Date_Format::now())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(-1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        /* Submitted is NOT set
+         * Accepted date is NOT set
+         * Publish date in the past
+         * Expiry date in the future
+         * User is in audience
+         */
+        $article2 = (new Model())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(-1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        /* Submitted is set
+         * Accepted date is set
+         * Publish date in the future
+         * Expiry date in the future
+         * User is in audience
+         */
+        $article3 = (new Model())
+            ->setSubmittedAt(\Alaress_Date_Format::now()->addDays(-10))
+            ->setAcceptedAt(\Alaress_Date_Format::now())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        /* Published, but not expired, article
+         *
+         * Submitted is set
+         * Accepted date is set
+         * Publish date in the past
+         * Expiry date in the future
+         * User is NOT in audience
+         */
+        $article4 = (new Model())
+            ->setSubmittedAt(\Alaress_Date_Format::now()->addDays(-10))
+            ->setAcceptedAt(\Alaress_Date_Format::now())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(-1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        /* Published and expired article
+         *
+         * Submitted is set
+         * Accepted date is set
+         * Publish date in the past
+         * Expiry date in the past
+         * User is NOT in audience
+         */
+        $article5 = (new Model())
+            ->setSubmittedAt(\Alaress_Date_Format::now()->addDays(-10))
+            ->setAcceptedAt(\Alaress_Date_Format::now())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(-1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        return [
+            'Valid 1' => [
+                $user3, $articleValid1, $userResolver::ARTICLE_AUDIENCES[2],
+                true
+            ],
+            'Valid 2' => [
+                $user3, $articleValid2, $userResolver::ARTICLE_AUDIENCES[2],
+                true
+            ],
+            'Invalid 1' => [
+                $user3, $article1, $userResolver::ARTICLE_AUDIENCES[2],
+                false
+            ],
+            'Invalid 2' => [
+                $user3, $article2, $userResolver::ARTICLE_AUDIENCES[2],
+                false
+            ],
+            'Invalid 3' => [
+                $user3, $article3, $userResolver::ARTICLE_AUDIENCES[2],
+                false
+            ],
+            'Invalid 4' => [
+                $user12345, $article4, $userResolver::ARTICLE_AUDIENCES[2],
+                false
+            ],
+            'Invalid 5' => [
+                $user12345, $article5, $userResolver::ARTICLE_AUDIENCES[2],
+                false
+            ]
         ];
     }
 }

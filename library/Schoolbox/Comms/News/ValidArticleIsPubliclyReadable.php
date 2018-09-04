@@ -9,21 +9,22 @@
 
 namespace Schoolbox\Comms\News;
 
-use Schoolbox\Comms\News\Audience\UserResolver;
+use Schoolbox\Comms\News\Audience\IUserResolver;
 use Schoolbox\User;
 
 class ValidArticleIsPubliclyReadable
 {
     /**
-     * @var UserResolver
+     * @var IUserResolver
      */
     private $userResolver;
 
     /**
      * ValidArticleIsPubliclyReadable constructor.
-     * @param UserResolver $userResolver
+     *
+     * @param IUserResolver $userResolver
      */
-    public function __construct(UserResolver $userResolver)
+    public function __construct(IUserResolver $userResolver)
     {
         $this->userResolver = $userResolver;
     }
@@ -44,9 +45,6 @@ class ValidArticleIsPubliclyReadable
      * @param Model      $article
      * @param array|null $audiencedUsers
      * @return bool
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
      */
     public function isSatisfiedBy(User $user, Model $article, array $audiencedUsers = null): bool
     {
