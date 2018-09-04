@@ -267,7 +267,7 @@ if ($event->getType()->isTaskType()) {
  */
 $groupHandler = new \Group();
 
-/* Possible options, based on current user's involvement
+/* Possible options, based on current user's involvement.
  */
 $currentUserFolderList = $groupHandler->involvedInCategoryList($currentUser->getId(), true, WRITE_ACCESS);
 $currentUserFolderIds = [];
@@ -276,17 +276,10 @@ foreach ($currentUserFolderList as $current) {
     $currentUserFolderIds[] = $current['id'];
 }
 
+/* Possible options, based on calendar user's involvement. Will intersect with current user
+ */
 $calendarUserFolderList = $groupHandler->involvedInCategoryList($selectedUser->getId(), true, READ_ACCESS);
 
-/* Unset items that are not in the current users write list */
-if (!$currentUser->isSuperuser()) {
-    foreach ($calendarUserFolderList as $key => $value) {
-        if (!in_array($value['id'], $currentUserFolderIds, false)) {
-            unset($calendarUserFolderList[$key]);
-        }
-    }
-
-}
 
 /* Ones that it's already in, from previous selections
  */
@@ -328,7 +321,9 @@ $previousInvolvement = array();
 /* Ones that you could possibly tick (intersect of write level of logged in user and read level of calendar user)
  */
 foreach ($calendarUserFolderList as $current) {
-    $allFolderList[$current['id']] = $current;
+    if (in_array($current['id'], $currentUserFolderIds, false)) {
+        $allFolderList[$current['id']] = $current;
+    }
 }
 
 /* Ones that have been ticked in the past
