@@ -46,7 +46,11 @@
             // Current calculated rubric total
             var rubricSum = getRubricSum();
 
-            $("[data-rubric-sum]").text(rubricSum);
+            if (markType === 'Percentage') {
+                $("[data-rubric-sum]").text(rubricSum + "%");
+            } else {
+                $("[data-rubric-sum]").text(rubricSum);
+            }
 
             // Mark entered in the overall mark field
             var currentMarkInput   = $status.find(markInputSelector).val();
