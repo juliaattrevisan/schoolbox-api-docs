@@ -259,6 +259,7 @@
 
                 // Stream location
                 events: function(start, end, timezone, callback) {
+                    var self = this;
                     $.ajax({
                         dataType: 'json',
                         url:      '/calendar/ajax/full',
@@ -271,6 +272,9 @@
                             callback(data.filter(function(v) {
                                 return 'start' in v;
                             }));
+                            /* Save state to the db every time you change tabs
+                             */
+                            $.post('/calendar/changeState', {calendarView: self.getView().type });
                         },
                         cache: false
                     });
@@ -282,6 +286,12 @@
 
 
         /* LISTENERS */
+
+        /* Save state to the db every time you change tabs
+         */
+        $('.fc-agendaWeek-button, .fc-agendaDay-button, .fc-month-button').on('click', function(event) {
+            $.post('/calendar/changeState', {calendarView: c.dom.fullCalendar('getView').type });
+        });
 
         /**
          * Change event for create task and event title.
