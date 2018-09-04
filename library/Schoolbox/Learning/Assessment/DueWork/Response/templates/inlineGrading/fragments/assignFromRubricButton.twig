@@ -22,8 +22,10 @@
         // Disable the button if the rubric value is same as input value
         $assignFromRubricButton.prop('disabled', getRubricSum() == currentMarkInput);
 
+        // Dynamically insert the rubric mark into the button on page load
+        updateButtonMark();
 
-        function refreshAssignFromRubricButton() {
+        function refreshAssignFromRubricInput() {
             // Current calculated rubric total
             var rubricSum = getRubricSum();
 
@@ -34,12 +36,9 @@
             // but ONLY if we haven't already customised the mark - don't clobber!
             if ( rubricSum !== currentMarkInput && (!$status.find(markInputSelector).attr('data-customised')) ) {
                 $status.find(markInputSelector).val(rubricSum); // Input val
-                $status.find("[data-rubric-sum]").val(rubricSum); // Mark shown on button
-                currentMarkInput = rubricSum;
             }
 
-            // Disable the button if the rubric value is same as input value
-            $assignFromRubricButton.prop('disabled', rubricSum == currentMarkInput);
+            updateButtonMark();
         }
 
         function updateButtonMark() {
@@ -84,7 +83,7 @@
             $status.find(markInputSelector).removeAttr('data-customised');
 
             e.preventDefault();
-            refreshAssignFromRubricButton();
+            refreshAssignFromRubricInput();
         });
 
         $status.find(markInputSelector).change(function() {
@@ -103,18 +102,12 @@
         $(".use-descriptor-values").on('click', function(e) {
             e.preventDefault();
             if (!$status.find(markInputSelector).attr('data-customised')) {
-                refreshAssignFromRubricButton();
+                refreshAssignFromRubricInput();
             }
         });
 
-        updateButtonMark();
-
         // Update the input val when any of these inputs change
-        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-mark]', refreshAssignFromRubricButton);
-
-        // Update the value shown on the button
-        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-mark]', updateButtonMark);
-
+        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-mark]', refreshAssignFromRubricInput);
     });
 </script>
 <p><button id="use-rubric-value" class="full-width">Assign <span data-rubric-sum></span> from Rubric</button></p>
