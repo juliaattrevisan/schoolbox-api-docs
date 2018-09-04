@@ -263,14 +263,18 @@ class RelationshipFilterer
                                    ->equals('type', UserAccess::ACCESS_READ)
         );
 
-        $classStudentExternalIds = [];
+        // Get all the codes from all the folders
+        $folderCodes = [];
         foreach ($taughtFolders as $taughtFolder) {
             foreach ($taughtFolder->getCodes() as $code) {
-                $classStudents = $this->externalClass->getStudents($code->getCode());
-                foreach ($classStudents as $classStudent) {
-                    $classStudentExternalIds[] = $classStudent['synergy_id'];
-                }
+                $folderCodes[] = $code->getCode();
             }
+        }
+
+        // Find students for these folders codes
+        $classStudentExternalIds = [];
+        foreach ($this->externalClass->getStudents(\implode(',', \array_unique($folderCodes))) as $classStudent) {
+            $classStudentExternalIds[] = $classStudent['synergy_id'];
         }
 
         if (!\count($groupMemberIds) && !\count($classStudentExternalIds)) {
