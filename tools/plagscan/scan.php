@@ -108,7 +108,7 @@ foreach ($allDocuments as $currentDocument) {
                     catch (FileException $e) {
                         /* Die critically until the plagscan report can be saved
                          */
-                        $log->critical("{$prefix}: could not save plagscan report file to storage", [$e]);
+                        $log->critical("{$prefix}: could not save plagscan report file to storage", ['exception'=>$e]);
                     }
                 } else {
                     $log->warning("{$prefix}: all report pieces (score, mode 6 and 7 reports) not yet ready");

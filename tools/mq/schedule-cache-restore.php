@@ -105,7 +105,7 @@ $k->run(function ($di, $loop, $log, $opts) {
             exit(0);
 
         } catch (Exception $e) {
-            $log->alert("Failed to restore Schedule queue from cache", [$e]);
+            $log->alert("Failed to restore Schedule queue from cache", ['exception'=>$e]);
             exit(1);
         }
     }

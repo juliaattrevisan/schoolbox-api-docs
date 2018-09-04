@@ -199,7 +199,7 @@ class Notifier extends AbstractModuleNotifier
                 }
             } catch (MapperException $e) {
                 // Log an error and move on so we don't break the rest of the notifications
-                $this->log->error("Error: Unable to send pastoral {$method} notification. {$e->getMessage()}", [$e]);
+                $this->log->error("Error: Unable to send pastoral {$method} notification. {$e->getMessage()}", ['exception'=>$e]);
             }
         }
 

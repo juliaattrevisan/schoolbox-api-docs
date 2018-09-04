@@ -69,7 +69,7 @@ class DataIOListener extends AbstractIOStreamListener
             $this->pool->releaseWorker($pid, Pool::RELEASE_HARD);
 
         } catch(UnexpectedValueException $e) {
-            $this->log->critical("Unexpected stream supplied, cannot locate PID");
+            $this->log->critical("Unexpected stream supplied, cannot locate PID",['exception'=>$e]);
         }
 
     }
@@ -93,7 +93,7 @@ class DataIOListener extends AbstractIOStreamListener
             $data = $e->getData();
 
         } catch(UnexpectedValueException $e) {
-            $this->log->critical("Unexpected stream supplied, cannot locate PID");
+            $this->log->critical("Unexpected stream supplied, cannot locate PID",['exception'=>$e]);
             return;
         }
 

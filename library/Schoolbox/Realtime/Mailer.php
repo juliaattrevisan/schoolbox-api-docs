@@ -121,10 +121,10 @@ class Mailer
             $this->log->warning("Failed to email to $address");
 
         } catch (Swift_SwiftException $e) {
-            $this->log->warning(get_class($e) . ': ' . $e->getMessage(), [$e]);
+            $this->log->warning(get_class($e) . ': ' . $e->getMessage(), ['exception'=>$e]);
 
         } catch (Twig_Error_Runtime $e) {
-            $this->log->error(get_class($e) . ': ' . $e->getMessage(), [$e]);
+            $this->log->error(get_class($e) . ': ' . $e->getMessage(), ['exception'=>$e]);
 
             if (strpos($e->getMessage(), 'Invalid multibyte sequence in argument') !== false) {
                 // this means the template couldn't render the mail because of bad data, so we have to flush it :/

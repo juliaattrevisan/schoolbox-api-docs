@@ -135,7 +135,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             return;
         }
 
-        $this->log->critical(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()));
+        $this->log->critical(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()), ['exception'=>$e]);
         // we need the daemon to crash if there's a database issue
         if ($e instanceof PDOException || $e instanceof External\Exception) {
             throw $e;
@@ -200,14 +200,14 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
         } catch (RuntimeException $e) {
             $truncated = substr($trigger, 0, 64);
-            $this->log->critical("Could not decode '$truncated...' to schedule event", [ $e ]);
+            $this->log->critical("Could not decode '$truncated...' to schedule event", [ 'exception'=>$e ]);
             // this message is can't be parsed, so we ACK it to make it go away
 
         } catch (CompressionException $e) {
             $this->log->debug('Failed to inflate message: ' . $e->getMessage(), [ $e ]);
 
         } catch (ErrorException $e) {
-            $this->log->critical('Error Exception: '. $e->getMessage(), [ $e ]);
+            $this->log->critical('Error Exception: '. $e->getMessage(), [ 'exception'=>$e ]);
         }
 
         $resolver->acknowledge();

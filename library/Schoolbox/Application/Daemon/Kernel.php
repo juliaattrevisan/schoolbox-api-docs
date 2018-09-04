@@ -160,10 +160,10 @@ EOL;
         try {
             call_user_func($callable, $this->di, $this->loop, $this->logger(), $this->opts);
         } catch (\Schoolbox\External\Exception $e) {
-            $this->logger()->emergency($e->getMessage(), [$e]);
+            $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
             throw $e;
         } catch (Exception $e) {
-            $this->logger()->critical("{$this->name} daemon failed to launch: " . $e->getMessage(), [$e]);
+            $this->logger()->critical("{$this->name} daemon failed to launch: " . $e->getMessage(), ['exception'=>$e]);
             throw $e;
         }
 
@@ -171,12 +171,12 @@ EOL;
             $this->getLoop()->run();
             $this->logger()->notice($this->name . " daemon loop ended; preparing to terminate");
         } catch (PDOException $e) {
-            $this->logger()->emergency($e->getMessage(), [$e]);
+            $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
         } catch (\Schoolbox\External\Exception $e) {
-            $this->logger()->emergency($e->getMessage(), [$e]);
+            $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
         } catch (Exception $e) {
             $this->logger()->critical(sprintf("%s daemon received %s: %s", $this->name, get_class($e),
-                $e->getMessage()), [$e]);
+                $e->getMessage()), ['exception'=>$e]);
         }
     }
 
@@ -312,7 +312,7 @@ EOL;
     {
         $this->callExceptionCallbacks($e);
         try {
-            $this->logger()->alert('FATAL ' . get_class($e) . ': ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile(), [$e]);
+            $this->logger()->alert('FATAL ' . get_class($e) . ': ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile(), ['exception'=>$e]);
         } catch (IOException $e) {
             // can't do anything, STDOUT has been closed
         }

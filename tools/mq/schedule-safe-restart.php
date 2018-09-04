@@ -272,11 +272,11 @@ function verifyFrameTrigger(Frame $input, LoggerInterface $log)
         }
 
     } catch (InvalidArgumentException $e) {
-        $log->critical('Payload is not a valid trigger instance: '.$e->getMessage());
+        $log->critical('Payload is not a valid trigger instance: '.$e->getMessage(), [ 'exception'=>$e ]);
         $exit = 2;
 
     } catch (ErrorException $e) {
-        $log->critical('Failed to unserialize payload', [ $e ]);
+        $log->critical('Failed to unserialize payload', [ 'exception'=>$e ]);
         $exit = 2;
     }
 
@@ -350,16 +350,16 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
         if ($input instanceof Frame) {
             $exit = verifyFrameTrigger($input, $log);
         } else {
-            $log->critical($e->getMessage(), [ $e ]);
+            $log->critical($e->getMessage(), [ 'exception'=>$e ]);
             $exit = 2;
         }
 
     } catch (ScheduleException $e) {
-        $log->notice($e->getMessage(), [ $e ]);
+        $log->notice($e->getMessage(), [ 'exception'=>$e ]);
         $exit = 2;
 
     } catch (Exception $e) {
-        $log->critical($e->getMessage(), [ $e ]);
+        $log->critical($e->getMessage(), [ 'exception'=>$e ]);
         $exit = 2;
     }
 

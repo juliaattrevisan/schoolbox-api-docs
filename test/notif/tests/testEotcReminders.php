@@ -420,7 +420,7 @@ class EotcReminders extends AbstractNotificationTest
         try {
             $message = $this->fetchMessageInstance($messageId)->jsonSerialize();
         } catch (OutOfBoundsException $e) {
-            $this->log->error($e->getMessage(), [$e]);
+            $this->log->error($e->getMessage(), ['exception'=>$e]);
             return;
         }
 

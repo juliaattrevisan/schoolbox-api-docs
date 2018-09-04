@@ -297,7 +297,7 @@ abstract class AbstractMailer implements IMailer
                 get_class($e), $retries, $retries == 1 ? 'retry remains' : 'retries remain', $e->getMessage()
             );
 
-            $this->log->error($errMsg, [$e]);
+            $this->log->error($errMsg, ['exception'=>$e]);
 
             if ($retries <= 0) {
                 throw $e;

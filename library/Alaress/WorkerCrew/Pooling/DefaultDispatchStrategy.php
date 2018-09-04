@@ -366,7 +366,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      */
     public function handleException($exception, $log)
     {
-        $log->critical(sprintf("Exception during dispatch - %s: %s", get_class($exception), $exception->getMessage()), array($exception));
+        $log->critical(sprintf("Exception during dispatch - %s: %s", get_class($exception), $exception->getMessage()), ['exception'=>$exception]);
 
         // allow PDO exceptions to get out
         if ($exception instanceof PDOException) {

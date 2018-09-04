@@ -236,9 +236,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`', $e->getMessage(), $matches)) {
             $this->log->warning("IOException: {$matches[3]} [{$matches[2]}] ({$matches[1]} bytes dropped)");
         } else {
-            $this->log->critical(sprintf('%s: "%s" occurred in %s on line %s',
-                get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()
-            ));
+            $this->log->critical(
+                sprintf('%s: "%s" occurred in %s on line %s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()),
+                ['exception'=>$e]
+            );
         }
 
         // process exception needs to be rethrown
@@ -314,7 +315,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $this->enqueue($pipe, $command, $arguments);
 
         } catch (QueueingException $e) {
-            $this->log->critical("Failed to enqueue, task '$command' lost: " . $e->getMessage());
+            $this->log->critical("Failed to enqueue, task '$command' lost: " . $e->getMessage(), ['exception'=>$e]);
             // since a full queue constitutes service unavailable, probably best to kick this pipe
             $this->sendHeader($pipe, 503, true);
 
@@ -465,9 +466,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                         $this->enqueueInstances($pipe, $timer->getData());
 
                     } catch (QueueingException $e) {
-                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage());
+                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception'=>$e]);
                     } catch (InvalidArgumentException $e) {
-                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage());
+                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception'=>$e]);
                     }
                 }
             );
