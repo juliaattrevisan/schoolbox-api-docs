@@ -103,11 +103,11 @@ class Lists
         $this->saveForLaterMapper = $saveForLaterMapper;
         $this->statisticsMapper = $statisticsMapper;
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
+        $this->databaseInternal = $databaseInternal;
 
         /* Hyperdrive injection
          */
         $this->articleResolver = $articleResolver;
-        $this->databaseInternal = $databaseInternal;
     }
 
 

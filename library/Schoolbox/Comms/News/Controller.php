@@ -445,7 +445,6 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      * @throws \PDOException
-     * @throws InvalidArgumentException
      */
     public function getDetail(Model $article)
     {
@@ -698,6 +697,9 @@ class Controller extends Base
      */
     public function getArchive(int $year = null, int $month = null)
     {
+
+        /* These referrers should be used, even when they're not explicitly provided in the url
+         */
         $params = new Querystring($this->getRequest()->query);
         $params->setReferrer(Statistics\Mapper::REFERRER_ARCHIVE);
 
@@ -758,8 +760,12 @@ class Controller extends Base
      */
     public function getIndex()
     {
+
+        /* These referrers should be used, even when they're not explicitly provided in the url
+         */
         $params = new Querystring($this->getRequest()->query);
         $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
+
         $topics = $this->topicMapper->findAll();
         $lists = new Moderation\Lists($this->newsMapper);
 
