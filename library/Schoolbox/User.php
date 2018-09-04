@@ -1020,14 +1020,9 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      * @param  User $parent
      * @return bool
      */
-    public function isChildOf(User $parent)
+    public function isChildOf(User $parent): bool
     {
-        foreach ($this->getParents() as $childParent) {
-            if ($childParent->getId() == $parent->getId()) {
-                return true;
-            }
-        }
-        return false;
+        return $parent->isParentOf($this);
     }
 
 
