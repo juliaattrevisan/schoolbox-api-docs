@@ -715,6 +715,9 @@
                 // Reset select all
                 self.selectAll[list] = false;
 
+                // Reset checked item model
+                self.intersectList[list] = [];
+
                 // Urgh
                 var otherList;
                 if (list === 'primary') {
