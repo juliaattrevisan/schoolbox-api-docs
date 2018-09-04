@@ -123,7 +123,6 @@ class Session
             $_SESSION['eportfolio_enabled'] = $user->getEportfolioEnable();
             $_SESSION['ip']                 = $ip;
             $_SESSION['campus']             = $userHandler->getUserCampus($user->getId());
-            $_SESSION['calendar_view']      = $user->getCalendarView();
 
             // add mobile session data
             $sbmAuth = new Authenticator();
