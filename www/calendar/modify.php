@@ -321,7 +321,7 @@ $previousInvolvement = array();
 /* Ones that you could possibly tick (intersect of write level of logged in user and read level of calendar user)
  */
 foreach ($calendarUserFolderList as $current) {
-    if (in_array($current['id'], $currentUserFolderIds, false)) {
+    if (in_array($current['id'], $currentUserFolderIds, false) || $currentUser->isSuperuser() ) {
         $allFolderList[$current['id']] = $current;
     }
 }
@@ -393,7 +393,7 @@ $campusList   = $campusMapper->getAvailableCampusesForUser($selectedUser);
  */
 $page->dropDown(
     'event_level_drop',
-    new \Schoolbox\Calendar\EventLevelCollection($calendarUserFolderList, $campusList),
+    new \Schoolbox\Calendar\EventLevelCollection($allFolderList, $campusList),
     $defaultAccessLevel,
     TEMPLATE_content,
     array(
