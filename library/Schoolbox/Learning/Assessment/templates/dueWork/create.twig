@@ -222,6 +222,10 @@
             // Initiate
             processUseRubricClick($useRubricSwitch);
 
+            // Dynamically calculate button text on page load
+            $grid.find("[data-group]").each(function() {
+                setRubricMarkButtonText($(this).attr('data-group'));
+            })
 
             /**
              * Update max available mark on descriptor point value changes
@@ -281,12 +285,18 @@
              */
             function assignGroupTotal(groupIdentifier) {
                 var $inputEl = $("[data-group-max-value-row][data-group='" + groupIdentifier + "']").find("input");
+                var groupTotal = calculateGroupTotal(groupIdentifier);
                 // Don't automatically update if customised
                 if (! $inputEl.attr("data-customised")) {
-                    $inputEl.val(calculateGroupTotal(groupIdentifier));
+                    $inputEl.val(groupTotal);
+                    setRubricMarkButtonText(groupIdentifier);
                 }
             }
 
+            function setRubricMarkButtonText(groupIdentifier) {
+                var $closestInput = $("[data-group-max-value-row][data-group='" + groupIdentifier + "']").find("input");
+                $closestInput.next("button").find("[data-rubric-sum]").text(calculateGroupTotal(groupIdentifier));
+            }
 
             /**
              * Calculates the assessment's max available marks from the rubric grid,
