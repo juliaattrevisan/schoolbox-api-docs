@@ -415,8 +415,8 @@
                             var newBlock = {
                                 id: selectedItem.id,
                                 name: 'Combination',
-                                entityType: 'Parents, Students',
-                                modifier: 'French 9A, English 3 4'
+                                entityType: vue.intersect.primary.name,
+                                modifier: vue.intersect.secondary.name
                             };
                             vue.selectedAudienceItems.push(newBlock);
                         }
@@ -624,16 +624,29 @@
             },
 
             addAudienceIntersect: function () {
+                var self = this;
+
                 // Add to selectize
+                var compositeItems = [];
+
+                self.intersectList.primary.forEach(function(value) {
+                    compositeItems.push({
+                        type: self.intersect.primary.id,
+                        value: value
+                    });
+                });
+
+                self.intersectList.secondary.forEach(function(index, value) {
+                    compositeItems.push({
+                        type: self.intersect.secondary.id,
+                        value: value
+                    });
+                });
+
                 var intersectOption = {
                     id: btoa(JSON.stringify({
                         type: 'composite',
-                        value: [
-                            {
-                                type: 'folder',
-                                id: 3
-                            }
-                        ]
+                        value: compositeItems
                     })),
                     intersect: true // Used in selectize onItemAdd to work out how to display the segment brick
                 };
@@ -719,12 +732,7 @@
                 self.intersectList[list] = [];
 
                 // Urgh
-                var otherList;
-                if (list === 'primary') {
-                    otherList = 'secondary';
-                } else {
-                    otherList = 'primary'
-                }
+                var otherList = (list === 'primary') ? 'secondary' : 'primary';
 
                 // Remove this option from the other dropdown
                 self.audienceOptions.intersect[otherList] = Object.assign({}, audienceOptions);
