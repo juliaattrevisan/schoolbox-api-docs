@@ -454,6 +454,7 @@ class Controller extends Base
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
+     * @throws \PDOException
      */
     public function getDetail(Model $article)
     {
@@ -478,6 +479,10 @@ class Controller extends Base
                 // noop; default is fine
             }
         }
+
+        /* Record this Open
+         */
+        $this->statisticsMapper->saveOpen($article->getId(), $this->getUser()->getId(), $this->getRequest()->query[Querystring::REFERRER]);
 
         // don't supply the extra twig-necessary data if just returning JSON
         if ($this->isJsonRequest()) {
