@@ -106,10 +106,10 @@
         updateButtonMark();
 
         // Update the input val when any of these inputs change
-        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-max-value]', refreshAssignFromRubricButton);
+        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-mark]', refreshAssignFromRubricButton);
 
         // Update the value shown on the button
-        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-max-value]', updateButtonMark);
+        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-mark]', updateButtonMark);
 
     });
 </script>
