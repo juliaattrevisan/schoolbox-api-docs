@@ -306,6 +306,10 @@ table.rb {
     font-weight: bold;
 }
 
+select.letter-grade-select {
+    margin-bottom: 0;
+}
+
 @media #{$medium-down} {
 
     table.rb {

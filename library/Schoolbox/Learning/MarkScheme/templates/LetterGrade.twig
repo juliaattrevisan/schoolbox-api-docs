@@ -29,7 +29,7 @@
         {% set humanReadableMark = participant.humanReadableMark(false) %}
     {% endif %}
 
-    <select data-mark-input name="mark" tabindex="{{ tabIndex }}" title="Select a {{ locale.grades.proper }}">
+    <select class="letter-grade-select" data-mark-input name="mark" tabindex="{{ tabIndex }}" title="Select a {{ locale.grades.proper }}">
 
         {# Empty state #}
         {% set found = (humanReadableMark is null) %}
