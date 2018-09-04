@@ -352,5 +352,9 @@
         return valid;
     }, "Descriptor values must be an ascending or descending sequence");
 
+    $.validator.addMethod('positiveNumber', function(value) {
+        return value >= 0;
+    }, "Please enter a positive number");
+
 
 }(jQuery));
