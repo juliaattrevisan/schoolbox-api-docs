@@ -73,7 +73,7 @@ class Factory
      * @return Rubric
      * @throws InvalidArgumentException
      */
-    public function buildFromPostData(array $formData, bool $markPerCap, bool $usesMarkRange,  bool $includeEmptyCriteria)
+    public function buildFromPostData(array $formData, bool $markPerCap, bool $usesMarkRange, bool $includeEmptyCriteria)
     {
         // we're only going to take the first one... this could be converted to foreach easily enough
         $rubricData = reset($formData);
