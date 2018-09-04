@@ -362,6 +362,7 @@
             });
 
             $(".use-criterion-values").click(function() {
+                // TODO why does clicking this button seem to submit the form?!
                 var $closestMaxMarkInput = $(this).prev("[data-group-max-value]");
                 var groupIdentifier = $(this).closest("[data-group]").attr("data-group");
                 var groupTotal = calculateGroupTotal(groupIdentifier);
