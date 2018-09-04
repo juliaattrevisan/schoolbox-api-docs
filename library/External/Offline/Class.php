@@ -9,7 +9,11 @@
 
 class External_Offline_Class implements External_ClassInterface
 {
-    public function getStudents($classCode)
+
+    /**
+     * @inheritdoc
+     */
+    public function getStudents(string $classCode): array
     {
         // Noop
         return [];

@@ -68,7 +68,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
     /**
      * @inheritDoc
      */
-    public function getStudents($classCode)
+    public function getStudents(string $classCode): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */

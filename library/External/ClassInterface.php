@@ -22,10 +22,10 @@ interface External_ClassInterface {
      * synergy_id,
      * ClassCampus
      *
-     * @param $classCode
-     * @return array
+     * @param string $classCode  CSV list of class codes to find students in. eg 'ABC123' or 'ABC123,XYZ456'
+     * @return string[][]
      */
-    public function getStudents($classCode);
+    public function getStudents(string $classCode): array;
 
     /**
      * Returns a list of *THE IDs OF* teachers that are associated

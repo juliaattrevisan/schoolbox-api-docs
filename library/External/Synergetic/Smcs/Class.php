@@ -11,14 +11,14 @@ class External_Synergetic_Smcs_Class extends External_Synergetic_Class
     /**
      * @inheritdoc
      */
-    public function getStudents($subCode)
+    public function getStudents(string $classCode): array
     {
-        if (!$subCode) {
+        if (!$classCode) {
             /* Dont bother if you got no code */
             return [];
         }
 
-        $classQuery = $this->getClassCodeQuery($subCode);
+        $classQuery = $this->getClassCodeQuery($classCode);
 
         // TODO: Inject $_SESSION['user'], short term to get this working without arch changes
         /** @var Schoolbox\User $sessionUser */

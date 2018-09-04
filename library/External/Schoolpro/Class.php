@@ -21,12 +21,9 @@ class External_Schoolpro_Class implements External_ClassInterface
     }
 
     /**
-     * Get a list of students that are in a particular class
-     *
-     * @param $classCode
-     * @return array|bool
+     * @inheritdoc
      */
-    public function getStudents($classCode)
+    public function getStudents(string $classCode): array
     {
         $allStudents = [];
 

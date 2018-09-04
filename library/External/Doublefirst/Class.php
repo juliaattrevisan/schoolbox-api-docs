@@ -37,20 +37,18 @@ class External_Doublefirst_Class implements External_ClassInterface
     }
 
     /**
-     * Get all student in class
-     * @param $subCode
-     * @return array|bool
+     * @inheritdoc
      */
-    public function getStudents($subCode)
+    public function getStudents(string $classCode): array
     {
-        if (!$subCode) {
+        if (!$classCode) {
             /* Dont bother if you got no code */
             return [];
         }
 
         $year = date("Y");
 
-        $arrayCodes = explode(",", $subCode);
+        $arrayCodes = explode(",", $classCode);
 
         foreach ($arrayCodes as $code) {
             $query = "

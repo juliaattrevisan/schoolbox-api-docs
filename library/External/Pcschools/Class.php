@@ -27,21 +27,9 @@ class External_Pcschools_Class implements External_ClassInterface
     }
 
     /**
-     * Get a list of students in a particular $classCode
-     * lastname,
-     * firstname,
-     * yearlevel,
-     * StudentHouseDescription as house,
-     * StudentMedicalAlert,
-     * StudentSpecialNeedsFlag,
-     * synergy_id,
-     * ClassCampus
-     *
-     * @param string $classCodes
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function getStudents($classCodes)
+    public function getStudents(string $classCodes): array
     {
         $codeQuery = $this->getTimefileFilter($classCodes);
 

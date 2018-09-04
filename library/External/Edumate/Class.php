@@ -11,12 +11,10 @@
 class External_Edumate_Class extends External_Edumate_Connection implements External_ClassInterface {
 
     /**
-     * Returns a list of students that are associated with a class
-     *
-     * @param $classCode
-     * @return array
+     * @inheritdoc
      */
-    public function getStudents($classCode) {
+    public function getStudents(string $classCode): array
+    {
 
         // fully qualified table names
         $studentClass = 'DB2INST1.SCHOOLBOX_STUDENTCLASS';

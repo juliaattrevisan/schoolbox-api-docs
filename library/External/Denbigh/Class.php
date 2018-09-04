@@ -26,11 +26,8 @@ class External_Denbigh_Class implements External_ClassInterface
 
     /**
      * {@inheritDoc}
-     * @param string $classCode CSV list of class codes to find students in
-     *
-     * @return array
      */
-    public function getStudents($classCode)
+    public function getStudents(string $classCode): array
     {
         $classCodes = array_filter(explode(',', $classCode));
 

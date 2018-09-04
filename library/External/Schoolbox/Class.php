@@ -27,12 +27,9 @@ class External_Schoolbox_Class implements External_ClassInterface
     }
 
     /**
-     * {@inheritDoc}
-     * @param string $classCode
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function getStudents($classCode)
+    public function getStudents(string $classCode): array
     {
         $studentIterator = $this->getClassIterator($classCode, Role::STUDENT);
 

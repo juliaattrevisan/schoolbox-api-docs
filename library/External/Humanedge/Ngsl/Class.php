@@ -39,7 +39,7 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
     /**
      * @inheritDoc
      */
-    public function getStudents($classCode)
+    public function getStudents(string $classCode): array
     {
         $db    = $this->loadAPlusDatabase();
         // Period join is required even though it's unused - this filters out
