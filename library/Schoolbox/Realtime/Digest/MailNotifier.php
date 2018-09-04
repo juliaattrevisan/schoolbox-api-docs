@@ -87,7 +87,7 @@ class MailNotifier extends WorkNotifier
                 );
 
             } catch (Swift_RfcComplianceException $e) {
-                $this->log()->warning($e->getMessage(), [ $e ]);
+                $this->log()->warning($e->getMessage(), [ 'exception'=>$e ]);
 
             } catch (UnderflowException $e) {
                 $this->log()->debug("{$user->getUsername()} has nothing to digest");

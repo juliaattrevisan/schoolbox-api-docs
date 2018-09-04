@@ -90,7 +90,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
             }
         } catch (\Throwable $e) {
             $loop->stop();
-            $log->alert($e->getMessage(), [ $e ]);
+            $log->alert($e->getMessage(), [ 'exception'=>$e ]);
             throw $e;
         }
     });

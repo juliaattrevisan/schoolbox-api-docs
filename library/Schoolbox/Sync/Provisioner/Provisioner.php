@@ -159,7 +159,7 @@ class Provisioner
             try {
                 $ruleset = $this->rulesetFactory->produceRuleset($roleType, $this->logger, $this->grammarFactory);
             } catch (\Exception $e) {
-                $this->logger->alert("Invalid ruleset detected for '{$roleType}'; skipping.", [ $e ]);
+                $this->logger->alert("Invalid ruleset detected for '{$roleType}'; skipping.", [ 'exception'=>$e ]);
                 $this->logMapper->flush($this->logger);
                 continue;
             }

@@ -229,6 +229,6 @@ if (!$dryRun) {
     try {
         $cache->cacheAllUsers(INSTANCE_ID);
     } catch (UnderflowException $e) {
-        $log->notice($e->getMessage(), [ $e ]);
+        $log->notice($e->getMessage(), [ 'exception'=>$e ]);
     }
 }

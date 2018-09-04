@@ -137,7 +137,7 @@ class GCM extends AbstractService
                     // your API key is bad: don't try to do anything else
                     throw $e;
                 }
-                $this->getLog()->warning($e->getMessage(), [ $e ]);
+                $this->getLog()->warning($e->getMessage(), [ 'exception'=>$e ]);
             }
             // range exception not caught here
         }

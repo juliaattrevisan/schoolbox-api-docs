@@ -90,7 +90,7 @@ class ServiceManager implements IServiceManager
 
                 } catch (InvalidArgumentException $e) {
                     // service not available
-                    $this->log->notice("Failed push to {$service->getProviderName()} provider '{$service->getAppIdentifier()}': {$e->getMessage()}", [ $e ]);
+                    $this->log->notice("Failed push to {$service->getProviderName()} provider '{$service->getAppIdentifier()}': {$e->getMessage()}", [ 'exception'=>$e ]);
                 }
             }
         }
@@ -114,12 +114,12 @@ class ServiceManager implements IServiceManager
 
         } catch (OutOfBoundsException $e) {
             // bad API key, which will require a daemon restart, so remove this service from use
-            $this->log->warning("Service '{$service->getProviderName()}' unusable: {$e->getMessage()}", [ $e ]);
+            $this->log->warning("Service '{$service->getProviderName()}' unusable: {$e->getMessage()}", [ 'exception'=>$e ]);
 
         } catch (RangeException $e) {
             // TODO implement backoff-and-retry.
             // TODO $e->getCode() will contain a Retry-After TTL (in seconds), or 0 if exponential backoff is to be implemented
-            $this->log->info($e->getMessage(), [ $e ]);
+            $this->log->info($e->getMessage(), [ 'exception'=>$e ]);
         }
     }
 

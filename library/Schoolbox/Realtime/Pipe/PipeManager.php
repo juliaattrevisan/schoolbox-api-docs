@@ -160,7 +160,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         } catch (CommunicationException $e) {
             // couldn't talk to redis, send a retry back to the client
-            $this->log->error('Communication Exception: ' . $e->getMessage(), [ $e ]);
+            $this->log->error('Communication Exception: ' . $e->getMessage(), [ 'exception'=>$e ]);
 
             $this->sendHeader($pipe, 503, true);
             $this->pipes->unregisterPipe($pipe->getSocketKey());
@@ -168,7 +168,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         } catch (SessionException $e) {
             // user not found, not logged in: signal authentication required
-            $this->log->error('Failed to fully register pipe: ' . $e->getMessage(), [ $e ]);
+            $this->log->error('Failed to fully register pipe: ' . $e->getMessage(), [ 'exception'=>$e ]);
 
             $this->sendHeader($pipe, 401);
             $this->pipes->unregisterPipe($pipe->getSocketKey());

@@ -189,10 +189,10 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
         } catch (Deleted $e) {
             // this can be thrown from the hydration of the trigger
-            $this->log->warning('Refusing to schedule notification, target object has been deleted.', [ $e ]);
+            $this->log->warning('Refusing to schedule notification, target object has been deleted.', [ 'exception'=>$e ]);
 
         } catch (InvalidArgumentException $e) {
-            $this->log->error($e->getMessage(), [ $e ]);
+            $this->log->error($e->getMessage(), [ 'exception'=>$e ]);
 
         } catch (PDOException $e) {
             // this must be thrown out!
@@ -204,7 +204,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             // this message is can't be parsed, so we ACK it to make it go away
 
         } catch (CompressionException $e) {
-            $this->log->debug('Failed to inflate message: ' . $e->getMessage(), [ $e ]);
+            $this->log->debug('Failed to inflate message: ' . $e->getMessage(), [ 'exception'=>$e ]);
 
         } catch (ErrorException $e) {
             $this->log->critical('Error Exception: '. $e->getMessage(), [ 'exception'=>$e ]);

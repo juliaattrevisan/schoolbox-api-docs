@@ -75,7 +75,7 @@ try {
     $cache = $this->getDi()->get('subscriptionCache');
     $cache->cacheUsers(INSTANCE_ID, $userIds);
 } catch (\RuntimeException|\Aura\Di\Exception $e) {
-    $userMapper->log($e->getMessage(), [ $e ]);
+    $userMapper->log($e->getMessage(), [ 'exception'=>$e ]);
 }
 
 /* Show some confirmation stuff

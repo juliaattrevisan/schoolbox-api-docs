@@ -112,7 +112,7 @@ abstract class CronScheduler extends AbstractScheduler implements EventListener
             get_class($e),
             substr(static::class, strrpos(static::class, '\\')),
             $e->getMessage()
-        ), [ $e ]);
+        ), [ 'exception'=>$e ]);
     }
 
 

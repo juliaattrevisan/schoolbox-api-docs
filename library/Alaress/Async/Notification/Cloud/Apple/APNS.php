@@ -157,12 +157,12 @@ class APNS extends AbstractService
 
             } catch (InvalidArgumentException $e) {
                 // unable to connect to APNS, abort mission
-                $this->getLog()->error("Connection to APNS failed: {$e->getMessage()}", [ $e ]);
+                $this->getLog()->error("Connection to APNS failed: {$e->getMessage()}", [ 'exception'=>$e ]);
                 return false;
 
             } catch (RuntimeException $e) {
                 // connected, but server became unavailable
-                $this->getLog()->error("APNS server stopped responding: {$e->getMessage()}", [ $e ]);
+                $this->getLog()->error("APNS server stopped responding: {$e->getMessage()}", [ 'exception'=>$e ]);
                 return false;
 
             }

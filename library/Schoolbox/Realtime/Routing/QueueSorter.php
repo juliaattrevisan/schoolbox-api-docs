@@ -123,7 +123,7 @@ class QueueSorter implements FilterInterface
             throw $e;
 
         } catch (Exception $e) {
-			$this->log->error(get_class($e) . ' occurred during rerouting: ' . $e->getMessage(), [ $e ]);
+			$this->log->error(get_class($e) . ' occurred during rerouting: ' . $e->getMessage(), [ 'exception'=>$e ]);
 		}
 
 		return false;
