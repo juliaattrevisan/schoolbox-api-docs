@@ -121,6 +121,7 @@ class Controller extends Base
      * @param Audience\Mapper              $audienceMapper
      * @param RoleAccessMapper             $roleAccessMapper
      * @param Folder\Mapper                $folderMapper
+     * @param IConnector                   $databaseInternal
      * @param Audience\ArticleResolver     $articleResolver
      * @param Audience\UserResolver        $userResolver
      */
@@ -135,6 +136,7 @@ class Controller extends Base
         Audience\Mapper $audienceMapper,
         RoleAccessMapper $roleAccessMapper,
         Folder\Mapper $folderMapper,
+        IConnector $databaseInternal,
         Audience\ArticleResolver $articleResolver,
         Audience\UserResolver $userResolver
     ) {
@@ -148,6 +150,7 @@ class Controller extends Base
         $this->audienceMapper = $audienceMapper;
         $this->roleAccessMapper = $roleAccessMapper;
         $this->folderMapper = $folderMapper;
+        $this->databaseInternal = $databaseInternal;
 
         /* Hyperdrive injection
          */

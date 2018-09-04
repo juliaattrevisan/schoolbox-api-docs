@@ -185,6 +185,7 @@ class Module extends BaseModule
             'audienceMapper' => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
             'roleAccessMapper' => $this->getMapperFactory()->getLazy(Access\RoleAccessMapper::class),
             'folderMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Resource\Folder\Mapper::class),
+            'databaseInternal' => $injector->lazyGet('databaseInternal'),
 
             /* Hyperdrive injection
              */
