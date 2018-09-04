@@ -397,7 +397,7 @@ $campusList   = $campusMapper->getAvailableCampusesForUser($selectedUser);
  */
 $page->dropDown(
     'event_level_drop',
-    new \Schoolbox\Calendar\EventLevelCollection($allFolderList, $campusList),
+    new \Schoolbox\Calendar\EventLevelCollection($allFolderList->getAll(), $campusList),
     $defaultAccessLevel,
     TEMPLATE_content,
     array(
