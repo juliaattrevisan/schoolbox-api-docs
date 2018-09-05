@@ -10,7 +10,6 @@
 namespace Schoolbox\Comms\News\Audience\Segment;
 
 use Alaress\Web\Output\Html;
-use Aura\Di;
 
 class HtmlFormatter
 {
@@ -40,16 +39,12 @@ class HtmlFormatter
      * $data is an array of (id, name, entityType, modifier) tuples
      * @param array $data
      * @return array
-     * @throws Di\Exception\ServiceNotFound
      */
     public function decorate(array $data): array
     {
-        foreach ($data as $key => &$current) {
-            $current['itemHtml'] = $this->outputter->setTemplate('@commsNews/audienceItem.twig')->setData($current)->getAsString();
+        foreach ($data as $key => $current) {
+            $data[$key]['itemHtml'] = $this->outputter->setTemplate('@commsNews/audienceItem.twig')->setData($current)->getAsString();
         }
-
-        unset($current);
-
         return $data;
     }
 }
