@@ -1,19 +1,19 @@
 {% import '@commsNews/indicator.twig' as indicator %}
 
 <div class="row">
-        <div class="small-12 columns">
-            <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
-            <ul class="meta">
-                {% if article.acceptedBy.id %}
-                    <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
-                        {% if article.isAccepted %}
-                            on {{ article.acceptedAt.local }}
-                        {% endif %}
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
+    <div class="small-12 columns">
+        <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
+        <ul class="meta">
+            {% if article.acceptedBy.id %}
+                <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
+                    {% if article.isAccepted %}
+                        on {{ article.acceptedAt.local }}
+                    {% endif %}
+                </li>
+            {% endif %}
+        </ul>
     </div>
+</div>
 
 {# Train Line #}
 {% include '@commsNews/workflow.twig' with {
@@ -76,8 +76,14 @@
                                 <div class="actions-small-1">
                                     <div class="card small-12">
                                         <h4 :title="selectedAudienceItem.name">${ selectedAudienceItem.name }</h4>
-                                        <p class="meta">${ selectedAudienceItem.entityType }</p>
-                                        <p class="meta" :title="selectedAudienceItem.modifier">${ selectedAudienceItem.modifier }</p>
+                                        <p class="meta">
+                                            <a href="#" v-if="selectedAudienceItem.compositeModal" @click.prevent="showCompositeInfo(selectedAudienceItem)">${ selectedAudienceItem.entityType }</a>
+                                            <slot v-if="!selectedAudienceItem.compositeModal">${ selectedAudienceItem.entityType }</slot>
+                                        </p>
+                                        <p class="meta" :title="selectedAudienceItem.modifier">
+                                            <a href="#" v-if="selectedAudienceItem.compositeModal" @click.prevent="showCompositeInfo(selectedAudienceItem)">${ selectedAudienceItem.modifier }</a>
+                                            <slot v-if="!selectedAudienceItem.compositeModal">${ selectedAudienceItem.modifier }</slot>
+                                        </p>
                                     </div>
                                     <nav>
                                         <a class="icon-close size-8" :title="'Remove ' + selectedAudienceItem.name + ' from audience'" @click="removeAudienceItem(selectedAudienceItem)"></a>
@@ -92,7 +98,7 @@
                         </div>
                     </div>
 
-                    {# the modal #}
+                    {# audience browser modal #}
                     <div data-reveal id="audience-browse" class="reveal-modal">
                         <div class="audience-browse-head">
                             <h2>Browse Audience</h2>
@@ -160,7 +166,7 @@
                                 <input type="checkbox" id="primary-all" v-model="selectAll.primary" @change="toggleSelectAll('primary')">
                                 <label for="primary-all" class="checkbox-label">Select all</label>
                                 <slot v-for="(item, index) in audienceListItemsIntersect.primary">
-                                    <input type="checkbox" :id="'primary-' + index" :value="item.self.id" v-model="intersectList.primary">
+                                    <input type="checkbox" :id="'primary-' + index" :value="item.self" v-model="intersectList.primary">
                                     <label :for="'primary-' + index" class="checkbox-label">${ item.self.name }</label>
                                 </slot>
                             </div>
@@ -175,13 +181,35 @@
                                 <input type="checkbox" id="secondary-all" v-model="selectAll.secondary" @change="toggleSelectAll('secondary')">
                                 <label for="secondary-all" class="checkbox-label">Select all</label>
                                 <slot v-for="(item, index) in audienceListItemsIntersect.secondary">
-                                    <input type="checkbox" :id="'secondary-' + index" :value="item.self.id" v-model="intersectList.secondary">
+                                    <input type="checkbox" :id="'secondary-' + index" :value="item.self" v-model="intersectList.secondary">
                                     <label :for="'secondary-' + index" class="checkbox-label">${ item.self.name }</label>
                                 </slot>
                             </div>
                             <button class="button submit" @click.prevent="addAudienceIntersect" :disabled="!submitEnableAdvanced">Add</button>
                         </div>
 
+                    </div>
+
+                    {# composite info modal #}
+                    <div data-reveal id="audience-composite" class="reveal-modal">
+                        <h2>Combination Details</h2>
+                        <a class="close-reveal-modal" aria-label="Close">×</a>
+                        <div class="small-12 medium-6 columns">
+                            <h3>${ compositeTypes.primary.name }</h3>
+                            <ul>
+                                <li v-for="compositeItem in compositeInfo.primary">
+                                    ${ compositeItem.values.name }
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="small-12 medium-6 columns">
+                            <h3>${ compositeTypes.secondary.name }</h3>
+                            <ul>
+                                <li v-for="compositeItem in compositeInfo.secondary">
+                                    ${ compositeItem.values.name }
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </fieldset>
 
@@ -227,7 +255,6 @@
 </div>
 
 <div class="toast" id="saveDraft"></div>
-
 
 {# le scripts #}
 <script src="/javascript/ckeditor/ckeditor.js"></script>
@@ -413,10 +440,12 @@
                             }
                         } else {
                             var newBlock = {
-                                id: selectedItem.id,
+                                item: selectedItem,
                                 name: 'Combination',
                                 entityType: vue.intersect.primary.name,
-                                modifier: vue.intersect.secondary.name
+                                modifier: vue.intersect.secondary.name,
+                                compositeModal: true,
+
                             };
                             vue.selectedAudienceItems.push(newBlock);
                         }
@@ -509,10 +538,22 @@
             // Just a marker to check if advanced has been clicked for (need to load defaults on first click)
             hasLoadedAdvanced: false,
 
+            // Model for the intersector select alls
             selectAll: {
                 'primary': false,
                 'secondary': false
             },
+
+            // These will hold the information to display on the composite modal
+            compositeTypes: {
+                'primary': [],
+                'secondary': []
+            },
+            compositeInfo: {
+                'primary': [],
+                'secondary': []
+            }
+
         },
         methods: {
             /**
@@ -627,28 +668,49 @@
                 var self = this;
 
                 // Add to selectize
-                var compositeItems = [];
+                var compositeTypes = {
+                    primary:  self.intersect.primary,
+                    secondary: self.intersect.secondary
+                };
+                var compositeItems = {
+                    all: [],
+                    primary: [],
+                    secondary: []
+                };
 
                 self.intersectList.primary.forEach(function(value) {
-                    compositeItems.push({
+                    compositeItems.all.push({
                         type: self.intersect.primary.id,
-                        value: value
+                        values: value
+                    });
+                    compositeItems.primary.push({
+                        values: value
                     });
                 });
 
-                self.intersectList.secondary.forEach(function(index, value) {
-                    compositeItems.push({
+                self.intersectList.secondary.forEach(function(value) {
+                    compositeItems.all.push({
                         type: self.intersect.secondary.id,
-                        value: value
+                        values: value
+                    });
+                    compositeItems.secondary.push({
+                        values: value
                     });
                 });
 
                 var intersectOption = {
+                    // Base64 and stringify a json object of the composite items
                     id: btoa(JSON.stringify({
                         type: 'composite',
-                        value: compositeItems
+                        value: compositeItems.all
                     })),
-                    intersect: true // Used in selectize onItemAdd to work out how to display the segment brick
+
+                    // This will be used in selectize onItemAdd to work out how to display the segment brick
+                    intersect: true,
+
+                    // These are stored for the case they click the brick and want to see the composite info
+                    compositeTypes: compositeTypes,
+                    compositeItems: compositeItems
                 };
 
                 $('#audience-search').data('selectize').addOption(intersectOption);
@@ -769,9 +831,29 @@
                 if (self.selectAll[list]) {
                     // Loop the possible options and add them to the list of checked options (intersectList)
                     for (var option in this.cachedOptions[this.intersect[list].id]) {
-                        self.intersectList[list].push(self.cachedOptions[this.intersect[list].id][option].self.id);
+                        self.intersectList[list].push(self.cachedOptions[this.intersect[list].id][option].self);
                     }
                 }
+            },
+
+            /**
+             * Populate and show a modal with info on a composite audience segment
+             */
+            showCompositeInfo: function(audienceItem) {
+                this.compositeTypes = {
+                    'primary': audienceItem.item.compositeTypes.primary,
+                    'secondary': audienceItem.item.compositeTypes.secondary
+                };
+                this.compositeInfo = {
+                    'primary': [],
+                    'secondary': []
+                };
+
+                this.compositeInfo.primary = audienceItem.item.compositeItems.primary;
+                this.compositeInfo.secondary = audienceItem.item.compositeItems.secondary;
+
+                // Show modal
+                $('#audience-composite').foundation('reveal', 'open');
             }
         },
         computed: {
