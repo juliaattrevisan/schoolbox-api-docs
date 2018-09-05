@@ -114,7 +114,7 @@ class Transactor
     {
         /* Purge existing records before resaving the new ones
          */
-        $this->audienceMapper->deleteByColumn('comms_news_article_id', $article->getId());
+        $this->audienceMapper->deleteForArticle($article->getId());
 
         if ('' !== $segments) {
             $audiencingOptions = explode(',', $segments);
