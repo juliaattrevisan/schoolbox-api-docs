@@ -193,11 +193,6 @@ class Controller extends Base
      */
     protected function processRubric(Participant $participant, array $post, IFeedback $feedback)
     {
-        // TODO need to get:
-        // - marktype
-        // - capability max
-        // in here. Neither is in the $post data
-
         if (!$participant->getAssessable() instanceof DueWork\Model){
             return false;
         }
@@ -208,7 +203,7 @@ class Controller extends Base
             $this->rubricMapper->saveForFeedback(
                 $post['rubric']['descriptors'] ?? [],
                 $post['rubric']['groups'] ?? [],
-                $post['markType'],
+                $feedback->getAssessable()->getMarkType()->getName(),
                 $feedback->getId()
             );
             return true;

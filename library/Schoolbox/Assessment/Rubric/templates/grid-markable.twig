@@ -9,9 +9,6 @@
 
 {% set hidePoints = not config.rubric_show_points or (studentView and selfReflect) %}
 
-{# Post mark type so we can determine how to validate discretionary capability mark #}
-<input type="hidden" name="markType" value="{{ markSchemeName }}"/>
-
 <div class="scrollable">
     <table class="rb markable stack-for-medium-down" id="{{ rubricId }}">
 
