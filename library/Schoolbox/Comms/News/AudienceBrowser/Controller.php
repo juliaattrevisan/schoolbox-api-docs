@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -118,6 +116,7 @@ class Controller extends Base
      * Look for all the audience pieces that might somehow match $keyword
      *
      * @api /comms/news/audiencebrowser/search
+     * @level 18.1
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
@@ -260,6 +259,7 @@ class Controller extends Base
      * Get (id, name) tuples for every Campus
      *
      * @api /comms/news/audiencebrowser/campuses
+     * @level 18.1
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
@@ -275,6 +275,7 @@ class Controller extends Base
      * Get (id, name) tuples for every Role
      *
      * @api /comms/news/audiencebrowser/roles
+     * @level 18.1
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
@@ -290,6 +291,7 @@ class Controller extends Base
      * Get (id, name) tuples for every Pastoral Group
      *
      * @api /comms/news/audiencebrowser/pastoralgroups
+     * @level 18.1
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
@@ -305,6 +307,7 @@ class Controller extends Base
      * Get (id, name) tuples for every House
      *
      * @api /comms/news/audiencebrowser/houses
+     * @level 18.1
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
@@ -320,6 +323,7 @@ class Controller extends Base
      * Get (id, name) tuples for every folder
      *
      * @api /comms/news/audiencebrowser/folders
+     * @level 18.1
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
@@ -383,6 +387,7 @@ class Controller extends Base
      * Get all year levels
      *
      * @api /comms/news/audiencebrowser/yearlevels
+     * @level 18.1
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
