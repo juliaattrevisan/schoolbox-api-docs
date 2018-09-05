@@ -107,7 +107,7 @@ class Factory
             $groupName     = $groupData['name'];
             $groupMaxValue = isset($groupData['maxValue']) ? $groupData['maxValue'] : null;
 
-            if ((new ValidCapabilityMax())->isSatisifedBy($groupMaxValue, $markPerCap)) {
+            if ((new ValidCapabilityMax($markPerCap))->isSatisfiedBy($groupMaxValue)) {
                 $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
             } else {
                 throw new InvalidArgumentException(sprintf('provide capability maximum points that are numeric and greater than or equal to 0'));

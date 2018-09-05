@@ -8,10 +8,18 @@
 namespace Schoolbox\Assessment\Rubric;
 
 
-class ValidCapabilityMax
+class ValidCapabilityMax extends \Alaress\Specification\Base
 {
-    public function isSatisifedBy($capabilityMax, $markPerCap) {
-        if ($markPerCap) {
+    private $markPerCap;
+
+    public function __construct(bool $markPerCap)
+    {
+        $this->markPerCap = $markPerCap;
+    }
+
+    public function isSatisfiedBy($capabilityMax) : bool
+    {
+        if ($this->markPerCap) {
             return is_numeric($capabilityMax) && $capabilityMax >= 0;
         }
         return true;
