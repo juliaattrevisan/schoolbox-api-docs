@@ -13,7 +13,6 @@ use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\ISearch;
 use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 use Schoolbox\Comms\News\Audience\Segment\ValidRestrictedSearch;
-use Schoolbox\Permission\Access\RoleAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -39,42 +38,41 @@ class Folder implements ISearch, ITranslate
      */
     private $roleAccessMapper;
 
+    /** @var bool */
+    private $moderationEnabled;
+
 
     /**
      * Folder constructor.
+     *
      * @param User             $user
      * @param FolderMapper     $folderMapper
      * @param RoleAccessMapper $roleAccessMapper
+     * @param bool             $moderationEnabled
      */
-    public function __construct(User $user, FolderMapper $folderMapper, RoleAccessMapper $roleAccessMapper)
+    public function __construct(User $user, FolderMapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $moderationEnabled)
     {
-        $this->user = $user;
-        $this->folderMapper = $folderMapper;
-        $this->roleAccessMapper = $roleAccessMapper;
+        $this->user              = $user;
+        $this->folderMapper      = $folderMapper;
+        $this->roleAccessMapper  = $roleAccessMapper;
+        $this->moderationEnabled = $moderationEnabled;
     }
 
 
     /**
-     * Check which folders $user can see based on role permissions
+     * Returns the set of folder ids where $user has the specified access or greater due to role permissions
      *
-     * @return array
-     * @throws \Schoolbox\Mapper\Exception
+     * @param int $accessLevel
+     * @return int[]
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    private function findFolderIdsWithRoleAccess(): array
+    private function findFolderIdsWithRoleAccess(int $accessLevel): array
     {
-        $folders = $this->roleAccessMapper->findByColumnList([
-            'gid' => $this->user->getRole()->getId(),
-            'type' => UserAccess::ACCESS_READ
-        ]);
+        $pb = $this->roleAccessMapper->getPredicateBuilder()
+                                     ->equals('gid', $this->user->getRole()->getId())
+                                     ->greaterThanOrEqualTo('type', $accessLevel);
 
-        $ids = [];
-
-        /** @var RoleAccess $current */
-        foreach ($folders as $folder) {
-            $ids[] = $folder->getCategory()->getId();
-        }
-
-        return $ids;
+        return $this->roleAccessMapper->findScalarByPredicates('cid', $pb);
     }
 
 
@@ -93,30 +91,30 @@ class Folder implements ISearch, ITranslate
      *
      * If the resultant list of folders is empty, exit early and don't bother executing query
      *
+     * @param string $searchPlaceholder
      * @return string
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function getSearchSql(): string
+    public function getSearchSql(string $searchPlaceholder = null): string
     {
         $folderMembershipSql = '';
 
-        if ((new ValidRestrictedSearch())->isSatisifiedBy($this->user)) {
+        if ((new ValidRestrictedSearch())->isSatisfiedBy($this->user)) {
 
-            /* Check to see whether I have read access to any group/class folders
-             */
-            $groupAndClassMembership = $this->folderMapper->findFolderIdsForUser($this->user);
+            // What access level a user must have depends on whether moderation is enabled
+            $minAccessLevel = $this->moderationEnabled ? UserAccess::ACCESS_READ : UserAccess::ACCESS_WRITE;
 
-            /* Also check to see whether I have read access in other ways
-             * First, check role permissions on a group
-             */
-            $roleAccess = $this->findFolderIdsWithRoleAccess();
+            // Get folders where user has required access via group/class individual permissions
+            $groupAndClassMembership = $this->folderMapper->findFolderIdsForUser($this->user, true, $minAccessLevel);
 
-            /* Combine the two
-             */
-            $folderMembership = array_unique(array_merge($groupAndClassMembership, $roleAccess));
+            // Get folders where user has required access via their role permissions
+            $roleAccess = $this->findFolderIdsWithRoleAccess($minAccessLevel);
+
+            // Combine the two
+            $folderMembership = \array_unique(\array_merge($groupAndClassMembership, $roleAccess));
 
             /* If I have zero elements in my folderMembership, boot me out - there's nothing to fetch
              * I'm restricted from seeing any folders
@@ -130,6 +128,9 @@ class Folder implements ISearch, ITranslate
             $folderMembershipSql = ' AND folder.id IN (' . implode(', ', $folderMembership) . ')';
         }
 
+        $entityType    = Model::ENTITY_TYPE_FOLDER;
+        $keywordFilter = null === $searchPlaceholder ? '' : "AND (folder.name LIKE :{$searchPlaceholder} OR folder_code.code LIKE :{$searchPlaceholder})";
+
         return "
             SELECT folder.id, 
                 CONCAT(folder.name,  
@@ -138,7 +139,7 @@ class Folder implements ISearch, ITranslate
                     THEN CONCAT(' (', GROUP_CONCAT(folder_code.code SEPARATOR ', '), ')')
                     ELSE ''
                     END) AS `name`,
-                '".Model::ENTITY_TYPE_FOLDER."' AS entity_type
+                '{$entityType}' AS entity_type
             FROM folder
             LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
             WHERE (
@@ -146,8 +147,8 @@ class Folder implements ISearch, ITranslate
                 OR
                 folder.id IN (SELECT cid FROM userGroups)
             )
+            {$keywordFilter}
             {$folderMembershipSql}
-            AND (folder.name LIKE :keyword OR folder_code.code LIKE :keyword)
             AND folder.deleted_at IS NULL
             GROUP BY folder.id
             ORDER BY folder.name

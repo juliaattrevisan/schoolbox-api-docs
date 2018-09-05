@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Controller
  *
@@ -14,12 +15,16 @@ use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\GenericCollection;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
+use PDO;
+use Schoolbox\ValueLabelInterface;
+use Schoolbox\Comms\News;
 
 class Controller extends Base
 {
@@ -67,6 +72,8 @@ class Controller extends Base
      */
     private $roleAccessMapper;
 
+    /** @var News\Policy\Mapper */
+    private $policyMapper;
 
     /**
      * Controller constructor.
@@ -80,6 +87,7 @@ class Controller extends Base
      * @param UserMapper            $userMapper
      * @param Audience\Mapper       $audienceMapper
      * @param RoleAccessMapper      $roleAccessMapper
+     * @param News\Policy\Mapper    $policyMapper
      */
     public function __construct(
         IConnector $db,
@@ -90,9 +98,10 @@ class Controller extends Base
         Pastoral\Group\Mapper $pastoralGroupMapper,
         UserMapper $userMapper,
         Audience\Mapper $audienceMapper,
-        RoleAccessMapper $roleAccessMapper
+        RoleAccessMapper $roleAccessMapper,
+        News\Policy\Mapper $policyMapper
     ) {
-        $this->db = $db;
+        $this->db           = $db;
         $this->campusMapper = $campusMapper;
         $this->roleMapper = $roleMapper;
         $this->houseMapper = $houseMapper;
@@ -101,6 +110,7 @@ class Controller extends Base
         $this->userMapper = $userMapper;
         $this->audienceMapper = $audienceMapper;
         $this->roleAccessMapper = $roleAccessMapper;
+        $this->policyMapper = $policyMapper;
     }
 
 
@@ -108,27 +118,33 @@ class Controller extends Base
      * Look for all the audience pieces that might somehow match $keyword
      *
      * @api /comms/news/audiencebrowser/search
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public function getSearch()
+    public function getSearch(): void
     {
         $searchResult = [];
 
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $registry = new Audience\Segment\SearchRegistry($this->getUser(), $this->folderMapper, $this->roleAccessMapper);
-        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper);
+        $registry = new Audience\Segment\SearchRegistry($this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
+        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
         $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
-        $statement = $this->userMapper->getDatabase()->prepare($registry->getSearchSql());
+        $placeholder = 'keyword';
+        $statement   = $this->userMapper->getDatabase()->prepare($registry->getSearchSql($placeholder));
 
         $escapedKeyword = $this->db->escapeForLike($this->getRequest()->query['query']);
         $statement->execute([
-            'keyword' => "%{$escapedKeyword}%",
+            $placeholder => "%{$escapedKeyword}%",
         ]);
 
         /* Set up the RELATIONSHIP_SELF variant first then add Parents and Teachers modifiers
          */
+        /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $data = $this->generateDecoratedDataTuple($row, $translator, $formatter);
 
@@ -141,8 +157,9 @@ class Controller extends Base
     }
 
 
+
     /**
-     * @param Collection $collection
+     * @param Collection|ValueLabelInterface[] $collection
      * @param string     $entityType
      * @return \Alaress\Web\Output\Json
      * @throws \Aura\Di\Exception\ServiceNotFound
@@ -157,7 +174,7 @@ class Controller extends Base
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper);
+        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
         $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         foreach ($collection as $item) {
@@ -243,8 +260,12 @@ class Controller extends Base
      * Get (id, name) tuples for every Campus
      *
      * @api /comms/news/audiencebrowser/campuses
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public function getCampuses()
+    public function getCampuses(): void
     {
         $this->getResponse()->content->set($this->generate($this->campusMapper->findAll()->sortBy('name', 'asc'), Audience\Model::ENTITY_TYPE_CAMPUS));
     }
@@ -254,8 +275,12 @@ class Controller extends Base
      * Get (id, name) tuples for every Role
      *
      * @api /comms/news/audiencebrowser/roles
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public function getRoles()
+    public function getRoles(): void
     {
         $this->getResponse()->content->set($this->generate($this->roleMapper->findAll()->sortBy('name', 'asc'), Audience\Model::ENTITY_TYPE_ROLE));
     }
@@ -265,8 +290,12 @@ class Controller extends Base
      * Get (id, name) tuples for every Pastoral Group
      *
      * @api /comms/news/audiencebrowser/pastoralgroups
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public function getPastoralGroups()
+    public function getPastoralGroups(): void
     {
         $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll()->sortBy('name', 'asc'), Audience\Model::ENTITY_TYPE_PASTORAL_GROUP));
     }
@@ -276,8 +305,12 @@ class Controller extends Base
      * Get (id, name) tuples for every House
      *
      * @api /comms/news/audiencebrowser/houses
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public function getHouses()
+    public function getHouses(): void
     {
         $this->getResponse()->content->set($this->generate($this->houseMapper->findAll()->sortBy('house', 'asc'), Audience\Model::ENTITY_TYPE_SCHOOL_HOUSE));
     }
@@ -287,10 +320,62 @@ class Controller extends Base
      * Get (id, name) tuples for every folder
      *
      * @api /comms/news/audiencebrowser/folders
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws \UnexpectedValueException
      */
-    public function getFolders()
+    public function getFolders(): void
     {
-        $this->getResponse()->content->set($this->generate($this->folderMapper->findForUser($this->getUser())->sortBy('title', 'asc'), Audience\Model::ENTITY_TYPE_FOLDER));
+        $folderStrategy = new Audience\Segment\Strategy\Folder($this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
+        $statement      = $this->db->executeQuery($folderStrategy->getSearchSql());
+        $searchResults = new GenericCollection(ValueLabelInterface::class);
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $searchResults[$row['id']] = new class($row['id'], $row['name']) implements ValueLabelInterface
+            {
+
+                /** @var string */
+                private $id;
+                /** @var string */
+                private $name;
+
+
+                /**
+                 * @param string $id
+                 * @param string $name
+                 */
+                public function __construct(string $id, string $name)
+                {
+                    $this->id   = $id;
+                    $this->name = $name;
+                }
+
+
+                /**
+                 * @inheritdoc
+                 */
+                public function findValueLabelPair(): array
+                {
+                    return [
+                        'value' => $this->id,
+                        'label' => $this->name,
+                    ];
+                }
+            };
+        }
+
+        $searchResults->sortByCallback(function (ValueLabelInterface $left, ValueLabelInterface $right) {
+            // compensate for MySQL lack of natural sort for names like [F1, F9, F10]
+            return \strnatcasecmp($left->findValueLabelPair()['label'], $right->findValueLabelPair()['label']);
+        }, true);
+
+
+        $this->getResponse()->content->set($this->generate($searchResults, Audience\Model::ENTITY_TYPE_FOLDER));
     }
 
 
@@ -304,14 +389,14 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public function getYearLevels()
+    public function getYearLevels(): void
     {
         $items = [];
 
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper);
+        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
         $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         $years = array_filter($this->userMapper->findDistinct('year'));
@@ -331,5 +416,18 @@ class Controller extends Base
             'success' => true,
             'data' => $items
         ]));
+    }
+
+
+    /**
+     * Returns whether global moderation is enabled
+     *
+     * @return bool
+     */
+    private function isGlobalModerationEnabled(): bool
+    {
+        /** @var News\Policy\Model $policy */
+        $policy = $this->policyMapper->findByColumn('identifier', 'global_moderation')->first();
+        return (bool)$policy->getValue();
     }
 }

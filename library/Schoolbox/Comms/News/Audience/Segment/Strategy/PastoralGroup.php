@@ -17,18 +17,19 @@ class PastoralGroup implements ISearch, ITranslate
 {
 
     /**
-     * Gets an sql fragment for the ISearch instance
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getSearchSql(): string
+    public function getSearchSql(string $searchPlaceholder = null): string
     {
+        $entityType    = Model::ENTITY_TYPE_PASTORAL_GROUP;
+        $keywordFilter = null === $searchPlaceholder ? '' : "AND `name` LIKE :{$searchPlaceholder}";
+
         // Note that we need to collate the output so the result set can be UNIONed with other result sets
         return "
-            SELECT id, name COLLATE utf8mb4_general_ci, '".Model::ENTITY_TYPE_PASTORAL_GROUP."' AS entity_type 
+            SELECT id, name COLLATE utf8mb4_general_ci, '{$entityType}' AS entity_type
             FROM `pastoral_group`
-            WHERE `name` LIKE :keyword
-            AND deleted_at IS NULL
+            WHERE deleted_at IS NULL
+            {$keywordFilter}
         ";
     }
 

@@ -24,16 +24,18 @@ class TranslatorRegistry implements ITranslate
 
     /**
      * Registry constructor.
+     *
      * @param User             $user
      * @param Folder\Mapper    $folderMapper
      * @param RoleAccessMapper $roleAccessMapper
+     * @param bool             $isModerationEnabled
      */
-    public function __construct(User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper)
+    public function __construct(User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $isModerationEnabled)
     {
         $this->registry = [
             $campusSql = new Strategy\Campus(),
             $roleSql = new Strategy\Role(),
-            $folderSql = new Strategy\Folder($user, $folderMapper, $roleAccessMapper),
+            $folderSql = new Strategy\Folder($user, $folderMapper, $roleAccessMapper, $isModerationEnabled),
             $houseSql = new Strategy\House(),
             $userSql = new Strategy\User(),
             $yearSql = new Strategy\Year(),

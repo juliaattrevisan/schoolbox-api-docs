@@ -17,16 +17,17 @@ class Campus implements ISearch, ITranslate
 {
 
     /**
-     * Gets an sql fragment for the ISearch instance
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getSearchSql(): string
+    public function getSearchSql(string $searchPlaceholder = null): string
     {
+        $entityType    = Model::ENTITY_TYPE_CAMPUS;
+        $keywordFilter = null === $searchPlaceholder ? '' : "WHERE `name` LIKE :{$searchPlaceholder}";
+
         return "
-            SELECT id, name, '".Model::ENTITY_TYPE_CAMPUS."' AS entity_type
+            SELECT id, name, '{$entityType}' AS entity_type
             FROM luCampus
-            WHERE `name` LIKE :keyword
+            {$keywordFilter}
         ";
     }
 

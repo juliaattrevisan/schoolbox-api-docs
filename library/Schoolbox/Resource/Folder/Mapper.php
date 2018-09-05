@@ -1109,7 +1109,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @return PDOStatement
      * @throws DefinitionException
      */
-    private function findForUserQuery(User $user, bool $get_subjects, int $access_level, bool $exactAccess)
+    private function findForUserQuery(User $user, bool $get_subjects, int $access_level, bool $exactAccess): PDOStatement
     {
         $query = "
 			SELECT
@@ -1135,9 +1135,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             'access'  => $access_level,
         );
 
-        //
-        // If getting subjects - get the external user mapper and query that.
-        if ($get_subjects) {
+        // TODO Currently incorrectly shows all classes for Staff, regardless of requested access. See SA-7364
+        if ($this->fetchClassesFromExternalSis($get_subjects, $user, $access_level, $exactAccess)) {
             $external_user = $this->getExternalUser();
             if ($external_user instanceof External_UserInterface) {
                 $subject_list = $external_user->getSubjectList($user);
@@ -2031,5 +2030,38 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $whereParams[':endDate'] = $term->getActualFinish();
         }
         return $whereParams;
+    }
+
+
+    /**
+     * Return whether we should fetch classes from external SIS
+     *
+     * @param bool $getSubjects
+     * @param User $user
+     * @param int  $accessLevel
+     * @param bool $exactAccess
+     * @return bool
+     */
+    private function fetchClassesFromExternalSis(bool $getSubjects, User $user, int $accessLevel, bool $exactAccess): bool
+    {
+        if (!$getSubjects) {
+            // Don't get subjects if caller specifically specified that
+            return false;
+        }
+
+        $role = $user->getRole();
+
+        if ($role->isStaff()) {
+            return true;
+            // TODO, the next line is the correct business logic, but may break functionality that relies on this bug. See SA-7364
+//            return $accessLevel === UserAccess::ACCESS_WRITE || ($accessLevel < UserAccess::ACCESS_WRITE && !$exactAccess);
+        }
+
+        if ($role->isStudent()) {
+            // Fetch classes if caller specified READ access, or less that READ but not exact
+            return $accessLevel === UserAccess::ACCESS_READ || ($accessLevel < UserAccess::ACCESS_READ && !$exactAccess);
+        }
+
+        return false;
     }
 }

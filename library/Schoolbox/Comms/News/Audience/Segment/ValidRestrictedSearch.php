@@ -1,7 +1,5 @@
 <?php
 /**
- * ValidRestrictedSearch
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -13,6 +11,14 @@ use Schoolbox\Comms\News\ValidUserIsCommsOfficer;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
+/**
+ * Specification of a user that is restricted to only target groups/classes where they have READ+ access
+ *
+ * A user is restricted if they are/have none of:
+ * * a superuser
+ * * a comms officer
+ * * READ+ CMS perm
+ */
 class ValidRestrictedSearch
 {
 
@@ -24,7 +30,7 @@ class ValidRestrictedSearch
      *    - Folder can't be deleted
      *
      * Anything else is rolled over or otherwise inaccessible and shouldn't appear as a search result
-     * The result set is affected by whether $user has READ access to the folder in some way
+     * The result set is affected by whether $user has READ+ access to the folder in some way
      *
      *    - Superusers/Comms Officers/CMS Perms aren't limited to what they can search and can audience
      *    - Restrict non-superusers/non-comms-officer/non-CMS Perms people
@@ -36,13 +42,9 @@ class ValidRestrictedSearch
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function isSatisifiedBy(User $user): bool
+    public function isSatisfiedBy(User $user): bool
     {
-        $isSuperuser = $user->isSuperuser();
-        $hasCMSPermission = $this->hasCMSPermission($user);
-        $isCommsOfficer = (new ValidUserIsCommsOfficer())->isSatisfiedBy($user);
-
-        return !$isSuperuser && !$hasCMSPermission && !$isCommsOfficer;
+        return !$user->isSuperuser() && !$this->hasCMSPermission($user) && !$this->isCommsOfficer($user);
     }
 
 
@@ -68,5 +70,21 @@ class ValidRestrictedSearch
         }
 
         return false;
+    }
+
+
+    /**
+     * Returns whether the specified user is a comms officer
+     *
+     * @param User $user
+     * @return bool
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function isCommsOfficer(User $user): bool
+    {
+        return (new ValidUserIsCommsOfficer())->isSatisfiedBy($user);
     }
 }

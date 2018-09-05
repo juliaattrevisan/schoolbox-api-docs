@@ -17,13 +17,12 @@ class Year implements ISearch, ITranslate
 {
 
     /**
-     * Gets an sql fragment for the ISearch instance
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getSearchSql(): string
+    public function getSearchSql(string $searchPlaceholder = null): string
     {
-        $entityType = Model::ENTITY_TYPE_YEAR;
+        $entityType    = Model::ENTITY_TYPE_YEAR;
+        $keywordFilter = null === $searchPlaceholder ? '' : "AND year LIKE :{$searchPlaceholder}";
 
         // If user.year is numeric, prefix 'Year ' to read like 'Year 9'
         return "
@@ -32,8 +31,8 @@ class Year implements ISearch, ITranslate
               IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) AS name,
               '{$entityType}' AS entity_type
             FROM `user`
-            WHERE year LIKE :keyword
-            AND deleted_at IS NULL
+            WHERE deleted_at IS NULL
+            {$keywordFilter}
         ";
     }
 

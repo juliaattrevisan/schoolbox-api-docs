@@ -24,15 +24,17 @@ class SearchRegistry implements ISearch
 
     /**
      * SearchRegistry constructor.
+     *
      * @param User             $user
      * @param Folder\Mapper    $folderMapper
      * @param RoleAccessMapper $roleAccessMapper
+     * @param bool             $moderationEnabled
      */
-    public function __construct(User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper)
+    public function __construct(User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $moderationEnabled)
     {
         $this->registry = [
             $campusSql = new Strategy\Campus(),
-            $folderSql = new Strategy\Folder($user, $folderMapper, $roleAccessMapper),
+            $folderSql = new Strategy\Folder($user, $folderMapper, $roleAccessMapper, $moderationEnabled),
             $houseSql = new Strategy\House(),
         ];
 
@@ -49,17 +51,15 @@ class SearchRegistry implements ISearch
     }
 
     /**
-     * Gets an sql fragment for the ISearch instance
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getSearchSql(): string
+    public function getSearchSql(string $searchPlaceholder = null): string
     {
         $pieces = [];
 
         /** @var ISearch $strategy */
         foreach ($this->registry as $strategy) {
-            $pieces[] = "({$strategy->getSearchSql()})";
+            $pieces[] = "({$strategy->getSearchSql($searchPlaceholder)})";
         }
 
         // We can UNION ALL and avoid de-duplication logic as each sub-query has a distinct entity type

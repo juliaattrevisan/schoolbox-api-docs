@@ -53,6 +53,9 @@ class Translator
      */
     private $roleAccessMapper;
 
+    /** @var bool */
+    private $isModerationEnabled;
+
     /**
      * This array is of the structure:
      *
@@ -93,17 +96,20 @@ class Translator
 
     /**
      * SegmentTranslator constructor.
+     *
      * @param IDatabase        $db
      * @param User             $user
      * @param Folder\Mapper    $folderMapper
      * @param RoleAccessMapper $roleAccessMapper
+     * @param bool             $isModerationEnabled
      */
-    public function __construct(IDatabase $db, User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper)
+    public function __construct(IDatabase $db, User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $isModerationEnabled)
     {
         $this->database = $db;
         $this->user = $user;
         $this->folderMapper = $folderMapper;
         $this->roleAccessMapper = $roleAccessMapper;
+        $this->isModerationEnabled = $isModerationEnabled;
 
         /* Entity names
          */
@@ -214,7 +220,7 @@ class Translator
      */
     public function buildCache(int $articleId): self
     {
-        $translator = new TranslatorRegistry($this->user, $this->folderMapper, $this->roleAccessMapper);
+        $translator = new TranslatorRegistry($this->user, $this->folderMapper, $this->roleAccessMapper, $this->isModerationEnabled);
 
         $statement = $this->database->prepare($translator->getTranslateSql());
 

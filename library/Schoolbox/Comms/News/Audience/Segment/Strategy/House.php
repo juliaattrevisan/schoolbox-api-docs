@@ -17,16 +17,17 @@ class House implements ISearch, ITranslate
 {
 
     /**
-     * Gets an sql fragment for the ISearch instance
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getSearchSql(): string
+    public function getSearchSql(string $searchPlaceholder = null): string
     {
+        $entityType    = Model::ENTITY_TYPE_SCHOOL_HOUSE;
+        $keywordFilter = null === $searchPlaceholder ? '' : "WHERE house LIKE :{$searchPlaceholder}";
+
         return "
-            SELECT id, house AS name, '".Model::ENTITY_TYPE_SCHOOL_HOUSE."' AS entity_type
+            SELECT id, house AS name, '{$entityType}' AS entity_type
             FROM house
-            WHERE house LIKE :keyword
+            {$keywordFilter}
         ";
     }
 

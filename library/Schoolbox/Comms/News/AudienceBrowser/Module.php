@@ -20,6 +20,7 @@ use Schoolbox\Pastoral;
 use Schoolbox\Resource;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Comms\News;
 
 class Module extends BaseModule
 {
@@ -82,15 +83,7 @@ class Module extends BaseModule
             'groupMapper' => $this->getMapperFactory()->getLazy(Resource\GroupMapper::class),
             'pastoralGroupMapper' => $this->getMapperFactory()->getLazy(Pastoral\Group\Mapper::class),
             'audienceMapper' => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
+            'policyMapper' => $this->getMapperFactory()->getLazy(News\Policy\Mapper::class),
         ];
-    }
-
-    /**
-     * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    protected function getUserMapper()
-    {
-        return $this->getMapperFactory()->get(UserMapper::class);
     }
 }

@@ -40,19 +40,26 @@ class Transactor
      */
     private $roleAccessMapper;
 
+    /** @var bool */
+    private $isModerationEnabled;
+
+
     /**
      * Segments constructor.
+     *
      * @param User             $user
      * @param Mapper           $audienceMapper
      * @param Folder\Mapper    $folderMapper
      * @param RoleAccessMapper $roleAccessMapper
+     * @param bool             $isModerationEnabled
      */
-    public function __construct(User $user, Mapper $audienceMapper, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper)
+    public function __construct(User $user, Mapper $audienceMapper, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $isModerationEnabled)
     {
         $this->user = $user;
         $this->audienceMapper = $audienceMapper;
         $this->folderMapper = $folderMapper;
         $this->roleAccessMapper = $roleAccessMapper;
+        $this->isModerationEnabled = $isModerationEnabled;
     }
 
 
@@ -66,7 +73,8 @@ class Transactor
     {
         $pieces = [];
 
-        $translator = (new Translator($this->audienceMapper->getDatabase(), $this->user, $this->folderMapper, $this->roleAccessMapper))->buildCache($article->getId());
+        $translator = new Translator($this->audienceMapper->getDatabase(), $this->user, $this->folderMapper, $this->roleAccessMapper, $this->isModerationEnabled);
+        $translator->buildCache($article->getId());
         $audiencing = $translator->getCache();
 
         foreach ($audiencing as $entityType => $values) {
