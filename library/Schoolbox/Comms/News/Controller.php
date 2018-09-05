@@ -277,7 +277,7 @@ class Controller extends Base
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $audiencingData = (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper, $this->roleAccessMapper))->load($article);
+        $audiencingData = (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper, $this->roleAccessMapper, $moderationRequired))->load($article);
         $audiencingHtml = (new Audience\Segment\HtmlFormatter($outputFormatter))->decorate($audiencingData);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
@@ -413,7 +413,8 @@ class Controller extends Base
 
         /* Set audiencing options via the hyperdrive
          */
-        (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper, $this->roleAccessMapper))->save($article, $this->getRequest()->post['audience']);
+        $transactor = new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
+        $transactor->save($article, $this->getRequest()->post['audience']);
     }
 
 
@@ -824,5 +825,18 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@commsNews/recipients.twig', ['users' => $users]));
+    }
+
+
+    /**
+     * Returns whether global moderation is enabled
+     *
+     * @return bool
+     */
+    private function isGlobalModerationEnabled(): bool
+    {
+        /** @var Policy\Model $policy */
+        $policy = $this->policyMapper->findByColumn('identifier', 'global_moderation')->first();
+        return (bool)$policy->getValue();
     }
 }

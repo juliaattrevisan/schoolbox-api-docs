@@ -24,15 +24,17 @@ class SearchRegistry implements ISearch
 
     /**
      * SearchRegistry constructor.
+     *
      * @param User             $user
      * @param Folder\Mapper    $folderMapper
      * @param RoleAccessMapper $roleAccessMapper
+     * @param bool             $moderationEnabled
      */
-    public function __construct(User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper)
+    public function __construct(User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $moderationEnabled)
     {
         $this->registry = [
             $campusSql = new Strategy\Campus(),
-            $folderSql = new Strategy\Folder($user, $folderMapper, $roleAccessMapper),
+            $folderSql = new Strategy\Folder($user, $folderMapper, $roleAccessMapper, $moderationEnabled),
             $houseSql = new Strategy\House(),
         ];
 

@@ -38,32 +38,39 @@ class Folder implements ISearch, ITranslate
      */
     private $roleAccessMapper;
 
+    /** @var bool */
+    private $moderationEnabled;
+
 
     /**
      * Folder constructor.
+     *
      * @param User             $user
      * @param FolderMapper     $folderMapper
      * @param RoleAccessMapper $roleAccessMapper
+     * @param bool             $moderationEnabled
      */
-    public function __construct(User $user, FolderMapper $folderMapper, RoleAccessMapper $roleAccessMapper)
+    public function __construct(User $user, FolderMapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $moderationEnabled)
     {
-        $this->user = $user;
-        $this->folderMapper = $folderMapper;
-        $this->roleAccessMapper = $roleAccessMapper;
+        $this->user              = $user;
+        $this->folderMapper      = $folderMapper;
+        $this->roleAccessMapper  = $roleAccessMapper;
+        $this->moderationEnabled = $moderationEnabled;
     }
 
 
     /**
-     * Returns the set of folder ids where $user has READ+ access due to role permissions
+     * Returns the set of folder ids where $user has the specified access or greater due to role permissions
      *
+     * @param int $accessLevel
      * @return int[]
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    private function findFolderIdsWithRoleAccess(): array
+    private function findFolderIdsWithRoleAccess(int $accessLevel): array
     {
         $pb = $this->roleAccessMapper->getPredicateBuilder()
                                      ->equals('gid', $this->user->getRole()->getId())
-                                     ->greaterThanOrEqualTo('type', UserAccess::ACCESS_READ);
+                                     ->greaterThanOrEqualTo('type', $accessLevel);
 
         return $this->roleAccessMapper->findScalarByPredicates('cid', $pb);
     }
@@ -97,18 +104,17 @@ class Folder implements ISearch, ITranslate
 
         if ((new ValidRestrictedSearch())->isSatisfiedBy($this->user)) {
 
-            /* Check to see whether I have READ+ access to any group/class folders
-             */
-            $groupAndClassMembership = $this->folderMapper->findFolderIdsForUser($this->user);
+            // What access level a user must have depends on whether moderation is enabled
+            $minAccessLevel = $this->moderationEnabled ? UserAccess::ACCESS_READ : UserAccess::ACCESS_WRITE;
 
-            /* Also check to see whether I have READ+ access in other ways
-             * First, check role permissions on a group
-             */
-            $roleAccess = $this->findFolderIdsWithRoleAccess();
+            // Get folders where user has required access via group/class individual permissions
+            $groupAndClassMembership = $this->folderMapper->findFolderIdsForUser($this->user, true, $minAccessLevel);
 
-            /* Combine the two
-             */
-            $folderMembership = array_unique(array_merge($groupAndClassMembership, $roleAccess));
+            // Get folders where user has required access via their role permissions
+            $roleAccess = $this->findFolderIdsWithRoleAccess($minAccessLevel);
+
+            // Combine the two
+            $folderMembership = \array_unique(\array_merge($groupAndClassMembership, $roleAccess));
 
             /* If I have zero elements in my folderMembership, boot me out - there's nothing to fetch
              * I'm restricted from seeing any folders

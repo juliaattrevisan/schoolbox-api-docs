@@ -24,6 +24,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 use PDO;
 use Schoolbox\ValueLabelInterface;
+use Schoolbox\Comms\News;
 
 class Controller extends Base
 {
@@ -71,6 +72,8 @@ class Controller extends Base
      */
     private $roleAccessMapper;
 
+    /** @var News\Policy\Mapper */
+    private $policyMapper;
 
     /**
      * Controller constructor.
@@ -84,6 +87,7 @@ class Controller extends Base
      * @param UserMapper            $userMapper
      * @param Audience\Mapper       $audienceMapper
      * @param RoleAccessMapper      $roleAccessMapper
+     * @param News\Policy\Mapper    $policyMapper
      */
     public function __construct(
         IConnector $db,
@@ -94,7 +98,8 @@ class Controller extends Base
         Pastoral\Group\Mapper $pastoralGroupMapper,
         UserMapper $userMapper,
         Audience\Mapper $audienceMapper,
-        RoleAccessMapper $roleAccessMapper
+        RoleAccessMapper $roleAccessMapper,
+        News\Policy\Mapper $policyMapper
     ) {
         $this->db           = $db;
         $this->campusMapper = $campusMapper;
@@ -105,6 +110,7 @@ class Controller extends Base
         $this->userMapper = $userMapper;
         $this->audienceMapper = $audienceMapper;
         $this->roleAccessMapper = $roleAccessMapper;
+        $this->policyMapper = $policyMapper;
     }
 
 
@@ -124,8 +130,8 @@ class Controller extends Base
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $registry = new Audience\Segment\SearchRegistry($this->getUser(), $this->folderMapper, $this->roleAccessMapper);
-        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper);
+        $registry = new Audience\Segment\SearchRegistry($this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
+        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
         $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         $placeholder = 'keyword';
@@ -151,6 +157,7 @@ class Controller extends Base
     }
 
 
+
     /**
      * @param Collection|ValueLabelInterface[] $collection
      * @param string     $entityType
@@ -167,7 +174,7 @@ class Controller extends Base
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper);
+        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
         $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         foreach ($collection as $item) {
@@ -323,7 +330,7 @@ class Controller extends Base
      */
     public function getFolders(): void
     {
-        $folderStrategy = new Audience\Segment\Strategy\Folder($this->getUser(), $this->folderMapper, $this->roleAccessMapper);
+        $folderStrategy = new Audience\Segment\Strategy\Folder($this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
         $statement      = $this->db->executeQuery($folderStrategy->getSearchSql());
         $searchResults = new GenericCollection(ValueLabelInterface::class);
 
@@ -389,7 +396,7 @@ class Controller extends Base
         /** @var Html $outputFormatter */
         $outputFormatter = $this->getDi()->get('webOutput:nochrome');
 
-        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper);
+        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
         $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         $years = array_filter($this->userMapper->findDistinct('year'));
@@ -409,5 +416,18 @@ class Controller extends Base
             'success' => true,
             'data' => $items
         ]));
+    }
+
+
+    /**
+     * Returns whether global moderation is enabled
+     *
+     * @return bool
+     */
+    private function isGlobalModerationEnabled(): bool
+    {
+        /** @var News\Policy\Model $policy */
+        $policy = $this->policyMapper->findByColumn('identifier', 'global_moderation')->first();
+        return (bool)$policy->getValue();
     }
 }
