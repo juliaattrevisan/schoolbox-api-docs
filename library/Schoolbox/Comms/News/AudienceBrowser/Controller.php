@@ -43,7 +43,7 @@ class Controller extends Base
     private $roleMapper;
 
     /**
-     * @var \HouseMapper
+     * @var HouseMapper
      */
     private $houseMapper;
 
