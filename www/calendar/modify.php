@@ -273,7 +273,7 @@ $currentUserFolderIds = $folderMapper->findFolderIdsForUser($currentUser, true, 
 
 /* Possible options, based on calendar user's involvement. Will intersect with current user
  */
-$calendarUserFolderList = $folderMapper->findForUser($selectedUser, true, UserAccess::ACCESS_WRITE);
+$calendarUserFolderList = $folderMapper->findForUser($selectedUser, true, UserAccess::ACCESS_READ);
 
 /* Ones that it's already in, from previous selections
  */
