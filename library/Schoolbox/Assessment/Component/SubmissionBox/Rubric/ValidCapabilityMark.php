@@ -19,11 +19,10 @@ class ValidCapabilityMark extends \Alaress\Specification\Base
         $this->markType = $markType;
     }
 
+    // Marks are intentionally validated in their scaled form here; it's easiest to compare the exact value the user typed in
+    // with the capability max to ensure it's within the range.
     public function isSatisfiedBy($capabilityMark) : bool
     {
-        // TODO aren't marks always normalised??? This statement is incorrect
-        // TODO the marks coming through here are not normalised!
-        // TODO is the calculation fix merged???!
         // Percentage mark types (Letter Grade and Percentage) are always sent to the backend as values between 0-100
         $max = $this->markType === 'Total Mark' ? $this->capabilityMax : 100;
 
