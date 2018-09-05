@@ -215,7 +215,7 @@ class Controller extends Base
         ];
 
         $data[Audience\Model::RELATIONSHIP_SELF] = array_merge($baseData, [
-            'id' => Audience\Segment\Codec::encode($row['entity_type'], $row['id'], Audience\Model::RELATIONSHIP_SELF),
+            'id' => Audience\Segment\Codec::encode($row['entity_type'], (string)$row['id'], Audience\Model::RELATIONSHIP_SELF),
             'modifierOriginal' => Audience\Model::RELATIONSHIP_SELF,
             'modifier' => $translator->translateModifier(Audience\Model::RELATIONSHIP_SELF),
         ]);
@@ -234,7 +234,7 @@ class Controller extends Base
          */
         if ($businessRules->isValidRelationship($segment, Audience\Model::RELATIONSHIP_PARENTS_OF)) {
             $data[Audience\Model::RELATIONSHIP_PARENTS_OF] = array_merge($baseData, [
-                'id' => Audience\Segment\Codec::encode($row['entity_type'], $row['id'], Audience\Model::RELATIONSHIP_PARENTS_OF),
+                'id' => Audience\Segment\Codec::encode($row['entity_type'], (string)$row['id'], Audience\Model::RELATIONSHIP_PARENTS_OF),
                 'modifierOriginal' => Audience\Model::RELATIONSHIP_PARENTS_OF,
                 'modifier' => $translator->translateModifier(Audience\Model::RELATIONSHIP_PARENTS_OF),
             ]);
@@ -244,7 +244,7 @@ class Controller extends Base
          */
         if ($businessRules->isValidRelationship($segment, Audience\Model::RELATIONSHIP_TEACHERS_OF)) {
             $data[Audience\Model::RELATIONSHIP_TEACHERS_OF] = array_merge($baseData, [
-                'id' => Audience\Segment\Codec::encode($row['entity_type'], $row['id'], Audience\Model::RELATIONSHIP_TEACHERS_OF),
+                'id' => Audience\Segment\Codec::encode($row['entity_type'], (string)$row['id'], Audience\Model::RELATIONSHIP_TEACHERS_OF),
                 'modifierOriginal' => Audience\Model::RELATIONSHIP_TEACHERS_OF,
                 'modifier' => $translator->translateModifier(Audience\Model::RELATIONSHIP_TEACHERS_OF),
             ]);
