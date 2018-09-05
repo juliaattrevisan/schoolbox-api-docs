@@ -354,15 +354,20 @@
         {% endif %}
     };
 
+    // Audience selectize where user can search for simple audience segments
+    var $audienceSelectize;
+
     var app = new Vue({
         el: '#audience-select-container',
         delimiters: ['${', '}'],
         mounted: function() {
             var vue = this;
 
+            $audienceSelectize = $('#audience-search');
+
             // Audience Selectize
             // A blend of Vue and jQuery, what a world
-            $('#audience-search').selectizeSelector({
+            $audienceSelectize.selectizeSelector({
                 ajax: {
                     url: '{{ routeLookup('commsNewsAudienceBrowser.getSearch') }}',
                     type: 'GET',
@@ -459,7 +464,7 @@
 
                         // The selectize dropdown doesn't position correctly for some reason with this setup so force reposition again after a very short timeout
                         setTimeout(function() {
-                            $('#audience-search').data('selectize').positionDropdown();
+                            $audienceSelectize.data('selectize').positionDropdown();
                         }, 1);
                     },
                     onItemRemove: function() {
@@ -654,12 +659,12 @@
                     }
 
                     selectizeOptions.forEach(function (selectizeOption) {
-                        $('#audience-search').data('selectize').addOption(selectizeOption);
-                        $('#audience-search').data('selectize').addItem(selectizeOption.id);
+                        $audienceSelectize.data('selectize').addOption(selectizeOption);
+                        $audienceSelectize.data('selectize').addItem(selectizeOption.id);
                     });
                 });
 
-                $('#audience-search').data('selectize').refreshItems();
+                $audienceSelectize.data('selectize').refreshItems();
 
                 // Close modal
                 $('#audience-browse').foundation('reveal', 'close');
@@ -714,9 +719,9 @@
                     compositeItems: compositeItems
                 };
 
-                $('#audience-search').data('selectize').addOption(intersectOption);
-                $('#audience-search').data('selectize').addItem(intersectOption.id);
-                $('#audience-search').data('selectize').refreshItems();
+                $audienceSelectize.data('selectize').addOption(intersectOption);
+                $audienceSelectize.data('selectize').addItem(intersectOption.id);
+                $audienceSelectize.data('selectize').refreshItems();
 
                 // Close modal
                 $('#audience-browse').foundation('reveal', 'close');
@@ -755,9 +760,9 @@
              */
             removeAudienceItem: function(item) {
                 // Remove item + any modifiers for item from selectize
-                $('#audience-search').data('selectize').removeItem(item.id);
-                $('#audience-search').data('selectize').removeItem(item.id + '{{ relationshipParentsOf }}');
-                $('#audience-search').data('selectize').removeItem(item.id + '{{ relationshipTeachersOf }}');
+                $audienceSelectize.data('selectize').removeItem(item.id);
+                $audienceSelectize.data('selectize').removeItem(item.id + '{{ relationshipParentsOf }}');
+                $audienceSelectize.data('selectize').removeItem(item.id + '{{ relationshipTeachersOf }}');
 
                 // Remove from vue list
                 this.selectedAudienceItems.splice(this.selectedAudienceItems.indexOf(item), 1);
