@@ -8,6 +8,12 @@ message is to be delivered.
 This subsystem is the bridge between the [scheduler](200-scheduling.md) and the
 [delivery system](400-delivery.md).
 
+## Sequence Diagram
+
+![Routing sequence diagram](routing.png "Routing sequence diagram")
+
+Source: [routing.plantuml](routing.plantuml)
+
 
 
 [< Scheduling sub-system documentation](200-scheduling.md) |
