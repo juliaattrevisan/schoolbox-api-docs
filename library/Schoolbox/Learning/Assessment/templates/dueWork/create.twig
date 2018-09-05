@@ -222,6 +222,10 @@
             // Initiate
             processUseRubricClick($useRubricSwitch);
 
+            // Dynamically calculate button text on page load
+            $grid.find("[data-group]").each(function() {
+                setRubricMarkButtonText($(this).attr('data-group'));
+            })
 
             /**
              * Update max available mark on descriptor point value changes
@@ -239,7 +243,8 @@
                 function () {
 
                     // Calculate total for this descriptor's group
-                    calculateGroupTotal($(this).closest('[data-group]').data('group'));
+                    var $groupIdentifier = $(this).closest('[data-group]').attr('data-group');
+                    assignGroupTotal($groupIdentifier);
 
                     // Then calculate the entire grid total
                     calculateGridTotal();
@@ -262,11 +267,11 @@
                 // List of all groups, no duplicates
                 var groupIdentifiers = new Set(
                     $grid.find('[data-group]')
-                        .map(function() { return $(this).data('group'); })
+                        .map(function() { return $(this).attr('data-group'); })
                         .toArray()
                 );
                 groupIdentifiers.forEach(function (groupIdentifier) {
-                    calculateGroupTotal(groupIdentifier)
+                    assignGroupTotal(groupIdentifier)
                 });
                 calculateGridTotal();
             }
@@ -278,6 +283,46 @@
              *
              * @param groupIdentifier The value of this row's data-group attribute
              */
+            function assignGroupTotal(groupIdentifier) {
+                var $inputEl = $("[data-group-max-value-row][data-group='" + groupIdentifier + "']").find("input");
+                var groupTotal = calculateGroupTotal(groupIdentifier);
+                // Don't automatically update if customised
+                if (! $inputEl.attr("data-customised")) {
+                    $inputEl.val(groupTotal);
+                }
+                setRubricMarkButtonText(groupIdentifier);
+            }
+
+            function setRubricMarkButtonText(groupIdentifier) {
+                var $closestInput = $("[data-group-max-value-row][data-group='" + groupIdentifier + "']").find("input");
+                $closestInput.next("button").find("[data-rubric-sum]").text(calculateGroupTotal(groupIdentifier));
+            }
+
+            /**
+             * Calculates the assessment's max available marks from the rubric grid,
+             * and fills the max mark input with that value.
+             *
+             * Now uses the defined max value for each group, instead of the max
+             * descriptor value for each criterion.
+             */
+            function calculateGridTotal() {
+                var max = 0;
+
+                // iterate the grid, and sum the max of each row
+                $grid.find('[data-group-max-value]').each(function () {
+                    var i = parseFloat($(this).val());
+                    if (!isNaN(i)) {
+                        max += i;
+                    }
+                });
+
+                max = parseFloat(max.toFixed(2));
+
+                // Set and validate the max mark
+                $('#maxMark').val(max).valid();
+            }
+
+
             function calculateGroupTotal(groupIdentifier) {
                 var $thisMaxValueInput = $(),
                     groupMax = 0;
@@ -311,33 +356,38 @@
                     groupMax += rowMax;
                 });
 
-                $thisMaxValueInput.val(groupMax);
+                return groupMax;
             }
 
+            $("[data-group-max-value]").change(function() {
+                // TODO don't use a class for button (or any of the others)
+                var groupIdentifier = $(this).closest("[data-group]").attr("data-group");
+                var $closestAssignButton = $(this).next(".use-criterion-values");
+                if (! ($(this).val() == calculateGroupTotal(groupIdentifier)) ) {
+                    $closestAssignButton.removeAttr("disabled");
+                } else {
+                    $closestAssignButton.attr("disabled", true);
+                }
+                $(this).attr("data-customised", true);
+            });
 
-            /**
-             * Calculates the assessment's max available marks from the rubric grid,
-             * and fills the max mark input with that value.
-             *
-             * Now uses the defined max value for each group, instead of the max
-             * descriptor value for each criterion.
-             */
-            function calculateGridTotal() {
-                var max = 0;
+            $(".use-criterion-values").click(function($e) {
+                $e.preventDefault();
+                var $closestMaxMarkInput = $(this).prev("[data-group-max-value]");
+                var groupIdentifier = $(this).closest("[data-group]").attr("data-group");
+                var groupTotal = calculateGroupTotal(groupIdentifier);
 
-                // iterate the grid, and sum the max of each row
-                $grid.find('[data-group-max-value]').each(function () {
-                    var i = parseFloat($(this).val());
-                    if (!isNaN(i)) {
-                        max += i;
-                    }
-                });
+                $(this).prev("[data-group-max-value]").val(groupTotal);
 
-                max = parseFloat(max.toFixed(2));
+                // Only disable if mark is the same (which it always should be in this case, but...be safe)
+                if (groupTotal == $closestMaxMarkInput.val()) {
+                    $(this).attr("disabled", true);
+                } else {
+                    $(this).removeAttr("disabled");
+                }
 
-                // Set and validate the max mark
-                $('#maxMark').val(max).valid();
-            }
+                $closestMaxMarkInput.removeAttr("data-customised");
+            });
         }
 
         // Init the entire grid on document.ready

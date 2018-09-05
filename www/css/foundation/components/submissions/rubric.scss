@@ -134,6 +134,25 @@ table.rb {
             background-color: $container-bg;
         }
     }
+
+    .rb-group-summary {
+        background-color: lighten($input-border-color, 10%) !important;
+        color: calc-text-color(lighten($input-border-color, 10%));
+
+        label {
+            font-weight: bold!important;
+            display: block;
+        }
+
+        input[type=tel] {
+            border-color: $input-border-color;
+            color: calc-text-color($container-bg);
+            background-color: $container-bg;
+            width: 5rem;
+            display: inline-block;
+        }
+    }
+
     tr {
         label {
             transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
@@ -236,14 +255,6 @@ table.rb {
 .rb-blank {
     background-color: #FFEFEB !important;
     color: calc-text-color(#FFEFEB);
-}
-.rb-group-summary {
-    background-color: lighten($input-border-color, 10%) !important;
-    color: calc-text-color(lighten($input-border-color, 10%));
-
-    label {
-        font-weight: bold!important;
-    }
 }
 .rb-final-summary {
     background-color: $input-border-color !important;

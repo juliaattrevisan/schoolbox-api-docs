@@ -120,6 +120,7 @@ class Controller extends BaseController
                 $normGroup = $this->mapper->normaliseForComparison($criterion->getGroup()->getName());
                 $normName = $this->mapper->normaliseForComparison($criterion->getName());
                 if($normGroup == $proposedGroup && $normName == $proposedName){
+                    // TODO localise!!!!!
                     $this->sendJSONError("Indicator already exists in this Group");
                     return;
                 }
@@ -142,6 +143,7 @@ class Controller extends BaseController
             foreach ($criteria as $criterion){
                 $grouping = $this->mapper->normaliseForComparison($criterion->getGroup()->getName());
                 if($proposed == $grouping){
+                    // TODO localise
                     $this->sendJSONError("Group name already exists in this context");
                     return;
                 }
