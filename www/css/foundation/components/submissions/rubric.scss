@@ -148,6 +148,8 @@ table.rb {
             border-color: $input-border-color;
             color: calc-text-color($container-bg);
             background-color: $container-bg;
+            width: 5rem;
+            display: inline-block;
         }
     }
 
@@ -313,11 +315,6 @@ table.rb {
 
 .descriptor-sum {
     font-weight: bold;
-}
-
-input[data-group-max-value] {
-    width: 5rem;
-    display: inline-block;
 }
 
 select.letter-grade-select {
