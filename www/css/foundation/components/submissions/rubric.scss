@@ -15,9 +15,6 @@ table.rb {
         }
 
         .rb-group-summary {
-            label {
-                width: 7rem;
-            }
             .groupMark {
                 width: 5rem;
                 display: inline-block;
@@ -59,6 +56,10 @@ table.rb {
         span {
             margin: $table-row-padding;
         }
+
+        &.error {
+            margin-bottom: 0;
+        }
     }
 
     // Self Reflection
@@ -78,13 +79,7 @@ table.rb {
             padding-left: 2.6125rem;
         }
     }
-    label {
-        // Prevent validation errors from making cells enormous
-        &.error {
-            max-width: 11rem;
-        }
-        margin: 0;
-    }
+
     tbody th:first-of-type {
         border-right: solid 1px $body-bg;
         border-left: 0;
@@ -104,6 +99,7 @@ table.rb {
             }
         }
     }
+
     td {
         overflow: hidden;
 
