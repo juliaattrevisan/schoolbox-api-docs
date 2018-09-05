@@ -25,13 +25,6 @@ var validateOptions = {
     },
     messages: {
         weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should be zero or greater',
-    },
-    errorPlacement: function(error, element) {
-        if ($(element).attr("data-criterion-name")) {
-            error.insertAfter($(element).next("label.checkbox-label"));
-        } else {
-            error.insertAfter(element);
-        }
     }
 };
 
