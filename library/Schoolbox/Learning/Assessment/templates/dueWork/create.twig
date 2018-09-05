@@ -392,10 +392,9 @@
             $("[data-group-max-value]").each(function() {
                 $(this).rules("add", {
                     number: true,
-                    positiveNumber: true,
+                    min: 0,
                     messages: {
-                        number: "Please enter a numeric value",
-                        positiveNumber: "Please enter a number greater than or equal to 0"
+                        number: "Please enter a numeric value"
                     }
                 });
             });
