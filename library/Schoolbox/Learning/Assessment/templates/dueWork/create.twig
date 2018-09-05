@@ -391,6 +391,7 @@
             // TODO get validation error message to appear UNDERNEATH not BETWEEN input and button
             $("[data-group-max-value]").each(function() {
                 $(this).rules("add", {
+                    required: true,
                     number: true,
                     min: 0,
                     messages: {
