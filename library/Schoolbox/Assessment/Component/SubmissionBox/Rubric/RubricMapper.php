@@ -786,7 +786,7 @@ class RubricMapper
         }
 
         /** @var Rubric $rubric */
-        $rubric = $this->factory->buildFromPostData([0 => $postdata], $useMarkRange, $markPerCapability, true);
+        $rubric = $this->factory->buildFromPostData([0 => $postdata], $markPerCapability, $useMarkRange,true);
 
         return [$rubric, $markPerCapability, $useMarkRange];
     }
