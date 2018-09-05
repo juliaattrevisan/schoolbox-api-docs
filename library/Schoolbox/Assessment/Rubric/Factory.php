@@ -68,10 +68,12 @@ class Factory
      *
      * @param array $formData
      * @param bool  $includeEmptyCriteria
+     * @param bool $markPerCap
      * @param bool  $usesMarkRange
      * @return Rubric
+     * @throws InvalidArgumentException
      */
-    public function buildFromPostData(array $formData, bool $includeEmptyCriteria, bool $usesMarkRange)
+    public function buildFromPostData(array $formData, bool $markPerCap, bool $usesMarkRange, bool $includeEmptyCriteria)
     {
         // we're only going to take the first one... this could be converted to foreach easily enough
         $rubricData = reset($formData);
@@ -103,8 +105,14 @@ class Factory
         // cache groups
         foreach ($groups as $groupId => $groupData) {
             $groupName     = $groupData['name'];
-            $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
-            $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
+            $groupMaxValue = isset($groupData['maxValue']) ? $groupData['maxValue'] : null;
+
+            if ((new ValidCapabilityMax($markPerCap))->isSatisfiedBy($groupMaxValue)) {
+                $groupCache[$groupId] = new Group($groupId, $groupName, $groupMaxValue);
+            } else {
+                throw new InvalidArgumentException(sprintf('provide capability maximum points that are numeric and greater than or equal to 0'));
+            }
+
         }
 
         foreach ($criteria as $criterionId => $criterion) {

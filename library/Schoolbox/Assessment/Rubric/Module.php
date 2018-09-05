@@ -47,14 +47,6 @@ class Module extends BaseModule
         $this->register('POST', '', 'create', $permission);
         $this->register('POST', '/csv', 'download', $permission);
         $this->register('POST', '/import/{storageTuple}', 'import', $permission, $filePreload);
-
-        // Test actions
-        // TODO consider removing
-        $this->register('GET', '/test', 'testGeneric', $permission);
-        $this->register('GET', '/test/empty', 'testEmpty', $permission);
-        $this->register('GET', '/test/box/{boxId}', 'testBox', $permission);
-        $this->register('GET', '/test/csv/{boxId}', 'testCSV', $permission);
-        $this->register('GET', '/test/folder/{folderId}', 'testFolder', $permission);
     }
 
 

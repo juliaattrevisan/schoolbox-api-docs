@@ -249,7 +249,7 @@ class RubricMapper
 
         // use the factory to produce the rubric object
         /** @var Rubric $rubric */
-        $rubric = $this->factory->buildFromPostData($postdata, $getParentCriteria || $editMode, $box->isMarkedUsingRange());
+        $rubric = $this->factory->buildFromPostData($postdata, $box->isMarkedPerRubricGroup(), $box->isMarkedUsingRange(), $getParentCriteria || $editMode);
 
         return $rubric->setSubmissionBox($box);
     }
@@ -786,8 +786,7 @@ class RubricMapper
         }
 
         /** @var Rubric $rubric */
-        // TODO until such time as mark range config is stored in CSV, default to false
-        $rubric = $this->factory->buildFromPostData([0 => $postdata], true, false);
+        $rubric = $this->factory->buildFromPostData([0 => $postdata], $markPerCapability, $useMarkRange,true);
 
         return [$rubric, $markPerCapability, $useMarkRange];
     }
