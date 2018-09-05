@@ -145,7 +145,7 @@ table.rb {
         }
 
         input[type=tel] {
-            border-color: $input-focus-border-color !important;
+            border-color: $input-border-color;
             color: calc-text-color($container-bg);
             background-color: $container-bg;
         }
