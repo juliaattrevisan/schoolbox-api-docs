@@ -136,6 +136,14 @@ table.rb {
     }
 
     .rb-group-summary {
+        background-color: lighten($input-border-color, 10%) !important;
+        color: calc-text-color(lighten($input-border-color, 10%));
+
+        label {
+            font-weight: bold!important;
+            display: block;
+        }
+
         input[type=tel] {
             border-color: $input-focus-border-color !important;
             color: calc-text-color($container-bg);
@@ -246,14 +254,6 @@ table.rb {
     background-color: #FFEFEB !important;
     color: calc-text-color(#FFEFEB);
 }
-.rb-group-summary {
-    background-color: lighten($input-border-color, 10%) !important;
-    color: calc-text-color(lighten($input-border-color, 10%));
-
-    label {
-        font-weight: bold!important;
-    }
-}
 .rb-final-summary {
     background-color: $input-border-color !important;
     color: calc-text-color($input-border-color);
@@ -313,12 +313,6 @@ table.rb {
 
 .descriptor-sum {
     font-weight: bold;
-}
-
-.rb-group-summary {
-    label {
-        display: block;
-    }
 }
 
 input[data-group-max-value] {
