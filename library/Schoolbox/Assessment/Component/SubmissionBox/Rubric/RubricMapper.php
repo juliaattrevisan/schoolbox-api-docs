@@ -1167,7 +1167,7 @@ class RubricMapper
             ->equals('sr.owner', $student->getId())
             ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->notNull('sr.published_at')
-            ->isTrue('rm.valid')
+            ->isTrue('rgm.valid')
             ->isNull('sr.deleted_at')
             ->isNull('rd.deleted_at')
             ->isNull('rl.deleted_at')
