@@ -21,6 +21,7 @@ class ValidCapabilityMark extends \Alaress\Specification\Base
 
     public function isSatisfiedBy($capabilityMark) : bool
     {
+        // TODO aren't marks always normalised??? This statement is incorrect
         // Percentage mark types (Letter Grade and Percentage) are always sent to the backend as values between 0-100
         $max = $this->markType === 'Total Mark' ? $this->capabilityMax : 100;
 
