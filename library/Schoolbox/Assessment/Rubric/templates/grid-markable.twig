@@ -444,9 +444,10 @@
             var customMark = $changed.val();
 
             if ($groupSummary.length) {
-                $groupSummary.attr('data-scaled-mark', scale($groupSummary, getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'))));
-                $groupSummary.attr('data-mark', getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum')));
-                $groupSummary.find('[data-db-mark]').val(getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum')));
+                var normalisedMark = getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'), $groupSummary.attr('data-max'));
+                $groupSummary.attr('data-scaled-mark', scale($groupSummary, normalisedMark));
+                $groupSummary.attr('data-mark', normalisedMark);
+                $groupSummary.find('[data-db-mark]').val(normalisedMark);
                 $groupSummary.attr('data-customised', true);
             }
 
@@ -463,23 +464,21 @@
         });
 
         // Custom marks reach us as either a scaled numeric mark or a percentage. Turn them into an unscaled raw mark for data-mark
-        function getNormalisedCustomMark($groupRows, customMark, rowMaxSum) {
+        function getNormalisedCustomMark($groupRows, customMark, rowMaxSum, capMax) {
             var normalised = 0;
-
-            // console.log(customMark);
 
             if ($groupRows.length) {
                 var rowCount = $groupRows.length;
                 switch (markType) {
                     case 'TotalMarkFractional':
                         // We got a scaled numeric mark. We need to make it unscaled.
-                        normalised = customMark * rowCount;
+                        normalised = customMark * (rowMaxSum / capMax);
                         break;
 
                     case 'LetterGrade':
                     case 'Percentage':
                         // What is x percent of the total possible (unscaled) marks?
-                        normalised = (rowMaxSum / 100) * customMark;
+                        normalised = customMark * (rowMaxSum / 100);
                         break;
 
                     default:
