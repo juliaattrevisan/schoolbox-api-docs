@@ -23,8 +23,12 @@ class ValidCapabilityMark extends \Alaress\Specification\Base
     {
         // TODO aren't marks always normalised??? This statement is incorrect
         // Percentage mark types (Letter Grade and Percentage) are always sent to the backend as values between 0-100
-        $max = $this->markType === 'Total Mark' ? $this->capabilityMax : 100;
+        $max = $this->markType === 'TotalMarkFractional' ? $this->capabilityMax : 100;        // Percentage mark types (Letter Grade and Percentage) are always sent to the backend as values between 0-100
 
-        return is_numeric($capabilityMark) && $capabilityMark >= 0 && $capabilityMark <= $max;
+        // TODO for debugging only, remove later
+        $isNumeric = is_numeric($capabilityMark);
+        $greaterOrEqualToZero = $capabilityMark >= 0;
+        $lessThanOrEqualToMax = $capabilityMark <= $max;
+        return $isNumeric && $greaterOrEqualToZero && $lessThanOrEqualToMax;
     }
 }
