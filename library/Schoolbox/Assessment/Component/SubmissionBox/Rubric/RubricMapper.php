@@ -834,7 +834,7 @@ class RubricMapper
         // Pass 1.5: is a custom max mark for the group set?
         foreach ($customGroupMarks as $groupId => $markData) {
 
-            if ((new ValidCapabilityMark($markData['max'], $markType))->isSatisifedBy($markData['customMark'])) {
+            if ((new ValidCapabilityMark($markData['max'], $markType))->isSatisfiedBy($markData['customMark'])) {
                 // Find a record for its group
                 $group = $groupMapper->findById($groupId);
 
