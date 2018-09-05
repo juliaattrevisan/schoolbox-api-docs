@@ -113,11 +113,10 @@ class Model
     /** @var GenericCollection|self[] */
     private $children;
 
-    /**
-     * @throws \UnexpectedValueException
-     */
+
     public function __construct()
     {
+        /** @noinspection PhpUnhandledExceptionInspection (impossible as we're not adding items) */
         $this->children = new GenericCollection(self::class);
     }
 
