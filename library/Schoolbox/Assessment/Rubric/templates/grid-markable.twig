@@ -444,9 +444,10 @@
             var customMark = $changed.val();
 
             if ($groupSummary.length) {
-                $groupSummary.attr('data-scaled-mark', scale($groupSummary, getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'), $groupSummary.attr('data-max'))));
-                $groupSummary.attr('data-mark', getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'), $groupSummary.attr('data-max')));
-                $groupSummary.find('[data-db-mark]').val(getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'), $groupSummary.attr('data-max')));
+                var normalisedMark = getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'), $groupSummary.attr('data-max'));
+                $groupSummary.attr('data-scaled-mark', scale($groupSummary, normalisedMark));
+                $groupSummary.attr('data-mark', normalisedMark);
+                $groupSummary.find('[data-db-mark]').val(normalisedMark);
                 $groupSummary.attr('data-customised', true);
             }
 
