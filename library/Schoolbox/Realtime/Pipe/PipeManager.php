@@ -234,7 +234,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
         if ($e instanceof ConnectionException) {
-            $this->log->warning("Socket connection to redis gone away");
+            $this->log->warning("Connection to client lost, terminating");
         }
         else if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`', $e->getMessage(), $matches)) {
             $this->log->warning("IOException: {$matches[3]} [{$matches[2]}] ({$matches[1]} bytes dropped)");
