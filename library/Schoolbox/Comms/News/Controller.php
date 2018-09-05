@@ -163,12 +163,13 @@ class Controller extends Base
      * Provide form to create a news article
      *
      * @api GET /comms/news/create
+     * @level 18.1
      *
      * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException
      */
-    public function getCreate()
+    public function getCreate(): void
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
@@ -217,6 +218,7 @@ class Controller extends Base
      * Create a news article
      *
      * @api POST /comms/news/create
+     * @level 18.1
      *
      * @throws InvalidArgumentException
      * @throws MapperException
@@ -226,7 +228,7 @@ class Controller extends Base
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
      */
-    public function postCreate()
+    public function postCreate(): void
     {
         /* Set YOU as the initial author
          * Otherwise, when a moderator edits your article, they might assume direct authorship instead
@@ -241,6 +243,7 @@ class Controller extends Base
      * Provide form to update a news article
      *
      * @api GET /comms/news/{articleId}/update
+     * @level 18.1
      *
      * @param Model $article
      * @throws MapperException
@@ -250,7 +253,7 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function getUpdate(Model $article)
+    public function getUpdate(Model $article): void
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
@@ -294,6 +297,7 @@ class Controller extends Base
      * Update a news article
      *
      * @api POST /comms/news/{articleId}
+     * @level 18.1
      *
      * @param Model $article
      * @throws InvalidArgumentException
@@ -304,7 +308,7 @@ class Controller extends Base
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
      */
-    public function postUpdate(Model $article)
+    public function postUpdate(Model $article): void
     {
         try {
 
@@ -422,8 +426,9 @@ class Controller extends Base
      * Get a list of available news topics that can be assigned to an article
      *
      * @api GET /comms/news/topics
+     * @level 18.1
      */
-    public function getTopics()
+    public function getTopics(): void
     {
         $this->getResponse()->content->set($this->buildJsonOutput($this->topicMapper->findAll()));
     }
@@ -433,6 +438,7 @@ class Controller extends Base
      * Load a news article so you can read its contents (the detail screen)
      *
      * @api GET /comms/news/{articleId}
+     * @level 18.1
      *
      * @param Model $article
      * @throws MapperException
@@ -536,6 +542,7 @@ class Controller extends Base
      * Delete an article
      *
      * @api POST /comms/news/{articleId}/delete
+     * @level 18.1
      *
      * @param Model $article
      * @throws MapperException
@@ -546,7 +553,7 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function postDelete(Model $article)
+    public function postDelete(Model $article): void
     {
         try {
             /* Try to delete this article
@@ -598,6 +605,7 @@ class Controller extends Base
      * This is the central piece of the puzzle
      *
      * @api GET /comms/news/list
+     * @level 18.1
      *
      * @param int|null $year
      * @param int|null $month
@@ -612,7 +620,7 @@ class Controller extends Base
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getListByTopic(?int $year, ?int $month)
+    public function getListByTopic(?int $year, ?int $month): void
     {
         $params = new Querystring($this->getRequest()->query);
         $topics = $this->topicMapper->findAll();
@@ -654,6 +662,7 @@ class Controller extends Base
      * News Archive
      *
      * @api GET /comms/news/archive{/year,month}
+     * @level 18.1
      *
      * @param int|null $year
      * @param int|null $month
@@ -668,7 +677,7 @@ class Controller extends Base
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getArchive(int $year = null, int $month = null)
+    public function getArchive(int $year = null, int $month = null): void
     {
 
         /* These referrers should be used, even when they're not explicitly provided in the url
@@ -719,6 +728,7 @@ class Controller extends Base
      * Get a list of articles audienced to you
      *
      * @api GET /comms/news
+     * @level 18.1
      *
      * @throws InvalidArgumentException
      * @throws MapperException
@@ -731,7 +741,7 @@ class Controller extends Base
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getIndex()
+    public function getIndex(): void
     {
 
         /* These referrers should be used, even when they're not explicitly provided in the url
@@ -936,13 +946,14 @@ class Controller extends Base
      * Compute the recipients so author can identify
      *
      * @api /comms/news/:articleId/recipients
+     * @level 18.1
      *
      * @param Model $article
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getRecipients(Model $article)
+    public function getRecipients(Model $article): void
     {
         $userIds = $this->userResolver->findUsersForArticle($article->getId());
 
