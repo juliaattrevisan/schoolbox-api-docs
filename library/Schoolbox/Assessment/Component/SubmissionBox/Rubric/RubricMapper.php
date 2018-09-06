@@ -25,6 +25,7 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\IStorage;
@@ -796,11 +797,13 @@ class RubricMapper
      *
      * @param array[] $descriptors key = descriptor.id
      *                             val = [selected: is it selected?, value: what's its value?]
-     * @param array[] $groups      key = group.id
+     * @param array[] $customGroupMarks      key = group.id
      *                             val = [value: what's its value? (only if set manually)]
+     * @param IMarkScheme $markScheme
      * @param int     $returnId    Feedback
+     * @throws \InvalidArgumentException
      */
-    public function saveForFeedback(array $descriptors, array $groups, int $returnId): void
+    public function saveForFeedback(array $descriptors, array $customGroupMarks, IMarkScheme $markScheme, int $returnId): void
     {
         $groupMapper     = GroupMapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();
@@ -820,10 +823,6 @@ class RubricMapper
         // - optionally, marks from the custom mark-per-cap input fields (only if mark-per-cap is enabled. may be empty array)
         // - optionally, selected descriptor values (may be empty array)
 
-        $customGroupMarks = array_map(function($group) {
-            return $group['value'];
-        }, $groups);
-
         $selectedDescriptors = [];
         foreach ($descriptors as $id => $descriptor) {
             if (!empty($descriptor['selected'])) {
@@ -834,20 +833,27 @@ class RubricMapper
         $returnedWork     = $returnedWorkMapper->findById($returnId);
 
         // Pass 1.5: is a custom max mark for the group set?
-        foreach ($customGroupMarks as $groupId => $customMark) {
-            // Find a record for its group
-            $group = $groupMapper->findById($groupId);
+        foreach ($customGroupMarks as $groupId => $markData) {
 
-            // If it doesn't exist: make a new one
-            if (!$groupMarksToSave[$groupId]) {
-                $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
-                    ->setSubmissionReturn($returnedWork)
-                    ->setGroup($group)
-                    ->setValid(true);
+            if ((new ValidCapabilityMark($markData['max'], $markScheme))->isSatisfiedBy($markData['customMark'])) {
+                // Find a record for its group
+                $group = $groupMapper->findById($groupId);
+
+                // If it doesn't exist: make a new one
+                // TODO under what circumstance would it be possible to mark a group that doesn't exist??
+                if (!$groupMarksToSave[$groupId]) {
+                    $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
+                        ->setSubmissionReturn($returnedWork)
+                        ->setGroup($group)
+                        ->setValid(true);
+                }
+
+                // Save the custom mark if provided; otherwise just 0
+                $groupMarksToSave[$groupId]->setValue($markData['customMark']);
+            } else {
+                // TODO handle this somewhere else?
+                throw new \InvalidArgumentException("Capability mark must be between 0 and " . $markData['max']);
             }
-
-            // Save the custom mark if provided; otherwise just 0
-            $groupMarksToSave[$groupId]->setValue($customMark ?? 0);
         }
 
         // Pass 2: build set of descriptor marks

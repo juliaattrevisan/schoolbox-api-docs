@@ -158,7 +158,12 @@
                         <input type="hidden"
                                data-db-mark
                                value="{{ group.mark }}"
-                               name="{{ formField }}[groups][{{ group.id }}][value]">
+                               name="{{ formField }}[groups][{{ group.id }}][unscaledMark]">
+
+                        {# This is the maximum capability mark, which wouldn't get POSTed otherwise #}
+                        <input type="hidden"
+                               value="{{ group.max }}"
+                               name="{{ formField }}[groups][{{ group.id }}][max]">
 
                         <label for="group-{{ group.id }}-mark">{{ locale.rubricGroup.proper }} mark</label>
 
@@ -167,11 +172,13 @@
                                    class="groupMark"
                                    id="group-{{ group.id }}-mark"
                                    type="tel"
+                                   name="{{ formField }}[groups][{{ group.id }}][customMark]"
                                    value="{{ group.scaledMark }}"/> / {{ group.max }}
 
                         {% elseif markSchemeName == 'LetterGrade' %}
                             <select data-group-mark
                                     class="groupMark"
+                                    name="{{ formField }}[groups][{{ group.id }}][customMark]"
                                     id="group-{{ group.id }}-mark">
 
                                 {% for value, letter in markType.conf %}
@@ -188,6 +195,7 @@
                                    class="groupMark"
                                    id="group-{{ group.id }}-mark"
                                    type="tel"
+                                   name="{{ formField }}[groups][{{ group.id }}][customMark]"
                                    value="{{ percentageMark }}"/> %
 
                         {% endif %}
