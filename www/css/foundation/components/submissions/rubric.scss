@@ -29,6 +29,8 @@ table.rb {
                 }
             }
             + label {
+                margin: 0;
+
                 // Prevent iPad breakage
                 * {
                     pointer-events: none;
