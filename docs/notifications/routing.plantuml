@@ -9,6 +9,10 @@ participant "RouterTransmitterReceiver\n<size:10>//\Schoolbox\Realtime\Routing\R
 'participant "Dispatcher\n<size:10>//\Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy//</size>" as Dispatcher
 participant "Worker\n<size:10>//\Schoolbox\Realtime\Routing\Worker//</size>" as Worker
 participant "QueueSorter\n<size:10>//\Schoolbox\Realtime\Routing\QueueSorter//</size>" as QueueSorter
+participant "PermissionMapper\n<size:10>//\Schoolbox\Realtime\Message\RoutePermissionMapper//</size>" as PermissionMapper
+participant "DeliveryQueue\n<size:10>//\Alaress\Async\Queue\QueueInterface//</size>" as DeliveryQueue
+
+
 
 ==Startup==
 
@@ -39,6 +43,14 @@ note left
     process knows to whom messages are sent:
     its job is to determine the delivery mechanism
     through which they're sent.
+end note
+QueueSorter <-> PermissionMapper : getReroutedLevel()
+QueueSorter -> DeliveryQueue : push()
+note left
+    getReroutedLevel is used to determine exactly
+    which DeliveryQueue instance is pushed to,
+    and therefore the delivery mechanism for the
+    message.
 end note
 end group
 
