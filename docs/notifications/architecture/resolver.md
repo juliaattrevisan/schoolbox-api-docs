@@ -12,7 +12,7 @@ with whether a Message is deliverable to a user.
 <dl>
   <dt>Resolver</dt>
   <dd>
-    A subsystem that is used to determine which users are subscribed to a 
+    A subsystem that is used to determine which users are subscribed to a
     Message Topic.
   </dd>
 
@@ -154,7 +154,7 @@ The Resolver has two variants, for two different use cases:
 
 #### Read-only (flattened)
 
-This variant is optimised for read performance: 
+This variant is optimised for read performance:
 
 
 #### Writable (hydrated)
