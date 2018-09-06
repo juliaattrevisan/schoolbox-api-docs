@@ -29,6 +29,7 @@ use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Pastoral\UploadQueue\Model as UploadQueue;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -236,7 +237,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         do {
             $queryRecords =
-            "
+                "
                 {$this->sqlPastoralSelect}
                 WHERE         PastoralCareSeq > {$highestPastoralSeq}
                 ORDER BY      dbo.tPastoralCare.PastoralCareSeq
@@ -405,6 +406,53 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 }
 
                 $this->getPastoralLogMapper()->save($logAccess);
+            }
+        }
+
+        // Import attachments from Synergetic DocMan
+
+        $queryDocuments = $this->connector->executeQuery("
+            SELECT      ref.RelatedSeq as external_id,
+                        doc.Description as [filename],
+                        DocumentType as extension,
+                        [Document] as [blob]
+            FROM        media.tDocuments doc
+            JOIN        media.tDocumentReferences ref on ref.tDocumentsSeq = doc.tDocumentsSeq
+            WHERE       RelatedSeqModuleCode = 'SPC' 
+        ");
+        $documents = $queryDocuments->fetchAll();
+
+        foreach ($documents as $document) {
+            try {
+                $record = $this->getPastoralMapper()->findOneByColumn('external_id', $document['external_id']);
+
+                $filename = tempnam(sys_get_temp_dir(), 'pastoral_attachment');
+                file_put_contents($filename, $document["blob"]);
+
+                /** @var StorageMapper $storageMapper */
+                $storageMapper = StorageMapper::getInstance();
+                $storageObject = $storageMapper->accept("{$document['filename']}.{$document['extension']}", $filename, false);
+
+                $pastoralAttachmentMapper = PastoralAttachmentMapper::getInstance();
+
+                $attachment = $pastoralAttachmentMapper->createModel();
+                $attachment->setPastoral($record);
+                $attachment->setStorage($storageObject);
+                $attachment->setPrivate(true);
+                $pastoralAttachmentMapper->save($attachment);
+
+                $log = $this->getPastoralLogMapper()->createModel();
+                $log->setImportId($importId);
+                $log->setUserId($user->getId());
+                $log->setPastoralId($record->getId());
+                $log->setCreatorName($record->getOwner()->getFullName());
+                $log->setStudentName($record->getStudent()->getFullName());
+                $log->setHeading("Imported Attachment '{$document["filename"]}'");
+                $log->setResult("OK");
+                $this->getPastoralLogMapper()->save($log);
+
+                unlink($filename);
+            } catch (MapperException $e) {
             }
         }
 
