@@ -28,8 +28,6 @@ class Module extends BaseModule
 
     /**
      * Hook method for setting up routes via self::register()
-     *
-     * @throws InvalidArgumentException
      */
     protected function registerRoutes(): void
     {
