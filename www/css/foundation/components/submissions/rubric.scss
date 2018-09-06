@@ -26,10 +26,11 @@ table.rb {
                 + label {
                     background-color: $content-ui-selected;
                     color: calc-text-color($content-ui-selected);
-                    margin: 0;
                 }
             }
             + label {
+                margin: 0;
+
                 // Prevent iPad breakage
                 * {
                     pointer-events: none;
