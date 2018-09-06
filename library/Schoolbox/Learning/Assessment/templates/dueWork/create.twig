@@ -360,9 +360,8 @@
             }
 
             $("[data-group-max-value]").change(function() {
-                // TODO don't use a class for button (or any of the others)
                 var groupIdentifier = $(this).closest("[data-group]").attr("data-group");
-                var $closestAssignButton = $(this).next(".use-criterion-values");
+                var $closestAssignButton = $(this).next("[data-use-criterion-values]");
                 if (! ($(this).val() == calculateGroupTotal(groupIdentifier)) ) {
                     $closestAssignButton.removeAttr("disabled");
                 } else {
@@ -371,7 +370,7 @@
                 $(this).attr("data-customised", true);
             });
 
-            $(".use-criterion-values").click(function($e) {
+            $("[data-use-criterion-values]").click(function($e) {
                 $e.preventDefault();
                 var $closestMaxMarkInput = $(this).prev("[data-group-max-value]");
                 var groupIdentifier = $(this).closest("[data-group]").attr("data-group");
@@ -387,6 +386,18 @@
                 }
 
                 $closestMaxMarkInput.removeAttr("data-customised");
+            });
+
+            // TODO get validation error message to appear UNDERNEATH not BETWEEN input and button
+            $("[data-group-max-value]").each(function() {
+                $(this).rules("add", {
+                    required: true,
+                    number: true,
+                    min: 0,
+                    messages: {
+                        number: "Please enter a numeric value"
+                    }
+                });
             });
         }
 

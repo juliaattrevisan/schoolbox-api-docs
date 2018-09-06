@@ -11,7 +11,9 @@
 <script>
     $(function () {
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
-        $('input[data-mage-next]').mage();
+        $('input[data-mage-next]').mage({
+            validateOptions: validateOptions
+        });
 
         /**
          * When you finish configuring a non-project assessment
