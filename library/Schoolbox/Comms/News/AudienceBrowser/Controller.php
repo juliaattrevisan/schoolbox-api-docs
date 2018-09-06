@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\AudienceBrowser;
 
 use Alaress\Web\Controller\Base;
-use Alaress\Web\Output\Html;
 use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -126,12 +125,8 @@ class Controller extends Base
     {
         $searchResult = [];
 
-        /** @var Html $outputFormatter */
-        $outputFormatter = $this->getDi()->get('webOutput:nochrome');
-
         $registry = new Audience\Segment\SearchRegistry($this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
         $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
-        $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         $placeholder = 'keyword';
         $statement   = $this->userMapper->getDatabase()->prepare($registry->getSearchSql($placeholder));
@@ -145,14 +140,22 @@ class Controller extends Base
          */
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data = $this->generateDecoratedDataTuple($row, $translator, $formatter);
+            $data = $this->generateDecoratedDataTuple($row, $translator);
 
             /* One-dimensional stack, please
              */
-            $searchResult[] = array_values($formatter->decorate($data));
+            $searchResult[] = array_values($data);
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($searchResult));
+        // TODO only return required data
+        $flatResults = [];
+        foreach ($searchResult as $r){
+            foreach($r as $x) {
+                $flatResults[] = $x;
+            }
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($flatResults));
     }
 
 
@@ -161,7 +164,6 @@ class Controller extends Base
      * @param Collection|ValueLabelInterface[] $collection
      * @param string     $entityType
      * @return \Alaress\Web\Output\Json
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
@@ -170,18 +172,14 @@ class Controller extends Base
     {
         $items = [];
 
-        /** @var Html $outputFormatter */
-        $outputFormatter = $this->getDi()->get('webOutput:nochrome');
-
         $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
-        $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         foreach ($collection as $item) {
             $row = array_combine(['id', 'name'], $item->findValueLabelPair());
 
             $row['entity_type'] = $entityType;
 
-            $items[] = $this->generateDecoratedDataTuple($row, $translator, $formatter);
+            $items[] = $this->generateDecoratedDataTuple($row, $translator);
         }
 
         return $this->buildJsonOutput([
@@ -196,14 +194,12 @@ class Controller extends Base
      *
      * @param array                  $row
      * @param Audience\Segment\Translator     $translator
-     * @param Audience\Segment\HtmlFormatter  $formatter
      * @return array
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    private function generateDecoratedDataTuple(array $row, Audience\Segment\Translator $translator, Audience\Segment\HtmlFormatter $formatter): array
+    private function generateDecoratedDataTuple(array $row, Audience\Segment\Translator $translator): array
     {
         $data = [];
 
@@ -249,9 +245,7 @@ class Controller extends Base
             ]);
         }
 
-        /* Generate nice html versions of each data point
-         */
-        return $formatter->decorate($data);
+        return $data;
     }
 
 
@@ -260,7 +254,6 @@ class Controller extends Base
      *
      * @api /comms/news/audiencebrowser/campuses
      * @level 18.1
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
@@ -276,7 +269,6 @@ class Controller extends Base
      *
      * @api /comms/news/audiencebrowser/roles
      * @level 18.1
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
@@ -292,7 +284,6 @@ class Controller extends Base
      *
      * @api /comms/news/audiencebrowser/pastoralgroups
      * @level 18.1
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
@@ -308,10 +299,10 @@ class Controller extends Base
      *
      * @api /comms/news/audiencebrowser/houses
      * @level 18.1
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @todo This should be SchoolHouse (to disambiguate from residential house), or better yet, take $entityType as param and use factory/interface
      */
     public function getHouses(): void
     {
@@ -325,7 +316,6 @@ class Controller extends Base
      * @api /comms/news/audiencebrowser/folders
      * @level 18.1
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
@@ -398,11 +388,7 @@ class Controller extends Base
     {
         $items = [];
 
-        /** @var Html $outputFormatter */
-        $outputFormatter = $this->getDi()->get('webOutput:nochrome');
-
         $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
-        $formatter = new Audience\Segment\HtmlFormatter($outputFormatter);
 
         $years = array_filter($this->userMapper->findDistinct('year'));
         sort($years);
@@ -414,7 +400,7 @@ class Controller extends Base
                 'entity_type' => Audience\Model::ENTITY_TYPE_YEAR
             ];
 
-            $items[] = $this->generateDecoratedDataTuple($row, $translator, $formatter);
+            $items[] = $this->generateDecoratedDataTuple($row, $translator);
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput([

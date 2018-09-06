@@ -44,18 +44,18 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>Title</label>
-                        <input name="title" type="text" maxlength="255" value="{{ article.title }}" />
+                        <label for="title">Title</label>
+                        <input id="title" name="title" type="text" maxlength="255" value="{{ article.title }}" />
                     </div>
 
                     <div class="small-12 columns">
-                        <label>Body</label>
-                        <textarea name="body">{{ article.body }}</textarea>
+                        <label for="body">Body</label>
+                        <textarea id="body" name="body">{{ article.body }}</textarea>
                     </div>
 
                     <div class="small-12 columns">
-                        <label>Blurb</label>
-                        <textarea name="blurb">{{ article.blurb }}</textarea>
+                        <label for="blurb">Blurb</label>
+                        <textarea id="blurb" name="blurb">{{ article.blurb }}</textarea>
                     </div>
                 </fieldset>
 
@@ -256,6 +256,13 @@
 
 <div class="toast" id="saveDraft"></div>
 
+{# custom HTML for the audience selecize dropdown options. Client-side to ensure consitent human-readable entity types #}
+<div id="audience-selectize-dropdown-option">
+    <span data-name></span>
+    <span data-entityType class="meta"></span>
+    <span data-modifier class="meta"></span>
+</div>
+
 {# le scripts #}
 <script src="/javascript/ckeditor/ckeditor.js"></script>
 <script src="/javascript/shared/editor/jquery.editor.js"></script>
@@ -266,6 +273,9 @@
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 <script>
     'use strict';
+
+    // HTML template for rendering audience selectize dropdown options.
+    var $audienceSelectizeItemTemplate = $('#audience-selectize-dropdown-option').detach();
 
     $(function () {
         {# CKEditors #}
@@ -307,7 +317,7 @@
             namePlural: 'Campuses',
             icon: 'location',
             selfModifier: 'Users in campus',
-            ajax: '/comms/news/audiencebrowser/campuses'
+            ajax: '{{ routeLookup('commsNewsAudienceBrowser.getCampuses') }}'
         },
         'role': {
             id: 'role',
@@ -315,7 +325,7 @@
             namePlural: 'Roles',
             icon: 'staff-students',
             selfModifier: 'Users in role',
-            ajax: '/comms/news/audiencebrowser/roles'
+            ajax: '{{ routeLookup('commsNewsAudienceBrowser.getRoles') }}'
         },
         'school_house': {
             id: 'school_house',
@@ -323,7 +333,7 @@
             namePlural: 'Houses',
             icon: 'home',
             selfModifier: 'House members',
-            ajax: '/comms/news/audiencebrowser/houses'
+            ajax: '{{ routeLookup('commsNewsAudienceBrowser.getHouses') }}'
         },
         'year': {
             id: 'year',
@@ -331,7 +341,7 @@
             namePlural: 'Year Levels',
             icon: 'teacher',
             selfModifier: 'Users in year level/s',
-            ajax: '/comms/news/audiencebrowser/yearlevels'
+            ajax: '{{ routeLookup('commsNewsAudienceBrowser.getYearLevels') }}'
         },
         {% endif %}
         'folder': {
@@ -340,7 +350,7 @@
             namePlural: 'Classes & Groups',
             icon: 'group',
             selfModifier: 'Class/group members',
-            ajax: '/comms/news/audiencebrowser/folders'
+            ajax: '{{ routeLookup('commsNewsAudienceBrowser.getFolders') }}'
         },
         {% if user.role.staff %}
         'pastoral_group': {
@@ -349,10 +359,11 @@
             namePlural: 'Pastoral Groups',
             icon: 'pastoral',
             selfModifier: 'Group members',
-            ajax: '/comms/news/audiencebrowser/pastoralgroups'
+            ajax: '{{ routeLookup('commsNewsAudienceBrowser.getPastoralGroups') }}'
         }
         {% endif %}
     };
+
 
     // Audience selectize where user can search for simple audience segments
     var $audienceSelectize;
@@ -375,12 +386,31 @@
                 },
                 selectize: {
                     render: {
-                        option: function(item, escape) {
-                            /** @var {string} item.itemHtml */
-                            return item.itemHtml;
+                        /**
+                         * Called when ajax call returns to add each item to dropdown list
+                         *
+                         * @param {Object} item     - The selected item from the AJAX set
+                         * @param {function} escape - A function that replaces [&<>"] chars with HTML character entities
+                         * @return {string}
+                         */
+                        option: function (item, escape) {
+                            var $option = $audienceSelectizeItemTemplate.clone();
+                            $option.find('[data-name]').html(escape(item.name));
+                            $option.find('[data-entityType]').html('(' + item.entityType + ')');
+                            if (item.modifier) {
+                                $option.find('[data-modifier]').html('[' + item.modifier + ']');
+                            } else {
+                                $option.find('[data-modifier]').remove();
+                            }
+                            return '<div>' + $option.html() + '</div>';
                         }
                     },
+                    /**
+                     * @param {string} value - The simple audience segment identifier, eg 'folder:Mzgx:parents_of'
+                     * @param {jQuery} $item - The jQuery wrapper of the DOM element that is displayed in default selectize
+                     */
                     onItemAdd: function(value, $item) {
+
                         // Selectize doesn't give us all the data of the selected item, find the item in the full list -_-
                         var selectedItem = this.options[value];
 
