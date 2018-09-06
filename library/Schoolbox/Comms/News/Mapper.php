@@ -173,15 +173,6 @@ class Mapper extends \Schoolbox\Mapper
             $collection->setOffset($article->getId(), $article);
         }
 
-        /* Reindex the new topics so they're not in an associative array
-         * json-encode results in a different structure otherwise
-         */
-        foreach ($collection as $current) {
-            $current->getTopics()->reindex();
-        }
-
-        $collection->reindex();
-
         return $collection;
     }
 
