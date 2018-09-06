@@ -176,8 +176,8 @@ class Controller extends Base
         $assessmentsPerFolder = $this->assessmentMapperProxy
             ->findAllByStudent($viewee, false, $term)
             ->filter(function (IAssessable $a) use ($viewee) {
-                $isPublished = $a->getParticipant($viewee)->getPublishDate()->getUnixTimeStamp() <= \Alaress_Date_Format::now()->getUnixTimeStamp();
-                return $a->isParticipant($viewee) && $isPublished;
+                $participant = $a->getParticipantIfExtant($viewee);
+                return $participant && !$participant->isExcluded() && !$participant->getPublishDate()->isFuture();
             })
             ->groupByCallback(function (IAssessable $assessment) {
                 return $assessment->getBaseContext()->getFolder()->getId();
@@ -635,7 +635,8 @@ class Controller extends Base
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
         $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $user)
                                                    ->filter(function (IAssessable $a) use ($viewee) {
-                                                       return $a->isParticipant($viewee) && !$a->getParticipantIfExtant($viewee)->getPublishDate()->isFuture();
+                                                       $participant = $a->getParticipantIfExtant($viewee);
+                                                       return $participant && !$participant->isExcluded() && !$participant->getPublishDate()->isFuture();
                                                    });
         return $assessments;
     }
