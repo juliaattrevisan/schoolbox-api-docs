@@ -67,8 +67,26 @@
                         <div class="list-item">
                             <div class="small-12 card">
                                 <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
-                                <p class="meta">Authored by {{ article.author.fullname }} on {{ article.createdAt.local }}</p>
-                                <p class="meta">Accepted by {{ article.acceptedBy.fullname }} on {{ article.acceptedAt.local }}</p>
+                                <p class="meta">Authored by
+
+                                    {% if article.author.deletedAt.isNull %}
+                                        <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
+                                    {% else %}
+                                        {{ article.author.fullname }}
+                                    {% endif %}
+
+                                    on {{ article.createdAt.local }}
+                                </p>
+
+                                <p class="meta">Accepted by
+                                    {% if article.acceptedBy.deletedAt.isNull %}
+                                        <a href="/search/user/{{ article.acceptedBy.id }}" title="View Profile">{{ article.acceptedBy.fullname }}</a>
+                                    {% else %}
+                                        {{ article.acceptedBy.fullname }}
+                                    {% endif %}
+
+                                    on {{ article.acceptedAt.local }}
+                                </p>
 
                                 {% if article.topics|length %}
                                     <p class="meta">Related topics:
@@ -102,8 +120,26 @@
                             <div class="list-item">
                                 <div class="small-12 card">
                                     <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
-                                    <p class="meta">Authored by {{ article.author.fullname }} on {{ article.createdAt.local }}</p>
-                                    <p class="meta">Rejected by {{ article.rejectedBy.fullname }} on {{ article.rejectedAt.local }}</p>
+                                    <p class="meta">Authored by
+
+                                        {% if article.author.deletedAt.isNull %}
+                                            <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
+                                        {% else %}
+                                            {{ article.author.fullname }}
+                                        {% endif %}
+
+                                        on {{ article.createdAt.local }}
+                                    </p>
+
+                                    <p class="meta">Rejected by
+                                        {% if article.rejectedBy.deletedAt.isNull %}
+                                            <a href="/search/user/{{ article.rejectedBy.id }}" title="View Profile">{{ article.rejectedBy.fullname }}</a>
+                                        {% else %}
+                                            {{ article.rejectedBy.fullname }}
+                                        {% endif %}
+
+                                        on {{ article.rejectedAt.local }}
+                                    </p>
 
                                     {% if article.topics|length %}
                                         <p class="meta">Related topics:
