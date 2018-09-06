@@ -67,7 +67,7 @@
                         <div class="list-item">
                             <div class="small-12 card">
                                 <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
-                                <p class="meta">Authored by {{ article.author.fullname }} on {{ article.updatedAt.local }}</p>
+                                <p class="meta">Authored by {{ article.author.fullname }} on {{ article.createdAt.local }}</p>
                                 <p class="meta">Accepted by {{ article.acceptedBy.fullname }} on {{ article.acceptedAt.local }}</p>
 
                                 {% if article.topics|length %}
@@ -102,7 +102,7 @@
                             <div class="list-item">
                                 <div class="small-12 card">
                                     <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
-                                    <p class="meta">Authored by {{ article.author.fullname }} on {{ article.updatedAt.local }}</p>
+                                    <p class="meta">Authored by {{ article.author.fullname }} on {{ article.createdAt.local }}</p>
                                     <p class="meta">Rejected by {{ article.rejectedBy.fullname }} on {{ article.rejectedAt.local }}</p>
 
                                     {% if article.topics|length %}
