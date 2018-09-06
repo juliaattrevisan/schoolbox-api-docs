@@ -56,7 +56,112 @@ The actual `notify` method that gets called depends on:
 * the trigger label
   * this is a short description of the type of event that occurred
 
+Each `notify` method will return a `Envelope` object; this object contains all
+information required for the formation of a message:
+* its audience
+* its topic (determines how the message is sent to everyone in its audience)
+* its title (determines what each audience member actually sees)
+
+
 #### Example
+
+```php
+<?php
+
+use Alaress\Async\Notification\Instance\Builder;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
+use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\User;
+
+class MyNotifier extends AbstractModuleNotifier
+{
+    private const TRIGGER_CREATED = 'created';
+    private const TRIGGER_DELETED = 'deleted';
+    
+    public function bundleTriggers(TriggerBundle $bundle): void
+    {
+        // Often, the triggered notify method depends on the bundle's method.
+        switch ($bundle->getMethod()) {
+            case \Schoolbox\Mapper::METHOD_CREATE:
+                // Trigger the created notify method one day from now
+                $bundle->attach(
+                    self::TRIGGER_CREATED, 
+                    Alaress_Date_Format::now()->addDays(1)->getUnixTimeStamp()
+                );
+                break;
+                
+            case \Schoolbox\Mapper::METHOD_DELETE:
+                // Trigger the deleted notify method immediately
+                $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+                break;
+        }
+    }
+    
+
+    /**
+     * This method will be called when the created trigger is fired.
+     * 
+     * It's assumed that this will only build envelopes that are targeted to 
+     * staff.
+     * 
+     * @param object $object   The object that was just affected
+     * @param User   $effector The user who effected the change to the object
+     * @param array  $diff     If set, the difference between $object's current
+     *                         and previous state
+     * @return Envelope
+     */
+    public function notifyStaffCreated($object, User $effector, array $diff = null): Envelope
+    {
+        // This method is creating a message to be sent to all staff.
+        // There is no equivalent method for students or parents, thus it is
+        // assumed that they will not receive a message on this topic.
+        $bob = new Builder();
+        $bob->setTitle(":user created an object")
+            ->setHref('/home/')
+            ->addTopic("object.{$object->getId()}.created");
+
+        $bob->setParams([
+            'user' => new UserParam($effector),
+        ]);
+
+        $envelope = new Envelope();
+        $envelope->broadcastToRoleType('staff', $bob->build());
+        return $envelope;
+    }
+    
+    
+
+    /**
+     * This method will be called when the deleted trigger is fired.
+     * 
+     * @param object $object   The object that was just affected
+     * @param User   $effector The user who effected the change to the object
+     * @param array  $diff     If set, the difference between $object's current
+     *                         and previous state
+     * @return Envelope
+     */
+    public function notifySystemDeleted($object, User $effector, array $diff = null): Envelope
+    {
+        // This method is issuing a retraction for the message sent to all
+        // staff above.
+        $bob = new Builder();
+        $bob->setTitle(":user created an object")
+            ->setHref('/home/')
+            ->addTopic("object.{$object->getId()}.created");
+
+        $bob->setParams([
+            'user' => new UserParam($effector),
+        ]);
+
+        $envelope = new Envelope();
+        $envelope->retractAllLike($bob->build());
+        return $envelope;
+    }
+}
+
+```
 
 #### Developer Notes
 
