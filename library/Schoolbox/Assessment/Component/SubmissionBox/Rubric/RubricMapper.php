@@ -1375,6 +1375,7 @@ class RubricMapper
 
 
 //        /** @var Rubric $rubric */
+//        // TODO until such time as mark range config is stored in CSV, default to false
 //        $rubric = $this->factory->buildFromPostData([0 => $postdata], $markPerCapability, $useMarkRange,true);
 
         return [$postdata, $markPerCapability, $useMarkRange];
