@@ -108,15 +108,13 @@
                     <ul class="information-list">
                         <!-- BEGIN showcased_work -->
                         <li class="row">
-                            <div class="list-item">
-                                <div class="card small-9">
+                            <div class="list-item flex-grade">
+                                <div class="card small-12 sibling">
                                     <h3><a href="/learning/assessments/{SHOWCASED_WORK_ASSESSMENT_ID}/{EPORTFOLIO_PAGE_USER_ID}">{SHOWCASED_WORK_BOX_NAME}</h3>
                                     <p class="meta">{SHOWCASED_WORK_BOX_TYPE}</p>
                                 </div>
-                                <div class="small-3 columns text-center">
-                                    <p class="grade gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">
-                                        <span>{SHOWCASED_WORK_RETURNED_MARK}</span>
-                                    </p>
+                                <div class="grade gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}-bg">
+                                    <span>{SHOWCASED_WORK_RETURNED_MARK}</span>
                                 </div>
                             </div>
                             <!-- BEGIN submission_file_list -->
@@ -203,13 +201,17 @@
                         <!-- BEGIN subject -->
                         <li>
                             <div class="compact card small-12">
-                                <span class="icon-home" title="Visit Homepage"></span>
-                                <!-- BEGIN subject_linked -->
-                                <h3><a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a></h3>
-                                <!-- END subject_linked -->
                                 <!-- BEGIN subject_unlinked -->
+                                <div class="icon-home" title="Visit Homepage"></div>
                                 <h3>{SUBJECT_NAME}</h3>
                                 <!-- END subject_unlinked -->
+
+                                <!-- BEGIN subject_linked -->
+                                <a href="/homepage/{SUBJECT_ID}" title="Visit Homepage">
+                                    <div class="icon-home"></div>
+                                    <h3>{SUBJECT_NAME}</h3>
+                                </a>
+                                <!-- END subject_linked -->
                             </div>
                         </li>
                         <!-- END subject -->
@@ -228,13 +230,17 @@
                         <!-- BEGIN group -->
                         <li>
                             <div class="compact card small-12">
-                                <span class="icon-home" title="Visit Homepage"></span>
-                                <!-- BEGIN group_linked -->
-                                <h3><a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a></h3>
-                                <!-- END group_linked -->
                                 <!-- BEGIN group_unlinked -->
+                                <div class="icon-home"></div>
                                 <h3>{GROUP_NAME}</h3>
                                 <!-- END group_unlinked -->
+
+                                <!-- BEGIN group_linked -->
+                                <a href="/homepage/{GROUP_ID}" title="Visit Homepage">
+                                    <div class="icon-home"></div>
+                                    <h3>{GROUP_NAME}</h3>
+                                </a>
+                                <!-- END group_linked -->
                             </div>
                         </li>
                         <!-- END group -->
