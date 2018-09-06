@@ -25,6 +25,7 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\IStorage;
@@ -798,11 +799,11 @@ class RubricMapper
      *                             val = [selected: is it selected?, value: what's its value?]
      * @param array[] $customGroupMarks      key = group.id
      *                             val = [value: what's its value? (only if set manually)]
-     * @param string $markType
+     * @param IMarkScheme $markScheme
      * @param int     $returnId    Feedback
      * @throws \InvalidArgumentException
      */
-    public function saveForFeedback(array $descriptors, array $customGroupMarks, string $markType, int $returnId): void
+    public function saveForFeedback(array $descriptors, array $customGroupMarks, IMarkScheme $markScheme, int $returnId): void
     {
         $groupMapper     = GroupMapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();
@@ -834,7 +835,7 @@ class RubricMapper
         // Pass 1.5: is a custom max mark for the group set?
         foreach ($customGroupMarks as $groupId => $markData) {
 
-            if ((new ValidCapabilityMark($markData['max'], $markType))->isSatisfiedBy($markData['customMark'])) {
+            if ((new ValidCapabilityMark($markData['max'], $markScheme))->isSatisfiedBy($markData['customMark'])) {
                 // Find a record for its group
                 $group = $groupMapper->findById($groupId);
 

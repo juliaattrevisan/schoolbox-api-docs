@@ -203,7 +203,7 @@ class Controller extends Base
             $this->rubricMapper->saveForFeedback(
                 $post['rubric']['descriptors'] ?? [],
                 $post['rubric']['groups'] ?? [],
-                $feedback->getAssessable()->getMarkType()->getName(),
+                $feedback->getAssessable()->getMarkScheme(),
                 $feedback->getId()
             );
             return true;
