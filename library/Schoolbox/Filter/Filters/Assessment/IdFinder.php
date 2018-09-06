@@ -86,7 +86,7 @@ class IdFinder extends Filter\AbstractIdFinder
         $yearsDue       = $completeFilters[YearDue\Definition::class];
 
         list($aTypeJoin, $aTypeWhere)               = $this->getClauseAType($aTypes);
-        list($temporalWhere, $temporalParams)       = $this->getClauseTemporalState($temporalStates);
+        list($temporalWhere, $temporalParams, $participantPlanJoin) = $this->getClauseTemporalState($temporalStates);
         list($termDJoin, $termDWhere, $termDParams) = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
         list($termCJoin, $termCWhere, $termCParams) = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
         list($weightingWhere, $weightingParams)     = $this->getClauseWeighting($weightings);
@@ -113,7 +113,7 @@ class IdFinder extends Filter\AbstractIdFinder
         if ($this->subQueryBase($unitImpSpcIds, $teacherFolderIds, $studentFolderIds, $projectIds, $unitImplIds, $unitSpecIds)) {
             $subQueries[] = "
                 SELECT a.id, 0 AS 'case' FROM `assessment` a
-                {$aTypeJoin} {$termDJoin} {$termCJoin}
+                {$participantPlanJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
                 WHERE {$deletedWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere} AND {$weightingWhere}
                 AND {$workTypeWhere} AND {$yearDueWhere}
                 ";
@@ -123,7 +123,7 @@ class IdFinder extends Filter\AbstractIdFinder
                 $subQueries[] = "
                     SELECT a.id, 1 AS 'case' FROM `assessment` a
                     JOIN assessment_folder af ON af.assessment_id = a.id
-                    {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
+                    {$participantPlanJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
                     WHERE {$deletedWhere} AND {$folderWhere} AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere}
                     AND {$termCWhere} AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
                     ";
@@ -135,7 +135,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN project_assessment ap ON ap.assessment_id  = a.id
                     JOIN project p             ON ap.project_id     = p.id
                     JOIN assessment_folder paf ON paf.assessment_id = p.assessment_id
-                    {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
+                    {$participantPlanJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
                     WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere} AND {$aTypeWhere} AND {$temporalWhere}
                     AND {$termDWhere} AND {$termCWhere} AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
                     ";
@@ -149,7 +149,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     SELECT a.id, 3 AS 'case' FROM `assessment` a
                     JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
-                    {$uImpSpcJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
+                    {$participantPlanJoin} {$uImpSpcJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
                     WHERE {$deletedWhere} AND {$uImpSpcWhere} AND {$folderWhere} AND {$unitImplWhere}
                     AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere}
                     AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
@@ -167,7 +167,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN project p                                 ON ap.project_id                     = p.id 
                     JOIN assessment_course_unit_implementation aui ON aui.assessment_id                 = p.assessment_id
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
-                    {$uImpSpcJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
+                    {$participantPlanJoin} {$uImpSpcJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
                     WHERE {$deletedWhere} AND {$uImpSpcWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitImplWhere}
                     AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere}
                     AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
@@ -179,7 +179,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     SELECT a.id, 5 AS 'case' FROM `assessment` a
                     JOIN assessment_course_unit_specification aus ON aus.assessment_id = a.id
                     JOIN course_unit_specification us ON aus.course_unit_specification_id = us.id
-                    {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
+                    {$participantPlanJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
                     WHERE {$deletedWhere} AND {$folderWhere} AND {$unitSpecWhere}
                     AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere}
                     AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
@@ -193,13 +193,14 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN project p                                 ON ap.project_id     = p.id
                     JOIN assessment_course_unit_specification aus  ON aus.assessment_id = p.assessment_id
                     JOIN course_unit_specification us              ON aus.course_unit_specification_id = us.id
-                    {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
+                    {$participantPlanJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
                     WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitSpecWhere}
                     AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere}
                     AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
                     ";
             }
         }
+
         return [implode("\n\n\tUNION\n\n", $subQueries), $params];
     }
 
@@ -714,7 +715,7 @@ class IdFinder extends Filter\AbstractIdFinder
     {
         // If no weighting types are selected, don't filter
         if (null === $temporalStates) {
-            return ['TRUE', []];
+            return ['TRUE', [], ''];
         }
 
         /* We cannot use the MySQL 'BETWEEN' operator as that includes both limits.
@@ -723,6 +724,8 @@ class IdFinder extends Filter\AbstractIdFinder
 
         $now     = \Alaress_Date_Format::now()->getDatabase();
         $orParts = [];
+        $joinParticipantPlan = false;
+
         foreach ($temporalStates as $temporalState) {
             if (TemporalState\Definition::KEY_UNPUBLISHED === $temporalState) {
                 $orParts[] = '(:now < a.publish_date)';
@@ -734,9 +737,21 @@ class IdFinder extends Filter\AbstractIdFinder
                 $orParts[] = '(a.due_date <= :now AND :now < a.close_date)';
             } elseif (TemporalState\Definition::KEY_CLOSED === $temporalState) {
                 $orParts[] = '(a.close_date <= :now)';
+            } elseif (TemporalState\Definition::KEY_CUSTOM_PUBLISH_DATE === $temporalState) {
+                $joinParticipantPlan = true;
+                $orParts[] = '(pp.publish_date <= :now)';
             }
         }
-        return ['(' . implode(' OR ', $orParts) . ')', [':now' => $now]];
+
+        if ($joinParticipantPlan) {
+            return [
+                '(' . implode(' OR ', $orParts) . ')',
+                [':now' => $now],
+                'LEFT JOIN participant_plan pp  ON pp.assessment_id = a.id'
+            ];
+        }
+
+        return ['(' . implode(' OR ', $orParts) . ')', [':now' => $now], ''];
     }
 
 
