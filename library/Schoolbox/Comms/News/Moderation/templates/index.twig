@@ -73,7 +73,7 @@
                                 {% if article.topics|length %}
                                     <p class="meta">Related topics:
                                         {% for topic in article.topics %}
-                                            <a href="{{ routeLookup('commsNews.getIndex', {slug: topic.slug}) }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                                            <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
                                         {% endfor %}
                                     </p>
                                 {% endif %}
