@@ -283,7 +283,7 @@
                 {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {articleId: article.id}) %}
 
                 {% if rejectRoute %}
-                    {% if article.isPublished %}
+                    {% if article.isPublished or article.isExpired %}
                         {% set verb = 'Unpublish' %}
                     {% else %}
                         {% set verb = 'Reject' %}
