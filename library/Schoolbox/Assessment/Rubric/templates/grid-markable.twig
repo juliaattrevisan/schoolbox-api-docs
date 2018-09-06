@@ -204,7 +204,7 @@
 
                         {% if group.rowMaxSum > 0 %}
                             {# TODO these need to be the descriptor sum! #}
-                            <button class="[data-use-descriptor-values]">Assign <span class="descriptor-sum" data-group-descriptor-sum>
+                            <button data-use-descriptor-values>Assign <span class="descriptor-sum" data-group-descriptor-sum>
                                 {% if markSchemeName == 'TotalMarkFractional' %}
                                     {{ group.scaledMark }}
 
