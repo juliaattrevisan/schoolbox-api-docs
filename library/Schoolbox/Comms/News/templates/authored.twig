@@ -179,7 +179,7 @@
         },
         computed: {
             pageCount: function () {
-                return this.filteredArticles.length / {{ config.search_type_limit }};
+                return Math.ceil(this.filteredArticles.length / {{ config.search_type_limit }});
             }
         }
     });
