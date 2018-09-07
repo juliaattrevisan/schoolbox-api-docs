@@ -57,7 +57,7 @@ class Factory
                 );
 
             // Add criteria
-            foreach ($postedGroup['items'] as $tempCriterionId => $postedCriterion) {
+            foreach ($postedGroup['items'] ?? [] as $tempCriterionId => $postedCriterion) {
                 $criterion = (new Criterion())
                     ->setId($postedCriterion['id'])
                     ->setName($postedCriterion['name'])
