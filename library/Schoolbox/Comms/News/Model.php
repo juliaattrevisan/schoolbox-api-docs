@@ -337,8 +337,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     {
         switch ($this->getDiscreteState($now)) {
             case self::STATE_PUBLISHED:
-            case self::STATE_AWAITING_MODERATION:
-            case self::STATE_AWAITING_PUBLICATION:
                 return $this->getPublishAt();
 
             case self::STATE_REJECTED:
@@ -347,7 +345,11 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
             case self::STATE_EXPIRED:
                 return $this->getExpiresAt();
 
+            case self::STATE_AWAITING_PUBLICATION:
+                return $this->getAcceptedAt();
+
             case self::STATE_DRAFT:
+            case self::STATE_AWAITING_MODERATION:
             default:
                 return $this->getCreatedAt();
         }
