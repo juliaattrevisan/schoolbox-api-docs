@@ -163,56 +163,64 @@ another.
 This variant is optimised for read performance: it is implemented as the nested
 Trie structure as documented above.
 
-Each word in the key is a single node in the trie.
+Each word in the key is a single node in the trie, with the following
+optimizations:
+* Numeric words are replaced with the regular expression `(\d+)`, capturing the
+  word for later comparison. Once the last word in the key is traversed, the
+  captured numeric keys are traversed from that point.
+* Single wildcard words (`*`) are replaced with the regular expression 
+  `[^\.]*`, matching any single word
+* Wildcard sentences (`#`) are replaced with the regular expression `.*`,
+  matching any character string
 
 ```
 {
-    "info": {
-        "notify": {
-            'service": {
-                "1": {
-                    "43": {
-                        "1": {
-                            "forum": {
-                                "77": {
-                                    "replied": [
-                                        1,
-                                        3,
-                                        6,
-                                        10,
-                                        "info.notify.service.2.43.1.forum.77.replied",
-                                        "info.notify.service.2.43.1.forum.76.replied",
-                                    ],
-                                }
-                            }
+  info: {
+    notify: {
+      service: {
+        "(\d+)": {
+          "(\d+)": {
+            "(\d+)": {
+              forum: {
+                "(\d+)": {
+                  replied: {
+                    // at this point, matches for "info.notify.service.(\d+).(\d+).(\d+).forum.(\d+).replied"
+                    // are evaluated
+                    1: {
+                      43: {
+                        1: {
+                          // matches "info.notify.service.1.43.1.forum.77.replied"
+                          77: [ 1, 3, 6, 10, "...", "..." ]
                         }
+                      }
                     }
-                },
-                "2": {
-                    "43": {
-                        "1": {
-                            "forum": {
-                                "77": {
-                                    "*": [1, 3, 9, 15,],
-                                }
-                            }
+                  },
+                  "[^\.]*": {   // this non-capture is intentional, which is why there's no nested key for it
+                    2: {
+                      43: {
+                        1: {
+                          // matches "info.notify.service.2.43.1.forum.77.*"
+                          77: [ 1, 3, 9, 15 ]
                         }
-                    }
-                },
-                "3": {
-                    "43": {
-                        "1": {
-                            "forum": {
-                                "77": {
-                                    "*": [11, 19,],
-                                }
-                            }
+                      }
+                    },
+                    3: {
+                      43: {
+                        1: {
+                          // matches "info.notify.service.3.43.1.forum.77.*"
+                          77: [ 11, 19 ]
                         }
+                      }
                     }
+                  }
                 }
+              }
             }
+          }
         }
+      }
     }
+  }
 }
 ```
 
