@@ -64,7 +64,7 @@ class External_Offline_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords = true, $importAttachments = false)
+    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments)
     {
         // NOOP
     }

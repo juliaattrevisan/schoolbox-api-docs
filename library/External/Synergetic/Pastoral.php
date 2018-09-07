@@ -201,7 +201,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords = true, $importAttachments = false)
+    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments)
     {
         // Give the import 30 minutes to complete and bump up the memory limit just to make sure we don't bomb out
 

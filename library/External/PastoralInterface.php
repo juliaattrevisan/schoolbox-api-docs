@@ -30,7 +30,7 @@ interface External_PastoralInterface
      * @param bool $importParentAccess Flag indicating if parent contacts should be added to the pastoral_access table
      * @return bool
      */
-    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords = true, $importAttachments = false);
+    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments);
 
     /**
      * Sync a schoolbox pastoral record with the remote system
