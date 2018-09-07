@@ -835,7 +835,8 @@ class Controller extends BaseController
         $colourList = Timetable_ColourMapper::getInstance()->findAll();
         $colourIndex = 0;
         $folderList = new Collection();
-        $userAccess  = Array();
+        $userAccess  = [];
+
         foreach($this->getFolderMapper()->findForUser($this->getUser(), false)->sortBy('name', 'asc') as $folder) {
             if (!$folder->getColour()) {
                 /* Apply colour from list if no colour exists */
@@ -859,8 +860,11 @@ class Controller extends BaseController
             }
             $folderList->add($folder);
         }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@folder/groups.twig', [
-            'groupList'           => $folderList,
+            'groupList'           => $folderList->sortByCallback(function ($a, $b) {
+                return strnatcasecmp($a->getName(), $b->getName());
+            }),
             'userAccess'          => $userAccess
         ]));
     }
