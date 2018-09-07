@@ -57,7 +57,7 @@ leaf or branch) within the trie is a single word.
 
 A trie node may also be one of these wildcard values:
 * `*` matches any single word in the Topic
-* `#` matches any one or more words in the Topic
+* `#` matches zero or more words in the Topic
 
 #### Examples
 
@@ -68,6 +68,8 @@ The following trie keys will match the above example Topic:
   * the wildcard `*` word matches `77`
 * `info.notify.service.1.43.1.#`
   * the wildcard `#` word matches everything after it
+* `info.notify.service.1.43.1.forum.77.replied.#`
+  * the wildcard `#` word matches the end of the key
 
 The following will not match:
 * `info.notify.serviced.1.43.1.forum.77.replied`
@@ -76,9 +78,6 @@ The following will not match:
   * `2` doesn't match the word `1`
 * `info.notify.service.1.43.1.blog.#`
   * Despite the `#` wildcard, `blog` doesn't match the word `forum` beforehand
-`info.notify.service.1.43.1.forum.77.replied.#`
-  * The `#` wildcard matches one or more words; there are no words after
-    `replied`
 
 
 ### Values
@@ -87,7 +86,7 @@ Each value in the trie is a list; each item in that list will be one of either:
 * an integer (corresponds to a user ID)
 * a string (this key is aliased to another key in the trie)
 
-The final value will be the union of:
+The final value will be the recursive union of:
 * the integer values
 * any integer values returned by resolving an alias key
 
@@ -152,22 +151,22 @@ The Resolver has two variants, for two different use cases:
 * writeability
 
 
-#### Read-only (flattened)
+#### Read-only (hydrated)
 
-This variant is optimised for read performance:
+This variant is optimised for read performance: it is a nested Trie structure
 
 
-#### Writable (hydrated)
+#### Writable (flattened)
 
-This variant is optimised for writeability:
+This variant is optimised for writeability: it is a 2-dimensional array
 
 
 ### Rebinding
 
 > TODO figure out why rebinding happens only upon update, rather than create?
 
-Any action within Schoolbox that changes the audience of a message must rebind
-the values stored within the resolver.
+Any action within Schoolbox that changes the audience of a topic must rebind
+the associated values stored within the resolver.
 
 These actions include:
 * Changing the alternate source of a component

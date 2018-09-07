@@ -17,7 +17,7 @@ The delivery subsystem consist of distinct delivery mechanisms, each of which
 delivers messages via a different process.
 
 
-### Instant Messaging
+### In-Browser Instant Notifications
 
 Messages may be delivered by instant message within a Schoolbox window. These
 messages are not browser notifications (should that be implemented?), but
@@ -26,7 +26,7 @@ instead render in the notifications side panel.
 The instant messaging subsystem is implemented as a WebSockets server, for
 full-duplex communication between the Schoolbox server and the web browser.
 
-> TODO document instant messaging
+> TODO document instant notifications
 
 
 ### Email

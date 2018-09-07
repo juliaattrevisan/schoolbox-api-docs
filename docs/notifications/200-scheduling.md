@@ -57,7 +57,7 @@ The actual `notify` method that gets called depends on:
   * this is a short description of the type of event that occurred
 
 Each `notify` method will return a `Envelope` object; this object contains all
-information required for the formation of a message:
+information required for the formation of one or more messages:
 * its audience
 * its topic (determines how the message is sent to everyone in its audience)
 * its title (determines what each audience member actually sees)

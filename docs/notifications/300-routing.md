@@ -2,11 +2,11 @@
 
 # Routing
 
-The routing subsystem is used to determine to whom, and by what channel, a
+The routing subsystem is used to determine to whom, and by which channel(s), a
 message is to be delivered.
 
-This subsystem is the bridge between the [scheduler](200-scheduling.md) and the
-[delivery system](400-delivery.md).
+This subsystem is the bridge between the [scheduling](200-scheduling.md) and
+the [delivery](400-delivery.md) subsystems.
 
 ## Sequence Diagram
 
