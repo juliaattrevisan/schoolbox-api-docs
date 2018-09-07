@@ -168,7 +168,7 @@ optimizations:
 * Numeric words are replaced with the regular expression `(\d+)`, capturing the
   word for later comparison. Once the last word in the key is traversed, the
   captured numeric keys are traversed from that point.
-* Single wildcard words (`*`) are replaced with the regular expression 
+* Single wildcard words (`*`) are replaced with the regular expression
   `[^\.]*`, matching any single word
 * Wildcard sentences (`#`) are replaced with the regular expression `.*`,
   matching any character string
