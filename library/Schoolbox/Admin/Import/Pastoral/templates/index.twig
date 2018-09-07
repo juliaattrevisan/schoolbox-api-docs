@@ -97,6 +97,32 @@
                     <select id="defaultOwner" name="defaultOwnerId" placeholder="Fallback Record Owner"></select>
                 </label>
 
+                <label for="importRecordsGroup">
+                    Import pastoral records
+                    <span class="hint has-tip tip-top" data-tooltip
+                          title="Import records from your SIS overwriting any matching existing records in Schoolbox.">?</span>
+                </label>
+                <div class="switch round">
+                    <input id="importRecords" type="checkbox" name="importRecords" checked="" data-checkbox-group="importRecordsGroup">
+                    <label for="importRecords">
+                        <span>Yes</span>
+                        <span>No</span>
+                    </label>
+                </div>
+
+                <label for="importAttachmentsGroup">
+                    Import documents/attachments
+                    <span class="hint has-tip tip-top" data-tooltip
+                          title="Import pastoral records file attachments from your SIS.">?</span>
+                </label>
+                <div class="switch round">
+                    <input id="importAttachments" type="checkbox" name="importAttachments" checked="" data-checkbox-group="importAttachmentsGroup">
+                    <label for="importAttachments">
+                        <span>Yes</span>
+                        <span>No</span>
+                    </label>
+                </div>
+
                 <label for="importParentAccessGroup">
                     Add parent contacts in your SIS as Individual Access Users in pastoral records
                     <span class="hint has-tip tip-top" data-tooltip
@@ -109,7 +135,6 @@
                         <span>No</span>
                     </label>
                 </div>
-
 
                 <label id="defaultOwnerError" for="defaultOwner" class="error hide">You must select a fallback record owner before you can proceed.</label>
 

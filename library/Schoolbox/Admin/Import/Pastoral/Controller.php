@@ -108,6 +108,8 @@ class Controller extends Base
         try {
             $defaultOwner       = $this->getUserMapper()->findById($post["defaultOwnerId"]);
             $importParentAccess = $post["importParentAccess"];
+            $importRecords      = $post["importRecords"];
+            $importAttachments  = $post["importAttachments"];
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
@@ -125,8 +127,8 @@ class Controller extends Base
                 'message'        => true,
             ],
             'postOutput' => [
-                function () use ($sessionUser, $defaultOwner, $importParentAccess) {
-                    $this->importCallback($sessionUser, $defaultOwner, $importParentAccess);
+                function () use ($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments) {
+                    $this->importCallback($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments);
                 },
             ],
         ]);
@@ -139,11 +141,11 @@ class Controller extends Base
      * @param User $defaultOwner       Fallback owner when cannot be located in Schoolbox
      * @param bool $importParentAccess Flag indicating if parents should be imported to the pastoral_access table
      */
-    public function importCallback(User $user, User $defaultOwner, $importParentAccess)
+    public function importCallback(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments)
     {
         try {
             $pastoralExternal = new External_Pastoral();
-            $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess);
+            $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments);
         } catch (Exception $e) {
             //                                  .
             //                                 -|-

@@ -201,7 +201,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function importPastoral(User $user, User $defaultOwner, $importParentAccess)
+    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords = true, $importAttachments = false)
     {
         // Give the import 30 minutes to complete and bump up the memory limit just to make sure we don't bomb out
 
@@ -222,196 +222,200 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $log->setResult("Parent Importing " . ($importParentAccess ? 'Enabled' : 'Disabled'));
         $this->getPastoralLogMapper()->save($log);
 
-        // Only load a severity if it is enabled by policy
+        if ($importRecords) {
 
-        $severity = $this->getPastoralSeverity();
+            // Only load a severity if it is enabled by policy
 
-        // Retrieve an iterator for all current students pastoral care records from Synergetic sorted by student name as
-        // it makes searching the import log much easier.
+            $severity = $this->getPastoralSeverity();
 
-        $highestPastoralSeq = 0;
+            // Retrieve an iterator for all current students pastoral care records from Synergetic sorted by student name as
+            // it makes searching the import log much easier.
 
-        // Keep the pastoral records we create so we can add audience members and remove the need for MARS
+            $highestPastoralSeq = 0;
 
-        $pastoralRecordsCreated = [];
+            // Keep the pastoral records we create so we can add audience members and remove the need for MARS
 
-        do {
-            $queryRecords =
-                "
+            $pastoralRecordsCreated = [];
+
+            do {
+                $queryRecords =
+                    "
                 {$this->sqlPastoralSelect}
                 WHERE         PastoralCareSeq > {$highestPastoralSeq}
                 ORDER BY      dbo.tPastoralCare.PastoralCareSeq
             ";
 
-            // Chunk the import without using the iterator, because its failing miserably for some reason
+                // Chunk the import without using the iterator, because its failing miserably for some reason
 
-            $queryRecords = $this->connector->executeQuery(str_replace("SELECT", "SELECT TOP 5", $queryRecords));
-            $records = $queryRecords->fetchAll();
+                $queryRecords = $this->connector->executeQuery(str_replace("SELECT", "SELECT TOP 5", $queryRecords));
+                $records = $queryRecords->fetchAll();
 
-            foreach ($records as $record) {
-                // Capture the pastoral sequence so we can iterate
+                foreach ($records as $record) {
+                    // Capture the pastoral sequence so we can iterate
 
-                $highestPastoralSeq = $record["PastoralCareSeq"];
+                    $highestPastoralSeq = $record["PastoralCareSeq"];
 
 
-                // Remove the Synergetic magic blank value
+                    // Remove the Synergetic magic blank value
 
-                $record["Details"] = trim(($record["Details"]));
+                    $record["Details"] = trim(($record["Details"]));
 
-                if ($record["Details"] == self::BLANK_PRIVATE_RECORD) {
-                    $record["Details"] = '';
-                }
-
-                $this->htmlConverter->setHtml($record["Details"]);
-                $record["Details"] = trim($this->htmlConverter->getText());
-                $record["Details"] = html_entity_decode($record["Details"], ENT_QUOTES);
-
-                $this->htmlConverter->setHtml($record["PrivateDetails"]);
-                $record["PrivateDetails"] = trim($this->htmlConverter->getText());
-                $record["PrivateDetails"] = html_entity_decode($record["PrivateDetails"], ENT_QUOTES);
-
-                if ($record["PrivateDetails"] == self::BLANK_PRIVATE_RECORD) {
-                    $record["PrivateDetails"] = '';
-                }
-
-                // Create a heading from the public details in Synergetic
-
-                $heading = mb_substr(trim($record["Details"]), 0, 50, self::CHARACTER_ENCODING);
-
-                if (empty($heading)) {
-                    $heading = "Untitled Synergetic Record (Seq: {$record["PastoralCareSeq"]})";
-                }
-
-                // Create a new log entry
-
-                $logRecord = $this->pastoralLogMapper->createModel();
-                $logRecord->setImportId($importId);
-                $logRecord->setUserId($user->getId());
-                $logRecord->setHeading($heading);
-                $logRecord->setStudentName("{$record["StudentLastname"]}, {$record["StudentFirstname"]}");
-                $logRecord->setCreatorName("{$record["OwnerLastname"]}, {$record["OwnerFirstname"]}");
-
-                try {
-                    $student = $this->getSchoolboxUser($record["ID"]);
-                    $owner = $this->getSchoolboxUser($record["CreatedByID"]) ?: $defaultOwner;
-
-                    if (!$student instanceof User) {
-                        // The student of the pastoral care record is not available in Schoolbox, skip this record
-
-                        $logRecord->setResult("Skipped Unknown Student ({$record["PastoralCareSeq"]})");
-                        $this->getPastoralLogMapper()->save($logRecord);
-
-                        continue;
+                    if ($record["Details"] == self::BLANK_PRIVATE_RECORD) {
+                        $record["Details"] = '';
                     }
 
-                    $logRecord->setCreatorName($owner->getFullName());
-                    $logRecord->setStudentName($student->getFullName());
-                    $logRecord->setResult("Importing ({$record["PastoralCareSeq"]})");
-                    $this->getPastoralLogMapper()->save($logRecord);
+                    $this->htmlConverter->setHtml($record["Details"]);
+                    $record["Details"] = trim($this->htmlConverter->getText());
+                    $record["Details"] = html_entity_decode($record["Details"], ENT_QUOTES);
 
-                    // If this pastoral care record already exists in Schoolbox, delete it so we don't end up with duplicate
-                    // records. Could update the record, but its contents may have deviated it was originally imported, and
-                    // deleting will at least keep that history
+                    $this->htmlConverter->setHtml($record["PrivateDetails"]);
+                    $record["PrivateDetails"] = trim($this->htmlConverter->getText());
+                    $record["PrivateDetails"] = html_entity_decode($record["PrivateDetails"], ENT_QUOTES);
 
-                    $this->getPastoralMapper()->deleteByColumn("external_id", $record["PastoralCareSeq"]);
+                    if ($record["PrivateDetails"] == self::BLANK_PRIVATE_RECORD) {
+                        $record["PrivateDetails"] = '';
+                    }
 
-                    // Only create record if both public and private aren't blank
+                    // Create a heading from the public details in Synergetic
 
-                    if (!empty($record["Details"]) || !empty($record["PrivateDetails"])) {
-                        /** @var Pastoral $pastoralRecord */
-                        $pastoralRecord = $this->getPastoralMapper()->createModel();
-                        $pastoralRecord->setExternalId($record["PastoralCareSeq"]);
-                        $pastoralRecord->setOwner($owner);
-                        $pastoralRecord->setStudent($student);
-                        $pastoralRecord->setHeading($heading);
-                        $pastoralRecord->setBodyPublic("<p>{$record["Details"]}</p>");
-                        $pastoralRecord->setBodyPrivate("<p>{$record["PrivateDetails"]}</p>");
-                        $pastoralRecord->setType($this->getPastoralType($record));
-                        $pastoralRecord->setSubType($this->getPastoralSubType($record));
+                    $heading = mb_substr(trim($record["Details"]), 0, 50, self::CHARACTER_ENCODING);
 
-                        if ($this->config->get('pastoral_severity')) {
-                            $pastoralRecord->setSeverity($severity);
+                    if (empty($heading)) {
+                        $heading = "Untitled Synergetic Record (Seq: {$record["PastoralCareSeq"]})";
+                    }
+
+                    // Create a new log entry
+
+                    $logRecord = $this->pastoralLogMapper->createModel();
+                    $logRecord->setImportId($importId);
+                    $logRecord->setUserId($user->getId());
+                    $logRecord->setHeading($heading);
+                    $logRecord->setStudentName("{$record["StudentLastname"]}, {$record["StudentFirstname"]}");
+                    $logRecord->setCreatorName("{$record["OwnerLastname"]}, {$record["OwnerFirstname"]}");
+
+                    try {
+                        $student = $this->getSchoolboxUser($record["ID"]);
+                        $owner = $this->getSchoolboxUser($record["CreatedByID"]) ?: $defaultOwner;
+
+                        if (!$student instanceof User) {
+                            // The student of the pastoral care record is not available in Schoolbox, skip this record
+
+                            $logRecord->setResult("Skipped Unknown Student ({$record["PastoralCareSeq"]})");
+                            $this->getPastoralLogMapper()->save($logRecord);
+
+                            continue;
                         }
 
-                        $this->getPastoralMapper()->save($pastoralRecord);
-                        $logRecord->setResult("OK");
-                        $logRecord->setPastoralId($pastoralRecord->getId());
+                        $logRecord->setCreatorName($owner->getFullName());
+                        $logRecord->setStudentName($student->getFullName());
+                        $logRecord->setResult("Importing ({$record["PastoralCareSeq"]})");
+                        $this->getPastoralLogMapper()->save($logRecord);
 
-                        $pastoralRecordsCreated[] = $pastoralRecord;
-                    } else {
-                        // Skip blank records
+                        // If this pastoral care record already exists in Schoolbox, delete it so we don't end up with duplicate
+                        // records. Could update the record, but its contents may have deviated it was originally imported, and
+                        // deleting will at least keep that history
 
-                        $logRecord->setResult("Skipped Blank Record ({$record["PastoralCareSeq"]})");
+                        $this->getPastoralMapper()->deleteByColumn("external_id", $record["PastoralCareSeq"]);
+
+                        // Only create record if both public and private aren't blank
+
+                        if (!empty($record["Details"]) || !empty($record["PrivateDetails"])) {
+                            /** @var Pastoral $pastoralRecord */
+                            $pastoralRecord = $this->getPastoralMapper()->createModel();
+                            $pastoralRecord->setExternalId($record["PastoralCareSeq"]);
+                            $pastoralRecord->setOwner($owner);
+                            $pastoralRecord->setStudent($student);
+                            $pastoralRecord->setHeading($heading);
+                            $pastoralRecord->setBodyPublic("<p>{$record["Details"]}</p>");
+                            $pastoralRecord->setBodyPrivate("<p>{$record["PrivateDetails"]}</p>");
+                            $pastoralRecord->setType($this->getPastoralType($record));
+                            $pastoralRecord->setSubType($this->getPastoralSubType($record));
+
+                            if ($this->config->get('pastoral_severity')) {
+                                $pastoralRecord->setSeverity($severity);
+                            }
+
+                            $this->getPastoralMapper()->save($pastoralRecord);
+                            $logRecord->setResult("OK");
+                            $logRecord->setPastoralId($pastoralRecord->getId());
+
+                            $pastoralRecordsCreated[] = $pastoralRecord;
+                        } else {
+                            // Skip blank records
+
+                            $logRecord->setResult("Skipped Blank Record ({$record["PastoralCareSeq"]})");
+                        }
+                    } catch (Exception $e) {
+                        // If ANYTHING goes wrong during the import we need to log it. The import is running in a detached
+                        // state, so there is no other way to communicate with the user, so an exception would leave the user
+                        // thinking the import is still running.
+
+                        $logRecord->setResult("Import Error: {$e->getMessage()}");
                     }
-                } catch (Exception $e) {
-                    // If ANYTHING goes wrong during the import we need to log it. The import is running in a detached
-                    // state, so there is no other way to communicate with the user, so an exception would leave the user
-                    // thinking the import is still running.
 
-                    $logRecord->setResult("Import Error: {$e->getMessage()}");
+                    $this->getPastoralLogMapper()->save($logRecord);
                 }
+            } while (count($records) > 0);
 
-                $this->getPastoralLogMapper()->save($logRecord);
-            }
-        } while (count($records) > 0);
+            // Import audience members for each record we created
 
-        // Import audience members for each record we created
-
-        foreach ($pastoralRecordsCreated as $pastoralRecord) {
-            $queryAudience = $this->connector->executeQuery(
-                "
+            foreach ($pastoralRecordsCreated as $pastoralRecord) {
+                $queryAudience = $this->connector->executeQuery(
+                    "
                     SELECT  ID 
                     FROM    PastoralCareContacts 
                     WHERE   PastoralCareSeq = :pastoralCareSeq
                 ",
-                ['pastoralCareSeq' => $pastoralRecord->getExternalId()]
-            );
+                    ['pastoralCareSeq' => $pastoralRecord->getExternalId()]
+                );
 
-            $audienceRecords = $queryAudience->fetchAll();
+                $audienceRecords = $queryAudience->fetchAll();
 
-            $queryAudience->getPDOStatement()->errorCode();
+                $queryAudience->getPDOStatement()->errorCode();
 
-            // Cache the access records in case we need to create identical ones for the private record, will
+                // Cache the access records in case we need to create identical ones for the private record, will
 
-            foreach ($audienceRecords as $audience) {
-                /** @var PastoralLog $logAccess */
-                $logAccess = $this->getPastoralLogMapper()->createModel();
-                $logAccess->setImportId($importId);
-                $logAccess->setUserId($user->getId());
-                $logAccess->setPastoralId($pastoralRecord->getId());
-                $logAccess->setCreatorName($pastoralRecord->getOwner()->getFullName());
-                $logAccess->setStudentName($pastoralRecord->getStudent()->getFullName());
+                foreach ($audienceRecords as $audience) {
+                    /** @var PastoralLog $logAccess */
+                    $logAccess = $this->getPastoralLogMapper()->createModel();
+                    $logAccess->setImportId($importId);
+                    $logAccess->setUserId($user->getId());
+                    $logAccess->setPastoralId($pastoralRecord->getId());
+                    $logAccess->setCreatorName($pastoralRecord->getOwner()->getFullName());
+                    $logAccess->setStudentName($pastoralRecord->getStudent()->getFullName());
 
-                $audienceUser = $this->getSchoolboxUser($audience["ID"]);
+                    $audienceUser = $this->getSchoolboxUser($audience["ID"]);
 
-                if ($audienceUser instanceof User) {
+                    if ($audienceUser instanceof User) {
 
-                    // If the school does not want parents given access to pastoral records, then don't add them
+                        // If the school does not want parents given access to pastoral records, then don't add them
 
-                    if ($importParentAccess || $audienceUser->getRole()->isStaff()) {
-                        /** @var PastoralAccess $accessRecord */
-                        $accessRecord = $this->getPastoralAccessMapper()->createModel();
-                        $accessRecord->setPastoral($pastoralRecord);
-                        $accessRecord->setAccess(PastoralAccessMapper::ACCESS_PUBLIC);
-                        $accessRecord->setUser($audienceUser);
-                        $this->getPastoralAccessMapper()->save($accessRecord);
+                        if ($importParentAccess || $audienceUser->getRole()->isStaff()) {
+                            /** @var PastoralAccess $accessRecord */
+                            $accessRecord = $this->getPastoralAccessMapper()->createModel();
+                            $accessRecord->setPastoral($pastoralRecord);
+                            $accessRecord->setAccess(PastoralAccessMapper::ACCESS_PUBLIC);
+                            $accessRecord->setUser($audienceUser);
+                            $this->getPastoralAccessMapper()->save($accessRecord);
 
-                        $logAccess->setResult("Audience: {$audienceUser->getFullName()}");
+                            $logAccess->setResult("Audience: {$audienceUser->getFullName()}");
+                        } else {
+                            $logAccess->setResult("Skipped Audience: {$audienceUser->getFullName()}");
+                        }
+
                     } else {
-                        $logAccess->setResult("Skipped Audience: {$audienceUser->getFullName()}");
+                        $logAccess->setResult("Error Audience: {$audience["ID"]}");
                     }
 
-                } else {
-                    $logAccess->setResult("Error Audience: {$audience["ID"]}");
+                    $this->getPastoralLogMapper()->save($logAccess);
                 }
-
-                $this->getPastoralLogMapper()->save($logAccess);
             }
         }
 
-        // Import attachments from Synergetic DocMan
+        if ($importAttachments) {
+            // Import attachments from Synergetic DocMan
 
-        $queryDocuments = $this->connector->executeQuery("
+            $queryDocuments = $this->connector->executeQuery("
             SELECT      ref.RelatedSeq as external_id,
                         doc.Description as [filename],
                         DocumentType as extension,
@@ -420,39 +424,40 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             JOIN        {$this->schemaMedia}.tDocumentReferences ref on ref.tDocumentsSeq = doc.tDocumentsSeq
             WHERE       RelatedSeqModuleCode = 'SPC' 
         ");
-        $documents = $queryDocuments->fetchAll();
+            $documents = $queryDocuments->fetchAll();
 
-        foreach ($documents as $document) {
-            try {
-                $record = $this->getPastoralMapper()->findOneByColumn('external_id', $document['external_id']);
+            foreach ($documents as $document) {
+                try {
+                    $record = $this->getPastoralMapper()->findOneByColumn('external_id', $document['external_id']);
 
-                $filename = tempnam(sys_get_temp_dir(), 'pastoral_attachment');
-                file_put_contents($filename, $document["blob"]);
+                    $filename = tempnam(sys_get_temp_dir(), 'pastoral_attachment');
+                    file_put_contents($filename, $document["blob"]);
 
-                /** @var StorageMapper $storageMapper */
-                $storageMapper = StorageMapper::getInstance();
-                $storageObject = $storageMapper->accept("{$document['filename']}.{$document['extension']}", $filename, false);
+                    /** @var StorageMapper $storageMapper */
+                    $storageMapper = StorageMapper::getInstance();
+                    $storageObject = $storageMapper->accept("{$document['filename']}.{$document['extension']}", $filename, false);
 
-                $pastoralAttachmentMapper = PastoralAttachmentMapper::getInstance();
+                    $pastoralAttachmentMapper = PastoralAttachmentMapper::getInstance();
 
-                $attachment = $pastoralAttachmentMapper->createModel();
-                $attachment->setPastoral($record);
-                $attachment->setStorage($storageObject);
-                $attachment->setPrivate(true);
-                $pastoralAttachmentMapper->save($attachment);
+                    $attachment = $pastoralAttachmentMapper->createModel();
+                    $attachment->setPastoral($record);
+                    $attachment->setStorage($storageObject);
+                    $attachment->setPrivate(true);
+                    $pastoralAttachmentMapper->save($attachment);
 
-                $log = $this->getPastoralLogMapper()->createModel();
-                $log->setImportId($importId);
-                $log->setUserId($user->getId());
-                $log->setPastoralId($record->getId());
-                $log->setCreatorName($record->getOwner()->getFullName());
-                $log->setStudentName($record->getStudent()->getFullName());
-                $log->setHeading("Imported Attachment '{$document["filename"]}'");
-                $log->setResult("OK");
-                $this->getPastoralLogMapper()->save($log);
+                    $log = $this->getPastoralLogMapper()->createModel();
+                    $log->setImportId($importId);
+                    $log->setUserId($user->getId());
+                    $log->setPastoralId($record->getId());
+                    $log->setCreatorName($record->getOwner()->getFullName());
+                    $log->setStudentName($record->getStudent()->getFullName());
+                    $log->setHeading("Imported Attachment '{$document["filename"]}'");
+                    $log->setResult("OK");
+                    $this->getPastoralLogMapper()->save($log);
 
-                unlink($filename);
-            } catch (MapperException $e) {
+                    unlink($filename);
+                } catch (MapperException $e) {
+                }
             }
         }
 
