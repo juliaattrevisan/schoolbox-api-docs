@@ -2,7 +2,7 @@
     <div class="row actions-small-1">
         <div class="list-item">
             <div class="small-12 columns">
-                <h1>My Articles</h1>
+                <h1>My {{ locale.news.plural | capitalize }}</h1>
             </div>
         </div>
         <nav>
@@ -58,14 +58,14 @@
                                 </div>
                             </div>
                             <nav>
-                                <a :href="article._links.update.href" class="icon-modify no-text" title="Modify this article"></a>
+                                <a :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
                             </nav>
                         </li>
                     </ul>
 
                     <div class="empty-state no-margin" v-if="!filteredArticles.length && !articlesLoading">
                         <i class="icon-news"></i>
-                        <p>You haven't authored any articles.</p>
+                        <p>You haven't authored any {{ locale.news.plural }}.</p>
                         <p><a href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}">Create {{ locale.news }}</a>.</p>
                     </div>
 

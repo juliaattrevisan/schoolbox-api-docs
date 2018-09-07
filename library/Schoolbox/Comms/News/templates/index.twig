@@ -38,7 +38,7 @@
         <ul id="tab-control" class="f-dropdown" data-dropdown-content>
             <li><a href="{{ archiveRoute }}" class="icon-archive">{{ locale.news.proper }} archive</a></li>
             {% if authoredRoute %}
-                <li><a href="{{ authoredRoute }}" class="icon-staff-students">My articles</a></li>
+                <li><a href="{{ authoredRoute }}" class="icon-staff-students">My {{ locale.news.plural }}</a></li>
             {% endif %}
             {% if moderationRoute %}
                 <li><a href="{{ moderationRoute }}" class="icon-list">Moderation list</a></li>
