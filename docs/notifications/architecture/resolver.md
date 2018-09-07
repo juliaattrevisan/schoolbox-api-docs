@@ -109,7 +109,7 @@ Looking up the key `info.notify.service.1.43.1.forum.77.replied` in the data
 structure below:
 
 ```
-[
+{
     "info.notify.service.1.43.1.forum.77.replied": [
         1,
         3,
@@ -128,7 +128,7 @@ structure below:
         11,
         19,
     ],
-]
+}
 ```
 
 returns the following:
@@ -141,24 +141,140 @@ returns the following:
   * this recursive lookup returns nothing
 * the union of these values is returned: `[1,3,6,9,10,15]`
 
+> Note that this example shows the write-optimized variant of the resolver's
+  data structure.
+>
+> The write and read optimized variants are functionally identical, but are
+  intended for different use cases.
+
 
 ### Variants
-
-> TODO verify the veracity of this section's statements
 
 The Resolver has two variants, for two different use cases:
 * read performance
 * writeability
 
+The read performance and writable variants are able to be translated to one
+another.
+
 
 #### Read-only (hydrated)
 
-This variant is optimised for read performance: it is a nested Trie structure
+This variant is optimised for read performance: it is implemented as the nested
+Trie structure as documented above.
+
+Each word in the key is a single node in the trie.
+
+```
+{
+    "info": {
+        "notify": {
+            'service": {
+                "1": {
+                    "43": {
+                        "1": {
+                            "forum": {
+                                "77": {
+                                    "replied": [
+                                        1,
+                                        3,
+                                        6,
+                                        10,
+                                        "info.notify.service.2.43.1.forum.77.replied",
+                                        "info.notify.service.2.43.1.forum.76.replied",
+                                    ],
+                                }
+                            }
+                        }
+                    }
+                },
+                "2": {
+                    "43": {
+                        "1": {
+                            "forum": {
+                                "77": {
+                                    "*": [1, 3, 9, 15,],
+                                }
+                            }
+                        }
+                    }
+                },
+                "3": {
+                    "43": {
+                        "1": {
+                            "forum": {
+                                "77": {
+                                    "*": [11, 19,],
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+A read operation in this data structure should be (one or more) O(1) efficiency
+hash lookups.
+
+However, a write operation will be somewhat more expensive than the writable
+variant: the key must be split into its constituent words before the lookup can
+take place.
+
+##### Use cases
+
+The read-only variant is used in the routing sub-system; its resolver is used
+for determining the target audience for a message.
 
 
 #### Writable (flattened)
 
-This variant is optimised for writeability: it is a 2-dimensional array
+This variant is optimised for writeability: it is a 2-dimensional array.
+
+The entire key is used as the key for the array.
+
+```
+{
+    "info.notify.service.1.43.1.forum.77.replied": [
+        1,
+        3,
+        6,
+        10,
+        "info.notify.service.2.43.1.forum.77.replied",
+        "info.notify.service.2.43.1.forum.76.replied",
+    ],
+    "info.notify.service.2.43.1.forum.77.*": [
+        1,
+        3,
+        9,
+        15,
+    ],
+    "info.notify.service.3.43.1.forum.77.*": [
+        11,
+        19,
+    ],
+}
+```
+
+A write operation in this data structure should be a simple O(1) efficiency
+hash lookup.
+
+However, a read operation will be significantly more expensive (to the point of
+being infeasible), and is at least an O(n) operation: each key in the data
+structure must be evaluated against the looked-up key, and determined whether
+it is a match for that key (all the while evaluating any wildcard characters in
+key names).
+
+##### Use cases
+
+The writable variant is used when rebinding the routing sub-system's resolver;
+the rebinding process must incrementally build a new data structure, and this
+process involves repeated writes to the data structure.
+
+Once the binding is complete, the writable data structure is translated to a
+readable structure and cached for the resolver to use.
 
 
 ### Rebinding
