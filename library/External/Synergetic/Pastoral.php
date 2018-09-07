@@ -416,8 +416,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         doc.Description as [filename],
                         DocumentType as extension,
                         [Document] as [blob]
-            FROM        media.tDocuments doc
-            JOIN        media.tDocumentReferences ref on ref.tDocumentsSeq = doc.tDocumentsSeq
+            FROM        {$this->schemaMedia}.tDocuments doc
+            JOIN        {$this->schemaMedia}.tDocumentReferences ref on ref.tDocumentsSeq = doc.tDocumentsSeq
             WHERE       RelatedSeqModuleCode = 'SPC' 
         ");
         $documents = $queryDocuments->fetchAll();
