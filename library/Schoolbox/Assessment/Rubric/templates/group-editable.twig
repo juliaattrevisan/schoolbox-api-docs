@@ -58,7 +58,7 @@
     <th class="rb-group-summary" data-group-max-value-cell colspan="{{ rubricGrid.levels|length + 3 }}">
         <label for="{{ groupInput }}[maxValue]">Maximum points for {{ locale.translate('rubricGroup') }}</label>
         <input type="tel"
-               value="{{ group.max }}"
+               value="{{ rubricGrid.retrieveGroupUsage(group).maxValue }}"
                name="{{ groupInput }}[maxValue]"
                data-group-max-value
                {% if not showGroupMaxValue %}disabled class="hide"{% endif %}
