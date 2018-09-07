@@ -29,14 +29,14 @@ class Factory
     public function buildFromPostData(Grid $grid, array $postData): Grid
     {
         // we're only going to take the first one... this could be converted to foreach easily enough
-        $rubricData  = reset($postData);
-        $levels      = $rubricData['level']      ?: [];
-        $capabilities      = $rubricData['group']      ?: [];
-        $indicators    = $rubricData['indicator']  ?: [];
-        $descriptors = $rubricData['descriptor'] ?: [];
-        $assessment  = $grid->getAssessment();
-        $markPerCap  = $assessment instanceof DueWork && $assessment->getMarkPerCapability();
-        $spec        = new ValidCapabilityMax($markPerCap);
+        $rubricData   = reset($postData);
+        $levels       = $rubricData['level']      ?: [];
+        $capabilities = $rubricData['group']      ?: [];
+        $indicators   = $rubricData['criterion']  ?: [];
+        $descriptors  = $rubricData['descriptor'] ?: [];
+        $assessment   = $grid->getAssessment();
+        $markPerCap   = $assessment instanceof DueWork && $assessment->getMarkPerCapability();
+        $spec         = new ValidCapabilityMax($markPerCap);
 
 
         /** @var Level[] $levelCache */
