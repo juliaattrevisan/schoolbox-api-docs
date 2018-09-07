@@ -812,7 +812,7 @@ class Controller extends Base
     /**
      * Index of articles you've authored
      *
-     * @api GET /comms/news/authored
+     * @api GET /comms/news/me
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
