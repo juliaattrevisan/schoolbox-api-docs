@@ -128,7 +128,7 @@
             var vue = this;
 
             // Find some articles
-            axios.get('/comms/news/me/articles').then(function(response) {
+            axios.get('{{ routeLookup('commsNews.getAuthoredArticles') }}').then(function(response) {
 
                 vue.articlesLoading = false;
                 vue.allArticles = response.data;
