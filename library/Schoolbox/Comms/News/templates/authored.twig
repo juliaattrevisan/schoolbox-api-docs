@@ -22,7 +22,7 @@
                     <dd v-for="status in statuses" :class="{active: tabSelected === status}">
                         <a @click="onTabChange(status)">${ status }</a>
                     </dd>
-                    <dd class="placeholder" v-if="articlesLoading" v-for="n in 3">
+                    <dd class="skeleton" v-if="articlesLoading" v-for="n in 3">
                         <a></a>
                     </dd>
                 </dl>
@@ -32,7 +32,7 @@
 
                         <li class="actions-small-1" v-if="articlesLoading" v-for="n in 3">
                             <div class="list-item">
-                                <div class="small-12 card placeholder">
+                                <div class="small-12 card skeleton">
                                     <div class="img"></div>
                                     <h3></h3>
                                     <p class="meta"></p>

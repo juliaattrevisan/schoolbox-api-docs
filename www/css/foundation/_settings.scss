@@ -71,8 +71,8 @@ $shiny-edge-size: 0 1px 0;
 $shiny-edge-color: rgba($white, .5);
 $shiny-edge-active-color: rgba($black, .2);
 
-// Placeholders
-$placeholder-background: #f6f6f6;
+// Skeleton screen loaders
+$skeleton-background: $vapor;
 
 $column-gutter: rem-calc(32);
 

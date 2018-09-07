@@ -50,9 +50,9 @@ $border-bottom-width: 2px;
       border-bottom: $border-bottom-width solid $accent-foreground;
     }
 
-    &.placeholder {
+    &.skeleton {
       a {
-        background: $placeholder-background;
+        background: $skeleton-background;
         width: 5rem;
         height: 22px;
         padding: 0;
