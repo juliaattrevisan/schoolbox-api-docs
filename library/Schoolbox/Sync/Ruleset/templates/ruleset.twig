@@ -55,7 +55,21 @@ set upsConfig = {
                     <p>Please be patient - we'll notify you when it's done.</p>
                 {% else %}
                     <p>
-                        If messaging was enabled, you would be notified when the dry run was completed.
+                        If messaging was enabled, you would have been notified when the dry run was completed.
+                        It isn't though, so maybe check again in a few minutes?
+                    </p>
+                {% endif %}
+                <a href="" class="close">×</a>
+            </div>
+        {% endif %}
+        {% if hasPerformUpdate %}
+            <div data-alert class="alert-box">
+                <h2>Processing {{ rulesetId|capitalize }} Update</h2>
+                {% if config.messaging_enabled %}
+                    <p>Please be patient - we'll notify you when it's done.</p>
+                {% else %}
+                    <p>
+                        If messaging was enabled, you would have been notified when the UPS run was completed.
                         It isn't though, so maybe check again in a few minutes?
                     </p>
                 {% endif %}
@@ -91,6 +105,7 @@ set upsConfig = {
                     <li class="separator">Ruleset</li>
                     <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
                     <li><a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="icon-export" title="Perform Dry Run">Perform Dry Run</a></li>
+                    <li><a data-perform-update href='#' class="icon-export" title="Perform Live Update">Perform Live Update</a></li>
                 </ul>
             </div>
 
@@ -347,3 +362,20 @@ set upsConfig = {
         </div>
     </div>
 </div>
+
+<script>
+    $(function() {
+        $('[data-perform-update]').click(function(e) {
+            e.preventDefault();
+
+            $(this).confirmDialog({
+                header: 'Warning! Live UPS Run Selected',
+                format: 'html',
+                text: '<span style="color:red"><b>You have selected to perform a live UPS update. This will create/update user records in your Schoolbox and is not a reversible action. Please ensure you have performed a dry run and confirmed that your UPS rules are correct before proceeding.</b></span><br><br>Are you sure you wish to proceed?',
+                confirmEvent: function () {
+                    window.location.href = '{{ routeLookup('upsRuleset.performUpdate', {rulesetId: rulesetId}) }}';
+                }
+            });
+        });
+    });
+</script>
