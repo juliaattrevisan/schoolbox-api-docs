@@ -92,6 +92,7 @@ class CampusMapper extends Mapper {
             FROM userCampus c
             RIGHT JOIN `user` u on c.uid = u.id
             WHERE c.campus = :campus
+            AND u.deleted_at IS NULL
         ");
 
         $stmt->execute(array(
