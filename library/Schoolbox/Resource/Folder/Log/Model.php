@@ -18,7 +18,7 @@ class Model
     /**
      * @var Folder\Model
      */
-    protected $category;
+    protected $folder;
 
     /**
      * @var User
@@ -40,20 +40,20 @@ class Model
      */
 
     /**
-     * @param  Folder\Model $category
+     * @param  Folder\Model $folder
      *
      * @return $this
      */
-    public function setCategory($category) {
-        $this->category = $category;
+    public function setFolder($folder) {
+        $this->folder = $folder;
         return $this;
     }
 
     /**
      * @return Folder\Model
      */
-    public function getCategory() {
-        return $this->category;
+    public function getFolder() {
+        return $this->folder;
     }
 
     /**
