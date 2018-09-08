@@ -7,7 +7,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Calendar\Event\Access;
 
 if (isset($this)) {
-    $page = $this;
+    $this->pageNotFound();
 } else {
     /* Direct access to modify.php -_-
      */
