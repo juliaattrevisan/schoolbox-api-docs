@@ -49,15 +49,13 @@
             <ul class="information-list">
                 <!-- BEGIN showcased_work -->
                 <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="card small-9">
+                    <div class="list-item flex-grade">
+                        <div class="card small-12 sibling">
                             <h3><a href="/learning/assessments/{SHOWCASED_WORK_ASSESSMENT_ID}/{EPORTFOLIO_PAGE_USER_ID}">{SHOWCASED_WORK_BOX_NAME}</a></h3>
                             <p class="meta">{SHOWCASED_WORK_BOX_TYPE}</p>
                         </div>
-                        <div class="small-3 columns text-center">
-                            <p class="grade gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">
-                                <span>{SHOWCASED_WORK_RETURNED_MARK}</span>
-                            </p>
+                        <div class="grade gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}-bg">
+                            <span>{SHOWCASED_WORK_RETURNED_MARK}</span>
                         </div>
                     </div>
                     <!-- BEGIN submission_file_list -->
@@ -66,7 +64,6 @@
                             <img src="/images/mime/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="Preview" class="mime">
                             <p>{SHOWCASED_WORK_FILE_NAME}</p>
                             <p class="meta">{SHOWCASED_WORK_SUBMISSION_FILESIZE}</p>
-
                         </a>
                     </div>
                     <!-- END submission_file_list -->
