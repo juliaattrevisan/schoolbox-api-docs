@@ -30,11 +30,15 @@ use Schoolbox\UserMapper;
 use OutOfBoundsException;
 use InvalidArgumentException;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Mapper\Exception;
 
 class Notifier extends AbstractModuleNotifier
 {
 
     const TRIGGER_POSTED = 'posted';
+    // This is to support ePortfolio for staff and parent
+    const TRIGGER_BLOG_POSTED = 'blogPosted';
+
     const BASE_URI = '/eportfolio/blog/';
 
     /**
@@ -88,15 +92,8 @@ class Notifier extends AbstractModuleNotifier
             /** @var Model $blog */
             $blog = $bundle->getEvent()->getObject();
 
-            //TODO remove this hack when SA-4400 is merged.
-            $blog = $this->getMapper()->findByColumn(
-                $this->getMapper()->getIdentifierColumn(),
-                $blog->getId(),
-                ['cache' => false]
-            )->first();
-            $bundle->getEvent()->setObject($blog);
-
             $bundle->attach(self::TRIGGER_POSTED, $blog->getCreatedAt()->getUnixTimeStamp());
+            $bundle->attach(self::TRIGGER_BLOG_POSTED, $blog->getCreatedAt()->getUnixTimeStamp());
         }
     }
 
@@ -114,15 +111,52 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffPosted(Model $post, User $effector): Envelope
     {
-        $page  = $this->pageMapper->findById($post->getPage()->getPageId());
-        $owner = $this->userMapper->findById($page->getOwner()->getId());
+        try {
+            $page = $this->pageMapper->findById($post->getPage()->getPageId());
+            $owner = $this->userMapper->findById($page->getOwner()->getId());
 
-        // Send it to all their teachers (across all subjects)
-        $audience = $owner->loadTeachers()->getTeacherCollection();
+            // Care only about student's blog. The others are handled in the other methods.
+            if (!$owner->getRole()->isStudent()) {
+                return new Envelope();
+            }
 
-        return $this->notifyPosted($post, $effector, $audience, RoleMapper::ROLE_STAFF);
+            // Send it to all their teachers (across all subjects)
+            $audience = $owner->loadTeachers()->getTeacherCollection();
+
+            return $this->notifyPosted($post, $owner, $effector, $audience, RoleMapper::ROLE_STAFF);
+        } catch (Exception $e) {
+            // page or owner was invalid.
+            return new Envelope();
+        }
     }
 
+    /**
+     * Notify staff someone posted on their Eportfolio blog
+     *
+     * @param Model $post
+     * @param User $effector
+     * @return Envelope
+     * @throws OutOfBoundsException     If severity is not set
+     * @throws InvalidArgumentException If a required property was not set
+     */
+    public function notifyStaffBlogposted(Model $post, User $effector): Envelope
+    {
+        return $this->notifyOwnerPosted($effector, $post, RoleMapper::ROLE_STAFF, self::TRIGGER_BLOG_POSTED);
+    }
+
+    /**
+     * Notify parent someone posted on their Eportfolio blog
+     *
+     * @param Model $post
+     * @param User $effector
+     * @return Envelope
+     * @throws OutOfBoundsException     If severity is not set
+     * @throws InvalidArgumentException If a required property was not set
+     */
+    public function notifyParentBlogposted(Model $post, User $effector): Envelope
+    {
+        return $this->notifyOwnerPosted($effector, $post, RoleMapper::ROLE_PARENT, self::TRIGGER_BLOG_POSTED);
+    }
 
     /**
      * Notify a student someone posted on their Eportfolio blog
@@ -135,13 +169,44 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentPosted(Model $post, User $effector): Envelope
     {
-        $page     = $this->pageMapper->findById($post->getPage()->getPageId());
-        $owner    = $this->userMapper->findById($page->getOwner()->getId());
-        $audience = $this->userMapper->createCollection([$owner]);
-
-        return $this->notifyPosted($post, $effector, $audience, RoleMapper::ROLE_STUDENT);
+        return $this->notifyOwnerPosted($effector, $post, RoleMapper::ROLE_STUDENT, self::TRIGGER_POSTED);
     }
 
+    /**
+     * Notify the post owner that someone posted on their Eportfolio blog, if the owner is in the given role
+     * @param User $effector
+     * @param Model $post
+     * @param string $roleType
+     * @param string $trigger
+     * @return Envelope
+     */
+    private function notifyOwnerPosted(User $effector, Model $post, string $roleType, string $trigger): Envelope
+    {
+        try {
+            $page = $this->pageMapper->findById($post->getPage()->getPageId());
+            $owner = $this->userMapper->findById($page->getOwner()->getId());
+
+            if ($owner->getRole()->getType() !== $roleType) {
+                return new Envelope();
+            }
+
+            $params = [
+                'author' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                'title' => new Param($post->getHeading(), $this->buildBlogUrl($post)),
+            ];
+
+            $envelope = new Envelope();
+            $bob = $this->createBuilder($post, $effector, $trigger);
+            $bob->setTitle(":author posted :title on your eportfolio blog")
+                ->setParams($params);
+            $envelope->targetToUser($owner->getId(), $bob->build());
+            return $envelope;
+
+        } catch (Exception $e) {
+            // page or owner was invalid.
+            return new Envelope();
+        }
+    }
 
     /**
      * Notify parents that someone posted on their child's eportfolio blog
@@ -149,31 +214,48 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $post
      * @param User  $effector
      * @return Envelope
-     * @throws BaseMapper\Exception
      * @throws OutOfBoundsException     If severity is not set
      * @throws InvalidArgumentException If a required property was not set
      */
     public function notifyParentPosted(Model $post, User $effector): Envelope
     {
-        // Hydrate
-        $post->setPage($this->pageMapper->findById($post->getPage()->getPageId()));
-        $post->getPage()->setOwner($this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents());
-        $audience = $this->userMapper->createCollection();
+        try {
+            $page = $this->pageMapper->findById($post->getPage()->getPageId());
+            $owner = $this->userMapper->findById($page->getOwner()->getId());
 
-        foreach ($post->getPage()->getOwner()->getParents() as $parent) {
-            if ($this->access->userCanView($post, $parent)) {
-                $audience[$parent->getId()] = $parent;
+            // Care only about student's blog. The others are handled in the other methods.
+            if (!$owner->getRole()->isStudent()) {
+                return new Envelope();
             }
+
+            // Send it to all their parents
+            $parents = $owner->loadParents()->getParents();
+            $audience = $this->userMapper->createCollection();
+            // Need to explicitely set page owner
+            $post->getPage()->setOwner($owner);
+
+            foreach ($parents as $parent) {
+                if ($this->access->userCanView($post, $parent)) {
+                    try {
+                        $audience[$parent->getId()] = $parent;
+                    } catch (Exception $e) {
+                        // noop
+                    }
+                }
+            }
+
+            return $this->notifyPosted($post, $owner, $effector, $audience, RoleMapper::ROLE_PARENT);
+        } catch (Exception $e) {
+            // page or owner was invalid.
+            return new Envelope();
         }
-
-        return $this->notifyPosted($post, $effector, $audience, RoleMapper::ROLE_PARENT);
     }
-
 
     /**
      * Common logic for the 'notify{RoleType}Posted()' public methods
      *
      * @param Model      $post
+     * @param User       $owner
      * @param User       $effector
      * @param Collection $audience
      * @param string     $roleType
@@ -181,20 +263,9 @@ class Notifier extends AbstractModuleNotifier
      * @throws OutOfBoundsException     If severity is not set
      * @throws InvalidArgumentException If a required property was not set
      */
-    private function notifyPosted(Model $post, User $effector, Collection $audience, string $roleType): Envelope
+    private function notifyPosted(Model $post, User $owner, User $effector, Collection $audience, string $roleType): Envelope
     {
         $envelope = new Envelope();
-        $page     = $this->pageMapper->findById($post->getPage()->getPageId());
-        $owner    = $this->userMapper->findById($page->getOwner()->getId());
-
-        // Are we targeting parents?
-        if (RoleMapper::ROLE_PARENT === $roleType) {
-            // Load parents so we can display just their child's first name
-            $effector->loadParents();
-            if ($effector->getId() !== $owner->getId()) {
-                $owner->loadParents();
-            }
-        }
 
         foreach ($audience as $target) {
             // Just first name if advising parent of child's action

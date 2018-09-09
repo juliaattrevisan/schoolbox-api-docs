@@ -27,6 +27,7 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Mapper\Exception;
 use OutOfBoundsException;
 use InvalidArgumentException;
 
@@ -38,6 +39,8 @@ class Notifier extends AbstractModuleNotifier
 
     const TRIGGER_CREATED = 'created';
     const TRIGGER_COMMENTED = 'commented';
+    // this is to support ePortfolio for staff and parent
+    const TRIGGER_BLOG_COMMENTED = 'blogCommented';
     const TRIGGER_FOLLOWED = 'followed';
 
     const BASE_URI = '/eportfolio/blog/';
@@ -93,16 +96,9 @@ class Notifier extends AbstractModuleNotifier
             /** @var Model $comment */
             $comment = $bundle->getEvent()->getObject();
 
-            //TODO remove this hack when SA-4400 is merged. (timestamp population)
-            $comment = $this->getMapper()->findByColumn(
-                $this->getMapper()->getIdentifierColumn(),
-                $comment->getId(),
-                ['cache' => false]
-            )->first();
-            $bundle->getEvent()->setObject($comment);
-
             $bundle->attach(self::TRIGGER_CREATED, $comment->getCreatedAt()->getUnixTimeStamp());
             $bundle->attach(self::TRIGGER_COMMENTED, $comment->getCreatedAt()->getUnixTimeStamp());
+            $bundle->attach(self::TRIGGER_BLOG_COMMENTED, $comment->getCreatedAt()->getUnixTimeStamp());
             $bundle->attach(self::TRIGGER_FOLLOWED, $comment->getCreatedAt()->getUnixTimeStamp());
         }
     }
@@ -126,9 +122,10 @@ class Notifier extends AbstractModuleNotifier
         $author   = $this->userMapper->findById($post->getOwner()->getId());
         $audience = $this->userMapper->createCollection();
 
-        if ($author->getRole()->isStaff()) {
-            $audience->add($author);
+        if (!$author->getRole()->isStaff()) {
+            return new Envelope();
         }
+        $audience->add($author);
         return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_STAFF, self::TRIGGER_CREATED);
     }
 
@@ -147,12 +144,44 @@ class Notifier extends AbstractModuleNotifier
         $post  = $this->postMapper->findById($comment->getBlog()->getId());
         $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId());
 
+        // Care only student's page
+        if (!$owner->getRole()->isStudent()) {
+            return new Envelope();
+        }
+
         // Send it to all their teachers (across all subjects)
         $audience = $owner->loadTeachers()->getTeacherCollection();
 
         return $this->notifyCommented($comment, $effector, $audience, RoleMapper::ROLE_STAFF);
     }
 
+    /**
+     * Notify a staff that someone commented on one of their eportfolio blog posts
+     *
+     * @param Model $comment
+     * @param User  $effector
+     * @return Envelope
+     * @throws OutOfBoundsException     If severity is not set
+     * @throws InvalidArgumentException If a required property was not set
+     */
+    public function notifyStaffBlogcommented(Model $comment, User $effector): Envelope
+    {
+        return $this->notifyOwnerCommented($effector, $comment, RoleMapper::ROLE_STAFF, self::TRIGGER_BLOG_COMMENTED);
+    }
+
+    /**
+     * Notify a parent that someone commented on one of their eportfolio blog posts
+     *
+     * @param Model $comment
+     * @param User  $effector
+     * @return Envelope
+     * @throws OutOfBoundsException     If severity is not set
+     * @throws InvalidArgumentException If a required property was not set
+     */
+    public function notifyParentBlogcommented(Model $comment, User $effector): Envelope
+    {
+        return $this->notifyOwnerCommented($effector, $comment, RoleMapper::ROLE_PARENT, self::TRIGGER_BLOG_COMMENTED);
+    }
 
     /**
      * Notify a student that someone commented on one of their eportfolio blog posts
@@ -165,11 +194,38 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentCommented(Model $comment, User $effector): Envelope
     {
-        $post     = $this->postMapper->findById($comment->getBlog()->getId());
-        $owner    = $this->userMapper->findById($post->getPage()->getOwner()->getId());
-        $audience = $this->userMapper->createCollection([$owner]);
+        return $this->notifyOwnerCommented($effector, $comment, RoleMapper::ROLE_STUDENT, self::TRIGGER_COMMENTED);
+    }
 
-        return $this->notifyCommented($comment, $effector, $audience, RoleMapper::ROLE_STUDENT);
+    /**
+     * Notify the post owner that someone commented on their Eportfolio blog, if the owner is in the given role
+     * @param User $effector
+     * @param Model $comment
+     * @param string $roleType
+     * @return Envelope
+     */
+    private function notifyOwnerCommented(User $effector, Model $comment, string $roleType, string $trigger): Envelope
+    {
+        try {
+            $post = $this->postMapper->findById($comment->getBlog()->getId());
+            $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId());
+
+            if ($owner->getRole()->getType() !== $roleType) {
+                return new Envelope();
+            }
+
+            $envelope = new Envelope();
+            $bob = $this->createBuilder($post, $effector, $comment, $trigger);
+            $bob->setTitle(":effector commented on your eportfolio blog")
+                ->setParams(['effector' => new UserParam($effector)]);
+            $envelope->targetToUser($owner->getId(), $bob->build());
+
+            return $envelope;
+
+        } catch (Exception $e) {
+            // page or owner was invalid.
+            return new Envelope();
+        }
     }
 
 
@@ -188,6 +244,11 @@ class Notifier extends AbstractModuleNotifier
         $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents();
         $post->getPage()->setOwner($owner);
 
+        // Only care about student
+        if (!$owner->getRole()->isStudent()) {
+            return new Envelope();
+        }
+
         $audience = $this->userMapper->createCollection();
 
         foreach ($owner->getParents() as $parent) {
@@ -195,7 +256,7 @@ class Notifier extends AbstractModuleNotifier
                 if ($this->access->userCanView($post, $parent)) {
                     $audience[$parent->getId()] = $parent;
                 }
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (Exception $e) {
                 // noop
             }
         }
