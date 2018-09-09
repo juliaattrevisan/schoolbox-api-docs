@@ -72,10 +72,13 @@ class Factory
         /** @var Group[] $groupCache */
         $groupCache = [];
         foreach ($groups as $groupData) {
-            // This group must exist in order for it to be saved
+            // This group must exist and be in use in order for it to be saved
             $groupId   = (int)$groupData['id'];
             $groupName = $groupData['name'];
             if (!$groupId) {
+                continue;
+            }
+            if (empty($groupIdsInUse[$groupId])) {
                 continue;
             }
             $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
