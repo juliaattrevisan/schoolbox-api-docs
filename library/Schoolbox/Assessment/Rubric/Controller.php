@@ -261,7 +261,11 @@ class Controller extends BaseController
             );
 
             $rubricRowSet = $this->mapper->retrieveRowSet($folder, true);
-            $rubricGrid   = new Grid((new DueWork())->setId($box->getAssessmentModel()->getId()), $rubricRowSet);
+            $dummyDueWork = (new DueWork())
+                ->setId($box->getAssessmentModel()->getId())
+                ->setMarkPerCapability($usingMarkPerCapability)
+                ->setUseMarkRange($usingMarkRange);
+            $rubricGrid   = new Grid($dummyDueWork, $rubricRowSet);
             $rubricGrid   = (new GridFactory())
                 ->buildFromPostData($rubricGrid, [$box->getAssessmentModel()->getId() => $postData]);
 
