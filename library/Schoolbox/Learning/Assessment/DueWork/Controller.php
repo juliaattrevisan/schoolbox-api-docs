@@ -1102,15 +1102,6 @@ class Controller extends Assessment\Controller
         ];
 
         // ...append rubric-related data...
-        if($assessment->getId()){
-            $getParentCriteria = $assessment->getBaseContext() instanceof UnitSpecification;
-            $editMode = true;
-            $rubric = $this->rubricMapper->findByDueWork($assessment, $getParentCriteria, $editMode);
-        } else {
-            $rubric = $this->rubricMapper->createForContext($assessment->getBaseContext());
-        }
-        $assessment->setRubric($rubric);
-
         $data = array_merge($data, $this->generateRubricTwigData($assessment));
 
         // ...and scene.
@@ -1127,10 +1118,6 @@ class Controller extends Assessment\Controller
     private function generateRubricTwigData(Model $dueWork)
     {
         $data = [];
-
-        if (!$dueWork->getRubric() instanceof Rubric\Rubric) {
-            throw new \InvalidArgumentException("Rubric unspecified");
-        }
 
         $rubricZone = new Zone('rubric');
         // JS file.type isn't set reliably enough to use text/csv mime filter
@@ -1151,19 +1138,14 @@ class Controller extends Assessment\Controller
         $data['rubricResultSets'] = $rs;
 
         // Do any students have marks for this rubric?
-        if($dueWork->getRubric()->getSubmissionBox() instanceof SubmissionBox ) {
-            $levelIds = Rubric\LevelMapper::getInstance()->findIdsByColumn('box_id', $dueWork->getRubric()->getSubmissionBox()->getId());
-            $descriptorIds = Rubric\DescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
-            $countMarkIds = Rubric\DescriptorMarkMapper::getInstance()->countByColumnList([
-                'descriptor_id' => $descriptorIds,
-                'valid'         => true
-            ]);
+        $levelIds      = Rubric\LevelMapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
+        $descriptorIds = Rubric\DescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
+        $countMarkIds  = Rubric\DescriptorMarkMapper::getInstance()->countByColumnList([
+            'descriptor_id' => $descriptorIds,
+            'valid'         => true
+        ]);
 
-            $data['rubricHasMarks'] = $countMarkIds > 0;
-        }
-        else {
-            $data['rubricHasMarks'] = false;
-        }
+        $data['rubricHasMarks'] = $countMarkIds > 0;
 
         // The rubric grid can be used as is without Twig-wrangling
         $rubricGrid = $this->rubricMapper->retrieveGrid($dueWork, true);
