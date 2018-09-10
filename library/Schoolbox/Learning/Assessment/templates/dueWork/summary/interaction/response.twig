@@ -18,11 +18,13 @@
     {# does it belong to current user? #}
     {% if currentInteraction.submittedOnBehalfOf.id == USER.id %}
         {# try to resume at 'submit response' page #}
-        {% set url = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {
+        {% set url = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponseForSelfReflection', {
             assessmentId: currentInteraction.assessable.id,
-            studentId:    participant.user.id,
-            assessment:   currentInteraction.assessable,
-            student:      participant.user
+            studentId: participant.user.id,
+            responseId: currentInteraction.Id,
+            response: currentInteraction,
+            assessment: currentInteraction.assessable,
+            student: participant.user
         }) %}
         {% if url %}
             {% set tooltip = 'Resume Submission' %}
