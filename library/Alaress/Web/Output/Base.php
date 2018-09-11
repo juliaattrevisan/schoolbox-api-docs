@@ -44,13 +44,20 @@ class Base implements OutputInterface
         $this->outputHeaders();
         $this->outputCookies();
 
+        // Don't send response body if there is a redirect.
+
+        $location = $this->getResponse()->headers->get('location');
+
         // Is there a post-output callback?
         // Buffer response body and output it later
+
         if ($this->hasPostOutputCallbacks()) {
             ob_start();
         }
 
-        $this->outputResponseBody();
+        if (!isset($location)) {
+            $this->outputResponseBody();
+        }
 
         if ($this->hasPostOutputCallbacks()) {
             $this->runPostOutputCallbacks(ob_get_clean());
