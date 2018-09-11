@@ -8,8 +8,6 @@
  */
 namespace Schoolbox\Comms\News\Statistics\Scale;
 
-use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
-
 class Month extends Base
 {
 
@@ -26,13 +24,15 @@ class Month extends Base
 
 
     /**
-     * Number of minutes to add when generating date placeholders in generateDateRange()
+     * Not presently used in this strat; we can shortcut it with a simpler interpretation
+     * Classically you could use getInterval() and return PERIOD_LENGTH etc. but we can hardcode
+     * an intended result instead for now
      *
      * @return int
      */
     public function getInterval(): int
     {
-        return ImpressionsConversionsOpens::PERIOD_LENGTH*24*60;
+        return 0;
     }
 
 
@@ -48,15 +48,12 @@ class Month extends Base
         $start->startOfMonth()->startOfDay();
         $endTimestamp = $end->startOfMonth()->startOfDay()->getUnixTimeStamp();
 
-        $range = [];
-
-        /* Multiply by 1000 to get milliseconds conversion, because highcharts
+        /* Special format for month; there are only ever two data points because of our crontab deletion
          */
-        while ($start->getUnixTimeStamp() < $endTimestamp) {
-            $range[$start->getDatabase()] = [1000*$start->getUnixTimeStamp(), 0];
-
-            $start->addMinutes($this->getInterval());
-        }
+        $range = [
+            $start->getDatabase() => [$start->getUnixTimeStamp()*1000, 0],
+            $end->getDatabase() => [$endTimestamp*1000, 0]
+        ];
 
         return $range;
     }
