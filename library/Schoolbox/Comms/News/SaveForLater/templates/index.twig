@@ -66,7 +66,15 @@
                             <div class="list-item">
                                 <div class="small-12 card">
                                     <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
-                                    <p class="meta">Authored by {{ article.author.fullname }} on {{ article.updatedAt.local }}</p>
+                                    <p class="meta">
+                                        Authored by
+                                        {% if article.author.deletedAt.isNull %}
+                                            <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
+                                        {% else %}
+                                            {{ article.author.fullname }}
+                                        {% endif %}
+                                        <time title="{{ article.publishAt.long }}">{{ article.publishAt.relativeTime }}</time>
+                                    </p>
 
                                     {% if article.topics|length %}
                                         <p class="meta">Related topics:
@@ -79,7 +87,7 @@
                             </div>
                             {% if routeRemove %}
                             <nav>
-                                <a class="icon-close" href="{{ routeRemove }}" title="Remove this from your saved items" data-remove="{{ article.title }}"></a>
+                                <a class="icon-favourite" href="{{ routeRemove }}" title="Remove this from your saved items" data-remove="{{ article.title }}"></a>
                             </nav>
                             {% endif %}
                             <article>{{ article.blurb|purify }}</article>
