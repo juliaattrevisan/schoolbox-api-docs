@@ -51,7 +51,7 @@ class Factory
         foreach ($postData as $tempGroupId => $postedGroup) {
             $group = (new Group())
                 ->setId($postedGroup['id'])
-                ->setName($postedGroup['name'])
+                ->setName($postedGroup['name'] ?? '')
                 ->setCurriculumNodes(
                     $this->nodeMapper->findByColumn('id', $postedGroup['curriculumCode'])
                 );
@@ -60,7 +60,7 @@ class Factory
             foreach ($postedGroup['items'] ?? [] as $tempCriterionId => $postedCriterion) {
                 $criterion = (new Criterion())
                     ->setId($postedCriterion['id'])
-                    ->setName($postedCriterion['name'])
+                    ->setName($postedCriterion['name'] ?? '')
                     ->setCurriculumNodes(
                         $this->nodeMapper->findByColumn('id', $postedCriterion['curriculumCode'])
                     );
