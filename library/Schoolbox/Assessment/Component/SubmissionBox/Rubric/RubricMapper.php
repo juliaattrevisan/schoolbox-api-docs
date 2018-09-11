@@ -783,6 +783,37 @@ class RubricMapper
             }
         }
 
+
+        // For each group: infer its mark-per-capability
+        if ($markPerCapability) {
+            foreach ($postdata['group'] as $groupId => $group) {
+                // Only infer if it's not provided
+                if (isset($group['maxValue'])) {
+                    continue;
+                }
+
+                // Find the criteria for this group
+                $inferredMaxValue = 0;
+                foreach ($postdata['criterion'] as $criterionId => $criterion) {
+                    if ((int)$criterion['groupId'] !== $groupId) {
+                        continue;
+                    }
+
+
+                    // Now go thru its descriptors
+                    $criterionMaxValue = 0;
+                    foreach ($postdata['descriptor'][$criterionId] as $descriptor) {
+                        $criterionMaxValue = max($criterionMaxValue, $descriptor['points']);
+                    }
+
+                    $inferredMaxValue += $criterionMaxValue;
+                }
+
+                $postdata['group'][$groupId]['maxValue'] = $inferredMaxValue;
+            }
+        }
+
+
         /** @var Rubric $rubric */
         $rubric = $this->factory->buildFromPostData([0 => $postdata], $markPerCapability, $useMarkRange,true);
 
