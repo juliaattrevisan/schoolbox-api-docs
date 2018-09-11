@@ -55,6 +55,11 @@ class Querystring
     public const FOLDER = 'f';
 
     /**
+     * Querystring param for the status filter (on the /me page)
+     */
+    public const STATUS = 'status';
+
+    /**
      * Querystring param for the Referrer (used in stats)
      */
     public const REFERRER = 'ref';
@@ -82,6 +87,7 @@ class Querystring
             self::HIDE_PAGINATOR => $data[self::HIDE_PAGINATOR],
             self::FOLDER => $data[self::FOLDER],
             self::REFERRER => $data[self::REFERRER],
+            self::STATUS => $data[self::STATUS],
         ];
     }
 
@@ -148,6 +154,16 @@ class Querystring
     public function getFolderId()
     {
         return $this->querystring[self::FOLDER];
+    }
+
+    /**
+     * Get the status
+     *
+     * @return mixed
+     */
+    public function getStatus()
+    {
+        return $this->querystring[self::STATUS];
     }
 
 

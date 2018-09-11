@@ -818,7 +818,22 @@ class Controller extends Base
      */
     public function getAuthored()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored.twig', []));
+        $params = new Querystring($this->getRequest()->query);
+        $pageNum = $params->getPageNum();
+        $status = $params->getStatus();
+
+        if (!$pageNum) {
+            $pageNum = 1;
+        }
+
+        if (!$status) {
+            $status = 'All';
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored.twig', [
+            'page' => $pageNum,
+            'status' => $status
+        ]));
     }
 
 

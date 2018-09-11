@@ -101,7 +101,7 @@
         },
         data: {
             // The active page on the pagination
-            page: 1,
+            page: {{ page }},
 
             // Whether the articles are still being loaded or not
             // Used to show the placeholder loader
@@ -118,11 +118,8 @@
             // Will be populated as all articles on load
             filteredArticles: [],
 
-            // The current page of articles
-            currentArticles: [],
-
             // The selected tab, just used for active styling
-            tabSelected: 'All'
+            tabSelected: '{{ status }}'
         },
         mounted: function () {
             var vue = this;
@@ -133,53 +130,117 @@
                 vue.articlesLoading = false;
                 vue.allArticles = response.data;
                 vue.filteredArticles = response.data;
-                vue.currentArticles = response.data.slice(0, {{ config.search_type_limit }});
 
                 // Loop the returned articles and populate the 'statuses' array for the status tabs
-                vue.statuses.push('All'); // Add 'all' here so that they're all loaded at the same time
+                vue.statuses.push('All'); // Add the 'all' tab here so that all the tabs are loaded on the screen at the same time
                 response.data.forEach(function (article) {
                     if (vue.statuses.indexOf(article.status) === -1) {
                         vue.statuses.push(article.status);
                     }
                 });
 
+                // In the case that this page has loaded with a page and/or tab in the URL params - update the page to reflect those params
+                if (vue.tabSelected !== 'All') {
+                    vue.onTabChange(vue.tabSelected, true, true);
+                }
+                if (vue.page > 1) {
+                    vue.onPaginate(vue.page, true);
+                }
+
             }).catch(function (error) {
                 console.log(error);
             });
+
+            // Set initial state for window history
+            if (!history.state) {
+                history.pushState({page: vue.page, tab: this.tabSelected}, '', '');
+            }
+
+            // Listen for window state change
+            window.onpopstate = function(event) {
+                if (!event.state) {
+                    // Let the browser go back to normal history
+                    return false;
+                } else {
+                    if (event.state.page) {
+                        vue.page = event.state.page;
+                        vue.onPaginate(event.state.page, true);
+                    }
+
+                    if (event.state.tab) {
+                        vue.tabSelected = event.state.tab;
+                        vue.onTabChange(event.state.tab, true, true);
+                    }
+                }
+            };
         },
         methods: {
-            onPaginate: function (page) {
-                // Show the next set
-                var limit = {{ config.search_type_limit }};
-                var offset = (page-1) * limit;
-                var total = offset + {{ config.search_type_limit }};
-                this.currentArticles = this.filteredArticles.slice(offset, total);
+            /**
+             * On change of page
+             *
+             * @param {int} page - The page to change to
+             * @param {boolean} holdState - Whether to change the window's history or not
+             */
+            onPaginate: function (page, holdState) {
+                // Update the window history
+                if (!holdState) {
+                    var params;
+                    if (this.tabSelected === 'All') {
+                        params = '?p=' + page;
+                    } else {
+                        params = '?p=' + page + '&status=' + this.tabSelected;
+                    }
+                    window.history.pushState({page: page, tab: this.tabSelected}, '', params);
+                }
             },
-            onTabChange: function (tab) {
+
+            /**
+             * Changing status tab
+             *
+             * @param {string} tab - The tab to change to
+             * @param {boolean} persistPage
+             * @param {boolean} holdState - Whether to change the window's history or not
+             */
+            onTabChange: function (tab, persistPage, holdState) {
                 var vue = this;
                 var limit = {{ config.search_type_limit }};
 
                 vue.tabSelected = tab;
-                vue.page = 1;
+                if (!persistPage) {
+                    vue.page = 1;
+                }
 
                 if (tab === 'All') {
                     // Reset back to original set
                     vue.filteredArticles = vue.allArticles;
-                    vue.currentArticles = vue.allArticles.slice(0, limit);
                 } else {
                     // Filter by tab selected
-                    var filteredArticles = vue.currentArticles = vue.allArticles.filter(function (article) {
+                    var filteredArticles = vue.allArticles.filter(function (article) {
                         return article.status === tab;
                     });
 
                     vue.filteredArticles = filteredArticles;
-                    vue.currentArticles = filteredArticles.slice(0, limit);
+                }
+
+                // Update the window history
+                if (!holdState) {
+                    window.history.pushState({tab: tab, page: vue.page}, '', '?status=' + tab);
                 }
             }
         },
         computed: {
+            // The total pages to show for pagination buttons
             pageCount: function () {
                 return Math.ceil(this.filteredArticles.length / {{ config.search_type_limit }});
+            },
+
+            // The current set of articles showing for the page
+            currentArticles: function() {
+                var limit = {{ config.search_type_limit }};
+                var offset = (this.page-1) * limit;
+                var total = offset + limit;
+
+                return this.filteredArticles.slice(offset, total);
             }
         }
     });
