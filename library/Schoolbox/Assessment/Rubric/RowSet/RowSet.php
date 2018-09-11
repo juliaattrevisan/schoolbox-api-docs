@@ -61,12 +61,7 @@ class RowSet
      */
     public function retrieveGroup(int $groupId): ?Group
     {
-        foreach ($this->groups as $group) {
-            if ($group->getId() === $groupId) {
-                return $group;
-            }
-        }
-        return null;
+        return $this->groups->getBy('id', $groupId);
     }
 
 

@@ -71,12 +71,7 @@ class Group
      */
     public function retrieveCriterion(int $criterionId): ?Criterion
     {
-        foreach ($this->criteria as $criterion) {
-            if ($criterion->getId() === $criterionId) {
-                return $criterion;
-            }
-        }
-        return null;
+        return $this->criteria->getBy('id', $criterionId);
     }
 
 
