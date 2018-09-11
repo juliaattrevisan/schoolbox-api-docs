@@ -168,7 +168,7 @@ class ImpressionsConversionsOpens
          * We can't rely on the INSERT ON DUPLICATE idea because I also need to
          * increment cumulative total if (and only if) a unique Conversion was made
          */
-        $existing = $this->statisticsMapper->countByColumnList([
+        $existingConversion = $this->statisticsMapper->countByColumnList([
             'article_id' => $article->getId(),
             'type' => Mapper::TYPE_CONVERSION,
             'user_id' => $userId,
@@ -177,7 +177,19 @@ class ImpressionsConversionsOpens
             'role_id' => $roleId,
         ]);
 
-        if ($existing) {
+        $existingOpen = $this->statisticsMapper->countByColumnList([
+            'article_id' => $article->getId(),
+            'type' => Mapper::TYPE_OPEN,
+            'user_id' => $userId,
+            'role_type' => $roleType,
+            'role_id' => $roleId,
+        ]);
+
+        /* If this (user, referrer) combination already exists, don't record duplicate data; just leave
+         * Otherwise, this (user, referrer) combination indicates a new conversion or a new open
+         * for this particular user
+         */
+        if ($existingConversion || $existingOpen) {
             return false;
         }
 
