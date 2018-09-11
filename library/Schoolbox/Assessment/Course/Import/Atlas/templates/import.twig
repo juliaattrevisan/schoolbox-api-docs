@@ -195,12 +195,10 @@
                         $collapsers = $();
 
                     // Find collapsers
-                    // TODO this needs to keep up to date with which fields are currently invalid,
-                    // otherwise we end up unnecessarily expanding valid collapsers
                     Object.keys(validator.invalid).forEach(function(invalidInputName) {
-                        var $inputElement     = units.find('[name="' + invalidInputName + '"]'),
-                            $collapsable = $inputElement.closest('[data-collapsable]'),
-                            $collapserButton = $collapsable.prevAll(".actions-small-1").find("[data-collapser]");
+                        var $inputElement    = units.find('[name="' + invalidInputName + '"]'),
+                            $collapsableId   = $inputElement.closest('[data-collapsable]').attr('data-collapsable'),
+                            $collapserButton = units.find('[data-collapser="' + $collapsableId + '"]');
 
                             $collapsers = $collapsers.add($collapserButton);
                     });
