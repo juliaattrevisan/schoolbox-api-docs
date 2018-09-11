@@ -669,11 +669,8 @@ class RubricMapper
         $isLastRowNewGroup = false;
         while ($row = $this->getcsv($fp, $maxLevels + 2)) {
             if ($isLastRowNewGroup) {
+                $groupMaxValue     = $row[0];
                 $isLastRowNewGroup = false;
-                if ($row[0]) {
-                    $markPerCapability = true;
-                    $groupMaxValue     = $row[0];
-                }
             } else {
                 // list of criteria, grouped by... uh, group
                 if ($row[0]) {
@@ -695,7 +692,7 @@ class RubricMapper
             // (The group values persist from previous rows)
             $groups[$workingGroupName]['id']                         = null;
             $groups[$workingGroupName]['name']                       = $workingGroupName;
-            $groups[$workingGroupName]['maxValue']                   = $groupMaxValue ?? null;
+            $groups[$workingGroupName]['maxValue']                   = $groupMaxValue ?: null;
             $groups[$workingGroupName]['criteria'][$workingCritName] = [
                 'id'   => null,
                 'name' => $workingCritName,
