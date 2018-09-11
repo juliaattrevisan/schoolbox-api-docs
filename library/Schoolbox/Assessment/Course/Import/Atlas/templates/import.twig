@@ -169,15 +169,9 @@
                         unitEnabled   = $this.prop('checked'),
                         $inputs       = $().add(units.find(':input[name^="unit['+unit+'][assessment]"]'))
                                            .add(units.find(':input[name^="unit['+unit+'][attachment]"]')),
-                        $assessments  = units.find('[data-checkbox-group="unit-'+unit+'-assessments"]'),
-                        $attachments  = units.find('[data-checkbox-group="unit-'+unit+'-attachments"]'),
                         $metaSelected = units.find('[data-unit-meta="'+unit+'"] [data-checkbox-group-count]');
+
                     $inputs.prop('disabled', !unitEnabled);
-
-                    // Select/deselect all
-                    $assessments.prop('checked', unitEnabled);
-                    $attachments.prop('checked', unitEnabled);
-
                     $metaSelected.toggle(unitEnabled);
                 });
 
