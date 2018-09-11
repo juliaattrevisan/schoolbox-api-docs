@@ -195,19 +195,21 @@
                         $collapsers = $();
 
                     // Find collapsers
-                    Object.keys(validator.invalid).forEach(function(v) {
-                        var $element     = units.find('[name="' + v + '"]'),
-                            $collapsable = $element.closest('[data-collapsable]');
+                    Object.keys(validator.invalid).forEach(function(invalidInputName) {
+                        var $inputElement    = units.find('[name="' + invalidInputName + '"]'),
+                            $collapsableId   = $inputElement.closest('[data-collapsable]').attr('data-collapsable'),
+                            $collapserButton = units.find('[data-collapser="' + $collapsableId + '"]');
 
-                        if ($collapsable.data('collapse-state') === 'collapsed') {
-                            var $collapser = units.find('[data-collapser="' + $collapsable.data('collapsable') + '"]');
-                            $collapsers = $collapsers.add($collapser);
-                        }
+                            $collapsers = $collapsers.add($collapserButton);
                     });
 
                     // Click each unique one
                     $.unique($collapsers).each(function () {
-                        $(this).click();
+                        // Don't simulate click if collapser is already expanded
+                        var $collapsable = $(this).closest(".actions-small-1").next("[data-collapsable]");
+                        if ($collapsable.attr("data-collapse-state") === "collapsed") {
+                            $(this).click();
+                        }
                     })
                 }
             },
