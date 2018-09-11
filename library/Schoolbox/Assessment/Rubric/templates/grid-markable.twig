@@ -696,7 +696,7 @@
 
                 if ($descriptorCheckbox.prop('checked')) {
                     // Is there a select box for this? If so use its value instead
-                    var descriptorId = $descriptorCheckbox.attr('data-rubricDescriptor'),
+                    var descriptorId = $descriptorCheckbox.attr('data-rubric-descriptor'),
                         $select = $rb.find('#rangeDropdown-'+String(descriptorId)),
                         descriptorValue;
                     if ($select.length) {
