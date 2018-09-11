@@ -82,7 +82,7 @@ class ImpressionsConversionsOpens
     {
         /* Only record Impressions for publicly-accessible articles
          */
-        if (!$article->isPublished()) {
+        if (!$article->isPublished() && !$article->isExpired()) {
             return false;
         }
 
@@ -151,7 +151,7 @@ class ImpressionsConversionsOpens
     {
         /* Only record Conversions for publicly-accessible articles
          */
-        if (!$article->isPublished()) {
+        if (!$article->isPublished() && !$article->isExpired()) {
             return false;
         }
 
