@@ -167,8 +167,9 @@
                     var $this         = $(this),
                         unit          = $this.data('unit'),
                         unitEnabled   = $this.prop('checked'),
-                        $inputs       = $().add(units.find(':input[name^="unit['+unit+'][assessment]"]'))
-                                           .add(units.find(':input[name^="unit['+unit+'][attachment]"]')),
+                        $inputs       = units.find(
+                            ':input[name^="unit['+unit+'][assessment]"], :input[name^="unit['+unit+'][attachment]"]'
+                        ),
                         $metaSelected = units.find('[data-unit-meta="'+unit+'"] [data-checkbox-group-count]');
 
                     $inputs.prop('disabled', !unitEnabled);
