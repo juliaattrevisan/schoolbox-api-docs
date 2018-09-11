@@ -126,9 +126,9 @@
                 });
 
                 {# Zoom into the last seven days to start with #}
-                var d = new Date();
-                chart.xAxis[0].setExtremes(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate() - 7), Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-                chart.showResetZoom();
+                {#var d = new Date();#}
+                {#chart.xAxis[0].setExtremes(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate() - 7), Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));#}
+                {#chart.showResetZoom();#}
             });
         }
 
