@@ -8,6 +8,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Alaress\Web\Controller\Base as BaseController;
 use GuzzleHttp\Exception as HttpException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
@@ -242,17 +243,27 @@ class Controller extends BaseController
 
         // Import:
         // Pass through plan, folder, selected units
-        $this->importer->import(
-            $curriculumPlan,
-            $baseFolder,
-            $this->request->post->get('unit')
-        );
+        try {
+            $this->importer->import(
+                $curriculumPlan,
+                $baseFolder,
+                $this->request->post->get('unit')
+            );
+            $this->response->content->set($this->buildJsonOutput([]));
+            // SHUP.
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $this->response->status->setCode(204);
 
-
-        $this->response->content->set($this->buildJsonOutput([]));
-        // SHUP.
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $this->response->status->setCode(204);
+        } catch (SchoolboxException $e) {
+            if ($this->request->isXhr()) {
+                $this->response->status->set(400);
+                $this->response->content->set(
+                    $this->buildJsonOutput($e->getMessage())
+                );
+            } else {
+                throw $e;
+            }
+        }
     }
 
 

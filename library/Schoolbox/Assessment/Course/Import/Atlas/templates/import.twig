@@ -164,29 +164,53 @@
                 // * uncheck: disable assess/attach
                 // * change:  update counts
                 units.find('[data-unit]').on('change', function () {
-                    var $this        = $(this),
-                        unit         = $this.data('unit'),
-                        disable      = !$this.prop('checked'),
-                        $assessments = units.find('[data-checkbox-group="unit-'+unit+'-assessments"]'),
-                        $attachments = units.find('[data-checkbox-group="unit-'+unit+'-attachments"]'),
-                        $metaSelected  = units.find('[data-unit-meta="'+unit+'"] [data-checkbox-group-count]');
-                    $assessments.prop('disabled', disable);
-                    $attachments.prop('disabled', disable);
+                    var $this         = $(this),
+                        unit          = $this.data('unit'),
+                        unitEnabled   = $this.prop('checked'),
+                        $inputs       = units.find(
+                            ':input[name^="unit['+unit+'][assessment]"], :input[name^="unit['+unit+'][attachment]"]'
+                        ),
+                        $metaSelected = units.find('[data-unit-meta="'+unit+'"] [data-checkbox-group-count]');
 
-                    // Select/deselect all
-                    $assessments.prop('checked', !disable);
-                    $attachments.prop('checked', !disable);
+                    $inputs.prop('disabled', !unitEnabled);
+                    $metaSelected.toggle(unitEnabled);
+                });
 
-                    if (disable) {
-                        $metaSelected.hide();
-                    } else {
-                        $metaSelected.show();
-                    }
+                // Assessment/attachment:
+                // Check/uncheck: enable/disable title input
+                units.find('[data-enables]').on('change', function () {
+                    var $this     = $(this),
+                        enablesId = $this.data('enables'),
+                        $target   = units.find('#'+enablesId);
+                    $target.prop('disabled', !$this.prop('checked'));
                 });
             }
         });
 
         $('input[data-mage-next="part-3"]').mage({
+            validateOptions: {
+                invalidHandler: function (event, validator) {
+                    // Ensure any units with invalid inputs are expanded
+                    var units       = $('#curriculum-plan-units'),
+                        $collapsers = $();
+
+                    // Find collapsers
+                    Object.keys(validator.invalid).forEach(function(v) {
+                        var $element     = units.find('[name="' + v + '"]'),
+                            $collapsable = $element.closest('[data-collapsable]');
+
+                        if ($collapsable.data('collapse-state') === 'collapsed') {
+                            var $collapser = units.find('[data-collapser="' + $collapsable.data('collapsable') + '"]');
+                            $collapsers = $collapsers.add($collapser);
+                        }
+                    });
+
+                    // Click each unique one
+                    $.unique($collapsers).each(function () {
+                        $(this).click();
+                    })
+                }
+            },
             confirmRevert: function (e, revert) {
                 // verify that we aren't trying to go FORWARD
                 if (this.nextAll('.current-stop').length > 0) {
