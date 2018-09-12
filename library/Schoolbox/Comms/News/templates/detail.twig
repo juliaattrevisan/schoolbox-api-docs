@@ -15,6 +15,14 @@
     ) }}
 {% endif %}
 
+{% if article.isPublished or article.isExpired %}
+    {% set rejectVerb = 'Unpublish' %}
+    {% set showReject = false %}
+{% else %}
+    {% set rejectVerb = 'Reject' %}
+    {% set showReject = true %}
+{% endif %}
+
 <script type="text/javascript">
     $(function() {
         history.replaceState({}, '', '{{ article.id }}');
@@ -76,6 +84,14 @@
         {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {articleId: article.id}) %}
         {% if modifyRoute and isEditable %}
             <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
+        {% endif %}
+
+        {# Unpublish article (just a reject renamed to unpublish when the article is published or archived) #}
+        {% if isRejectable and not showReject %}
+            {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {articleId: article.id}) %}
+            {% if rejectRoute %}
+                <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
+            {% endif %}
         {% endif %}
 
         {# Delete article #}
@@ -277,66 +293,14 @@
 
         {# Moderators #}
         {% if isCommsOfficer %}
-            {% if isRejectable %}
-
+            {% if isRejectable and showReject %}
                 {# Reject this news article #}
                 {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {articleId: article.id}) %}
 
                 {% if rejectRoute %}
-                    {% if article.isPublished or article.isExpired %}
-                        {% set verb = 'Unpublish' %}
-                    {% else %}
-                        {% set verb = 'Reject' %}
-                    {% endif %}
-                    <script>
-                        $(function() {
-                            $('#actionButtons').on('click', 'a[data-reject]', function(event) {
-                                event.preventDefault();
-
-                                var $element = $(this);
-                                var $toast = $('#toast');
-                                var title = $element.attr('data-reject');
-
-                                $element.confirmDialog({
-                                    header: '{{ verb }} ' + title,
-                                    format: 'html',
-                                    text: 'Provide brief feedback for {{ verb|lower }}ing this article to help the author improve their content. <textarea id="rejectedReason" rows="5"></textarea>',
-                                    confirmLabel: '{{ verb }}',
-                                    cancelLabel: 'Cancel',
-                                    confirmEvent: function() {
-                                        $toast.toastActivate({
-                                            text: '{{ verb }}ing ' + title
-                                        });
-
-                                        $.ajax({
-                                            type: 'POST',
-                                            url: $element.attr('href'),
-                                            data: {articleId: {{ article.id }}, rejectedReason: $('#rejectedReason').val()},
-                                            dataType: 'json'
-                                        }).success(function (response) {
-                                            $toast.toastTimeout({
-                                                text: title + ' was {{ verb|lower }}ed',
-                                                css: 'success'
-                                            });
-
-                                            window.location.href = response.redirect;
-                                        }).error(function (response) {
-                                            var temp = $.parseJSON(response.responseText);
-
-                                            $toast.toastTimeout({
-                                                text: 'Error: ' + temp.message,
-                                                css: 'alert'
-                                            });
-                                        });
-                                    }
-                                });
-                            });
-                        });
-                    </script>
-                    <li><a class="icon-undo" href="{{ rejectRoute }}" title="{{ verb }} this article" data-reject="{{ article.title }}">{{ verb }}</a></li>
+                    <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
                 {% endif %}
             {% endif %}
-
 
             {# Accept this news article for publication to the world #}
             {% if isAcceptable %}
@@ -357,3 +321,51 @@
 <div id="recipientsModal" class="reveal-modal" data-reveal>
     <a class="close-reveal-modal">&#215;</a>
 </div>
+
+{% if isCommsOfficer and isRejectable %}
+<script>
+    $(function() {
+        $(document).on('click', '#reject-article, #unpublish-article', function(event) {
+            event.preventDefault();
+
+            var $element = $(this);
+            var $toast = $('#toast');
+            var title = $element.attr('data-reject');
+
+            $element.confirmDialog({
+                header: '{{ rejectVerb }} ' + title,
+                format: 'html',
+                text: 'Provide brief feedback for {{ rejectVerb|lower }}ing this article to help the author improve their content. <textarea id="rejectedReason" rows="5"></textarea>',
+                confirmLabel: '{{ rejectVerb }}',
+                cancelLabel: 'Cancel',
+                confirmEvent: function() {
+                    $toast.toastActivate({
+                        text: '{{ rejectVerb }}ing ' + title
+                    });
+
+                    $.ajax({
+                        type: 'POST',
+                        url: $element.attr('href'),
+                        data: {articleId: {{ article.id }}, rejectedReason: $('#rejectedReason').val()},
+                        dataType: 'json'
+                    }).success(function (response) {
+                        $toast.toastTimeout({
+                            text: title + ' was {{ rejectVerb|lower }}ed',
+                            css: 'success'
+                        });
+
+                        window.location.href = response.redirect;
+                    }).error(function (response) {
+                        var temp = $.parseJSON(response.responseText);
+
+                        $toast.toastTimeout({
+                            text: 'Error: ' + temp.message,
+                            css: 'alert'
+                        });
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endif %}
