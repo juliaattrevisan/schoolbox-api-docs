@@ -1,20 +1,6 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@commsNews/layout.twig' as layout %}
 
-{# TODO: How to do breadcrumbs now? #}
-{% if isCommsOfficer %}
-    {{ bread.crumbs(
-        [ locale.news.proper, routeLookup('commsNews.getIndex') ],
-        [ 'Moderation', routeLookup('commsNewsModeration.getList') ],
-        [ article.title ]
-    ) }}
-{% else %}
-    {{ bread.crumbs(
-        [ locale.news.proper, routeLookup('commsNews.getIndex') ],
-        [ article.title ]
-    ) }}
-{% endif %}
-
 {% if article.isPublished or article.isExpired %}
     {% set rejectVerb = 'Unpublish' %}
     {% set showReject = false %}
