@@ -33,17 +33,16 @@ class House implements ISearch, ITranslate
 
 
     /**
-     * Translate this ITranslate instance from an entity_type to a human-readable version
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getTranslateSql(): string
+    public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
+        $entityType = Model::ENTITY_TYPE_SCHOOL_HOUSE;
         return "
-            SELECT cna.*, house.house AS `name`
+            SELECT DISTINCT cna.entity_type, cna.entity_value, house.house AS `name`
             FROM comms_news_audience cna
-            INNER JOIN house ON entity_type = '".Model::ENTITY_TYPE_SCHOOL_HOUSE."' AND entity_value = house.id
-            WHERE comms_news_article_id = :articleId
+            INNER JOIN house ON cna.entity_type = '{$entityType}' AND cna.entity_value = house.id
+            WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }
 }

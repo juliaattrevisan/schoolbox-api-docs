@@ -35,17 +35,16 @@ class PastoralGroup implements ISearch, ITranslate
 
 
     /**
-     * Translate this ITranslate instance from an entity_type to a human-readable version
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getTranslateSql(): string
+    public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
+        $entityType = Model::ENTITY_TYPE_PASTORAL_GROUP;
         return "
-            SELECT cna.*, pastoral_group.`name` COLLATE utf8mb4_general_ci AS `name`
+            SELECT DISTINCT cna.entity_type, cna.entity_value, pastoral_group.`name` COLLATE utf8mb4_general_ci AS `name`
             FROM comms_news_audience cna
-            INNER JOIN pastoral_group ON entity_type = '".Model::ENTITY_TYPE_PASTORAL_GROUP."' AND entity_value = pastoral_group.id
-            WHERE comms_news_article_id = :articleId
+            INNER JOIN pastoral_group ON entity_type = '{$entityType}' AND cna.entity_value = pastoral_group.id
+            WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }
 }

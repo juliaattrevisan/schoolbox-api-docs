@@ -33,17 +33,16 @@ class Campus implements ISearch, ITranslate
 
 
     /**
-     * Translate this ITranslate instance from an entity_type to a human-readable version
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getTranslateSql(): string
+    public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
+        $entityType = Model::ENTITY_TYPE_CAMPUS;
         return "
-            SELECT cna.*, luCampus.`name` AS `name`
+            SELECT DISTINCT cna.entity_type, cna.entity_value, luCampus.name
             FROM comms_news_audience cna
-            INNER JOIN luCampus ON entity_type = '".Model::ENTITY_TYPE_CAMPUS."' AND entity_value = luCampus.id
-            WHERE comms_news_article_id = :articleId
+            INNER JOIN luCampus ON cna.entity_type = '{$entityType}' AND cna.entity_value = luCampus.id
+            WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }
 }

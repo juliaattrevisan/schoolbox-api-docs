@@ -157,14 +157,13 @@ class Folder implements ISearch, ITranslate
 
 
     /**
-     * Translate this ITranslate instance from an entity_type to a human-readable version
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getTranslateSql(): string
+    public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
+        $entityType = Model::ENTITY_TYPE_FOLDER;
         return "
-            SELECT cna1.*, f.name 
+            SELECT cna1.entity_type, cna1.entity_value, f.name
             FROM 
             (SELECT folder.id,
                 CONCAT(name,  
@@ -178,11 +177,11 @@ class Folder implements ISearch, ITranslate
             WHERE folder.id IN 
                 (SELECT DISTINCT entity_value
                 FROM comms_news_audience cna2
-                WHERE entity_type = '".Model::ENTITY_TYPE_FOLDER."'
-                AND cna2.comms_news_article_id = :articleId)
+                WHERE entity_type = '{$entityType}'
+                AND cna2.id IN ($segmentIdsPlaceholder))
             AND folder.deleted_at IS NULL
             GROUP BY folder.id) AS f 
-            INNER JOIN comms_news_audience cna1 ON cna1.entity_value = f.id AND entity_type = '".Model::ENTITY_TYPE_FOLDER."'
+            INNER JOIN comms_news_audience cna1 ON cna1.entity_value = f.id AND entity_type = '{$entityType}'
         ";
     }
 }
