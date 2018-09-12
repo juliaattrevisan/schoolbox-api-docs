@@ -364,6 +364,7 @@ class Controller extends Base
             $this->updateLog(Controller::RESULT_SUCCESS, null, 0, 0, "Import started");
 
             $this->getResponse()->content->set([
+                'format' => 'noContent',
                 'postOutput' => [
 
                     function () use ($post) {
