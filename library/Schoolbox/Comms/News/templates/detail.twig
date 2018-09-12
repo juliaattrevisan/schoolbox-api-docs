@@ -148,22 +148,6 @@
             <li><a class="icon-progress" href="{{ statisticsRoute }}">Statistics</a></li>
         {% endif %}
 
-        {# Helper links #}
-        {# TODO: maybs delete once there's actual ways to get to these places #}
-
-        {# Create new article #}
-        <li><a class="icon-add" href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}" >Create {{ locale.news }}</a></li>
-
-        {# Go to the moderation list #}
-        {% if moderationRequired %}
-            {# Go back to the moderation list #}
-            {% set moderationListRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
-
-            {% if moderationListRoute %}
-                <li><a class="icon-list" href="{{ moderationListRoute }}" title="A list of articles to moderate">Moderation List</a></li>
-            {% endif %}
-        {% endif %}
-
     </ul>
 </div>
 
