@@ -153,6 +153,27 @@ class Grid
 
 
     /**
+     * Return the indicator usage for a given descriptor ID, or null if this
+     * grid doesn't use it.
+     *
+     * @param int $descriptorId
+     * @return null|IndicatorUsage
+     */
+    public function retrieveIndicatorUsageByDescriptorId(int $descriptorId): ?IndicatorUsage
+    {
+        // TODO investigate performance, this is 3x O(n)
+        foreach ($this->capabilityUsages as $capabilityUsage) {
+            foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+                if ($indicatorUsage->getDescriptors()->getBy('id', $descriptorId)) {
+                    return $indicatorUsage;
+                }
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Iterates each group in the grid's rowset, whether this grid uses them
      * or not.
      *

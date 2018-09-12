@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
 use Schoolbox\Assessment\Rubric\Criteria;
 use Schoolbox\Assessment\Rubric\Factory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Assessment\Rubric\ValidCapabilityMax;
@@ -643,20 +644,43 @@ class RubricMapper
      */
     public function retrieveMarkedGrid(IFeedback $feedback): MarkedGrid
     {
-        $markedGrid = new MarkedGrid($feedback, $this->retrieveGrid($feedback->getAssessable(), false));
+        $grid       = $this->retrieveGrid($feedback->getAssessable(), false);
+        $rowSet     = $grid->getRowSet();
+        $markedGrid = new MarkedGrid($feedback, $grid);
 
         // What goes in the grid?
         // * Capability (fka group) marks
         // * Descriptor marks
         // ** more correctly known as indicator marks, which reference a descriptor
+        /** @var GenericCollection|GroupMark[] $capabilityMarkModels */
         $capabilityMarkModels = GroupMarkMapper::getInstance()->findByColumn(
             'return_id',
             $feedback->getId()
         );
+
+        /** @var Collection|GenericCollection[]|DescriptorMark[][] $indicatorMarkModels */
         $indicatorMarkModels = DescriptorMarkMapper::getInstance()->findByColumn(
             'rubric_group_mark_id',
             $capabilityMarkModels->getPropertyValues('id')
+        )->groupByCallback(
+            function (DescriptorMark $indicatorMark) {
+                return $indicatorMark->getGroupMark()->getId();
+            }
         );
+
+        // Load em into the marked grid
+        foreach ($capabilityMarkModels as $capabilityMarkModel) {
+            $capabilityId    = $capabilityMarkModel->getGroup()->getId();
+            $capability      = $rowSet->retrieveCapability($capabilityId);
+            $capabilityUsage = $grid->retrieveCapabilityUsage($capability);
+            $capabilityMark  = (new CapabilityMark($capabilityUsage))
+                ->setValue($capabilityMarkModel->getValue());
+
+            foreach ($indicatorMarkModels[$capabilityId] as $indicatorMarkModel) {
+                $descriptorId = $indicatorMarkModel->getDescriptor()->getId();
+                $descriptor   = $grid->retrieveIndicatorUsageByDescriptorId($descriptorId);
+            }
+        }
 
         return $markedGrid;
     }
