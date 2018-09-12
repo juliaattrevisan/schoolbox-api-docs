@@ -137,6 +137,70 @@ class Model
 
 
     /**
+     * Returns whether this is a simple segment
+     *
+     * @return bool
+     * @throws InsufficientHydrationException
+     */
+    public function isSimple(): bool
+    {
+        return !$this->isComposite();
+    }
+
+
+    /**
+     * Returns whether this segment is logically equivalent to another segment.
+     *
+     * Ignores ID and child permutation
+     *
+     * @param Model $other
+     * @return bool
+     * @throws InsufficientHydrationException
+     */
+    public function equals(Model $other): bool
+    {
+        if ($this->isSimple() !== $other->isSimple()) {
+            return false;
+        }
+
+
+        if ($this->getEntityType() !== $other->getEntityType() ||
+            $this->getEntityValue() !== $other->getEntityValue() ||
+            $this->getRelationship() !== $other->getRelationship()) {
+            return false;
+        }
+
+        // Simple case
+        if ($this->isSimple()) {
+            // If we passed the above test, that's sufficient
+            return true;
+        }
+
+        // Composite case. Need to check children are the same combination (but not permutation)
+        if ($this->children->count() !== $other->children->count()) {
+            return false;
+        }
+
+        // Ensure each child is found in the other composite
+        foreach ($this->children as $thisChild) {
+            $otherChildMatchFound = false;
+            foreach ($other->children as $otherChild) {
+                if ($thisChild->equals($otherChild)) {
+                    $otherChildMatchFound = true;
+                    break;
+                }
+            }
+            if (!$otherChildMatchFound) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Getters/Setters
+
+
+    /**
       * @return null|News\Model
      */
     public function getCommsNewsArticle(): ?News\Model
