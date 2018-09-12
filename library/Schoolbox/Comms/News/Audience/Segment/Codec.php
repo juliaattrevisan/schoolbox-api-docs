@@ -52,6 +52,20 @@ class Codec
 
 
     /**
+     * Returns a string-representation of a simple segment's logical attributes
+     *
+     * @param string      $entityType
+     * @param null|string $entityValue
+     * @param string      $modifier
+     * @return string
+     */
+    public function encodeSimpleAttributes(string $entityType, ?string $entityValue, string $modifier): string
+    {
+        return $this->encodeSimpleParts($entityType, 0, $entityValue, $modifier);
+    }
+
+
+    /**
      * Converts an encoded string into an Audience Segment Model
      *
      * @param string $encodedSegment
@@ -65,6 +79,27 @@ class Codec
         return 0 !== strpos($encodedSegment, Audience\Model::ENTITY_TYPE_COMPOSITE)
             ? $this->decodeSimple($encodedSegment)
             : $this->decodeComposite($encodedSegment);
+    }
+
+
+    /**
+     * Helper to ensure consistent encoding scheme, regardless of data source
+     *
+     * @param string      $entityType
+     * @param int         $id
+     * @param null|string $entityValue
+     * @param string      $modifier
+     * @return string
+     */
+    private function encodeSimpleParts(string $entityType, int $id, ?string $entityValue, string $modifier): string
+    {
+        $parts = [
+            $entityType,
+            $id,
+            $this->encodeValue($entityValue),
+            $modifier,
+        ];
+        return \implode(self::DELIMITER_SIMPLE, $parts);
     }
 
 
@@ -104,7 +139,7 @@ class Codec
     {
         $parts = [
             $segment->getEntityType(),
-            $segment->getId() ?: '0',
+            $segment->getId() ?: 0,
             $this->encodeValue($segment->getEntityValue()),
             $segment->getRelationship(),
         ];
@@ -122,7 +157,7 @@ class Codec
     private function decodeSimple(string $encodedSegment): Audience\Model
     {
         [$type, $id, $encodedValue, $modifier] = \explode(self::DELIMITER_SIMPLE, $encodedSegment);
-        return $this->segmentMapper->createModel($id ?: null)
+        return $this->segmentMapper->createModel($id ? (int)$id : null)
                                    ->setEntityType($type)
                                    ->setEntityValue($this->decodeValue($encodedValue))
                                    ->setRelationship($modifier);
@@ -144,7 +179,7 @@ class Codec
 
         $parts = [
             $segment->getEntityType(),
-            $segment->getId() ?: '0',
+            $segment->getId() ?: 0,
             \implode(',', $childParts),
             $segment->getRelationship(),
         ];
