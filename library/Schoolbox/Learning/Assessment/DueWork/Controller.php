@@ -851,6 +851,7 @@ class Controller extends Assessment\Controller
          * for it to read 1 byte at a time >_<
          */
         $this->getResponse()->content->set([
+            'format' => 'noContent',
             'postOutput' => [
                 function() use ($plagscanMapper, $isFinal, $selfAssessable, $response) {
                     if ($isFinal && !$selfAssessable && $response->getId()) {
