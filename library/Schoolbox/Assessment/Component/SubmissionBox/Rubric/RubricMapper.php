@@ -645,7 +645,18 @@ class RubricMapper
     {
         $markedGrid = new MarkedGrid($feedback, $this->retrieveGrid($feedback->getAssessable(), false));
 
-        // Load the marks
+        // What goes in the grid?
+        // * Capability (fka group) marks
+        // * Descriptor marks
+        // ** more correctly known as indicator marks, which reference a descriptor
+        $capabilityMarkModels = GroupMarkMapper::getInstance()->findByColumn(
+            'return_id',
+            $feedback->getId()
+        );
+        $indicatorMarkModels = DescriptorMarkMapper::getInstance()->findByColumn(
+            'rubric_group_mark_id',
+            $capabilityMarkModels->getPropertyValues('id')
+        );
 
         return $markedGrid;
     }
