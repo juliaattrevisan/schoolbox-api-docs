@@ -246,6 +246,14 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         $acceptedAt  = $this->acceptedAt && !$this->acceptedAt->isNull() ? $this->acceptedAt : null;
         $rejectedAt  = $this->rejectedAt && !$this->rejectedAt->isNull() ? $this->rejectedAt : null;
 
+        /* submitted_at is nulled when an article is rejected therefore an empty submitted_at means
+         * an article is in draft state, but there are two specific variants of a draft state:
+         * creating a new thing, and a thing that got rejected
+         */
+        if ($rejectedAt && (!$acceptedAt || $rejectedAt->gt($acceptedAt))) {
+            return self::STATE_REJECTED;
+        }
+
         // Stubs will be treated as drafts. Assumes not possible to enter a different state if never submitted.
         if (null === $submittedAt) {
             return self::STATE_DRAFT;
@@ -254,10 +262,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         // (Never accepted or resubmitted after acceptance) && (never rejected or resubmitted after rejection)
         if ((!$acceptedAt || $submittedAt->gt($acceptedAt)) && (!$rejectedAt || $submittedAt->gt($rejectedAt))) {
             return self::STATE_AWAITING_MODERATION;
-        }
-
-        if ($rejectedAt && (!$acceptedAt || $rejectedAt->gt($acceptedAt))) {
-            return self::STATE_REJECTED;
         }
 
         // $submittedAt is not null and $acceptedAt is later than both $submittedAt and $rejectedAt
