@@ -26,7 +26,7 @@
                                         {{ article.author.fullname }}
                                     {% endif %}
 
-                                    on {{ article.updatedAt.local }}
+                                    on <time title="{{ article.updatedAt.local }}">{{ article.updatedAt.relativeTime }}</time>
                                 </p>
 
                                 {% if article.topics|length %}
@@ -74,7 +74,7 @@
                                         {{ article.author.fullname }}
                                     {% endif %}
 
-                                    on {{ article.createdAt.local }}
+                                    on <time title="{{ article.createdAt.local }}">{{ article.createdAt.relativeTime }}</time>
                                 </p>
 
                                 <p class="meta">Accepted by
@@ -84,7 +84,7 @@
                                         {{ article.acceptedBy.fullname }}
                                     {% endif %}
 
-                                    on {{ article.acceptedAt.local }}
+                                    on <time title="{{ article.acceptedAt.local }}">{{ article.acceptedAt.relativeTime }}</time>
                                 </p>
 
                                 {% if article.topics|length %}
@@ -127,7 +127,7 @@
                                             {{ article.author.fullname }}
                                         {% endif %}
 
-                                        on {{ article.createdAt.local }}
+                                        on <time title="{{ article.createdAt.local }}">{{ article.createdAt.relativeTime }}</time>
                                     </p>
 
                                     <p class="meta">Rejected by
@@ -137,7 +137,7 @@
                                             {{ article.rejectedBy.fullname }}
                                         {% endif %}
 
-                                        on {{ article.rejectedAt.local }}
+                                        on <time title="{{ article.rejectedAt.local }}">{{ article.rejectedAt.relativeTime }}</time>
                                     </p>
 
                                     {% if article.topics|length %}
