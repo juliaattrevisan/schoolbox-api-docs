@@ -494,6 +494,16 @@ class Controller extends Base
          */
         $referrer = $this->getRequest()->query[Querystring::REFERRER];
 
+        /* If you don't have an http referrer, disregard the $referrer specified in the url.
+         *
+         * This could occur if you copy/paste a link to someone in email or instant messenger,
+         * and they visit it from that place. Consider them a Non-referred open, rather than
+         * a Conversion.
+         */
+        if (null === $this->getRequest()->client->getReferer()) {
+            $referrer = null;
+        }
+
         /* Record this Conversion/Open
          * referrer value determines what kind it was
          */
