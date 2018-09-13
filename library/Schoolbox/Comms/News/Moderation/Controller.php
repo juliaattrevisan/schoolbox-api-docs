@@ -175,9 +175,7 @@ class Controller extends Base
                 ->setAcceptedAt(\Alaress_Date_Format::now())
                 ->setAcceptedBy($this->getUser());
 
-            if ((new News\ValidBroadcast())->isSatisfiedBy($article)) {
-                $this->newsMapper->save($article);
-            }
+            $this->newsMapper->save($article);
 
             /* Go back to the list
              */
