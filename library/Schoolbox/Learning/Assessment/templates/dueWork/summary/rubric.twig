@@ -3,9 +3,9 @@
         <h2 class="subheader">{{ locale.grading.proper }} Guide</h2>
 
         {% include '@rubric/grid.twig' with {
-            rubric: rubricContext.rubric,
+            rubricGrid: assessment.rubricGrid,
             markVisibility: markVisibility ?? participant.assessable.isFeedbackVisibleToUser(USER),
-            useMarkRange: assessment.useMarkRange
+            useMarkRange: assessment.useMarkRange,
         } only %}
     </div>
 </div>
