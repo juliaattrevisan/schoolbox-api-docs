@@ -196,11 +196,13 @@ class Controller extends Assessment\Controller
         // Generate rubric marked grids for every feedback being displayed
         if ($assessment->getUseRubric()) {
             $assessment->setRubricGrid($this->rubricMapper->retrieveGrid($assessment, false));
-            foreach ($participant->getAllFeedbacks() as $feedback) {
-                // All feedbacks ought to be due work feedbacks,
-                // and thus have a rubric grid
-                if ($feedback instanceof Feedback\Model) {
-                    $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
+            if ($participant) {
+                foreach ($participant->getAllFeedbacks() as $feedback) {
+                    // All feedbacks ought to be due work feedbacks,
+                    // and thus have a rubric grid
+                    if ($feedback instanceof Feedback\Model) {
+                        $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
+                    }
                 }
             }
 //            $assessment->setRubricGrid($this->rubricMapper->retrieveGrid($assessment, false));
