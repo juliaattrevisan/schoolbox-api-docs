@@ -67,12 +67,6 @@
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
 
-        {# Statistics link: must be author or comms officer and article must be published #}
-        {% set statisticsRoute = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {articleId: article.id}) %}
-        {% if isAuthor or isCommsOfficer %}
-            <li><a class="icon-progress" href="{{ statisticsRoute }}">Statistics</a></li>
-        {% endif %}
-
         {# Modify article #}
         {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {articleId: article.id}) %}
         {% if modifyRoute and isEditable %}
@@ -125,6 +119,12 @@
                 });
             </script>
             <li><a class="icon-delete" href="{{ deleteRoute }}" data-delete="{{ article.title }}">Delete</a></li>
+        {% endif %}
+
+        {# Statistics link: must be author or comms officer and article must be published #}
+        {% set statisticsRoute = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {articleId: article.id}) %}
+        {% if isAuthor or isCommsOfficer %}
+            <li><a class="icon-progress" href="{{ statisticsRoute }}">Statistics</a></li>
         {% endif %}
 
         {# Helper links #}
