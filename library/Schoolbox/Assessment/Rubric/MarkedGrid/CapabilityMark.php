@@ -72,6 +72,26 @@ class CapabilityMark
 
 
     /**
+     * Retrieve a capability mark for a capability usage, if one exists.
+     *
+     * @param IndicatorUsage $indicatorUsage
+     * @return null|CapabilityMark
+     */
+    public function retrieveIndicatorMark(IndicatorUsage $indicatorUsage): ?IndicatorMark
+    {
+        foreach ($this->indicatorMarks as $indicatorMark) {
+            // TODO indicator usage should have its own ID
+            if ($indicatorMark->getIndicatorUsage()->getIndicator()->getId()
+                === $indicatorUsage->getIndicator()->getId()
+            ) {
+                return $indicatorMark;
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * @return GenericCollection
      */
     public function getIndicatorMarks(): GenericCollection

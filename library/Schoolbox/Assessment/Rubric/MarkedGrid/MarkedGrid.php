@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
 
@@ -102,6 +103,24 @@ class MarkedGrid
                 === $capabilityUsage->getCapability()->getId()
             ) {
                 return $capabilityMark;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Retrieve an indicator mark for an indicator usage, if one exists.
+     *
+     * @param IndicatorUsage $indicatorUsage
+     * @return null|IndicatorMark
+     */
+    public function retrieveIndicatorMark(IndicatorUsage $indicatorUsage): ?IndicatorMark
+    {
+        foreach ($this->capabilityMarks as $capabilityMark) {
+            $indicatorMark = $capabilityMark->retrieveIndicatorMark($indicatorUsage);
+            if ($indicatorMark) {
+                return $indicatorMark;
             }
         }
         return null;
