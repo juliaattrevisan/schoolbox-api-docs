@@ -51,23 +51,23 @@ class TestRenderer
             </thead>
 
             <tbody>
-            <?php foreach ($grid->getCapabilityUsages() as $groupUsage): ?>
+            <?php foreach ($grid->getCapabilityUsages() as $capabilityUsage): ?>
                 <?php
-                $groupMark = $markedGrid ? $markedGrid->retrieveCapabilityMark($groupUsage) : null;
-                foreach ($groupUsage->getIndicatorUsages() as $criterionUsage):
+                $capabilityMark = $markedGrid ? $markedGrid->retrieveCapabilityMark($capabilityUsage) : null;
+                foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage):
                     ?>
                     <tr>
-                        <th><?php echo $groupUsage->getCapability()->getName() ?>\<?php echo $criterionUsage->getIndicator()->getName() ?></th>
+                        <th><?php echo $capabilityUsage->getCapability()->getName() ?>\<?php echo $indicatorUsage->getIndicator()->getName() ?></th>
                         <?php
-                        // Is this criterion in use?
-                        $criterionMark      = $markedGrid ? $markedGrid->retrieveIndicatorMark($criterionUsage) : null;
-                        $selectedDescriptor = $criterionMark ? $criterionMark->getDescriptor() : null;
+                        // Is this indicator in use?
+                        $indicatorMark      = $markedGrid ? $markedGrid->retrieveIndicatorMark($indicatorUsage) : null;
+                        $selectedDescriptor = $indicatorMark ? $indicatorMark->getDescriptor() : null;
                         foreach ($grid->getLevels() as $levelIndex => $level):
                             ?>
                             <td>
                                 <?php
                                 // What's the descriptor here?
-                                $descriptor = $criterionUsage->retrieveDescriptor($levelIndex);
+                                $descriptor = $indicatorUsage->retrieveDescriptor($levelIndex);
                                 if (isset($descriptor)):
                                     echo $descriptor->getDescription();
                                     if (null !== $descriptor->getMaxValue()):
@@ -75,7 +75,7 @@ class TestRenderer
                                     endif;
 
                                     if ($selectedDescriptor === $descriptor):
-                                        printf('<br/><em>selected (%0.2f)</em>', $criterionMark->getValue());
+                                        printf('<br/><em>selected (%0.2f)</em>', $indicatorMark->getValue());
                                     endif;
                                 else:
                                     printf('<em>N/A</em>');
@@ -88,8 +88,8 @@ class TestRenderer
                 <tr>
                     <td colspan="<?php echo count($grid->getLevels()) + 2 ?>">
                         <?php
-                        if ($groupMark):
-                            printf('%0.2f', $groupMark->getValue());
+                        if ($capabilityMark):
+                            printf('%0.2f', $capabilityMark->getValue());
                         else:
                             printf('<em>N/A</em>');
                         endif;
