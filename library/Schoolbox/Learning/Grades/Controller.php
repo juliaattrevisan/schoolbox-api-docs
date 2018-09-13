@@ -19,6 +19,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Resource\Folder;
@@ -171,13 +172,14 @@ class Controller extends Base
 
         // Add folders with response or feedback
         $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
+        $assessmentVisibility = new Visibility($this->access);
 
         // Get all assessments for this user in the specified term, grouped by folder
         $assessmentsPerFolder = $this->assessmentMapperProxy
             ->findAllByStudent($viewee, false, $term)
-            ->filter(function (IAssessable $a) use ($viewee) {
-                $participant = $a->getParticipantIfExtant($viewee);
-                return $participant && !$participant->isExcluded() && !$participant->getPublishDate()->isFuture();
+            ->filter(function (IAssessable $a) use ($viewee, $assessmentVisibility) {
+                return $assessmentVisibility->isVisibleToUser($a, $viewee, true);
+
             })
             ->groupByCallback(function (IAssessable $assessment) {
                 return $assessment->getBaseContext()->getFolder()->getId();
@@ -632,11 +634,12 @@ class Controller extends Base
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         // Fetch assessments & participants
         $user        = $loadOtherParticipantInteractions ? null : $viewee;
+        $assessmentVisibility = new Visibility($this->access);
+
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
         $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $user)
-                                                   ->filter(function (IAssessable $a) use ($viewee) {
-                                                       $participant = $a->getParticipantIfExtant($viewee);
-                                                       return $participant && !$participant->isExcluded() && !$participant->getPublishDate()->isFuture();
+                                                   ->filter(function (IAssessable $a) use ($viewee, $assessmentVisibility) {
+                                                       return $assessmentVisibility->isVisibleToUser($a, $viewee, true);
                                                    });
         return $assessments;
     }
