@@ -193,21 +193,30 @@ class Controller extends Assessment\Controller
     {
         $participant = $assessment->getParticipantIfExtant($student);
 
-        if($assessment->getUseRubric()){
-            $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+        // Generate rubric marked grids for every feedback being displayed
+        if ($assessment->getUseRubric()) {
+            foreach ($participant->getAllFeedbacks() as $feedback) {
+                // All feedbacks ought to be due work feedbacks,
+                // and thus have a rubric grid
+                if ($feedback instanceof Feedback\Model) {
+                    $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
+                }
+            }
+//            $assessment->setRubricGrid($this->rubricMapper->retrieveGrid($assessment, false));
+//            $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
         }
 
         // Generate rubric context for every feedback
-        $rubricContext = new RubricContext($this->rubricMapper);
+//        $rubricContext = new RubricContext($this->rubricMapper);
         $timeline      = $feedbackRubricContexts = null;
         if ($participant) {
             $timeline               = (new FullTimeline($participant))->getForUser($this->getUser());
-            $feedbackRubricContexts = $rubricContext->generateSeriesForTimeline(
-                $timeline,
-                $this->getUser(),
-                $this->getAccess(),
-                false
-            );
+//            $feedbackRubricContexts = $rubricContext->generateSeriesForTimeline(
+//                $timeline,
+//                $this->getUser(),
+//                $this->getAccess(),
+//                false
+//            );
         }
 
 
@@ -227,10 +236,10 @@ class Controller extends Assessment\Controller
              */
             'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
 
-            /* Rubrics data
-             */
-            'emptyRubricContext' => $rubricContext->generateBasic($assessment, $student),
-            'feedbackRubricContexts' => $feedbackRubricContexts,
+//            /* Rubrics data - now incorporated into feedback
+//             */
+//            'emptyRubricContext' => $rubricContext->generateBasic($assessment, $student),
+//            'feedbackRubricContexts' => $feedbackRubricContexts,
 
             'authoritativeFeedback' => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
         ];
