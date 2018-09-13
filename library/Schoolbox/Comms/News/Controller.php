@@ -24,6 +24,7 @@ use Schoolbox\Comms\News\Audience\BusinessRules;
 use Schoolbox\Comms\News\Audience\RelationshipFilterer;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
+use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
@@ -65,6 +66,16 @@ class Controller extends Base
      * @var SaveForLater\Mapper
      */
     private $saveForLaterMapper;
+
+    /**
+     * @var Statistics\Mapper
+     */
+    private $statisticsMapper;
+
+    /**
+     * @var Statistics\Cumulative\Mapper
+     */
+    private $statisticsCumulativeMapper;
 
     /**
      * @var IConnector
@@ -115,6 +126,8 @@ class Controller extends Base
      * @param Policy\Mapper           $policyMapper
      * @param TopicMapper             $topicMapper
      * @param SaveForLater\Mapper     $saveForLaterMapper
+     * @param Statistics\Mapper       $statisticsMapper
+     * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
      * @param IConnector              $databaseInternal
      * @param Folder\Mapper           $folderMapper
      * @param Access\UserAccessMapper $userAccessMapper
@@ -130,6 +143,8 @@ class Controller extends Base
         Policy\Mapper $policyMapper,
         TopicMapper $topicMapper,
         SaveForLater\Mapper $saveForLaterMapper,
+        Statistics\Mapper $statisticsMapper,
+        Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
         Folder\Mapper $folderMapper,
         Access\UserAccessMapper $userAccessMapper,
@@ -144,6 +159,8 @@ class Controller extends Base
         $this->policyMapper = $policyMapper;
         $this->topicMapper = $topicMapper;
         $this->saveForLaterMapper = $saveForLaterMapper;
+        $this->statisticsMapper = $statisticsMapper;
+        $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
         $this->audienceMapper = $audienceMapper;
         $this->roleAccessMapper = $roleAccessMapper;
 
@@ -217,8 +234,10 @@ class Controller extends Base
      *
      * @api POST /comms/news/create
      *
+     * @throws InvalidArgumentException
      * @throws MapperException
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws MapperException\InsufficientHydrationException
+     * @throws RouteNotFound
      * @throws \PDOException
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
@@ -300,11 +319,13 @@ class Controller extends Base
      * @api POST /comms/news/{articleId}
      *
      * @param Model $article
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws MapperException\InsufficientHydrationException
+     * @throws RouteNotFound
      * @throws \PDOException
-     * @throws \UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
+     * @throws \UnexpectedValueException
      */
     public function postUpdate(Model $article)
     {
@@ -368,10 +389,12 @@ class Controller extends Base
      * @param Model                          $article
      * @param array|\Aura\Web\Request\Values $data
      * @return void
+     * @throws InvalidArgumentException
      * @throws MapperException
+     * @throws MapperException\InsufficientHydrationException
      * @throws \PDOException
-     * @throws \UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
+     * @throws \UnexpectedValueException
      */
     private function persist(Model $article, $data): void
     {
@@ -440,6 +463,8 @@ class Controller extends Base
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
+     * @throws \PDOException
+     * @throws InvalidArgumentException
      */
     public function getDetail(Model $article)
     {
@@ -464,6 +489,32 @@ class Controller extends Base
                 // noop; default is fine
             }
         }
+
+        /* Impression referrer
+         */
+        $referrer = $this->getRequest()->query[Querystring::REFERRER];
+
+        /* If you don't have an http referrer, disregard the $referrer specified in the url.
+         *
+         * This could occur if you copy/paste a link to someone in email or instant messenger,
+         * and they visit it from that place. Consider them a Non-referred open, rather than
+         * a Conversion.
+         */
+        if (null === $this->getRequest()->client->getReferer()) {
+            $referrer = null;
+        }
+
+        /* Record this Conversion/Open
+         * referrer value determines what kind it was
+         */
+        (new ImpressionsConversionsOpens($this->databaseInternal, $this->statisticsMapper, $this->statisticsCumulativeMapper))
+            ->saveConversionOpen(
+                $article,
+                $this->getUser()->getId(),
+                $this->getUser()->getRole()->getType(),
+                $this->getUser()->getRole()->getId(),
+                $referrer
+            );
 
         // don't supply the extra twig-necessary data if just returning JSON
         if ($this->isJsonRequest()) {
@@ -597,13 +648,15 @@ class Controller extends Base
      * @param int|null $year
      * @param int|null $month
      * @throws InvalidArgumentException
+     * @throws MapperException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
      * @throws \OutOfRangeException
+     * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
-     * @throws \DomainException
      */
     public function getListByTopic(?int $year, ?int $month)
     {
@@ -651,17 +704,21 @@ class Controller extends Base
      * @param int|null $year
      * @param int|null $month
      * @throws InvalidArgumentException
+     * @throws MapperException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
      * @throws \OutOfRangeException
+     * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
-     * @throws \DomainException
      */
     public function getArchive(int $year = null, int $month = null)
     {
         $params = new Querystring($this->getRequest()->query);
+        $params->setReferrer(Statistics\Mapper::REFERRER_ARCHIVE);
+
         $topics = $this->topicMapper->findAll();
 
         /* The initial data set to load, given the params provided
@@ -681,6 +738,7 @@ class Controller extends Base
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'slug' => $params->getSlug(),
+            'referrer' => $params->getReferrer(),
 
             /* Archive-specific vars that don't appear anywhere else
              */
@@ -699,17 +757,20 @@ class Controller extends Base
      * @api GET /comms/news
      *
      * @throws InvalidArgumentException
+     * @throws MapperException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
      * @throws \OutOfRangeException
+     * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
-     * @throws \DomainException
      */
     public function getIndex()
     {
         $params = new Querystring($this->getRequest()->query);
+        $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
         $topics = $this->topicMapper->findAll();
 
         /* The initial data set to load, given the params provided
@@ -729,6 +790,7 @@ class Controller extends Base
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'slug' => $params->getSlug(),
+            'referrer' => $params->getReferrer(),
 
             /* For configuring the rss button which changes per topic chosen
              */
@@ -751,11 +813,13 @@ class Controller extends Base
      * @param int|null           $month
      * @return array
      * @throws InvalidArgumentException
+     * @throws MapperException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
      * @throws \OutOfRangeException
+     * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
-     * @throws \DomainException
      */
     private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
@@ -764,6 +828,8 @@ class Controller extends Base
             $this->newsMapper,
             $this->policyMapper,
             $this->saveForLaterMapper,
+            $this->statisticsMapper,
+            $this->statisticsCumulativeMapper,
             $this->databaseInternal,
             $this->folderMapper,
             $this->userAccessMapper,
@@ -784,7 +850,8 @@ class Controller extends Base
         $partialData = array_merge($topicData, [
             'hidePaginator' => $hidePaginator,
             'compactMode' => $params->getCompactMode(),
-            'pageNum' => $params->getPageNum()
+            'pageNum' => $params->getPageNum(),
+            'referrer' => $params->getReferrer()
         ]);
 
         return $partialData;

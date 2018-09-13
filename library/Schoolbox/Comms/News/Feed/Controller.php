@@ -42,6 +42,16 @@ class Controller extends Base
     private $saveForLaterMapper;
 
     /**
+     * @var News\Statistics\Mapper
+     */
+    private $statisticsMapper;
+
+    /**
+     * @var News\Statistics\Cumulative\Mapper
+     */
+    private $statisticsCumulativeMapper;
+
+    /**
      * @var IConnector
      */
     private $databaseInternal;
@@ -74,22 +84,27 @@ class Controller extends Base
 
     /**
      * Controller constructor.
-     * @param News\Mapper              $newsMapper
-     * @param News\Policy\Mapper       $policyMapper
-     * @param TopicMapper              $topicMapper
-     * @param News\SaveForLater\Mapper $saveForLaterMapper
-     * @param IConnector               $databaseInternal
-     * @param Folder\Mapper            $folderMapper
-     * @param Access\UserAccessMapper  $userAccessMapper
-     * @param UserMapper               $userMapper
-     * @param External_User            $externalUser
-     * @param External_Class           $externalClass
+     *
+     * @param News\Mapper                       $newsMapper
+     * @param News\Policy\Mapper                $policyMapper
+     * @param TopicMapper                       $topicMapper
+     * @param News\SaveForLater\Mapper          $saveForLaterMapper
+     * @param News\Statistics\Mapper            $statisticsMapper
+     * @param News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper
+     * @param IConnector                        $databaseInternal
+     * @param Folder\Mapper                     $folderMapper
+     * @param Access\UserAccessMapper           $userAccessMapper
+     * @param UserMapper                        $userMapper
+     * @param External_User                     $externalUser
+     * @param External_Class                    $externalClass
      */
     public function __construct(
         News\Mapper $newsMapper,
         News\Policy\Mapper $policyMapper,
         TopicMapper $topicMapper,
         News\SaveForLater\Mapper $saveForLaterMapper,
+        News\Statistics\Mapper $statisticsMapper,
+        News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
         Folder\Mapper $folderMapper,
         Access\UserAccessMapper $userAccessMapper,
@@ -101,6 +116,8 @@ class Controller extends Base
         $this->policyMapper = $policyMapper;
         $this->topicMapper = $topicMapper;
         $this->saveForLaterMapper = $saveForLaterMapper;
+        $this->statisticsMapper = $statisticsMapper;
+        $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
 
         /* Hyperdrive injection
          */
@@ -125,12 +142,14 @@ class Controller extends Base
      * @param null|Folder\Model $folder
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Web\Exception\InvalidComponent
+     * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \OutOfRangeException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
-     * @throws \DomainException
-     * @throws \Aura\Web\Exception\InvalidComponent
      */
     public function getFeed(User $user, ?Folder\Model $folder)
     {
@@ -174,6 +193,8 @@ class Controller extends Base
             $this->newsMapper,
             $this->policyMapper,
             $this->saveForLaterMapper,
+            $this->statisticsMapper,
+            $this->statisticsCumulativeMapper,
             $this->databaseInternal,
             $this->folderMapper,
             $this->userAccessMapper,

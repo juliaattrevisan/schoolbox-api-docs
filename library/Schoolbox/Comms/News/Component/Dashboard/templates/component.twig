@@ -8,6 +8,7 @@
  # @param string slug
  # @param int compactMode
  # @param int limit
+ # @param string referrer
  #}
 <script src="/javascript/shared/comms/articletabs.js"></script>
 <script src="/javascript/shared/comms/saveforlater.js"></script>
@@ -17,7 +18,8 @@
         'topic=' ~ slug,
         'c=' ~ compactMode,
         'l=' ~ limit,
-        'hp=1'
+        'hp=1',
+        'ref=' ~ referrer
     ]|join('&') %}
 
     $(function() {
@@ -54,7 +56,8 @@
     slug: slug,
     compactMode: compactMode,
     limit: limit,
-    hidePaginator: true
+    hidePaginator: true,
+    referrer: referrer
 } %}
 
 <div id="news-container-{{ componentInstanceId }}">

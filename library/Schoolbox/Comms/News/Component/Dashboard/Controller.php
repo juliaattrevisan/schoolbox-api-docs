@@ -97,7 +97,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
             'topicAll' => News\Mapper::TOPIC_ALL_SLUG,
             'slug' => $this->slug,
             'compactMode' => $this->getConfig('compactMode'),
-            'limit' => (int)$this->getConfig('size')
+            'limit' => (int)$this->getConfig('size'),
+            'referrer' => News\Statistics\Mapper::REFERRER_DASHBOARD
         ]);
     }
 }

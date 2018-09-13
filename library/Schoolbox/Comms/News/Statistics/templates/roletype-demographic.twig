@@ -1,0 +1,100 @@
+{##
+ # RoleType Demographics, Periodic
+ #
+ # A breakdown of roletypes during this period
+ #
+ # @param array roleTypeDemographic
+ #}
+<script>
+    $(function() {
+        $('#roleTypeDemographic').highcharts({
+            chart: {
+                spacingRight: 48,
+                type: 'column',
+                zoomType: 'xy'
+            },
+
+            credits: {
+                enabled: false
+            },
+
+            plotOptions: {
+                column: {
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function() {
+                            return '<span style="color:' + this.series.color + '">' + this.y + '</span>'
+                        }
+                    }
+                }
+            },
+
+            time: {
+                useUTC: false
+            },
+
+            title: {
+                text: 'User Demographic'
+            },
+
+            tooltip: {
+                pointFormat: '{point.y} {point.category}',
+                useHTML: true
+            },
+
+            xAxis: {
+                categories: ['Conversions', 'Impressions', 'Non-referred Opens']
+            },
+
+            yAxis: {
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: 'People'
+                }
+            },
+
+            series: [
+                {
+                    color: '#82b5d8',
+                    name: 'Staff',
+                    data: [
+                        {{ roleTypeDemographic['conversion']['staff'] }},
+                        {{ roleTypeDemographic['impression']['staff'] }},
+                        {{ roleTypeDemographic['open']['staff'] }},
+
+                    ]
+                },
+                {
+                    color: '#1f78c1',
+                    name: 'Parent',
+                    data: [
+                        {{ roleTypeDemographic['conversion']['parent'] }},
+                        {{ roleTypeDemographic['impression']['parent'] }},
+                        {{ roleTypeDemographic['open']['parent'] }}
+                    ]
+                },
+                {
+                    color: '#0a437c',
+                    name: 'Student',
+                    data: [
+                        {{ roleTypeDemographic['conversion']['student'] }},
+                        {{ roleTypeDemographic['impression']['student'] }},
+                        {{ roleTypeDemographic['open']['student'] }}
+
+                    ]
+                },
+                {
+                    color: '#806eb7',
+                    name: 'Guest',
+                    data: [
+                        {{ roleTypeDemographic['conversion']['guest'] }},
+                        {{ roleTypeDemographic['impression']['guest'] }},
+                        {{ roleTypeDemographic['open']['guest'] }}
+                    ]
+                }
+            ]
+        });
+    });
+</script>
+<div id="roleTypeDemographic"></div>

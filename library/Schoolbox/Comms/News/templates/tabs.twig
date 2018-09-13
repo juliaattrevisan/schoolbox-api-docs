@@ -11,6 +11,7 @@
  # @param int|null limit
  # @param int|null folderId
  # @param bool hidePaginator
+ # @param string referrer
  #}
 
 {% set params = '' %}
@@ -25,6 +26,10 @@
 
 {% if folderId %}
     {% set params = params ~ '&f=' ~ folderId %}
+{% endif %}
+
+{% if referrer %}
+    {% set params = params ~ '&ref=' ~ referrer %}
 {% endif %}
 
 {# The paginator is enabled by default

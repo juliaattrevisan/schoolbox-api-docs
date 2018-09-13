@@ -1,0 +1,92 @@
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script>
+    $(function() {
+        $('[data-cumulative]').DataTable({
+            info: false,
+            paging: false,
+            searching: false
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Statistics for {{ article.title }}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island" id="cumulatives">
+        <h2 class="subheader">Cumulative Summary</h2>
+        <p class="meta">Overall cumulative statistics from all time.</p>
+
+        <section>
+            {% include '@commsNewsStatistics/cumulative-summary.twig' with {
+                cumulative: cumulative
+            } %}
+        </section>
+
+        <section class="content">
+            {% include '@commsNewsStatistics/referrer-demographic.twig' with {
+                referrerDemographic: referrerDemographic
+            } %}
+        </section>
+
+        <section class="content">
+            {% include '@commsNewsStatistics/roletype-demographic.twig' with {
+                roleTypeDemographic: roleTypeDemographic
+            } %}
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Periodic Data</h2>
+        <p class="meta">Statistics from the last {{ period }} days. Click and drag graphs to zoom; click and drag while holding down <strong>Shift</strong> to pan while zoomed in.</strong></p>
+
+        <section class="content">
+            {% include '@commsNewsStatistics/interactions-chronological.twig' with {
+                article: article,
+                scaleOptions: scaleOptions,
+                scale: scale,
+                interactions: interactions,
+                conversionRatio: conversionRatio
+            } %}
+
+            {% include '@commsNewsStatistics/referrer-chronological.twig' with {
+                article: article,
+                scale: scale,
+                series: series
+            } %}
+        </section>
+    </div>
+</div>
+
+{# Historical Dailies: temporarily disabled
+ #
+ # This seems to confuse people a lot, and there's a lot of numbers here
+ # We'd need to design the way we present this information, either as a
+ # line graph or as a series of tables as per below
+ #
+ # We also don't know the utility of this information yet. Regardless, we
+ # continue to capture enough data points to show this kind of information
+ # such that we can enable/re-present this later.
+ #}
+{#{% if historic|length %}#}
+{#<div class="row">#}
+    {#<div class="small-12 island">#}
+        {#<h2 class="subheader">Historic Dailies</h2>#}
+        {#<p class="meta">Daily cumulative statistics from all time.</p>#}
+
+        {#{% for daily in historic %}#}
+        {#<section>#}
+            {#{% include '@commsNewsStatistics/cumulative-historic.twig' with {#}
+                {#cumulative: daily#}
+            {#} %}#}
+        {#</section>#}
+        {#{% endfor %}#}
+    {#</div>#}
+{#</div>#}
+{#{% endif %}#}
+

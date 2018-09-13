@@ -15,6 +15,11 @@
     ) }}
 {% endif %}
 
+<script type="text/javascript">
+    $(function() {
+        history.replaceState({}, '', '{{ article.id }}');
+    });
+</script>
 
 <div class="actions-small-2 row">
     <div class="list-item">
@@ -119,6 +124,12 @@
                 });
             </script>
             <li><a class="icon-delete" href="{{ deleteRoute }}" data-delete="{{ article.title }}">Delete</a></li>
+        {% endif %}
+
+        {# Statistics link: must be author or comms officer and article must be published #}
+        {% set statisticsRoute = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {articleId: article.id}) %}
+        {% if isAuthor or isCommsOfficer %}
+            <li><a class="icon-progress" href="{{ statisticsRoute }}">Statistics</a></li>
         {% endif %}
 
         {# Helper links #}

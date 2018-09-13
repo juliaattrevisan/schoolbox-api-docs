@@ -1,0 +1,111 @@
+{##
+ # Referrer Demographics, Periodic
+ #
+ # A breakdown of referrers during this period
+ #
+ # @param array referrerDemographic
+ #}
+<script>
+    $(function() {
+        $('#referrerDemographic').highcharts({
+            chart: {
+                spacingRight: 48,
+                type: 'column',
+                zoomType: 'xy'
+            },
+
+            credits: {
+                enabled: false
+            },
+
+            plotOptions: {
+                column: {
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function() {
+                            return '<span style="color:' + this.series.color + '">' + this.y + '</span>'
+                        }
+                    }
+                }
+            },
+
+            time: {
+                useUTC: false
+            },
+
+            title: {
+                text: 'Referrer'
+            },
+
+            tooltip: {
+                pointFormat: '{point.y} {point.category} came<br />from the <span style="color:{series.color}">{series.name}</span> referrer',
+                useHTML: true
+            },
+
+            xAxis: {
+                categories: ['Conversions', 'Impressions']
+            },
+
+            yAxis: {
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: 'People'
+                }
+            },
+
+            series: [
+                {
+                    color: '#82b5d8',
+                    name: 'Dashboard',
+                    data: [
+                        {{ referrerDemographic['conversion']['dashboard'] }},
+                        {{ referrerDemographic['impression']['dashboard'] }}
+
+                    ]
+                },
+                {
+                    color: '#1f78c1',
+                    name: 'Homepage',
+                    data: [
+                        {{ referrerDemographic['conversion']['homepage'] }},
+                        {{ referrerDemographic['impression']['homepage'] }}
+                    ]
+                },
+                {
+                    color: '#0a437c',
+                    name: 'Index',
+                    data: [
+                        {{ referrerDemographic['conversion']['index'] }},
+                        {{ referrerDemographic['impression']['index'] }}
+
+                    ]
+                },
+                {
+                    color: '#806eb7',
+                    name: 'Archive',
+                    data: [
+                        {{ referrerDemographic['conversion']['archive'] }},
+                        {{ referrerDemographic['impression']['archive'] }}
+                    ]
+                },
+                {
+                    color: '#ba43a9',
+                    name: 'Email',
+                    data: [
+                        {{ referrerDemographic['conversion']['email'] }},
+                        {{ referrerDemographic['impression']['email'] }}
+                    ]
+                },
+                {
+                    color: '#888888',
+                    name: 'Non-referred Opens',
+                    data: [
+                        {{ referrerDemographic['open'] }}
+                    ]
+                }
+            ]
+        });
+    });
+</script>
+<div id="referrerDemographic"></div>

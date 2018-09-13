@@ -1,0 +1,158 @@
+{##
+ # Conversions, Impressions vs Time
+ #
+ # @param News\Model $article
+ # @param array scaleOptions
+ # @param string scale
+ # @param array interactions
+ # @param array conversionRatio
+ #}
+<script>
+    $(function() {
+
+        /**
+         * Reloads the graph with the selected scale
+         *
+         * @param url
+         * @param scale
+         */
+        function reloadInteractionsVsTime(url, scale) {
+            $.getJSON(url, {scale: scale}, function (data) {
+                var chart = new Highcharts.Chart({
+                    chart: {
+                        height: 500,
+                        panning: true,
+                        panKey: 'shift',
+                        renderTo: 'conversions-chronological',
+                        spacingBottom: 64,
+                        type: 'line',
+                        zoomType: 'xy'
+                    },
+
+                    credits: {
+                        enabled: false
+                    },
+
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal'
+                        }
+                    },
+
+                    time: {
+                        useUTC: false
+                    },
+
+                    title: {
+                        text: 'Conversions, Impressions vs Time'
+                    },
+
+                    tooltip: {
+                        useHTML: true
+                    },
+
+                    xAxis: {
+
+                        {# We don't care about seconds/milliseconds in display
+                         # Our highest granularity is Minutes.
+                         #}
+                        dateTimeLabelFormats: {
+                            millisecond: '%l:%M%P',
+                            second: '%l:%M%P',
+                            minute: '%l:%M%P',
+                            hour: '%l:%M%P'
+                        },
+                        title: {
+                            text: 'Date'
+                        },
+                        type: 'datetime'
+                    },
+
+                    yAxis: [
+                        {
+                            allowDecimals: false,
+                            min: 0,
+                            title: {
+                                text: 'Quantity'
+                            }
+                        },
+                        {
+                            labels: {
+                                style: {
+                                    color: '#629e51'
+                                }
+                            },
+                            lineColor: '#629e51',
+                            lineWidth: 1,
+                            max: 100,
+                            min: 0,
+                            tickInterval: 10,
+                            title: {
+                                allowDecimals: true,
+                                style: {
+                                    color: '#629e51'
+                                },
+                                text: 'Conversion Ratio This Period (%)'
+                            },
+                            opposite: true
+                        }
+                    ],
+
+                    series: [
+                        {
+                            color: '#82b5d8',
+                            name: 'Conversions',
+                            data: data.interactions.conversion
+                        },
+                        {
+                            color: '#f2c96d',
+                            name: 'Impressions',
+                            data: data.interactions.impression
+                        },
+                        {
+                            color: '#888888',
+                            name: 'Non-referred Opens',
+                            data: data.interactions.open
+                        },
+                        {
+                            color: '#629e51',
+                            lineWidth: 1,
+                            name: 'Conversion Ratio This Period (%)',
+                            type: 'spline',
+                            yAxis: 1,
+                            data: data.conversionRatio
+                        }
+                    ]
+                });
+
+                {# Zoom into the last seven days to start with #}
+                {#var d = new Date();#}
+                {#chart.xAxis[0].setExtremes(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate() - 7), Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));#}
+                {#chart.showResetZoom();#}
+            });
+        }
+
+        {# Load initially #}
+        reloadInteractionsVsTime("{{ routeLookupIfAuthorized('commsNewsStatistics.getInteractionsVsTime', {articleId: article.id}) }}", $('#scale').val());
+
+        {# Reload upon selection #}
+        $('#scale').on('change', function (event) {
+            event.preventDefault();
+
+            reloadInteractionsVsTime("{{ routeLookupIfAuthorized('commsNewsStatistics.getInteractionsVsTime', {articleId: article.id}) }}", $(this).val());
+        });
+    });
+</script>
+
+<section class="content">
+    <label for="scale">Scale</label>
+    <p class="meta">Change the way the graph condenses data.</p>
+
+    <select id="scale">
+        {% for value, label in scaleOptions %}
+            <option value="{{ value }}" {% if value == scale %}selected="selected"{% endif %}>{{ value }}</option>
+        {% endfor %}
+    </select>
+</section>
+
+<div id="conversions-chronological"></div>
