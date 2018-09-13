@@ -1,7 +1,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@commsNews/layout.twig' as layout %}
 
-{% if article.isPublished or article.isExpired %}
+{% if isUnpublishable %}
     {% set rejectVerb = 'Unpublish' %}
     {% set showReject = false %}
 {% else %}
