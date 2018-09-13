@@ -15,6 +15,11 @@
     ) }}
 {% endif %}
 
+<script type="text/javascript">
+    $(function() {
+        history.replaceState({}, '', '{{ article.id }}');
+    });
+</script>
 
 <div class="actions-small-2 row">
     <div class="list-item">
