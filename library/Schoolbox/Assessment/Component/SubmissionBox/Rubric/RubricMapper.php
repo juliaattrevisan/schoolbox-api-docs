@@ -682,10 +682,21 @@ class RubricMapper
 
         // Load em into the marked grid
         foreach ($capabilityMarkModels as $capabilityMarkModel) {
-            $capabilityId    = $capabilityMarkModel->getGroup()->getId();
-            $capability      = $rowSet->retrieveCapability($capabilityId);
+            // Load the capability
+            $capabilityId = $capabilityMarkModel->getGroup()->getId();
+            $capability   = $rowSet->retrieveCapability($capabilityId);
+            if (!$capability) {
+                continue;
+            }
+
+            // Load its usage
             $capabilityUsage = $grid->retrieveCapabilityUsage($capability);
-            $capabilityMark  = (new CapabilityMark($capabilityUsage))
+            if (!$capabilityUsage) {
+                continue;
+            }
+
+            // Create the cap mark
+            $capabilityMark = (new CapabilityMark($capabilityUsage))
                 ->setValue($capabilityMarkModel->getValue());
 
             // Associate indicator mark models with indicator marks
@@ -694,14 +705,23 @@ class RubricMapper
                 $indicatorId = $indicatorUsage->getIndicator()->getId();
 
                 // Which indicator mark model is the right one?
-                $indicatorMarkModel = $indicatorMarkModels[$indicatorId];
-                $descriptorModel    = $indicatorMarkModel->getDescriptor();
+                $indicatorMarkModel = $indicatorMarkModels[$indicatorId] ?? null;
+                if (!$indicatorMarkModel) {
+                    continue;
+                }
 
+                // Load descriptor model
+                $descriptorModel = $indicatorMarkModel->getDescriptor();
+                if (!$descriptorModel) {
+                    continue;
+                }
+                $descriptorId = $descriptorModel->getId();
+
+                // Create the ind mark
                 $indicatorMark = (new IndicatorMark($indicatorUsage))
                     ->setValue($indicatorMarkModel->getValue());
 
-                // Need a descriptor from the indicator usage
-                $descriptorId = $descriptorModel->getId();
+                // Associate the ind mark with its descriptor
                 foreach ($indicatorUsage->getDescriptors() as $descriptor) {
                     if ($descriptor->getId() === $descriptorId) {
                         $indicatorMark->setDescriptor($descriptor);
@@ -713,7 +733,6 @@ class RubricMapper
             }
 
             $markedGrid->getCapabilityMarks()->add($capabilityMark);
-
         }
 
         return $markedGrid;
