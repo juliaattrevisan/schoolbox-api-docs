@@ -46,7 +46,8 @@
                  # This is only off when self-reflecting with a grid that doesn't show descriptor points
                  # and groups - here, it never shows the group subtotal, and rowspan calcs are off
                  #}
-                {% set rowspan = groupUsage.indicatorUsages|length + (rubricGrid.assessment.markPerCapability and markSchemeName != "None" ? 1 : 0) %}
+                {% set rowspan        = groupUsage.indicatorUsages|length + (rubricGrid.assessment.markPerCapability and markSchemeName != "None" ? 1 : 0) %}
+                {% set capabilityMark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
 
                 {% for critIndex, critUsage in groupUsage.indicatorUsages %}
                 <tr data-group="{{ rubricId }}-{{ critUsage.indicator.id }}">
@@ -148,8 +149,17 @@
                 </tr>
             {% endfor %}
 
+
+        {# Take down this elephant one leg at a time #}
+        {% set capabilityId = groupUsage.capability.id %}
+        {% set capabilityMaxValue = groupUsage.maxValue %}
+        {% set capabilityScaledMark = '' %}
+        {% set capabilityMaxSum = '' %}
+
+
+
         {% if showGroupTotal and markSchemeName != "None" and not hidePoints %}
-            {% set percentageMark = group.rowMaxSum > 0 ? group.mark * (100 / group.rowMaxSum) : 0 %}
+            {% set percentageMark = capabilityMaxSum > 0 ? capabilityMark.value * (100 / capabilityMaxSum) : 0 %}
             {% set letterGradeBracket = false %}
 
             {# TODO assumes values are always descending which might not be the case? #}
@@ -158,40 +168,40 @@
             {% endfor %}
             <tr>
                 <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
-                    <span data-group-summary="{{ rubricId }}-{{ group.id }}"
-                          data-mark="{{ group.mark }}"
-                          data-scaled-mark="{{ group.scaledMark }}"
-                          data-max="{{ group.max }}"
-                          data-row-max-sum="{{ group.rowMaxSum }}"
-                          data-group-id="{{ group.id }}"
+                    <span data-group-summary="{{ rubricId }}-{{ capabilityId }}"
+                          data-mark="{{ capabilityMark.value }}"
+                          data-scaled-mark="{{ capabilityScaledMark }}"
+                          data-max="{{ capabilityMaxValue }}"
+                          data-row-max-sum="{{ capabilityMaxSum }}"
+                          data-group-id="{{ capabilityId }}"
                           data-rubric-id="{{ rubric.id }}">
 
                         {# This is the value we insert into the database. #}
                         <input type="hidden"
                                data-db-mark
-                               value="{{ group.mark }}"
-                               name="{{ formField }}[groups][{{ group.id }}][unscaledMark]">
+                               value="{{ capabilityMark.value }}"
+                               name="{{ formField }}[groups][{{ capabilityId }}][unscaledMark]">
 
                         {# This is the maximum capability mark, which wouldn't get POSTed otherwise #}
                         <input type="hidden"
-                               value="{{ group.max }}"
-                               name="{{ formField }}[groups][{{ group.id }}][max]">
+                               value="{{ capabilityMaxValue }}"
+                               name="{{ formField }}[groups][{{ capabilityId }}][max]">
 
-                        <label for="group-{{ group.id }}-mark">{{ locale.rubricGroup.proper }} mark</label>
+                        <label for="group-{{ capabilityId }}-mark">{{ locale.rubricGroup.proper }} mark</label>
 
                         {% if markSchemeName == 'TotalMarkFractional' %}
                             <input data-group-mark
                                    class="groupMark"
-                                   id="group-{{ group.id }}-mark"
+                                   id="group-{{ capabilityId }}-mark"
                                    type="tel"
-                                   name="{{ formField }}[groups][{{ group.id }}][customMark]"
-                                   value="{{ group.scaledMark }}"/> / {{ group.max }}
+                                   name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
+                                   value="{{ capabilityScaledMark }}"/> / {{ capabilityMaxValue }}
 
                         {% elseif markSchemeName == 'LetterGrade' %}
                             <select data-group-mark
                                     class="groupMark"
-                                    name="{{ formField }}[groups][{{ group.id }}][customMark]"
-                                    id="group-{{ group.id }}-mark">
+                                    name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
+                                    id="group-{{ capabilityId }}-mark">
 
                                 {% for value, letter in markType.conf %}
                                     <option value="{{ value }}"
@@ -205,20 +215,20 @@
                         {% elseif markSchemeName == 'Percentage'%}
                             <input data-group-mark
                                    class="groupMark"
-                                   id="group-{{ group.id }}-mark"
+                                   id="group-{{ capabilityId }}-mark"
                                    type="tel"
-                                   name="{{ formField }}[groups][{{ group.id }}][customMark]"
+                                   name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
                                    value="{{ percentageMark }}"/> %
 
                         {% endif %}
 
                         {# TODO why is markSchemeName null when student is self-assessing (note: will be addressed in SA-7242) #}
 
-                        {% if group.rowMaxSum > 0 %}
+                        {% if capabilityMaxSum > 0 %}
                             {# TODO these need to be the descriptor sum! #}
                             <button data-use-descriptor-values>Assign <span class="descriptor-sum" data-group-descriptor-sum>
                                 {% if markSchemeName == 'TotalMarkFractional' %}
-                                    {{ group.scaledMark }}
+                                    {{ capabilityScaledMark }}
 
                                 {% elseif markSchemeName == 'LetterGrade' %}
                                     {{ markType.conf[letterGradeValue] }}
@@ -239,7 +249,7 @@
                             {#{% set selfReflectionName = locale.selfReflection.proper %}#}
                         {#{% endif %}#}
 
-                        {#({{ learnerRubric.groups[group.id].humanReadableMark }} given in {{ selfReflectionName }})#}
+                        {#({{ learnerRubric.groups[capabilityId].humanReadableMark }} given in {{ selfReflectionName }})#}
                     {#{% endif %}#}
                 </th>
             </tr>
