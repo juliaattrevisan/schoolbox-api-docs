@@ -21,21 +21,32 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
      */
     public function determineIcon($iconSize = 'square64'): string
     {
-        /* Load the current icon as set by Admin > Allowed Files because sysadmins can choose their own icons
-         * If the filetype is indeterminate, return a default icon rather than nothing
+        $iconDirectory = '/images/mime/';
+
+        /* Default icon as a fallback */
+        $icon = $iconDirectory . 'application-document.svg';
+
+        /* Attempt to load the icon for this mimetype as set in Admin > Allowed Files
+         * (sysadmins can choose their own icons)
          */
         try {
             $iconFile = MimetypeMapper::getInstance()->getByFilename($this->getExternalTitle())->getIconFile();
-            return '/images/mime/' . $iconFile;
+            $icon = $iconDirectory . $iconFile;
         } catch (FileException $e) {
-            // noop;
+            /* Mimetype unknown? Try to load either an icon or a thumbnail image
+             * specified in the DB for this social stream post
+             */
+            if (stristr($this->getThumbnail(), 'icon:')) {
+                // Icon
+                $iconFile = str_replace('icon:', '', $this->getThumbnail());
+                $icon = $iconDirectory . $iconFile;
+            } elseif ($this->hasThumbnail()) {
+                // Thumbnail image
+                $icon = "/socialstream/image.php?size={$iconSize}&id=" . $this->getPostId();
+            }
         }
 
-        if ($this->hasThumbnail()) {
-            return "/socialstream/image.php?size={$iconSize}&id=" . $this->getPostId();
-        }
-        // default icon
-        return '/images/mime/application-octet-stream.svg';
+        return $icon;
     }
 
     /**
@@ -67,7 +78,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
         if ($context === 'post') {
             $page->setVar(array(
                 'SOCIALSTREAM_POST_URL'            => Scrub::text($this->getUrl()),
-                'SOCIALSTREAM_POST_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()),
+                'SOCIALSTREAM_POST_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()) ?: Scrub::text($this->getUrl()),
                 'SOCIALSTREAM_POST_EXTERNAL_BODY'  => Scrub::text($this->getExternalBody()),
                 'SOCIALSTREAM_POST_ICON' => $icon,
             ));
@@ -84,7 +95,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
         elseif ($context === 'comment') {
             $page->setVar(array(
                 'SOCIALSTREAM_COMMENT_URL'            => Scrub::text($this->getUrl()),
-                'SOCIALSTREAM_COMMENT_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()),
+                'SOCIALSTREAM_COMMENT_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()) ?: Scrub::text($this->getUrl()),
                 'SOCIALSTREAM_COMMENT_EXTERNAL_BODY'  => Scrub::text($this->getExternalBody()),
                 'SOCIALSTREAM_COMMENT_ICON' => $icon,
             ));
@@ -101,7 +112,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
         elseif ($context === 'reply') {
             $page->setVar(array(
                 'SOCIALSTREAM_REPLY_URL'            => Scrub::text($this->getUrl()),
-                'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()),
+                'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()) ?: Scrub::text($this->getUrl()),
                 'SOCIALSTREAM_REPLY_EXTERNAL_BODY'  => Scrub::text($this->getExternalBody()),
                 'SOCIALSTREAM_REPLY_ICON' => $icon,
             ));
