@@ -36,7 +36,7 @@ class TranslatorRegistry implements ITranslate
             $campusSql = new Strategy\Campus(),
             $roleSql = new Strategy\Role(),
             $folderSql = new Strategy\Folder($user, $folderMapper, $roleAccessMapper, $isModerationEnabled),
-            $houseSql = new Strategy\House(),
+            $houseSql = new Strategy\SchoolHouse(),
             $userSql = new Strategy\User(),
             $yearSql = new Strategy\Year(),
             $pastoralGroupSql = new Strategy\PastoralGroup()
@@ -45,18 +45,16 @@ class TranslatorRegistry implements ITranslate
 
 
     /**
-     * Translate this ITranslate instance from an entity_type to a human-readable version
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getTranslateSql(): string
+    public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
         $pieces = [];
 
         foreach ($this->registry as $strategy) {
-            $pieces[] = "({$strategy->getTranslateSql()})";
+            $pieces[] = "({$strategy->getTranslateSql($segmentIdsPlaceholder)})";
         }
 
-        return implode(' UNION ', $pieces);
+        return \implode(' UNION ALL ', $pieces);
     }
 }
