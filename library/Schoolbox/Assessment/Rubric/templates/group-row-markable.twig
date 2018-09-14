@@ -1,0 +1,107 @@
+
+
+{# Take down this elephant one leg at a time #}
+{% set capabilityId = groupUsage.capability.id %}
+{% set capabilityScaledMark = '' %}
+
+{# What could the difference between these two things possibly be? #}
+{% set capabilityMaxValue = groupUsage.maxValue %}
+{% set capabilityMaxSum = '' %}
+
+{% if showGroupTotal and markSchemeName != "None" and not hidePoints %}
+    {% set percentageMark = capabilityMaxSum > 0 ? capabilityMark.value * (100 / capabilityMaxSum) : 0 %}
+    {% set letterGradeBracket = false %}
+
+    {# TODO assumes values are always descending which might not be the case? #}
+    {% for value, letter in markType.conf if (percentageMark >= value and not letterGradeBracket) %}
+        {% set letterGradeBracket = value %}
+    {% endfor %}
+<tr>
+    <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 1 }}">
+        <span data-group-summary="{{ rubricId }}-{{ capabilityId }}"
+              data-mark="{{ capabilityMark.value }}"
+              data-scaled-mark="{{ capabilityScaledMark }}"
+              data-max="{{ capabilityMaxValue }}"
+              data-row-max-sum="{{ capabilityMaxSum }}"
+              data-group-id="{{ capabilityId }}"
+              data-rubric-id="{{ rubricGrid.id }}">
+
+            {# This is the value we insert into the database. #}
+            <input type="hidden"
+                   data-db-mark
+                   value="{{ capabilityMark.value }}"
+                   name="{{ formField }}[groups][{{ capabilityId }}][unscaledMark]">
+
+            {# This is the maximum capability mark, which wouldn't get POSTed otherwise #}
+            <input type="hidden"
+                   value="{{ capabilityMaxValue }}"
+                   name="{{ formField }}[groups][{{ capabilityId }}][max]">
+
+            <label for="group-{{ capabilityId }}-mark">{{ locale.rubricGroup.proper }} mark</label>
+
+            {% if markSchemeName == 'TotalMarkFractional' %}
+                <input data-group-mark
+                       class="groupMark"
+                       id="group-{{ capabilityId }}-mark"
+                       type="tel"
+                       name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
+                       value="{{ capabilityScaledMark }}"/> / {{ capabilityMaxValue }}
+
+            {% elseif markSchemeName == 'LetterGrade' %}
+                <select data-group-mark
+                        class="groupMark"
+                        name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
+                        id="group-{{ capabilityId }}-mark">
+
+                    {% for value, letter in markType.conf %}
+                        <option value="{{ value }}"
+                                {% if letterGradeBracket == value %}selected{% endif %}
+                                data-letter="{{ letter }}">
+                            {{ letter }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+            {% elseif markSchemeName == 'Percentage'%}
+                <input data-group-mark
+                       class="groupMark"
+                       id="group-{{ capabilityId }}-mark"
+                       type="tel"
+                       name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
+                       value="{{ percentageMark }}"/> %
+
+            {% endif %}
+
+            {# TODO why is markSchemeName null when student is self-assessing (note: will be addressed in SA-7242) #}
+
+            {% if capabilityMaxSum > 0 %}
+                {# TODO these need to be the descriptor sum! #}
+                <button data-use-descriptor-values>Assign <span class="descriptor-sum" data-group-descriptor-sum>
+                    {% if markSchemeName == 'TotalMarkFractional' %}
+                        {{ capabilityScaledMark }}
+
+                    {% elseif markSchemeName == 'LetterGrade' %}
+                        {{ markType.conf[letterGradeValue] }}
+
+                    {% elseif markSchemeName == 'Percentage'%}
+                        {{ percentageMark }}
+
+                    {% endif %}
+                    </span> from Descriptors</button>
+            {% endif %}
+        </span>
+
+        {# Self-Assessment #}
+        {#{% if learnerRubric %}#}
+        {#{% if latestSelfReflectedFeedback.isSelfGrading %}#}
+        {#{% set selfReflectionName = locale.selfAssessment.proper %}#}
+        {#{% else %}#}
+        {#{% set selfReflectionName = locale.selfReflection.proper %}#}
+        {#{% endif %}#}
+
+        {#({{ learnerRubric.groups[capabilityId].humanReadableMark }} given in {{ selfReflectionName }})#}
+        {#{% endif %}#}
+    </th>
+</tr>
+
+{% endif %}
