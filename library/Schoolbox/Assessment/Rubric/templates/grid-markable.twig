@@ -152,11 +152,11 @@
 
         {# Take down this elephant one leg at a time #}
         {% set capabilityId = groupUsage.capability.id %}
-        {% set capabilityMaxValue = groupUsage.maxValue %}
         {% set capabilityScaledMark = '' %}
+
+        {# What could the difference between these two things possibly be? #}
+        {% set capabilityMaxValue = groupUsage.maxValue %}
         {% set capabilityMaxSum = '' %}
-
-
 
         {% if showGroupTotal and markSchemeName != "None" and not hidePoints %}
             {% set percentageMark = capabilityMaxSum > 0 ? capabilityMark.value * (100 / capabilityMaxSum) : 0 %}
@@ -167,14 +167,14 @@
                 {% set letterGradeBracket = value %}
             {% endfor %}
             <tr>
-                <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
+                <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 1 }}">
                     <span data-group-summary="{{ rubricId }}-{{ capabilityId }}"
                           data-mark="{{ capabilityMark.value }}"
                           data-scaled-mark="{{ capabilityScaledMark }}"
                           data-max="{{ capabilityMaxValue }}"
                           data-row-max-sum="{{ capabilityMaxSum }}"
                           data-group-id="{{ capabilityId }}"
-                          data-rubric-id="{{ rubric.id }}">
+                          data-rubric-id="{{ rubricGrid.id }}">
 
                         {# This is the value we insert into the database. #}
                         <input type="hidden"
@@ -258,17 +258,22 @@
     {% endfor %}
 
     {% if showRubricTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
+
+        {% set rubricHumanReadableMark = '' %}
+        {% set rubricScaledMark        = '' %}
+        {% set rubricMax               = '' %}
+
         <tr>
             <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
                 <span data-final-summary="{{ rubricId }}"
-                      data-scaled-mark="{{ rubric.scaledMark }}"
-                      data-max="{{ rubric.max }}"
+                      data-scaled-mark="{{ rubricScaledMark }}"
+                      data-max="{{ rubricMax }}"
                       data-mark-type="{{ markSchemeName }}">
 
                     {#{% if markSchemeName == 'TotalMarkFractional' %}#}
-                       {#{{ rubric.scaledMark }} / {{ rubric.max }}#}
+                       {#{{ rubricScaledMark }} / {{ rubricMax }}#}
                     {#{% else %}#}
-                       {#{{ rubric.humanReadableMark }}#}
+                       {#{{ rubricHumanReadableMark }}#}
                     {#{% endif %}#}
                     {{ rubricMarkedGrid.feedback.humanReadableMark }}
                 </span>
