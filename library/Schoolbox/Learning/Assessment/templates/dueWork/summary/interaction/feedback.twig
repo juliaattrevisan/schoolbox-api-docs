@@ -202,7 +202,8 @@ feedback: currentFeedback,
                  data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
                  {% endif %}>
                 {% include '@rubric/grid.twig' with {
-                    rubric:         feedbackRubricContexts[currentFeedback.id].rubric,
+                    rubricGrid:       currentFeedback.rubricMarkedGrid.grid,
+                    rubricMarkedGrid: currentFeedback.rubricMarkedGrid,
                     markVisibility: currentFeedback.isSelfAssessment
                                     or participant.assessable.isFeedbackVisibleToUser(USER),
                     useMarkRange: assessment.useMarkRange,
