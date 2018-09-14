@@ -89,7 +89,7 @@ class TestRenderer
                     <td colspan="<?php echo count($grid->getLevels()) + 2 ?>">
                         <?php
                         if ($capabilityMark):
-                            printf('%0.2f', $capabilityMark->getValue());
+                            printf('%s (%0.2f)', $capabilityMark->retrieveHumanReadableMark(), $capabilityMark->retrieveNormalizedMark());
                         else:
                             printf('<em>N/A</em>');
                         endif;
@@ -97,6 +97,16 @@ class TestRenderer
                     </td>
                 </tr>
             <?php endforeach; ?>
+
+            <?php if ($markedGrid): ?>
+            <tr>
+                <td colspan="<?php echo count($grid->getLevels()) + 2 ?>">
+                    <?php
+                    printf('%s (%0.2f)', $markedGrid->retrieveHumanReadableMark(), $markedGrid->retrieveNormalizedMark());
+                    ?>
+                </td>
+            </tr>
+            <?php endif; ?>
             </tbody>
         </table>
         <?php

@@ -61,6 +61,55 @@ class MarkedGrid
 
 
     /**
+     * Render the grid's mark in normalized format.
+     *
+     * @return float
+     */
+    public function retrieveNormalizedMark(): float
+    {
+        $capabilityMaxValues = [];
+        $totalWeight       = 0;
+        foreach ($this->capabilityMarks as $capabilityMark) {
+            $capabilityNormMark    = $capabilityMark->retrieveNormalizedMark();
+            $capabilityWeight      = $capabilityMark->getCapabilityUsage()->getMaxValue();
+            $capabilityMaxValues[] = [$capabilityNormMark, $capabilityWeight,];
+            $totalWeight += $capabilityWeight;
+        }
+
+        if ($totalWeight === 0) {
+            return 0;
+        }
+
+        $normalizedMark = 0;
+        foreach ($capabilityMaxValues as [$capabilityNormMark, $capabilityWeight]) {
+            if ($capabilityWeight === 0) {
+                continue;
+            }
+            $normalizedMark += ($capabilityNormMark * ($capabilityWeight / $totalWeight));
+        }
+        return $normalizedMark;
+    }
+
+
+    /**
+     * Render the grid's mark in human-readable format.
+     *
+     * @return string
+     */
+    public function retrieveHumanReadableMark(): string
+    {
+        $totalMark   = 0;
+        $totalWeight = 0;
+        foreach ($this->capabilityMarks as $capabilityMark) {
+            $totalMark   += $capabilityMark->getValue();
+            $totalWeight += $capabilityMark->getCapabilityUsage()->getMaxValue();
+        }
+
+        return sprintf('%d / %d', $totalMark, $totalWeight);
+    }
+
+
+    /**
      * @return IFeedback
      */
     public function getFeedback(): IFeedback

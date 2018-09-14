@@ -50,6 +50,30 @@ class CapabilityMark
 
 
     /**
+     * Render the capability's mark in normalized format.
+     *
+     * @return float
+     */
+    public function retrieveNormalizedMark(): float
+    {
+        return $this->getValue() / $this->getCapabilityUsage()->getMaxValue() * 100;
+    }
+
+
+    /**
+     * Render the capability's mark in human-readable format.
+     *
+     * @return string
+     */
+    public function retrieveHumanReadableMark(): string
+    {
+        // TODO make this work with the assessment's mark type?
+        // It will need to be passed in though.
+        return sprintf('%d / %d', $this->getValue(), $this->getCapabilityUsage()->getMaxValue());
+    }
+
+
+    /**
      * @return CapabilityUsage
      */
     public function getCapabilityUsage(): CapabilityUsage
