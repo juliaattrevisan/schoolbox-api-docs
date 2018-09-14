@@ -14,7 +14,7 @@
 <div class="scrollable">
 <table class="rb stack-for-medium-down">
     {% set hasLevels = '' %}
-    {% for level in rubric.levels %}
+    {% for level in rubricGrid.levels %}
         {% set hasLevels = hasLevels ~ level.name %}
     {% endfor %}
     {% if hasLevels | length %}
