@@ -127,26 +127,51 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * Deletes an article's audience segments.
+     * Deletes a segment and its children using leaf-first strategy
      *
      * Returns whether any records were deleted.
      *
-     * @param int $articleId
+     * @param Model $segment
      * @return bool
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function deleteForArticle(int $articleId): bool
+    public function deleteSegment(Model $segment): bool
     {
-        $segments  = $this->findForArticle($articleId);
-        $deletions = false;
-        foreach ($segments as $segment) {
-            if ($this->delete($segment->getChildren())) {
-                $deletions = true;
-            }
-            if ($this->delete($segment)) {
-                $deletions = true;
+        $deletedChildren = false;
+        foreach ($segment->getChildren() as $child) {
+            if ($this->deleteSegment($child)) {
+                $deletedChildren = true;
             }
         }
-        return $deletions;
+        $deleted = $this->delete($segment);
+        return $deletedChildren || $deleted;
+    }
+
+    /**
+     * Saves a segment and its children using root-first strategy
+     *
+     * Returns whether any records were deleted.
+     *
+     * @param Model $segment
+     * @return bool|int[]
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function saveSegment(Model $segment)
+    {
+        $affectedIds = [];
+        $id = $this->save($segment);
+        if(false === $id){
+            return false;
+        }
+        $affectedIds[] = $id;
+
+        foreach ($segment->getChildren() as $child) {
+            $child->setParent($segment);
+            $childId = $this->saveSegment($child);
+            if(false === $childId){
+                $affectedIds[] = $childId;
+            }
+        }
+        return $affectedIds;
     }
 }
