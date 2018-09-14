@@ -2,6 +2,9 @@
 /**
  * IsPubliclyReadable
  *
+ * This determines whether a user can view an article's contents.
+ * It uses the spec pattern ValidArticleIsPubliclyReadable to decide.
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -51,11 +54,8 @@ class IsPubliclyReadable implements IAuthorizationRule
      * @return bool
      * @throws InvalidArgumentException
      * @throws Unauthorized
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \UnexpectedValueException
-     * @throws \UnderflowException
      */
     public function authorize(array $params = [], User $user = null): bool
     {
