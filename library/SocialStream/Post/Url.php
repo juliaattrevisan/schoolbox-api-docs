@@ -32,7 +32,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
         }
 
         /* Mimetype unknown? Try to load icon specified in the DB for this social stream post */
-        if(stristr($this->getThumbnail(), 'icon:')) {
+        if (stristr($this->getThumbnail(), 'icon:')) {
             $iconFile = str_replace('icon:', '', $this->getThumbnail());
             return '/images/mime/' . $iconFile;
         }
