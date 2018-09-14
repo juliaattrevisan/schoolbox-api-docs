@@ -543,6 +543,7 @@ class Controller extends Base
                 'isEditable' => (new ValidUserCanEdit())->isSatisfiedBy($this->getUser(), $moderationRequired, $article),
                 'isAcceptable' => (new Moderation\ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $article),
                 'isRejectable' => (new Moderation\ValidUserCanReject())->isSatisfiedBy($this->getUser(), $article),
+                'isUnpublishable' => (new Moderation\ValidUserCanUnpublish())->isSatisfiedBy($this->getUser(), $article),
                 'isDeletable' => (new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $moderationRequired, $article)
             ];
         }

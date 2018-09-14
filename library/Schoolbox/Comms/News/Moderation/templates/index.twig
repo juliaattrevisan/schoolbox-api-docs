@@ -26,7 +26,7 @@
                                         {{ article.author.fullname }}
                                     {% endif %}
 
-                                    on {{ article.updatedAt.local }}
+                                    <time title="{{ article.updatedAt.long }}">{{ article.updatedAt.relativeTime }}</time>
                                 </p>
 
                                 {% if article.topics|length %}
@@ -46,7 +46,6 @@
         <div class="empty-state">
             <i class="icon-news"></i>
             <p>All {{ locale.news }} have been processed.</p>
-            <p>You can <a href="">view statistics on existing {{ locale.news }} articles</a> to see how they are faring.</p>
         </div>
         {% endif %}
     </div>
@@ -55,25 +54,40 @@
 {# A list of recently-accepted articles
  # Not having this is pretty disorienting
  #}
-{% if recentArticles|length %}
+{% if recentlyAcceptedArticles|length %}
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Recently Accepted</h2>
 
         <section>
             <ul class="information-list">
-                {% for article in recentArticles %}
+                {% for article in recentlyAcceptedArticles %}
                     <li>
                         <div class="list-item">
                             <div class="small-12 card">
                                 <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
-                                <p class="meta">Authored by {{ article.author.fullname }} on {{ article.updatedAt.local }}</p>
-                                <p class="meta">Accepted by {{ article.acceptedBy.fullname }} on {{ article.updatedAt.local }}</p>
+                                <p class="meta">Authored by
+                                    {% if article.author.deletedAt.isNull %}
+                                        <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
+                                    {% else %}
+                                        {{ article.author.fullname }}
+                                    {% endif %}
+                                    <time title="{{ article.createdAt.long }}">{{ article.createdAt.relativeTime }}</time>
+                                </p>
+
+                                <p class="meta">Accepted by
+                                    {% if article.acceptedBy.deletedAt.isNull %}
+                                        <a href="/search/user/{{ article.acceptedBy.id }}" title="View Profile">{{ article.acceptedBy.fullname }}</a>
+                                    {% else %}
+                                        {{ article.acceptedBy.fullname }}
+                                    {% endif %}
+                                    <time title="{{ article.acceptedAt.long }}">{{ article.acceptedAt.relativeTime }}</time>
+                                </p>
 
                                 {% if article.topics|length %}
                                     <p class="meta">Related topics:
                                         {% for topic in article.topics %}
-                                            <a href="{{ routeLookup('commsNews.getIndex', {slug: topic.slug}) }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                                            <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
                                         {% endfor %}
                                     </p>
                                 {% endif %}
@@ -85,4 +99,57 @@
         </section>
     </div>
 </div>
+{% endif %}
+
+{# A list of recently-rejected articles
+ # Not having this is pretty disorienting
+ #}
+{% if recentlyRejectedArticles|length %}
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Recently Rejected</h2>
+
+            <section>
+                <ul class="information-list">
+                    {% for article in recentlyRejectedArticles %}
+                        <li>
+                            <div class="list-item">
+                                <div class="small-12 card">
+                                    <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
+                                    <p class="meta">Authored by
+
+                                        {% if article.author.deletedAt.isNull %}
+                                            <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
+                                        {% else %}
+                                            {{ article.author.fullname }}
+                                        {% endif %}
+
+                                        <time title="{{ article.createdAt.long }}">{{ article.createdAt.relativeTime }}</time>
+                                    </p>
+
+                                    <p class="meta">Rejected by
+                                        {% if article.rejectedBy.deletedAt.isNull %}
+                                            <a href="/search/user/{{ article.rejectedBy.id }}" title="View Profile">{{ article.rejectedBy.fullname }}</a>
+                                        {% else %}
+                                            {{ article.rejectedBy.fullname }}
+                                        {% endif %}
+
+                                        <time title="{{ article.rejectedAt.long }}">{{ article.rejectedAt.relativeTime }}</time>
+                                    </p>
+
+                                    {% if article.topics|length %}
+                                        <p class="meta">Related topics:
+                                            {% for topic in article.topics %}
+                                                <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+    </div>
 {% endif %}

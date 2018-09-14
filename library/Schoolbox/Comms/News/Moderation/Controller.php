@@ -15,6 +15,7 @@ use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -75,7 +76,8 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
             'articles' => $articles,
-            'recentArticles' => $lists->getRecentlyAccepted(),
+            'recentlyAcceptedArticles' => $lists->getRecentlyAccepted(),
+            'recentlyRejectedArticles' => $lists->getRecentlyRejected(),
             'moderationRequired' => $moderationRequired
         ])->setTitle('Moderation List'));
     }
@@ -170,13 +172,20 @@ class Controller extends Base
     public function postAccept(Model $article)
     {
         if ((new ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $article)) {
+            $now = \Alaress_Date_Format::now();
+
             $article
-                ->setAcceptedAt(\Alaress_Date_Format::now())
+                ->setAcceptedAt($now)
                 ->setAcceptedBy($this->getUser());
 
-            if ((new News\ValidBroadcast())->isSatisfiedBy($article)) {
-                $this->newsMapper->save($article);
+            /* If submitted_at was empty, fill them in because we're Approving directly
+             * from an unsubmitted state
+             */
+            if (!$article->getSubmittedAt() instanceof User) {
+                $article->setSubmittedAt($now);
             }
+
+            $this->newsMapper->save($article);
 
             /* Go back to the list
              */

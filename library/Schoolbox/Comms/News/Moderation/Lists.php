@@ -23,7 +23,12 @@ class Lists
     /**
      * Maximum number of Recently Accepted articles to show
      */
-    private const NUM_RECENTLY_ACCEPTED = 3;
+    private const NUM_RECENTLY_ACCEPTED = 5;
+
+    /**
+     * Maximum number of Recently Rejected articles to show
+     */
+    private const NUM_RECENTLY_REJECTED = 5;
 
     /**
      * @var News\Mapper
@@ -64,7 +69,7 @@ class Lists
 
     /**
      * A list of recently-accepted articles
-     * Most recently article is listed first
+     * Most recently accepted article is listed first
      *
      * @return GenericCollection
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -78,6 +83,27 @@ class Lists
             'limit' => self::NUM_RECENTLY_ACCEPTED,
             'order' => [
                 'accepted_at' => 'desc'
+            ]
+        ]);
+    }
+
+
+    /**
+     * A list of rejected/unpublished articles
+     * Most recently rejected article is listed first
+     *
+     * @return GenericCollection
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    public function getRecentlyRejected(): GenericCollection
+    {
+        $builder = (new Builder($this->newsMapper->getDatabase(), 'comms_news_article'))
+            ->notNull('rejected_at');
+
+        return $this->newsMapper->findByPredicates($builder, [
+            'limit' => self::NUM_RECENTLY_REJECTED,
+            'order' => [
+                'rejected_at' => 'desc'
             ]
         ]);
     }
