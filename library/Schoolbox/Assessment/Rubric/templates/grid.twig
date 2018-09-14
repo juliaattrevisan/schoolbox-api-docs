@@ -99,7 +99,7 @@
         {# Capability mark: needs to be rendered in human-readable form, use the assessment's mark scheme to do so #}
         {% if rubricGrid.assessment.markPerCapability and capabilitymark %}
             <tr>
-                <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 1 }}">
+                <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
                     {{ capabilitymark.value }}
 
                     {# Self-Assessment #}
@@ -115,7 +115,7 @@
     {# Overall mark #}
     {% if showRubricTotal and rubricMarkedGrid %}
         <tr>
-            <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 1 }}">
+            <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
                 {{ rubricMarkedGrid.feedback.humanReadableMark }}
 
                 {# Self-Assessment #}
