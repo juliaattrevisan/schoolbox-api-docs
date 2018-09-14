@@ -156,7 +156,7 @@ Usage:
                 {% set self = 'none' %}
 
                 {% block rubricGrid %}
-                    {% if assessment.useRubric and rubricContext %}
+                    {% if assessment.useRubric %}
                         <fieldset class="content">
                             {% set rubricTemplate = readonly
                             ? 'grid.twig'
@@ -165,6 +165,8 @@ Usage:
                             {% include '@rubric/' ~ rubricTemplate with {
                                 useMarkRange: assessment.useMarkRange,
                                 rubric: rubricContext.rubric,
+                                rubricGrid: assessment.rubricGrid,
+                                rubricMarkedGrid: feedback.rubricMarkedGrid,
                                 learnerRubric: learnerRubricContext.rubric,
                                 learner: participant.user,
                                 markType: rubricContext.markType,
