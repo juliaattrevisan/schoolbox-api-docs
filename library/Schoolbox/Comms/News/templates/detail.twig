@@ -3,10 +3,8 @@
 
 {% if isUnpublishable %}
     {% set rejectVerb = 'Unpublish' %}
-    {% set showReject = false %}
 {% else %}
     {% set rejectVerb = 'Reject' %}
-    {% set showReject = true %}
 {% endif %}
 
 <script type="text/javascript">
@@ -121,7 +119,7 @@
         {% endif %}
 
         {# Unpublish article (just a reject renamed to unpublish when the article is published or archived) #}
-        {% if isRejectable and not showReject %}
+        {% if isRejectable and isUnpublishable %}
             {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {articleId: article.id}) %}
             {% if rejectRoute %}
                 <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
@@ -263,7 +261,7 @@
 
         {# Moderators #}
         {% if isCommsOfficer %}
-            {% if isRejectable and showReject %}
+            {% if isRejectable and not isUnpublishable %}
                 {# Reject this news article #}
                 {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {articleId: article.id}) %}
 
