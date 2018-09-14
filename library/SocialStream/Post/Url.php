@@ -21,29 +21,30 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
      */
     public function determineIcon($iconSize = 'square64'): string
     {
-        /* Load the icon for this mimetype as set in Admin > Allowed Files
+        /* Default icon as a fallback */
+        $icon = '/images/mime/application-document.svg';
+
+        /* Attempt to load the icon for this mimetype as set in Admin > Allowed Files
          * (sysadmins can choose their own icons)
          */
         try {
             $iconFile = MimetypeMapper::getInstance()->getByFilename($this->getExternalTitle())->getIconFile();
-            return '/images/mime/' . $iconFile;
+            $icon = '/images/mime/' . $iconFile;
         } catch (FileException $e) {
-            // noop;
+            /* Mimetype unknown? Try to load either an icon or a thumbnail image
+             * specified in the DB for this social stream post
+             */
+            if (stristr($this->getThumbnail(), 'icon:')) {
+                // Icon
+                $iconFile = str_replace('icon:', '', $this->getThumbnail());
+                $icon = '/images/mime/' . $iconFile;
+            } else if ($this->hasThumbnail()) {
+                // Thumbnail image
+                $icon = "/socialstream/image.php?size={$iconSize}&id=" . $this->getPostId();
+            }
         }
 
-        /* Mimetype unknown? Try to load icon specified in the DB for this social stream post */
-        if (stristr($this->getThumbnail(), 'icon:')) {
-            $iconFile = str_replace('icon:', '', $this->getThumbnail());
-            return '/images/mime/' . $iconFile;
-        }
-
-        /* Or use a thumbnail image if there is one */
-        if ($this->hasThumbnail()) {
-            return "/socialstream/image.php?size={$iconSize}&id=" . $this->getPostId();
-        }
-
-        /* Fallback: return a default icon */
-        return '/images/mime/application-document.svg';
+        return $icon;
     }
 
     /**
