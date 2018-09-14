@@ -19,6 +19,7 @@ use Schoolbox\Resource\Folder;
 use PDO;
 use Alaress\Database\Predicate;
 use External_User;
+use InvalidArgumentException;
 
 /**
  * Responsible for returning the set of articles whose audience contains a specific user.
@@ -502,14 +503,97 @@ class ArticleResolver implements IArticleResolver
      *              should include articleA                  // as [folder:X ∩ role:Y] is a subset of [folder:X ∪ role:Y]
      *              should include articleB                  // as [folder:X ∩ role:Y] is a subset of [folder:X ∩ role:Y]
      *
-     * @param string          $entityType
-     * @param int|string|null $entityValue  Null is a valid value to match on.
-     * @param string|null     $relationship Null means don't don't filter by relationship modifier.
+     * @param string                $entityType
+     * @param int|string|null|array $entityValue  Null is a valid value to match on.
+     * @param string|null           $relationship Null means don't don't filter by relationship modifier.
      * @return int[]
+     * @throws InvalidArgumentException If called to perform a composite search and the value does not match required format
+     * @todo Currently only working for $relationship == 'self'. Need to update for other relationship types.
+     * @todo This is written recursively for composite audiences. It should be updated to do this in a single db query.
      */
     public function findArticlesForAudience(string $entityType, $entityValue, string $relationship = null): array
     {
-        // TODO implement findArticlesForAudience
-        return [];
+        // Simple equality case
+        if (Model::ENTITY_TYPE_COMPOSITE !== $entityType) {
+            $pb = $this->db
+                ->buildPredicateBuilder(Mapper::TABLE_NAME)
+                ->equals(Mapper::FIELD_ENTITY_TYPE, $entityType)
+                ->isNull(Mapper::FIELD_PARENT_ID);
+
+            if (null === $entityValue) {
+                $pb->isNull(Mapper::FIELD_ENTITY_VALUE);
+            } else {
+                $pb->equals(Mapper::FIELD_ENTITY_VALUE, $entityValue);
+            }
+
+            if (null !== $relationship) {
+                $pb->equals(Mapper::FIELD_RELATIONSHIP, $relationship);
+            }
+
+            $whereClause = \implode(' AND ', $pb->getWhere());
+
+            $sql = "
+                SELECT comms_news_article_id
+                FROM comms_news_audience
+                WHERE {$whereClause}";
+
+            $articleIds = $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
+
+            return \array_unique($articleIds);
+        }
+
+        // Complex intersect case
+        if (!\is_array($entityValue)) {
+            throw new InvalidArgumentException('If performing a complex search, $entityValue must be an array of type:value pairs');
+        }
+
+        if (!\count($entityValue)) {
+            return [];
+        }
+
+        /* Must match all elements/children of composite rule.
+         * eg A1 = [folder:x ∩ role:y ∩ year:z]
+         * findArticlesForAudience([folder:x ∩ role:y]) should not return A1,  as there may be users
+         * in that audience who have year != z and hence should not see article.
+         */
+        $whereClauses = new Collection();
+        $whereParams  = new Collection();
+
+        /** @var array $entityValue */
+        foreach ($entityValue as $type => $value) {
+            $this->buildClause($whereClauses, $whereParams, 0, $type, $value, Model::RELATIONSHIP_SELF);
+        }
+
+        $whereClause = \implode(' OR ', $whereClauses->getAll());
+
+        // TODO investigate re-writing this to perform matchCount == availableCount before joining to parent composite rule to get article ids
+        $sql = "
+            SELECT t1.comms_news_article_id
+            FROM comms_news_audience t1
+            JOIN (
+              -- Get child segments that match the target audience
+              SELECT parent_id, count(*) AS child_count
+              FROM comms_news_audience
+              WHERE {$whereClause}
+              AND parent_id IS NOT NULL
+              GROUP BY parent_id
+            ) t2 ON t1.id = t2.parent_id
+            JOIN (
+              -- Group all child segments by parent to get count of parents' children.
+              -- If count-matching children == count-available children, then composite segment is a match
+              SELECT parent_id, COUNT(*) as child_count FROM comms_news_audience WHERE parent_id IS NOT NULL GROUP BY parent_id
+            ) t3 ON t1.id = t3.parent_id AND t2.child_count = t3.child_count
+        ";
+
+        // Check the exact intersect
+        $articleIds = $this->db->executeQuery($sql, $whereParams->getAll())->fetchAll(PDO::FETCH_COLUMN);
+
+        // Check more generally-audienced articles
+        /** @var array $entityValue */
+        foreach ($entityValue as $type => $value) {
+            /** @noinspection SlowArrayOperationsInLoopInspection */
+            $articleIds = \array_merge($articleIds, $this->findArticlesForAudience($type, $value));
+        }
+        return \array_unique($articleIds);
     }
 }
