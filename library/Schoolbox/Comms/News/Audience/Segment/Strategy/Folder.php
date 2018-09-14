@@ -1,7 +1,5 @@
 <?php
 /**
- * Folder
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,17 +7,15 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience\Model;
-use Schoolbox\Comms\News\Audience\Segment\ISearch;
-use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 use Schoolbox\Comms\News\Audience\Segment\ValidRestrictedSearch;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 
-class Folder implements ISearch, ITranslate
+class Folder extends Base
 {
+    public const ENTITY_TYPE = 'folder';
 
     /**
      * @var User
@@ -128,7 +124,6 @@ class Folder implements ISearch, ITranslate
             $folderMembershipSql = ' AND folder.id IN (' . implode(', ', $folderMembership) . ')';
         }
 
-        $entityType    = Model::ENTITY_TYPE_FOLDER;
         $keywordFilter = null === $searchPlaceholder ? '' : "AND (folder.name LIKE :{$searchPlaceholder} OR folder_code.code LIKE :{$searchPlaceholder})";
 
         return "
@@ -139,7 +134,7 @@ class Folder implements ISearch, ITranslate
                     THEN CONCAT(' (', GROUP_CONCAT(folder_code.code SEPARATOR ', '), ')')
                     ELSE ''
                     END) AS `name`,
-                '{$entityType}' AS entity_type
+                '{$this->getEntityType()}' AS entity_type
             FROM folder
             LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
             WHERE (
@@ -161,7 +156,6 @@ class Folder implements ISearch, ITranslate
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
-        $entityType = Model::ENTITY_TYPE_FOLDER;
         return "
             SELECT cna1.entity_type, cna1.entity_value, f.name
             FROM 
@@ -177,11 +171,20 @@ class Folder implements ISearch, ITranslate
             WHERE folder.id IN 
                 (SELECT DISTINCT entity_value
                 FROM comms_news_audience cna2
-                WHERE entity_type = '{$entityType}'
+                WHERE entity_type = '{$this->getEntityType()}'
                 AND cna2.id IN ($segmentIdsPlaceholder))
             AND folder.deleted_at IS NULL
             GROUP BY folder.id) AS f 
-            INNER JOIN comms_news_audience cna1 ON cna1.entity_value = f.id AND entity_type = '{$entityType}'
+            INNER JOIN comms_news_audience cna1 ON cna1.entity_value = f.id AND entity_type = '{$this->getEntityType()}'
         ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canTargetNullEntityValue(): bool
+    {
+        // Quite possible for a user to not have any folders
+        return true;
     }
 }

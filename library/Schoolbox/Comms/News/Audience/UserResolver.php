@@ -175,7 +175,7 @@ class UserResolver implements IUserResolver
             $parameters = ['entity_value' => $entityValue];
         }
 
-        // TODO This logic is tightly coupled to ArticleResolver::addClauses(). Snap each out into class behind interface so coupled
+        // TODO This logic is tightly coupled to ArticleResolver::addClauses(). Snap each out into class behind interface (Segment\IStrategy) so coupled
         // TODO  pairs have their implementations inside a single class in adjacent methods.
 
         switch ($entityType) {

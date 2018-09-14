@@ -9,7 +9,9 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use InvalidArgumentException;
+use Schoolbox\Comms\News\Audience\Segment\IStrategy;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 /**
  * Responsible for encapsulating the business rules:
@@ -30,36 +32,36 @@ class BusinessRules
     private const VALID_SEGMENT_RELATIONSHIPS = [
         // For composite, this is a superset of what may ultimately be available. Composites cannot have a relationship modifier
         // if any sub-segment does not support that modifier.
-        Model::ENTITY_TYPE_COMPOSITE      => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
+        Model::ENTITY_TYPE_COMPOSITE         => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
 
-        Model::ENTITY_TYPE_USER           => [Model::RELATIONSHIP_SELF],
-        Model::ENTITY_TYPE_SUPER          => [Model::RELATIONSHIP_SELF],
-        Model::ENTITY_TYPE_CAMPUS         => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
-        Model::ENTITY_TYPE_ROLE           => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
-        Model::ENTITY_TYPE_ROLE_TYPE      => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
-        Model::ENTITY_TYPE_SCHOOL_HOUSE   => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
-        Model::ENTITY_TYPE_RES_HOUSE      => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
-        Model::ENTITY_TYPE_YEAR           => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
-        Model::ENTITY_TYPE_SERVICE        => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
-        Model::ENTITY_TYPE_PASTORAL_GROUP => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
-        Model::ENTITY_TYPE_FOLDER         => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
+        Strategy\User::ENTITY_TYPE           => [Model::RELATIONSHIP_SELF],
+        Strategy\Super::ENTITY_TYPE          => [Model::RELATIONSHIP_SELF],
+        Strategy\Campus::ENTITY_TYPE         => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
+        Strategy\Role::ENTITY_TYPE           => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
+        Strategy\RoleType::ENTITY_TYPE       => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
+        Strategy\SchoolHouse::ENTITY_TYPE    => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
+        Strategy\ResHouse::ENTITY_TYPE       => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
+        Strategy\Year::ENTITY_TYPE           => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
+        Strategy\Service::ENTITY_TYPE        => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
+        Strategy\PastoralGroup::ENTITY_TYPE  => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
+        Strategy\Folder::ENTITY_TYPE         => [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF],
     ];
 
     // Is it valid for segments that target these types to target a null value, eg users
     // * who are not in a school house, or
     // * who are not in any groups.
     private const VALID_SEGMENT_NULL_ENTITIES = [
-        Model::ENTITY_TYPE_USER           => false,
-        Model::ENTITY_TYPE_SUPER          => false,
-        Model::ENTITY_TYPE_CAMPUS         => true,
-        Model::ENTITY_TYPE_ROLE           => false,
-        Model::ENTITY_TYPE_ROLE_TYPE      => false,
-        Model::ENTITY_TYPE_SCHOOL_HOUSE   => true,
-        Model::ENTITY_TYPE_RES_HOUSE      => true,
-        Model::ENTITY_TYPE_YEAR           => true,
-        Model::ENTITY_TYPE_SERVICE        => false,
-        Model::ENTITY_TYPE_PASTORAL_GROUP => true,
-        Model::ENTITY_TYPE_FOLDER         => true,
+        Strategy\User::ENTITY_TYPE           => false,
+        Strategy\Super::ENTITY_TYPE          => false,
+        Strategy\Campus::ENTITY_TYPE         => true,
+        Strategy\Role::ENTITY_TYPE           => false,
+        Strategy\RoleType::ENTITY_TYPE       => false,
+        Strategy\SchoolHouse::ENTITY_TYPE    => true,
+        Strategy\ResHouse::ENTITY_TYPE       => true,
+        Strategy\Year::ENTITY_TYPE           => true,
+        Strategy\Service::ENTITY_TYPE        => false,
+        Strategy\PastoralGroup::ENTITY_TYPE  => true,
+        Strategy\Folder::ENTITY_TYPE         => true,
     ];
 
 
@@ -77,6 +79,8 @@ class BusinessRules
      *
      * @param string $entityType
      * @return bool
+     * @deprecated
+     * @see IStrategy::canTargetNullEntityValue()
      */
     public function canTargetNullEntity(string $entityType): bool
     {
@@ -117,6 +121,7 @@ class BusinessRules
      * @param Model $audienceSegment
      * @return string[]
      * @throws InsufficientHydrationException If the segment's entity type is not set
+     * @deprecated Move to IStrategy interface
      */
     public function getValidRelationships(Model $audienceSegment): array
     {
@@ -138,6 +143,17 @@ class BusinessRules
             $validRelationships = \array_intersect($validRelationships, $this->getValidRelationships($subSegment));
         }
         return $validRelationships;
+    }
+
+
+    /**
+     * @param string $entityType
+     * @return string[]
+     * @deprecated Move to IStrategy interface
+     */
+    public function getValidRelationshipsForEntityType(string $entityType): array
+    {
+        return self::VALID_SEGMENT_RELATIONSHIPS[$entityType];
     }
 
 

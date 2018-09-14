@@ -35,7 +35,7 @@ class SearchRegistry implements ISearch
         $this->registry = [
             $campusSql = new Strategy\Campus(),
             $folderSql = new Strategy\Folder($user, $folderMapper, $roleAccessMapper, $moderationEnabled),
-            $houseSql = new Strategy\House(),
+            $houseSql = new Strategy\SchoolHouse(),
         ];
 
         /* Staff-only search capability

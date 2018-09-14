@@ -1,7 +1,5 @@
 <?php
 /**
- * Campus
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,23 +7,19 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience\Model;
-use Schoolbox\Comms\News\Audience\Segment\ISearch;
-use Schoolbox\Comms\News\Audience\Segment\ITranslate;
-
-class Campus implements ISearch, ITranslate
+class Campus extends Base
 {
+    public const ENTITY_TYPE = 'campus';
 
     /**
      * @inheritdoc
      */
     public function getSearchSql(string $searchPlaceholder = null): string
     {
-        $entityType    = Model::ENTITY_TYPE_CAMPUS;
         $keywordFilter = null === $searchPlaceholder ? '' : "WHERE `name` LIKE :{$searchPlaceholder}";
 
         return "
-            SELECT id, name, '{$entityType}' AS entity_type
+            SELECT id, name, '{$this->getEntityType()}' AS entity_type
             FROM luCampus
             {$keywordFilter}
         ";
@@ -37,12 +31,20 @@ class Campus implements ISearch, ITranslate
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
-        $entityType = Model::ENTITY_TYPE_CAMPUS;
         return "
             SELECT DISTINCT cna.entity_type, cna.entity_value, luCampus.name
             FROM comms_news_audience cna
-            INNER JOIN luCampus ON cna.entity_type = '{$entityType}' AND cna.entity_value = luCampus.id
+            INNER JOIN luCampus ON cna.entity_type = '{$this->getEntityType()}' AND cna.entity_value = luCampus.id
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canTargetNullEntityValue(): bool
+    {
+        // From a schema level, a user has 0:N campus
+        return true;
     }
 }
