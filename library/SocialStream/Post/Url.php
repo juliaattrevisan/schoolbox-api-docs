@@ -38,7 +38,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
                 // Icon
                 $iconFile = str_replace('icon:', '', $this->getThumbnail());
                 $icon = '/images/mime/' . $iconFile;
-            } else if ($this->hasThumbnail()) {
+            } elseif ($this->hasThumbnail()) {
                 // Thumbnail image
                 $icon = "/socialstream/image.php?size={$iconSize}&id=" . $this->getPostId();
             }
