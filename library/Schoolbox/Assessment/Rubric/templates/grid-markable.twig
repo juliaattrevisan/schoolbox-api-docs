@@ -100,7 +100,7 @@
                                     {% if descriptor.hasValue and showDescriptorValue and not hidePoints %}
                                         <span class="rb-value {% if not descriptorHasMarkRange %}used {% elseif isDescriptorSelected %}hide{% endif %}">
                                             {% if descriptorHasMarkRange %}
-                                                {{descriptor.minValue}}–{{descriptor.maxValue}}
+                                                {{ descriptor.minValue }}–{{ descriptor.maxValue }}
                                             {% else %}
                                                 {{ descriptor.maxValue }}
                                             {% endif %}
@@ -109,25 +109,22 @@
                                 </label>
 
                                 {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
-                                {% if useMarkRange %}
+                                {% if rubricGrid.assessment.useMarkRange %}
                                     {# Render a dropdown to select a value from the range #}
 
                                     <select id="rangeDropdown-{{ descriptor.id }}"
                                             name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
-                                            class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
-                                            {% if useMarkRange and descriptorMin != descriptorMax and not hidePoints %}used{% endif %}"
-                                            data-rubric="{{ rubric.id }}"
-                                            data-rubric-group="{{ group.id }}"
+                                            class="{% if not isDescriptorSelected or not descriptorHasMarkRange %} hide{% endif %}
+                                            {% if descriptorHasMarkRange and not hidePoints %}used{% endif %}"
+                                            data-rubric="{{ rubricGrid.id }}"
+                                            data-rubric-group="{{ groupUsage.capability.id }}"
                                             data-rubric-descriptor="{{ descriptor.id }}"
                                     >
-                                        {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
-                                        {% set rangeEnd = direction == 'asc' ? descriptorMax : descriptorMin %}
-
                                         {# Selected value: if not provided, use max #}
-                                        {% set selectedValue = descriptor.selectedValue ?? descriptorMax %}
+                                        {% set selectedValue = isDescriptorSelected ? indicatorMark.value : descriptor.maxValue %}
 
-                                        {% for i in rangeStart..rangeEnd %}
-                                            <option value={{ i }}
+                                        {% for i in descriptor.minValue..descriptor.maxValue %}
+                                            <option value="{{ i }}"
                                                     {% if i == selectedValue %}selected{% endif %}
                                             >{{ i }}
                                             </option>
@@ -252,17 +249,18 @@
 
     {% if showRubricTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
         <tr>
-            <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
+            <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
                 <span data-final-summary="{{ rubricId }}"
-                      data-scaled-mark="{{ rubric.scaledMark}}"
+                      data-scaled-mark="{{ rubric.scaledMark }}"
                       data-max="{{ rubric.max }}"
                       data-mark-type="{{ markSchemeName }}">
 
-                    {% if markSchemeName == 'TotalMarkFractional' %}
-                       {{ rubric.scaledMark }} / {{ rubric.max }}
-                    {% else %}
-                       {{ rubric.humanReadableMark }}
-                    {% endif %}
+                    {#{% if markSchemeName == 'TotalMarkFractional' %}#}
+                       {#{{ rubric.scaledMark }} / {{ rubric.max }}#}
+                    {#{% else %}#}
+                       {#{{ rubric.humanReadableMark }}#}
+                    {#{% endif %}#}
+                    {{ rubricMarkedGrid.feedback.humanReadableMark }}
                 </span>
 
                 {# Self-Assessment #}
