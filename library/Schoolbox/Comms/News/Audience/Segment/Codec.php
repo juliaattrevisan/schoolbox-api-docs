@@ -11,6 +11,8 @@ namespace Schoolbox\Comms\News\Audience\Segment;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
 use LogicException;
+use Schoolbox\Mapper;
+use DomainException;
 
 /**
  * Responsible for converting between audience segment models and their string representation.
@@ -19,9 +21,10 @@ use LogicException;
 class Codec
 {
 
-    private const DELIMITER_COMPOSITE = ':';
-    public const DELIMITER_SIMPLE = ':'; // TODO consider making private
-    private const DELIMITER_CHILDREN = ',';
+    private const DELIMITER_SELECTIZE = ',';
+    private const DELIMITER_COMPOSITE = ';';
+    private const DELIMITER_SIMPLE = ':';
+    private const DELIMITER_CHILDREN = '.';
 
     /** @var Audience\Mapper */
     private $segmentMapper;
@@ -41,7 +44,7 @@ class Codec
      *
      * @param Audience\Model $segment
      * @return string
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws Mapper\Exception\InsufficientHydrationException
      */
     public function encode(Audience\Model $segment): string
     {
@@ -70,15 +73,47 @@ class Codec
      *
      * @param string $encodedSegment
      * @return Audience\Model
-     * @throws \DomainException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws DomainException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\InsufficientHydrationException
      */
     public function decode(string $encodedSegment): Audience\Model
     {
         return 0 !== strpos($encodedSegment, Audience\Model::ENTITY_TYPE_COMPOSITE)
             ? $this->decodeSimple($encodedSegment)
             : $this->decodeComposite($encodedSegment);
+    }
+
+
+    /**
+     * Takes a value string $value and encodes it
+     *
+     * @param null|string $value
+     * @return string
+     */
+    public function encodeValue(?string $value): string
+    {
+        // This scheme supports at least the following values:
+        // [':', ',', null, 'null', '1', '', 1, '"', "'", '\\', '/', '<', '&', '!@*(@*#&)!+_!+!@']
+        return \base64_encode(\json_encode($value));
+    }
+
+
+    /**
+     * @param string $selectizeValues
+     * @return GenericCollection
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function decodeSelectizeValues(string $selectizeValues): GenericCollection
+    {
+        $rootSegments = $this->segmentMapper->createCollection();
+
+        foreach (\explode(self::DELIMITER_SELECTIZE, $selectizeValues) as $encodedSegment) {
+            // Cannot index, as may not have an id set (ie new segments)
+            $rootSegments->add($this->decode($encodedSegment));
+        }
+
+        return $rootSegments;
     }
 
 
@@ -99,21 +134,8 @@ class Codec
             $this->encodeValue($entityValue),
             $modifier,
         ];
+
         return \implode(self::DELIMITER_SIMPLE, $parts);
-    }
-
-
-    /**
-     * Takes a value string $value and encodes it
-     *
-     * @param null|string $value
-     * @return string
-     */
-    private function encodeValue(?string $value): string
-    {
-        // This scheme supports at least the following values:
-        // [':', ',', null, 'null', '1', '', 1, '"', "'", '\\', '/', '<', '&', '!@*(@*#&)!+_!+!@']
-        return \base64_encode(\json_encode($value));
     }
 
 
@@ -143,6 +165,7 @@ class Codec
             $this->encodeValue($segment->getEntityValue()),
             $segment->getRelationship(),
         ];
+
         return implode(self::DELIMITER_SIMPLE, $parts);
     }
 
@@ -152,11 +175,12 @@ class Codec
      *
      * @param string $encodedSegment
      * @return Audience\Model
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Mapper\Exception
      */
     private function decodeSimple(string $encodedSegment): Audience\Model
     {
         [$type, $id, $encodedValue, $modifier] = \explode(self::DELIMITER_SIMPLE, $encodedSegment);
+
         return $this->segmentMapper->createModel($id ? (int)$id : null)
                                    ->setEntityType($type)
                                    ->setEntityValue($this->decodeValue($encodedValue))
@@ -178,11 +202,12 @@ class Codec
         }
 
         $parts = [
-            $segment->getEntityType(),
+            $segment->getEntityType(),         // need to put 'composite' first to easily detect composites
             $segment->getId() ?: 0,
-            \implode(',', $childParts),
             $segment->getRelationship(),
+            \implode(self::DELIMITER_CHILDREN, $childParts),
         ];
+
         return implode(self::DELIMITER_COMPOSITE, $parts);
     }
 
@@ -192,9 +217,9 @@ class Codec
      *
      * @param string $encodedSegment
      * @return Audience\Model
-     * @throws \DomainException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws DomainException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\InsufficientHydrationException
      */
     private function decodeComposite(string $encodedSegment): Audience\Model
     {
@@ -218,10 +243,11 @@ class Codec
             }
         }
         if (!$distinctChildFound) {
+            $effectiveModifier = $modifier === Audience\Model::RELATIONSHIP_SELF ? $firstSegment->getRelationship() : $modifier;
             return $this->segmentMapper->createModel()
                                        ->setEntityType($firstSegment->getEntityType())
                                        ->setEntityValue($firstSegment->getEntityValue())
-                                       ->setRelationship($modifier === Audience\Model::RELATIONSHIP_SELF ? $firstSegment->getRelationship() : $modifier);
+                                       ->setRelationship($effectiveModifier);
         }
 
         return $this->segmentMapper->createModel($id ?: null)
@@ -240,6 +266,7 @@ class Codec
     private function getSortedChildSegments(GenericCollection $segments): GenericCollection
     {
         $unsorted = $segments->shallowClone();
+
         return $unsorted->sortByCallback(function (Audience\Model $left, Audience\Model $right) {
             // first sort by entityType
             if ($left->getEntityType() < $right->getEntityType()) {
