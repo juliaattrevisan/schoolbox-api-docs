@@ -236,6 +236,10 @@
 
             // The current set of articles showing for the page
             currentArticles: function() {
+                if (!this.filteredArticles.length) {
+                    return [];
+                }
+
                 var limit = {{ config.search_type_limit }};
                 var offset = (this.page-1) * limit;
                 var total = offset + limit;
