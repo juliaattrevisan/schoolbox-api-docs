@@ -212,7 +212,10 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
      */
     public function isSubmitted(Alaress_Date_Format $now = null): bool
     {
-        return self::STATE_DRAFT !== $this->getDiscreteState($now);
+        return $this->isAwaitingModeration() ||
+            $this->isAwaitingPublication() ||
+            $this->isPublished() ||
+            $this->isExpired();
     }
 
 
@@ -246,34 +249,64 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         $acceptedAt  = $this->acceptedAt && !$this->acceptedAt->isNull() ? $this->acceptedAt : null;
         $rejectedAt  = $this->rejectedAt && !$this->rejectedAt->isNull() ? $this->rejectedAt : null;
 
-        /* submitted_at is nulled when an article is rejected therefore an empty submitted_at means
-         * an article is in draft state, but there are two specific variants of a draft state:
-         * creating a new thing, and a thing that got rejected
+        /* If the rejected_at timestamp exists, this article has been rejected at some point in its lifetime
+         * Rejection details persist until an article's been accepted
          */
-        if ($rejectedAt && (!$acceptedAt || $rejectedAt->gt($acceptedAt))) {
-            return self::STATE_REJECTED;
+        if ($rejectedAt) {
+
+            /* If the submitted_at timestamp is null, the author hasn't resubmitted the article for
+             * further moderation
+             */
+            if (null === $submittedAt) {
+                return self::STATE_REJECTED;
+            }
+
+            /* If the submitted_at timestamp exists and submitted_at is greater than rejected_at, then
+             * the author has resubmitted the article and the state should be Awaiting Moderation again
+             */
+            if ($submittedAt->gt($rejectedAt)) {
+                return self::STATE_AWAITING_MODERATION;
+            }
         }
 
-        // Stubs will be treated as drafts. Assumes not possible to enter a different state if never submitted.
-        if (null === $submittedAt) {
-            return self::STATE_DRAFT;
-        }
+        /* If an article has an accepted_at value then it's either Expired, Published, or Awaiting Publication
+         */
+        if ($acceptedAt) {
+            $now = $now ?? Alaress_Date_Format::now();
 
-        // (Never accepted or resubmitted after acceptance) && (never rejected or resubmitted after rejection)
-        if ((!$acceptedAt || $submittedAt->gt($acceptedAt)) && (!$rejectedAt || $submittedAt->gt($rejectedAt))) {
+            /* We've reached the expiry_at value, so we're expired
+             */
+            if ($now->gte($this->expiresAt)) {
+                return self::STATE_EXPIRED;
+            }
+
+            /* We've reached the publish_at value, so we're published
+             */
+            if ($now->gte($this->publishAt)) {
+                return self::STATE_PUBLISHED;
+            }
+
+            /* We haven't reached the publish_at value, but we've been accepted
+             * We are therefore awaiting publication
+             */
+            if ($now->lt($this->publishAt)) {
+                return self::STATE_AWAITING_PUBLICATION;
+            }
+        } else {
+
+            /* If an article doesn't have an accepted_at value, then it must be either Draft or Awaiting Moderation
+             * (or it's previously been rejected but we covered that case already)
+             */
+            if (null === $submittedAt) {
+                return self::STATE_DRAFT;
+            }
+
             return self::STATE_AWAITING_MODERATION;
         }
 
-        // $submittedAt is not null and $acceptedAt is later than both $submittedAt and $rejectedAt
-
-        $now = $now ?? Alaress_Date_Format::now();
-
-        // An article may be archived prior to it being published
-        if ($now->gt($this->expiresAt)) {
-            return self::STATE_EXPIRED;
-        }
-
-        return $now->lt($this->publishAt) ? self::STATE_AWAITING_PUBLICATION : self::STATE_PUBLISHED;
+        /* Default unknown scenario
+         */
+        return self::STATE_DRAFT;
     }
 
 

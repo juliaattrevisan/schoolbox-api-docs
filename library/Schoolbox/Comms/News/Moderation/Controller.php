@@ -174,7 +174,12 @@ class Controller extends Base
         if ((new ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $article)) {
             $now = \Alaress_Date_Format::now();
 
+            /* Clear rejection reasons because they no longer matter
+             */
             $article
+                ->setRejectedAt(new \Alaress_Date_NullDate())
+                ->setRejectedBy(null)
+                ->setRejectedReason(null)
                 ->setAcceptedAt($now)
                 ->setAcceptedBy($this->getUser());
 
