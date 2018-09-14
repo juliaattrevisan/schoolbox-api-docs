@@ -72,14 +72,6 @@
             <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
         {% endif %}
 
-        {# Unpublish article (just a reject renamed to unpublish when the article is published or archived) #}
-        {% if isRejectable and not showReject %}
-            {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {articleId: article.id}) %}
-            {% if rejectRoute %}
-                <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
-            {% endif %}
-        {% endif %}
-
         {# Delete article #}
         {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {articleId: article.id}) %}
 
@@ -126,6 +118,14 @@
                 });
             </script>
             <li><a class="icon-delete" href="{{ deleteRoute }}" data-delete="{{ article.title }}">Delete</a></li>
+        {% endif %}
+
+        {# Unpublish article (just a reject renamed to unpublish when the article is published or archived) #}
+        {% if isRejectable and not showReject %}
+            {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {articleId: article.id}) %}
+            {% if rejectRoute %}
+                <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
+            {% endif %}
         {% endif %}
 
         {# Statistics link: must be author or comms officer and article must be published #}
