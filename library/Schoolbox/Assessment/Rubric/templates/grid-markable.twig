@@ -86,7 +86,7 @@
                                        data-rubric="{{ rubricGrid.assessment.id }}"
                                        data-rubric-group="{{ groupUsage.capability.id }}"
                                        data-rubric-descriptor="{{ descriptor.id }}"
-                                       {% if descriptor.selected %}checked="checked"{% endif %}
+                                       {% if isDescriptorSelected %}checked="checked"{% endif %}
                                 />
 
                                 <label for="{{ inputId }}">
