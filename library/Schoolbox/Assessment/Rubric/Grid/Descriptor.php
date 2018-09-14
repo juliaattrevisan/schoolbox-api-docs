@@ -39,6 +39,28 @@ class Descriptor
 
 
     /**
+     * Does this descriptor have either a min or max value?
+     *
+     * @return bool
+     */
+    public function hasValue(): bool
+    {
+        return !(null === $this->minValue && null === $this->maxValue);
+    }
+
+
+    /**
+     * Does this descriptor have a range?
+     *
+     * @return bool
+     */
+    public function hasRange(): bool
+    {
+        return $this->hasValue() && $this->minValue !== $this->maxValue;
+    }
+
+
+    /**
      * @return null|string
      */
     public function getDescription(): ?string
