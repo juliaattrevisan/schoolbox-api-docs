@@ -21,15 +21,17 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
      */
     public function determineIcon($iconSize = 'square64'): string
     {
+        $iconDirectory = '/images/mime/';
+
         /* Default icon as a fallback */
-        $icon = '/images/mime/application-document.svg';
+        $icon = $iconDirectory . 'application-document.svg';
 
         /* Attempt to load the icon for this mimetype as set in Admin > Allowed Files
          * (sysadmins can choose their own icons)
          */
         try {
             $iconFile = MimetypeMapper::getInstance()->getByFilename($this->getExternalTitle())->getIconFile();
-            $icon = '/images/mime/' . $iconFile;
+            $icon = $iconDirectory . $iconFile;
         } catch (FileException $e) {
             /* Mimetype unknown? Try to load either an icon or a thumbnail image
              * specified in the DB for this social stream post
@@ -37,7 +39,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
             if (stristr($this->getThumbnail(), 'icon:')) {
                 // Icon
                 $iconFile = str_replace('icon:', '', $this->getThumbnail());
-                $icon = '/images/mime/' . $iconFile;
+                $icon = $iconDirectory . $iconFile;
             } elseif ($this->hasThumbnail()) {
                 // Thumbnail image
                 $icon = "/socialstream/image.php?size={$iconSize}&id=" . $this->getPostId();
