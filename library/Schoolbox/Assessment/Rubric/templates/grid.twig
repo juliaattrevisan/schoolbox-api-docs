@@ -31,7 +31,7 @@
 
     {% for groupIndex, groupUsage in rubricGrid.capabilityUsages %}
 
-        {% set rowspan        = groupUsage.indicatorUsages|length + (showGroupTotal ? 1 : 0) %}
+        {% set rowspan        = groupUsage.indicatorUsages|length + (rubricGrid.assessment.markPerCapability ? 1 : 0) %}
         {% set capabilitymark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
 
         {% for critIndex, critUsage in groupUsage.indicatorUsages %}
@@ -57,23 +57,20 @@
                         {#{% set learnerSelected      = learnerRubric.descriptors[crit.id][levelIndex].selected %}#}
 
                         {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
+                        {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
 
-                        <td {% if isDescriptorSelected and markVisibility %}class="rb-selected"{% endif %}>
+                        <td {% if isMarkDisplayed %}class="rb-selected"{% endif %}>
                             <div>
                                 <p>
                                     {{- descriptor.description|nl2br -}}
                                 </p>
                                 {% if descriptor.hasValue and config.rubric_show_points %}
                                     <aside>
-                                        {% set direction = rubric.descriptorMetadata[crit.id].direction %}
-                                        {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex].min %}
-                                        {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
-
-                                        {% if grid.assessment.useMarkRange and descriptor.hasRange %}
-                                            {% if isDescriptorSelected and markVisibility %}
+                                        {% if rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
+                                            {% if isMarkDisplayed %}
                                                 <span class="range-selection-value">{{ indicatorMark.value }}</span>
                                             {% endif %}
-                                            <span class="range {% if isDescriptorSelected and markVisibility %}selected{% endif %}">
+                                            <span class="range {% if isMarkDisplayed %}selected{% endif %}">
                                                 {{descriptor.minValue}}–{{descriptor.maxValue}}
                                             </span>
                                         {% else %}
@@ -100,7 +97,7 @@
         {% endfor %}
 
         {# Capability mark: needs to be rendered in human-readable form, use the assessment's mark scheme to do so #}
-        {% if showGroupTotal and capabilitymark %}
+        {% if rubricGrid.assessment.markPerCapability and capabilitymark %}
             <tr>
                 <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 1 }}">
                     {{ capabilitymark.value }}
