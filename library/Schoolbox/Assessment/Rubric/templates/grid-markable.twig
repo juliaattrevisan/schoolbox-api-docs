@@ -1,7 +1,20 @@
+{##
+ # This template must support both an empty and a marked grid.
+ #
+ # Parameters:
+ # * rubricGrid:              the base rubric grid object
+ # * rubricMarkedGrid:        the marked rubric grid, shouldst there be one
+ # * learnerRubricMarkedGrid: the self-assessed marked grid, shouldst there be one
+ # * markVisibility:          ? Should be inferred from grid's assessment (assessment.isVisibleTo(USER))
+ # * useMarkRange:            ? Should be inferred from grid's assessment (assessment.markRange)
+ # * showGroupTotal:          ? Should be inferred from grid's assessment (assessment.markPerCapability)
+ #}
+
+
 {% import '@learningMarkScheme/macro/limitDecimal.twig' as limit_decimal %}
 
 {% set formField = 'rubric' %}
-{% set rubricId = 'rb-' ~ rubric.id %}
+{% set rubricId = 'rb-' ~ rubricGrid.assessment.id %}
 {% set markType = markType ?: { mode: 'raw' } %}
 {% set showDescriptorValue = showDescriptorValue ? true : false %}
 {% set showGroupTotal = showGroupTotal ? true : false %}
@@ -14,85 +27,87 @@
 
         {# Suppress level headings if none have names #}
         {% set hasLevels = false %}
-        {% for level in rubric.levels if level.name | trim | length %}
+        {% for level in rubricGrid.levels if level.name | trim | length %}
             {% set hasLevels = true %}
         {% endfor %}
         {% if hasLevels  %}
         <thead>
             <tr>
                 <th colspan="2">&nbsp;</th>
-                {% for level in rubric.levels %}
+                {% for level in rubricGrid.levels %}
                 <th>{{ level.name }}</th>
                 {% endfor %}
             </tr>
         </thead>
         {% endif %}
         <tbody>
-            {% for groupIndex, group in rubric.groups %}
+            {% for groupIndex, groupUsage in rubricGrid.capabilityUsages %}
                 {# Use rowspans when group total is visible, otherwise don't need it
                  # This is only off when self-reflecting with a grid that doesn't show descriptor points
                  # and groups - here, it never shows the group subtotal, and rowspan calcs are off
                  #}
-                {% set rowspan = group.criteria|length + (showGroupTotal and markSchemeName != "None" ? 1 : 0) %}
+                {% set rowspan = groupUsage.indicatorUsages|length + (rubricGrid.assessment.markPerCapability and markSchemeName != "None" ? 1 : 0) %}
 
-                {% for critIndex, crit in group.criteria %}
-                <tr data-group="{{ rubricId }}-{{ group.id }}">
+                {% for critIndex, critUsage in groupUsage.indicatorUsages %}
+                <tr data-group="{{ rubricId }}-{{ critUsage.indicator.id }}">
                     {# yay html tables... -_-; #}
                     {% if rowspan %}
-                        <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name }}</span></th>
+                        <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ groupUsage.capability.name }}</span></th>
                         {% set rowspan = 0 %}
                     {% endif %}
 
-                    <th class="rb-criterion-name">{{ crit.name }}</th>
+                    <th class="rb-criterion-name">{{ critUsage.indicator.name }}</th>
 
                     {# Required so that this form is recognised as containing a rubric, even if nothing is submitted #}
                     <input name="saveEmpty" value="true" type="hidden"/>
 
-                    {% for levelIndex, level in rubric.levels %}
-                        {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
+                    {% set indicatorId             = critUsage.indicator.id %}
+                    {% set indicatorMark           = rubricMarkedGrid ? rubricMarkedGrid.retrieveIndicatorMark(critUsage) : null %}
+                    {% set indicatorMarkDescriptor = indicatorMark    ? indicatorMark.descriptor                          : null %}
+
+                    {% for levelIndex, level in rubricGrid.levels %}
+
+                        {% set descriptor = critUsage.retrieveDescriptor(levelIndex) %}
 
                         {% if descriptor %}
 
-                            {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
+                            {% set inputId %}{{ formField }}[{{ indicatorId }}][{{ level.id }}]{% endset %}
+                            {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
+                            {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
 
                             {# Self-Assessment #}
-                            {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex].selected %}
+                            {#{% set learnerSelected = learnerRubric.descriptors[indicatorId][levelIndex].selected %}#}
                             <td>
                                 <input id="{{ inputId }}"
                                        name="{{ formField }}[descriptors][{{ descriptor.id }}][selected]"
                                        value="1"
                                        type="checkbox"
-                                       data-value="{{ descriptor.value }}"
-                                       data-rubric="{{ rubric.id }}"
-                                       data-rubric-group="{{ group.id }}"
+                                       data-value="{{ descriptor.maxValue }}"
+                                       data-rubric="{{ rubricGrid.assessment.id }}"
+                                       data-rubric-group="{{ groupUsage.capability.id }}"
                                        data-rubric-descriptor="{{ descriptor.id }}"
                                        {% if descriptor.selected %}checked="checked"{% endif %}
                                 />
 
                                 <label for="{{ inputId }}">
                                     <span class="rb-description">
-                                        {{- descriptor.text|nl2br -}}
+                                        {{- descriptor.description|nl2br -}}
                                     </span>
 
-                                    {% set direction = rubric.descriptorMetadata[crit.id].direction %}
-                                    {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex].min %}
-                                    {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
+                                    {% set descriptorHasMarkRange = rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
 
                                     {# Just show a text value if the descriptor is not selected #}
-                                    {% if descriptor.value is not null and showDescriptorValue and not hidePoints %}
-                                        <span class="rb-value {% if descriptorMin == descriptorMax or not useMarkRange %}used {% elseif descriptor.selected %}hide{% endif %}">
-                                            {% if useMarkRange and descriptorMin != descriptorMax %}
-                                                {% if direction == 'asc' %}
-                                                    {{- descriptorMin -}} - {{- descriptorMax -}}
-                                                {% else %}
-                                                    {{- descriptorMax -}} - {{- descriptorMin -}}
-                                                {% endif %}
+                                    {% if descriptor.hasValue and showDescriptorValue and not hidePoints %}
+                                        <span class="rb-value {% if not descriptorHasMarkRange %}used {% elseif isDescriptorSelected %}hide{% endif %}">
+                                            {% if descriptorHasMarkRange %}
+                                                {{descriptor.minValue}}–{{descriptor.maxValue}}
                                             {% else %}
-                                                {{ descriptor.value }}
+                                                {{ descriptor.maxValue }}
                                             {% endif %}
                                         </span>
                                     {% endif %}
                                 </label>
+
                                 {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
                                 {% if useMarkRange %}
                                     {# Render a dropdown to select a value from the range #}
@@ -120,11 +135,11 @@
                                     </select>
                                 {% endif %}
 
-                                {% if learnerSelected %}
-                                    <img class="rb-self-reflection-choice"
-                                         src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
-                                         title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
-                                {% endif %}
+                                {#{% if learnerSelected %}#}
+                                    {#<img class="rb-self-reflection-choice"#}
+                                         {#src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"#}
+                                         {#title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />#}
+                                {#{% endif %}#}
 
                             </td>
 
@@ -220,15 +235,15 @@
                     </span>
 
                     {# Self-Assessment #}
-                    {% if learnerRubric %}
-                        {% if latestSelfReflectedFeedback.isSelfGrading %}
-                            {% set selfReflectionName = locale.selfAssessment.proper %}
-                        {% else %}
-                            {% set selfReflectionName = locale.selfReflection.proper %}
-                        {% endif %}
+                    {#{% if learnerRubric %}#}
+                        {#{% if latestSelfReflectedFeedback.isSelfGrading %}#}
+                            {#{% set selfReflectionName = locale.selfAssessment.proper %}#}
+                        {#{% else %}#}
+                            {#{% set selfReflectionName = locale.selfReflection.proper %}#}
+                        {#{% endif %}#}
 
-                        ({{ learnerRubric.groups[group.id].humanReadableMark }} given in {{ selfReflectionName }})
-                    {% endif %}
+                        {#({{ learnerRubric.groups[group.id].humanReadableMark }} given in {{ selfReflectionName }})#}
+                    {#{% endif %}#}
                 </th>
             </tr>
         {% endif %}
@@ -251,15 +266,15 @@
                 </span>
 
                 {# Self-Assessment #}
-                {% if learnerRubric %}
-                    {% if latestSelfReflectedFeedback.isSelfGrading %}
-                        {% set selfReflectionName = locale.selfAssessment.proper %}
-                    {% else %}
-                        {% set selfReflectionName = locale.selfReflection.proper %}
-                    {% endif %}
+                {#{% if learnerRubric %}#}
+                    {#{% if latestSelfReflectedFeedback.isSelfGrading %}#}
+                        {#{% set selfReflectionName = locale.selfAssessment.proper %}#}
+                    {#{% else %}#}
+                        {#{% set selfReflectionName = locale.selfReflection.proper %}#}
+                    {#{% endif %}#}
 
-                    ({{ learnerRubric.humanReadableMark }} given in {{ selfReflectionName }})
-                {% endif %}
+                    {#({{ learnerRubric.humanReadableMark }} given in {{ selfReflectionName }})#}
+                {#{% endif %}#}
             </th>
         </tr>
     {% endif %}
