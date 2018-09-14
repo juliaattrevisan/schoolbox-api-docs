@@ -14,6 +14,7 @@ use Schoolbox\Comms\News\Audience;
 use Schoolbox\Role;
 use Alaress\Specification;
 use Schoolbox\Comms\News\Audience\Validation;
+use Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 class ValidSegmentTest extends PHPUnit\Framework\TestCase
 {
@@ -90,7 +91,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 (new Audience\Model())
                     ->setId(1)
                     ->setCommsNewsArticle(new News\Model())
-                    ->setEntityType(Audience\Model::ENTITY_TYPE_USER)
+                    ->setEntityType(Strategy\User::ENTITY_TYPE)
                     ->setEntityValue('230')
                     ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
             ],
@@ -98,7 +99,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 (new Audience\Model())
                     ->setId(2)
                     ->setCommsNewsArticle(new News\Model())
-                    ->setEntityType(Audience\Model::ENTITY_TYPE_SUPER)
+                    ->setEntityType(Strategy\Super::ENTITY_TYPE)
                     ->setEntityValue(Audience\Model::ENTITY_VALUE_SUPER)
                     ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
             ],
@@ -106,7 +107,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 (new Audience\Model())
                     ->setId(3)
                     ->setCommsNewsArticle(new News\Model())
-                    ->setEntityType(Audience\Model::ENTITY_TYPE_CAMPUS)
+                    ->setEntityType(Strategy\Campus::ENTITY_TYPE)
                     ->setEntityValue('2')
                     ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
             ],
@@ -114,7 +115,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 (new Audience\Model())
                     ->setId(4)
                     ->setCommsNewsArticle(new News\Model())
-                    ->setEntityType(Audience\Model::ENTITY_TYPE_ROLE_TYPE)
+                    ->setEntityType(Strategy\RoleType::ENTITY_TYPE)
                     ->setEntityValue(Role::STUDENT)
                     ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
             ],
@@ -132,7 +133,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
             [
                 (new Audience\Model())
                     ->setId(1)
-                    ->setEntityType(Audience\Model::ENTITY_TYPE_USER)
+                    ->setEntityType(Strategy\User::ENTITY_TYPE)
                     ->setEntityValue('230')
                     ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
                 Specification\ExclusiveOr::class,
@@ -143,7 +144,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                     ->setId(2)
                     ->setCommsNewsArticle(new News\Model())
                     ->setParent(new Audience\Model())
-                    ->setEntityType(Audience\Model::ENTITY_TYPE_SUPER)
+                    ->setEntityType(Strategy\Super::ENTITY_TYPE)
                     ->setEntityValue(Audience\Model::ENTITY_VALUE_SUPER)
                     ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
                 Specification\ExclusiveOr::class,
@@ -153,7 +154,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 (new Audience\Model())
                     ->setId(3)
                     ->setCommsNewsArticle(new News\Model())
-                    ->setEntityType(Audience\Model::ENTITY_TYPE_ROLE_TYPE)
+                    ->setEntityType(Strategy\RoleType::ENTITY_TYPE)
                     ->setEntityValue(Role::STUDENT),
                 Specification\Conjunction::class,
                 'No relationship',
@@ -193,7 +194,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
         $grandchild = (new Audience\Model())
             ->setId(2)
             ->setParent($parent)
-            ->setEntityType(Audience\Model::ENTITY_TYPE_USER)
+            ->setEntityType(Strategy\User::ENTITY_TYPE)
             ->setRelationship(Audience\Model::RELATIONSHIP_SELF);
 
         $grandparent->getChildren()[] = $parent;
