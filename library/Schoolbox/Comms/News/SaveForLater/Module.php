@@ -142,22 +142,15 @@ class Module extends BaseModule
 
 
     /**
-     * Returns a lazy auth rule do determine if a user can view their 'save-for-later' list
+     * Returns an auth rule do determine if the user the user is logged in to view their 'save-for-later' list
      *
      * @return Rule\IAuthorizationRule
      */
     private function getAuthRuleCanViewList(): Rule\IAuthorizationRule
     {
-        return new Rule\LazyCallback(function () {
-            return new Rule\Callback(function () {
-                // Intentionally not catching mapper exception, that's a 5xx, not 4xx
-                $policy = $this->getPolicyMapper()->findOneByColumn('identifier', 'save_for_later');
-                if (!$policy->getValue()) {
-                    throw new InvalidPath('This feature has been disabled.');
-                }
-                return true;
-            });
-        });
+        return new Rule\All(
+            new Rule\IsLoggedIn()
+        );
     }
 
     /**
