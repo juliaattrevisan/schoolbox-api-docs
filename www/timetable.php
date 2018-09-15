@@ -61,9 +61,9 @@ if ($_SESSION['user']->getRole()->isParent()) {
         }
     }
     //
-    // Requesting a child that isn't yours? Access Denied
+    // Requesting a child that isn't yours or does not exist, page not found
     if (empty($userList)) {
-        error(19);
+        $this->pageNotFound();
     }
 } else {
     if ($child_id) {
