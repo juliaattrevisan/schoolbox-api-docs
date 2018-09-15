@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -23,8 +23,8 @@ class Mapper extends Schoolbox\Mapper
         $this->hasTable('homepage_log');
 
         $this->uses('datetime', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'lastAccessTime');
-        $this->joins('user_id', UserMapper::class, 'id', self::TYPE_MODEL, null, 'user', 'user');
-        $this->joins('folder_id', FolderMapper::class, 'id', self::TYPE_MODEL, null, 'folder', 'folder');
+        $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->joins('folder_id', FolderMapper::class, 'id', null, null, 'folder', 'folder');
         $this->uses('hitcount', self::TYPE_INTEGER);
     }
 
@@ -34,7 +34,7 @@ class Mapper extends Schoolbox\Mapper
      *
      * @return String
      */
-    public function getUpdateString()
+    public function getUpdateString(): string
     {
         return '`hitcount` = `hitcount` + 1, `datetime` = NOW()';
     }
@@ -42,8 +42,9 @@ class Mapper extends Schoolbox\Mapper
     /**
      * Increments hit count for this user and category.
      *
-     * @param int|User         $user     A User object or user ID
-     * @param int|Folder\Model $folder A Category object or ID
+     * @param int|User         $user A User object or user ID
+     * @param Folder\Model $folder A Category object or ID
+     * @throws Schoolbox\Mapper\Exception
      */
     public function incrementHitcount($user, $folder)
     {
@@ -69,8 +70,9 @@ class Mapper extends Schoolbox\Mapper
      * Get the last time a person visited this place
      *
      * @param Folder\Model $folder
-     * @param User $user
+     * @param User         $user
      * @return Schoolbox\Collection|Model[]
+     * @throws Schoolbox\Mapper\Exception
      */
     public function lastVisit(Folder\Model $folder, User $user)
     {
@@ -86,9 +88,9 @@ class Mapper extends Schoolbox\Mapper
 
         $statement = $this->database->prepare($query);
         $statement->execute(array(
-            'folderId' => $folder->getId(),
-            'userId' => $user->getId()
-        ));
+                                'folderId' => $folder->getId(),
+                                'userId'   => $user->getId(),
+                            ));
 
         /* Manually construct hierarchy of items
          */

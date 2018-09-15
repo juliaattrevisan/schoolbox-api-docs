@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -10,13 +10,13 @@
 namespace Schoolbox\Resource\Folder\Log;
 
 use Alaress_Date_Format;
-use Schoolbox\Resource\Folder;
+use \Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 
 class Model
 {
     /**
-     * @var Folder\Model
+     * @var FolderModel
      */
     protected $folder;
 
@@ -40,19 +40,21 @@ class Model
      */
 
     /**
-     * @param  Folder\Model $folder
+     * @param  FolderModel $folder
      *
      * @return $this
      */
-    public function setFolder($folder) {
+    public function setFolder(FolderModel $folder): self
+    {
         $this->folder = $folder;
         return $this;
     }
 
     /**
-     * @return Folder\Model
+     * @return FolderModel
      */
-    public function getFolder() {
+    public function getFolder(): FolderModel
+    {
         return $this->folder;
     }
 
@@ -61,7 +63,8 @@ class Model
      *
      * @return $this
      */
-    public function setHitcount($hitcount) {
+    public function setHitcount($hitcount): self
+    {
         $this->hitcount = $hitcount;
         return $this;
     }
@@ -69,7 +72,8 @@ class Model
     /**
      * @return int
      */
-    public function getHitcount() {
+    public function getHitcount(): int
+    {
         return $this->hitcount;
     }
 
@@ -78,7 +82,8 @@ class Model
      *
      * @return $this
      */
-    public function setLastAccessTime($last_access_time) {
+    public function setLastAccessTime($last_access_time): self
+    {
         $this->last_access_time = $last_access_time;
         return $this;
     }
@@ -86,7 +91,8 @@ class Model
     /**
      * @return Alaress_Date_Format
      */
-    public function getLastAccessTime() {
+    public function getLastAccessTime(): Alaress_Date_Format
+    {
         return $this->last_access_time;
     }
 
@@ -95,7 +101,8 @@ class Model
      *
      * @return $this
      */
-    public function setUser($user) {
+    public function setUser($user): self
+    {
         $this->user = $user;
         return $this;
     }
@@ -103,7 +110,8 @@ class Model
     /**
      * @return User
      */
-    public function getUser() {
+    public function getUser(): User
+    {
         return $this->user;
     }
 
