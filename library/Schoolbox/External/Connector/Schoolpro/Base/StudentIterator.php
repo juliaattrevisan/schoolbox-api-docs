@@ -11,11 +11,61 @@
 
 namespace Schoolbox\External\Connector\Schoolpro\Base;
 
+use IteratorIterator;
 use Schoolbox\External\Normalise;
-use Schoolbox\Sync\Iterator\Student;
+use Schoolbox\External\Normalise\User;
+use Schoolbox\Sync\Iterator\StackableHelper;
 
-class StudentIterator extends Student
+class StudentIterator extends IteratorIterator
 {
+    use StackableHelper;
+
+    /**
+     * @var User\Student|null
+     */
+    private $currentItem;
+
+
+    /**
+     * @return bool
+     */
+    public function valid()
+    {
+        return $this->currentItem instanceof User\Student;
+    }
+
+
+    /**
+     * Return the current element
+     *
+     * @return User\Student|null
+     */
+    public function current()
+    {
+        return $this->currentItem;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function next()
+    {
+        $this->getInnerIterator()->next();
+        $this->loadCurrent();
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function rewind()
+    {
+        parent::rewind();
+        $this->loadCurrent();
+    }
+
+
     /**
      * Performs the transformation of database row to Student object
      * @return void
@@ -104,5 +154,14 @@ class StudentIterator extends Student
         ;
 
         $this->setCurrentItem($student);
+    }
+
+
+    /**
+     * @param User\Student|null $currentItem
+     */
+    protected function setCurrentItem(User\Student $currentItem = null)
+    {
+        $this->currentItem = $currentItem;
     }
 }
