@@ -50,7 +50,7 @@
                 {% set capabilityMark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
 
                 {% for critIndex, critUsage in groupUsage.indicatorUsages %}
-                <tr data-group="{{ rubricId }}-{{ critUsage.indicator.id }}">
+                <tr data-group="{{ rubricId }}-{{ groupUsage.capability.id }}">
                     {# yay html tables... -_-; #}
                     {% if rowspan %}
                         <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ groupUsage.capability.name }}</span></th>
