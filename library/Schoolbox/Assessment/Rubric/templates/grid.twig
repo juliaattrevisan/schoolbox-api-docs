@@ -32,7 +32,7 @@
     {% for groupIndex, groupUsage in rubricGrid.capabilityUsages %}
 
         {% set rowspan        = groupUsage.indicatorUsages|length + (rubricGrid.assessment.markPerCapability ? 1 : 0) %}
-        {% set capabilitymark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
+        {% set capabilityMark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
 
         {% for critIndex, critUsage in groupUsage.indicatorUsages %}
             <tr>
@@ -97,10 +97,10 @@
         {% endfor %}
 
         {# Capability mark: needs to be rendered in human-readable form, use the assessment's mark scheme to do so #}
-        {% if rubricGrid.assessment.markPerCapability and capabilitymark %}
+        {% if rubricGrid.assessment.markPerCapability and capabilityMark %}
             <tr>
                 <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
-                    {{ capabilitymark.value }}
+                    {{ capabilityMark.retrieveHumanReadableMark }}
 
                     {# Self-Assessment #}
                     {#{% if learnerRubric %}#}
@@ -116,7 +116,7 @@
     {% if showRubricTotal and rubricMarkedGrid %}
         <tr>
             <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
-                {{ rubricMarkedGrid.feedback.humanReadableMark }}
+                {{ rubricMarkedGrid.retrieveHumanReadableMark }}
 
                 {# Self-Assessment #}
                 {#{% if learnerRubric %}#}
