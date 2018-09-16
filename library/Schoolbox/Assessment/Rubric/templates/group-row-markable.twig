@@ -1,12 +1,10 @@
-
-
 {# Take down this elephant one leg at a time #}
-{% set capabilityId = groupUsage.capability.id %}
-{% set capabilityScaledMark = '' %}
+{% set capabilityId         = groupUsage.capability.id %}
+{% set capabilityScaledMark = capabilityMark.value %}
 
 {# What could the difference between these two things possibly be? #}
 {% set capabilityMaxValue = groupUsage.maxValue %}
-{% set capabilityMaxSum = '' %}
+{% set capabilityMaxSum   = groupUsage.calculateMaxValueFromIndicators %}
 
 {% if showGroupTotal and markSchemeName != "None" and not hidePoints %}
     {% set percentageMark = capabilityMaxSum > 0 ? capabilityMark.value * (100 / capabilityMaxSum) : 0 %}
@@ -33,6 +31,7 @@
                    name="{{ formField }}[groups][{{ capabilityId }}][unscaledMark]">
 
             {# This is the maximum capability mark, which wouldn't get POSTed otherwise #}
+            {# TODO don't post this: instead use the marked grid to calculate it #}
             <input type="hidden"
                    value="{{ capabilityMaxValue }}"
                    name="{{ formField }}[groups][{{ capabilityId }}][max]">
