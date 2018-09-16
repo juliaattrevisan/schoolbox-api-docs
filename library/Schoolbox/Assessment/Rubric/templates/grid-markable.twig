@@ -615,7 +615,7 @@
 
         // If not multi-select, simulate radio behaviour per row (simpler to do this than intercept radio checked event!)
         {# TODO I have no idea what multiSelect is, and AFAICT it's always false #}
-        {% if not rubric.multiSelect %}
+        {#{% if not rubric.multiSelect %}#}
         // Can't delegate this, as auto-mark will run before it can un-check siblings
         $('[data-rubric-descriptor]').on('change', function(event){
 
@@ -630,7 +630,7 @@
                 }
             });
         });
-        {% endif %}
+        {#{% endif %}#}
 
         /**
          *
