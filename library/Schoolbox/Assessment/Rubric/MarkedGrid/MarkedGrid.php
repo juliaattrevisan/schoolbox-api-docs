@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 
 /**
  * A marked rubric grid.
@@ -105,7 +106,10 @@ class MarkedGrid
             $totalWeight += $capabilityMark->getCapabilityUsage()->getMaxValue();
         }
 
-        return sprintf('%d / %d', $totalMark, $totalWeight);
+        // TODO make this work with the assessment's mark type?
+        // (copy-pasted from CapabilityMark humanReadableMark)
+        $markScheme = new TotalMarkFractional($totalWeight);
+        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($totalMark));
     }
 
 
