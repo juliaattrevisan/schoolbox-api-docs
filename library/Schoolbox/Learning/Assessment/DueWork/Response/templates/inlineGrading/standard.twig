@@ -247,10 +247,10 @@ Usage:
                                     } only %}
                                 </label>
 
-                                {% if assessment.useRubric and rubricContext and not readonly %}
+                                {% if assessment.useRubric and not readonly %}
                                     {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
                                         locale: locale,
-                                        rubricContext: rubricContext
+                                        rubricId: assessment.rubricGrid.id,
                                     } only %}
                                 {% endif %}
                             </div>

@@ -2,8 +2,9 @@
  # The Assign From Rubric button
  #
  # locale
- # RubricContext rubricContext
+ # rubricId: the rubric's ID
  #}
+{% autoescape 'js' %}
 <script>
     $(function () {
 
@@ -11,7 +12,7 @@
         var $status                 = $('#assessment-status'),
             markInputSelector      = '[data-mark-input]',
             $assignFromRubricButton = $('#use-rubric-value'),
-            $rb                     = $('#rb-{{ rubricContext.rubric.id }}'),
+            $rb                     = $('#rb-{{ rubricId }}'),
             finalSummarySelector    = '[data-final-summary]',
             markType = $rb.find("[data-final-summary]").data("mark-type");
 
@@ -111,3 +112,4 @@
     });
 </script>
 <p><button id="use-rubric-value" class="full-width">Assign <span data-rubric-sum></span> from Rubric</button></p>
+{% endautoescape %}
