@@ -70,9 +70,7 @@
                                             {% if isMarkDisplayed %}
                                                 <span class="range-selection-value">{{ indicatorMark.value }}</span>
                                             {% endif %}
-                                            <span class="range {% if isMarkDisplayed %}selected{% endif %}">
-                                                {{descriptor.minValue}}–{{descriptor.maxValue}}
-                                            </span>
+                                            <span class="range {% if isMarkDisplayed %}selected{% endif %}">{{descriptor.minValue}}–{{descriptor.maxValue}}</span>
                                         {% else %}
                                             {{ descriptor.maxValue }}
                                         {% endif %}
