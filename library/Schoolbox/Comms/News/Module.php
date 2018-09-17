@@ -18,6 +18,7 @@ use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
+use Schoolbox\Resource\Folder;
 
 
 class Module extends BaseModule
@@ -32,21 +33,20 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
-     * @throws InvalidArgumentException
      */
     protected function registerRoutes(): void
     {
 
         /* Anyone can spawn new articles, visit the archive or index
          */
-        $viewPerms = new Rule\LazyCallback(function() {
+        $loggedIn = new Rule\LazyCallback(function() {
             return new Rule\All(
                 new Rule\IsLoggedIn()
             );
         });
 
-        /* For reading articles, you need to be logged in and be either the Author/Moderator;
-         * or the article is publicly accessible
+        /* To see an article, you must be a SU, CommsOfficer, Moderator, or the article must be published/expired
+         * and either publicly visible, or you are in the audience
          */
         $readerPerms = new Rule\LazyCallback(function () {
             /** @var UserResolver $userResolver */
@@ -54,19 +54,30 @@ class Module extends BaseModule
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
-                    new Authorizer\Rule\IsAuthorOrModerator($this->getNewsMapper()),
-                    new Authorizer\Rule\IsPubliclyReadable($this->getNewsMapper(), $userResolver)
+                    new Rule\IsSuperuser(),
+                    new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
+                    new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper()),
+                    new Rule\All(
+                        new Authorizer\Rule\IsPublishedOrExpired(),
+                        new Rule\Any(
+                            new Authorizer\Rule\IsShareable(),
+                            new Authorizer\Rule\IsMemberOfArticleAudience($userResolver)
+                        )
+                    )
                 )
             );
         });
 
-        /* The current user modify the article
-         * Supers, Comms Officers, Article Authors
-         */
-        $modifyPerms = new Rule\LazyCallback(function () {
+        // Can modify if any of: Supers, Comms Officers, Article Authors, Article audience moderators
+        $canModify = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
-                new Authorizer\Rule\IsAuthorOrModerator($this->getNewsMapper())
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
+                    new Authorizer\Rule\IsArticleAuthor(),
+                    new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper())
+                )
             );
         });
 
@@ -74,81 +85,44 @@ class Module extends BaseModule
             return $this->preloadArticle($params);
         };
 
-        /* Create news article
-         */
-        $this->register('GET', '/create', 'getCreate', $viewPerms);
-        $this->register('POST', '/create', 'postCreate', $viewPerms);
+        $preloadArticleWithAudience = function ($params) {
+            return $this->preloadArticleWithAudience($params);
+        };
 
-        /* (async) Get a list of topics to chooze
-         */
-        $this->register('GET', '/topics', 'getTopics', $viewPerms);
-
-        /* Update news article
-         */
-        $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $modifyPerms, $preloadArticle);
-        $this->register('POST', '/{articleId:\d+}', 'postUpdate', $modifyPerms, $preloadArticle);
-
-        /* Delete article
-         */
-        $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', $modifyPerms, $preloadArticle);
-
-        /* View news article
-         */
-        $this->register('GET', '/{articleId:\d+}', 'getDetail', $readerPerms, $preloadArticle);
-
-        /* (async) Get a list of articles audienced to me, by topic
-         */
-        $this->register('GET', '/list{/year,month}', 'getListByTopic', $viewPerms);
-
-        /* News Archive
-         */
-        $this->register('GET', '/archive{/year,month}', 'getArchive', $viewPerms);
+        $this->register('GET', '/create', 'getCreate', $loggedIn);                                               // Create news article
+        $this->register('POST', '/create', 'postCreate', $loggedIn);
+        $this->register('GET', '/topics', 'getTopics', $loggedIn);                                               // (async) Get a list of topics to chooze
+        $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $canModify, $preloadArticleWithAudience); // Update news article
+        $this->register('POST', '/{articleId:\d+}', 'postUpdate', $canModify, $preloadArticleWithAudience);
+        $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $canModify, $preloadArticle);     // Find out who will receive this article
+        $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', $canModify, $preloadArticle);           // Delete article
+        $this->register('GET', '/{articleId:\d+}', 'getDetail', $readerPerms, $preloadArticle);                  // View news article
+        $this->register('GET', '/list{/year,month}', 'getListByTopic', $loggedIn);                               // (async) Get a list of articles audienced to me, by topic
+        $this->register('GET', '/archive{/year,month}', 'getArchive', $loggedIn);                                // News Archive
+        $this->register('GET', '', 'getIndex', $loggedIn);                                                       // Index of articles audienced to you
 
         // Index of articles authored by the logged in user
-        $this->register('GET', '/me', 'getAuthored', $viewPerms);
+        $this->register('GET', '/me', 'getAuthored', $loggedIn);
 
         // (async) Get a list of articles a user has authored
-        $this->register('GET', '/me/articles', 'getAuthoredArticles', $viewPerms);
-
-        /* Find out who will receive this article
-         */
-        $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $modifyPerms, $preloadArticle);
-
-        /* Index of articles audienced to you
-         */
-        $this->register('GET', '', 'getIndex', $viewPerms);
+        $this->register('GET', '/me/articles', 'getAuthoredArticles', $loggedIn);
     }
 
 
     /**
-     * Preload the news article
-     *
-     * @param array $params
-     * @return array
-     * @throws \Schoolbox\Application\Exception\NotFound
-     * @throws InvalidArgumentException
-     * @throws NotFound
+     * @inheritdoc
      */
-    private function preloadArticle(array $params) :array
+    public function initControllers(ContainerInterface $injector): void
     {
-        try {
-            $article = $this->getNewsMapper()->findById($params['articleId']);
-        } catch (MapperException $e) {
-            throw new NotFound('Unknown news article.');
-        }
-
-        return [
-            'article' => $article,
-        ];
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
     /**
-     * @return \Schoolbox\Mapper|Mapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * {@inheritdoc}
      */
-    private function getNewsMapper(): Mapper
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
-        return $this->getMapperFactory()->get(Mapper::class);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 
@@ -166,38 +140,99 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(Error\Mapper::class),
-            'newsMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
-            'policyMapper' => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
-            'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class),
-            'saveForLaterMapper' => $this->getMapperFactory()->getLazy(SaveForLater\Mapper::class),
-            'statisticsMapper' => $this->getMapperFactory()->getLazy(Statistics\Mapper::class),
+            'errorMapper'                => $this->getMapperFactory()->getLazy(Error\Mapper::class),
+            'newsMapper'                 => $this->getMapperFactory()->getLazy(Mapper::class),
+            'policyMapper'               => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
+            'topicMapper'                => $this->getMapperFactory()->getLazy(TopicMapper::class),
+            'saveForLaterMapper'         => $this->getMapperFactory()->getLazy(SaveForLater\Mapper::class),
+            'statisticsMapper'           => $this->getMapperFactory()->getLazy(Statistics\Mapper::class),
             'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(Statistics\Cumulative\Mapper::class),
-            'audienceMapper' => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
-            'roleAccessMapper' => $this->getMapperFactory()->getLazy(Access\RoleAccessMapper::class),
-            'folderMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Resource\Folder\Mapper::class),
-            'databaseInternal' => $injector->lazyGet('databaseInternal'),
+            'audienceMapper'             => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
+            'roleAccessMapper'           => $this->getMapperFactory()->getLazy(Access\RoleAccessMapper::class),
+            'folderMapper'               => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
+            'databaseInternal'           => $injector->lazyGet('databaseInternal'),
 
             /* Hyperdrive injection
              */
-            'articleResolver' => $injector->lazyGet('commsNewsArticleResolver'),
-            'userResolver' => $injector->lazyGet('commsNewsUserResolver'),
+            'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
+            'userResolver'               => $injector->lazyGet('commsNewsUserResolver'),
         ];
     }
 
+
     /**
-     * @inheritdoc
+     * Preload the news article
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Application\Exception\NotFound
+     * @throws InvalidArgumentException
+     * @throws NotFound
      */
-    public function initControllers(ContainerInterface $injector): void
+    private function preloadArticle(array $params): array
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        try {
+            return [
+                'article' => $this->getArticleMapper()->findById($params['articleId']),
+            ];
+        } catch (MapperException $e) {
+            throw new NotFound('Unknown news article.', 0, $e);
+        }
     }
 
     /**
-     * {@inheritdoc}
+     * Preload the news article with audience hydrated
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Application\Exception\NotFound
+     * @throws InvalidArgumentException
+     * @throws NotFound
+     * @throws \DomainException
      */
-    public function initTemplatePaths(IChainLoader $templateLoader): void
+    private function preloadArticleWithAudience(array $params): array
     {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+        $args = $this->preloadArticle($params);
+        /** @var Model $article */
+        $article = $args['article'];
+        $article->setAudience($this->getAudienceMapper()->findForArticle($article->getId()));
+        return $args;
+    }
+
+    /**
+     * @return \Schoolbox\Mapper|Mapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    private function getArticleMapper(): Mapper
+    {
+        return $this->getMapperFactory()->get(Mapper::class);
+    }
+
+
+    /**
+     * @return \Schoolbox\Mapper|Audience\Mapper
+     * @throws InvalidArgumentException
+     */
+    private function getAudienceMapper(): Audience\Mapper
+    {
+        return $this->getMapperFactory()->get(Audience\Mapper::class);
+    }
+
+    /**
+     * @return \Schoolbox\Mapper|Access\UserAccessMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    private function getUserAccessMapper(): Access\UserAccessMapper
+    {
+        return $this->getMapperFactory()->get(Access\UserAccessMapper::class);
+    }
+
+    /**
+     * @return \Schoolbox\Mapper|Folder\Mapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    private function getFolderMapper(): Folder\Mapper
+    {
+        return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
 }
