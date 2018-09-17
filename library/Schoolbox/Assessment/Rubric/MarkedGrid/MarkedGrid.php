@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 
 /**
@@ -99,17 +100,20 @@ class MarkedGrid
      */
     public function retrieveHumanReadableMark(): string
     {
-        $totalMark   = 0;
-        $totalWeight = 0;
+        $value    = 0;
+        $maxValue = 0;
         foreach ($this->capabilityMarks as $capabilityMark) {
-            $totalMark   += $capabilityMark->getValue();
-            $totalWeight += $capabilityMark->getCapabilityUsage()->getMaxValue();
+            $value    += $capabilityMark->getValue();
+            $maxValue += $capabilityMark->getCapabilityUsage()->getMaxValue();
         }
 
         // TODO make this work with the assessment's mark type?
         // (copy-pasted from CapabilityMark humanReadableMark)
-        $markScheme = new TotalMarkFractional($totalWeight);
-        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($totalMark));
+//        $markScheme = new TotalMarkFractional($maxValue);
+//        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($value));
+        $markScheme = new Percentage();
+        $percent    = min(max($value / $maxValue * 100, 0), 100);
+        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($percent));
     }
 
 
