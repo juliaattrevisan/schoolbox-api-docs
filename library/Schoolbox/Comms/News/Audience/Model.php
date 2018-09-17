@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\Segment\Codec;
 use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
@@ -51,6 +52,9 @@ class Model
 
     // The value of segments targeted to superusers
     public const ENTITY_VALUE_SUPER       = '1';
+
+
+    public const DEPTH_SEGMENT_TREE_MAX   = 1;
 
 
     /**
