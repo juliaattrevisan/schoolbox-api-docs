@@ -1,7 +1,5 @@
 <?php
 /**
- * Module
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -15,11 +13,11 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
-use Schoolbox\UserMapper;
+
 
 class Module extends BaseModule
 {
@@ -142,23 +140,14 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Mapper|UserMapper
+     * @return \Schoolbox\Mapper|Mapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
-    protected function getNewsMapper()
+    private function getNewsMapper(): Mapper
     {
         return $this->getMapperFactory()->get(Mapper::class);
     }
 
-
-    /**
-     * @return Mapper|ErrorMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    protected function getErrorMapper()
-    {
-        return $this->getMapperFactory()->get(ErrorMapper::class);
-    }
 
     /**
      * Override with any steps required for a controller and its routes
@@ -174,7 +163,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+            'errorMapper' => $this->getMapperFactory()->getLazy(Error\Mapper::class),
             'newsMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
             'policyMapper' => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
             'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class),
