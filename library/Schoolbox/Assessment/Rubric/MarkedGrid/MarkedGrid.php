@@ -109,8 +109,12 @@ class MarkedGrid
 
         // TODO make this work with the assessment's mark type?
         // (copy-pasted from CapabilityMark humanReadableMark)
+
+        // Total mark
 //        $markScheme = new TotalMarkFractional($maxValue);
 //        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($value));
+
+        // Percentage
         $markScheme = new Percentage();
         $percent    = min(max($value / $maxValue * 100, 0), 100);
         return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($percent));

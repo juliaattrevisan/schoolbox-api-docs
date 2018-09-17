@@ -69,6 +69,8 @@ class CapabilityMark
      */
     public function retrieveHumanReadableMark(): string
     {
+        $value    = $this->getValue();
+        $maxValue = $this->getCapabilityUsage()->getMaxValue();
         // TODO make this work with the assessment's mark type?
         // It will need to be passed in though.
 
@@ -76,15 +78,14 @@ class CapabilityMark
         // $value is a human-readable value;
         // it needs to be normalized, and then human-readable in the format
         // that assessment marks are usually displayed in.
-//        $markScheme = new TotalMarkFractional($this->getCapabilityUsage()->getMaxValue());
-//        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($this->getValue()));
+
+        // Total mark
+//        $markScheme = new TotalMarkFractional($maxValue);
+//        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($value));
+
+        // Percentage
         $markScheme = new Percentage();
-
-        $value      = $this->getValue();
-        $maxValue   = $this->getCapabilityUsage()->getMaxValue();
-
         $percent    = min(max($value / $maxValue * 100, 0), 100);
-
         return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($percent));
     }
 
