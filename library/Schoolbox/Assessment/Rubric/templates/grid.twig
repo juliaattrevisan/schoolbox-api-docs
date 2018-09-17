@@ -10,6 +10,7 @@
  # * showGroupTotal:          ? Should be inferred from grid's assessment (assessment.markPerCapability)
  #}
 
+{% set markSchemeName = rubricGrid.assessment.markScheme.title %}
 
 <div class="scrollable">
 <table class="rb stack-for-medium-down">
@@ -31,7 +32,7 @@
 
     {% for groupIndex, groupUsage in rubricGrid.capabilityUsages %}
 
-        {% set rowspan        = groupUsage.indicatorUsages|length + (rubricGrid.assessment.markPerCapability ? 1 : 0) %}
+        {% set rowspan        = groupUsage.indicatorUsages|length + (rubricGrid.assessment.markPerCapability and markSchemeName != "None" ? 1 : 0) %}
         {% set capabilityMark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
 
         {% for critIndex, critUsage in groupUsage.indicatorUsages %}
@@ -95,7 +96,7 @@
         {% endfor %}
 
         {# Capability mark: needs to be rendered in human-readable form, use the assessment's mark scheme to do so #}
-        {% if rubricGrid.assessment.markPerCapability and capabilityMark %}
+        {% if rubricGrid.assessment.markPerCapability and capabilityMark and markSchemeName != "None" %}
             <tr>
                 <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
                     {{ capabilityMark.retrieveHumanReadableMark }}
@@ -111,7 +112,7 @@
     {% endfor %}
 
     {# Overall mark #}
-    {% if showRubricTotal and rubricMarkedGrid %}
+    {% if showRubricTotal and rubricMarkedGrid and markSchemeName != "None" %}
         <tr>
             <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
                 {{ rubricMarkedGrid.retrieveHumanReadableMark }}
