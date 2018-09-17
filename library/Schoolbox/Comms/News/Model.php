@@ -11,7 +11,9 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
+use DomainException;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Json\Api\AuraLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -137,6 +139,16 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
      */
     private $topics;
 
+    /** @var GenericCollection|Audience\Model[] */
+    private $audience;
+
+
+    public function __construct()
+    {
+        /** @noinspection PhpUnhandledExceptionInspection (impossible as we're not adding items) */
+        $this->audience = new GenericCollection(Audience\Model::class);
+    }
+
 
     /* Conveniences
      */
@@ -145,62 +157,68 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     /**
      * Returns whether articles is a draft. Stubs will return true.
      *
+     * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isDraft(): bool
+    public function isDraft(Alaress_Date_Format $now = null): bool
     {
-        return self::STATE_DRAFT === $this->getDiscreteState();
+        return self::STATE_DRAFT === $this->getDiscreteState($now);
     }
 
 
     /**
+     * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isAwaitingModeration(): bool
+    public function isAwaitingModeration(Alaress_Date_Format $now = null): bool
     {
-        return self::STATE_AWAITING_MODERATION === $this->getDiscreteState();
+        return self::STATE_AWAITING_MODERATION === $this->getDiscreteState($now);
     }
 
 
     /**
      * This news has been rejected
      *
+     * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isRejected(): bool
+    public function isRejected(Alaress_Date_Format $now = null): bool
     {
-        return self::STATE_REJECTED === $this->getDiscreteState();
+        return self::STATE_REJECTED === $this->getDiscreteState($now);
     }
 
 
     /**
+     * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isAwaitingPublication(): bool
+    public function isAwaitingPublication(Alaress_Date_Format $now = null): bool
     {
-        return self::STATE_AWAITING_PUBLICATION === $this->getDiscreteState();
+        return self::STATE_AWAITING_PUBLICATION === $this->getDiscreteState($now);
     }
 
 
     /**
      * Returns whether this article is in the 'published' state
      *
+     * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isPublished(): bool
+    public function isPublished(Alaress_Date_Format $now = null): bool
     {
-        return self::STATE_PUBLISHED === $this->getDiscreteState();
+        return self::STATE_PUBLISHED === $this->getDiscreteState($now);
     }
 
 
     /**
      * Returns whether this article is in the 'expired' (aka 'archived') state
      *
+     * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isExpired(): bool
+    public function isExpired(Alaress_Date_Format $now = null): bool
     {
-        return self::STATE_EXPIRED === $this->getDiscreteState();
+        return self::STATE_EXPIRED === $this->getDiscreteState($now);
     }
 
 
@@ -212,10 +230,10 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
      */
     public function isSubmitted(Alaress_Date_Format $now = null): bool
     {
-        return $this->isAwaitingModeration() ||
-            $this->isAwaitingPublication() ||
-            $this->isPublished() ||
-            $this->isExpired();
+        return $this->isAwaitingModeration($now) ||
+            $this->isAwaitingPublication($now) ||
+            $this->isPublished($now) ||
+            $this->isExpired($now);
     }
 
 
@@ -652,6 +670,27 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
 
     /**
+     * @return Audience\Model[]|GenericCollection
+     */
+    public function getAudience(): GenericCollection
+    {
+        return $this->audience;
+    }
+
+
+    /**
+     * @param Collection|Audience\Model[] $audience
+     * @throws DomainException If the new collection contains items of an incompatible type
+     * @return $this
+     */
+    public function setAudience(Collection $audience): self
+    {
+        $this->audience->replaceWith($audience);
+        return $this;
+    }
+
+
+    /**
      * @return array
      */
     public function getDefaultJsonMap(): array
@@ -685,5 +724,4 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
             'statistics' => new AuraLink('commsNewsStatistics.getOverview', [ 'articleId' => $this->getId() ]),
         ];
     }
-
 }

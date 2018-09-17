@@ -11,6 +11,9 @@ namespace Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\GenericCollection;
+use InvalidArgumentException;
+use PDOStatement;
+use PDO;
 
 /**
  * @method Model createModel($idValue = null)
@@ -31,6 +34,7 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * @inheritdoc
+     * @throws InvalidArgumentException
      */
     protected function mapping(): void
     {
@@ -39,9 +43,84 @@ class Mapper extends \Schoolbox\Mapper
 
         $this->uses(self::FIELD_ID, self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins(self::FIELD_COMMS_NEWS_ARTICLE_ID, News\Mapper::class, 'id', null, null, 'commsNewsArticle', 'commsNewsArticle');
-        $this->joins(self::FIELD_PARENT_ID,  self::class, 'id', null, null, 'parent', 'parent');
+        $this->joins(self::FIELD_PARENT_ID, self::class, 'id', null, null, 'parent', 'parent');
+        $this->joinsReverseMulti(self::FIELD_PARENT_ID, self::class, 'children', 'children');
         $this->uses(self::FIELD_ENTITY_TYPE, self::TYPE_STRING);
         $this->uses(self::FIELD_ENTITY_VALUE, self::TYPE_STRING);
         $this->uses(self::FIELD_RELATIONSHIP, self::TYPE_STRING);
     }
+
+    /**
+     * Attempt to join to both parent and children
+     *
+     * @return string
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT    {$this->getColumnString()},
+                      {$this->getJoinColumnString('parent', 'parent')},
+                      {$this->getJoinColumnString('children', 'child')}
+            FROM      {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('parent', '', 'parent')}
+            LEFT JOIN {$this->getJoinSql('children', '', 'child')}
+        ";
+    }
+    /**
+     * Returns a structured collection of segments.
+     *
+     * ie, composite segments will be linked to their child components, which are linked back to the parent composite segment.
+     *
+     * Parent and children are always hydrated.
+     *
+     * @param PDOStatement $statement
+     * @return Model[]|GenericCollection
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $idColumn       = $this->getIdentifierColumn();
+        $parentIdColumn = "parent.{$this->getIdentifierColumn()}";
+        $childIdColumn  = "child.{$this->getIdentifierColumn()}";
+        $segments = $this->createCollection();
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            // Hydrate Segment
+            $id = $row[$idColumn];
+            if (!$segments->offsetExists($id)) {
+                $segments[$id] = $this->hydrate($row);
+            }
+            $segment = $segments[$id];
+            // Link parent back to child if this is a child of a composite.
+            $parentId = $row[$parentIdColumn];
+            if ($parentId) {
+                $parent = $this->hydrate($row, 'parent');
+                $segment->setParent($parent);
+                /** @noinspection NullPointerExceptionInspection */
+                $parent->getChildren()[$id] = $segment;
+            }
+            // Optionally hydrate children
+            $childId = $row[$childIdColumn];
+            if ($childId) {
+                $child = $this->hydrate($row, 'child');
+                /** @noinspection NullPointerExceptionInspection */
+                $child->setParent($segments[$id]);
+                $segments[$id]->getChildren()[$childId] = $child;
+            }
+        }
+        return $segments;
+    }
+    /**
+     * Efficiently returns an article's audience segment structure for attaching to an article
+     *
+     * @param int   $articleId
+     * @param array $options
+     * @return GenericCollection|Model[]
+     */
+    public function findForArticle(int $articleId, array $options = []): GenericCollection
+    {
+        return $this->findByColumn(self::FIELD_COMMS_NEWS_ARTICLE_ID, $articleId, $options);
+    }
+
 }
