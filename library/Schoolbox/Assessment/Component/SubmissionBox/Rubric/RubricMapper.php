@@ -34,6 +34,7 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -647,7 +648,14 @@ class RubricMapper
     {
         $grid       = $this->retrieveGrid($feedback->getAssessable(), false);
         $rowSet     = $grid->getRowSet();
-        $markedGrid = new MarkedGrid($feedback, $grid);
+
+        $markSchemeFactory = new MarkSchemeFactory();
+        $gridMarkScheme    = $markSchemeFactory->spawnMarkSchemeFor(
+            $feedback->getAssessable(),
+            $grid->calculateMaxValueFromCapabilities()
+        );
+
+        $markedGrid = new MarkedGrid($feedback, $grid, $gridMarkScheme);
 
         // What goes in the grid?
         // * Capability (fka group) marks
@@ -696,7 +704,11 @@ class RubricMapper
             }
 
             // Create the cap mark
-            $capabilityMark = (new CapabilityMark($capabilityUsage))
+            $capabilityMarkScheme = $markSchemeFactory->spawnMarkSchemeFor(
+                $feedback->getAssessable(),
+                $capabilityUsage->calculateMaxValueFromIndicators()
+            );
+            $capabilityMark = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
                 ->setValue($capabilityMarkModel->getValue());
 
             // Associate indicator mark models with indicator marks

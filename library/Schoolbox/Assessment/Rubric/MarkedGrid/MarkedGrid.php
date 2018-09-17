@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
@@ -44,6 +45,12 @@ class MarkedGrid
 
 
     /**
+     * @var IMarkScheme
+     */
+    private $markScheme;
+
+
+    /**
      * @var GenericCollection|CapabilityMark[]
      */
     private $capabilityMarks;
@@ -52,13 +59,15 @@ class MarkedGrid
     /**
      * Constructor
      *
-     * @param IFeedback $feedback
-     * @param Grid      $grid
+     * @param IFeedback   $feedback
+     * @param Grid        $grid
+     * @param IMarkScheme $markScheme
      */
-    public function __construct(IFeedback $feedback, Grid $grid)
+    public function __construct(IFeedback $feedback, Grid $grid, IMarkScheme $markScheme)
     {
         $this->feedback        = $feedback;
         $this->grid            = $grid;
+        $this->markScheme      = $markScheme;
         $this->capabilityMarks = new GenericCollection(CapabilityMark::class);
     }
 
@@ -111,9 +120,11 @@ class MarkedGrid
         // TODO make this work with the assessment's mark type?
         // (copy-pasted from CapabilityMark humanReadableMark)
 
+        return $this->markScheme->getHumanReadableMark($this->markScheme->getNormalisedMark($value));
+
         // None
-        $markScheme = new None();
-        return $markScheme->getHumanReadableMark($value);
+//        $markScheme = new None();
+//        return $markScheme->getHumanReadableMark($value);
 
         // Total mark
 //        $markScheme = new TotalMarkFractional($maxValue);

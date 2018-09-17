@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
@@ -29,6 +30,12 @@ class CapabilityMark
 
 
     /**
+     * @var IMarkScheme
+     */
+    private $markScheme;
+
+
+    /**
      * @var GenericCollection|IndicatorMark[]
      */
     private $indicatorMarks;
@@ -44,10 +51,12 @@ class CapabilityMark
      * Constructor
      *
      * @param CapabilityUsage $capabilityUsage
+     * @param IMarkScheme     $markScheme
      */
-    public function __construct(CapabilityUsage $capabilityUsage)
+    public function __construct(CapabilityUsage $capabilityUsage, IMarkScheme $markScheme)
     {
         $this->capabilityUsage = $capabilityUsage;
+        $this->markScheme      = $markScheme;
         $this->indicatorMarks  = new GenericCollection(IndicatorMark::class);
     }
 
@@ -80,9 +89,11 @@ class CapabilityMark
         // it needs to be normalized, and then human-readable in the format
         // that assessment marks are usually displayed in.
 
+        return $this->markScheme->getHumanReadableMark($this->markScheme->getNormalisedMark($value));
+
         // None
-        $markScheme = new None();
-        return $markScheme->getHumanReadableMark($value);
+//        $markScheme = new None();
+//        return $markScheme->getHumanReadableMark($value);
 
         // Total mark
 //        $markScheme = new TotalMarkFractional($maxValue);
