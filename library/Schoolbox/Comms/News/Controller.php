@@ -1,18 +1,17 @@
 <?php
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
+
 namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
-use Alaress\Web\Output\Html;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
@@ -175,7 +174,6 @@ class Controller extends Base
 
         /* Spawn an empty news with default settings
          */
-        /** @var Model $article */
         $article = $this->newsMapper->createModel()
                                     ->setPublishAt(\Alaress_Date_Format::now())
                                     ->setExpiresAt(\Alaress_Date_Format::now());
@@ -205,10 +203,9 @@ class Controller extends Base
             ->setMimeFilter('image/*');
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
-            'policies' => $policies,
-            'action' => 'Create',
-            'user' => $this->getUser(),
-            'article' => $article,
+            'policies'         => $policies,
+            'action'           => 'Create',
+            'article'          => $article,
             'featureImageZone' => $zone->getTwigContext(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
@@ -242,7 +239,7 @@ class Controller extends Base
     /**
      * Provide form to update a news article
      *
-     * @api GET /comms/news/{articleId}/update
+     * @api   GET /comms/news/{articleId}/update
      * @level 18.1
      *
      * @param Model $article
@@ -252,12 +249,11 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
+     * @throws MapperException\InsufficientHydrationException
      */
     public function getUpdate(Model $article): void
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
-
-        $moderationRequired = $policies->getOffset('global_moderation')->getValue();
 
         /* Feature image
          */
@@ -271,24 +267,45 @@ class Controller extends Base
             $zone->attachFiles([$article->getFeatureImage()->getHash()]);
         }
 
-        /* Audiencing decoration
-         */
+        $codec = new Audience\Segment\Codec($this->audienceMapper);
 
-        /** @var Html $outputFormatter */
-        $outputFormatter = $this->getDi()->get('webOutput:nochrome');
+        $translator = new Audience\Segment\Translator(
+            $this->databaseInternal,
+            $this->getUser(),
+            $this->folderMapper,
+            $this->roleAccessMapper,
+            $this->isGlobalModerationEnabled()
+        );
+        $translator->buildCache($article);
 
-        $audiencingData = (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper, $this->roleAccessMapper, $moderationRequired))->load($article);
-        $audiencingHtml = (new Audience\Segment\HtmlFormatter($outputFormatter))->decorate($audiencingData);
+        // Audiencing selectize data
+        $audienceSegments = [];
+        foreach($article->getAudience() as $segment){
+            // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
+            // Labels are used in brick rendering
+            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
+
+            // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
+            if($segment->isSimple()) {
+                $encodedValue = $codec->encodeValue($segment->getEntityValue());
+                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
+            } else {
+                foreach($segment->getChildren() as $child){
+                    $encodedValue = $codec->encodeValue($child->getEntityValue());
+                    $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
+                }
+            }
+            $audienceSegments[] = $option;
+        }
+
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
-            'policies' => $policies,
-            'action' => 'Update',
-            'user' => $this->getUser(),
-            'article' => $article,
-            'featureImageZone' => $zone->getTwigContext(),
-            'audience' => $audiencingHtml,
-            'relationshipParentsOf' => Audience\Segment\Codec::AUDIENCE_SEPARATOR . Audience\Model::RELATIONSHIP_PARENTS_OF,
-            'relationshipTeachersOf' => Audience\Segment\Codec::AUDIENCE_SEPARATOR . Audience\Model::RELATIONSHIP_TEACHERS_OF
+            'policies'               => $policies,
+            'action'                 => 'Update',
+            'article'                => $article,
+            'featureImageZone'       => $zone->getTwigContext(),
+            'audienceSegments'       => $audienceSegments,
+            'isCommsOfficer'         => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -312,10 +329,7 @@ class Controller extends Base
     {
         try {
 
-            /* TODO: Check that the current session user is allowed to modify this $article
-             */
-
-            $this->persist($article, $this->getRequest()->post);
+            $this->persist($article, $this->getRequest()->post->getArrayCopy());
 
             /* Save a draft of the news article
              * This can occur from either the Create or Update context
@@ -377,7 +391,7 @@ class Controller extends Base
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
      */
-    private function persist(Model $article, $data): void
+    private function persist(Model $article, array $data): void
     {
         $article
             ->setTitle($data['title'])
@@ -415,10 +429,16 @@ class Controller extends Base
 
         $this->newsMapper->save($article);
 
-        /* Set audiencing options via the hyperdrive
-         */
-        $transactor = new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
-        $transactor->save($article, $this->getRequest()->post['audience']);
+        // Persist audience segments
+        $transactor = new Audience\Segment\Transactor(
+            $this->getUser(),
+            $this->audienceMapper,
+            new Audience\Segment\Codec($this->audienceMapper),
+            $this->folderMapper,
+            $this->roleAccessMapper,
+            $this->isGlobalModerationEnabled()
+        );
+        $transactor->save($article, $data['audience'] ?? '');
     }
 
 
