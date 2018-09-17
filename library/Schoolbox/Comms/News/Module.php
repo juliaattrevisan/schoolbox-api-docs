@@ -68,15 +68,19 @@ class Module extends BaseModule
             );
         });
 
-        // Can modify if any of: Supers, Comms Officers, Article Authors, Article audience moderators
+        // Can modify if any of: Supers, Comms Officers, Article audience moderators, or
+        // You are the author, and the article is not yet accepted
         $canModify = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
-                    new Authorizer\Rule\IsArticleAuthor(),
-                    new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper())
+                    new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper()),
+                    new Rule\All(
+                        new Authorizer\Rule\IsArticleAuthor(),
+                        new Authorizer\Rule\IsNotYetAccepted()
+                    )
                 )
             );
         });

@@ -221,6 +221,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         return self::STATE_EXPIRED === $this->getDiscreteState($now);
     }
 
+    // Composite states.
 
     /**
      * This news has been submitted
@@ -230,10 +231,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
      */
     public function isSubmitted(Alaress_Date_Format $now = null): bool
     {
-        return $this->isAwaitingModeration($now) ||
-            $this->isAwaitingPublication($now) ||
-            $this->isPublished($now) ||
-            $this->isExpired($now);
+        $submittedStates = [self::STATE_AWAITING_MODERATION, self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
+        return \in_array($this->getDiscreteState($now), $submittedStates, true);
     }
 
 
