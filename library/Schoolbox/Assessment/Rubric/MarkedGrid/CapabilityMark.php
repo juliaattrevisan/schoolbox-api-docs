@@ -64,6 +64,20 @@ class CapabilityMark
 
 
     /**
+     * Calculates the capability's mark, with a scaling factor applied.
+     *
+     * @return float
+     */
+    public function calculateScaledMark(): float
+    {
+        $actualMaxValue  = $this->capabilityUsage->getMaxValue();
+        $derivedMaxValue = $this->capabilityUsage->calculateMaxValueFromIndicators();
+        $scalingFactor   = $derivedMaxValue ? ($actualMaxValue / $derivedMaxValue) : 0;
+        return $scalingFactor ? $this->value / $scalingFactor : 0;
+    }
+
+
+    /**
      * Render the capability's mark in normalized format.
      *
      * @return float
