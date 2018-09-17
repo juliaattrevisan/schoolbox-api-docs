@@ -11,6 +11,8 @@ use RangeException;
 
 abstract class AbstractMarkScheme implements IMarkScheme
 {
+    public const SLUG = 'raw';
+
     const TITLE = 'Abstract Mark Scheme';
 
     /**
@@ -100,5 +102,15 @@ abstract class AbstractMarkScheme implements IMarkScheme
     public function isQualitative()
     {
         return !static::QUANTITATIVE;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function generateContext(): array
+    {
+        return [
+            'mode' => static::SLUG,
+        ];
     }
 }

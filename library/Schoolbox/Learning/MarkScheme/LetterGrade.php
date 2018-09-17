@@ -14,6 +14,8 @@ use Schoolbox\Learning\Assessment\IResponse;
 
 class LetterGrade extends AbstractMarkScheme
 {
+    public const SLUG = 'letter';
+
     const TITLE = 'Letter Grade';
 
     /** @var GradeGroup */

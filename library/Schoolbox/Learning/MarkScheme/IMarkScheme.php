@@ -71,4 +71,13 @@ interface IMarkScheme
      * @return string
      */
     public static function getTitle();
+
+    /**
+     * Generates a context for this mark scheme.
+     *
+     * TODO I don't really want to do this, this should instead be a decorator?
+     *
+     * @return array
+     */
+    public function generateContext(): array;
 }
