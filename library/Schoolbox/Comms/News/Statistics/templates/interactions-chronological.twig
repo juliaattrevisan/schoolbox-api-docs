@@ -133,13 +133,13 @@
         }
 
         {# Load initially #}
-        reloadInteractionsVsTime("{{ routeLookupIfAuthorized('commsNewsStatistics.getInteractionsVsTime', {articleId: article.id}) }}", $('#scale').val());
+        reloadInteractionsVsTime("{{ routeLookupIfAuthorized('commsNewsStatistics.getInteractionsVsTime', {article: article, articleId: article.id}) }}", $('#scale').val());
 
         {# Reload upon selection #}
         $('#scale').on('change', function (event) {
             event.preventDefault();
 
-            reloadInteractionsVsTime("{{ routeLookupIfAuthorized('commsNewsStatistics.getInteractionsVsTime', {articleId: article.id}) }}", $(this).val());
+            reloadInteractionsVsTime("{{ routeLookupIfAuthorized('commsNewsStatistics.getInteractionsVsTime', {article: article, articleId: article.id}) }}", $(this).val());
         });
     });
 </script>
