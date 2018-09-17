@@ -89,7 +89,7 @@ class CapabilityMark
         // it needs to be normalized, and then human-readable in the format
         // that assessment marks are usually displayed in.
 
-        return $this->markScheme->getHumanReadableMark($this->markScheme->getNormalisedMark($value));
+        return $this->markScheme->getHumanReadableMark($value / $maxValue * 100);
 
         // None
 //        $markScheme = new None();
