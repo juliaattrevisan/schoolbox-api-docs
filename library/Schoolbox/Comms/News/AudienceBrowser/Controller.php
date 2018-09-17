@@ -1,27 +1,23 @@
 <?php
-declare(strict_types=1);
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
+
 namespace Schoolbox\Comms\News\AudienceBrowser;
 
 use Alaress\Web\Controller\Base;
-use HouseMapper;
-use Schoolbox\CampusMapper;
-use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\GenericCollection;
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\Pastoral;
+use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\RoleMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 use PDO;
-use Schoolbox\ValueLabelInterface;
 use Schoolbox\Comms\News;
+use InvalidArgumentException;
 
 class Controller extends Base
 {
@@ -30,34 +26,9 @@ class Controller extends Base
     private $db;
 
     /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
-
-    /**
-     * @var RoleMapper
-     */
-    private $roleMapper;
-
-    /**
-     * @var HouseMapper
-     */
-    private $houseMapper;
-
-    /**
-     * @var FolderMapper
+     * @var Folder\Mapper
      */
     private $folderMapper;
-
-    /**
-     * @var Pastoral\Group\Mapper
-     */
-    private $pastoralGroupMapper;
-
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
 
     /**
      * @var Audience\Mapper
@@ -72,42 +43,26 @@ class Controller extends Base
     /** @var News\Policy\Mapper */
     private $policyMapper;
 
+
     /**
-     * Controller constructor.
-     *
      * @param IConnector            $db
-     * @param CampusMapper          $campusMapper
-     * @param RoleMapper            $roleMapper
-     * @param HouseMapper           $houseMapper
-     * @param FolderMapper          $folderMapper
-     * @param Pastoral\Group\Mapper $pastoralGroupMapper
-     * @param UserMapper            $userMapper
+     * @param Folder\Mapper         $folderMapper
      * @param Audience\Mapper       $audienceMapper
      * @param RoleAccessMapper      $roleAccessMapper
      * @param News\Policy\Mapper    $policyMapper
      */
     public function __construct(
         IConnector $db,
-        CampusMapper $campusMapper,
-        RoleMapper $roleMapper,
-        HouseMapper $houseMapper,
-        FolderMapper $folderMapper,
-        Pastoral\Group\Mapper $pastoralGroupMapper,
-        UserMapper $userMapper,
+        Folder\Mapper $folderMapper,
         Audience\Mapper $audienceMapper,
         RoleAccessMapper $roleAccessMapper,
         News\Policy\Mapper $policyMapper
     ) {
-        $this->db           = $db;
-        $this->campusMapper = $campusMapper;
-        $this->roleMapper = $roleMapper;
-        $this->houseMapper = $houseMapper;
-        $this->folderMapper = $folderMapper;
-        $this->pastoralGroupMapper = $pastoralGroupMapper;
-        $this->userMapper = $userMapper;
-        $this->audienceMapper = $audienceMapper;
+        $this->db               = $db;
+        $this->folderMapper     = $folderMapper;
+        $this->audienceMapper   = $audienceMapper;
         $this->roleAccessMapper = $roleAccessMapper;
-        $this->policyMapper = $policyMapper;
+        $this->policyMapper     = $policyMapper;
     }
 
 
@@ -116,297 +71,83 @@ class Controller extends Base
      *
      * @api /comms/news/audiencebrowser/search
      * @level 18.1
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
     public function getSearch(): void
     {
-        $searchResult = [];
+        $codec           = new Audience\Segment\Codec($this->audienceMapper);
+        $strategyFactory = $this->buildStrategyFactory();
+        $strategies      = $strategyFactory->makeAll();
+        $searchRegistry  = new Audience\Segment\SearchRegistry($this->getUser(), $strategies);
+        $placeholder     = 'keyword';
+        $statement       = $this->db->prepareQuery($searchRegistry->getSearchSql($placeholder));
+        $escapedKeyword  = $this->db->escapeForLike($this->getRequest()->query['query']);
 
-        $registry = new Audience\Segment\SearchRegistry($this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
-        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
+        $statement->execute([$placeholder => "%{$escapedKeyword}%"]);
 
-        $placeholder = 'keyword';
-        $statement   = $this->userMapper->getDatabase()->prepare($registry->getSearchSql($placeholder));
-
-        $escapedKeyword = $this->db->escapeForLike($this->getRequest()->query['query']);
-        $statement->execute([
-            $placeholder => "%{$escapedKeyword}%",
-        ]);
-
-        /* Set up the RELATIONSHIP_SELF variant first then add Parents and Teachers modifiers
-         */
+        $options = [];
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $data = $this->generateDecoratedDataTuple($row, $translator);
 
-            /* One-dimensional stack, please
-             */
-            $searchResult[] = array_values($data);
-        }
+            $entityType   = $row['entity_type'];
+            $value        = $row['id'];
+            $name         = $row['name'];
+            $encodedValue = $codec->encodeValue($value);
 
-        // TODO only return required data
-        $flatResults = [];
-        foreach ($searchResult as $r){
-            foreach($r as $x) {
-                $flatResults[] = $x;
+            foreach($strategies[$entityType]->getValidRelationshipModifiers($this->getUser()) as $modifier){
+                $key = $codec->encodeSimpleAttributes($entityType, $value, $modifier);
+                $option = new Audience\SegmentSelectizeOption($key, $name);
+                $option->addLabel($entityType, $encodedValue, $name);
+                $options[] = $option;
             }
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput($flatResults));
+        $this->getResponse()->content->set($this->buildJsonOutput($options));
     }
 
 
-
     /**
-     * @param Collection|ValueLabelInterface[] $collection
-     * @param string     $entityType
-     * @return \Alaress\Web\Output\Json
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * Provides a list of available entity values of this entity type for the current user
+     *
+     * @param string $entityType
+     * @throws \Alaress\Web\Controller\Exception
      */
-    private function generate(Collection $collection, string $entityType): \Alaress\Web\Output\Json
+    public function getList(string $entityType): void
     {
-        $items = [];
+        $strategyFactory = $this->buildStrategyFactory();
 
-        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
-
-        foreach ($collection as $item) {
-            $row = array_combine(['id', 'name'], $item->findValueLabelPair());
-
-            $row['entity_type'] = $entityType;
-
-            $items[] = $this->generateDecoratedDataTuple($row, $translator);
+        try{
+            $strategy = $strategyFactory->make($entityType);
+        } catch (InvalidArgumentException $e){
+            $this->sendError('Unrecognised entity type', [], 404);
+            return;
         }
 
-        return $this->buildJsonOutput([
-            'success' => true,
-            'data' => $items
-        ]);
-    }
-
-
-    /**
-     * Return an (id, name, entityType, modifier, itemHtml) tuple
-     *
-     * @param array                  $row
-     * @param Audience\Segment\Translator     $translator
-     * @return array
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
-     */
-    private function generateDecoratedDataTuple(array $row, Audience\Segment\Translator $translator): array
-    {
-        $data = [];
-
-        $baseData = [
-            'name' => $row['name'],
-            'entityTypeOriginal' => $row['entity_type'],
-            'entityType' => $translator->translateEntityType($row['entity_type']),
-        ];
-
-        $data[Audience\Model::RELATIONSHIP_SELF] = array_merge($baseData, [
-            'id' => Audience\Segment\Codec::encode($row['entity_type'], (string)$row['id'], Audience\Model::RELATIONSHIP_SELF),
-            'modifierOriginal' => Audience\Model::RELATIONSHIP_SELF,
-            'modifier' => $translator->translateModifier(Audience\Model::RELATIONSHIP_SELF),
-        ]);
-
-        /* Only provide the Parents and Teachers modifiers to strats which support them
-         * We exclude Parents and Teachers modifiers from Users due to privacy reasons
-         *
-         * Decide whether entity_type has the modifiers parents_of and teachers_of
-         */
-        $businessRules = new Audience\BusinessRules();
-
-        $segment = $this->audienceMapper->createModel()
-            ->setEntityType($row['entity_type']);
-
-        /* Parents modifier
-         */
-        if ($businessRules->isValidRelationship($segment, Audience\Model::RELATIONSHIP_PARENTS_OF)) {
-            $data[Audience\Model::RELATIONSHIP_PARENTS_OF] = array_merge($baseData, [
-                'id' => Audience\Segment\Codec::encode($row['entity_type'], (string)$row['id'], Audience\Model::RELATIONSHIP_PARENTS_OF),
-                'modifierOriginal' => Audience\Model::RELATIONSHIP_PARENTS_OF,
-                'modifier' => $translator->translateModifier(Audience\Model::RELATIONSHIP_PARENTS_OF),
-            ]);
+        if(!$strategy->canBeTargetedByUser($this->getUser())){
+            $this->sendError('You cannot audience articles to this audience type', [], 403);
+            return;
         }
 
-        /* Teachers modifier
-         */
-        if ($businessRules->isValidRelationship($segment, Audience\Model::RELATIONSHIP_TEACHERS_OF)) {
-            $data[Audience\Model::RELATIONSHIP_TEACHERS_OF] = array_merge($baseData, [
-                'id' => Audience\Segment\Codec::encode($row['entity_type'], (string)$row['id'], Audience\Model::RELATIONSHIP_TEACHERS_OF),
-                'modifierOriginal' => Audience\Model::RELATIONSHIP_TEACHERS_OF,
-                'modifier' => $translator->translateModifier(Audience\Model::RELATIONSHIP_TEACHERS_OF),
-            ]);
-        }
-
-        return $data;
-    }
-
-
-    /**
-     * Get (id, name) tuples for every Campus
-     *
-     * @api /comms/news/audiencebrowser/campuses
-     * @level 18.1
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
-     */
-    public function getCampuses(): void
-    {
-        $this->getResponse()->content->set($this->generate($this->campusMapper->findAll()->sortBy('name', 'asc'), Audience\Model::ENTITY_TYPE_CAMPUS));
-    }
-
-
-    /**
-     * Get (id, name) tuples for every Role
-     *
-     * @api /comms/news/audiencebrowser/roles
-     * @level 18.1
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
-     */
-    public function getRoles(): void
-    {
-        $this->getResponse()->content->set($this->generate($this->roleMapper->findAll()->sortBy('name', 'asc'), Audience\Model::ENTITY_TYPE_ROLE));
-    }
-
-
-    /**
-     * Get (id, name) tuples for every Pastoral Group
-     *
-     * @api /comms/news/audiencebrowser/pastoralgroups
-     * @level 18.1
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
-     */
-    public function getPastoralGroups(): void
-    {
-        $this->getResponse()->content->set($this->generate($this->pastoralGroupMapper->findAll()->sortBy('name', 'asc'), Audience\Model::ENTITY_TYPE_PASTORAL_GROUP));
-    }
-
-
-    /**
-     * Get (id, name) tuples for every House
-     *
-     * @api /comms/news/audiencebrowser/houses
-     * @level 18.1
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
-     * @todo This should be SchoolHouse (to disambiguate from residential house), or better yet, take $entityType as param and use factory/interface
-     */
-    public function getHouses(): void
-    {
-        $this->getResponse()->content->set($this->generate($this->houseMapper->findAll()->sortBy('house', 'asc'), Audience\Model::ENTITY_TYPE_SCHOOL_HOUSE));
-    }
-
-
-    /**
-     * Get (id, name) tuples for every folder
-     *
-     * @api /comms/news/audiencebrowser/folders
-     * @level 18.1
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
-     * @throws \UnexpectedValueException
-     */
-    public function getFolders(): void
-    {
-        $folderStrategy = new Audience\Segment\Strategy\Folder($this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
-        $statement      = $this->db->executeQuery($folderStrategy->getSearchSql());
-        $searchResults = new GenericCollection(ValueLabelInterface::class);
+        $codec         = new Audience\Segment\Codec($this->audienceMapper);
+        $stmt          = $this->db->executeQuery($strategy->getSearchSql());
+        $valueLabels   = [];
 
         /** @noinspection PhpAssignmentInConditionInspection */
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $searchResults[$row['id']] = new class($row['id'], $row['name']) implements ValueLabelInterface
-            {
-
-                /** @var string */
-                private $id;
-                /** @var string */
-                private $name;
-
-
-                /**
-                 * @param string $id
-                 * @param string $name
-                 */
-                public function __construct(string $id, string $name)
-                {
-                    $this->id   = $id;
-                    $this->name = $name;
-                }
-
-
-                /**
-                 * @inheritdoc
-                 */
-                public function findValueLabelPair(): array
-                {
-                    return [
-                        'value' => $this->id,
-                        'label' => $this->name,
-                    ];
-                }
-            };
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $valueLabels[$codec->encodeValue($row['id'])] = $row['name'];
         }
 
-        $searchResults->sortByCallback(function (ValueLabelInterface $left, ValueLabelInterface $right) {
-            // compensate for MySQL lack of natural sort for names like [F1, F9, F10]
-            return \strnatcasecmp($left->findValueLabelPair()['label'], $right->findValueLabelPair()['label']);
-        }, true);
+        \uasort($valueLabels, function (string $left, string $right) {
+            return \strnatcasecmp($left, $right);
+        });
 
-
-        $this->getResponse()->content->set($this->generate($searchResults, Audience\Model::ENTITY_TYPE_FOLDER));
-    }
-
-
-    /**
-     * Get all year levels
-     *
-     * @api /comms/news/audiencebrowser/yearlevels
-     * @level 18.1
-     *
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
-     */
-    public function getYearLevels(): void
-    {
-        $items = [];
-
-        $translator = new Audience\Segment\Translator($this->folderMapper->getDatabase(), $this->getUser(), $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
-
-        $years = array_filter($this->userMapper->findDistinct('year'));
-        sort($years);
-
-        foreach ($years as $year) {
-            $row = [
-                'id' => $year,
-                'name' => \is_numeric($year) ? "Year {$year}" : $year,
-                'entity_type' => Audience\Model::ENTITY_TYPE_YEAR
-            ];
-
-            $items[] = $this->generateDecoratedDataTuple($row, $translator);
-        }
-
-        $this->getResponse()->content->set($this->buildJsonOutput([
-            'success' => true,
-            'data' => $items
-        ]));
+        $data = [
+            'availableModifiers' => $strategy->getValidRelationshipModifiers($this->getUser()),
+            'canTargetNull'      => $strategy->canTargetNullEntityValue(),
+            'valueLabels'        => $valueLabels,
+        ];
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
 
@@ -420,5 +161,19 @@ class Controller extends Base
         /** @var News\Policy\Model $policy */
         $policy = $this->policyMapper->findByColumn('identifier', 'global_moderation')->first();
         return (bool)$policy->getValue();
+    }
+
+
+    /**
+     * @return StrategyFactory
+     */
+    private function buildStrategyFactory(): StrategyFactory
+    {
+        return new StrategyFactory(
+            $this->getUser(),
+            $this->folderMapper,
+            $this->roleAccessMapper,
+            $this->isGlobalModerationEnabled()
+        );
     }
 }

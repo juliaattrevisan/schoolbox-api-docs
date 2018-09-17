@@ -13,14 +13,10 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\CampusMapper;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Mapper;
-use Schoolbox\Pastoral;
-use Schoolbox\Resource;
-use Schoolbox\RoleMapper;
-use Schoolbox\UserMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Comms\News;
+use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
 {
@@ -36,21 +32,13 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Anyone can retrieve options
-         * TODO: But maybe it should be staff only?
-         */
+        // Routes are always available. Results will vary depending on user and system config.
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn()
         );
 
-        $this->register('GET', '/campuses', 'getCampuses', $getPerms);
-        $this->register('GET', '/roles', 'getRoles', $getPerms);
-        $this->register('GET', '/houses', 'getHouses', $getPerms);
-        $this->register('GET', '/classes', 'getClasses', $getPerms);
-        $this->register('GET', '/folders', 'getFolders', $getPerms);
-        $this->register('GET', '/yearlevels', 'getYearLevels', $getPerms);
-        $this->register('GET', '/pastoralgroups', 'getPastoralGroups', $getPerms);
         $this->register('GET', '/search', 'getSearch', $getPerms);
+        $this->register('GET', '/list/{entityType}', 'getList', $getPerms);
     }
 
 
@@ -76,14 +64,11 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'db'           => $injector->lazyGet('databaseInternal'),
-            'campusMapper' => $this->getMapperFactory()->getLazy(CampusMapper::class),
-            'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
-            'houseMapper' => $this->getMapperFactory()->getLazy(\HouseMapper::class),
-            'groupMapper' => $this->getMapperFactory()->getLazy(Resource\GroupMapper::class),
-            'pastoralGroupMapper' => $this->getMapperFactory()->getLazy(Pastoral\Group\Mapper::class),
-            'audienceMapper' => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
-            'policyMapper' => $this->getMapperFactory()->getLazy(News\Policy\Mapper::class),
+            'db'               => $injector->lazyGet('databaseInternal'),
+            'folderMapper'     => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
+            'audienceMapper'   => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
+            'roleAccessMapper' => $this->getMapperFactory()->getLazy(RoleAccessMapper::class),
+            'policyMapper'     => $this->getMapperFactory()->getLazy(News\Policy\Mapper::class),
         ];
     }
 }
