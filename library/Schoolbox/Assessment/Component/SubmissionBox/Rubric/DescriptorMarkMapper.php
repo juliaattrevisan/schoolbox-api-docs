@@ -84,7 +84,7 @@ class DescriptorMarkMapper extends Mapper
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('group_mark', '', 'g')}
             LEFT JOIN {$this->getJoinSql('group_mark.submission_return', 'g', 'r')}
-            LEFT JOIN {$this->getJoinSql('descriptor', '', 'd')}
+            LEFT JOIN {$this->getJoinSql('descriptor', '', 'd', true)}
         ";
     }
 
