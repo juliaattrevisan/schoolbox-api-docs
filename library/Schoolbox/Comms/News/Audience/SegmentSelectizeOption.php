@@ -21,37 +21,42 @@ class SegmentSelectizeOption implements JsonSerializable
 {
 
     /**
-     * The encoded value that represents a segment
+     * The encoded value that represents a segment. eg 'folder:2:x:self'
      * @var string
      */
-    private $value;
+    private $key;
 
     /**
-     * A label to show on a selected segment (not brick)
+     * A semantically descriptive name to render in selectize option list, and on a selected segment.
+     * Not rendered on the brick (that comes from labels)
+     *
      * @var string
      */
-    private $label;
+    private $name;
 
     /**
      * The labels for each simple segment represented by this selectize option
+     *
+     * Intended for display to end-users.
+     *
      * @var string[][]
      */
     private $labels = [];
 
 
     /**
-     * @param string $value
-     * @param string $label
+     * @param string $key
+     * @param string $name
      */
-    public function __construct(string $value, string $label)
+    public function __construct(string $key, string $name)
     {
-        $this->value = $value;
-        $this->label = $label;
+        $this->key  = $key;
+        $this->name = $name;
     }
 
 
     /**
-     * Any entity logically referred to in 'value' should have a human-friendly label added via this method.
+     * Any entity logically referenced by the segment should have a human-friendly label added via this method.
      * If not, the front-end will fallback to the raw value, eg folder:'2' is not as helpful as folder:'English 34'
      *
      * @param string $entityType
@@ -70,8 +75,8 @@ class SegmentSelectizeOption implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'value'  => $this->value,
-            'label'  => $this->label,
+            'key'    => $this->key,
+            'name'   => $this->name,
             'labels' => $this->labels,
         ];
     }
