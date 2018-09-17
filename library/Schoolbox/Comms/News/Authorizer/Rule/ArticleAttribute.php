@@ -23,7 +23,7 @@ abstract class ArticleAttribute implements IAuthorizationRule
      * @return News\Model
      * @throws UnexpectedValueException
      */
-    protected function findArticleInParams(array $params, string $key = 'articleId'): News\Model
+    protected function findArticleInParams(array $params, string $key = 'article'): News\Model
     {
         if (!\array_key_exists($key, $params)) {
             throw new UnexpectedValueException("No param found for key '{$key}'");
