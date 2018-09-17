@@ -96,9 +96,8 @@
 
     {% if showRubricTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
 
-        {% set rubricHumanReadableMark = '' %}
-        {% set rubricScaledMark        = '' %}
-        {% set rubricMax               = '' %}
+        {% set rubricScaledMark = rubricGrid.value %}
+        {% set rubricMax        = rubricGrid.calculateMaxValueFromCapabilities %}
 
         <tr>
             <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
