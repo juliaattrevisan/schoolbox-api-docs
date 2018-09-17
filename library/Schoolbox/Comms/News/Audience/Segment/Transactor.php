@@ -7,13 +7,15 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
-use PDOException;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
-use InvalidArgumentException;
 use UnexpectedValueException;
+use Schoolbox\User;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+
 
 /**
  * Responsible for the intricacies of news article audience segment persistence.
@@ -21,21 +23,48 @@ use UnexpectedValueException;
 class Transactor
 {
 
+    /** @var User */
+    private $sessionUser;
+
+
     /** @var Audience\Mapper */
     private $audienceMapper;
 
     /** @var Codec */
     private $codec;
 
+    /** @var Folder\Mapper */
+    private $folderMapper;
+
+    /** @var RoleAccessMapper */
+    private $roleAccessMapper;
+
+    /** @var bool */
+    private $isModerationEnabled;
+
 
     /**
-     * @param Audience\Mapper $audienceMapper
-     * @param Codec           $codec
+     * @param User             $sessionUser
+     * @param Audience\Mapper  $audienceMapper
+     * @param Codec            $codec
+     * @param Folder\Mapper    $folderMapper
+     * @param RoleAccessMapper $roleAccessMapper
+     * @param bool             $isModerationEnabled
      */
-    public function __construct(Audience\Mapper $audienceMapper, Codec $codec)
-    {
-        $this->audienceMapper = $audienceMapper;
-        $this->codec          = $codec;
+    public function __construct(
+        User $sessionUser,
+        Audience\Mapper $audienceMapper,
+        Codec $codec,
+        Folder\Mapper $folderMapper,
+        RoleAccessMapper $roleAccessMapper,
+        bool $isModerationEnabled
+    ) {
+        $this->sessionUser         = $sessionUser;
+        $this->audienceMapper      = $audienceMapper;
+        $this->codec               = $codec;
+        $this->folderMapper        = $folderMapper;
+        $this->roleAccessMapper    = $roleAccessMapper;
+        $this->isModerationEnabled = $isModerationEnabled;
     }
 
 
@@ -48,11 +77,9 @@ class Transactor
      *
      * @param News\Model $article
      * @param string     $selectizeAudienceSegments
-     * @return bool Whether any changes were made
-     * @throws PDOException
-     * @throws InvalidArgumentException
-     * @throws UnexpectedValueException
+     * @return bool
      * @throws Mapper\Exception
+     * @throws Mapper\Exception\InsufficientHydrationException
      */
     public function save(News\Model $article, string $selectizeAudienceSegments): bool
     {
@@ -64,9 +91,9 @@ class Transactor
         $segmentsToDelete = $this->audienceMapper->createCollection();
 
         // Delete any segment that currently exists, but was not posted from form (ie it's been removed by user)
-        foreach($existingSegments as $existingSegment) {
+        foreach ($existingSegments as $existingSegment) {
             $found = false;
-            foreach($postedSegments as $postedSegment) {
+            foreach ($postedSegments as $postedSegment) {
                 if ($existingSegment->equals($postedSegment)) {
                     $found = true;
                     break;
@@ -77,9 +104,9 @@ class Transactor
             }
         }
         // Add any segment that was posted but is not currently persisted
-        foreach($postedSegments as $postedSegment) {
+        foreach ($postedSegments as $postedSegment) {
             $found = false;
-            foreach($existingSegments as $existingSegment) {
+            foreach ($existingSegments as $existingSegment) {
                 if ($existingSegment->equals($postedSegment)) {
                     $found = true;
                     break;
@@ -90,24 +117,78 @@ class Transactor
             }
         }
 
+        $isSegmentsDeleted = $this->deleteRemovedSegments($article, $segmentsToDelete);
+        $isSegmentsAdded   = $this->saveAddedSegments($article, $segmentsToAdd);
+
+        return $isSegmentsDeleted || $isSegmentsAdded;
+    }
+
+
+    /**
+     * @param News\Model                         $article
+     * @param GenericCollection|Audience\Model[] $segmentsToDelete
+     * @return bool
+     * @throws Mapper\Exception
+     */
+    private function deleteRemovedSegments(News\Model $article, GenericCollection $segmentsToDelete): bool
+    {
         $changesMade = false;
-        foreach($segmentsToDelete as $segmentToDelete) {
+        foreach ($segmentsToDelete as $segmentToDelete) {
             $isDeleted = $this->audienceMapper->deleteSegment($segmentToDelete);
             if ($isDeleted) {
                 $article->getAudience()->offsetUnset($segmentToDelete->getId());
                 $changesMade = true;
             }
         }
+        return $changesMade;
+    }
 
-        foreach($segmentsToAdd as $segmentToAdd) {
-            $segmentToAdd->setCommsNewsArticle($article);
-            $wasSaved = $this->audienceMapper->saveSegment($segmentToAdd);
-            if (false !== $wasSaved) {
-                $article->getAudience()->offsetSet($segmentToAdd->getId(), $segmentToAdd);
-                $changesMade = true;
+
+    /**
+     * @param News\Model        $article
+     * @param GenericCollection $segmentsToAdd
+     * @return bool
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
+     */
+    private function saveAddedSegments(News\Model $article, GenericCollection $segmentsToAdd): bool
+    {
+        $isSegmentsAdded = false;
+        if ($segmentsToAdd->count()) {
+
+
+            $strategyFactory = new StrategyFactory($this->sessionUser, $this->folderMapper, $this->roleAccessMapper, $this->isModerationEnabled);
+            $strategies      = $strategyFactory->makeAll();
+
+            // Ensure the relationship is valid for the segment's entity type
+            $validRelationships = [];
+            // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
+            $validNullEntities = [];
+            foreach ($strategies as $strategy) {
+                $validRelationships[$strategy->getEntityType()] = $strategy->getValidRelationshipModifiers($this->sessionUser);
+                $validNullEntities[$strategy->getEntityType()]  = $strategy->canTargetNullEntityValue();
+            }
+
+            $validSegmentSpecFactory = new Audience\Validation\Factory($validRelationships, $validNullEntities);
+            $validSegmentSpec        = $validSegmentSpecFactory->makeValidSegmentSpecification($this->sessionUser);
+
+
+            foreach ($segmentsToAdd as $segmentToAdd) {
+                $segmentToAdd->setCommsNewsArticle($article);
+
+                if (!$validSegmentSpec->isSatisfiedBy($segmentToAdd)) {
+                    // TODO make this a specific exception that wraps the $unsatisified so caller can handle gracefully
+                    $unsatisfied = $validSegmentSpec->remainderUnsatisfiedBy($segmentToAdd);
+                    throw new UnexpectedValueException('Audience segment fails specification pattern');
+                }
+
+                $wasSaved = $this->audienceMapper->saveSegment($segmentToAdd);
+                if (false !== $wasSaved) {
+                    $article->getAudience()->offsetSet($segmentToAdd->getId(), $segmentToAdd);
+                    $isSegmentsAdded = true;
+                }
             }
         }
-
-        return $changesMade;
+        return $isSegmentsAdded;
     }
 }
