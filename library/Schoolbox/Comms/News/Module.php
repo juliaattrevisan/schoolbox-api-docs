@@ -13,6 +13,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Comms\News\Audience\UserResolver;
 use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
@@ -48,11 +49,13 @@ class Module extends BaseModule
          * or the article is publicly accessible
          */
         $readerPerms = new Rule\LazyCallback(function () {
+            /** @var UserResolver $userResolver */
+            $userResolver = $this->getInjector()->get('commsNewsUserResolver');
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Authorizer\Rule\IsAuthorOrModerator($this->getNewsMapper()),
-                    new Authorizer\Rule\IsPubliclyReadable($this->getNewsMapper(), $this->getInjector()->get('commsNewsUserResolver'))
+                    new Authorizer\Rule\IsPubliclyReadable($this->getNewsMapper(), $userResolver)
                 )
             );
         });
