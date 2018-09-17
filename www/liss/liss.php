@@ -10,9 +10,11 @@
 
 require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
-$liss = new External_Liss_Server();
+/** @var Schoolbox\Application\WebRequest\Kernel $kernel */
+$externalDb = $kernel->get('databaseExternal');
+$liss = new External_Liss_Server($externalDb);
 
-$log = External_Liss_Server::log();
+$log = $liss->log();
 
 try {
     $liss->start();
