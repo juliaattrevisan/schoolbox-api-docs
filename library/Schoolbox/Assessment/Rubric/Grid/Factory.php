@@ -55,59 +55,60 @@ class Factory
         }
 
 
-        // Must assume that all capabilities in formdata exist
-        // They will because the group was created when sending to the form
+        // Must assume that all capabilities in formdata exist:
+        // they will, because it was created when the capability was added
+        // via the form.
 
 
-        // Which groups are actually in use?
-        $groupIdsInUse = [];
-        foreach ($criteria as $criterion) {
-            if ($criterion['on']) {
-                $groupIdsInUse[$criterion['groupId']] = true;
+        // Which capabilities are actually in use?
+        $capabilityIdsInUse = [];
+        foreach ($indicators as $indicator) {
+            if ($indicator['on']) {
+                $capabilityIdsInUse[$indicator['groupId']] = true;
             }
         }
 
 
         // cache capabilities
-        /** @var Capability[] $groupCache */
-        $groupCache = [];
-        foreach ($capabilities as $groupData) {
-            // This group must exist and be in use in order for it to be saved
-            $groupId   = (int)$groupData['id'];
-            $groupName = $groupData['name'];
-            if (!$groupId) {
+        /** @var Capability[] $capabilityCache */
+        $capabilityCache = [];
+        foreach ($capabilities as $capability) {
+            // This capability must exist and be in use in order for it to be saved
+            $capabilityId   = (int)$capability['id'];
+            $capabilityName = $capability['name'];
+            if (!$capabilityId) {
                 continue;
             }
-            if (empty($groupIdsInUse[$groupId])) {
+            if (empty($capabilityIdsInUse[$capabilityId])) {
                 continue;
             }
-            $groupMaxValue = isset($groupData['maxValue']) ? (float)$groupData['maxValue'] : null;
-            $group         = $grid->getRowSet()->retrieveCapability($groupId);
+            $capabilityMaxValue = isset($capability['maxValue']) ? (float)$capability['maxValue'] : null;
+            $capability         = $grid->getRowSet()->retrieveCapability($capabilityId);
 
             // If $group is null, then that's a problem; we're trying to save
             // usage for a group which doesn't exist
 
 
             // Can this group's name be set?
-            if (!$group->isInUseExcluding($grid->getAssessment())) {
-                $group->setName($groupName);
+            if (!$capability->isInUseExcluding($grid->getAssessment())) {
+                $capability->setName($capabilityName);
             }
 
-            if ($spec->isSatisfiedBy($groupMaxValue)) {
-                $groupUsage = (new CapabilityUsage($group))->setMaxValue($groupMaxValue);
+            if ($spec->isSatisfiedBy($capabilityMaxValue)) {
+                $capabilityUsage = (new CapabilityUsage($capability))->setMaxValue($capabilityMaxValue);
             } else {
                 throw new InvalidArgumentException(sprintf('provide capability maximum points that are numeric and greater than or equal to 0'));
             }
 
 
-            $groupCache[$groupId]                  = $group;
-            $grid->getCapabilityUsages()[$groupId] = $groupUsage;
+            $capabilityCache[$capabilityId]             = $capability;
+            $grid->getCapabilityUsages()[$capabilityId] = $capabilityUsage;
         }
 
 
         // Cache indicators
         foreach ($indicators as $indicatorData) {
-            $groupId          = (int)$indicatorData['groupId'];
+            $capabilityId     = (int)$indicatorData['groupId'];
             $indicatorId      = (int)$indicatorData['id'];
             $indicatorName    = $indicatorData['name'];
             $indicatorEnabled = isset($indicatorData['on']) && $indicatorData['on'];
@@ -116,8 +117,8 @@ class Factory
             }
 
             // spawn
-            $group     = $groupCache[$groupId];
-            $indicator = $group->retrieveIndicator($indicatorId);
+            $capability = $capabilityCache[$capabilityId];
+            $indicator  = $capability->retrieveIndicator($indicatorId);
 
             // If $indicator is null, then that's a problem; we're trying to
             // save usage for a indicator which doesn't exist
@@ -151,16 +152,16 @@ class Factory
                 }
             }
 
-            $groupUsage                                     = $grid->retrieveCapabilityUsage($group);
-            $groupUsage->getIndicatorUsages()[$indicatorId] = $indicatorUsage;
+            $capabilityUsage                                     = $grid->retrieveCapabilityUsage($capability);
+            $capabilityUsage->getIndicatorUsages()[$indicatorId] = $indicatorUsage;
         }
 
-        // Calculate max values for each group usage.
+        // Calculate max values for each capability usage.
         // If no value was passed: use calculated value
-        foreach ($grid->getCapabilityUsages() as $groupUsage) {
-            $groupMaxValue = $groupUsage->getMaxValue();
-            if (null === $groupMaxValue) {
-                $groupUsage->setMaxValue($groupUsage->calculateMaxValueFromIndicators());
+        foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
+            $capabilityMaxValue = $capabilityUsage->getMaxValue();
+            if (null === $capabilityMaxValue) {
+                $capabilityUsage->setMaxValue($capabilityUsage->calculateMaxValueFromIndicators());
             }
         }
 
