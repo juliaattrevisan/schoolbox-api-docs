@@ -24,12 +24,11 @@ class IsShareable extends ArticleAttribute
     /**
      * @param array     $params
      * @param User|null $user
-     * @return bool
      * @throws InvalidArgumentException
      * @throws Unauthorized
      * @throws UnexpectedValueException
      */
-    public function authorize(array $params = [], User $user = null): bool
+    public function authorize(array $params = [], User $user = null): void
     {
         if (!$user) {
             throw new InvalidArgumentException('No session user available to test permissions');
@@ -39,10 +38,6 @@ class IsShareable extends ArticleAttribute
 
         if (!$article->isShareable()) {
             throw new Unauthorized("Article {$article->getId()} is not shareable");
-        }
-
-        if (!$article->isPublished() && !$article->isExpired()) {
-            throw new Unauthorized("Article {$article->getId()} is not published or expired");
         }
     }
 }
