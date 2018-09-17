@@ -1,10 +1,5 @@
 <?php
 /**
- * IsPubliclyReadable
- *
- * This determines whether a user can view an article's contents.
- * It uses the spec pattern ValidArticleIsPubliclyReadable to decide.
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -20,6 +15,10 @@ use Schoolbox\Comms\News\Mapper;
 use Schoolbox\Comms\News\ValidArticleIsPubliclyReadable;
 use Schoolbox\User;
 
+/**
+ * This determines whether a user can view an article's contents.
+ * It uses the spec pattern ValidArticleIsPubliclyReadable to decide.
+ */
 class IsPubliclyReadable implements IAuthorizationRule
 {
 
