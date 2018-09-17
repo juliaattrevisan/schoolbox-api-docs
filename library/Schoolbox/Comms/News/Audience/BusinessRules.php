@@ -10,7 +10,6 @@ namespace Schoolbox\Comms\News\Audience;
 
 use InvalidArgumentException;
 use Schoolbox\Comms\News\Audience\Segment\IStrategy;
-use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 /**
@@ -21,12 +20,12 @@ use Schoolbox\Comms\News\Audience\Segment\Strategy;
  *
  * If a segment is composite, then the valid relationships are the intersect of their component segments.
  * eg Audience = user:X && campus:Y. If we can send to user^[S|P|T] and campus^[S|P], then the composite can only send to composite^[S|P]
- *
+ * @deprecated
+ * @see IStrategy
  */
 class BusinessRules
 {
-    // Maximum node paths from a root segment to a leaf segment
-    private const DEPTH_SEGMENT_TREE_MAX = 1;
+
 
     // To ensure efficient db queries, only build query predicates that are valid and can actually match a segment.
     private const VALID_SEGMENT_RELATIONSHIPS = [
@@ -51,6 +50,8 @@ class BusinessRules
     // * who are not in a school house, or
     // * who are not in any groups.
     private const VALID_SEGMENT_NULL_ENTITIES = [
+        Model::ENTITY_TYPE_COMPOSITE         => true,
+
         Strategy\User::ENTITY_TYPE           => false,
         Strategy\Super::ENTITY_TYPE          => false,
         Strategy\Campus::ENTITY_TYPE         => true,
@@ -63,15 +64,6 @@ class BusinessRules
         Strategy\PastoralGroup::ENTITY_TYPE  => true,
         Strategy\Folder::ENTITY_TYPE         => true,
     ];
-
-
-    /**
-     * @return int
-     */
-    public function getMaxSegmentTreeHeight(): int
-    {
-        return self::DEPTH_SEGMENT_TREE_MAX;
-    }
 
 
     /**
@@ -98,6 +90,8 @@ class BusinessRules
      * @param string $relationship
      * @return string[]
      * @throws InvalidArgumentException If unable to recognise relationship
+     * @deprecated
+     * @see IStrategy::getValidRelationshipModifiers()
      */
     public function getValidEntities(string $relationship): array
     {
@@ -112,66 +106,5 @@ class BusinessRules
             }
         }
         return $validEntities;
-    }
-
-
-    /**
-     * Returns the valid set of relationship modifiers for an audience segment
-     *
-     * @param Model $audienceSegment
-     * @return string[]
-     * @throws InsufficientHydrationException If the segment's entity type is not set
-     * @deprecated Move to IStrategy interface
-     */
-    public function getValidRelationships(Model $audienceSegment): array
-    {
-        $entityType = $audienceSegment->getEntityType();
-        if (null === $entityType) {
-            throw new InsufficientHydrationException('Cannot determine valid relationships if entity type is not defined');
-        }
-
-        $validRelationships = self::VALID_SEGMENT_RELATIONSHIPS[$entityType];
-
-        // Base case:
-        if (Model::ENTITY_TYPE_COMPOSITE !== $entityType) {
-            return $validRelationships;
-        }
-
-        // Recursive case:
-        // Composites have their own inherent limitations, but also respect the limitations of any sub-segment.
-        foreach ($audienceSegment->getChildren() as $subSegment) {
-            $validRelationships = \array_intersect($validRelationships, $this->getValidRelationships($subSegment));
-        }
-        return $validRelationships;
-    }
-
-
-    /**
-     * @param string $entityType
-     * @return string[]
-     * @deprecated Move to IStrategy interface
-     */
-    public function getValidRelationshipsForEntityType(string $entityType): array
-    {
-        return self::VALID_SEGMENT_RELATIONSHIPS[$entityType];
-    }
-
-
-    /**
-     * Returns whether the proposed relationship modifier is valid for an audience segment
-     *
-     * @param Model  $segment
-     * @param string $candidateRelationship
-     * @return bool
-     * @throws InvalidArgumentException If the relationship is not recognised
-     * @throws InsufficientHydrationException
-     */
-    public function isValidRelationship(Model $segment, string $candidateRelationship): bool
-    {
-        // Is this an unrecognised relationship (as opposed to a proscribed one)
-        if (!\in_array($candidateRelationship, Model::getRelationships(), true)) {
-            throw new InvalidArgumentException("Invalid relationship: $candidateRelationship");
-        }
-        return \in_array($candidateRelationship, $this->getValidRelationships($segment), true);
     }
 }
