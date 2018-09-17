@@ -334,7 +334,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
 
         $di->set(
-            'articleResolver',
+            'commsNewsArticleResolver',
             $di->lazy(
                 function() use ($di) {
                     /**
@@ -367,7 +367,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
         );
 
         $di->set(
-            'userResolver',
+            'commsNewsUserResolver',
             $di->lazy(
                 function() use ($di) {
                     /**

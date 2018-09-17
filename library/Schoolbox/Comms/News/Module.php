@@ -54,7 +54,7 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Authorizer\Rule\IsAuthorOrModerator($this->getNewsMapper()),
-                    new Authorizer\Rule\IsPubliclyReadable($this->getNewsMapper(), $this->getInjector()->get('userResolver'))
+                    new Authorizer\Rule\IsPubliclyReadable($this->getNewsMapper(), $this->getInjector()->get('commsNewsUserResolver'))
                 )
             );
         });
@@ -188,8 +188,8 @@ class Module extends BaseModule
 
             /* Hyperdrive injection
              */
-            'articleResolver' => $injector->lazyGet('articleResolver'),
-            'userResolver' => $injector->lazyGet('userResolver'),
+            'articleResolver' => $injector->lazyGet('commsNewsArticleResolver'),
+            'userResolver' => $injector->lazyGet('commsNewsUserResolver'),
         ];
     }
 
