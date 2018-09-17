@@ -11,6 +11,9 @@ use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Comms\News;
 use UnexpectedValueException;
 
+/**
+ * Common implementation for various Comms News Auth rules
+ */
 abstract class ArticleAttribute implements IAuthorizationRule
 {
 
