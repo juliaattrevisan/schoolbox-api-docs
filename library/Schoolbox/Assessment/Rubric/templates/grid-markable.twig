@@ -15,8 +15,7 @@
 
 {% set formField = 'rubric' %}
 {% set rubricId = 'rb-' ~ rubricGrid.assessment.id %}
-{% set markType = markType ?: { mode: 'raw' } %}
-{% set markSchemeName = rubricGrid.assessment.markScheme.title %}
+{% set markType = rubricGrid.assessment.markScheme.generateContext %}
 {% set showDescriptorValue = showDescriptorValue ? true : false %}
 {% set showGroupTotal = showGroupTotal ? true : false %}
 {% set showRubricTotal = showRubricTotal ? true : false %}
@@ -47,7 +46,7 @@
                  # This is only off when self-reflecting with a grid that doesn't show descriptor points
                  # and groups - here, it never shows the group subtotal, and rowspan calcs are off
                  #}
-                {% set rowspan        = groupUsage.indicatorUsages|length + (rubricGrid.assessment.markPerCapability and markSchemeName != "None" ? 1 : 0) %}
+                {% set rowspan        = groupUsage.indicatorUsages|length + (rubricGrid.assessment.markPerCapability and markType.mode != "none" ? 1 : 0) %}
                 {% set capabilityMark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
 
                 {% for critIndex, critUsage in groupUsage.indicatorUsages %}
@@ -95,7 +94,7 @@
 
     {% endfor %}
 
-    {% if showRubricTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
+    {% if showRubricTotal and markType.mode != "none" and (config.rubric_show_points or not studentView) %}
 
         {% set rubricScaledMark = rubricGrid.value %}
         {% set rubricMax        = rubricGrid.calculateMaxValueFromCapabilities %}
@@ -105,7 +104,7 @@
                 <span data-final-summary="{{ rubricId }}"
                       data-scaled-mark="{{ rubricScaledMark }}"
                       data-max="{{ rubricMax }}"
-                      data-mark-type="{{ markSchemeName }}">
+                      data-mark-type="{{ markType.mode }}">
 
                     {#{% if markSchemeName == 'TotalMarkFractional' %}#}
                        {#{{ rubricScaledMark }} / {{ rubricMax }}#}
@@ -154,7 +153,7 @@
         $("[data-group-mark]").each(function() {
 
             // TODO not sure how to validate the letter grade dropdown, so skip it for now
-            if (markType !== 'LetterGrade') {
+            if (markType !== 'letter') {
 
                 // Percentage and total mark types must be numeric
                 $(this).rules('add', {
@@ -163,11 +162,11 @@
                 });
 
                 // If percentage mark type, range is between 0 and 100
-                if (markType === 'Percentage') {
+                if (markType === 'percent') {
                     $(this).rules('add', {
                         range: [0, 100]
                     });
-                } else if (markType === "TotalMarkFractional") {
+                } else if (markType === "raw") {
                     // Otherwise, range is between 0 and capability max
                     var capMax = $(this).closest("[data-group-summary]").attr("data-max");
 
@@ -194,7 +193,7 @@
                 var displayedMark = $(this).find("[data-group-descriptor-sum]").text().replace(/%/, '').trim();
                 var customMark = $(this).find("[data-group-mark]").val();
 
-                if (markType === 'LetterGrade') {
+                if (markType === 'letter') {
                     var grades = getLetterGrades($(this));
                     customMark = getLetterGradeFromNumeric($(this).find("[data-group-mark]").val(), grades);
                 }
@@ -224,12 +223,12 @@
                 var descriptorSum = scale($(this), summateDescriptors($descriptorCheckboxes));
 
                 switch(markType) {
-                    case 'TotalMarkFractional':
+                    case 'raw':
                         // Simply use the number as-is
                         $(this).find("[data-group-descriptor-sum]").text(descriptorSum);
                         break;
 
-                    case 'LetterGrade':
+                    case 'letter':
                         // Turn the numeric value into a letter grade
                         // Don't use scaled values when working with percentages
                         descriptorSum = summateDescriptors($descriptorCheckboxes);
@@ -239,7 +238,7 @@
                         );
                         break;
 
-                    case 'Percentage':
+                    case 'percent':
                         // Turn the numeric value into a percentage and append percent sign]
                         // Don't use scaled values when working with percentages
                         descriptorSum = summateDescriptors($descriptorCheckboxes);
@@ -287,16 +286,16 @@
 
                 // Update button text with mark calculated from descriptors
                 switch(markType) {
-                    case 'TotalMarkFractional':
+                    case 'raw':
                         $groupSummary.find("[data-group-descriptor-sum]").text(scaledGroupMark);
                         break;
 
-                    case 'LetterGrade':
+                    case 'letter':
                         var grades = getLetterGrades($groupSummary.find("[data-group-mark]"));
                         $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, $groupSummary.attr('data-mark')), grades));
                         break;
 
-                    case 'Percentage':
+                    case 'percent':
                         $groupSummary.find("[data-group-descriptor-sum]").text(getPercentage($groupSummary, $groupSummary.attr('data-mark')) + "%");
                         break;
 
@@ -309,15 +308,15 @@
                     if (! $groupSummary.attr('data-customised')) {
                         // Only update dropdown/input field if the mark has not been customised
                         switch(markType) {
-                            case 'TotalMarkFractional':
+                            case 'raw':
                                 $groupSummary.find("[data-group-mark]").val(scaledGroupMark);
                                 break;
 
-                            case 'LetterGrade':
+                            case 'letter':
                                 assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $groupSummary.find("[data-group-mark]").val(scaledGroupMark));
                                 break;
 
-                            case 'Percentage':
+                            case 'percent':
                                 $groupSummary.find("[data-group-mark]").val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
                                 break;
 
@@ -390,13 +389,13 @@
             if ($groupRows.length) {
                 var rowCount = $groupRows.length;
                 switch (markType) {
-                    case 'TotalMarkFractional':
+                    case 'raw':
                         // We got a scaled numeric mark. We need to make it unscaled.
                         normalised = customMark * (rowMaxSum / capMax);
                         break;
 
-                    case 'LetterGrade':
-                    case 'Percentage':
+                    case 'letter':
+                    case 'percent':
                         // What is x percent of the total possible (unscaled) marks?
                         normalised = customMark * (rowMaxSum / 100);
                         break;
@@ -431,15 +430,15 @@
             $groupSummary.find('[data-db-mark]').val(unscaledGroupMark);
 
             switch(markType) {
-                case 'TotalMarkFractional':
+                case 'raw':
                     $gradeInput.val(scaledGroupMark);
                     break;
 
-                case 'LetterGrade':
+                case 'letter':
                     assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $gradeInput.val(scaledGroupMark));
                     break;
 
-                case 'Percentage':
+                case 'percent':
                     $groupSummary.find("[data-group-mark]").val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
                     break;
 

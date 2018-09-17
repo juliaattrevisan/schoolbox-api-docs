@@ -110,4 +110,20 @@ class LetterGrade extends AbstractMarkScheme
         $this->gradeGroup = $gradeGroup;
         return $this;
     }
+
+    /**
+     * Add configured grade levels to context.
+     *
+     * @return array
+     */
+    public function generateContext(): array
+    {
+        $context = parent::generateContext();
+        $context['conf'] = [];
+
+        foreach ($this->gradeGroup->getGradeLevels() as $gradeLevel) {
+            $context['conf'][$gradeLevel->getLowerBound()] = $gradeLevel->getCaption();
+        }
+        return $context;
+    }
 }

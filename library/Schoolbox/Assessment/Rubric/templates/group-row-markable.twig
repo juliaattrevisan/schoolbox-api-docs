@@ -6,7 +6,9 @@
 {% set capabilityMaxValue = groupUsage.maxValue %}
 {% set capabilityMaxSum   = groupUsage.calculateMaxValueFromIndicators %}
 
-{% if showGroupTotal and markSchemeName != "None" and not hidePoints %}
+{% set markType = rubricGrid.assessment.markScheme.generateContext %}
+
+{% if showGroupTotal and markType.conf != "none" and not hidePoints %}
     {% set percentageMark     = capabilityMaxSum > 0 ? capabilityMark.value * (100 / capabilityMaxSum) : 0 %}
     {% set letterGradeBracket = false %}
     {% set letterGradeValue   = '' %}
@@ -42,7 +44,7 @@
 
             <label for="group-{{ capabilityId }}-mark">{{ locale.rubricGroup.proper }} mark</label>
 
-            {% if markSchemeName == 'TotalMarkFractional' %}
+            {% if markType.conf == 'raw' %}
                 <input data-group-mark
                        class="groupMark"
                        id="group-{{ capabilityId }}-mark"
@@ -50,7 +52,7 @@
                        name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
                        value="{{ capabilityScaledMark }}"/> / {{ capabilityMaxValue }}
 
-            {% elseif markSchemeName == 'LetterGrade' %}
+            {% elseif markType.conf == 'letter' %}
                 <select data-group-mark
                         class="groupMark"
                         name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
@@ -65,7 +67,7 @@
                     {% endfor %}
                 </select>
 
-            {% elseif markSchemeName == 'Percentage'%}
+            {% elseif markType.conf == 'percent' %}
                 <input data-group-mark
                        class="groupMark"
                        id="group-{{ capabilityId }}-mark"
@@ -80,13 +82,13 @@
             {% if capabilityMaxSum > 0 %}
                 {# TODO these need to be the descriptor sum! #}
                 <button data-use-descriptor-values>Assign <span class="descriptor-sum" data-group-descriptor-sum>
-                    {% if markSchemeName == 'TotalMarkFractional' %}
+                    {% if markType.conf == 'raw' %}
                         {{ capabilityScaledMark }}
 
-                    {% elseif markSchemeName == 'LetterGrade' %}
+                    {% elseif markType.conf == 'letter' %}
                         {{ letterGradeValue }}
 
-                    {% elseif markSchemeName == 'Percentage'%}
+                    {% elseif markType.conf == 'percent' %}
                         {{ percentageMark }}
 
                     {% endif %}

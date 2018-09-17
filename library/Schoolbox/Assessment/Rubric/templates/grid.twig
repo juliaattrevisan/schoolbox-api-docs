@@ -10,8 +10,9 @@
  # * showGroupTotal:          ? Should be inferred from grid's assessment (assessment.markPerCapability)
  #}
 
-{% set markSchemeName = rubricGrid.assessment.markScheme.title %}
-{% set showSummaryRows = rubricGrid.assessment.markPerCapability and rubricMarkedGrid and markSchemeName != "None" %}
+{% set markType = rubricGrid.assessment.markScheme.generateContext %}
+{#{% set markSchemeName = rubricGrid.assessment.markScheme.title %}#}
+{% set showSummaryRows = rubricGrid.assessment.markPerCapability and rubricMarkedGrid and markType.conf != "none" %}
 
 <div class="scrollable">
 <table class="rb stack-for-medium-down">
