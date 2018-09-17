@@ -119,8 +119,8 @@ class MarkedGrid
 
         // TODO make this work with the assessment's mark type?
         // (copy-pasted from CapabilityMark humanReadableMark)
-
-        return $this->markScheme->getHumanReadableMark($value / $maxValue * 100);
+        $normMark = $maxValue === 0 ? 0 : ($value / $maxValue * 100);
+        return $this->markScheme->getHumanReadableMark($normMark);
 
         // None
 //        $markScheme = new None();
