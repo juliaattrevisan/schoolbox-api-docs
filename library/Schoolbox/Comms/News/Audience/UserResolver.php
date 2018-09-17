@@ -10,7 +10,7 @@ namespace Schoolbox\Comms\News\Audience;
 
 use Alaress\Database;
 use Schoolbox\Permission\Access\UserAccess;
-use External_Class;
+use External_ClassInterface;
 use PDO;
 use UnexpectedValueException;
 
@@ -27,7 +27,7 @@ class UserResolver implements IUserResolver
     /** @var Database\Connector\IConnector */
     private $db;
 
-    /** @var \External_Class */
+    /** @var External_ClassInterface */
     private $externalClass;
 
     /** @var RelationshipFilterer */
@@ -40,14 +40,14 @@ class UserResolver implements IUserResolver
     /**
      * @param BusinessRules                 $businessRules
      * @param Database\Connector\IConnector $db
-     * @param External_Class                $externalClass
+     * @param External_ClassInterface       $externalClass
      * @param RelationshipFilterer          $relationshipFilterer
      * @param Mapper                        $audienceMapper
      */
     public function __construct(
         BusinessRules $businessRules,
         Database\Connector\IConnector $db,
-        External_Class $externalClass,
+        External_ClassInterface $externalClass,
         RelationshipFilterer $relationshipFilterer,
         Mapper $audienceMapper
     ) {
