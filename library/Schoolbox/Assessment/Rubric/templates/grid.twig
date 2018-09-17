@@ -12,7 +12,7 @@
 
 {% set markType = rubricGrid.assessment.markScheme.generateContext %}
 {#{% set markSchemeName = rubricGrid.assessment.markScheme.title %}#}
-{% set showSummaryRows = rubricGrid.assessment.markPerCapability and rubricMarkedGrid and markType.conf != "none" %}
+{% set showSummaryRows = rubricGrid.assessment.markPerCapability and rubricMarkedGrid and markType.mode != "none" %}
 
 <div class="scrollable">
 <table class="rb stack-for-medium-down">
