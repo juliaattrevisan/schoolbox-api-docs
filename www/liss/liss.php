@@ -14,7 +14,7 @@ require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 $externalDb = $kernel->get('databaseExternal');
 $liss = new External_Liss_Server($externalDb);
 
-$log = External_Liss_Server::log();
+$log = $liss->log();
 
 try {
     $liss->start();
