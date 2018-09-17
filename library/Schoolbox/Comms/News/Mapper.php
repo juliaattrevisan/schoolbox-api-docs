@@ -293,7 +293,6 @@ class Mapper extends \Schoolbox\Mapper
 
             $yearMonth = "{$year}-{$paddedMonth}%";
 
-            $pb->lessThan('expires_at', $now);
             $pb->like('publish_at', $yearMonth);
         } else {
             $pb->greaterThan('expires_at', $now);
