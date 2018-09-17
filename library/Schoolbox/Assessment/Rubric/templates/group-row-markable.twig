@@ -9,11 +9,13 @@
 {% if showGroupTotal and markSchemeName != "None" and not hidePoints %}
     {% set percentageMark     = capabilityMaxSum > 0 ? capabilityMark.value * (100 / capabilityMaxSum) : 0 %}
     {% set letterGradeBracket = false %}
+    {% set letterGradeValue   = '' %}
 
     {# TODO assumes values are always descending which might not be the case? #}
     {% for gradeLevel in rubricMarkedGrid.markScheme.gradeGroup.gradeLevels %}
         {% if (capabilityMark.value >= gradeLevel.lowerBound and not letterGradeBracket) %}
             {% set letterGradeBracket = gradeLevel.rawGrade %}
+            {% set letterGradeValue   = gradeLevel.caption %}
         {% endif %}
     {% endfor %}
 <tr>
@@ -82,7 +84,7 @@
                         {{ capabilityScaledMark }}
 
                     {% elseif markSchemeName == 'LetterGrade' %}
-                        {{ markType.conf[letterGradeValue] }}
+                        {{ letterGradeValue }}
 
                     {% elseif markSchemeName == 'Percentage'%}
                         {{ percentageMark }}
