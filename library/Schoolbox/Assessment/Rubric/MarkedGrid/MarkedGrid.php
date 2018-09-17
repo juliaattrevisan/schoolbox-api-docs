@@ -156,6 +156,15 @@ class MarkedGrid
 
 
     /**
+     * @return IMarkScheme
+     */
+    public function getMarkScheme(): IMarkScheme
+    {
+        return $this->markScheme;
+    }
+
+
+    /**
      * Returns an iterator over capability usages.
      *
      * @return iterable|CapabilityUsage[]

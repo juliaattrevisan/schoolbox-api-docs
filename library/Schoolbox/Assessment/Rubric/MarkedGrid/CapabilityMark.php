@@ -117,6 +117,15 @@ class CapabilityMark
 
 
     /**
+     * @return IMarkScheme
+     */
+    public function getMarkScheme(): IMarkScheme
+    {
+        return $this->markScheme;
+    }
+
+
+    /**
      * Iterates the list of indicator usages?
      *
      * @return iterable|IndicatorUsage[]
