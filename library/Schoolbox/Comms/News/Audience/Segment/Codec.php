@@ -64,7 +64,7 @@ class Codec
      */
     public function encodeSimpleAttributes(string $entityType, ?string $entityValue, string $modifier): string
     {
-        return $this->encodeSimpleParts($entityType, 0, $entityValue, $modifier);
+        return $this->encodeSimpleParts($entityType, $entityValue, $modifier);
     }
 
 
@@ -108,8 +108,14 @@ class Codec
     {
         $rootSegments = $this->segmentMapper->createCollection();
 
-        foreach (\explode(self::DELIMITER_SELECTIZE, $selectizeValues) as $encodedSegment) {
-            // Cannot index, as may not have an id set (ie new segments)
+        $trimmed = \trim($selectizeValues);
+
+        if('' === $trimmed){
+            return $rootSegments;
+        }
+
+        foreach (\explode(self::DELIMITER_SELECTIZE, $trimmed) as $encodedSegment) {
+            // Cannot index, as will not have id set
             $rootSegments->add($this->decode($encodedSegment));
         }
 
@@ -121,16 +127,14 @@ class Codec
      * Helper to ensure consistent encoding scheme, regardless of data source
      *
      * @param string      $entityType
-     * @param int         $id
      * @param null|string $entityValue
      * @param string      $modifier
      * @return string
      */
-    private function encodeSimpleParts(string $entityType, int $id, ?string $entityValue, string $modifier): string
+    private function encodeSimpleParts(string $entityType, ?string $entityValue, string $modifier): string
     {
         $parts = [
             $entityType,
-            $id,
             $this->encodeValue($entityValue),
             $modifier,
         ];
@@ -161,12 +165,11 @@ class Codec
     {
         $parts = [
             $segment->getEntityType(),
-            $segment->getId() ?: 0,
             $this->encodeValue($segment->getEntityValue()),
             $segment->getRelationship(),
         ];
 
-        return implode(self::DELIMITER_SIMPLE, $parts);
+        return \implode(self::DELIMITER_SIMPLE, $parts);
     }
 
 
@@ -179,9 +182,9 @@ class Codec
      */
     private function decodeSimple(string $encodedSegment): Audience\Model
     {
-        [$type, $id, $encodedValue, $modifier] = \explode(self::DELIMITER_SIMPLE, $encodedSegment);
+        [$type, $encodedValue, $modifier] = \explode(self::DELIMITER_SIMPLE, $encodedSegment);
 
-        return $this->segmentMapper->createModel($id ? (int)$id : null)
+        return $this->segmentMapper->createModel()
                                    ->setEntityType($type)
                                    ->setEntityValue($this->decodeValue($encodedValue))
                                    ->setRelationship($modifier);
@@ -203,7 +206,6 @@ class Codec
 
         $parts = [
             $segment->getEntityType(),         // need to put 'composite' first to easily detect composites
-            $segment->getId() ?: 0,
             $segment->getRelationship(),
             \implode(self::DELIMITER_CHILDREN, $childParts),
         ];
@@ -223,7 +225,7 @@ class Codec
      */
     private function decodeComposite(string $encodedSegment): Audience\Model
     {
-        [$type, $id, $modifier, $encodedChildren] = \explode(self::DELIMITER_COMPOSITE, $encodedSegment);
+        [$type, $modifier, $encodedChildren] = \explode(self::DELIMITER_COMPOSITE, $encodedSegment);
 
         $children = $this->segmentMapper->createCollection();
         foreach (\explode(self::DELIMITER_CHILDREN, $encodedChildren) as $encodedChild) {
@@ -250,7 +252,7 @@ class Codec
                                        ->setRelationship($effectiveModifier);
         }
 
-        return $this->segmentMapper->createModel($id ?: null)
+        return $this->segmentMapper->createModel()
                                    ->setEntityType($type)
                                    ->setChildren($children)
                                    ->setRelationship($modifier);
@@ -276,10 +278,13 @@ class Codec
                 return +1;
             }
             // Yes, it's possible to target the intersection of two entities of the same type, eg pastoral groups which are 1:N with users.
-            if ($left->getEntityValue() < $right->getEntityValue()) {
+            // Also need to encode first so we match the client-side algorithm
+            $encodedLeft  = $this->encodeValue($left->getEntityValue());
+            $encodedRight = $this->encodeValue($right->getEntityValue());
+            if ($encodedLeft < $encodedRight) {
                 return -1;
             }
-            if ($left->getEntityValue() > $right->getEntityValue()) {
+            if ($encodedLeft > $encodedRight) {
                 return +1;
             }
             // Yes, it's possible to target the intersection of two entities of the same type, and value.
