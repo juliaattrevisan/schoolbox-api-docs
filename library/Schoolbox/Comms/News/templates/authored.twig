@@ -127,13 +127,18 @@
             // Find some articles
             axios.get('{{ routeLookup('commsNews.getAuthoredArticles') }}').then(function(response) {
 
+                // Convert response into an array
+                var articles = Object.keys(response.data).map(function(key) {
+                    return response.data[key];
+                });
+
                 vue.articlesLoading = false;
-                vue.allArticles = response.data;
-                vue.filteredArticles = response.data;
+                vue.allArticles = articles;
+                vue.filteredArticles = articles;
 
                 // Loop the returned articles and populate the 'statuses' array for the status tabs
                 vue.statuses.push('All'); // Add the 'all' tab here so that all the tabs are loaded on the screen at the same time
-                response.data.forEach(function (article) {
+                articles.forEach(function (article) {
                     if (vue.statuses.indexOf(article.status) === -1) {
                         vue.statuses.push(article.status);
                     }
