@@ -45,7 +45,7 @@ class Module extends BaseModule
             );
         });
 
-        /* To see an article, you must be a SU, CommsOfficer, Moderator, or the article must be published/expired
+        /* To see an article, you must be a SU, CommsOfficer, Moderator, or Author - or the article must be published/expired
          * and either publicly visible, or you are in the audience
          */
         $readerPerms = new Rule\LazyCallback(function () {
@@ -57,6 +57,7 @@ class Module extends BaseModule
                     new Rule\IsSuperuser(),
                     new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
                     new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper()),
+                    new Authorizer\Rule\IsArticleAuthor(),
                     new Rule\All(
                         new Authorizer\Rule\IsPublishedOrExpired(),
                         new Rule\Any(
