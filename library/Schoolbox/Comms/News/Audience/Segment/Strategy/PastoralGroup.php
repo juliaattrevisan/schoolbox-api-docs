@@ -7,9 +7,22 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience;
+use Schoolbox\User;
+
 class PastoralGroup extends Base
 {
     public const ENTITY_TYPE = 'pastoral_group';
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canBeTargetedByUser(User $user): bool
+    {
+        return $user->getRole()->isStaff();
+    }
+
 
     /**
      * @inheritdoc
@@ -48,5 +61,14 @@ class PastoralGroup extends Base
     {
         // Quite likely a user is not in any pastoral groups
         return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getValidRelationshipModifiers(User $user): array
+    {
+        return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }
 }

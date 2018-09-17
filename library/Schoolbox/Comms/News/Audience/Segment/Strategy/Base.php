@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience;
+use Schoolbox\User;
 use Schoolbox\Comms\News\Audience\Segment\IStrategy;
 use UnexpectedValueException;
 
@@ -34,9 +36,29 @@ abstract class Base implements IStrategy
     /**
      * @inheritdoc
      */
+    public function canBeTargetedByUser(User $user): bool
+    {
+        // Default to restricted.
+        return false;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     public function canTargetNullEntityValue(): bool
     {
         // Default implementation. Assume 1:1 with users, eg not possible for a user to not have a Role.
         return false;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getValidRelationshipModifiers(User $user): array
+    {
+        // Safe default it to not permit relationship modification
+        return [Audience\Model::RELATIONSHIP_SELF];
     }
 }

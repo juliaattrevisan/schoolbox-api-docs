@@ -7,6 +7,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience;
+use Schoolbox\User;
+
 class ResHouse extends Base
 {
 
@@ -36,5 +39,14 @@ class ResHouse extends Base
     {
         // Users have 0:1 residential houses
         return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getValidRelationshipModifiers(User $user): array
+    {
+        return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }
 }

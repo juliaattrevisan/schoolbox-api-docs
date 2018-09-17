@@ -7,9 +7,20 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience;
+use Schoolbox\User;
+
 class Campus extends Base
 {
     public const ENTITY_TYPE = 'campus';
+
+    /**
+     * @inheritdoc
+     */
+    public function canBeTargetedByUser(User $user): bool
+    {
+        return true;
+    }
 
     /**
      * @inheritdoc
@@ -46,5 +57,13 @@ class Campus extends Base
     {
         // From a schema level, a user has 0:N campus
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getValidRelationshipModifiers(User $user): array
+    {
+        return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }
 }

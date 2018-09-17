@@ -14,6 +14,14 @@ class User extends Base
     /**
      * @inheritdoc
      */
+    public function canBeTargetedByUser(\Schoolbox\User $user): bool
+    {
+        return $user->getRole()->isStaff();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getSearchSql(string $searchPlaceholder = null): string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "AND (firstname LIKE :{$searchPlaceholder} OR lastname LIKE :{$searchPlaceholder})";

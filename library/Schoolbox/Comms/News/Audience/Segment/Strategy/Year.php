@@ -7,9 +7,20 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience;
+use Schoolbox\User;
+
 class Year extends Base
 {
     public const ENTITY_TYPE = 'year';
+
+    /**
+     * @inheritdoc
+     */
+    public function canBeTargetedByUser(User $user): bool
+    {
+        return $user->getRole()->isStaff();
+    }
 
     /**
      * @inheritdoc
@@ -52,5 +63,14 @@ class Year extends Base
     {
         // User's may not have a year
         return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getValidRelationshipModifiers(User $user): array
+    {
+        return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }
 }

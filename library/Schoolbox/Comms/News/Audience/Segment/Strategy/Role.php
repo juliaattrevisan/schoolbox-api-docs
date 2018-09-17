@@ -7,9 +7,19 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\User;
+
 class Role extends Base
 {
     public const ENTITY_TYPE = 'role';
+
+    /**
+     * @inheritdoc
+     */
+    public function canBeTargetedByUser(User $user): bool
+    {
+        return $user->getRole()->isStaff();
+    }
 
     /**
      * @inheritdoc
