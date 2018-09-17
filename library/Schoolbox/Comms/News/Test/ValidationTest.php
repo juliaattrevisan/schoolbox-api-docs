@@ -14,34 +14,18 @@ use Schoolbox\Comms\News\Audience\MockUserResolver;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\ValidArticle;
-use Schoolbox\Comms\News\ValidArticleIsPubliclyReadable;
-use Schoolbox\Comms\News\ValidBroadcast;
 use Schoolbox\Comms\News\ValidDateOffset;
 use Schoolbox\User;
 
-
 class ValidationTest extends TestCase
 {
-
-    /**
-     * @dataProvider provider_validBroadcastRequirements
-     * @param Model $article
-     * @param bool  $expected
-     */
-    public function testValidBroadcastRequirements(Model $article, bool $expected): void
-    {
-        $validation = new ValidBroadcast();
-
-        $this->assertEquals($expected, $validation->isSatisfiedBy($article));
-    }
-
     /**
      * Data provider for testValidModerationRequirements
      *
      * @return array
      */
     public function provider_validBroadcastRequirements(): array {
-        $user = (new \Schoolbox\User())->setId(19);
+        $user = (new User())->setId(19);
         $date = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 14);
         $publishAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 15);
         $expiresAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 16);
@@ -292,24 +276,6 @@ class ValidationTest extends TestCase
                 false
             ],
         ];
-    }
-
-
-    /**
-     * Find out whether $user can see $article contents
-     *
-     * @dataProvider provider_validAccessibility
-     * @param User  $user
-     * @param Model $article
-     * @param array $audiencedUsers
-     * @param       $expected
-     */
-    public function testValidAccessibility(User $user, Model $article, array $audiencedUsers, $expected): void
-    {
-        $userResolver = new MockUserResolver();
-        $validation = new ValidArticleIsPubliclyReadable($userResolver);
-
-        $this->assertEquals($expected, $validation->isSatisfiedBy($user, $article, $audiencedUsers));
     }
 
 

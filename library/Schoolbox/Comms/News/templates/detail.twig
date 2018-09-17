@@ -66,14 +66,14 @@
 
         {# Modify article #}
         {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {articleId: article.id}) %}
-        {% if modifyRoute and isEditable %}
+        {% if modifyRoute %}
             <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
         {% endif %}
 
         {# Delete article #}
         {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {articleId: article.id}) %}
 
-        {% if deleteRoute and isDeletable %}
+        {% if deleteRoute %}
             <script>
                 $(function() {
                     $('#header-options').on('click', 'a[data-delete]', function(event) {
@@ -128,7 +128,7 @@
 
         {# Statistics link: must be author or comms officer and article must be published #}
         {% set statisticsRoute = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {articleId: article.id}) %}
-        {% if isAuthor or isCommsOfficer %}
+        {% if statisticsRoute %}
             <li><a class="icon-progress" href="{{ statisticsRoute }}">Statistics</a></li>
         {% endif %}
 

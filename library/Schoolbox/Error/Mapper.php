@@ -189,15 +189,6 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     public const ERROR_SUBMISSION_WINDOW_EXCEEDED = 214;
     public const ERROR_TASS_SSO_FAILURE = 215;
 
-    /* You cannot view this article because it is already moderated and ready for publishing
-     * Only comms officers can crud from this point onwards
-     */
-    public const ERROR_COMMS_NEWS_ALREADY_ACCEPTED = 221;
-
-    /* Only Comms Officers can delete news articles when they're already moderated and/or published
-     */
-    public const ERROR_COMMS_NEWS_CANNOT_DELETE = 222;
-
     /* This article isn't valid
      */
     public const ERROR_COMMS_NEWS_INVALID_ARTICLE = 223;
