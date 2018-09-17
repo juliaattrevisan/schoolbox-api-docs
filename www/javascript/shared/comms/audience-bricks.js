@@ -1400,8 +1400,14 @@ function BrickManager(vue, codec, entityTypeLabelMap) {
                 }
             }
         }
-        console.log('logical1dBrickWithMultiValues');
-        console.log(logical1dBrickWithMultiValues);
+
+        // Did we not find any simple bricks with 'self' modifier for this entity type?
+        if(!logical1dBrickWithMultiValues){
+            // Since for now all composite segments have a 'self' brick modifier, we can conclude that no combination
+            // of simple bricks is a superset of a composite brick.
+            return;
+        }
+
         var bricksToRemove = [];
         // Now that we have built this logical 1D brick, see if it logically contains any composites
         for(var k in bricks){
