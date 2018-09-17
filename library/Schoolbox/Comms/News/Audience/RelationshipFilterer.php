@@ -15,7 +15,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use External_User;
+use External_UserInterface;
 use Schoolbox\Resource\Folder;
 use External_ClassInterface;
 use PDO;
@@ -37,7 +37,7 @@ class RelationshipFilterer
     /** @var UserMapper */
     private $userMapper;
 
-    /** @var External_User */
+    /** @var External_UserInterface */
     private $externalUser;
 
     /** @var Folder\Mapper */
@@ -51,17 +51,17 @@ class RelationshipFilterer
 
 
     /**
-     * @param IConnector       $db
-     * @param UserMapper       $userMapper
-     * @param External_User    $externalUser
-     * @param Folder\Mapper    $folderMapper
-     * @param External_ClassInterface   $externalClass
-     * @param UserAccessMapper $userAccessMapper
+     * @param IConnector              $db
+     * @param UserMapper              $userMapper
+     * @param External_UserInterface  $externalUser
+     * @param Folder\Mapper           $folderMapper
+     * @param External_ClassInterface $externalClass
+     * @param UserAccessMapper        $userAccessMapper
      */
     public function __construct(
         IConnector $db,
         UserMapper $userMapper,
-        External_User $externalUser,
+        External_UserInterface $externalUser,
         Folder\Mapper $folderMapper,
         External_ClassInterface $externalClass,
         UserAccessMapper $userAccessMapper
