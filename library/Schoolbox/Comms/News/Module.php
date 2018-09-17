@@ -96,10 +96,10 @@ class Module extends BaseModule
         $this->register('GET', '/archive{/year,month}', 'getArchive', $viewPerms);
 
         // Index of articles authored by the logged in user
-        $this->register('GET', '/me', 'getAuthored', $getPerms);
+        $this->register('GET', '/me', 'getAuthored', $viewPerms);
 
         // (async) Get a list of articles a user has authored
-        $this->register('GET', '/me/articles', 'getAuthoredArticles', $getPerms);
+        $this->register('GET', '/me/articles', 'getAuthoredArticles', $viewPerms);
 
         /* Find out who will receive this article
          */
