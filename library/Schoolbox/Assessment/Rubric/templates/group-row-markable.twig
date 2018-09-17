@@ -7,8 +7,10 @@
 {% set capabilityMaxSum   = groupUsage.calculateMaxValueFromIndicators %}
 
 {% if showGroupTotal and markSchemeName != "None" and not hidePoints %}
-    {% set percentageMark = capabilityMaxSum > 0 ? capabilityMark.value * (100 / capabilityMaxSum) : 0 %}
+    {% set percentageMark     = capabilityMaxSum > 0 ? capabilityMark.value * (100 / capabilityMaxSum) : 0 %}
     {% set letterGradeBracket = false %}
+
+    {{ dump(capabilityMark.markScheme) }}
 
     {# TODO assumes values are always descending which might not be the case? #}
     {% for value, letter in markType.conf if (percentageMark >= value and not letterGradeBracket) %}
