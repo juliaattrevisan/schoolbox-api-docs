@@ -104,13 +104,15 @@
 
     <div id="toast" class="toast"></div>
 {% else %}
-    <div class="empty-state">
-        <i class="icon-news"></i>
-        <p>The archive is empty.</p>
+    <div class="small-12 columns">
+        <div class="empty-state">
+            <i class="icon-news"></i>
+            <p>The archive is empty.</p>
 
-        {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-        {% if createRoute %}
-            <p>You can <a href="{{ createRoute }}">create some {{ locale.news }}</a>.</p>
-        {% endif %}
+            {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+            {% if createRoute %}
+                <p>You can <a href="{{ createRoute }}">create some {{ locale.news }}</a>.</p>
+            {% endif %}
+        </div>
     </div>
 {% endif %}
