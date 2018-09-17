@@ -1,13 +1,8 @@
-
-/* TODO. Move to own class.
- * Note that the client side always deals with encoded entity values, it has no need to use the raw underlying entityValue
- *
- */
-
-/* Encapsulation considerations.
+/**
+ * JS Object encapsulation considerations:
  * Ideally we would have public prototype methods, on private properties to enforce encapsulation.
  * But logging of objects to console does not show private property values, which is difficult to debug.
- * We would also way public accessor methods for type-hinting.
+ * We would desire public accessor methods for type-hinting.
  * Trade-offs:
  * * use this.x style for variables so we can see their values when logging to console
  * * use privileged getter methods to type-hint instance properties
@@ -15,21 +10,22 @@
  * * no point using public methods as they need to proxy through privileged to hit private.
  */
 
+
 /**
  * Codec (Encoder + Decoder)
  *
- * Objects of this class are responsible for converting an audience segment into a string to be used as a selectize option key.
+ * Objects of this class are responsible for converting an audience segment into a string to be used as a unique selectize option key.
  * An audience segment may be simple, or composite, where the composite is the intersect of 2:N simple sub-segments.
  * Note that the rendered audience 'bricks' and vue-model data structures are N:1 to an audience segment.
- * Must match server-side codec algorithm.
  *
  * Design Considerations:
  * * Must not be part of the base64 charset to ensure we don't split on the encoded entityValue
  * * Must ensure simple segment delimiter in both simple and composite segments to be the same to enable code reuse
  * * place entityType first so we can easily determine outer segment simple/composite nature
+ * * Must match server-side codec algorithm.
  *
  * Examples:
- *      "folder:ef:self"                                         [folder:ef=]^self
+ *      "folder:ef:self"                                     [folder:ef=]^self
  *      "composite;parents_of;folder:ef:self,role:bc:self"   [folder:ef= ∩ role:bc]^parents_of
  *      "composite;self;folder:ef:self,folder:bc:self"       [folder:ef= ∩ folder:bc]^self
  *
@@ -37,7 +33,6 @@
  *
  * @constructor
  * @see Audience\Segment\Codec
- * @todo move to JS file
  */
 function Codec() {
     "use strict";
@@ -374,7 +369,9 @@ function Segment(entityType, entityValue, modifier, children)
 /**
  * Encapsulates an entityType, set of entityValues, and modifier
  *
- * When used in a simple Brick, the dimesion's modifier should always be 'self', with the segment's modifier applied to the Brick
+ * When used in a simple Brick, the dimension modifier should always be 'self', with the segment's modifier applied to the Brick
+ * @todo. I now think this is wrong. We should simply make the definition of a simple brick as being 1D. The rendering of a 1D can handle this case,
+ * but it will simplify the implementation. I think...
  *
  * @constructor
  * @param {string} entityType
@@ -427,6 +424,9 @@ function Dimension(entityType, entityValue, modifier) {
             return 1;
         } else {
             for(var i in otherValues){
+                if(!otherValues.hasOwnProperty(i)){
+                    continue;
+                }
                 if(-1 === this.entityValues.indexOf(otherValues[i])){
                     return 1;
                 }
@@ -450,7 +450,7 @@ function Dimension(entityType, entityValue, modifier) {
      * Attempts to another dimension's entityValues to this dimension.
      * Returns whether any values were added
      * @param {Dimension} other
-     * @throws If an invalid entity type is specified
+     * @throws If the other Dimension has an incompatible entityType or modifier
      */
     this.absorbDimension = function (other) {
         if(other.getEntityType() !== this.entityType){
@@ -471,8 +471,6 @@ function Dimension(entityType, entityValue, modifier) {
         return valuesAdded;
     }
 }
-
-
 
 
 
@@ -517,7 +515,7 @@ function Brick(segment, typeLabelMap, valueLabelMap)
     var _isComposite = segment.isComposite();
 
     var self           = this;                    // So private methods can access public properties
-    this.segments      = [segment];               // Required to be stored so we can track Segment IDs
+    this.segments      = [segment];               // Required to be stored so we can remove from selectize if we remove this brick
     this.dimensions    = [];                      // eg [{folder, [A,B]}, {folder, [Y]}, {role, [Z]}]
     this.modifiers     = [segment.getModifier()]; // eg ['self', 'parents_of']
     this.typeLabelMap  = typeLabelMap;            // Need to store a reference so we can inject to new bricks during explosion.
@@ -593,10 +591,8 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         return _isComposite;
     };
 
-
-
     /**
-     *
+     * When absorbing another brick, we must also absorb its value label map so we can render it appropriately
      * @param {Object|string[][]} otherValueLabelMap - Translated names used by the segment. Indexed by [entityType][encodedEntityValue]
      */
     this.absorbValueLabelMap = function(otherValueLabelMap){
@@ -654,12 +650,18 @@ function Brick(segment, typeLabelMap, valueLabelMap)
             var thisDimension  = this.dimensions[j];
             var isSuperSet = false;
             for(var k in otherDimensions){
+                if(!otherDimensions.hasOwnProperty(k)){
+                    continue;
+                }
                 var otherDimension = otherDimensions[k];
                 if(thisDimension.entityType !== otherDimension.entityType || thisDimension.modifier !== otherDimension.modifier){
                     continue;
                 }
                 var isExtraValue = false;
                 for(var l in otherDimension.entityValues){
+                    if(!otherDimension.entityValues.hasOwnProperty(l)) {
+                        continue;
+                    }
                     var otherDimensionValue = otherDimension.entityValues[l];
                     if(-1 === thisDimension.entityValues.indexOf(otherDimensionValue)){
                         isExtraValue = true;
@@ -693,22 +695,22 @@ function Brick(segment, typeLabelMap, valueLabelMap)
      */
     this.canAbsorbBrick = function(other){
         if(this.isSimple() !== other.isSimple()){
-            // console.log('xor simple');
             return false;
         }
         if(this.dimensions.length !==  other.dimensions.length){
-            // console.log('different dim length');
             return false;
         }
 
         if(this.containsBrick(other)){
-            // console.log('already contsins');
             return false;
         }
 
         // Would we need to increase the brick modifiers?
         var brickModifierDOF = 0;
         for(var i in other.modifiers){
+            if(!other.modifiers.hasOwnProperty(i)){
+                continue;
+            }
             if(-1 === this.modifiers.indexOf(other.modifiers[i])){
                 brickModifierDOF = 1;
                 break;
@@ -721,7 +723,7 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         var otherDimensions = filteredDimensions[1];
 
 
-        // Need to find number of count of mergable (but not subset) dimensions;
+        // Need to find count of dimensions that can be merged (but not subset);
         var countCompatibleDim = 0;
         for(var j in otherDimensions){
             var otherDimension = otherDimensions[j];
@@ -734,17 +736,14 @@ function Brick(segment, typeLabelMap, valueLabelMap)
                     break;
                 }
             }
-            // console.log('dof: ' + minDof);
             if(2 === minDof){
                 // Unable to merge the other dimension with any on this brick.
-                // console.log('no mergable dimension found');
                 return false;
             }
             if(1 === minDof){
                 countCompatibleDim++;
             }
             if(countCompatibleDim >= 2){
-                // console.log('2 mergable dimensions is too many');
                 return false;
             }
         }
@@ -752,64 +751,9 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         if(this.isSimple()){
             return 0 === countCompatibleDim && 1 === brickModifierDOF;
         }
-// console.log(countCompatibleDim);
-// console.log(brickModifierDOF);
+
         return  1 === countCompatibleDim + brickModifierDOF;
 
-
-        // Compute dimensions DOF
-        // We need to remove any 0-DOF dimension from other so that these are not available for aggregating with a 1-DOF dimension
-        // eg, consider [(F:A)^S ∩ (F:X)^S]^S + [(F:A)^S ∩ (F:X)^P]^S
-        // Here, if we iterate the first bricks dimensions, they will be 0-DOF and 1-DOF respectively from the first dimension in the second brick
-        // Hence, we need to ensure we remove the 0-DOF dimensions from the other brick to avoid them being treated as aggregation candidates.
-
-        // var sumDimensionDOF = 0;
-        // for(var j in this.dimensions){
-        //     var thisDimension = this.dimensions[j];
-        //     console.log('this');
-        //     console.log(thisDimension);
-        //     var minDimensionDOF = 2;
-        //     for(var k in otherDimensions){
-        //         var otherDimension = otherDimensions[k];
-        //         console.log('other');
-        //         console.log(otherDimension);
-        //
-        //         if(thisDimension.modifier !== otherDimension.modifier || thisDimension.entityType !== otherDimension.entityType){
-        //             console.log('dif mod or type');
-        //             continue;
-        //         }
-        //         minDimensionDOF = 0;
-        //         var otherDimValues = otherDimension.entityValues;
-        //         for(var l in otherDimValues){
-        //             if(-1 === thisDimension.entityValues.indexOf(otherDimValues[l])){
-        //                 minDimensionDOF = 1;
-        //                 break;
-        //             }
-        //         }
-        //         if(0 === minDimensionDOF) {
-        //             otherDimensions.splice(k, 1);
-        //             console.log('splicing...');
-        //             console.log(otherDimensions);
-        //         }
-        //     }
-        //     console.log('minDimensionDOF: ' + minDimensionDOF);
-        //     sumDimensionDOF += minDimensionDOF;
-        //     if(sumDimensionDOF >= 2){
-        //         // We can short-circuit if at any point we know that the dimension DOF is too high
-        //         return false;
-        //     }
-        // }
-        //
-        // // Simple bricks can only absorb if they differ just in brick modifier
-        // if(this.isSimple()){
-        //     return 0 === sumDimensionDOF && 1 === brickModifierDOF;
-        // }
-        //
-        // // Composite bricks can absorb if they differ in any one DOF
-        // console.log(sumDimensionDOF);
-        // console.log(brickModifierDOF);
-        // console.log(otherDimensions);
-        // return 1 === sumDimensionDOF + brickModifierDOF;
     };
 
 
@@ -824,42 +768,6 @@ function Brick(segment, typeLabelMap, valueLabelMap)
      * @return Dimension[][] The dimensions with the 0Dof pairs removed
      */
     var strip0dofDimensionPairs = function(thisDimensions, otherDimensions){
-        var zeroDofs = [];
-        for(var i in thisDimensions){
-            for(var j in otherDimensions){
-                if(thisDimensions[i].equals(otherDimensions[j])){
-                    zeroDofs.push(thisDimensions[i]);
-                    break;
-                }
-            }
-        }
-
-        function filterODofs(dimension){
-            for(var k in zeroDofs){
-                if(zeroDofs[k].equals(dimension)){
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        var filteredThis = thisDimensions.filter(filterODofs),
-            filteredThat = otherDimensions.filter(filterODofs);
-
-        return [filteredThis, filteredThat];
-    };
-
-    /**
-     * In some cases, we need to traverse the dimensions without 0DOF pairs matching as 1DOF pairs.
-     * To do so, we must remove them from both arrays.
-     *
-     * This assumes arrays are of the same length.
-     *
-     * @param {Dimension[]} thisDimensions
-     * @param {Segment[]} otherSegments
-     * @return Dimension[][] The dimensions with the 0Dof pairs removed
-     */
-    var strip0dofDimensionSegmentPairs = function(thisDimensions, otherSegments){
         var zeroDofs = [];
         for(var i in thisDimensions){
             for(var j in otherDimensions){
@@ -918,8 +826,8 @@ function Brick(segment, typeLabelMap, valueLabelMap)
             sourceDimension     = null;
 
         // For each other dimension
-        for(var i in otherDimensions){
-            var otherDimension = otherDimensions[i],
+        for(var k in otherDimensions){
+            var otherDimension = otherDimensions[k],
                 is0DOF         = false;
 
             // Compare it to each remaining candidate on this brick
@@ -966,17 +874,6 @@ function Brick(segment, typeLabelMap, valueLabelMap)
 
 
     /**
-     * Returns DOF between a Segment and Brick's modifiers
-     *
-     * @param {Segment} segment
-     * @return int
-     */
-    var computeSegmentAndBrickModifierDOF = function(segment){
-        // Return's 1 DOF if Brick does not contain the Segment's modifier
-        return -1 === self.modifiers.indexOf(segment.getModifier()) ? 1 : 0;
-    };
-
-    /**
      * Returns DOF between this Brick and another Brick's modifiers
      *
      * @param {Brick} other
@@ -998,51 +895,6 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         return 0
     };
 
-    /**
-     * @param {Segment} segment
-     * @return int
-     */
-    var computeDimensionsDOF = function(segment){
-
-        // Simple Case
-        if(segment.isSimple()){
-            return minDimensionDOF(segment);
-        }
-
-        // Composite Case
-        var sumMin = 0;
-        var childSegments = segment.getChildren();
-        for(var i in childSegments){
-            sumMin += minDimensionDOF(childSegments[i]);
-        }
-        return sumMin;
-    };
-
-    /**
-     * Returns the minimum DOF between a segment and any of this Brick's type:values dimensions
-     *
-     * @param {Segment} segment
-     * @return int
-     * @todo this is flawed for multi dimensions because you need to remove a candiated dimension from the list to avoid it matching with multimidensms
-     */
-    var minDimensionDOF = function(segment){
-        // Start at max DOF. Implies different type (2), value (1) + modifier (1).
-        var minDOF = 4, typeDOF, valueDOF, modifierDOF, dimension;
-        for(var i in self.dimensions){
-            dimension   = self.dimensions[i];
-            typeDOF     = segment.getEntityType() === dimension.getEntityType() ? 0 : 2;
-            valueDOF    = (dimension.getEntityValues().length > 1 || -1 === dimension.getEntityValues().indexOf(segment.getEntityValue())) ? 1 : 0;
-            // We don't care about simple segment modifiers, they are applied to the Brick instead, and hardcoded to 'self' on the dimensions
-            modifierDOF = segment.isSimple() || segment.getModifier() === dimension.getModifier() ? 0 : 1;
-            // console.log('typeDOF: ' + typeDOF);
-            // console.log('valueDOF: ' + valueDOF);
-            // console.log('modifierDOF: ' + modifierDOF);
-
-            minDOF = Math.min(minDOF, typeDOF + valueDOF + modifierDOF);
-        }
-        // console.log('minDOF: ' + minDOF);
-        return minDOF;
-    };
 
     /**
      * Explodes this Brick into N bricks, each containing 1 Segment only
@@ -1098,7 +950,7 @@ function Brick(segment, typeLabelMap, valueLabelMap)
 /**
  * Updates all labels on this brick
  * @todo No need to do this during brick build. Instead just set a dirty flag on brick update
- * @todo and when brick build is over, then update the labels on all dirty bricks.
+ * @todo and when brick build algorithm is over, then update the labels on all dirty bricks.
  */
 Brick.prototype.updateLabels = function(){
     this.nameLabel     = this.getNameLabel();
@@ -1239,14 +1091,9 @@ Brick.prototype.getModifiersBitMap = function(modifiers){
 
 
 /**
- *  TODO need to handle case when multiple simple bricks means we can cancel a composite brick. eg [F:X] and [F:Y] means any composite of [F:X,Y ......] can be removed
- *
- *
  * A BrickManager knows how to build Bricks out of Segments and other Bricks.
  *
- * Bricks can absorb Segments or other Bricks if the absorbed entity is either:
- * * A subset of this brick, or
- * * 1-degree of freedom difference from this brick
+ * Bricks can absorb other Bricks if the other brick is 1-degree of freedom difference from this brick.
  *
  * Degree-of-Freedom Analysis (much easier on paper)
  *   Consider a brick composed of simple segments, [(Campus:X)^S]^SP
@@ -1262,7 +1109,7 @@ Brick.prototype.getModifiersBitMap = function(modifiers){
  *   The following cannot be absorbed:
  *   * [Campus:C,D ∩ House:G ∩ Role:X]^S - both Campus and House are different
  *
- *   Note that in the complex case, it is possible that multiple Bricks are able to absorb a Brick or Segment, in
+ *   Note that in the complex case, it is possible that multiple Bricks are able to absorb a Brick, in
  *   this case we sort the candidate Bricks to ensure consistency when building bricks, regardless of whether loaded from DB or modal.
  *
  *   Whenever a Brick absorbs another Brick or Segment, it now becomes a candidate for absorption itself because it may now be 1-degree of freedom away from another Brick.
@@ -1329,14 +1176,12 @@ function BrickManager(vue, codec, entityTypeLabelMap) {
         }
         // Did we find any suitable candidate bricks?
         if(brickCandidates.length){
-            // console.log('absorbing segment in existing brick');
             // Find the optimal brick and insert segment there
             var optimalBrick = computeOptimalHostBrick(brickCandidates, newBrick);
             optimalBrick.absorbBrick(newBrick);
             onBrickChanged(selectize, bricks, optimalBrick);
         } else {
             // Create a new brick with the segment
-            // console.log('creating new brick for segment');
             bricks.push(newBrick);
             onBrickChanged(selectize, bricks, newBrick);
         }
@@ -1381,8 +1226,10 @@ function BrickManager(vue, codec, entityTypeLabelMap) {
                 if(!logical1dBrickWithMultiValues){
                     logical1dBrickWithMultiValues = new Brick(brick.segments[0], {}, {});
                     for(var j in brick.segments){
+                        if(!brick.segments.hasOwnProperty(j)){
+                            continue;
+                        }
                         var nextSegment = brick.segments[j];
-                        console.log('j: ' + j);
                         if(j === 0){
                             continue;
                         }
@@ -1445,28 +1292,21 @@ function BrickManager(vue, codec, entityTypeLabelMap) {
      * @param {Brick} changedBrick
      */
     var onBrickChanged = function (selectize, bricks, changedBrick) {
-        // console.log('onBrickChanged()');
-
         for(var i in bricks){
-            console.log('testing brick #' + i);
             if(changedBrick === bricks[i]){
-                console.log('no point comparing to self, skipping...');
                 continue;
             }
             if(changedBrick.containsBrick(bricks[i])){
                 // eg you have a brick [R:A ∩ C:X] then add new brick [R:A]. The former is a subset of the latter.
-                console.log('changed brick contains existing brick - todo');
                 self.removeBrick(selectize, bricks, bricks[i]);
             }
             else if(changedBrick.canAbsorbBrick(bricks[i])){
-                console.log('changed brick absorbing existing brick');
-                console.log(changedBrick);
-                console.log(bricks[i]);
                 changedBrick.absorbBrick(bricks[i]);
                 bricks.splice(i, 1);
                 onBrickChanged(selectize, bricks, changedBrick);
                 break;
             }
+            // TODO is this required? Do we need to check both ways?
             // if(bricks[i].canAbsorbBrick(changedBrick)){
             //     console.log('existing brick can absorb changed brick');
             //     // bricks[i].absorbBrick(changedBrick);
@@ -1477,10 +1317,15 @@ function BrickManager(vue, codec, entityTypeLabelMap) {
         }
     };
 
+    /**
+     * Removes a Brick from Vue's data model, and the Brick's segments from Selectize
+     * @param {Selectize} selectize
+     * @param {Brick[]} bricks
+     * @param {Brick} brick
+     */
     this.removeBrick = function(selectize, bricks, brick){
         for(var j in brick.segments){
             if(brick.segments.hasOwnProperty(j)){
-                console.log('removing: ' + codec.encode(brick.segments[j]));
                 selectize.removeItem(codec.encode(brick.segments[j]));
             }
         }

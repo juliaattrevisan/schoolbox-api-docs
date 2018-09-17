@@ -690,7 +690,6 @@ function TestSuite() {
             sBrick1 = new Brick(sS1, {}, {}),                                 // [C:A]
             cBrick  = new Brick(cS1, {}, {});
             cBrick.absorbBrick(new Brick(cS2, {}, {}));                       // [(C:A,B) (R:X)]
-        console.log(cBrick);
 
         // currently not valid via brick public methods
         sBrick1.dimensions[0].entityValues = ['A', 'B'];
@@ -750,68 +749,9 @@ function TestSuite() {
         throw new Error("Expected: '" + expected + "' (" + typeof expected + "), Actual: '" + actual + "' (" + typeof actual + ")");
     };
 }
+
 $(function () {
-
-
-
-
-
-    // 1. find 0dofs and put in temp array (N^2)
-    // clean both arrays by stripping pairs (N^2)
-    // compare stripped (N2)
-
-    // 1. find
-
     new TestSuite().run();
-
-
-    var codec = new Codec();
-
-//
-// // Test brick building - simple
-// var brick1 = new Brick(decodedSimple1);
-//
-// console.log('canAdd: ' + brick1.canAbsorbBrick(decodedSimple1));
-// console.log('contains: ' + brick1.containsSegment(decodedSimple1));
-//
-// console.log('canAdd: ' + brick1.canAbsorbBrick(decodedSimple2));
-// console.log('contains: ' + brick1.containsSegment(decodedSimple2));
-//
-//
-// if(brick1.canAbsorbBrick(decodedSimple2)){
-//     brick1.absorbSegment(decodedSimple2)
-// }
-// console.log('contains: ' + brick1.containsSegment(decodedSimple2));
-//
-//
-// // Ensure we cannot build a composite segment where the composite and a child are both non-self
-// var caught = false;
-// try{
-//     codec.decode('composite;0;parents_of;folder:0:X:parents_of,folder:0:Y:self');
-// } catch (e){
-//     caught = true;
-// }
-// if(!caught){
-//     console.log('Detect non-self composite nesting: Expected: true, Actual: ' + caught);
-// }
-
-
-
-
-
-// Test brick building - composite
-//     var s1 = codec.decode('composite;0;parents_of;folder:0:X:self,folder:0:Y:self');
-//     var brick2 = new Brick(s1, {}, {});
-//
-//
-//     var s2 = codec.decode('composite;0;parents_of;folder:0:X:self,folder:0:X:self');
-// console.log(s2);
-// console.log(brick2.containsSegment(s2) ? 'contains' : 'not contains');
-//
-// // console.log(s1);
-// console.log(brick2);
-
-// var dimension = new Dimension('folder', '3');
 });
 
 
