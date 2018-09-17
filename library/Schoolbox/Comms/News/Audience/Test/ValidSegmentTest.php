@@ -15,6 +15,7 @@ use Schoolbox\Role;
 use Alaress\Specification;
 use Schoolbox\Comms\News\Audience\Validation;
 use Schoolbox\Comms\News\Audience\Segment\Strategy;
+use Schoolbox\User;
 
 class ValidSegmentTest extends PHPUnit\Framework\TestCase
 {
@@ -29,8 +30,42 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     public function setUp()
     {
         parent::setUp();
-        $factory                = new Validation\Factory(new Audience\BusinessRules());
-        $this->validSegmentSpec = $factory->makeValidSegmentSpecification();
+
+        // Ensure the relationship is valid for the segment's entity type
+        $validRelationships = [
+            Audience\Model::ENTITY_TYPE_COMPOSITE => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
+
+            Strategy\User::ENTITY_TYPE           => [Audience\Model::RELATIONSHIP_SELF],
+            Strategy\Super::ENTITY_TYPE          => [Audience\Model::RELATIONSHIP_SELF],
+            Strategy\Campus::ENTITY_TYPE         => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
+            Strategy\Role::ENTITY_TYPE           => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
+            Strategy\RoleType::ENTITY_TYPE       => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
+            Strategy\SchoolHouse::ENTITY_TYPE    => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
+            Strategy\ResHouse::ENTITY_TYPE       => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
+            Strategy\Year::ENTITY_TYPE           => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
+            Strategy\Service::ENTITY_TYPE        => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
+            Strategy\PastoralGroup::ENTITY_TYPE  => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
+            Strategy\Folder::ENTITY_TYPE         => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
+        ];
+
+
+        // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
+        $validNullEntities = [
+            Audience\Model::ENTITY_TYPE_COMPOSITE => true,
+            Strategy\User::ENTITY_TYPE            => false,
+            Strategy\Super::ENTITY_TYPE           => false,
+            Strategy\Campus::ENTITY_TYPE          => true,
+            Strategy\Role::ENTITY_TYPE            => false,
+            Strategy\RoleType::ENTITY_TYPE        => false,
+            Strategy\SchoolHouse::ENTITY_TYPE     => true,
+            Strategy\ResHouse::ENTITY_TYPE        => true,
+            Strategy\Year::ENTITY_TYPE            => true,
+            Strategy\Service::ENTITY_TYPE         => false,
+            Strategy\PastoralGroup::ENTITY_TYPE   => true,
+            Strategy\Folder::ENTITY_TYPE          => true,
+        ];
+        $factory                = new Validation\Factory($validRelationships, $validNullEntities);
+        $this->validSegmentSpec = $factory->makeValidSegmentSpecification(new User());
     }
 
 
