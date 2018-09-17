@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 
@@ -65,9 +66,9 @@ class CapabilityMark
     /**
      * Render the capability's mark in human-readable format.
      *
-     * @return string
+     * @return null|string
      */
-    public function retrieveHumanReadableMark(): string
+    public function retrieveHumanReadableMark(): ?string
     {
         $value    = $this->getValue();
         $maxValue = $this->getCapabilityUsage()->getMaxValue();
@@ -79,14 +80,18 @@ class CapabilityMark
         // it needs to be normalized, and then human-readable in the format
         // that assessment marks are usually displayed in.
 
+        // None
+        $markScheme = new None();
+        return $markScheme->getHumanReadableMark($value);
+
         // Total mark
 //        $markScheme = new TotalMarkFractional($maxValue);
 //        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($value));
 
         // Percentage
-        $markScheme = new Percentage();
-        $percent    = min(max($value / $maxValue * 100, 0), 100);
-        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($percent));
+//        $markScheme = new Percentage();
+//        $percent    = min(max($value / $maxValue * 100, 0), 100);
+//        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($percent));
     }
 
 

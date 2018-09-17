@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 
@@ -96,9 +97,9 @@ class MarkedGrid
     /**
      * Render the grid's mark in human-readable format.
      *
-     * @return string
+     * @return null|string
      */
-    public function retrieveHumanReadableMark(): string
+    public function retrieveHumanReadableMark(): ?string
     {
         $value    = 0;
         $maxValue = 0;
@@ -110,14 +111,18 @@ class MarkedGrid
         // TODO make this work with the assessment's mark type?
         // (copy-pasted from CapabilityMark humanReadableMark)
 
+        // None
+        $markScheme = new None();
+        return $markScheme->getHumanReadableMark($value);
+
         // Total mark
 //        $markScheme = new TotalMarkFractional($maxValue);
 //        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($value));
 
         // Percentage
-        $markScheme = new Percentage();
-        $percent    = min(max($value / $maxValue * 100, 0), 100);
-        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($percent));
+//        $markScheme = new Percentage();
+//        $percent    = min(max($value / $maxValue * 100, 0), 100);
+//        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($percent));
     }
 
 
