@@ -30,6 +30,8 @@ class CapabilityMark
 
 
     /**
+     * TODO this belongs on the capability usage, not the capability
+     *
      * @var IMarkScheme
      */
     private $markScheme;

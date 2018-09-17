@@ -45,6 +45,8 @@ class MarkedGrid
 
 
     /**
+     * TODO this belongs on the grid, not the marked grid
+     *
      * @var IMarkScheme
      */
     private $markScheme;
