@@ -837,7 +837,9 @@ class Controller extends BaseController
         $folderList = new Collection();
         $userAccess  = [];
 
-        foreach($this->getFolderMapper()->findForUser($this->getUser(), false)->sortBy('name', 'asc') as $folder) {
+        /** @var \Schoolbox\Resource\Folder\Model $folder */
+        foreach ($this->getFolderMapper()->findForUser($this->getUser(), false, UserAccess::ACCESS_READ, false, true)
+                     ->sortBy('name', 'asc') as $folder) {
             if (!$folder->getColour()) {
                 /* Apply colour from list if no colour exists */
                 $folder->setColour($colourList[$colourIndex]->getHexColour());

@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -212,7 +213,7 @@ class Controller extends Base
         // Only get subjects from external if student's timetable isn't hidden.
         // I don't get this logic as class list != timetable, but apparently
         // it's important. ¯\_(ツ)_/¯
-        foreach ($this->folderMapper->findForUser($student, !$student->getHideTimetable()) as $folder) {
+        foreach ($this->folderMapper->findForUser($student, !$student->getHideTimetable(), UserAccess::ACCESS_READ, false, true) as $folder) {
             // Load teachers for this subject (if this subject has them)
             $teachers = [];
             if (count($folder->getCodes()) > 0) {

@@ -734,7 +734,7 @@ class Group extends DeprecatedModel
      * @see Schoolbox\Resource\FolderMapper->getForUser() for an implementation
      *      that uses the mapper classes.
      */
-    function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = READ_ACCESS)
+    function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = READ_ACCESS, $requireHomepage = false)
     {
 
         $catList = array();
@@ -758,11 +758,14 @@ class Group extends DeprecatedModel
         $exclude_part = !empty($excluded_id_list)
             ? ('AND folder.id NOT IN (' . implode(',', $excluded_id_list) . ')')
             : '';
+        $homepageJoin = $requireHomepage ? ' JOIN homepage_config ON folder.id = homepage_config.cid ' : '';
+
         $query = "
 			SELECT
 			folder.name, folder.id, type, 
 			GROUP_CONCAT(cc.code) as code
 			FROM userAccess, folder LEFT JOIN folder_code cc ON folder.id = cc.folder_id AND cc.deleted_at IS NULL
+			$homepageJoin
 			WHERE userAccess.uid = '$userID'
 			AND userAccess.sid = folder.id
 			AND userAccess.service = '" . $this->_service . "'

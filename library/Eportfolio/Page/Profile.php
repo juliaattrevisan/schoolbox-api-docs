@@ -7,6 +7,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Resource\Folder\Model as Folder;
+
 class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 {
     /**
@@ -349,19 +353,24 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
     private function renderGroups()
     {
         $groupHandler = new Group();
-        $allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getUserId(), false);
+        $folderMapper = new FolderMapper();
+        /** @var Schoolbox\Collection $allGroups */
+        $allGroups = $folderMapper->findForUser($this->getUser(), false, READ_ACCESS, false, true);
+        $allGroups->sortByCallback(function (Folder $f1, Folder $f2) {
+            return strnatcasecmp($f1->getName(), $f2->getName());
+        }, true);
 
-        if (is_array($allGroups) && count($allGroups)) {
+        if ($allGroups->count() > 0) {
             foreach ($allGroups as $currentGroup) {
                 $this->getPage()->setVar(array(
-                    'GROUP_ID' => $currentGroup['id'],
-                    'GROUP_NAME' => $currentGroup['name'],
+                    'GROUP_ID' => $currentGroup->getId(),
+                    'GROUP_NAME' => $currentGroup->getName(),
                 ));
 
                 /* Check permissions on whether you can view this subject's
                  * homepage - if not, don't link it
                  */
-                if (($permission = $groupHandler->getPermission($currentGroup['id'])) < READ_ACCESS) {
+                if ($groupHandler->getPermission($currentGroup->getId()) < READ_ACCESS) {
                     $this->getPage()->parse('group_unlinked_block', 'group_unlinked');
                 } else {
                     $this->getPage()->parse('group_linked_block', 'group_linked');
