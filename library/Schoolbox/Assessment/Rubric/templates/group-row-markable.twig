@@ -10,11 +10,11 @@
     {% set percentageMark     = capabilityMaxSum > 0 ? capabilityMark.value * (100 / capabilityMaxSum) : 0 %}
     {% set letterGradeBracket = false %}
 
-    {{ dump(capabilityMark.markScheme) }}
-
     {# TODO assumes values are always descending which might not be the case? #}
-    {% for value, letter in markType.conf if (percentageMark >= value and not letterGradeBracket) %}
-        {% set letterGradeBracket = value %}
+    {% for gradeLevel in rubricMarkedGrid.markScheme.gradeGroup.gradeLevels %}
+        {% if (capabilityMark.value >= gradeLevel.lowerBound and not letterGradeBracket) %}
+            {% set letterGradeBracket = gradeLevel.rawGrade %}
+        {% endif %}
     {% endfor %}
 <tr>
     <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 1 }}">
@@ -54,11 +54,11 @@
                         name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
                         id="group-{{ capabilityId }}-mark">
 
-                    {% for value, letter in markType.conf %}
-                        <option value="{{ value }}"
-                                {% if letterGradeBracket == value %}selected{% endif %}
-                                data-letter="{{ letter }}">
-                            {{ letter }}
+                    {% for gradeLevel in rubricMarkedGrid.markScheme.gradeGroup.gradeLevels %}
+                        <option value="{{ gradeLevel.rawGrade }}"
+                                {% if letterGradeBracket == gradeLevel.rawGrade %}selected{% endif %}
+                                data-letter="{{ gradeLevel.caption }}">
+                            {{ gradeLevel.caption }}
                         </option>
                     {% endfor %}
                 </select>
