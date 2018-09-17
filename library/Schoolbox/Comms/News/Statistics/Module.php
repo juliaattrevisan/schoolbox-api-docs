@@ -32,7 +32,7 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         /* Only comms officers and authors can view statistics and obtain their data
-         * Supers, Comms Officers, Article Authors
+         * Supers, Comms Officers, Article Moderators
          */
         $modifyPerms = new Rule\LazyCallback(function () {
             return new Rule\All(
@@ -40,7 +40,6 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
-                    new Authorizer\Rule\IsArticleAuthor(),
                     new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper())
                 )
             );
