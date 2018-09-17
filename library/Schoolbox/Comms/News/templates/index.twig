@@ -9,87 +9,49 @@
  # @param int limit
  # @param string referrer
  #}
-<div class="actions-small-2 row">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h1>{{ locale.news.proper }}</h1>
+{% extends '@commsNews/page-layout.twig' %}
+
+{% block newsTitle %}{{ locale.news.proper }} Feed{% endblock %}
+
+{% block newsContent %}
+    <section>
+        {% include '@commsNews/tabs.twig' with {
+            url: routeLookup('commsNews.getListByTopic'),
+            topicContainerId: 'news-topics',
+            topics: topics,
+            topicAll: topicAll,
+            slug: slug,
+            compactMode: false,
+            limit: limit,
+            referrer: referrer
+        } %}
+
+        <div id="news-container">
+            {# TODO: Purifying pre-built content strips data-saveforlater var
+             # For now, presume this was previously filtered elsewhere server-side
+             #}
+            {{ initialContent|raw }}
         </div>
-    </div>
-    {% set saveForLaterRoute = routeLookupIfAuthorized('commsNewsSaveForLater.getList') %}
-    <nav>
-        {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-        {% set moderationRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
-        {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') %}
-        {% set authoredRoute = routeLookupIfAuthorized('commsNews.getAuthored') %}
-        {% if createRoute %}
-            <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
-        {% endif %}
+    </section>
+{% endblock %}
 
-        {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key}) %}
-        {% if rssRoute %}
-            <a href="{{ rssRoute }}?topic={{ slug }}" class='icon-rss' title="Download RSS feed for this topic" id="rss"></a>
-        {% endif %}
+{% block newsScripts %}
+    <script src="/javascript/shared/comms/articletabs.js"></script>
+    <script src="/javascript/shared/comms/saveforlater.js"></script>
+    <script>
+        $(function() {
+            var $newContainer = $('#news-container');
 
-        {% if moderationRoute or saveForLaterRoute or archiveRoute or authorRoute %}
-            <a href="#" class="icon-more" data-dropdown="tab-control" title="Actions"></a>
-        {% endif %}
-    </nav>
-    {% if moderationRoute or saveForLaterRoute or archiveRoute or authorRoute %}
-        <ul id="tab-control" class="f-dropdown" data-dropdown-content>
-            <li><a href="{{ archiveRoute }}" class="icon-archive">{{ locale.news.proper }} archive</a></li>
-            {% if authoredRoute %}
-                <li><a href="{{ authoredRoute }}" class="icon-staff-students">My {{ locale.news.plural }}</a></li>
-            {% endif %}
-            {% if moderationRoute %}
-                <li><a href="{{ moderationRoute }}" class="icon-list">Moderation list</a></li>
-            {% endif %}
-            {% if saveForLaterRoute %}
-                <li><a href="{{ saveForLaterRoute }}" class="icon-star">Saved items</a></li>
-            {% endif %}
-        </ul>
-    {% endif %}
-</div>
+            $newContainer.articleTabs({
+                'topicTabs': $('#news-topics'),
+                'updateUrl': true,
+                onChangeSuccess: function(response) {
+                    $('#rss').attr('href', '{{ rssRoute }}?topic=' + response.slug);
+                }
+            });
 
-<div class="row">
-    <div class="small-12 island">
-        <section>
-            <script src="/javascript/shared/comms/articletabs.js"></script>
-            <script src="/javascript/shared/comms/saveforlater.js"></script>
-            <script>
-                $(function() {
-                    var $newContainer = $('#news-container');
+            $newContainer.saveForLater();
+        });
+    </script>
+{% endblock %}
 
-                    $newContainer.articleTabs({
-                        'topicTabs': $('#news-topics'),
-                        'updateUrl': true,
-                        onChangeSuccess: function(response) {
-                            $('#rss').attr('href', '{{ rssRoute }}?topic=' + response.slug);
-                        }
-                    });
-
-                    $newContainer.saveForLater();
-                });
-            </script>
-
-            {% include '@commsNews/tabs.twig' with {
-                url: routeLookup('commsNews.getListByTopic'),
-                topicContainerId: 'news-topics',
-                topics: topics,
-                topicAll: topicAll,
-                slug: slug,
-                compactMode: false,
-                limit: limit,
-                referrer: referrer
-            } %}
-
-            <div id="news-container">
-                {# TODO: Purifying pre-built content strips data-saveforlater var
-                 # For now, presume this was previously filtered elsewhere server-side
-                 #}
-                {{ initialContent|raw }}
-            </div>
-        </section>
-    </div>
-</div>
-
-<div id="toast" class="toast"></div>

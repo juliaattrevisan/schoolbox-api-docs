@@ -1,0 +1,72 @@
+<div class="actions-small-3 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>{% block newsTitle %}{% endblock %}</h1>
+        </div>
+    </div>
+    <nav>
+        {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+        {% if createRoute %}
+            <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
+        {% endif %}
+
+        {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') %}
+        {% if archiveRoute %}
+            <a href="{{ archiveRoute }}" class='icon-archive' title="View archived {{ locale.news }}"></a>
+        {% endif %}
+
+        {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key}) %}
+        {% if rssRoute %}
+            <a href="{{ rssRoute }}?topic={{ slug }}" class='icon-rss' title="Download RSS feed for this topic" id="rss"></a>
+        {% endif %}
+    </nav>
+</div>
+
+<div class="row">
+    {# main content #}
+    <div class="small-12 medium-9 island">
+        {% block newsContent %}
+        {% endblock %}
+    </div>
+
+    {# navigation sidebar #}
+    <div class="small-12 medium-3 island">
+        <section>
+            <nav>
+                <ul class="side-nav">
+                    {% set indexRoute = routeLookupIfAuthorized('commsNews.getIndex') %}
+                    {% if indexRoute %}
+                        <li {% if page == indexRoute %}class="active"{% endif %} role="menuitem">
+                            <a href="{{ indexRoute }}">{{ locale.news | capitalize }} feed</a>
+                        </li>
+                    {% endif %}
+
+                    {% set authoredRoute = routeLookupIfAuthorized('commsNews.getAuthored') %}
+                    {% if authoredRoute %}
+                        <li {% if page == authoredRoute %}class="active"{% endif %} role="menuitem">
+                            <a href="{{ authoredRoute }}">My authored {{ locale.news }}</a>
+                        </li>
+                    {% endif %}
+
+                    {% set moderationRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
+                    {% if moderationRoute %}
+                        <li {% if page == moderationRoute %}class="active"{% endif %} role="menuitem">
+                            <a href="{{ moderationRoute }}">Moderation list</a>
+                        </li>
+                    {% endif %}
+
+                    {% set savedRoute = routeLookupIfAuthorized('commsNewsSaveForLater.getList') %}
+                    {% if savedRoute %}
+                        <li {% if page == savedRoute %}class="active"{% endif %} role="menuitem">
+                            <a href="{{ savedRoute }}">My saved {{ locale.news }}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </section>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+{% block newsScripts %}{% endblock %}

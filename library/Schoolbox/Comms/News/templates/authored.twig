@@ -1,267 +1,256 @@
-<div id="authored-container">
-    <div class="row actions-small-1">
-        <div class="list-item">
-            <div class="small-12 columns">
-                <h1>My {{ locale.news.plural | capitalize }}</h1>
-            </div>
-        </div>
-        <nav>
-            {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-            {% if createRoute %}
-                <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
-            {% endif %}
-        </nav>
-    </div>
+{% extends '@commsNews/page-layout.twig' %}
 
-    <div class="row">
-        <div class="small-12 island">
-            <section>
+{% block newsTitle %}My Authored {{ locale.news.plural | capitalize }}{% endblock %}
 
-                {# tabs #}
-                <dl class="tabs" id="{{ topicContainerId }}" v-if="statuses.length || articlesLoading">
-                    <dd v-for="status in statuses" :class="{active: tabSelected === status}">
-                        <a @click="onTabChange(status)">${ status }</a>
-                    </dd>
-                    <dd class="skeleton" v-if="articlesLoading" v-for="n in 3">
-                        <a></a>
-                    </dd>
-                </dl>
+{% block newsContent %}
+    <div id="authored-container">
+        <section>
+            {# tabs #}
+            <dl class="tabs" id="{{ topicContainerId }}" v-if="statuses.length || articlesLoading">
+                <dd v-for="status in statuses" :class="{active: tabSelected === status}">
+                    <a @click="onTabChange(status)">${ status }</a>
+                </dd>
+                <dd class="skeleton" v-if="articlesLoading" v-for="n in 3">
+                    <a></a>
+                </dd>
+            </dl>
 
-                <div class="tabs-content no-margin">
-                    <ul class="information-list">
+            <div class="tabs-content no-margin">
+                <ul class="information-list">
 
-                        <li class="actions-small-1" v-if="articlesLoading" v-for="n in 3">
-                            <div class="list-item">
-                                <div class="small-12 card skeleton">
-                                    <div class="img"></div>
-                                    <h3></h3>
-                                    <p class="meta"></p>
-                                </div>
+                    <li class="actions-small-1" v-if="articlesLoading" v-for="n in 3">
+                        <div class="list-item">
+                            <div class="small-12 card skeleton">
+                                <div class="img"></div>
+                                <h3></h3>
+                                <p class="meta"></p>
                             </div>
-                        </li>
+                        </div>
+                    </li>
 
-                        <li class="actions-small-2" v-for="article in currentArticles">
-                            <div class="list-item">
-                                <div class="small-12 card">
+                    <li class="actions-small-2" v-for="article in currentArticles">
+                        <div class="list-item">
+                            <div class="small-12 card">
 
-                                    <a :href="article._links.self.href" v-if="article.featureImage">
-                                        <img :src="article.featureImage._links.image.href + '&size=square64'">
-                                    </a>
+                                <a :href="article._links.self.href" v-if="article.featureImage">
+                                    <img :src="article.featureImage._links.image.href + '&size=square64'">
+                                </a>
 
-                                    <h3><a :href="article._links.self.href">${ article.title }</a></h3>
+                                <h3><a :href="article._links.self.href">${ article.title }</a></h3>
 
-                                    <p class="meta">
-                                        <b>${ article.status }</b>
-                                        <time :title="article.statusDate.long">${ article.statusDate.relativeTime }</time>
-                                    </p>
+                                <p class="meta">
+                                    <b>${ article.status }</b>
+                                    <time :title="article.statusDate.long">${ article.statusDate.relativeTime }</time>
+                                </p>
 
-                                </div>
                             </div>
-                            <nav>
-                                <a :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
-                                <a href="#" class="icon-more no-text" :data-dropdown="'article-more-' + article.id"></a>
-                            </nav>
-                            <ul :id="'article-more-' + article.id" class="f-dropdown" data-dropdown-content>
-                                <li><a :href="article._links.statistics.href" class="icon-progress">Statistics</a></li>
-                            </ul>
-                        </li>
-                    </ul>
+                        </div>
+                        <nav>
+                            <a :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
+                            <a href="#" class="icon-more no-text" :data-dropdown="'article-more-' + article.id"></a>
+                        </nav>
+                        <ul :id="'article-more-' + article.id" class="f-dropdown" data-dropdown-content>
+                            <li><a :href="article._links.statistics.href" class="icon-progress">Statistics</a></li>
+                        </ul>
+                    </li>
+                </ul>
 
-                    <div class="empty-state no-margin" v-if="!filteredArticles.length && !articlesLoading">
-                        <i class="icon-news"></i>
-                        <p>You haven't authored any {{ locale.news.plural }}.</p>
-                        <p><a href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}">Create {{ locale.news }}</a>.</p>
-                    </div>
-
+                <div class="empty-state no-margin" v-if="!filteredArticles.length && !articlesLoading">
+                    <i class="icon-news"></i>
+                    <p>You haven't authored any {{ locale.news.plural }}.</p>
+                    <p><a href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}">Create {{ locale.news }}</a>.</p>
                 </div>
-            </section>
-            <paginate
-                    v-model="page"
-                    :page-count="pageCount"
-                    :container-class="'pagination'"
-                    :prev-text="'‹'"
-                    :next-text="'›'"
-                    :prev-link-class="'arrow'"
-                    :next-link-class="'arrow'"
-                    :disabled-class="'unavailable'"
-                    :click-handler="onPaginate"
-                    v-if="currentArticles.length && pageCount > 1"
-            >
-            </paginate>
-        </div>
+
+            </div>
+        </section>
+        <paginate
+            v-model="page"
+            :page-count="pageCount"
+            :container-class="'pagination'"
+            :prev-text="'‹'"
+            :next-text="'›'"
+            :prev-link-class="'arrow'"
+            :next-link-class="'arrow'"
+            :disabled-class="'unavailable'"
+            :click-handler="onPaginate"
+            v-if="currentArticles.length && pageCount > 1"
+        >
+        </paginate>
     </div>
+{% endblock %}
 
-</div>
 
-<script src="/javascript/components/schoolbox-vue.min.js"></script>
-<script>
-    'use strict';
+{% block newsScripts %}
+    <script src="/javascript/components/schoolbox-vue.min.js"></script>
+    <script>
+        'use strict';
 
-    var app = new Vue({
-        el: '#authored-container',
-        delimiters: ['${', '}'],
-        components: {
-            'paginate': VuejsPaginate
-        },
-        data: {
-            // The active page on the pagination
-            page: {{ page }},
+        var app = new Vue({
+            el: '#authored-container',
+            delimiters: ['${', '}'],
+            components: {
+                'paginate': VuejsPaginate
+            },
+            data: {
+                // The active page on the pagination
+                page: {{ pageNum }},
 
-            // Whether the articles are still being loaded or not
-            // Used to show the placeholder loader
-            articlesLoading: true,
+                // Whether the articles are still being loaded or not
+                // Used to show the placeholder loader
+                articlesLoading: true,
 
-            // A unique list of statuses returned from the user's articles
-            // Used to display tab options
-            statuses: [],
+                // A unique list of statuses returned from the user's articles
+                // Used to display tab options
+                statuses: [],
 
-            // *All* the author's articles
-            allArticles: [],
+                // *All* the author's articles
+                allArticles: [],
 
-            // A container for a filtered list of authored articles
-            // Will be populated as all articles on load
-            filteredArticles: [],
+                // A container for a filtered list of authored articles
+                // Will be populated as all articles on load
+                filteredArticles: [],
 
-            // The selected tab, just used for active styling
-            tabSelected: '{{ status }}'
-        },
-        mounted: function () {
-            var vue = this;
+                // The selected tab, just used for active styling
+                tabSelected: '{{ status }}'
+            },
+            mounted: function () {
+                var vue = this;
 
-            // Find some articles
-            axios.get('{{ routeLookup('commsNews.getAuthoredArticles') }}').then(function(response) {
+                // Find some articles
+                axios.get('{{ routeLookup('commsNews.getAuthoredArticles') }}').then(function(response) {
 
-                // Convert response into an array
-                var articles = Object.keys(response.data).map(function(key) {
-                    return response.data[key];
+                    // Convert response into an array
+                    var articles = Object.keys(response.data).map(function(key) {
+                        return response.data[key];
+                    });
+
+                    vue.articlesLoading = false;
+                    vue.allArticles = articles;
+                    vue.filteredArticles = articles;
+
+                    if (articles.length) {
+                        // Loop the returned articles and populate the 'statuses' array for the status tabs
+                        vue.statuses.push('All'); // Add the 'all' tab here so that all the tabs are loaded on the screen at the same time
+                        articles.forEach(function (article) {
+                            if (vue.statuses.indexOf(article.status) === -1) {
+                                vue.statuses.push(article.status);
+                            }
+                        });
+                    }
+
+                    // In the case that this page has loaded with a page and/or tab in the URL params - update the page to reflect those params
+                    if (vue.tabSelected !== 'All') {
+                        vue.onTabChange(vue.tabSelected, true, true);
+                    }
+                    if (vue.page > 1) {
+                        vue.onPaginate(vue.page, true);
+                    }
+
+                    // Reinit foundation for the kebab dropdowns, for some reason this has to happen just very slightly delayed :|
+                    setTimeout(function(){
+                        $(document).foundation();
+                    }, 1);
+
+                }).catch(function (error) {
+                    console.log(error);
                 });
 
-                vue.articlesLoading = false;
-                vue.allArticles = articles;
-                vue.filteredArticles = articles;
-
-                if (articles.length) {
-                    // Loop the returned articles and populate the 'statuses' array for the status tabs
-                    vue.statuses.push('All'); // Add the 'all' tab here so that all the tabs are loaded on the screen at the same time
-                    articles.forEach(function (article) {
-                        if (vue.statuses.indexOf(article.status) === -1) {
-                            vue.statuses.push(article.status);
-                        }
-                    });
+                // Set initial state for window history
+                if (!history.state) {
+                    history.pushState({page: vue.page, tab: this.tabSelected}, '', '');
                 }
 
-                // In the case that this page has loaded with a page and/or tab in the URL params - update the page to reflect those params
-                if (vue.tabSelected !== 'All') {
-                    vue.onTabChange(vue.tabSelected, true, true);
-                }
-                if (vue.page > 1) {
-                    vue.onPaginate(vue.page, true);
-                }
-
-                // Reinit foundation for the kebab dropdowns, for some reason this has to happen just very slightly delayed :|
-                setTimeout(function(){
-                    $(document).foundation();
-                }, 1);
-
-            }).catch(function (error) {
-                console.log(error);
-            });
-
-            // Set initial state for window history
-            if (!history.state) {
-                history.pushState({page: vue.page, tab: this.tabSelected}, '', '');
-            }
-
-            // Listen for window state change
-            window.onpopstate = function(event) {
-                if (!event.state) {
-                    // Let the browser go back to normal history
-                    return false;
-                } else {
-                    if (event.state.page) {
-                        vue.page = event.state.page;
-                        vue.onPaginate(event.state.page, true);
-                    }
-
-                    if (event.state.tab) {
-                        vue.tabSelected = event.state.tab;
-                        vue.onTabChange(event.state.tab, true, true);
-                    }
-                }
-            };
-        },
-        methods: {
-            /**
-             * On change of page
-             *
-             * @param {int} page - The page to change to
-             * @param {boolean} holdState - Whether to change the window's history or not
-             */
-            onPaginate: function (page, holdState) {
-                // Update the window history
-                if (!holdState) {
-                    var params;
-                    if (this.tabSelected === 'All') {
-                        params = '?p=' + page;
+                // Listen for window state change
+                window.onpopstate = function(event) {
+                    if (!event.state) {
+                        // Let the browser go back to normal history
+                        return false;
                     } else {
-                        params = '?p=' + page + '&status=' + this.tabSelected;
+                        if (event.state.page) {
+                            vue.page = event.state.page;
+                            vue.onPaginate(event.state.page, true);
+                        }
+
+                        if (event.state.tab) {
+                            vue.tabSelected = event.state.tab;
+                            vue.onTabChange(event.state.tab, true, true);
+                        }
                     }
-                    window.history.pushState({page: page, tab: this.tabSelected}, '', params);
+                };
+            },
+            methods: {
+                /**
+                 * On change of page
+                 *
+                 * @param {int} page - The page to change to
+                 * @param {boolean} holdState - Whether to change the window's history or not
+                 */
+                onPaginate: function (page, holdState) {
+                    // Update the window history
+                    if (!holdState) {
+                        var params;
+                        if (this.tabSelected === 'All') {
+                            params = '?p=' + page;
+                        } else {
+                            params = '?p=' + page + '&status=' + this.tabSelected;
+                        }
+                        window.history.pushState({page: page, tab: this.tabSelected}, '', params);
+                    }
+                },
+
+                /**
+                 * Changing status tab
+                 *
+                 * @param {string} tab - The tab to change to
+                 * @param {boolean} persistPage
+                 * @param {boolean} holdState - Whether to change the window's history or not
+                 */
+                onTabChange: function (tab, persistPage, holdState) {
+                    var vue = this;
+                    var limit = {{ config.search_type_limit }};
+
+                    vue.tabSelected = tab;
+                    if (!persistPage) {
+                        vue.page = 1;
+                    }
+
+                    if (tab === 'All') {
+                        // Reset back to original set
+                        vue.filteredArticles = vue.allArticles;
+                    } else {
+                        // Filter by tab selected
+                        var filteredArticles = vue.allArticles.filter(function (article) {
+                            return article.status === tab;
+                        });
+
+                        vue.filteredArticles = filteredArticles;
+                    }
+
+                    // Update the window history
+                    if (!holdState) {
+                        window.history.pushState({tab: tab, page: vue.page}, '', '?status=' + tab);
+                    }
                 }
             },
+            computed: {
+                // The total pages to show for pagination buttons
+                pageCount: function () {
+                    return Math.ceil(this.filteredArticles.length / {{ config.search_type_limit }});
+                },
 
-            /**
-             * Changing status tab
-             *
-             * @param {string} tab - The tab to change to
-             * @param {boolean} persistPage
-             * @param {boolean} holdState - Whether to change the window's history or not
-             */
-            onTabChange: function (tab, persistPage, holdState) {
-                var vue = this;
-                var limit = {{ config.search_type_limit }};
+                // The current set of articles showing for the page
+                currentArticles: function() {
+                    if (!this.filteredArticles.length) {
+                        return [];
+                    }
 
-                vue.tabSelected = tab;
-                if (!persistPage) {
-                    vue.page = 1;
-                }
+                    var limit = {{ config.search_type_limit }};
+                    var offset = (this.page-1) * limit;
+                    var total = offset + limit;
 
-                if (tab === 'All') {
-                    // Reset back to original set
-                    vue.filteredArticles = vue.allArticles;
-                } else {
-                    // Filter by tab selected
-                    var filteredArticles = vue.allArticles.filter(function (article) {
-                        return article.status === tab;
-                    });
-
-                    vue.filteredArticles = filteredArticles;
-                }
-
-                // Update the window history
-                if (!holdState) {
-                    window.history.pushState({tab: tab, page: vue.page}, '', '?status=' + tab);
+                    return this.filteredArticles.slice(offset, total);
                 }
             }
-        },
-        computed: {
-            // The total pages to show for pagination buttons
-            pageCount: function () {
-                return Math.ceil(this.filteredArticles.length / {{ config.search_type_limit }});
-            },
-
-            // The current set of articles showing for the page
-            currentArticles: function() {
-                if (!this.filteredArticles.length) {
-                    return [];
-                }
-
-                var limit = {{ config.search_type_limit }};
-                var offset = (this.page-1) * limit;
-                var total = offset + limit;
-
-                return this.filteredArticles.slice(offset, total);
-            }
-        }
-    });
-</script>
+        });
+    </script>
+{% endblock %}

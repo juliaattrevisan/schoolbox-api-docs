@@ -799,6 +799,7 @@ class Controller extends Base
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'slug' => $params->getSlug(),
             'referrer' => $params->getReferrer(),
+            'page' => $this->getRequest()->query['page'],
 
             /* For configuring the rss button which changes per topic chosen
              */
@@ -831,7 +832,8 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored.twig', [
-            'page' => $pageNum,
+            'page' => $this->getRequest()->query['page'],
+            'pageNum' => $pageNum,
             'status' => $status
         ]));
     }

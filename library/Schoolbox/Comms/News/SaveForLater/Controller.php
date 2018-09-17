@@ -56,6 +56,7 @@ class Controller extends Base
         $articles = (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', [
+            'page' => $this->getRequest()->query['page'],
             'articles'        => $articles,
         ])->setTitle('Saved For Later'));
     }

@@ -4,109 +4,108 @@
  # A list of articles that you've saved for later
  #}
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Saved</h1>
+{% extends '@commsNews/page-layout.twig' %}
+
+{% block newsTitle %}My Saved {{ locale.news | capitalize }}{% endblock %}
+
+{% block newsContent %}
+    {% if articles|length %}
+        <section>
+            <ul class="information-list" id="saveForLaterList">
+                {% for article in articles %}
+                    {% set routeRemove = routeLookupIfAuthorized('commsNewsSaveForLater.postRemove', {article: article, articleId: article.id}) %}
+                    <li class="{% if routeRemove %}actions-small-1{% endif %}">
+                        <div class="list-item">
+                            <div class="small-12 card">
+                                <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
+                                <p class="meta">
+                                    Authored by
+                                    {% if article.author.deletedAt.isNull %}
+                                        <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
+                                    {% else %}
+                                        {{ article.author.fullname }}
+                                    {% endif %}
+                                    <time title="{{ article.publishAt.long }}">{{ article.publishAt.relativeTime }}</time>
+                                </p>
+
+                                {% if article.topics|length %}
+                                    <p class="meta">Related topics:
+                                        {% for topic in article.topics %}
+                                            <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if routeRemove %}
+                        <nav>
+                            <a class="icon-favourite" href="{{ routeRemove }}" title="Remove this from your saved items" data-remove="{{ article.title }}"></a>
+                        </nav>
+                        {% endif %}
+                        <article>{{ article.blurb|purify }}</article>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
+    {% if articles|length %}
+        {% set initialEmptyState = 'display:none' %}
+    {% else %}
+        {% set initialEmptyState = '' %}
+    {% endif %}
+
+    <div class="empty-state" id="emptyState" style="{{ initialEmptyState }}">
+        <i class="icon-news"></i>
+        <p>You don't have any saved articles yet.</p>
     </div>
-</div>
-<div class="row">
-    <div class="small-12 island">
+{% endblock %}
 
-        {% if articles|length %}
-            <script>
-                $(function() {
+{% block newsScripts %}
+    {% if articles|length %}
+        <script>
+            $(function() {
 
-                    $('#saveForLaterList [data-remove]').on('click', function(event) {
-                        event.preventDefault();
+                $('#saveForLaterList [data-remove]').on('click', function(event) {
+                    event.preventDefault();
 
-                        var element = $(this);
-                        var toast = $('#toast');
+                    var element = $(this);
+                    var toast = $('#toast');
 
-                        $(this).confirmDialog({
-                            format: 'html',
-                            text: 'Are you sure you want to remove <em>' + element.attr('data-remove') + '</em>?',
-                            confirmEvent: function() {
-                                toast.toastActivate({
-                                    text: 'Removing...'
+                    $(this).confirmDialog({
+                        format: 'html',
+                        text: 'Are you sure you want to remove <em>' + element.attr('data-remove') + '</em>?',
+                        confirmEvent: function() {
+                            toast.toastActivate({
+                                text: 'Removing...'
+                            });
+
+                            $.ajax({
+                                type: 'POST',
+                                url: element.attr('href'),
+                                dataType: 'json'
+                            }).success(function () {
+                                toast.toastTimeout({
+                                    text: 'Removed',
+                                    css: 'success'
                                 });
 
-                                $.ajax({
-                                    type: 'POST',
-                                    url: element.attr('href'),
-                                    dataType: 'json'
-                                }).success(function () {
-                                    toast.toastTimeout({
-                                        text: 'Removed',
-                                        css: 'success'
-                                    });
+                                element.closest('li').remove();
 
-                                    element.closest('li').remove();
-
-                                    {# If this was the last in the list, respawn Empty State #}
-                                    if (!$('#saveForLaterList li').length) {
-                                        $('#emptyState').show();
-                                    }
-                                }).error(function () {
-                                      toast.toastTimeout({
-                                        text: 'Unable to remove item from list',
-                                        css: 'alert'
-                                    });
+                                {# If this was the last in the list, respawn Empty State #}
+                                if (!$('#saveForLaterList li').length) {
+                                    $('#emptyState').show();
+                                }
+                            }).error(function () {
+                                toast.toastTimeout({
+                                    text: 'Unable to remove item from list',
+                                    css: 'alert'
                                 });
-                            }
-                        });
+                            });
+                        }
                     });
                 });
-            </script>
-
-            <section>
-                <ul class="information-list" id="saveForLaterList">
-                    {% for article in articles %}
-                        {% set routeRemove = routeLookupIfAuthorized('commsNewsSaveForLater.postRemove', {article: article, articleId: article.id}) %}
-                        <li class="{% if routeRemove %}actions-small-1{% endif %}">
-                            <div class="list-item">
-                                <div class="small-12 card">
-                                    <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
-                                    <p class="meta">
-                                        Authored by
-                                        {% if article.author.deletedAt.isNull %}
-                                            <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
-                                        {% else %}
-                                            {{ article.author.fullname }}
-                                        {% endif %}
-                                        <time title="{{ article.publishAt.long }}">{{ article.publishAt.relativeTime }}</time>
-                                    </p>
-
-                                    {% if article.topics|length %}
-                                        <p class="meta">Related topics:
-                                            {% for topic in article.topics %}
-                                                <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
-                                            {% endfor %}
-                                        </p>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            {% if routeRemove %}
-                            <nav>
-                                <a class="icon-favourite" href="{{ routeRemove }}" title="Remove this from your saved items" data-remove="{{ article.title }}"></a>
-                            </nav>
-                            {% endif %}
-                            <article>{{ article.blurb|purify }}</article>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        {% endif %}
-
-        {% if articles|length %}
-            {% set initialEmptyState = 'display:none' %}
-        {% else %}
-            {% set initialEmptyState = '' %}
-        {% endif %}
-        <div class="empty-state" id="emptyState" style="{{ initialEmptyState }}">
-            <i class="icon-news"></i>
-            <p>You don't have any saved articles yet.</p>
-        </div>
-    </div>
-</div>
-
-<div id="toast" class="toast"></div>
+            });
+        </script>
+    {% endif %}
+{% endblock %}

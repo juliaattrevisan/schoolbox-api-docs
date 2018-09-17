@@ -1,16 +1,15 @@
-{# A list of articles that require moderation
- # Moderation is performed by Comms Officers and their deputy Moderators (if assigned)
- #}
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Moderation List</h1>
-    </div>
-</div>
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Awaiting Acceptance</h2>
+{% extends '@commsNews/page-layout.twig' %}
 
-        {% if articles|length %}
+{% block newsTitle %}Moderation List{% endblock %}
+
+{% block newsContent %}
+
+    {# A list of articles that require moderation
+     # Moderation is performed by Comms Officers and their deputy Moderators (if assigned)
+     #}
+    <h2 class="subheader">Awaiting Acceptance</h2>
+
+    {% if articles|length %}
         <section>
             <ul class="information-list">
                 {% for article in articles %}
@@ -42,21 +41,18 @@
                 {% endfor %}
             </ul>
         </section>
-        {% else %}
+    {% else %}
         <div class="empty-state">
             <i class="icon-news"></i>
             <p>All {{ locale.news }} have been processed.</p>
         </div>
-        {% endif %}
-    </div>
-</div>
+    {% endif %}
 
-{# A list of recently-accepted articles
- # Not having this is pretty disorienting
- #}
-{% if recentlyAcceptedArticles|length %}
-<div class="row">
-    <div class="small-12 island">
+
+    {# A list of recently-accepted articles
+     # Not having this is pretty disorienting
+     #}
+    {% if recentlyAcceptedArticles|length %}
         <h2 class="subheader">Recently Accepted</h2>
 
         <section>
@@ -97,19 +93,16 @@
                 {% endfor %}
             </ul>
         </section>
-    </div>
-</div>
-{% endif %}
+    {% endif %}
 
-{# A list of recently-rejected articles
- # Not having this is pretty disorienting
- #}
-{% if recentlyRejectedArticles|length %}
-    <div class="row">
-        <div class="small-12 island">
-            <h2 class="subheader">Recently Rejected</h2>
 
-            <section>
+    {# A list of recently-rejected articles
+     # Not having this is pretty disorienting
+     #}
+    {% if recentlyRejectedArticles|length %}
+        <h2 class="subheader">Recently Rejected</h2>
+
+        <section>
                 <ul class="information-list">
                     {% for article in recentlyRejectedArticles %}
                         <li>
@@ -150,6 +143,5 @@
                     {% endfor %}
                 </ul>
             </section>
-        </div>
-    </div>
-{% endif %}
+    {% endif %}
+{% endblock %}
