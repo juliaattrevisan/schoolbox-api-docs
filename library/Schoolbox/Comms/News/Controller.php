@@ -731,6 +731,13 @@ class Controller extends Base
         $partialData = $this->generatePartial($urlPrefix, $params, $topics, false, $year, $month);
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
 
+        $availableYearsAndMonths = $this->newsMapper->findYearsAndMonthsWithArticles($partialData['articleIdsForUser']);
+
+        // Default to filtering by the most recent year if none is provided
+        if (null === $year) {
+            $year = array_keys($availableYearsAndMonths)[0];
+        }
+
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
          */
@@ -743,7 +750,7 @@ class Controller extends Base
 
             /* Archive-specific vars that don't appear anywhere else
              */
-            'availableYearsAndMonths' => $this->newsMapper->findYearsAndMonthsWithArticles($partialData['articleIdsForUser']),
+            'availableYearsAndMonths' => $availableYearsAndMonths,
             'year' => $year,
             'month' => $month,
         ];
