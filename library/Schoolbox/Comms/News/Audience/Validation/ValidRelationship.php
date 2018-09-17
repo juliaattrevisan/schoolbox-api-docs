@@ -18,26 +18,58 @@ use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 class ValidRelationship extends Specification\Leaf
 {
 
-    /** @var Audience\BusinessRules */
-    private $businessRules;
+    /** @var string[][] */
+    private $validModifiers;
 
 
     /**
-     * @param Audience\BusinessRules $businessRules
+     * @param string[][] $validModifiers
      */
-    public function __construct(Audience\BusinessRules $businessRules)
+    public function __construct(array $validModifiers)
     {
-        $this->businessRules = $businessRules;
+        $this->validModifiers = $validModifiers;
     }
 
 
     /**
-     * @param Audience\Model $candidate
+     * @param mixed $candidate
      * @return bool
      * @throws InsufficientHydrationException
      */
     public function isSatisfiedBy($candidate): bool
     {
-        return \in_array($candidate->getRelationship(), $this->businessRules->getValidRelationships($candidate), true);
+        return \in_array($candidate->getRelationship(), $this->getValidRelationships($candidate), true);
+    }
+
+
+    /**
+     * @param Audience\Model $audienceSegment
+     * @return array
+     * @throws InsufficientHydrationException
+     */
+    public function getValidRelationships(Audience\Model $audienceSegment): array
+    {
+        $entityType = $audienceSegment->getEntityType();
+        if (null === $entityType) {
+            throw new InsufficientHydrationException('Cannot determine valid relationships if entity type is not defined');
+        }
+
+
+        // Base case:
+        if (Audience\Model::ENTITY_TYPE_COMPOSITE !== $entityType) {
+            return $this->validModifiers[$entityType];
+        }
+
+        // Recursive case:
+        // Composites have their own inherent limitations, but also respect the limitations of any sub-segment.
+        $validRelationships = null;
+        foreach ($audienceSegment->getChildren() as $subSegment) {
+            if (null === $validRelationships) {
+                $validRelationships = $this->getValidRelationships($subSegment);
+            } else {
+                $validRelationships = \array_intersect($validRelationships, $this->getValidRelationships($subSegment));
+            }
+        }
+        return $validRelationships;
     }
 }
