@@ -28,7 +28,7 @@ class ValidationTest extends TestCase
      * @param Model $article
      * @param bool  $expected
      */
-    public function testValidBroadcastRequirements(Model $article, bool $expected)
+    public function testValidBroadcastRequirements(Model $article, bool $expected): void
     {
         $validation = new ValidBroadcast();
 
@@ -123,7 +123,7 @@ class ValidationTest extends TestCase
      * @param Model $article
      * @param int   $expected
      */
-    public function testValidArticle(Model $article, $expected)
+    public function testValidArticle(Model $article, $expected): void
     {
         $validation = new ValidArticle();
 
@@ -184,7 +184,7 @@ class ValidationTest extends TestCase
      * @param Model $article
      * @param int   $expected
      */
-    public function testValidArticleDates(Model $article, $expected)
+    public function testValidArticleDates(Model $article, $expected): void
     {
         $validation = new ValidArticle();
 
@@ -233,7 +233,7 @@ class ValidationTest extends TestCase
      * @param Policy\Model $policy
      * @param int   $expected
      */
-    public function testValidDateOffset(Policy\Model $policy, $expected)
+    public function testValidDateOffset(Policy\Model $policy, $expected): void
     {
         $validation = new ValidDateOffset();
 
@@ -304,7 +304,7 @@ class ValidationTest extends TestCase
      * @param array $audiencedUsers
      * @param       $expected
      */
-    public function testValidAccessibility(User $user, Model $article, array $audiencedUsers, $expected)
+    public function testValidAccessibility(User $user, Model $article, array $audiencedUsers, $expected): void
     {
         $userResolver = new MockUserResolver();
         $validation = new ValidArticleIsPubliclyReadable($userResolver);
