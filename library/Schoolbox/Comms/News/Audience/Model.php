@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Audience\Segment\Codec;
 use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
