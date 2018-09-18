@@ -482,7 +482,8 @@
         function assignLetterGrade(numericMark, $dropdown) {
             var grades = getLetterGrades($dropdown);
 
-            var optionIndex = 0;
+            // Default option index if no other selected: the last one
+            var optionIndex = grades.length - 1;
             for (var i = 0; i < grades.length; i++) {
                 // TODO assumes values are always descending which might not be the case?
                 if (numericMark >= grades[i].value) {
@@ -495,16 +496,16 @@
 
         // Given a percentage mark, find the letter grade that corresponds to its bracket in the marking scheme
         function getLetterGradeFromNumeric(numericMark, grades) {
-            var markLetterValue = '';
-            for (var i = 0; i < grades.length; i++) {
+            var gradesLength = grades.length;
+            for (var i = 0; i < gradesLength; i++) {
                 // TODO assumes values are always descending which might not be the case?
                 if (numericMark >= grades[i].value) {
-                    markLetterValue = grades[i].letter;
-                    break;
+                    return grades[i].letter;
                 }
             }
 
-            return markLetterValue;
+            // Did I fall through to here? Use the last grade
+            return gradesLength > 0 ? grades[gradesLength-1].letter : '';
         }
 
         // Turn a specified value into a percentage of the max marks for a group

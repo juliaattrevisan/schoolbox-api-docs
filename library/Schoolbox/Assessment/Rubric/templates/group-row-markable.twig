@@ -16,7 +16,8 @@
 
     {# TODO assumes values are always descending which might not be the case? #}
     {% for gradeLevel in rubricMarkedGrid.markScheme.gradeGroup.gradeLevels %}
-        {% if (capabilityNormMark >= gradeLevel.lowerBound and not letterGradeBracket) %}
+        {# Is this below the last? If so use the last one #}
+        {% if not letterGradeBracket and (capabilityNormMark >= gradeLevel.lowerBound or loop.last) %}
             {% set letterGradeBracket = gradeLevel.rawGrade %}
             {% set letterGradeValue   = gradeLevel.caption %}
         {% endif %}
