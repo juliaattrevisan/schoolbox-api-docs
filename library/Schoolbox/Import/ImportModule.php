@@ -76,7 +76,10 @@ class ImportModule extends BaseModule
             'controller:'.$this->basename,
             $injector->lazyNew(
                 ImportController::class,
-                ['basename' => $this->basename]
+                [
+                    'basename' => $this->basename,
+                    'importerFactory' => $injector->lazyNew(ImporterFactory::class)
+                ]
             )
         );
     }
