@@ -30,29 +30,4 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('show_on_grades_page', self::TYPE_BOOLEAN);
         $this->uses('staff_or_instructor_visible_only', self::TYPE_BOOLEAN);
     }
-
-
-    /**
-     * @param int $id
-     * @return string|bool
-     */
-    public function findNameById($id)
-    {
-        try {
-            return $this->selectScalarByColumnList('name', ['id' => $id])->fetchColumn();
-        } catch (\UnderflowException $e) {
-            return false;
-        }
-    }
-
-
-    /**
-     * @param int $id
-     * @return Schoolbox\GenericCollection
-     * @throws Schoolbox\Mapper\Exception
-     */
-    public function findAllExcept($id)
-    {
-        return $this->findByPredicates($this->getPredicateBuilder()->notEquals('id', $id));
-    }
 }
