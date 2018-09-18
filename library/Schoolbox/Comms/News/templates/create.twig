@@ -124,7 +124,7 @@
                             <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions.base" v-if="audienceOption.displayInModal">
                                 <button class="button-block" @click="changePage(audienceOption)">
                                     <i :class="'icon-' + audienceOption.icon"></i>
-                                    ${ audienceOption.labelPlural }
+                                    ${ audienceOption.namePlural }
                                 </button>
                             </div>
                         </div>
@@ -138,7 +138,7 @@
                             <p class="meta">Select ${ selectedAudienceOption.namePlural } below, then choose whether you would like to include the users themselves, the parents of the users, the teachers of the users, or a combination.</p>
 
                             <div class="empty-state" v-show="showEmptyState">
-                                <p>No ${ selectedAudienceOption.labelPlural } found.</p>
+                                <p>No ${ selectedAudienceOption.namePlural } found.</p>
                             </div>
 
                             <fieldset class="checklist checklist-container" v-show="!showEmptyState">
@@ -316,17 +316,17 @@
      *
      * @param {string}  entityType
      * @param {string}  label
-     * @param {string}  labelPlural
+     * @param {string}  namePlural
      * @param {string}  icon
      * @param {string}  selfModifier
      * @param {boolean} displayInModal
      * @param {boolean} isMulti          Is this entityType 1:N from users? eg target users in [Eng34 ∩ Chem12]
      * @constructor
      */
-    var AudienceOption = function(entityType, label, labelPlural, icon, selfModifier, displayInModal, isMulti){
+    var AudienceOption = function(entityType, label, namePlural, icon, selfModifier, displayInModal, isMulti){
         this.entityType     = entityType;
         this.label          = label;
-        this.labelPlural    = labelPlural;
+        this.namePlural     = namePlural;
         this.icon           = icon;
         this.selfModifier   = selfModifier;
         this.ajax           = '{{ routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'entityType'}) }}'.replace('entityType', entityType);
@@ -517,7 +517,7 @@
             // Whether the user should see the write version of the modal or not.
             // Read users will not see the write options even if this is set to true (because of twig conditionals), this just makes the experience easier
             // for read users
-            writeOnly: {{ (user.role.staff) ? 'true' : 'false' }},
+            writeOnly: {{ (USER.role.staff) ? 'true' : 'false' }},
 
             // The selected intersect groups
             // Default to campus and role
