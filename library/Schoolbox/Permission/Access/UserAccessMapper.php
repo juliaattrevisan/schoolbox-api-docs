@@ -244,7 +244,7 @@ class UserAccessMapper extends Mapper
      *
      * @param User $user
      * @param int  $service
-     * @return Collection
+     * @return Collection|UserAccess[]
      */
     public function findServiceForUser(User $user, $service)
     {

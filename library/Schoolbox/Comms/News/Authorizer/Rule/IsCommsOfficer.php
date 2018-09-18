@@ -38,10 +38,6 @@ class IsCommsOfficer implements IAuthorizationRule
      * @param User|null $user
      * @throws InvalidArgumentException
      * @throws Unauthorized
-     * @throws Predicate\InvalidColumnException
-     * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
-     * @throws UnexpectedValueException
      */
     public function authorize(array $params = [], User $user = null): void
     {
@@ -49,13 +45,9 @@ class IsCommsOfficer implements IAuthorizationRule
             throw new InvalidArgumentException("No session user available to test permissions");
         }
 
-        $isCommsOfficer = $this->userAccessMapper
-            ->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)
-            ->getUnique('id')
-            ->indexBy('id')
-            ->offsetExists($user->getId());
+        $commsOfficerPerms = $this->userAccessMapper->findServiceForUser($user, UserAccess::SERVICE_COMMS_OFFICER);
 
-        if (!$isCommsOfficer) {
+        if (!$commsOfficerPerms->count()) {
             throw new Unauthorized("User ({$user->getId()}) is not a comms officer");
         }
     }
