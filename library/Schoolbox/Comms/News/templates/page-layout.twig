@@ -16,7 +16,7 @@
         {% endif %}
 
         {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key}) %}
-        {% if rssRoute %}
+        {% if rssRoute and slug %}
             <a href="{{ rssRoute }}?topic={{ slug }}" class='icon-rss' title="Download RSS feed for this topic" id="rss"></a>
         {% endif %}
     </nav>
@@ -51,7 +51,7 @@
                                         {% if  data.count > 0 %}
                                         <li role="menuitem"><a href="{{ routeLookup('commsNews.getAuthored') }}?status={{ state }}">
                                                 {{ state }}
-                                            <span class="label {{ data.labelClass }} right">{{ data.count }}</span>
+                                            <span class="label {{ data.labelClass }} right round">{{ data.count }}</span>
                                             </a>
                                         </li>
                                         {% endif %}
@@ -67,7 +67,7 @@
                             <a href="{{ moderationRoute }}">
                                 Moderation List
                                 {% if moderationCount > 0 %}
-                                    <span class="label highlight right" title="{{ moderationCount }} item{% if moderationCount > 1 %}s{% endif %} awaiting moderation">{{ moderationCount }}</span>
+                                    <span class="label highlight right round" title="{{ moderationCount }} item{% if moderationCount > 1 %}s{% endif %} awaiting moderation">{{ moderationCount }}</span>
                                 {% endif %}
                             </a>
                         </li>

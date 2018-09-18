@@ -128,15 +128,7 @@
                     vue.allArticles = articles;
                     vue.filteredArticles = articles;
 
-                    if (articles.length) {
-                        // Loop the returned articles and populate the 'statuses' array for the status tabs
-                        vue.statuses.push('All'); // Add the 'all' tab here so that all the tabs are loaded on the screen at the same time
-                        articles.forEach(function (article) {
-                            if (vue.statuses.indexOf(article.status) === -1) {
-                                vue.statuses.push(article.status);
-                            }
-                        });
-                    }
+                    vue.statuses = ['All','Drafted','Awaiting Moderation','Rejected','Published','Archived'];
 
                     // In the case that this page has loaded with a page and/or tab in the URL params - update the page to reflect those params
                     if (vue.tabSelected !== 'All') {

@@ -67,14 +67,14 @@ class Controller extends Base
                     'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateDraft($this->getUser())),
                     'labelClass' => 'unsubmitted'
                 ],
+                'Awaiting Moderation' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
+                    'labelClass' => 'submitted'
+                ],
                 'Rejected' => [
                     'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
                     'labelClass' => 'submitted-late'
                 ],
-                'Awaiting Moderation' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
-                    'labelClass' => 'submitted'
-                ]
             ]
         ])->setTitle('Saved For Later'));
     }
