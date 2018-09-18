@@ -43,17 +43,15 @@ class External_Isams_Class implements External_ClassInterface
     }
 
     /**
-     * Get all student in class
-     * @param $subCode
-     * @return array
+     * @inheritdoc
      */
-    public function getStudents($subCode)
+    public function getStudents(string $classCode): array
     {
-        if (empty($subCode)) {
+        if (empty($classCode)) {
             return [];
         }
 
-        $classQuery = $this->getClassCodeQuery($subCode);
+        $classQuery = $this->getClassCodeQuery($classCode);
 
         $query = "
             SELECT    V_Student.StudentSurname      AS lastname, 
@@ -97,18 +95,15 @@ class External_Isams_Class implements External_ClassInterface
     }
 
     /**
-     * Retrieve teacher external IDs for a particular class (great function naming)
-     * @param $subCode
-     * @param null $user
-     * @return array
+     * @inheritdoc
      */
-    public function getTeacherName($subCode, $user = null)
+    public function getTeacherName(string $classCode): array
     {
-        if (empty($subCode)) {
+        if (empty($classCode)) {
             return [];
         }
 
-        $classQuery = $this->getClassCodeQuery($subCode);
+        $classQuery = $this->getClassCodeQuery($classCode);
 
         $query =
             "

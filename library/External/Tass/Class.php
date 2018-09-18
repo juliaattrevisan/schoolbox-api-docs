@@ -23,10 +23,15 @@ class External_Tass_Class implements External_ClassInterface {
         $this->externalUser = new External_User('tass');
 	}
 
-    function getStudents($subCode) {
+
+    /**
+     * @inheritdoc
+     */
+    public function getStudents(string $classCode): array
+    {
         $classQuery = '';
-		if(stristr($subCode, ',')) {
-			$subCodeArray = explode(',',$subCode);
+		if(stristr($classCode, ',')) {
+			$subCodeArray = explode(',',$classCode);
 			foreach($subCodeArray as $code) {
 				list($year,$code,$class) = explode('-',$code);
 				$yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
@@ -36,7 +41,7 @@ class External_Tass_Class implements External_ClassInterface {
 			$classQuery .= '1=0';
 		}
 		else {
-			list($year,$code,$class) = explode('-',$subCode);
+			list($year,$code,$class) = explode('-',$classCode);
             $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
 			$classQuery = " $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ";
@@ -65,11 +70,16 @@ class External_Tass_Class implements External_ClassInterface {
 
 		return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
 	}
-	
-	function getTeacherName($subCode) {
+
+
+    /**
+     * @inheritdoc
+     */
+	public function getTeacherName(string $classCode): array
+    {
 		$classQuery = '';
-		if(stristr($subCode, ',')) {
-			$subCodeArray = explode(',',$subCode);
+		if(stristr($classCode, ',')) {
+			$subCodeArray = explode(',',$classCode);
 			foreach($subCodeArray as $code) {
 				list($year,$code,$class) = explode('-',$code);
                 $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
@@ -80,14 +90,13 @@ class External_Tass_Class implements External_ClassInterface {
 			$classQuery .= '1=0';
 		}
 		else {
-			list($year,$code,$class) = explode('-',$subCode);
+			list($year,$code,$class) = explode('-',$classCode);
             $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
 
 			$classQuery = " $yearQuery sub_code = '$code' AND class = '$class' ";
 		}
 
 
-		list($year, $code, $class) = explode('-',$subCode);
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
 		$query = "SELECT DISTINCT tch_code FROM tchsub WHERE semester = '{$fileSemester}' AND year_num = '{$fileYear}'

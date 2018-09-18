@@ -18,11 +18,9 @@ class External_Maze_Class implements External_ClassInterface {
 	protected $db = null;
 
 	/**
-	 * Helper
-	 *
-	 * @var null
+	 * @var External_Maze_Helper
 	 */
-	protected $helper = null;
+	protected $helper;
 
 	/**
 	 * Constructor
@@ -33,12 +31,10 @@ class External_Maze_Class implements External_ClassInterface {
 	}
 
     /**
-	 * Returns a list of students that are associated with a class
-	 *
-	 * @param $classCode
-	 * @return array
+	 * @inheritdoc
 	 */
-	public function getStudents($classCode) {
+	public function getStudents(string $classCode): array
+    {
 		$ttPeriod = $this->getHelper()->getCurrentTTPERIOD();
 
 		$ingredients = $this->getHelper()->degenerateClassCode($classCode);
@@ -133,13 +129,12 @@ class External_Maze_Class implements External_ClassInterface {
 		return $studentList;
 	}
 
-	/**
-	 * Returns a list of *THE IDs OF* teachers that are associated with a class (method is misnamed)
-	 *
-	 * @param $classCode
-	 * @return array
-	 */
-	public function getTeacherName($classCode) {
+
+    /**
+     * @inheritdoc
+     */
+    public function getTeacherName(string $classCode): array
+    {
 		$ttPeriod = $this->getHelper()->getCurrentTTPERIOD();
 
 		/* Assume Schoolbox $classCodes are in the format: '07SCI-1'
@@ -247,7 +242,7 @@ class External_Maze_Class implements External_ClassInterface {
 	/**
 	 * Get helper
 	 *
-	 * @return null
+	 * @return External_Maze_Helper
 	 */
 	protected function getHelper() {
 		return $this->helper;

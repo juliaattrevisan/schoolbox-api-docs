@@ -17,7 +17,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use External_User;
 use Schoolbox\Resource\Folder;
-use External_Class;
+use External_ClassInterface;
 use PDO;
 
 /**
@@ -43,7 +43,7 @@ class RelationshipFilterer
     /** @var Folder\Mapper */
     private $folderMapper;
 
-    /** @var External_Class */
+    /** @var External_ClassInterface */
     private $externalClass;
 
     /** @var UserAccessMapper */
@@ -55,7 +55,7 @@ class RelationshipFilterer
      * @param UserMapper       $userMapper
      * @param External_User    $externalUser
      * @param Folder\Mapper    $folderMapper
-     * @param External_Class   $externalClass
+     * @param External_ClassInterface   $externalClass
      * @param UserAccessMapper $userAccessMapper
      */
     public function __construct(
@@ -63,7 +63,7 @@ class RelationshipFilterer
         UserMapper $userMapper,
         External_User $externalUser,
         Folder\Mapper $folderMapper,
-        External_Class $externalClass,
+        External_ClassInterface $externalClass,
         UserAccessMapper $userAccessMapper
     ) {
         $this->db               = $db;
@@ -183,24 +183,31 @@ class RelationshipFilterer
 
         $students = $this->userMapper->findByPredicates($pb);
 
-        $teacherExternalIds = [];
-        $allFolders         = $this->folderMapper->createCollection();
+        $allFolders = $this->folderMapper->createCollection();
         foreach ($students as $student) {
             // Find all folders where the user is a class student or learner-only.
             $allFolders = $allFolders->mergeUnique($this->folderMapper->findForUser($student, true, UserAccess::ACCESS_READ, true), 'id');
         }
-        // Then find the teachers of these classes from synergetic.
-        $folderIds = [];
+
+        // Students are not in any groups/classes?
+        if (!$allFolders->count()) {
+            // Then they have no teachers
+            return [];
+        }
+
+        // Find all class codes these students are in.
+        $classCodes = [];
+        $folderIds  = [];
         foreach ($allFolders as $folder) {
             $folderIds[] = $folder->getId();
             foreach ($folder->getCodes() as $code) {
-                /** @noinspection SlowArrayOperationsInLoopInspection */
-                $teacherExternalIds = \array_merge($teacherExternalIds, $this->externalClass->getTeacherName($code->getCode()));
+                $classCodes[] = $code->getCode();
             }
         }
-        if (!\count($folderIds)) {
-            return [];
-        }
+
+        // Then find the teachers of these classes from synergetic.
+        $teacherExternalIds = $this->externalClass->getTeacherName(\implode(',', \array_unique($classCodes)));
+
         $instructorIds = $this->userAccessMapper->findScalarByPredicates(
             'uid',
             $this->userAccessMapper->getPredicateBuilder()
@@ -209,6 +216,7 @@ class RelationshipFilterer
                                    ->equals('type', UserAccess::ACCESS_WRITE)
         );
 
+        // No class teachers or group instructors?
         if (!\count($teacherExternalIds) && !\count($instructorIds)) {
             return [];
         }
@@ -263,14 +271,18 @@ class RelationshipFilterer
                                    ->equals('type', UserAccess::ACCESS_READ)
         );
 
-        $classStudentExternalIds = [];
+        // Get all the codes from all the folders
+        $folderCodes = [];
         foreach ($taughtFolders as $taughtFolder) {
             foreach ($taughtFolder->getCodes() as $code) {
-                $classStudents = $this->externalClass->getStudents($code->getCode());
-                foreach ($classStudents as $classStudent) {
-                    $classStudentExternalIds[] = $classStudent['synergy_id'];
-                }
+                $folderCodes[] = $code->getCode();
             }
+        }
+
+        // Find students for these folders codes
+        $classStudentExternalIds = [];
+        foreach ($this->externalClass->getStudents(\implode(',', \array_unique($folderCodes))) as $classStudent) {
+            $classStudentExternalIds[] = $classStudent['synergy_id'];
         }
 
         if (!\count($groupMemberIds) && !\count($classStudentExternalIds)) {

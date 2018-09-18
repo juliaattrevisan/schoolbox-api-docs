@@ -45,7 +45,7 @@ class External_Humanedge_Class implements External_ClassInterface
     /**
      * @inheritDoc
      */
-    public function getStudents($classCode)
+    public function getStudents(string $classCode): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
@@ -102,7 +102,7 @@ class External_Humanedge_Class implements External_ClassInterface
     /**
      * @inheritDoc
      */
-    public function getTeacherName($classCode)
+    public function getTeacherName(string $classCode): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
