@@ -5,6 +5,7 @@
 {# What could the difference between these two things possibly be? #}
 {% set capabilityMaxValue = groupUsage.maxValue %}
 {% set capabilityMaxSum   = groupUsage.calculateMaxValueFromIndicators %}
+{% set capabilityNormMark = capabilityMark.retrieveNormalizedMark %}
 
 {% set markType = rubricGrid.assessment.markScheme.generateContext %}
 
@@ -15,7 +16,7 @@
 
     {# TODO assumes values are always descending which might not be the case? #}
     {% for gradeLevel in rubricMarkedGrid.markScheme.gradeGroup.gradeLevels %}
-        {% if (capabilityMark.value >= gradeLevel.lowerBound and not letterGradeBracket) %}
+        {% if (capabilityNormMark >= gradeLevel.lowerBound and not letterGradeBracket) %}
             {% set letterGradeBracket = gradeLevel.rawGrade %}
             {% set letterGradeValue   = gradeLevel.caption %}
         {% endif %}
