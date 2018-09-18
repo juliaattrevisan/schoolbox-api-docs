@@ -14,19 +14,11 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Paginator\Paginator as BasePaginator;
-use External_Class;
-use External_User;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
-use Schoolbox\Comms\News\Audience\BusinessRules;
-use Schoolbox\Comms\News\Audience\RelationshipFilterer;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
-use Schoolbox\News\Article;
 use Schoolbox\News\Topic;
-use Schoolbox\Permission\Access;
-use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class Lists
 {
@@ -97,17 +89,14 @@ class Lists
         IConnector $databaseInternal,
         ArticleResolver $articleResolver
     ) {
-        $this->defaultLimit = $defaultLimit;
-        $this->newsMapper = $newsMapper;
-        $this->policyMapper = $policyMapper;
-        $this->saveForLaterMapper = $saveForLaterMapper;
-        $this->statisticsMapper = $statisticsMapper;
+        $this->defaultLimit               = $defaultLimit;
+        $this->newsMapper                 = $newsMapper;
+        $this->policyMapper               = $policyMapper;
+        $this->saveForLaterMapper         = $saveForLaterMapper;
+        $this->statisticsMapper           = $statisticsMapper;
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
-        $this->databaseInternal = $databaseInternal;
-
-        /* Hyperdrive injection
-         */
-        $this->articleResolver = $articleResolver;
+        $this->databaseInternal           = $databaseInternal;
+        $this->articleResolver            = $articleResolver;
     }
 
 

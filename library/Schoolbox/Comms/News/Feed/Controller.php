@@ -1,7 +1,5 @@
 <?php
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -10,14 +8,11 @@ namespace Schoolbox\Comms\News\Feed;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
-use External_Class;
-use External_User;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
@@ -56,30 +51,8 @@ class Controller extends Base
      */
     private $databaseInternal;
 
-    /**
-     * @var Folder\Mapper
-     */
-    private $folderMapper;
-
-    /**
-     * @var Access\UserAccessMapper
-     */
-    private $userAccessMapper;
-
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-    /**
-     * @var External_User
-     */
-    private $externalUser;
-
-    /**
-     * @var External_Class
-     */
-    private $externalClass;
+    /** @var ArticleResolver */
+    private $articleResolver;
 
 
     /**
@@ -92,11 +65,7 @@ class Controller extends Base
      * @param News\Statistics\Mapper            $statisticsMapper
      * @param News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper
      * @param IConnector                        $databaseInternal
-     * @param Folder\Mapper                     $folderMapper
-     * @param Access\UserAccessMapper           $userAccessMapper
-     * @param UserMapper                        $userMapper
-     * @param External_User                     $externalUser
-     * @param External_Class                    $externalClass
+     * @param ArticleResolver                   $articleResolver
      */
     public function __construct(
         News\Mapper $newsMapper,
@@ -106,27 +75,16 @@ class Controller extends Base
         News\Statistics\Mapper $statisticsMapper,
         News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
-        Folder\Mapper $folderMapper,
-        Access\UserAccessMapper $userAccessMapper,
-        UserMapper $userMapper,
-        External_User $externalUser,
-        External_Class $externalClass
+        ArticleResolver $articleResolver
     ) {
-        $this->newsMapper = $newsMapper;
-        $this->policyMapper = $policyMapper;
-        $this->topicMapper = $topicMapper;
-        $this->saveForLaterMapper = $saveForLaterMapper;
-        $this->statisticsMapper = $statisticsMapper;
+        $this->newsMapper                 = $newsMapper;
+        $this->policyMapper               = $policyMapper;
+        $this->topicMapper                = $topicMapper;
+        $this->saveForLaterMapper         = $saveForLaterMapper;
+        $this->statisticsMapper           = $statisticsMapper;
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
-
-        /* Hyperdrive injection
-         */
-        $this->databaseInternal = $databaseInternal;
-        $this->folderMapper = $folderMapper;
-        $this->userAccessMapper = $userAccessMapper;
-        $this->userMapper = $userMapper;
-        $this->externalUser = $externalUser;
-        $this->externalClass = $externalClass;
+        $this->databaseInternal           = $databaseInternal;
+        $this->articleResolver            = $articleResolver;
     }
 
 
@@ -189,18 +147,14 @@ class Controller extends Base
         /* Get all the articles across all topics
          */
         $topicData = (new News\Lists(
-            $this->getConfigLoader()->get('search_type_limit'),
+            (int)$this->getConfigLoader()->get('search_type_limit'),
             $this->newsMapper,
             $this->policyMapper,
             $this->saveForLaterMapper,
             $this->statisticsMapper,
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
-            $this->folderMapper,
-            $this->userAccessMapper,
-            $this->userMapper,
-            $this->externalUser,
-            $this->externalClass
+            $this->articleResolver
         ))->findForTopic(
             $urlPrefix,
             $params,
@@ -209,6 +163,7 @@ class Controller extends Base
             null,
             null
         );
+
 
         /* I haven't seen an outputter for xml in Web/Output
          */
