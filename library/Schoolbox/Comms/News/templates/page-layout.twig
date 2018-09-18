@@ -49,7 +49,7 @@
                                 <ul>
                                     {% for state, data in authoredCounts %}
                                         {% if authoredCounts > 1 %}
-                                        <li role="menuitem"><a href="{{ routeLookup('commsNews.getAuthored') }}">
+                                        <li role="menuitem"><a href="{{ routeLookup('commsNews.getAuthored') }}?status={{ state }}">
                                                 {{ state }}
                                             <span class="label {{ data.labelClass }} right">{{ data.count }}</span>
                                             </a>
