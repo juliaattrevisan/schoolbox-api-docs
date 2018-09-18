@@ -37,14 +37,24 @@
                     {% set indexRoute = routeLookupIfAuthorized('commsNews.getIndex') %}
                     {% if indexRoute %}
                         <li {% if page == indexRoute %}class="active"{% endif %} role="menuitem">
-                            <a href="{{ indexRoute }}">{{ locale.news | capitalize }} feed</a>
+                            <a href="{{ indexRoute }}">{{ locale.news | capitalize }} Feed</a>
                         </li>
                     {% endif %}
 
                     {% set authoredRoute = routeLookupIfAuthorized('commsNews.getAuthored') %}
                     {% if authoredRoute %}
                         <li {% if page == authoredRoute %}class="active"{% endif %} role="menuitem">
-                            <a href="{{ authoredRoute }}">My authored {{ locale.news }}</a>
+                            <a href="{{ authoredRoute }}">My Authored {{ locale.news | capitalize }}</a>
+                            {% if authoredCounts | length %}
+                                <ul>
+                                    {% for state, data in authoredCounts %}
+                                        <li role="menuitem"><a href="{{ routeLookup('commsNews.getAuthored') }}">
+                                            {{ state }}
+                                            <span class="label {{ data.labelClass }} right">{{ data.count }}</span>
+                                        </a></li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         </li>
                     {% endif %}
 
@@ -52,9 +62,9 @@
                     {% if moderationRoute %}
                         <li {% if page == moderationRoute %}class="active"{% endif %} role="menuitem">
                             <a href="{{ moderationRoute }}">
-                                Moderation list
+                                Moderation List
                                 {% if moderationCount > 0 %}
-                                    <span class="label neutral right" title="{{ moderationCount }} item{% if moderationCount > 1 %}s{% endif %} awaiting moderation">{{ moderationCount }}</span>
+                                    <span class="label highlight right" title="{{ moderationCount }} item{% if moderationCount > 1 %}s{% endif %} awaiting moderation">{{ moderationCount }}</span>
                                 {% endif %}
                             </a>
                         </li>
@@ -63,7 +73,7 @@
                     {% set savedRoute = routeLookupIfAuthorized('commsNewsSaveForLater.getList') %}
                     {% if savedRoute %}
                         <li {% if page == savedRoute %}class="active"{% endif %} role="menuitem">
-                            <a href="{{ savedRoute }}">My saved {{ locale.news }}</a>
+                            <a href="{{ savedRoute }}">My Saved {{ locale.news | capitalize }}</a>
                         </li>
                     {% endif %}
                 </ul>

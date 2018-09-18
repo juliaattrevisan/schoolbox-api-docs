@@ -808,6 +808,20 @@ class Controller extends Base
             // Vars for the nav sidebar
             'page' => $this->getRequest()->query['page'],
             'moderationCount' => $lists->getNeedModerationCount(),
+            'authoredCounts' => [
+                'Drafted' => [
+                    'count' => 14,
+                        'labelClass' => 'highlight'
+                ],
+                'Rejected' => [
+                    'count' => 2,
+                    'labelClass' => 'alert'
+                ],
+                'Awaiting Moderation' => [
+                    'count' => 4,
+                    'labelClass' => 'neutral'
+                ]
+            ]
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $data));
@@ -821,7 +835,7 @@ class Controller extends Base
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getAuthored()
+    public function getAuthored($status, $pageNum)
     {
         $params = new Querystring($this->getRequest()->query);
         $pageNum = $params->getPageNum();
