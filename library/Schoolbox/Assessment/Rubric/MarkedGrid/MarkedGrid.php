@@ -101,7 +101,7 @@ class MarkedGrid
     public function retrieveNormalizedMark(): float
     {
         $capabilityMaxValues = [];
-        $totalWeight       = 0;
+        $totalWeight         = 0;
         foreach ($this->capabilityMarks as $capabilityMark) {
             $capabilityNormMark    = $capabilityMark->retrieveNormalizedMark();
             $capabilityWeight      = $capabilityMark->getCapabilityUsage()->getMaxValue();
@@ -131,17 +131,21 @@ class MarkedGrid
      */
     public function retrieveHumanReadableMark(): ?string
     {
-        $value    = 0;
-        $maxValue = 0;
-        foreach ($this->capabilityMarks as $capabilityMark) {
-            $value    += $capabilityMark->getValue();
-            $maxValue += $capabilityMark->getCapabilityUsage()->getMaxValue();
-        }
-
-        // TODO make this work with the assessment's mark type?
-        // (copy-pasted from CapabilityMark humanReadableMark)
-        $normMark = $maxValue === 0 ? 0 : ($value / $maxValue * 100);
-        return $this->markScheme->getHumanReadableMark($normMark);
+//        $value    = 0;
+//        $maxValue = 0;
+//        foreach ($this->capabilityMarks as $capabilityMark) {
+//            // getValue is NOT scaled to max capability mark
+//            // BUT: the amount it contributes to the max mark is.
+//            $value += $capabilityMark->getValue();
+//            foreach ($capabilityMark->getCapabilityUsage()->getIndicatorUsages() as $indicatorUsage) {
+//                $maxValue += $indicatorUsage->calculateMaxValueFromDescriptors();
+//            }
+//        }
+//
+//        // TODO make this work with the assessment's mark type?
+//        // (copy-pasted from CapabilityMark humanReadableMark)
+//        $normMark = $maxValue === 0 ? 0 : ($value / $maxValue * 100);
+        return $this->markScheme->getHumanReadableMark($this->retrieveNormalizedMark());
 
         // None
 //        $markScheme = new None();
