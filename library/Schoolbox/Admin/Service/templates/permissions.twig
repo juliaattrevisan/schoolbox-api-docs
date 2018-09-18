@@ -1,3 +1,9 @@
+<ul class="breadcrumb">
+    <li><a href="/adminv2/home">Admin</a></li>
+    <li><a href="/adminv2/user">Users</a></li>
+    <li class="active"><a href="">Service Permissions</a></li>
+</ul>
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Service Permissions</h1>
@@ -7,22 +13,34 @@
 {% for service, people in services %}
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">{{ service }}</h2>
-
+        <h2 class="subheader" id="{{ service }}">{{ service }}</h2>
         {% if people|length %}
         <section>
             <ul class="information-list">
                 {% for person in people %}
-                    <li class="content"><a href="/search/user/{{ person.id }}" title="View Profile">{{ person.fullname }}</a></li>
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="compact card small-12">
+                                <a href="/adminv2/user/{{ person.id }}/modify">
+                                    <img src="/portrait.php?userId={{ person.externalId }}&size=square64" />
+                                    <p>
+                                        {{ person.fullname }}
+                                    </p>
+                                </a>
+                            </div>
+                        </div>
+                        <nav>
+                            <!-- <a class="icon-delete no-text" href="#" title="Delete"></a> -->
+                        </nav>
+                    </li>
                 {% endfor %}
             </ul>
         </section>
         {% else %}
             <div class="empty-state">
                 <i class="icon-staff-students"></i>
-                <p>Nobody is assigned to this service permission.</p>
+                <p>Nobody is assigned to this service.</p>
             </div>
-
         {% endif %}
     </div>
 </div>
