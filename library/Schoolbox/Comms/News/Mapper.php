@@ -187,6 +187,7 @@ class Mapper extends \Schoolbox\Mapper
         return $this->getPredicateBuilder()
             ->equals('author_id',$author->getId())
             ->isNull('submitted_at')
+            ->isNull('rejected_at')
             ->isNull('deleted_at');
     }
 

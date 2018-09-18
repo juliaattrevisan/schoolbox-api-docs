@@ -3,58 +3,68 @@
 {% block newsTitle %}Moderation List{% endblock %}
 
 {% block newsContent %}
-
+    <dl class="tabs" data-tab>
+        <dd class="active">
+            <a href="#awaiting-acceptance">Awaiting Acceptance</a>
+        </dd>
+        <dd>
+            <a href="#accepted-articles">Recently Accepted</a>
+        </dd>
+        <dd {{ selected|purify }}>
+            <a href="#rejected-articles">Recently Rejected</a>
+        </dd>
+    </dl>
+    <div class="tabs-content">
     {# A list of articles that require moderation
      # Moderation is performed by Comms Officers and their deputy Moderators (if assigned)
      #}
-    <h2 class="subheader">Awaiting Acceptance</h2>
-
-    {% if articles|length %}
+    <div class="content active" id="awaiting-acceptance">
+        {% if articles|length %}
         <section>
-            <ul class="information-list">
-                {% for article in articles %}
-                    <li>
-                        <div class="list-item">
-                            <div class="small-12 card">
-                                <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
-                                <p class="meta">Authored by
+                <ul class="information-list">
+                    {% for article in articles %}
+                        <li>
+                            <div class="list-item">
+                                <div class="small-12 card">
+                                    <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
+                                    <p class="meta">Authored by
 
-                                    {% if article.author.deletedAt.isNull %}
-                                        <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
-                                    {% else %}
-                                        {{ article.author.fullname }}
-                                    {% endif %}
+                                        {% if article.author.deletedAt.isNull %}
+                                            <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
+                                        {% else %}
+                                            {{ article.author.fullname }}
+                                        {% endif %}
 
-                                    <time title="{{ article.updatedAt.long }}">{{ article.updatedAt.relativeTime }}</time>
-                                </p>
-
-                                {% if article.topics|length %}
-                                    <p class="meta">Related topics:
-                                        {% for topic in article.topics %}
-                                            <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
-                                        {% endfor %}
+                                        <time title="{{ article.updatedAt.long }}">{{ article.updatedAt.relativeTime }}</time>
                                     </p>
-                                {% endif %}
+
+                                    {% if article.topics|length %}
+                                        <p class="meta">Related topics:
+                                            {% for topic in article.topics %}
+                                                <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-        </section>
-    {% else %}
-        <div class="empty-state">
-            <i class="icon-news"></i>
-            <p>All {{ locale.news }} have been processed.</p>
-        </div>
-    {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-news"></i>
+                <p>All {{ locale.news }} have been processed.</p>
+            </div>
+        {% endif %}
+    </div>
 
 
     {# A list of recently-accepted articles
      # Not having this is pretty disorienting
      #}
+    <div class="content" id="accepted-articles">
     {% if recentlyAcceptedArticles|length %}
-        <h2 class="subheader">Recently Accepted</h2>
-
         <section>
             <ul class="information-list">
                 {% for article in recentlyAcceptedArticles %}
@@ -94,14 +104,14 @@
             </ul>
         </section>
     {% endif %}
+    </div>
 
 
     {# A list of recently-rejected articles
      # Not having this is pretty disorienting
      #}
+    <div class="content" id="rejected-articles">
     {% if recentlyRejectedArticles|length %}
-        <h2 class="subheader">Recently Rejected</h2>
-
         <section>
                 <ul class="information-list">
                     {% for article in recentlyRejectedArticles %}
@@ -144,4 +154,6 @@
                 </ul>
             </section>
     {% endif %}
+    </div>
+    </div>
 {% endblock %}
