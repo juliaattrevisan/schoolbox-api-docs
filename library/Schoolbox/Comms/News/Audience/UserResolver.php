@@ -67,6 +67,7 @@ class UserResolver implements IUserResolver
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws UnexpectedValueException If we attempt to build a query with an unrecognised entity type
      * @throws \UnderflowException
+     * @TODO This is too poorly implemented and needs to be optimised. See SA-7431
      */
     public function findUsersForArticle(int $articleId): array
     {
