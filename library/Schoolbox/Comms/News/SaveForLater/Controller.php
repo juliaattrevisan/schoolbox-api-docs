@@ -62,6 +62,20 @@ class Controller extends Base
             // Vars for the nav sidebar
             'page' => $this->getRequest()->query['page'],
             'moderationCount' => $lists->getNeedModerationCount(),
+            'authoredCounts' => [
+                'Drafted' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateDraft($this->getUser())),
+                    'labelClass' => 'unsubmitted'
+                ],
+                'Rejected' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
+                    'labelClass' => 'submitted-late'
+                ],
+                'Awaiting Moderation' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
+                    'labelClass' => 'submitted'
+                ]
+            ]
         ])->setTitle('Saved For Later'));
     }
 
