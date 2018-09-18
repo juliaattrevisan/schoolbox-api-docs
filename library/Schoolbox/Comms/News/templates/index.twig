@@ -13,6 +13,20 @@
 
 {% block newsTitle %}{{ locale.news.proper }} Feed{% endblock %}
 
+{% block archiveLink %}
+    {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') %}
+    {% if archiveRoute %}
+        <a href="{{ archiveRoute }}" class='icon-archive' title="View archived {{ locale.news }}"></a>
+    {% endif %}
+{% endblock %}
+
+{% block rssLink %}
+    {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key}) %}
+    {% if rssRoute and slug %}
+        <a href="{{ rssRoute }}?topic={{ slug }}" class='icon-rss' title="Download RSS feed for this topic" id="rss"></a>
+    {% endif %}
+{% endblock %}
+
 {% block newsContent %}
     <section>
         {% include '@commsNews/tabs.twig' with {
