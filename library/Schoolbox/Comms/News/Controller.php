@@ -931,8 +931,12 @@ class Controller extends Base
      */
     private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
+        $defaultSearchLimit    = 10;
+        $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
+        $searchLimit           = null === $configuredSearchLimit ? $defaultSearchLimit : (int)$configuredSearchLimit;
+
         $topicData = (new Lists(
-            $this->getConfigLoader()->get('search_type_limit'),
+            $searchLimit,
             $this->newsMapper,
             $this->policyMapper,
             $this->saveForLaterMapper,
