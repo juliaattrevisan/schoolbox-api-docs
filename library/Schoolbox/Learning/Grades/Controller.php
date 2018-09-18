@@ -234,11 +234,13 @@ class Controller extends Base
         $workTypeNames = $workTypes->getPropertyValues('name');
 
         // Storage for each folders markbook
-        $markbooks        = [];
+        $markbooks = new GenericCollection(Markbook::class);
         $markbooksFolders = [];
 
         // Keep a collection of all folders student has an assessment in for use in the dropdown
         $assessmentTasks = [];
+
+        $showOverallGrade = $this->getConfigLoader()->get('show_overall_grade');
 
         $folders = $this->getFolderMapper()->createCollection();
 
@@ -266,10 +268,13 @@ class Controller extends Base
             }
         }
 
-        foreach ($markbooksFolders as $folderId => $assessmentsArray) {
-            $markbooks[$folderId] =
-                (new Markbook($assessmentsArray, $this->getDefaultGradeGroup(), $this->getUser()))
-                    ->getStudentStatistics()[$viewee->getId()];
+        foreach ($markbooksFolders as $folderId => $assessments) {
+            $assessment = $assessments->first();
+            if($assessment instanceof IAssessable &&
+                ($showOverallGrade || $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder()))
+            ) {
+                $markbooks->setOffset($folderId, new Markbook($assessments, $this->defaultGradeGroup, $this->getUser()));
+            }
         }
 
         //Do we have access to btacs year summary route?
@@ -289,6 +294,7 @@ class Controller extends Base
             'folders'         => $folders,
             'assessmentTasks' => $assessmentTasks,
             'markbooks'       => $markbooks,
+            'showOverallGrade' => $showOverallGrade,
             'mailHandle'      => $this->getSession()->get('mailhandle'),
             'currentUser'     => $this->getUser(),
             'yearRoute'       => $yearRoute
