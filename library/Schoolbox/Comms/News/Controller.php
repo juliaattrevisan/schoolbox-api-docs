@@ -780,6 +780,7 @@ class Controller extends Base
         $params = new Querystring($this->getRequest()->query);
         $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
         $topics = $this->topicMapper->findAll();
+        $lists = new Moderation\Lists($this->newsMapper);
 
         /* The initial data set to load, given the params provided
          * Compact Mode is hardcoded to be disabled from this context
@@ -799,11 +800,14 @@ class Controller extends Base
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'slug' => $params->getSlug(),
             'referrer' => $params->getReferrer(),
-            'page' => $this->getRequest()->query['page'],
 
             /* For configuring the rss button which changes per topic chosen
              */
             'key' => $this->getUser()->getKey(),
+
+            // Vars for the nav sidebar
+            'page' => $this->getRequest()->query['page'],
+            'moderationCount' => $lists->getNeedModerationCount(),
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $data));
@@ -822,6 +826,7 @@ class Controller extends Base
         $params = new Querystring($this->getRequest()->query);
         $pageNum = $params->getPageNum();
         $status = $params->getStatus();
+        $lists = new Moderation\Lists($this->newsMapper);
 
         if (!$pageNum) {
             $pageNum = 1;
@@ -832,9 +837,12 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored.twig', [
-            'page' => $this->getRequest()->query['page'],
             'pageNum' => $pageNum,
-            'status' => $status
+            'status' => $status,
+
+            // Vars for the nav sidebar
+            'page' => $this->getRequest()->query['page'],
+            'moderationCount' => $lists->getNeedModerationCount(),
         ]));
     }
 

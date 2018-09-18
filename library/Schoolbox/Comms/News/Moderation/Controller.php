@@ -75,11 +75,14 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
-            'page' => $this->getRequest()->query['page'],
             'articles' => $articles,
             'recentlyAcceptedArticles' => $lists->getRecentlyAccepted(),
             'recentlyRejectedArticles' => $lists->getRecentlyRejected(),
-            'moderationRequired' => $moderationRequired
+            'moderationRequired' => $moderationRequired,
+
+            // Vars for the nav sidebar
+            'page' => $this->getRequest()->query['page'],
+            'moderationCount' => $lists->getNeedModerationCount(),
         ])->setTitle('Moderation List'));
     }
 

@@ -51,7 +51,12 @@
                     {% set moderationRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
                     {% if moderationRoute %}
                         <li {% if page == moderationRoute %}class="active"{% endif %} role="menuitem">
-                            <a href="{{ moderationRoute }}">Moderation list</a>
+                            <a href="{{ moderationRoute }}">
+                                Moderation list
+                                {% if moderationCount > 0 %}
+                                    <span class="label neutral right" title="{{ moderationCount }} item{% if moderationCount > 1 %}s{% endif %} awaiting moderation">{{ moderationCount }}</span>
+                                {% endif %}
+                            </a>
                         </li>
                     {% endif %}
 

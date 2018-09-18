@@ -54,10 +54,14 @@ class Controller extends Base
     public function getList(): void
     {
         $articles = (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
+        $lists = new News\Moderation\Lists($this->newsMapper);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', [
+            'articles' => $articles,
+
+            // Vars for the nav sidebar
             'page' => $this->getRequest()->query['page'],
-            'articles'        => $articles,
+            'moderationCount' => $lists->getNeedModerationCount(),
         ])->setTitle('Saved For Later'));
     }
 
