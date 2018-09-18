@@ -437,7 +437,6 @@ class Controller extends Base
      * @param Model $article
      * @throws MapperException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      * @throws \PDOException
@@ -446,7 +445,7 @@ class Controller extends Base
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
-        $moderationRequired = $policies->getOffset('global_moderation')->getValue();
+        $moderationEnabled = (bool)$policies->getOffset('global_moderation')->getValue();
 
         /* Figure out if this was Saved For Later for the current user
          */
@@ -512,7 +511,7 @@ class Controller extends Base
             $data = [
                 'policies'           => $policies,
                 'article'            => $article,
-                'moderationRequired' => $moderationRequired,
+                'moderationEnabled'  => $moderationEnabled,
                 'isSavedForLater'    => $isSavedForLater,
                 'isCommsOfficer'     => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
                 'isAuthor'           => (new ValidUserIsAuthor())->isSatisfiedBy($this->getUser(), $article),
