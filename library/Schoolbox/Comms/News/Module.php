@@ -86,6 +86,18 @@ class Module extends BaseModule
             );
         });
 
+        $viewRecipients = new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
+                    new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper()),
+                    new Authorizer\Rule\IsArticleAuthor()
+                )
+            );
+        });
+
         $preloadArticle = function ($params) {
             return $this->preloadArticle($params);
         };
@@ -99,7 +111,7 @@ class Module extends BaseModule
         $this->register('GET', '/topics', 'getTopics', $loggedIn);                                               // (async) Get a list of topics to chooze
         $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $canModify, $preloadArticleWithAudience); // Update news article
         $this->register('POST', '/{articleId:\d+}', 'postUpdate', $canModify, $preloadArticleWithAudience);
-        $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $canModify, $preloadArticle);     // Find out who will receive this article
+        $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $viewRecipients, $preloadArticle);// Find out who will receive this article
         $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', $canModify, $preloadArticle);           // Delete article
         $this->register('GET', '/{articleId:\d+}', 'getDetail', $readerPerms, $preloadArticle);                  // View news article
         $this->register('GET', '/list{/year,month}', 'getListByTopic', $loggedIn);                               // (async) Get a list of articles audienced to me, by topic
