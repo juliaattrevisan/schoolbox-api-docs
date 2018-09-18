@@ -20,7 +20,7 @@ class Mapper extends Schoolbox\Mapper
     /**
      * @inheritdoc
      */
-    protected function mapping()
+    protected function mapping(): void
     {
         $this->hasTable('lu_work_type');
         $this->hasModel(Model::class);
@@ -28,6 +28,7 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('name', self::TYPE_STRING);
         $this->uses('external_result_type', self::TYPE_STRING);
         $this->uses('show_on_grades_page', self::TYPE_BOOLEAN);
+        $this->uses('staff_or_instructor_visible_only', self::TYPE_BOOLEAN);
     }
 
 
