@@ -188,13 +188,18 @@ class Module extends BaseModule
      */
     private function preloadArticle(array $params): array
     {
-        try {
-            return [
-                'article' => $this->getArticleMapper()->findById($params['articleId']),
-            ];
-        } catch (MapperException $e) {
-            throw new NotFound('Unknown news article.', 0, $e);
+        if (\array_key_exists('article', $params)) {
+            $article = $params['article'];
+        } else {
+            try {
+                $article = $this->getArticleMapper()->findById($params['articleId']);
+            } catch (MapperException $e) {
+                throw new NotFound('Unknown news article.', 0, $e);
+            }
         }
+        return [
+            'article' => $article,
+        ];
     }
 
     /**

@@ -105,10 +105,14 @@ class Module extends BaseModule
      */
     private function preloadArticle(array $params): array
     {
-        try {
-            $article = $this->getArticleMapper()->findById($params['articleId']);
-        } catch (MapperException $e) {
-            throw new NotFound();
+        if (\array_key_exists('article', $params)) {
+            $article = $params['article'];
+        } else {
+            try {
+                $article = $this->getArticleMapper()->findById($params['articleId']);
+            } catch (MapperException $e) {
+                throw new NotFound();
+            }
         }
 
         return [
