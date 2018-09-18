@@ -909,6 +909,7 @@ class Controller extends Base
             ]
         ];
 
+        $articles->reindex();
         $articles = $articles->jsonSerialize(
             new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()))
         );
