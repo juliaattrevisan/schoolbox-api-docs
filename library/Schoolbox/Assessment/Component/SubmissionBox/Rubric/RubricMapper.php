@@ -1537,6 +1537,7 @@ class RubricMapper
         // Pass 1.5: is a custom max mark for the group set?
         foreach ($customGroupMarks as $groupId => $markData) {
 
+            // TODO I should be validating against unscaled mark, not custom mark
             if ((new ValidCapabilityMark($markData['max'], $markScheme))->isSatisfiedBy($markData['customMark'])) {
                 // Find a record for its group
                 $group = $groupMapper->findById($groupId);
