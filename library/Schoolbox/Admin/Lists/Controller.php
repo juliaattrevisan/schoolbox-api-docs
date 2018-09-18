@@ -128,6 +128,7 @@ class Controller extends Base
         $nulls  = [];
         $radios = [];
         $checkboxes = [];
+        $empty_checkboxes = [];
         // for mandatory text fields
         $mandatoryValues = [];
 
@@ -148,6 +149,8 @@ class Controller extends Base
                 $radios[substr($field, 6)] = $value;
             } else if (substr($field, 0, 9) == "checkbox-") {
                 $checkboxes[substr($field, 9)] = $value;
+            } else if (substr($field, 0, 15) == "empty-checkbox-") {
+                $empty_checkboxes[substr($field, 15)] = $value;
             } else if ($field == "id") {
                 $ids = $value;
             }
@@ -217,6 +220,14 @@ class Controller extends Base
             }
 
             //Process all the lovely checkboxes
+            //First unset all models
+            foreach ($empty_checkboxes as $field => $value) {
+                $setter = "set" . $this->underscoreToCamelCase($field);
+                $boolean = !isset($value[$currentIndex]);
+                $model->$setter($boolean);
+            }
+
+            //Then set models whose that are checked
             foreach ($checkboxes as $field => $value) {
                 $setter = "set" . $this->underscoreToCamelCase($field);
                 $boolean = isset($value[$currentIndex]);
@@ -479,24 +490,23 @@ class Controller extends Base
                 'title'             => 'Work Types',
                 'mapper'            => WorkTypeMapper::class,
                 'fields'            => [
+                    'showOnGradesPage'       => [
+                        'caption'   => 'Grades page',
+                        'tooltip'   => 'If checked, assessments with this work type will appear on the grades summary page.',
+                        'checkbox'  =>  true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ],
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 8,
+                        'width'     => 7,
                         'maxLength' => 40,
                         'mandatory' => true,
                     ],
                     'externalResultType' => [
                         'caption'   => 'External SIS Type',
                         'width'     => 4,
-                    ],
-//                    'showOnGradesPage'       => [
-//                        'caption'   => 'Show on Grades Summary Page',
-//                        'tooltip'   => 'Assessment with the work types chosen here will appear on the grades summary page.
-//                                                This will change the layout of the grades summary.',
-//                        'checkbox'  =>  true,
-//                        'width'     => 1,
-//                        'mandatory' => true,
-//                    ]
+                    ]
                 ]
             ],
             'submission-errors'     => [
