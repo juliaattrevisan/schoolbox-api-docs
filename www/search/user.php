@@ -181,7 +181,7 @@ function renderStudent(
     }
 
     // Load the list of groups, and their owner.
-    $groups = $groupHandler->involvedInCategoryList($user['uid'], false);
+    $groups = $groupHandler->involvedInCategoryList($user['uid'], false, READ_ACCESS, true);
     foreach ($groups as &$group) {
         $group['perms'] = $groupHandler->getPermission($group['id']);
 

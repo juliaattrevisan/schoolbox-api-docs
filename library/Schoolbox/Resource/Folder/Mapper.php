@@ -1209,6 +1209,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param int $access_level Defaults to UserAccess::ACCESS_READ, but may be
      *                           any access level.
      * @param bool $exactAccess If true, $access_level must be exact
+     * @param bool $requireHomepage  If true, groups which do not have homepage are excluded.
      *
      * @return \Schoolbox\Collection|Model[]
      */
@@ -1216,7 +1217,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         User $user,
         $get_subjects = true,
         $access_level = UserAccess::ACCESS_READ,
-        $exactAccess = false
+        $exactAccess = false,
+        $requireHomepage = false
     ) {
         $statement = $this->findForUserQuery($user, $get_subjects, $access_level, $exactAccess);
 
@@ -1243,6 +1245,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // Does folder have a group, and we haven't attached it yet?
             $groupId = $row['g.cid'];
             if(!$folder->getGroup() && isset($groupId)){
+                // if list requires homepage and this group does not have it, skip.
+                if ($requireHomepage && (!isset($homepageId) || $homepageId === null)) {
+                    $collection->offsetUnset($id);
+                    continue;
+                }
                 /** @var Group $group */
                 $group = $this->hydrateJoin($row, 'groups', 'g');
                 $folder->setGroup($group);
