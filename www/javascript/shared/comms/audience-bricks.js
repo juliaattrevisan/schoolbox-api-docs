@@ -1069,7 +1069,7 @@ Brick.prototype.getModifierLabel = function(modifiers){
         1: '',
         2: '(Parents of students only)',
         3: '(Inc. parents of students)',
-        4: '(Parents of students only)',
+        4: '(Teachers of students only)',
         5: '(Inc. teachers of students)',
         6: '(Teachers & parents of students only)',
         7: '(Inc. teachers & parents of students)'
