@@ -3,6 +3,8 @@
 use Schoolbox\Collection;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\Admin\Service\Permissions;
+use Schoolbox\Permission\Access\UserAccessMapper;
 
 /** @var SitePage $this */
 
@@ -13,6 +15,8 @@ if (!$_SESSION['user']->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/user.html');
 $this->setTitle('Admin - Users');
 $this->setBlock(TEMPLATE_content, 'superusers', 'superusers_block');
+$this->setBlock(TEMPLATE_content, 'service', 'service_block');
+
 
 // include the admin navigation
 $nav = new AdminV2_Nav();
@@ -37,6 +41,15 @@ if(is_array($superuserList)) {
         $this->parse('superusers_block','superusers', true);
     }
 }
+
+$serviceUserList = (new Permissions(new UserAccessMapper()))->generate();
+foreach($serviceUserList as $service => $serviceUsers) {
+    $this->setVar(['SERVICE_NAME' => $service,
+                   'SERVICE_COUNT' => count($serviceUsers)]
+    );
+    $this->parse('service_block','service', true);
+}
+
 
 // Which modify template gets used?
 if (Config::get('external_db') === 'schoolbox') {

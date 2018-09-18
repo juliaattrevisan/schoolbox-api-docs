@@ -124,7 +124,33 @@
             <!-- END superusers -->
             </tbody>
         </table>
+        <h2 class="subheader">Service Permissions</h2>
+        <section>
+                <table>
+                    <colgroup>
+                        <col width="40%" />
+                        <col width="40%" />
+                        <col width="20%" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Members</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- BEGIN service -->
+                    <tr>
+                        <td><a href="/adminv2/service/permissions#{SERVICE_NAME}">{SERVICE_NAME}</a></td>
+                        <td>{SERVICE_COUNT}</td>
+                    </tr>
+                    <!-- END service -->
+                    </tbody>
+                </table>
+        </section>
     </div>
+
+
 
     <div class="small-12 large-6 island">
         <!--<h2>Bulk Options <span data-tooltip class="hint has-tip tip-top" title="If you are wanting to deal with large lists at once, use this section.">?</span></h2>-->
@@ -169,11 +195,6 @@
                 <!-- END select_clone -->
                 <input type="submit" class="icon-copy" value="Clone" />
             </form>
-        </section>
-
-        <h2 class="subheader">Service Permissions</h2>
-        <section class="content">
-            <p><a href="/adminv2/service/permissions">A list of users who have been assigned service permissions</a>.</p>
         </section>
     </div>
 </div>
