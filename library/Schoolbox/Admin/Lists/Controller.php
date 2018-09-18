@@ -492,7 +492,7 @@ class Controller extends Base
                 'fields'            => [
                     'showOnGradesPage'       => [
                         'caption'   => 'Grades page',
-                        'tooltip'   => 'If checked, assessments with the associated work type will appear on the grades summary page.',
+                        'tooltip'   => 'If checked, assessments with this work type will appear on the grades summary page.',
                         'checkbox'  =>  true,
                         'width'     => 1,
                         'mandatory' => true,
