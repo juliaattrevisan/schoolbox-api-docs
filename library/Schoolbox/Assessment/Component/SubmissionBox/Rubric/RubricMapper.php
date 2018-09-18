@@ -1550,8 +1550,9 @@ class RubricMapper
                         ->setValid(true);
                 }
 
-                // Save the custom mark if provided; otherwise just 0
-                $groupMarksToSave[$groupId]->setValue($markData['customMark']);
+                // Save the unscaled mark if provided; otherwise just 0
+                // TODO confirm this w/ d-baker
+                $groupMarksToSave[$groupId]->setValue($markData['unscaledMark']);
             } else {
                 // TODO handle this somewhere else?
                 throw new \InvalidArgumentException("Capability mark must be between 0 and " . $markData['max']);
