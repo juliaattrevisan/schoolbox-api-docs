@@ -78,7 +78,25 @@ class Controller extends Base
             'articles' => $articles,
             'recentlyAcceptedArticles' => $lists->getRecentlyAccepted(),
             'recentlyRejectedArticles' => $lists->getRecentlyRejected(),
-            'moderationRequired' => $moderationRequired
+            'moderationRequired' => $moderationRequired,
+
+            // Vars for the nav sidebar
+            'page' => $this->getRequest()->query['page'],
+            'moderationCount' => $lists->getNeedModerationCount(),
+            'authoredCounts' => [
+                'Drafted' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateDraft($this->getUser())),
+                    'labelClass' => 'unsubmitted'
+                ],
+                'Rejected' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
+                    'labelClass' => 'submitted-late'
+                ],
+                'Awaiting Moderation' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
+                    'labelClass' => 'submitted'
+                ]
+            ]
         ])->setTitle('Moderation List'));
     }
 

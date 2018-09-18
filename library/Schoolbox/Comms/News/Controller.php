@@ -192,8 +192,8 @@ class Controller extends Base
          */
         /** @var Model $article */
         $article = $this->newsMapper->createModel()
-            ->setPublishAt(\Alaress_Date_Format::now())
-            ->setExpiresAt(\Alaress_Date_Format::now());
+                                    ->setPublishAt(\Alaress_Date_Format::now())
+                                    ->setExpiresAt(\Alaress_Date_Format::now());
 
         /* Policies: Publish Date Offset
          */
@@ -780,6 +780,7 @@ class Controller extends Base
         $params = new Querystring($this->getRequest()->query);
         $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
         $topics = $this->topicMapper->findAll();
+        $lists = new Moderation\Lists($this->newsMapper);
 
         /* The initial data set to load, given the params provided
          * Compact Mode is hardcoded to be disabled from this context
@@ -803,9 +804,117 @@ class Controller extends Base
             /* For configuring the rss button which changes per topic chosen
              */
             'key' => $this->getUser()->getKey(),
+
+            // Vars for the nav sidebar
+            'page' => $this->getRequest()->query['page'],
+            'moderationCount' => $lists->getNeedModerationCount(),
+            'authoredCounts' => [
+                'Drafted' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateDraft($this->getUser())),
+                        'labelClass' => 'unsubmitted'
+                ],
+                'Rejected' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
+                    'labelClass' => 'submitted-late'
+                ],
+                'Awaiting Moderation' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
+                    'labelClass' => 'submitted'
+                ]
+            ]
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $data));
+    }
+
+
+    /**
+     * Index of articles you've authored
+     *
+     * @api GET /comms/news/me
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getAuthored($status, $pageNum)
+    {
+        $params = new Querystring($this->getRequest()->query);
+        $pageNum = $params->getPageNum();
+        $status = $params->getStatus();
+        $lists = new Moderation\Lists($this->newsMapper);
+
+        if (!$pageNum) {
+            $pageNum = 1;
+        }
+
+        if (!$status) {
+            $status = 'All';
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored.twig', [
+            'pageNum' => $pageNum,
+            'status' => $status,
+
+            // Vars for the nav sidebar
+            'page' => $this->getRequest()->query['page'],
+            'moderationCount' => $lists->getNeedModerationCount(),
+            'authoredCounts' => [
+                'Drafted' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateDraft($this->getUser())),
+                    'labelClass' => 'unsubmitted'
+                ],
+                'Rejected' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
+                    'labelClass' => 'submitted-late'
+                ],
+                'Awaiting Moderation' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
+                    'labelClass' => 'submitted'
+                ]
+            ]
+        ]));
+    }
+
+
+    /**
+     * Get a list of articles that the logged in user authored
+     *
+     * @api GET /comms/news/me/articles
+     */
+    public function getAuthoredArticles()
+    {
+        $args = [
+            'order' => [
+                'created_at' => 'desc'
+            ]
+        ];
+
+        $articles = $this->newsMapper->findByColumn('author_id', $this->getUser()->getId(), $args);
+
+        $map = [
+            'id',
+            'title',
+            'featureImage',
+            'publishAt' => [
+                'long',
+                'relativeTime'
+            ],
+            'topics' => [
+                'name',
+                'slug',
+            ],
+            'status',
+            'statusDate' => [
+                'long',
+                'relativeTime'
+            ]
+        ];
+
+        $articles->reindex();
+        $articles = $articles->jsonSerialize(
+            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()))
+        );
+
+        $this->getResponse()->content->set($this->buildJsonOutput($articles));
     }
 
 

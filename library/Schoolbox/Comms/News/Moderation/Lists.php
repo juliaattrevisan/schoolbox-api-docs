@@ -66,6 +66,21 @@ class Lists
         ]);
     }
 
+    /**
+     * A count of articles that require moderation
+     *
+     * @return int
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    public function getNeedModerationCount(): int
+    {
+        $builder = (new Builder($this->newsMapper->getDatabase(), 'comms_news_article'))
+            ->notNull('submitted_at')
+            ->isNull('accepted_at');
+
+        return $this->newsMapper->countByPredicates($builder);
+    }
+
 
     /**
      * A list of recently-accepted articles

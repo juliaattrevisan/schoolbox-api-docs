@@ -53,12 +53,16 @@
 	position: relative;
 	padding: 0.5rem 1rem 0 1rem;
 
-	img, [class^="icon-"], [class*=" icon-"] {
+	img,
+	.img, // for placeholder cards
+	[class^="icon-"],
+	[class*=" icon-"] {
 		float: left;
 		margin: -0.5rem 1rem 0 -1rem;
 	}
 
-	img{
+	img,
+	.img {
 		@media #{$medium-down} {
 			width: (3 * rem-calc($base-font-size));
 		}
@@ -277,6 +281,28 @@
 
 		p {
 			margin-left: 1.5rem;
+		}
+	}
+
+	&.skeleton {
+		> .img {
+			width: 4rem;
+			height: 4rem;
+			background: $skeleton-background;
+		}
+
+		> h3 {
+			width: 50%;
+			height: 1rem;
+			background: $skeleton-background;
+			margin-bottom: .4rem;
+		}
+
+		p.meta {
+			display: block;
+			width: 20%;
+			height: .8125rem;
+			background: $skeleton-background;
 		}
 	}
 
