@@ -72,7 +72,7 @@ class CapabilityMark
     {
         $actualMaxValue  = $this->capabilityUsage->getMaxValue();
         $derivedMaxValue = $this->capabilityUsage->calculateMaxValueFromIndicators();
-        $scalingFactor   = $derivedMaxValue ? ($actualMaxValue / $derivedMaxValue) : 0;
+        $scalingFactor   = $actualMaxValue ? ($derivedMaxValue / $actualMaxValue) : 0;
         return $scalingFactor ? $this->value / $scalingFactor : 0;
     }
 

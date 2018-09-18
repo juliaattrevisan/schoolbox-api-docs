@@ -88,7 +88,7 @@ class MarkedGrid
             $value           += $capabilityMark->getValue();
             $derivedMaxValue += $capabilityMark->getCapabilityUsage()->calculateMaxValueFromIndicators();
         }
-        $scalingFactor = $derivedMaxValue ? ($actualMaxValue / $derivedMaxValue) : 0;
+        $scalingFactor = $actualMaxValue ? ($derivedMaxValue / $actualMaxValue) : 0;
         return $scalingFactor ? $value / $scalingFactor : 0;
     }
 
