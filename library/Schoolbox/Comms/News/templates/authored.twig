@@ -155,16 +155,14 @@
                     console.log(error);
                 });
 
-                // Set initial state for window history
-                if (!history.state) {
-                    history.pushState({page: vue.page, tab: this.tabSelected}, '', '');
-                }
-
                 // Listen for window state change
                 window.onpopstate = function(event) {
                     if (!event.state) {
-                        // Let the browser go back to normal history
-                        return false;
+                        // Return to defaults
+                        vue.page = 1;
+                        vue.onPaginate(vue.page, true);
+                        vue.tabSelected = 'All';
+                        vue.onTabChange(vue.tabSelected, true, true);
                     } else {
                         if (event.state.page) {
                             vue.page = event.state.page;
