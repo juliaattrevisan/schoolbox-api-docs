@@ -48,7 +48,7 @@
                             {% if authoredCounts | length %}
                                 <ul>
                                     {% for state, data in authoredCounts %}
-                                        {% if authoredCounts > 1 %}
+                                        {% if  data.count > 0 %}
                                         <li role="menuitem"><a href="{{ routeLookup('commsNews.getAuthored') }}?status={{ state }}">
                                                 {{ state }}
                                             <span class="label {{ data.labelClass }} right">{{ data.count }}</span>
