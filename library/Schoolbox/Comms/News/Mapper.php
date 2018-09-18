@@ -10,6 +10,7 @@
 namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Collection;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -176,6 +177,44 @@ class Mapper extends \Schoolbox\Mapper
         return $collection;
     }
 
+
+    /**
+     * Returns a predicate for getting articles that are awaiting moderation
+     * @param User $author
+     * @return Builder
+     */
+    public function getPredicateDraft(User $author) {
+        return $this->getPredicateBuilder()
+            ->equals('author_id',$author->getId())
+            ->isNull('submitted_at')
+            ->isNull('deleted_at');
+    }
+
+    /**
+     * Returns a predicate for getting articles that are awaiting moderation
+     * @param User $author
+     * @return Builder
+     */
+    public function getPredicateRejected(User $author) {
+        return $this->getPredicateBuilder()
+            ->equals('author_id',$author->getId())
+            ->notNull('rejected_at')
+            ->isNull('deleted_at');
+    }
+
+    /**
+     * Returns a predicate for getting articles that are awaiting moderation
+     * @param User $author
+     * @return Builder
+     */
+    public function getPredicateAwaitingModeration(User $author) {
+        return $this->getPredicateBuilder()
+            ->equals('author_id',$author->getId())
+            ->notNull('submitted_at')
+            ->isNull('rejected_at')
+            ->isNull('accepted_at')
+            ->isNull('deleted_at');
+    }
 
     /**
      * Get a list of years that have article(s) that were audienced to a user

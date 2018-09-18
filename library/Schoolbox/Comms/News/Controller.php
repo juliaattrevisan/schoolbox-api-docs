@@ -810,16 +810,16 @@ class Controller extends Base
             'moderationCount' => $lists->getNeedModerationCount(),
             'authoredCounts' => [
                 'Drafted' => [
-                    'count' => 14,
-                        'labelClass' => 'highlight'
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateDraft($this->getUser())),
+                        'labelClass' => 'unsubmitted'
                 ],
                 'Rejected' => [
-                    'count' => 2,
-                    'labelClass' => 'alert'
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
+                    'labelClass' => 'submitted-late'
                 ],
                 'Awaiting Moderation' => [
-                    'count' => 4,
-                    'labelClass' => 'neutral'
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
+                    'labelClass' => 'submitted'
                 ]
             ]
         ];
