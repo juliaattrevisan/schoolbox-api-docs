@@ -11,6 +11,7 @@ use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
 use DomainException;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Exceptions\InvalidTransitionException;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Json\Api\AuraLink;
@@ -354,6 +355,88 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         ];
 
         return $map[$this->getDiscreteState($now)];
+    }
+
+
+    /**
+     * @param Alaress_Date_Format|null $now
+     * @throws InvalidTransitionException If transition is invalid for some reason
+     */
+    public function submit(Alaress_Date_Format $now = null): void
+    {
+        $now          = $now ?? Alaress_Date_Format::now();
+        $currentState = $this->getDiscreteState($now);
+
+        // Already submitted. No risk to caller of data loss
+        if(self::STATE_AWAITING_MODERATION === $currentState){
+            throw new InvalidTransitionException($currentState, "Article was already submitted at {$this->submittedAt}");
+        }
+
+        // Invalid operation
+        if(!\in_array($currentState, [self::STATE_DRAFT, self::STATE_REJECTED], true)){
+            throw new InvalidTransitionException($currentState, 'Only draft and rejected articles may be submitted');
+        }
+
+        $this->submittedAt = $now;
+    }
+
+
+    /**
+     * @param User                     $effector
+     * @param string|null              $reason
+     * @param Alaress_Date_Format|null $now
+     * @throws InvalidTransitionException
+     */
+    public function reject(User $effector, string $reason = null, Alaress_Date_Format $now = null): void
+    {
+        $now          = $now ?? Alaress_Date_Format::now();
+        $currentState = $this->getDiscreteState($now);
+
+        // Already rejected.
+        if(self::STATE_REJECTED === $currentState){
+            throw new InvalidTransitionException($currentState, "Article was already rejected at {$this->rejectedAt} by {$this->rejectedBy->getFullName()}");
+        }
+
+        // Invalid operation
+        if(self::STATE_DRAFT === $currentState){
+            throw new InvalidTransitionException($currentState, "An article in draft state cannot be rejected");
+        }
+
+        // Treat article as never being submitted or approved.
+        $this->submittedAt    = null;
+        $this->acceptedAt     = null;
+        $this->acceptedBy     = null;
+
+        // Set rejection details
+        $this->rejectedBy     = $effector;
+        $this->rejectedAt     = $now;
+        $this->rejectedReason = $reason;
+    }
+
+
+    /**
+     * @param User                     $effector
+     * @param Alaress_Date_Format|null $now
+     * @throws InvalidTransitionException
+     */
+    public function approve(User $effector, Alaress_Date_Format $now = null): void
+    {
+        $now          = $now ?? Alaress_Date_Format::now();
+        $currentState = $this->getDiscreteState($now);
+
+        // Already rejected.
+        if (self::STATE_AWAITING_MODERATION !== $currentState) {
+            throw new InvalidTransitionException($currentState, "Only article's awaiting moderation may be approved");
+        }
+
+        // Treat as never being rejected
+        $this->rejectedAt     = null;
+        $this->rejectedBy     = null;
+        $this->rejectedReason = null;
+
+        // Set acceptance details
+        $this->acceptedAt = $now;
+        $this->acceptedBy = $effector;
     }
 
 
