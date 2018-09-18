@@ -497,9 +497,16 @@ class Controller extends Base
                         'width'     => 1,
                         'mandatory' => true,
                     ],
+                    'staffOrInstructorVisibleOnly' => [
+                        'caption'   => 'Visible to Staff & Instructors only',
+                        'tooltip'   => 'If on, assessments with this work-type will only be visible to Staff or Instructors. Assessment marks will still be included in aggregate marks',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ],
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 7,
+                        'width'     => 6,
                         'maxLength' => 40,
                         'mandatory' => true,
                     ],
