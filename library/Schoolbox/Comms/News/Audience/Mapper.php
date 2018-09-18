@@ -122,5 +122,4 @@ class Mapper extends \Schoolbox\Mapper
     {
         return $this->findByColumn(self::FIELD_COMMS_NEWS_ARTICLE_ID, $articleId, $options);
     }
-
 }

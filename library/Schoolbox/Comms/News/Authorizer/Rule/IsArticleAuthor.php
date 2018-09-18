@@ -39,5 +39,4 @@ class IsArticleAuthor extends ArticleAttribute
             throw new Unauthorized("User {$user->getId()} is not this article author {$article->getAuthor()->getId()}");
         }
     }
-
 }

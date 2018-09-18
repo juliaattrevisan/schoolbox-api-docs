@@ -20,7 +20,6 @@ use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder;
 
-
 class Module extends BaseModule
 {
     /**
@@ -39,7 +38,7 @@ class Module extends BaseModule
 
         /* Anyone can spawn new articles, visit the archive or index
          */
-        $loggedIn = new Rule\LazyCallback(function() {
+        $loggedIn = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn()
             );
