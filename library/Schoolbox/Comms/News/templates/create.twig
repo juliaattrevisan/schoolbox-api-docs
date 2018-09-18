@@ -223,7 +223,11 @@
             selectize: {
                 placeholder: 'Assign Topics'
             },
-            value: {{ article.topics|json_encode|raw }},
+            value: [
+                {% for topic in article.topics %}
+                {'id': '{{ topic.id }}', 'name': '{{ topic.name | escape('js') }}'},
+                {% endfor %}
+            ],
             multiple: true
         });
 
