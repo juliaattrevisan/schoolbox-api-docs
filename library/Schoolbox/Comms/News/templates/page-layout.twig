@@ -5,20 +5,18 @@
         </div>
     </div>
     <nav>
-        {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-        {% if createRoute %}
-            <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
-        {% endif %}
+        {% block createLink %}
+            {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+            {% if createRoute %}
+                <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
+            {% endif %}
+        {% endblock %}
 
-        {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') %}
-        {% if archiveRoute %}
-            <a href="{{ archiveRoute }}" class='icon-archive' title="View archived {{ locale.news }}"></a>
-        {% endif %}
+        {% block archiveLink %}
+        {% endblock %}
 
-        {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key}) %}
-        {% if rssRoute and slug %}
-            <a href="{{ rssRoute }}?topic={{ slug }}" class='icon-rss' title="Download RSS feed for this topic" id="rss"></a>
-        {% endif %}
+        {% block rssLink %}
+        {% endblock %}
     </nav>
 </div>
 
