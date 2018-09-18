@@ -137,8 +137,9 @@
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
-        var $rb = $('#{{ rubricId }}');
-        var markType = $rb.find("[data-final-summary]").attr("data-mark-type");
+        var $rb       = $('#{{ rubricId }}'),
+            markType  = $rb.find("[data-final-summary]").attr("data-mark-type"),
+            dynagrade = {{ markType | json_encode | raw }};
 
         $("[data-feedback-form]").validate(
             {
@@ -258,7 +259,7 @@
         disableEnableAssignFromDescs();
 
         // initialise dynamic mark display
-        $rb.dynagrade({{ markType | json_encode | raw }});
+        $rb.dynagrade(dynagrade);
 
         // Update the per-capability and overall marks when descriptor selection is changed
         $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
