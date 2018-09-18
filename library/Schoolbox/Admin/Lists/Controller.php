@@ -490,23 +490,22 @@ class Controller extends Base
                 'title'             => 'Work Types',
                 'mapper'            => WorkTypeMapper::class,
                 'fields'            => [
+                    'showOnGradesPage'       => [
+                        'caption'   => 'Grades page',
+                        'tooltip'   => 'If checked, assessments with the associated work type will appear on the grades summary page.',
+                        'checkbox'  =>  true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ],
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 6,
+                        'width'     => 7,
                         'maxLength' => 40,
                         'mandatory' => true,
                     ],
                     'externalResultType' => [
                         'caption'   => 'External SIS Type',
                         'width'     => 4,
-                    ],
-                    'showOnGradesPage'       => [
-                        'caption'   => 'Show on Grades Summary Page',
-                        'tooltip'   => 'Assessment with the work types chosen here will appear on the grades summary page.
-                                                This will change the layout of the grades summary.',
-                        'checkbox'  =>  true,
-                        'width'     => 2,
-                        'mandatory' => true,
                     ]
                 ]
             ],
