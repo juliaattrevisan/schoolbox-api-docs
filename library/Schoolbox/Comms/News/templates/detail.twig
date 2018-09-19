@@ -245,10 +245,10 @@ Data:
             {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
             {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
             {% if not article.isSubmitted %}
-                {% if not approveRoute %}
-                    {% set buttonText = 'Submit for moderation' %}
+                {% if approveRoute %}
+                    {% set buttonText = 'Approve' %}
                 {% else %}
-                    {% set buttonText = 'Submit' %}
+                    {% set buttonText = 'Submit for moderation' %}
                 {% endif %}
                 <li>
                     <form action="{{ approveRoute ?: submitRoute }}" method="post">
