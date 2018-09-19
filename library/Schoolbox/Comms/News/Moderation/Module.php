@@ -72,12 +72,16 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws NotFound
      */
-    private function preloadNews(array $params) :array
+    private function preloadNews(array $params): array
     {
-        try {
-            $article = $this->getNewsMapper()->findById($params['articleId']);
-        } catch (MapperException $e) {
-            throw new NotFound($this->getErrorMapper()->getMessageById(ErrorMapper::ERROR_GENERIC_NOT_FOUND));
+        if (\array_key_exists('article', $params)) {
+            $article = $params['article'];
+        } else {
+            try {
+                $article = $this->getNewsMapper()->findById($params['articleId']);
+            } catch (MapperException $e) {
+                throw new NotFound($this->getErrorMapper()->getMessageById(ErrorMapper::ERROR_GENERIC_NOT_FOUND));
+            }
         }
 
         return [
