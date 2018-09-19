@@ -151,6 +151,6 @@ class MarkedGrid extends TestCase
      */
     public function testRetrieveNormalizedMark(RubricMarkedGrid\MarkedGrid $grid, float $expected): void
     {
-        $this->assertSame($grid->retrieveNormalizedMark(), $expected);
+        $this->assertSame($expected, $grid->retrieveNormalizedMark());
     }
 }
