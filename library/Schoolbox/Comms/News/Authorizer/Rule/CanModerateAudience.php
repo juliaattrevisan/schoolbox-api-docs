@@ -9,6 +9,7 @@ namespace Schoolbox\Comms\News\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Comms\News\Audience;
@@ -24,7 +25,7 @@ class CanModerateAudience extends ArticleAttribute
     /**
      * Just compute this once per user. Indexed by user.id, folder.id
      *
-     * @var Folder\Model[][]
+     * @var GenericCollection[]|Folder\Model[][]
      */
     private $folderCache = [];
 
@@ -95,7 +96,8 @@ class CanModerateAudience extends ArticleAttribute
                 $this->folderCache[$user->getId()] = $this->folderMapper->findForUser($user, true, UserAccess::ACCESS_WRITE)
                                                                         ->indexBy($this->folderMapper->getIdentifierProperty());
             }
-            return \array_key_exists($segment->getEntityValue(), $this->folderCache);
+
+            return $this->folderCache[$user->getId()]->keyExists($segment->getEntityValue());
         }
 
         // TODO add tests for other implicit moderation permissions.
