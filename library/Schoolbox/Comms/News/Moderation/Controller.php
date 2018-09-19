@@ -139,9 +139,7 @@ class Controller extends Base
 
 
     /**
-     * Accept an article for publishing to its audience
-     *
-     * If session user is a moderator, then
+     * Approve an article for publishing to its audience
      *
      * @api POST /comms/news/moderation/{articleId}/accept
      *
