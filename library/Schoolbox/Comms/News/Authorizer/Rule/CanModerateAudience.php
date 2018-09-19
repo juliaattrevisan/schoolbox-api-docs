@@ -61,7 +61,7 @@ class CanModerateAudience extends ArticleAttribute
 
         // Since root-level segments are a UNION, you must have moderation permission to ALL root segments.
         foreach ($article->getAudience() as $segment) {
-            if ($this->canModerate($user, $segment)) {
+            if (!$this->canModerate($user, $segment)) {
                 throw new Unauthorized("User {$user->getId()} cannot moderate audience segment {$segment->getId()}");
             }
         }
