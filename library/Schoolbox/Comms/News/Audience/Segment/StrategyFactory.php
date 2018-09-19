@@ -71,6 +71,7 @@ class StrategyFactory
     /**
      * @param string $entityType
      * @return IStrategy
+     * @throws InvalidArgumentException
      */
     public function make(string $entityType): IStrategy
     {
@@ -115,12 +116,15 @@ class StrategyFactory
         throw new InvalidArgumentException("Unrecognised entity type: '{$entityType}'");
     }
 
-
+    // Impossible to occur as not adding elements
+    /** @noinspection PhpDocMissingThrowsInspection */
     /**
      * @return GenericCollection|IStrategy[]
+     * @throws InvalidArgumentException
      */
     public function makeAll(): GenericCollection
     {
+        /** @noinspection PhpUnhandledExceptionInspection - Impossible to occur as not adding elements */
         $c = new GenericCollection(IStrategy::class);
         foreach(self::ENTITY_VALUES as $entityValue){
             $c[$entityValue] = $this->make($entityValue);
