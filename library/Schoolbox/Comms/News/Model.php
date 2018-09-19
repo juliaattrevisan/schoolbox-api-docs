@@ -542,8 +542,11 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         // Default to expiring now
         $expireAt = $expireAt ?? Alaress_Date_Format::now();
 
-        // Note that no check against publishAt means it's permitted to set an article to be published a week from now, but have been expired
-        // since some time before that.
+        // Ensure the publish date does not become after the expire date
+        if($this->publishAt->gt($expireAt)){
+            $this->publishAt = $expireAt;
+        }
+
         $this->expiresAt = $expireAt;
     }
 
