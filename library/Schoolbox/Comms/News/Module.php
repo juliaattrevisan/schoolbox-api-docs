@@ -18,6 +18,7 @@ use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
@@ -54,8 +55,8 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
-                    new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper()),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
+                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
                     new Authorizer\Rule\IsArticleAuthor(),
                     new Rule\All(
                         new Authorizer\Rule\IsPublishedOrExpired(),
@@ -75,8 +76,8 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
-                    new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper()),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
+                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
                     new Rule\All(
                         new Authorizer\Rule\IsArticleAuthor(),
                         new Authorizer\Rule\IsNotYetAccepted()
@@ -90,8 +91,8 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
-                    new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper()),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
+                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
                     new Authorizer\Rule\IsArticleAuthor()
                 )
             );
@@ -235,14 +236,6 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(Audience\Mapper::class);
     }
 
-    /**
-     * @return \Schoolbox\Mapper|Access\UserAccessMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    private function getUserAccessMapper(): Access\UserAccessMapper
-    {
-        return $this->getMapperFactory()->get(Access\UserAccessMapper::class);
-    }
 
     /**
      * @return \Schoolbox\Mapper|Folder\Mapper
