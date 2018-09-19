@@ -6,9 +6,8 @@
     <div id="authored-container">
         <section>
             {# tabs #}
-            <dl class="tabs" id="{{ topicContainerId }}" v-if="statuses || articlesLoading">
+            <dl class="tabs" id="{{ topicContainerId }}" v-if="allArticles.length || articlesLoading">
                 <dd v-for="(statusCount, status) in statuses" :class="{active: tabSelected === status}" v-if="statusCount">
-
                     <a @click="onTabChange(status)">${ status }</a>
                 </dd>
                 <dd class="skeleton" v-if="articlesLoading" v-for="n in 3">
