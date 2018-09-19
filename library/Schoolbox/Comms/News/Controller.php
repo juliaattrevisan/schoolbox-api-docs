@@ -37,11 +37,6 @@ class Controller extends Base
 
 
     /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
-
-    /**
      * @var Mapper
      */
     private $newsMapper;
@@ -111,9 +106,6 @@ class Controller extends Base
 
 
     /**
-     * Controller constructor.
-     *
-     * @param ErrorMapper                  $errorMapper
      * @param Mapper                       $newsMapper
      * @param Policy\Mapper                $policyMapper
      * @param TopicMapper                  $topicMapper
@@ -129,7 +121,6 @@ class Controller extends Base
      * @param Validation\Factory           $validSpecFactory
      */
     public function __construct(
-        ErrorMapper $errorMapper,
         Mapper $newsMapper,
         Policy\Mapper $policyMapper,
         TopicMapper $topicMapper,
@@ -144,7 +135,6 @@ class Controller extends Base
         Audience\UserResolver $userResolver,
         Validation\Factory $validSpecFactory
     ) {
-        $this->errorMapper                = $errorMapper;
         $this->newsMapper                 = $newsMapper;
         $this->policyMapper               = $policyMapper;
         $this->topicMapper                = $topicMapper;
