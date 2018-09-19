@@ -80,7 +80,7 @@ class Module extends BaseModule
                     new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
                     new Rule\All(
                         new Authorizer\Rule\IsArticleAuthor(),
-                        new Authorizer\Rule\IsNotYetAccepted()
+                        new Authorizer\Rule\IsNotYetApproved()
                     )
                 )
             );

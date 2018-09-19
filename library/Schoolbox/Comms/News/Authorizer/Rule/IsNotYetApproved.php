@@ -10,7 +10,7 @@ namespace Schoolbox\Comms\News\Authorizer\Rule;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\User;
 
-class IsNotYetAccepted extends ArticleAttribute
+class IsNotYetApproved extends ArticleAttribute
 {
 
     /**
