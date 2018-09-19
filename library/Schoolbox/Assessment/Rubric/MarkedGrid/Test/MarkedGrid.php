@@ -22,15 +22,12 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  */
 class MarkedGrid extends TestCase
 {
-    // TODO figure out what methods are required, and implement tests for them
-
-
     /**
-     * Data provider for `getTestRetrieveNormalizedMarkData`
+     * Data provider for various test methods.
      *
      * @return iterable
      */
-    public function getTestRetrieveNormalizedMarkData(): iterable
+    public function getTestRetrieveMarkData(): iterable
     {
         // Build the row set
         $folder = new FolderModel();
@@ -121,36 +118,59 @@ class MarkedGrid extends TestCase
             new TotalMarkFractional($capabilityUsage2->getMaxValue())
         );
 
-//        $indicatorMark1 = (new RubricMarkedGrid\IndicatorMark($indicatorUsage1))->setValue(7);
-//        $indicatorMark2 = (new RubricMarkedGrid\IndicatorMark($indicatorUsage2))->setValue(8);
-//        $indicatorMark3 = (new RubricMarkedGrid\IndicatorMark($indicatorUsage2))->setValue(1);
-//        $indicatorMark4 = (new RubricMarkedGrid\IndicatorMark($indicatorUsage2))->setValue(2);
-
         // Remember, the value is NOT scaled here
         $capabilityMark1->setValue(15);
         $capabilityMark2->setValue(3);
-//        $capabilityMark1->getIndicatorMarks()[$indicator1->getId()] = $indicatorMark1;
-//        $capabilityMark1->getIndicatorMarks()[$indicator2->getId()] = $indicatorMark2;
-//        $capabilityMark2->getIndicatorMarks()[$indicator3->getId()] = $indicatorMark3;
-//        $capabilityMark2->getIndicatorMarks()[$indicator4->getId()] = $indicatorMark4;
 
         $markedGrid->getCapabilityMarks()[$capability1->getId()] = $capabilityMark1;
         $markedGrid->getCapabilityMarks()[$capability2->getId()] = $capabilityMark2;
 
         // Value should be: (15/16) * (8/12) + (3/16) * (4/12) => .625 + .0625 => .6875
-        yield [$markedGrid, 68.75];
+        yield [
+            $markedGrid, [
+                'normalizedMark'    => 68.75,
+                'scaledMark'        => 8.25,
+                'humanReadableMark' => '8.25 / 12',
+            ]
+        ];
     }
 
 
     /**
-     * @dataProvider getTestRetrieveNormalizedMarkData
+     * @dataProvider getTestRetrieveMarkData
      * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid::retrieveNormalizedMark
      *
      * @param RubricMarkedGrid\MarkedGrid $grid
-     * @param float                       $expected
+     * @param array                       $expected
      */
-    public function testRetrieveNormalizedMark(RubricMarkedGrid\MarkedGrid $grid, float $expected): void
+    public function testRetrieveNormalizedMark(RubricMarkedGrid\MarkedGrid $grid, array $expected): void
     {
-        $this->assertSame($expected, $grid->retrieveNormalizedMark());
+        $this->assertSame($expected['normalizedMark'], $grid->retrieveNormalizedMark());
+    }
+
+
+    /**
+     * @dataProvider getTestRetrieveMarkData
+     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid::calculateScaledMark
+     *
+     * @param RubricMarkedGrid\MarkedGrid $grid
+     * @param array                       $expected
+     */
+    public function testCalculateScaledMark(RubricMarkedGrid\MarkedGrid $grid, array $expected): void
+    {
+        $this->assertSame($expected['scaledMark'], $grid->calculateScaledMark());
+    }
+
+
+    /**
+     * @dataProvider getTestRetrieveMarkData
+     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid::calculateScaledMark
+     *
+     * @param RubricMarkedGrid\MarkedGrid $grid
+     * @param array                       $expected
+     */
+    public function testRetrieveHumanReadableMark(RubricMarkedGrid\MarkedGrid $grid, array $expected): void
+    {
+        $this->assertSame($expected['humanReadableMark'], $grid->retrieveHumanReadableMark());
     }
 }
