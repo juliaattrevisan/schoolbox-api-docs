@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\Comms\News\Audience\MockUserResolver;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Policy;
-use Schoolbox\Comms\News\ValidArticle;
+use Schoolbox\Comms\News\Validation\ValidArticleAttributes;
 use Schoolbox\Comms\News\ValidDateOffset;
 use Schoolbox\User;
 
@@ -109,7 +109,7 @@ class ValidationTest extends TestCase
      */
     public function testValidArticle(Model $article, $expected): void
     {
-        $validation = new ValidArticle();
+        $validation = new ValidArticleAttributes();
 
         $this->assertEquals($expected, $validation->isSatisfiedBy($article));
     }
@@ -170,7 +170,7 @@ class ValidationTest extends TestCase
      */
     public function testValidArticleDates(Model $article, $expected): void
     {
-        $validation = new ValidArticle();
+        $validation = new ValidArticleAttributes();
 
         $this->assertEquals($expected, $validation->isSatisfiedBy($article));
     }
