@@ -466,8 +466,13 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
             throw new InvalidTransitionException($currentState, "Article was already approved by {$this->acceptedBy->getFullName()} at {$this->acceptedAt->getLocalShort()}");
         }
 
-        // Ensure it is submitted
+        // Ensure it is able to be approved
         if (!\in_array($currentState, self::VALID_STATES_TO_APPROVE, true)) {
+            throw new InvalidTransitionException($currentState, "Article was already approved by {$this->acceptedBy->getFullName()} at {$this->acceptedAt->getLocalShort()}");
+        }
+
+        // Ensure it is submitted
+        if (!$this->isSubmitted($now)) {
             $this->submit($now);
         }
 
