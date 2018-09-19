@@ -149,8 +149,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     }
 
 
-    /* Conveniences
-     */
+    // Discrete states
 
 
     /**
@@ -223,7 +222,20 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     // Composite states.
 
     /**
-     * This news has been submitted
+     * Returns whether the article has been approved for publishing.
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return bool
+     */
+    public function isApproved(Alaress_Date_Format $now = null): bool
+    {
+        $acceptedStates = [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
+        return \in_array($this->getDiscreteState($now), $acceptedStates, true);
+    }
+
+
+    /**
+     * Returns whether this article has been submitted
      *
      * @param Alaress_Date_Format|null $now
      * @return bool
@@ -232,19 +244,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     {
         $submittedStates = [self::STATE_AWAITING_MODERATION, self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
         return \in_array($this->getDiscreteState($now), $submittedStates, true);
-    }
-
-
-    /**
-     * This news has been accepted
-     *
-     * @param Alaress_Date_Format|null $now
-     * @return bool
-     */
-    public function isAccepted(Alaress_Date_Format $now = null): bool
-    {
-        $acceptedStates = [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
-        return \in_array($this->getDiscreteState($now), $acceptedStates, true);
     }
 
 
@@ -262,67 +261,33 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     {
         // Needed to compensate for AlaressNullDate object/null duality
         $submittedAt = $this->submittedAt && !$this->submittedAt->isNull() ? $this->submittedAt : null;
-        $acceptedAt  = $this->acceptedAt && !$this->acceptedAt->isNull() ? $this->acceptedAt : null;
+        $approvedAt  = $this->acceptedAt && !$this->acceptedAt->isNull() ? $this->acceptedAt : null;
         $rejectedAt  = $this->rejectedAt && !$this->rejectedAt->isNull() ? $this->rejectedAt : null;
 
-        /* If the rejected_at timestamp exists, this article has been rejected at some point in its lifetime
-         * Rejection details persist until an article's been accepted
-         */
-        if ($rejectedAt) {
-
-            /* If the submitted_at timestamp is null, the author hasn't resubmitted the article for
-             * further moderation
-             */
-            if (null === $submittedAt) {
-                return self::STATE_REJECTED;
-            }
-
-            /* If the submitted_at timestamp exists and submitted_at is greater than rejected_at, then
-             * the author has resubmitted the article and the state should be Awaiting Moderation again
-             */
-            if ($submittedAt->gt($rejectedAt)) {
-                return self::STATE_AWAITING_MODERATION;
-            }
+        if (!$submittedAt) {
+            return self::STATE_DRAFT;
         }
 
-        /* If an article has an accepted_at value then it's either Expired, Published, or Awaiting Publication
-         */
-        if ($acceptedAt) {
-            $now = $now ?? Alaress_Date_Format::now();
+        // Populated when rejected and exists until either (re-)submitted or approved.
+        if ($rejectedAt) {
+            return self::STATE_REJECTED;
+        }
 
-            /* We've reached the expiry_at value, so we're expired
-             */
-            if ($now->gte($this->expiresAt)) {
-                return self::STATE_EXPIRED;
-            }
-
-            /* We've reached the publish_at value, so we're published
-             */
-            if ($now->gte($this->publishAt)) {
-                return self::STATE_PUBLISHED;
-            }
-
-            /* We haven't reached the publish_at value, but we've been accepted
-             * We are therefore awaiting publication
-             */
-            if ($now->lt($this->publishAt)) {
-                return self::STATE_AWAITING_PUBLICATION;
-            }
-        } else {
-
-            /* If an article doesn't have an accepted_at value, then it must be either Draft or Awaiting Moderation
-             * (or it's previously been rejected but we covered that case already)
-             */
-            if (null === $submittedAt) {
-                return self::STATE_DRAFT;
-            }
-
+        if (!$approvedAt) {
             return self::STATE_AWAITING_MODERATION;
         }
 
-        /* Default unknown scenario
-         */
-        return self::STATE_DRAFT;
+        $now = $now ?? Alaress_Date_Format::now();
+
+        if ($now->lt($this->publishAt)) {
+            return self::STATE_AWAITING_PUBLICATION;
+        }
+
+        if ($now->lt($this->expiresAt)) {
+            return self::STATE_PUBLISHED;
+        }
+
+        return self::STATE_EXPIRED;
     }
 
 
@@ -359,6 +324,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
 
     /**
+     * Transitions an article to the 'Awaiting Moderation' state
+     *
      * @param Alaress_Date_Format|null $now
      * @throws InvalidTransitionException If transition is invalid for some reason
      */
@@ -380,8 +347,33 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         $this->submittedAt = $now;
     }
 
+    /**
+     * Transitions an article to the 'Draft' state
+     *
+     * @param Alaress_Date_Format|null $now
+     * @throws InvalidTransitionException If transition is invalid for some reason
+     */
+    public function unSubmit(): void
+    {
+        $currentState = $this->getDiscreteState($now);
+
+        // Already submitted. No risk to caller of data loss
+        if(self::STATE_AWAITING_MODERATION === $currentState){
+            throw new InvalidTransitionException($currentState, "Article was already submitted at {$this->submittedAt}");
+        }
+
+        // Invalid operation
+        if(!\in_array($currentState, [self::STATE_DRAFT, self::STATE_REJECTED], true)){
+            throw new InvalidTransitionException($currentState, 'Only draft and rejected articles may be submitted');
+        }
+
+        $this->submittedAt = $now;
+    }
+
 
     /**
+     * Transitions an article to the 'Rejected' state
+     *
      * @param User                     $effector
      * @param string|null              $reason
      * @param Alaress_Date_Format|null $now
@@ -415,6 +407,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
 
     /**
+     * Transitions an article to the 'Approved' state
+     *
      * @param User                     $effector
      * @param Alaress_Date_Format|null $now
      * @throws InvalidTransitionException
