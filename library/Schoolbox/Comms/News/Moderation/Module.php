@@ -59,7 +59,7 @@ class Module extends BaseModule
 
         /* The Fate of the Article: accept/reject it
          */
-        $this->register('POST', '/{articleId:\d+}/accept', 'postAccept', $moderatorPerms, $preloadNews);
+        $this->register('POST', '/{articleId:\d+}/accept', 'postApprove', $moderatorPerms, $preloadNews);
         $this->register('POST', '/{articleId:\d+}/reject', 'postReject', $moderatorPerms, $preloadNews);
     }
 
@@ -126,9 +126,8 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'newsMapper' => $this->getMapperFactory()->getLazy(NewsMapper::class),
+            'newsMapper'   => $this->getMapperFactory()->getLazy(NewsMapper::class),
             'policyMapper' => $this->getMapperFactory()->getLazy(PolicyMapper::class),
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
         ];
     }
 
