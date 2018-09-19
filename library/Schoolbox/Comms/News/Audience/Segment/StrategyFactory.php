@@ -12,6 +12,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\RoleAccessMapper;
+use UnexpectedValueException;
 
 /**
  * Responsible for enumeration of the IStrategy interface
@@ -116,15 +117,14 @@ class StrategyFactory
         throw new InvalidArgumentException("Unrecognised entity type: '{$entityType}'");
     }
 
-    // Impossible to occur as not adding elements
-    /** @noinspection PhpDocMissingThrowsInspection */
+
     /**
      * @return GenericCollection|IStrategy[]
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function makeAll(): GenericCollection
     {
-        /** @noinspection PhpUnhandledExceptionInspection - Impossible to occur as not adding elements */
         $c = new GenericCollection(IStrategy::class);
         foreach(self::ENTITY_VALUES as $entityValue){
             $c[$entityValue] = $this->make($entityValue);
