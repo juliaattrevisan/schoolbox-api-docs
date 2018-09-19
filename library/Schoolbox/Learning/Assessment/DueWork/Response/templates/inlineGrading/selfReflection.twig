@@ -50,6 +50,8 @@
     {% if rubricContext.rubric %}
         {% set text = 'rubric and'  %}
     {% endif %}
+
+
     <ul class="train-line">
         <li>
             <a><span class="icon-due-work"></span>Submission</a>
@@ -62,13 +64,13 @@
         </li>
     </ul>
     <div class="row">
-    <div class="small-12 columns">
-        <div class="alert-box">{% spaceless %}
-            Use the {{ text }} comment box below to submit a {{ locale.selfReflection.singularForm }} before you submit this
-            work to your teacher for feedback.
-            {% endspaceless %}</div>
+        <div class="small-12 columns">
+            <div class="alert-box">{% spaceless %}
+                Use the {{ text }} comment box below to submit a {{ locale.selfReflection.singularForm }} before you submit this
+                work to your teacher for feedback.
+                {% endspaceless %}</div>
+        </div>
     </div>
-</div>
 {% endblock %}
 
 {# Maybe out of date message doesn't exist here #}
