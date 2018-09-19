@@ -81,21 +81,18 @@ class MarkedGrid
 
 
     /**
-     * Calculates the grid's mark, with a scaling factor applied.
+     * Calculates the grid's mark, with the scaling factor from each of its
+     * capabilities applied.
      *
      * @return float
      */
     public function calculateScaledMark(): float
     {
-        $value           = 0;
-        $actualMaxValue  = $this->grid->calculateMaxValueFromCapabilities();
-        $derivedMaxValue = 0;
+        $value = 0;
         foreach ($this->capabilityMarks as $capabilityMark) {
-            $value           += $capabilityMark->getValue();
-            $derivedMaxValue += $capabilityMark->getCapabilityUsage()->calculateMaxValueFromIndicators();
+            $value += $capabilityMark->calculateScaledMark();
         }
-        $scalingFactor = $actualMaxValue ? ($derivedMaxValue / $actualMaxValue) : 0;
-        return $scalingFactor ? $value / $scalingFactor : 0;
+        return $value;
     }
 
 
