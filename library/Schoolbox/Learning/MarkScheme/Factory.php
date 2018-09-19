@@ -48,12 +48,12 @@ class Factory
 
     /**
      * @param IAssessable $assessable
-     * @param int|null $totalMark
+     * @param float|null $totalMark
      * @return null|IMarkScheme
      * @throws \DomainException If MarkType is invalid for the assessment
      * @throws \InvalidArgumentException If assessment class not registered
      */
-    public function spawnMarkSchemeFor(IAssessable $assessable, ?int $totalMark = null): ?IMarkScheme
+    public function spawnMarkSchemeFor(IAssessable $assessable, ?float $totalMark = null): ?IMarkScheme
     {
         $markType = $assessable->getMarkType();
         if (null === $markType) {
@@ -105,10 +105,10 @@ class Factory
 
     /**
      * @param DueWork $dueWork
-     * @param int|null $totalMark
+     * @param float|null $totalMark
      * @return IMarkScheme
      */
-    protected function spawnForDueWork(DueWork $dueWork, ?int $totalMark = null)
+    protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null)
     {
         switch ($dueWork->getMarkType()->getId()) {
             case MarkType::TYPE_PERCENT:
