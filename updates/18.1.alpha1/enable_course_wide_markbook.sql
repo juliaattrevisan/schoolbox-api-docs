@@ -1,0 +1,1 @@
+UPDATE config SET hidden = 'false' WHERE name like 'course_markbook_enable';
