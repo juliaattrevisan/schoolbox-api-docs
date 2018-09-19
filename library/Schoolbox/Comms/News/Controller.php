@@ -1,18 +1,17 @@
 <?php
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
+
 namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
-use Alaress\Web\Output\Html;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
@@ -163,18 +162,18 @@ class Controller extends Base
      * Provide form to create a news article
      *
      * @api GET /comms/news/create
+     * @level 18.1
      *
      * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException
      */
-    public function getCreate()
+    public function getCreate(): void
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
         /* Spawn an empty news with default settings
          */
-        /** @var Model $article */
         $article = $this->newsMapper->createModel()
                                     ->setPublishAt(\Alaress_Date_Format::now())
                                     ->setExpiresAt(\Alaress_Date_Format::now());
@@ -204,10 +203,9 @@ class Controller extends Base
             ->setMimeFilter('image/*');
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
-            'policies' => $policies,
-            'action' => 'Create',
-            'user' => $this->getUser(),
-            'article' => $article,
+            'policies'         => $policies,
+            'action'           => 'Create',
+            'article'          => $article,
             'featureImageZone' => $zone->getTwigContext(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
@@ -217,6 +215,7 @@ class Controller extends Base
      * Create a news article
      *
      * @api POST /comms/news/create
+     * @level 18.1
      *
      * @throws InvalidArgumentException
      * @throws MapperException
@@ -226,7 +225,7 @@ class Controller extends Base
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
      */
-    public function postCreate()
+    public function postCreate(): void
     {
         /* Set YOU as the initial author
          * Otherwise, when a moderator edits your article, they might assume direct authorship instead
@@ -240,7 +239,8 @@ class Controller extends Base
     /**
      * Provide form to update a news article
      *
-     * @api GET /comms/news/{articleId}/update
+     * @api   GET /comms/news/{articleId}/update
+     * @level 18.1
      *
      * @param Model $article
      * @throws MapperException
@@ -249,12 +249,11 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
+     * @throws MapperException\InsufficientHydrationException
      */
-    public function getUpdate(Model $article)
+    public function getUpdate(Model $article): void
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
-
-        $moderationRequired = $policies->getOffset('global_moderation')->getValue();
 
         /* Feature image
          */
@@ -268,24 +267,45 @@ class Controller extends Base
             $zone->attachFiles([$article->getFeatureImage()->getHash()]);
         }
 
-        /* Audiencing decoration
-         */
+        $codec = new Audience\Segment\Codec($this->audienceMapper);
 
-        /** @var Html $outputFormatter */
-        $outputFormatter = $this->getDi()->get('webOutput:nochrome');
+        $translator = new Audience\Segment\Translator(
+            $this->databaseInternal,
+            $this->getUser(),
+            $this->folderMapper,
+            $this->roleAccessMapper,
+            $this->isGlobalModerationEnabled()
+        );
+        $translator->buildCache($article);
 
-        $audiencingData = (new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper, $this->roleAccessMapper, $moderationRequired))->load($article);
-        $audiencingHtml = (new Audience\Segment\HtmlFormatter($outputFormatter))->decorate($audiencingData);
+        // Audiencing selectize data
+        $audienceSegments = [];
+        foreach($article->getAudience() as $segment){
+            // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
+            // Labels are used in brick rendering
+            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
+
+            // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
+            if($segment->isSimple()) {
+                $encodedValue = $codec->encodeValue($segment->getEntityValue());
+                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
+            } else {
+                foreach($segment->getChildren() as $child){
+                    $encodedValue = $codec->encodeValue($child->getEntityValue());
+                    $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
+                }
+            }
+            $audienceSegments[] = $option;
+        }
+
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
-            'policies' => $policies,
-            'action' => 'Update',
-            'user' => $this->getUser(),
-            'article' => $article,
-            'featureImageZone' => $zone->getTwigContext(),
-            'audience' => $audiencingHtml,
-            'relationshipParentsOf' => Audience\Segment\Codec::AUDIENCE_SEPARATOR . Audience\Model::RELATIONSHIP_PARENTS_OF,
-            'relationshipTeachersOf' => Audience\Segment\Codec::AUDIENCE_SEPARATOR . Audience\Model::RELATIONSHIP_TEACHERS_OF
+            'policies'               => $policies,
+            'action'                 => 'Update',
+            'article'                => $article,
+            'featureImageZone'       => $zone->getTwigContext(),
+            'audienceSegments'       => $audienceSegments,
+            'isCommsOfficer'         => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -294,6 +314,7 @@ class Controller extends Base
      * Update a news article
      *
      * @api POST /comms/news/{articleId}
+     * @level 18.1
      *
      * @param Model $article
      * @throws InvalidArgumentException
@@ -304,14 +325,11 @@ class Controller extends Base
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
      */
-    public function postUpdate(Model $article)
+    public function postUpdate(Model $article): void
     {
         try {
 
-            /* TODO: Check that the current session user is allowed to modify this $article
-             */
-
-            $this->persist($article, $this->getRequest()->post);
+            $this->persist($article, $this->getRequest()->post->getArrayCopy());
 
             /* Save a draft of the news article
              * This can occur from either the Create or Update context
@@ -373,7 +391,7 @@ class Controller extends Base
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
      */
-    private function persist(Model $article, $data): void
+    private function persist(Model $article, array $data): void
     {
         $article
             ->setTitle($data['title'])
@@ -411,10 +429,16 @@ class Controller extends Base
 
         $this->newsMapper->save($article);
 
-        /* Set audiencing options via the hyperdrive
-         */
-        $transactor = new Audience\Segment\Transactor($this->getUser(), $this->audienceMapper, $this->folderMapper, $this->roleAccessMapper, $this->isGlobalModerationEnabled());
-        $transactor->save($article, $this->getRequest()->post['audience']);
+        // Persist audience segments
+        $transactor = new Audience\Segment\Transactor(
+            $this->getUser(),
+            $this->audienceMapper,
+            new Audience\Segment\Codec($this->audienceMapper),
+            $this->folderMapper,
+            $this->roleAccessMapper,
+            $this->isGlobalModerationEnabled()
+        );
+        $transactor->save($article, $data['audience'] ?? '');
     }
 
 
@@ -422,8 +446,9 @@ class Controller extends Base
      * Get a list of available news topics that can be assigned to an article
      *
      * @api GET /comms/news/topics
+     * @level 18.1
      */
-    public function getTopics()
+    public function getTopics(): void
     {
         $this->getResponse()->content->set($this->buildJsonOutput($this->topicMapper->findAll()));
     }
@@ -433,6 +458,7 @@ class Controller extends Base
      * Load a news article so you can read its contents (the detail screen)
      *
      * @api GET /comms/news/{articleId}
+     * @level 18.1
      *
      * @param Model $article
      * @throws MapperException
@@ -536,6 +562,7 @@ class Controller extends Base
      * Delete an article
      *
      * @api POST /comms/news/{articleId}/delete
+     * @level 18.1
      *
      * @param Model $article
      * @throws MapperException
@@ -546,7 +573,7 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function postDelete(Model $article)
+    public function postDelete(Model $article): void
     {
         try {
             /* Try to delete this article
@@ -598,6 +625,7 @@ class Controller extends Base
      * This is the central piece of the puzzle
      *
      * @api GET /comms/news/list
+     * @level 18.1
      *
      * @param int|null $year
      * @param int|null $month
@@ -612,7 +640,7 @@ class Controller extends Base
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getListByTopic(?int $year, ?int $month)
+    public function getListByTopic(?int $year, ?int $month): void
     {
         $params = new Querystring($this->getRequest()->query);
         $topics = $this->topicMapper->findAll();
@@ -654,6 +682,7 @@ class Controller extends Base
      * News Archive
      *
      * @api GET /comms/news/archive{/year,month}
+     * @level 18.1
      *
      * @param int|null $year
      * @param int|null $month
@@ -668,7 +697,7 @@ class Controller extends Base
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getArchive(int $year = null, int $month = null)
+    public function getArchive(int $year = null, int $month = null): void
     {
 
         /* These referrers should be used, even when they're not explicitly provided in the url
@@ -719,6 +748,7 @@ class Controller extends Base
      * Get a list of articles audienced to you
      *
      * @api GET /comms/news
+     * @level 18.1
      *
      * @throws InvalidArgumentException
      * @throws MapperException
@@ -731,7 +761,7 @@ class Controller extends Base
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getIndex()
+    public function getIndex(): void
     {
 
         /* These referrers should be used, even when they're not explicitly provided in the url
@@ -901,8 +931,12 @@ class Controller extends Base
      */
     private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
+        $defaultSearchLimit    = 10;
+        $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
+        $searchLimit           = null === $configuredSearchLimit ? $defaultSearchLimit : (int)$configuredSearchLimit;
+
         $topicData = (new Lists(
-            $this->getConfigLoader()->get('search_type_limit'),
+            $searchLimit,
             $this->newsMapper,
             $this->policyMapper,
             $this->saveForLaterMapper,
@@ -936,13 +970,14 @@ class Controller extends Base
      * Compute the recipients so author can identify
      *
      * @api /comms/news/:articleId/recipients
+     * @level 18.1
      *
      * @param Model $article
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getRecipients(Model $article)
+    public function getRecipients(Model $article): void
     {
         $userIds = $this->userResolver->findUsersForArticle($article->getId());
 

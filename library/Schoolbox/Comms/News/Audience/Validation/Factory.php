@@ -10,6 +10,8 @@ namespace Schoolbox\Comms\News\Audience\Validation;
 
 use Alaress\Specification;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\GenericCollection;
+use Schoolbox\User;
 
 /**
  * Responsible for building valid audience segment specifications
@@ -17,25 +19,30 @@ use Schoolbox\Comms\News\Audience;
 class Factory
 {
 
-    /** @var Audience\BusinessRules */
-    private $businessRules;
+    /** @var GenericCollection|Audience\Segment\IStrategy[] */
+    private $validRelationships;
+
+    private $validNullEntities;
 
 
     /**
-     * @param Audience\BusinessRules $businessRules
+     * @param string[][] $validRelationships
+     * @param bool[]     $validNullEntities
      */
-    public function __construct(Audience\BusinessRules $businessRules)
+    public function __construct($validRelationships, $validNullEntities)
     {
-        $this->businessRules = $businessRules;
+        $this->validRelationships = $validRelationships;
+        $this->validNullEntities = $validNullEntities;
     }
 
 
     /**
      * Defines what is a valid audience segment
      *
+     * @param User $user
      * @return Specification\ISpecification
      */
-    public function makeValidSegmentSpecification(): Specification\ISpecification
+    public function makeValidSegmentSpecification(User $user): Specification\ISpecification
     {
         // Candidate must be of correct class
         $instanceOfSegment = new Specification\IsInstanceOf(Audience\Model::class);
@@ -53,7 +60,7 @@ class Factory
         $hasRelationship = new Specification\Negation(new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_RELATIONSHIP), null));
 
         // Segment's tree height must be valid
-        $validTreeHeight = new ValidTreeHeight($this->businessRules->getMaxSegmentTreeHeight());
+        $validTreeHeight = new ValidTreeHeight(Audience\Model::DEPTH_SEGMENT_TREE_MAX);
 
         // Composite segments:
         // * must have children
@@ -73,12 +80,12 @@ class Factory
         $compositeOrSimple     = new Specification\ExclusiveOr([$compositeWithChildren, $simpleWithoutChildren]);
 
         // Ensure the relationship is valid for the segment's entity type
-        $validEntityRelationship = new ValidRelationship($this->businessRules);
+        $validEntityRelationship = new ValidRelationship($this->validRelationships);
 
         // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
         $notInvalidNull = new Specification\Disjunction([
             new Specification\Negation(new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_ENTITY_TYPE), null)),
-            new ValidNullEntity($this->businessRules),
+            new ValidNullEntity($this->validNullEntities),
         ]);
 
         return new Specification\Conjunction([

@@ -1,7 +1,5 @@
 <?php
 /**
- * Role
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,23 +7,29 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience\Model;
-use Schoolbox\Comms\News\Audience\Segment\ISearch;
-use Schoolbox\Comms\News\Audience\Segment\ITranslate;
+use Schoolbox\User;
 
-class Role implements ISearch, ITranslate
+class Role extends Base
 {
+    public const ENTITY_TYPE = 'role';
+
+    /**
+     * @inheritdoc
+     */
+    public function canBeTargetedByUser(User $user): bool
+    {
+        return $user->getRole()->isStaff();
+    }
 
     /**
      * @inheritdoc
      */
     public function getSearchSql(string $searchPlaceholder = null): string
     {
-        $entityType    = Model::ENTITY_TYPE_ROLE;
         $keywordFilter = null === $searchPlaceholder ? '' : "AND `name` LIKE :{$searchPlaceholder}";
 
         return "
-            SELECT id, name, '{$entityType}' AS entity_type
+            SELECT id, name, '{$this->getEntityType()}' AS entity_type
             FROM groups
             WHERE deleted_at IS NULL
             {$keywordFilter}
@@ -34,17 +38,15 @@ class Role implements ISearch, ITranslate
 
 
     /**
-     * Translate this ITranslate instance from an entity_type to a human-readable version
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getTranslateSql(): string
+    public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
         return "
-            SELECT cna.*, groups.name AS `name`
+            SELECT DISTINCT cna.entity_type, cna.entity_value, groups.name AS `name`
             FROM comms_news_audience cna
-            INNER JOIN groups ON entity_type = '".Model::ENTITY_TYPE_ROLE."' AND entity_value = groups.id
-            WHERE comms_news_article_id = :articleId
+            INNER JOIN groups ON cna.entity_type = '{$this->getEntityType()}' AND cna.entity_value = groups.id
+            WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }
 }

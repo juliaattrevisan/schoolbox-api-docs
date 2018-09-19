@@ -17,16 +17,19 @@ use Alaress\Specification;
 class ValidNullEntity extends Specification\Leaf
 {
 
-    /** @var Audience\BusinessRules */
-    private $businessRules;
+    /**
+     * The set of entities that can target null, indexed by entityType
+     * @var bool[]
+     */
+    private $entitiesThanCanTargetNull;
 
 
     /**
-     * @param Audience\BusinessRules $businessRules
+     * @param bool[] $entitiesThanCanTargetNull Indexed by entityType
      */
-    public function __construct(Audience\BusinessRules $businessRules)
+    public function __construct(array $entitiesThanCanTargetNull)
     {
-        $this->businessRules = $businessRules;
+        $this->entitiesThanCanTargetNull = $entitiesThanCanTargetNull;
     }
 
 
@@ -36,6 +39,6 @@ class ValidNullEntity extends Specification\Leaf
      */
     public function isSatisfiedBy($candidate): bool
     {
-        return null === $candidate->getEntityValue() && $this->businessRules->canTargetNullEntity($candidate->getEntityType());
+        return null === $candidate->getEntityValue() && \array_key_exists($candidate->getEntityValue(), $this->entitiesThanCanTargetNull);
     }
 }

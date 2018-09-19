@@ -100,7 +100,6 @@ class Module extends BaseModule
         $preloadArticle = function ($params) {
             return $this->preloadArticle($params);
         };
-
         $preloadArticleWithAudience = function ($params) {
             return $this->preloadArticleWithAudience($params);
         };
@@ -167,9 +166,6 @@ class Module extends BaseModule
             'roleAccessMapper'           => $this->getMapperFactory()->getLazy(Access\RoleAccessMapper::class),
             'folderMapper'               => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
             'databaseInternal'           => $injector->lazyGet('databaseInternal'),
-
-            /* Hyperdrive injection
-             */
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
             'userResolver'               => $injector->lazyGet('commsNewsUserResolver'),
         ];

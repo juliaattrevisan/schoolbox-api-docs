@@ -1,25 +1,35 @@
+{#
+    policies          Policy\Model[]
+    action            string ['Create','Update']
+    article           News\Article\Model
+    featureImageZone  array
+    audienceSegments  null|array,
+    isCommsOfficer    null|bool (null on create version)
+#}
+
 {% import '@commsNews/indicator.twig' as indicator %}
 
 <div class="row">
-        <div class="small-12 columns">
-            <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
-            <ul class="meta">
-                {% if article.acceptedBy.id %}
-                    <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
-                        {% if article.isAccepted %}
-                            on {{ article.acceptedAt.local }}
-                        {% endif %}
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
+    <div class="small-12 columns">
+        <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
+        <ul class="meta">
+            {% if article.acceptedBy.id %}
+                <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
+                    {% if article.isAccepted %}
+                        on {{ article.acceptedAt.local }}
+                    {% endif %}
+                </li>
+            {% endif %}
+        </ul>
     </div>
+</div>
 
 {# Train Line #}
 {% include '@commsNews/workflow.twig' with {
     article: article,
-    moderationRequired: policies['global_moderation'].value
-} %}
+    moderationRequired: policies['global_moderation'].value,
+    isCommsOfficer: isCommsOfficer
+} only %}
 
 {% if policies['global_moderation'].value %}
 <div class="row">
@@ -44,25 +54,25 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>Title</label>
-                        <input name="title" type="text" maxlength="255" value="{{ article.title }}" />
+                        <label for="title">Title</label>
+                        <input id="title" name="title" type="text" maxlength="255" value="{{ article.title }}" />
                     </div>
 
                     <div class="small-12 columns">
-                        <label>Body</label>
-                        <textarea name="body">{{ article.body }}</textarea>
+                        <label for="body">Body</label>
+                        <textarea id="body" name="body">{{ article.body }}</textarea>
                     </div>
 
                     <div class="small-12 columns">
-                        <label>Blurb</label>
-                        <textarea name="blurb">{{ article.blurb }}</textarea>
+                        <label for="blurb">Blurb</label>
+                        <textarea id="blurb" name="blurb">{{ article.blurb }}</textarea>
                     </div>
                 </fieldset>
 
                 <fieldset class="content" id="audience-select-container">
 
-                    {% if user.role.staff %}
-                        {% set audiencePlaceholder = 'Search for classes, groups, year levels, roles, individual users...' %}
+                    {% if USER.role.staff %}
+                        {% set audiencePlaceholder = 'Search for classes, groups, year levels, roles, campuses, individual users...' %}
                     {% else %}
                         {% set audiencePlaceholder = 'Search for classes or groups...' %}
                     {% endif %}
@@ -71,16 +81,22 @@
                         <label>Audience</label>
                         <p class="meta">Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of available options.</p>
 
-                        <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4 audience-grid" v-show="selectedAudienceItems.length">
-                            <li v-for="selectedAudienceItem in selectedAudienceItems">
+                        <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4 audience-grid" v-show="audienceBricks.length">
+                            <li v-for="audienceBrick in audienceBricks">
                                 <div class="actions-small-1">
                                     <div class="card small-12">
-                                        <h4 :title="selectedAudienceItem.name">${ selectedAudienceItem.name }</h4>
-                                        <p class="meta">${ selectedAudienceItem.entityType }</p>
-                                        <p class="meta" :title="selectedAudienceItem.modifier">${ selectedAudienceItem.modifier }</p>
+                                        <h4 :title="audienceBrick.nameLabel">${ audienceBrick.nameLabel }</h4>
+                                        <p class="meta">
+                                            <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.typeLabel }</a>
+                                            <slot v-if="audienceBrick.isSimple()">${ audienceBrick.typeLabel }</slot>
+                                        </p>
+                                        <p class="meta" :title="audienceBrick.modifier">
+                                            <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.modifierLabel }</a>
+                                            <slot v-if="audienceBrick.isSimple()">${ audienceBrick.modifierLabel }</slot>
+                                        </p>
                                     </div>
                                     <nav>
-                                        <a class="icon-close size-8" :title="'Remove ' + selectedAudienceItem.name + ' from audience'" @click="removeAudienceItem(selectedAudienceItem)"></a>
+                                        <a class="icon-close size-8" :title="'Remove ' + audienceBrick.nameLabel + ' from audience'" @click="removeAudienceBrick(audienceBrick)"></a>
                                     </nav>
                                 </div>
                             </li>
@@ -88,17 +104,24 @@
 
                         <div class="input-group">
                             <input type="text" id="audience-search" name="audience" placeholder="{{ audiencePlaceholder }}" />
-                            <button class="button icon-drag-drop" @click.prevent="{{ (user.role.staff) ? 'openBrowseModal' : 'openBrowseModalRead' }}">Browse&hellip;</button>
+                            <button class="button icon-drag-drop" @click.prevent="{{ (USER.role.staff) ? 'openBrowseModal' : 'openBrowseModalRead' }}">Browse&hellip;</button>
                         </div>
                     </div>
 
-                    {# the modal #}
+                    {# audience browser modal #}
                     <div data-reveal id="audience-browse" class="reveal-modal">
-                        <h2>Browse Audience</h2>
+                        <div class="audience-browse-head">
+                            <h2>Browse Audience</h2>
+                            <small class="advanced-toggle">
+                                <a href="#" :class="{ active: pageShow.index || pageShow.valueSelect }" @click.prevent="showPage('index')">Simple</a>
+                                |
+                                <a href="#" :class="{ active: pageShow.intersect }" @click.prevent="advancedToggle()">Advanced</a>
+                            </small>
+                        </div>
                         <a class="close-reveal-modal" aria-label="Close">×</a>
 
                         <div v-show="pageShow.index">
-                            <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions">
+                            <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions.base" v-if="audienceOption.displayInModal">
                                 <button class="button-block" @click="changePage(audienceOption)">
                                     <i :class="'icon-' + audienceOption.icon"></i>
                                     ${ audienceOption.namePlural }
@@ -121,25 +144,72 @@
                             <fieldset class="checklist checklist-container" v-show="!showEmptyState">
                                 <div class="loader" v-show="showLoader"></div>
                                 <template v-for="(audienceListItem, index) in audienceListItems">
-                                    <input type="checkbox" :id="'audience-list-input-' + index" :value="audienceListItem" v-model="audienceListChecked" />
-                                    <label :for="'audience-list-input-' + index">${ audienceListItem.self.name }</label>
+                                    <input type="checkbox" :id="'audience-list-input-' + index" :value="index" v-model="audienceListChecked" />
+                                    <label :for="'audience-list-input-' + index">${ audienceListItem }</label>
                                 </template>
                             </fieldset>
 
-                            <fieldset class="checklist border-none" v-show="writeOnly">
-                                <input type="checkbox" id="audience-select-users" v-model="includeUsers" />
-                                <label for="audience-select-users">${ selectedAudienceOption.selfModifier }</label>
-                                {% if user.role.staff %}
-                                <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
-                                <label for="audience-select-parents">Parents of students</label>
-                                <input type="checkbox" id="audience-select-teachers" v-model="includeTeachers" />
-                                <label for="audience-select-teachers">Teachers of students</label>
-                                {% endif %}
+                            <fieldset class="checklist border-none" v-show="showModifierCheckboxes">
+                                <template v-if="showModifierSelfCheckbox">
+                                    <input type="checkbox" id="audience-select-users" v-model="includeUsers" />
+                                    <label for="audience-select-users">${ selectedAudienceOption.selfModifier }</label>
+                                </template>
+                                <template v-if="showModifierParentsCheckbox">
+                                    <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
+                                    <label for="audience-select-parents">Parents of students</label>
+                                </template>
+                                <template v-if="showModifierTeachersCheckbox">
+                                    <input type="checkbox" id="audience-select-teachers" v-model="includeTeachers" />
+                                    <label for="audience-select-teachers">Teachers of students</label>
+                                </template>
                             </fieldset>
 
-                            <button class="button submit" @click.prevent="addAudience" :disabled="!submitEnable">Add</button>
+                            <button class="button submit" @click.prevent="addAudienceSimple" :disabled="!submitEnable">Add</button>
                         </div>
 
+                        <div v-show="pageShow.intersect">
+                            <p class="meta">Use the two columns below to create an intersection audience segment. E.g. Parents in the Senior Campus</p>
+                            <div class="small-12 columns">
+                                <div class="alert-box alert" v-if="isTooManyAdvancedSelections">
+                                    Too many selections. Please deselect some options.
+                                </div>
+                            </div>
+                            <template v-for="(item, index) in intersect">
+                                <div class="small-12 medium-6 columns checklist">
+                                    <legend>
+                                        <select @change="updateIntersectList(index)" v-model="intersect[index]">
+                                            <option :value="audienceOption" v-for="audienceOption in audienceOptions.intersect[index]" v-if="audienceOption.displayInModal">
+                                                ${ audienceOption.label }
+                                            </option>
+                                        </select>
+                                    </legend>
+                                    <input type="checkbox" :id="index + '-all'" v-model="selectAll[index]" @change="toggleSelectAll(index)">
+                                    <label :for="index + '-all'" class="checkbox-label">Select all</label>
+                                    <slot v-for="(item, index2) in audienceListItemsIntersect[index]">
+                                        <input type="checkbox" :id="index + '-' + index2" :value="index2" v-model="intersectList[index]">
+                                        <label :for="index + '-' + index2" class="checkbox-label">${ item }</label>
+                                    </slot>
+                                </div>
+                            </template>
+                            <button class="button submit" @click.prevent="addAudienceIntersect" :disabled="!submitEnableAdvanced">Add</button>
+                        </div>
+
+                    </div>
+
+                    {# composite info modal #}
+                    <div data-reveal id="audience-composite" class="reveal-modal">
+                        <h2>Combination Details</h2>
+                        <a class="close-reveal-modal" aria-label="Close">×</a>
+                        <template v-for="dimensionData in selectedCompositeBrick.modalData">
+                            <div class="small-12 medium-6 columns">
+                                <h3>${ dimensionData.typeLabel }</h3>
+                                <ul>
+                                    <li v-for="label in dimensionData.valueLabels">
+                                        ${ label }
+                                    </li>
+                                </ul>
+                            </div>
+                        </template>
                     </div>
                 </fieldset>
 
@@ -186,16 +256,28 @@
 
 <div class="toast" id="saveDraft"></div>
 
+{# custom HTML for the audience selecize dropdown options. Client-side to ensure consitent human-readable entity types #}
+<div id="audience-selectize-dropdown-option">
+    <span data-name></span>
+    <span data-entityType class="meta"></span>
+    <span data-modifier class="meta"></span>
+</div>
 
 {# le scripts #}
+<script src="/javascript/shared/comms/unit-tests.js"></script> {# TODO TEMP TESTING. REMOVE #}
 <script src="/javascript/ckeditor/ckeditor.js"></script>
 <script src="/javascript/shared/editor/jquery.editor.js"></script>
 <script src="/javascript/shared/comms/draft.js"></script>
+<script src="/javascript/shared/comms/audience-bricks.js"></script>
 <script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 <script>
     'use strict';
+
+    // HTML template for rendering audience audienceSelectize dropdown options.
+    var $audienceSelectizeItemTemplate = $('#audience-selectize-dropdown-option').detach();
 
     $(function () {
         {# CKEditors #}
@@ -231,193 +313,201 @@
             ],
             multiple: true
         });
-
     });
+
+    /**
+     * Encapsulates information about a type of audience, eg 'folder' or 'campus'
+     *
+     * @param {string}  entityType
+     * @param {string}  label
+     * @param {string}  namePlural
+     * @param {string}  icon
+     * @param {string}  selfModifier
+     * @param {boolean} displayInModal
+     * @param {boolean} isMulti          Is this entityType 1:N from users? eg target users in [Eng34 ∩ Chem12]
+     * @constructor
+     */
+    var AudienceOption = function(entityType, label, namePlural, icon, selfModifier, displayInModal, isMulti){
+        this.entityType     = entityType;
+        this.label          = label;
+        this.namePlural     = namePlural;
+        this.icon           = icon;
+        this.selfModifier   = selfModifier;
+        this.ajax           = '{{ routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'entityType'}) }}'.replace('entityType', entityType);
+        this.displayInModal = displayInModal;
+        this.isMulti        = isMulti;
+
+        // We'll populate these via ajax on first time this audience type is displayed in the modal
+        this.isLoaded           = false;
+        this.availableModifiers = undefined;
+        this.canTargetNull      = undefined;
+        this.valueLabels        = undefined;    // will maps encoded values to human-friendly labels
+    };
+
+    {% set isStaff = USER.role.staff ? 'true' : 'false' %}
+
+    /** @var {AudienceOption[]|Object} audienceOptions */
+    var audienceOptions = {
+        campus:         new AudienceOption('campus', 'Campus', 'Campuses', 'location', 'Users in campus', {{ isStaff }}, true),
+        role:           new AudienceOption('role', 'Role', 'Roles', 'staff-students', 'Users in role', {{ isStaff }}, false),
+        school_house:   new AudienceOption('school_house', 'House', 'Houses', 'home', 'House members', {{ isStaff }}, false),
+        year:           new AudienceOption('year', 'Year Level', 'Year Levels', 'teacher', 'Users in year level/s', {{ isStaff }}, false),
+        folder:         new AudienceOption('folder', 'Class/Group', 'Classes & Groups', 'group', 'Class/group members', true, true),
+        pastoral_group: new AudienceOption('pastoral_group', 'Pastoral Group', 'Pastoral Groups', 'pastoral', 'Group members', {{ isStaff }}, true),
+        user:           new AudienceOption('user', 'User', 'Users', 'user', 'Users', false, false)
+    };
+
+    // Bricks need to render various human-friendly labels, so inject the entityType labels
+    // into the BrickManager so it can supply it to Bricks that it creates.
+    var entityTypeLabelMap = {composite: 'Composite'};
+    for(var entityType in audienceOptions){
+        entityTypeLabelMap[entityType] = audienceOptions[entityType].label;
+    }
+
+    var modifierLabelMap = {
+        self:        'Self',
+        parents_of:  'Parents of students',
+        teachers_of: 'Teachers of students'
+    };
+
+    // Audience audienceSelectize where user can search for simple audience segments. The first is the jQuery DOM wrapper, the latter the Selecize plugin.
+    /** @param {jQuery} $audienceSelectize */
+    var $audienceSelectize;
+    /** @param {Selectize} audienceSelectize */
+    var audienceSelectize;
+    /** @param {BrickManager} brickManager */
+    var brickManager;
+    /** @param {Codec} codec */
+    var codec = new Codec();
 
     var app = new Vue({
         el: '#audience-select-container',
         delimiters: ['${', '}'],
         mounted: function() {
-            var vue = this;
+            var vue          = this;
+            brickManager = new BrickManager(vue, codec, entityTypeLabelMap);
+
+            $audienceSelectize = $('#audience-search');
 
             // Audience Selectize
             // A blend of Vue and jQuery, what a world
-            $('#audience-search').selectizeSelector({
+            audienceSelectize = $audienceSelectize.selectizeSelector({
                 ajax: {
                     url: '{{ routeLookup('commsNewsAudienceBrowser.getSearch') }}',
                     type: 'GET',
                     dataType: 'json'
                 },
                 selectize: {
+                    valueField: 'key',
+                    labelField: 'name',
+                    searchField: 'name',
                     render: {
-                        option: function(item, escape) {
-                            return item.itemHtml;
+                        /**
+                         * Called when ajax call returns to render each item into dropdown list
+                         *
+                         * @param {Object} item     - The selected item from the AJAX set
+                         * @param {function} escape - A function that replaces [&<>"] chars with HTML character entities
+                         * @return {string}
+                         */
+                        option: function (item, escape) {
+
+                            var segment    = codec.decode(item.key),
+                                entityType = segment.getEntityType(),
+                                modifier   = segment.getModifier();
+
+                            var $option = $audienceSelectizeItemTemplate.clone();
+                            $option.find('[data-name]').html(escape(item.name));
+                            $option.find('[data-entityType]').html('(' + audienceOptions[entityType].label + ')');
+                            if ('self' !== modifier) {
+                                $option.find('[data-modifier]').html('[' + modifierLabelMap[modifier] + ']');
+                            } else {
+                                $option.find('[data-modifier]').remove();
+                            }
+                            return '<div>' + $option.html() + '</div>';
                         }
                     },
-                    onItemAdd: function(value, $item) {
+                    /**
+                     * Called when an item is added to audienceSelectize. (either due to initial value, option selection, or manual addition)
+                     *
+                     * We want to add the simple/composite segment to our bricks in Vue's data model, Vue will then update the Brick DOM for us.
+                     *
+                     * @param {string} key - The audience segment identifier, eg 'folder:Mzgx:parents_of'
+                     * @param {jQuery} $item - The jQuery wrapper of the DOM element that is displayed in default audienceSelectize
+                     */
+                    onItemAdd: function(key, $item) {
+
                         // Selectize doesn't give us all the data of the selected item, find the item in the full list -_-
-                        var selectedItem = this.options[value];
+                        var selectedItem = this.options[key];
 
-                        // Loop through the current audience items and check for an item with the same name and entityType to append to
-                        var baseItemKey;
-                        for (var selectedAudienceItem in vue.selectedAudienceItems) {
-                            if (
-                                vue.selectedAudienceItems[selectedAudienceItem].name === selectedItem.name &&
-                                vue.selectedAudienceItems[selectedAudienceItem].entityType === selectedItem.entityType
-                            ) {
+                        brickManager.onAddSegment(audienceSelectize, vue.audienceBricks, key, selectedItem.name, $item, selectedItem.labels);
 
-                                baseItemKey = selectedAudienceItem;
-                            }
-                        }
-
-                        if (baseItemKey) {
-                            var baseItem  = vue.selectedAudienceItems[baseItemKey];
-
-                            // Add the modifier to the object
-                            baseItem[selectedItem.modifierOriginal] = true;
-
-                            // Create the new modifier summary based on what modifiers are set
-                            var modifierSummary;
-
-                            if (
-                                baseItem.self &&
-                                baseItem.parents_of &&
-                                baseItem.teachers_of
-                            ) {
-                                modifierSummary = '(Inc. teachers & parents of students)';
-                            } else if (
-                                baseItem.self &&
-                                baseItem.parents_of
-                            ) {
-                                modifierSummary = '(Inc. parents of students)';
-                            } else if (
-                                baseItem.self &&
-                                baseItem.teachers_of
-                            ) {
-                                modifierSummary = '(Inc. teachers of students)';
-                            } else if (
-                                baseItem.parents_of &&
-                                baseItem.teachers_of
-                            ) {
-                                modifierSummary = '(Teachers & parents of students only)'
-                            }
-
-                            vue.$set(vue.selectedAudienceItems[baseItemKey], 'modifier', modifierSummary)
-                        } else {
-                            // Create a new block
-                            var newBlock = {
-                                id: selectedItem.id,
-                                name: selectedItem.name,
-                                entityType: selectedItem.entityType
-                            };
-
-                            if (selectedItem.modifier !== '') {
-                                newBlock['modifier'] = '(' + selectedItem.modifier + ' only)';
-                            }
-
-                            newBlock[selectedItem.modifierOriginal] = true;
-                            vue.selectedAudienceItems.push(newBlock);
-                        }
-
-                        // Hide this item from the selectize list
+                        // Hide this item from the audienceSelectize list
                         $item.addClass('hide');
 
                         // Selectize hides the placeholder once an item is added- we want to keep it, quite hacky
                         $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
 
-                        // The selectize dropdown doesn't position correctly for some reason with this setup so force reposition again after a very short timeout
+                        // The audienceSelectize dropdown doesn't position correctly for some reason with this setup so force reposition again after a very short timeout
                         setTimeout(function() {
-                            $('#audience-search').data('selectize').positionDropdown();
+                            audienceSelectize.positionDropdown();
                         }, 1);
                     },
-                    onItemRemove: function() {
+                    /**
+                     * Called when we remove an item from audienceSelectize. (either because we clicked X icon on audienceSelectize item, or programmatically)
+                     * @param {string} key    - eg 'composite:508:campus:509:IjIi:self,role:510:IjYi:self:self'
+                     * @param {jQuery} $item - Wrapper of audienceSelectize item
+                     */
+                    onItemRemove: function(key, $item) {
+                        brickManager.onRemoveSegment(key, $item);
                         // Selectize hides the placeholder once an item is removed- we want to keep it, quite hacky
                         $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
                     }
                 },
-                {% if audience|length %}
-                value: {{ audience|json_encode|raw }},
+                {% if audienceSegments|length %}
+                value: {{ audienceSegments|json_encode|raw }},
                 {% endif %}
                 multiple: true
-            });
+            }).data('selectize');
         },
         data: {
-            // The set of options on the initial modal screen
+            // Prevent the user from submitting the composite modal form if current selections would exceed this number of composite segments.
+            // eg a 10 x 10 selection will create (10 * 10)*(2+1) = 300 rows in the audience segment table!
+            limitSegmentsPerAddition: 300,
+
+            // The audience groups available in the main simple-segment panel, and the dropdowns on the intersect panel
             audienceOptions: {
-                {% if user.role.staff %}
-                'campus': {
-                    id: 'campus',
-                    name: 'Campus',
-                    namePlural: 'Campuses',
-                    icon: 'location',
-                    selfModifier: 'Students in campus',
-                    ajax: '/comms/news/audiencebrowser/campuses'
-                },
-                'role': {
-                    id: 'role',
-                    name: 'Role',
-                    namePlural: 'Roles',
-                    icon: 'staff-students',
-                    selfModifier: 'Users in role',
-                    ajax: '/comms/news/audiencebrowser/roles'
-                },
-                'school_house': {
-                    id: 'school_house',
-                    name: 'House',
-                    namePlural: 'Houses',
-                    icon: 'home',
-                    selfModifier: 'House members',
-                    ajax: '/comms/news/audiencebrowser/houses'
-                },
-                'year': {
-                    id: 'year',
-                    name: 'Year Level',
-                    namePlural: 'Year Levels',
-                    icon: 'teacher',
-                    selfModifier: 'Students in year level/s',
-                    ajax: '/comms/news/audiencebrowser/yearlevels'
-                },
-                {% endif %}
-                'folder': {
-                    id: 'folder',
-                    name: 'Class/Group',
-                    namePlural: 'Classes & Groups',
-                    icon: 'group',
-                    selfModifier: 'Class/group members',
-                    ajax: '/comms/news/audiencebrowser/folders'
-                },
-                {% if user.role.staff %}
-                'pastoral_group': {
-                    id: 'pastoral_group',
-                    name: 'Pastoral Group',
-                    namePlural: 'Pastoral Groups',
-                    icon: 'pastoral',
-                    selfModifier: 'Group members',
-                    ajax: '/comms/news/audiencebrowser/pastoralgroups'
+                base: Object.assign({}, audienceOptions),
+                intersect: {
+                    'primary': Object.assign({}, audienceOptions),
+                    'secondary': Object.assign({}, audienceOptions)
                 }
-                {% endif %}
             },
 
             // Modal sections showing and hiding
             pageShow: {
                 'index': true,
-                'valueSelect': false
+                'valueSelect': false,
+                'intersect': false
             },
 
             // The option selected by the user from the initial modal screen
             selectedAudienceOption: {},
 
             // The list of options populated by ajax after the user selects an initial option
-            audienceListItems: [],
+            audienceListItems: {},
+            audienceListItemsIntersect: {
+                'primary': [],
+                'secondary': []
+            },
 
             // The checked state of the above list items
             audienceListChecked: [],
 
-            // The list of selected audience groups for this article
-            selectedAudienceItems: [],
-
-            // Ajax responses of the above are stored in here, so that we don't do multiple ajax calls for the same thing
-            cachedOptions: [],
+            /**
+             * The set of audience bricks for this article
+             * @param {Brick[]}
+             */
+            audienceBricks: [],
 
             // Preloader and empty state showing/hiding for the 2nd screen
             showLoader: true,
@@ -431,7 +521,31 @@
             // Whether the user should see the write version of the modal or not.
             // Read users will not see the write options even if this is set to true (because of twig conditionals), this just makes the experience easier
             // for read users
-            writeOnly: {{ (user.role.staff) ? 'true' : 'false' }},
+            writeOnly: {{ (USER.role.staff) ? 'true' : 'false' }},
+
+            // The selected intersect groups
+            // Default to campus and role
+            intersect: {
+                'primary': audienceOptions.role,
+                'secondary': audienceOptions.campus
+            },
+
+            // The models for the checkboxes
+            intersectList: {
+                'primary': [],
+                'secondary': []
+            },
+
+            // Just a marker to check if advanced has been clicked for (need to load defaults on first click)
+            hasLoadedAdvanced: false,
+
+            // Model for the intersector select alls
+            selectAll: {
+                'primary': false,
+                'secondary': false
+            },
+            // the composite brick currently selected for display in the composite details modal
+            selectedCompositeBrick: {}
         },
         methods: {
             /**
@@ -452,7 +566,7 @@
              */
             openBrowseModalRead: function () {
                 this.resetModal();
-                this.changePage(this.audienceOptions.folder);
+                this.changePage(this.audienceOptions.base.folder);
 
                 // Open the modal
                 $('#audience-browse').foundation('reveal', 'open');
@@ -460,7 +574,7 @@
 
             /**
              * Selecting one of the initial options
-             * @param audienceOption
+             * @param {AudienceOption} audienceOption
              */
             changePage: function (audienceOption) {
                 var self = this;
@@ -474,72 +588,194 @@
                 // Update the selected option
                 self.selectedAudienceOption = audienceOption;
 
-                // Try for cached list
-                if (self.cachedOptions[audienceOption.id] !== undefined) {
-                    this.populateAudienceList(self.cachedOptions[audienceOption.id]);
-                } else { // Nope, ajax time
-                    // Request a list of options with the uri listed in the object above
-                    axios.get(audienceOption.ajax).then(function(response) {
-                        self.populateAudienceList(response.data.data);
-
-                        // Cache the options
-                        self.cachedOptions[audienceOption.id] = response.data.data;
-
-                    }).catch(function (error) {
-                        console.log(error);
-                    });
+                // Not yet loaded?
+                if (audienceOption.isLoaded) {
+                    this.populateAudienceList(audienceOption);
+                } else {
+                    var callback = function(){
+                        self.populateAudienceList(audienceOption);
+                    };
+                    this.loadAudienceOptions(audienceOption, callback);
                 }
+            },
+
+            /**
+             * Loads available options for the specific audience option, then calls the specified callback
+             *
+             * @param {AudienceOption} audienceOption
+             * @param {function} callback
+             */
+            loadAudienceOptions: function(audienceOption, callback){
+                // Request a list of options with the uri listed in the object above
+                axios.get(audienceOption.ajax).then(function(response) {
+                    // Ensure we received expected payload
+                    if(
+                        undefined === response.data.availableModifiers ||
+                        undefined === response.data.canTargetNull ||
+                        undefined === response.data.valueLabels
+                    ) {
+                        throw new Error('Unable to process AJAX payload: ' + response);
+                    }
+                    // Cache the options
+                    audienceOption.availableModifiers = response.data.availableModifiers;
+                    audienceOption.isLoaded           = true;
+
+                    audienceOption.canTargetNull      = response.data.canTargetNull;
+                    audienceOption.valueLabels        = response.data.valueLabels;
+
+                    callback();
+                }).catch(function (error) {
+                    console.log(error);
+                });
             },
 
             /**
              * Show the list of items, or show the empty state
-             * @param data
+             * @param {AudienceOption} audienceOption
              */
-            populateAudienceList: function (data) {
+            populateAudienceList: function (audienceOption) {
                 // Hide the loader
-                this.showLoader = false;
+                app.showLoader = false;
 
-                if (data.length) {
+                if (Object.keys(audienceOption.valueLabels).length) {
                     // Populate the list with cached version
-                    this.audienceListItems = data;
+                    app.audienceListItems = audienceOption.valueLabels;
                 } else {
                     // Show empty state
-                    this.showEmptyState = true;
+                    app.showEmptyState = true;
                 }
             },
 
             /**
-             * Submitting the modal form
+             * Submitting the simple-segment modal form
              */
-            addAudience: function () {
-                var self = this;
+            addAudienceSimple: function () {
+                var self       = this,
+                    entityType = self.selectedAudienceOption.entityType;
 
-                // Add to selectize
-                self.audienceListChecked.forEach(function(option) {
-                    var selectizeOptions = [];
-
-                    if (self.includeUsers) {
-                        selectizeOptions.push(option.self);
-                    }
-
-                    if (self.includeParents) {
-                        selectizeOptions.push(option.parents_of);
-                    }
-
-                    if (self.includeTeachers) {
-                        selectizeOptions.push(option.teachers_of);
-                    }
-
-                    selectizeOptions.forEach(function (selectizeOption) {
-                        $('#audience-search').data('selectize').addOption(selectizeOption);
-                        $('#audience-search').data('selectize').addItem(selectizeOption.id);
-                    });
+                // Add to audienceSelectize
+                self.audienceListChecked.forEach(function (encodedValue) {
+                    self.injectSimpleSegment(self.selectedAudienceOption, entityType, encodedValue, self.selectedModifiers);
                 });
 
-                $('#audience-search').data('selectize').refreshItems();
+                brickManager.onAddSetSimpleSegmentsViaUi(audienceSelectize, self.audienceBricks, entityType);
+
+                audienceSelectize.refreshItems();
 
                 // Close modal
                 $('#audience-browse').foundation('reveal', 'close');
+            },
+
+            // Inject a simple segment item into audienceSelectize
+            injectSimpleSegment: function(audienceOption, entityType, encodedValue, modifiers) {
+
+                var entityTypeHR = entityTypeLabelMap[entityType];
+                var label = audienceOption.valueLabels[encodedValue];
+                var labels = {};
+                labels[entityType] = {};
+                labels[entityType][encodedValue] = label;
+
+                modifiers.forEach(function (modifier) {
+                    var option = {
+                        key:    codec.encodeSimpleAttributes(entityType, encodedValue, modifier),
+                        name:  '[' + entityTypeHR + ':' + label + ']^' + modifier,
+                        labels: labels
+                    };
+                    audienceSelectize.addOption(option);
+                    audienceSelectize.addItem(option.key);
+                });
+            },
+
+            // Submitting the composite-segment modal form
+            addAudienceIntersect: function () {
+
+                if (this.isTooManyAdvancedSelections) {
+                    throw new Error('Too many selections');
+                }
+
+                // TODO move this to BrickManager method. Pass in reference to Vue data
+
+                var self = this,
+                    entityTypePrimary = self.intersect.primary.entityType,
+                    entityTypePrimaryHR = entityTypeLabelMap[entityTypePrimary],
+                    entityTypeSecondary = self.intersect.secondary.entityType,
+                    entityTypeSecondaryHR = entityTypeLabelMap[entityTypeSecondary],
+                    simplifiedValues = [];
+
+                // Go through both lists, and if any is used in both, create simplified segment.
+                // Since any intersection with a simple segment is a subset, don't bother adding the subset.
+                if (entityTypePrimary === entityTypeSecondary) {
+                    self.intersectList.primary.forEach(function (primaryValue) {
+                        self.intersectList.secondary.forEach(function (secondaryValue) {
+                            if (primaryValue === secondaryValue) {
+                                self.injectSimpleSegment(self.intersect.primary, entityTypePrimary, primaryValue, ['self']);
+                                simplifiedValues.push(primaryValue);
+                            }
+                        });
+                    });
+                }
+
+                // Each checkbox in first dimension
+                self.intersectList.primary.forEach(function (primaryValue) {
+
+                    if(-1 !== simplifiedValues.indexOf(primaryValue)){
+                        return true;
+                    }
+
+                    var labelPrimary = self.intersect.primary.valueLabels[primaryValue];
+
+                    // Each checkbox in second dimension
+                    self.intersectList.secondary.forEach(function (secondaryValue) {
+
+                        if(-1 !== simplifiedValues.indexOf(secondaryValue)){
+                            return true;
+                        }
+
+                        var labelSecondary = self.intersect.secondary.valueLabels[secondaryValue];
+
+                        // Create a audienceSelectize item. Adding it will cause audienceSelectize to inject a Segment into the BrickManager
+                        var labels = {};
+                        labels[entityTypePrimary] = {};
+                        labels[entityTypePrimary][primaryValue] = labelPrimary;
+                        if (entityTypePrimary !== entityTypeSecondary) {
+                            labels[entityTypeSecondary] = {};
+                        }
+                        labels[entityTypeSecondary][secondaryValue] = labelSecondary;
+
+                        self.selectedModifiers.forEach(function (modifier) {
+
+                            // composite children are hard-coded to 'self' for now
+                            var ss1 = new Segment(entityTypePrimary, primaryValue, 'self', null),
+                                ss2 = new Segment(entityTypeSecondary, secondaryValue, 'self', null),
+                                cs = new Segment('composite', null, modifier, [ss1, ss2]);
+
+                            // Composite names are not displayed to user, but helpful for debugging.
+                            var name1 = '[' + entityTypePrimaryHR + ':' + labelPrimary + ']^S',
+                                name2 = '[' + entityTypeSecondaryHR + ':' + labelSecondary + ']^S',
+                                option = {
+                                    key: codec.encode(cs),
+                                    name: '[' + name1 + ' ∩ ' + name2 + ']^' + modifier,
+                                    labels: labels
+                                };
+
+                            audienceSelectize.addOption(option);
+                            audienceSelectize.addItem(option.key);
+                        });
+                    });
+                });
+
+                if(simplifiedValues.length){
+                    brickManager.onAddSetSimpleSegmentsViaUi(audienceSelectize, self.audienceBricks, entityType);
+                }
+
+                // Close modal
+                $('#audience-browse').foundation('reveal', 'close');
+                self.intersectList.primary = [];
+                self.intersectList.secondary = [];
+                self.selectAll.primary = false;
+                self.selectAll.secondary = false;
+
+                audienceSelectize.refreshItems();
             },
 
             /**
@@ -561,7 +797,7 @@
              * Reset the second modal section back to a default state
              */
             resetModal: function () {
-                this.audienceListItems = [];
+                this.audienceListItems = {};
                 this.audienceListChecked = [];
                 this.includeUsers = true;
                 this.includeParents = false;
@@ -572,24 +808,153 @@
 
             /**
              * Remove an audience item
+             * TODO ask the brick manager to do this, and pass it selecize
              */
-            removeAudienceItem: function(item) {
-                // Remove item + any modifiers for item from selectize
-                $('#audience-search').data('selectize').removeItem(item.id);
-                $('#audience-search').data('selectize').removeItem(item.id + '{{ relationshipParentsOf }}');
-                $('#audience-search').data('selectize').removeItem(item.id + '{{ relationshipTeachersOf }}');
+            removeAudienceBrick: function(brick) {
+                brickManager.removeBrick(audienceSelectize, this.audienceBricks, brick);
+                audienceSelectize.refreshItems();
+            },
 
-                // Remove from vue list
-                this.selectedAudienceItems.splice(this.selectedAudienceItems.indexOf(item), 1);
+            /**
+             * Clicking the 'advanced' tab
+             */
+            advancedToggle: function() {
+                if (!this.hasLoadedAdvanced) {
+                    // Load the defaults
+                    this.updateIntersectList('primary');
+                    this.updateIntersectList('secondary');
+                    // Update the flag
+                    this.hasLoadedAdvanced = true;
+                }
+
+                // Show the page always
+                this.showPage('intersect');
+            },
+
+            /**
+             * Update an intersect list with possible options
+             * @param {string} list 'primary' or 'secondary'
+             */
+            updateIntersectList: function(list) {
+                var self = this;
+                var audienceOption = self.intersect[list];
+
+                // Reset select all
+                self.selectAll[list] = false;
+
+                // Reset checked item model
+                self.intersectList[list] = [];
+
+                // Urgh
+                var otherList = (list === 'primary') ? 'secondary' : 'primary';
+
+                // Remove this option from the other dropdown if it is not a 1:N relationship
+                self.audienceOptions.intersect[otherList] = Object.assign({}, audienceOptions);
+                if(!audienceOption.isMulti){
+                    console.log('deleting from other list: ' + otherList + ' ' + audienceOption.entityType);
+                    Vue.delete(self.audienceOptions.intersect[otherList], audienceOption.entityType);
+                }
+
+                // Try for cached list
+                if (audienceOption.isLoaded) {
+                    self.audienceListItemsIntersect[list] = audienceOption.valueLabels;
+                } else { // Nope, ajax time
+
+                    var callback = function(){
+                        self.audienceListItemsIntersect[list] = audienceOption.valueLabels;
+                    };
+
+                    this.loadAudienceOptions(audienceOption, callback);
+                }
+            },
+
+            /**
+             * Select all
+             * @param list 'primary' or 'secondary'
+             */
+            toggleSelectAll: function(list) {
+                var self = this;
+                self.intersectList[list] = [];
+
+                // Get ready for something wild...
+                if (self.selectAll[list]) {
+                    // Loop the possible options and add them to the list of checked options (intersectList)
+                    var valueLabels = this.intersect[list].valueLabels;
+                    for (var encodedValue in valueLabels) {
+                        if(valueLabels.hasOwnProperty(encodedValue)) {
+                            self.intersectList[list].push(encodedValue);
+                        }
+                    }
+                }
+            },
+
+            /**
+             * Populate and show a modal with info on a composite audience segment
+             * @param {Brick} audienceBrick
+             */
+            showCompositeInfo: function(audienceBrick) {
+                this.selectedCompositeBrick = audienceBrick;
+                // Show modal
+                $('#audience-composite').foundation('reveal', 'open');
             }
         },
         computed: {
+            showModifierSelfCheckbox: function(){
+                return this.selectedAudienceOption.availableModifiers && -1 !== this.selectedAudienceOption.availableModifiers.indexOf('self');
+            },
+            showModifierParentsCheckbox: function(){
+                return this.selectedAudienceOption.availableModifiers && -1 !== this.selectedAudienceOption.availableModifiers.indexOf('parents_of');
+            },
+            showModifierTeachersCheckbox: function(){
+                return this.selectedAudienceOption.availableModifiers && -1 !== this.selectedAudienceOption.availableModifiers.indexOf('teachers_of');
+            },
+            showModifierCheckboxes: function(){
+                return this.showModifierParentsCheckbox || this.showModifierTeachersCheckbox;
+            },
             /**
              * Disable the modal submit button until each of the checklists has something checked
              */
             submitEnable: function () {
                 return !!(this.audienceListChecked.length && (this.includeUsers || this.includeParents || this.includeTeachers));
+            },
+            submitEnableAdvanced: function () {
+                return !!(this.intersectList.primary.length && this.intersectList.secondary.length && !this.isTooManyAdvancedSelections);
+            },
+            isTooManyAdvancedSelections: function() {
+                return (this.intersectList.primary.length * this.intersectList.secondary.length) * 3 > this.limitSegmentsPerAddition;
+            },
+            selectedModifiers: function(){
+                var modifiers = [];
+                if (this.includeUsers) {
+                    modifiers.push('self');
+                }
+                if (this.includeParents) {
+                    modifiers.push('parents_of');
+                }
+                if (this.includeTeachers) {
+                    modifiers.push('teachers_of');
+                }
+                return modifiers;
             }
         }
     });
 </script>
+
+<style>
+    .active {
+        font-weight: bold;
+    }
+
+    .audience-browse-head {
+        position: relative;
+    }
+
+    .audience-browse-head h2 {
+        display: inline-block;
+    }
+
+    .advanced-toggle {
+        position: absolute;
+        right: 0;
+    }
+</style>

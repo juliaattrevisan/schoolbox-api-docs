@@ -47,9 +47,8 @@
         var settings = {}
         var defaults = {
             ajax: {
-                url:      '/ajax/user.php',
                 type:     'GET',
-                data:     {groupID: 0},
+                data:     {},
                 dataType: 'json'
             },
             selectize: {

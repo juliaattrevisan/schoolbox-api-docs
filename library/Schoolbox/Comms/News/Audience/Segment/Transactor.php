@@ -1,7 +1,5 @@
 <?php
 /**
- * Transactor
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,35 +7,36 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
-use PDOException;
 use Schoolbox\Comms\News;
-use Schoolbox\Comms\News\Audience\Mapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Comms\News\Audience;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper;
+use UnexpectedValueException;
 use Schoolbox\User;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 
+
+/**
+ * Responsible for the intricacies of news article audience segment persistence.
+ */
 class Transactor
 {
 
-    /**
-     * @var User
-     */
-    private $user;
+    /** @var User */
+    private $sessionUser;
 
-    /**
-     * @var Mapper
-     */
+
+    /** @var Audience\Mapper */
     private $audienceMapper;
 
-    /**
-     * @var Folder\Mapper
-     */
+    /** @var Codec */
+    private $codec;
+
+    /** @var Folder\Mapper */
     private $folderMapper;
 
-    /**
-     * @var RoleAccessMapper
-     */
+    /** @var RoleAccessMapper */
     private $roleAccessMapper;
 
     /** @var bool */
@@ -45,91 +44,151 @@ class Transactor
 
 
     /**
-     * Segments constructor.
-     *
-     * @param User             $user
-     * @param Mapper           $audienceMapper
+     * @param User             $sessionUser
+     * @param Audience\Mapper  $audienceMapper
+     * @param Codec            $codec
      * @param Folder\Mapper    $folderMapper
      * @param RoleAccessMapper $roleAccessMapper
      * @param bool             $isModerationEnabled
      */
-    public function __construct(User $user, Mapper $audienceMapper, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $isModerationEnabled)
-    {
-        $this->user = $user;
-        $this->audienceMapper = $audienceMapper;
-        $this->folderMapper = $folderMapper;
-        $this->roleAccessMapper = $roleAccessMapper;
+    public function __construct(
+        User $sessionUser,
+        Audience\Mapper $audienceMapper,
+        Codec $codec,
+        Folder\Mapper $folderMapper,
+        RoleAccessMapper $roleAccessMapper,
+        bool $isModerationEnabled
+    ) {
+        $this->sessionUser         = $sessionUser;
+        $this->audienceMapper      = $audienceMapper;
+        $this->codec               = $codec;
+        $this->folderMapper        = $folderMapper;
+        $this->roleAccessMapper    = $roleAccessMapper;
         $this->isModerationEnabled = $isModerationEnabled;
     }
 
 
     /**
-     * Load the audiencing segments for a given article
+     * Updates the audiencing segments for a given article
+     *
+     * On method return, the article model's audience will match the persisted state
+     *
+     * Does not perform DB mutations unless logical changes to the audience have been made
      *
      * @param News\Model $article
-     * @return array
+     * @param string     $selectizeAudienceSegments
+     * @return bool
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\InsufficientHydrationException
      */
-    public function load(News\Model $article): array
+    public function save(News\Model $article, string $selectizeAudienceSegments): bool
     {
-        $pieces = [];
+        /** @var Audience\Model[]|GenericCollection $existingSegments */
+        $existingSegments = $article->getAudience()->indexBy($this->audienceMapper->getIdentifierProperty());
+        $postedSegments   = $this->codec->decodeSelectizeValues($selectizeAudienceSegments);
 
-        $translator = new Translator($this->audienceMapper->getDatabase(), $this->user, $this->folderMapper, $this->roleAccessMapper, $this->isModerationEnabled);
-        $translator->buildCache($article->getId());
-        $audiencing = $translator->getCache();
+        $segmentsToAdd    = $this->audienceMapper->createCollection();
+        $segmentsToDelete = $this->audienceMapper->createCollection();
 
-        foreach ($audiencing as $entityType => $values) {
-            foreach ($values as $value => $data) {
-                foreach ($data['relationships'] as $relationship) {
-
-                    /* translate "name" into something nicer to read for humans
-                     */
-                    $pieces[] = [
-                        'id' => Codec::encode($entityType, $value, $relationship),
-                        'name' => $translator->translateNameFromEntityType($entityType, $value),
-                        'entityType' => $translator->translateEntityType($entityType),
-                        'entityTypeOriginal' => $entityType,
-                        'modifierOriginal' => $relationship,
-                        'modifier' => $translator->translateModifier($relationship),
-                    ];
+        // Delete any segment that currently exists, but was not posted from form (ie it's been removed by user)
+        foreach ($existingSegments as $existingSegment) {
+            $found = false;
+            foreach ($postedSegments as $postedSegment) {
+                if ($existingSegment->equals($postedSegment)) {
+                    $found = true;
+                    break;
                 }
+            }
+            if (!$found) {
+                $segmentsToDelete->add($existingSegment);
+            }
+        }
+        // Add any segment that was posted but is not currently persisted
+        foreach ($postedSegments as $postedSegment) {
+            $found = false;
+            foreach ($existingSegments as $existingSegment) {
+                if ($existingSegment->equals($postedSegment)) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $segmentsToAdd->add($postedSegment);
             }
         }
 
-        return $pieces;
+        $isSegmentsDeleted = $this->deleteRemovedSegments($article, $segmentsToDelete);
+        $isSegmentsAdded   = $this->saveAddedSegments($article, $segmentsToAdd);
+
+        return $isSegmentsDeleted || $isSegmentsAdded;
     }
 
 
     /**
-     * Save the audiencing segments for a given article
-     *
-     * @param News\Model $article
-     * @param string     $segments
-     * @throws MapperException
-     * @throws MapperException\InsufficientHydrationException
-     * @throws PDOException
-     * @throws \InvalidArgumentException
-     * @throws \UnexpectedValueException
+     * @param News\Model                         $article
+     * @param GenericCollection|Audience\Model[] $segmentsToDelete
+     * @return bool
+     * @throws Mapper\Exception
      */
-    public function save(News\Model $article, string $segments): void
+    private function deleteRemovedSegments(News\Model $article, GenericCollection $segmentsToDelete): bool
     {
-        /* Purge existing records before resaving the new ones
-         */
-        $this->audienceMapper->deleteByColumn('comms_news_article_id', $article->getId());
-
-        if ('' !== $segments) {
-            $audiencingOptions = explode(',', $segments);
-
-            foreach ($audiencingOptions as $audiencingOption) {
-                $segment = Codec::decode($audiencingOption);
-
-                $audienceModel = $this->audienceMapper->createModel()
-                    ->setCommsNewsArticle($article)
-                    ->setEntityType($segment['entityType'])
-                    ->setEntityValue($segment['entityValue'])
-                    ->setRelationship($segment['relationship']);
-
-                $this->audienceMapper->save($audienceModel);
+        $changesMade = false;
+        foreach ($segmentsToDelete as $segmentToDelete) {
+            $isDeleted = $this->audienceMapper->deleteSegment($segmentToDelete);
+            if ($isDeleted) {
+                $article->getAudience()->offsetUnset($segmentToDelete->getId());
+                $changesMade = true;
             }
         }
+        return $changesMade;
+    }
+
+
+    /**
+     * @param News\Model        $article
+     * @param GenericCollection $segmentsToAdd
+     * @return bool
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
+     */
+    private function saveAddedSegments(News\Model $article, GenericCollection $segmentsToAdd): bool
+    {
+        $isSegmentsAdded = false;
+        if ($segmentsToAdd->count()) {
+
+
+            $strategyFactory = new StrategyFactory($this->sessionUser, $this->folderMapper, $this->roleAccessMapper, $this->isModerationEnabled);
+            $strategies      = $strategyFactory->makeAll();
+
+            // Ensure the relationship is valid for the segment's entity type
+            $validRelationships = [];
+            // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
+            $validNullEntities = [];
+            foreach ($strategies as $strategy) {
+                $validRelationships[$strategy->getEntityType()] = $strategy->getValidRelationshipModifiers($this->sessionUser);
+                $validNullEntities[$strategy->getEntityType()]  = $strategy->canTargetNullEntityValue();
+            }
+
+            $validSegmentSpecFactory = new Audience\Validation\Factory($validRelationships, $validNullEntities);
+            $validSegmentSpec        = $validSegmentSpecFactory->makeValidSegmentSpecification($this->sessionUser);
+
+
+            foreach ($segmentsToAdd as $segmentToAdd) {
+                $segmentToAdd->setCommsNewsArticle($article);
+
+                if (!$validSegmentSpec->isSatisfiedBy($segmentToAdd)) {
+                    // TODO make this a specific exception that wraps the $unsatisified so caller can handle gracefully
+                    $unsatisfied = $validSegmentSpec->remainderUnsatisfiedBy($segmentToAdd);
+                    throw new UnexpectedValueException('Audience segment fails specification pattern');
+                }
+
+                $wasSaved = $this->audienceMapper->saveSegment($segmentToAdd);
+                if (false !== $wasSaved) {
+                    $article->getAudience()->offsetSet($segmentToAdd->getId(), $segmentToAdd);
+                    $isSegmentsAdded = true;
+                }
+            }
+        }
+        return $isSegmentsAdded;
     }
 }

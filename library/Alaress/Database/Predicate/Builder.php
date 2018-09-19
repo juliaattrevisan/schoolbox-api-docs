@@ -576,6 +576,18 @@ class Builder implements IBuilder
 
 
     /**
+     * @param array       $input
+     * @param string|null $prefix
+     * @return Bindings
+     */
+    public static function getBindings(array $input, string $prefix = null): Bindings
+    {
+        $arrayBindings = self::getArrayBindings($input, $prefix);
+        return new Bindings($arrayBindings['placeholders'], $arrayBindings['bindings']);
+    }
+
+
+    /**
      * The non-concatenated version of getArrayPlaceholders()
      *
      * @param array|Traversable $input

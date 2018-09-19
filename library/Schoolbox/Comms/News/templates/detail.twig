@@ -156,8 +156,9 @@
 {% if isAuthor or isCommsOfficer %}
 {% include '@commsNews/workflow.twig' with {
     article: article,
-    moderationEnabled: moderationEnabled
-} %}
+    moderationEnabled: moderationEnabled,
+    isCommsOfficer: isCommsOfficer
+} only %}
 {% endif %}
 
 <div class="row">

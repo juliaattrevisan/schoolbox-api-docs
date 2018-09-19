@@ -1,119 +1,302 @@
 <?php
 /**
- * Codec
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
-use Schoolbox\Comms\News\Audience\BusinessRules;
-use Schoolbox\Comms\News\Audience\Mapper;
-use Schoolbox\Comms\News\Audience\Model;
+use Schoolbox\Comms\News\Audience;
+use Schoolbox\GenericCollection;
+use LogicException;
+use Schoolbox\Mapper;
+use DomainException;
 
+/**
+ * Responsible for converting between audience segment models and their string representation.
+ * Must match the implementation of the JS version of this class.
+ */
 class Codec
 {
 
+    private const DELIMITER_SELECTIZE = ',';
+    private const DELIMITER_COMPOSITE = ';';
+    private const DELIMITER_SIMPLE = ':';
+    private const DELIMITER_CHILDREN = '.';
+
+    /** @var Audience\Mapper */
+    private $segmentMapper;
+
+
     /**
-     * Separates the audiencing option type from its value
-     * e.g. house:12345, role:5678
+     * @param Audience\Mapper $segmentMapper
      */
-    public const AUDIENCE_SEPARATOR = ':';
+    public function __construct(Audience\Mapper $segmentMapper)
+    {
+        $this->segmentMapper = $segmentMapper;
+    }
+
+
+    /**
+     * Returns a string-representation of this segment
+     *
+     * @param Audience\Model $segment
+     * @return string
+     * @throws Mapper\Exception\InsufficientHydrationException
+     */
+    public function encode(Audience\Model $segment): string
+    {
+        return $segment->isSimple()
+            ? $this->encodeSimpleSegment($segment)
+            : $this->encodeComposite($segment);
+    }
+
+
+    /**
+     * Returns a string-representation of a simple segment's logical attributes
+     *
+     * @param string      $entityType
+     * @param null|string $entityValue
+     * @param string      $modifier
+     * @return string
+     */
+    public function encodeSimpleAttributes(string $entityType, ?string $entityValue, string $modifier): string
+    {
+        return $this->encodeSimpleParts($entityType, $entityValue, $modifier);
+    }
+
+
+    /**
+     * Converts an encoded string into an Audience Segment Model
+     *
+     * @param string $encodedSegment
+     * @return Audience\Model
+     * @throws DomainException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\InsufficientHydrationException
+     */
+    public function decode(string $encodedSegment): Audience\Model
+    {
+        return 0 !== strpos($encodedSegment, Audience\Model::ENTITY_TYPE_COMPOSITE)
+            ? $this->decodeSimple($encodedSegment)
+            : $this->decodeComposite($encodedSegment);
+    }
 
 
     /**
      * Takes a value string $value and encodes it
      *
-     * @param string $value
+     * @param null|string $value
      * @return string
      */
-    public static function encodeValue(string $value): string
+    public function encodeValue(?string $value): string
     {
-        return base64_encode($value);
+        // This scheme supports at least the following values:
+        // [':', ',', null, 'null', '1', '', 1, '"', "'", '\\', '/', '<', '&', '!@*(@*#&)!+_!+!@']
+        return \base64_encode(\json_encode($value));
     }
 
 
     /**
-     * Taks an encoded value string $value and decodes it
-     *
-     * @param string $value
-     * @return string
-     */
-    public static function decodeValue(string $value): string
-    {
-        return base64_decode($value);
-    }
-
-
-    /**
-     * Takes three strings, encodes them into the format below
-     *
-     * user:230:parents
-     *
-     * @param string $entityType
-     * @param string $entityValue
-     * @param string $relationship
-     * @return string
-     */
-    public static function encode(string $entityType, string $entityValue, string $relationship): string
-    {
-        $segment = $entityType . self::AUDIENCE_SEPARATOR . self::encodeValue($entityValue);
-
-        if ($relationship !== Model::RELATIONSHIP_SELF) {
-            $segment .= self::AUDIENCE_SEPARATOR . $relationship;
-        }
-
-        return $segment;
-    }
-
-    /**
-     * Takes a segment string and snaps it into constituent pieces
-     *
-     * @param string $segment
-     * @return array
-     * @throws \InvalidArgumentException
+     * @param string $selectizeValues
+     * @return GenericCollection
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
-    public static function decode(string $segment): array
+    public function decodeSelectizeValues(string $selectizeValues): GenericCollection
     {
-        $pieces = explode(self::AUDIENCE_SEPARATOR, $segment);
+        $rootSegments = $this->segmentMapper->createCollection();
 
-        $entityType = $pieces[0];
-        $entityValue = self::decodeValue($pieces[1]);
+        $trimmed = \trim($selectizeValues);
 
-        /* If there isn't a $pieces[2], there was no relationship detected in $segment
-         * Segments require three pieces - entity type, entity value, relationship
-         *
-         * A null relationship typically infers as RELATIONSHIP_SELF from frontend
-         */
-        $relationship = $pieces[2];
-
-        if (null === $relationship) {
-            $relationship = Model::RELATIONSHIP_SELF;
+        if('' === $trimmed){
+            return $rootSegments;
         }
 
-        /* If the entity type isn't recognised, error out
-         * BusinessRules requires a model, so we'll mash one together with the pieces we have
-         */
-        $model = Mapper::getInstance()->createModel()
-            ->setEntityType($entityType)
-            ->setEntityValue($entityValue)
-            ->setRelationship($relationship);
-
-        /* Verify that the constituent pieces are valid; otherwise die loudly because you're trying
-         * to use some kind of illegal configuration somehow
-         */
-        if ((new BusinessRules())->isValidRelationship($model, $relationship)) {
-            return [
-                'entityType' => $entityType,
-                'entityValue' => $entityValue,
-                'relationship' => $relationship
-            ];
+        foreach (\explode(self::DELIMITER_SELECTIZE, $trimmed) as $encodedSegment) {
+            // Cannot index, as will not have id set
+            $rootSegments->add($this->decode($encodedSegment));
         }
 
-        return [];
+        return $rootSegments;
+    }
+
+
+    /**
+     * Helper to ensure consistent encoding scheme, regardless of data source
+     *
+     * @param string      $entityType
+     * @param null|string $entityValue
+     * @param string      $modifier
+     * @return string
+     */
+    private function encodeSimpleParts(string $entityType, ?string $entityValue, string $modifier): string
+    {
+        $parts = [
+            $entityType,
+            $this->encodeValue($entityValue),
+            $modifier,
+        ];
+
+        return \implode(self::DELIMITER_SIMPLE, $parts);
+    }
+
+
+    /**
+     * Takes an encoded value string $value and decodes it
+     *
+     * @param string $encodedValue
+     * @return null|string
+     */
+    private function decodeValue(string $encodedValue): ?string
+    {
+        return \json_decode(\base64_decode($encodedValue));
+    }
+
+
+    /**
+     * Encodes a simple segment
+     *
+     * @param Audience\Model $segment
+     * @return string
+     */
+    private function encodeSimpleSegment(Audience\Model $segment): string
+    {
+        $parts = [
+            $segment->getEntityType(),
+            $this->encodeValue($segment->getEntityValue()),
+            $segment->getRelationship(),
+        ];
+
+        return \implode(self::DELIMITER_SIMPLE, $parts);
+    }
+
+
+    /**
+     * Decodes a encoded string into a simple audience segment
+     *
+     * @param string $encodedSegment
+     * @return Audience\Model
+     * @throws Mapper\Exception
+     */
+    private function decodeSimple(string $encodedSegment): Audience\Model
+    {
+        [$type, $encodedValue, $modifier] = \explode(self::DELIMITER_SIMPLE, $encodedSegment);
+
+        return $this->segmentMapper->createModel()
+                                   ->setEntityType($type)
+                                   ->setEntityValue($this->decodeValue($encodedValue))
+                                   ->setRelationship($modifier);
+    }
+
+
+    /**
+     * Encodes a composite segment
+     *
+     * @param Audience\Model $segment
+     * @return string
+     */
+    private function encodeComposite(Audience\Model $segment): string
+    {
+        $childParts = [];
+        foreach ($this->getSortedChildSegments($segment->getChildren()) as $childSegment) {
+            $childParts[] = $this->encodeSimpleSegment($childSegment);
+        }
+
+        $parts = [
+            $segment->getEntityType(),         // need to put 'composite' first to easily detect composites
+            $segment->getRelationship(),
+            \implode(self::DELIMITER_CHILDREN, $childParts),
+        ];
+
+        return implode(self::DELIMITER_COMPOSITE, $parts);
+    }
+
+
+    /**
+     * Decodes an encoded composite segment
+     *
+     * @param string $encodedSegment
+     * @return Audience\Model
+     * @throws DomainException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\InsufficientHydrationException
+     */
+    private function decodeComposite(string $encodedSegment): Audience\Model
+    {
+        [$type, $modifier, $encodedChildren] = \explode(self::DELIMITER_COMPOSITE, $encodedSegment);
+
+        $children = $this->segmentMapper->createCollection();
+        foreach (\explode(self::DELIMITER_CHILDREN, $encodedChildren) as $encodedChild) {
+            $children->add($this->decodeSimple($encodedChild));
+        }
+
+        // Check whether all children are identical. If so, reduce to equivalent simple form.
+        /** @var null|Audience\Model $firstSegment */
+        $firstSegment       = null;
+        $distinctChildFound = false;
+        foreach ($children as $child) {
+            if (!$firstSegment) {
+                $firstSegment = $child;
+            } elseif (!$firstSegment->equals($child)) {
+                $distinctChildFound = true;
+                break;
+            }
+        }
+        if (!$distinctChildFound) {
+            $effectiveModifier = $modifier === Audience\Model::RELATIONSHIP_SELF ? $firstSegment->getRelationship() : $modifier;
+            return $this->segmentMapper->createModel()
+                                       ->setEntityType($firstSegment->getEntityType())
+                                       ->setEntityValue($firstSegment->getEntityValue())
+                                       ->setRelationship($effectiveModifier);
+        }
+
+        return $this->segmentMapper->createModel()
+                                   ->setEntityType($type)
+                                   ->setChildren($children)
+                                   ->setRelationship($modifier);
+    }
+
+
+    /**
+     * Returns a set of audience segments sorted. Does not mutate passed-in collection
+     *
+     * @param GenericCollection|Audience\Model[] $segments
+     * @return GenericCollection|Audience\Model[]
+     */
+    private function getSortedChildSegments(GenericCollection $segments): GenericCollection
+    {
+        $unsorted = $segments->shallowClone();
+
+        return $unsorted->sortByCallback(function (Audience\Model $left, Audience\Model $right) {
+            // first sort by entityType
+            if ($left->getEntityType() < $right->getEntityType()) {
+                return -1;
+            }
+            if ($left->getEntityType() > $right->getEntityType()) {
+                return +1;
+            }
+            // Yes, it's possible to target the intersection of two entities of the same type, eg pastoral groups which are 1:N with users.
+            // Also need to encode first so we match the client-side algorithm
+            $encodedLeft  = $this->encodeValue($left->getEntityValue());
+            $encodedRight = $this->encodeValue($right->getEntityValue());
+            if ($encodedLeft < $encodedRight) {
+                return -1;
+            }
+            if ($encodedLeft > $encodedRight) {
+                return +1;
+            }
+            // Yes, it's possible to target the intersection of two entities of the same type, and value.
+            // Eg must be a member of House:X, and a parent of a student who is a member of House:X
+            if ($left->getRelationship() < $right->getRelationship()) {
+                return -1;
+            }
+            if ($left->getRelationship() > $right->getRelationship()) {
+                return +1;
+            }
+            // If we get here, something has gone wrong.
+            throw new LogicException("Unable to distinguish composite segment children for sort. EntityType: '{$left->getEntityType()}', EntityValue: '{$left->getEntityValue()}'");
+        }, true);
     }
 }

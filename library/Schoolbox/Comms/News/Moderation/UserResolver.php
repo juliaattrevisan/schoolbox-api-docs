@@ -11,6 +11,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Comms\News\Audience\Mapper as AudienceMapper;
 use Schoolbox\Comms\News\Audience\Model as Audience;
+use Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 /**
  * Responsible for:
@@ -63,7 +64,7 @@ class UserResolver implements IUserResolver
         /** @var Audience $segment */
         $segment = $segments->first();
 
-        if ($segment->getEntityType() !== Audience::ENTITY_TYPE_FOLDER || $segment->getRelationship() !== Audience::RELATIONSHIP_SELF) {
+        if ($segment->getEntityType() !== Strategy\Folder::ENTITY_TYPE || $segment->getRelationship() !== Audience::RELATIONSHIP_SELF) {
             // not a trivial folder segment; bounce this
             return $this->findCommsOfficerIds();
         }

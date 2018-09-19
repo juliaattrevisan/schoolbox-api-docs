@@ -9,9 +9,8 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
-use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
-use Schoolbox\Resource\Folder;
 
 class SearchRegistry implements ISearch
 {
@@ -21,32 +20,18 @@ class SearchRegistry implements ISearch
      */
     private $registry;
 
-
     /**
      * SearchRegistry constructor.
      *
-     * @param User             $user
-     * @param Folder\Mapper    $folderMapper
-     * @param RoleAccessMapper $roleAccessMapper
-     * @param bool             $moderationEnabled
+     * @param User              $user
+     * @param GenericCollection|ISearch[] $strategies
      */
-    public function __construct(User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $moderationEnabled)
+    public function __construct(User $user, GenericCollection $strategies)
     {
-        $this->registry = [
-            $campusSql = new Strategy\Campus(),
-            $folderSql = new Strategy\Folder($user, $folderMapper, $roleAccessMapper, $moderationEnabled),
-            $houseSql = new Strategy\House(),
-        ];
-
-        /* Staff-only search capability
-         */
-        if ($user->getRole()->isStaff()) {
-            $this->registry = array_merge($this->registry, [
-                $yearSql = new Strategy\Year(),
-                $roleSql = new Strategy\Role(),
-                $userSql = new Strategy\User(),
-                $pastoralGroupSql = new Strategy\PastoralGroup(),
-            ]);
+        foreach($strategies as $strategy){
+            if($strategy->canBeTargetedByUser($user)){
+                $this->registry[$strategy->getEntityType()] = $strategy;
+            }
         }
     }
 
@@ -63,6 +48,6 @@ class SearchRegistry implements ISearch
         }
 
         // We can UNION ALL and avoid de-duplication logic as each sub-query has a distinct entity type
-        return implode(' UNION ALL ', $pieces);
+        return \implode(' UNION ALL ', $pieces);
     }
 }

@@ -1,7 +1,5 @@
 <?php
 /**
- * Folder
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,17 +7,20 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience\Model;
-use Schoolbox\Comms\News\Audience\Segment\ISearch;
-use Schoolbox\Comms\News\Audience\Segment\ITranslate;
 use Schoolbox\Comms\News\Audience\Segment\ValidRestrictedSearch;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Comms\News\Audience;
 use Schoolbox\User;
 
-class Folder implements ISearch, ITranslate
+/**
+ * @TODO due to disparate dependencies, this should probably be a composite of classes each capable of a subset of interface methods.
+ * @see https://github.com/alaress/schoolbox/pull/16840#discussion-diff-210142468
+ */
+class Folder extends Base
 {
+    public const ENTITY_TYPE = 'folder';
 
     /**
      * @var User
@@ -56,6 +57,15 @@ class Folder implements ISearch, ITranslate
         $this->folderMapper      = $folderMapper;
         $this->roleAccessMapper  = $roleAccessMapper;
         $this->moderationEnabled = $moderationEnabled;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canBeTargetedByUser(User $user): bool
+    {
+        return true;
     }
 
 
@@ -128,7 +138,6 @@ class Folder implements ISearch, ITranslate
             $folderMembershipSql = ' AND folder.id IN (' . implode(', ', $folderMembership) . ')';
         }
 
-        $entityType    = Model::ENTITY_TYPE_FOLDER;
         $keywordFilter = null === $searchPlaceholder ? '' : "AND (folder.name LIKE :{$searchPlaceholder} OR folder_code.code LIKE :{$searchPlaceholder})";
 
         return "
@@ -139,7 +148,7 @@ class Folder implements ISearch, ITranslate
                     THEN CONCAT(' (', GROUP_CONCAT(folder_code.code SEPARATOR ', '), ')')
                     ELSE ''
                     END) AS `name`,
-                '{$entityType}' AS entity_type
+                '{$this->getEntityType()}' AS entity_type
             FROM folder
             LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
             WHERE (
@@ -157,14 +166,12 @@ class Folder implements ISearch, ITranslate
 
 
     /**
-     * Translate this ITranslate instance from an entity_type to a human-readable version
-     *
-     * @return string
+     * @inheritdoc
      */
-    public function getTranslateSql(): string
+    public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
         return "
-            SELECT cna1.*, f.name 
+            SELECT cna1.entity_type, cna1.entity_value, f.name
             FROM 
             (SELECT folder.id,
                 CONCAT(name,  
@@ -178,11 +185,29 @@ class Folder implements ISearch, ITranslate
             WHERE folder.id IN 
                 (SELECT DISTINCT entity_value
                 FROM comms_news_audience cna2
-                WHERE entity_type = '".Model::ENTITY_TYPE_FOLDER."'
-                AND cna2.comms_news_article_id = :articleId)
+                WHERE entity_type = '{$this->getEntityType()}'
+                AND cna2.id IN ($segmentIdsPlaceholder))
             AND folder.deleted_at IS NULL
             GROUP BY folder.id) AS f 
-            INNER JOIN comms_news_audience cna1 ON cna1.entity_value = f.id AND entity_type = '".Model::ENTITY_TYPE_FOLDER."'
+            INNER JOIN comms_news_audience cna1 ON cna1.entity_value = f.id AND entity_type = '{$this->getEntityType()}'
         ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canTargetNullEntityValue(): bool
+    {
+        // Quite possible for a user to not have any folders
+        return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getValidRelationshipModifiers(User $user): array
+    {
+        return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }
 }

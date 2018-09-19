@@ -19,6 +19,8 @@ use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\News\Topic;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
+use Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 class Lists
 {
@@ -151,7 +153,7 @@ class Lists
          * This limits you to the articles you can see in a given topic, for a specified homepage
          */
         if ($params->getFolderId()) {
-            $homepageArticleIds = $this->articleResolver->findArticlesForAudience(Audience\Model::ENTITY_TYPE_FOLDER, $params->getFolderId(), Audience\Model::RELATIONSHIP_SELF);
+            $homepageArticleIds = $this->articleResolver->findArticlesForAudience(Strategy\Folder::ENTITY_TYPE, $params->getFolderId(), Audience\Model::RELATIONSHIP_SELF);
 
             $articleIdsForUser = array_intersect($articleIdsForUser, $homepageArticleIds);
         }

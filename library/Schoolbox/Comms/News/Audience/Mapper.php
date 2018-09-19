@@ -17,6 +17,8 @@ use PDO;
 
 /**
  * @method Model createModel($idValue = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method GenericCollection|Model[] createCollection($contents = [])
  * @method GenericCollection|Model[] findByPredicates(Builder $pb, array $options = [])
  */
 class Mapper extends \Schoolbox\Mapper
@@ -121,5 +123,55 @@ class Mapper extends \Schoolbox\Mapper
     public function findForArticle(int $articleId, array $options = []): GenericCollection
     {
         return $this->findByColumn(self::FIELD_COMMS_NEWS_ARTICLE_ID, $articleId, $options);
+    }
+
+
+    /**
+     * Deletes a segment and its children using leaf-first strategy
+     *
+     * Returns whether any records were deleted.
+     *
+     * @param Model $segment
+     * @return bool
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function deleteSegment(Model $segment): bool
+    {
+        $deletedChildren = false;
+        foreach ($segment->getChildren() as $child) {
+            if ($this->deleteSegment($child)) {
+                $deletedChildren = true;
+            }
+        }
+        $deleted = $this->delete($segment);
+        return $deletedChildren || $deleted;
+    }
+
+    /**
+     * Saves a segment and its children using root-first strategy
+     *
+     * Returns whether any records were deleted.
+     *
+     * @param Model $segment
+     * @return bool|int[]
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function saveSegment(Model $segment)
+    {
+        $affectedIds = [];
+        $id = $this->save($segment);
+        if(false === $id){
+            return false;
+        }
+        $affectedIds[] = $id;
+
+        foreach ($segment->getChildren() as $child) {
+            $child->setParent($segment);
+            $childId = $this->saveSegment($child);
+            if(false === $childId){
+                $affectedIds[] = $childId;
+            }
+        }
+        return $affectedIds;
     }
 }

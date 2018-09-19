@@ -13,24 +13,36 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 class Model
 {
     // A composite audience segment is composed of the intersection of 2 or more simple segments
     public const ENTITY_TYPE_COMPOSITE      = 'composite';          // Values = [NULL]
 
-    // Simple audience segments
-    public const ENTITY_TYPE_USER           = 'user';               // Values = [1,2,...]
-    public const ENTITY_TYPE_SUPER          = 'super';              // Values = [1]
-    public const ENTITY_TYPE_CAMPUS         = 'campus';             // Values = [1,2,...]
-    public const ENTITY_TYPE_ROLE           = 'role';               // Values = [1,2,...]
-    public const ENTITY_TYPE_ROLE_TYPE      = 'role_type';          // Values = []
-    public const ENTITY_TYPE_SCHOOL_HOUSE   = 'school_house';       // Values = [NULL,1,2,...]
-    public const ENTITY_TYPE_RES_HOUSE      = 'res_house';          // Values = [NULL,1,2,...]
-    public const ENTITY_TYPE_YEAR           = 'year';               // Values = [NULL,1,2,...]
-    public const ENTITY_TYPE_SERVICE        = 'service';            // Values = ['1.43.3','2.3.*',...]
-    public const ENTITY_TYPE_PASTORAL_GROUP = 'pastoral_group';     // Values = [NULL,1,2,...]
-    public const ENTITY_TYPE_FOLDER         = 'folder';             // Values = [NULL,1,2,...]
+    // Simple audience segments - TODO deprecated. Use the IStrategy::getEntityType() interface instead.
+    /** @deprecated */
+    public const ENTITY_TYPE_USER           = Strategy\User::ENTITY_TYPE;               // Values = [1,2,...]
+    /** @deprecated */
+    public const ENTITY_TYPE_SUPER          = Strategy\Super::ENTITY_TYPE;              // Values = [1]
+    /** @deprecated */
+    public const ENTITY_TYPE_CAMPUS         = Strategy\Campus::ENTITY_TYPE;             // Values = [1,2,...]
+    /** @deprecated */
+    public const ENTITY_TYPE_ROLE           = Strategy\Role::ENTITY_TYPE;               // Values = [1,2,...]
+    /** @deprecated */
+    public const ENTITY_TYPE_ROLE_TYPE      = Strategy\RoleType::ENTITY_TYPE;           // Values = []
+    /** @deprecated */
+    public const ENTITY_TYPE_SCHOOL_HOUSE   = Strategy\SchoolHouse::ENTITY_TYPE;        // Values = [NULL,1,2,...]
+    /** @deprecated */
+    public const ENTITY_TYPE_RES_HOUSE      = Strategy\ResHouse::ENTITY_TYPE;           // Values = [NULL,1,2,...]
+    /** @deprecated */
+    public const ENTITY_TYPE_YEAR           = Strategy\Year::ENTITY_TYPE;               // Values = [NULL,1,2,...]
+    /** @deprecated */
+    public const ENTITY_TYPE_SERVICE        = Strategy\Service::ENTITY_TYPE;            // Values = ['1.43.3','2.3.*',...]
+    /** @deprecated */
+    public const ENTITY_TYPE_PASTORAL_GROUP = Strategy\PastoralGroup::ENTITY_TYPE;      // Values = [NULL,1,2,...]
+    /** @deprecated */
+    public const ENTITY_TYPE_FOLDER         = Strategy\Folder::ENTITY_TYPE;             // Values = [NULL,1,2,...]
 
     // Any audience modifier?
     public const RELATIONSHIP_SELF        = 'self';                 // eg, Audience = the user 15
@@ -41,42 +53,7 @@ class Model
     public const ENTITY_VALUE_SUPER       = '1';
 
 
-
-
-    /**
-     * Returns the set of all known entity types
-     *
-     * @return string[]
-     */
-    public static function getEntityTypes(): array
-    {
-        $entityTypes = self::getSimpleEntityTypes();
-        \array_unshift($entityTypes, self::ENTITY_TYPE_COMPOSITE);
-        return $entityTypes;
-    }
-
-
-    /**
-     * Returns the set of all simple entity types
-     *
-     * @return string[]
-     */
-    public static function getSimpleEntityTypes(): array
-    {
-        return [
-            self::ENTITY_TYPE_USER,
-            self::ENTITY_TYPE_SUPER,
-            self::ENTITY_TYPE_CAMPUS,
-            self::ENTITY_TYPE_ROLE,
-            self::ENTITY_TYPE_ROLE_TYPE,
-            self::ENTITY_TYPE_SCHOOL_HOUSE,
-            self::ENTITY_TYPE_RES_HOUSE,
-            self::ENTITY_TYPE_YEAR,
-            self::ENTITY_TYPE_SERVICE,
-            self::ENTITY_TYPE_PASTORAL_GROUP,
-            self::ENTITY_TYPE_FOLDER,
-        ];
-    }
+    public const DEPTH_SEGMENT_TREE_MAX   = 1;
 
 
     /**
@@ -113,11 +90,10 @@ class Model
     /** @var GenericCollection|self[] */
     private $children;
 
-    /**
-     * @throws \UnexpectedValueException
-     */
+
     public function __construct()
     {
+        /** @noinspection PhpUnhandledExceptionInspection (impossible as we're not adding items) */
         $this->children = new GenericCollection(self::class);
     }
 
@@ -135,6 +111,70 @@ class Model
         }
         return self::ENTITY_TYPE_COMPOSITE === $this->entityType;
     }
+
+
+    /**
+     * Returns whether this is a simple segment
+     *
+     * @return bool
+     * @throws InsufficientHydrationException
+     */
+    public function isSimple(): bool
+    {
+        return !$this->isComposite();
+    }
+
+
+    /**
+     * Returns whether this segment is logically equivalent to another segment.
+     *
+     * Ignores ID and child permutations
+     *
+     * @param Model $other
+     * @return bool
+     * @throws InsufficientHydrationException
+     */
+    public function equals(Model $other): bool
+    {
+        if ($this->isSimple() !== $other->isSimple()) {
+            return false;
+        }
+
+
+        if ($this->getEntityType() !== $other->getEntityType() ||
+            $this->getEntityValue() !== $other->getEntityValue() ||
+            $this->getRelationship() !== $other->getRelationship()) {
+            return false;
+        }
+
+        // Simple case
+        if ($this->isSimple()) {
+            // If we passed the above test, that's sufficient
+            return true;
+        }
+
+        // Composite case. Need to check children are the same combination (but not permutation)
+        if ($this->children->count() !== $other->children->count()) {
+            return false;
+        }
+
+        // Ensure each child is found in the other composite
+        foreach ($this->children as $thisChild) {
+            $otherChildMatchFound = false;
+            foreach ($other->children as $otherChild) {
+                if ($thisChild->equals($otherChild)) {
+                    $otherChildMatchFound = true;
+                    break;
+                }
+            }
+            if (!$otherChildMatchFound) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Getters/Setters
 
 
     /**
