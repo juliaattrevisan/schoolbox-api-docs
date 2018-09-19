@@ -173,4 +173,8 @@ class MarkedGrid extends TestCase
     {
         $this->assertSame($expected['humanReadableMark'], $grid->retrieveHumanReadableMark());
     }
+
+    // TODO test iterateCapabilityUsages
+    // TODO test retrieveCapabilityMark
+    // TODO test retrieveIndicatorMark
 }
