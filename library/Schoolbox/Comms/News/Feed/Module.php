@@ -114,21 +114,14 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'newsMapper' => $this->getMapperFactory()->getLazy(News\Mapper::class),
-            'policyMapper' => $this->getMapperFactory()->getLazy(News\Policy\Mapper::class),
-            'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class),
-            'saveForLaterMapper' => $this->getMapperFactory()->getLazy(News\SaveForLater\Mapper::class),
-
-            /* Hyperdrive injection
-             */
-            'databaseInternal' => $injector->lazy(function () {
-                return $this->getInjector()->get('databaseInternal');
-            }),
-            'folderMapper' => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
-            'userAccessMapper' => $this->getMapperFactory()->getLazy(Access\UserAccessMapper::class),
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'externalUser' => $injector->lazyGet('externalUser'),
-            'externalClass' => $injector->lazyGet('externalClass'),
+            'newsMapper'                 => $this->getMapperFactory()->getLazy(News\Mapper::class),
+            'policyMapper'               => $this->getMapperFactory()->getLazy(News\Policy\Mapper::class),
+            'topicMapper'                => $this->getMapperFactory()->getLazy(TopicMapper::class),
+            'saveForLaterMapper'         => $this->getMapperFactory()->getLazy(News\SaveForLater\Mapper::class),
+            'statisticsMapper'           => $this->getMapperFactory()->getLazy(News\Statistics\Mapper::class),
+            'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(News\Statistics\Cumulative\Mapper::class),
+            'databaseInternal'           => $injector->lazyGet('databaseInternal'),
+            'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
         ];
     }
 

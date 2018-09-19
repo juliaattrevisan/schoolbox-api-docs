@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use Alaress\Database;
+use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
@@ -18,7 +19,6 @@ use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use PDO;
 use Alaress\Database\Predicate;
-use External_User;
 use InvalidArgumentException;
 
 /**
@@ -42,7 +42,7 @@ class ArticleResolver implements IArticleResolver
     /** @var RelationshipFilterer */
     private $relationshipFilter;
 
-    /** @var External_User */
+    /** @var External_UserInterface */
     private $externalUser;
 
 
@@ -51,7 +51,7 @@ class ArticleResolver implements IArticleResolver
      * @param Database\Connector\IConnector $db
      * @param UserAccessMapper              $userAccessMapper
      * @param Folder\Mapper                 $folderMapper
-     * @param External_User                 $externalUser
+     * @param External_UserInterface        $externalUser
      * @param RelationshipFilterer          $relationshipFilter
      */
     public function __construct(
@@ -59,7 +59,7 @@ class ArticleResolver implements IArticleResolver
         Database\Connector\IConnector $db,
         UserAccessMapper $userAccessMapper,
         Folder\Mapper $folderMapper,
-        External_User $externalUser,
+        External_UserInterface $externalUser,
         RelationshipFilterer $relationshipFilter
     ) {
         $this->businessRules      = $businessRules;

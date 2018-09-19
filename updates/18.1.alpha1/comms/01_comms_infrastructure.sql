@@ -80,11 +80,6 @@ FOREIGN KEY (`topic_id`) REFERENCES `newsTopic` (`newsTopicID`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- Error messages
-INSERT INTO `error` (id, message)
-VALUES (221, 'You cannot edit articles that are already accepted.');
-
-INSERT INTO `error` (id, message)
-VALUES (222, 'You cannot delete this article.');
 
 INSERT INTO `error` (id, message)
 VALUES (223, 'This article is missing required details that you need to add, but we saved it anyway.');

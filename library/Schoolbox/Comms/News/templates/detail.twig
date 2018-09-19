@@ -44,6 +44,67 @@
             </ul>
         </div>
     </div>
+
+
+    {# Modify article #}
+    {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {article: article, articleId: article.id}) %}
+
+    {# Delete article #}
+    {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {article: article, articleId: article.id}) %}
+
+    {% if deleteRoute %}
+        <script>
+            $(function() {
+                $('#header-options').on('click', 'a[data-delete]', function(event) {
+                    event.preventDefault();
+
+                    var $element = $(this);
+                    var $toast = $('#toast');
+                    var title = $element.attr('data-delete');
+
+                    $element.confirmDialog({
+                        text: 'Are you sure you want to delete ' + title + '?',
+                        confirmEvent: function() {
+                            $toast.toastActivate({
+                                text: 'Deleting ' + title
+                            });
+
+                            $.ajax({
+                                type: 'POST',
+                                url: $element.attr('href'),
+                                data: {articleId: {{ article.id }}},
+                                dataType: 'json'
+                            }).success(function (response) {
+                                $toast.toastTimeout({
+                                    text: title + ' was deleted',
+                                    css: 'success'
+                                });
+
+                                window.location.href = response.redirect;
+                            }).error(function (response) {
+                                var temp = $.parseJSON(response.responseText);
+
+                                $toast.toastTimeout({
+                                    text: 'Error: ' + temp.message,
+                                    css: 'alert'
+                                });
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
+    {% endif %}
+
+    {# Unpublish article (just a reject renamed to unpublish when the article is published or archived) #}
+    {% if isRejectable and isUnpublishable %}
+        {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
+    {% endif %}
+
+    {# Statistics link: must be author or comms officer and article must be published #}
+    {% set statisticsRoute = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {article: article, articleId: article.id}) %}
+
+    {% set hasDropDownRoutes = modifyRoute or deleteRoute or rejectRoute or statisticsRoute %}
     <nav>
         {# Save For Later #}
         <script src="/javascript/shared/comms/saveforlater.js"></script>
@@ -60,79 +121,31 @@
             } only %}
         </span>
 
-        <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+        {% if hasDropDownRoutes %}
+            <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+        {% endif %}
     </nav>
+
+    {% if hasDropDownRoutes %}
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
 
-        {# Modify article #}
-        {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {articleId: article.id}) %}
-        {% if modifyRoute and isEditable %}
+        {% if modifyRoute %}
             <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
         {% endif %}
 
-        {# Delete article #}
-        {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {articleId: article.id}) %}
-
-        {% if deleteRoute and isDeletable %}
-            <script>
-                $(function() {
-                    $('#header-options').on('click', 'a[data-delete]', function(event) {
-                        event.preventDefault();
-
-                        var $element = $(this);
-                        var $toast = $('#toast');
-                        var title = $element.attr('data-delete');
-
-                        $element.confirmDialog({
-                            text: 'Are you sure you want to delete ' + title + '?',
-                            confirmEvent: function() {
-                                $toast.toastActivate({
-                                    text: 'Deleting ' + title
-                                });
-
-                                $.ajax({
-                                    type: 'POST',
-                                    url: $element.attr('href'),
-                                    data: {articleId: {{ article.id }}},
-                                    dataType: 'json'
-                                }).success(function (response) {
-                                    $toast.toastTimeout({
-                                        text: title + ' was deleted',
-                                        css: 'success'
-                                    });
-
-                                    window.location.href = response.redirect;
-                                }).error(function (response) {
-                                    var temp = $.parseJSON(response.responseText);
-
-                                    $toast.toastTimeout({
-                                        text: 'Error: ' + temp.message,
-                                        css: 'alert'
-                                    });
-                                });
-                            }
-                        });
-                    });
-                });
-            </script>
+        {% if deleteRoute %}
             <li><a class="icon-delete" href="{{ deleteRoute }}" data-delete="{{ article.title }}">Delete</a></li>
         {% endif %}
 
-        {# Unpublish article (just a reject renamed to unpublish when the article is published or archived) #}
-        {% if isRejectable and isUnpublishable %}
-            {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {articleId: article.id}) %}
-            {% if rejectRoute %}
-                <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
-            {% endif %}
+        {% if rejectRoute %}
+            <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
         {% endif %}
 
-        {# Statistics link: must be author or comms officer and article must be published #}
-        {% set statisticsRoute = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {articleId: article.id}) %}
-        {% if isAuthor or isCommsOfficer %}
+        {% if statisticsRoute %}
             <li><a class="icon-progress" href="{{ statisticsRoute }}">Statistics</a></li>
         {% endif %}
-
     </ul>
+    {% endif %}
 </div>
 
 
@@ -143,7 +156,7 @@
 {% if isAuthor or isCommsOfficer %}
 {% include '@commsNews/workflow.twig' with {
     article: article,
-    moderationRequired: moderationRequired
+    moderationEnabled: moderationEnabled
 } %}
 {% endif %}
 
@@ -232,7 +245,7 @@
          # Only available before the article has been accepted
          #}
         {% if not article.isAccepted %}
-            {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {articleId: article.id}) %}
+            {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {article: article, articleId: article.id}) %}
 
             {% if modifyRoute %}
                 <li><a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article">Modify</a></li>
@@ -263,7 +276,7 @@
         {% if isCommsOfficer %}
             {% if isRejectable and not isUnpublishable %}
                 {# Reject this news article #}
-                {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {articleId: article.id}) %}
+                {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
 
                 {% if rejectRoute %}
                     <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>

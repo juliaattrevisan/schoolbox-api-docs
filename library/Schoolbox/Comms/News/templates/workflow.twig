@@ -6,7 +6,7 @@
  # i.e. publishAt hasn't been reached yet
  #
  # @param News\Model article
- # @param bool moderationRequired
+ # @param bool moderationEnabled Can users audience articles to segments where the user only has READ perm
  # @param string identifier The current node in the workflow to highlight
  #}
 
@@ -19,7 +19,7 @@
 {% if article.id %}
     {% set identifier = 'preview' %}
 
-    {% if moderationRequired %}
+    {% if moderationEnabled %}
         {% if article.isSubmitted %}
             {% set identifier = 'awaiting-moderation' %}
 
@@ -64,9 +64,9 @@
 {% if article.id %}
     {% if isCommsOfficer %}
         {% set composeUrl = routeLookup('commsNews.getUpdate', {articleId: article.id}) %}
-    {% elseif moderationRequired and not article.isAccepted %}
+    {% elseif moderationEnabled and not article.isAccepted %}
         {% set composeUrl = routeLookup('commsNews.getUpdate', {articleId: article.id}) %}
-    {% elseif not moderationRequired %}
+    {% elseif not moderationEnabled %}
         {% set composeUrl = routeLookup('commsNews.getUpdate', {articleId: article.id}) %}
     {% endif %}
 {% endif %}
@@ -90,7 +90,7 @@
     {% set previewUrl = null %}
 {% endif %}
 
-{% if moderationRequired %}
+{% if moderationEnabled %}
     {% set previewAlt = 'Preview your article and submit it for moderation' %}
 {% else %}
     {% set previewAlt = 'Preview your article and submit it for publishing' %}
@@ -108,7 +108,7 @@
 {# Awaiting Moderation
  # Varies depending on the moderation policy
  #}
-{% if moderationRequired %}
+{% if moderationEnabled %}
     {% if article.isAccepted %}
         {% set alt = 'This article was accepted on ' ~ article.acceptedAt.local  %}
     {% elseif article.isSubmittedAt %}
@@ -156,7 +156,7 @@
 {% if article.id %}
     {% set alt = alt ~ ' on ' ~ article.publishAt.local %}
 
-    {% if moderationRequired and article.isAccepted and article.acceptedAt.isPast %}
+    {% if moderationEnabled and article.isAccepted and article.acceptedAt.isPast %}
         {% if article.publishAt.isPast %}
             {% set alt = 'This article publishes on ' ~ article.publishAt.local  %}
         {% endif %}

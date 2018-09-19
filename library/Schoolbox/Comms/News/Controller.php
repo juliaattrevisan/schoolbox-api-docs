@@ -14,14 +14,10 @@ use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
 use Alaress\Web\Output\Html;
 use Aura\Router\Exception\RouteNotFound;
-use External_Class;
-use External_User;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Comms\News\Audience\BusinessRules;
-use Schoolbox\Comms\News\Audience\RelationshipFilterer;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
@@ -31,7 +27,6 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -83,29 +78,14 @@ class Controller extends Base
     private $databaseInternal;
 
     /**
-     * @var Folder\Mapper
+     * @var Mapper
      */
     private $folderMapper;
-
-    /**
-     * @var Access\UserAccessMapper
-     */
-    private $userAccessMapper;
 
     /**
      * @var UserMapper
      */
     private $userMapper;
-
-    /**
-     * @var External_User
-     */
-    private $externalUser;
-
-    /**
-     * @var External_Class
-     */
-    private $externalClass;
 
     /**
      * @var Audience\Mapper
@@ -117,25 +97,33 @@ class Controller extends Base
      */
     private $roleAccessMapper;
 
+    /**
+     * @var Audience\ArticleResolver
+     */
+    private $articleResolver;
+
+    /**
+     * @var Audience\UserResolver
+     */
+    private $userResolver;
+
 
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper             $errorMapper
-     * @param Mapper                  $newsMapper
-     * @param Policy\Mapper           $policyMapper
-     * @param TopicMapper             $topicMapper
-     * @param SaveForLater\Mapper     $saveForLaterMapper
-     * @param Statistics\Mapper       $statisticsMapper
+     * @param ErrorMapper                  $errorMapper
+     * @param Mapper                       $newsMapper
+     * @param Policy\Mapper                $policyMapper
+     * @param TopicMapper                  $topicMapper
+     * @param SaveForLater\Mapper          $saveForLaterMapper
+     * @param Statistics\Mapper            $statisticsMapper
      * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
-     * @param IConnector              $databaseInternal
-     * @param Folder\Mapper           $folderMapper
-     * @param Access\UserAccessMapper $userAccessMapper
-     * @param UserMapper              $userMapper
-     * @param External_User           $externalUser
-     * @param External_Class          $externalClass
-     * @param Audience\Mapper         $audienceMapper
-     * @param RoleAccessMapper        $roleAccessMapper
+     * @param Audience\Mapper              $audienceMapper
+     * @param RoleAccessMapper             $roleAccessMapper
+     * @param Folder\Mapper                $folderMapper
+     * @param IConnector                   $databaseInternal
+     * @param Audience\ArticleResolver     $articleResolver
+     * @param Audience\UserResolver        $userResolver
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -145,14 +133,12 @@ class Controller extends Base
         SaveForLater\Mapper $saveForLaterMapper,
         Statistics\Mapper $statisticsMapper,
         Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
-        IConnector $databaseInternal,
-        Folder\Mapper $folderMapper,
-        Access\UserAccessMapper $userAccessMapper,
-        UserMapper $userMapper,
-        External_User $externalUser,
-        External_Class $externalClass,
         Audience\Mapper $audienceMapper,
-        RoleAccessMapper $roleAccessMapper
+        RoleAccessMapper $roleAccessMapper,
+        Folder\Mapper $folderMapper,
+        IConnector $databaseInternal,
+        Audience\ArticleResolver $articleResolver,
+        Audience\UserResolver $userResolver
     ) {
         $this->errorMapper = $errorMapper;
         $this->newsMapper = $newsMapper;
@@ -163,15 +149,13 @@ class Controller extends Base
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
         $this->audienceMapper = $audienceMapper;
         $this->roleAccessMapper = $roleAccessMapper;
+        $this->folderMapper = $folderMapper;
+        $this->databaseInternal = $databaseInternal;
 
         /* Hyperdrive injection
          */
-        $this->databaseInternal = $databaseInternal;
-        $this->folderMapper = $folderMapper;
-        $this->userAccessMapper = $userAccessMapper;
-        $this->userMapper = $userMapper;
-        $this->externalUser = $externalUser;
-        $this->externalClass = $externalClass;
+        $this->articleResolver = $articleResolver;
+        $this->userResolver = $userResolver;
     }
 
 
@@ -272,12 +256,6 @@ class Controller extends Base
 
         $moderationRequired = $policies->getOffset('global_moderation')->getValue();
 
-        /* Only comms officers can edit articles that have been accepted for publishing
-         */
-        if (!(new ValidUserCanEdit())->isSatisfiedBy($this->getUser(), $moderationRequired, $article)) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_COMMS_NEWS_ALREADY_ACCEPTED);
-        }
-
         /* Feature image
          */
         $zone = (new Zone('featureImage'))
@@ -306,7 +284,6 @@ class Controller extends Base
             'article' => $article,
             'featureImageZone' => $zone->getTwigContext(),
             'audience' => $audiencingHtml,
-            'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
             'relationshipParentsOf' => Audience\Segment\Codec::AUDIENCE_SEPARATOR . Audience\Model::RELATIONSHIP_PARENTS_OF,
             'relationshipTeachersOf' => Audience\Segment\Codec::AUDIENCE_SEPARATOR . Audience\Model::RELATIONSHIP_TEACHERS_OF
         ])->setTitle("Update {$article->getTitle()}"));
@@ -460,17 +437,15 @@ class Controller extends Base
      * @param Model $article
      * @throws MapperException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      * @throws \PDOException
-     * @throws InvalidArgumentException
      */
-    public function getDetail(Model $article)
+    public function getDetail(Model $article): void
     {
         $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
-        $moderationRequired = $policies->getOffset('global_moderation')->getValue();
+        $moderationEnabled = (bool)$policies->getOffset('global_moderation')->getValue();
 
         /* Figure out if this was Saved For Later for the current user
          */
@@ -534,17 +509,15 @@ class Controller extends Base
 
         } else {
             $data = [
-                'policies' => $policies,
-                'article' => $article,
-                'moderationRequired' => $moderationRequired,
-                'isSavedForLater' => $isSavedForLater,
-                'isCommsOfficer' => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
-                'isAuthor' => (new ValidUserIsAuthor())->isSatisfiedBy($this->getUser(), $article),
-                'isEditable' => (new ValidUserCanEdit())->isSatisfiedBy($this->getUser(), $moderationRequired, $article),
-                'isAcceptable' => (new Moderation\ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $article),
-                'isRejectable' => (new Moderation\ValidUserCanReject())->isSatisfiedBy($this->getUser(), $article),
-                'isUnpublishable' => (new Moderation\ValidUserCanUnpublish())->isSatisfiedBy($this->getUser(), $article),
-                'isDeletable' => (new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $moderationRequired, $article)
+                'policies'           => $policies,
+                'article'            => $article,
+                'moderationEnabled'  => $moderationEnabled,
+                'isSavedForLater'    => $isSavedForLater,
+                'isCommsOfficer'     => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
+                'isAuthor'           => (new ValidUserIsAuthor())->isSatisfiedBy($this->getUser(), $article),
+                'isAcceptable'       => (new Moderation\ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $article),
+                'isRejectable'       => (new Moderation\ValidUserCanReject())->isSatisfiedBy($this->getUser(), $article),
+                'isUnpublishable'    => (new Moderation\ValidUserCanUnpublish())->isSatisfiedBy($this->getUser(), $article),
             ];
         }
 
@@ -576,54 +549,34 @@ class Controller extends Base
     public function postDelete(Model $article)
     {
         try {
-            $policies = $this->policyMapper->findAll()->indexBy('identifier');
-
-            $moderationRequired = $policies->getOffset('global_moderation')->getValue();
-
             /* Try to delete this article
              *
              * Moderators can delete any article, but authors can only delete articles
              * that haven't been witnessed by the world. Such articles have to be unaccepted
              * and unpublished
              */
-            if ((new ValidUserCanDelete())->isSatisfiedBy($this->getUser(), $moderationRequired, $article)) {
-                $this->newsMapper->delete($article);
 
-                /* If you're a moderator, go back to the Moderation list
-                 *
-                 * TODO: Otherwise go...somewhere else? I don't have a component or dashboard yet
-                 */
-                $nextStep = '/';
+            $this->newsMapper->delete($article);
 
-                if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
-                    $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
-                }
-
-                if ($this->getRequest()->isXhr()) {
-                    $this->getResponse()->content->set($this->buildJsonOutput([
-                        'success' => true,
-                        'redirect' => $nextStep
-                    ]));
-                } else {
-                    $this->getResponse()->redirect->to($nextStep);
-                }
-
-                return;
-            }
-
-            /* Couldn't delete this article; maybe you weren't allowed
+            /* If you're a moderator, go back to the Moderation list
+             *
+             * TODO: Otherwise go...somewhere else? I don't have a component or dashboard yet
              */
-            if ($this->getRequest()->isXhr()) {
-                $this->getResponse()->status->set(400);
-                $this->getResponse()->content->set($this->buildJsonOutput([
-                    'success' => false,
-                    'message' => "You don't have permission to delete this article."
-                ]));
+            $nextStep = '/';
 
-                return;
+            if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
+                $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
             }
 
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_COMMS_NEWS_CANNOT_DELETE);
+            if ($this->getRequest()->isXhr()) {
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'success' => true,
+                    'redirect' => $nextStep
+                ]));
+            } else {
+                $this->getResponse()->redirect->to($nextStep);
+            }
+
         } catch (MapperException|RouteNotFound|\Alaress\Database\Predicate\InvalidColumnException|\PDOException|DefinitionException|\UnexpectedValueException|Exception $e) {
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->status->set(400);
@@ -717,6 +670,9 @@ class Controller extends Base
      */
     public function getArchive(int $year = null, int $month = null)
     {
+
+        /* These referrers should be used, even when they're not explicitly provided in the url
+         */
         $params = new Querystring($this->getRequest()->query);
         $params->setReferrer(Statistics\Mapper::REFERRER_ARCHIVE);
 
@@ -777,8 +733,12 @@ class Controller extends Base
      */
     public function getIndex()
     {
+
+        /* These referrers should be used, even when they're not explicitly provided in the url
+         */
         $params = new Querystring($this->getRequest()->query);
         $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
+
         $topics = $this->topicMapper->findAll();
         $lists = new Moderation\Lists($this->newsMapper);
 
@@ -949,11 +909,7 @@ class Controller extends Base
             $this->statisticsMapper,
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
-            $this->folderMapper,
-            $this->userAccessMapper,
-            $this->userMapper,
-            $this->externalUser,
-            $this->externalClass
+            $this->articleResolver
         ))->findForTopic(
             $urlPrefix,
             $params,
@@ -988,20 +944,7 @@ class Controller extends Base
      */
     public function getRecipients(Model $article)
     {
-        $userIds = (new Audience\UserResolver(
-            new BusinessRules(),
-            $this->databaseInternal,
-            $this->externalClass,
-            new RelationshipFilterer(
-                $this->databaseInternal,
-                $this->userMapper,
-                $this->externalUser,
-                $this->folderMapper,
-                $this->externalClass,
-                $this->userAccessMapper
-            ),
-            $this->audienceMapper
-        ))->findUsersForArticle($article->getId());
+        $userIds = $this->userResolver->findUsersForArticle($article->getId());
 
         if (\count($userIds)) {
             $users = $this->userMapper->findByColumn('id', $userIds)->sortBy('lastname', 'asc');

@@ -35,7 +35,7 @@
     <div class="small-12 island">
 
         {% if article.id %}
-            {% set formAction = routeLookupIfAuthorized('commsNews.postUpdate', {articleId: article.id}) %}
+            {% set formAction = routeLookupIfAuthorized('commsNews.postUpdate', {article: article, articleId: article.id}) %}
         {% else %}
             {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
         {% endif %}

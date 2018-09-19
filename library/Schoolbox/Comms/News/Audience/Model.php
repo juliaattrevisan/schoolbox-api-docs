@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\Audience;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 class Model
@@ -118,6 +119,21 @@ class Model
     public function __construct()
     {
         $this->children = new GenericCollection(self::class);
+    }
+
+
+    /**
+     * Returns whether this is a composite segment
+     *
+     * @return bool
+     * @throws InsufficientHydrationException
+     */
+    public function isComposite(): bool
+    {
+        if (null === $this->entityType) {
+            throw new InsufficientHydrationException('Cannot determine if simple/composite if not hydrated');
+        }
+        return self::ENTITY_TYPE_COMPOSITE === $this->entityType;
     }
 
 

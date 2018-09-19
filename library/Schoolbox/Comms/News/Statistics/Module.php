@@ -1,7 +1,5 @@
 <?php
 /**
- * Module
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -16,8 +14,10 @@ use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
-use Schoolbox\Comms\News\Authorizer\Rule\IsAuthorOrModerator;
+use Schoolbox\Comms\News\Authorizer;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
 {
@@ -31,14 +31,17 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-
         /* Only comms officers and authors can view statistics and obtain their data
-         * Supers, Comms Officers, Article Authors
+         * Supers, Comms Officers, Article Moderators
          */
         $modifyPerms = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
-                new IsAuthorOrModerator($this->getNewsMapper())
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
+                    new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper())
+                )
             );
         });
 
@@ -55,27 +58,6 @@ class Module extends BaseModule
         $this->register('GET', '/{articleId}', 'getOverview', $modifyPerms, $preloadArticle);
     }
 
-
-    /**
-     * Preload an article instance
-     *
-     * @param array $params
-     * @return array
-     * @throws InvalidArgumentException
-     * @throws NotFound
-     */
-    private function preloadArticle(array $params): array
-    {
-        try {
-            $article = $this->getNewsMapper()->findById($params['articleId']);
-        } catch (MapperException $e) {
-            throw new NotFound();
-        }
-
-        return [
-            'article' => $article,
-        ];
-    }
 
     /**
      * @inheritdoc
@@ -112,12 +94,58 @@ class Module extends BaseModule
         ];
     }
 
+
+    /**
+     * Preload an article instance
+     *
+     * @param array $params
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws NotFound
+     */
+    private function preloadArticle(array $params): array
+    {
+        if (\array_key_exists('article', $params)) {
+            $article = $params['article'];
+        } else {
+            try {
+                $article = $this->getArticleMapper()->findById($params['articleId']);
+            } catch (MapperException $e) {
+                throw new NotFound();
+            }
+        }
+
+        return [
+            'article' => $article,
+        ];
+    }
+
+
     /**
      * @return \Schoolbox\Mapper|News\Mapper
      * @throws InvalidArgumentException
      */
-    protected function getNewsMapper(): News\Mapper
+    private function getArticleMapper(): News\Mapper
     {
         return $this->getMapperFactory()->get(News\Mapper::class);
+    }
+
+
+    /**
+     * @return \Schoolbox\Mapper|UserAccessMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    private function getUserAccessMapper(): UserAccessMapper
+    {
+        return $this->getMapperFactory()->get(UserAccessMapper::class);
+    }
+
+    /**
+     * @return \Schoolbox\Mapper|Folder\Mapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    private function getFolderMapper(): Folder\Mapper
+    {
+        return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
 }

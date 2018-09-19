@@ -10,35 +10,22 @@
 namespace Schoolbox\Comms\News\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Comms\News\Audience\MockUserResolver;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\ValidArticle;
-use Schoolbox\Comms\News\ValidBroadcast;
 use Schoolbox\Comms\News\ValidDateOffset;
-
+use Schoolbox\User;
 
 class ValidationTest extends TestCase
 {
-
-    /**
-     * @dataProvider provider_validBroadcastRequirements
-     * @param Model $article
-     * @param bool  $expected
-     */
-    public function testValidBroadcastRequirements(Model $article, bool $expected)
-    {
-        $validation = new ValidBroadcast();
-
-        $this->assertEquals($expected, $validation->isSatisfiedBy($article));
-    }
-
     /**
      * Data provider for testValidModerationRequirements
      *
      * @return array
      */
     public function provider_validBroadcastRequirements(): array {
-        $user = (new \Schoolbox\User())->setId(19);
+        $user = (new User())->setId(19);
         $date = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 14);
         $publishAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 15);
         $expiresAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 16);
@@ -120,7 +107,7 @@ class ValidationTest extends TestCase
      * @param Model $article
      * @param int   $expected
      */
-    public function testValidArticle(Model $article, $expected)
+    public function testValidArticle(Model $article, $expected): void
     {
         $validation = new ValidArticle();
 
@@ -181,7 +168,7 @@ class ValidationTest extends TestCase
      * @param Model $article
      * @param int   $expected
      */
-    public function testValidArticleDates(Model $article, $expected)
+    public function testValidArticleDates(Model $article, $expected): void
     {
         $validation = new ValidArticle();
 
@@ -230,7 +217,7 @@ class ValidationTest extends TestCase
      * @param Policy\Model $policy
      * @param int   $expected
      */
-    public function testValidDateOffset(Policy\Model $policy, $expected)
+    public function testValidDateOffset(Policy\Model $policy, $expected): void
     {
         $validation = new ValidDateOffset();
 
@@ -288,6 +275,140 @@ class ValidationTest extends TestCase
                 (new Policy\Model())->setValue('@#(O$%&U@(*$U(@JKO$HJO@#H$(*@#YU( 9284 2894 y9284 y928y97&$(!@&$'),
                 false
             ],
+        ];
+    }
+
+
+    /**
+     * Data provider for testValidAccessibility
+     *
+     * @return array
+     */
+    public function provider_validAccessibility(): array
+    {
+        $userResolver = new MockUserResolver();
+
+        $user3 = (new User())->setId(3);
+        $user12345 = (new User())->setId(12345);
+
+        /* Published, but not expired, article
+         *
+         * Submitted is set
+         * Accepted date is set
+         * Publish date in the past
+         * Expiry date in the future
+         * User is in audience
+         */
+        $articleValid1 = (new Model())
+            ->setSubmittedAt(\Alaress_Date_Format::now()->addDays(-10))
+            ->setAcceptedAt(\Alaress_Date_Format::now())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(-1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        /* Published and expired article
+         *
+         * Submitted is set
+         * Accepted date is set
+         * Publish date in the past
+         * Expiry date in the past
+         * User is in audience
+         */
+        $articleValid2 = (new Model())
+            ->setSubmittedAt(\Alaress_Date_Format::now()->addDays(-10))
+            ->setAcceptedAt(\Alaress_Date_Format::now())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(-1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        /* Submitted is NOT set
+         * Accepted date is set
+         * Publish date in the past
+         * Expiry date in the future
+         * User is in audience
+         */
+        $article1 = (new Model())
+            ->setAcceptedAt(\Alaress_Date_Format::now())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(-1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        /* Submitted is NOT set
+         * Accepted date is NOT set
+         * Publish date in the past
+         * Expiry date in the future
+         * User is in audience
+         */
+        $article2 = (new Model())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(-1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        /* Submitted is set
+         * Accepted date is set
+         * Publish date in the future
+         * Expiry date in the future
+         * User is in audience
+         */
+        $article3 = (new Model())
+            ->setSubmittedAt(\Alaress_Date_Format::now()->addDays(-10))
+            ->setAcceptedAt(\Alaress_Date_Format::now())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        /* Published, but not expired, article
+         *
+         * Submitted is set
+         * Accepted date is set
+         * Publish date in the past
+         * Expiry date in the future
+         * User is NOT in audience
+         */
+        $article4 = (new Model())
+            ->setSubmittedAt(\Alaress_Date_Format::now()->addDays(-10))
+            ->setAcceptedAt(\Alaress_Date_Format::now())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(-1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        /* Published and expired article
+         *
+         * Submitted is set
+         * Accepted date is set
+         * Publish date in the past
+         * Expiry date in the past
+         * User is NOT in audience
+         */
+        $article5 = (new Model())
+            ->setSubmittedAt(\Alaress_Date_Format::now()->addDays(-10))
+            ->setAcceptedAt(\Alaress_Date_Format::now())
+            ->setPublishAt(\Alaress_Date_Format::now()->addDays(-1))
+            ->setExpiresAt(\Alaress_Date_Format::now()->addDays(2));
+
+        return [
+            'Valid 1' => [
+                $user3, $articleValid1, $userResolver::ARTICLE_AUDIENCES[2],
+                true
+            ],
+            'Valid 2' => [
+                $user3, $articleValid2, $userResolver::ARTICLE_AUDIENCES[2],
+                true
+            ],
+            'Invalid 1' => [
+                $user3, $article1, $userResolver::ARTICLE_AUDIENCES[2],
+                false
+            ],
+            'Invalid 2' => [
+                $user3, $article2, $userResolver::ARTICLE_AUDIENCES[2],
+                false
+            ],
+            'Invalid 3' => [
+                $user3, $article3, $userResolver::ARTICLE_AUDIENCES[2],
+                false
+            ],
+            'Invalid 4' => [
+                $user12345, $article4, $userResolver::ARTICLE_AUDIENCES[2],
+                false
+            ],
+            'Invalid 5' => [
+                $user12345, $article5, $userResolver::ARTICLE_AUDIENCES[2],
+                false
+            ]
         ];
     }
 }

@@ -25,9 +25,12 @@ use Alaress\Web\Output;
 use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Locale_Config;
 use Aura\Di;
+use External_ClassInterface;
+use External_UserInterface;
 use GuzzleHttp;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News;
 use Schoolbox\External\Connector\CompositeSync;
 use Schoolbox\External\Connector\CustomSync;
 use Schoolbox\External\Connector\ICommunityPortal;
@@ -96,7 +99,7 @@ use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\Renderer as LearningRenderer;
 use Schoolbox\LTI\Provider\Mapper as LTIProviderMapper;
 use Schoolbox\Notif\StorefileLogger as NotifStorefileLogger;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Sync\Grammar\Factory as SyncGrammarFactory;
 use Schoolbox\Sync\Log\Mapper as SyncLogMapper;
@@ -328,6 +331,73 @@ abstract class AbstractBootstrap implements BootstrapInterface
             $sitepage->setDi($di);
             return $sitepage;
         }));
+
+
+        $di->set(
+            'commsNewsArticleResolver',
+            $di->lazy(
+                function() use ($di) {
+                    /**
+                     * @var IConnector              $db
+                     * @var External_UserInterface  $externalUser
+                     * @var External_ClassInterface $externalClass
+                     */
+                    $db              = $di->get('databaseInternal');
+                    $externalUser    = $di->get('externalUser');
+                    $externalClass   = $di->get('externalClass');
+                    $articleResolver = new News\Audience\ArticleResolver(
+                        new News\Audience\BusinessRules(),
+                        $db,
+                        $di->get('mapperFactory')->get(UserAccessMapper::class),
+                        $di->get('mapperFactory')->get(Folder\Mapper::class),
+                        $externalUser,
+                        new News\Audience\RelationshipFilterer(
+                            $db,
+                            $di->get('mapperFactory')->get(UserMapper::class),
+                            $externalUser,
+                            $di->get('mapperFactory')->get(Folder\Mapper::class),
+                            $externalClass,
+                            $di->get('mapperFactory')->get(UserAccessMapper::class)
+                        )
+                    );
+
+                    return $articleResolver;
+                }
+            )
+        );
+
+        $di->set(
+            'commsNewsUserResolver',
+            $di->lazy(
+                function() use ($di) {
+                    /**
+                     * @var IConnector              $db
+                     * @var External_UserInterface  $externalUser
+                     * @var External_ClassInterface $externalClass
+                     */
+                    $db              = $di->get('databaseInternal');
+                    $externalUser    = $di->get('externalUser');
+                    $externalClass   = $di->get('externalClass');
+                    $userResolver = new News\Audience\UserResolver(
+                        new News\Audience\BusinessRules(),
+                        $db,
+                        $externalClass,
+                        new News\Audience\RelationshipFilterer(
+                            $db,
+                            $di->get('mapperFactory')->get(UserMapper::class),
+                            $externalUser,
+                            $di->get('mapperFactory')->get(Folder\Mapper::class),
+                            $externalClass,
+                            $di->get('mapperFactory')->get(UserAccessMapper::class)
+                        ),
+                        $di->get('mapperFactory')->get(News\Audience\Mapper::class)
+                    );
+
+                    return $userResolver;
+                }
+            )
+        );
+
 
         // Web output class - currently uses Sitepage
         $di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
@@ -798,7 +868,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
         );
 
         $di->params[LearningAssessmentTransactor::class] = [
-            'folderMapper'                  => $di->get('mapperFactory')->getLazy(FolderMapper::class),
+            'folderMapper'                  => $di->get('mapperFactory')->getLazy(Folder\Mapper::class),
             'unitImplementationMapperProxy' => $di->lazyGet('unitImplementationDataSource'),
             'unitSpecificationMapperProxy'  => $di->lazyGet('unitSpecificationDataSource'),
             'assessmentMapperProxy'         => $di->lazyGet('assessmentDataSource'),
@@ -883,7 +953,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
             'userMapper'        => $mapperFactory->getLazy(UserMapper::class),
             'roleMapper'        => $mapperFactory->getLazy(\Schoolbox\RoleMapper::class),
             'userAccessMapper'  => $mapperFactory->getLazy(UserAccessMapper::class),
-            'categoryMapper'    => $mapperFactory->getLazy(\Schoolbox\Resource\Folder\Mapper::class)
+            'categoryMapper'    => $mapperFactory->getLazy(Folder\Mapper::class)
         ];
 
         $di->params[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
