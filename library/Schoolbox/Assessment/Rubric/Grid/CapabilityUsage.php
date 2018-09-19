@@ -115,6 +115,25 @@ class CapabilityUsage
 
 
     /**
+     * Calculates the mark multiplier for this capability usage.
+     *
+     * This is the multiplier by which marks for this capability are scaled in
+     * order to determine their contribution to an overall mark.
+     *
+     * @example if the max value for this capability is 12, and the max value
+     *          of this capability's indicators is 24, then the capability mark
+     *          is multiplied by 0.5 to determine its overall contribution.
+     *
+     * @return float
+     */
+    public function calculateMarkMultiplier(): float
+    {
+        $maxIndicatorValue = $this->calculateMaxValueFromIndicators();
+        return $maxIndicatorValue ? $this->maxValue / $maxIndicatorValue : 0;
+    }
+
+
+    /**
      * @return Capability
      */
     public function getCapability(): Capability
