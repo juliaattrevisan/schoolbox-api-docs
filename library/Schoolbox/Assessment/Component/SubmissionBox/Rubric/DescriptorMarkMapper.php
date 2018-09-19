@@ -108,8 +108,12 @@ class DescriptorMarkMapper extends Mapper
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
 
             $descriptorId = $r[$descriptorKey];
-            if(!$descriptors->offsetExists($descriptorId)){
-                $descriptors->setOffset($descriptorId, $this->hydrateJoin($r, 'descriptor', 'd'));
+            if (!$descriptors->offsetExists($descriptorId)) {
+                // Descriptor can be null?
+                $descriptor = $this->hydrateJoin($r, 'descriptor', 'd');
+                if ($descriptor) {
+                    $descriptors->setOffset($descriptorId, $descriptor);
+                }
             }
             /** @var Descriptor $descriptor */
             $descriptor = $descriptors->getOffset($descriptorId);
