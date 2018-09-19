@@ -27,14 +27,16 @@ use Alaress_Date_Format;
 class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 {
     // The discrete, atomic states this article may be in.
-    // It is quite valid for composite states to be composed of 2+ more atomic states. eg isAccepted = [AWAITING_PUBLICATION|PUBLISHED|EXPIRED]
-    // Although explicit usage of the atomics is probably clearer.
     private const STATE_DRAFT                = 1;
     private const STATE_AWAITING_MODERATION  = 2;
     private const STATE_AWAITING_PUBLICATION = 3;
     private const STATE_REJECTED             = 4;
     private const STATE_PUBLISHED            = 5;
     private const STATE_EXPIRED              = 6;
+
+    // Composite states
+    private const STATE_APPROVED =  [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
+    private const STATE_SUBMITTED = [self::STATE_AWAITING_MODERATION, self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
 
     // Authoritative declaration of *possible* transitions.
     // *Permitted* (ie for some user) transitions are always a subset of these.
@@ -243,8 +245,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
      */
     public function isApproved(Alaress_Date_Format $now = null): bool
     {
-        $acceptedStates = [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
-        return \in_array($this->getDiscreteState($now), $acceptedStates, true);
+        return \in_array($this->getDiscreteState($now), self::STATE_APPROVED, true);
     }
 
 
@@ -256,8 +257,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
      */
     public function isSubmitted(Alaress_Date_Format $now = null): bool
     {
-        $submittedStates = [self::STATE_AWAITING_MODERATION, self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
-        return \in_array($this->getDiscreteState($now), $submittedStates, true);
+        return \in_array($this->getDiscreteState($now), self::STATE_SUBMITTED, true);
     }
 
 
