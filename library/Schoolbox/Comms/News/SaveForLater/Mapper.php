@@ -1,7 +1,5 @@
 <?php
 /**
- * Mapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,8 +7,7 @@
 
 namespace Schoolbox\Comms\News\SaveForLater;
 
-use Alaress\Database\Predicate\InvalidColumnException;
-use Schoolbox\Collection;
+use InvalidArgumentException;
 use Schoolbox\Comms\News;
 use Schoolbox\UserMapper;
 
@@ -26,8 +23,10 @@ class Mapper extends \Schoolbox\Mapper
     public const SAVED = 1;
     public const UNSAVED = 0;
 
+
     /**
      * @inheritdoc
+     * @throws InvalidArgumentException
      */
     protected function mapping(): void
     {
