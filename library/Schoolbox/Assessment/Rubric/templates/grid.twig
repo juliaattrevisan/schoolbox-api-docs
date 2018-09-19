@@ -57,7 +57,7 @@
                     {% if descriptor %}
 
                         {# Self-Assessment #}
-                        {#{% set learnerSelected      = learnerRubric.descriptors[crit.id][levelIndex].selected %}#}
+                        {% set learnerSelected      = learnerRubric.descriptors[crit.id][levelIndex].selected %}
 
                         {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
                         {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
@@ -81,11 +81,11 @@
                                 {% endif %}
 
                             {# Self-Assessment #}
-                            {#{% if learnerSelected %}#}
-                                {#<img class="rb-self-reflection-choice"#}
-                                     {#src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"#}
-                                     {#title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />#}
-                            {#{% endif %}#}
+                            {% if learnerSelected %}
+                                <img class="rb-self-reflection-choice"
+                                     src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
+                                     title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
+                            {% endif %}
                             </div>
                         </td>
 
@@ -104,9 +104,9 @@
                     {{ capabilityMark.retrieveHumanReadableMark }}
 
                     {# Self-Assessment #}
-                    {#{% if learnerRubric %}#}
-                        {#({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ locale.selfAssessment.singularForm }})#}
-                    {#{% endif %}#}
+                    {% if learnerRubric %}
+                        ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ locale.selfAssessment.singularForm }})
+                    {% endif %}
                 </th>
             </tr>
         {% endif %}
@@ -120,9 +120,9 @@
                 {{ rubricMarkedGrid.retrieveHumanReadableMark }}
 
                 {# Self-Assessment #}
-                {#{% if learnerRubric %}#}
-                    {#({{ learnerRubric.humanReadableMark }} given in {{ locale.selfAssessment.singularForm }})#}
-                {#{% endif %}#}
+                {% if learnerRubric %}
+                    ({{ learnerRubric.humanReadableMark }} given in {{ locale.selfAssessment.singularForm }})
+                {% endif %}
             </th>
         </tr>
     {% endif %}

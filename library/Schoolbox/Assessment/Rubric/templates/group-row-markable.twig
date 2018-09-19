@@ -99,15 +99,15 @@
         </span>
 
         {# Self-Assessment #}
-        {#{% if learnerRubric %}#}
-        {#{% if latestSelfReflectedFeedback.isSelfGrading %}#}
-        {#{% set selfReflectionName = locale.selfAssessment.proper %}#}
-        {#{% else %}#}
-        {#{% set selfReflectionName = locale.selfReflection.proper %}#}
-        {#{% endif %}#}
+        {% if learnerRubric %}
+            {% if latestSelfReflectedFeedback.isSelfGrading %}
+                {% set selfReflectionName = locale.selfAssessment.proper %}
+            {% else %}
+                {% set selfReflectionName = locale.selfReflection.proper %}
+            {% endif %}
 
-        {#({{ learnerRubric.groups[capabilityId].humanReadableMark }} given in {{ selfReflectionName }})#}
-        {#{% endif %}#}
+            ({{ learnerRubric.groups[capabilityId].humanReadableMark }} given in {{ selfReflectionName }})
+        {% endif %}
     </th>
 </tr>
 

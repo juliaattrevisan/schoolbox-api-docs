@@ -77,7 +77,7 @@
                             {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
 
                             {# Self-Assessment #}
-                            {#{% set learnerSelected = learnerRubric.descriptors[indicatorId][levelIndex].selected %}#}
+                            {% set learnerSelected = learnerRubric.descriptors[indicatorId][levelIndex].selected %}
                             <td>
                                 {% include '@rubric/descriptor-markable.twig' %}
                             </td>
@@ -115,15 +115,15 @@
                 </span>
 
                 {# Self-Assessment #}
-                {#{% if learnerRubric %}#}
-                    {#{% if latestSelfReflectedFeedback.isSelfGrading %}#}
-                        {#{% set selfReflectionName = locale.selfAssessment.proper %}#}
-                    {#{% else %}#}
-                        {#{% set selfReflectionName = locale.selfReflection.proper %}#}
-                    {#{% endif %}#}
+                {% if learnerRubric %}
+                    {% if latestSelfReflectedFeedback.isSelfGrading %}
+                        {% set selfReflectionName = locale.selfAssessment.proper %}
+                    {% else %}
+                        {% set selfReflectionName = locale.selfReflection.proper %}
+                    {% endif %}
 
-                    {#({{ learnerRubric.humanReadableMark }} given in {{ selfReflectionName }})#}
-                {#{% endif %}#}
+                    ({{ learnerRubric.humanReadableMark }} given in {{ selfReflectionName }})
+                {% endif %}
             </th>
         </tr>
     {% endif %}
