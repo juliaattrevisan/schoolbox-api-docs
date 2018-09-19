@@ -46,6 +46,6 @@ class ValidUserCanAccept
          *
          * Allow moderators to accept the remainder of articles that previously expected moderation acceptance
          */
-        return $isCommsOfficer && $article->isSubmitted() && !$article->isAccepted();
+        return $isCommsOfficer && $article->isSubmitted() && !$article->isApproved();
     }
 }

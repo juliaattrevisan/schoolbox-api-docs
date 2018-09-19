@@ -23,7 +23,7 @@ class IsNotYetAccepted extends ArticleAttribute
     {
         $article = $this->findArticleInParams($params);
 
-        if ($article->isAccepted()) {
+        if ($article->isApproved()) {
             throw new Unauthorized("Article {$article->getId()} is already accepted");
         }
     }
