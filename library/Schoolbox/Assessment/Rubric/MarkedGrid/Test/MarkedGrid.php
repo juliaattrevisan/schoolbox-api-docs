@@ -29,6 +29,8 @@ class MarkedGrid extends TestCase
      */
     public function getTestRetrieveMarkData(): iterable
     {
+        // TODO consider generator for this data set
+
         // Build the row set
         $folder = new FolderModel();
         $rowSet = new Rowset\RowSet($folder);
