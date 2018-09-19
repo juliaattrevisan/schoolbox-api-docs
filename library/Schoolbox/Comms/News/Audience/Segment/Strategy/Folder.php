@@ -14,6 +14,10 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\User;
 
+/**
+ * @TODO due to disparate dependencies, this should probably be a composite of classes each capable of a subset of interface methods.
+ * @see https://github.com/alaress/schoolbox/pull/16840#discussion-diff-210142468
+ */
 class Folder extends Base
 {
     public const ENTITY_TYPE = 'folder';
