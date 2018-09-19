@@ -180,20 +180,28 @@ class Controller extends Base
         /* Rubrics data
         */
         $rubricMapper = RubricMapper::getInstance();
-        $rubricContext = new RubricContext($rubricMapper);
-
+//        $rubricContext = new RubricContext($rubricMapper);
+//
+//        if ($assessment->getUseRubric()) {
+//            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
+//        }
+//
+//        $rubricMapper = RubricMapper::getInstance();
         if ($assessment->getUseRubric()) {
-            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
+            $assessment->setRubricGrid($rubricMapper->retrieveGrid($assessment, false));
+            if ($latestFeedback instanceof Feedback) {
+                $latestFeedback->setRubricMarkedGrid($rubricMapper->retrieveMarkedGrid($latestFeedback));
+            }
         }
 
-        // Load self-reflection; if there is one, override the standard grid
-        $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $response, $rubricContext))->generate();
-        if (isset($selfReflectionData['learnerRubricContext'])) {
-            $data['rubricContext'] = $selfReflectionData['learnerRubricContext'];
-        } else {
-            $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
-            $data = array_merge($data, $rubricData);
-        }
+//        // Load self-reflection; if there is one, override the standard grid
+//        $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $response, $rubricContext))->generate();
+//        if (isset($selfReflectionData['learnerRubricContext'])) {
+//            $data['rubricContext'] = $selfReflectionData['learnerRubricContext'];
+//        } else {
+//            $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
+//            $data = array_merge($data, $rubricData);
+//        }
 
         $data['selfReflect'] = false;
         $data['selfAssess'] = false;
@@ -313,25 +321,12 @@ class Controller extends Base
         /* Rubrics data
         */
         $rubricMapper = RubricMapper::getInstance();
-//        $rubricContext = new RubricContext($rubricMapper);
-
         if ($assessment->getUseRubric()) {
             $assessment->setRubricGrid($rubricMapper->retrieveGrid($assessment, false));
-//            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
-
             if ($feedback instanceof Feedback) {
                 $feedback->setRubricMarkedGrid($rubricMapper->retrieveMarkedGrid($feedback));
             }
         }
-
-//        $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
-//
-//        $data = array_merge($data, $rubricData);
-//
-//        /* Augment with self-reflection rubric data
-//         */
-//        $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $response, $rubricContext))->generate();
-//        $data = array_merge($data, $selfReflectionData);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
     }
