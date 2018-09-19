@@ -28,15 +28,20 @@ class Controller extends Base
      */
     private $policyMapper;
 
+    /** @var News\Validation\Factory */
+    private $validSpecFactory;
+
 
     /**
-     * @param News\Mapper   $newsMapper
-     * @param Policy\Mapper $policyMapper
+     * @param News\Mapper             $newsMapper
+     * @param Policy\Mapper           $policyMapper
+     * @param News\Validation\Factory $validSpecFactory
      */
-    public function __construct(News\Mapper $newsMapper, Policy\Mapper $policyMapper)
+    public function __construct(News\Mapper $newsMapper, Policy\Mapper $policyMapper, News\Validation\Factory $validSpecFactory)
     {
-        $this->newsMapper = $newsMapper;
-        $this->policyMapper = $policyMapper;
+        $this->newsMapper       = $newsMapper;
+        $this->policyMapper     = $policyMapper;
+        $this->validSpecFactory = $validSpecFactory;
     }
 
 
@@ -107,6 +112,18 @@ class Controller extends Base
      */
     public function postSubmit(Model $article): void
     {
+        $spec        = $this->validSpecFactory->buildSpecCanBeSubmitted($this->getUser());
+        $unsatisfied = $spec->remainderUnsatisfiedBy($article);
+
+        if($unsatisfied){
+            $this->getResponse()->status->set(400);
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'success' => false,
+                'message' => "Article appears to be invalid"
+            ]));
+            return;
+        }
+
         // If someone else got in first, we don't care. No risk of data loss.
         if (!$article->isSubmitted()) {
             $article->submit();
