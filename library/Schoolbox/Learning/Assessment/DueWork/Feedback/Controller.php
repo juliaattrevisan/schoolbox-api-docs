@@ -197,21 +197,39 @@ class Controller extends Base
             return false;
         }
 
-        // Did we just give some rubric marks?
-        if (\is_array($post['rubric'])) {
-            // First arg needs to default to array
-            $this->rubricMapper->saveForFeedback(
-                $post['rubric']['descriptors'] ?? [],
-                $post['rubric']['groups'] ?? [],
-                $feedback->getAssessable()->getMarkScheme(),
-                $feedback->getId()
+        // Presumably $feedback has been saved already?
+        $markedGrid = (new \Schoolbox\Assessment\Rubric\MarkedGrid\Factory())
+            ->buildFromPostData(
+                $this->rubricMapper->retrieveMarkedGrid($feedback),
+                $post['rubric']
             );
-            return true;
-        } else if (array_key_exists('saveEmpty', $post) && $post['saveEmpty']) {
-            $this->rubricMapper->saveForFeedback([], [], $feedback->getId());
-            return true;
-        }
-        return false;
+
+        // TODO figure out how/if to deal with saveEmpty vs. mark from quickmark
+        $this->rubricMapper->persistMarkedGrid($markedGrid);
+        return true;
+
+//        // Did we just give some rubric marks?
+//        if (\is_array($post['rubric'])) {
+//            // First arg needs to default to array
+//            $this->rubricMapper->saveForFeedback(
+//                $post['rubric']['descriptors'] ?? [],
+//                $post['rubric']['groups'] ?? [],
+//                $feedback->getAssessable()->getMarkScheme(),
+//                $feedback->getId()
+//            );
+//            return true;
+//        }
+//        if (array_key_exists('saveEmpty', $post) && $post['saveEmpty']) {
+//            // I must still save the empty rubric
+//            $this->rubricMapper->saveForFeedback(
+//                [],
+//                [],
+//                $feedback->getAssessable()->getMarkScheme(),
+//                $feedback->getId()
+//            );
+//            return true;
+//        }
+//        return false;
     }
 
 
