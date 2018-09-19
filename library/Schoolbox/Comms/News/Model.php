@@ -36,6 +36,20 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     private const STATE_PUBLISHED            = 5;
     private const STATE_EXPIRED              = 6;
 
+    // Authoritative declaration of *possible* transitions.
+    // *Permitted* (ie for some user) transitions are always a subset of these.
+    // The latter concept is the domain of route auth rules.
+    // Action=Submit
+    private const VALID_STATES_TO_SUBMIT    = [self::STATE_DRAFT, self::STATE_REJECTED];
+    // Action=UnSubmit
+    private const VALID_STATES_TO_UN_SUBMIT = [self:: STATE_AWAITING_MODERATION, self:: STATE_AWAITING_PUBLICATION, self:: STATE_PUBLISHED, self:: STATE_EXPIRED];
+    // Action=Approve
+    private const VALID_STATES_TO_APPROVE   = [self::STATE_DRAFT, self::STATE_AWAITING_MODERATION, self::STATE_REJECTED];
+    // Action=Reject
+    private const VALID_STATES_TO_REJECT    = [self::STATE_AWAITING_MODERATION, self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
+    // Action=Archive
+    private const VALID_STATES_TO_ARCHIVE   = [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED];
+
     use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
@@ -324,6 +338,66 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
 
     /**
+     * Returns whether this article can be submitted
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return bool
+     */
+    public function canBeSubmitted(Alaress_Date_Format $now = null): bool
+    {
+        return \in_array($this->getDiscreteState($now), self::VALID_STATES_TO_SUBMIT, true);
+    }
+
+
+    /**
+     * Returns whether this article can be un-submitted
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return bool
+     */
+    public function canBeUnSubmitted(Alaress_Date_Format $now = null): bool
+    {
+        return \in_array($this->getDiscreteState($now), self::VALID_STATES_TO_UN_SUBMIT, true);
+    }
+
+
+    /**
+     * Returns whether this article can be approved
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return bool
+     */
+    public function canBeApproved(Alaress_Date_Format $now = null): bool
+    {
+        return \in_array($this->getDiscreteState($now), self::VALID_STATES_TO_APPROVE, true);
+    }
+
+
+    /**
+     * Returns whether this article can be rejected
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return bool
+     */
+    public function canBeRejected(Alaress_Date_Format $now = null): bool
+    {
+        return \in_array($this->getDiscreteState($now), self::VALID_STATES_TO_REJECT, true);
+    }
+
+
+    /**
+     * Returns whether this article can be archived
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return bool
+     */
+    public function canBeArchived(Alaress_Date_Format $now = null): bool
+    {
+        return \in_array($this->getDiscreteState($now), self::VALID_STATES_TO_ARCHIVE, true);
+    }
+
+
+    /**
      * Transitions an article to the 'Awaiting Moderation' state
      *
      * @param Alaress_Date_Format|null $now
@@ -335,17 +409,18 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         $currentState = $this->getDiscreteState($now);
 
         // Already submitted. No risk to caller of data loss
-        if(self::STATE_AWAITING_MODERATION === $currentState){
+        if (self::STATE_AWAITING_MODERATION === $currentState) {
             throw new InvalidTransitionException($currentState, "Article was already submitted at {$this->submittedAt}");
         }
 
         // Invalid operation
-        if(!\in_array($currentState, [self::STATE_DRAFT, self::STATE_REJECTED], true)){
+        if (!\in_array($currentState, self::VALID_STATES_TO_SUBMIT, true)) {
             throw new InvalidTransitionException($currentState, 'Only draft and rejected articles may be submitted');
         }
 
         $this->submittedAt = $now;
     }
+
 
     /**
      * Transitions an article to the 'Draft' state
@@ -357,11 +432,11 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         $currentState = $this->getDiscreteState();
 
         // Already submitted. No risk to caller of data loss
-        if(self::STATE_DRAFT === $currentState){
+        if (self::STATE_DRAFT === $currentState) {
             throw new InvalidTransitionException($currentState, "Article is already a draft");
         }
 
-        if(self::STATE_REJECTED === $currentState){
+        if (!\in_array($currentState, self::VALID_STATES_TO_UN_SUBMIT, true)) {
             throw new InvalidTransitionException($currentState, "Cannot un-submit a rejected article");
         }
 
@@ -369,8 +444,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         $this->submittedAt = null;
 
         // Clear approval details - so it will need to be re-approved if re-submitted
-        $this->acceptedAt  = null;
-        $this->acceptedBy  = null;
+        $this->acceptedAt = null;
+        $this->acceptedBy = null;
     }
 
 
@@ -392,7 +467,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         }
 
         // Ensure it is submitted
-        if(!$this->isSubmitted()){
+        if (!\in_array($currentState, self::VALID_STATES_TO_APPROVE, true)) {
             $this->submit($now);
         }
 
@@ -421,19 +496,19 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         $currentState = $this->getDiscreteState($now);
 
         // Already rejected.
-        if(self::STATE_REJECTED === $currentState){
+        if (self::STATE_REJECTED === $currentState) {
             throw new InvalidTransitionException($currentState, "Article was already rejected by {$this->rejectedBy->getFullName()} at {$this->rejectedAt->getLocalShort()}");
         }
 
         // Invalid operation
-        if(self::STATE_DRAFT === $currentState){
+        if (!\in_array($currentState, self::VALID_STATES_TO_REJECT, true)) {
             throw new InvalidTransitionException($currentState, "An article in draft state cannot be rejected");
         }
 
         // Treat article as never being submitted or approved.
-        $this->submittedAt    = null;
-        $this->acceptedAt     = null;
-        $this->acceptedBy     = null;
+        $this->submittedAt = null;
+        $this->acceptedAt  = null;
+        $this->acceptedBy  = null;
 
         // Set rejection details
         $this->rejectedBy     = $effector;
@@ -460,7 +535,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         }
 
         // Ensure transition is valid
-        if (!\in_array($currentState, [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED], true)) {
+        if (!\in_array($currentState, self::VALID_STATES_TO_ARCHIVE, true)) {
             throw new InvalidTransitionException($currentState, "Only articles awaiting publication, or published, may be archived");
         }
 
