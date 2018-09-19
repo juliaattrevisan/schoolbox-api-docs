@@ -84,7 +84,8 @@ class CapabilityMark
      */
     public function retrieveNormalizedMark(): float
     {
-        return $this->getValue() / $this->getCapabilityUsage()->getMaxValue() * 100;
+        // Remember, $this->value isn't scaled
+        return $this->value / $this->getCapabilityUsage()->calculateMaxValueFromIndicators() * 100;
     }
 
 
