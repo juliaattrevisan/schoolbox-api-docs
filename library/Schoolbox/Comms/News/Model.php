@@ -553,9 +553,9 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
     /**
      * @param Alaress_Date_Format|null $now
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getStatusDate(Alaress_Date_Format $now = null): Alaress_Date_Format
+    public function getStatusDate(Alaress_Date_Format $now = null): ?Alaress_Date_Format
     {
         switch ($this->getDiscreteState($now)) {
             case self::STATE_PUBLISHED:
