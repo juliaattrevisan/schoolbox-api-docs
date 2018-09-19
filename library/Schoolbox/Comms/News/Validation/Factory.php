@@ -24,7 +24,7 @@ class Factory
      * @param User $effector
      * @return ISpecification
      */
-    public function buildSpecCanBeDrafted(User $effector): ISpecification
+    public function buildSpecValidAudience(User $effector): ISpecification
     {
         return new ValidAudience($effector);
     }

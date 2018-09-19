@@ -169,6 +169,9 @@ class Module extends BaseModule
             'databaseInternal'           => $injector->lazyGet('databaseInternal'),
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
             'userResolver'               => $injector->lazyGet('commsNewsUserResolver'),
+            'validSpecFactory'           => $injector->lazy(function () {
+                return new Validation\Factory();
+            }),
         ];
     }
 
