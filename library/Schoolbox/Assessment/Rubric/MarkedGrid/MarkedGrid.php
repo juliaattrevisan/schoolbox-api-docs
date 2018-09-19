@@ -14,9 +14,6 @@ use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use Schoolbox\Learning\MarkScheme\None;
-use Schoolbox\Learning\MarkScheme\Percentage;
-use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 
 /**
  * A marked rubric grid.
@@ -132,19 +129,6 @@ class MarkedGrid
     public function retrieveHumanReadableMark(): ?string
     {
         return $this->markScheme->getHumanReadableMark($this->retrieveNormalizedMark());
-
-        // None
-//        $markScheme = new None();
-//        return $markScheme->getHumanReadableMark($value);
-
-        // Total mark
-//        $markScheme = new TotalMarkFractional($maxValue);
-//        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($value));
-
-        // Percentage
-//        $markScheme = new Percentage();
-//        $percent    = min(max($value / $maxValue * 100, 0), 100);
-//        return $markScheme->getHumanReadableMark($markScheme->getNormalisedMark($percent));
     }
 
 
