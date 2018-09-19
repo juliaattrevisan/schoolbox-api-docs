@@ -798,7 +798,7 @@ class Controller extends Base
             'initialContent' => $content,
             'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
-            'slug' => $params->getSlug(),
+            'slug' => $params->getSlug() ?: 'all',
             'referrer' => $params->getReferrer(),
 
             /* For configuring the rss button which changes per topic chosen
@@ -813,14 +813,15 @@ class Controller extends Base
                     'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateDraft($this->getUser())),
                         'labelClass' => 'unsubmitted'
                 ],
+                'Awaiting Moderation' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
+                    'labelClass' => 'submitted'
+                ],
                 'Rejected' => [
                     'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
                     'labelClass' => 'submitted-late'
                 ],
-                'Awaiting Moderation' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
-                    'labelClass' => 'submitted'
-                ]
+
             ]
         ];
 
@@ -862,13 +863,13 @@ class Controller extends Base
                     'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateDraft($this->getUser())),
                     'labelClass' => 'unsubmitted'
                 ],
-                'Rejected' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
-                    'labelClass' => 'submitted-late'
-                ],
                 'Awaiting Moderation' => [
                     'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
                     'labelClass' => 'submitted'
+                ],
+                'Rejected' => [
+                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
+                    'labelClass' => 'submitted-late'
                 ]
             ]
         ]));

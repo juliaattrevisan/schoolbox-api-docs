@@ -5,20 +5,18 @@
         </div>
     </div>
     <nav>
-        {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-        {% if createRoute %}
-            <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
-        {% endif %}
+        {% block createLink %}
+            {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+            {% if createRoute %}
+                <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
+            {% endif %}
+        {% endblock %}
 
-        {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') %}
-        {% if archiveRoute %}
-            <a href="{{ archiveRoute }}" class='icon-archive' title="View archived {{ locale.news }}"></a>
-        {% endif %}
+        {% block archiveLink %}
+        {% endblock %}
 
-        {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key}) %}
-        {% if rssRoute %}
-            <a href="{{ rssRoute }}?topic={{ slug }}" class='icon-rss' title="Download RSS feed for this topic" id="rss"></a>
-        {% endif %}
+        {% block rssLink %}
+        {% endblock %}
     </nav>
 </div>
 
@@ -44,14 +42,14 @@
                     {% set authoredRoute = routeLookupIfAuthorized('commsNews.getAuthored') %}
                     {% if authoredRoute %}
                         <li {% if page == authoredRoute %}class="active"{% endif %} role="menuitem">
-                            <a href="{{ authoredRoute }}">My Authored {{ locale.news | capitalize }}</a>
+                            <a href="{{ authoredRoute }}">Created By Me</a>
                             {% if authoredCounts | length %}
                                 <ul>
                                     {% for state, data in authoredCounts %}
                                         {% if  data.count > 0 %}
                                         <li role="menuitem"><a href="{{ routeLookup('commsNews.getAuthored') }}?status={{ state }}">
                                                 {{ state }}
-                                            <span class="label {{ data.labelClass }} right">{{ data.count }}</span>
+                                            <span class="label {{ data.labelClass }} right round">{{ data.count }}</span>
                                             </a>
                                         </li>
                                         {% endif %}
@@ -67,7 +65,7 @@
                             <a href="{{ moderationRoute }}">
                                 Moderation List
                                 {% if moderationCount > 0 %}
-                                    <span class="label highlight right" title="{{ moderationCount }} item{% if moderationCount > 1 %}s{% endif %} awaiting moderation">{{ moderationCount }}</span>
+                                    <span class="label highlight right round" title="{{ moderationCount }} item{% if moderationCount > 1 %}s{% endif %} awaiting moderation">{{ moderationCount }}</span>
                                 {% endif %}
                             </a>
                         </li>
