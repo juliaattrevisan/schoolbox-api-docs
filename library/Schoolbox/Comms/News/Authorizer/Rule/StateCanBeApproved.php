@@ -11,7 +11,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\User;
 use UnexpectedValueException;
 
-class CanBeSubmitted extends ArticleAttribute
+class StateCanBeApproved extends ArticleAttribute
 {
     /**
      * @inheritdoc
@@ -20,7 +20,7 @@ class CanBeSubmitted extends ArticleAttribute
     public function authorize(array $params = [], User $user = null): void
     {
         $article = $this->findArticleInParams($params);
-        if (!$article->canBeSubmitted()) {
+        if (!$article->canBeApproved()) {
             throw new Unauthorized("Cannot submit article. Current status: {$article->getStatus()}");
         }
     }

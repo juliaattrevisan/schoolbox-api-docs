@@ -11,7 +11,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\User;
 use UnexpectedValueException;
 
-class CanBeUnSubmitted extends ArticleAttribute
+class StateCanBeUnSubmitted extends ArticleAttribute
 {
     /**
      * @inheritdoc
