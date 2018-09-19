@@ -115,6 +115,20 @@ class Grid
     }
 
 
+    public function calculateMarkMultiplier(): float
+    {
+        // How to calculate the scale factor for the entire grid?
+        // Indeed, does the grid even have a mark multiplier?
+
+        $maxIndicatorValue = 0;
+        foreach ($this->capabilityUsages as $capabilityUsage) {
+            $maxIndicatorValue += $capabilityUsage->calculateMaxValueFromIndicators();
+        }
+
+        return $maxIndicatorValue ? $this->calculateMaxValueFromCapabilities() / $maxIndicatorValue : 0;
+    }
+
+
     /**
      * Return the group usage for a given group, or null if this grid doesn't
      * use it.
