@@ -96,18 +96,18 @@ class CapabilityMark
      */
     public function retrieveHumanReadableMark(): ?string
     {
-        $value    = $this->getValue();
-        $maxValue = $this->getCapabilityUsage()->getMaxValue();
-        // TODO make this work with the assessment's mark type?
-        // It will need to be passed in though.
-
-        // As loopy as this looks, it actually works.
-        // $value is a human-readable value;
-        // it needs to be normalized, and then human-readable in the format
-        // that assessment marks are usually displayed in.
-
-        $normMark = $maxValue === 0 ? 0 : ($value / $maxValue * 100);
-        return $this->markScheme->getHumanReadableMark($normMark);
+//        $value    = $this->getValue();
+//        $maxValue = $this->getCapabilityUsage()->getMaxValue();
+//        // TODO make this work with the assessment's mark type?
+//        // It will need to be passed in though.
+//
+//        // As loopy as this looks, it actually works.
+//        // $value is a human-readable value;
+//        // it needs to be normalized, and then human-readable in the format
+//        // that assessment marks are usually displayed in.
+//
+//        $normMark = $maxValue === 0 ? 0 : ($value / $maxValue * 100);
+        return $this->markScheme->getHumanReadableMark($this->retrieveNormalizedMark());
 
         // None
 //        $markScheme = new None();
