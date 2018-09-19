@@ -321,7 +321,7 @@ class Controller extends Base
     {
         $validAudience = $this->validSpecFactory->buildSpecValidAudience($this->getUser());
 
-        if($validAudience->isSatisfiedBy($article)){
+        if(!$validAudience->isSatisfiedBy($article)){
             $this->getResponse()->status->set(400);
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => false,

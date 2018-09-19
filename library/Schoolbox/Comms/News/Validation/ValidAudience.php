@@ -42,5 +42,6 @@ class ValidAudience extends Specification\Leaf
     public function isSatisfiedBy($candidate): bool
     {
         // TODO: Implement isSatisfiedBy() method.
+        return true;
     }
 }
