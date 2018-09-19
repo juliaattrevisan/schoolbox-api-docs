@@ -393,9 +393,20 @@ class Grid extends TestCase
         );
 
 
+        // Grid 1: no capability usage
+        $grid1 = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid1->setLevels($levels);
+        yield 'No capabilities' => [$grid1, 0];
+
+
+        // Grid 2: indicator max for capabilities = capability max
+        $grid2 = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid2->setLevels($levels);
+
+
         // Build capability and indicator usage
-        $capabilityUsage1 = (new RubricGrid\CapabilityUsage($capability1))->setMaxValue(8);
-        $capabilityUsage2 = (new RubricGrid\CapabilityUsage($capability2))->setMaxValue(4);
+        $capabilityUsage1 = (new RubricGrid\CapabilityUsage($capability1))->setMaxValue(16);
+        $capabilityUsage2 = (new RubricGrid\CapabilityUsage($capability2))->setMaxValue(16);
         $indicatorUsage1  = new RubricGrid\IndicatorUsage($indicator1);
         $indicatorUsage2  = new RubricGrid\IndicatorUsage($indicator2);
         $indicatorUsage3  = new RubricGrid\IndicatorUsage($indicator3);
@@ -423,22 +434,8 @@ class Grid extends TestCase
         $capabilityUsage2->getIndicatorUsages()[$indicator3->getId()] = $indicatorUsage3;
         $capabilityUsage2->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4;
 
-
-        // Grid 1: no capability usage
-        $grid1 = new RubricGrid\Grid($dueWork, $rowSet);
-        $grid1->setLevels($levels);
-        yield 'No capabilities' => [$grid1, 0];
-
-
-        // Grid 2: indicator max for capabilities = capability max
-        $grid2 = new RubricGrid\Grid($dueWork, $rowSet);
-        $grid2->setLevels($levels);
-
-//        $capabilityUsage1 = (new RubricGrid\CapabilityUsage($capability1))->setMaxValue(16);
-//        $capabilityUsage2 = (new RubricGrid\CapabilityUsage($capability2))->setMaxValue(16);
-
-        $grid2->getCapabilityUsages()[$capability1->getId()] = $capabilityUsage1->setMaxValue(16);
-        $grid2->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2->setMaxValue(16);
+        $grid2->getCapabilityUsages()[$capability1->getId()] = $capabilityUsage1;
+        $grid2->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2;
 
         yield 'Max capability mark, indicator max = capability max' => [$grid2, 1];
 
@@ -447,12 +444,38 @@ class Grid extends TestCase
         $grid3 = new RubricGrid\Grid($dueWork, $rowSet);
         $grid3->setLevels($levels);
 
-//        unset($capabilityUsage1, $capabilityUsage2);
-//        $capabilityUsage1 = (new RubricGrid\CapabilityUsage($capability1))->setMaxValue(8);
-//        $capabilityUsage2 = (new RubricGrid\CapabilityUsage($capability2))->setMaxValue(32);
+        // Build capability and indicator usage
+        $capabilityUsage1 = (new RubricGrid\CapabilityUsage($capability1))->setMaxValue(8);
+        $capabilityUsage2 = (new RubricGrid\CapabilityUsage($capability2))->setMaxValue(32);
+        $indicatorUsage1  = new RubricGrid\IndicatorUsage($indicator1);
+        $indicatorUsage2  = new RubricGrid\IndicatorUsage($indicator2);
+        $indicatorUsage3  = new RubricGrid\IndicatorUsage($indicator3);
+        $indicatorUsage4  = new RubricGrid\IndicatorUsage($indicator4);
 
-        $grid3->getCapabilityUsages()[$capability1->getId()] = $capabilityUsage1->setMaxValue(8);;
-        $grid3->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2->setMaxValue(32);;
+        // Build descriptors, add to indicators
+        $descriptorValue = 0;
+        foreach ($levels as $levelId => $level) {
+            $descriptor = (new RubricGrid\Descriptor())
+                ->setId($levelId)
+                ->setDescription((string)$descriptorValue)
+                ->setMinValue((float)$descriptorValue)
+                ->setMaxValue((float)$descriptorValue);
+            $indicatorUsage1->getDescriptors()[$levelId] = $descriptor;
+            $indicatorUsage2->getDescriptors()[$levelId] = $descriptor;
+            $indicatorUsage3->getDescriptors()[$levelId] = $descriptor;
+            $indicatorUsage4->getDescriptors()[$levelId] = $descriptor;
+
+            $descriptorValue += 2;
+        }
+
+        $capabilityUsage1->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
+        $capabilityUsage1->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
+
+        $capabilityUsage2->getIndicatorUsages()[$indicator3->getId()] = $indicatorUsage3;
+        $capabilityUsage2->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4;
+
+        $grid3->getCapabilityUsages()[$capability1->getId()] = $capabilityUsage1;
+        $grid3->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2;
 
         yield 'Max capability mark, 1.25x indicator max = capability max' => [$grid3, 1.25];
 
@@ -461,12 +484,38 @@ class Grid extends TestCase
         $grid4 = new RubricGrid\Grid($dueWork, $rowSet);
         $grid4->setLevels($levels);
 
-//        unset($capabilityUsage1, $capabilityUsage2);
-//        $capabilityUsage1 = (new RubricGrid\CapabilityUsage($capability1))->setMaxValue(1);
-//        $capabilityUsage2 = (new RubricGrid\CapabilityUsage($capability2))->setMaxValue(3);
+        // Build capability and indicator usage
+        $capabilityUsage1 = (new RubricGrid\CapabilityUsage($capability1))->setMaxValue(1);
+        $capabilityUsage2 = (new RubricGrid\CapabilityUsage($capability2))->setMaxValue(3);
+        $indicatorUsage1  = new RubricGrid\IndicatorUsage($indicator1);
+        $indicatorUsage2  = new RubricGrid\IndicatorUsage($indicator2);
+        $indicatorUsage3  = new RubricGrid\IndicatorUsage($indicator3);
+        $indicatorUsage4  = new RubricGrid\IndicatorUsage($indicator4);
 
-        $grid4->getCapabilityUsages()[$capability1->getId()] = $capabilityUsage1->setMaxValue(1);
-        $grid4->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2->setMaxValue(3);
+        // Build descriptors, add to indicators
+        $descriptorValue = 0;
+        foreach ($levels as $levelId => $level) {
+            $descriptor = (new RubricGrid\Descriptor())
+                ->setId($levelId)
+                ->setDescription((string)$descriptorValue)
+                ->setMinValue((float)$descriptorValue)
+                ->setMaxValue((float)$descriptorValue);
+            $indicatorUsage1->getDescriptors()[$levelId] = $descriptor;
+            $indicatorUsage2->getDescriptors()[$levelId] = $descriptor;
+            $indicatorUsage3->getDescriptors()[$levelId] = $descriptor;
+            $indicatorUsage4->getDescriptors()[$levelId] = $descriptor;
+
+            $descriptorValue += 2;
+        }
+
+        $capabilityUsage1->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
+        $capabilityUsage1->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
+
+        $capabilityUsage2->getIndicatorUsages()[$indicator3->getId()] = $indicatorUsage3;
+        $capabilityUsage2->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4;
+
+        $grid4->getCapabilityUsages()[$capability1->getId()] = $capabilityUsage1;
+        $grid4->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2;
 
         yield 'Max capability mark, 0.125x indicator max = capability max' => [$grid4, 0.125];
     }
