@@ -1,7 +1,17 @@
+{#
+Data:
+    policies           Policy\Model[]
+    article            News\Model
+    moderationEnabled  bool
+    isSavedForLater    bool
+    isCommsOfficer     bool
+#}
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@commsNews/layout.twig' as layout %}
 
-{% if isUnpublishable %}
+{% set isAuthor = USER.id == article.author.id %}
+{% if article.isPublished or article.isExpired %}
     {% set rejectVerb = 'Unpublish' %}
 {% else %}
     {% set rejectVerb = 'Reject' %}
@@ -97,9 +107,7 @@
     {% endif %}
 
     {# Unpublish article (just a reject renamed to unpublish when the article is published or archived) #}
-    {% if isRejectable and isUnpublishable %}
-        {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
-    {% endif %}
+    {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
 
     {# Statistics link: must be author or comms officer and article must be published #}
     {#{% set statisticsRoute = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {article: article, articleId: article.id}) %}#}
@@ -228,46 +236,39 @@
     <div class="small-12 columns">
         <ul class="flex-list buttons" id="actionButtons">
 
-        {# Unsubmitted articles need explicit actions to be made available to the world
-         #
-         # Moderation is required: you're prompted to consciously submit for moderation
-         # Moderation isn't required: you're prompted to consciously publish to the world
-         #}
-        {% if not article.isSubmitted %}
-            {% if moderationRequired %}
-                {% set buttonText = 'Submit for moderation' %}
-            {% else %}
-                {% set buttonText = 'Submit' %}
+            {# Modify this news article #}
+            {% if modifyRoute %}
+                <li><a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article">Modify</a></li>
             {% endif %}
-            <li>
-                <form action="{{ routeLookup('commsNewsModeration.postSubmit', {articleId: article.id}) }}" method="post">
-                    <input type="submit" value="{{ buttonText }}" />
-                </form>
-            </li>
-        {% endif %}
 
-
-        {# Moderators #}
-        {% if isCommsOfficer %}
-            {% if isRejectable and not isUnpublishable %}
-                {# Reject this news article #}
-                {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
-
-                {% if rejectRoute %}
-                    <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
+            {# If you have permission to submit and implicitly approve your own articles, do that, otherwise submit for moderation #}
+            {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
+            {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
+            {% if not article.isSubmitted %}
+                {% if not approveRoute %}
+                    {% set buttonText = 'Submit for moderation' %}
+                {% else %}
+                    {% set buttonText = 'Submit' %}
                 {% endif %}
+                <li>
+                    <form action="{{ approveRoute ?: submitRoute }}" method="post">
+                        <input type="submit" value="{{ buttonText }}" />
+                    </form>
+                </li>
             {% endif %}
 
-            {# Accept this news article for publication to the world #}
-            {% if isAcceptable %}
+            {# Reject this news article #}
+            {% if rejectRoute %}
+                <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
+            {% endif %}
+
+            {% if article.isAwaitingModeration %}
             <li>
-                <form action="{{ routeLookup('commsNewsModeration.postApprove', {articleId: article.id}) }}" method="post">
+                <form action="{{ approveRoute }}" method="post">
                     <input type="submit" value="Approve" />
                 </form>
             </li>
             {% endif %}
-        {% endif %}
-
         </ul>
     </div>
 </div>
@@ -278,7 +279,7 @@
     <a class="close-reveal-modal">&#215;</a>
 </div>
 
-{% if isCommsOfficer and isRejectable %}
+{% if rejectRoute %}
 <script>
     $(function() {
         $(document).on('click', '#reject-article, #unpublish-article', function(event) {
