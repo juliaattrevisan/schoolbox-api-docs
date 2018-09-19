@@ -21,12 +21,17 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
 class CapabilityMark
 {
     /**
+     * The capability usage for which this mark is for.
+     *
      * @var CapabilityUsage
      */
     private $capabilityUsage;
 
 
     /**
+     * The scheme via which the capability is marked. This controls how the
+     * overall mark for the capability is validated and rendered.
+     *
      * TODO this belongs on the capability usage, not the capability
      *
      * @var IMarkScheme
@@ -35,12 +40,20 @@ class CapabilityMark
 
 
     /**
+     * The marks for each indicator within the capability.
+     *
      * @var GenericCollection|IndicatorMark[]
      */
     private $indicatorMarks;
 
 
     /**
+     * The value that was given for this capability.
+     *
+     * This is a raw value, and is not scaled based on the capability usage's
+     * max mark, or the mark scheme: it is instead out of the capability
+     * usage's maximum value based on its indicators.
+     *
      * @var float|null
      */
     private $value;
@@ -81,7 +94,6 @@ class CapabilityMark
      */
     public function retrieveNormalizedMark(): float
     {
-        // Remember, $this->value isn't scaled
         return $this->value / $this->getCapabilityUsage()->calculateMaxValueFromIndicators() * 100;
     }
 

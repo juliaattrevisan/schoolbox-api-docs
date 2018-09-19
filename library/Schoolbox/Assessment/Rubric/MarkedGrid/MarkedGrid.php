@@ -30,18 +30,25 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
 class MarkedGrid
 {
     /**
+     * The feedback which this marked grid is assigned to.
+     *
      * @var IFeedback
      */
     private $feedback;
 
 
     /**
+     * The grid that is used as the template for marking.
+     *
      * @var Grid
      */
     private $grid;
 
 
     /**
+     * The scheme via which the marked grid is marked. This controls how the
+     * overall mark for this grid is validated and rendered.
+     *
      * TODO this belongs on the grid, not the marked grid
      *
      * @var IMarkScheme
@@ -50,6 +57,8 @@ class MarkedGrid
 
 
     /**
+     * The marks for each capability on the grid.
+     *
      * @var GenericCollection|CapabilityMark[]
      */
     private $capabilityMarks;

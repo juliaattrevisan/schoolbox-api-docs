@@ -22,18 +22,26 @@ use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 class IndicatorMark
 {
     /**
+     * The indicator usage for which this mark is for.
+     *
      * @var IndicatorUsage
      */
     private $indicatorUsage;
 
 
     /**
+     * The descriptor that was selected for this mark.
+     *
      * @var Descriptor|null
      */
     private $descriptor;
 
 
     /**
+     * The actual mark value that was given for the indicator.
+     *
+     * This can be anywhere within the descriptor's value range.
+     *
      * @var float|null
      */
     private $value;
