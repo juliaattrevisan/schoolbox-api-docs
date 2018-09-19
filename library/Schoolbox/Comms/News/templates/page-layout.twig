@@ -42,7 +42,7 @@
                     {% set authoredRoute = routeLookupIfAuthorized('commsNews.getAuthored') %}
                     {% if authoredRoute %}
                         <li {% if page == authoredRoute %}class="active"{% endif %} role="menuitem">
-                            <a href="{{ authoredRoute }}">My Authored {{ locale.news | capitalize }}</a>
+                            <a href="{{ authoredRoute }}">Created By Me</a>
                             {% if authoredCounts | length %}
                                 <ul>
                                     {% for state, data in authoredCounts %}
