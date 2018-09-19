@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
+use Alaress\Specification\Exception\UnsatisfiedException;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
@@ -15,7 +16,7 @@ use UnexpectedValueException;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\RoleAccessMapper;
-
+use InvalidArgumentException;
 
 /**
  * Responsible for the intricacies of news article audience segment persistence.
@@ -80,6 +81,9 @@ class Transactor
      * @return bool
      * @throws Mapper\Exception
      * @throws Mapper\Exception\InsufficientHydrationException
+     * @throws \DomainException
+     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
      */
     public function save(News\Model $article, string $selectizeAudienceSegments): bool
     {
@@ -150,6 +154,8 @@ class Transactor
      * @return bool
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
+     * @throws UnsatisfiedException
      */
     private function saveAddedSegments(News\Model $article, GenericCollection $segmentsToAdd): bool
     {
@@ -177,9 +183,7 @@ class Transactor
                 $segmentToAdd->setCommsNewsArticle($article);
 
                 if (!$validSegmentSpec->isSatisfiedBy($segmentToAdd)) {
-                    // TODO make this a specific exception that wraps the $unsatisified so caller can handle gracefully
-                    $unsatisfied = $validSegmentSpec->remainderUnsatisfiedBy($segmentToAdd);
-                    throw new UnexpectedValueException('Audience segment fails specification pattern');
+                    throw new UnsatisfiedException($segmentToAdd, $validSegmentSpec);
                 }
 
                 $wasSaved = $this->audienceMapper->saveSegment($segmentToAdd);
