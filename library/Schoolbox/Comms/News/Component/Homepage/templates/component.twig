@@ -67,9 +67,8 @@
         {% if rssRoute %}
             <a href="{{ rssRoute }}?topic={{ slug }}" class="button" title="Download RSS feed for this topic" data-rss>RSS</a>
         {% endif %}
-
         {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-        {% if createRoute %}
+        {% if createRoute and not readonly %}
         <a href="{{ createRoute }}" class="button">Create {{ locale.news }}</a>
         {% endif %}
         
