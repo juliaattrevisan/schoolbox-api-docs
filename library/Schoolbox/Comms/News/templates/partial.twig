@@ -109,6 +109,11 @@
 {% else %}
     <div class="empty-state no-margin">
         <i class="icon-news"></i>
-        <p>There aren't any {{ locale.news }} articles in this topic.</p>
+        {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+        {% if createRoute and not readonly %}
+            <p><a href="{{ createRoute }}">Post a {{ locale.news }} article</a> to share new information on this homepage.</p>
+        {% else %}
+            <p>There is no {{ locale.news }} to view at this time.</p>
+        {% endif %}
     </div>
 {% endif %}

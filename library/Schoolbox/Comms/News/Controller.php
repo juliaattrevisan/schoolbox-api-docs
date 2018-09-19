@@ -27,6 +27,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
