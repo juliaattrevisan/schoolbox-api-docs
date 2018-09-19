@@ -28,7 +28,7 @@
                         </div>
                     </li>
 
-                    <li class="actions-small-2" v-for="article in currentArticles">
+                    <li class="actions-small-1" v-for="article in currentArticles">
                         <div class="list-item">
                             <div class="small-12 card">
 
@@ -47,11 +47,7 @@
                         </div>
                         <nav>
                             <a :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
-                            <a href="#" class="icon-more no-text" :data-dropdown="'article-more-' + article.id"></a>
                         </nav>
-                        <ul :id="'article-more-' + article.id" class="f-dropdown" data-dropdown-content>
-                            <li><a :href="article._links.statistics.href" class="icon-progress">Statistics</a></li>
-                        </ul>
                     </li>
                 </ul>
 
