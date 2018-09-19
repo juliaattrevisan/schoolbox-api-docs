@@ -350,24 +350,60 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     /**
      * Transitions an article to the 'Draft' state
      *
-     * @param Alaress_Date_Format|null $now
      * @throws InvalidTransitionException If transition is invalid for some reason
      */
     public function unSubmit(): void
     {
-        $currentState = $this->getDiscreteState($now);
+        $currentState = $this->getDiscreteState();
 
         // Already submitted. No risk to caller of data loss
-        if(self::STATE_AWAITING_MODERATION === $currentState){
-            throw new InvalidTransitionException($currentState, "Article was already submitted at {$this->submittedAt}");
+        if(self::STATE_DRAFT === $currentState){
+            throw new InvalidTransitionException($currentState, "Article is already a draft");
         }
 
-        // Invalid operation
-        if(!\in_array($currentState, [self::STATE_DRAFT, self::STATE_REJECTED], true)){
-            throw new InvalidTransitionException($currentState, 'Only draft and rejected articles may be submitted');
+        if(self::STATE_REJECTED === $currentState){
+            throw new InvalidTransitionException($currentState, "Cannot un-submit a rejected article");
         }
 
-        $this->submittedAt = $now;
+        // Put back to draft state
+        $this->submittedAt = null;
+
+        // Clear approval details - so it will need to be re-approved if re-submitted
+        $this->acceptedAt  = null;
+        $this->acceptedBy  = null;
+    }
+
+
+    /**
+     * Transitions an article to the 'Approved' state
+     *
+     * @param User                     $effector
+     * @param Alaress_Date_Format|null $now
+     * @throws InvalidTransitionException
+     */
+    public function approve(User $effector, Alaress_Date_Format $now = null): void
+    {
+        $now          = $now ?? Alaress_Date_Format::now();
+        $currentState = $this->getDiscreteState($now);
+
+        // Already approved.
+        if ($this->isApproved($now)) {
+            throw new InvalidTransitionException($currentState, "Article was already approved by {$this->acceptedBy->getFullName()} at {$this->acceptedAt->getLocalShort()}");
+        }
+
+        // Ensure it is submitted
+        if(!$this->isSubmitted()){
+            $this->submit($now);
+        }
+
+        // Treat as never being rejected
+        $this->rejectedAt     = null;
+        $this->rejectedBy     = null;
+        $this->rejectedReason = null;
+
+        // Set acceptance details
+        $this->acceptedAt = $now;
+        $this->acceptedBy = $effector;
     }
 
 
@@ -386,7 +422,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
         // Already rejected.
         if(self::STATE_REJECTED === $currentState){
-            throw new InvalidTransitionException($currentState, "Article was already rejected at {$this->rejectedAt} by {$this->rejectedBy->getFullName()}");
+            throw new InvalidTransitionException($currentState, "Article was already rejected by {$this->rejectedBy->getFullName()} at {$this->rejectedAt->getLocalShort()}");
         }
 
         // Invalid operation
@@ -407,30 +443,33 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
 
     /**
-     * Transitions an article to the 'Approved' state
+     * Transitions an article to the 'expired' state
      *
-     * @param User                     $effector
+     * @param Alaress_Date_Format|null $expireAt
      * @param Alaress_Date_Format|null $now
      * @throws InvalidTransitionException
      */
-    public function approve(User $effector, Alaress_Date_Format $now = null): void
+    public function archive(Alaress_Date_Format $expireAt = null, Alaress_Date_Format $now = null)
     {
         $now          = $now ?? Alaress_Date_Format::now();
         $currentState = $this->getDiscreteState($now);
 
-        // Already rejected.
-        if (self::STATE_AWAITING_MODERATION !== $currentState) {
-            throw new InvalidTransitionException($currentState, "Only article's awaiting moderation may be approved");
+        // Already archived?
+        if (self::STATE_EXPIRED === $currentState) {
+            throw new InvalidTransitionException($currentState, "Article has been expired as of {$this->expiresAt->getLocalShort()}");
         }
 
-        // Treat as never being rejected
-        $this->rejectedAt     = null;
-        $this->rejectedBy     = null;
-        $this->rejectedReason = null;
+        // Ensure transition is valid
+        if (!\in_array($currentState, [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED], true)) {
+            throw new InvalidTransitionException($currentState, "Only articles awaiting publication, or published, may be archived");
+        }
 
-        // Set acceptance details
-        $this->acceptedAt = $now;
-        $this->acceptedBy = $effector;
+        // Default to expiring now
+        $expireAt = $expireAt ?? Alaress_Date_Format::now();
+
+        // Note that no check against publishAt means it's permitted to set an article to be published a week from now, but have been expired
+        // since some time before that.
+        $this->expiresAt = $expireAt;
     }
 
 
