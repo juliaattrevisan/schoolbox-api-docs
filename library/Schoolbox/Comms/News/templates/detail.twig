@@ -262,7 +262,7 @@ Data:
                 <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
             {% endif %}
 
-            {% if article.isAwaitingModeration %}
+            {% if article.isAwaitingModeration and approveRoute %}
             <li>
                 <form action="{{ approveRoute }}" method="post">
                     <input type="submit" value="Approve" />
