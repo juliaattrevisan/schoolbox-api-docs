@@ -17,6 +17,7 @@ use Schoolbox\Resource\Folder;
 use PDO;
 use Schoolbox\Comms\News;
 use InvalidArgumentException;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -68,10 +69,11 @@ class Controller extends Base
     /**
      * Look for all the audience pieces that might somehow match $keyword
      *
-     * @api /comms/news/audiencebrowser/search
+     * @api   /comms/news/audiencebrowser/search
      * @level 18.1
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Exception
      */
     public function getSearch(): void
     {
