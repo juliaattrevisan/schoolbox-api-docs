@@ -189,10 +189,6 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     public const ERROR_SUBMISSION_WINDOW_EXCEEDED = 214;
     public const ERROR_TASS_SSO_FAILURE = 215;
 
-    /* This article isn't valid
-     */
-    public const ERROR_COMMS_NEWS_INVALID_ARTICLE = 223;
-
     /* Unknown topic chosen
      */
     public const ERROR_COMMS_NEWS_INVALID_TOPIC = 224;
