@@ -1,7 +1,5 @@
 <?php
 /**
- * Module
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -22,7 +20,6 @@ use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -43,7 +40,7 @@ class Module extends BaseModule
          */
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, function(array $params = array(), User $user = null) {
+            new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, function(array $params) {
                 return $params['folderId'];
             }, Access\Access::getInstance())
         );
