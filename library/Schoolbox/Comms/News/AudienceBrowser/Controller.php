@@ -14,7 +14,6 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder;
-use Schoolbox\UserMapper;
 use PDO;
 use Schoolbox\Comms\News;
 use InvalidArgumentException;
