@@ -98,17 +98,14 @@ class Module extends BaseModule
         });
 
         $preloadArticle = function ($params) {
-            return $this->preloadArticle($params);
-        };
-        $preloadArticleWithAudience = function ($params) {
             return $this->preloadArticleWithAudience($params);
         };
 
         $this->register('GET', '/create', 'getCreate', $loggedIn);                                               // Create news article
         $this->register('POST', '/create', 'postCreate', $loggedIn);
         $this->register('GET', '/topics', 'getTopics', $loggedIn);                                               // (async) Get a list of topics to chooze
-        $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $canModify, $preloadArticleWithAudience); // Update news article
-        $this->register('POST', '/{articleId:\d+}', 'postUpdate', $canModify, $preloadArticleWithAudience);
+        $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $canModify, $preloadArticle);             // Update news article
+        $this->register('POST', '/{articleId:\d+}', 'postUpdate', $canModify, $preloadArticle);
         $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $viewRecipients, $preloadArticle);// Find out who will receive this article
         $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', $canModify, $preloadArticle);           // Delete article
         $this->register('GET', '/{articleId:\d+}', 'getDetail', $readerPerms, $preloadArticle);                  // View news article

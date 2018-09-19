@@ -90,14 +90,14 @@ class Module extends BaseModule
             )
         );
 
-        $preloadNews = function ($params) {
-            return $this->preloadNews($params);
+        $preloadArticle = function ($params) {
+            return $this->preloadArticleWithAudience($params);
         };
 
-        $this->register('GET', '', 'getList', $suOrCommsOfficer);                                      // See all items requiring moderation
-        $this->register('POST', '/{articleId:\d+}/submit', 'postSubmit', $canSubmit, $preloadNews);    // Submit For Moderation
-        $this->register('POST', '/{articleId:\d+}/accept', 'postApprove', $canApprove, $preloadNews);  // Approve
-        $this->register('POST', '/{articleId:\d+}/reject', 'postReject', $canReject, $preloadNews);    // Reject
+        $this->register('GET', '', 'getList', $suOrCommsOfficer);                                         // See all items requiring moderation
+        $this->register('POST', '/{articleId:\d+}/submit', 'postSubmit', $canSubmit, $preloadArticle);    // Submit For Moderation
+        $this->register('POST', '/{articleId:\d+}/accept', 'postApprove', $canApprove, $preloadArticle);  // Approve
+        $this->register('POST', '/{articleId:\d+}/reject', 'postReject', $canReject, $preloadArticle);    // Reject
     }
 
 
@@ -124,6 +124,26 @@ class Module extends BaseModule
         return [
             'article' => $article,
         ];
+    }
+
+
+    /**
+     * Preload the news article with audience hydrated
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Application\Exception\NotFound
+     * @throws InvalidArgumentException
+     * @throws NotFound
+     * @throws \DomainException
+     */
+    private function preloadArticleWithAudience(array $params): array
+    {
+        $args = $this->preloadNews($params);
+        /** @var News\Model $article */
+        $article = $args['article'];
+        $article->setAudience($this->getAudienceMapper()->findForArticle($article->getId()));
+        return $args;
     }
 
 
@@ -172,7 +192,7 @@ class Module extends BaseModule
      * @return Mapper|Error\Mapper
      * @throws InvalidArgumentException
      */
-    private function getErrorMapper()
+    private function getErrorMapper(): Error\Mapper
     {
         return $this->getMapperFactory()->get(Error\Mapper::class);
     }
@@ -182,9 +202,18 @@ class Module extends BaseModule
      * @return Mapper|News\Mapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
-    private function getArticleMapper()
+    private function getArticleMapper(): News\Mapper
     {
         return $this->getMapperFactory()->get(News\Mapper::class);
+    }
+
+    /**
+     * @return Mapper|News\Audience\Mapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    private function getAudienceMapper(): News\Audience\Mapper
+    {
+        return $this->getMapperFactory()->get(News\Audience\Mapper::class);
     }
 
 
