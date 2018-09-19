@@ -718,9 +718,9 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     public function getJsonApiLinks(): array
     {
         return [
-            'self'   => new AuraLink('commsNews.getDetail', [ 'articleId' => $this->getId() ]),
-            'update' => new AuraLink('commsNews.getUpdate', [ 'articleId' => $this->getId() ]),
-            'statistics' => new AuraLink('commsNewsStatistics.getOverview', [ 'articleId' => $this->getId() ]),
+            'self'   => new AuraLink('commsNews.getDetail', [ 'article' => $this, 'articleId' => $this->getId() ]),
+            'update' => new AuraLink('commsNews.getUpdate', [ 'article' => $this, 'articleId' => $this->getId() ]),
+            'statistics' => new AuraLink('commsNewsStatistics.getOverview', [ 'article' => $this, 'articleId' => $this->getId() ]),
         ];
     }
 }
