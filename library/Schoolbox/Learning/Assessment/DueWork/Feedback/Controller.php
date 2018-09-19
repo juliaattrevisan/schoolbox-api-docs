@@ -191,45 +191,40 @@ class Controller extends Base
      * @param IFeedback   $feedback
      * @return bool Was a rubric processed?
      */
-    protected function processRubric(Participant $participant, array $post, IFeedback $feedback)
+    protected function processRubric(Participant $participant, array $post, IFeedback $feedback): bool
     {
         if (!$participant->getAssessable() instanceof DueWork\Model){
             return false;
         }
 
         // Presumably $feedback has been saved already?
-        $markedGrid = (new \Schoolbox\Assessment\Rubric\MarkedGrid\Factory())
-            ->buildFromPostData(
+        $factory = new \Schoolbox\Assessment\Rubric\MarkedGrid\Factory();
+
+        // Did we just give some rubric marks? Save them
+        if (\is_array($post['rubric'])) {
+            $markedGrid = $factory->buildFromPostData(
                 $this->rubricMapper->retrieveMarkedGrid($feedback),
                 $post['rubric']
             );
 
-        // TODO figure out how/if to deal with saveEmpty vs. mark from quickmark
-        $this->rubricMapper->persistMarkedGrid($markedGrid);
-        return true;
+            $this->rubricMapper->persistMarkedGrid($markedGrid);
+            return true;
+        }
 
-//        // Did we just give some rubric marks?
-//        if (\is_array($post['rubric'])) {
-//            // First arg needs to default to array
-//            $this->rubricMapper->saveForFeedback(
-//                $post['rubric']['descriptors'] ?? [],
-//                $post['rubric']['groups'] ?? [],
-//                $feedback->getAssessable()->getMarkScheme(),
-//                $feedback->getId()
-//            );
-//            return true;
-//        }
-//        if (array_key_exists('saveEmpty', $post) && $post['saveEmpty']) {
-//            // I must still save the empty rubric
-//            $this->rubricMapper->saveForFeedback(
-//                [],
-//                [],
-//                $feedback->getAssessable()->getMarkScheme(),
-//                $feedback->getId()
-//            );
-//            return true;
-//        }
-//        return false;
+        // Did we not give marks, but the `saveEmpty` flag is set?
+        // Save empty marks
+        if (array_key_exists('saveEmpty', $post) && $post['saveEmpty']) {
+            $markedGrid = $factory->buildFromPostData(
+                $this->rubricMapper->retrieveMarkedGrid($feedback),
+                []
+            );
+
+            $this->rubricMapper->persistMarkedGrid($markedGrid);
+            return true;
+        }
+
+        // Neither: do nothing (and copy from previous feedback)
+        return false;
     }
 
 
