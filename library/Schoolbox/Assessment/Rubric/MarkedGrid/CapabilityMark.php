@@ -80,10 +80,7 @@ class CapabilityMark
      */
     public function calculateScaledMark(): float
     {
-        $actualMaxValue  = $this->capabilityUsage->getMaxValue();
-        $derivedMaxValue = $this->capabilityUsage->calculateMaxValueFromIndicators();
-        $scalingFactor   = $actualMaxValue ? ($derivedMaxValue / $actualMaxValue) : 0;
-        return $scalingFactor ? $this->value / $scalingFactor : 0;
+        return $this->value * $this->capabilityUsage->calculateMarkMultiplier();
     }
 
 
