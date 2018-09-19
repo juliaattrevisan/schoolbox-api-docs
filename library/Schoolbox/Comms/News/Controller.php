@@ -713,19 +713,14 @@ class Controller extends Base
          */
         $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
 
-        // Get all articles the user can see first
-        $partialData = $this->generatePartial($urlPrefix, $params, $topics, false, null, $month);
-
-        // Find the years and months of those articles
-        $availableYearsAndMonths = $this->newsMapper->findYearsAndMonthsWithArticles($partialData['articleIdsForUser']);
+        // Find the years and months that have any articles (some may not contain any visible articles; thats ok)
+        $availableYearsAndMonths = $this->newsMapper->findYearsAndMonthsWithArticles();
 
         // Default to filtering by the most recent year if none is provided
         if (null === $year) {
             $year = array_keys($availableYearsAndMonths)[0];
         }
 
-        // Regenerate data with the correct year
-        // TODO UGHHHH
         $partialData = $this->generatePartial($urlPrefix, $params, $topics, false, $year, $month);
 
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
@@ -746,6 +741,7 @@ class Controller extends Base
             'availableYearsAndMonths' => $availableYearsAndMonths,
             'year' => $year,
             'month' => $month,
+            'newsItems' => $partialData
         ];
 
 

@@ -225,15 +225,8 @@ class Mapper extends \Schoolbox\Mapper
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      */
-    public function findYearsAndMonthsWithArticles(array $articleIdsForUser): array
+    public function findYearsAndMonthsWithArticles(): array
     {
-
-        /* If you aren't able to see anything at all, the archive will be empty
-         */
-        if (!\count($articleIdsForUser)) {
-            return [];
-        }
-
         /* Dates - must be expired, accepted, published and not deleted
          */
         $now = \Alaress_Date_Format::now()->getDatabase();
@@ -243,11 +236,6 @@ class Mapper extends \Schoolbox\Mapper
             ->lessThan('publish_at', $now)
             ->notNull('accepted_at')
             ->isNull('deleted_at');
-
-        /* These are articles that the user could see
-         * Don't provide year/month combinations that contain articles, but the user isn't in their audience lol
-         */
-        $pb->in('id', $articleIdsForUser);
 
         $where = implode("\nAND ", $pb->getWhere());
 
