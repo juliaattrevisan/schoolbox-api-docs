@@ -37,8 +37,8 @@ class MarkedGrid extends TestCase
         $rowSet = new Rowset\RowSet($folder);
 
         // Build caps and indicators
-        $capability1 = (new RowSet\Capability())->setId(1)->setName('Group 1');
-        $capability2 = (new RowSet\Capability())->setId(2)->setName('Group 2');
+        $capability1 = (new RowSet\Capability())->setId(1)->setName('Capability 1');
+        $capability2 = (new RowSet\Capability())->setId(2)->setName('Capability 2');
         $indicator1  = (new RowSet\Indicator())->setId(1)->setName('Indicator 1.1');
         $indicator2  = (new RowSet\Indicator())->setId(2)->setName('Indicator 1.2');
         $indicator3  = (new RowSet\Indicator())->setId(3)->setName('Indicator 2.1');
