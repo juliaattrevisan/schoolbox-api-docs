@@ -130,7 +130,7 @@ class Module extends BaseModule
      * @return Mapper|Folder\Mapper
      * @throws InvalidArgumentException
      */
-    protected function getFolderMapper()
+    private function getFolderMapper()
     {
         return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
@@ -140,7 +140,7 @@ class Module extends BaseModule
      * @return Mapper|UserMapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
-    protected function getUserMapper()
+    private function getUserMapper()
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
