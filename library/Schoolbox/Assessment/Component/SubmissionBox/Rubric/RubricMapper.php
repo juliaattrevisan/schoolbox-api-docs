@@ -671,7 +671,9 @@ class RubricMapper
         $indicatorMarkModelsByCapability = DescriptorMarkMapper::getInstance()->findByColumn(
             'rubric_group_mark_id',
             $capabilityMarkModels->getPropertyValues('id')
-        )->groupByCallback(
+        )->filter(function (DescriptorMark $indicatorMark) {
+            return null !== $indicatorMark->getDescriptor();
+        })->groupByCallback(
             function (DescriptorMark $indicatorMark) {
                 return $indicatorMark->getGroupMark()->getGroup()->getId();
             }
