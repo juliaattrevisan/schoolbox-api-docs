@@ -23,6 +23,7 @@ use Schoolbox\User;
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  * @method DescriptorMark hydrate(array $row, $alias = '', $callback = null)
  * @method DescriptorMark createModel($idValue = null)
+ * @method GenericCollection|DescriptorMark[] createCollection($contents = [])
  * @method GenericCollection|DescriptorMark[] findByColumnList($columnList, $options = array())
  * @method GenericCollection|DescriptorMark[] findByColumn($columnName, $columnValue, $options = [])
  */

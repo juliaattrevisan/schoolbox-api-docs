@@ -752,6 +752,68 @@ class RubricMapper
 
 
     /**
+     * Save this marked grid to the database.
+     *
+     * @param MarkedGrid $markedGrid
+     * @throws MapperException if something wasn't found
+     */
+    public function persistMarkedGrid(MarkedGrid $markedGrid): void
+    {
+        // Required mappers
+        $capabilityMapper     = GroupMapper::getInstance();
+        $descriptorMapper     = DescriptorMapper::getInstance();
+        $indicatorMarkMapper  = DescriptorMarkMapper::getInstance();
+        $capabilityMarkMapper = GroupMarkMapper::getInstance();
+        $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
+
+
+        // Blow away any previous cap/ind marks for this feedback
+        $returnId = $markedGrid->getFeedback()->getId();
+        $indicatorMarkMapper->deleteFeedbackMarks($returnId);
+        $capabilityMarkMapper->deleteFeedbackMarks($returnId);
+
+
+        // What am I saving marks for?
+        $returnedWork = $returnedWorkMapper->findById($returnId);
+
+
+        // Create list of cap/ind marks that will be saved
+        $capabilityMarksToSave = $capabilityMarkMapper->createCollection();
+        $indicatorMarksToSave  = $indicatorMarkMapper->createCollection();
+        foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
+            // Create cap mark
+            $capabilityId    = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
+            $capabilityModel = $capabilityMapper->findById($capabilityId);
+            $capabilityMarksToSave[$capabilityId] = $capabilityMarkModel = $capabilityMarkMapper->createModel()
+                ->setSubmissionReturn($returnedWork)
+                ->setGroup($capabilityModel)
+                ->setValue($capabilityMark->getValue())
+                ->setValid(true);
+
+
+            // Create ind marks
+            foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                $indicatorId     = $indicatorMark->getIndicatorUsage()->getIndicator()->getId();
+                $descriptorModel = null;
+                if ($indicatorMark->getDescriptor()) {
+                    $descriptorModel = $descriptorMapper->findById($indicatorMark->getDescriptor()->getId());
+                }
+                $indicatorMarksToSave[$indicatorId] = $indicatorMarkMapper->createModel()
+                    ->setGroupMark($capabilityMarkModel)
+                    ->setDescriptor($descriptorModel)
+                    ->setValue($indicatorMark->getValue())
+                    ->setValid(true);
+            }
+        }
+
+
+        // And save cap/ind marks
+        $capabilityMarkMapper->save($capabilityMarksToSave);
+        $indicatorMarkMapper->save($indicatorMarksToSave);
+    }
+
+
+    /**
      * @param AssessmentContext $context
      * @param string[]          $levelNames
      *

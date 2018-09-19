@@ -158,7 +158,7 @@ class CapabilityMark
 
 
     /**
-     * @return GenericCollection
+     * @return GenericCollection|IndicatorMark[]
      */
     public function getIndicatorMarks(): GenericCollection
     {
@@ -167,7 +167,7 @@ class CapabilityMark
 
 
     /**
-     * @param GenericCollection $indicatorMarks
+     * @param GenericCollection|IndicatorMark[] $indicatorMarks
      * @return static
      */
     public function setIndicatorMarks(GenericCollection $indicatorMarks): self
