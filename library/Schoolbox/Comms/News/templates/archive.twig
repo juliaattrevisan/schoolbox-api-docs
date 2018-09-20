@@ -56,13 +56,8 @@
 
 {% endif %}
 
-{% block subheader %}
-    <div class="small-12 columns">
-        <h2 class="subheader">{{ subheading }}</h2>
-    </div>
-{% endblock %}
-
 {% block newsContent %}
+    <h2 class="subheader">{{ subheading }}</h2>
 
     {% if availableYearsAndMonths|length %}
 
