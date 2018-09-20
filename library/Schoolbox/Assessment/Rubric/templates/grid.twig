@@ -121,9 +121,9 @@
             <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
                 {{ rubricMarkedGrid.retrieveHumanReadableMark }}
 
-                {# Self-Assessment #}
-                {% if learnerRubric %}
-                    ({{ learnerRubric.humanReadableMark }} given in {{ locale.selfAssessment.singularForm }})
+                {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
+                {% if selfAssessmentFeedback.isSelfGrading %}
+                    ({{ selfAssessmentFeedback.humanReadableMark }} given in {{ locale.selfAssessment.proper }})
                 {% endif %}
             </th>
         </tr>
