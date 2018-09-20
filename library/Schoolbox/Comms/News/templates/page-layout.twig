@@ -78,11 +78,13 @@
                     {% endif %}
                 </ul>
             </nav>
+
+            {% block archiveFilter %}
+            {% endblock %}
+
         </section>
     </div>
 
-    {% block archiveFilter %}
-    {% endblock %}
 
     {# main content #}
     <div class="small-12 medium-8 large-9 island">
