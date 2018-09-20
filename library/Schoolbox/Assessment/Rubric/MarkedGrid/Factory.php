@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+
 /**
  * Factory for building `MarkedGrid` objects.
  */
@@ -24,8 +26,14 @@ class Factory
     {
         // TODO mark schemes still need to be in the grid, not marked grid
         $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
-        $postDescriptors  = $postData['descriptors'] ?? [];
-        $postCapabilities = $postData['groups']      ?? [];
+        $postDescriptors   = $postData['descriptors'] ?? [];
+        $postCapabilities  = $postData['groups']      ?? [];
+
+
+        // Is this a self-reflection?
+        // Don't even save capability/indicator mark values
+        $feedback         = $markedGrid->getFeedback();
+        $isSelfReflection = $feedback instanceof DueWorkFeedback && $feedback->isSelfReflectionOnly();
 
 
         // Set marks for all the capabilities and indicators
@@ -46,14 +54,15 @@ class Factory
 
             // Set its value
             // TODO validate the value is within the cap's max mark bounds
-            $capabilityId = $capabilityUsage->getCapability()->getId();
-            $capabilityMark->setValue(
-                filter_var(
+            $capabilityId        = $capabilityUsage->getCapability()->getId();
+            $capabilityMarkValue = $isSelfReflection
+                ? null
+                : filter_var(
                     $postCapabilities[$capabilityId]['unscaledMark'] ?? null,
                     FILTER_VALIDATE_FLOAT,
                     FILTER_NULL_ON_FAILURE
-                )
-            );
+                );
+            $capabilityMark->setValue($capabilityMarkValue);
 
 
             // Set marks for indicators
@@ -80,9 +89,12 @@ class Factory
                     $capabilityMark->getIndicatorMarks()->add($indicatorMark);
                 }
 
+                $indicatorMarkValue = $isSelfReflection
+                    ? null
+                    : filter_var($descriptorMark, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
                 $indicatorMark
                     ->setDescriptor($selectedDescriptor)
-                    ->setValue(filter_var($descriptorMark, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE));
+                    ->setValue($indicatorMarkValue);
             }
         }
 
