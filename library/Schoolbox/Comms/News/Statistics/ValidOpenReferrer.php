@@ -19,7 +19,9 @@ class ValidOpenReferrer
         Mapper::REFERRER_HOMEPAGE,
         Mapper::REFERRER_INDEX,
         Mapper::REFERRER_ARCHIVE,
-        Mapper::REFERRER_EMAIL
+        Mapper::REFERRER_EMAIL,
+        Mapper::REFERRER_SAVED,
+        Mapper::REFERRER_SEARCH,
     ];
 
 

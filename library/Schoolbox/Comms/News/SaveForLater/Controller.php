@@ -56,8 +56,12 @@ class Controller extends Base
         $articles = (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
         $lists = new News\Moderation\Lists($this->newsMapper);
 
+        $params = new News\Querystring($this->getRequest()->query);
+        $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', [
             'articles' => $articles,
+            'referrer' => $params->getReferrer(),
 
             // Vars for the nav sidebar
             'page' => $this->getRequest()->query['page'],
