@@ -7,19 +7,21 @@
 
             </div>
 
-            <div class="small-3 columns actions-small-2">
-                <nav>
-                    {% block createLink %}
-                        {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-                        {% if createRoute %}
-                            <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
-                        {% endif %}
-                    {% endblock %}
+            {% block actionIcons %}
+                <div class="small-3 columns actions-small-2">
+                    <nav>
+                        {% block createLink %}
+                            {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+                            {% if createRoute %}
+                                <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
+                            {% endif %}
+                        {% endblock %}
 
-                    {% block rssLink %}
-                    {% endblock %}
-                </nav>
-            </div>
+                        {% block rssLink %}
+                        {% endblock %}
+                    </nav>
+                </div>
+            {% endblock %}
         </div>
 
     </div>

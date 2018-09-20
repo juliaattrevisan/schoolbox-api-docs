@@ -13,6 +13,9 @@
  #}
 {% extends '@commsNews/page-layout.twig' %}
 
+{% block actionIcons %}
+{% endblock %}
+
 {% if year and month %}
     {% set selectedDate = year ~ '-' ~ month ~ '-01' %}
     {% set subheading = selectedDate|date('F Y') %}
