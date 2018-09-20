@@ -1,21 +1,30 @@
-<div class="actions-small-3 row">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h1>{% block newsTitle %}{% endblock %}</h1>
-        </div>
-    </div>
-    <nav>
-        {% block createLink %}
-            {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-            {% if createRoute %}
-                <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
-            {% endif %}
-        {% endblock %}
+<div class="row">
+    <div class="small-12 medium-8 large-9 columns">
 
-        {% block rssLink %}
-        {% endblock %}
-    </nav>
+        <div class="row">
+            <div class="small-12 medium-11 columns">
+                <h1>{% block newsTitle %}{% endblock %}</h1>
+
+            </div>
+
+            <div class="small-12 medium-1 columns actions-small-1">
+                <nav>
+                    {% block createLink %}
+                        {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+                        {% if createRoute %}
+                            <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
+                        {% endif %}
+                    {% endblock %}
+
+                    {% block rssLink %}
+                    {% endblock %}
+                </nav>
+            </div>
+        </div>
+
+    </div>
 </div>
+
 
 <div class="row">
     {% block subheader %} {% endblock %}
