@@ -26,12 +26,6 @@
 {% block newsTitle %}{{ locale.news.proper }} Archive{% endblock %}
 
 {% if availableYearsAndMonths|length %}
-    {% block subheader %}
-        <div class="small-12 columns">
-            <h2 class="subheader">{{ subheading }}</h2>
-        </div>
-    {% endblock %}
-
     {% block archiveFilter %}
         {# Month/Year Selector #}
         <nav>
@@ -62,6 +56,11 @@
 
 {% endif %}
 
+{% block subheader %}
+    <div class="small-12 columns">
+        <h2 class="subheader">{{ subheading }}</h2>
+    </div>
+{% endblock %}
 
 {% block newsContent %}
 

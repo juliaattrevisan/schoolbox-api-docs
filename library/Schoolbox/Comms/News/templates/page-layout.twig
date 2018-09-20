@@ -29,7 +29,6 @@
 
 
 <div class="row">
-    {% block subheader %} {% endblock %}
     {# navigation sidebar #}
     <div class="small-12 medium-4 large-3 island push right">
         <section>
@@ -97,9 +96,10 @@
         </section>
     </div>
 
-
     {# main content #}
     <div class="small-12 medium-8 large-9 island">
+        {% block subheader %} {% endblock %}
+
         {% block newsContent %}
         {% endblock %}
     </div>
