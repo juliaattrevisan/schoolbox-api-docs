@@ -109,7 +109,7 @@ class RubricMapper
 
         // Unit-specs have their course spec's capabilities/indicators as well
         $courseSpecFolderId = null;
-        if ($folder->hasUnitSpecification()) {
+        if ($context instanceof UnitSpecification || $folder->hasUnitSpecification()) {
             $courseSpecFolderId = (int)$folder->getParent()->getId();
             $indicatorModels    = CriterionMapper::getInstance()->findForFolder($courseSpecFolderId)
                                                                 ->merge($indicatorModels);
