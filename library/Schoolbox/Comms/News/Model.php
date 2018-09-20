@@ -421,7 +421,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         }
 
         $this->submittedAt = $now;
-        $this->rejectedAt = null;
+        $this->rejectedAt  = null;
     }
 
 
@@ -513,9 +513,9 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
             throw new InvalidTransitionException($currentState, "An article in draft state cannot be rejected");
         }
 
-        // Treat article as never being submitted or approved.
-        $this->acceptedAt  = null;
-        $this->acceptedBy  = null;
+        // Treat article as never being approved.
+        $this->acceptedAt = null;
+        $this->acceptedBy = null;
 
         // Set rejection details
         $this->rejectedBy     = $effector;
