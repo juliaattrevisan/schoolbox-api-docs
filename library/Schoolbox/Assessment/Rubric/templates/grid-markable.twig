@@ -63,9 +63,16 @@
                     {# Required so that this form is recognised as containing a rubric, even if nothing is submitted #}
                     <input name="saveEmpty" value="true" type="hidden"/>
 
-                    {% set indicatorId             = critUsage.indicator.id %}
-                    {% set indicatorMark           = rubricMarkedGrid ? rubricMarkedGrid.retrieveIndicatorMark(critUsage) : null %}
-                    {% set indicatorMarkDescriptor = indicatorMark    ? indicatorMark.descriptor                          : null %}
+                    {% set indicatorId   = critUsage.indicator.id %}
+                    {% set indicatorMark = rubricMarkedGrid
+                        ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)
+                        : null %}
+                    {% set indicatorMarkDescriptor = indicatorMark
+                        ? indicatorMark.descriptor
+                        : null %}
+                    {% set selfAssessmentIndicatorMark = selfAssessmentFeedback
+                        ? selfAssessmentFeedback.rubricMarkedGrid.retrieveIndicatorMark(critUsage)
+                        : null %}
 
                     {% for levelIndex, level in rubricGrid.levels %}
 
@@ -77,8 +84,6 @@
                             {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
                             {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
 
-                            {# Self-Assessment #}
-                            {% set learnerSelected = learnerRubric.descriptors[indicatorId][levelIndex].selected %}
                             <td>
                                 {% include '@rubric/descriptor-markable.twig' %}
                             </td>

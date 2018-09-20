@@ -50,8 +50,8 @@
 {% endif %}
 
 {# Self-assessment #}
-{% if learnerSelected %}
+{% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
     <img class="rb-self-reflection-choice"
          src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
-         title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
+         title="{% if selfAssessmentFeedback.isSelfGrading %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
 {% endif %}

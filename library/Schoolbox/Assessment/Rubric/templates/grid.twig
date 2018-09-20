@@ -49,8 +49,15 @@
 
                 <th>{{ critUsage.indicator.name }}</th>
 
-                {% set indicatorMark           = rubricMarkedGrid ? rubricMarkedGrid.retrieveIndicatorMark(critUsage) : null %}
-                {% set indicatorMarkDescriptor = indicatorMark    ? indicatorMark.descriptor                          : null %}
+                {% set indicatorMark = rubricMarkedGrid
+                    ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)
+                    : null %}
+                {% set indicatorMarkDescriptor = indicatorMark
+                    ? indicatorMark.descriptor
+                    : null %}
+                {% set selfAssessmentIndicatorMark = selfAssessmentFeedback
+                    ? selfAssessmentFeedback.rubricMarkedGrid.retrieveIndicatorMark(critUsage)
+                    : null %}
 
                 {% for levelIndex, level in rubricGrid.levels %}
 
@@ -59,8 +66,6 @@
                     {% if descriptor %}
 
                         {# Self-Assessment #}
-                        {% set learnerSelected      = learnerRubric.descriptors[crit.id][levelIndex].selected %}
-
                         {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
                         {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
 
@@ -83,10 +88,10 @@
                                 {% endif %}
 
                             {# Self-Assessment #}
-                            {% if learnerSelected %}
+                            {% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
                                 <img class="rb-self-reflection-choice"
                                      src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
-                                     title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
+                                     title="{% if selfAssessmentFeedback.isSelfGrading %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
                             {% endif %}
                             </div>
                         </td>
