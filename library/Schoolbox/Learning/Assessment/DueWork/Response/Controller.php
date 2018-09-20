@@ -157,7 +157,7 @@ class Controller extends Base
                 ->add([$assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getSummary',['assessmentId' => $assessment->getId(), 'studentId' => $participant->getUser()->getId()])])
                 ->add([$breadcrumbNode, '']),
             'response' => $response,
-            'latestFeedback' => $latestFeedback,
+            'feedback' => $latestFeedback,
             'attachzone' => $attachZone->getTwigContext(),
             'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
 

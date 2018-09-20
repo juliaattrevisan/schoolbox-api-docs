@@ -94,7 +94,7 @@
             %}
             {% include '@rubric/' ~ rubricTemplate with {
                 rubricGrid: assessment.rubricGrid,
-                rubricMarkedGrid: latestFeedback.rubricMarkedGrid,
+                rubricMarkedGrid: feedback.rubricMarkedGrid,
                 learner: participant.user,
                 markType: rubricContext.markType,
                 markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
@@ -118,7 +118,7 @@
         tabIndex: 2,
         readonly: readonly,
         selfAssessment: true,
-        feedback: latestFeedback
+        feedback: feedback
         } only %}
     </div>
 {% endblock %}
