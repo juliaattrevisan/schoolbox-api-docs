@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Exceptions;
 
 use DomainException;
+use Schoolbox\Comms\News\Model;
 use Throwable;
 
 /**
@@ -24,11 +25,20 @@ use Throwable;
 class InvalidTransitionException extends DomainException
 {
 
-    /** @var string */
+    /**
+     * @var int
+     * @see Model::STATE_* constants
+     */
     private $currentState;
 
 
-    public function __construct(string $state, string $message = "", int $code = 0, Throwable $previous = null)
+    /**
+     * @param int            $state
+     * @param string         $message
+     * @param int            $code
+     * @param Throwable|null $previous
+     */
+    public function __construct(int $state, string $message = "", int $code = 0, Throwable $previous = null)
     {
         $this->currentState = $state;
         parent::__construct($message, $code, $previous);
@@ -38,9 +48,9 @@ class InvalidTransitionException extends DomainException
     /**
      * Returns the current state to enable the catcher to determine whether they can ignore this exception.
      * eg, we may not care that we are trying to submit an already submitted article and can just carry on
-     * @return string
+     * @return int
      */
-    public function getCurrentState(): string
+    public function getCurrentState(): int
     {
         return $this->currentState;
     }
