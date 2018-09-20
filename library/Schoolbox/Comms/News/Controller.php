@@ -735,6 +735,7 @@ class Controller extends Base
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'slug' => $params->getSlug(),
             'referrer' => $params->getReferrer(),
+            'page' => $this->getRequest()->query['page'],
 
             /* Archive-specific vars that don't appear anywhere else
              */
