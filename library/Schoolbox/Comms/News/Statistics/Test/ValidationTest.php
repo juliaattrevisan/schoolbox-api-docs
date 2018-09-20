@@ -53,6 +53,14 @@ class ValidationTest extends TestCase
                 Statistics\Mapper::REFERRER_EMAIL,
                 true
             ],
+            'Valid referrer: saved' => [
+                Statistics\Mapper::REFERRER_SAVED,
+                true
+            ],
+            'Valid referrer: search' => [
+                Statistics\Mapper::REFERRER_SEARCH,
+                true
+            ],
             'Valid referrer: null' => [
                 null,
                 false
@@ -118,6 +126,14 @@ class ValidationTest extends TestCase
             ],
             'Valid referrer: email' => [
                 Statistics\Mapper::REFERRER_EMAIL,
+                true
+            ],
+            'Valid referrer: saved' => [
+                Statistics\Mapper::REFERRER_SAVED,
+                true
+            ],
+            'Valid referrer: search' => [
+                Statistics\Mapper::REFERRER_SEARCH,
                 true
             ],
             'Valid referrer: null' => [
