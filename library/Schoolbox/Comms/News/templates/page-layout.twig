@@ -21,14 +21,8 @@
 </div>
 
 <div class="row">
-    {# main content #}
-    <div class="small-12 medium-9 island">
-        {% block newsContent %}
-        {% endblock %}
-    </div>
-
     {# navigation sidebar #}
-    <div class="small-12 medium-3 island">
+    <div class="small-12 medium-3 island push right">
         <section>
             <nav>
                 <ul class="side-nav">
@@ -81,6 +75,13 @@
             </nav>
         </section>
     </div>
+
+    {# main content #}
+    <div class="small-12 medium-9 island">
+        {% block newsContent %}
+        {% endblock %}
+    </div>
+
 </div>
 
 <div id="toast" class="toast"></div>
