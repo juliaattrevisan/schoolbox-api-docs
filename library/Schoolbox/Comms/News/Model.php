@@ -49,6 +49,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     private const VALID_STATES_TO_APPROVE   = [self::STATE_DRAFT, self::STATE_AWAITING_MODERATION, self::STATE_REJECTED];
     // Action=Reject
     private const VALID_STATES_TO_REJECT    = [self::STATE_AWAITING_MODERATION, self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
+    // Action=Publish
+    private const VALID_STATES_TO_PUBLISH   = [self::STATE_AWAITING_PUBLICATION];
     // Action=Archive
     private const VALID_STATES_TO_ARCHIVE   = [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED];
 
@@ -519,6 +521,42 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         $this->rejectedBy     = $effector;
         $this->rejectedAt     = $now;
         $this->rejectedReason = $reason;
+    }
+
+
+    /**
+     * Transitions an article to the 'published' state
+     *
+     * Normally this would immediately publish any article awaiting publication
+     *
+     * @param Alaress_Date_Format|null $publishAt
+     * @param Alaress_Date_Format|null $now
+     * @throws InvalidTransitionException
+     */
+    public function publish(Alaress_Date_Format $publishAt = null, Alaress_Date_Format $now = null)
+    {
+        $now          = $now ?? Alaress_Date_Format::now();
+        $currentState = $this->getDiscreteState($now);
+
+        // Already published?
+        if (self::STATE_PUBLISHED === $currentState) {
+            throw new InvalidTransitionException($currentState, "Article has been published as of {$this->publishAt->getDatabase()}");
+        }
+
+        // Ensure transition is valid
+        if (!\in_array($currentState, self::VALID_STATES_TO_PUBLISH, true)) {
+            throw new InvalidTransitionException($currentState, "Only articles awaiting publication may be published");
+        }
+
+        // Default to publish immediately
+        $publishAt = $publishAt ?? Alaress_Date_Format::now();
+
+        // Ensure the expiry date is always never precedes the publish date
+        if ($publishAt->gt($this->expiresAt)) {
+            $this->expiresAt = $publishAt;
+        }
+
+        $this->publishAt = $publishAt ?? Alaress_Date_Format::now();
     }
 
 
