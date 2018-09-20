@@ -125,7 +125,8 @@ class Controller extends Base
         }
 
         // If someone else got in first, we don't care. No risk of data loss.
-        if (!$article->isSubmitted()) {
+        // Submission and Resubmission
+        if (!$article->isSubmitted() || $article->isRejected()) {
             $article->submit();
             $this->newsMapper->save($article);
         }
