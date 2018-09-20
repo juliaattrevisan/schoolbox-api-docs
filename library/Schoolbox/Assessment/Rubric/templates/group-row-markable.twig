@@ -99,14 +99,9 @@
         </span>
 
         {# Self-Assessment #}
-        {% if learnerRubric %}
-            {% if latestSelfReflectedFeedback.isSelfGrading %}
-                {% set selfReflectionName = locale.selfAssessment.proper %}
-            {% else %}
-                {% set selfReflectionName = locale.selfReflection.proper %}
-            {% endif %}
-
-            ({{ learnerRubric.groups[capabilityId].humanReadableMark }} given in {{ selfReflectionName }})
+        {% if selfAssessmentFeedback.isSelfGrading %}
+            {% set selfAssessmentCapabilityMark = selfAssessmentFeedback.rubricMarkedGrid.retrieveCapabilityMark(groupUsage) %}
+            ({{ selfAssessmentCapabilityMark.retrieveHumanReadableMark }} given in {{ locale.selfAssessment }})
         {% endif %}
     </th>
 </tr>
