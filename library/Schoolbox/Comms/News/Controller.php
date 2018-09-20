@@ -736,6 +736,7 @@ class Controller extends Base
             'slug' => $params->getSlug(),
             'referrer' => $params->getReferrer(),
             'page' => $this->getRequest()->query['page'],
+            'pageWithoutParams' => $this->getRouter()->generate('commsNews.getArchive'),
 
             /* Archive-specific vars that don't appear anywhere else
              */

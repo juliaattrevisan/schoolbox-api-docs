@@ -72,7 +72,7 @@
 
                     {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') %}
                     {% if archiveRoute %}
-                        <li {% if page == archiveRoute %}class="active"{% endif %} role="menuitem">
+                        <li {% if pageWithoutParams == archiveRoute %}class="active"{% endif %} role="menuitem">
                             <a href="{{ archiveRoute }}">{{ locale.news | capitalize }} Archive</a>
                         </li>
                     {% endif %}
