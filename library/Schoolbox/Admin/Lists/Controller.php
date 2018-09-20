@@ -501,7 +501,7 @@ class Controller extends Base
                         'caption'   => 'Visible to Staff & Instructors only',
                         'tooltip'   => 'If on, assessments with this work-type will only be visible to Staff or Instructors. Assessment marks will still be included in aggregate marks',
                         'checkbox'  => true,
-                        'width'     => 1,
+                        'width'     => 2,
                         'mandatory' => true,
                     ],
                     'name'          => [
@@ -512,7 +512,7 @@ class Controller extends Base
                     ],
                     'externalResultType' => [
                         'caption'   => 'External SIS Type',
-                        'width'     => 4,
+                        'width'     => 3,
                     ]
                 ]
             ],
