@@ -59,48 +59,44 @@
             {% set subheading = year %}
         {% endif %}
 
-        <div class="small-12 medium-9 island">
-            <h2 class="subheader">{{ subheading }}</h2>
-            {% if year %}
-                <section>
-                    <script src="/javascript/shared/comms/articletabs.js"></script>
-                    <script src="/javascript/shared/comms/saveforlater.js"></script>
-                    <script>
-                        $(function() {
-                            var $newsContainer = $('#news-container');
+        <h2 class="subheader">{{ subheading }}</h2>
+        {% if year %}
+            <section>
+                <script src="/javascript/shared/comms/articletabs.js"></script>
+                <script src="/javascript/shared/comms/saveforlater.js"></script>
+                <script>
+                    $(function() {
+                        var $newsContainer = $('#news-container');
 
-                            $newsContainer.articleTabs({
-                                'topicTabs': $('#news-topics'),
-                                'updateUrl': true
-                            });
-
-                            $newsContainer.saveForLater();
+                        $newsContainer.articleTabs({
+                            'topicTabs': $('#news-topics'),
+                            'updateUrl': true
                         });
-                    </script>
 
-                    {% include '@commsNews/tabs.twig' with {
-                        url: routeLookup('commsNews.getListByTopic', {year: year, month: month}),
-                        topicContainerId: 'news-topics',
-                        topics: topics,
-                        topicAll: topicAll,
-                        slug: slug,
-                        compactMode: false,
-                        limit: limit,
-                        referrer: referrer
-                    } %}
+                        $newsContainer.saveForLater();
+                    });
+                </script>
 
-                    <div id="news-container">
-                        {# TODO: Purifying pre-built content strips data-saveforlater var
-                         # For now, presume this was previously filtered elsewhere server-side
-                         #}
-                        {{ initialContent|raw }}
-                    </div>
-                </section>
-            {% endif %}
-        </div>
+                {% include '@commsNews/tabs.twig' with {
+                    url: routeLookup('commsNews.getListByTopic', {year: year, month: month}),
+                    topicContainerId: 'news-topics',
+                    topics: topics,
+                    topicAll: topicAll,
+                    slug: slug,
+                    compactMode: false,
+                    limit: limit,
+                    referrer: referrer
+                } %}
 
-        <div id="toast" class="toast"></div>
-
+                <div id="news-container">
+                    {# TODO: Purifying pre-built content strips data-saveforlater var
+                     # For now, presume this was previously filtered elsewhere server-side
+                     #}
+                    {{ initialContent|raw }}
+                </div>
+            </section>
+        {% endif %}
+        
     {% else %}
 
         <div class="small-12 columns">
