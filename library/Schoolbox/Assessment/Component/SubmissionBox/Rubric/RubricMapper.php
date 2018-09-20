@@ -708,7 +708,7 @@ class RubricMapper
             // Create the cap mark
             $capabilityMarkScheme = $markSchemeFactory->spawnMarkSchemeFor(
                 $feedback->getAssessable(),
-                $capabilityUsage->calculateMaxValueFromIndicators()
+                $capabilityUsage->getMaxValue()
             );
             $capabilityMark = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
                 ->setValue($capabilityMarkModel->getValue());
