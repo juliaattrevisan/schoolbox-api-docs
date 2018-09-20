@@ -282,13 +282,13 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
             return self::STATE_DRAFT;
         }
 
+        if (!$approvedAt) {
+            return self::STATE_AWAITING_MODERATION;
+        }
+
         // Populated when rejected and exists until either (re-)submitted or approved.
         if ($rejectedAt) {
             return self::STATE_REJECTED;
-        }
-
-        if (!$approvedAt) {
-            return self::STATE_AWAITING_MODERATION;
         }
 
         $now = $now ?? Alaress_Date_Format::now();
