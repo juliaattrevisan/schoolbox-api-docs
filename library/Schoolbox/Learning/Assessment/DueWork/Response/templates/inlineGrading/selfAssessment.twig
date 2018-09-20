@@ -94,14 +94,13 @@
             %}
             {% include '@rubric/' ~ rubricTemplate with {
                 rubricGrid: assessment.rubricGrid,
-                rubricMarkedGrid: latestSelfReflectedFeedback.rubricMarkedGrid,
+                rubricMarkedGrid: latestFeedback.rubricMarkedGrid,
                 learner: participant.user,
                 markType: rubricContext.markType,
                 markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
                 showDescriptorValue: showDescriptorValue,
                 showGroupTotal: showGroupTotal,
                 showRubricTotal: showRubricTotal,
-                latestSelfReflectedFeedback: latestSelfReflectedFeedback,
                 self: self,
                 studentView: true,
                 selfAssess: selfAssess,
