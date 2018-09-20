@@ -113,7 +113,7 @@
                         <a class="close-reveal-modal" aria-label="Close">×</a>
 
                         <div v-show="pageShow.index">
-                            <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions.base" v-if="audienceOption.displayInModal">
+                            <div class="small-12 medium-4 columns left" v-for="audienceOption in audienceOptions.base" v-if="audienceOption.displayInModal">
                                 <button class="button-block" @click="changePage(audienceOption)">
                                     <i :class="'icon-' + audienceOption.icon"></i>
                                     ${ audienceOption.namePlural }
