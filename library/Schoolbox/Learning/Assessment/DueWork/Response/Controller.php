@@ -276,6 +276,9 @@ class Controller extends Base
         // Authoritative feedback, draft or published
         $feedback = $participant->findMostRecentInstructorGivenFeedback();
 
+        // Self-assessed feedback (published only)
+        $selfAssessmentFeedback = $response->findMostRecentSelfAssessedPublishedFeedback();
+
         // The zone which contains the files
         $attachZoneFactory = new Attachzone\Factory();
         $attachZone        = $attachZoneFactory->buildForDueWorkFeedback(
@@ -293,6 +296,7 @@ class Controller extends Base
             'response' => $response,
             'isMostRecentResponse' => $isMostRecentResponse,
             'feedback' => $feedback,
+            'selfAssessmentFeedback' => $selfAssessmentFeedback,
             'attachzone' => $attachZone->getTwigContext(),
             'selectedFileHash' => $this->getRequest()->query['hash'],
             'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
@@ -326,6 +330,11 @@ class Controller extends Base
             if ($feedback instanceof Feedback) {
                 $feedback->setRubricMarkedGrid($rubricMapper->retrieveMarkedGrid($feedback));
             }
+        }
+
+        // Self-assessment rubric data
+        if ($selfAssessmentFeedback instanceof Feedback && $assessment->getUseRubric()) {
+            $selfAssessmentFeedback->setRubricMarkedGrid($rubricMapper->retrieveMarkedGrid($selfAssessmentFeedback));
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));

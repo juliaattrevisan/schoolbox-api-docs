@@ -116,14 +116,14 @@
                 </span>
 
                 {# Self-Assessment #}
-                {% if learnerRubric %}
+                {% if selfAssessmentFeedback %}
                     {% if latestSelfReflectedFeedback.isSelfGrading %}
                         {% set selfReflectionName = locale.selfAssessment.proper %}
                     {% else %}
                         {% set selfReflectionName = locale.selfReflection.proper %}
                     {% endif %}
 
-                    ({{ learnerRubric.humanReadableMark }} given in {{ selfReflectionName }})
+                    ({{ selfAssessmentFeedback.humanReadableMark }} given in {{ selfReflectionName }})
                 {% endif %}
             </th>
         </tr>
