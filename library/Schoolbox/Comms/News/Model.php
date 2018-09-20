@@ -93,7 +93,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     private $featureImage;
 
     /**
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
     private $submittedAt;
 
@@ -107,14 +107,14 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     /**
      * The datetime when this article was allowed to be published
      *
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
     private $acceptedAt;
 
     /**
      * The datetime when this article was rejected
      *
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
     private $rejectedAt;
 
@@ -128,7 +128,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     /**
      * The reason why this article was rejected
      *
-     * @var string
+     * @var string|null
      */
     private $rejectedReason;
 
