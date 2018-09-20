@@ -36,7 +36,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
     // Composite states
     private const STATE_APPROVED =  [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
-    private const STATE_SUBMITTED = [self::STATE_AWAITING_MODERATION, self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
+    private const STATE_SUBMITTED = [self::STATE_AWAITING_MODERATION, self::STATE_REJECTED, self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
 
     // Authoritative declaration of *possible* transitions.
     // *Permitted* (ie for some user) transitions are always a subset of these.
@@ -44,7 +44,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     // Action=Submit
     private const VALID_STATES_TO_SUBMIT    = [self::STATE_DRAFT, self::STATE_REJECTED];
     // Action=UnSubmit
-    private const VALID_STATES_TO_UN_SUBMIT = [self:: STATE_AWAITING_MODERATION, self:: STATE_AWAITING_PUBLICATION, self:: STATE_PUBLISHED, self:: STATE_EXPIRED];
+    private const VALID_STATES_TO_UN_SUBMIT = self::STATE_SUBMITTED;
     // Action=Approve
     private const VALID_STATES_TO_APPROVE   = [self::STATE_DRAFT, self::STATE_AWAITING_MODERATION, self::STATE_REJECTED];
     // Action=Reject
@@ -282,13 +282,13 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
             return self::STATE_DRAFT;
         }
 
-        if (!$approvedAt) {
-            return self::STATE_AWAITING_MODERATION;
-        }
-
         // Populated when rejected and exists until either (re-)submitted or approved.
         if ($rejectedAt) {
             return self::STATE_REJECTED;
+        }
+
+        if (!$approvedAt) {
+            return self::STATE_AWAITING_MODERATION;
         }
 
         $now = $now ?? Alaress_Date_Format::now();
@@ -410,7 +410,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
         // Already submitted. No risk to caller of data loss
         if (self::STATE_AWAITING_MODERATION === $currentState) {
-            throw new InvalidTransitionException($currentState, "Article was already submitted at {$this->submittedAt}");
+            throw new InvalidTransitionException($currentState, "Article was already submitted at {$this->submittedAt->getDatabase()}");
         }
 
         // Invalid operation
@@ -419,6 +419,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         }
 
         $this->submittedAt = $now;
+        $this->rejectedAt = null;
     }
 
 
@@ -463,12 +464,12 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
         // Already approved.
         if ($this->isApproved($now)) {
-            throw new InvalidTransitionException($currentState, "Article was already approved by {$this->acceptedBy->getFullName()} at {$this->acceptedAt->getLocalShort()}");
+            throw new InvalidTransitionException($currentState, "Article was already approved by user {$this->acceptedBy->getId()} at {$this->acceptedAt->getDatabase()}");
         }
 
         // Ensure it is able to be approved
         if (!\in_array($currentState, self::VALID_STATES_TO_APPROVE, true)) {
-            throw new InvalidTransitionException($currentState, "Article was already approved by {$this->acceptedBy->getFullName()} at {$this->acceptedAt->getLocalShort()}");
+            throw new InvalidTransitionException($currentState, "Article was already approved by user {$this->acceptedBy->getId()} at {$this->acceptedAt->getDatabase()}");
         }
 
         // Ensure it is submitted
@@ -502,7 +503,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
         // Already rejected.
         if (self::STATE_REJECTED === $currentState) {
-            throw new InvalidTransitionException($currentState, "Article was already rejected by {$this->rejectedBy->getFullName()} at {$this->rejectedAt->getLocalShort()}");
+            throw new InvalidTransitionException($currentState, "Article was already rejected by user {$this->rejectedBy->getId()} at {$this->rejectedAt->getDatabase()}");
         }
 
         // Invalid operation
@@ -511,7 +512,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         }
 
         // Treat article as never being submitted or approved.
-        $this->submittedAt = null;
         $this->acceptedAt  = null;
         $this->acceptedBy  = null;
 
@@ -536,7 +536,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
         // Already archived?
         if (self::STATE_EXPIRED === $currentState) {
-            throw new InvalidTransitionException($currentState, "Article has been expired as of {$this->expiresAt->getLocalShort()}");
+            throw new InvalidTransitionException($currentState, "Article has been expired as of {$this->expiresAt->getDatabase()}");
         }
 
         // Ensure transition is valid
