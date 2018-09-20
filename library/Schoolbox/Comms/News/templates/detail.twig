@@ -241,12 +241,19 @@ Data:
                 <li><a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article">Modify</a></li>
             {% endif %}
 
+            {# Reject this news article #}
+            {% if rejectRoute %}
+                <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
+            {% endif %}
+
             {# If you have permission to submit and implicitly approve your own articles, do that, otherwise submit for moderation #}
             {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
             {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
-            {% if not article.isSubmitted %}
+            {% if approveRoute or submitRoute %}
                 {% if approveRoute %}
                     {% set buttonText = 'Approve' %}
+                {% elseif article.isRejected %}
+                    {% set buttonText = 'Resubmit for moderation' %}
                 {% else %}
                     {% set buttonText = 'Submit for moderation' %}
                 {% endif %}
@@ -255,19 +262,6 @@ Data:
                         <input type="submit" value="{{ buttonText }}" />
                     </form>
                 </li>
-            {% endif %}
-
-            {# Reject this news article #}
-            {% if rejectRoute %}
-                <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
-            {% endif %}
-
-            {% if article.isAwaitingModeration and approveRoute %}
-            <li>
-                <form action="{{ approveRoute }}" method="post">
-                    <input type="submit" value="Approve" />
-                </form>
-            </li>
             {% endif %}
         </ul>
     </div>
