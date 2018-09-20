@@ -115,15 +115,9 @@
                     {{ rubricMarkedGrid.retrieveHumanReadableMark }}
                 </span>
 
-                {# Self-Assessment #}
-                {% if selfAssessmentFeedback %}
-                    {% if latestSelfReflectedFeedback.isSelfGrading %}
-                        {% set selfReflectionName = locale.selfAssessment.proper %}
-                    {% else %}
-                        {% set selfReflectionName = locale.selfReflection.proper %}
-                    {% endif %}
-
-                    ({{ selfAssessmentFeedback.humanReadableMark }} given in {{ selfReflectionName }})
+                {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
+                {% if selfAssessmentFeedback.isSelfGrading %}
+                    ({{ selfAssessmentFeedback.humanReadableMark }} given in {{ locale.selfAssessment.proper }})
                 {% endif %}
             </th>
         </tr>
