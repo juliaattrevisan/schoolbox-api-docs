@@ -1,4 +1,3 @@
-
 <input id="{{ inputId }}"
        name="{{ formField }}[descriptors][{{ descriptor.id }}][selected]"
        value="1"
@@ -11,50 +10,48 @@
 />
 
 <label for="{{ inputId }}">
-                                    <span class="rb-description">
-                                        {{- descriptor.description|nl2br -}}
-                                    </span>
+    <span class="rb-description">
+        {{- descriptor.description|nl2br -}}
+    </span>
 
     {% set descriptorHasMarkRange = rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
 
     {# Just show a text value if the descriptor is not selected #}
     {% if descriptor.hasValue and showDescriptorValue and not hidePoints %}
         <span class="rb-value {% if not descriptorHasMarkRange %}used {% elseif isDescriptorSelected %}hide{% endif %}">
-                                            {% if descriptorHasMarkRange %}
-                                                {{ descriptor.minValue }}–{{ descriptor.maxValue }}
-                                            {% else %}
-                                                {{ descriptor.maxValue }}
-                                            {% endif %}
-                                        </span>
+            {% if descriptorHasMarkRange %}
+                {{ descriptor.minValue }}–{{ descriptor.maxValue }}
+            {% else %}
+                {{ descriptor.maxValue }}
+            {% endif %}
+        </span>
     {% endif %}
 </label>
 
 {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
-                                {% if rubricGrid.assessment.useMarkRange %}
-                                    {# Render a dropdown to select a value from the range #}
+{% if rubricGrid.assessment.useMarkRange %}
+    {# Render a dropdown to select a value from the range #}
 
-                                    <select id="rangeDropdown-{{ descriptor.id }}"
-                                            name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
-                                            class="{% if not isDescriptorSelected or not descriptorHasMarkRange %} hide{% endif %}
-                                            {% if descriptorHasMarkRange and not hidePoints %}used{% endif %}"
-                                            data-rubric="{{ rubricGrid.id }}"
-                                            data-rubric-group="{{ groupUsage.capability.id }}"
-                                            data-rubric-descriptor="{{ descriptor.id }}"
-                                    >
-                                        {# Selected value: if not provided, use max #}
-                                        {% set selectedValue = isDescriptorSelected ? indicatorMark.value : descriptor.maxValue %}
+    <select id="rangeDropdown-{{ descriptor.id }}"
+            name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
+            class="{% if not isDescriptorSelected or not descriptorHasMarkRange %} hide{% endif %}
+            {% if descriptorHasMarkRange and not hidePoints %}used{% endif %}"
+            data-rubric="{{ rubricGrid.id }}"
+            data-rubric-group="{{ groupUsage.capability.id }}"
+            data-rubric-descriptor="{{ descriptor.id }}"
+    >
+        {# Selected value: if not provided, use max #}
+        {% set selectedValue = isDescriptorSelected ? indicatorMark.value : descriptor.maxValue %}
 
-                                        {% for i in descriptor.minValue..descriptor.maxValue %}
-                                            <option value="{{ i }}"
-                                                    {% if i == selectedValue %}selected{% endif %}
-                                            >{{ i }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                {% endif %}
+        {% for i in descriptor.minValue..descriptor.maxValue %}
+            <option value="{{ i }}" {% if i == selectedValue %}selected{% endif %}>{{ i }}</option>
+        {% endfor %}
+    </select>
+{% endif %}
 
-                                {#{% if learnerSelected %}#}
-                                    {#<img class="rb-self-reflection-choice"#}
-                                         {#src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"#}
-                                         {#title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />#}
-                                {#{% endif %}#}
+{# Self-assessment #}
+{% if learnerSelected %}
+    <img class="rb-self-reflection-choice"
+         src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
+         title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
+{% endif %}
