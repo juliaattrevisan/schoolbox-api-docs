@@ -71,6 +71,14 @@
                             <a href="{{ savedRoute }}">My Saved {{ locale.news | capitalize }}</a>
                         </li>
                     {% endif %}
+
+                    {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') %}
+                    {% if archiveRoute %}
+                        <li {% if page == archiveRoute %}class="active"{% endif %} role="menuitem">
+                            <a href="{{ archiveRoute }}">{{ locale.news | capitalize }} Archive</a>
+                        </li>
+                        {# TODO if this is selected, also render the archive filter #}
+                    {% endif %}
                 </ul>
             </nav>
         </section>
