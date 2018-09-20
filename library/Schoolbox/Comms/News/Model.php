@@ -548,7 +548,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         $expireAt = $expireAt ?? Alaress_Date_Format::now();
 
         // Ensure the publish date does not become after the expire date
-        if($this->publishAt->gt($expireAt)){
+        if ($this->publishAt->gt($expireAt)) {
             $this->publishAt = $expireAt;
         }
 

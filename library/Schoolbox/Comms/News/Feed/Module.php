@@ -40,7 +40,7 @@ class Module extends BaseModule
          */
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, function(array $params) {
+            new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, function (array $params) {
                 return $params['folderId'];
             }, Access\Access::getInstance())
         );

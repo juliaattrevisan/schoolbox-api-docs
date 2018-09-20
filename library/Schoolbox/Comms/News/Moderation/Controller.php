@@ -115,11 +115,11 @@ class Controller extends Base
         $spec        = $this->validSpecFactory->buildSpecCanBeSubmitted($this->getUser());
         $unsatisfied = $spec->remainderUnsatisfiedBy($article);
 
-        if($unsatisfied){
+        if ($unsatisfied) {
             $this->getResponse()->status->set(400);
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => false,
-                'message' => "Article appears to be invalid"
+                'message' => "Article appears to be invalid",
             ]));
             return;
         }
@@ -191,11 +191,11 @@ class Controller extends Base
         // Note that if article is already rejected, but the reason given is the same, we don't care
         // and just report a success. The implication is the rejectingUser will remain as the first-in user.
 
-        if(!$article->isRejected()){
+        if (!$article->isRejected()) {
             // Normal Case
             $article->reject($this->getUser(), $rejectionReason);
             $this->newsMapper->save($article);
-        } elseif($article->getRejectedReason() !== $rejectionReason) {
+        } elseif ($article->getRejectedReason() !== $rejectionReason) {
             // If the article is already rejected then
             // we will lose either the original reason, or the new reason.
             // We need to warn the client so it can decide what to do.
