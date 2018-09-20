@@ -110,8 +110,8 @@
                         collapsed: true,
                         feedbackRubricContexts: feedbackRubricContexts,
                         deleteIcon: true,
-                        showRubricTotal: true,
-                        showGroupTotal: assessment.markPerCapability
+                        showRubricTotal: not currentFeedback.isSelfReflectionOnly,
+                        showGroupTotal: not currentFeedback.isSelfReflectionOnly and assessment.markPerCapability,
                     }
                     only %}
                 {% endfor %}
