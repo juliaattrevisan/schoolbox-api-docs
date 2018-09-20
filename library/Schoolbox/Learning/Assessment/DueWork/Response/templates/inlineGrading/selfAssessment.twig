@@ -111,30 +111,6 @@
     {% endif %}
 {% endblock %}
 
-{% block gradeValue %}
-  {% if 'none' != markSchemeName | lower %}
-      <div class="small-12 medium-3 column">
-          <label>{{ locale.grades.proper }}
-              {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
-                  participant: participant,
-                  feedback: latestFeedback,
-                  markScheme: assessment.markScheme,
-                  tabIndex: 1,
-                  errors: errors,
-                  readonly: readonly
-              } only %}
-
-              {% if assessment.useRubric and rubricContext and not readonly and config.rubric_show_points %}
-                  {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
-                      locale: locale,
-                      rubricContext: rubricContext
-                  } only %}
-              {% endif %}
-          </label>
-      </div>
-  {% endif %}
-{% endblock %}
-
 {# Comment box #}
 {% block comment %}
     <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
