@@ -8,11 +8,13 @@
  # * markVisibility:          ? Should be inferred from grid's assessment (assessment.isVisibleTo(USER))
  # * useMarkRange:            ? Should be inferred from grid's assessment (assessment.markRange)
  # * showGroupTotal:          ? Should be inferred from grid's assessment (assessment.markPerCapability)
+ #                              but is also false for self-reflections
+ # * showRubricTotal:         False for self-reflections
  #}
 
 {% set markType = rubricGrid.assessment.markScheme.generateContext %}
 {#{% set markSchemeName = rubricGrid.assessment.markScheme.title %}#}
-{% set showSummaryRows = rubricGrid.assessment.markPerCapability and rubricMarkedGrid and markType.mode != "none" %}
+{% set showSummaryRows = showGroupTotal and rubricGrid.assessment.markPerCapability and rubricMarkedGrid and markType.mode != "none" %}
 
 <div class="scrollable">
 <table class="rb stack-for-medium-down">
@@ -67,7 +69,7 @@
                                 <p>
                                     {{- descriptor.description|nl2br -}}
                                 </p>
-                                {% if descriptor.hasValue and config.rubric_show_points %}
+                                {% if descriptor.hasValue and config.rubric_show_points and showRubricTotal %}
                                     <aside>
                                         {% if rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
                                             {% if isMarkDisplayed %}
