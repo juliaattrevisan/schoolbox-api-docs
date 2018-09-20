@@ -186,6 +186,7 @@ class Controller extends Base
      */
     public function postReject(Model $article): void
     {
+        $responseData    = ['success' => true];
         $rejectionReason = $this->getRequest()->post['rejectedReason'];
 
         // Note that if article is already rejected, but the reason given is the same, we don't care
@@ -195,6 +196,7 @@ class Controller extends Base
             // Normal Case
             $article->reject($this->getUser(), $rejectionReason);
             $this->newsMapper->save($article);
+            $responseData['success'] = true;
         } elseif ($article->getRejectedReason() !== $rejectionReason) {
             // If the article is already rejected then
             // we will lose either the original reason, or the new reason.
@@ -203,17 +205,20 @@ class Controller extends Base
             $message = "Article was already rejected by {$article->getRejectedBy()->getFullName()} at {$article->getRejectedAt()->getLocalShort()}";
 
             $this->getResponse()->status->set(400);
-            $this->getResponse()->content->set($this->buildJsonOutput([
-                'success' => false,
-                'message' => $message
-            ]));
-            return;
+            $responseData['success'] = false;
+            $responseData['message'] = $message;
+        } else {
+            // Already rejected but same message
+            $responseData['message'] = 'Already rejected but reason is not different.';
         }
 
-        // TODO. The client should be responsible for determining what to do after rejection.
-        // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
-        // TODO. THis should just return the outcome of the request, not a redirect.
-        $route = $this->getRouter()->generate('commsNewsModeration.getList');
-        $this->getResponse()->redirect->to($route);
+        if($responseData['success']){
+            // TODO. The client should be responsible for determining what to do after rejection.
+            // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
+            // TODO. THis should just return the outcome of the request, not a redirect.
+            $responseData['redirect'] = $this->getRouter()->generate('commsNewsModeration.getList');
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($responseData));
     }
 }
