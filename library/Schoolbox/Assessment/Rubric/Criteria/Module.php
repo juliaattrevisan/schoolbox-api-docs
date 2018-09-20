@@ -38,7 +38,9 @@ class Module extends BaseModule
         // Criteria form actions
         $permission = new Rule\HasHomepageAccess(
             UserAccess::ACCESS_WRITE,
-            'folderId',
+            function (array $params = []) {
+                return $params['folderId'];
+            },
             Access::getInstance()
         );
         $preload    = function ($params) {
