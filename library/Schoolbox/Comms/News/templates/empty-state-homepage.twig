@@ -1,0 +1,11 @@
+{% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+<div class="empty-state no-margin">
+    <i class="icon-news"></i>
+    <p>
+        {% if readonly %}
+            There aren't any {{ locale.news }} articles in this homepage.
+        {% else %}
+            <a href="{{ createRoute }}">Post a {{ locale.news }} article</a> to share new information on this homepage.
+        {% endif %}
+    </p>
+</div>

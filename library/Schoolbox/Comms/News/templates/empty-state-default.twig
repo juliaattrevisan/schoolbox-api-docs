@@ -1,0 +1,12 @@
+{% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+<div class="empty-state no-margin">
+    <i class="icon-news"></i>
+    <p>
+        {% if readonly %}
+            There is no {{ locale.news }} in this topic to view at this time.
+        {% else %}
+            {# Todo: Update the text #}
+            There is no {{ locale.news }} in this topic to view at this time.
+        {% endif %}
+    </p>
+</div>
