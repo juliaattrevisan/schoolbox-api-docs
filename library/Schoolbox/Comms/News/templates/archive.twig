@@ -23,6 +23,11 @@
 {% block newsTitle %}{{ locale.news.proper }} Archive{% endblock %}
 
 {% if availableYearsAndMonths|length %}
+    {% block subheader %}
+        <div class="small-12 columns">
+            <h2 class="subheader">{{ subheading }}</h2>
+        </div>
+    {% endblock %}
 
     {% block archiveFilter %}
         {# Month/Year Selector #}
@@ -59,7 +64,6 @@
 
     {% if availableYearsAndMonths|length %}
 
-        <h2 class="subheader">{{ subheading }}</h2>
         {% if year %}
             <section>
                 <script src="/javascript/shared/comms/articletabs.js"></script>
