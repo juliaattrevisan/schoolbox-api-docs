@@ -77,14 +77,21 @@
                             <li v-for="audienceBrick in audienceBricks">
                                 <div class="actions-small-1">
                                     <div class="card small-12">
-                                        <h4 :title="audienceBrick.nameLabel">${ audienceBrick.nameLabel }</h4>
+                                        <h4 :title="audienceBrick.nameLabel">
+                                            <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">
+                                                ${ audienceBrick.nameLabel }
+                                            </a>
+                                            <template v-if="audienceBrick.isSimple()">
+                                                ${ audienceBrick.nameLabel }
+                                            </template>
+                                        </h4>
                                         <p class="meta">
                                             <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.typeLabel }</a>
-                                            <slot v-if="audienceBrick.isSimple()">${ audienceBrick.typeLabel }</slot>
+                                            <template v-if="audienceBrick.isSimple()">${ audienceBrick.typeLabel }</template>
                                         </p>
                                         <p class="meta" :title="audienceBrick.modifier">
                                             <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.modifierLabel }</a>
-                                            <slot v-if="audienceBrick.isSimple()">${ audienceBrick.modifierLabel }</slot>
+                                            <template v-if="audienceBrick.isSimple()">${ audienceBrick.modifierLabel }</template>
                                         </p>
                                     </div>
                                     <nav>
@@ -202,11 +209,11 @@
 
                     {# composite info modal #}
                     <div data-reveal id="audience-composite" class="reveal-modal">
-                        <h2>Combination Details</h2>
+                        <h2>Complex Audience</h2>
                         <a class="close-reveal-modal" aria-label="Close">×</a>
                         <template v-for="dimensionData in selectedCompositeBrick.modalData">
                             <div class="small-12 medium-6 columns">
-                                <h3>${ dimensionData.typeLabel }</h3>
+                                <h3>${ dimensionData.typeLabel.singular }</h3>
                                 <ul>
                                     <li v-for="label in dimensionData.valueLabels">
                                         ${ label }
@@ -362,9 +369,17 @@
 
     // Bricks need to render various human-friendly labels, so inject the entityType labels
     // into the BrickManager so it can supply it to Bricks that it creates.
-    var entityTypeLabelMap = {composite: 'Composite'};
-    for(var entityType in audienceOptions){
-        entityTypeLabelMap[entityType] = audienceOptions[entityType].label;
+    var entityTypeLabelMap = {
+        composite: { // -_-
+            singular: 'Complex Audience',
+            plural: 'Complex Audience'
+        }
+    };
+    for (var entityType in audienceOptions) {
+        entityTypeLabelMap[entityType] = {
+            singular: audienceOptions[entityType].label,
+            plural: audienceOptions[entityType].namePlural
+        };
     }
 
     var modifierLabelMap = {
