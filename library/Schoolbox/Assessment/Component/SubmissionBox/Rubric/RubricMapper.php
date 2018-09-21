@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Rubric\Factory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
+use Schoolbox\Assessment\Rubric\ValidCapabilityMax;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
@@ -504,6 +505,10 @@ class RubricMapper
         $existingLevelIds    = $levelMapper->findIdsByColumn('box_id', $submissionBox->getId());
         $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
 
+        // Spec for valid capability max marks
+        $assessment = $grid->getAssessment();
+        $markPerCap = $assessment instanceof DueWork\Model && $assessment->getMarkPerCapability();
+        $spec       = new ValidCapabilityMax($markPerCap);
 
         // First, persist the levels
         $levelModels   = $levelMapper->createCollection();
@@ -558,10 +563,19 @@ class RubricMapper
         $capabilityUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
 
         foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
+
+            // Validate cap against spec
+            $capabilityMaxValue = $capabilityUsage->getMaxValue();
+            if (!$spec->isSatisfiedBy($capabilityMaxValue)) {
+                throw new \InvalidArgumentException(
+                    'provide capability maximum points that are numeric and greater than or equal to 0'
+                );
+            }
+
             $capabilityUsageModel = $capabilityUsageMapper->createModel()
                 ->setSubmissionBox($submissionBox)
                 ->setGroup($capabilityModels[$capabilityUsage->getCapability()->getId()])
-                ->setMaxValue($capabilityUsage->getMaxValue())
+                ->setMaxValue($capabilityMaxValue)
                 ->setSequence($capabilitySequence++);
             $capabilityUsageModels->add($capabilityUsageModel);
 
