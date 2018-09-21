@@ -174,21 +174,21 @@
                             </div>
 
                             <div class="row">
-                                <template v-for="(item, index) in intersect">
+                                <template v-for="(item, key, index) in intersect">
                                     <div class="small-12 medium-6 columns checklist">
                                         <legend>
-                                            <label for="">Audience Type ${ index }:</label>
-                                            <select @change="updateIntersectList(index)" v-model="intersect[index]">
-                                                <option :value="audienceOption" v-for="audienceOption in audienceOptions.intersect[index]" v-if="audienceOption.displayInModal">
+                                            <label for="">Audience Type ${ index + 1 }:</label>
+                                            <select @change="updateIntersectList(key)" v-model="intersect[key]">
+                                                <option :value="audienceOption" v-for="audienceOption in audienceOptions.intersect[key]" v-if="audienceOption.displayInModal">
                                                     ${ audienceOption.label }
                                                 </option>
                                             </select>
                                         </legend>
-                                        <input type="checkbox" :id="index + '-all'" v-model="selectAll[index]" @change="toggleSelectAll(index)">
-                                        <label :for="index + '-all'" class="checkbox-label">Select all</label>
-                                        <slot v-for="(item, index2) in audienceListItemsIntersect[index]">
-                                            <input type="checkbox" :id="index + '-' + index2" :value="index2" v-model="intersectList[index]">
-                                            <label :for="index + '-' + index2" class="checkbox-label">${ item }</label>
+                                        <input type="checkbox" :id="index + '-all'" v-model="selectAll[key]" @change="toggleSelectAll(key)">
+                                        <label :for="key + '-all'" class="checkbox-label">Select all</label>
+                                        <slot v-for="(item, key2) in audienceListItemsIntersect[key]">
+                                            <input type="checkbox" :id="key + '-' + key2" :value="key2" v-model="intersectList[key]">
+                                            <label :for="key + '-' + key2" class="checkbox-label">${ item }</label>
                                         </slot>
                                     </div>
                                 </template>
@@ -207,7 +207,14 @@
                     <div data-reveal id="audience-composite" class="reveal-modal">
                         <h2>Complex Audience</h2>
                         <a class="close-reveal-modal" aria-label="Close">×</a>
-                        <template v-for="dimensionData in selectedCompositeBrick.modalData">
+
+                        <p class="meta">Some help text</p>
+
+                        <p v-for="dimensionData in selectedCompositeBrick.modalData">
+                            <b>${ dimensionData.typeLabel.plural }</b>: <template v-for="(label, index) in dimensionData.valueLabels">${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template> </template>
+                        </p>
+
+                        {#<template v-for="dimensionData in selectedCompositeBrick.modalData">
                             <div class="small-12 medium-6 columns">
                                 <h3>${ dimensionData.typeLabel.singular }</h3>
                                 <ul>
@@ -216,7 +223,7 @@
                                     </li>
                                 </ul>
                             </div>
-                        </template>
+                        </template>#}
                     </div>
                 </fieldset>
 
