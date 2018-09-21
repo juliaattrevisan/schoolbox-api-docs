@@ -8,10 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
-use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
-use Schoolbox\Assessment\Rubric\ValidCapabilityMax;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 /**
  * Class Factory
@@ -34,9 +31,6 @@ class Factory
         $capabilities = $rubricData['group']      ?: [];
         $indicators   = $rubricData['criterion']  ?: [];
         $descriptors  = $rubricData['descriptor'] ?: [];
-        $assessment   = $grid->getAssessment();
-        $markPerCap   = $assessment instanceof DueWork && $assessment->getMarkPerCapability();
-        $spec         = new ValidCapabilityMax($markPerCap);
 
 
         /** @var Level[] $levelCache */
@@ -94,13 +88,7 @@ class Factory
                 $capability->setName($capabilityName);
             }
 
-            if ($spec->isSatisfiedBy($capabilityMaxValue)) {
-                $capabilityUsage = (new CapabilityUsage($capability))->setMaxValue($capabilityMaxValue);
-            } else {
-                throw new InvalidArgumentException(sprintf('provide capability maximum points that are numeric and greater than or equal to 0'));
-            }
-
-
+            $capabilityUsage = (new CapabilityUsage($capability))->setMaxValue($capabilityMaxValue);
             $capabilityCache[$capabilityId]             = $capability;
             $grid->getCapabilityUsages()[$capabilityId] = $capabilityUsage;
         }

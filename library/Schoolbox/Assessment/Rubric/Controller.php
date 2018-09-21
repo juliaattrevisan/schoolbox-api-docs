@@ -15,65 +15,44 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Rubric\Grid\Exporter\ArrayExporter;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Model as File;
 use Url;
 
 class Controller extends BaseController
 {
-
-    /** @var Factory */
-    private $factory;
-
-    /** @var RubricMapper */
+    /**
+     * @var RubricMapper
+     */
     private $mapper;
 
 
     /**
-     * @return Factory
+     * @var AssessmentDataSource
      */
-    public function getFactory()
-    {
-        return $this->factory;
-    }
+    private $assessmentDataSource;
 
 
     /**
-     * @param Factory $factory
-     * @return self
+     * Constructor
+     *
+     * @param RubricMapper         $mapper
+     * @param AssessmentDataSource $assessmentDataSource
      */
-    public function setFactory(Factory $factory)
-    {
-        $this->factory = $factory;
-        return $this;
+    public function __construct(
+        RubricMapper $mapper,
+        AssessmentDataSource $assessmentDataSource
+    ) {
+        $this->mapper               = $mapper;
+        $this->assessmentDataSource = $assessmentDataSource;
     }
 
-
-    /**
-     * @return RubricMapper
-     */
-    public function getMapper()
-    {
-        return $this->mapper;
-    }
-
-
-    /**
-     * @param RubricMapper $mapper
-     * @return self
-     */
-    public function setMapper(RubricMapper $mapper)
-    {
-        $this->mapper = $mapper;
-        return $this;
-    }
 
     /**
      * AJAX method for creating a new group or criterion
@@ -254,7 +233,7 @@ class Controller extends BaseController
 
             // attempt to build the grid
             $maxLevels = $this->getDi()->get('config')->get('rubric_max_levels');
-            [$postData, $usingMarkPerCapability, $usingMarkRange] = $this->getMapper()->buildFromCSV(
+            [$postData, $usingMarkPerCapability, $usingMarkRange] = $this->mapper->buildFromCSV(
                 $file,
                 $folder->getId(),
                 $maxLevels
@@ -303,15 +282,23 @@ class Controller extends BaseController
     {
         $post     = $this->request->post->get('rb');
         $boxId    = key($post);
-        $box      = SubmissionBoxMapper::getInstance()->findById($boxId);
-        $grid     = (new Factory())->buildFromPostData($post, $box->isMarkedPerRubricGroup(), $box->isMarkedUsingRange(), false);
-        $basename = (new Url($box->getName()))->getSlug();
-        $content  = $this->array2csv(
-            $grid->toGrid(
-                $this->request->post->getBool('markPerCapability') ?? false,
-                $this->request->post->getBool('useMarkRange') ?? false
-            )
+
+        // Note: I can't download rubrics for due works that don't exist yet
+        $box      = $this->assessmentDataSource->findById($boxId);
+        if (!$box instanceof DueWork) {
+            // This is an error. How do I generate one?
+            $this->sendError('Can only download rubrics for due work');
+            return;
+        }
+        $box->setMarkPerCapability($this->request->post->getBool('markPerCapability') ?? false)
+            ->setUseMarkRange($this->request->post->getBool('useMarkRange') ?? false);
+
+        $grid     = (new GridFactory())->buildFromPostData(
+            $this->mapper->retrieveGrid($box, false),
+            $post
         );
+        $basename = (new Url($box->getTitle()))->getSlug();
+        $content  = $this->array2csv((new ArrayExporter())->export($grid));
 
         $headers  = $this->getResponse()->headers;
 
