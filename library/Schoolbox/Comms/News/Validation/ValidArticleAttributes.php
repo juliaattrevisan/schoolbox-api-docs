@@ -32,7 +32,7 @@ class ValidArticleAttributes extends Specification\Leaf
         /* A valid article consists of title, publish and expiry dates
          * Publish must occur before, or equal to, expiry
          */
-        $hasTitle = '' !== trim($article->getTitle());
+        $hasTitle =  '' !== trim($article->getTitle() ?? '');
         $hasPublishDate = $article->getPublishAt() !== null && !$article->getPublishAt()->isNull();
         $hasExpiryDate = $article->getExpiresAt() !== null && !$article->getExpiresAt()->isNull();
 
