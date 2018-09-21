@@ -107,7 +107,9 @@ Data:
     {% endif %}
 
     {# Unpublish article (just a reject renamed to unpublish when the article is published or archived) #}
-    {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
+    {% if article.canBeRejected %}
+        {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
+    {% endif %}
 
     {# Statistics link: must be author or comms officer and article must be published #}
     {#{% set statisticsRoute = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {article: article, articleId: article.id}) %}#}
@@ -247,8 +249,12 @@ Data:
             {% endif %}
 
             {# If you have permission to submit and implicitly approve your own articles, do that, otherwise submit for moderation #}
-            {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
-            {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
+            {% if article.canBeApproved %}
+                {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
+            {% endif %}
+            {% if article.canBeSubmitted %}
+                {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
+            {% endif %}
             {% if approveRoute or submitRoute %}
                 {% if approveRoute %}
                     {% set buttonText = 'Approve' %}

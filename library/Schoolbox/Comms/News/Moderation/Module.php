@@ -17,9 +17,6 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Authorizer\Rule\CanModerateAudience;
 use Schoolbox\Comms\News\Authorizer\Rule\IsModerationEnabled;
-use Schoolbox\Comms\News\Authorizer\Rule\StateCanBeSubmitted;
-use Schoolbox\Comms\News\Authorizer\Rule\StateCanBeApproved;
-use Schoolbox\Comms\News\Authorizer\Rule\StateCanBeRejected;
 use Schoolbox\Comms\News\Authorizer\Rule\IsArticleAuthor;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Policy;
@@ -53,10 +50,9 @@ class Module extends BaseModule
             )
         );
 
-        // loggedIn && canBeSubmitted && (SU || CO || moderator || (moderationEnabled && author))
+        // loggedIn && (SU || CO || moderator || (moderationEnabled && author))
         $canSubmit = new Rule\All(
             new Rule\IsLoggedIn(),
-            new StateCanBeSubmitted(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
@@ -68,10 +64,9 @@ class Module extends BaseModule
             )
         );
 
-        // loggedIn && canBeApproved && (SU || CO || moderator)
+        // loggedIn && (SU || CO || moderator)
         $canApprove = new Rule\All(
             new Rule\IsLoggedIn(),
-            new StateCanBeApproved(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
@@ -79,10 +74,9 @@ class Module extends BaseModule
             )
         );
 
-        // loggedIn && canBeRejected && (SU || CO || moderator)
+        // loggedIn && (SU || CO || moderator)
         $canReject = new Rule\All(
             new Rule\IsLoggedIn(),
-            new StateCanBeRejected(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
