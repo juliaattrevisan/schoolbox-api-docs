@@ -29,14 +29,14 @@
     {% block archiveFilter %}
         {# Month/Year Selector #}
         <nav>
-            <ul class="side-nav">
+            <ul class="news-archive-filter side-nav">
                 {% for availableYear, availableMonths in availableYearsAndMonths %}
 
                     <li class="{{ year == availableYear and not month ? 'active' : '' }}" role="menuitem">
                         <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear}) }}">
                             {{ availableYear }}
                         </a>
-                        <ul>
+                        <ul class="months">
                             {% for availableMonth, val in availableMonths %}
                                 {% set archiveDate = availableYear ~ '-' ~ availableMonth ~ '-01' %}
 
