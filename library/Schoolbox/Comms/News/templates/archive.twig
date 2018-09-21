@@ -32,7 +32,7 @@
             <ul class="news-archive-filter side-nav">
                 {% for availableYear, availableMonths in availableYearsAndMonths %}
 
-                    <li class="{{ year == availableYear and not month ? 'active' : '' }}" role="menuitem">
+                    <li class="{{ year == availableYear ? 'active' : '' }} {% if month %}has-month-selected{% endif %}" role="menuitem">
                         <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear}) }}">
                             {{ availableYear }}
                         </a>
