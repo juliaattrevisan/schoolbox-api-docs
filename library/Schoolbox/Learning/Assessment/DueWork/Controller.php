@@ -16,6 +16,8 @@ use DueWork_ErrorMapper;
 use Raven_Client;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
@@ -1100,16 +1102,6 @@ class Controller extends Assessment\Controller
         ];
 
         // ...append rubric-related data...
-        if($assessment->getId()){
-            $getParentCriteria = $assessment->getBaseContext() instanceof UnitSpecification;
-            $editMode = true;
-            $rubric = $this->rubricMapper->findByDueWork($assessment, $getParentCriteria, $editMode);
-        } else {
-            $rubric = $this->rubricMapper->createForContext($assessment->getBaseContext());
-        }
-        $assessment->setRubric($rubric);
-
-
         $data = array_merge($data, $this->generateRubricTwigData($assessment));
 
         // ...and scene.
@@ -1126,12 +1118,6 @@ class Controller extends Assessment\Controller
     private function generateRubricTwigData(Model $dueWork)
     {
         $data = [];
-
-        if (!$dueWork->getRubric() instanceof Rubric\Rubric) {
-            throw new \InvalidArgumentException("Rubric unspecified");
-        }
-
-        $data['rubric'] = $dueWork->getRubric()->toContext();
 
         $rubricZone = new Zone('rubric');
         // JS file.type isn't set reliably enough to use text/csv mime filter
@@ -1152,19 +1138,24 @@ class Controller extends Assessment\Controller
         $data['rubricResultSets'] = $rs;
 
         // Do any students have marks for this rubric?
-        if($dueWork->getRubric()->getSubmissionBox() instanceof SubmissionBox ) {
-            $levelIds = Rubric\LevelMapper::getInstance()->findIdsByColumn('box_id', $dueWork->getRubric()->getSubmissionBox()->getId());
-            $descriptorIds = Rubric\DescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
-            $countMarkIds = Rubric\DescriptorMarkMapper::getInstance()->countByColumnList([
-                'descriptor_id' => $descriptorIds,
-                'valid'         => true
-            ]);
+        $levelIds      = Rubric\LevelMapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
+        $descriptorIds = Rubric\DescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
+        $countMarkIds  = Rubric\DescriptorMarkMapper::getInstance()->countByColumnList([
+            'descriptor_id' => $descriptorIds,
+            'valid'         => true
+        ]);
 
-            $data['rubricHasMarks'] = $countMarkIds > 0;
+        $data['rubricHasMarks'] = $countMarkIds > 0;
+
+        // The rubric grid can be used as is without Twig-wrangling
+        $rubricGrid = $this->rubricMapper->retrieveGrid($dueWork, true);
+        if (\count($rubricGrid->getLevels()) === 0) {
+            // Two fake levels
+            $rubricGrid->getLevels()
+                       ->add(new Level())
+                       ->add(new Level());
         }
-        else {
-            $data['rubricHasMarks'] = false;
-        }
+        $data['rubricGrid'] = $rubricGrid;
 
         return $data;
     }

@@ -1,0 +1,11 @@
+<th class="rb-level" data-sequencer-group="levels">
+    <input data-level
+           placeholder="{{ locale.translate('rubricLevel', false, true) }} name"
+           type="text"
+           value="{{ level.name }}"
+           name="{{ formField }}[{{ rubricGrid.id }}][level][{{ levelIndex }}][name]" />
+    <span class="sequencer" data-sequencer-h="levels">
+        <a class="icon-previous" data-sequencer-left title="Move left"></a>
+        <a class="icon-next" data-sequencer-right title="Move right"></a>
+    </span>
+</th>

@@ -21,6 +21,9 @@ use SplObjectStorage;
 
 /**
  * Composed of domain-level objects. Can be decomposed into ORM mapped-models
+ *
+ * @deprecated use the `\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}`
+ *             classes instead
  */
 class Rubric extends Core\Rubric
 {
@@ -543,15 +546,19 @@ class Rubric extends Core\Rubric
         }
 
         foreach ($this->criteriaGroups as $group) {
-            $post['group'][$group->getId()] = [
-                'name' => $group->getName()
+            $groupId = $group->getId();
+            $post['group'][$groupId] = [
+                'id'   => $groupId,
+                'name' => $group->getName(),
             ];
 
             foreach ($group->getAllCriteria() as $criterion) {
 
                 $descriptors = $criterion->getAllDescriptors();
 
-                $post['criterion'][$criterion->getId()] = [
+                $criterionId = $criterion->getId();
+                $post['criterion'][$criterionId] = [
+                    'id'       => $criterionId,
                     'groupId'  => $group->getId(),
                     'on'       => $descriptors->count() > 0,
                     'name'     => $criterion->getName(),

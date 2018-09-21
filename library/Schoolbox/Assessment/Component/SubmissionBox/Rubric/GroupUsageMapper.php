@@ -8,13 +8,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 /**
  * Mapper for usage of a rubric group on a due work.
  *
+ * @method GroupUsage hydrate(array $row, $alias = '', $callback = null)
  * @method GroupUsage createModel($idValue = null)
+ * @method GroupUsage[]|Schoolbox\GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
 class GroupUsageMapper extends Schoolbox\Mapper
 {
@@ -45,6 +48,48 @@ class GroupUsageMapper extends Schoolbox\Mapper
             'submissionBox',
             'submission_box'
         );
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('submission_box', 'sb')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('submission_box', '', 'sb', true)}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(PDOStatement $statement): Schoolbox\GenericCollection
+    {
+        /** @var SubmissionBoxMapper $boxMapper */
+        $boxMapper  = $this->getJoinMapper('submission_box');
+        $collection = $this->createCollection();
+        foreach ($statement as $row) {
+            $usage = $this->hydrate($row);
+            $usage->setSubmissionBox($boxMapper->hydrate($row, 'sb'));
+            $collection->add($usage);
+        }
+        return $collection;
     }
 
 

@@ -17,6 +17,11 @@ use Schoolbox\Assessment\Rubric\Twiggable;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 
+/**
+ * Object representation of a rubric group.
+ *
+ * @deprecated use `\Schoolbox\Assessment\Rubric\RowSet\Group` or `\Schoolbox\Assessment\Rubric\Grid\GroupUsage`
+ */
 class Group implements Twiggable, Calculable
 {
 

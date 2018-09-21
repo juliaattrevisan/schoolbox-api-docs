@@ -15,6 +15,10 @@ use Schoolbox\Assessment\Rubric\Competency;
 use Scrub;
 use SplObjectStorage;
 
+/**
+ * @deprecated use the `\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}`
+ *             classes instead
+ */
 class Rubric implements Twiggable
 {
 
@@ -37,6 +41,10 @@ class Rubric implements Twiggable
      */
     public function __construct($id = null, $multiSelect = false)
     {
+//        trigger_error(
+//            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid} instead',
+//            E_USER_DEPRECATED
+//        );
         $this->criteriaGroups = new CalculableAggregator();
         $this->levels = new CalculableAggregator();
         $this->setMultiSelect($multiSelect);

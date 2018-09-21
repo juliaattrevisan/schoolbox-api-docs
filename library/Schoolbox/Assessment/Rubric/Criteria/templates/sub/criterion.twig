@@ -1,26 +1,24 @@
 {##
  # Params:
+ # * group:                    If null, this is an input for a criterion in a new group
  # * criterion:                If null, this is an input for a new criterion
- # * usage:                    Assessments that use the criterion
- # * groupCount:               The number of the group, used only for array keys.
- #                             If null, no name is output.
  # * isSpecFolder:             Is the folder this criterion is in a course or unit spec?
  #                             If so, the group name is never readonly.
  # * curriculumTaggingEnabled: Are curriculum code inputs shown?
  #}
 
-{% set showNames = groupCount is not null and criterion is not null %}
-{% set readonly  = not isSpecFolder and criterion is not null and usage|length > 0 %}
+{% set showNames = group and criterion %}
+{% set readonly  = not isSpecFolder and criterion is not null and criterion.usage|length > 0 %}
 {% set new       = criterion is null %}
 <li class="actions-small-1"
-    data-rubric-criterion-row="{{ groupCount }}"
+    data-rubric-criterion-row="{{ criterion.id }}"
     {% if not criterion %}data-rubric-unsaved data-rubric-criterion-new-row{% endif %}
 >
     <div class="list-item">
         {# Hidden input for criterion ID #}
         <input type="hidden"
                data-template="rubric-criterion-id"
-               {% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][id]"{% endif %}
+               {% if showNames %}name="crits[{{ group.id }}][items][{{ criterion.id }}][id]"{% endif %}
                value="{{ criterion.id }}"
                {% if readonly %}readonly{% endif %}
         />
@@ -30,7 +28,7 @@
                {% if new %}data-rubric-criterion-new="1"{% endif %}
                data-rubric-criterion
                data-template="rubric-criterion-name"
-               {% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][name]"{% endif %}
+               {% if showNames %}name="crits[{{ group.id }}][items][{{ criterion.id }}][name]"{% endif %}
                value="{{ criterion.name }}"
                {% if showNames %}id="i{{ criterion.id }}"{% endif %}
                {% if readonly %}readonly{% endif %}
@@ -40,7 +38,7 @@
         {% if curriculumTaggingEnabled %}
             <select data-curriculum-code-selector
                     data-template="rubric-criterion-curriculum-codes"
-                    {% if showNames %}name="crits[{{ groupCount }}][items][{{ criterion.id }}][curriculumCode][]"{% endif %}
+                    {% if showNames %}name="crits[{{ group.id }}][items][{{ criterion.id }}][curriculumCode][]"{% endif %}
                     multiple
                     {% if new %}class="hide"{% endif %}
                     data-placeholder="Add curriculum codes..."
@@ -86,7 +84,7 @@
     </nav>
 
     {# Tot for existent criteria #}
-    {% set criterionUsageCount = usage|length %}
+    {% set criterionUsageCount = criterion.usage|length %}
     <ul id="dropdown-i{{ criterion.id }}" class="f-dropdown" data-dropdown-content="">
         {% if criterionUsageCount > 0 %}
             <li>
@@ -111,7 +109,7 @@
                     {{ criterionUsageCount > 1 ? locale.assessment.plural : locale.assessment }};
                 </p>
                 <ul>
-                    {% for assessment in usage %}
+                    {% for assessment in criterion.usage %}
                         <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}">{{ assessment.title }}</a></li>
                     {% endfor %}
                 </ul>

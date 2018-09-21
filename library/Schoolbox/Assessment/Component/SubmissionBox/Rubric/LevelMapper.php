@@ -70,6 +70,16 @@ class LevelMapper extends Mapper
         return "
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('box', 'b')}
+        ";
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('box', null, 'b', true)}
         ";

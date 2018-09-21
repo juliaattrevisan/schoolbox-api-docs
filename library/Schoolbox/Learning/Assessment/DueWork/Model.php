@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use DomainException;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\ISelfAssessable;
 use UnexpectedValueException;
@@ -81,9 +82,16 @@ class Model extends AbstractAssessment implements ISelfAssessable
     protected $useRubric = false;
 
     /**
+     * @deprecated use `$this->rubricGrid` for all your rubric grid needs
+     *
      * @var Rubric|null
      */
     private $rubric;
+
+    /**
+     * @var Grid|null
+     */
+    private $rubricGrid;
 
     /**
      * This DueWork's Rubric has Mark Per Capability on
@@ -610,20 +618,44 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
+     * @deprecated use `getRubricGrid` instead
+     *
      * @return Rubric|null
      */
     public function getRubric()
     {
+//        trigger_error('This method is deprecated; use "getRubricGrid()" instead', E_USER_DEPRECATED);
         return $this->rubric;
     }
 
     /**
+     * @deprecated use `setRubricGrid` instead
+     *
      * @param Rubric|null $rubric
      * @return static
      */
     public function setRubric(Rubric $rubric = null)
     {
+//        trigger_error('This method is deprecated; use "setRubricGrid()" instead', E_USER_DEPRECATED);
         $this->rubric = $rubric;
+        return $this;
+    }
+
+    /**
+     * @return null|Grid
+     */
+    public function getRubricGrid(): ?Grid
+    {
+        return $this->rubricGrid;
+    }
+
+    /**
+     * @param null|Grid $rubricGrid
+     * @return static
+     */
+    public function setRubricGrid(?Grid $rubricGrid): self
+    {
+        $this->rubricGrid = $rubricGrid;
         return $this;
     }
 

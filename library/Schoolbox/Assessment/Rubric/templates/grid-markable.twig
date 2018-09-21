@@ -227,7 +227,7 @@
                             {% set selfReflectionName = locale.selfReflection.proper %}
                         {% endif %}
 
-                        ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ selfReflectionName }})
+                        ({{ learnerRubric.groups[group.id].humanReadableMark }} given in {{ selfReflectionName }})
                     {% endif %}
                 </th>
             </tr>

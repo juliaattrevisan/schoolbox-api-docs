@@ -17,10 +17,16 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
 use Schoolbox\Assessment\Rubric\Criteria;
 use Schoolbox\Assessment\Rubric\Factory;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
+use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -77,6 +83,559 @@ class RubricMapper
         $this->database = Database::getInstance();
         $this->factory  = new Factory(new Rubric());
     }
+
+
+    /**
+     * Retrieves a rowset for the given context.
+     *
+     * @todo consider whether this belongs here, or in some other class
+     *
+     * @param AssessmentContext $context
+     * @param bool              $getUsages
+     * @return RowSet
+     * @throws MapperException
+     */
+    public function retrieveRowSet(AssessmentContext $context, bool $getUsages): RowSet
+    {
+        $rowSet = new RowSet($context);
+
+        // Load the capabilities and indicators for this context
+        $folder = $context->getBaseContext()->getFolder();
+
+        // Capability contains indicators too: inside-out them
+        /** @var GenericCollection|\Schoolbox\Assessment\Rubric\RowSet\Capability[] $capabilities */
+        $capabilities    = new GenericCollection(\Schoolbox\Assessment\Rubric\RowSet\Capability::class);
+        $indicatorModels = CriterionMapper::getInstance()->findForFolder($folder->getId());
+
+        // Unit-specs have their course spec's capabilities/indicators as well
+        $courseSpecFolderId = null;
+        if ($context instanceof UnitSpecification || $folder->hasUnitSpecification()) {
+            $courseSpecFolderId = (int)$folder->getParent()->getId();
+            $indicatorModels    = CriterionMapper::getInstance()->findForFolder($courseSpecFolderId)
+                                                                ->merge($indicatorModels);
+        }
+
+        // This is how it SHOULD work...
+//        if ($context instanceof UnitSpecification) {
+//            $indicatorModels = $indicatorModels->merge(
+//                CriterionMapper::getInstance()->findForFolder(
+//                    $context->getCourse()->getFolder()->getId()
+//                )
+//            );
+//        }
+
+        foreach ($indicatorModels as $indicatorModel) {
+            $capabilityModel    = $indicatorModel->getGroup();
+            $isCourseCapability = $capabilityModel->getParentId() === $courseSpecFolderId;
+            $capabilityId       = $capabilityModel->getId();
+            $indicatorId        = $indicatorModel->getId();
+            if (!isset($capabilities[$capabilityId])) {
+                $capabilities[$capabilityId] = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
+                    ->setId($capabilityId)
+                    ->setName($capabilityModel->getName())
+                    ->setIsCourseLevel($isCourseCapability)
+                    ->setCurriculumNodes($capabilityModel->getCurriculumNodes());
+
+                if ($getUsages) {
+                    foreach (CriterionUsageMapper::getInstance()->findGroupUsage($capabilityId) as $capabilityUsage) {
+                        $capabilities[$capabilityId]->getUsage()[$capabilityUsage['id']] = (new DueWork\Model())
+                            ->setId($capabilityUsage['id'])
+                            ->setTitle($capabilityUsage['title']);
+                    }
+                }
+            }
+            $capabilities[$capabilityId]->getIndicators()[$indicatorId] = (new \Schoolbox\Assessment\Rubric\RowSet\Indicator())
+                ->setId($indicatorId)
+                ->setName($indicatorModel->getName())
+                ->setCurriculumNodes($indicatorModel->getCurriculumNodes());
+
+            if ($getUsages) {
+                foreach (CriterionUsageMapper::getInstance()->findCriterionUsage($indicatorId) as $indicatorUsage) {
+                    $capabilities[$capabilityId]->getIndicators()[$indicatorId]->getUsage()[$indicatorUsage['id']]
+                        = (new DueWork\Model())
+                            ->setId($indicatorUsage['id'])
+                            ->setTitle($indicatorUsage['title']);
+                }
+            }
+        }
+        $rowSet->setCapabilities($capabilities);
+
+        return $rowSet;
+    }
+
+
+    /**
+     * Saves this row set to the database.
+     *
+     * @param RowSet           $rowSet
+     * @param bool             $persistCurriculum    Should curriculum nodes for groups and
+     *                                               criteria be updated?
+     * @param bool             $allowModifyUsed      Should groups/criteria that are in use
+     *                                               be modifiable or deletable?
+     * @param null|IAssessable $allowModifyExclusion If set and `$allowModifyUsed` is off, a
+     *                                               group or criterion in `$rowSet` MAY be
+     *                                               modified if it is used by no other
+     *                                               assessment than this one.
+     * @throws MapperException
+     */
+    public function persistRowSet(
+        RowSet $rowSet,
+        bool $persistCurriculum,
+        bool $allowModifyUsed,
+        ?IAssessable $allowModifyExclusion = null
+    ): void {
+        // Where does this go?
+        $folder                   = $rowSet->getContext()->getBaseContext()->getFolder();
+
+        // Required mappers
+        $capabilityMapper         = GroupMapper::getInstance();
+        $indicatorMapper          = CriterionMapper::getInstance();
+        $errorMapper              = ErrorMapper::getInstance();
+
+        // Existing data
+        $existingRowSet           = $this->retrieveRowSet($rowSet->getContext(), true);
+        $existingCapabilityIds    = $existingRowSet->retrieveCapabilityIds();
+        $existingIndicatorIds     = $existingRowSet->retrieveIndicatorIds();
+        $existingCapabilityModels = $capabilityMapper->findByColumn('id', $existingCapabilityIds);
+        $existingIndicatorModels  = $indicatorMapper->findByColumn('id', $existingIndicatorIds);
+
+        // New data
+        $newCapabilityIds         = $rowSet->retrieveCapabilityIds();
+        $newIndicatorIds          = $rowSet->retrieveIndicatorIds();
+        $newCapabilityModels      = $capabilityMapper->createCollection();
+        $newIndicatorModels       = $indicatorMapper->createCollection();
+
+        // Track names used
+        $capabilityNamesUsed      = [];
+
+
+        // Process capabilities+indicators into models
+        foreach ($rowSet->getCapabilities() as $capability) {
+            // Set the capability aside to be persisted
+            $existingCapability = null;
+            $capabilityId       = $capability->getId();
+            $capabilityModel    = null;
+            if ($capabilityId) {
+                $existingCapability = $existingRowSet->retrieveCapability($capability->getId());
+                $capabilityModel    = $existingCapabilityModels[$capabilityId] ?? null;
+            }
+
+            // If the capability model doesn't exist yet: create it
+            // (New capabilities may never be course-level, they are always
+            //  created on the unit)
+            if (!$capabilityModel) {
+                $capabilityModel = $capabilityMapper->createModel()
+                    ->setId($capabilityId)
+                    ->setParentId($folder->getId())
+                    ->setParentType(Group::PARENT_TYPE_CATEGORY);
+            }
+
+            // Validate whether name can be changed
+            $allowNameChange = true;
+            if ($existingCapability && !$allowModifyUsed && $existingCapability->isInUse($allowModifyExclusion)) {
+                $allowNameChange = false;
+            }
+            if ($allowNameChange) {
+                $capabilityModel->setName($capability->getName());
+            }
+
+            // Validate if this name has already been used by a capability whose
+            // name can be changed
+            $normalizedName = $this->normaliseForComparison($capability->getName());
+            if (isset($capabilityNamesUsed[$normalizedName])) {
+                $capabilityNamesUsed[$normalizedName] = $capabilityNamesUsed[$normalizedName] || $allowNameChange;
+                if ($capabilityNamesUsed[$normalizedName]) {
+                    // this is used by a capability which is allowed to change:
+                    // invalidate
+                    throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                }
+            } else {
+                $capabilityNamesUsed[$normalizedName] = $allowNameChange;
+            }
+
+            // Validate whether curriculum code can be changed
+            if ($persistCurriculum) {
+                $capabilityModel->setCurriculumNodes($capability->getCurriculumNodes());
+            }
+
+            // Add capability to list
+            $newCapabilityModels->add($capabilityModel);
+
+            // Set each indicator in the capability aside to be persisted
+            $indicatorNamesUsed = [];
+            foreach ($capability->getIndicators() as $indicator) {
+                $existingIndicator = null;
+                $indicatorId       = $indicator->getId();
+                $indicatorModel    = null;
+                if ($indicatorId) {
+                    $existingIndicator = $existingRowSet->retrieveIndicator($indicatorId);
+                    $indicatorModel    = $existingIndicatorModels[$indicatorId] ?? null;
+                }
+
+                // If the indicator model doesn't exist yet: create it
+                if (!$indicatorModel) {
+                    $indicatorModel = $indicatorMapper->createModel()
+                        ->setId($indicatorId)
+                        ->setGroup($capabilityModel);
+                }
+
+                // Validate whether name can be changed
+                $allowNameChange = true;
+                if ($existingIndicator && !$allowModifyUsed && $existingIndicator->isInUse($allowModifyExclusion)) {
+                    $allowNameChange = false;
+                }
+                if ($allowNameChange) {
+                    $indicatorModel->setName($indicator->getName());
+                }
+
+                // Validate if this name has already been used by a indicator
+                // whose name can be changed
+                $normalizedName = $this->normaliseForComparison($indicator->getName());
+                if (isset($indicatorNamesUsed[$normalizedName])) {
+                    $indicatorNamesUsed[$normalizedName] = $indicatorNamesUsed[$normalizedName] || $allowNameChange;
+                    if ($indicatorNamesUsed[$normalizedName]) {
+                        // this is used by a indicator which is allowed to
+                        // change: invalidate
+                        throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                    }
+                } else {
+                    $indicatorNamesUsed[$normalizedName] = $allowNameChange;
+                }
+
+                // Validate whether curriculum code can be changed
+                if ($persistCurriculum) {
+                    $indicatorModel->setCurriculumNodes($indicator->getCurriculumNodes());
+                }
+
+                // Add indicator to list
+                $newIndicatorModels->add($indicatorModel);
+            }
+        }
+
+
+        // Validate whether capabilities/indicators marked for deletion may
+        // actually be removed
+        $deletedCapabilityIds = array_diff($existingCapabilityIds, $newCapabilityIds);
+        $deletedIndicatorIds  = array_diff($existingIndicatorIds, $newIndicatorIds);
+        if (!$allowModifyUsed) {
+            // Validate deleted capabilities aren't in use
+            foreach ($deletedCapabilityIds as $deletedCapabilityId) {
+                $existingCapability = $existingRowSet->retrieveCapability($deletedCapabilityId);
+                if ($existingCapability && $existingCapability->isInUse($allowModifyExclusion)) {
+                    throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                }
+            }
+
+            // Validate deleted indicators aren't in use
+            foreach ($deletedIndicatorIds as $deletedIndicatorId) {
+                $existingIndicator = $existingRowSet->retrieveIndicator($deletedIndicatorId);
+                if ($existingIndicator && $existingIndicator->isInUse($allowModifyExclusion)) {
+                    throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                }
+            }
+        }
+
+
+        // Save new capabilities+indicators
+        $capabilityMapper->save($newCapabilityModels);
+        $indicatorMapper->save($newIndicatorModels);
+
+
+        // Tidy up unsaved capabilities+indicators
+        $this->tidyUp($indicatorMapper, ['id' => $deletedIndicatorIds], []);
+        $this->tidyUp($capabilityMapper, ['id' => $deletedCapabilityIds], []);
+    }
+
+
+    /**
+     * Retrieve a grid for the given assessment.
+     *
+     * @param IAssessable $assessment
+     * @param bool        $getUsages
+     * @return Grid
+     * @throws MapperException
+     */
+    public function retrieveGrid(IAssessable $assessment, bool $getUsages): Grid
+    {
+        // Build the rowset first
+        $grid = new Grid($assessment, $this->retrieveRowSet($assessment->getContext(), $getUsages));
+
+        // Not a due work? This has an empty grid
+        if (!$assessment instanceof DueWork\Model) {
+            return $grid;
+        }
+
+        // Assessment isn't persisted yet? This has an empty grid
+        if (!$assessment->getId()) {
+            return $grid;
+        }
+
+        // Load the levels, selected capabilities+indicators, descriptors for
+        // the assessment
+        $capabilityUsageModels = GroupUsageMapper::getInstance()->findByColumn(
+            'sb.assessment_id',
+            $assessment->getId(),
+            ['order' => ['sequence' => 'asc',]]
+        )->indexByCallback(function (GroupUsage $gu) {
+            return $gu->getGroup()->getId();
+        });
+        $indicatorUsageModels = CriterionUsageMapper::getInstance()->findByColumn(
+            'sb.assessment_id',
+            $assessment->getId(),
+            ['order' => ['sequence' => 'asc',]]
+        )->indexByCallback(function (CriterionUsage $cu) {
+            return $cu->getCriterion()->getId();
+        });
+        $levelModels = LevelMapper::getInstance()->findByColumn(
+            'b.assessment_id',
+            $assessment->getId(),
+            ['order' => ['sequence' => 'asc',]]
+        )->indexByCallback(function (Level $l) {
+            return $l->getId();
+        });
+        $descriptorModels = DescriptorMapper::getInstance()->findByColumnList([
+            'criterion_id' => $indicatorUsageModels->keys(),
+            'level_id'     => $levelModels->keys(),
+        ]);
+
+        $groupedIndicatorUsageModels = $indicatorUsageModels->groupByCallback(
+            function (CriterionUsage $cu) {
+                return $cu->getCriterion()->getGroup()->getId();
+            }
+        );
+
+
+        // Create descriptor models
+        $descriptorsByLevel     = [];
+        $descriptorsByIndicator = [];
+        foreach ($descriptorModels as $descriptorModel) {
+            $levelId     = $descriptorModel->getLevel()->getId();
+            $indicatorId = $descriptorModel->getCriterion()->getId();
+            $descriptor  = (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
+                ->setId($descriptorModel->getId())
+                ->setDescription($descriptorModel->getDescription())
+                ->setMaxValue($descriptorModel->getMaxValue());
+
+            $descriptorsByIndicator[$indicatorId][$levelId] = $descriptor;
+            $descriptorsByLevel[$levelId][$indicatorId]     = $descriptor;
+        }
+
+
+        // Add levels
+        /** @var Level[] $levelModels */
+        foreach ($levelModels as $levelModel) {
+            $levelId = $levelModel->getId();
+            $level   = (new \Schoolbox\Assessment\Rubric\Grid\Level())
+                ->setId($levelId)
+                ->setName($levelModel->getName());
+
+            $grid->getLevels()->add($level);
+        }
+
+
+        // Add capability/indicator usages
+        // Respect prescribed ordering in usage objects
+        foreach ($capabilityUsageModels as $capabilityUsageModel) {
+            /** @var GroupUsage $capabilityUsageModel */
+            $capabilityModel = $capabilityUsageModel->getGroup();
+            $capabilityId    = $capabilityModel->getId();
+            $capability      = $grid->getRowSet()->retrieveCapability($capabilityId);
+            if (!$capability) {
+                continue;
+            }
+
+            $capabilityUsage = (new \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage($capability))
+                ->setMaxValue($capabilityUsageModel->getMaxValue());
+
+            $capabilityIndicatorUsageModels = $groupedIndicatorUsageModels[$capabilityId] ?? [];
+            foreach ($capabilityIndicatorUsageModels as $indicatorUsageModel) {
+                /** @var CriterionUsage $indicatorUsageModel */
+                $indicatorModel = $indicatorUsageModel->getCriterion();
+                $indicatorId    = $indicatorModel->getId();
+                $indicator      = $grid->getRowSet()->retrieveIndicator($indicatorId);
+                if (!$indicator) {
+                    continue;
+                }
+
+                $indicatorUsage = new \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage($indicator);
+
+                // Add descriptors, and apply min value
+                $levelIndex = 0;
+                foreach ($levelModels as $levelModel) {
+                    $descriptor = $descriptorsByIndicator[$indicatorId][$levelModel->getId()] ?? null;
+                    if (null !== $descriptor) {
+                        $indicatorUsage->getDescriptors()[$levelIndex] = $descriptor;
+                    }
+                    $levelIndex++;
+                }
+                $indicatorUsage->applyDescriptorMinValues($assessment->getUseMarkRange());
+
+                $capabilityUsage->getIndicatorUsages()[$indicatorId] = $indicatorUsage;
+            }
+
+            $grid->getCapabilityUsages()[$capabilityId] = $capabilityUsage;
+        }
+
+        return $grid;
+    }
+
+
+    /**
+     * Saves this grid to the database.
+     *
+     * @param Grid $grid
+     * @throws MapperException if something happens in the mapper
+     */
+    public function persistGrid(Grid $grid): void
+    {
+        // The mappers still deal in submission boxes, but we deal in levels
+        // If this exceptioned out, it was never meant to be
+        $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn(
+            'assessment_id',
+            $grid->getAssessment()->getId()
+        );
+
+        // TODO some way to wrap all this in a transaction would be nice... -_-;
+        // (The answer exists: merge SA-6405)
+        $levelMapper         = LevelMapper::getInstance();
+        $descriptorMapper    = DescriptorMapper::getInstance();
+        $indicatorMapper     = CriterionMapper::getInstance();
+        $capabilityMapper    = GroupMapper::getInstance();
+        $existingLevelIds    = $levelMapper->findIdsByColumn('box_id', $submissionBox->getId());
+        $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
+
+
+        // First, persist the levels
+        $levelModels   = $levelMapper->createCollection();
+        $levelSequence = 1;
+        foreach ($grid->getLevels() as $level) {
+            $levelModel = $levelMapper->createModel()
+                ->setId($level->getId())
+                ->setName($level->getName())
+                ->setSubmissionBox($submissionBox)
+                ->setSequence($levelSequence++);
+            $levelModels->add($levelModel);
+
+            // Need to save NOW so that I have an ID which can then be assoc'd
+            // with a descriptor
+            $levelMapper->save($levelModel);
+            $level->setId($levelModel->getId());
+        }
+
+
+        // Persist capabilities+indicators
+        $indicatorModels  = $indicatorMapper->createCollection();
+        $capabilityModels = $capabilityMapper->createCollection();
+        foreach ($grid->getRowSet()->getCapabilities() as $capability) {
+            $capabilityId = $capability->getId();
+            if (!$capabilityId) {
+                continue;
+            }
+            $capabilityModel = $capabilityMapper->findById($capabilityId)
+                ->setName($capability->getName());
+            $capabilityModels[$capabilityId] = $capabilityModel;
+
+            foreach ($capability->getIndicators() as $indicator) {
+                $indicatorId = $indicator->getId();
+                if (!$indicatorId) {
+                    continue;
+                }
+                $indicatorModel                = $indicatorMapper->findById($indicatorId)
+                    ->setName($indicator->getName());
+                $indicatorModels[$indicatorId] = $indicatorModel;
+            }
+        }
+
+
+        // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
+        $indicatorUsageMapper  = CriterionUsageMapper::getInstance();
+        $capabilityUsageMapper = GroupUsageMapper::getInstance();
+        $indicatorUsageModels  = $indicatorUsageMapper->createCollection();
+        $capabilityUsageModels = $capabilityUsageMapper->createCollection();
+        $descriptorModels      = $descriptorMapper->createCollection();
+        $capabilitySequence    = 1;
+        $indicatorUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
+        $capabilityUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
+
+        foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
+            $capabilityUsageModel = $capabilityUsageMapper->createModel()
+                ->setSubmissionBox($submissionBox)
+                ->setGroup($capabilityModels[$capabilityUsage->getCapability()->getId()])
+                ->setMaxValue($capabilityUsage->getMaxValue())
+                ->setSequence($capabilitySequence++);
+            $capabilityUsageModels->add($capabilityUsageModel);
+
+            $indicatorSequence = 1;
+            foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+                $indicatorModel      = $indicatorModels[$indicatorUsage->getIndicator()->getId()];
+                $indicatorUsageModel = $indicatorUsageMapper->createModel()
+                    ->setSubmissionBox($submissionBox)
+                    ->setCriterion($indicatorModel)
+                    ->setSequence($indicatorSequence++);
+                $indicatorUsageModels->add($indicatorUsageModel);
+
+                // Descriptors
+                foreach ($grid->getLevels() as $levelIndex => $level) {
+                    $descriptor = $indicatorUsage->retrieveDescriptor($levelIndex);
+                    if ($descriptor) {
+                        $descriptorModel = $descriptorMapper->createModel()
+                            ->setId($descriptor->getId())
+                            ->setCriterion($indicatorModel)
+                            ->setLevel($levelMapper->createModel($level->getId()))
+                            // One day: set min value here
+                            ->setMaxValue($descriptor->getMaxValue())
+                            ->setDescription($descriptor->getDescription());
+                        $descriptorModels->add($descriptorModel);
+                    }
+                }
+            }
+        }
+
+        $capabilityMapper->save($capabilityModels);
+        $indicatorMapper->save($indicatorModels);
+        $capabilityUsageMapper->save($capabilityUsageModels);
+        $indicatorUsageMapper->save($indicatorUsageModels);
+        $descriptorMapper->save($descriptorModels);
+
+
+        // wash up before dinner, kids
+
+
+        // invalidate changed descriptors
+        $this->checkDescriptorValueChanges($existingDescriptors, $descriptorModels);
+
+
+        // remove all levels that have zero descriptors attached - extract from the descriptors
+        $seenLevels = [];
+        foreach ($descriptorModels as $desc) {
+            $seenLevels[$desc->getLevel()->getId()] = true;
+        }
+        $seenLevels = array_keys($seenLevels);
+        $this->tidyUp($levelMapper, ['box_id' => $submissionBox->getId()], $seenLevels);
+
+
+        // remove all descriptors that are on this box, but are not among the descriptors we just saved (it indicates blankness / unused-ness)
+        $levelIds = $levelMapper->findIdsByColumn('box_id', $submissionBox->getId(), ['deleted' => true]);
+        $this->tidyUp($descriptorMapper, ['level_id' => $levelIds], $descriptorModels->getPropertyValues('id'));
+    }
+
+
+    /**
+     * Retrieve a marked grid for the given feedback.
+     *
+     * @param IFeedback $feedback
+     * @return MarkedGrid
+     * @throws MapperException
+     */
+    public function retrieveMarkedGrid(IFeedback $feedback): MarkedGrid
+    {
+        $markedGrid = new MarkedGrid($feedback, $this->retrieveGrid($feedback->getAssessable(), false));
+
+        // Load the marks
+
+        return $markedGrid;
+    }
+
 
     /**
      * @param AssessmentContext $context
@@ -584,7 +1143,7 @@ class RubricMapper
      * @param int      $maxLevels
      *
      * @throws \Schoolbox\Resource\Exception
-     * @return array 0: Rubric
+     * @return array 0: rubric POST data used to build a rubric grid
      *               1: bool: does the rubric have customised max mark per group values?
      *                        (required as the rubric object doesn't store this separately
      *                         from their actual value)
@@ -814,10 +1373,11 @@ class RubricMapper
         }
 
 
-        /** @var Rubric $rubric */
-        $rubric = $this->factory->buildFromPostData([0 => $postdata], $markPerCapability, $useMarkRange,true);
+//        /** @var Rubric $rubric */
+//        // TODO until such time as mark range config is stored in CSV, default to false
+//        $rubric = $this->factory->buildFromPostData([0 => $postdata], $markPerCapability, $useMarkRange,true);
 
-        return [$rubric, $markPerCapability, $useMarkRange];
+        return [$postdata, $markPerCapability, $useMarkRange];
     }
 
     /**

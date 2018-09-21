@@ -101,7 +101,7 @@
 
         });
 
-        {% if rubric.boxId %}
+        {% if rubricGrid.assessment.id %}
         $('#dl-csv').on('click', function (e) {
             e.preventDefault();
 
@@ -132,7 +132,7 @@
         <div>
             {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
         </div>
-        {% if rubric.boxId %}
+        {% if rubricGrid.assessment.id %}
         <a href="{{ routeLookup('rubric.download') }}" class="icon-download button" id="dl-csv">Download Rubric as CSV</a>
         {% endif %}
     </div>

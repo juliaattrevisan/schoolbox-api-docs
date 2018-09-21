@@ -225,16 +225,16 @@ $(function() {
                 </fieldset>
                 #}
 
-                {% for group in groups %}
-                    {% set groupCount = loop.index0 %}
-                    <fieldset class='content' data-rubric-group-row="{{ groupCount }}">
+                {% for group in rowSet.capabilities %}
+                    <fieldset class='content' data-rubric-group-row="{{ group.id }}">
                         <div class="{{ groupColumn }} columns">
-                            <h3>{{ locale.rubricGroup.proper }}</h3>
+                            <h3>
+                                {{ locale.rubricGroup.proper }}
+                                {% if group.courseLevel %}(Course-level){% endif %}
+                            </h3>
                             <ul class="information-list">
                                 {% include '@rubricCriteria/sub/group.twig' with {
-                                    group:                    group.group,
-                                    groupCount:               groupCount,
-                                    usage:                    group.usage,
+                                    group:                    group,
                                     isSpecFolder:             isSpecFolder,
                                     curriculumTaggingEnabled: curriculumTaggingEnabled,
                                 } only %}
@@ -245,11 +245,10 @@ $(function() {
                             <h3>{{ locale.rubricCriterion.properPlural }}</h3>
                             <ul class="information-list">
 
-                                {% for criterion in group.criteria %}
+                                {% for criterion in group.indicators %}
                                     {% include '@rubricCriteria/sub/criterion.twig' with {
-                                        criterion:                criterion.criterion,
-                                        groupCount:               groupCount,
-                                        usage:                    criterion.usage,
+                                        group:                    group,
+                                        criterion:                criterion,
                                         isSpecFolder:             isSpecFolder,
                                         curriculumTaggingEnabled: curriculumTaggingEnabled,
                                     } only %}
@@ -257,9 +256,8 @@ $(function() {
 
                                 {# New criterion within group #}
                                 {% include '@rubricCriteria/sub/criterion.twig' with {
+                                    group:                    group,
                                     criterion:                null,
-                                    groupCount:               groupCount,
-                                    usage:                    null,
                                     isSpecFolder:             isSpecFolder,
                                     curriculumTaggingEnabled: curriculumTaggingEnabled,
                                 } only %}
@@ -275,8 +273,6 @@ $(function() {
                         <ul class="information-list">
                             {% include '@rubricCriteria/sub/group.twig' with {
                                 group:                    null,
-                                groupCount:               null,
-                                usage:                    null,
                                 isSpecFolder:             isSpecFolder,
                                 curriculumTaggingEnabled: curriculumTaggingEnabled,
                             } only %}
@@ -287,9 +283,8 @@ $(function() {
                         <ul class="information-list">
                             {# New criterion within new group #}
                             {% include '@rubricCriteria/sub/criterion.twig' with {
+                                group:                    null,
                                 criterion:                null,
-                                groupCount:               null,
-                                usage:                    null,
                                 isSpecFolder:             isSpecFolder,
                                 curriculumTaggingEnabled: curriculumTaggingEnabled,
                             } only %}

@@ -1,49 +1,53 @@
 {# ensure these are set #}
-{%- set rubricId  = rubricId ?: 'rb-' ~ rubric.id -%}
-{%- set groupId   = rubricId ~ '-' ~ group.id -%}
+{%- set rubricId  = rubricId ?: 'rb-' ~ rubricGrid.id -%}
+{%- set groupId   = rubricId ~ '-' ~ groupIndex -%}
 {%- set groupName = group.name ? group.name : '(no ' ~ locale.translate('rubricGroup') ~ ')' -%}
 {%- set levelLimit = levelLimit ?: config.rubric_max_levels -%}
-{%- set groupInput = groupInput ?: formField ~ '[' ~ rubric.id ~ '][group]['  ~ group.id ~ ']' -%}
+{%- set groupInput = groupInput ?: formField ~ '[' ~ rubricGrid.id ~ '][group]['  ~ groupIndex ~ ']' -%}
 
 {# Don't show the max value if there are no selected criteria in the group #}
 {% set hasSelectedDescriptor = false %}
 
-{%- for critIndex, crit in group.criteria -%}
+{%- for crit in rubricGrid.iterateIndicators(group) -%}
+    {% set criterionUsage = rubricGrid.retrieveIndicatorUsage(crit) %}
     {% include '@rubric/group-row-editable.twig' %}
     {# this may seem bizarre, but we only ever want this applied the first time through an interation #}
     {% set rowspan = null %}
-    {% if crit.descriptors|length > 0 %}
+
+    {# Descriptors now come from the rubric grid's copy of this criterion, not the row set #}
+    {% if criterionUsage %}
         {% set hasSelectedDescriptor = true %}
     {% endif %}
+
+{% else %}
+    {# TODO undupe this, this is the same template as @rubric/group-row-editable.twig #}
+    <tr data-group="{{ groupId }}" data-sequencer-group="{{ rubricId }}-groups" data-groupname="{{ groupName }}" class="rb-group-header">
+        {# no criteria specified, meaning this was an empty group (and the above iteration didn't run) #}
+        <th rowspan="2">
+            <span class="sequencer" data-sequencer-v="{{ rubricId }}-groups">
+                <a class="icon-up-arrow" data-sequencer-up title="Move up"></a>
+                <a class="icon-down-arrow" data-sequencer-down title="Move down"></a>
+            </span>
+            <input type="hidden" readonly name="{{ groupInput }}[id]" value="{{ group.id }}" data-group-id />
+            {% if group.name %}
+                <label>
+                    {%- if group.inUseExcluding(rubricGrid.assessment) -%}
+                        {{ groupName }}
+                        <span data-tooltip class="hint has-tip tip-right" data-width="200" title="This {{ locale.translate('rubricGroup') }} cannot be modified because it contains one or more {{ locale.translate('rubricCriterion', false, true) }} that are in use elsewhere">?</span>
+                        <input type="hidden" value="{{ groupName }}" name="{{ groupInput }}[name]" />
+                    {% else %}
+                        <textarea name="{{ groupInput }}[name]" >{{ groupName }}</textarea>
+                    {% endif %}
+                </label>
+            {% else %}
+                <label class="meta">{{ groupName }}</label>
+            {% endif %}
+        </th>
+    </tr>
 {%- endfor -%}
 
-{% if not group.criteria %}
-<tr data-group="{{ groupId }}" data-sequencer-group="{{ rubricId }}-groups" data-groupname="{{ groupName }}" class="rb-group-header">
-    {# no criteria specified, meaning this was an empty group (and the above iteration didn't run) #}
-    <th rowspan="2">
-        <span class="sequencer" data-sequencer-v="{{ rubricId }}-groups">
-            <a class="icon-up-arrow" data-sequencer-up title="Move up"></a>
-            <a class="icon-down-arrow" data-sequencer-down title="Move down"></a>
-        </span>
-        {% if group.name %}
-            <label>
-                {%- if group.used -%}
-                    {{ groupName }}
-                    <span data-tooltip class="hint has-tip tip-right" data-width="200" title="This {{ locale.translate('rubricGroup') }} cannot be modified because it contains one or more {{ locale.translate('rubricCriterion', false, true) }} that are in use elsewhere">?</span>
-                    <input type="hidden" value="{{ groupName }}" name="{{ groupInput }}[name]" />
-                {% else %}
-                    <textarea name="{{ groupInput }}[name]" >{{ groupName }}</textarea>
-                {% endif %}
-            </label>
-        {% else %}
-            <label class="meta">{{ groupName }}</label>
-        {% endif %}
-    </th>
-</tr>
-{% endif %}
-
 <tr data-group="{{ groupId }}" class="rb-new-criterion">
-    <th colspan="{{ rubric.levels|length + 2 }}">
+    <th colspan="{{ rubricGrid.levels|length + 2 }}">
         <textarea data-spawn="criterion" placeholder="+ Type to add new {{ locale.translate('rubricCriterion') }} {{ group.name ? ('to ' ~ group.name) : ('with no ' ~ locale.translate('rubricGroup')) }}"></textarea>
     </th>
 </tr>
@@ -51,10 +55,10 @@
 {# Input for max value #}
 {% set showGroupMaxValue = usingMarkPerCapability and hasSelectedDescriptor %}
 <tr data-group="{{ groupId }}" data-group-max-value-row {% if not showGroupMaxValue %}class="hide"{% endif %}>
-    <th class="rb-group-summary" data-group-max-value-cell colspan="{{ rubric.levels|length + 3 }}">
+    <th class="rb-group-summary" data-group-max-value-cell colspan="{{ rubricGrid.levels|length + 3 }}">
         <label for="{{ groupInput }}[maxValue]">Maximum points for {{ locale.translate('rubricGroup') }}</label>
         <input type="tel"
-               value="{{ group.max }}"
+               value="{{ rubricGrid.retrieveCapabilityUsage(group).maxValue }}"
                name="{{ groupInput }}[maxValue]"
                data-group-max-value
                {% if not showGroupMaxValue %}disabled class="hide"{% endif %}

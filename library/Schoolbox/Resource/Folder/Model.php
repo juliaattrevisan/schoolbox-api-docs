@@ -123,6 +123,18 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
+     * Is this a spec folder?
+     *
+     * (In other words, does it have a course or unit specification?)
+     *
+     * @return bool
+     */
+    public function isSpecFolder(): bool
+    {
+        return $this->hasCourseSpecification() || $this->hasUnitSpecification();
+    }
+
+    /**
      * Does this folder have a course specification?
      *
      * @return bool

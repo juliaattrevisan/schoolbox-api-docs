@@ -13,6 +13,8 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -110,13 +112,19 @@ class Decorator implements DecoratorInterface
             $assessment->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
         } // Otherwise let the existing setting persist
 
-        if($this->getUseRubric()){
-            /** @var DueWorkRubric $rubric */
-            $rubric = (new RubricFactory(new DueWorkRubric()))->buildFromPostData($this->getRubricData(), $this->getMarkPerCapability(), $assessment->getUseMarkRange(), false);
-            $assessment->setRubric($rubric);
+
+
+        if ($this->getUseRubric()) {
+            $gridFactory  = new GridFactory();
+            $existingGrid = new Grid(
+                $assessment,
+                SubmissionBox\Rubric\RubricMapper::getInstance()->retrieveRowSet($assessment->getBaseContext(), true)
+            );
+            $newGrid = $gridFactory->buildFromPostData($existingGrid, $this->getRubricData());
+            $assessment->setRubricGrid($newGrid);
 
             // TODO validate here??
-            $markMax = $rubric->calculateMax();
+            $markMax = $newGrid->calculateMaxValueFromCapabilities();
             $assessment->setMaxMark($markMax);
         }
 

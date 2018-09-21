@@ -12,10 +12,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionUsageMapper;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\Access;
@@ -41,7 +38,9 @@ class Module extends BaseModule
         // Criteria form actions
         $permission = new Rule\HasHomepageAccess(
             UserAccess::ACCESS_WRITE,
-            'folderId',
+            function (array $params = []) {
+                return $params['folderId'];
+            },
             Access::getInstance()
         );
         $preload    = function ($params) {
@@ -74,13 +73,9 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'criterionMapper' => $this->getMapperFactory()->getLazy(CriterionMapper::class),
-                    'groupMapper'     => $this->getMapperFactory()->getLazy(GroupMapper::class),
-                    'nodeMapper'      => $this->getMapperFactory()->getLazy(NodeMapper::class),
-                    'usageMapper'     => $this->getMapperFactory()->getLazy(CriterionUsageMapper::class),
-                    'rubricMapper'    => $this->getMapperFactory()->getLazy(RubricMapper::class),
-                    'errorMapper'     => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                    'rosettaStone'    => $injector->lazyGet('l10n'),
+                    'nodeMapper'   => $this->getMapperFactory()->getLazy(NodeMapper::class),
+                    'rubricMapper' => $this->getMapperFactory()->getLazy(RubricMapper::class),
+                    'rosettaStone' => $injector->lazyGet('l10n'),
                 ]
             )
         );

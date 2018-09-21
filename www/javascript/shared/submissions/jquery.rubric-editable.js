@@ -67,7 +67,12 @@
                 type   = $input.data('spawn'),
                 name   = this.value ? this.value.trim() : '',
                 $toastFeedback = $('[data-relation="create-response"]'),
-                $row, groupId;
+                $row,
+                groupIdentifier,
+                groupIndex,
+                groupId,
+                $groupIdInput;
+
 
             // prevent blank, but also prevent double-fire from keydown to blur
             if (name.length === 0 || $input.prop('disabled')) {
@@ -76,13 +81,17 @@
 
             $row = $input.closest('tr');
 
-            groupId = $row.data('group');
+            groupIdentifier = $row.data('group');
 
-            if (typeof groupId !== 'undefined') {
-                groupId = groupId.split('-')[2];
+            if (typeof groupIdentifier !== 'undefined') {
+                groupIndex = groupIdentifier.split('-')[2];
             } else {
-                groupId = null;
+                groupIndex = null;
             }
+
+            // Find the group row, extract its ID (as opposed to its index)
+            $groupIdInput = $rb.find('[data-group="'+groupIdentifier+'"][data-groupname] input[data-group-id]');
+            groupId       = $groupIdInput.val();
 
             var message = 'Creating "' + name + '"...';
             $toastFeedback.toastActivate({text: message});
@@ -92,7 +101,7 @@
              * duplicate criterion, but cannot prevent duplicate groups as they are not persisted until a indicator
              * name is entered.
              */
-            if('group' === type){
+            if ('group' === type) {
                 var normalisedNewGroup = normaliseForComparison(name);
                 var $groups =  $('[data-groupname]');
                 for (var i = 0; i < $groups.length; i++) {
@@ -108,18 +117,24 @@
             // prevent mods
             $input.val(message).prop('disabled', true);
 
+            // Pass in group index too
             var payload = {
                 type: type,
                 rubricId: opt.rubricId,
                 groupId: groupId,
+                groupIndex: groupIndex,
                 name: name,
                 levelCount: $rb.children('thead').find('input').length,
                 folderId: $('input[name=folderId]').val(),
                 markPerCapability: $('#markPerCapability').prop('checked')
             };
 
-            if (type === 'criterion') {
-                payload.groupName = $rb.find('[name="' + ( opt.formField + '[' + [ payload.rubricId, 'group', groupId, 'name' ].join('][') + ']' ) + '"]').val();
+            if ('criterion' === type) {
+                payload.groupName = $rb.find(
+                    '[name="'
+                    + ( opt.formField + '[' + [ payload.rubricId, 'group', groupIndex, 'name' ].join('][') + ']' )
+                    + '"]'
+                ).val();
             }
 
             $.post(opt.url, payload)
@@ -131,12 +146,18 @@
 
                     var cellTypeName = '';
 
-                    if (type === 'criterion') {
+                    if ('criterion' === type) {
                         cellTypeName = opt.localisedCriterionName;
 
                         // just gotta extend that rowspan
                         var $span = $row.parent().children('[data-group="' + $row.data('group') + '"][data-groupname]').children('[rowspan]');
                         $span.attr('rowspan', parseInt($span.attr('rowspan')) + 1);
+
+                        // And apply the group ID from this element to the new one
+                        // find data-sequencer-group=something
+                        // update its ID to whatever is in this ID
+                        $groupIdInput.val($data.find('input[data-group-id]').val());
+
                     } else {
                         cellTypeName = opt.localisedGroupName;
                     }

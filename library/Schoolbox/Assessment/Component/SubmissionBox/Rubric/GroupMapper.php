@@ -124,6 +124,44 @@ class GroupMapper extends BaseMapper
 
 
     /**
+     * Find all groups for a parent type.
+     *
+     * @param int|int[] $parentId   The parent ID (or list thereof) to find for
+     * @param string    $parentType One of the `Group::PARENT_TYPE_*` constants
+     * @param bool      $cache      If false, bypass result cache
+     * @return GenericCollection|Group[]
+     * @throws MapperException
+     */
+    public function findForParent($parentId, string $parentType, bool $cache = true): GenericCollection
+    {
+        return $this->findByColumnList(
+            [
+                'parent_id'   => $parentId,
+                'parent_type' => $parentType,
+            ],
+            [
+                'order' => ['name' => 'ASC'],
+                'cache' => $cache,
+            ]
+        );
+    }
+
+
+    /**
+     * Find all criteria for a folder.
+     *
+     * @param int|int[] $folderId The folder ID (or list thereof) to find for
+     * @param bool      $cache    If false, bypass result cache
+     * @return GenericCollection|Criterion[]
+     * @throws MapperException
+     */
+    public function findForFolder($folderId, bool $cache = true): GenericCollection
+    {
+        return $this->findForParent($folderId, Group::PARENT_TYPE_CATEGORY, $cache);
+    }
+
+
+    /**
      * Find a group with the given name for the given parent.
      * If none is found, create one and return it.
      *

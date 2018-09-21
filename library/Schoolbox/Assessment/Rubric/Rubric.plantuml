@@ -1,0 +1,150 @@
+@startuml
+
+hide empty fields
+hide empty methods
+
+namespace Assessment {
+
+    interface AssessmentContext {
+        getFolder() : Folder
+        getBaseContext() : AssessmentContext
+    }
+
+    interface IAssessable {
+        getContext() : AssessmentContext
+    }
+
+    interface IFeedback {
+        getAssessable() : IAssessable
+        getReviewee() : User
+    }
+
+    ' internal relations
+    AssessmentContext *-r- IAssessable
+    IAssessable *-r- IFeedback
+}
+
+
+namespace RubricRowset {
+
+    class RubricRowset {
+        capabilities : RubricCapability[]
+        context : AssessmentContext
+    }
+
+    class RubricCapability {
+        indicators : RubricIndicator[]
+        name : string
+        isInUse() : bool
+        isInUseExcluding(IAssessable) : bool
+    }
+
+    class RubricIndicator {
+        name : string
+        usage : IAssessable[]
+        isInUse() : bool
+        isInUseExcluding(IAssessable) : bool
+    }
+
+    ' internal relations
+    RubricRowset *-d- RubricCapability
+    RubricCapability *-d- RubricIndicator
+
+    ' relation to Assessment
+    Assessment.AssessmentContext *-d- RubricRowset
+}
+
+
+namespace RubricGrid {
+
+    class RubricGrid {
+        assessment : IAssessable
+        rowset : RubricRowset
+        levels : RubricLevel[]
+        capabilities : RubricCapabilityUsage[]
+        calculateMaxValueFromCapabilities() : float
+        iterateCapabilities() : RubricCapability[]
+        retrieveCapabilityUsage(RubricCapability) : ?RubricCapabilityUsage
+        retrieveIndicatorUsage(RubricIndicator) : ?RubricIndicatorUsage
+    }
+
+    class RubricCapabilityUsage {
+        capability : RubricCapability
+        indicators : RubricIndicatorUsage[]
+        maxValue : float
+        calculateMaxValueFromIndicators() : float
+        iterateIndicators() : RubricIndicator[]
+        retrieveIndicatorUsage(RubricIndicator) : ?RubricIndicatorUsage
+    }
+
+    class RubricIndicatorUsage {
+        indicator : RubricIndicator
+        descriptors : RubricDescriptor[]
+        calculateMaxValueFromDescriptors() : float
+        applyDescriptorMinValues() : void
+    }
+
+    class RubricLevel {
+        name : string
+    }
+
+    class RubricDescriptor {
+        description : string
+        minValue : float
+        maxValue : float
+    }
+
+    ' internal relations
+    RubricGrid *-d- RubricCapabilityUsage
+    RubricCapabilityUsage *-d- RubricIndicatorUsage
+    RubricIndicatorUsage *-d- RubricDescriptor
+    RubricGrid *-d- RubricLevel
+    RubricLevel *-[hidden]r- RubricCapabilityUsage
+
+    ' relation to Assessment
+    Assessment.IAssessable *-d- RubricGrid
+
+    ' relation to RubricRowset
+    RubricGrid -l-* RubricRowset.RubricRowset
+    RubricCapabilityUsage -l-* RubricRowset.RubricCapability
+    RubricIndicatorUsage -l-* RubricRowset.RubricIndicator
+}
+
+
+namespace RubricMarkedGrid {
+
+    class RubricMarkedGrid {
+        grid : RubricGrid
+        feedback : IFeedback
+        capabilities : RubricCapabilityMark[]
+        calculateMarkFromCapabilities() : float
+    }
+
+    class RubricCapabilityMark {
+        capability : RubricCapabilityUsage
+        indicators: RubricIndicatorMark[]
+        value : float
+        calculateMarkFromIndicators() : float
+    }
+
+    class RubricIndicatorMark {
+        indicator : RubricIndicatorUsage
+        selectedDescriptor: RubricDescriptor
+        value : float
+    }
+
+    ' internal relations
+    RubricMarkedGrid *-d- RubricCapabilityMark
+    RubricCapabilityMark *-d- RubricIndicatorMark
+
+    ' relation to Assessment
+    Assessment.IFeedback *-d- RubricMarkedGrid
+
+    ' relation to RubricGrid
+    RubricMarkedGrid -l-* RubricGrid.RubricGrid
+    RubricCapabilityMark -l-* RubricGrid.RubricCapabilityUsage
+    RubricIndicatorMark -l-* RubricGrid.RubricIndicatorUsage
+    RubricIndicatorMark -l-* RubricGrid.RubricDescriptor
+}
+
+@enduml

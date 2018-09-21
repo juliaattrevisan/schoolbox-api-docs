@@ -1,0 +1,122 @@
+<?php
+/**
+ * @copyright Copyright 2018, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Assessment\Rubric\RowSet;
+
+use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Mapper\Traits\Model\Id;
+
+/**
+ * An indicator within a rubric rowset.
+ */
+class Indicator
+{
+    use Id;
+    use HasCurriculumNodes;
+
+
+    /**
+     * @var string
+     */
+    private $name;
+
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * Assessments which are using this indicator.
+     *
+     * @var GenericCollection|IAssessable[]
+     */
+    private $usage;
+
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->usage = new GenericCollection(IAssessable::class);
+    }
+
+
+    /**
+     * Is this indicator in use on any existing assessment?
+     *
+     * @param null|IAssessable $exclusion If set, assessment to exclude from
+     *                                    usage check
+     * @return bool
+     */
+    public function isInUse(?IAssessable $exclusion = null): bool
+    {
+        if ($exclusion) {
+            return $this->isInUseExcluding($exclusion);
+        }
+        return \count($this->usage) > 0;
+    }
+
+
+    /**
+     * Is this indicator in use on any existing assessment, excluding one
+     * particular assessment?
+     *
+     * @param IAssessable $exclusion Assessment to exclude from usage check
+     * @return bool
+     */
+    public function isInUseExcluding(IAssessable $exclusion): bool
+    {
+        foreach ($this->usage as $assessment) {
+            // Skip the exclusion if it matches
+            if ((int)$exclusion->getId() === (int)$assessment->getId()) {
+                continue;
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * @param string $name
+     * @return static
+     */
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection|IAssessable[]
+     */
+    public function getUsage(): GenericCollection
+    {
+        return $this->usage;
+    }
+
+
+    /**
+     * @param GenericCollection|IAssessable[] $usage
+     * @return static
+     */
+    public function setUsage(GenericCollection $usage): self
+    {
+        $this->usage = $usage;
+        return $this;
+    }
+}

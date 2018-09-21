@@ -1,0 +1,76 @@
+<?php
+/**
+ * @copyright Copyright 2018, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Assessment\Rubric\RowSet;
+
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
+use Schoolbox\Learning\AssessmentContext;
+
+/**
+ * Factory for building `RowSet` objects.
+ */
+class Factory
+{
+    /**
+     * @var NodeMapper
+     */
+    private $nodeMapper;
+
+
+    /**
+     * Constructor
+     *
+     * @param NodeMapper $nodeMapper
+     */
+    public function __construct(NodeMapper $nodeMapper)
+    {
+        $this->nodeMapper = $nodeMapper;
+    }
+
+
+    /**
+     * Port of `\Schoolbox\Assessment\Rubric\Criteria\Controller` methods used
+     * for creating a rowset for saving.
+     *
+     * Does not attempt to validate if the rowset is actually saveable.
+     *
+     * @param AssessmentContext $assessmentContext
+     * @param array             $postData
+     * @return RowSet
+     */
+    public function buildFromPostData(AssessmentContext $assessmentContext, array $postData): RowSet
+    {
+        $rowSet = new RowSet($assessmentContext);
+
+        // Add capabilities
+        foreach ($postData as $tempCapabilityId => $postedCapability) {
+            $capability = (new Capability())
+                ->setId($postedCapability['id'])
+                ->setName($postedCapability['name'] ?? '')
+                ->setCurriculumNodes(
+                    $this->nodeMapper->findByColumn('id', $postedCapability['curriculumCode'])
+                );
+
+            // Add indicators
+            foreach ($postedCapability['items'] ?? [] as $tempIndicatorId => $postedIndicator) {
+                $indicator = (new Indicator())
+                    ->setId($postedIndicator['id'])
+                    ->setName($postedIndicator['name'] ?? '')
+                    ->setCurriculumNodes(
+                        $this->nodeMapper->findByColumn('id', $postedIndicator['curriculumCode'])
+                    );
+                $capability->getIndicators()[$tempIndicatorId] = $indicator;
+            }
+
+
+            $rowSet->getCapabilities()[$tempCapabilityId] = $capability;
+        }
+
+        return $rowSet;
+    }
+}

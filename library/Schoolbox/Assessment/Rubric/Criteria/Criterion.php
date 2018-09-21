@@ -12,6 +12,11 @@ namespace Schoolbox\Assessment\Rubric\Criteria;
 
 use Schoolbox\Assessment\Rubric\DescriptorList;
 
+/**
+ * Object representation of a rubric criterion.
+ *
+ * @deprecated use `\Schoolbox\Assessment\Rubric\RowSet\Criterion` or `\Schoolbox\Assessment\Rubric\Grid\CriterionUsage`
+ */
 class Criterion extends DescriptorList
 {
     /** @var bool */

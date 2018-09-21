@@ -1,23 +1,19 @@
 {##
  # Params:
  # * group:                    If null, this is an input for a new group
- # * usage:                    Assessments that use the group
- # * groupCount:               The number of the group, used only for array keys.
- #                             If null, no name is output.
  # * isSpecFolder:             Is the folder this group is in a course or unit spec?
  #                             If so, the group name is never readonly.
  # * curriculumTaggingEnabled: Are curriculum code inputs shown?
  #}
 
-{% set showNames = groupCount is not null %}
-{% set readonly  = not isSpecFolder and group is not null and usage|length > 0 %}
+{% set readonly  = not isSpecFolder and group is not null and group.usage|length > 0 %}
 {% set new       = group is null %}
 <li class="actions-small-0">
     <div class="list-item">
         {# Hidden input for group ID #}
         <input type="hidden"
                data-template="rubric-group-id"
-               {% if showNames %}name="crits[{{ groupCount }}][id]"{% endif %}
+               {% if group %}name="crits[{{ group.id }}][id]"{% endif %}
                value="{{ group.id }}"
                {% if readonly %}readonly{% endif %}
         />
@@ -27,7 +23,7 @@
                {% if new %}data-rubric-group-new="1"{% endif %}
                data-rubric-group
                data-template="rubric-group-name"
-               {% if showNames %}name="crits[{{ groupCount }}][name]"{% endif %}
+               {% if group %}name="crits[{{ group.id }}][name]"{% endif %}
                value="{{ group.name }}"
                {% if readonly > 0 %}readonly{% endif %}
         />
@@ -36,7 +32,7 @@
         {% if curriculumTaggingEnabled %}
             <select data-curriculum-code-selector
                     data-template="rubric-group-curriculum-codes"
-                    {% if showNames %}name="crits[{{ groupCount }}][curriculumCode][]"{% endif %}
+                    {% if group %}name="crits[{{ group.id }}][curriculumCode][]"{% endif %}
                     multiple
                     {% if new %}class="hide"{% endif %}
                     data-placeholder="Add curriculum codes..."

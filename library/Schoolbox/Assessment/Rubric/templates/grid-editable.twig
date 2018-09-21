@@ -1,34 +1,32 @@
 {% set formField = formField ?: 'rb' %}
-{% set inputType = rubric.multiSelect ? 'checkbox' : 'radio' %}
-{% set rubricId  = 'rb-' ~ rubric.id %}
+{# Doesn't exist? #}
+{#{% set inputType = rubric.multiSelect ? 'checkbox' : 'radio' %}#}
+{# Use assessment ID I suppose #}
+{% set rubricId  = 'rb-' ~ rubricGrid.id %}
 {% set levelLimit = levelLimit ?: config.rubric_max_levels %}
 
     <input type="hidden" name="formField" value="{{ formField }}" />
     <h3 class="subheader show-for-medium-down">Levels</h3>
     <div class="scrollable">
-    <table data-rubric="{{ rubric.id }}" data-rb-grid class="rb stack-for-medium-down" id="{{ rubricId }}">
+    <table data-rubric="{{ rubricGrid.id }}" data-rb-grid class="rb stack-for-medium-down" id="{{ rubricId }}">
         <thead>
         <tr>
             <th class="rb-no-cell">{{ locale.translate('rubricGroup', true, true) }}</th>
             <th class="rb-no-cell">{{ locale.translate('rubricCriterion', true, true) }}</th>
-            {% for levelSequence, level in rubric.levels -%}
-            <th class="rb-level" data-sequencer-group="levels">
-                <input data-level placeholder="{{ locale.translate('rubricLevel', false, true) }} name" type="text" value="{{ level.name }}" name="{{ formField }}[{{ rubric.id }}][level][{{ levelSequence }}][name]" />
-                <span class="sequencer" data-sequencer-h="levels">
-                    <a class="icon-previous" data-sequencer-left title="Move left"></a>
-                    <a class="icon-next" data-sequencer-right title="Move right"></a>
-                </span>
-            </th>
+            {% for level in rubricGrid.levels -%}
+                {%- include '@rubric/level-editable.twig' with {
+                    levelIndex: loop.index0
+                } -%}
             {%- endfor %}
             <th><a href="#" data-spawn="level">&plus; {{ locale.translate('rubricLevel', false, true) }}</a></th>
         </tr>
         </thead>
         <tbody>
-        {% for groupIndex, group in rubric.groups -%}
-            {%- include '@rubric/group-editable.twig' with { rowspan: rowspan ?: group.criteria|length + 2 } -%}
+        {% for groupIndex, group in rubricGrid.iterateCapabilities -%}
+            {%- include '@rubric/group-editable.twig' with { rowspan: rowspan ?: group.indicators|length + 2 } -%}
         {%- endfor %}
         <tr class="rb-group-header rb-new-group">
-            <th colspan="{{ rubric.levels|length + 3 }}">
+            <th colspan="{{ rubricGrid.levels|length + 3 }}">
                 <textarea data-spawn="group" placeholder="+ Type to add new {{ locale.translate('rubricGroup') }}"></textarea>
             </th>
         </tr>
@@ -46,7 +44,7 @@
 
         $('#{{ rubricId }}').rubricEditable({
             url: '{{ routeLookup("rubric.create") }}',
-            rubricId: '{{ rubric.id }}',
+            rubricId: '{{ rubricGrid.id }}',
             formField: '{{ formField }}',
             levelLimit: {{ levelLimit }},
             localisedGroupName: '{{ locale.translate('rubricGroup', false, true) }}',
