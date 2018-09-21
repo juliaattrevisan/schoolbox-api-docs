@@ -52,7 +52,7 @@
 
 {% block newsContent %}
     {% if articles|length %}
-        <section>
+        <section class="saved-articles">
             <ul class="information-list" id="saveForLaterList">
                 {% for article in articles %}
                     {% set routeRemove = routeLookupIfAuthorized('commsNewsSaveForLater.postRemove', {article: article, articleId: article.id}) %}
@@ -147,9 +147,9 @@
                                 });
 
                                 element.closest('li').remove();
-
                                 {# If this was the last in the list, respawn Empty State #}
                                 if (!$('#saveForLaterList li').length) {
+                                    $('section').remove( ".saved-articles" );
                                     $('#emptyState').show();
                                 }
                             }).error(function () {
