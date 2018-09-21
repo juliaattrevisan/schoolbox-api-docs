@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Rubric\Grid\Exporter\ArrayExporter;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
@@ -297,12 +298,7 @@ class Controller extends BaseController
             $post
         );
         $basename = (new Url($box->getTitle()))->getSlug();
-        $content  = $this->array2csv(
-            $grid->toGrid(
-                $this->request->post->getBool('markPerCapability') ?? false,
-                $this->request->post->getBool('useMarkRange') ?? false
-            )
-        );
+        $content  = $this->array2csv((new ArrayExporter())->export($grid));
 
         $headers  = $this->getResponse()->headers;
 

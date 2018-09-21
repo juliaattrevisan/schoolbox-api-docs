@@ -280,6 +280,8 @@ class Rubric implements Twiggable
     /**
      * Return a CSV-compatible (ie. rectangular) array representation of the data structure this rubric contains
      *
+     * @deprecated use `\Schoolbox\Assessment\Rubric\Grid\Exporter\ArrayExporter::export` instead
+     *
      * @param bool $usingMarkPerCapability Does the array include max marks per
      *                                     capability?
      * @param bool $usingMarkRange         Does the array include mark ranges
