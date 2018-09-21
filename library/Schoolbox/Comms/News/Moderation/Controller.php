@@ -163,7 +163,12 @@ class Controller extends Base
         // TODO. The client should be responsible for determining what to do after approval.
         // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
         // TODO. THis should just return the outcome of the request, not a redirect.
-        $route = $this->getRouter()->generate('commsNewsModeration.getList');
+        $listRoute = $this->getRouteIfAuthorized('commsNewsModeration.getList');
+        if ($listRoute) {
+            $route = $listRoute;
+        } else {
+            $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
+        }
         $this->getResponse()->redirect->to($route);
     }
 
@@ -217,7 +222,13 @@ class Controller extends Base
             // TODO. The client should be responsible for determining what to do after rejection.
             // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
             // TODO. THis should just return the outcome of the request, not a redirect.
-            $responseData['redirect'] = $this->getRouter()->generate('commsNewsModeration.getList');
+            $listRoute = $this->getRouteIfAuthorized('commsNewsModeration.getList');
+            if ($listRoute) {
+                $route = $listRoute;
+            } else {
+                $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
+            }
+            $responseData['redirect'] = $route;
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($responseData));
