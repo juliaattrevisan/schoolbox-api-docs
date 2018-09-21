@@ -97,7 +97,7 @@ class Controller extends Base
                     'labelClass' => 'submitted-late'
                 ],
             ]
-        ])->setTitle('Moderation List'));
+        ])->setTitle('Requiring Moderation'));
     }
 
 

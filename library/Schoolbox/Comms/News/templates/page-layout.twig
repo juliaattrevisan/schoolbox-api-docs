@@ -65,7 +65,7 @@
                     {% if moderationRoute %}
                         <li {% if page == moderationRoute %}class="active"{% endif %} role="menuitem">
                             <a href="{{ moderationRoute }}">
-                                Moderation List
+                                Requiring Moderation
                                 {% if moderationCount > 0 %}
                                     <span class="label highlight right round" title="{{ moderationCount }} item{% if moderationCount > 1 %}s{% endif %} awaiting moderation">{{ moderationCount }}</span>
                                 {% endif %}
