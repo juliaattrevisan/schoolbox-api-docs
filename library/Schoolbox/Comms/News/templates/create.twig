@@ -177,6 +177,7 @@
                                 <template v-for="(item, index) in intersect">
                                     <div class="small-12 medium-6 columns checklist">
                                         <legend>
+                                            <label for="">Audience Type ${ index }:</label>
                                             <select @change="updateIntersectList(index)" v-model="intersect[index]">
                                                 <option :value="audienceOption" v-for="audienceOption in audienceOptions.intersect[index]" v-if="audienceOption.displayInModal">
                                                     ${ audienceOption.label }
