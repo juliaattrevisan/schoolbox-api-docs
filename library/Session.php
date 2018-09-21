@@ -84,6 +84,10 @@ class Session
 
         /* if user is found and enabled and session is started create our user record */
         if ($user instanceof User && $user->getEnabled() && session_start()) {
+
+            /* Start by creating a fresh ID to ensure ID has not been injected */
+            session_regenerate_id();
+
             /* Store remember me cookie so user can return in the future */
 
             if ($remember == true) {
