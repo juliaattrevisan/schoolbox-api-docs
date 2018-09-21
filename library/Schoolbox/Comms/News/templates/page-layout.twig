@@ -1,34 +1,36 @@
-<div class="actions-small-3 row">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h1>{% block newsTitle %}{% endblock %}</h1>
+<div class="row">
+    <div class="small-12 medium-8 large-9 columns">
+
+        <div class="row">
+            <div class="small-9 columns">
+                <h1>{% block newsTitle %}{% endblock %}</h1>
+
+            </div>
+
+            {% block actionIcons %}
+                <div class="small-3 columns actions-small-2">
+                    <nav>
+                        {% block createLink %}
+                            {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+                            {% if createRoute %}
+                                <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
+                            {% endif %}
+                        {% endblock %}
+
+                        {% block rssLink %}
+                        {% endblock %}
+                    </nav>
+                </div>
+            {% endblock %}
         </div>
+
     </div>
-    <nav>
-        {% block createLink %}
-            {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-            {% if createRoute %}
-                <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
-            {% endif %}
-        {% endblock %}
-
-        {% block archiveLink %}
-        {% endblock %}
-
-        {% block rssLink %}
-        {% endblock %}
-    </nav>
 </div>
 
-<div class="row">
-    {# main content #}
-    <div class="small-12 medium-9 island">
-        {% block newsContent %}
-        {% endblock %}
-    </div>
 
+<div class="row">
     {# navigation sidebar #}
-    <div class="small-12 medium-3 island">
+    <div class="small-12 medium-4 large-3 island push right">
         <section>
             <nav>
                 <ul class="side-nav">
@@ -63,7 +65,7 @@
                     {% if moderationRoute %}
                         <li {% if page == moderationRoute %}class="active"{% endif %} role="menuitem">
                             <a href="{{ moderationRoute }}">
-                                Moderation List
+                                Requiring Moderation
                                 {% if moderationCount > 0 %}
                                     <span class="label highlight right round" title="{{ moderationCount }} item{% if moderationCount > 1 %}s{% endif %} awaiting moderation">{{ moderationCount }}</span>
                                 {% endif %}
@@ -77,10 +79,29 @@
                             <a href="{{ savedRoute }}">My Saved {{ locale.news | capitalize }}</a>
                         </li>
                     {% endif %}
+
+                    {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') %}
+                    {% if archiveRoute %}
+                        <li {% if pageWithoutParams == archiveRoute %}class="active"{% endif %} role="menuitem">
+                            <a href="{{ archiveRoute }}">{{ locale.news | capitalize }} Archive</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </nav>
         </section>
+
+        <section>
+            {% block archiveFilter %}
+            {% endblock %}
+        </section>
     </div>
+    
+    {# main content #}
+    <div class="small-12 medium-8 large-9 island">
+        {% block newsContent %}
+        {% endblock %}
+    </div>
+
 </div>
 
 <div id="toast" class="toast"></div>

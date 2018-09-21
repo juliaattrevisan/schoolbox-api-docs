@@ -713,15 +713,18 @@ class Controller extends Base
          */
         $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
 
-        $partialData = $this->generatePartial($urlPrefix, $params, $topics, false, $year, $month);
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
-
-        $availableYearsAndMonths = $this->newsMapper->findYearsAndMonthsWithArticles($partialData['articleIdsForUser']);
+        // Find the years and months that have any articles (some may not contain any visible articles; thats ok)
+        $availableYearsAndMonths = $this->newsMapper->findYearsAndMonthsWithArticles();
 
         // Default to filtering by the most recent year if none is provided
         if (null === $year) {
             $year = array_keys($availableYearsAndMonths)[0];
         }
+
+        $partialData = $this->generatePartial($urlPrefix, $params, $topics, false, $year, $month);
+
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+
 
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
@@ -732,13 +735,18 @@ class Controller extends Base
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'slug' => $params->getSlug(),
             'referrer' => $params->getReferrer(),
+            'page' => $this->getRequest()->query['page'],
+            'pageWithoutParams' => $this->getRouter()->generate('commsNews.getArchive'),
 
             /* Archive-specific vars that don't appear anywhere else
              */
             'availableYearsAndMonths' => $availableYearsAndMonths,
             'year' => $year,
             'month' => $month,
+            'newsItems' => $partialData
         ];
+
+
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/archive.twig', $data));
     }

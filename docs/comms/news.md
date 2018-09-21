@@ -107,7 +107,7 @@ There is only one prescribed flow when moderation is required.
 
 > Compose > Preview > Awaiting Moderation > Awaiting Publication > Published > Expired
 
-It begins at the Moderation List found at /comms/news/moderation. From here you can view a list of articles that require moderation in accordance with the current Policy settings; it also shows you a list of recently-moderated articles where applicable.
+It begins at the Requiring Moderation page found at /comms/news/moderation. From here you can view a list of articles that require moderation in accordance with the current Policy settings; it also shows you a list of recently-moderated articles where applicable.
 
 * *View* a list of articles requiring Moderation.
 * *Preview* an article of your choosing.

@@ -11,59 +11,57 @@
  # @param int month
  # @param string referrer
  #}
-<div class="row">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h1>{{ locale.news.proper }} Archive</h1>
-        </div>
-    </div>
-</div>
+{% extends '@commsNews/page-layout.twig' %}
+
+{% block actionIcons %}
+{% endblock %}
+
+{% if year and month %}
+    {% set selectedDate = year ~ '-' ~ month ~ '-01' %}
+    {% set subheading = selectedDate|date('F Y') %}
+{% elseif year %}
+    {% set subheading = year %}
+{% endif %}
+
+{% block newsTitle %}{{ locale.news.proper }} Archive{% endblock %}
 
 {% if availableYearsAndMonths|length %}
-
-    {% if year and month %}
-        {% set selectedDate = year ~ '-' ~ month ~ '-01' %}
-        {% set subheading = selectedDate|date('F Y') %}
-    {% elseif year %}
-        {% set subheading = year %}
-    {% endif %}
-
-    <div class="row">
-
+    {% block archiveFilter %}
         {# Month/Year Selector #}
-        <div class="small-12 medium-3 island">
-            <h2 class="subheader">Filter</h2>
-            <section>
-                <nav>
-                    <ul class="side-nav">
-                        {% for availableYear, availableMonths in availableYearsAndMonths %}
+        <nav>
+            <ul class="news-archive-filter side-nav">
+                {% for availableYear, availableMonths in availableYearsAndMonths %}
 
-                            <li class="{{ year == availableYear and not month ? 'active' : '' }}" role="menuitem">
-                                <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear}) }}">
-                                    {{ availableYear }}
-                                </a>
-                                <ul>
-                                    {% for availableMonth, val in availableMonths %}
-                                        {% set archiveDate = availableYear ~ '-' ~ availableMonth ~ '-01' %}
+                    <li class="{{ year == availableYear ? 'active' : '' }} {% if month %}has-month-selected{% endif %}" role="menuitem">
+                        <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear}) }}">
+                            {{ availableYear }}
+                        </a>
+                        <ul class="months">
+                            {% for availableMonth, val in availableMonths %}
+                                {% set archiveDate = availableYear ~ '-' ~ availableMonth ~ '-01' %}
 
-                                        <li class="{{ archiveDate == selectedDate ? 'active' : '' }}" role="menuitem">
-                                            <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear, month: availableMonth}) }}">
-                                                {{ archiveDate | date('F') }}
-                                            </a>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </li>
-                            <li class="divider"></li>
-                        {% endfor %}
-                    </ul>
-                </nav>
-            </section>
-        </div>
+                                <li class="{{ archiveDate == selectedDate ? 'active' : '' }}" role="menuitem">
+                                    <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear, month: availableMonth}) }}">
+                                        {{ archiveDate | date('F') }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li class="divider"></li>
+                {% endfor %}
+            </ul>
+        </nav>
+    {% endblock %}
 
-        <div class="small-12 medium-9 island">
-            <h2 class="subheader">{{ subheading }}</h2>
-            {% if year %}
+{% endif %}
+
+{% block newsContent %}
+    <h2 class="subheader">{{ subheading }}</h2>
+
+    {% if availableYearsAndMonths|length %}
+
+        {% if year %}
             <section>
                 <script src="/javascript/shared/comms/articletabs.js"></script>
                 <script src="/javascript/shared/comms/saveforlater.js"></script>
@@ -98,21 +96,23 @@
                     {{ initialContent|raw }}
                 </div>
             </section>
-            {% endif %}
-        </div>
-    </div>
+        {% endif %}
 
-    <div id="toast" class="toast"></div>
-{% else %}
-    <div class="small-12 columns">
-        <div class="empty-state">
-            <i class="icon-news"></i>
-            <p>The archive is empty.</p>
+    {% else %}
 
-            {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-            {% if createRoute %}
-                <p>You can <a href="{{ createRoute }}">create some {{ locale.news }}</a>.</p>
-            {% endif %}
+        <div class="small-12 columns">
+            <div class="empty-state">
+                <i class="icon-news"></i>
+                <p>The archive is empty.</p>
+
+                {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+                {% if createRoute %}
+                    <p>You can <a href="{{ createRoute }}">create some {{ locale.news }}</a>.</p>
+                {% endif %}
+            </div>
         </div>
-    </div>
-{% endif %}
+
+    {% endif %}
+
+{% endblock %}
+
