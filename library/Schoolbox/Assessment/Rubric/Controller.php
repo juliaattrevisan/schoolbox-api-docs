@@ -281,9 +281,22 @@ class Controller extends BaseController
     {
         $post     = $this->request->post->get('rb');
         $boxId    = key($post);
+
+        // Note: I can't download rubrics for due works that don't exist yet
         $box      = $this->assessmentDataSource->findById($boxId);
-        $grid     = (new Factory())->buildFromPostData($post, $box->isMarkedPerRubricGroup(), $box->isMarkedUsingRange(), false);
-        $basename = (new Url($box->getName()))->getSlug();
+        if (!$box instanceof DueWork) {
+            // This is an error. How do I generate one?
+            $this->sendError('Can only download rubrics for due work');
+            return;
+        }
+        $box->setMarkPerCapability($this->request->post->getBool('markPerCapability') ?? false)
+            ->setUseMarkRange($this->request->post->getBool('useMarkRange') ?? false);
+
+        $grid     = (new GridFactory())->buildFromPostData(
+            $this->mapper->retrieveGrid($box, false),
+            $post
+        );
+        $basename = (new Url($box->getTitle()))->getSlug();
         $content  = $this->array2csv(
             $grid->toGrid(
                 $this->request->post->getBool('markPerCapability') ?? false,
