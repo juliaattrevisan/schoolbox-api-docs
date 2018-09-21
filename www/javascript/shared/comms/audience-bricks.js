@@ -1346,7 +1346,7 @@ function BrickManager(vue, codec, entityTypeLabelMap) {
      * @return Brick
      */
     var computeOptimalHostBrick = function(candidateBricks, guestBrick){
-        console.log('TODO implement optimal brick algorithm');
+        //console.log('TODO implement optimal brick algorithm');
         // TODO this is wrong, just a hack for now
         return candidateBricks[0];
     }
