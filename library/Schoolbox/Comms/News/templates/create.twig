@@ -78,16 +78,11 @@
                                 <div class="actions-small-1">
                                     <div class="card small-12">
                                         <h4 :title="audienceBrick.nameLabel">
-                                            <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">
-                                                ${ audienceBrick.nameLabel }
-                                            </a>
-                                            <template v-if="audienceBrick.isSimple()">
-                                                ${ audienceBrick.nameLabel }
-                                            </template>
+                                            ${ audienceBrick.nameLabel }
                                         </h4>
                                         <p class="meta">
-                                            <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.typeLabel }</a>
-                                            <template v-if="audienceBrick.isSimple()">${ audienceBrick.typeLabel }</template>
+                                            ${ audienceBrick.typeLabel }
+                                            <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">(view details)</a>
                                         </p>
                                         <p class="meta" :title="audienceBrick.modifier">
                                             <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.modifierLabel }</a>
