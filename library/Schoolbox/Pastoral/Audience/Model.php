@@ -27,7 +27,7 @@ class Model
     private $user;
 
     /** @var null|PastoralGroup $pastoralGroup */
-    private $pastoralGroup;
+    private $group;
 
     /** @var null|Role  */
     private $role;
@@ -46,9 +46,9 @@ class Model
      * @param PastoralGroup|null $pastoralGroup
      * @return $this
      */
-    public function setPastoralGroup(PastoralGroup $pastoralGroup): self
+    public function setGroup(PastoralGroup $pastoralGroup): self
     {
-        $this->pastoralGroup = $pastoralGroup;
+        $this->group = $pastoralGroup;
 
         return $this;
     }
@@ -56,9 +56,9 @@ class Model
     /**
      * @return null|PastoralGroup
      */
-    public function getPastoralGroup(): ?PastoralGroup
+    public function getGroup(): ?PastoralGroup
     {
-        return $this->pastoralGroup;
+        return $this->group;
     }
 
     /**

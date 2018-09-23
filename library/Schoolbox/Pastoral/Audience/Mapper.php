@@ -51,7 +51,7 @@ class Mapper extends BaseMapper
         $this->uses('access', self::TYPE_INTEGER);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role');
-        $this->joins('group_id', GroupMapper::class, 'id', null, null, 'pastoralGroup', 'group');
+        $this->joins('group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
@@ -116,7 +116,7 @@ class Mapper extends BaseMapper
             // Hydrate group
 
             if (!empty($row['g.id'])) {
-                $access->setPastoralGroup($this->hydrateJoin($row, 'group', 'g'));
+                $access->setGroup($this->hydrateJoin($row, 'group', 'g'));
             }
 
             $results->add($access);

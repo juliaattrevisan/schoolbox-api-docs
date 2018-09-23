@@ -204,7 +204,7 @@ class Controller extends Base
                         $audience = $this->pastoralAudienceMapper->createModel();
                         $audience->setTypeId($typeId);
                         $audience->setSubtypeId($subtypeId);
-                        $audience->setPastoralGroup($group);
+                        $audience->setGroup($group);
                         $audience->setAccess($accessLevel);
 
                         $this->pastoralAudienceMapper->save($audience);
