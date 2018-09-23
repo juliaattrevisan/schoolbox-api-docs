@@ -53,7 +53,7 @@ class Model
     /**
      * @return Folder\Model
      */
-    public function getFolder(): Folder\Model
+    public function getFolder(): ?Folder\Model
     {
         return $this->folder;
     }
@@ -72,7 +72,7 @@ class Model
     /**
      * @return int
      */
-    public function getHitcount(): int
+    public function getHitcount(): ?int
     {
         return $this->hitcount;
     }
@@ -91,7 +91,7 @@ class Model
     /**
      * @return Alaress_Date_Format
      */
-    public function getLastAccessTime(): Alaress_Date_Format
+    public function getLastAccessTime(): ?Alaress_Date_Format
     {
         return $this->last_access_time;
     }
@@ -110,7 +110,7 @@ class Model
     /**
      * @return User
      */
-    public function getUser(): User
+    public function getUser(): ?User
     {
         return $this->user;
     }
