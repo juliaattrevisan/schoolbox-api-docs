@@ -15,6 +15,9 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
+/**
+ * @method Model createModel($idValue = null)
+ */
 class Mapper extends Schoolbox\Mapper
 {
     protected function mapping()
