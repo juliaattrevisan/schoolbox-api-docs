@@ -8,18 +8,17 @@
 
 <div class='row'>
     <div class='small-12 columns'>
-        <h1>{{ locale.pastoralCare.proper }}</h1>
+        <h1>{{ locale.pastoralCare.proper }} Groups</h1>
     </div>
 </div>
 
 <div class="row actions-small-1">
     <div class="list-item">
         <div class="small-12 columns">
-            <h2 class="subheader">Groups Management</h2>
+            <h2 class="subheader">Your Groups</h2>
         </div>
     </div>
     <nav>
-        <a href="{{ routeLookup('pastoral.getIndex') }}" class="icon-home" title="{{ locale.pastoralCare.proper }} Dashboard"></a>
         {# Pastoral moderators can manage pastoral groups #}
         {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
             <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Group"></a>

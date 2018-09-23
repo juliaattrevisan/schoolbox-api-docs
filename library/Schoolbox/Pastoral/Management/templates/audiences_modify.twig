@@ -1,3 +1,12 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
+    [ 'Visibility Defaults',      routeLookup('pastoralManagement.getAudiences') ],
+    [ 'Type' ]
+) }}
+
+{{ dump(record) }}
+
 {% if subtypeId is null %}
  {% set action = routeLookupIfAuthorized('pastoralManagement.postAudienceUpdateNoSub', {typeId: typeId}) %}
 {% else %}

@@ -3,24 +3,21 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
 [ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
-[ 'Groups Management' ]
+[ 'Visibility Defaults' ]
 ) }}
 
 <div class='row'>
     <div class='small-12 columns'>
-        <h1>{{ locale.pastoralCare.proper }}</h1>
+        <h1>{{ locale.pastoralCare.proper }} Visibility Defaults</h1>
     </div>
 </div>
 
 <div class="row actions-small-1">
     <div class="list-item">
         <div class="small-12 columns">
-            <h2 class="subheader">Pastoral Type Defaults</h2>
+            <h2 class="subheader">Pastoral Types</h2>
         </div>
     </div>
-    <nav>
-        <a href="{{ routeLookup('pastoral.getIndex') }}" class="icon-home" title="{{ locale.pastoralCare.proper }} Dashboard"></a>
-    </nav>
 </div>
 
 <div class="row">

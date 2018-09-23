@@ -27,19 +27,9 @@
     </div>
     <nav>
         {% if user.role.isStaff %}
-
-            {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
             {% set routeRecordUpdate = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
             {% set routeRecordDelete = routeLookupIfAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
             {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
-
-            {% if routeReportBuilder %}
-                <a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>
-            {% endif %}
-
-            {% if routeGetGroups %}
-                <a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>
-            {% endif %}
 
             {% if linkedStudents | length %}
                 <a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>
