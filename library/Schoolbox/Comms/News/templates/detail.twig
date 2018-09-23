@@ -244,7 +244,7 @@ Data:
             {% endif %}
 
             {# Reject this news article #}
-            {% if rejectRoute %}
+            {% if article.canBeRejected and rejectRoute %}
                 <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
             {% endif %}
 
@@ -279,7 +279,7 @@ Data:
     <a class="close-reveal-modal">&#215;</a>
 </div>
 
-{% if rejectRoute %}
+{% if article.canBeRejected and rejectRoute %}
 <script>
     $(function() {
         $(document).on('click', '#reject-article, #unpublish-article', function(event) {
