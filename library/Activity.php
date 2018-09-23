@@ -16,7 +16,7 @@ class Activity {
 
     function lastCatVisit($id) {
         //get last visit to category
-        $query = "SELECT datetime FROM homepage_log WHERE cid = '$id' AND user = '" . $_SESSION['id'] . "'";
+        $query = "SELECT datetime FROM homepage_log WHERE folder_id = '$id' AND user_id = '" . $_SESSION['id'] . "'";
         $result = $this->db->getRow($query);
         if ($result['datetime']) {
             return $result['datetime'];
