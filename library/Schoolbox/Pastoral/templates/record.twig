@@ -86,9 +86,10 @@
 </div>
 
 {# Confidential body #}
-
+{% if record.bodyPrivate %}
 {% include '@pastoral/record_section_body.twig' with { recordType: 'private' } %}
 {% include '@pastoral/record_section_comments.twig' with { comments: commentsPrivate, recordType: 'private' } %}
+{% endif %}
 
 {# General body #}
 

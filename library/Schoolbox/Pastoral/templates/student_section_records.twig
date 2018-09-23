@@ -61,16 +61,13 @@
                                     {% endif %}
 
                                     {# Display name of poster #}
-                                    Created by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>
-                                    <span title="{{ record.createdAt.short }}">{{ record.createdAt.relativeDay }}</span><br>
-
-                                    {% if not linkedStudent %}
-                                        {# Display last updated by if applicable #}
-                                        {% if record.createdAt.long != record.updatedAtDisplay.long %}
-                                                Last updated by <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
-                                                <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span><br>
-                                        {% endif %}
+                                    Created by <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a><span title="{{ record.createdAt.short }}"> {{ record.createdAt.relativeDay }}</span>
+                                    {# Display last updated by if applicable #}
+                                    {% if record.createdAt.long != record.updatedAtDisplay.long %}
+                                        last updated by <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
+                                        <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span><br>
                                     {% endif %}
+
 
                                     {# Display linked students to staff #}
                                     {% if user.role.isStaff and record.relatedRecords | length %}

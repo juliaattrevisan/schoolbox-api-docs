@@ -141,7 +141,7 @@ class Controller extends Base
             'data'     => [
                 'record'            => $record,
                 'allowIndividual'   => $this->getConfigLoader()->get('pastoral_individual_access'),
-                'allowParents'      => $allowParents,
+                'allowParents'      => false,  //prevent user search from including student parents
                 'roles'             => $roles,
                 'groups'            => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
                 'type'              => $type,
