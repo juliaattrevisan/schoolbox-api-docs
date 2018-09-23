@@ -29,7 +29,6 @@
         {% if user.role.isStaff %}
             {% set routeRecordUpdate = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
             {% set routeRecordDelete = routeLookupIfAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
-            {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
 
             {% if linkedStudents | length %}
                 <a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>
