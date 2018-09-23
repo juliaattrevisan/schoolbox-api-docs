@@ -198,7 +198,7 @@ class Controller extends Base
             $httpCode  = 400;
             $errorCode = self::ERROR_CODE_INVALID_TRANSITION;
             $message   = "Invalid transition. Current article state: {$article->getStatus()}";
-        } elseif (!$article->isSubmitted() && $this->validSpecFactory->buildSpecCanBeSubmitted($this->getUser())->isSatisfiedBy($article)) {
+        } elseif (!$article->isSubmitted() && !$this->validSpecFactory->buildSpecCanBeSubmitted($this->getUser())->isSatisfiedBy($article)) {
             // Invalid article. Warn user
             // (template + clients-side validation should prevent this case, but we still need to check)
             $httpCode  = 400;
