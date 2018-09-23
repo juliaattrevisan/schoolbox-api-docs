@@ -82,9 +82,9 @@ class Mapper extends Schoolbox\Mapper
         $query = "
             SELECT
             	{$this->getColumnString('hl')},
-            	{$this->getJoinMapper('folder')->getColumnString('c')}
+              {$this->getJoinMapper('folder')->getColumnString('f')}
             FROM `{$this->table}` hl
-            JOIN {$this->getJoinSql('folder', 'hl', 'c')}
+            JOIN {$this->getJoinSql('folder', 'hl', 'f')}
             WHERE hl.folder_id = :folderId
             AND hl.user_id = :userId
 		";
@@ -103,7 +103,7 @@ class Mapper extends Schoolbox\Mapper
 
         foreach ($statement as $row) {
             $log = $this->hydrate($row, 'hl');
-            $log->setFolder($folderMapper->hydrate($row, 'c'));
+            $log->setFolder($folderMapper->hydrate($row, 'f'));
             $collection->add($log);
         }
 
