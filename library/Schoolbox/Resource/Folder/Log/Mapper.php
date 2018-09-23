@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -15,6 +15,9 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
+/**
+ * @method Model createModel($idValue = null)
+ */
 class Mapper extends Schoolbox\Mapper
 {
     protected function mapping()
@@ -23,8 +26,8 @@ class Mapper extends Schoolbox\Mapper
         $this->hasTable('homepage_log');
 
         $this->uses('datetime', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'lastAccessTime');
-        $this->joins('user', UserMapper::class, 'id', self::TYPE_MODEL, null, 'user', 'user');
-        $this->joins('cid', FolderMapper::class, 'id', self::TYPE_MODEL, null, 'category', 'category');
+        $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->joins('folder_id', FolderMapper::class, 'id', null, null, 'folder', 'folder');
         $this->uses('hitcount', self::TYPE_INTEGER);
     }
 
@@ -34,7 +37,7 @@ class Mapper extends Schoolbox\Mapper
      *
      * @return String
      */
-    public function getUpdateString()
+    public function getUpdateString(): string
     {
         return '`hitcount` = `hitcount` + 1, `datetime` = NOW()';
     }
@@ -42,13 +45,14 @@ class Mapper extends Schoolbox\Mapper
     /**
      * Increments hit count for this user and category.
      *
-     * @param int|User         $user     A User object or user ID
-     * @param int|Folder\Model $category A Category object or ID
+     * @param int|User         $user A User object or user ID
+     * @param Folder\Model $folder A Category object or ID
+     * @throws Schoolbox\Mapper\Exception
      */
-    public function incrementHitcount($user, $category)
+    public function incrementHitcount($user, $folder)
     {
         $item = $this->createModel();
-        $item->setUser($user)->setCategory($category)->setHitcount(1);
+        $item->setUser($user)->setFolder($folder)->setHitcount(1);
         $this->save($item);
     }
 
@@ -68,39 +72,38 @@ class Mapper extends Schoolbox\Mapper
     /**
      * Get the last time a person visited this place
      *
-     * @param Folder\Model $category
-     * @param User $user
+     * @param Folder\Model $folder
+     * @param User         $user
      * @return Schoolbox\Collection|Model[]
+     * @throws Schoolbox\Mapper\Exception
      */
-    public function lastVisit(Folder\Model $category, User $user)
+    public function lastVisit(Folder\Model $folder, User $user)
     {
         $query = "
             SELECT
             	{$this->getColumnString('hl')},
-            	{$this->getJoinMapper('category')->getColumnString('c')}
+              {$this->getJoinMapper('folder')->getColumnString('f')}
             FROM `{$this->table}` hl
-            JOIN {$this->getJoinSql('category', 'hl', 'c')}
-            WHERE hl.cid = :categoryId
-            AND hl.user = :userId
+            JOIN {$this->getJoinSql('folder', 'hl', 'f')}
+            WHERE hl.folder_id = :folderId
+            AND hl.user_id = :userId
 		";
 
         $statement = $this->database->prepare($query);
         $statement->execute(array(
-            'categoryId' => $category->getId(),
-            'userId' => $user->getId()
-        ));
+                                'folderId' => $folder->getId(),
+                                'userId'   => $user->getId(),
+                            ));
 
         /* Manually construct hierarchy of items
          */
         $collection = $this->createCollection();
 
-        $categoryMapper = $this->getJoinMapper('category');
+        $folderMapper = $this->getJoinMapper('folder');
 
         foreach ($statement as $row) {
             $log = $this->hydrate($row, 'hl');
-
-            $log->setCategory($categoryMapper->hydrate($row, 'c'));
-
+            $log->setFolder($folderMapper->hydrate($row, 'f'));
             $collection->add($log);
         }
 

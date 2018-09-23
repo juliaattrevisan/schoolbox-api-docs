@@ -170,7 +170,7 @@ class DataSource
             FROM        `{$this->folderLogMapper->getTable()}` AS `hl`
             LEFT JOIN   {$this->folderLogMapper->getJoinSql('user', 'hl', 'u')}
             LEFT JOIN   {$this->folderLogMapper->getJoinSql('user.role', 'u', 'ur')}
-            WHERE       hl.cid = :folderId AND
+            WHERE       hl.folder_id = :folderId AND
                         datetime BETWEEN :startDate AND :endDate
                         {$roleClause}
             ORDER BY    {$orderBy}
@@ -221,11 +221,11 @@ class DataSource
         }
 
         $query = "
-            SELECT      COUNT(user)
+            SELECT      COUNT(user_id)
             FROM        `{$this->folderLogMapper->getTable()}` AS `hl`
             LEFT JOIN   {$this->folderLogMapper->getJoinSql('user', 'hl', 'u')}
             LEFT JOIN   {$this->folderLogMapper->getJoinSql('user.role', 'u', 'ur')}
-            WHERE       cid = :folderId AND
+            WHERE       folder_id = :folderId AND
                         datetime BETWEEN :startDate AND :endDate
                         {$roleClause}
         ";
@@ -372,11 +372,11 @@ class DataSource
                             AND u.deleted_at IS NULL
                             {$roleFilter}
                             AND u.id NOT IN (
-                                SELECT `user`
+                                SELECT `user_id`
                                 FROM homepage_log
-                                WHERE cid = :folderId
+                                WHERE folder_id = :folderId
                                 AND datetime BETWEEN :startDate AND :endDate
-                                GROUP BY `user`
+                                GROUP BY `user_id`
                             )
             {$queryLimit}
         ";
@@ -431,11 +431,11 @@ class DataSource
                             AND u.deleted_at IS NULL
                             {$roleFilter}
                             AND u.id NOT IN (
-                                SELECT    `user`
+                                SELECT    `user_id`
                                 FROM      homepage_log
-                                WHERE     cid = :folderId
+                                WHERE     folder_id = :folderId
                                           AND datetime BETWEEN :startDate AND :endDate
-                                GROUP BY  `user`
+                                GROUP BY  `user_id`
                             )
         ";
 

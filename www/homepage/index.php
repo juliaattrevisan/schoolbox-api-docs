@@ -121,7 +121,7 @@ foreach ($homepageHandler->getColorList() as $key => $color) {
 
 // moving forward! log the pageview
 $mapper = new Schoolbox\Resource\Folder\Log\Mapper();
-$mapper->incrementHitcount($this->getDi()->get('session')->get('user'), $folder->getId());
+$mapper->incrementHitcount($this->getDi()->get('session')->get('user'), $folder);
 $folderMapper->logPageView($folder);
 
 /* BUILD PAGE */

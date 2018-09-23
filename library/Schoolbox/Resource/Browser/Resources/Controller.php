@@ -99,7 +99,7 @@ class Controller extends AbstractController
         }
 
         // moving forward! log the folder view
-        FolderLogMapper::getInstance()->incrementHitcount($this->getUser(), $folderId);
+        FolderLogMapper::getInstance()->incrementHitcount($this->getUser(), $data['folder']);
         FolderMapper::getInstance()->logPageView($data['folder']);
 
         return $data;

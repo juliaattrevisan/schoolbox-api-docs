@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -18,7 +18,7 @@ class Model
     /**
      * @var Folder\Model
      */
-    protected $category;
+    protected $folder;
 
     /**
      * @var User
@@ -40,20 +40,22 @@ class Model
      */
 
     /**
-     * @param  Folder\Model $category
+     * @param  Folder\Model $folder
      *
      * @return $this
      */
-    public function setCategory($category) {
-        $this->category = $category;
+    public function setFolder(Folder\Model $folder): self
+    {
+        $this->folder = $folder;
         return $this;
     }
 
     /**
      * @return Folder\Model
      */
-    public function getCategory() {
-        return $this->category;
+    public function getFolder(): ?Folder\Model
+    {
+        return $this->folder;
     }
 
     /**
@@ -61,7 +63,8 @@ class Model
      *
      * @return $this
      */
-    public function setHitcount($hitcount) {
+    public function setHitcount($hitcount): self
+    {
         $this->hitcount = $hitcount;
         return $this;
     }
@@ -69,7 +72,8 @@ class Model
     /**
      * @return int
      */
-    public function getHitcount() {
+    public function getHitcount(): ?int
+    {
         return $this->hitcount;
     }
 
@@ -78,7 +82,8 @@ class Model
      *
      * @return $this
      */
-    public function setLastAccessTime($last_access_time) {
+    public function setLastAccessTime($last_access_time): self
+    {
         $this->last_access_time = $last_access_time;
         return $this;
     }
@@ -86,7 +91,8 @@ class Model
     /**
      * @return Alaress_Date_Format
      */
-    public function getLastAccessTime() {
+    public function getLastAccessTime(): ?Alaress_Date_Format
+    {
         return $this->last_access_time;
     }
 
@@ -95,7 +101,8 @@ class Model
      *
      * @return $this
      */
-    public function setUser($user) {
+    public function setUser($user): self
+    {
         $this->user = $user;
         return $this;
     }
@@ -103,7 +110,8 @@ class Model
     /**
      * @return User
      */
-    public function getUser() {
+    public function getUser(): ?User
+    {
         return $this->user;
     }
 
