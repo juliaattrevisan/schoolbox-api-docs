@@ -18,6 +18,8 @@ use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\Type\Model as PastoralType;
+use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -103,10 +105,10 @@ class Controller extends Base
     /**
      *  Edit the defaults for a particular type and subtype
      *
-     * @param $typeId
-     * @param $subtypeId
+     * @param $type
+     * @param $subType
      */
-    public function getAudiencesModify($typeId, $subtypeId)
+    public function getAudiencesModify(PastoralType $type, ?PastoralSubType $subType)
     {
         $roles = new Collection();
         $rolesAll = RoleMapper::getInstance()->findAll(['order' => ['name' => 'ASC']]);
@@ -120,10 +122,14 @@ class Controller extends Base
             }
         }
 
+        if ($subType !== null) {
+            $subTypeId = $subType->getId();
+        }
+
         //This is fudged using the same audience screen from the record. So to get the saved records to display, it is easiest to attach them to $record
         $record = [];
         $record['id'] = "fakeId";
-        $record['access'] = $this->getAudienceForType($typeId, $subtypeId);
+        $record['access'] = $this->getAudienceForType($type->getId(), $subTypeId);
 
         $this->getResponse()->content->set([
             'template' => '@pastoralManagement/audiences_modify.twig',
@@ -133,17 +139,17 @@ class Controller extends Base
                 'allowParents'      => false,
                 'roles'             => $roles,
                 'groups'            => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
-                'typeId'            => $typeId,
-                'subtypeId'         => $subtypeId,
+                'type'              => $type,
+                'subtype'           => $subType,
                 'groups'            => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
             ],
             'title' => 'Pastoral Group Management',
         ]);
     }
 
-    public function getAudiencesModifyNoSub($typeId)
+    public function getAudiencesModifyNoSub(PastoralType $type)
     {
-        $this->getAudiencesModify($typeId, null);
+        $this->getAudiencesModify($type, null);
     }
 
     public function postAudienceUpdateNoSub($typeId)

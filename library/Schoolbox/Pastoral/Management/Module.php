@@ -17,6 +17,7 @@ use Schoolbox\Pastoral\Audience\Mapper as PastoralAudienceMapper;
 use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
+use Schoolbox\Pastoral\SubType\Mapper as SubTypeMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -102,6 +103,22 @@ class Module extends BaseModule
                         /** @var GroupMapper $groupMapper */
                         $groupMapper          = $this->getMapperFactory()->get(GroupMapper::class);
                         $returnArray['group'] = $groupMapper->findById($params['groupId']);
+                    } catch (MapperException $e) {
+                    }
+                }
+                if (array_key_exists('typeId', $params)) {
+                    try {
+                        /** @var GroupMapper $groupMapper */
+                        $typeMapper          = $this->getMapperFactory()->get(PastoralTypeMapper::class);
+                        $returnArray['type'] = $typeMapper->findById($params['typeId']);
+                    } catch (MapperException $e) {
+                    }
+                }
+                if (array_key_exists('subtypeId', $params)) {
+                    try {
+                        /** @var GroupMapper $groupMapper */
+                        $subTypeMapper          = $this->getMapperFactory()->get(SubTypeMapper::class);
+                        $returnArray['subType'] = $subTypeMapper->findById($params['subtypeId']);
                     } catch (MapperException $e) {
                     }
                 }

@@ -1,18 +1,24 @@
+{% if subtype.id is null %}
+    {% set action = routeLookupIfAuthorized('pastoralManagement.postAudienceUpdateNoSub', {typeId: type.id}) %}
+    {% set title = type.name %}
+{% else %}
+    {% set action = routeLookupIfAuthorized('pastoralManagement.postAudienceUpdate', {typeId: type.id, subtypeId: subtype.id}) %}
+    {% set title = type.name ~ ': ' ~ subtype.name %}
+{% endif %}
+
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
     [ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
     [ 'Visibility Defaults',      routeLookup('pastoralManagement.getAudiences') ],
-    [ 'Type' ]
+    [ title ]
 ) }}
 
-{{ dump(record) }}
-
-{% if subtypeId is null %}
- {% set action = routeLookupIfAuthorized('pastoralManagement.postAudienceUpdateNoSub', {typeId: typeId}) %}
-{% else %}
- {% set action = routeLookupIfAuthorized('pastoralManagement.postAudienceUpdate', {typeId: typeId, subtypeId: subtypeId}) %}
-{% endif %}
-
+<div class='row'>
+    <div class='small-12 columns'>
+        <h1>{{ title }} Visibility Defaults</h1>
+    </div>
+</div>
 
 
 <div class="small-12 island" id="formPastoral">
