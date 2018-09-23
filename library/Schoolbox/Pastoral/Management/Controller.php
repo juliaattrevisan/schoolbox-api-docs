@@ -112,6 +112,7 @@ class Controller extends Base
     {
         $roles = new Collection();
         $rolesAll = RoleMapper::getInstance()->findAll(['order' => ['name' => 'ASC']]);
+        $allowParents = $this->getConfigLoader()->get('pastoral_parent_access');
 
         //Staff roles only for default audiences
         /** @var Role $roleCurrent */
@@ -120,8 +121,12 @@ class Controller extends Base
             if ($roleCurrent->isStaff()) {
                 $roles->add($roleCurrent);
             }
-        }
 
+            // Parent role? Show only the # of this student's parents in this role
+            if ($allowParents && $roleCurrent->isParent()) {
+                $roles->add($roleCurrent);
+            }
+        }
         if ($subType !== null) {
             $subTypeId = $subType->getId();
         }
@@ -135,13 +140,12 @@ class Controller extends Base
             'template' => '@pastoralManagement/audiences_modify.twig',
             'data'     => [
                 'record'            => $record,
-                'allowIndividual'   => ConfigMapper::getInstance()->get('pastoral_individual_access'),
-                'allowParents'      => false,
+                'allowIndividual'   => $this->getConfigLoader()->get('pastoral_individual_access'),
+                'allowParents'      => $allowParents,
                 'roles'             => $roles,
                 'groups'            => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
                 'type'              => $type,
                 'subtype'           => $subType,
-                'groups'            => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
             ],
             'title' => 'Pastoral Group Management',
         ]);
