@@ -250,7 +250,6 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \UnexpectedValueException
      * @throws News\Exceptions\InvalidTransitionException
-     * @todo catch and handle InvalidTransitionException
      */
     public function postReject(Model $article): void
     {
