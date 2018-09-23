@@ -33,7 +33,7 @@ class Controller extends Base
     private const ERROR_CODE_OK                                    = 0; // 200 all aspects of requests were fulfilled as expected
     private const ERROR_CODE_INVALID_ARTICLE                       = 1; // 400 article attributes invalid. Client validation should protect from most cases.
     private const ERROR_CODE_ALREADY_DONE_AND_SAME_ATTRIBUTES      = 1; // 200 someone else got in first, and no data loss if we ignore
-    private const ERROR_CODE_ALREADY_DONE_BUT_DIFFERENT_ATTRIBUTES = 2; // 400 someone else got in first, but data loss if we ignore
+    private const ERROR_CODE_ALREADY_DONE_BUT_DIFFERENT_ATTRIBUTES = 2; // 409 someone else got in first, but data loss if we ignore
     private const ERROR_CODE_INVALID_TRANSITION                    = 3; // 400 client is authorized, but is asking for the impossible.
     private const ERROR_CODE_UNABLE_TO_SAVE                        = 4; // 500 not the client's fault.
 
@@ -260,12 +260,12 @@ class Controller extends Base
             if ($article->getRejectedReason() === $rejectionReason) {
                 // Already rejected for same reason. Just carry on.
                 $httpCode  = 200;
-                $errorCode = self::ERROR_CODE_ALREADY_DONE_BUT_DIFFERENT_ATTRIBUTES;
+                $errorCode = self::ERROR_CODE_ALREADY_DONE_AND_SAME_ATTRIBUTES;
                 $message   = "Article was already rejected" . ($rejectionReason ? " for identical reasons" : '');
             } else {
                 // If the article is already rejected then we will lose either the original reason, or the new reason.
                 // We need to warn the client so it can decide what to do.
-                $httpCode  = 400;
+                $httpCode  = 409;
                 $errorCode = self::ERROR_CODE_ALREADY_DONE_BUT_DIFFERENT_ATTRIBUTES;
                 /** @noinspection NullPointerExceptionInspection */
                 $message = "Article was already rejected by {$article->getRejectedBy()->getFullName()} at {$article->getRejectedAt()->getLocalShort()}";
