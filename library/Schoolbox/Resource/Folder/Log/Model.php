@@ -10,13 +10,13 @@
 namespace Schoolbox\Resource\Folder\Log;
 
 use Alaress_Date_Format;
-use \Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
 class Model
 {
     /**
-     * @var FolderModel
+     * @var Folder\Model
      */
     protected $folder;
 
@@ -40,20 +40,20 @@ class Model
      */
 
     /**
-     * @param  FolderModel $folder
+     * @param  Folder\Model $folder
      *
      * @return $this
      */
-    public function setFolder(FolderModel $folder): self
+    public function setFolder(Folder\Model $folder): self
     {
         $this->folder = $folder;
         return $this;
     }
 
     /**
-     * @return FolderModel
+     * @return Folder\Model
      */
-    public function getFolder(): FolderModel
+    public function getFolder(): Folder\Model
     {
         return $this->folder;
     }
