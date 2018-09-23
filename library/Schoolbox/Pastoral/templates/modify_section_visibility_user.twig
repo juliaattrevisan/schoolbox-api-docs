@@ -73,9 +73,6 @@
 
             window.modalUserAdded = function (user, permission = 1) {
 
-                console.log('adding user' + user.id + ' with permission' + permission);
-
-
                 {# Only add if they don't already exist in the table #}
 
                 if (window.usersAdded[user.id] !== true) {

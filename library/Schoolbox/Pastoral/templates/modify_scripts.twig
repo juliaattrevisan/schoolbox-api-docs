@@ -137,8 +137,8 @@
 
                     {% for audience in audiences %}
                         if ({{ audience.typeId }} == typeId && {{ audience.subtypeId | default("null") }} == subtypeId) {
-                            {% if audience.group_id %}
-                            window.addGroup({{ audience.group_id }});
+                            {% if audience.group.id %}
+                            window.addGroup("{{ audience.group.id }}", "{{ audience.group.name }}", "{{ audience.access }}");
                             {% elseif audience.role.id %}
                             window.addRole("{{ audience.role.id }}", "{{ audience.role.name }}", "{{ audience.access}}");
                             {% elseif audience.user.id %}
@@ -148,8 +148,6 @@
                                 'last_name': "{{ audience.user.lastname }}",
                                 'role': "{{ audience.user.role.name }}",
                             }, "{{ audience.access}}");
-                            {% else %}
-                            console.log("ERROR");
                             {% endif %}
                         }
                     {% endfor %}
