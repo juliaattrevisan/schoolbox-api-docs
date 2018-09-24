@@ -141,7 +141,7 @@ class CapabilityMark
      * Retrieve a capability mark for a capability usage, if one exists.
      *
      * @param IndicatorUsage $indicatorUsage
-     * @return null|CapabilityMark
+     * @return null|IndicatorMark
      */
     public function retrieveIndicatorMark(IndicatorUsage $indicatorUsage): ?IndicatorMark
     {
