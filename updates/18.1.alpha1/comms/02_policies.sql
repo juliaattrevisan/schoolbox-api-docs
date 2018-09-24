@@ -33,6 +33,11 @@ VALUES ('save_for_later', 1);
 INSERT INTO `comms_news_policy` (identifier, value)
 VALUES ('news_staff_post', 1);
 
+-- News Policy: Allow others users to edit news
+-- When enabled, users can edit other users news if they have write access to the page
+-- When disabled, users can only edit their own news, unless they are a moderator
+INSERT INTO `comms_news_policy` (identifier, value)
+VALUES ('news_edit_other', 1);
 
 CREATE TABLE `comms_news_saveforlater` (
   `id`                 int(11)       PRIMARY KEY NOT NULL AUTO_INCREMENT,

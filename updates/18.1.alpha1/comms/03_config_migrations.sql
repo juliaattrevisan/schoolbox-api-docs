@@ -12,6 +12,11 @@ WHERE identifier = 'news_staff_post' LIMIT 1;
 
 DELETE FROM `config` WHERE name = 'news_staff_post_enabled' LIMIT 1;
 
+UPDATE comms_news_policy SET `value` = (SELECT `value` FROM `config` WHERE name = 'news_edit_other')
+WHERE identifier = 'news_edit_other' LIMIT 1;
+
+DELETE FROM `config` WHERE name = 'news_edit_other' LIMIT 1;
+
 
 -- Component: Dashboard
 UPDATE `component_definition` SET `class`='Schoolbox\\Comms\\News\\Component\\Dashboard\\Controller'
