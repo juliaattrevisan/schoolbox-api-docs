@@ -208,7 +208,7 @@
                         <h2>Complex Audience</h2>
                         <a class="close-reveal-modal" aria-label="Close">×</a>
 
-                        <p class="meta">Some help text</p>
+                        <p class="meta">This audience is comprised of users who are part of at least one sub-type of both audience types.</p>
 
                         <p v-for="dimensionData in selectedCompositeBrick.modalData">
                             <b>${ dimensionData.typeLabel.plural }</b>: <template v-for="(label, index) in dimensionData.valueLabels">${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template> </template>
