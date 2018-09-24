@@ -4,7 +4,6 @@
     article           News\Article\Model
     featureImageZone  array
     audienceSegments  null|array,
-    isCommsOfficer    null|bool (null on create version)
 #}
 
 {% import '@commsNews/indicator.twig' as indicator %}
@@ -23,13 +22,6 @@
         </ul>
     </div>
 </div>
-
-{# Train Line #}
-{% include '@commsNews/workflow.twig' with {
-    article: article,
-    moderationRequired: policies['global_moderation'].value,
-    isCommsOfficer: isCommsOfficer
-} only %}
 
 {% if policies['global_moderation'].value %}
 <div class="row">
