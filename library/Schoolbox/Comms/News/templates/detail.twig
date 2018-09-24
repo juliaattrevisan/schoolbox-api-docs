@@ -150,19 +150,6 @@
     {% endif %}
 </div>
 
-
-{# Train Line
- # One of three possibilities are shown here
- # Only useful to authors and moderators
- #}
-{% if isAuthor or isCommsOfficer %}
-{% include '@commsNews/workflow.twig' with {
-    article: article,
-    moderationEnabled: moderationEnabled,
-    isCommsOfficer: isCommsOfficer
-} only %}
-{% endif %}
-
 <div class="row">
     <div class="small-12 island">
         <section>
