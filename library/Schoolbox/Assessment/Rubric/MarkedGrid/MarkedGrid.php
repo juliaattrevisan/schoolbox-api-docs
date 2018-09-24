@@ -103,25 +103,25 @@ class MarkedGrid
      */
     public function retrieveNormalizedMark(): float
     {
-        $capabilityMaxValues = [];
-        $totalWeight         = 0;
+        $capabilityValues = [];
+        $totalAvailableMark      = 0;
         foreach ($this->capabilityMarks as $capabilityMark) {
-            $capabilityNormMark    = $capabilityMark->retrieveNormalizedMark();
-            $capabilityWeight      = $capabilityMark->getCapabilityUsage()->getMaxValue();
-            $capabilityMaxValues[] = [$capabilityNormMark, $capabilityWeight,];
-            $totalWeight += $capabilityWeight;
+            $capabilityNormMark  = $capabilityMark->retrieveNormalizedMark();
+            $capabilityMaxMark   = $capabilityMark->getCapabilityUsage()->getMaxValue();
+            $capabilityValues[]  = [$capabilityNormMark, $capabilityMaxMark,];
+            $totalAvailableMark += $capabilityMaxMark;
         }
 
-        if ($totalWeight === 0) {
+        if ($totalAvailableMark === 0) {
             return 0;
         }
 
         $normalizedMark = 0;
-        foreach ($capabilityMaxValues as [$capabilityNormMark, $capabilityWeight]) {
-            if ($capabilityWeight === 0) {
+        foreach ($capabilityValues as [$capabilityNormMark, $capabilityMaxMark]) {
+            if ($capabilityMaxMark === 0) {
                 continue;
             }
-            $normalizedMark += ($capabilityNormMark * ($capabilityWeight / $totalWeight));
+            $normalizedMark += ($capabilityNormMark * ($capabilityMaxMark / $totalAvailableMark));
         }
         return $normalizedMark;
     }
