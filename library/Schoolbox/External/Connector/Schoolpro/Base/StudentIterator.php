@@ -14,11 +14,9 @@ namespace Schoolbox\External\Connector\Schoolpro\Base;
 use IteratorIterator;
 use Schoolbox\External\Normalise;
 use Schoolbox\External\Normalise\User;
-use Schoolbox\Sync\Iterator\StackableHelper;
 
 class StudentIterator extends IteratorIterator
 {
-    use StackableHelper;
 
     /**
      * @var User\Student|null
