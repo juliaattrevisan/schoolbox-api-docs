@@ -20,6 +20,26 @@
         'checkedValue': 1,
         'type': 'switch'
     },
+    'news_staff_post': {
+        'title': 'Allow Staff Post to All Audiences',
+        'subtext': 'Enable staff to audience ' ~ locale.news ~ ' to campus, roles, houses and year levels.',
+        'active': 'Staff may publish ' ~ locale.news ~ ' to all audiences',
+        'inactive': 'Staff may publish ' ~ locale.news ~ ' only to groups they have write access to',
+        'identifier': 'publish_date_offset',
+        'value': 0,
+        'checkedValue': 1,
+        'type': 'switch'
+    },
+    'news_edit_other': {
+        'title': 'Allow Staff to Modify ' ~ locale.news.proper,
+        'subtext': 'Enable staff to modify ' ~ locale.news ~ ' posted by other users if they have write access',
+        'active': 'Staff may modify ' ~ locale.news ~ ' posted by other users to their groups',
+        'inactive': 'Staff can only modify ' ~ locale.news ~ ' they posted',
+        'identifier': 'publish_date_offset',
+        'value': 0,
+        'checkedValue': 1,
+        'type': 'switch'
+    },
     'publish_date_offset': {
         'title': 'Publish Date Offset',
         'subtext': locale.news.proper ~ ' will initially have their default publish date set to the current datetime plus this value.',
