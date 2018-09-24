@@ -205,21 +205,12 @@ class Controller extends Assessment\Controller
                     }
                 }
             }
-//            $assessment->setRubricGrid($this->rubricMapper->retrieveGrid($assessment, false));
-//            $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
         }
 
         // Generate rubric context for every feedback
-//        $rubricContext = new RubricContext($this->rubricMapper);
-        $timeline      = $feedbackRubricContexts = null;
+        $timeline = null;
         if ($participant) {
-            $timeline               = (new FullTimeline($participant))->getForUser($this->getUser());
-//            $feedbackRubricContexts = $rubricContext->generateSeriesForTimeline(
-//                $timeline,
-//                $this->getUser(),
-//                $this->getAccess(),
-//                false
-//            );
+            $timeline = (new FullTimeline($participant))->getForUser($this->getUser());
         }
 
 
@@ -238,11 +229,6 @@ class Controller extends Assessment\Controller
             /* Plagscan status
              */
             'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-
-//            /* Rubrics data - now incorporated into feedback
-//             */
-//            'emptyRubricContext' => $rubricContext->generateBasic($assessment, $student),
-//            'feedbackRubricContexts' => $feedbackRubricContexts,
 
             'authoritativeFeedback' => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
         ];
