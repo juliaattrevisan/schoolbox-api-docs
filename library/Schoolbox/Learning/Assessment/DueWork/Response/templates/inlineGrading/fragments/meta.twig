@@ -20,7 +20,7 @@
             <h1>{{ title }} {{ assessment.title }}</h1>
             <ul class="meta">
                 <li class="icon-calendar">{{ dueDate.participant(participant) }}</li>
-                <li class="icon-due-work"><a href="/homepage/{{ assessment.context.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
+                <li class="icon-due-work"><a href="/homepage/{{ assessment.context.folder.id }}">{{ assessment.context.title }}</a> {{ assessment.typeName }}</li>
                 {% if responseList|length == 1 %}
                     <li class="icon-calendar">Submitted {{ response.submittedAt.short }}</li>
                 {% endif %}
