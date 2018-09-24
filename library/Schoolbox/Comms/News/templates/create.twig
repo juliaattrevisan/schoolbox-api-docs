@@ -206,22 +206,11 @@
                         <h2>Complex Audience</h2>
                         <a class="close-reveal-modal" aria-label="Close">×</a>
 
-                        <p class="meta">This audience is comprised of users who are part of at least one sub-type of both audience types.</p>
+                        <p class="meta" v-if="selectedCompositeBrick.modalData">This audience segment includes users who are in both one or more of the selected ${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() } and one or more of the selected ${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }.</p>
 
                         <p v-for="dimensionData in selectedCompositeBrick.modalData">
                             <b>${ dimensionData.typeLabel.plural }</b>: <template v-for="(label, index) in dimensionData.valueLabels">${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template> </template>
                         </p>
-
-                        {#<template v-for="dimensionData in selectedCompositeBrick.modalData">
-                            <div class="small-12 medium-6 columns">
-                                <h3>${ dimensionData.typeLabel.singular }</h3>
-                                <ul>
-                                    <li v-for="label in dimensionData.valueLabels">
-                                        ${ label }
-                                    </li>
-                                </ul>
-                            </div>
-                        </template>#}
                     </div>
                 </fieldset>
 
