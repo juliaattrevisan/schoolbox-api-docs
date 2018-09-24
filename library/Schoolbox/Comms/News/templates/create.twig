@@ -184,8 +184,6 @@
                                                 </option>
                                             </select>
                                         </legend>
-                                        <input type="checkbox" :id="index + '-all'" v-model="selectAll[key]" @change="toggleSelectAll(key)">
-                                        <label :for="key + '-all'" class="checkbox-label">Select all</label>
                                         <slot v-for="(item, key2) in audienceListItemsIntersect[key]">
                                             <input type="checkbox" :id="key + '-' + key2" :value="key2" v-model="intersectList[key]">
                                             <label :for="key + '-' + key2" class="checkbox-label">${ item }</label>
@@ -284,7 +282,6 @@
 <script src="/javascript/shared/comms/audience-bricks.js"></script>
 <script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 <script>
     'use strict';
@@ -559,11 +556,6 @@
             // Just a marker to check if advanced has been clicked for (need to load defaults on first click)
             hasLoadedAdvanced: false,
 
-            // Model for the intersector select alls
-            selectAll: {
-                'primary': false,
-                'secondary': false
-            },
             // the composite brick currently selected for display in the composite details modal
             selectedCompositeBrick: {}
         },
@@ -792,8 +784,6 @@
                 $('#audience-browse').foundation('reveal', 'close');
                 self.intersectList.primary = [];
                 self.intersectList.secondary = [];
-                self.selectAll.primary = false;
-                self.selectAll.secondary = false;
 
                 audienceSelectize.refreshItems();
             },
@@ -859,9 +849,6 @@
                 var self = this;
                 var audienceOption = self.intersect[list];
 
-                // Reset select all
-                self.selectAll[list] = false;
-
                 // Reset checked item model
                 self.intersectList[list] = [];
 
@@ -885,26 +872,6 @@
                     };
 
                     this.loadAudienceOptions(audienceOption, callback);
-                }
-            },
-
-            /**
-             * Select all
-             * @param list 'primary' or 'secondary'
-             */
-            toggleSelectAll: function(list) {
-                var self = this;
-                self.intersectList[list] = [];
-
-                // Get ready for something wild...
-                if (self.selectAll[list]) {
-                    // Loop the possible options and add them to the list of checked options (intersectList)
-                    var valueLabels = this.intersect[list].valueLabels;
-                    for (var encodedValue in valueLabels) {
-                        if(valueLabels.hasOwnProperty(encodedValue)) {
-                            self.intersectList[list].push(encodedValue);
-                        }
-                    }
                 }
             },
 
