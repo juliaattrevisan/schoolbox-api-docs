@@ -243,6 +243,9 @@ class Controller extends Base
             $isMostRecentResponse = ($mostRecentResponse && $mostRecentResponse->getId() == $response->getId());
         }
 
+        $file = null;
+        $selfAssessmentFeedback = null;
+
         /* If there is an an actual Latest Response, use it and subject
          * it to the usual checks.
          *
@@ -253,15 +256,16 @@ class Controller extends Base
             if (!$this->getUser()->isSuperuser() && $this->getUser()->getRole()->isStaff() && !$response->isSubmitted()) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
-        }
 
-        $file = $response ? $this->getFile($response, $this->getRequest()->query['hash']) : null;
+            // The file that's being reviewed
+            $file = $response ? $this->getFile($response, $this->getRequest()->query['hash']) : null;
+
+            // Self-assessed feedback (published only)
+            $selfAssessmentFeedback = $response->findMostRecentSelfAssessedPublishedFeedback();
+        }
 
         // Authoritative feedback, draft or published
         $feedback = $participant->findMostRecentInstructorGivenFeedback();
-
-        // Self-assessed feedback (published only)
-        $selfAssessmentFeedback = $response->findMostRecentSelfAssessedPublishedFeedback();
 
         // The zone which contains the files
         $attachZoneFactory = new Attachzone\Factory();
