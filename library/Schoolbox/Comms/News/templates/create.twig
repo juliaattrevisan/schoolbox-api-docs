@@ -208,9 +208,10 @@
 
                         <p class="meta" v-if="selectedCompositeBrick.modalData">This audience segment includes users who are in both one or more of the selected ${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() } and one or more of the selected ${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }.</p>
 
-                        <p v-for="dimensionData in selectedCompositeBrick.modalData">
-                            <b>${ dimensionData.typeLabel.plural }</b>: <template v-for="(label, index) in dimensionData.valueLabels">${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template> </template>
-                        </p>
+                        <div class="audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
+                            <div><b>${ dimensionData.typeLabel.plural }:</b></div>
+                            <div><template v-for="(label, index) in dimensionData.valueLabels">${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template></template></div>
+                        </div>
                     </div>
                 </fieldset>
 
