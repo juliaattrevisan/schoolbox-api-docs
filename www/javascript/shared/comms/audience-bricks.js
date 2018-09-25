@@ -1002,9 +1002,10 @@ Brick.prototype.getNameLabel = function(){
 
     for(var i in sortedDimensions){
         var dimension = sortedDimensions[i];
-        parts.push(dimension.getEntityValues().length + "x " + this.getTypeLabel(dimension.getEntityType()));
+        var name = dimension.getEntityValues().length + " " + this.getTypeLabel(dimension.getEntityType(), (dimension.getEntityValues().length > 1));
+        parts.push(name);
     }
-    return parts.join(' ∩ ');
+    return parts.join(' & ');
 };
 /**
  * A function to sort dimensions
@@ -1049,11 +1050,16 @@ Brick.prototype.sortDimensions = function(left, right){
  * We only have to do this once on brick creation, as this brick attribute is immutable.
  *
  * @param {string} entityType
+ * @param {boolean} plural
  * @return {string}
  */
-Brick.prototype.getTypeLabel = function(entityType){
-    if(this.typeLabelMap.hasOwnProperty(entityType)){
-        return this.typeLabelMap[entityType];
+Brick.prototype.getTypeLabel = function (entityType, plural) {
+    if (this.typeLabelMap.hasOwnProperty(entityType)) {
+        if (plural) {
+            return this.typeLabelMap[entityType].plural;
+        } else {
+            return this.typeLabelMap[entityType].singular;
+        }
     }
     return entityType;
 };
@@ -1340,7 +1346,7 @@ function BrickManager(vue, codec, entityTypeLabelMap) {
      * @return Brick
      */
     var computeOptimalHostBrick = function(candidateBricks, guestBrick){
-        console.log('TODO implement optimal brick algorithm');
+        //console.log('TODO implement optimal brick algorithm');
         // TODO this is wrong, just a hack for now
         return candidateBricks[0];
     }

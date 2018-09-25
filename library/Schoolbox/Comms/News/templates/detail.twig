@@ -230,19 +230,6 @@
     <div class="small-12 columns">
         <ul class="flex-list buttons" id="actionButtons">
 
-
-        {# Modify this news article
-         # Only available before the article has been accepted
-         #}
-        {% if not article.isAccepted %}
-            {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {article: article, articleId: article.id}) %}
-
-            {% if modifyRoute %}
-                <li><a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article">Modify</a></li>
-            {% endif %}
-        {% endif %}
-
-
         {# Unsubmitted articles need explicit actions to be made available to the world
          #
          # Moderation is required: you're prompted to consciously submit for moderation
