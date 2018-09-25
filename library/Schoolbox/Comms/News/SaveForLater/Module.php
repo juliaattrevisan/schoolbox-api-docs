@@ -148,9 +148,7 @@ class Module extends BaseModule
      */
     private function getAuthRuleCanViewList(): Rule\IAuthorizationRule
     {
-        return new Rule\All(
-            new Rule\IsLoggedIn()
-        );
+        return new Rule\IsLoggedIn();
     }
 
     /**

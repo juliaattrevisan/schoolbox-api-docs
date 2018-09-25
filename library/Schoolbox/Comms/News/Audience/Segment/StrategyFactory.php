@@ -12,6 +12,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\RoleAccessMapper;
+use UnexpectedValueException;
 
 /**
  * Responsible for enumeration of the IStrategy interface
@@ -71,6 +72,7 @@ class StrategyFactory
     /**
      * @param string $entityType
      * @return IStrategy
+     * @throws InvalidArgumentException
      */
     public function make(string $entityType): IStrategy
     {
@@ -118,6 +120,8 @@ class StrategyFactory
 
     /**
      * @return GenericCollection|IStrategy[]
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function makeAll(): GenericCollection
     {

@@ -10,7 +10,7 @@ namespace Schoolbox\Comms\News\Authorizer\Rule;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\User;
 
-class IsNotYetAccepted extends ArticleAttribute
+class IsNotYetApproved extends ArticleAttribute
 {
 
     /**
@@ -23,7 +23,7 @@ class IsNotYetAccepted extends ArticleAttribute
     {
         $article = $this->findArticleInParams($params);
 
-        if ($article->isAccepted()) {
+        if ($article->isApproved()) {
             throw new Unauthorized("Article {$article->getId()} is already accepted");
         }
     }

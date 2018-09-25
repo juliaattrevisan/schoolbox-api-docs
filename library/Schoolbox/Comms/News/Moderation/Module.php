@@ -1,11 +1,11 @@
 <?php
 /**
- * Module
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
+
 namespace Schoolbox\Comms\News\Moderation;
 
 use Alaress\Authorizer\Rule;
@@ -15,20 +15,25 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Comms\News\Mapper as NewsMapper;
-use Schoolbox\Comms\News\Policy\Mapper as PolicyMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Comms\News\Authorizer\Rule\CanModerateAudience;
+use Schoolbox\Comms\News\Authorizer\Rule\IsModerationEnabled;
+use Schoolbox\Comms\News\Authorizer\Rule\IsArticleAuthor;
+use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Policy;
+use Schoolbox\Error;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\UserMapper;
+use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
 {
+
     /**
      * @inheritdoc
      */
     protected $basename = 'commsNewsModeration';
+
 
     /**
      * Hook method for setting up routes via self::register()
@@ -37,7 +42,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $moderatorPerms = new Rule\All(
+        $suOrCommsOfficer = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
@@ -45,39 +50,69 @@ class Module extends BaseModule
             )
         );
 
-        $preloadNews = function ($params) {
-            return $this->preloadNews($params);
+        // loggedIn && (SU || CO || moderator || (moderationEnabled && author))
+        $canSubmit = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
+                new CanModerateAudience($this->getFolderMapper()),
+                new Rule\All(
+                    new IsModerationEnabled($this->getPolicyMapper()),
+                    new IsArticleAuthor()
+                )
+            )
+        );
+
+        // loggedIn && (SU || CO || moderator)
+        $canApprove = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
+                new CanModerateAudience($this->getFolderMapper())
+            )
+        );
+
+        // loggedIn && (SU || CO || moderator)
+        $canReject = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
+                new CanModerateAudience($this->getFolderMapper())
+            )
+        );
+
+        $preloadArticle = function ($params) {
+            return $this->preloadArticleWithAudience($params);
         };
 
-        /* Get a list of articles needing moderation
-         */
-        $this->register('GET', '', 'getList', $moderatorPerms);
-
-        /* Submit For Moderation
-         */
-        $this->register('POST', '/{articleId:\d+}/submit', 'postSubmit', null, $preloadNews);
-
-        /* The Fate of the Article: accept/reject it
-         */
-        $this->register('POST', '/{articleId:\d+}/accept', 'postAccept', $moderatorPerms, $preloadNews);
-        $this->register('POST', '/{articleId:\d+}/reject', 'postReject', $moderatorPerms, $preloadNews);
+        $this->register('GET', '', 'getList', $suOrCommsOfficer);                                         // See all items requiring moderation
+        $this->register('POST', '/{articleId:\d+}/submit', 'postSubmit', $canSubmit, $preloadArticle);    // Submit For Moderation
+        $this->register('POST', '/{articleId:\d+}/accept', 'postApprove', $canApprove, $preloadArticle);  // Approve
+        $this->register('POST', '/{articleId:\d+}/reject', 'postReject', $canReject, $preloadArticle);    // Reject
     }
+
 
     /**
      * Preload the news article
      *
      * @param array $params
      * @return array
-     * @throws \Schoolbox\Application\Exception\NotFound
-     * @throws InvalidArgumentException
      * @throws NotFound
+     * @throws InvalidArgumentException
      */
-    private function preloadNews(array $params) :array
+    private function preloadNews(array $params): array
     {
-        try {
-            $article = $this->getNewsMapper()->findById($params['articleId']);
-        } catch (MapperException $e) {
-            throw new NotFound($this->getErrorMapper()->getMessageById(ErrorMapper::ERROR_GENERIC_NOT_FOUND));
+        if (\array_key_exists('article', $params)) {
+            $article = $params['article'];
+        } else {
+            try {
+                $article = $this->getArticleMapper()->findById($params['articleId']);
+            } catch (MapperException $e) {
+                throw new NotFound($this->getErrorMapper()->getMessageById(Error\Mapper::ERROR_GENERIC_NOT_FOUND));
+            }
         }
 
         return [
@@ -87,12 +122,22 @@ class Module extends BaseModule
 
 
     /**
-     * @return Mapper|NewsMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * Preload the news article with audience hydrated
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Application\Exception\NotFound
+     * @throws InvalidArgumentException
+     * @throws NotFound
+     * @throws \DomainException
      */
-    protected function getNewsMapper()
+    private function preloadArticleWithAudience(array $params): array
     {
-        return $this->getMapperFactory()->get(NewsMapper::class);
+        $args = $this->preloadNews($params);
+        /** @var News\Model $article */
+        $article = $args['article'];
+        $article->setAudience($this->getAudienceMapper()->findForArticle($article->getId()));
+        return $args;
     }
 
 
@@ -104,6 +149,7 @@ class Module extends BaseModule
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -111,6 +157,7 @@ class Module extends BaseModule
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
+
 
     /**
      * Override with any steps required for a controller and its routes
@@ -126,28 +173,60 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'newsMapper' => $this->getMapperFactory()->getLazy(NewsMapper::class),
-            'policyMapper' => $this->getMapperFactory()->getLazy(PolicyMapper::class),
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+            'newsMapper'       => $this->getMapperFactory()->getLazy(News\Mapper::class),
+            'policyMapper'     => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
+            'validSpecFactory' => $injector->lazy(function () {
+                return new News\Validation\Factory();
+            }),
         ];
     }
 
+
     /**
-     * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @return Mapper|Error\Mapper
+     * @throws InvalidArgumentException
      */
-    protected function getUserMapper()
+    private function getErrorMapper(): Error\Mapper
     {
-        return $this->getMapperFactory()->get(UserMapper::class);
+        return $this->getMapperFactory()->get(Error\Mapper::class);
     }
 
 
     /**
-     * @return Mapper|ErrorMapper
-     * @throws InvalidArgumentException
+     * @return Mapper|News\Mapper
+     * @throws \InvalidArgumentException If cannot find mapper class
      */
-    protected function getErrorMapper()
+    private function getArticleMapper(): News\Mapper
     {
-        return $this->getMapperFactory()->get(ErrorMapper::class);
+        return $this->getMapperFactory()->get(News\Mapper::class);
+    }
+
+    /**
+     * @return Mapper|News\Audience\Mapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    private function getAudienceMapper(): News\Audience\Mapper
+    {
+        return $this->getMapperFactory()->get(News\Audience\Mapper::class);
+    }
+
+
+    /**
+     * @return Mapper|Folder\Mapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    private function getFolderMapper(): Folder\Mapper
+    {
+        return $this->getMapperFactory()->get(Folder\Mapper::class);
+    }
+
+
+    /**
+     * @return Mapper|Policy\Mapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    private function getPolicyMapper(): Policy\Mapper
+    {
+        return $this->getMapperFactory()->get(Policy\Mapper::class);
     }
 }

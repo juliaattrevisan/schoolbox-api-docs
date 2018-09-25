@@ -37,11 +37,6 @@ class Controller extends Base
 
 
     /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
-
-    /**
      * @var Mapper
      */
     private $newsMapper;
@@ -106,11 +101,11 @@ class Controller extends Base
      */
     private $userResolver;
 
+    /** @var Validation\Factory */
+    private $validSpecFactory;
+
 
     /**
-     * Controller constructor.
-     *
-     * @param ErrorMapper                  $errorMapper
      * @param Mapper                       $newsMapper
      * @param Policy\Mapper                $policyMapper
      * @param TopicMapper                  $topicMapper
@@ -123,9 +118,9 @@ class Controller extends Base
      * @param IConnector                   $databaseInternal
      * @param Audience\ArticleResolver     $articleResolver
      * @param Audience\UserResolver        $userResolver
+     * @param Validation\Factory           $validSpecFactory
      */
     public function __construct(
-        ErrorMapper $errorMapper,
         Mapper $newsMapper,
         Policy\Mapper $policyMapper,
         TopicMapper $topicMapper,
@@ -137,24 +132,22 @@ class Controller extends Base
         Folder\Mapper $folderMapper,
         IConnector $databaseInternal,
         Audience\ArticleResolver $articleResolver,
-        Audience\UserResolver $userResolver
+        Audience\UserResolver $userResolver,
+        Validation\Factory $validSpecFactory
     ) {
-        $this->errorMapper = $errorMapper;
-        $this->newsMapper = $newsMapper;
-        $this->policyMapper = $policyMapper;
-        $this->topicMapper = $topicMapper;
-        $this->saveForLaterMapper = $saveForLaterMapper;
-        $this->statisticsMapper = $statisticsMapper;
+        $this->newsMapper                 = $newsMapper;
+        $this->policyMapper               = $policyMapper;
+        $this->topicMapper                = $topicMapper;
+        $this->saveForLaterMapper         = $saveForLaterMapper;
+        $this->statisticsMapper           = $statisticsMapper;
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
-        $this->audienceMapper = $audienceMapper;
-        $this->roleAccessMapper = $roleAccessMapper;
-        $this->folderMapper = $folderMapper;
-        $this->databaseInternal = $databaseInternal;
-
-        /* Hyperdrive injection
-         */
-        $this->articleResolver = $articleResolver;
-        $this->userResolver = $userResolver;
+        $this->audienceMapper             = $audienceMapper;
+        $this->roleAccessMapper           = $roleAccessMapper;
+        $this->folderMapper               = $folderMapper;
+        $this->databaseInternal           = $databaseInternal;
+        $this->validSpecFactory           = $validSpecFactory;
+        $this->articleResolver            = $articleResolver;
+        $this->userResolver               = $userResolver;
     }
 
 
@@ -326,6 +319,17 @@ class Controller extends Base
      */
     public function postUpdate(Model $article): void
     {
+        $validAudience = $this->validSpecFactory->buildSpecValidAudience($this->getUser());
+
+        if (!$validAudience->isSatisfiedBy($article)) {
+            $this->getResponse()->status->set(400);
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'success' => false,
+                'message' => "Article audience appears to be invalid",
+            ]));
+            return;
+        }
+
         try {
 
             $this->persist($article, $this->getRequest()->post->getArrayCopy());
@@ -539,10 +543,6 @@ class Controller extends Base
                 'moderationEnabled'  => $moderationEnabled,
                 'isSavedForLater'    => $isSavedForLater,
                 'isCommsOfficer'     => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
-                'isAuthor'           => (new ValidUserIsAuthor())->isSatisfiedBy($this->getUser(), $article),
-                'isAcceptable'       => (new Moderation\ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $article),
-                'isRejectable'       => (new Moderation\ValidUserCanReject())->isSatisfiedBy($this->getUser(), $article),
-                'isUnpublishable'    => (new Moderation\ValidUserCanUnpublish())->isSatisfiedBy($this->getUser(), $article),
             ];
         }
 

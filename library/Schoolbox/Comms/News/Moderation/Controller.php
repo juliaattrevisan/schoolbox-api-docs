@@ -1,11 +1,11 @@
 <?php
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
+
 namespace Schoolbox\Comms\News\Moderation;
 
 use Alaress\Web\Controller\Base;
@@ -13,13 +13,29 @@ use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Policy;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
+use Schoolbox\Mapper;
 
 class Controller extends Base
 {
+    /* Moderation API error codes:
+     *
+     * These ensure the client has sufficient information to know what to do. HTTP response codes are insufficient to distinguish some cases.
+     * These are intentionally not tied to a specified route, the client can derive semantics from the combination
+     * of the route and the abstract code. eg 'different attributes' and 'reject' implies a different rejection reason.
+     *
+     * Note that we need to consider concurrent modification. eg
+     * 1. moderator loads page, sees valid article.
+     * 2. Someone else changes to make invalid (eg removing title)
+     * 3. moderator clicks 'approve'
+     * Expected: System should reject the approval, but give the reason why. Eg suggest to refresh the page.
+     *
+     */
+    private const ERROR_CODE_OK                                    = 0; // 200 all aspects of requests were fulfilled as expected
+    private const ERROR_CODE_INVALID_ARTICLE                       = 1; // 400 article attributes invalid. Client validation should protect from most cases.
+    private const ERROR_CODE_ALREADY_DONE_AND_SAME_ATTRIBUTES      = 1; // 200 someone else got in first, and no data loss if we ignore
+    private const ERROR_CODE_ALREADY_DONE_BUT_DIFFERENT_ATTRIBUTES = 2; // 409 someone else got in first, but data loss if we ignore
+    private const ERROR_CODE_INVALID_TRANSITION                    = 3; // 400 client is authorized, but is asking for the impossible.
+    private const ERROR_CODE_UNABLE_TO_SAVE                        = 4; // 500 not the client's fault.
 
     /**
      * @var News\Mapper
@@ -31,24 +47,20 @@ class Controller extends Base
      */
     private $policyMapper;
 
-    /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
+    /** @var News\Validation\Factory */
+    private $validSpecFactory;
 
 
     /**
-     * Controller constructor.
-     *
-     * @param News\Mapper   $newsMapper
-     * @param Policy\Mapper $policyMapper
-     * @param ErrorMapper   $errorMapper
+     * @param News\Mapper             $newsMapper
+     * @param Policy\Mapper           $policyMapper
+     * @param News\Validation\Factory $validSpecFactory
      */
-    public function __construct(News\Mapper $newsMapper, Policy\Mapper $policyMapper, ErrorMapper $errorMapper)
+    public function __construct(News\Mapper $newsMapper, Policy\Mapper $policyMapper, News\Validation\Factory $validSpecFactory)
     {
-        $this->newsMapper = $newsMapper;
-        $this->policyMapper = $policyMapper;
-        $this->errorMapper = $errorMapper;
+        $this->newsMapper       = $newsMapper;
+        $this->policyMapper     = $policyMapper;
+        $this->validSpecFactory = $validSpecFactory;
     }
 
 
@@ -60,7 +72,7 @@ class Controller extends Base
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function getList()
+    public function getList(): void
     {
         $lists = new Lists($this->newsMapper);
         $articles = new Collection();
@@ -70,7 +82,7 @@ class Controller extends Base
             $moderationRequired = (bool)$policy->getValue();
 
             $articles = $lists->getNeedModeration();
-        } catch (MapperException $e) {
+        } catch (Mapper\Exception $e) {
             $moderationRequired = false;
         }
 
@@ -105,129 +117,127 @@ class Controller extends Base
      * Submit For Moderation occurs here
      * A required action prior to Moderation taking place
      *
+     * Does not automatically approve an article if session user can moderate.
+     * @see $this->postApprove
+     *
      * @api POST /comms/news/moderation/{articleId}/submit
      *
      * @param Model $article
-     * @throws MapperException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws Mapper\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
-     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws News\Exceptions\InvalidTransitionException
      */
-    public function postSubmit(Model $article)
+    public function postSubmit(Model $article): void
     {
-        if ((new News\ValidArticle())->isSatisfiedBy($article)) {
-            $article->setSubmittedAt(\Alaress_Date_Format::now());
-
-            /* If moderation isn't required, automatically accept self-moderation by the author
-             */
-            $policy = $this->policyMapper->findOneByColumn('identifier', 'global_moderation');
-            $moderationRequired = (bool)$policy->getValue();
-
-            try {
-                if (!$moderationRequired) {
-                    $article->setAcceptedBy($this->getUser())
-                        ->setAcceptedAt(\Alaress_Date_Format::now());
-                }
-            } catch (MapperException $e) {
-                // noop
-            }
-
-            $this->newsMapper->save($article);
-
-            /* If you're a moderator and you authored your own article, redirect back to Detail
-             * so you get immediate access to Publish
-             *
-             * If you're a content creator and you just submitted, redirect back to Detail so
-             * you can see what you just submitted (because receipts are nice for anxious people)
-             * TODO: Maybe it should do something more obvious to indicate this outcome though.
-             */
-            if ((new News\ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
-                if ((new News\ValidUserIsAuthor())->isSatisfiedBy($this->getUser(), $article)) {
-                    $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'articleId' => $article->getId() ]);
-                } else {
-
-                    /* This represents a moderator submitting for (on behalf of) a content creator
-                     * Normally you can't get here except by visiting a direct link and even that is
-                     * questionable as to availability.
-                     * TODO: SA-7040 Should moderators be able to access unsubmitted (draft) articles
-                     */
-                    $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
-                }
-            } else {
-                $nextStep = $this->getRouter()->generate('commsNews.getDetail', [ 'articleId' => $article->getId() ]);
-            }
-
-            $this->getResponse()->redirect->to($nextStep);
+        if ($article->isAwaitingModeration()) {
+            // Someone else got in first. That's fine. No need to warn user.
+            $httpCode  = 200;
+            $errorCode = self::ERROR_CODE_ALREADY_DONE_AND_SAME_ATTRIBUTES;
+            $message   = 'Article was already submitted';
+        } elseif (!$article->canBeSubmitted()) {
+            // Invalid state transition
+            $httpCode  = 400;
+            $errorCode = self::ERROR_CODE_INVALID_TRANSITION;
+            $message   = "Invalid transition. Current article state: {$article->getStatus()}";
+        } elseif (!$this->validSpecFactory->buildSpecCanBeSubmitted($this->getUser())->isSatisfiedBy($article)) {
+            // Invalid article. Warn user
+            // (template + clients-side validation should prevent this case, but we still need to check)
+            $httpCode  = 400;
+            $errorCode = self::ERROR_CODE_INVALID_ARTICLE;
+            $message   = 'Article appears to be invalid';
         } else {
+            // Valid article. Attempt to submit and save
+            $article->submit();
+            if (false === $this->newsMapper->save($article)) {
+                $httpCode  = 500;
+                $errorCode = self::ERROR_CODE_UNABLE_TO_SAVE;
+                $message   = 'Could not save article state';
+            } else {
+                $httpCode  = 200;
+                $errorCode = self::ERROR_CODE_OK;
+                $message   = 'Successfully submitted and saved';
+            }
+        }
 
-            /* Invalid article; save what you currently sent to us so you don't lose everything,
-             * but warn you about it with a generic error.
-             */
-            $this->newsMapper->save($article);
-
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_COMMS_NEWS_INVALID_ARTICLE);
+        if (200 === $httpCode) {
+            // TODO. The client should be responsible for determining what to do after submission
+            // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
+            // TODO. THis should just return the outcome of the request, not a redirect.
+            $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
+            $this->getResponse()->redirect->to($route);
+        } else {
+            $this->buildAjaxResponse($httpCode, $errorCode, $message);
         }
     }
 
 
     /**
-     * Accept an article for publishing to its audience
+     * Approve an article for publishing to its audience
      *
      * @api POST /comms/news/moderation/{articleId}/accept
      *
      * @param Model $article
-     * @throws MapperException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws Mapper\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
-     * @throws \Schoolbox\Application\Exception\Exception
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
+     * @throws News\Exceptions\InvalidTransitionException
      */
-    public function postAccept(Model $article)
+    public function postApprove(Model $article): void
     {
-        if ((new ValidUserCanAccept())->isSatisfiedBy($this->getUser(), $article)) {
-            $now = \Alaress_Date_Format::now();
-
-            /* Clear rejection reasons because they no longer matter
-             */
-            $article
-                ->setRejectedAt(new \Alaress_Date_NullDate())
-                ->setRejectedBy(null)
-                ->setRejectedReason(null)
-                ->setAcceptedAt($now)
-                ->setAcceptedBy($this->getUser());
-
-            /* If submitted_at was empty, fill them in because we're Approving directly
-             * from an unsubmitted state
-             */
-            if (!$article->getSubmittedAt() instanceof User) {
-                $article->setSubmittedAt($now);
+        // If someone else got in first, we don't care. No risk of data loss.
+        // It does imply the 'approvedBy' will remain as the first-in user
+        if ($article->isApproved()) {
+            $httpCode  = 200;
+            $errorCode = self::ERROR_CODE_ALREADY_DONE_AND_SAME_ATTRIBUTES;
+            $message   = 'Article was already approved';
+        } elseif (!$article->canBeApproved()) {
+            // Invalid state transition
+            $httpCode  = 400;
+            $errorCode = self::ERROR_CODE_INVALID_TRANSITION;
+            $message   = "Invalid transition. Current article state: {$article->getStatus()}";
+        } elseif (!$article->isSubmitted() && !$this->validSpecFactory->buildSpecCanBeSubmitted($this->getUser())->isSatisfiedBy($article)) {
+            // Invalid article. Warn user
+            // (template + clients-side validation should prevent this case, but we still need to check)
+            $httpCode  = 400;
+            $errorCode = self::ERROR_CODE_INVALID_ARTICLE;
+            $message   = 'Article appears to be invalid';
+        } else {
+            // Valid article. Attempt to approve and save
+            $article->approve($this->getUser());
+            if (false === $this->newsMapper->save($article)) {
+                $httpCode  = 500;
+                $errorCode = self::ERROR_CODE_UNABLE_TO_SAVE;
+                $message   = 'Could not save article state';
+            } else {
+                $httpCode  = 200;
+                $errorCode = self::ERROR_CODE_OK;
+                $message   = 'Successfully approved and saved';
             }
-
-            $this->newsMapper->save($article);
-
-            /* Go back to the list
-             */
-            $this->getResponse()->redirect->to($this->getRouter()
-                                                    ->generate('commsNewsModeration.getList'));
-
-            return;
         }
 
-        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        if (200 === $httpCode) {
+            // TODO. The client should be responsible for determining what to do after approval.
+            // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
+            // TODO. THis should just return the outcome of the request, not a redirect.
+            $listRoute = $this->getRouteIfAuthorized('commsNewsModeration.getList');
+            if ($listRoute) {
+                $route = $listRoute;
+            } else {
+                $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
+            }
+            $this->getResponse()->redirect->to($route);
+        } else {
+            $this->buildAjaxResponse($httpCode, $errorCode, $message);
+        }
     }
 
 
     /**
      * Reject an article
      *
-     * This clears the submitted_at value, so authors can submit it again
-     * This clears the accepted_at and _by value, to immediately hide from the world
-     * This sets the rejected details
      *
      * Rejecting an article will send it back to the Compose/Preview phase, as if it had
      * never succeeded before lol (but it'll remember that you failed, and if stated, why)
@@ -235,53 +245,86 @@ class Controller extends Base
      * @api POST /comms/news/moderation/{articleId}/reject
      *
      * @param Model $article
-     * @throws MapperException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws Mapper\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
-     * @throws \Schoolbox\Application\Exception\Exception
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
+     * @throws News\Exceptions\InvalidTransitionException
      */
-    public function postReject(Model $article)
+    public function postReject(Model $article): void
     {
-        if ((new ValidUserCanReject())->isSatisfiedBy($this->getUser(), $article)) {
-            $article
-                ->setSubmittedAt(null)
-                ->setAcceptedAt(null)
-                ->setAcceptedBy(null)
-                ->setRejectedBy($this->getUser())
-                ->setRejectedAt(\Alaress_Date_Format::now())
-                ->setRejectedReason($this->getRequest()->post['rejectedReason']);
+        $rejectionReason = $this->getRequest()->post['rejectedReason'];
 
-            $this->newsMapper->save($article);
-
-            /* Redirect back to the moderation list
-             */
-            $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
-
-            if ($this->getRequest()->isXhr()) {
-                $this->getResponse()->content->set($this->buildJsonOutput([
-                    'success' => true,
-                    'redirect' => $nextStep
-                ]));
+        if ($article->isRejected()) {
+            if ($article->getRejectedReason() === $rejectionReason) {
+                // Already rejected for same reason. Just carry on.
+                $httpCode  = 200;
+                $errorCode = self::ERROR_CODE_ALREADY_DONE_AND_SAME_ATTRIBUTES;
+                $message   = "Article was already rejected" . ($rejectionReason ? " for identical reasons" : '');
             } else {
-                $this->getResponse()->redirect->to($nextStep);
+                // If the article is already rejected then we will lose either the original reason, or the new reason.
+                // We need to warn the client so it can decide what to do.
+                $httpCode  = 409;
+                $errorCode = self::ERROR_CODE_ALREADY_DONE_BUT_DIFFERENT_ATTRIBUTES;
+                /** @noinspection NullPointerExceptionInspection */
+                $message = "Article was already rejected by {$article->getRejectedBy()->getFullName()} at {$article->getRejectedAt()->getLocalShort()}";
             }
-
-            return;
+        } elseif (!$article->canBeRejected()) {
+            // Invalid state transition
+            $httpCode  = 400;
+            $errorCode = self::ERROR_CODE_INVALID_TRANSITION;
+            $message   = "Invalid transition. Current article state: {$article->getStatus()}";
+        } else {
+            // Valid article. Attempt to approve and save
+            $article->reject($this->getUser(), $rejectionReason);
+            if (false === $this->newsMapper->save($article)) {
+                $httpCode  = 500;
+                $errorCode = self::ERROR_CODE_UNABLE_TO_SAVE;
+                $message   = 'Could not save article state';
+            } else {
+                $httpCode  = 200;
+                $errorCode = self::ERROR_CODE_OK;
+                $message   = 'Successfully rejected and saved';
+            }
         }
 
-        if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->status->set(400);
-            $this->getResponse()->content->set($this->buildJsonOutput([
-                'success' => false,
-                'message' => $this->errorMapper->getMessageById(ErrorMapper::ERROR_PERM_PAGE_VIEW)
-            ]));
+        if (200 === $httpCode) {
+            // TODO. The client should be responsible for determining what to do after approval.
+            // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
+            // TODO. THis should just return the outcome of the request, not a redirect.
+            $listRoute = $this->getRouteIfAuthorized('commsNewsModeration.getList');
+            if ($listRoute) {
+                $route = $listRoute;
+            } else {
+                $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
+            }
+            $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);
+        } else {
+            $this->buildAjaxResponse($httpCode, $errorCode, $message);
+        }
+    }
 
-            return;
+
+    /**
+     * Build a consistently-formatted Moderation-API payload
+     *
+     * @param int         $httpCode
+     * @param int         $errorCode
+     * @param string|null $message
+     * @param string|null $redirect
+     */
+    private function buildAjaxResponse(int $httpCode, int $errorCode, string $message = null, string $redirect = null): void
+    {
+        $data = ['errorCode' => $errorCode,];
+
+        if (null !== $message) {
+            $data['message'] = $message;
+        }
+        if (null !== $redirect) {
+            $data['redirect'] = $redirect;
         }
 
-        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        $this->getResponse()->status->set($httpCode);
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 }

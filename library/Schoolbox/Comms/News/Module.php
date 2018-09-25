@@ -14,10 +14,10 @@ use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Audience\UserResolver;
-use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
@@ -54,8 +54,8 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
-                    new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper()),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
+                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
                     new Authorizer\Rule\IsArticleAuthor(),
                     new Rule\All(
                         new Authorizer\Rule\IsPublishedOrExpired(),
@@ -75,11 +75,11 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
-                    new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper()),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
+                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
                     new Rule\All(
                         new Authorizer\Rule\IsArticleAuthor(),
-                        new Authorizer\Rule\IsNotYetAccepted()
+                        new Authorizer\Rule\IsNotYetApproved()
                     )
                 )
             );
@@ -90,25 +90,22 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
-                    new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper()),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
+                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
                     new Authorizer\Rule\IsArticleAuthor()
                 )
             );
         });
 
         $preloadArticle = function ($params) {
-            return $this->preloadArticle($params);
-        };
-        $preloadArticleWithAudience = function ($params) {
             return $this->preloadArticleWithAudience($params);
         };
 
         $this->register('GET', '/create', 'getCreate', $loggedIn);                                               // Create news article
         $this->register('POST', '/create', 'postCreate', $loggedIn);
         $this->register('GET', '/topics', 'getTopics', $loggedIn);                                               // (async) Get a list of topics to chooze
-        $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $canModify, $preloadArticleWithAudience); // Update news article
-        $this->register('POST', '/{articleId:\d+}', 'postUpdate', $canModify, $preloadArticleWithAudience);
+        $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $canModify, $preloadArticle);             // Update news article
+        $this->register('POST', '/{articleId:\d+}', 'postUpdate', $canModify, $preloadArticle);
         $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $viewRecipients, $preloadArticle);// Find out who will receive this article
         $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', $canModify, $preloadArticle);           // Delete article
         $this->register('GET', '/{articleId:\d+}', 'getDetail', $readerPerms, $preloadArticle);                  // View news article
@@ -155,7 +152,6 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'errorMapper'                => $this->getMapperFactory()->getLazy(Error\Mapper::class),
             'newsMapper'                 => $this->getMapperFactory()->getLazy(Mapper::class),
             'policyMapper'               => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
             'topicMapper'                => $this->getMapperFactory()->getLazy(TopicMapper::class),
@@ -168,6 +164,9 @@ class Module extends BaseModule
             'databaseInternal'           => $injector->lazyGet('databaseInternal'),
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
             'userResolver'               => $injector->lazyGet('commsNewsUserResolver'),
+            'validSpecFactory'           => $injector->lazy(function () {
+                return new Validation\Factory();
+            }),
         ];
     }
 
@@ -235,14 +234,6 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(Audience\Mapper::class);
     }
 
-    /**
-     * @return \Schoolbox\Mapper|Access\UserAccessMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    private function getUserAccessMapper(): Access\UserAccessMapper
-    {
-        return $this->getMapperFactory()->get(Access\UserAccessMapper::class);
-    }
 
     /**
      * @return \Schoolbox\Mapper|Folder\Mapper

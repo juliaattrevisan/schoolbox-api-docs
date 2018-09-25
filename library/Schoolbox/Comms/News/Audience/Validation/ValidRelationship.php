@@ -62,13 +62,9 @@ class ValidRelationship extends Specification\Leaf
 
         // Recursive case:
         // Composites have their own inherent limitations, but also respect the limitations of any sub-segment.
-        $validRelationships = null;
+        $validRelationships = $this->validModifiers[$entityType];
         foreach ($audienceSegment->getChildren() as $subSegment) {
-            if (null === $validRelationships) {
-                $validRelationships = $this->getValidRelationships($subSegment);
-            } else {
-                $validRelationships = \array_intersect($validRelationships, $this->getValidRelationships($subSegment));
-            }
+            $validRelationships = \array_intersect($validRelationships, $this->getValidRelationships($subSegment));
         }
         return $validRelationships;
     }

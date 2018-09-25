@@ -100,9 +100,13 @@ class Codec
 
 
     /**
+     * Converts a selectize value to a set of structured audience segments
+     *
      * @param string $selectizeValues
      * @return GenericCollection
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws DomainException
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\InsufficientHydrationException
      */
     public function decodeSelectizeValues(string $selectizeValues): GenericCollection
     {

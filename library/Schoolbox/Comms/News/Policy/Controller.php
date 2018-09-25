@@ -1,16 +1,12 @@
 <?php
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 namespace Schoolbox\Comms\News\Policy;
 
-
 use Alaress\Web\Controller\Base;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -19,11 +15,6 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 
 class Controller extends Base
 {
-
-    /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
 
     /**
      * @var UserAccessMapper
@@ -41,16 +32,12 @@ class Controller extends Base
     private $topicMapper;
 
     /**
-     * Controller constructor.
-     *
-     * @param ErrorMapper      $errorMapper
      * @param UserAccessMapper $userAccessMapper
      * @param Mapper           $policyMapper
      * @param TopicMapper      $topicMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserAccessMapper $userAccessMapper, Mapper $policyMapper, TopicMapper $topicMapper)
+    public function __construct(UserAccessMapper $userAccessMapper, Mapper $policyMapper, TopicMapper $topicMapper)
     {
-        $this->errorMapper = $errorMapper;
         $this->userAccessMapper = $userAccessMapper;
         $this->policyMapper = $policyMapper;
         $this->topicMapper = $topicMapper;

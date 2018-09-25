@@ -14,10 +14,10 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder;
-use Schoolbox\UserMapper;
 use PDO;
 use Schoolbox\Comms\News;
 use InvalidArgumentException;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -69,10 +69,11 @@ class Controller extends Base
     /**
      * Look for all the audience pieces that might somehow match $keyword
      *
-     * @api /comms/news/audiencebrowser/search
+     * @api   /comms/news/audiencebrowser/search
      * @level 18.1
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Exception
      */
     public function getSearch(): void
     {

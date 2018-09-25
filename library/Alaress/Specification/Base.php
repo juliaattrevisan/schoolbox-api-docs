@@ -16,6 +16,6 @@ abstract class Base implements ISpecification
     public function remainderUnsatisfiedBy($candidate): ?ISpecification
     {
         // Default implementation
-        return $this->isSatisfiedBy($candidate) ? null : clone $this;
+        return $this->isSatisfiedBy($candidate) ? null : $this;
     }
 }

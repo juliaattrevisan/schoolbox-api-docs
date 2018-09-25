@@ -16,7 +16,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Authorizer;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
@@ -34,13 +34,13 @@ class Module extends BaseModule
         /* Only comms officers and authors can view statistics and obtain their data
          * Supers, Comms Officers, Article Moderators
          */
-        $modifyPerms = new Rule\LazyCallback(function () {
+        $viewStats = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Authorizer\Rule\IsCommsOfficer($this->getUserAccessMapper()),
-                    new Authorizer\Rule\IsAudienceModerator($this->getFolderMapper())
+                    new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
+                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper())
                 )
             );
         });
@@ -51,11 +51,11 @@ class Module extends BaseModule
 
         /* Json payload for the "Conversions, Impressions vs Time" graph
          */
-        $this->register('GET', '/{articleId}/interactionsvstime', 'getInteractionsVsTime', $modifyPerms, $preloadArticle);
+        $this->register('GET', '/{articleId}/interactionsvstime', 'getInteractionsVsTime', $viewStats, $preloadArticle);
 
         /* Overview
          */
-        $this->register('GET', '/{articleId}', 'getOverview', $modifyPerms, $preloadArticle);
+        $this->register('GET', '/{articleId}', 'getOverview', $viewStats, $preloadArticle);
     }
 
 
@@ -111,7 +111,7 @@ class Module extends BaseModule
             try {
                 $article = $this->getArticleMapper()->findById($params['articleId']);
             } catch (MapperException $e) {
-                throw new NotFound();
+                throw new NotFound("No article found for 'articleId' {$params['articleId']}", 0, $e);
             }
         }
 
@@ -130,15 +130,6 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(News\Mapper::class);
     }
 
-
-    /**
-     * @return \Schoolbox\Mapper|UserAccessMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    private function getUserAccessMapper(): UserAccessMapper
-    {
-        return $this->getMapperFactory()->get(UserAccessMapper::class);
-    }
 
     /**
      * @return \Schoolbox\Mapper|Folder\Mapper

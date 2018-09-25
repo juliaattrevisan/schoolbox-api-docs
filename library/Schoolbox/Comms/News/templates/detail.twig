@@ -1,7 +1,17 @@
+{#
+Data:
+    policies           Policy\Model[]
+    article            News\Model
+    moderationEnabled  bool
+    isSavedForLater    bool
+    isCommsOfficer     bool
+#}
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@commsNews/layout.twig' as layout %}
 
-{% if isUnpublishable %}
+{% set isAuthor = USER.id == article.author.id %}
+{% if article.isPublished or article.isExpired %}
     {% set rejectVerb = 'Unpublish' %}
 {% else %}
     {% set rejectVerb = 'Reject' %}
@@ -97,7 +107,7 @@
     {% endif %}
 
     {# Unpublish article (just a reject renamed to unpublish when the article is published or archived) #}
-    {% if isRejectable and isUnpublishable %}
+    {% if article.canBeRejected %}
         {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
     {% endif %}
 
@@ -188,10 +198,8 @@
 </div>
 {% endif %}
 
-{# Rejection details, if applicable
- # Only show rejection info prior to acceptance
- #}
-{% if article.isRejected and not article.isAccepted %}
+{# Rejection details, if applicable #}
+{% if article.isRejected %}
 <div class="row">
     <div class="small-12 island">
         <section class="no-pad no-margin">
@@ -229,47 +237,32 @@
 <div class="row">
     <div class="small-12 columns">
         <ul class="flex-list buttons" id="actionButtons">
-
-        {# Unsubmitted articles need explicit actions to be made available to the world
-         #
-         # Moderation is required: you're prompted to consciously submit for moderation
-         # Moderation isn't required: you're prompted to consciously publish to the world
-         #}
-        {% if not article.isSubmitted %}
-            {% if moderationRequired %}
-                {% set buttonText = 'Submit for moderation' %}
-            {% else %}
-                {% set buttonText = 'Submit' %}
+            {# Reject this news article #}
+            {% if article.canBeRejected and rejectRoute and not article.isApproved %}
+                <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
             {% endif %}
-            <li>
-                <form action="{{ routeLookup('commsNewsModeration.postSubmit', {articleId: article.id}) }}" method="post">
-                    <input type="submit" value="{{ buttonText }}" />
-                </form>
-            </li>
-        {% endif %}
 
-
-        {# Moderators #}
-        {% if isCommsOfficer %}
-            {% if isRejectable and not isUnpublishable %}
-                {# Reject this news article #}
-                {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
-
-                {% if rejectRoute %}
-                    <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
+            {# If you have permission to submit and implicitly approve your own articles, do that, otherwise submit for moderation #}
+            {% if article.canBeApproved %}
+                {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
+            {% endif %}
+            {% if article.canBeSubmitted %}
+                {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
+            {% endif %}
+            {% if approveRoute or submitRoute %}
+                {% if approveRoute %}
+                    {% set buttonText = 'Approve' %}
+                {% elseif article.isRejected %}
+                    {% set buttonText = 'Resubmit for moderation' %}
+                {% else %}
+                    {% set buttonText = 'Submit for moderation' %}
                 {% endif %}
+                <li>
+                    <form action="{{ approveRoute ?: submitRoute }}" method="post">
+                        <input type="submit" value="{{ buttonText }}" />
+                    </form>
+                </li>
             {% endif %}
-
-            {# Accept this news article for publication to the world #}
-            {% if isAcceptable %}
-            <li>
-                <form action="{{ routeLookup('commsNewsModeration.postAccept', {articleId: article.id}) }}" method="post">
-                    <input type="submit" value="Approve" />
-                </form>
-            </li>
-            {% endif %}
-        {% endif %}
-
         </ul>
     </div>
 </div>
@@ -280,7 +273,7 @@
     <a class="close-reveal-modal">&#215;</a>
 </div>
 
-{% if isCommsOfficer and isRejectable %}
+{% if article.canBeRejected and rejectRoute %}
 <script>
     $(function() {
         $(document).on('click', '#reject-article, #unpublish-article', function(event) {

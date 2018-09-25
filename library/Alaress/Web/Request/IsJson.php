@@ -8,11 +8,10 @@
 
 namespace Alaress\Web\Request;
 
-use Alaress\Specification\ISpecification;
+use Alaress\Specification;
 use Aura\Web\Request;
 
-
-class IsJson implements ISpecification
+class IsJson extends Specification\Leaf
 {
 
     /**
@@ -25,23 +24,4 @@ class IsJson implements ISpecification
     {
         return strpos($candidate->headers->get('accept'), 'application/json') !== false;
     }
-
-
-    /**
-     * Returns which specifications are not yet satisfied by the candidate.
-     *
-     * This enables callers to programmatically determine what they need to do to satisfy a specification.
-     *
-     * Does not assume the $candidate fails to validate against this specification
-     *
-     * Returns NULL if this specification is satisfied by the $candidate
-     *
-     * @param Request $candidate
-     * @return null|ISpecification
-     */
-    public function remainderUnsatisfiedBy($candidate): ?ISpecification
-    {
-        return $this->isSatisfiedBy($candidate) ? null : $this;
-    }
-
 }

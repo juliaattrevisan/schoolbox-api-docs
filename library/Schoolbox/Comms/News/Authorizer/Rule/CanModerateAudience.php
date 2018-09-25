@@ -9,13 +9,14 @@ namespace Schoolbox\Comms\News\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Resource\Folder;
 
-class IsAudienceModerator extends ArticleAttribute
+class CanModerateAudience extends ArticleAttribute
 {
 
     /** @var Folder\Mapper */
@@ -24,7 +25,7 @@ class IsAudienceModerator extends ArticleAttribute
     /**
      * Just compute this once per user. Indexed by user.id, folder.id
      *
-     * @var Folder\Model[][]
+     * @var GenericCollection[]|Folder\Model[][]
      */
     private $folderCache = [];
 
@@ -61,7 +62,7 @@ class IsAudienceModerator extends ArticleAttribute
 
         // Since root-level segments are a UNION, you must have moderation permission to ALL root segments.
         foreach ($article->getAudience() as $segment) {
-            if ($this->canModerate($user, $segment)) {
+            if (!$this->canModerate($user, $segment)) {
                 throw new Unauthorized("User {$user->getId()} cannot moderate audience segment {$segment->getId()}");
             }
         }
@@ -95,7 +96,8 @@ class IsAudienceModerator extends ArticleAttribute
                 $this->folderCache[$user->getId()] = $this->folderMapper->findForUser($user, true, UserAccess::ACCESS_WRITE)
                                                                         ->indexBy($this->folderMapper->getIdentifierProperty());
             }
-            return \array_key_exists($segment->getEntityValue(), $this->folderCache);
+
+            return $this->folderCache[$user->getId()]->keyExists($segment->getEntityValue());
         }
 
         // TODO add tests for other implicit moderation permissions.
