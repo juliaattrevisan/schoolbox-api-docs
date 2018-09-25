@@ -23,8 +23,6 @@
             Awaiting Moderation
         {% elseif article.isRejected %}
             Rejected
-        {% elseif article.isApproved %}
-            Approved
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
@@ -38,8 +36,6 @@
             submitted
         {% elseif article.isRejected %}
             submitted-late
-        {% elseif article.isApproved %}
-            reviewed
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
