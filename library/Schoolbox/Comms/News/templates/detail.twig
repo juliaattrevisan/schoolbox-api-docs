@@ -237,12 +237,6 @@ Data:
 <div class="row">
     <div class="small-12 columns">
         <ul class="flex-list buttons" id="actionButtons">
-
-            {# Modify this news article #}
-            {% if modifyRoute %}
-                <li><a class="icon-modify" href="{{ modifyRoute }}" title="Modify this article">Modify</a></li>
-            {% endif %}
-
             {# Reject this news article #}
             {% if article.canBeRejected and rejectRoute and not article.isApproved %}
                 <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
