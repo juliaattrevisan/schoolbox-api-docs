@@ -69,10 +69,11 @@
                  */
                 activator: element.find('input[type=submit]'),
 
-                /* Draft Lozenge
+                /**
+                 * Called on successful save.
+                 * @param {bool} wasAutoSave
                  */
-                newIndicator: $('#status-new'),
-                draftIndicator: $('#status-draft')
+                onSaveSuccess: $.noop
             };
 
             return $.extend(defaults, options);
@@ -253,10 +254,7 @@
                     css: 'success'
                 });
 
-                /* Show lozenge
-                 */
-                config.newIndicator.hide();
-                config.draftIndicator.show();
+                config.onSaveSuccess(true);
             }).error(function (response) {
                 var temp = $.parseJSON(response.responseText);
 
