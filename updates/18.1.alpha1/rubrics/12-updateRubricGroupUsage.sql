@@ -27,6 +27,7 @@ FROM (
     WHERE
         rc.deleted_at IS NULL
         AND rg.deleted_at IS NULL
+        AND rd.deleted_at IS NULL
         AND rd.value IS NOT NULL
     GROUP BY
         rc.id,
