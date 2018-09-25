@@ -96,8 +96,6 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         return $this->renderTwigTemplate($templateHandle, '@commsNewsHomepage/component.twig', [
             'componentInstanceId' => $this->getInstance()->getId(),
-            'topics' => $this->topics,
-            'topicAll' => News\Mapper::TOPIC_ALL_SLUG,
             'slug' => $this->slug,
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => (int)$this->getConfig('size'),
