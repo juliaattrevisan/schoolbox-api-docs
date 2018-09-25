@@ -1,0 +1,9 @@
+{% if articles|length %}
+    {% include '@commsNews/article-lists.twig' with {articles: articles} %}
+{% else %}
+    {% if referrer == 'homepage' %}
+        {% include '@commsNews/empty-state-homepage.twig' %}
+    {% else %}
+        {% include '@commsNews/empty-state-default.twig' %}
+    {% endif %}
+{% endif %}
