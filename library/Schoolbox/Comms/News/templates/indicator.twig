@@ -9,7 +9,7 @@
     {% set label    = self.label(article) %}
     {% set cssClass = self.cssClass(article) %}
     {% if label %}
-    <span id="status-new" class="label highlight {{ cssClass }}">{{ label }}</span>
+    <span id="status-new" class="label {{ cssClass }}">{{ label }}</span>
     {% endif %}
     {% endspaceless %}
 {% endmacro %}
