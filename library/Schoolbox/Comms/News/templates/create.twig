@@ -22,17 +22,6 @@
         </ul>
     </div>
 </div>
-
-{% if policies['global_moderation'].value %}
-<div class="row">
-    <div class="small-12 columns">
-        <div class="alert-box">
-            Moderation is required for this {{ locale.news }}. You can review <a href="{{ routeLookup('commsNewsPolicy.getPolicies') }}" title="view policy settings" target="_blank">current policy settings</a>.
-        </div>
-    </div>
-</div>
-{% endif %}
-
 <div class="row">
     <div class="small-12 island">
 

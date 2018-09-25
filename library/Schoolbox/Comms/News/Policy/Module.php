@@ -41,9 +41,9 @@ class Module extends BaseModule
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
-                new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL)
+                new Rule\IsSuperuser()
+                //new Rule\HasRole(Role::STAFF),
+                //new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL)
             )
         );
 
@@ -52,8 +52,8 @@ class Module extends BaseModule
         $postPerms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL)
+                new Rule\IsSuperuser()
+                //new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL)
             )
         );
 

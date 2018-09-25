@@ -17,6 +17,7 @@ class AdminV2_Nav
         'homepage'           => 'Homepages',
         'eportfolio'         => 'ePortfolios',
         'eportfolio/deploy'  => 'ePortfolio Deployment',
+        'news'               => 'News',
         'allowed-file'       => 'Allowed Files',
         'setting'            => 'Settings',
         'terminology'        => 'Terminology',

@@ -128,5 +128,9 @@ class Admin implements ModuleConfigInterface
         // SHAPS
         $shaps = new \Schoolbox\Admin\SHAPS\Module($di);
         $shaps->init('/adminv2/shaps');
+
+        // News
+        $news = new \Schoolbox\Comms\News\Policy\Module($di);
+        $news->init('/adminv2/news');
     }
 } 
