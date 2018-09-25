@@ -82,7 +82,8 @@
 {# No rubric descriptor/group/overall totals in self-reflection #}
 {% block rubricGrid %}
     {% set showDescriptorValue = false %}
-    {% set showRubricTotals = false %}
+    {% set showGroupTotal = false %}
+    {% set showRubricTotal = false %}
 
     {{ parent() }}
 {% endblock %}
