@@ -18,6 +18,8 @@ use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
 use Schoolbox\Assessment\Rubric\Criteria;
 use Schoolbox\Assessment\Rubric\Factory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
+use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Assessment\Rubric\ValidCapabilityMax;
@@ -32,6 +34,7 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -643,11 +646,172 @@ class RubricMapper
      */
     public function retrieveMarkedGrid(IFeedback $feedback): MarkedGrid
     {
-        $markedGrid = new MarkedGrid($feedback, $this->retrieveGrid($feedback->getAssessable(), false));
+        $grid       = $this->retrieveGrid($feedback->getAssessable(), false);
+        $rowSet     = $grid->getRowSet();
 
-        // Load the marks
+        $markSchemeFactory = new MarkSchemeFactory();
+        $gridMarkScheme    = $markSchemeFactory->spawnMarkSchemeFor(
+            $feedback->getAssessable(),
+            $grid->calculateMaxValueFromCapabilities()
+        );
+
+        $markedGrid = new MarkedGrid($feedback, $grid, $gridMarkScheme);
+
+        // What goes in the grid?
+        // * Capability (fka group) marks
+        // * Descriptor marks
+        // ** more correctly known as indicator marks, which reference a descriptor
+        /** @var GenericCollection|GroupMark[] $capabilityMarkModels */
+        $capabilityMarkModels = GroupMarkMapper::getInstance()->findByColumn(
+            'return_id',
+            $feedback->getId()
+        );
+
+        /** @var Collection|GenericCollection[]|DescriptorMark[][] $indicatorMarkModelsByCapability */
+        $indicatorMarkModelsByCapability = DescriptorMarkMapper::getInstance()->findByColumn(
+            'rubric_group_mark_id',
+            $capabilityMarkModels->getPropertyValues('id')
+        )->filter(function (DescriptorMark $indicatorMark) {
+            return null !== $indicatorMark->getDescriptor();
+        })->groupByCallback(
+            function (DescriptorMark $indicatorMark) {
+                return $indicatorMark->getGroupMark()->getGroup()->getId();
+            }
+        );
+        // Still only one selected descriptor per indicator
+        $indicatorMarkModelsByCapability = $indicatorMarkModelsByCapability->map(
+            function (GenericCollection $c) {
+                return $c->indexByCallback(
+                    function (DescriptorMark $mark) {
+                        return $mark->getDescriptor()->getCriterion()->getId();
+                    }
+                );
+            }
+        );
+
+
+        // Load em into the marked grid
+        foreach ($capabilityMarkModels as $capabilityMarkModel) {
+            // Load the capability
+            $capabilityId = $capabilityMarkModel->getGroup()->getId();
+            $capability   = $rowSet->retrieveCapability($capabilityId);
+            if (!$capability) {
+                continue;
+            }
+
+            // Load its usage
+            $capabilityUsage = $grid->retrieveCapabilityUsage($capability);
+            if (!$capabilityUsage) {
+                continue;
+            }
+
+            // Create the cap mark
+            $capabilityMarkScheme = $markSchemeFactory->spawnMarkSchemeFor(
+                $feedback->getAssessable(),
+                $capabilityUsage->getMaxValue()
+            );
+            $capabilityMark = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
+                ->setValue($capabilityMarkModel->getValue());
+
+            // Associate indicator mark models with indicator marks
+            $indicatorMarkModels = $indicatorMarkModelsByCapability[$capabilityId] ?? [];
+            foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+                $indicatorId = $indicatorUsage->getIndicator()->getId();
+
+                // Which indicator mark model is the right one?
+                $indicatorMarkModel = $indicatorMarkModels[$indicatorId] ?? null;
+                if (!$indicatorMarkModel) {
+                    continue;
+                }
+
+                // Load descriptor model
+                $descriptorModel = $indicatorMarkModel->getDescriptor();
+                if (!$descriptorModel) {
+                    continue;
+                }
+                $descriptorId = $descriptorModel->getId();
+
+                // Create the ind mark
+                $indicatorMark = (new IndicatorMark($indicatorUsage))
+                    ->setValue($indicatorMarkModel->getValue());
+
+                // Associate the ind mark with its descriptor
+                foreach ($indicatorUsage->getDescriptors() as $descriptor) {
+                    if ($descriptor->getId() === $descriptorId) {
+                        $indicatorMark->setDescriptor($descriptor);
+                        break;
+                    }
+                }
+
+                $capabilityMark->getIndicatorMarks()->add($indicatorMark);
+            }
+
+            $markedGrid->getCapabilityMarks()->add($capabilityMark);
+        }
 
         return $markedGrid;
+    }
+
+
+    /**
+     * Save this marked grid to the database.
+     *
+     * @param MarkedGrid $markedGrid
+     * @throws MapperException if something wasn't found
+     */
+    public function persistMarkedGrid(MarkedGrid $markedGrid): void
+    {
+        // Required mappers
+        $capabilityMapper     = GroupMapper::getInstance();
+        $descriptorMapper     = DescriptorMapper::getInstance();
+        $indicatorMarkMapper  = DescriptorMarkMapper::getInstance();
+        $capabilityMarkMapper = GroupMarkMapper::getInstance();
+        $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
+
+
+        // Blow away any previous cap/ind marks for this feedback
+        $returnId = $markedGrid->getFeedback()->getId();
+        $indicatorMarkMapper->deleteFeedbackMarks($returnId);
+        $capabilityMarkMapper->deleteFeedbackMarks($returnId);
+
+
+        // What am I saving marks for?
+        $returnedWork = $returnedWorkMapper->findById($returnId);
+
+
+        // Create list of cap/ind marks that will be saved
+        $capabilityMarksToSave = $capabilityMarkMapper->createCollection();
+        $indicatorMarksToSave  = $indicatorMarkMapper->createCollection();
+        foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
+            // Create cap mark
+            $capabilityId    = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
+            $capabilityModel = $capabilityMapper->findById($capabilityId);
+            $capabilityMarksToSave[$capabilityId] = $capabilityMarkModel = $capabilityMarkMapper->createModel()
+                ->setSubmissionReturn($returnedWork)
+                ->setGroup($capabilityModel)
+                ->setValue($capabilityMark->getValue())
+                ->setValid(true);
+
+
+            // Create ind marks
+            foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                $indicatorId     = $indicatorMark->getIndicatorUsage()->getIndicator()->getId();
+                $descriptorModel = null;
+                if ($indicatorMark->getDescriptor()) {
+                    $descriptorModel = $descriptorMapper->findById($indicatorMark->getDescriptor()->getId());
+                }
+                $indicatorMarksToSave[$indicatorId] = $indicatorMarkMapper->createModel()
+                    ->setGroupMark($capabilityMarkModel)
+                    ->setDescriptor($descriptorModel)
+                    ->setValue($indicatorMark->getValue())
+                    ->setValid(true);
+            }
+        }
+
+
+        // And save cap/ind marks
+        $capabilityMarkMapper->save($capabilityMarksToSave);
+        $indicatorMarkMapper->save($indicatorMarksToSave);
     }
 
 
@@ -1437,6 +1601,7 @@ class RubricMapper
         // Pass 1.5: is a custom max mark for the group set?
         foreach ($customGroupMarks as $groupId => $markData) {
 
+            // TODO I should be validating against unscaled mark, not custom mark
             if ((new ValidCapabilityMark($markData['max'], $markScheme))->isSatisfiedBy($markData['customMark'])) {
                 // Find a record for its group
                 $group = $groupMapper->findById($groupId);
@@ -1450,8 +1615,9 @@ class RubricMapper
                         ->setValid(true);
                 }
 
-                // Save the custom mark if provided; otherwise just 0
-                $groupMarksToSave[$groupId]->setValue($markData['customMark']);
+                // Save the unscaled mark if provided; otherwise just 0
+                // TODO confirm this w/ d-baker
+                $groupMarksToSave[$groupId]->setValue($markData['unscaledMark']);
             } else {
                 // TODO handle this somewhere else?
                 throw new \InvalidArgumentException("Capability mark must be between 0 and " . $markData['max']);

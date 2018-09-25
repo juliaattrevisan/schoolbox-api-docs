@@ -238,4 +238,86 @@ class CapabilityUsage extends TestCase
     {
         $this->assertSame($expected, $groupUsage->calculateMaxValueFromIndicators());
     }
+
+
+    /**
+     * Data provider for `testCalculateMarkMultiplier`.
+     *
+     * @return iterable
+     */
+    public function getTestCalculateMarkMultiplierData(): iterable
+    {
+        $capability = (new RowSet\Capability())->setId(1)->setName('Capability 1');
+        $indicator1 = (new RowSet\Indicator())->setId(1)->setName('Indicator 1.1');
+        $indicator2 = (new RowSet\Indicator())->setId(2)->setName('Indicator 1.2');
+        $indicator3 = (new RowSet\Indicator())->setId(3)->setName('Indicator 1.3');
+        $indicator4 = (new RowSet\Indicator())->setId(4)->setName('Indicator 1.4');
+
+        $capability->getIndicators()[$indicator1->getId()] = $indicator1;
+        $capability->getIndicators()[$indicator2->getId()] = $indicator2;
+        $capability->getIndicators()[$indicator3->getId()] = $indicator3;
+        $capability->getIndicators()[$indicator4->getId()] = $indicator4;
+
+        // Indicator usage 1: max is 8
+        $indicatorUsage1                      = new RubricGrid\IndicatorUsage($indicator1);
+        $indicatorUsage1->getDescriptors()[0] = new RubricGrid\Descriptor();
+        $indicatorUsage1->getDescriptors()[1] = (new RubricGrid\Descriptor())->setMaxValue(3);
+        $indicatorUsage1->getDescriptors()[2] = (new RubricGrid\Descriptor())->setMaxValue(5);
+        $indicatorUsage1->getDescriptors()[3] = (new RubricGrid\Descriptor())->setMaxValue(8);
+
+        // Indicator usage 2: max is 0 (no descriptors with marks)
+        $indicatorUsage2                      = new RubricGrid\IndicatorUsage($indicator2);
+        $indicatorUsage2->getDescriptors()[1] = new RubricGrid\Descriptor();
+        $indicatorUsage2->getDescriptors()[2] = new RubricGrid\Descriptor();
+
+        // Indicator usage 2: max is 8
+        $indicatorUsage3                      = new RubricGrid\IndicatorUsage($indicator3);
+        $indicatorUsage3->getDescriptors()[1] = (new RubricGrid\Descriptor())->setMaxValue(8);
+        $indicatorUsage3->getDescriptors()[2] = (new RubricGrid\Descriptor())->setMaxValue(5);
+        $indicatorUsage3->getDescriptors()[3] = (new RubricGrid\Descriptor())->setMaxValue(2);
+
+
+        $capabilityUsage1 = new RubricGrid\CapabilityUsage($capability);
+        yield 'No max cap mark, no indicators' => [$capabilityUsage1, 0];
+
+        $capabilityUsage2 = (new RubricGrid\CapabilityUsage($capability))->setMaxValue(10);
+        yield 'Max cap mark, no indicators' => [$capabilityUsage2, 0];
+
+        $capabilityUsage3 = (new RubricGrid\CapabilityUsage($capability))->setMaxValue(16);
+        $capabilityUsage3->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
+        $capabilityUsage3->getIndicatorUsages()[$indicator3->getId()] = $indicatorUsage3;
+        yield 'Max cap mark, indicator max = cap max' => [$capabilityUsage3, 1];
+
+        $capabilityUsage4 = (new RubricGrid\CapabilityUsage($capability))->setMaxValue(32);
+        $capabilityUsage4->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
+        $capabilityUsage4->getIndicatorUsages()[$indicator3->getId()] = $indicatorUsage3;
+        yield 'Max cap mark, 2x indicator max = cap max' => [$capabilityUsage4, 2];
+
+        $capabilityUsage5 = (new RubricGrid\CapabilityUsage($capability))->setMaxValue(8);
+        $capabilityUsage5->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
+        $capabilityUsage5->getIndicatorUsages()[$indicator3->getId()] = $indicatorUsage3;
+        yield 'Max cap mark, 0.5x indicator max = cap max' => [$capabilityUsage5, 0.5];
+
+        $capabilityUsage6 = (new RubricGrid\CapabilityUsage($capability))->setMaxValue(24);
+        $capabilityUsage6->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
+        $capabilityUsage6->getIndicatorUsages()[$indicator3->getId()] = $indicatorUsage3;
+        yield 'Max cap mark, 3/2x indicator max = cap max' => [$capabilityUsage6, 1.5];
+
+        $capabilityUsage7 = (new RubricGrid\CapabilityUsage($capability))->setMaxValue(24);
+        $capabilityUsage7->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
+        yield 'Max cap mark, no indicators with values' => [$capabilityUsage7, 0];
+    }
+
+
+    /**
+     * @dataProvider getTestCalculateMarkMultiplierData
+     * @covers \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage::calculateMarkMultiplier
+     *
+     * @param RubricGrid\CapabilityUsage $capabilityUsage
+     * @param float                      $expected
+     */
+    public function testCalculateMarkMultiplier(RubricGrid\CapabilityUsage $capabilityUsage, float $expected): void
+    {
+        $this->assertSame($expected, $capabilityUsage->calculateMarkMultiplier());
+    }
 }

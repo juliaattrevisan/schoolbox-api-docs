@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
@@ -47,11 +48,12 @@ class Factory
 
     /**
      * @param IAssessable $assessable
+     * @param float|null $totalMark
      * @return null|IMarkScheme
      * @throws \DomainException If MarkType is invalid for the assessment
      * @throws \InvalidArgumentException If assessment class not registered
      */
-    public function spawnMarkSchemeFor(IAssessable $assessable): ?IMarkScheme
+    public function spawnMarkSchemeFor(IAssessable $assessable, ?float $totalMark = null): ?IMarkScheme
     {
         $markType = $assessable->getMarkType();
         if (null === $markType) {
@@ -64,7 +66,7 @@ class Factory
             return $this->spawnForQuiz($assessable);
         }
         if ($assessable instanceof DueWork) {
-            return $this->spawnForDueWork($assessable);
+            return $this->spawnForDueWork($assessable, $totalMark);
         }
         if ($assessable instanceof Project) {
             return $this->spawnForProject($assessable);
@@ -103,9 +105,10 @@ class Factory
 
     /**
      * @param DueWork $dueWork
+     * @param float|null $totalMark
      * @return IMarkScheme
      */
-    protected function spawnForDueWork(DueWork $dueWork)
+    protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null)
     {
         switch ($dueWork->getMarkType()->getId()) {
             case MarkType::TYPE_PERCENT:
@@ -113,10 +116,11 @@ class Factory
             case MarkType::TYPE_NONE:
                 return new None();
             case MarkType::TYPE_TOTAL:
-                if ($dueWork->getMaxMark() > 0) {
-                    return new TotalMarkFractional($dueWork->getMaxMark());
+                $maxMark = $totalMark ?? $dueWork->getMaxMark();
+                if ($maxMark > 0) {
+                    return new TotalMarkFractional($maxMark);
                 }
-                throw new \UnexpectedValueException("Invalid MaxMark value for Total Mark MarkType: " . $dueWork->getMaxMark());
+                throw new \UnexpectedValueException("Invalid MaxMark value for Total Mark MarkType: " . $maxMark);
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
             default:

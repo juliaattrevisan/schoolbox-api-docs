@@ -157,7 +157,7 @@ class Controller extends Base
                 ->add([$assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getSummary',['assessmentId' => $assessment->getId(), 'studentId' => $participant->getUser()->getId()])])
                 ->add([$breadcrumbNode, '']),
             'response' => $response,
-            'latestFeedback' => $latestFeedback,
+            'feedback' => $latestFeedback,
             'attachzone' => $attachZone->getTwigContext(),
             'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
 
@@ -180,19 +180,11 @@ class Controller extends Base
         /* Rubrics data
         */
         $rubricMapper = RubricMapper::getInstance();
-        $rubricContext = new RubricContext($rubricMapper);
-
         if ($assessment->getUseRubric()) {
-            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
-        }
-
-        // Load self-reflection; if there is one, override the standard grid
-        $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $response, $rubricContext))->generate();
-        if (isset($selfReflectionData['learnerRubricContext'])) {
-            $data['rubricContext'] = $selfReflectionData['learnerRubricContext'];
-        } else {
-            $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
-            $data = array_merge($data, $rubricData);
+            $assessment->setRubricGrid($rubricMapper->retrieveGrid($assessment, false));
+            if ($latestFeedback instanceof Feedback) {
+                $latestFeedback->setRubricMarkedGrid($rubricMapper->retrieveMarkedGrid($latestFeedback));
+            }
         }
 
         $data['selfReflect'] = false;
@@ -251,6 +243,9 @@ class Controller extends Base
             $isMostRecentResponse = ($mostRecentResponse && $mostRecentResponse->getId() == $response->getId());
         }
 
+        $file = null;
+        $selfAssessmentFeedback = null;
+
         /* If there is an an actual Latest Response, use it and subject
          * it to the usual checks.
          *
@@ -261,9 +256,13 @@ class Controller extends Base
             if (!$this->getUser()->isSuperuser() && $this->getUser()->getRole()->isStaff() && !$response->isSubmitted()) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
-        }
 
-        $file = $response ? $this->getFile($response, $this->getRequest()->query['hash']) : null;
+            // The file that's being reviewed
+            $file = $response ? $this->getFile($response, $this->getRequest()->query['hash']) : null;
+
+            // Self-assessed feedback (published only)
+            $selfAssessmentFeedback = $response->findMostRecentSelfAssessedPublishedFeedback();
+        }
 
         // Authoritative feedback, draft or published
         $feedback = $participant->findMostRecentInstructorGivenFeedback();
@@ -285,6 +284,7 @@ class Controller extends Base
             'response' => $response,
             'isMostRecentResponse' => $isMostRecentResponse,
             'feedback' => $feedback,
+            'selfAssessmentFeedback' => $selfAssessmentFeedback,
             'attachzone' => $attachZone->getTwigContext(),
             'selectedFileHash' => $this->getRequest()->query['hash'],
             'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
@@ -313,20 +313,17 @@ class Controller extends Base
         /* Rubrics data
         */
         $rubricMapper = RubricMapper::getInstance();
-        $rubricContext = new RubricContext($rubricMapper);
-
         if ($assessment->getUseRubric()) {
-            $assessment->setRubric($rubricMapper->findByDueWork($assessment));
+            $assessment->setRubricGrid($rubricMapper->retrieveGrid($assessment, false));
+            if ($feedback instanceof Feedback) {
+                $feedback->setRubricMarkedGrid($rubricMapper->retrieveMarkedGrid($feedback));
+            }
         }
 
-        $rubricData = (new InlineGrader\Rubric($assessment, $participant, $this->getUser(), $response, $isInteractionLocked, $rubricContext))->generate();
-
-        $data = array_merge($data, $rubricData);
-
-        /* Augment with self-reflection rubric data
-         */
-        $selfReflectionData = (new SelfReflection\Rubric($assessment, $participant, $response, $rubricContext))->generate();
-        $data = array_merge($data, $selfReflectionData);
+        // Self-assessment rubric data
+        if ($selfAssessmentFeedback instanceof Feedback && $assessment->getUseRubric()) {
+            $selfAssessmentFeedback->setRubricMarkedGrid($rubricMapper->retrieveMarkedGrid($selfAssessmentFeedback));
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
     }

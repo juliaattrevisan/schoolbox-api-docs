@@ -13,6 +13,8 @@ use Schoolbox\Learning\Assessment\IResponse;
 
 class Percentage extends AbstractMarkScheme
 {
+    public const SLUG = 'percent';
+
     const TITLE = 'Percentage';
 
     /**

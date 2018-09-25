@@ -23,6 +23,7 @@ use Schoolbox\User;
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  * @method DescriptorMark hydrate(array $row, $alias = '', $callback = null)
  * @method DescriptorMark createModel($idValue = null)
+ * @method GenericCollection|DescriptorMark[] createCollection($contents = [])
  * @method GenericCollection|DescriptorMark[] findByColumnList($columnList, $options = array())
  * @method GenericCollection|DescriptorMark[] findByColumn($columnName, $columnValue, $options = [])
  */
@@ -84,7 +85,7 @@ class DescriptorMarkMapper extends Mapper
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('group_mark', '', 'g')}
             LEFT JOIN {$this->getJoinSql('group_mark.submission_return', 'g', 'r')}
-            LEFT JOIN {$this->getJoinSql('descriptor', '', 'd')}
+            LEFT JOIN {$this->getJoinSql('descriptor', '', 'd', true)}
         ";
     }
 
@@ -107,8 +108,12 @@ class DescriptorMarkMapper extends Mapper
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
 
             $descriptorId = $r[$descriptorKey];
-            if(!$descriptors->offsetExists($descriptorId)){
-                $descriptors->setOffset($descriptorId, $this->hydrateJoin($r, 'descriptor', 'd'));
+            if (!$descriptors->offsetExists($descriptorId)) {
+                // Descriptor can be null?
+                $descriptor = $this->hydrateJoin($r, 'descriptor', 'd');
+                if ($descriptor) {
+                    $descriptors->setOffset($descriptorId, $descriptor);
+                }
             }
             /** @var Descriptor $descriptor */
             $descriptor = $descriptors->getOffset($descriptorId);

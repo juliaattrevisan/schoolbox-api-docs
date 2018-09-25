@@ -63,15 +63,14 @@
             </a>
         </li>
     </ul>
-
-<div class="row">
-    <div class="small-12 columns">
-        <div class="alert-box">{% spaceless %}
-            Use the {{ text }} comment box below to submit a {{ locale.selfAssessment.singularForm }} before you submit this
-            work to your teacher for feedback.
-            {% endspaceless %}</div>
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="alert-box">{% spaceless %}
+                Use the {{ text }} comment box below to submit a {{ locale.selfAssessment.singularForm }} before you submit this
+                work to your teacher for feedback.
+                {% endspaceless %}</div>
+        </div>
     </div>
-</div>
 {% endblock %}
 
 {# Maybe out of date message doesn't exist here #}
@@ -87,22 +86,21 @@
     {% set showRubricTotal = true %}
     {% set self = 'selfAssessment' %}
 
-    {% if assessment.useRubric and rubricContext %}
+    {% if assessment.useRubric %}
         <fieldset class="content">
             {% set rubricTemplate = readonly
                 ? 'grid.twig'
                 : 'grid-markable.twig'
             %}
             {% include '@rubric/' ~ rubricTemplate with {
-                rubric: rubricContext.rubric,
-                learnerRubric: learnerRubricContext.rubric,
+                rubricGrid: assessment.rubricGrid,
+                rubricMarkedGrid: feedback.rubricMarkedGrid,
                 learner: participant.user,
                 markType: rubricContext.markType,
                 markVisibility: participant.assessable.isFeedbackVisibleToUser(USER),
                 showDescriptorValue: showDescriptorValue,
                 showGroupTotal: showGroupTotal,
                 showRubricTotal: showRubricTotal,
-                latestSelfReflectedFeedback: latestSelfReflectedFeedback,
                 self: self,
                 studentView: true,
                 selfAssess: selfAssess,
@@ -113,30 +111,6 @@
     {% endif %}
 {% endblock %}
 
-{% block gradeValue %}
-  {% if 'none' != markSchemeName | lower %}
-      <div class="small-12 medium-3 column">
-          <label>{{ locale.grades.proper }}
-              {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
-                  participant: participant,
-                  feedback: latestFeedback,
-                  markScheme: assessment.markScheme,
-                  tabIndex: 1,
-                  errors: errors,
-                  readonly: readonly
-              } only %}
-
-              {% if assessment.useRubric and rubricContext and not readonly and config.rubric_show_points %}
-                  {% include '@learningDueWorkResponse/inlineGrading/fragments/assignFromRubricButton.twig' with {
-                      locale: locale,
-                      rubricContext: rubricContext
-                  } only %}
-              {% endif %}
-          </label>
-      </div>
-  {% endif %}
-{% endblock %}
-
 {# Comment box #}
 {% block comment %}
     <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
@@ -144,7 +118,7 @@
         tabIndex: 2,
         readonly: readonly,
         selfAssessment: true,
-        feedback: latestFeedback
+        feedback: feedback
         } only %}
     </div>
 {% endblock %}

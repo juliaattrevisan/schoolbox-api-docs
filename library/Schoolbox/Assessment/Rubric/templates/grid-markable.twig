@@ -1,8 +1,22 @@
+{##
+ # This template must support both an empty and a marked grid.
+ #
+ # Parameters:
+ # * rubricGrid:              the base rubric grid object
+ # * rubricMarkedGrid:        the marked rubric grid, shouldst there be one
+ # * selfAssessmentFeedback:  the self-assessed feedback, shouldst there be one
+ # * markVisibility:          ? Should be inferred from grid's assessment (assessment.isVisibleTo(USER))
+ # * useMarkRange:            ? Should be inferred from grid's assessment (assessment.markRange)
+ # * showGroupTotal:          ? Should be inferred from grid's assessment (assessment.markPerCapability)
+ #                              Also depends if this is a self-reflection
+ #}
+
+
 {% import '@learningMarkScheme/macro/limitDecimal.twig' as limit_decimal %}
 
 {% set formField = 'rubric' %}
-{% set rubricId = 'rb-' ~ rubric.id %}
-{% set markType = markType ?: { mode: 'raw' } %}
+{% set rubricId = 'rb-' ~ rubricGrid.assessment.id %}
+{% set markType = rubricGrid.assessment.markScheme.generateContext %}
 {% set showDescriptorValue = showDescriptorValue ? true : false %}
 {% set showGroupTotal = showGroupTotal ? true : false %}
 {% set showRubricTotal = showRubricTotal ? true : false %}
@@ -14,118 +28,64 @@
 
         {# Suppress level headings if none have names #}
         {% set hasLevels = false %}
-        {% for level in rubric.levels if level.name | trim | length %}
+        {% for level in rubricGrid.levels if level.name | trim | length %}
             {% set hasLevels = true %}
         {% endfor %}
         {% if hasLevels  %}
         <thead>
             <tr>
                 <th colspan="2">&nbsp;</th>
-                {% for level in rubric.levels %}
+                {% for level in rubricGrid.levels %}
                 <th>{{ level.name }}</th>
                 {% endfor %}
             </tr>
         </thead>
         {% endif %}
         <tbody>
-            {% for groupIndex, group in rubric.groups %}
+            {% for groupIndex, groupUsage in rubricGrid.capabilityUsages %}
                 {# Use rowspans when group total is visible, otherwise don't need it
                  # This is only off when self-reflecting with a grid that doesn't show descriptor points
                  # and groups - here, it never shows the group subtotal, and rowspan calcs are off
                  #}
-                {% set rowspan = group.criteria|length + (showGroupTotal and markSchemeName != "None" ? 1 : 0) %}
+                {% set rowspan        = groupUsage.indicatorUsages|length + (showGroupTotal and rubricGrid.assessment.markPerCapability and markType.mode != "none" ? 1 : 0) %}
+                {% set capabilityMark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
 
-                {% for critIndex, crit in group.criteria %}
-                <tr data-group="{{ rubricId }}-{{ group.id }}">
+                {% for critIndex, critUsage in groupUsage.indicatorUsages %}
+                <tr data-group="{{ rubricId }}-{{ groupUsage.capability.id }}">
                     {# yay html tables... -_-; #}
                     {% if rowspan %}
-                        <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name }}</span></th>
+                        <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ groupUsage.capability.name }}</span></th>
                         {% set rowspan = 0 %}
                     {% endif %}
 
-                    <th class="rb-criterion-name">{{ crit.name }}</th>
+                    <th class="rb-criterion-name">{{ critUsage.indicator.name }}</th>
 
                     {# Required so that this form is recognised as containing a rubric, even if nothing is submitted #}
                     <input name="saveEmpty" value="true" type="hidden"/>
 
-                    {% for levelIndex, level in rubric.levels %}
-                        {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
+                    {% set indicatorId   = critUsage.indicator.id %}
+                    {% set indicatorMark = rubricMarkedGrid
+                        ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)
+                        : null %}
+                    {% set indicatorMarkDescriptor = indicatorMark
+                        ? indicatorMark.descriptor
+                        : null %}
+                    {% set selfAssessmentIndicatorMark = selfAssessmentFeedback
+                        ? selfAssessmentFeedback.rubricMarkedGrid.retrieveIndicatorMark(critUsage)
+                        : null %}
+
+                    {% for levelIndex, level in rubricGrid.levels %}
+
+                        {% set descriptor = critUsage.retrieveDescriptor(levelIndex) %}
 
                         {% if descriptor %}
 
-                            {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
+                            {% set inputId %}{{ formField }}[{{ indicatorId }}][{{ level.id }}]{% endset %}
+                            {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
+                            {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
 
-                            {# Self-Assessment #}
-                            {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex].selected %}
                             <td>
-                                <input id="{{ inputId }}"
-                                       name="{{ formField }}[descriptors][{{ descriptor.id }}][selected]"
-                                       value="1"
-                                       type="checkbox"
-                                       data-value="{{ descriptor.value }}"
-                                       data-rubric="{{ rubric.id }}"
-                                       data-rubric-group="{{ group.id }}"
-                                       data-rubric-descriptor="{{ descriptor.id }}"
-                                       {% if descriptor.selected %}checked="checked"{% endif %}
-                                />
-
-                                <label for="{{ inputId }}">
-                                    <span class="rb-description">
-                                        {{- descriptor.text|nl2br -}}
-                                    </span>
-
-                                    {% set direction = rubric.descriptorMetadata[crit.id].direction %}
-                                    {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex].min %}
-                                    {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
-
-                                    {# Just show a text value if the descriptor is not selected #}
-                                    {% if descriptor.value is not null and showDescriptorValue and not hidePoints %}
-                                        <span class="rb-value {% if descriptorMin == descriptorMax or not useMarkRange %}used {% elseif descriptor.selected %}hide{% endif %}">
-                                            {% if useMarkRange and descriptorMin != descriptorMax %}
-                                                {% if direction == 'asc' %}
-                                                    {{- descriptorMin -}} - {{- descriptorMax -}}
-                                                {% else %}
-                                                    {{- descriptorMax -}} - {{- descriptorMin -}}
-                                                {% endif %}
-                                            {% else %}
-                                                {{ descriptor.value }}
-                                            {% endif %}
-                                        </span>
-                                    {% endif %}
-                                </label>
-                                {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
-                                {% if useMarkRange %}
-                                    {# Render a dropdown to select a value from the range #}
-
-                                    <select id="rangeDropdown-{{ descriptor.id }}"
-                                            name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
-                                            class="{% if not descriptor.selected or descriptorMin == descriptorMax or not useMarkRange %} hide{% endif %}
-                                            {% if useMarkRange and descriptorMin != descriptorMax and not hidePoints %}used{% endif %}"
-                                            data-rubric="{{ rubric.id }}"
-                                            data-rubric-group="{{ group.id }}"
-                                            data-rubric-descriptor="{{ descriptor.id }}"
-                                    >
-                                        {% set rangeStart = direction == 'asc' ? descriptorMin : descriptorMax %}
-                                        {% set rangeEnd = direction == 'asc' ? descriptorMax : descriptorMin %}
-
-                                        {# Selected value: if not provided, use max #}
-                                        {% set selectedValue = descriptor.selectedValue ?? descriptorMax %}
-
-                                        {% for i in rangeStart..rangeEnd %}
-                                            <option value={{ i }}
-                                                    {% if i == selectedValue %}selected{% endif %}
-                                            >{{ i }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                {% endif %}
-
-                                {% if learnerSelected %}
-                                    <img class="rb-self-reflection-choice"
-                                         src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
-                                         title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
-                                {% endif %}
-
+                                {% include '@rubric/descriptor-markable.twig' %}
                             </td>
 
                         {% else %}
@@ -136,129 +96,33 @@
                 </tr>
             {% endfor %}
 
-        {% if showGroupTotal and markSchemeName != "None" and not hidePoints %}
-            {% set percentageMark = group.rowMaxSum > 0 ? group.mark * (100 / group.rowMaxSum) : 0 %}
-            {% set letterGradeBracket = false %}
-
-            {# TODO assumes values are always descending which might not be the case? #}
-            {% for value, letter in markType.conf if (percentageMark >= value and not letterGradeBracket) %}
-                {% set letterGradeBracket = value %}
-            {% endfor %}
-            <tr>
-                <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
-                    <span data-group-summary="{{ rubricId }}-{{ group.id }}"
-                          data-mark="{{ group.mark }}"
-                          data-scaled-mark="{{ group.scaledMark }}"
-                          data-max="{{ group.max }}"
-                          data-row-max-sum="{{ group.rowMaxSum }}"
-                          data-group-id="{{ group.id }}"
-                          data-rubric-id="{{ rubric.id }}">
-
-                        {# This is the value we insert into the database. #}
-                        <input type="hidden"
-                               data-db-mark
-                               value="{{ group.mark }}"
-                               name="{{ formField }}[groups][{{ group.id }}][unscaledMark]">
-
-                        {# This is the maximum capability mark, which wouldn't get POSTed otherwise #}
-                        <input type="hidden"
-                               value="{{ group.max }}"
-                               name="{{ formField }}[groups][{{ group.id }}][max]">
-
-                        <label for="group-{{ group.id }}-mark">{{ locale.rubricGroup.proper }} mark</label>
-
-                        {% if markSchemeName == 'TotalMarkFractional' %}
-                            <input data-group-mark
-                                   class="groupMark"
-                                   id="group-{{ group.id }}-mark"
-                                   type="tel"
-                                   name="{{ formField }}[groups][{{ group.id }}][customMark]"
-                                   value="{{ group.scaledMark }}"/> / {{ group.max }}
-
-                        {% elseif markSchemeName == 'LetterGrade' %}
-                            <select data-group-mark
-                                    class="groupMark"
-                                    name="{{ formField }}[groups][{{ group.id }}][customMark]"
-                                    id="group-{{ group.id }}-mark">
-
-                                {% for value, letter in markType.conf %}
-                                    <option value="{{ value }}"
-                                            {% if letterGradeBracket == value %}selected{% endif %}
-                                            data-letter="{{ letter }}">
-                                        {{ letter }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-
-                        {% elseif markSchemeName == 'Percentage'%}
-                            <input data-group-mark
-                                   class="groupMark"
-                                   id="group-{{ group.id }}-mark"
-                                   type="tel"
-                                   name="{{ formField }}[groups][{{ group.id }}][customMark]"
-                                   value="{{ percentageMark }}"/> %
-
-                        {% endif %}
-
-                        {# TODO why is markSchemeName null when student is self-assessing (note: will be addressed in SA-7242) #}
-
-                        {% if group.rowMaxSum > 0 %}
-                            {# TODO these need to be the descriptor sum! #}
-                            <button data-use-descriptor-values>Assign <span class="descriptor-sum" data-group-descriptor-sum>
-                                {% if markSchemeName == 'TotalMarkFractional' %}
-                                    {{ group.scaledMark }}
-
-                                {% elseif markSchemeName == 'LetterGrade' %}
-                                    {{ markType.conf[letterGradeValue] }}
-
-                                {% elseif markSchemeName == 'Percentage'%}
-                                    {{ percentageMark }}
-
-                                {% endif %}
-                                </span> from Descriptors</button>
-                        {% endif %}
-                    </span>
-
-                    {# Self-Assessment #}
-                    {% if learnerRubric %}
-                        {% if latestSelfReflectedFeedback.isSelfGrading %}
-                            {% set selfReflectionName = locale.selfAssessment.proper %}
-                        {% else %}
-                            {% set selfReflectionName = locale.selfReflection.proper %}
-                        {% endif %}
-
-                        ({{ learnerRubric.groups[group.id].humanReadableMark }} given in {{ selfReflectionName }})
-                    {% endif %}
-                </th>
-            </tr>
-        {% endif %}
+            {% include '@rubric/group-row-markable.twig' %}
 
     {% endfor %}
 
-    {% if showRubricTotal and markSchemeName != "None" and (config.rubric_show_points or not studentView) %}
-        <tr>
-            <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}">
-                <span data-final-summary="{{ rubricId }}"
-                      data-scaled-mark="{{ rubric.scaledMark}}"
-                      data-max="{{ rubric.max }}"
-                      data-mark-type="{{ markSchemeName }}">
+    {% if showRubricTotal and markType.mode != "none" and (config.rubric_show_points or not studentView) %}
 
-                    {% if markSchemeName == 'TotalMarkFractional' %}
-                       {{ rubric.scaledMark }} / {{ rubric.max }}
-                    {% else %}
-                       {{ rubric.humanReadableMark }}
-                    {% endif %}
+        {% set rubricScaledMark = rubricMarkedGrid.calculateScaledMark %}
+        {% set rubricMax        = rubricGrid.calculateMaxValueFromCapabilities %}
+
+        <tr>
+            <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
+                <span data-final-summary="{{ rubricId }}"
+                      data-scaled-mark="{{ rubricScaledMark }}"
+                      data-max="{{ rubricMax }}"
+                      data-mark-type="{{ markType.mode }}">
+
+                    {#{% if markSchemeName == 'TotalMarkFractional' %}#}
+                       {#{{ rubricScaledMark }} / {{ rubricMax }}#}
+                    {#{% else %}#}
+                       {#{{ rubricHumanReadableMark }}#}
+                    {#{% endif %}#}
+                    {{ rubricMarkedGrid.retrieveHumanReadableMark }}
                 </span>
 
-                {# Self-Assessment #}
-                {% if learnerRubric %}
-                    {% if latestSelfReflectedFeedback.isSelfGrading %}
-                        {% set selfReflectionName = locale.selfAssessment.proper %}
-                    {% else %}
-                        {% set selfReflectionName = locale.selfReflection.proper %}
-                    {% endif %}
-
-                    ({{ learnerRubric.humanReadableMark }} given in {{ selfReflectionName }})
+                {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
+                {% if selfAssessmentFeedback.isSelfGrading %}
+                    ({{ selfAssessmentFeedback.humanReadableMark }} given in {{ locale.selfAssessment.proper }})
                 {% endif %}
             </th>
         </tr>
@@ -269,10 +133,13 @@
 </div>
 {# js specific to the rubric we just injected to...wherever we injected it #}
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.dynagrade.js"></script>
+
+{% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
-        var $rb = $('#{{ rubricId }}');
-        var markType = $rb.find("[data-final-summary]").attr("data-mark-type");
+        var $rb       = $('#{{ rubricId }}'),
+            markType  = $rb.find("[data-final-summary]").attr("data-mark-type"),
+            dynagrade = {{ markType | json_encode | raw }};
 
         $("[data-feedback-form]").validate(
             {
@@ -287,7 +154,7 @@
         $("[data-group-mark]").each(function() {
 
             // TODO not sure how to validate the letter grade dropdown, so skip it for now
-            if (markType !== 'LetterGrade') {
+            if (markType !== 'letter') {
 
                 // Percentage and total mark types must be numeric
                 $(this).rules('add', {
@@ -296,11 +163,11 @@
                 });
 
                 // If percentage mark type, range is between 0 and 100
-                if (markType === 'Percentage') {
+                if (markType === 'percent') {
                     $(this).rules('add', {
                         range: [0, 100]
                     });
-                } else if (markType === "TotalMarkFractional") {
+                } else if (markType === "raw") {
                     // Otherwise, range is between 0 and capability max
                     var capMax = $(this).closest("[data-group-summary]").attr("data-max");
 
@@ -327,7 +194,7 @@
                 var displayedMark = $(this).find("[data-group-descriptor-sum]").text().replace(/%/, '').trim();
                 var customMark = $(this).find("[data-group-mark]").val();
 
-                if (markType === 'LetterGrade') {
+                if (markType === 'letter') {
                     var grades = getLetterGrades($(this));
                     customMark = getLetterGradeFromNumeric($(this).find("[data-group-mark]").val(), grades);
                 }
@@ -357,12 +224,12 @@
                 var descriptorSum = scale($(this), summateDescriptors($descriptorCheckboxes));
 
                 switch(markType) {
-                    case 'TotalMarkFractional':
+                    case 'raw':
                         // Simply use the number as-is
                         $(this).find("[data-group-descriptor-sum]").text(descriptorSum);
                         break;
 
-                    case 'LetterGrade':
+                    case 'letter':
                         // Turn the numeric value into a letter grade
                         // Don't use scaled values when working with percentages
                         descriptorSum = summateDescriptors($descriptorCheckboxes);
@@ -372,7 +239,7 @@
                         );
                         break;
 
-                    case 'Percentage':
+                    case 'percent':
                         // Turn the numeric value into a percentage and append percent sign]
                         // Don't use scaled values when working with percentages
                         descriptorSum = summateDescriptors($descriptorCheckboxes);
@@ -392,7 +259,7 @@
         disableEnableAssignFromDescs();
 
         // initialise dynamic mark display
-        $rb.dynagrade({{ markType | json_encode | raw }});
+        $rb.dynagrade(dynagrade);
 
         // Update the per-capability and overall marks when descriptor selection is changed
         $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
@@ -420,16 +287,16 @@
 
                 // Update button text with mark calculated from descriptors
                 switch(markType) {
-                    case 'TotalMarkFractional':
+                    case 'raw':
                         $groupSummary.find("[data-group-descriptor-sum]").text(scaledGroupMark);
                         break;
 
-                    case 'LetterGrade':
+                    case 'letter':
                         var grades = getLetterGrades($groupSummary.find("[data-group-mark]"));
                         $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, $groupSummary.attr('data-mark')), grades));
                         break;
 
-                    case 'Percentage':
+                    case 'percent':
                         $groupSummary.find("[data-group-descriptor-sum]").text(getPercentage($groupSummary, $groupSummary.attr('data-mark')) + "%");
                         break;
 
@@ -442,15 +309,15 @@
                     if (! $groupSummary.attr('data-customised')) {
                         // Only update dropdown/input field if the mark has not been customised
                         switch(markType) {
-                            case 'TotalMarkFractional':
+                            case 'raw':
                                 $groupSummary.find("[data-group-mark]").val(scaledGroupMark);
                                 break;
 
-                            case 'LetterGrade':
+                            case 'letter':
                                 assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $groupSummary.find("[data-group-mark]").val(scaledGroupMark));
                                 break;
 
-                            case 'Percentage':
+                            case 'percent':
                                 $groupSummary.find("[data-group-mark]").val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
                                 break;
 
@@ -523,13 +390,13 @@
             if ($groupRows.length) {
                 var rowCount = $groupRows.length;
                 switch (markType) {
-                    case 'TotalMarkFractional':
+                    case 'raw':
                         // We got a scaled numeric mark. We need to make it unscaled.
                         normalised = customMark * (rowMaxSum / capMax);
                         break;
 
-                    case 'LetterGrade':
-                    case 'Percentage':
+                    case 'letter':
+                    case 'percent':
                         // What is x percent of the total possible (unscaled) marks?
                         normalised = customMark * (rowMaxSum / 100);
                         break;
@@ -564,15 +431,15 @@
             $groupSummary.find('[data-db-mark]').val(unscaledGroupMark);
 
             switch(markType) {
-                case 'TotalMarkFractional':
+                case 'raw':
                     $gradeInput.val(scaledGroupMark);
                     break;
 
-                case 'LetterGrade':
+                case 'letter':
                     assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $gradeInput.val(scaledGroupMark));
                     break;
 
-                case 'Percentage':
+                case 'percent':
                     $groupSummary.find("[data-group-mark]").val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
                     break;
 
@@ -615,7 +482,8 @@
         function assignLetterGrade(numericMark, $dropdown) {
             var grades = getLetterGrades($dropdown);
 
-            var optionIndex = 0;
+            // Default option index if no other selected: the last one
+            var optionIndex = grades.length - 1;
             for (var i = 0; i < grades.length; i++) {
                 // TODO assumes values are always descending which might not be the case?
                 if (numericMark >= grades[i].value) {
@@ -628,16 +496,16 @@
 
         // Given a percentage mark, find the letter grade that corresponds to its bracket in the marking scheme
         function getLetterGradeFromNumeric(numericMark, grades) {
-            var markLetterValue = '';
-            for (var i = 0; i < grades.length; i++) {
+            var gradesLength = grades.length;
+            for (var i = 0; i < gradesLength; i++) {
                 // TODO assumes values are always descending which might not be the case?
                 if (numericMark >= grades[i].value) {
-                    markLetterValue = grades[i].letter;
-                    break;
+                    return grades[i].letter;
                 }
             }
 
-            return markLetterValue;
+            // Did I fall through to here? Use the last grade
+            return gradesLength > 0 ? grades[gradesLength-1].letter : '';
         }
 
         // Turn a specified value into a percentage of the max marks for a group
@@ -747,7 +615,8 @@
         }
 
         // If not multi-select, simulate radio behaviour per row (simpler to do this than intercept radio checked event!)
-        {% if not rubric.multiSelect %}
+        {# TODO I have no idea what multiSelect is, and AFAICT it's always false #}
+        {#{% if not rubric.multiSelect %}#}
         // Can't delegate this, as auto-mark will run before it can un-check siblings
         $('[data-rubric-descriptor]').on('change', function(event){
 
@@ -762,7 +631,7 @@
                 }
             });
         });
-        {% endif %}
+        {#{% endif %}#}
 
         /**
          *
@@ -786,3 +655,4 @@
 
     });
 </script>
+{% endautoescape %}

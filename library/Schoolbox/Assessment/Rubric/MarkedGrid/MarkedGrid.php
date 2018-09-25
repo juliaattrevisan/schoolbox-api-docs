@@ -8,9 +8,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
+use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 
 /**
  * A marked rubric grid.
@@ -27,34 +30,111 @@ use Schoolbox\Learning\Assessment\IFeedback;
 class MarkedGrid
 {
     /**
+     * The feedback which this marked grid is assigned to.
+     *
      * @var IFeedback
      */
     private $feedback;
 
 
     /**
+     * The grid that is used as the template for marking.
+     *
      * @var Grid
      */
     private $grid;
 
 
     /**
-     * @var GenericCollection|DescriptorMark[]
+     * The scheme via which the marked grid is marked. This controls how the
+     * overall mark for this grid is validated and rendered.
+     *
+     * TODO this belongs on the grid, not the marked grid
+     *
+     * @var IMarkScheme
      */
-    private $marks;
+    private $markScheme;
+
+
+    /**
+     * The marks for each capability on the grid.
+     *
+     * @var GenericCollection|CapabilityMark[]
+     */
+    private $capabilityMarks;
 
 
     /**
      * Constructor
      *
-     * @param IFeedback $feedback
-     * @param Grid      $grid
+     * @param IFeedback   $feedback
+     * @param Grid        $grid
+     * @param IMarkScheme $markScheme
      */
-    public function __construct(IFeedback $feedback, Grid $grid)
+    public function __construct(IFeedback $feedback, Grid $grid, IMarkScheme $markScheme)
     {
-        $this->feedback = $feedback;
-        $this->grid     = $grid;
-        $this->marks    = new GenericCollection(DescriptorMark::class);
+        $this->feedback        = $feedback;
+        $this->grid            = $grid;
+        $this->markScheme      = $markScheme;
+        $this->capabilityMarks = new GenericCollection(CapabilityMark::class);
+    }
+
+
+    /**
+     * Calculates the grid's mark, with the scaling factor from each of its
+     * capabilities applied.
+     *
+     * @return float
+     */
+    public function calculateScaledMark(): float
+    {
+        $value = 0;
+        foreach ($this->capabilityMarks as $capabilityMark) {
+            $value += $capabilityMark->calculateScaledMark();
+        }
+        return $value;
+    }
+
+
+    /**
+     * Render the grid's mark in normalized format.
+     *
+     * @return float
+     */
+    public function retrieveNormalizedMark(): float
+    {
+        $capabilityValues = [];
+        $totalAvailableMark      = 0;
+        foreach ($this->capabilityMarks as $capabilityMark) {
+            $capabilityNormMark  = $capabilityMark->retrieveNormalizedMark();
+            $capabilityMaxMark   = $capabilityMark->getCapabilityUsage()->getMaxValue();
+            $capabilityValues[]  = [$capabilityNormMark, $capabilityMaxMark,];
+            $totalAvailableMark += $capabilityMaxMark;
+        }
+
+        if ($totalAvailableMark === 0) {
+            return 0;
+        }
+
+        $normalizedMark = 0;
+        foreach ($capabilityValues as [$capabilityNormMark, $capabilityMaxMark]) {
+            if ($capabilityMaxMark === 0) {
+                continue;
+            }
+            $normalizedMark += ($capabilityNormMark * ($capabilityMaxMark / $totalAvailableMark));
+        }
+        return $normalizedMark;
+    }
+
+
+    /**
+     * Render the grid's mark in human-readable format.
+     *
+     * @return null|string
+     */
+    public function retrieveHumanReadableMark(): ?string
+    {
+        return $this->markScheme->getHumanReadableMark($this->retrieveNormalizedMark());
     }
 
 
@@ -77,21 +157,79 @@ class MarkedGrid
 
 
     /**
-     * @return DescriptorMark[]|GenericCollection
+     * @return IMarkScheme
      */
-    public function getMarks(): GenericCollection
+    public function getMarkScheme(): IMarkScheme
     {
-        return $this->marks;
+        return $this->markScheme;
     }
 
 
     /**
-     * @param DescriptorMark[]|GenericCollection $marks
+     * Returns an iterator over capability usages.
+     *
+     * @return iterable|CapabilityUsage[]
+     */
+    public function iterateCapabilityUsages(): iterable
+    {
+        return $this->grid->getCapabilityUsages();
+    }
+
+
+    /**
+     * Retrieve a capability mark for a capability usage, if one exists.
+     *
+     * @param CapabilityUsage $capabilityUsage
+     * @return null|CapabilityMark
+     */
+    public function retrieveCapabilityMark(CapabilityUsage $capabilityUsage): ?CapabilityMark
+    {
+        foreach ($this->capabilityMarks as $capabilityMark) {
+            // TODO capability usage should have its own ID
+            if ($capabilityMark->getCapabilityUsage()->getCapability()->getId()
+                === $capabilityUsage->getCapability()->getId()
+            ) {
+                return $capabilityMark;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Retrieve an indicator mark for an indicator usage, if one exists.
+     *
+     * @param IndicatorUsage $indicatorUsage
+     * @return null|IndicatorMark
+     */
+    public function retrieveIndicatorMark(IndicatorUsage $indicatorUsage): ?IndicatorMark
+    {
+        foreach ($this->capabilityMarks as $capabilityMark) {
+            $indicatorMark = $capabilityMark->retrieveIndicatorMark($indicatorUsage);
+            if ($indicatorMark) {
+                return $indicatorMark;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * @return CapabilityMark[]|GenericCollection
+     */
+    public function getCapabilityMarks(): GenericCollection
+    {
+        return $this->capabilityMarks;
+    }
+
+
+    /**
+     * @param CapabilityMark[]|GenericCollection $capabilityMarks
      * @return static
      */
-    public function setMarks(GenericCollection $marks): self
+    public function setCapabilityMarks(GenericCollection $capabilityMarks): self
     {
-        $this->marks = $marks;
+        $this->capabilityMarks = $capabilityMarks;
         return $this;
     }
 }

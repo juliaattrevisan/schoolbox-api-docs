@@ -11,6 +11,8 @@ use Schoolbox\Learning\Assessment\IResponse;
 
 class None extends AbstractMarkScheme
 {
+    public const SLUG = 'none';
+
     const TITLE = 'None';
 
     /**

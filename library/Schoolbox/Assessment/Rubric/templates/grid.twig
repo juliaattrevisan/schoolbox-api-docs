@@ -1,14 +1,32 @@
+{##
+ # This template must support both an empty and a marked grid.
+ #
+ # Parameters:
+ # * rubricGrid:              the base rubric grid object
+ # * rubricMarkedGrid:        the marked rubric grid, shouldst there be one
+ # * selfAssessmentFeedback:  the self-assessed feedback, shouldst there be one
+ # * markVisibility:          ? Should be inferred from grid's assessment (assessment.isVisibleTo(USER))
+ # * useMarkRange:            ? Should be inferred from grid's assessment (assessment.markRange)
+ # * showGroupTotal:          ? Should be inferred from grid's assessment (assessment.markPerCapability)
+ #                              but is also false for self-reflections
+ # * showRubricTotal:         False for self-reflections
+ #}
+
+{% set markType = rubricGrid.assessment.markScheme.generateContext %}
+{#{% set markSchemeName = rubricGrid.assessment.markScheme.title %}#}
+{% set showSummaryRows = showGroupTotal and rubricGrid.assessment.markPerCapability and rubricMarkedGrid and markType.mode != "none" %}
+
 <div class="scrollable">
 <table class="rb stack-for-medium-down">
     {% set hasLevels = '' %}
-    {% for level in rubric.levels %}
+    {% for level in rubricGrid.levels %}
         {% set hasLevels = hasLevels ~ level.name %}
     {% endfor %}
     {% if hasLevels | length %}
     <thead>
     <tr>
         <th colspan="2" class="rb-no-cell">&nbsp;</th>
-        {% for level in rubric.levels %}
+        {% for level in rubricGrid.levels %}
         <th>{{ level.name }}</th>
         {% endfor %}
     </tr>
@@ -16,62 +34,64 @@
     {% endif %}
     <tbody>
 
-    {% for groupIndex, group in rubric.groups %}
+    {% for groupIndex, groupUsage in rubricGrid.capabilityUsages %}
 
-        {% set rowspan = group.criteria|length + (showGroupTotal ? 1 : 0) %}
+        {% set rowspan        = groupUsage.indicatorUsages|length + (showSummaryRows ? 1 : 0) %}
+        {% set capabilityMark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
 
-        {% for critIndex, crit in group.criteria %}
+        {% for critIndex, critUsage in groupUsage.indicatorUsages %}
             <tr>
                 {# yay html tables... -_-; #}
                 {% if rowspan %}
-                    <th rowspan="{{ rowspan }}">{{ group.name }}</th>
+                    <th rowspan="{{ rowspan }}">{{ groupUsage.capability.name }}</th>
                     {% set rowspan = 0 %}
                 {% endif %}
 
-                <th>{{ crit.name }}</th>
+                <th>{{ critUsage.indicator.name }}</th>
 
-                {% for levelIndex, level in rubric.levels %}
+                {% set indicatorMark = rubricMarkedGrid
+                    ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)
+                    : null %}
+                {% set indicatorMarkDescriptor = indicatorMark
+                    ? indicatorMark.descriptor
+                    : null %}
+                {% set selfAssessmentIndicatorMark = selfAssessmentFeedback
+                    ? selfAssessmentFeedback.rubricMarkedGrid.retrieveIndicatorMark(critUsage)
+                    : null %}
 
-                    {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
+                {% for levelIndex, level in rubricGrid.levels %}
+
+                    {% set descriptor = critUsage.retrieveDescriptor(levelIndex) %}
 
                     {% if descriptor %}
 
                         {# Self-Assessment #}
-                        {% set learnerSelected = learnerRubric.descriptors[crit.id][levelIndex].selected %}
+                        {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
+                        {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
 
-                        <td {% if descriptor.selected and markVisibility %}class="rb-selected"{% endif %}>
+                        <td {% if isMarkDisplayed %}class="rb-selected"{% endif %}>
                             <div>
                                 <p>
-                                    {{- descriptor.text|nl2br -}}
+                                    {{- descriptor.description|nl2br -}}
                                 </p>
-                                {% if descriptor.value is not null and config.rubric_show_points %}
+                                {% if descriptor.hasValue and config.rubric_show_points and showRubricTotal %}
                                     <aside>
-                                        {% set direction = rubric.descriptorMetadata[crit.id].direction %}
-                                        {% set descriptorMin = rubric.descriptorMetadata[crit.id][levelIndex].min %}
-                                        {% set descriptorMax = rubric.descriptorMetadata[crit.id][levelIndex].max %}
-
-                                        {% if useMarkRange and descriptorMin != descriptorMax %}
-                                            {% if descriptor.selected and markVisibility %}
-                                                <span class="range-selection-value">{{ descriptor.selectedValue }}</span>
+                                        {% if rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
+                                            {% if isMarkDisplayed %}
+                                                <span class="range-selection-value">{{ indicatorMark.value }}</span>
                                             {% endif %}
-                                            <span class="range {% if descriptor.selected and markVisibility %}selected{% endif %}">
-                                                {%- if direction == 'asc' -%}
-                                                    {{descriptorMin}}–{{descriptorMax}}
-                                                {%- else -%}
-                                                    {{descriptorMax}}–{{descriptorMin}}
-                                                {%- endif -%}
-                                            </span>
+                                            <span class="range {% if isMarkDisplayed %}selected{% endif %}">{{descriptor.minValue}}–{{descriptor.maxValue}}</span>
                                         {% else %}
-                                            {{ descriptor.value }}
+                                            {{ descriptor.maxValue }}
                                         {% endif %}
                                     </aside>
                                 {% endif %}
 
                             {# Self-Assessment #}
-                            {% if learnerSelected %}
+                            {% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
                                 <img class="rb-self-reflection-choice"
                                      src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
-                                     title="{% if latestSelfReflectedFeedback.normalisedMark != null %}{{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
+                                     title="{% if selfAssessmentFeedback.isSelfGrading %}({{ selfAssessmentIndicatorMark.value }}) {{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
                             {% endif %}
                             </div>
                         </td>
@@ -84,14 +104,16 @@
             </tr>
         {% endfor %}
 
-        {% if showGroupTotal and group.humanReadableMark %}
+        {# Capability mark: needs to be rendered in human-readable form, use the assessment's mark scheme to do so #}
+        {% if showSummaryRows %}
             <tr>
-                <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">
-                    {{ group.humanReadableMark }}
+                <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
+                    {{ capabilityMark.retrieveHumanReadableMark }}
 
                     {# Self-Assessment #}
-                    {% if learnerRubric %}
-                        ({{ learnerRubric.groups[groupIndex].humanReadableMark }} given in {{ locale.selfAssessment.singularForm }})
+                    {% if selfAssessmentFeedback.isSelfGrading %}
+                        {% set selfAssessmentCapabilityMark = selfAssessmentFeedback.rubricMarkedGrid.retrieveCapabilityMark(groupUsage) %}
+                        ({{ selfAssessmentCapabilityMark.retrieveHumanReadableMark }} given in {{ locale.selfAssessment }})
                     {% endif %}
                 </th>
             </tr>
@@ -99,14 +121,15 @@
 
     {% endfor %}
 
-    {% if showRubricTotal and rubric.humanReadableMark %}
+    {# Overall mark #}
+    {% if showSummaryRows %}
         <tr>
-            <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}" >
-                {{ rubric.humanReadableMark }}
+            <th class="rb-final-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
+                {{ rubricMarkedGrid.retrieveHumanReadableMark }}
 
-                {# Self-Assessment #}
-                {% if learnerRubric %}
-                    ({{ learnerRubric.humanReadableMark }} given in {{ locale.selfAssessment.singularForm }})
+                {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
+                {% if selfAssessmentFeedback.isSelfGrading %}
+                    ({{ selfAssessmentFeedback.humanReadableMark }} given in {{ locale.selfAssessment }})
                 {% endif %}
             </th>
         </tr>

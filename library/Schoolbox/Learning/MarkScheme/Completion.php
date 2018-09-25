@@ -12,6 +12,8 @@ use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 
 class Completion extends AbstractMarkScheme
 {
+    public const SLUG = 'completion';
+
     const TITLE = 'Completion';
 
     const HUMAN_READABLE_INCOMPLETE  = 'Incomplete';

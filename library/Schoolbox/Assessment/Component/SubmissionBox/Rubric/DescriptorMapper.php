@@ -22,6 +22,7 @@ use Schoolbox\GenericCollection;
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
  * @method Descriptor createModel($idValue = null)
+ * @method Descriptor findById($identifierValue)
  * @method Descriptor[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
  * @method Descriptor[]|GenericCollection findByColumnList($columnList, $options = [])
  * @method Descriptor findOneByColumn($columnName, $columnValue, $order = array(), $options = array())

@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Rubric\Grid\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Resource\Folder\Model as Folder;
 

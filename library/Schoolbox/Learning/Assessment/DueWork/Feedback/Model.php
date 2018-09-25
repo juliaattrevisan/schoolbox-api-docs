@@ -10,6 +10,7 @@
  */
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
+use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\AbstractFeedback;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
@@ -33,6 +34,15 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
      * @see ReturnedWork::REVIEW_ROUTE_INSTRUCTOR and adjacent constants
      */
     private $reviewRoute;
+
+
+    /**
+     * The marked rubric grid for this feedback.
+     *
+     * @var MarkedGrid
+     */
+    private $rubricMarkedGrid;
+
 
     /**
      * Model constructor.
@@ -143,6 +153,26 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
     public function setReviewRoute(string $reviewRoute): self
     {
         $this->reviewRoute = $reviewRoute;
+        return $this;
+    }
+
+
+    /**
+     * @return MarkedGrid
+     */
+    public function getRubricMarkedGrid(): MarkedGrid
+    {
+        return $this->rubricMarkedGrid;
+    }
+
+
+    /**
+     * @param MarkedGrid $rubricMarkedGrid
+     * @return static
+     */
+    public function setRubricMarkedGrid(MarkedGrid $rubricMarkedGrid): self
+    {
+        $this->rubricMarkedGrid = $rubricMarkedGrid;
         return $this;
     }
 }

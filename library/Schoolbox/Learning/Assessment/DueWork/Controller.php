@@ -193,21 +193,24 @@ class Controller extends Assessment\Controller
     {
         $participant = $assessment->getParticipantIfExtant($student);
 
-        if($assessment->getUseRubric()){
-            $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+        // Generate rubric marked grids for every feedback being displayed
+        if ($assessment->getUseRubric()) {
+            $assessment->setRubricGrid($this->rubricMapper->retrieveGrid($assessment, false));
+            if ($participant) {
+                foreach ($participant->getAllFeedbacks() as $feedback) {
+                    // All feedbacks ought to be due work feedbacks,
+                    // and thus have a rubric grid
+                    if ($feedback instanceof Feedback\Model) {
+                        $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
+                    }
+                }
+            }
         }
 
         // Generate rubric context for every feedback
-        $rubricContext = new RubricContext($this->rubricMapper);
-        $timeline      = $feedbackRubricContexts = null;
+        $timeline = null;
         if ($participant) {
-            $timeline               = (new FullTimeline($participant))->getForUser($this->getUser());
-            $feedbackRubricContexts = $rubricContext->generateSeriesForTimeline(
-                $timeline,
-                $this->getUser(),
-                $this->getAccess(),
-                false
-            );
+            $timeline = (new FullTimeline($participant))->getForUser($this->getUser());
         }
 
 
@@ -226,11 +229,6 @@ class Controller extends Assessment\Controller
             /* Plagscan status
              */
             'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
-
-            /* Rubrics data
-             */
-            'emptyRubricContext' => $rubricContext->generateBasic($assessment, $student),
-            'feedbackRubricContexts' => $feedbackRubricContexts,
 
             'authoritativeFeedback' => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
         ];

@@ -195,19 +195,20 @@ feedback: currentFeedback,
             </ul>
         {% endif %}
         {# Rubric goes here #}
-        {% if feedbackRubricContexts[currentFeedback.id].rubric %}
+        {% if currentFeedback.rubricMarkedGrid %}
             <div class="rubric-wrap {{ collapsed? 'hide' : '' }}"
                  {% if hasCollapser %}
                  data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
                  data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
                  {% endif %}>
                 {% include '@rubric/grid.twig' with {
-                    rubric:         feedbackRubricContexts[currentFeedback.id].rubric,
+                    rubricGrid:       currentFeedback.rubricMarkedGrid.grid,
+                    rubricMarkedGrid: currentFeedback.rubricMarkedGrid,
                     markVisibility: currentFeedback.isSelfAssessment
                                     or participant.assessable.isFeedbackVisibleToUser(USER),
                     useMarkRange: assessment.useMarkRange,
-                    showRubricTotal: true,
-                    showGroupTotal: assessment.markPerCapability
+                    showRubricTotal: showRubricTotal,
+                    showGroupTotal: showGroupTotal
                 } only %}
             </div>
         {% endif %}
