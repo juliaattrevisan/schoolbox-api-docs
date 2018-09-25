@@ -192,6 +192,29 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
 
 
     /**
+     * Reconstructs and returns what the model looked like prior to the
+     * transaction by applying the diff to a clone of the current model.
+     *
+     * @param mixed      $current
+     * @param array|null $diff
+     * @param int        $previousKey The key of the previous values in the diff
+     * @return mixed|null
+     * @todo Add IModel interface so we can declare the type of $current and $previous
+     */
+    protected function buildPrevious($current, ?array $diff, int $previousKey = 1)
+    {
+        $previous = null;
+        if (null !== $diff) {
+            $previous = clone $current;
+            foreach ($diff as $property => $values) {
+                $this->mapper->setModelProperty($previous, $property, $values[$previousKey]);
+            }
+        }
+        return $previous;
+    }
+
+
+    /**
      * Conditionally hydrates the model given, depending on whether or not it's already sufficiently hydrated
      *
      * @param object $model

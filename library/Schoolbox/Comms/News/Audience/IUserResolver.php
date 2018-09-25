@@ -14,9 +14,9 @@ interface IUserResolver
     /**
      * Returns the ids of users who are in this article's audience
      *
-     * @param int $articleId
+     * @param \Schoolbox\Comms\News\Model $article
      * @return int[]
      */
-    public function findUsersForArticle(int $articleId): array;
+    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article): array;
 
 }

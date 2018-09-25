@@ -7,10 +7,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Moderation;
 
+use Alaress\Database;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Comms\News\Audience\Mapper as AudienceMapper;
 use Schoolbox\Comms\News\Audience\Model as Audience;
+use PDO;
 use Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 /**
@@ -25,16 +27,21 @@ class UserResolver implements IUserResolver
     /** @var UserAccessMapper */
     private $userAccessMapper;
 
+    /** @var Database\Connector\IConnector */
+    private $db;
+
     /**
      * @param AudienceMapper                $audienceMapper
      * @param UserAccessMapper              $userAccessMapper
      */
     public function __construct(
         AudienceMapper $audienceMapper,
-        UserAccessMapper $userAccessMapper
+        UserAccessMapper $userAccessMapper,
+        Database\Connector\IConnector $db
     ) {
         $this->audienceMapper       = $audienceMapper;
         $this->userAccessMapper     = $userAccessMapper;
+        $this->db                   = $db;
     }
 
     /**
@@ -47,18 +54,21 @@ class UserResolver implements IUserResolver
      * @param int $articleId
      * @throws \Schoolbox\Mapper\Exception
      * @return array
-     * @todo Add logic to handle the case when an article 1) does not exist, and 2) has 0 audience segments. See SA-6839
+     * @todo Add logic to handle the case when an article has 0 audience segments. See SA-6839
      */
-    public function findModeratorsForArticle(int $articleId): array
+    public function findModeratorsForArticle(\Schoolbox\Comms\News\Model $article): array
     {
-        // start off by finding the audience segments for this article
-        $where = $this->audienceMapper->getPredicateBuilder()->equals(AudienceMapper::FIELD_COMMS_NEWS_ARTICLE_ID, $articleId);
+        // Default moderators (superusers and comms officers)
+        $superuserIds = $this->db->executeQuery(
+            'SELECT u.id FROM user u JOIN superusers su ON u.id = su.id AND u.deleted_at IS NULL')
+            ->fetchAll(PDO::FETCH_COLUMN);
+        $moderators = array_unique(array_merge($superuserIds, $this->findCommsOfficerIds()));
 
-        $segments = $this->audienceMapper->findByPredicates($where);
+        $segments = $this->audienceMapper->findByColumn(AudienceMapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
 
         if ($segments->count() !== 1) {
             // non-trivial case, more than one segment
-            return $this->findCommsOfficerIds();
+            return $moderators;
         }
 
         /** @var Audience $segment */
@@ -66,13 +76,13 @@ class UserResolver implements IUserResolver
 
         if ($segment->getEntityType() !== Strategy\Folder::ENTITY_TYPE || $segment->getRelationship() !== Audience::RELATIONSHIP_SELF) {
             // not a trivial folder segment; bounce this
-            return $this->findCommsOfficerIds();
+            return $moderators;
         }
 
         $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->createModel($segment->getEntityValue());
         $writePlusIds = $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_WRITE)->getPropertyValues('id');
 
-        return array_unique(array_merge($writePlusIds, $this->findCommsOfficerIds()));
+        return array_unique(array_merge($writePlusIds, $moderators));
     }
 
 

@@ -62,19 +62,19 @@ class UserResolver implements IUserResolver
     /**
      * Returns the ids of users who are in the article's audience
      *
-     * @param int $articleId
+     * @param \Schoolbox\Comms\News\Model $article
      * @return int[]
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws UnexpectedValueException If we attempt to build a query with an unrecognised entity type
      * @throws \UnderflowException
      * @TODO This is too poorly implemented and needs to be optimised. See SA-7431
      */
-    public function findUsersForArticle(int $articleId): array
+    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article): array
     {
         $userIds = [];
-        $pb      = $this->audienceMapper->getPredicateBuilder()->equals(Mapper::FIELD_COMMS_NEWS_ARTICLE_ID, $articleId);
+        $segments = $this->audienceMapper->findByColumn(Mapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
 
-        foreach ($this->audienceMapper->findByPredicates($pb) as $rootAudienceSegment) {
+        foreach ($segments as $rootAudienceSegment) {
             // Root level segments are always a UNION
             /** @noinspection SlowArrayOperationsInLoopInspection */
             $userIds = \array_merge($userIds, $this->findUsersForAudienceSegment($rootAudienceSegment));
@@ -240,15 +240,18 @@ class UserResolver implements IUserResolver
 
                 // Associated with the class, regardless of role type.
                 // For students/teachers you'd need to use a composite segment that intersects the desired roleType.
+                $codes = $this->db->executeQuery(
+                    "SELECT code FROM folder_code fc JOIN folder f ON fc.folder_id=f.id AND fc.deleted_at IS NULL AND f.deleted_at IS NULL WHERE f.id= :folder_id",
+                    ['folder_id' => $entityValue])->fetchAll(PDO::FETCH_COLUMN);
                 $externalIds = [];
-                foreach ($this->externalClass->getStudents($entityValue) as $student) {
+                foreach ($this->externalClass->getStudents(implode(',', $codes)) as $student) {
                     $externalIds[] = $student['synergy_id'];
                 }
-                foreach ($this->externalClass->getTeacherName($entityValue) as $teacherExternalId) {
+                foreach ($this->externalClass->getTeacherName(implode(',', $codes)) as $teacherExternalId) {
                     $externalIds[] = $teacherExternalId;
                 }
                 if (\count($externalIds)) {
-                    $outerPb->in('synergy_id', $externalIds);
+                    $outerPb->in('u.synergy_id', $externalIds);
                 }
 
                 $whereClause = \implode(' OR ', $outerPb->getWhere());

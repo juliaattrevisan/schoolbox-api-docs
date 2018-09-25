@@ -57,6 +57,7 @@ class Splitter
      */
     public function generateTriggers(CrudEventInterface $event)
     {
+        // notifier
         $eventModule = $this->inflector->getModule($event);
 
         if ($eventModule instanceof ModuleNotifierInterface) {

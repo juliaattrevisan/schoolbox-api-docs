@@ -200,6 +200,7 @@ class Controller extends Base
             'action'           => 'Create',
             'article'          => $article,
             'featureImageZone' => $zone->getTwigContext(),
+            'isAutoSavable'          => ($article->isDraft() || $article->isAwaitingModeration()),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -298,6 +299,7 @@ class Controller extends Base
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
             'audienceSegments'       => $audienceSegments,
+            'isAutoSavable'          => ($article->isDraft() || $article->isAwaitingModeration()),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -986,7 +988,7 @@ class Controller extends Base
      */
     public function getRecipients(Model $article): void
     {
-        $userIds = $this->userResolver->findUsersForArticle($article->getId());
+        $userIds = $this->userResolver->findUsersForArticle($article);
 
         if (\count($userIds)) {
             $users = $this->userMapper->findByColumn('id', $userIds)->sortBy('lastname', 'asc');
