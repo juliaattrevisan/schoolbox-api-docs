@@ -1,38 +1,41 @@
-{# Render an indicator of the news article's current state
- #
- # A freshly minted news article: indicator lozenge says "New"
- #
- # Currently a draft: indicator lozenge says "Draft" after a draft persistence occurs
- #
- # Otherwise: article previously existed and the lozenge stays hidden until a draft persistence occurs
- #
- # @param News\Model article
- #}
+{#
+    Render an indicator of the news article's current state
+#}
+
+{# @param article: News\Model #}
 {% macro render(article) %}
-    {% if article.id %}
-        {% if not article.isSubmitted %}
-
-            {# Exists as a draft #}
-            {% set newStyle = 'style="display:none"' %}
-            {% set draftStyle = '' %}
-
-        {% else %}
-
-            {# Exists, but not a draft #}
-            {% set newStyle = 'style="display:none"' %}
-            {% set draftStyle = 'style="display:none"' %}
-
-        {% endif %}
-
-    {% elseif not article.isSubmitted %}
-
-        {# New article, never saved before #}
-        {% set newStyle = '' %}
-        {% set draftStyle = 'style="display:none"' %}
-
-    {% endif %}
-
-    {# Referenced by draft.js #}
-    <span id="status-new" class="label highlight" {{ newStyle|purify }}>New</span>
-    <span id="status-draft" class="label highlight" {{ draftStyle|purify }}>Draft</span>
+    {% import _self as self %}
+    {% set label    = self.label(article) %}
+    {% set cssClass = self.cssClass(article) %}
+    <span id="status-new" class="label highlight" {{ cssClass }}>{{ label }}</span>
 {% endmacro %}
+
+{# @param article: News\Model #}
+{%- macro label(article) -%}
+    {% spaceless %}
+        {% if article.isDraft %}
+            Draft
+        {% elseif article.isAwaitingModeration %}
+            Awaiting Moderation
+        {% elseif article.isRejected %}
+            Rejected
+        {% elseif article.isApproved %}
+            Approved
+        {% endif %}
+    {% endspaceless %}
+{%- endmacro -%}
+
+{# @param article: News\Model #}
+{%- macro cssClass(article) -%}
+    {% spaceless %}
+        {% if article.isDraft %}
+            unsubmitted
+        {% elseif article.isAwaitingModeration %}
+            submitted
+        {% elseif article.isRejected %}
+            submitted-late
+        {% elseif article.isApproved %}
+            reviewed
+        {% endif %}
+    {% endspaceless %}
+{%- endmacro -%}
