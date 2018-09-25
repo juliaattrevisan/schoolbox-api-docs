@@ -6,4 +6,7 @@ DELETE userGroups FROM userGroups JOIN folder ON cid = folder.id WHERE folder.in
 DELETE perms FROM perms JOIN folder ON cid = folder.id WHERE folder.inherit = 1;
 
 /* No class codes when nian is enabled */
-UPDATE folder_code, folder SET folder_code.deleted_at = NOW() WHERE folder_code.folder_id = folder.id AND folder.inherit = 1;
+UPDATE folder_code, folder SET folder_code.deleted_at = NOW()
+WHERE folder_code.folder_id = folder.id
+AND folder.inherit = 1
+AND folder_code.deleted_at IS NULL;
