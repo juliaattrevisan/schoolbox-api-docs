@@ -33,7 +33,7 @@ Data:
 <div class="actions-small-2 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>{{ article.title }} {% if modifyRoute %}{{ indicator.render(article) }}{% endif %}</h1>
+            <h1>{{ article.title }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
 
             <ul class="meta">
 
