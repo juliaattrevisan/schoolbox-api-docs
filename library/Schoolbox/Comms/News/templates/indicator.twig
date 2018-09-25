@@ -23,6 +23,12 @@
             Awaiting Moderation
         {% elseif article.isRejected %}
             Rejected
+        {% elseif article.isAwaitingPublication %}
+            Awaiting Publication
+        {% elseif article.isPublished %}
+            Published
+        {% elseif article.isExpired %}
+            Archived
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
@@ -36,6 +42,12 @@
             submitted
         {% elseif article.isRejected %}
             submitted-late
+        {% elseif article.isAwaitingPublication %}
+            reviewed
+        {% elseif article.isPublished %}
+            reviewed
+        {% elseif article.isExpired %}
+            unsubmitted
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
