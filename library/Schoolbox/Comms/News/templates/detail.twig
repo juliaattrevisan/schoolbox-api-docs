@@ -9,6 +9,7 @@ Data:
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@commsNews/layout.twig' as layout %}
+{% import '@commsNews/indicator.twig' as indicator %}
 
 {% set isAuthor = USER.id == article.author.id %}
 {% if article.isPublished or article.isExpired %}
@@ -26,7 +27,7 @@ Data:
 <div class="actions-small-2 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>{{ article.title }}</h1>
+            <h1>{{ article.title }} {{ indicator.render(article) }}</h1>
 
             <ul class="meta">
 
