@@ -4,10 +4,14 @@
 
 {# @param article: News\Model #}
 {% macro render(article) %}
+    {% spaceless %}
     {% import _self as self %}
     {% set label    = self.label(article) %}
     {% set cssClass = self.cssClass(article) %}
-    <span id="status-new" class="label highlight" {{ cssClass }}>{{ label }}</span>
+    {% if label %}
+    <span id="status-new" class="label highlight {{ cssClass }}">{{ label }}</span>
+    {% endif %}
+    {% endspaceless %}
 {% endmacro %}
 
 {# @param article: News\Model #}

@@ -11,6 +11,12 @@ Data:
 {% import '@commsNews/layout.twig' as layout %}
 {% import '@commsNews/indicator.twig' as indicator %}
 
+{# Modify article #}
+{% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {article: article, articleId: article.id}) %}
+
+{# Delete article #}
+{% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {article: article, articleId: article.id}) %}
+
 {% set isAuthor = USER.id == article.author.id %}
 {% if article.isPublished or article.isExpired %}
     {% set rejectVerb = 'Unpublish' %}
@@ -27,7 +33,7 @@ Data:
 <div class="actions-small-2 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>{{ article.title }} {{ indicator.render(article) }}</h1>
+            <h1>{{ article.title }} {% if modifyRoute %}{{ indicator.render(article) }}{% endif %}</h1>
 
             <ul class="meta">
 
@@ -55,13 +61,6 @@ Data:
             </ul>
         </div>
     </div>
-
-
-    {# Modify article #}
-    {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {article: article, articleId: article.id}) %}
-
-    {# Delete article #}
-    {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {article: article, articleId: article.id}) %}
 
     {% if deleteRoute %}
         <script>
