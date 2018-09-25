@@ -244,7 +244,7 @@ Data:
             {% endif %}
 
             {# Reject this news article #}
-            {% if article.canBeRejected and rejectRoute %}
+            {% if article.canBeRejected and rejectRoute and not article.isApproved %}
                 <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
             {% endif %}
 
