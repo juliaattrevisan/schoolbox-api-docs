@@ -4,7 +4,6 @@
     article           News\Article\Model
     featureImageZone  array
     audienceSegments  null|array,
-    isCommsOfficer    null|bool (null on create version)
 #}
 
 {% import '@commsNews/indicator.twig' as indicator %}
@@ -67,14 +66,16 @@
                             <li v-for="audienceBrick in audienceBricks">
                                 <div class="actions-small-1">
                                     <div class="card small-12">
-                                        <h4 :title="audienceBrick.nameLabel">${ audienceBrick.nameLabel }</h4>
+                                        <h4 :title="audienceBrick.nameLabel">
+                                            ${ audienceBrick.nameLabel }
+                                        </h4>
                                         <p class="meta">
-                                            <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.typeLabel }</a>
-                                            <slot v-if="audienceBrick.isSimple()">${ audienceBrick.typeLabel }</slot>
+                                            ${ audienceBrick.typeLabel }
+                                            <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">(view details)</a>
                                         </p>
                                         <p class="meta" :title="audienceBrick.modifier">
                                             <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.modifierLabel }</a>
-                                            <slot v-if="audienceBrick.isSimple()">${ audienceBrick.modifierLabel }</slot>
+                                            <template v-if="audienceBrick.isSimple()">${ audienceBrick.modifierLabel }</template>
                                         </p>
                                     </div>
                                     <nav>
@@ -91,19 +92,17 @@
                     </div>
 
                     {# audience browser modal #}
-                    <div data-reveal id="audience-browse" class="reveal-modal">
-                        <div class="audience-browse-head">
-                            <h2>Browse Audience</h2>
-                            <small class="advanced-toggle">
-                                <a href="#" :class="{ active: pageShow.index || pageShow.valueSelect }" @click.prevent="showPage('index')">Simple</a>
-                                |
-                                <a href="#" :class="{ active: pageShow.intersect }" @click.prevent="advancedToggle()">Advanced</a>
-                            </small>
-                        </div>
+                    <div data-reveal id="audience-browse" class="reveal-modal no-pad">
+
+                        <dl class="tabs text-center" role="tablist">
+                            <dd :class="{ active: pageShow.index || pageShow.valueSelect }" role="presentation"><a @click="showPage('index')">Select Simple Audience</a></dd>
+                            <dd :class="{ active: pageShow.intersect }" role="presentation"><a @click="advancedToggle()">Create Complex Audience</a></dd>
+                        </dl>
+
                         <a class="close-reveal-modal" aria-label="Close">×</a>
 
-                        <div v-show="pageShow.index">
-                            <div class="small-12 medium-4 columns" v-for="audienceOption in audienceOptions.base" v-if="audienceOption.displayInModal">
+                        <div v-show="pageShow.index" class="reveal-modal-tab-content">
+                            <div class="small-12 medium-4 columns left" v-for="audienceOption in audienceOptions.base" v-if="audienceOption.displayInModal">
                                 <button class="button-block" @click="changePage(audienceOption)">
                                     <i :class="'icon-' + audienceOption.icon"></i>
                                     ${ audienceOption.namePlural }
@@ -111,87 +110,97 @@
                             </div>
                         </div>
 
-                        <div v-show="pageShow.valueSelect">
-                            <ul class="breadcrumb" v-show="writeOnly">
-                                <li><a href="#" @click.prevent="showPage('index')">Audience Types</a></li>
-                                <li class="active"><a>${ selectedAudienceOption.namePlural }</a></li>
-                            </ul>
+                        <div v-show="pageShow.valueSelect" class="reveal-modal-tab-content">
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <ul class="breadcrumb" v-show="writeOnly">
+                                        <li><a href="#" @click.prevent="showPage('index')">Audience Types</a></li>
+                                        <li class="active"><a>${ selectedAudienceOption.namePlural }</a></li>
+                                    </ul>
 
-                            <p class="meta">Select ${ selectedAudienceOption.namePlural } below, then choose whether you would like to include the users themselves, the parents of the users, the teachers of the users, or a combination.</p>
+                                    <p class="meta">Select ${ selectedAudienceOption.namePlural } below, then choose whether you would like to include the users themselves, the parents of the users, the teachers of the users, or a combination.</p>
 
-                            <div class="empty-state" v-show="showEmptyState">
-                                <p>No ${ selectedAudienceOption.namePlural } found.</p>
+                                    <div class="empty-state" v-show="showEmptyState">
+                                        <p>No ${ selectedAudienceOption.namePlural } found.</p>
+                                    </div>
+
+                                    <fieldset class="checklist checklist-container" v-show="!showEmptyState">
+                                        <div class="loader" v-show="showLoader"></div>
+                                        <template v-for="(audienceListItem, index) in audienceListItems">
+                                            <input type="checkbox" :id="'audience-list-input-' + index" :value="index" v-model="audienceListChecked" />
+                                            <label :for="'audience-list-input-' + index">${ audienceListItem }</label>
+                                        </template>
+                                    </fieldset>
+
+                                    <fieldset class="checklist border-none" v-show="showModifierCheckboxes">
+                                        <template v-if="showModifierSelfCheckbox">
+                                            <input type="checkbox" id="audience-select-users" v-model="includeUsers" />
+                                            <label for="audience-select-users">${ selectedAudienceOption.selfModifier }</label>
+                                        </template>
+                                        <template v-if="showModifierParentsCheckbox">
+                                            <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
+                                            <label for="audience-select-parents">Parents of students</label>
+                                        </template>
+                                        <template v-if="showModifierTeachersCheckbox">
+                                            <input type="checkbox" id="audience-select-teachers" v-model="includeTeachers" />
+                                            <label for="audience-select-teachers">Teachers of students</label>
+                                        </template>
+                                    </fieldset>
+
+                                    <button class="button submit" @click.prevent="addAudienceSimple" :disabled="!submitEnable">Add</button>
+                                </div>
                             </div>
-
-                            <fieldset class="checklist checklist-container" v-show="!showEmptyState">
-                                <div class="loader" v-show="showLoader"></div>
-                                <template v-for="(audienceListItem, index) in audienceListItems">
-                                    <input type="checkbox" :id="'audience-list-input-' + index" :value="index" v-model="audienceListChecked" />
-                                    <label :for="'audience-list-input-' + index">${ audienceListItem }</label>
-                                </template>
-                            </fieldset>
-
-                            <fieldset class="checklist border-none" v-show="showModifierCheckboxes">
-                                <template v-if="showModifierSelfCheckbox">
-                                    <input type="checkbox" id="audience-select-users" v-model="includeUsers" />
-                                    <label for="audience-select-users">${ selectedAudienceOption.selfModifier }</label>
-                                </template>
-                                <template v-if="showModifierParentsCheckbox">
-                                    <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
-                                    <label for="audience-select-parents">Parents of students</label>
-                                </template>
-                                <template v-if="showModifierTeachersCheckbox">
-                                    <input type="checkbox" id="audience-select-teachers" v-model="includeTeachers" />
-                                    <label for="audience-select-teachers">Teachers of students</label>
-                                </template>
-                            </fieldset>
-
-                            <button class="button submit" @click.prevent="addAudienceSimple" :disabled="!submitEnable">Add</button>
                         </div>
 
-                        <div v-show="pageShow.intersect">
-                            <p class="meta">Use the two columns below to create an intersection audience segment. E.g. Parents in the Senior Campus</p>
-                            <div class="small-12 columns">
-                                <div class="alert-box alert" v-if="isTooManyAdvancedSelections">
-                                    Too many selections. Please deselect some options.
+                        <div v-show="pageShow.intersect" class="reveal-modal-tab-content">
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <p class="meta">Choose audience types and select the appropriate tickboxes to create a complex audience. E.g. Parents and Students only in the Senior Campus.</p>
+                                    <div class="alert-box alert" v-if="isTooManyAdvancedSelections">
+                                        Too many selections. Please deselect some options.
+                                    </div>
                                 </div>
                             </div>
-                            <template v-for="(item, index) in intersect">
-                                <div class="small-12 medium-6 columns checklist">
-                                    <legend>
-                                        <select @change="updateIntersectList(index)" v-model="intersect[index]">
-                                            <option :value="audienceOption" v-for="audienceOption in audienceOptions.intersect[index]" v-if="audienceOption.displayInModal">
-                                                ${ audienceOption.label }
-                                            </option>
-                                        </select>
-                                    </legend>
-                                    <input type="checkbox" :id="index + '-all'" v-model="selectAll[index]" @change="toggleSelectAll(index)">
-                                    <label :for="index + '-all'" class="checkbox-label">Select all</label>
-                                    <slot v-for="(item, index2) in audienceListItemsIntersect[index]">
-                                        <input type="checkbox" :id="index + '-' + index2" :value="index2" v-model="intersectList[index]">
-                                        <label :for="index + '-' + index2" class="checkbox-label">${ item }</label>
-                                    </slot>
+
+                            <div class="row">
+                                <template v-for="(item, key, index) in intersect">
+                                    <div class="small-12 medium-6 columns checklist">
+                                        <legend>
+                                            <label for="">Audience Type ${ index + 1 }:</label>
+                                            <select @change="updateIntersectList(key)" v-model="intersect[key]">
+                                                <option :value="audienceOption" v-for="audienceOption in audienceOptions.intersect[key]" v-if="audienceOption.displayInModal">
+                                                    ${ audienceOption.label }
+                                                </option>
+                                            </select>
+                                        </legend>
+                                        <slot v-for="(item, key2) in audienceListItemsIntersect[key]">
+                                            <input type="checkbox" :id="key + '-' + key2" :value="key2" v-model="intersectList[key]">
+                                            <label :for="key + '-' + key2" class="checkbox-label">${ item }</label>
+                                        </slot>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <button class="button submit" @click.prevent="addAudienceIntersect" :disabled="!submitEnableAdvanced">Add</button>
                                 </div>
-                            </template>
-                            <button class="button submit" @click.prevent="addAudienceIntersect" :disabled="!submitEnableAdvanced">Add</button>
+                            </div>
                         </div>
 
                     </div>
 
                     {# composite info modal #}
                     <div data-reveal id="audience-composite" class="reveal-modal">
-                        <h2>Combination Details</h2>
+                        <h2>Complex Audience</h2>
                         <a class="close-reveal-modal" aria-label="Close">×</a>
-                        <template v-for="dimensionData in selectedCompositeBrick.modalData">
-                            <div class="small-12 medium-6 columns">
-                                <h3>${ dimensionData.typeLabel }</h3>
-                                <ul>
-                                    <li v-for="label in dimensionData.valueLabels">
-                                        ${ label }
-                                    </li>
-                                </ul>
-                            </div>
-                        </template>
+
+                        <p class="meta" v-if="selectedCompositeBrick.modalData">This audience segment includes users who are in both one or more of the selected ${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() } and one or more of the selected ${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }.</p>
+
+                        <div class="audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
+                            <div><b>${ dimensionData.typeLabel.plural }:</b></div>
+                            <div><template v-for="(label, index) in dimensionData.valueLabels">${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template></template></div>
+                        </div>
                     </div>
                 </fieldset>
 
@@ -246,14 +255,12 @@
 </div>
 
 {# le scripts #}
-<script src="/javascript/shared/comms/unit-tests.js"></script> {# TODO TEMP TESTING. REMOVE #}
 <script src="/javascript/ckeditor/ckeditor.js"></script>
 <script src="/javascript/shared/editor/jquery.editor.js"></script>
 <script src="/javascript/shared/comms/draft.js"></script>
 <script src="/javascript/shared/comms/audience-bricks.js"></script>
 <script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 <script>
     'use strict';
@@ -335,15 +342,22 @@
         school_house:   new AudienceOption('school_house', 'House', 'Houses', 'home', 'House members', {{ isStaff }}, false),
         year:           new AudienceOption('year', 'Year Level', 'Year Levels', 'teacher', 'Users in year level/s', {{ isStaff }}, false),
         folder:         new AudienceOption('folder', 'Class/Group', 'Classes & Groups', 'group', 'Class/group members', true, true),
-        pastoral_group: new AudienceOption('pastoral_group', 'Pastoral Group', 'Pastoral Groups', 'pastoral', 'Group members', {{ isStaff }}, true),
         user:           new AudienceOption('user', 'User', 'Users', 'user', 'Users', false, false)
     };
 
     // Bricks need to render various human-friendly labels, so inject the entityType labels
     // into the BrickManager so it can supply it to Bricks that it creates.
-    var entityTypeLabelMap = {composite: 'Composite'};
-    for(var entityType in audienceOptions){
-        entityTypeLabelMap[entityType] = audienceOptions[entityType].label;
+    var entityTypeLabelMap = {
+        composite: { // -_-
+            singular: 'Complex Audience',
+            plural: 'Complex Audience'
+        }
+    };
+    for (var entityType in audienceOptions) {
+        entityTypeLabelMap[entityType] = {
+            singular: audienceOptions[entityType].label,
+            plural: audienceOptions[entityType].namePlural
+        };
     }
 
     var modifierLabelMap = {
@@ -521,11 +535,6 @@
             // Just a marker to check if advanced has been clicked for (need to load defaults on first click)
             hasLoadedAdvanced: false,
 
-            // Model for the intersector select alls
-            selectAll: {
-                'primary': false,
-                'secondary': false
-            },
             // the composite brick currently selected for display in the composite details modal
             selectedCompositeBrick: {}
         },
@@ -754,8 +763,6 @@
                 $('#audience-browse').foundation('reveal', 'close');
                 self.intersectList.primary = [];
                 self.intersectList.secondary = [];
-                self.selectAll.primary = false;
-                self.selectAll.secondary = false;
 
                 audienceSelectize.refreshItems();
             },
@@ -821,9 +828,6 @@
                 var self = this;
                 var audienceOption = self.intersect[list];
 
-                // Reset select all
-                self.selectAll[list] = false;
-
                 // Reset checked item model
                 self.intersectList[list] = [];
 
@@ -832,8 +836,8 @@
 
                 // Remove this option from the other dropdown if it is not a 1:N relationship
                 self.audienceOptions.intersect[otherList] = Object.assign({}, audienceOptions);
-                if(!audienceOption.isMulti){
-                    console.log('deleting from other list: ' + otherList + ' ' + audienceOption.entityType);
+                if (!audienceOption.isMulti) {
+                    //console.log('deleting from other list: ' + otherList + ' ' + audienceOption.entityType);
                     Vue.delete(self.audienceOptions.intersect[otherList], audienceOption.entityType);
                 }
 
@@ -847,26 +851,6 @@
                     };
 
                     this.loadAudienceOptions(audienceOption, callback);
-                }
-            },
-
-            /**
-             * Select all
-             * @param list 'primary' or 'secondary'
-             */
-            toggleSelectAll: function(list) {
-                var self = this;
-                self.intersectList[list] = [];
-
-                // Get ready for something wild...
-                if (self.selectAll[list]) {
-                    // Loop the possible options and add them to the list of checked options (intersectList)
-                    var valueLabels = this.intersect[list].valueLabels;
-                    for (var encodedValue in valueLabels) {
-                        if(valueLabels.hasOwnProperty(encodedValue)) {
-                            self.intersectList[list].push(encodedValue);
-                        }
-                    }
                 }
             },
 
@@ -921,22 +905,3 @@
         }
     });
 </script>
-
-<style>
-    .active {
-        font-weight: bold;
-    }
-
-    .audience-browse-head {
-        position: relative;
-    }
-
-    .audience-browse-head h2 {
-        display: inline-block;
-    }
-
-    .advanced-toggle {
-        position: absolute;
-        right: 0;
-    }
-</style>
