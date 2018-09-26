@@ -81,9 +81,9 @@
 
 {# Show totals in self-assessment #}
 {% block rubricGrid %}
-    {% set showDescriptorValue = false %}
+    {% set showDescriptorValue = true %}
     {% set showRubricTotal = true %}
-    {% set showGroupTotal = false %}
+    {% set showGroupTotal = assessment.markPerCapability %}
     {% set self = 'selfAssessment' %}
 
     {% if assessment.useRubric %}
