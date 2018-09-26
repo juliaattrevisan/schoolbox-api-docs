@@ -553,7 +553,48 @@ class Controller extends Base
         $this->response->content->set($output);
     }
 
+    /**
+     * Get a list of articles that are audienced to me for homepage component
+     *
+     * @api GET /comms/news/lists/homepage
+     *
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getListForHomepage() :void
+    {
+        $params = new Querystring($this->getRequest()->query);
+        $topics = $this->topicMapper->findAll();
 
+        $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+
+        $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), null, null);
+
+        if (!$this->isXhrRequest()) {
+            // if it's NOT XHR, go for API version
+            $this->response->content->set($this->buildJsonOutput([
+                'articles' => $partialData['articles']
+            ]));
+
+            return;
+        }
+
+        // Pass the readonly parameters into the template as well
+        $access = Access::getInstance();
+        $partialData['readonly'] = $access->getFolderAccess($this->getUser(), $params->getFolderId()) < UserAccess::ACCESS_WRITE;
+
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'success' => true,
+            'title' => $this->getDi()->get('l10n')->translate('news', false, true),
+            'url' => $partialData['currentUrl'],
+            'fragment' => $content,
+            'slug' => $params->getSlug()
+        ]));
+    }
+    
     /**
      * Delete an article
      *
