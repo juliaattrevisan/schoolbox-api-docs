@@ -26,7 +26,7 @@
 
     $(function() {
         $('#news-container-{{ componentInstanceId }}').articleTabs({
-            'selectedUrl': "{{ routeLookup('commsNews.getListForHomepage') }}?{{ querystringParams|raw }}",
+            'selectedUrl': "{{ routeLookup('commsNews.getListForHomepage') }}{{ folderId }}?{{ querystringParams|raw }}",
             'topicTabs': $("#news-topics-{{ componentInstanceId }}"),
             onChange: function() {
                 // Hide the component action bar
