@@ -243,17 +243,18 @@ class UserResolver implements IUserResolver
                 $codes = $this->db->executeQuery(
                     "SELECT code FROM folder_code fc JOIN folder f ON fc.folder_id=f.id AND fc.deleted_at IS NULL AND f.deleted_at IS NULL WHERE f.id= :folder_id",
                     ['folder_id' => $entityValue])->fetchAll(PDO::FETCH_COLUMN);
-                $externalIds = [];
-                foreach ($this->externalClass->getStudents(implode(',', $codes)) as $student) {
-                    $externalIds[] = $student['synergy_id'];
+                if (\count($codes)) {
+                    $externalIds = [];
+                    foreach ($this->externalClass->getStudents(implode(',', $codes)) as $student) {
+                        $externalIds[] = $student['synergy_id'];
+                    }
+                    foreach ($this->externalClass->getTeacherName(implode(',', $codes)) as $teacherExternalId) {
+                        $externalIds[] = $teacherExternalId;
+                    }
+                    if (\count($externalIds)) {
+                        $outerPb->in('u.synergy_id', $externalIds);
+                    }
                 }
-                foreach ($this->externalClass->getTeacherName(implode(',', $codes)) as $teacherExternalId) {
-                    $externalIds[] = $teacherExternalId;
-                }
-                if (\count($externalIds)) {
-                    $outerPb->in('u.synergy_id', $externalIds);
-                }
-
                 $whereClause = \implode(' OR ', $outerPb->getWhere());
                 $sql         = "SELECT u.id FROM user u JOIN userAccess ua on u.id = ua.uid WHERE {$whereClause}  AND u.deleted_at IS NULL";
                 return $this->db->executeQuery($sql, $outerPb->getParams())->fetchAll(PDO::FETCH_COLUMN);

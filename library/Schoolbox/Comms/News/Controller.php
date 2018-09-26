@@ -200,7 +200,7 @@ class Controller extends Base
             'action'           => 'Create',
             'article'          => $article,
             'featureImageZone' => $zone->getTwigContext(),
-            'isAutoSavable'          => ($article->isDraft() || $article->isAwaitingModeration()),
+            'isAutoSavable'    => !$article->isApproved(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -299,7 +299,7 @@ class Controller extends Base
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
             'audienceSegments'       => $audienceSegments,
-            'isAutoSavable'          => ($article->isDraft() || $article->isAwaitingModeration()),
+            'isAutoSavable'          => !$article->isApproved(),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
