@@ -64,15 +64,15 @@ class UserResolver implements IUserResolver
             ->fetchAll(PDO::FETCH_COLUMN);
         $moderators = array_unique(array_merge($superuserIds, $this->findCommsOfficerIds()));
 
-        $segments = $this->audienceMapper->findByColumn(AudienceMapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
+        $rootSegments = $this->audienceMapper->findByColumn(AudienceMapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
 
-        if ($segments->count() !== 1) {
+        if ($rootSegments->count() !== 1) {
             // non-trivial case, more than one segment
             return $moderators;
         }
 
         /** @var Audience $segment */
-        $segment = $segments->first();
+        $segment = $rootSegments->first();
 
         if ($segment->getEntityType() !== Strategy\Folder::ENTITY_TYPE || $segment->getRelationship() !== Audience::RELATIONSHIP_SELF) {
             // not a trivial folder segment; bounce this
