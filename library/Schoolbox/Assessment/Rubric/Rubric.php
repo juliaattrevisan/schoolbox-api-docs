@@ -42,7 +42,7 @@ class Rubric implements Twiggable
     public function __construct($id = null, $multiSelect = false)
     {
         trigger_error(
-            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid} instead',
+            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}" instead',
             E_USER_DEPRECATED
         );
         $this->criteriaGroups = new CalculableAggregator();

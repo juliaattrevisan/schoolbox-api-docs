@@ -20,7 +20,7 @@ use Schoolbox\GenericCollection;
 /**
  * Object representation of a rubric group.
  *
- * @deprecated use `\Schoolbox\Assessment\Rubric\RowSet\Group` or `\Schoolbox\Assessment\Rubric\Grid\GroupUsage`
+ * @deprecated use `\Schoolbox\Assessment\Rubric\RowSet\Capability` or `\Schoolbox\Assessment\Rubric\Grid\CapabilityUsage`
  */
 class Group implements Twiggable, Calculable
 {
@@ -65,6 +65,10 @@ class Group implements Twiggable, Calculable
      */
     public function __construct($id = null, $name = '', $maxValue = null, $selectedValue = null, $readOnly = false)
     {
+        trigger_error(
+            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}" instead',
+            E_USER_DEPRECATED
+        );
         $this->setName($name);
         $this->setId($id);
         $this->setReadOnly($readOnly);

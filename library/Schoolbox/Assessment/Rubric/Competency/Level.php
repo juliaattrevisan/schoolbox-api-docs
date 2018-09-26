@@ -12,6 +12,11 @@ namespace Schoolbox\Assessment\Rubric\Competency;
 
 use Schoolbox\Assessment\Rubric\DescriptorList;
 
+/**
+ * Class Level
+ *
+ * @deprecated use `\Schoolbox\Assessment\Rubric\Grid\Level` instead
+ */
 class Level extends DescriptorList
 {
 
