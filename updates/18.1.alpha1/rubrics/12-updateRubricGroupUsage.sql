@@ -24,9 +24,11 @@ FROM (
         INNER JOIN rubric_group           rg ON rc.rubric_group_id=rg.id
         INNER JOIN rubric_criterion_usage ru ON rc.id=ru.criterion_id
         INNER JOIN rubric_descriptor      rd ON rc.id=rd.criterion_id
+        INNER JOIN rubric_level           rl ON rd.level_id=rl.id AND ru.submission_box_id=rl.box_id
     WHERE
         rc.deleted_at IS NULL
         AND rg.deleted_at IS NULL
+        AND rd.deleted_at IS NULL
         AND rd.value IS NOT NULL
     GROUP BY
         rc.id,
