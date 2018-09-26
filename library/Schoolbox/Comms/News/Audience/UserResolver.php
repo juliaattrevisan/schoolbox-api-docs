@@ -72,9 +72,9 @@ class UserResolver implements IUserResolver
     public function findUsersForArticle(\Schoolbox\Comms\News\Model $article): array
     {
         $userIds = [];
-        $segments = $this->audienceMapper->findByColumn(Mapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
+        $rootSegments = $this->audienceMapper->findByColumn(Mapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
 
-        foreach ($segments as $rootAudienceSegment) {
+        foreach ($rootSegments as $rootAudienceSegment) {
             // Root level segments are always a UNION
             /** @noinspection SlowArrayOperationsInLoopInspection */
             $userIds = \array_merge($userIds, $this->findUsersForAudienceSegment($rootAudienceSegment));
