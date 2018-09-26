@@ -197,12 +197,32 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setMimeFilter('image/*');
 
+        /**
+         * Prefill audience
+         */
+        $audienceSegments = [];
+        $groupId = $this->getRequest()->query->get('groupId');
+        $entityType = $this->getRequest()->query->get('type');
+
+        if ($groupId && $entityType && $entityType === 'folder') {
+            $codec = new Audience\Segment\Codec($this->audienceMapper);
+            $label = $this->folderMapper->findCheaplyById($groupId)->getNameWithCodes();
+
+            $audienceSegments = new Audience\SegmentSelectizeOption(
+                $codec->encodeSimpleAttributes($entityType, $groupId, 'self'),
+                $label
+            );
+
+            $audienceSegments->addLabel($entityType, $codec->encodeValue($groupId), $label);
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'policies'         => $policies,
             'action'           => 'Create',
             'article'          => $article,
             'featureImageZone' => $zone->getTwigContext(),
             'isAutoSavable'    => !$article->isApproved(),
+            'audienceSegments' => $audienceSegments,
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -583,6 +603,7 @@ class Controller extends Base
         // Pass the readonly parameters into the template as well
         $access = Access::getInstance();
         $partialData['readonly'] = $access->getFolderAccess($this->getUser(), $params->getFolderId()) < UserAccess::ACCESS_WRITE;
+        $partialData['folderId'] = $params->getFolderId();
 
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
 
