@@ -1,47 +1,10 @@
+{% import '@commsNews/macro/newsBlurb.twig' as macro %}
+
 {##
  # Saved items
  #
  # A list of articles that you've saved for later
  #}
-
-{% import _self as macro %}
-
-{##
- # Pacify $text by removing everything except <p> tags
- # Cut to the maximum length specified
- # Provide a "Read More" link if specified
- #
- # @param News\Model article
- # @param string readMore
- #}
-{% macro pacify(article, readMore) %}
-    {% spaceless %}
-        {% set pacified = article.blurb|striptags %}
-
-        {# If the blurb was nonexistent, assume some body content instead #}
-        {% if pacified|length == 0 %}
-            {% set pacified = article.body|striptags %}
-        {% endif %}
-
-        {# Maximum length chars #}
-        {% set max = 300 %}
-
-        {# Split on the nearest word #}
-        {% if pacified|length > max %}
-            {% set detailUrl = routeLookup('commsNews.getDetail', {articleId: article.id}) %}
-            {% set pacified = pacified|slice(0, max+1)|split(' ')|slice(0, -1)|join(' ') ~ '...'%}
-
-            {# If read_more policy has a value, append a "Read More" style link
-             # Otherwise, don't do anything except the appended  ellipsis
-             #}
-            {% if readMore|length %}
-                {% set pacified = pacified ~ '<a href="' ~ detailUrl ~ '" title="Read more">' ~ readMore ~ '</a>' %}
-            {% endif %}
-        {% endif %}
-
-        {{ pacified|trim|purify }}
-    {% endspaceless %}
-{% endmacro %}
 
 {% extends '@commsNews/page-layout.twig' %}
 
@@ -91,10 +54,10 @@
                             <a class="icon-favourite" href="{{ routeRemove }}" title="Remove this from your saved items" data-remove="{{ article.title }}"></a>
                         </nav>
                         {% endif %}
+
                         {# Hide the article tag when there's no content to show, or when compactMode is on #}
                         {% if not compactMode %}
-                            {% set blurb = macro.pacify(article, readMore) %}
-
+                            {% set blurb = macro.newsBlurb(article, readMore) %}
                             {% if blurb|length %}
                                 <article>{{ blurb }}</article>
                             {% endif %}
