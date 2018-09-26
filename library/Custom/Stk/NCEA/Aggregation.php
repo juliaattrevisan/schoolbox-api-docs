@@ -84,7 +84,7 @@ class Aggregation
         foreach ($allRecords as $current) {
             $subjectKey = $current['subjectSort'];
             $levelKey = "L{$current['nceaLevel']}";
-            $gradeKey = $current['grade'];
+            $gradeKey = str_replace('+','', $current['grade']);
 
             /* Data for Graph: only care about the achievements listed in $this->achievements
              * All others are ignored
@@ -95,7 +95,6 @@ class Aggregation
                 $graph[$gradeKey][$levelKey] += $current['creditsGained'];
                 $seenLevels[$levelKey] = $levelKey;
             }
-
             /* Data for Tables
              */
             if ($current['year'] === $year) {
