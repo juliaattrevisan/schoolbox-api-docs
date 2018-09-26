@@ -7,16 +7,15 @@
  # * selfAssessmentFeedback:  the self-assessed feedback, shouldst there be one
  # * markVisibility:          ? Should be inferred from grid's assessment (assessment.isVisibleTo(USER))
  # * useMarkRange:            ? Should be inferred from grid's assessment (assessment.markRange)
- # * showRubricTotal:         ? Wether to show the totals at the bottom of overall rubric
+ # * showRubricTotal:         ? Whether to show the totals at the bottom of overall rubric
  #                              This is false for student views, but true for staff views
- # * showGroupTotal:          ? Wether to show group totals at the bottom of each capability, can be inferred from
+ # * showGroupTotal:          ? Whether to show group totals at the bottom of each capability, can be inferred from
                                     (assessment.markPerCapability)
- # * showDescriptorValue:     ? Wether points should be shown alongside descriptors, not there is also a config setting
+ # * showDescriptorValue:     ? Whether points should be shown alongside descriptors, note there is also a config setting
                                 that also controls this, false for self-reflections
  #}
 
 {% set markType = rubricGrid.assessment.markScheme.generateContext %}
-{#{% set markSchemeName = rubricGrid.assessment.markScheme.title %}#}
 {% set showSummaryTotal = showRubricTotal and rubricMarkedGrid and markType.mode != "none" %}
 {% set showSummaryCapability = showGroupTotal and rubricGrid.assessment.markPerCapability and markType.mode != "none"  %}
 

@@ -17,7 +17,7 @@
     {% set descriptorHasMarkRange = rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
 
     {# Just show a text value if the descriptor is not selected #}
-    {% if descriptor.hasValue and showDescriptorValue and not hidePoints %}
+    {% if descriptor.hasValue and showDescriptorValue  %}
         <span class="rb-value {% if not descriptorHasMarkRange %}used {% elseif isDescriptorSelected %}hide{% endif %}">
             {% if descriptorHasMarkRange %}
                 {{ descriptor.minValue }}–{{ descriptor.maxValue }}
@@ -35,7 +35,7 @@
     <select id="rangeDropdown-{{ descriptor.id }}"
             name="{{ formField }}[descriptors][{{ descriptor.id }}][value]"
             class="{% if not isDescriptorSelected or not descriptorHasMarkRange %} hide{% endif %}
-            {% if descriptorHasMarkRange and not hidePoints %}used{% endif %}"
+            {% if descriptorHasMarkRange  %}used{% endif %}"
             data-rubric="{{ rubricGrid.id }}"
             data-rubric-group="{{ groupUsage.capability.id }}"
             data-rubric-descriptor="{{ descriptor.id }}"
