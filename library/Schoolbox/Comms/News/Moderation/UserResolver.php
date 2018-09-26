@@ -51,9 +51,9 @@ class UserResolver implements IUserResolver
      *  - if an article is audienced ONLY to a single homepage, with no modifiers, users with WRITE+ access can moderate
      *  - in all other cases, only superusers and comms officers can moderate (since sub-moderators don't yet exist)
      *
-     * @param int $articleId
+     * @param \Schoolbox\Comms\News\Model $article
      * @throws \Schoolbox\Mapper\Exception
-     * @return array
+     * @return int[]
      * @todo Add logic to handle the case when an article has 0 audience segments. See SA-6839
      */
     public function findModeratorsForArticle(\Schoolbox\Comms\News\Model $article): array
