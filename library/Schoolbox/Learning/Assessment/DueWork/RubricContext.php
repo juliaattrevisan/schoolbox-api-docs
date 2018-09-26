@@ -21,6 +21,12 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 
+
+/**
+ * Class RubricContext
+ *
+ * @deprecated use `\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}` classes instead
+ */
 class RubricContext
 {
 
@@ -34,6 +40,10 @@ class RubricContext
      */
     public function __construct(RubricMapper $rubricMapper)
     {
+        trigger_error(
+            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}" instead',
+            E_USER_DEPRECATED
+        );
         $this->rubricMapper = $rubricMapper;
     }
 
