@@ -11,7 +11,7 @@
  #}
 {% set specifications = {
     'global_moderation': {
-        'title': 'Global Moderation',
+        'title': 'Global moderation',
         'subtext': 'Enable to require moderation on every article before they are made publicly available.',
         'active': '<strong>Global moderation is on</strong>. Every article requires moderator approval.',
         'inactive': '<strong>Global moderation is off</strong>. You can freely post articles.',
@@ -21,8 +21,8 @@
         'type': 'switch'
     },
     'news_staff_post': {
-        'title': 'Allow Staff To Post To All Audiences',
-        'subtext': 'Enable staff to audience ' ~ locale.news ~ ' to campus, roles, houses and year levels.',
+        'title': 'Allow staff to post to all audiences',
+        'subtext': 'Allows all staff to audience ' ~ locale.news ~ ' to campuses, roles, houses and year levels.',
         'active': 'Staff may publish ' ~ locale.news ~ ' to all audiences',
         'inactive': 'Staff may publish ' ~ locale.news ~ ' only to groups they have write access to',
         'identifier': 'news_staff_post',
@@ -31,8 +31,8 @@
         'type': 'switch'
     },
     'news_edit_other': {
-        'title': 'Allow Staff to Modify ' ~ locale.news.proper,
-        'subtext': 'Enable staff to modify ' ~ locale.news ~ ' posted by other users if they have write access',
+        'title': 'Allow staff to modify ' ~ locale.news,
+        'subtext': 'Allows staff to modify ' ~ locale.news ~ ' posted by other users if they have write access.',
         'active': 'Staff may modify ' ~ locale.news ~ ' posted by other users to their groups',
         'inactive': 'Staff can only modify ' ~ locale.news ~ ' they posted',
         'identifier': 'news_edit_other',
@@ -41,7 +41,7 @@
         'type': 'switch'
     },
     'publish_date_offset': {
-        'title': 'Publish Date Offset',
+        'title': 'Publish date offset',
         'subtext': locale.news.proper ~ ' will initially have their default publish date set to the current datetime plus this value.',
         'active': locale.news.proper ~ ' are set to <strong>publish using an offset</strong> from time of authorship',
         'inactive': locale.news.proper ~ ' are set to <strong>publish immediately</strong>.',
@@ -50,7 +50,7 @@
         'type': 'input'
     },
     'expiry_date_offset': {
-        'title': 'Expiry Date Offset',
+        'title': 'Expiry date offset',
         'subtext': locale.news.proper ~ ' will initially have their default expiry date set to the current datetime plus this value.',
         'active': locale.news.proper ~ ' are set to <strong>expire using an offset</strong> from time of authorship',
         'inactive': locale.news.proper ~ ' are set to <strong>expire one week from time of authorship</strong>.',
@@ -68,7 +68,7 @@
         'type': 'input'
     },
     'save_for_later': {
-        'title': 'Saving Articles',
+        'title': 'Saving articles',
         'subtext': 'Allow users to add ' ~ locale.news ~ ' articles to their saved items.',
         'active': locale.news.proper ~ ' <strong>can</strong> be Saved For Later.',
         'inactive': locale.news.proper ~ ' <strong>cannot</strong> be Saved For Later.',
