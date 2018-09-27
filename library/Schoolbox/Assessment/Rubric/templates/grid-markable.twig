@@ -112,11 +112,6 @@
                       data-max="{{ rubricMax }}"
                       data-mark-type="{{ markType.mode }}">
 
-                    {#{% if markSchemeName == 'TotalMarkFractional' %}#}
-                       {#{{ rubricScaledMark }} / {{ rubricMax }}#}
-                    {#{% else %}#}
-                       {#{{ rubricHumanReadableMark }}#}
-                    {#{% endif %}#}
                     {{ rubricMarkedGrid.retrieveHumanReadableMark }}
                 </span>
 

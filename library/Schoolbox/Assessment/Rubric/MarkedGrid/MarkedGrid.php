@@ -97,35 +97,29 @@ class MarkedGrid
 
 
     /**
-     * Render the grid's mark in normalized format.
+     * Convert the given mark to a percentage of the total available marks -
+     * this is used by IMarkScheme implementations to generate human readable marks
      *
      * @return float
      */
     public function retrieveNormalizedMark(): float
     {
-        $capabilityValues = [];
-        $totalAvailableMark      = 0;
-        foreach ($this->capabilityMarks as $capabilityMark) {
-            $capabilityNormMark  = $capabilityMark->retrieveNormalizedMark();
-            $capabilityMaxMark   = $capabilityMark->getCapabilityUsage()->getMaxValue();
-            $capabilityValues[]  = [$capabilityNormMark, $capabilityMaxMark,];
-            $totalAvailableMark += $capabilityMaxMark;
-        }
-
-        if ($totalAvailableMark === 0) {
-            return 0;
-        }
-
-        $normalizedMark = 0;
-        foreach ($capabilityValues as [$capabilityNormMark, $capabilityMaxMark]) {
-            if ($capabilityMaxMark === 0) {
-                continue;
-            }
-            $normalizedMark += ($capabilityNormMark * ($capabilityMaxMark / $totalAvailableMark));
-        }
-        return $normalizedMark;
+        return ($this->calculateScaledMark() / $this->calculateTotalAvailableMarks()) * 100;
     }
 
+    /**
+     * Calculate the highest possible marks that can be given for this rubric, based on the capability maxes
+     * which default to the indicator max if mark per cap is off.
+     * @return float
+     */
+    public function calculateTotalAvailableMarks() : float
+    {
+        $totalAvailableMarks = 0;
+        foreach ($this->iterateCapabilityUsages() as $capabilityUsage) {
+            $totalAvailableMarks += $capabilityUsage->getMaxValue();
+        }
+        return $totalAvailableMarks;
+    }
 
     /**
      * Render the grid's mark in human-readable format.

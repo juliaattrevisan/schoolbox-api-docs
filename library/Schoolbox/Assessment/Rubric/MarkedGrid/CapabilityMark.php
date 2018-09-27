@@ -80,9 +80,18 @@ class CapabilityMark
      */
     public function calculateScaledMark(): float
     {
-        return $this->value * $this->capabilityUsage->calculateMarkMultiplier();
-    }
+        // If a capability mark has been provided and is non-zero, use it to scale the given marks
+        if (null !== $this->value & $this->value > 0) {
+            return $this->value * $this->capabilityUsage->calculateMarkMultiplier();
+        }
 
+        // Otherwise, just use the given marks directly
+        $indicatorMarkSum = 0;
+        foreach($this->indicatorMarks as $indicatorMark) {
+            $indicatorMarkSum += $indicatorMark->getValue();
+        }
+        return $indicatorMarkSum;
+    }
 
     /**
      * Render the capability's mark in normalized format.
