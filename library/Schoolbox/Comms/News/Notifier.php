@@ -45,7 +45,7 @@ class Notifier extends AbstractModuleNotifier
     // These patterns need to be consts to ensure consistency between methods (revocation relies on these strings matching)
 
     private const PATTERN_POSTED_TITLE = ':user posted :title';
-    private const PATTERN_POSTED_HREF  = '/comms/news/%d?ref=email';
+    private const PATTERN_POSTED_HREF = '/comms/news/%d?ref=' . Statistics\Mapper::REFERRER_EMAIL;
     private const PATTERN_ARTICLE_HREF  = '/comms/news/%d';
 
     /** @var IUserResolver */
@@ -174,15 +174,16 @@ class Notifier extends AbstractModuleNotifier
          * Draft or no-change
          */
         if ($diff === null ||                                                     // no change at all
-            (\count($diff) === 1 && key_exists('updatedAt', $diff)) ||            // no real changes
+            (\count($diff) === 1 && \array_key_exists('updatedAt', $diff)) ||            // no real changes
             ($article->isDraft() && (!$previous || $previous->isDraft()))) {      // creation or updating of draft
             return;
         }
 
-        // At this point $previous should not be null, if auto save is properly working
-        if (!$previous) {
-            $previous = new Article();
-            $this->log->warning(sprintf('Article: %d has been changed directly to non-draft status.', $article->getId()));
+        // Invalid state transition. Article has been created in a non-draft state
+        if (!$previous && !$article->isDraft()) {
+            // Don't even attempt to process as it will likely cause fatal NPEs
+            $this->log->error(sprintf("Invalid transition. Article: %d has been created in a '%s' state.", $article->getId(), $article->getStatus()));
+            return;
         }
 
         /**
@@ -235,11 +236,11 @@ class Notifier extends AbstractModuleNotifier
                     // past -> future .. retract + re-attach
                     // future -> future .. detach + re-attach
                     // future -> past .. detach + re-attach
-                    if ($previous->getPublishAt()->isPast() && !$publishAt->isPast()) {
-                        $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
-                        $bundle->attach(self::TRIGGER_POSTED, $publishAt->getUnixTimeStamp());
-                    } elseif (!$previous->getPublishAt()->isPast()) {
+                    if ($previous->getPublishAt()->isFuture()) {
                         $bundle->detach(self::TRIGGER_POSTED);
+                        $bundle->attach(self::TRIGGER_POSTED, $publishAt->getUnixTimeStamp());
+                    } elseif ($publishAt->isFuture()) {
+                        $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
                         $bundle->attach(self::TRIGGER_POSTED, $publishAt->getUnixTimeStamp());
                     }
                 }
@@ -433,12 +434,12 @@ class Notifier extends AbstractModuleNotifier
 
         $previous = $this->buildPrevious($article, $diff);
 
-        if ($article->isRejected() && $previous->isPublished()) {
-            $action = 'unpublished';
-        } elseif ($article->isRejected()) {
-            $action = 'rejected';
-        } else {
+        if ($article->isApproved()) {
             $action = 'approved';
+        } elseif ($previous->isPublished()) {
+            $action = 'unpublished';
+        } else {
+            $action = 'rejected';
         }
         $bob->setTitle(':user ' . $action . ' your article, :title')
             ->setNamespace($this->getSlug())
@@ -600,6 +601,10 @@ class Notifier extends AbstractModuleNotifier
             ->build();
 
         foreach ($recipients as $recipient) {
+            // to avoid author getting the notification
+            if ($recipient->getId() === $author->getId()) {
+                continue;
+            }
             $envelope->targetToUser($recipient->getId(), $instance);
         }
 
