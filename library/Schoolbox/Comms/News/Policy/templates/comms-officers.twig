@@ -7,22 +7,7 @@
  #}
 <div class="row">
     <div class="small-12 island">
-
-        {% if USER.isSuperuser %}
-        <div class="actions-small-1 row">
-            <div class="list-item">
-                <div class="small-12 columns">
-                    <h2 class="subheader">News Moderators</h2>
-                </div>
-            </div>
-            <nav>
-                <a href="/adminv2/user" class="icon-add" title="Manage News Moderators"></a>
-            </nav>
-        </div>
-        {% else %}
         <h2 class="subheader">News Moderators</h2>
-        {% endif %}
-
         {% if commsOfficers|length %}
         <section>
             <ul class="grid medium-block-grid-2 large-block-grid-4">
@@ -45,7 +30,7 @@
             <i class="icon-staff-students"></i>
             <p>There are currently no news moderators setup.</p>
             {% if USER.isSuperuser %}
-            <p><a href="/adminv2/user" title="Add Comms Officers">Assign news moderatation service permissions</a> to a user.</p>
+            <p><a href="/adminv2/user" title="Add Comms Officers">Assign news moderatation service permissions</a> to a user via the user modify page.</p>
             {% endif %}
         </div>
         {% endif %}
