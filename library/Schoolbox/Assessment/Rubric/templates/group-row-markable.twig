@@ -9,7 +9,7 @@
 
 {% set markType = rubricGrid.assessment.markScheme.generateContext %}
 
-{% if showGroupTotal and markType.mode != "none" and not hidePoints %}
+{% if showGroupTotal and markType.mode != "none" %}
     {% set percentageMark     = capabilityMaxSum > 0 ? capabilityMark.value * (100 / capabilityMaxSum) : 0 %}
     {% set letterGradeBracket = false %}
     {% set letterGradeValue   = '' %}

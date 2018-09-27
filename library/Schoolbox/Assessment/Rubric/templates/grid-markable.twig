@@ -100,7 +100,7 @@
 
     {% endfor %}
 
-    {% if showRubricTotal and markType.mode != "none" and (config.rubric_show_points or not studentView) %}
+    {% if showRubricTotal and markType.mode != "none"  %}
 
         {% set rubricScaledMark = rubricMarkedGrid.calculateScaledMark %}
         {% set rubricMax        = rubricGrid.calculateMaxValueFromCapabilities %}

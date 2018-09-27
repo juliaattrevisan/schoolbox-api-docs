@@ -95,11 +95,10 @@
 
                 {% for currentFeedback in currentInteraction.allFeedback %}
 
-                    {% set hasCollapser = currentFeedback.allFiles.count or currentFeedback.comment | length > 0 or feedbackRubricContexts[currentFeedback.id].rubric %}
+                    {% set hasCollapser = currentFeedback.allFiles.count or currentFeedback.comment | length > 0 or currentFeedback.rubricMarkedGrid %}
 
                     {# We pass the responseId as well, so that people can download annotated kami docs
                      #}
-                    {# TODO restore only to include, as rubricContext shouldn't be passed in #}
                     {% include '@learningAssessment/dueWork/summary/interaction/feedback.twig' with {
                         currentFeedback: currentFeedback,
                         assessment: currentInteraction.assessable,
@@ -108,10 +107,10 @@
                         participant: participant,
                         hasCollapser: hasCollapser,
                         collapsed: true,
-                        feedbackRubricContexts: feedbackRubricContexts,
                         deleteIcon: true,
-                        showRubricTotal: not currentFeedback.isSelfReflectionOnly,
+                        showRubricTotal: showRubricTotal and not currentFeedback.isSelfReflectionOnly,
                         showGroupTotal: not currentFeedback.isSelfReflectionOnly and assessment.markPerCapability,
+                        showDescriptorValue: showDescriptorValue,
                     }
                     only %}
                 {% endfor %}
