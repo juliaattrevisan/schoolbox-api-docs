@@ -87,7 +87,7 @@ $deletor = new class extends App
             $this->execute();
             $this->database->commit();
         } catch (\Alaress\Database\Exception $e) {
-            $this->log->error($e->getMessage(), [$e]);
+            $this->log->error($e->getMessage(), ['exception' => $e]);
             $this->database->rollBack();
         }
     }
