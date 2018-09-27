@@ -128,9 +128,17 @@ class ConfigMapper extends Mapper implements IConfigLoader
         if (!($this->database instanceof \Database)) {
             $this->database = \Database::getInstance();
         }
+        // TODO this JOIN should not be necessary. lu_config_field and lu_config_type are constant.
         // Perform this common action without the overhead of hydration
-        foreach ($this->database->query("SELECT `name`, `value` FROM `{$this->getTable()}`") as $row) {
-            $this->cache[$row['name']] = $row['value'];
+        foreach ($this->database->query("SELECT c.`name`, c.`value`, lcf.field FROM `{$this->getTable()}` c JOIN lu_config_field lcf ON lcf.id = c.field_id") as $row) {
+            $value = $row['value'];
+            switch ($row['field']) {
+                case 'boolean':
+                case 'checkbox':
+                    $value = (bool)$value;
+                    break;
+            }
+            $this->cache[$row['name']] = $value;
         }
     }
 
