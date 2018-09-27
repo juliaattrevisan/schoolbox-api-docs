@@ -82,6 +82,7 @@ class External_Humanedge_User implements External_UserInterface
                 s.SpecialNeeds AS StudentSpecialNeedsFlag,
                 '' AS StudentStudiesCode,
                 '' AS AlertMessage,
+                '' AS CourtOrderType,
                 0 AS countIndividualEducationPlans
             FROM Student s
             LEFT JOIN StudentContact sc ON s.ID = sc.StudentID AND sc.EmergencyContact = 'Y'

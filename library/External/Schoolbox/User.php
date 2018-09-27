@@ -110,6 +110,7 @@ class External_Schoolbox_User implements External_UserInterface
                           '' AS StudentSpecialNeedsFlag,
                           '' AS StudentStudiesCode,
                           '' AS AlertMessage,
+                          '' AS CourtOrderType,
                           '' AS StudentBoarder,
                           '' AS Comment,
                           '' AS StudentEnrolmentDate,

@@ -210,6 +210,7 @@ class External_Denbigh_User implements External_UserInterface
                             fa.EmergencyEmail1,
                             stu.boardingStatus,
                             0 AS countIndividualEducationPlans,
+                            '' AS CourtOrderType,
                             '' AS StudentEnrolmentDate,
                             '' AS StudentLeavingDate,
                             '' AS StudentIBFlag

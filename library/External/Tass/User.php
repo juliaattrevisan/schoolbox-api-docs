@@ -162,6 +162,7 @@ class External_Tass_User implements External_UserInterface
             '' AS StudentSpecialNeedsFlag,
             '' AS StudentStudiesCode,
             '' AS AlertMessage,
+            '' AS CourtOrderType,
             boarder AS StudentBoarder,
             '' AS Comment,
             '' AS StudentEnrolmentDate,

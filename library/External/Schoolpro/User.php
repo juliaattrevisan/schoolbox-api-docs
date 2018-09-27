@@ -181,6 +181,7 @@ class External_Schoolpro_User implements External_UserInterface
                 'StudentMobilePhone'      => '',
                 'StudentSpecialNeedsFlag' => '',
                 'AlertMessage'            => '',
+                'CourtOrderType'          => '',
                 'Comment'                 => '',
                 'StudentEnrolmentDate'    => '',
                 'StudentLeavingDate'      => '',

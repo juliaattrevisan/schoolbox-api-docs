@@ -316,6 +316,7 @@ class NonFreedom implements IQueryHelper
 
                 -- alerts
                 S.ALERT                                                       AS StudentMedicalAlert,
+                ''                                                            AS CourtOrderType,
                 ''                                                            AS StudentMobilePhone,
                 ''                                                            AS StudentSpecialNeedsFlag,
                 ''                                                            AS StudentStudiesCode,

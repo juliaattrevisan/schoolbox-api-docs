@@ -397,6 +397,7 @@ class External_Doublefirst_User implements External_UserInterface
                 ''                                                  AS StudentSpecialNeedsFlag,
                 ''                                                  AS StudentStudiesCode,
                 UrgentNotes                                         AS AlertMessage,
+                ''                                                  AS CourtOrderType,
                 ''                                                  AS StudentBoarder,
                 ''                                                  AS Comment,
                 ''                                                  AS StudentEnrolmentDate,
