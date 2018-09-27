@@ -108,7 +108,7 @@
                         hasCollapser: hasCollapser,
                         collapsed: true,
                         deleteIcon: true,
-                        showRubricTotal: not currentFeedback.isSelfReflectionOnly,
+                        showRubricTotal: showRubricTotal and not currentFeedback.isSelfReflectionOnly,
                         showGroupTotal: not currentFeedback.isSelfReflectionOnly and assessment.markPerCapability,
                         showDescriptorValue: showDescriptorValue,
                     }
