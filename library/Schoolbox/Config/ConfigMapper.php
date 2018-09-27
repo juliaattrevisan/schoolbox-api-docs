@@ -25,18 +25,18 @@ class ConfigMapper extends Mapper implements IConfigLoader
     // Table definition
     public const TABLE_NAME = 'config';
 
-    public const COL_ID = 'configID';
-    public const COL_NAME = 'name';
-    public const COL_VALUE = 'value';
-    public const COL_TITLE = 'title';
+    public const COL_ID          = 'configID';
+    public const COL_NAME        = 'name';
+    public const COL_VALUE       = 'value';
+    public const COL_TITLE       = 'title';
     public const COL_DESCRIPTION = 'description';
-    public const COL_FIELD = 'field_id';
-    public const COL_OPTIONS = 'options';
-    public const COL_TYPE = 'type_id';
-    public const COL_EDITABLE = 'editable';
-    public const COL_HIDDEN = 'hidden';
-    public const COL_REQUIRED = 'required';
-    public const COL_MODULE = 'module';
+    public const COL_FIELD       = 'field_id';
+    public const COL_OPTIONS     = 'options';
+    public const COL_TYPE        = 'type_id';
+    public const COL_EDITABLE    = 'editable';
+    public const COL_HIDDEN      = 'hidden';
+    public const COL_REQUIRED    = 'required';
+    public const COL_MODULE      = 'module';
 
     // Module column enum
     public const MODULE_SETTINGS = 'settings';
