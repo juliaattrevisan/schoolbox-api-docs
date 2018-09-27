@@ -1,0 +1,175 @@
+{#
+    siteVersion:              string
+    hasTimePicker:            bool        - Does this set of config options include a timepicker?
+    pageCurrent:              string      - The current admin page we are on
+    settingsTabs:             array
+    settingsTabs['label']:    string      - human-friendly label
+    settingsTabs['route']:    string
+    settingsTabs['isActive']: bool
+    isLocalisation:           bool        - Are we rendering the localisation settings?
+    isSkinConfig:             bool        - Are we rendering the skin config settings?
+    settings:                 mixed[][]   -
+    settings.template         string
+    settings.data             mixed[]
+    isEditable                bool        - Is the form editable?
+
+#}
+<link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
+<script type="text/javascript" src="/javascript/components/schoolbox-masonry.min.js?v={{ siteVersion }}"></script>
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        $("[data-colour-picker]").spectrum({
+            allowEmpty: false,
+            showAlpha: true,
+            showInput: true,
+            preferredFormat: 'rgb',
+            clickoutFiresChange: true,
+            showInitial: true,
+            change: function(color) {
+                $(this).val(color.toRgbString());
+            }
+        });
+
+        $.fn.alaressEditor({
+            targetElements: $('#settings').find('[data-html-editor]')
+        });
+
+        /**
+         * Homepage selector
+         */
+        var settings = $('form[data-action="saveSettings"]');
+        settings.on('click', 'a[data-interaction="homepage_selector"]', function(e) {
+            e.preventDefault();
+            var inputName = $(this).data('input_name');
+            $('#resource-browser').socialstreamBrowser({
+                title: 'Choose a folder',
+                mimeFilter: false,
+                categoryId: 0,
+                submitCallback: function(url) {
+                    settings.find('input[name="'+inputName+'"]').val(url);
+                }
+            });
+        });
+        settings.alaressValidate();
+    });
+</script>
+
+
+{% if hasTimePicker %}
+<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#settings input[data-timepicker]').timepicker({
+            timeFormat: "H:i",
+            // It's meant to stop at 23:00 by default but doesn't, and the show2400 option does nothing.
+            maxTime: "2300",
+            step: 60,
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
+        });
+    });
+</script>
+{% endif %}
+
+{# Shared navigation menu #}
+{{ renderAdminNavigation(pageCurrent) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <dl class="sub-nav">
+            {% for tab in settingsTabs %}
+                <dd class="{% if tab.isActive %}active{% endif %}"><a href="{{ tab.route }}">{{ tab.label }}</a></dd>
+            {% endfor %}
+        </dl>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form data-action="saveSettings" id="settings" method="post" action="{{ routeLookup('settings.postSettings') }}">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        {% if isLocalisation %}
+                            <h3>Date Format special characters</h3>
+                            <dl class="clearfix">
+                                <dt>d</dt>
+                                <dd>Day of month, leading zero (01 to 31)</dd>
+                                <dt>j</dt>
+                                <dd>Day of month, no leading zero (1 to 31)</dd>
+                                <dt>S</dt>
+                                <dd>Suffix for day of month ("st" in "1st")</dd>
+                                <dt>D</dt>
+                                <dd>Day name, 3 letters (Mon to Sun)</dd>
+                                <dt>l</dt>
+                                <dd>Day name in full (Monday to Sunday)</dd>
+                                <dt>M</dt>
+                                <dd>Month name, 3 letters (Jan to Dec)</dd>
+                                <dt>F</dt>
+                                <dd>Month name in full (January to December)</dd>
+                                <dt>m</dt>
+                                <dd>Month number, leading zero (01 to 12)</dd>
+                                <dt>n</dt>
+                                <dd>Month number, no leading zero (1 to 12)</dd>
+                                <dt>y</dt>
+                                <dd>Year, 2 digits</dd>
+                                <dt>Y</dt>
+                                <dd>Year, 4 digits</dd>
+                            </dl>
+                            <h3>Time Format special characters</h3>
+                            <dl class="clearfix">
+                                <dt>h</dt>
+                                <dd>12 hour time, leading zero (01 to 12)</dd>
+                                <dt>g</dt>
+                                <dd>12 hour time, no leading zero (1 to 12)</dd>
+                                <dt>a</dt>
+                                <dd>am/pm of time, lower case</dd>
+                                <dt>A</dt>
+                                <dd>AM/PM of time, upper case</dd>
+                                <dt>H</dt>
+                                <dd>24 hour time, leading zero (00 to 23)</dd>
+                                <dt>G</dt>
+                                <dd>24 hour time, no leading zero (0 to 23)</dd>
+                                <dt>i</dt>
+                                <dd>Minutes, leading zero (00 to 59)</dd>
+                                <dt>s</dt>
+                                <dd>Seconds, leading zero (00 to 59)</dd>
+                            </dl>
+                        {% endif %}
+
+                        {% if isSkinConfig %}
+                        <div class="alert-box warning">
+                            Any changes made to the skin configuration will take up to 5 minutes to be applied.
+                            Once we have built your new skin it will be available by pressing Ctrl-F5 in the browser.
+                        </div>
+                        {% endif %}
+
+                        {% for setting in settings %}
+                            {% set data = setting.data %}
+                            <label for="{{ data.name }}">
+                                {{ data.title }}
+                                <span data-tooltip class="has-tip tip-top hint" title="{{ data.description }}">?</span>
+                            </label>
+
+                            {% if not data.editable %}
+                                <p>{{ data.value }}</p>
+                            {% else %}
+                                {% include '@settings/fieldType/' ~ setting.template with data only %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </fieldset>
+            </section>
+
+            {% if isEditable %}
+            <input type="submit" value="Save"/>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div id="resource-browser" class="hide"></div>
