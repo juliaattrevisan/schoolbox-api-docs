@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Config\ConfigMapper;
+
 if (!$_SESSION['user']->isSuperuser()) {
 	error(19);
 }
@@ -42,12 +44,12 @@ if ($this->arg[0]) {
 	$selectedType = 'Site';
 }
 
-$optionList = Cfg::getAllOfType('configID', $selectedType);
+$optionList = ConfigMapper::getInstance()->findByTypeLabel($selectedType);
 
 /**
  * 404 if there's nothing found with the settings page requested
  */
-if (!$optionList) {
+if (!$optionList->count()) {
     $this->pageNotFound();
 }
 
@@ -74,13 +76,13 @@ if (is_array($typeList)) {
 $editable = false;
 $hasTimepicker = false;
 
-if(is_array($optionList)) {
+if(\is_iterable($optionList)) {
     foreach ($optionList as $option) {
         $output = array(
-            'SETTING_TITLE' => Scrub::text($option['title']),
-            'SETTING_DESC'  => Scrub::text($option['description']),
-            'SETTING_NAME'  => Scrub::text($option['name']),
-            'SETTING_VALUE' => Scrub::text($option['value']),
+            'SETTING_TITLE' => Scrub::text($option->getTitle()),
+            'SETTING_DESC'  => Scrub::text($option->getDescription()),
+            'SETTING_NAME'  => Scrub::text($option->getName()),
+            'SETTING_VALUE' => Scrub::text($option->getValue()),
             'setting_type_noneditable_block' => '',
             'setting_type_input_block'       => '',
             'setting_type_password_block'    => '',
@@ -99,10 +101,10 @@ if(is_array($optionList)) {
 
         $this->setVar($output);
 
-        if ($option['hidden'] == 'true') {
+        if ($option->getHidden()) {
             continue;
         }
-        elseif ($option['editable'] == 'false') {
+        if (!$option->getEditable()) {
             $this->parse('setting_type_noneditable_block', 'setting_type_noneditable', true);
         }
         else {
@@ -110,7 +112,7 @@ if(is_array($optionList)) {
             /* Decide whether this option should have
              * javascript validation enforced
              */
-            if ($option['required'] == 'true') {
+            if ($option->getRequired()) {
                 $this->setVar(array(
                     'OPTION_REQUIRED' => 'required'
                 ));
@@ -121,29 +123,29 @@ if(is_array($optionList)) {
                 ));
             }
 
-            switch ($option['field']) {
-                case 'input':
+            switch ($option->getFieldId()) {
+                case ConfigMapper::FIELD_INPUT:
                     $this->parse('setting_type_input_block', 'setting_type_input', true);
                     break;
-                case 'password':
+                case ConfigMapper::FIELD_PASSWORD:
                     $this->parse('setting_type_password_block', 'setting_type_password', true);
                     break;
 
-                case 'textarea' :
+                case ConfigMapper::FIELD_TEXTAREA :
                     $this->parse('setting_type_textarea_block', 'setting_type_textarea', true);
                     break;
 
-                case 'html' :
+                case ConfigMapper::FIELD_HTML :
                     $this->parse('setting_type_html_block', 'setting_type_html', true);
                     break;
 
-                case 'resource':
+                case ConfigMapper::FIELD_RESOURCE:
                     $this->parse('setting_type_resource_block', 'setting_type_resource', true);
                     break;
 
-                case 'checkbox':
-                case 'boolean' :
-                    if ($option['value'] == 1) {
+                case ConfigMapper::FIELD_CHECKBOX:
+                case ConfigMapper::FIELD_BOOLEAN :
+                    if ($option->getValue()) {
                         $checked = 'checked="checked"';
                     }
                     else {
@@ -155,35 +157,33 @@ if(is_array($optionList)) {
 
                     break;
 
-                case 'select':
-                    $optionList = explode(':', $option['options']);
+                case ConfigMapper::FIELD_SELECT:
                     $this->setVar('setting_select_block', '');
-                    foreach ($optionList as $opt) {
+                    foreach (explode(':', $option->getOptions() ?? '') as $opt) {
                         $this->setVar('SELECT_VALUE', $opt);
                         $this->setVar('SELECT_OPTION', $opt);
-                        $this->setVar('SETTING_OPTION_SELECTED', $option['value'] == $opt ? 'selected="selected"' : '');
+                        $this->setVar('SETTING_OPTION_SELECTED', $option->getValue() == $opt ? 'selected="selected"' : '');
                         $this->parse('setting_select_block', 'setting_select', true);
                     }
                     $this->parse('setting_type_input_block', 'setting_type_select', true);
                     break;
 
-                case 'selectKey':
-                    $optionList = explode(':', $option['options']);
+                case ConfigMapper::FIELD_SELECTKEY:
                     $this->setVar('setting_select_block', '');
-                    foreach ($optionList as $opt) {
+                    foreach (explode(':', $option->getOptions() ?? '') as $opt) {
                         list($key, $value) = explode(';', $opt);
                         $this->setVar('SELECT_VALUE', $key);
                         $this->setVar('SELECT_OPTION', $value);
-                        $this->setVar('SETTING_OPTION_SELECTED', $option['value'] == $key ? 'selected="selected"' : '');
+                        $this->setVar('SETTING_OPTION_SELECTED', $option->getValue() == $key ? 'selected="selected"' : '');
                         $this->parse('setting_select_block', 'setting_select', true);
                     }
                     $this->parse('setting_type_input_block', 'setting_type_select', true);
                     break;
 
-                case 'selectLookup':
+                case ConfigMapper::FIELD_SELECTLOOKUP:
                     $this->setVar('setting_select_block', '');
                     // options: expected to contain mapper
-                    $lookupOptions  = unserialize($option['options']);
+                    $lookupOptions  = unserialize($option->getOptions() ?? '');
                     $mapper         = call_user_func(array($lookupOptions['mapper'], 'getInstance'));
                     $getKeyMethod   = $lookupOptions['getKeyMethod']   ?: 'getId';
                     $getValueMethod = $lookupOptions['getValueMethod'] ?: 'getName';
@@ -193,60 +193,56 @@ if(is_array($optionList)) {
                         $value = $opt->$getValueMethod();
                         $this->setVar('SELECT_VALUE', $key);
                         $this->setVar('SELECT_OPTION', $value);
-                        $this->setVar('SETTING_OPTION_SELECTED', $option['value'] == $key ? 'selected="selected"' : '');
+                        $this->setVar('SETTING_OPTION_SELECTED', $option->getValue() == $key ? 'selected="selected"' : '');
                         $this->parse('setting_select_block', 'setting_select', true);
                     }
                     $this->parse('setting_type_input_block', 'setting_type_select', true);
                     break;
 
-                case 'timepicker':
+                case ConfigMapper::FIELD_TIMEPICKER:
                     $hasTimepicker = true;
                     $this->parse('setting_type_timepicker_block', 'setting_type_timepicker');
                     break;
 
-                case 'bytes':
-                    $this->setVar('SETTING_VALUE', Alaress_Byte_Format::bytesToString($option['value']));
+                case ConfigMapper::FIELD_BYTES:
+                    $this->setVar('SETTING_VALUE', Alaress_Byte_Format::bytesToString($option->getValue()));
                     $this->parse('setting_type_input_block', 'setting_type_input', true);
                     break;
 
-                case 'list':
-
-                    break;
-
-                case 'colour':
+                case ConfigMapper::FIELD_COLOUR:
                     $this->parse('setting_type_colour_block', 'setting_type_colour', true);
                     break;
 
-                case 'file':
-                    $mimeFilter = (strpos($option['name'], '_logo') || strpos($option['name'], '_bg')) ? 'image/*' : '*/*';
+                case ConfigMapper::FIELD_FILE:
+                    $mimeFilter = (strpos($option->getName(), '_logo') || strpos($option->getName(), '_bg')) ? 'image/*' : '*/*';
 
-                    $zone = new \Schoolbox\Resource\Attachment\Zone(Scrub::text($option['name']));
+                    $zone = new \Schoolbox\Resource\Attachment\Zone(Scrub::text($option->getName()));
                     $zone->setThumbnailSize(64);
-                    $zone->setAttachPrompt('Attach '. Scrub::text(strtolower($option['title'])));
+                    $zone->setAttachPrompt('Attach '. Scrub::text(strtolower($option->getTitle())));
                     $zone->setAttachmentsLabel('');
-                    $zone->setFileVar(Scrub::text($option['name']));
+                    $zone->setFileVar(Scrub::text($option->getName()));
                     $zone->setMimeFilter($mimeFilter);
-                    $zone->setModalTitle('Select '. Scrub::text(strtolower($option['title'])));
-                    if($option['value']) {
-                        $zone->attachFiles(array($option['value']));
+                    $zone->setModalTitle('Select '. Scrub::text(strtolower($option->getTitle())));
+                    if($option->getValue()) {
+                        $zone->attachFiles(array($option->getValue()));
                     }
                     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
                     $this->parse('setting_type_file_block', 'setting_type_file', true);
                     break;
 
                 case 'fileMulti':
-                    $mimeFilter = (strpos($option['name'], '_logo') || strpos($option['name'], '_bg')) ? 'image/*' : '*/*';
+                    $mimeFilter = (strpos($option->getName(), '_logo') || strpos($option->getName(), '_bg')) ? 'image/*' : '*/*';
 
-                    $zone = new \Schoolbox\Resource\Attachment\Zone(Scrub::text($option['name']));
+                    $zone = new \Schoolbox\Resource\Attachment\Zone(Scrub::text($option->getName()));
                     $zone->setThumbnailSize(64);
-                    $zone->setAttachPrompt('Attach '. Scrub::text(strtolower($option['title'])));
+                    $zone->setAttachPrompt('Attach '. Scrub::text(strtolower($option->getTitle())));
                     $zone->setAttachmentsLabel('');
                     $zone->setMulti(true);
-                    $zone->setFileVar(Scrub::text($option['name'])."[]");
+                    $zone->setFileVar(Scrub::text($option->getName())."[]");
                     $zone->setMimeFilter($mimeFilter);
-                    $zone->setModalTitle('Select '. Scrub::text(strtolower($option['title'])));
+                    $zone->setModalTitle('Select '. Scrub::text(strtolower($option->getTitle())));
 
-                    $paths = explode(",", $option['value']);
+                    $paths = explode(",", $option->getValue());
 
                     if (count($paths)) {
                         if ($zone->attachFiles($paths));

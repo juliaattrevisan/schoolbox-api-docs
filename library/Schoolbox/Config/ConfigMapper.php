@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,9 +8,10 @@
 
 namespace Schoolbox\Config;
 
-
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
+use PDO;
 
 
 /**
@@ -38,9 +38,11 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const COL_REQUIRED = 'required';
     public const COL_MODULE = 'module';
 
+    // Module column enum
     public const MODULE_SETTINGS = 'settings';
     public const MODULE_COMMS    = 'comms';
 
+    // Field enum (kinda)
     public const FIELD_INPUT        =  1;
     public const FIELD_TEXTAREA     =  2;
     public const FIELD_BOOLEAN      =  3;
@@ -57,6 +59,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const FIELD_PASSWORD     = 14;
     public const FIELD_TIMEPICKER   = 15;
 
+    // Type enum
     public const TYPE_SITE          =  1;
     public const TYPE_SECURITY      =  2;
     public const TYPE_PATHS         =  3;
@@ -119,7 +122,6 @@ class ConfigMapper extends Mapper implements IConfigLoader
 
 
     /**
-     * @return void
      * @throws \InvalidArgumentException
      */
     protected function mapping(): void
@@ -175,7 +177,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
         }
 
         // Perform this common action without the overhead of hydration
-        foreach ($this->database->query("SELECT `name`, `value`, field FROM `{$this->getTable()}`") as $row) {
+        foreach ($this->database->query("SELECT `name`, `value`, field_id FROM `{$this->getTable()}`") as $row) {
             $value = $row['value'];
             switch ($row['field']) {
                 case self::FIELD_BOOLEAN:
@@ -197,6 +199,32 @@ class ConfigMapper extends Mapper implements IConfigLoader
     {
         $this->cache = array();
     }
+
+
+    /**
+     * Returns all config items for a specific lu_config_type.type
+     *
+     * @param string $typeLabel
+     * @return GenericCollection|Config[]
+     */
+    public function findByTypeLabel(string $typeLabel): GenericCollection
+    {
+        $stmt = $this->database->prepare("SELECT id FROM lu_config_type WHERE type = :type");
+        $stmt->execute(['type' => $typeLabel]);
+        $results = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        if (!\count($results)) {
+            return $this->createCollection();
+        }
+        $type = (int)$results[0];
+
+        /* filter out references to leave module if not enabled */
+        if (self::TYPE_BOARD === $type && !$this->get(self::_BOARDER_LEAVE_ENABLED)) {
+            return $this->createCollection();
+        }
+
+        return $this->findByColumn('type_id', $type);
+    }
+
 
     /**
      * Override notifications to silence them
