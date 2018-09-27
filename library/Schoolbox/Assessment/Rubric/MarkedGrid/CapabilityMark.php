@@ -80,6 +80,7 @@ class CapabilityMark
      */
     public function calculateScaledMark(): float
     {
+        // TODO this needs to return a descriptor summation if no capability mark exists
         return $this->value * $this->capabilityUsage->calculateMarkMultiplier();
     }
 
