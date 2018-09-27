@@ -34,21 +34,30 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const FIELD_COLOUR       = 11;
     public const FIELD_FILE         = 12;
     public const FIELD_FILEMULTI    = 13;
+    public const FIELD_PASSWORD     = 14;
+    public const FIELD_TIMEPICKER   = 15;
 
-    public const TYPE_SITE         =  1;
-    public const TYPE_SECURITY     =  2;
-    public const TYPE_PATHS        =  3;
-    public const TYPE_RESOURCES    =  4;
-    public const TYPE_POLICY       =  5;
-    public const TYPE_LOCALISATION =  6;
-    public const TYPE_EXTERNAL     =  7;
-    public const TYPE_EMAIL        =  8;
-    public const TYPE_COLOURS      =  9;
-    public const TYPE_3RD          = 10;
-    public const TYPE_MODULES      = 11;
-    public const TYPE_BOARD        = 12;
-    public const TYPE_WELCOME      = 13;
-    public const TYPE_DEBUGGING    = 14;
+    public const TYPE_SITE          =  1;
+    public const TYPE_SECURITY      =  2;
+    public const TYPE_PATHS         =  3;
+    public const TYPE_RESOURCES     =  4;
+    public const TYPE_POLICY        =  5;
+    public const TYPE_LOCALISATION  =  6;
+    public const TYPE_EXTERNAL      =  7;
+    public const TYPE_EMAIL         =  8;
+    public const TYPE_COLOURS       =  9;
+    public const TYPE_3RD           = 10;
+    public const TYPE_MODULES       = 11;
+    public const TYPE_BOARD         = 12;
+    public const TYPE_WELCOME       = 13;
+    public const TYPE_DEBUGGING     = 14;
+    public const TYPE_LMS_POLICY    = 15;
+    public const TYPE_LDAP          = 16;
+    public const TYPE_PROXY         = 17;
+    public const TYPE_SKIN_CONFIG   = 18;
+    public const TYPE_PASTORAL_CARE = 19;
+    public const TYPE_DOC_MANAGE    = 20;
+    public const TYPE_SAML          = 21;
 
     /** @var array */
     protected $cache = array();
