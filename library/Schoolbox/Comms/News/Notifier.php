@@ -191,7 +191,7 @@ class Notifier extends AbstractModuleNotifier
         if ($article->isRejected() && $previous->isRejected()) {
             // likely to be auto-saved
             return;
-        } elseif ($article->isRejected() && ($previous->canBeRejected() || $previous->canBeUnSubmitted())) {
+        } elseif ($article->isRejected() && $previous->canBeRejected()) {
             // just been rejected or unpublished from a valid status
             $bundle->attach(self::TRIGGER_MODERATED, self::IMMEDIATELY);
             $bundle->detach(self::TRIGGER_POSTED);
@@ -212,7 +212,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         /**
-         * Approved (Published / Ready to be published / Expired)
+         * Approved (Awaiting Publication / Published / Expired)
          */
         if ($article->isApproved()) {
 
@@ -231,7 +231,6 @@ class Notifier extends AbstractModuleNotifier
             } else {
                 // publish date changed
                 if (isset($diff['publishAt'])) {
-
                     // past -> past .. noop
                     // past -> future .. retract + re-attach
                     // future -> future .. detach + re-attach
