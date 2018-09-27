@@ -21,6 +21,34 @@ use Schoolbox\Mapper;
  */
 class ConfigMapper extends Mapper implements IConfigLoader
 {
+    public const FIELD_INPUT        =  1;
+    public const FIELD_TEXTAREA     =  2;
+    public const FIELD_BOOLEAN      =  3;
+    public const FIELD_SELECT       =  4;
+    public const FIELD_CHECKBOX     =  5;
+    public const FIELD_BYTES        =  6;
+    public const FIELD_SELECTKEY    =  7;
+    public const FIELD_HTML         =  8;
+    public const FIELD_RESOURCE     =  9;
+    public const FIELD_SELECTLOOKUP = 10;
+    public const FIELD_COLOUR       = 11;
+    public const FIELD_FILE         = 12;
+    public const FIELD_FILEMULTI    = 13;
+
+    public const TYPE_SITE         =  1;
+    public const TYPE_SECURITY     =  2;
+    public const TYPE_PATHS        =  3;
+    public const TYPE_RESOURCES    =  4;
+    public const TYPE_POLICY       =  5;
+    public const TYPE_LOCALISATION =  6;
+    public const TYPE_EXTERNAL     =  7;
+    public const TYPE_EMAIL        =  8;
+    public const TYPE_COLOURS      =  9;
+    public const TYPE_3RD          = 10;
+    public const TYPE_MODULES      = 11;
+    public const TYPE_BOARD        = 12;
+    public const TYPE_WELCOME      = 13;
+    public const TYPE_DEBUGGING    = 14;
 
     /** @var array */
     protected $cache = array();

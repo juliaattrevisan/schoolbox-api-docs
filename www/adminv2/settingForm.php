@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Config\ConfigMapper;
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 
 $page = new SitePage();
@@ -28,10 +30,10 @@ if ($_SESSION['user']->isSuperuser()) {
         $oldValue = $record['value'];
 
         /* handle conversion to bytes */
-        if ($record['field_id'] == Config::FIELD_BYTES) {
+        if ($record['field_id'] == ConfigMapper::FIELD_BYTES) {
             $newValue = Alaress_Byte_Format::stringToBytes($_POST[$currentRow]);
         }
-        else if ($record['field_id'] == Config::FIELD_FILE) {
+        else if ($record['field_id'] == ConfigMapper::FIELD_FILE) {
             $factory = new \Schoolbox\Resource\Attachment\Collector\CollectorFactory();
             try {
                 $result   = $factory->build(array($_POST[$currentRow]))->getFirst();
@@ -43,7 +45,7 @@ if ($_SESSION['user']->isSuperuser()) {
                 $newValue = '';
             }
         }
-        else if ($record['field_id'] == Config::FIELD_FILEMULTI) {
+        else if ($record['field_id'] == ConfigMapper::FIELD_FILEMULTI) {
             $factory = new \Schoolbox\Resource\Attachment\Collector\CollectorFactory();
             try {
                 $newValue = '';

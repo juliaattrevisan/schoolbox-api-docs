@@ -1,40 +1,13 @@
 <?php
 
+use Schoolbox\Config\ConfigMapper;
+
 require_once dirname(__FILE__) . '/../www/conf/conf.php';
 
 /**
  * @deprecated use \Schoolbox\Config\Loader
  */
 class Config extends DeprecatedModel {
-
-    const FIELD_INPUT     = 1;
-    const FIELD_TEXTAREA  = 2;
-    const FIELD_BOOLEAN   = 3;
-    const FIELD_SELECT    = 4;
-    const FIELD_CHECKBOX  = 5;
-    const FIELD_BYTES     = 6;
-    const FIELD_SELECTKEY = 7;
-    const FIELD_HTML      = 8;
-    const FIELD_RESOURCE  = 9;
-    const FIELD_SELECTLOOKUP = 10;
-    const FIELD_COLOUR    = 11;
-    const FIELD_FILE      = 12;
-    const FIELD_FILEMULTI = 13;
-
-    const TYPE_SITE         = 1;
-    const TYPE_SECURITY     = 2;
-    const TYPE_PATHS        = 3;
-    const TYPE_RESOURCES    = 4;
-    const TYPE_POLICY       = 5;
-    const TYPE_LOCALISATION = 6;
-    const TYPE_EXTERNAL     = 7;
-    const TYPE_EMAIL        = 8;
-    const TYPE_COLOURS      = 9;
-    const TYPE_3RD          = 10;
-    const TYPE_MODULES      = 11;
-    const TYPE_BOARD        = 12;
-    const TYPE_WELCOME      = 13;
-    const TYPE_DEBUGGING    = 14;
 
 
         static private $instance = false;
@@ -85,7 +58,7 @@ class Config extends DeprecatedModel {
                 
                 /* filter out references to leave module if not enabled */
                 if (!self::get('boarder_leave_enabled')) {
-                        $query .= "AND `config`.`type_id` != '".self::TYPE_BOARD."'";
+                        $query .= "AND `config`.`type_id` != '".ConfigMapper::TYPE_BOARD."'";
                 }
 
                 $query .= "ORDER BY `config`.`configID` ASC";
@@ -122,7 +95,7 @@ class Config extends DeprecatedModel {
 
             /* filter out references to leave module if not enabled */
             if (!self::get('boarder_leave_enabled')) {
-                $query .= "AND `config`.`type_id` != '{$db->quote(self::TYPE_BOARD)}'";
+                $query .= "AND `config`.`type_id` != '{$db->quote(ConfigMapper::TYPE_BOARD)}'";
             }
 
             if (!empty($orderBy)) {
