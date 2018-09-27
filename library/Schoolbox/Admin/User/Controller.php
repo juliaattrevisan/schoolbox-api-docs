@@ -151,10 +151,10 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_NEWS => [
             'name' => 'News',
-            'identifier' => self::IDENTIFIER_CAMPUS,
+            'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
-                'read' => true,
-                'write' => true,
+                'read' => false,
+                'write' => false,
                 'moderate' => true
             ]
         ],
