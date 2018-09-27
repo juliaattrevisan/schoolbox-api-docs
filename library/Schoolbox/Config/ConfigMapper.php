@@ -21,6 +21,23 @@ use Schoolbox\Mapper;
  */
 class ConfigMapper extends Mapper implements IConfigLoader
 {
+
+    // Table definition
+    public const TABLE_NAME = 'config';
+
+    public const COL_ID = 'configID';
+    public const COL_NAME = 'name';
+    public const COL_VALUE = 'value';
+    public const COL_TITLE = 'title';
+    public const COL_DESCRIPTION = 'description';
+    public const COL_FIELD = 'field_id';
+    public const COL_OPTIONS = 'options';
+    public const COL_TYPE = 'type_id';
+    public const COL_EDITABLE = 'editable';
+    public const COL_HIDDEN = 'hidden';
+    public const COL_REQUIRED = 'required';
+    public const COL_MODULE = 'module';
+
     public const MODULE_SETTINGS = 'settings';
     public const MODULE_COMMS    = 'comms';
 
@@ -107,12 +124,21 @@ class ConfigMapper extends Mapper implements IConfigLoader
      */
     protected function mapping(): void
     {
-        $this->hasTable('config');
+        $this->hasTable(self::TABLE_NAME);
         $this->hasModel(Config::class);
 
-        $this->uses('configID', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
-        $this->uses('name', self::TYPE_STRING);
-        $this->uses('value', self::TYPE_STRING);
+        $this->uses(self::COL_ID, self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->uses(self::COL_NAME, self::TYPE_STRING);
+        $this->uses(self::COL_VALUE, self::TYPE_STRING);
+        $this->uses(self::COL_TITLE, self::TYPE_STRING);
+        $this->uses(self::COL_DESCRIPTION, self::TYPE_STRING);
+        $this->uses(self::COL_FIELD, self::TYPE_INTEGER);
+        $this->uses(self::COL_OPTIONS, self::TYPE_STRING);
+        $this->uses(self::COL_TYPE, self::TYPE_INTEGER);
+        $this->uses(self::COL_EDITABLE, self::TYPE_BOOL_ENUM);
+        $this->uses(self::COL_HIDDEN, self::TYPE_BOOL_ENUM);
+        $this->uses(self::COL_REQUIRED, self::TYPE_BOOL_ENUM);
+        $this->uses(self::COL_MODULE, self::TYPE_STRING, self::COLUMN_ENUM, null, [self::MODULE_SETTINGS, self::MODULE_COMMS]);
     }
 
 
