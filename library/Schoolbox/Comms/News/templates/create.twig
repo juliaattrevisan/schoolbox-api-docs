@@ -257,7 +257,9 @@
 {# le scripts #}
 <script src="/javascript/ckeditor/ckeditor.js"></script>
 <script src="/javascript/shared/editor/jquery.editor.js"></script>
-<script src="/javascript/shared/comms/draft.js"></script>
+{% if isAutoSavable %}
+    <script src="/javascript/shared/comms/draft.js"></script>
+{% endif %}
 <script src="/javascript/shared/comms/audience-bricks.js"></script>
 <script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
@@ -280,11 +282,13 @@
         });
 
         {# Drafting mechanism #}
+        {% if isAutoSavable %}
         $('#createForm').draft({
             inputs: ['title', 'publishAt', 'expiresAt', 'audience'],
             textareas: ['body', 'blurb'],
             attachzones: ['attachment']
         });
+        {% endif %}
 
         $('[data-topics]').selectizeSelector({
             ajax: {

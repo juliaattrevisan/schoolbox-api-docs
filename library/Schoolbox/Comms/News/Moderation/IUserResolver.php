@@ -13,9 +13,9 @@ interface IUserResolver
     /**
      * Returns the ids of users who are capable of moderating this article
      *
-     * @param int $articleId
+     * @param \Schoolbox\Comms\News\Model $article
      * @return int[]
      */
-    public function findModeratorsForArticle(int $articleId): array;
+    public function findModeratorsForArticle(\Schoolbox\Comms\News\Model $article): array;
 
 }

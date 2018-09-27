@@ -50,9 +50,9 @@ class MockUserResolver implements IUserResolver
     /**
      * @inheritdoc
      */
-    public function findUsersForArticle(int $articleId): array
+    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article): array
     {
-        return $this->findUsers($articleId, self::ARTICLE_AUDIENCES);
+        return $this->findUsers($article->getId(), self::ARTICLE_AUDIENCES);
     }
 
     /**

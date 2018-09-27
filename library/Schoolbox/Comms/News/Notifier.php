@@ -30,18 +30,23 @@ use Schoolbox\Comms\News\Model as Article;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
-
+/**
+ * @method Article buildPrevious($current, ?array $diff, int $previousKey = 1)
+ */
 class Notifier extends AbstractModuleNotifier
 {
     public const TRIGGER_POSTED    = 'posted';
-    public const TRIGGER_REJECTED  = 'rejected';
+    public const TRIGGER_MODERATED  = 'moderated';
     public const TRIGGER_SUBMITTED = 'submitted';
+    public const TRIGGER_EXPIRED   = 'expired';
 
     // These patterns need to be consts to ensure consistency between methods (revocation relies on these strings matching)
 
     private const PATTERN_POSTED_TITLE = ':user posted :title';
-    private const PATTERN_POSTED_HREF  = '/comms/news/%d';
+    private const PATTERN_POSTED_HREF = '/comms/news/%d?ref=' . Statistics\Mapper::REFERRER_EMAIL;
+    private const PATTERN_ARTICLE_HREF  = '/comms/news/%d';
 
     /** @var IUserResolver */
     private $audienceResolver;
@@ -49,11 +54,13 @@ class Notifier extends AbstractModuleNotifier
     /** @var iModeratorResolver */
     private $moderatorResolver;
 
+    /** @var UserMapper */
+    private $userMapper;
 
     /**
-     * @param \Aura\Di\ContainerInterface $di
+     * @inheritdoc
+     *
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @return array
      */
     public static function getSetters(\Aura\Di\ContainerInterface $di): array
     {
@@ -62,7 +69,7 @@ class Notifier extends AbstractModuleNotifier
 
         $relationshipFilterer = $di->lazyNew(RelationshipFilterer::class, [
             'db'                   => $di->lazyGet('databaseInternal'),
-            'userMapper'           => $mf->getLazy(\Schoolbox\UserMapper::class),
+            'userMapper'           => $mf->getLazy(UserMapper::class),
             'externalUser'         => $di->lazyGet('externalUser'),
             'folderMapper'         => $mf->getLazy(\Schoolbox\Resource\Folder\Mapper::class),
             'externalClass'        => $di->lazyGet('externalClass'),
@@ -74,16 +81,18 @@ class Notifier extends AbstractModuleNotifier
             'db'                   => $di->lazyGet('databaseInternal'),
             'externalClass'        => $di->lazyGet('externalClass'),
             'relationshipFilterer' => $relationshipFilterer,
-            'audienceMapper'       => $mf->getLazy(\Schoolbox\Comms\News\Audience\Mapper::class),
+            'audienceMapper'       => $mf->getLazy(Audience\Mapper::class),
         ]);
 
         $moderatorResolver = $di->lazyNew(ModeratorResolver::class, [
-            'audienceMapper'       => $mf->getLazy(\Schoolbox\Comms\News\Audience\Mapper::class),
-            'userAccessMapper'     => $mf->getLazy(UserAccessMapper::class)
+            'audienceMapper'       => $mf->getLazy(Audience\Mapper::class),
+            'userAccessMapper'     => $mf->getLazy(UserAccessMapper::class),
+            'db'                   => $di->lazyGet('databaseInternal')
         ]);
 
         return [
             'setMapper'            => $mf->getLazy(Mapper::class),
+            'setUserMapper'        => $mf->getLazy(UserMapper::class),
             'setAudienceResolver'  => $userResolver,
             'setModeratorResolver' => $moderatorResolver
         ];
@@ -91,7 +100,7 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * @param IConfigLoader $configLoader
+     * @inheritdoc
      */
     public function __construct($configLoader)
     {
@@ -100,15 +109,16 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * @return string
+     * @inheritdoc
      */
-    protected function getSlug()
+    protected function getSlug(): string
     {
         return NSMapper::NS_NEWS;
     }
 
 
     /**
+     * Setter for Audience\UserResolver
      * @param IUserResolver $audienceResolver
      */
     public function setAudienceResolver(IUserResolver $audienceResolver)
@@ -117,6 +127,7 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
+     * Setter for Moderation\UserResolver
      * @param IModeratorResolver $moderatorResolver
      */
     public function setModeratorResolver(IModeratorResolver $moderatorResolver)
@@ -125,93 +136,132 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Objectives of this method: if the request
-     *  - rejects the article, trigger REJECTED immediately
-     *  - accepts the article, schedule POSTED appropriately
+     * Setter for UserMapper
+     * @param UserMapper $userMapper
+     */
+    public function setUserMapper(UserMapper $userMapper)
+    {
+        $this->userMapper = $userMapper;
+    }
+
+    /**
+     * Attaches and detaches triggers properly depending on the article status and transition
      *
      * @param TriggerBundleInterface $bundle
      * @return void
      */
-    public function bundleTriggers($bundle)
+    public function bundleTriggers($bundle): void
     {
         $crudMethod = $bundle->getMethod();
 
-
-        //// when the article is deleted ////
-
+        /**
+         * Deleted
+         */
         if ($crudMethod === \Schoolbox\Mapper::METHOD_DELETE) {
             // article deleted; revoke that bad boy
             $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
             $bundle->detach(self::TRIGGER_POSTED);
-
+            $bundle->detach(self::TRIGGER_EXPIRED);
             return;
         }
-
-
-        //// when an article is rejected ////
 
         /** @var Article $article */
         $article = $bundle->getEvent()->getObject();
-
         $diff = $bundle->getEvent()->getDiff();
+        $previous = $this->buildPrevious($article, $diff);
 
-        // if draft, return
-        // TODO: isDraft is false, when auto-saving awaiting-approval article
-        if ($article->isDraft()) {
+        /**
+         * Draft or no-change
+         */
+        if ($diff === null ||                                                     // no change at all
+            (\count($diff) === 1 && \array_key_exists('updatedAt', $diff)) ||            // no real changes
+            ($article->isDraft() && (!$previous || $previous->isDraft()))) {      // creation or updating of draft
             return;
         }
 
-        // TODO: this is not actually triggered at the moment
-        if (isset($diff['rejectedAt'])) {
-            $bundle->attach(self::TRIGGER_REJECTED, self::IMMEDIATELY);
+        // Invalid state transition. Article has been created in a non-draft state
+        if (!$previous && !$article->isDraft()) {
+            // Don't even attempt to process as it will likely cause fatal NPEs
+            $this->log->error(sprintf("Invalid transition. Article: %d has been created in a '%s' state.", $article->getId(), $article->getStatus()));
+            return;
         }
 
-        //// when an article is not yet accepted ////
-
-        $acceptedAt = $article->getAcceptedAt();
-
-        if (!$acceptedAt || $acceptedAt->isNull()) {
-            // article is not accepted; ensure no trigger exists
+        /**
+         * Rejected or Unpublished
+         */
+        if ($article->isRejected() && $previous->isRejected()) {
+            // likely to be auto-saved
+            return;
+        } elseif ($article->isRejected() && $previous->canBeRejected()) {
+            // just been rejected or unpublished from a valid status
+            $bundle->attach(self::TRIGGER_MODERATED, self::IMMEDIATELY);
             $bundle->detach(self::TRIGGER_POSTED);
-
-            if (isset($diff['acceptedAt'])) {
-                // this action is removing the accepted-at: this is a REVOCATION
-                $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
-            }
-
-            if (isset($diff['submittedAt'])) {
-                // this action is submitting the article, send in the mods!
-                $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
-            }
-
-            // if the article is not accepted, no further checks are relevant
+            $bundle->detach(self::TRIGGER_EXPIRED);
             return;
         }
 
-
-        //// when there's no publication date ////
-
-        $publishAt = $article->getPublishAt();
-
-        if (!$publishAt || $publishAt->isNull()) {
-            // if there is no publish date on the article, unhook any triggers that might exist
-            $bundle->detach(self::TRIGGER_POSTED);
-
-            // and that is all for now
+        /**
+         * Awaiting for moderation
+         */
+        if ($article->isAwaitingModeration() && $previous->isAwaitingModeration()) {
+            // likely to be auto-saved
+            return;
+        } elseif ($article->isAwaitingModeration() && $previous->canBeSubmitted()) {
+            // just been submitted from a valid status
+            $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
             return;
         }
 
+        /**
+         * Approved (Awaiting Publication / Published / Expired)
+         */
+        if ($article->isApproved()) {
 
-        // IF YOU GET HERE the article:
-        //  - has been accepted, and
-        //  - has a publish date (which could be in the past or future)
+            $publishAt = $article->getPublishAt();
+            $expiresAt = $article->getExpiresAt();
 
-        if (isset($diff['acceptedAt'])) {
-            // this action specifically accepted the article: set up the trigger
-            $bundle->attach(self::TRIGGER_POSTED, $publishAt->getUnixTimeStamp());
+            // TODO: If audience has been changed after being published
+
+            // The article has just been approved from a valid status.
+            if ($previous->canBeApproved()) {
+                $bundle->attach(self::TRIGGER_MODERATED, self::IMMEDIATELY);
+                if (!$article->isExpired()) {
+                    $bundle->attach(self::TRIGGER_POSTED, $publishAt->getUnixTimeStamp());
+                    $bundle->attach(self::TRIGGER_EXPIRED, $expiresAt->getUnixTimeStamp());
+                }
+            } else {
+                // publish date changed
+                if (isset($diff['publishAt'])) {
+                    // past -> past .. noop
+                    // past -> future .. retract + re-attach
+                    // future -> future .. detach + re-attach
+                    // future -> past .. detach + re-attach
+                    if ($previous->getPublishAt()->isFuture()) {
+                        $bundle->detach(self::TRIGGER_POSTED);
+                        $bundle->attach(self::TRIGGER_POSTED, $publishAt->getUnixTimeStamp());
+                    } elseif ($publishAt->isFuture()) {
+                        $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+                        $bundle->attach(self::TRIGGER_POSTED, $publishAt->getUnixTimeStamp());
+                    }
+                }
+                // expiry date changed
+                if (isset($diff['expiresAt'])) {
+                    // past -> past .. noop
+                    // past -> future .. detach + re-attach
+                    // future -> future .. detach + re-attach
+                    // future -> past .. detach
+                    if ($expiresAt->isFuture()) {
+                        $bundle->detach(self::TRIGGER_EXPIRED);
+                        $bundle->attach(self::TRIGGER_EXPIRED, $expiresAt->getUnixTimeStamp());
+                    } elseif ($previous->getExpiresAt()->isFuture()) {
+                        $bundle->detach(self::TRIGGER_EXPIRED);
+                    }
+                }
+            }
+            return;
         }
+
     }
-
 
     /**
      * Retracts a deleted article.
@@ -220,6 +270,17 @@ class Notifier extends AbstractModuleNotifier
      * @return Envelope
      */
     public function notifySystemDeleted(Article $article): Envelope
+    {
+        return $this->retractPosted($article);
+    }
+
+    /**
+     * Retracts a given article.
+     *
+     * @param Article $article
+     * @return Envelope
+     */
+    private function retractPosted(Article $article): Envelope
     {
         $envelope  = new Envelope();
         $bob       = new Builder(false);
@@ -239,119 +300,45 @@ class Notifier extends AbstractModuleNotifier
         return $envelope;
     }
 
-
     /**
-     * Notify a staff member that an article needs moderation
+     * Retracts an expired article.
      *
-     * @param Model $article
-     * @param User  $effector
-     * @param array $diff
+     * @param Article $article
      * @return Envelope
      */
-    public function notifyStaffSubmitted($article, $effector, $diff = [])
+    public function notifySystemExpired(Article $article): Envelope
     {
-        $envelope  = new Envelope();
+        return $this->retractPosted($article);
+    }
 
-        $bob = new Builder();
-
-        $bob->setTitle(':user submitted an article, :title')
-            ->setHref(sprintf(self::PATTERN_POSTED_HREF, $article->getId()))
-            ->setParams([
-                'user' => new UserParam($effector),
-                'title' => new Param($article->getTitle())
-            ])
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
-            ->addTopic("news.{$article->getId()}." . self::TRIGGER_SUBMITTED)
-        ;
-
-        foreach ($this->moderatorResolver->findModeratorsForArticle($article->getId()) as $modId) {
-            $envelope->targetToUser($modId, $bob->build());
+    /**
+     * Retracts a rejected/unpublished article.
+     *
+     * @param Article $article
+     * @return Envelope
+     */
+    public function notifySystemModerated(Article $article): Envelope
+    {
+        // Retract when rejected or unpublished (in rejected status for now).
+        // Article is unlikely to be in draft status, at this point. However, we should probably retract it, if it is.
+        if ($article->isDraft() || $article->isRejected()) {
+            return $this->retractPosted($article);
         }
-
-        return $envelope;
+        return new Envelope();
     }
 
-
     /**
-     * @param string  $roleType
+     * Notify a moderator that an article needs moderation
+     *
+     * @param string $roleType
      * @param Article $article
-     * @param User    $effector
-     * @param array $diff
+     * @param User $effector
      * @return Envelope
      */
-    private function notifyRejected($roleType, $article, $effector, $diff = [])
+    private function notifySubmitted(string $roleType, Article $article, User $effector): Envelope
     {
         $envelope  = new Envelope();
-
-        $bob = new Builder();
-
-        $bob->setTitle(':user rejected your article, :title')
-            ->setHref(sprintf(self::PATTERN_POSTED_HREF, $article->getId()))
-            ->setParams([
-                'user' => new UserParam($effector),
-                'title' => new Param($article->getTitle())
-            ])
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
-            ->addTopic("news.{$article->getId()}." . self::TRIGGER_REJECTED)
-        ;
-
-        $envelope->targetToUser($article->getAuthor()->getId(), $bob->build());
-
-        return $envelope;
-    }
-
-
-    /**
-     * @param Article $article
-     * @param User    $effector
-     * @param array   $diff
-     * @return Envelope
-     */
-    public function notifyStaffRejected($article, $effector, $diff = [])
-    {
-        return $this->notifyRejected(Role::STAFF, $article, $effector, $diff);
-    }
-
-
-    /**
-     * @param Article $article
-     * @param User    $effector
-     * @param array   $diff
-     * @return Envelope
-     */
-    public function notifyStudentRejected($article, $effector, $diff = [])
-    {
-        return $this->notifyRejected(Role::STUDENT, $article, $effector, $diff);
-    }
-
-
-    /**
-     * @param Article $article
-     * @param User    $effector
-     * @param array   $diff
-     * @return Envelope
-     */
-    public function notifyParentRejected($article, $effector, $diff = [])
-    {
-        return $this->notifyRejected(Role::PARENT, $article, $effector, $diff);
-    }
-
-
-    /**
-     * Notify a group type that news has been posted
-     *
-     * @param string  $roleType
-     * @param Article $article
-     * @param User    $user
-     * @return Envelope
-     */
-    private function notifyPosted($roleType, $article, $user)
-    {
-        $envelope = new Envelope();
-
-        $articleId = $article->getId();
-
-        $recipientIds = $this->audienceResolver->findUsersForArticle($articleId);
+        $recipientIds = $this->moderatorResolver->findModeratorsForArticle($article);
 
         if (empty($recipientIds)) {
             // no recipients? do nothing
@@ -359,34 +346,224 @@ class Notifier extends AbstractModuleNotifier
         }
 
         try {
+            $recipients = $this->userMapper->findByColumnList(['id' => $recipientIds, 'g.group_type' => $roleType]);
+        } catch (Exception $e) {
+            $this->log->warning('Failed to find users with given ids:' . implode(',', $recipientIds) . $e->getMessage());
+            return $envelope;
+        }
+
+        $bob = new Builder();
+
+        $bob->setTitle(':user submitted an article, :title')
+            ->setNamespace($this->getSlug())
+            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
+            ->setSeverity(Logger::INFO)
+            ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
+            ->setParams([
+                'user'  => new UserParam($effector, Param::STACKING_REPLACE),
+                'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
+                    Param::STACKING_APPEND),
+            ])
+            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
+            ->addTopic("news.{$article->getId()}." . self::TRIGGER_SUBMITTED);
+
+        foreach ($recipients as $recipient) {
+            $envelope->targetToUser($recipient->getId(), $bob->build());
+        }
+
+        return $envelope;
+    }
+
+    /**
+     * Notify a staff member that an article needs moderation
+     *
+     * @param Article $article
+     * @param User $effector
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyStaffSubmitted(Article $article, User $effector, array $diff = []): Envelope
+    {
+        return $this->notifySubmitted(Role::STAFF, $article, $effector);
+    }
+
+
+    /**
+     * Notify a student member that an article needs moderation
+     *
+     * @param Article $article
+     * @param User $effector
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyStudentSubmitted(Article $article, User $effector, array $diff = []): Envelope
+    {
+        return $this->notifySubmitted(Role::STUDENT, $article, $effector);
+    }
+
+
+    /**
+     * Notify a parent that an article needs moderation
+     *
+     * @param Article $article
+     * @param User $effector
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyParentSubmitted(Article $article, User $effector, array $diff = []): Envelope
+    {
+        return $this->notifySubmitted(Role::PARENT, $article, $effector);
+    }
+
+
+    /**
+     * Notify author that the article is moderated (rejected, unpublished or approved)
+     *
+     * @param string $roleType
+     * @param Article $article
+     * @param User $effector
+     * @param array $diff
+     * @return Envelope
+     */
+    private function notifyModerated(string $roleType, Article $article, User $effector, array $diff = []): Envelope
+    {
+        $envelope = new Envelope();
+        $bob = new Builder();
+        // hydrate to get role
+        try {
+            $author = $this->userMapper->findById($article->getAuthor()->getId());
+        } catch (Exception $e) {
+            $this->log->warning('Failed to find author using userId: ' . $e->getMessage());
+            return $envelope;
+        }
+
+        // if the author does not have the targeted role type, return.
+        if ($author->getRole()->getType() !== $roleType) {
+            return $envelope;
+        }
+
+        $previous = $this->buildPrevious($article, $diff);
+
+        if ($article->isApproved()) {
+            $action = 'approved';
+        } elseif ($previous->isPublished()) {
+            $action = 'unpublished';
+        } else {
+            $action = 'rejected';
+        }
+        $bob->setTitle(':user ' . $action . ' your article, :title')
+            ->setNamespace($this->getSlug())
+            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
+            ->setSeverity(Logger::INFO)
+            ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
+            ->setParams([
+                'user' => new UserParam($effector, Param::STACKING_REPLACE),
+                'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
+                    Param::STACKING_APPEND)
+            ])
+            ->addTopic("news.{$article->getId()}." . self::TRIGGER_MODERATED);
+
+        $envelope->targetToUser($author, $bob->build());
+
+        return $envelope;
+    }
+
+    /**
+     * Notify staff that an article the staff authored has been approved/rejected
+     *
+     * @param Article $article
+     * @param User $effector
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyStaffModerated(Article $article, User $effector, array $diff = []): Envelope
+    {
+        return $this->notifyModerated(Role::STAFF, $article, $effector, $diff);
+    }
+
+    /**
+     * Notify student that an article the student authored has been approved/rejected
+     *
+     * @param Article $article
+     * @param User $effector
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyStudentModerated(Article $article, User $effector, array $diff = []): Envelope
+    {
+        return $this->notifyModerated(Role::STUDENT, $article, $effector, $diff);
+    }
+
+    /**
+     * Notify parent that an article the parent authored has been approved/rejected
+     *
+     * @param Article $article
+     * @param User $effector
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyParentModerated(Article $article, User $effector, array $diff = []): Envelope
+    {
+        return $this->notifyModerated(Role::PARENT, $article, $effector, $diff);
+    }
+
+    /**
+     * Notify an article's audience in given role type that news has been posted
+     *
+     * @param string $roleType
+     * @param Article $article
+     * @param User $effector
+     * @return Envelope
+     */
+    private function notifyPosted(string $roleType, Article $article, User $effector): Envelope
+    {
+        $envelope = new Envelope();
+
+        $recipientIds = $this->audienceResolver->findUsersForArticle($article);
+
+        if (empty($recipientIds)) {
+            // no recipients? do nothing
+            return $envelope;
+        }
+
+        try {
+            $recipients = $this->userMapper->findByColumnList(['id' => $recipientIds, 'g.group_type' => $roleType]);
+        } catch (Exception $e) {
+            $this->log->warning('Failed to find users with given ids:' . implode(',', $recipientIds) . $e->getMessage());
+            return $envelope;
+        }
+
+        $articleId = $article->getId();
+
+        try {
             // self hydration -_-
             /** @var Article $article */
             $article = $this->mapper->findById($article->getId());
 
         } catch (Deleted $e) {
-            $this->log->error('Tried to send an article notification, but it has been deleted; ID is ' . $articleId, [ $e ]);
+            $this->log->error('Tried to send an article notification, but it has been deleted; ID is ' . $articleId, [$e]);
             return $envelope;
 
         } catch (Exception $e) {
-            $this->log->error($e->getMessage(), [ $e ]);
+            $this->log->error($e->getMessage(), [$e]);
             return $envelope;
         }
 
+        $author = $article->getAuthor();
+
         if (is_object($article->getFeatureImage())) {
-            $hash  = $article->getFeatureImage()->getHash();
-            $icon  = "/storage/image.php?hash=$hash&size=square64";
+            $hash = $article->getFeatureImage()->getHash();
+            $icon = "/storage/image.php?hash=$hash&size=square64";
             $thumb = "/storage/image.php?hash=$hash&size=square200";
 
         } else {
-            $icon  = "/portrait.php?userId={$user->getExternalId()}&size={$this->iconSize}";
+            $icon = "/portrait.php?userId={$author->getExternalId()}&size={$this->iconSize}";
             $thumb = '/images/emails/spacer.gif';
         }
 
         $href = sprintf(self::PATTERN_POSTED_HREF, $articleId);
 
         $heading = $article->getTitle();
-
-        // TODO verify this
 
         // use the more recent of the two available dates
         $activeDate = $article->getPublishAt() < $article->getCreatedAt()
@@ -395,12 +572,12 @@ class Notifier extends AbstractModuleNotifier
 
         if (!$activeDate) {
             // oh noes
-            $this->log->warning('Attempted to process news article with no created_at OR published_at; ID is ' . $article->getId());
+            $this->log->warning('Attempted to process news article with no created_at OR published_at; ID is ' . $articleId);
             return $envelope;
         }
 
-        $shortDate  = $activeDate->getDateOnly();
-        $authorName = $user->formatName();
+        $shortDate = $activeDate->getDateOnly();
+        $authorName = $author->formatName();
 
 
         $bob = new Builder();
@@ -409,8 +586,8 @@ class Notifier extends AbstractModuleNotifier
 
         $instance = $bob->setTitle(self::PATTERN_POSTED_TITLE)
             ->setParams(array(
-                'user'  => new UserParam($user, Param::STACKING_REPLACE),
-                'title' => new Param($heading, "/news/item/$articleId", Param::STACKING_APPEND),
+                'user'  => new UserParam($author, Param::STACKING_REPLACE),
+                'title' => new Param($heading, sprintf(self::PATTERN_ARTICLE_HREF, $articleId), Param::STACKING_APPEND),
             ))
             ->setIcon($icon)
             ->setHref($href)
@@ -430,13 +607,15 @@ class Notifier extends AbstractModuleNotifier
             // timestamp and filters are optional
             ->setTimestamp($activeDate->getUnixTimeStamp())
             // and then you build
-            ->addFilter('roleType', [ $roleType ])
+            ->addFilter('roleType', [$roleType])
             ->build();
 
-
-        /** @var \Schoolbox\User $articleUser */
-        foreach ($recipientIds as $recipientId) {
-            $envelope->targetToUser($recipientId, $instance);
+        foreach ($recipients as $recipient) {
+            // to avoid author getting the notification
+            if ($recipient->getId() === $author->getId()) {
+                continue;
+            }
+            $envelope->targetToUser($recipient->getId(), $instance);
         }
 
         return $envelope;
@@ -451,7 +630,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array $diff
      * @return Envelope
      */
-    public function notifyStudentPosted($article, $user, $diff = array())
+    public function notifyStudentPosted(Article $article, User $user, array $diff = array()): Envelope
     {
         return $this->notifyPosted(Role::STUDENT, $article, $user);
     }
@@ -464,7 +643,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array $diff
      * @return Envelope
      */
-    public function notifyStaffPosted($article, $user, $diff = array())
+    public function notifyStaffPosted(Article $article, User $user, array $diff = array()): Envelope
     {
         return $this->notifyPosted(Role::STAFF, $article, $user);
     }
@@ -477,14 +656,9 @@ class Notifier extends AbstractModuleNotifier
      * @param array $diff
      * @return Envelope
      */
-    public function notifyParentPosted($article, $user, $diff = array())
+    public function notifyParentPosted(Article $article, User $user, array $diff = array()): Envelope
     {
         return $this->notifyPosted(Role::PARENT, $article, $user);
     }
-
-
-
-
-
 
 }

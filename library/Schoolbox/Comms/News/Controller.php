@@ -200,6 +200,7 @@ class Controller extends Base
             'action'           => 'Create',
             'article'          => $article,
             'featureImageZone' => $zone->getTwigContext(),
+            'isAutoSavable'    => !$article->isApproved(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -298,6 +299,7 @@ class Controller extends Base
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
             'audienceSegments'       => $audienceSegments,
+            'isAutoSavable'          => !$article->isApproved(),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -495,18 +497,11 @@ class Controller extends Base
         }
 
         /* Impression referrer
+         *
+         * Even when you copy/paste a link to someone in email or instant messenger,
+         * and they visit it from that place, "we" decided to  consider them as a conversion.
          */
         $referrer = $this->getRequest()->query[Querystring::REFERRER];
-
-        /* If you don't have an http referrer, disregard the $referrer specified in the url.
-         *
-         * This could occur if you copy/paste a link to someone in email or instant messenger,
-         * and they visit it from that place. Consider them a Non-referred open, rather than
-         * a Conversion.
-         */
-        if (null === $this->getRequest()->client->getReferer()) {
-            $referrer = null;
-        }
 
         /* Record this Conversion/Open
          * referrer value determines what kind it was
@@ -986,7 +981,7 @@ class Controller extends Base
      */
     public function getRecipients(Model $article): void
     {
-        $userIds = $this->userResolver->findUsersForArticle($article->getId());
+        $userIds = $this->userResolver->findUsersForArticle($article);
 
         if (\count($userIds)) {
             $users = $this->userMapper->findByColumn('id', $userIds)->sortBy('lastname', 'asc');
