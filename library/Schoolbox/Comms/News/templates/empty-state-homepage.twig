@@ -8,7 +8,7 @@
     <i class="icon-news"></i>
     <p>
         {% if createRoute and readonly %}
-            There aren't any {{ locale.news }} articles in this homepage.
+            There is no {{ locale.news }} to view at this time.
         {% else %}
             <a href="{{ createRoute }}?{{ createNewsQuerystringParams }}">Post a {{ locale.news }} article</a> to share new information on this homepage.
         {% endif %}
