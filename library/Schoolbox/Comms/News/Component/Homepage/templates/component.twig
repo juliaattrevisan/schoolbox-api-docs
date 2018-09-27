@@ -62,11 +62,6 @@
     <div class="loader"></div>
 </div>
 
-{% set createNewsQuerystringParams = [
-    'groupId=' ~ folderId,
-    'type=folder'
-]|join('&') %}
-
 <div class="component-action hide" id="news-component-actions-{{ componentInstanceId }}">
     <section>
         {% if rssRoute %}
@@ -74,7 +69,11 @@
         {% endif %}
         {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
         {% if createRoute and not readonly %}
-        <a href="{{ createRoute }}?{{ createNewsQuerystringParams|raw }}" class="button">Create {{ locale.news }}</a>
+            {% set createNewsQuerystringParams = [
+                'groupId=' ~ folderId,
+                'type=folder'
+            ]|join('&') %}
+            <a href="{{ createRoute }}?{{ createNewsQuerystringParams|raw }}" class="button">Create {{ locale.news }}</a>
         {% endif %}
         
         {# ^ href is populated by js in articletabs.js #}
