@@ -1,7 +1,6 @@
 {#
     name:          string
     value:         string
-    title:         string
     required:      bool
 #}
-<textarea title="{{ title }}" id="{{ name }}" {% if required %}class="required" required{% endif %} name="{{ name }}" rows="5" {% block extraAttributes %}{% endblock %}>{{ value }}</textarea>
+<textarea id="{{ name }}" {% if required %}class="required" required{% endif %} name="{{ name }}" rows="5" {% block extraAttributes %}{% endblock %}>{{ value }}</textarea>

@@ -1,9 +1,8 @@
 {#
     name:          string
     value:         string
-    title:         string
     required:      bool
 #}
 <div>
-    <input title="{{ title }}" type="text" value="{{ value }}" name="{{ name }}" {% if required %}class="required" required{% endif %} data-colour-picker />
+    <input type="text" value="{{ value }}" name="{{ name }}" {% if required %}class="required" required{% endif %} data-colour-picker />
 </div>
