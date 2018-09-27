@@ -30,10 +30,11 @@
     {% endif %}
 
     {% set querystringParams = querystringParams|join('&') %}
+    {% set getListHomePagePath = routeLookup('commsNews.getListForHomepage')|replace({'{folderId}':''}) ~ folderId %}
 
     $(function() {
         $('#news-container-{{ componentInstanceId }}').articleTabs({
-            'selectedUrl': "{{ routeLookup('commsNews.getListForHomepage') }}{{ folderId }}?{{ querystringParams|raw }}",
+            'selectedUrl': "{{ getListHomePagePath }}?{{ querystringParams|raw }}",
             'topicTabs': $("#news-topics-{{ componentInstanceId }}"),
             onChange: function() {
                 // Hide the component action bar
