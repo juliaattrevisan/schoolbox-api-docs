@@ -63,37 +63,16 @@ class ConfigMapper extends Mapper implements IConfigLoader
 
     /**
      * @return void
+     * @throws \InvalidArgumentException
      */
-    protected function mapping()
+    protected function mapping(): void
     {
         $this->hasTable('config');
         $this->hasModel(Config::class);
 
-        $this->hasMap(
-            array(
-                'column'     => 'configID',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'name',
-                'property' => 'name',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'value',
-                'property' => 'value',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-
+        $this->uses('configID', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
+        $this->uses('name', self::TYPE_STRING);
+        $this->uses('value', self::TYPE_STRING);
     }
 
 
