@@ -30,7 +30,7 @@
                         {% else %}
                             {{ article.author.fullname }}
                         {% endif %}
-                        <time title="{{ article.publishAt.local }}">{{ article.publishAt.relativeTime }}</time>
+                        <time title="{{ article.publishAt.long }}">{{ article.publishAt.relativeTime }}</time>
                     </p>
 
                     {% if article.topics|length %}
