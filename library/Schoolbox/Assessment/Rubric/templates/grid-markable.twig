@@ -112,7 +112,7 @@
                       data-max="{{ rubricMax }}"
                       data-mark-type="{{ markType.mode }}">
 
-                    {{ rubricMarkedGrid.retrieveHumanReadableMark }}
+                    {{ rubricMarkedGrid.calculateScaledMark }}
                 </span>
 
                 {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
