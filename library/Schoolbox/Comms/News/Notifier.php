@@ -263,7 +263,6 @@ class Notifier extends AbstractModuleNotifier
 
     }
 
-
     /**
      * Retracts a deleted article.
      *
@@ -271,6 +270,17 @@ class Notifier extends AbstractModuleNotifier
      * @return Envelope
      */
     public function notifySystemDeleted(Article $article): Envelope
+    {
+        return $this->retractPosted($article);
+    }
+
+    /**
+     * Retracts a given article.
+     *
+     * @param Article $article
+     * @return Envelope
+     */
+    private function retractPosted(Article $article): Envelope
     {
         $envelope  = new Envelope();
         $bob       = new Builder(false);
@@ -298,7 +308,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifySystemExpired(Article $article): Envelope
     {
-        return $this->notifySystemDeleted($article);
+        return $this->retractPosted($article);
     }
 
     /**
@@ -312,7 +322,7 @@ class Notifier extends AbstractModuleNotifier
         // Retract when rejected or unpublished (in rejected status for now).
         // Article is unlikely to be in draft status, at this point. However, we should probably retract it, if it is.
         if ($article->isDraft() || $article->isRejected()) {
-            return $this->notifySystemDeleted($article);
+            return $this->retractPosted($article);
         }
         return new Envelope();
     }
