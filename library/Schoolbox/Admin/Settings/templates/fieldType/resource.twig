@@ -1,0 +1,10 @@
+{#
+    name:          string
+    value:         string
+    title:         string
+    required:      bool
+#}
+<div>
+    <input title="{{ title }}" id="{{ name }}" {% if required %}class="required" required{% endif %} type="text" name="{{ name }}" value="{{ value }}" />
+    <a href="#" class="button" data-interaction="homepage_selector" data-input_name="{{ name }}">Select Source</a>
+</div>

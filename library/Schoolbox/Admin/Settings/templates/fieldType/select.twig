@@ -1,0 +1,13 @@
+{#
+    name:          string
+    title:         string
+    value:         string
+    options:       array
+    required:      bool
+#}
+
+<select name="{{ name }}" title="{{ title }}">
+    {% for key, option in options %}
+    <option value="{{ key }}" {% if option == value %}selected="selected"{% endif %}>{{ option }}</option>
+    {% endfor %}
+</select>
