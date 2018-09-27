@@ -97,7 +97,8 @@ class MarkedGrid
 
 
     /**
-     * Render the grid's mark in normalized format.
+     * Convert the given mark to a percentage of the total available marks -
+     * this is used by IMarkScheme implementations to generate human readable marks
      *
      * @return float
      */
