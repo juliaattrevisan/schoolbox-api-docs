@@ -27,12 +27,18 @@ class Controller extends Base
     private $database;
 
     /**
+     * @var string $schema
+     */
+    private $schema;
+
+    /**
      * Controller constructor.
      * @param MSSQL $database
      */
     public function __construct(MSSQL $database)
     {
         $this->database = $database;
+        $this->schema = $this->retrieveDocumentSchema();
     }
 
 
@@ -51,10 +57,12 @@ class Controller extends Base
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
+
+
         $query = "
             SELECT StudentReportsArchiveLinkSeq, sral.FileYear, sral.FileSemester, Description
-            FROM SynergyOneMedia.dbo.StudentReportsArchive sra
-            JOIN SynergyOneMedia.dbo.StudentReportsArchiveLink sral ON sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
+            FROM {$this->schema}.StudentReportsArchive sra
+            JOIN {$this->schema}.StudentReportsArchiveLink sral ON sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
             INNER JOIN dbo.studentyears sy ON sy.id = sral.ID AND sy.fileyear = sral.FileYear
             LEFT OUTER JOIN dbo.uluStudentReports ulusr
             ON sral.fileyear = ulusr.fileyear AND sral.FileSemester = ulusr.FileSemester AND sy.YearLevel = ulusr.YearLevel
@@ -115,8 +123,8 @@ class Controller extends Base
         // Ensure the report is for the specified user
         $query = "
             SELECT Document, Description
-            FROM SynergyOneMedia.dbo.StudentReportsArchive sra
-            JOIN SynergyOneMedia.dbo.StudentReportsArchiveLink sral ON sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
+            FROM {$this->schema}.StudentReportsArchive sra
+            JOIN {$this->schema}.StudentReportsArchiveLink sral ON sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
             WHERE ID = {$student->getExternalId()}
             AND sra.StudentReportsArchiveSeq = {$reportId}";
 
@@ -159,5 +167,21 @@ class Controller extends Base
     protected function setDatabase(MSSQL $database){
         $this->database = $database;
         return $this;
+    }
+
+    /**
+     * What schema does the document integration use?
+     *
+     * @return string
+     */
+    private function retrieveDocumentSchema()
+    {
+        $externalPing = new \External_Ping();
+
+        if ($externalPing->getVersion() > 67) {
+            return "media";
+        }
+
+        return "SynergyOneMedia.dbo";
     }
 }
