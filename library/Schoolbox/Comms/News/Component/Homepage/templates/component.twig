@@ -23,7 +23,13 @@
         'f=' ~ folderId,
         'hp=1',
         'ref=' ~ referrer
-    ]|join('&') %}
+    ] %}
+
+    {% if readonly %}
+    {% set querystringParams = querystringParams|merge(['ro=1']) %}
+    {% endif %}
+
+    {% set querystringParams = querystringParams|join('&') %}
 
     $(function() {
         $('#news-container-{{ componentInstanceId }}').articleTabs({

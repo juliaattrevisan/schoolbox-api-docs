@@ -601,8 +601,7 @@ class Controller extends Base
         }
 
         // Pass the readonly parameters into the template as well
-        $access = Access::getInstance();
-        $partialData['readonly'] = $access->getFolderAccess($this->getUser(), $params->getFolderId()) < UserAccess::ACCESS_WRITE;
+        $partialData['readonly'] = $params->getReadOnlyFlag();
         $partialData['folderId'] = $params->getFolderId();
 
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
