@@ -97,6 +97,19 @@ class Module extends BaseModule
             );
         });
 
+        $hasHomePageAccess =  new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, function ($params) {
+                        return $params['folderId'];
+                        }, Access\Access::getInstance()
+                    )
+                )
+            );
+        });
+
         $preloadArticle = function ($params) {
             return $this->preloadArticleWithAudience($params);
         };
@@ -112,6 +125,7 @@ class Module extends BaseModule
         $this->register('GET', '/list{/year,month}', 'getListByTopic', $loggedIn);                               // (async) Get a list of articles audienced to me, by topic
         $this->register('GET', '/archive{/year,month}', 'getArchive', $loggedIn);                                // News Archive
         $this->register('GET', '', 'getIndex', $loggedIn);                                                       // Index of articles audienced to you
+        $this->register('GET', '/lists/folder/{folderId:\d+}', 'getListForHomepage', $hasHomePageAccess);
 
         // Index of articles authored by the logged in user
         $this->register('GET', '/me', 'getAuthored', $loggedIn);

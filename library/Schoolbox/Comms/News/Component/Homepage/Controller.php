@@ -16,6 +16,7 @@ use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\User;
 use SitePage;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
@@ -95,14 +96,13 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         return $this->renderTwigTemplate($templateHandle, '@commsNewsHomepage/component.twig', [
             'componentInstanceId' => $this->getInstance()->getId(),
-            'topics' => $this->topics,
-            'topicAll' => News\Mapper::TOPIC_ALL_SLUG,
             'slug' => $this->slug,
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => (int)$this->getConfig('size'),
             'folderId' => $this->getSource()->getId(),
             'key' => $this->getUser()->getKey(),
-            'referrer' => News\Statistics\Mapper::REFERRER_HOMEPAGE
+            'referrer' => News\Statistics\Mapper::REFERRER_HOMEPAGE,
+            'readonly' => $this->getContextPermission() < UserAccess::ACCESS_WRITE
         ]);
     }
 }

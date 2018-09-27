@@ -15,6 +15,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use PDOException;
 use UnexpectedValueException;
+use Schoolbox\Comms\News\Policy;
 
 class Controller extends Base
 {
@@ -29,17 +30,23 @@ class Controller extends Base
      */
     private $newsMapper;
 
+    /**
+     * @var Policy\Mapper
+     */
+    private $policyMapper;
+
 
     /**
      * Controller constructor.
-     *
-     * @param Mapper        $saveForLaterMapper
-     * @param News\Mapper   $newsMapper
+     * @param Mapper $saveForLaterMapper
+     * @param News\Mapper $newsMapper
+     * @param Policy\Mapper $policyMapper
      */
-    public function __construct(Mapper $saveForLaterMapper, News\Mapper $newsMapper)
+    public function __construct(Mapper $saveForLaterMapper, News\Mapper $newsMapper, Policy\Mapper $policyMapper)
     {
         $this->saveForLaterMapper = $saveForLaterMapper;
         $this->newsMapper         = $newsMapper;
+        $this->policyMapper       = $policyMapper;
     }
 
 
@@ -58,6 +65,8 @@ class Controller extends Base
 
         $params = new News\Querystring($this->getRequest()->query);
         $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
+
+        $policies = $this->policyMapper->findAll()->indexBy('identifier');
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', [
             'articles' => $articles,
@@ -79,7 +88,8 @@ class Controller extends Base
                     'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
                     'labelClass' => 'submitted-late'
                 ],
-            ]
+            ],
+            'readMore' => $policies->getOffset('read_more')->getValue(),
         ])->setTitle('Saved For Later'));
     }
 

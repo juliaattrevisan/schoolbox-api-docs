@@ -20,7 +20,6 @@ use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -195,12 +194,32 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setMimeFilter('image/*');
 
+        /**
+         * Prefill audience
+         */
+        $audienceSegments = [];
+        $groupId = $this->getRequest()->query->get('groupId');
+        $entityType = $this->getRequest()->query->get('type');
+
+        if ($groupId && $entityType && $entityType === 'folder') {
+            $codec = new Audience\Segment\Codec($this->audienceMapper);
+            $label = $this->folderMapper->findCheaplyById($groupId)->getNameWithCodes();
+
+            $audienceSegments = new Audience\SegmentSelectizeOption(
+                $codec->encodeSimpleAttributes($entityType, $groupId, 'self'),
+                $label
+            );
+
+            $audienceSegments->addLabel($entityType, $codec->encodeValue($groupId), $label);
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'policies'         => $policies,
             'action'           => 'Create',
             'article'          => $article,
             'featureImageZone' => $zone->getTwigContext(),
             'isAutoSavable'    => !$article->isApproved(),
+            'audienceSegments' => $audienceSegments,
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -551,7 +570,48 @@ class Controller extends Base
         $this->response->content->set($output);
     }
 
+    /**
+     * Get a list of articles that are audienced to me for homepage component
+     *
+     * @api GET /comms/news/lists/homepage
+     *
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getListForHomepage() :void
+    {
+        $params = new Querystring($this->getRequest()->query);
+        $topics = $this->topicMapper->findAll();
 
+        $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+
+        $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), null, null);
+
+        if (!$this->isXhrRequest()) {
+            // if it's NOT XHR, go for API version
+            $this->response->content->set($this->buildJsonOutput([
+                'articles' => $partialData['articles']
+            ]));
+
+            return;
+        }
+
+        // Pass the readonly parameters into the template as well
+        $partialData['readonly'] = $params->getReadOnlyFlag();
+        $partialData['folderId'] = $params->getFolderId();
+
+        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'success' => true,
+            'title' => $this->getDi()->get('l10n')->translate('news', false, true),
+            'url' => $partialData['currentUrl'],
+            'fragment' => $content,
+            'slug' => $params->getSlug()
+        ]));
+    }
+    
     /**
      * Delete an article
      *

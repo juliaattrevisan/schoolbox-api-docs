@@ -1,3 +1,5 @@
+{% import '@commsNews/../macro/newsBlurb.twig' as macro %}
+
 {##
  # Saved items
  #
@@ -13,16 +15,23 @@
 
 {% block newsContent %}
     {% if articles|length %}
-        <section>
+        <section id="savedArticlesSection">
             <ul class="information-list" id="saveForLaterList">
                 {% for article in articles %}
                     {% set routeRemove = routeLookupIfAuthorized('commsNewsSaveForLater.postRemove', {article: article, articleId: article.id}) %}
                     <li class="{% if routeRemove %}actions-small-1{% endif %}">
                         <div class="list-item">
                             <div class="small-12 card">
+
+                                {% if article.featureImage.hash %}
+                                    <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}?ref={{ referrer }}">
+                                        <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
+                                    </a>
+                                {% endif %}
+
                                 <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}?ref={{ referrer }}">{{ article.title }}</a></h3>
                                 <p class="meta">
-                                    Authored by
+                                    Published by
                                     {% if article.author.deletedAt.isNull %}
                                         <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
                                     {% else %}
@@ -45,7 +54,14 @@
                             <a class="icon-favourite" href="{{ routeRemove }}" title="Remove this from your saved items" data-remove="{{ article.title }}"></a>
                         </nav>
                         {% endif %}
-                        <article>{{ article.blurb|purify }}</article>
+
+                        {# Hide the article tag when there's no content to show, or when compactMode is on #}
+                        {% if not compactMode %}
+                            {% set blurb = macro.newsBlurb(article, readMore) %}
+                            {% if blurb|length %}
+                                <article>{{ blurb }}</article>
+                            {% endif %}
+                        {% endif %}
                     </li>
                 {% endfor %}
             </ul>
@@ -94,9 +110,9 @@
                                 });
 
                                 element.closest('li').remove();
-
                                 {# If this was the last in the list, respawn Empty State #}
                                 if (!$('#saveForLaterList li').length) {
+                                    $('#savedArticlesSection').remove();
                                     $('#emptyState').show();
                                 }
                             }).error(function () {

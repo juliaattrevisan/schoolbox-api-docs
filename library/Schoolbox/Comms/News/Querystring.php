@@ -71,6 +71,11 @@ class Querystring
      */
     private $querystring;
 
+    /**
+     * Querystring param for Read-Only
+     */
+    public const READONLY = 'ro';
+
 
     /**
      * Querystring constructor.
@@ -88,6 +93,7 @@ class Querystring
             self::FOLDER => $data[self::FOLDER],
             self::REFERRER => $data[self::REFERRER],
             self::STATUS => $data[self::STATUS],
+            self::READONLY => $data[self::READONLY]
         ];
     }
 
@@ -175,6 +181,16 @@ class Querystring
     public function getReferrer()
     {
         return $this->querystring[self::REFERRER];
+    }
+
+    /**
+     * The option to determine whether the request is read-only
+     *
+     * @return bool
+     */
+    public function getReadOnlyFlag(): bool
+    {
+        return (bool)$this->querystring[self::READONLY];
     }
 
 
