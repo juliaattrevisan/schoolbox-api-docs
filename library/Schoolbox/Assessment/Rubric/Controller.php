@@ -168,7 +168,7 @@ class Controller extends BaseController
 
             $context['rowspan']    = 1;
             $context['group']      = $group;
-            $context['groupIndex'] = \count($groupModels);
+            $context['groupIndex'] = $post->get('groupIndex');
 
             $template = 'group-editable';
 

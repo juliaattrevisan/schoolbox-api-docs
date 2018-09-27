@@ -84,14 +84,16 @@
             groupIdentifier = $row.data('group');
 
             if (typeof groupIdentifier !== 'undefined') {
-                groupIndex = groupIdentifier.split('-')[2];
+                // This is creating a new indicator within an existing capability
+                groupIndex    = groupIdentifier.split('-')[2];
+                $groupIdInput = $rb.find('[data-group="'+groupIdentifier+'"][data-groupname] input[data-group-id]');
+                groupId       = $groupIdInput.val();
             } else {
-                groupIndex = null;
+                // This is creating a new capability
+                groupIndex    = $rb.find('[data-group][data-groupname]').length;
+                $groupIdInput = $();
+                groupId       = null;
             }
-
-            // Find the group row, extract its ID (as opposed to its index)
-            $groupIdInput = $rb.find('[data-group="'+groupIdentifier+'"][data-groupname] input[data-group-id]');
-            groupId       = $groupIdInput.val();
 
             var message = 'Creating "' + name + '"...';
             $toastFeedback.toastActivate({text: message});
