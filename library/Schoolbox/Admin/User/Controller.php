@@ -212,15 +212,6 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
-        UserAccess::SERVICE_COMMS_OFFICER => [
-            'name' => 'Comms Officer',
-            'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => false,
-                'write' => false,
-                'moderate' => true
-            ]
-        ],
     ];
 
     /**

@@ -35,7 +35,7 @@ class ValidUserIsCommsOfficer
         }
 
         return UserAccessMapper::getInstance()
-            ->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)
+            ->findUsersForService(UserAccess::SERVICE_NEWS)
             ->getUnique('id')
             ->indexBy('id')
             ->offsetExists($user->getId());

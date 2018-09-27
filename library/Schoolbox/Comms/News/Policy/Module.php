@@ -41,7 +41,7 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser()
                 //new Rule\HasRole(Role::STAFF),
-                //new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL)
+                //new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
             )
         );
 
@@ -51,7 +51,7 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser()
-                //new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL)
+                //new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
             )
         );
 

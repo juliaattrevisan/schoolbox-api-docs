@@ -1,6 +1,3 @@
--- Comms Officer
-INSERT INTO lu_service (id, name) VALUES (11, 'Comms Officer');
-
 -- News Article
 -- Note the Character Set/Collation settings for that infernal storage table
 CREATE TABLE `comms_news_article` (
