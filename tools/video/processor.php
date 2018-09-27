@@ -51,7 +51,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
         /** @var MapperFactory $mapperFactory */
         $mapperFactory = $di->get('mapperFactory');
     } catch (ServiceNotFound $e) {
-        $log->critical("Unknown service requested");
+        $log->critical("Unknown service requested", ['exception'=>$e]);
         exit(1);
     }
 
@@ -165,7 +165,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                     $mediaCurrent->setStatus(QueueMapper::STATUS_FAILED);
                 }
             } catch (Exception $e) {
-                $log->error($e->getMessage(), [$e]);
+                $log->error($e->getMessage(), ['exception'=>$e]);
                 $mediaCurrent->setStatus(QueueMapper::STATUS_FAILED);
             } finally {
                 $queueMapper->save($mediaCurrent);

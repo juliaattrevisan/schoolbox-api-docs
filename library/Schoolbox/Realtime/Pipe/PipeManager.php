@@ -160,7 +160,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         } catch (CommunicationException $e) {
             // couldn't talk to redis, send a retry back to the client
-            $this->log->error('Communication Exception: ' . $e->getMessage(), [ $e ]);
+            $this->log->error('Communication Exception: ' . $e->getMessage(), [ 'exception'=>$e ]);
 
             $this->sendHeader($pipe, 503, true);
             $this->pipes->unregisterPipe($pipe->getSocketKey());
@@ -168,7 +168,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         } catch (SessionException $e) {
             // user not found, not logged in: signal authentication required
-            $this->log->error('Failed to fully register pipe: ' . $e->getMessage(), [ $e ]);
+            $this->log->error('Failed to fully register pipe: ' . $e->getMessage(), [ 'exception'=>$e ]);
 
             $this->sendHeader($pipe, 401);
             $this->pipes->unregisterPipe($pipe->getSocketKey());
@@ -239,9 +239,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         else if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`', $e->getMessage(), $matches)) {
             $this->log->warning("IOException: {$matches[3]} [{$matches[2]}] ({$matches[1]} bytes dropped)");
         } else {
-            $this->log->critical(sprintf('%s: "%s" occurred in %s on line %s',
-                get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()
-            ));
+            $this->log->critical(
+                sprintf('%s: "%s" occurred in %s on line %s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()),
+                ['exception'=>$e]
+            );
         }
 
         // process exception needs to be rethrown
@@ -317,7 +318,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $this->enqueue($pipe, $command, $arguments);
 
         } catch (QueueingException $e) {
-            $this->log->critical("Failed to enqueue, task '$command' lost: " . $e->getMessage());
+            $this->log->critical("Failed to enqueue, task '$command' lost: " . $e->getMessage(), ['exception'=>$e]);
             // since a full queue constitutes service unavailable, probably best to kick this pipe
             $this->sendHeader($pipe, 503, true);
 
@@ -468,9 +469,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                         $this->enqueueInstances($pipe, $timer->getData());
 
                     } catch (QueueingException $e) {
-                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage());
+                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception'=>$e]);
                     } catch (InvalidArgumentException $e) {
-                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage());
+                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception'=>$e]);
                     }
                 }
             );

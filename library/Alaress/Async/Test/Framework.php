@@ -494,13 +494,13 @@ class Framework
                         $unhook = true;
 
                         // handle the exception
-                        $this->log->warning($e->getMessage(), [ $e ]);
+                        $this->log->warning($e->getMessage(), [ 'exception'=>$e ]);
 
                     } catch (\Exception $e) {
                         // we can't exceptions exploding our harness; this is one of those rare cases you need to catch EVERYTHING
                         $unhook = true;
 
-                        $this->log->critical($e->getMessage(), [ $e ]);
+                        $this->log->critical($e->getMessage(), [ 'exception'=>$e ]);
                     }
 
                     if ($unhook !== false) {

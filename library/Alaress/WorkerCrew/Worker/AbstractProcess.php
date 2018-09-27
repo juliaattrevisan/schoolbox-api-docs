@@ -124,7 +124,7 @@ abstract class AbstractProcess implements WorkerInterface
                 throw new InvalidArgumentException("Rejecting command '$cmd'");
             }
         } catch(InvalidArgumentException $e) {
-            $this->log->error("Rejecting data '$buffer'", array($e));
+            $this->log->error("Rejecting data '$buffer'", ['exception' => $e]);
             throw $e;
         }
 

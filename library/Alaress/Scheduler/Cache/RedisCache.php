@@ -84,7 +84,7 @@ class RedisCache implements ICache
                 ++$i;
 
             } catch (ErrorException $e) {
-                $this->log->error("Error decompressing cached data", [$e]);
+                $this->log->error("Error decompressing cached data", ['exception'=>$e]);
             }
         }
 

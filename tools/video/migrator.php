@@ -46,7 +46,7 @@ try {
             /** @var MapperFactory $mapperFactory */
             $mapperFactory = $di->get('mapperFactory');
         } catch (ServiceNotFound $e) {
-            $log->critical("Unknown service requested");
+            $log->critical("Unknown service requested", ['exception'=>$e]);
             exit;
         }
 

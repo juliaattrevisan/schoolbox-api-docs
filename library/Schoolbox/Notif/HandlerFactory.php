@@ -170,7 +170,7 @@ class HandlerFactory
                 try {
                     array_push($stack, $this->getHandler($tag));
                 } catch (InvalidArgumentException $e) {
-                    $this->log->alert($e->getMessage(), [ $e ]);
+                    $this->log->alert($e->getMessage(), [ 'exception'=>$e ]);
                 }
             } else {
                 // exceptions not being suppressed

@@ -98,7 +98,7 @@ try {
 
                 $log->notice($count . ' results returned');
             } catch (InvalidArgumentException|OverflowException $e) {
-                $log->alert($e->getMessage(), [ $e ]);
+                $log->alert($e->getMessage(), [ 'exception'=>$e ]);
             }
         }
 

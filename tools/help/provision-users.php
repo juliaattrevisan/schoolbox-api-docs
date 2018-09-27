@@ -209,21 +209,21 @@ $kernel->run(new class extends App {
             }
         } catch (Schoolbox\Mapper\Exception $e) {
             // failed to look up route
-            $log->emergency($e->getMessage(), [ $e ]);
+            $log->emergency($e->getMessage(), [ 'exception'=>$e ]);
             return;
 
         } catch (RouteNotFound $e) {
             // route lookup failed: logic error
-            $log->critical($e->getMessage(), [ $e ]);
+            $log->critical($e->getMessage(), [ 'exception'=>$e ]);
             return;
 
         } catch (ClientException $e) {
             // client made a wobbly
-            $log->warning($e->getMessage(), [ $e ]);
+            $log->warning($e->getMessage(), [ 'exception'=>$e ]);
 
         } catch (ServerException $e) {
             // server did a boo boo
-            $log->error($e->getMessage(), [ $e ]);
+            $log->error($e->getMessage(), [ 'exception'=>$e ]);
         }
     }
 

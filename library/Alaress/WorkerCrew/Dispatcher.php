@@ -204,7 +204,7 @@ class Dispatcher implements DispatcherInterface
                 throw $e;
             } catch(Exception $e) {
                 // we need to catch (almost) any and all exception here, lest we explode our reactor
-                $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), [ $e ]);
+                $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), [ 'exception'=>$e ]);
             }
             // regardless of whether or not we succeeded, we've finished handling this message, so dequeue it
             $this->strat->pdequeue($identifier);
@@ -232,10 +232,10 @@ class Dispatcher implements DispatcherInterface
         } catch(IOException $e) {
             $this->log->warning("Could not communicate with worker: " . $e->getMessage());
         } catch(RuntimeException $e) {
-            $this->log->critical("Failed to spawn worker: " . $e->getMessage());
+            $this->log->critical("Failed to spawn worker: " . $e->getMessage(), ['exception'=>$e]);
         } catch(Exception $e) {
             // we need to catch any and all exception here, lest we explode our reactor
-            $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), [ $e ]);
+            $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), ['exception'=>$e]);
         }
 
     }

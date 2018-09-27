@@ -87,7 +87,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
         $log->info("Listening for incoming websockets on port {$opts['port']}...", [ 'char' => '+' ]);
 
     } catch (ConnectionException $e) {
-        $log->alert('Unable to launch: ' . $e->getMessage(), [ $e ]);
+        $log->alert('Unable to launch: ' . $e->getMessage(), [ 'exception'=>$e ]);
         throw $e;
     }
 

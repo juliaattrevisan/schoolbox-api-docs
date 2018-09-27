@@ -97,7 +97,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                 $file->uploadPastoralDocument();
                 $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_COMPLETED);
             } catch (Exception $e) {
-                $log->error("$e", array($e));
+                $log->error("$e", ['exception' => $e]);
                 $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_FAILED);
             }
 

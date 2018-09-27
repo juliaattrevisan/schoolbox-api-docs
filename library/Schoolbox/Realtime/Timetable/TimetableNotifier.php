@@ -152,7 +152,7 @@ class TimetableNotifier extends WorkNotifier {
         try {
             $handler = new \External_Timetable();
         } catch (\Exception $e) {
-            $this->log()->critical('Failed to connect to external timetable, no alerts sent');
+            $this->log()->critical('Failed to connect to external timetable, no alerts sent', ['exception'=>$e]);
             return 0;
         }
 

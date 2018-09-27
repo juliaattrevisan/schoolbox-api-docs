@@ -491,7 +491,7 @@ class Controller extends BaseController
                     unserialize(gzuncompress($data), ['allowed_classes' => [Instance::class, Param::class,],])
                 );
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $log->warning("Failed to retrieve user $userId: {$e->getMessage()}", [ $e ]);
+                $log->warning("Failed to retrieve user $userId: {$e->getMessage()}", [ 'exception'=>$e ]);
             }
 
             $log->warning('-- END --');

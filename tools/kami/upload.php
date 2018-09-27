@@ -190,7 +190,7 @@ $kernel->run(function (Di\Container $di,
     try {
         $results = $uploader->upload($retryFailed, $batchSize, $maxSkips);
     } catch (Throwable $e) {
-        $log->error($e->getMessage(), $e->getTrace());
+        $log->error($e->getMessage(), ['exception' => $e]);
         $log->error($e->getTraceAsString());
         exit(1);
     }

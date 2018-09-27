@@ -52,15 +52,15 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $lo
         $framework->launch($testCase);
 
     } catch (UnderflowException $e) {
-        $log->critical($e->getMessage(), [ $e ]);
+        $log->critical($e->getMessage(), [ 'exception'=>$e ]);
         return;
 
     } catch (OutOfBoundsException $e) {
-        $log->error($e->getMessage(), [ $e ]);
+        $log->error($e->getMessage(), [ 'exception'=>$e ]);
         return;
 
     } catch (InvalidArgumentException $e) {
-        $log->error($e->getMessage(), [ $e ]);
+        $log->error($e->getMessage(), [ 'exception'=>$e ]);
         return;
     }
 

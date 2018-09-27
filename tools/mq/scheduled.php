@@ -116,7 +116,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
         });
 
     } catch (ConnectionException $e) {
-        $log->alert('AMQP server is offline or STOMP misconfigured: '. $e->getMessage(), [ $e ]);
+        $log->alert('AMQP server is offline or STOMP misconfigured: '. $e->getMessage(), [ 'exception'=>$e ]);
 
     } catch (AMQPRuntimeException $e) {
         $log->alert('Unable to connect to AMQP server: server is offline.');

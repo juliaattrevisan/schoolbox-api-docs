@@ -66,7 +66,7 @@ $reQueue = new class() extends App
             $requeueErrors = new Kami\ReQueueErrors($kamiConnector, $kamiMapper, $jitter, $log);
             $requeueErrors->deleteAndReQueue(false, Kami\ReQueueErrors::DEFAULT_MAX_SKIPS, 'Conversion failed');
         } catch (Throwable $e) {
-            $log->error($e->getMessage(), [$e]);
+            $log->error($e->getMessage(), ['exception'=>$e]);
         }
     }
 };
