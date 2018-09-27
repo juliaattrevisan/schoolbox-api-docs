@@ -82,6 +82,16 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const TYPE_DOC_MANAGE    = 20;
     public const TYPE_SAML          = 21;
 
+    // Technically these should be prefixed with 'NAME_', but it gets a bit verbose for little extra clarity
+    public const _GLOBAL_MODERATION     = 'global_moderation';
+    public const _PUBLISH_DATE_OFFSET   = 'publish_date_offset';
+    public const _EXPIRY_DATE_OFFSET    = 'news_default_expiry';
+    public const _READ_MORE             = 'read_more';
+    public const _SAVE_FOR_LATER        = 'save_for_later';
+    public const _STAFF_CAN_POST_NEWS   = 'news_staff_post_enabled';
+    public const _NEWS_EDIT_OTHERS      = 'news_edit_other';
+    public const _BOARDER_LEAVE_ENABLED = 'boarder_leave_enabled';
+
     /** @var array */
     protected $cache = array();
 
