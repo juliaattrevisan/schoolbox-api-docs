@@ -16,8 +16,10 @@ use PDO;
 
 /**
  * Class ConfigMapper
+ *
  * @package Schoolbox\Config
  * @method Config findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
+ * @method GenericCollection|Config[] findByColumn($columnName, $columnValue, $options = array())
  */
 class ConfigMapper extends Mapper implements IConfigLoader
 {
@@ -43,21 +45,21 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const MODULE_COMMS    = 'comms';
 
     // Field enum (kinda)
-    public const FIELD_INPUT        =  1;
-    public const FIELD_TEXTAREA     =  2;
-    public const FIELD_BOOLEAN      =  3;
-    public const FIELD_SELECT       =  4;
-    public const FIELD_CHECKBOX     =  5;
-    public const FIELD_BYTES        =  6;
-    public const FIELD_SELECTKEY    =  7;
-    public const FIELD_HTML         =  8;
-    public const FIELD_RESOURCE     =  9;
-    public const FIELD_SELECTLOOKUP = 10;
-    public const FIELD_COLOUR       = 11;
-    public const FIELD_FILE         = 12;
-    public const FIELD_FILEMULTI    = 13;
-    public const FIELD_PASSWORD     = 14;
-    public const FIELD_TIMEPICKER   = 15;
+    public const FIELD_INPUT         =  1;
+    public const FIELD_TEXT_AREA     =  2;
+    public const FIELD_BOOLEAN       =  3;
+    public const FIELD_SELECT        =  4;
+    public const FIELD_CHECKBOX      =  5;
+    public const FIELD_BYTES         =  6;
+    public const FIELD_SELECT_KEY    =  7;
+    public const FIELD_HTML          =  8;
+    public const FIELD_RESOURCE      =  9;
+    public const FIELD_SELECT_LOOKUP = 10;
+    public const FIELD_COLOUR        = 11;
+    public const FIELD_FILE          = 12;
+    public const FIELD_FILE_MULTI    = 13;
+    public const FIELD_PASSWORD      = 14;
+    public const FIELD_TIME_PICKER   = 15;
 
     // Type enum
     public const TYPE_SITE          =  1;
@@ -248,5 +250,4 @@ class ConfigMapper extends Mapper implements IConfigLoader
     {
         //Silence notifications
     }
-
 }

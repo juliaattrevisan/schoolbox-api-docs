@@ -33,7 +33,7 @@ class Config
     /** @var null|string */
     private $options;
 
-    /** @var int */
+    /** @var null|int */
     private $typeId;
 
     /** @var bool */
@@ -179,10 +179,10 @@ class Config
 
 
     /**
-     * @param int $typeId
+     * @param null|int $typeId
      * @return $this
      */
-    public function setTypeId(int $typeId): self
+    public function setTypeId(?int $typeId): self
     {
         $this->typeId = $typeId;
         return $this;
