@@ -21,6 +21,9 @@ use Schoolbox\Mapper;
  */
 class ConfigMapper extends Mapper implements IConfigLoader
 {
+    public const MODULE_SETTINGS = 'settings';
+    public const MODULE_COMMS    = 'comms';
+
     public const FIELD_INPUT        =  1;
     public const FIELD_TEXTAREA     =  2;
     public const FIELD_BOOLEAN      =  3;
