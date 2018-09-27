@@ -35,6 +35,7 @@
 {% for levelIndex, level in rubricGrid.levels -%}
     {% set descriptor = criterionUsage.retrieveDescriptor(levelIndex) %}
     <td data-descriptor class="{{ cellClass }}">
+        <input type="hidden" readonly name="{{ descInput }}[{{ levelIndex }}][id]" value="{{ descriptor.id }}" />
         <textarea {% if not checkChecked %} disabled="disabled"{% endif %}
                 data-descriptor-text
                 placeholder="Descriptor"
