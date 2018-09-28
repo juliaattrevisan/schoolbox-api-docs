@@ -5,11 +5,12 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Settings\Renderer;
+namespace Schoolbox\Admin\Settings\FieldType\Checkbox;
 
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Admin\Settings\FieldType\AbstractRenderer;
 
-class Checkbox extends Base
+class Renderer extends AbstractRenderer
 {
 
     /**

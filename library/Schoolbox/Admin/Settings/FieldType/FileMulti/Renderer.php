@@ -5,13 +5,14 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Settings\Renderer;
+namespace Schoolbox\Admin\Settings\FieldType\FileMulti;
 
+use Schoolbox\Admin\Settings\FieldType\File;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Zone;
 
-class FileMulti extends File
+class Renderer extends File\Renderer
 {
 
     /**
@@ -51,5 +52,32 @@ class FileMulti extends File
     protected function getFieldId(): int
     {
         return ConfigMapper::FIELD_FILE_MULTI;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function serializeValue($value): string
+    {
+        $factory = new \Schoolbox\Resource\Attachment\Collector\CollectorFactory();
+        try {
+            $newValue = '';
+            if (\is_array($value)) {
+                foreach ($value as $file) {
+                    $image = $factory->build([$file])->getFirst();
+                    if ($newValue !== '') {
+                        $newValue .= ',';
+                    }
+                    $newValue .= $image->getHash();
+                }
+            }
+        } catch (\Schoolbox\Resource\Exception $e) {
+            // File is empty or not found. Delete the record completely
+            $newValue = '';
+        } catch (\InvalidArgumentException $e) {
+            $newValue = '';
+        }
+        return $newValue;
     }
 }

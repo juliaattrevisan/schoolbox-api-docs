@@ -5,13 +5,14 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Settings\Renderer;
+namespace Schoolbox\Admin\Settings\FieldType\SelectLookup;
 
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MapperFactory;
+use Schoolbox\Admin\Settings\FieldType\Select;
 
-class SelectLookup extends Select
+class Renderer extends Select\Renderer
 {
 
     /** @var MapperFactory */

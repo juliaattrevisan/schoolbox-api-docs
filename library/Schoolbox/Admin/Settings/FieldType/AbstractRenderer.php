@@ -5,13 +5,16 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Settings\Renderer;
+namespace Schoolbox\Admin\Settings\FieldType;
 
 use Schoolbox\Config\Config;
 use Schoolbox\Admin\Settings\IConfigRenderer;
 use InvalidArgumentException;
 
-abstract class Base implements IConfigRenderer
+/**
+ * Provides common functionality for config field-type rendering classes
+ */
+abstract class AbstractRenderer implements IConfigRenderer
 {
 
     /**

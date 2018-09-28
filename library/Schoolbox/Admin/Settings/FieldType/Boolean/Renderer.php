@@ -1,15 +1,16 @@
 <?php
 /**
- * Author: andy@modernwebservices.com.au
- * Created: 28/09/18 12:09 PM
+ * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Settings\Renderer;
+namespace Schoolbox\Admin\Settings\FieldType\Boolean;
 
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Admin\Settings\FieldType\Checkbox;
 
-class Boolean extends Checkbox
+class Renderer extends Checkbox\Renderer
 {
 
     /**

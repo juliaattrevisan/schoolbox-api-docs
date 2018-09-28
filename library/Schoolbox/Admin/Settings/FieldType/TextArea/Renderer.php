@@ -5,11 +5,12 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Settings\Renderer;
+namespace Schoolbox\Admin\Settings\FieldType\TextArea;
 
+use Schoolbox\Admin\Settings\FieldType\AbstractRenderer;
 use Schoolbox\Config\ConfigMapper;
 
-class TextArea extends Base
+class Renderer extends AbstractRenderer
 {
 
     /**
