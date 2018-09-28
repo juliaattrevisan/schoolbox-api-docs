@@ -61,6 +61,6 @@ class Alaress_Byte_Format {
 			$bytes = $match[1] * 1024 * 1024 * 1024 * 1024;
 		}
 
-        return (int)round($bytes,0);
+        return (int)round($bytes ?? 0, 0);
 	}
 }
