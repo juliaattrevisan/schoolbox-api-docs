@@ -57,7 +57,7 @@ class Controller extends Base
 
         $configContext = (new ModuleConfig($this->fieldRendererFactory))->getContext(
             $this->getConfigLoader()->get('site_version'),
-            $this->configMapper->findByTypeLabel($typeLabel),
+            $this->configMapper->findByTypeLabel($typeLabel, ConfigMapper::MODULE_SETTINGS),
             $this->router->generate('settings.postSettings', ['typeLabel' => $typeLabel])
         );
 

@@ -214,15 +214,20 @@ class ConfigMapper extends Mapper implements IConfigLoader
 
 
     /**
-     * Returns all config items for a specific lu_config_type.type
+     * Returns all config items for a specific lu_config_type.type, and optional module
      *
-     * @param string $typeLabel
+     * @param string      $typeLabel
+     * @param string|null $module
      * @return GenericCollection|Config[]
      */
-    public function findByTypeLabel(string $typeLabel): GenericCollection
+    public function findByTypeLabel(string $typeLabel, string $module = null): GenericCollection
     {
         $pb = $this->getPredicateBuilder()
             ->equals('lct.type', $typeLabel);
+
+        if ($module) {
+            $pb->equals(self::COL_MODULE, $module);
+        }
 
         if(!$this->get(self::_BOARDER_LEAVE_ENABLED)){
             $pb->notEquals(self::COL_TYPE, self::TYPE_BOARD);
