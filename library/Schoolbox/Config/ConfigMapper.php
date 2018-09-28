@@ -11,8 +11,6 @@ namespace Schoolbox\Config;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
-use PDO;
-
 
 /**
  * Class ConfigMapper
@@ -223,13 +221,13 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public function findByTypeLabel(string $typeLabel, string $module = null): GenericCollection
     {
         $pb = $this->getPredicateBuilder()
-            ->equals('lct.type', $typeLabel);
+                   ->equals('lct.type', $typeLabel);
 
         if ($module) {
             $pb->equals(self::COL_MODULE, $module);
         }
 
-        if(!$this->get(self::_BOARDER_LEAVE_ENABLED)){
+        if (!$this->get(self::_BOARDER_LEAVE_ENABLED)) {
             $pb->notEquals(self::COL_TYPE, self::TYPE_BOARD);
         }
 

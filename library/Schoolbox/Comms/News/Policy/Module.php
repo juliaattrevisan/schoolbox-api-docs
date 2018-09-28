@@ -18,7 +18,6 @@ use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
-
 class Module extends BaseModule
 {
     /**
