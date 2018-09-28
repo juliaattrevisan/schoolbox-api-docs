@@ -110,6 +110,7 @@ class FormatTest extends TestCase
 
     public function testDataTypeBytesToString(): void
     {
+        /** @noinspection UnnecessaryAssertionInspection */
         $this->assertInternalType('string', Alaress_Byte_Format::bytesToString('10 MB'));
     }
 }
