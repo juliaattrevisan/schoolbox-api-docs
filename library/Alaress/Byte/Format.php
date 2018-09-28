@@ -33,7 +33,16 @@ class Alaress_Byte_Format {
 	 */
 	static public function stringToBytes($size) {
 
-		if (preg_match('/([0-9\.]+)\s?((KB)|(K))/i', $size, $match)) {
+	    // All numeric
+	    if(preg_match('/\d+/', trim($size), $match)){
+            $bytes = $match[0];
+        }
+        // Numeric with 'B'
+        elseif(preg_match('/(\d+)\s?B/i', trim($size), $match)){
+            $bytes = $match[1];
+        }
+
+		elseif (preg_match('/([0-9\.]+)\s?((KB)|(K))/i', $size, $match)) {
 			$bytes = $match[1] * 1024;
 		}
 
