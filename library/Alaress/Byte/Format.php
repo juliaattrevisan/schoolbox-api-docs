@@ -35,29 +35,30 @@ class Alaress_Byte_Format {
 	 */
 	public static function stringToBytes(string $size): int
     {
+        $trimmed = \trim($size);
 
 	    // All numeric
-	    if(preg_match('/\d+/', trim($size), $match)){
+	    if(preg_match('/^\d+$/', $trimmed, $match)){
             $bytes = $match[0];
         }
         // Numeric with 'B'
-        elseif(preg_match('/(\d+)\s?B/i', trim($size), $match)){
+        elseif(preg_match('/(\d+)\s?B/i', $trimmed, $match)){
             $bytes = $match[1];
         }
 
-		elseif (preg_match('/([0-9\.]+)\s?((KB)|(K))/i', $size, $match)) {
+		elseif (preg_match('/([0-9\.]+)\s?((KB)|(K))/i', $trimmed, $match)) {
 			$bytes = $match[1] * 1024;
 		}
 
-		elseif (preg_match('/([0-9\.]+)\s?((MB)|(M))/i', $size, $match)) {
+		elseif (preg_match('/([0-9\.]+)\s?((MB)|(M))/i', $trimmed, $match)) {
 			$bytes = $match[1] * 1024 * 1024;
 		}
 
-        elseif (preg_match('/([0-9\.]+)\s?((GB)|(G))/i', $size, $match)) {
+        elseif (preg_match('/([0-9\.]+)\s?((GB)|(G))/i', $trimmed, $match)) {
 			$bytes = $match[1] * 1024 * 1024 * 1024;
 		}
 
-        elseif (preg_match('/([0-9\.]+)\s?((TB)|(T))/i', $size, $match)) {
+        elseif (preg_match('/([0-9\.]+)\s?((TB)|(T))/i', $trimmed, $match)) {
 			$bytes = $match[1] * 1024 * 1024 * 1024 * 1024;
 		}
 
