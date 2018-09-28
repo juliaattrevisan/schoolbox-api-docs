@@ -221,20 +221,25 @@ class ConfigMapper extends Mapper implements IConfigLoader
      */
     public function findByTypeLabel(string $typeLabel): GenericCollection
     {
-        $stmt = $this->database->prepare("SELECT id FROM lu_config_type WHERE type = :type");
-        $stmt->execute(['type' => $typeLabel]);
-        $results = $stmt->fetchAll(PDO::FETCH_COLUMN);
-        if (!\count($results)) {
-            return $this->createCollection();
-        }
-        $type = (int)$results[0];
+        $pb = $this->getPredicateBuilder()
+            ->equals('lct.type', $typeLabel);
 
-        /* filter out references to leave module if not enabled */
-        if (self::TYPE_BOARD === $type && !$this->get(self::_BOARDER_LEAVE_ENABLED)) {
-            return $this->createCollection();
+        if(!$this->get(self::_BOARDER_LEAVE_ENABLED)){
+            $pb->notEquals(self::COL_TYPE, self::TYPE_BOARD);
         }
 
-        return $this->findByColumn('type_id', $type);
+        return $this->findByPredicates($pb);
+    }
+
+
+    protected function getSelectString(): string
+    {
+        return "
+          SELECT  {$this->getColumnString()}
+          FROM {$this->getTable()}
+          INNER JOIN lu_config_field lcf on config.field_id = lcf.id
+          LEFT  JOIN lu_config_type  lct on config.type_id  = lct.id
+        ";
     }
 
 
