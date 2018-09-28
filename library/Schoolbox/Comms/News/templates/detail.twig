@@ -1,6 +1,5 @@
 {#
 Data:
-    policies           Policy\Model[]
     article            News\Model
     moderationEnabled  bool
     isSavedForLater    bool
@@ -226,12 +225,12 @@ Data:
 
 {# Social Features and assorted functionality #}
 {#{% include '@commsNews/social.twig' with {#}
-    {#policies: policies,#}
+    {#saveForLaterEnabled: saveForLaterEnabled,#}
     {#article: article,#}
     {#states: {#}
         {#'save_for_later': isSavedForLater#}
     {#}#}
-{#} %}#}
+{#} only %}#}
 
 
 <div class="row">

@@ -19,7 +19,6 @@ use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\News\Topic;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 use Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 class Lists
@@ -38,10 +37,11 @@ class Lists
      */
     private $newsMapper;
 
-    /**
-     * @var Policy\Mapper
-     */
-    private $policyMapper;
+    /** @var string */
+    private $readMoreText;
+
+    /** @var bool */
+    private $saveForLaterEnabled;
 
     /**
      * @var SaveForLater\Mapper
@@ -74,7 +74,8 @@ class Lists
      *
      * @param int                          $defaultLimit
      * @param Mapper                       $newsMapper
-     * @param Policy\Mapper                $policyMapper
+     * @param string                       $readMoreText
+     * @param bool                         $saveForLaterEnabled
      * @param SaveForLater\Mapper          $saveForLaterMapper
      * @param Statistics\Mapper            $statisticsMapper
      * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
@@ -84,7 +85,8 @@ class Lists
     public function __construct(
         int $defaultLimit,
         Mapper $newsMapper,
-        Policy\Mapper $policyMapper,
+        string $readMoreText,
+        bool $saveForLaterEnabled,
         SaveForLater\Mapper $saveForLaterMapper,
         Statistics\Mapper $statisticsMapper,
         Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
@@ -93,7 +95,8 @@ class Lists
     ) {
         $this->defaultLimit               = $defaultLimit;
         $this->newsMapper                 = $newsMapper;
-        $this->policyMapper               = $policyMapper;
+        $this->readMoreText               = $readMoreText;
+        $this->saveForLaterEnabled        = $saveForLaterEnabled;
         $this->saveForLaterMapper         = $saveForLaterMapper;
         $this->statisticsMapper           = $statisticsMapper;
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
@@ -137,8 +140,6 @@ class Lists
      */
     public function findForTopic(string $urlPrefix, Querystring $params, User $user, Collection $topics, ?int $year, ?int $month): array
     {
-        $policies = $this->policyMapper->findAll()->indexBy('identifier');
-
         /* News Topics were never obtainable by slug
          * We always fetched everything, then manually sorted by slug
          * Inherit this situation, improvise and adapt (or just use ids...)
@@ -225,14 +226,14 @@ class Lists
 
         /* Figure out the articles that this user has saved for later
          */
-        $savedArticleIds = $this->findSavedArticles($user, $policies->getOffset('save_for_later'));
+        $savedArticleIds = $this->findSavedArticles($user, $this->saveForLaterEnabled);
 
         /* These pieces are needed to represent an article, due to Save For Later
          */
         return [
             'articles' => $articles,
-            'readMore' => $policies->getOffset('read_more')->getValue(),
-            'saveForLater' => $policies->getOffset('save_for_later')->getValue(),
+            'readMore' => $this->readMoreText,
+            'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $savedArticleIds,
             'unsaved' => SaveForLater\Mapper::UNSAVED,
 
@@ -274,14 +275,14 @@ class Lists
     /**
      * Find the article ids that were saved by $user in accordance with policy setting
      *
-     * @param User         $user
-     * @param Policy\Model $policy
+     * @param User    $user
+     * @param bool    $saveForLaterEnabled
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    private function findSavedArticles(User $user, Policy\Model $policy): array
+    private function findSavedArticles(User $user, bool $saveForLaterEnabled): array
     {
-        if ($policy->getValue()) {
+        if ($saveForLaterEnabled) {
             $savedArticleIds = (new SaveForLater\Lists($this->saveForLaterMapper, $this->newsMapper))->findSavedIdsForUser($user->getId());
 
             return array_fill_keys($savedArticleIds, SaveForLater\Mapper::SAVED);

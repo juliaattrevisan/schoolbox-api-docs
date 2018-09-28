@@ -15,7 +15,6 @@ use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Comms\News;
 use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
@@ -68,7 +67,6 @@ class Module extends BaseModule
             'folderMapper'     => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
             'audienceMapper'   => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
             'roleAccessMapper' => $this->getMapperFactory()->getLazy(RoleAccessMapper::class),
-            'policyMapper'     => $this->getMapperFactory()->getLazy(News\Policy\Mapper::class),
         ];
     }
 }

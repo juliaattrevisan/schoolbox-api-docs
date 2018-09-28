@@ -12,7 +12,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Model;
-use Schoolbox\Comms\News\Policy;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
 
 class Controller extends Base
@@ -42,24 +42,17 @@ class Controller extends Base
      */
     private $newsMapper;
 
-    /**
-     * @var Policy\Mapper
-     */
-    private $policyMapper;
-
     /** @var News\Validation\Factory */
     private $validSpecFactory;
 
 
     /**
      * @param News\Mapper             $newsMapper
-     * @param Policy\Mapper           $policyMapper
      * @param News\Validation\Factory $validSpecFactory
      */
-    public function __construct(News\Mapper $newsMapper, Policy\Mapper $policyMapper, News\Validation\Factory $validSpecFactory)
+    public function __construct(News\Mapper $newsMapper, News\Validation\Factory $validSpecFactory)
     {
         $this->newsMapper       = $newsMapper;
-        $this->policyMapper     = $policyMapper;
         $this->validSpecFactory = $validSpecFactory;
     }
 
@@ -78,10 +71,8 @@ class Controller extends Base
         $articles = new Collection();
 
         try {
-            $policy = $this->policyMapper->findOneByColumn('identifier', 'global_moderation');
-            $moderationRequired = (bool)$policy->getValue();
-
-            $articles = $lists->getNeedModeration();
+            $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
+            $articles           = $lists->getNeedModeration();
         } catch (Mapper\Exception $e) {
             $moderationRequired = false;
         }

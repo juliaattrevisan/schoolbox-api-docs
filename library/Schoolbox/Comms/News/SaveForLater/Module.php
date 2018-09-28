@@ -18,8 +18,8 @@ use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
-use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater\Mapper as SaveForLaterMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -132,16 +132,6 @@ class Module extends BaseModule
 
 
     /**
-     * @return Mapper|Policy\Mapper
-     * @throws InvalidArgumentException
-     */
-    private function getPolicyMapper(): Policy\Mapper
-    {
-        return $this->getMapperFactory()->get(Policy\Mapper::class);
-    }
-
-
-    /**
      * Returns an auth rule do determine if the user the user is logged in to view their 'save-for-later' list
      *
      * @return Rule\IAuthorizationRule
@@ -161,8 +151,7 @@ class Module extends BaseModule
         return new Rule\LazyCallback(function () {
             return new Rule\Callback(function (array $params = []) {
                 // Intentionally not catching mapper exception, that's a 5xx, not 4xx
-                $policy = $this->getPolicyMapper()->findOneByColumn('identifier', 'save_for_later');
-                if (!$policy->getValue()) {
+                if (!$this->getConfig()->get(ConfigMapper::_SAVE_FOR_LATER)) {
                     throw new InvalidPath('This feature has been disabled.');
                 }
                 try {
@@ -190,8 +179,7 @@ class Module extends BaseModule
         return new Rule\LazyCallback(function(){
             return new Rule\Callback(function (array $params = []) {
                 // Intentionally not catching mapper exception, that's a 5xx, not 4xx
-                $policy = $this->getPolicyMapper()->findOneByColumn('identifier', 'save_for_later');
-                if (!$policy->getValue()) {
+                if (!$this->getConfig()->get(ConfigMapper::_SAVE_FOR_LATER)) {
                     throw new InvalidPath('This feature has been disabled.');
                 }
                 try {

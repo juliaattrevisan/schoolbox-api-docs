@@ -10,6 +10,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
@@ -20,11 +21,6 @@ class Controller extends Base
      * @var News\Mapper
      */
     private $newsMapper;
-
-    /**
-     * @var News\Policy\Mapper
-     */
-    private $policyMapper;
 
     /**
      * @var TopicMapper
@@ -59,7 +55,6 @@ class Controller extends Base
      * Controller constructor.
      *
      * @param News\Mapper                       $newsMapper
-     * @param News\Policy\Mapper                $policyMapper
      * @param TopicMapper                       $topicMapper
      * @param News\SaveForLater\Mapper          $saveForLaterMapper
      * @param News\Statistics\Mapper            $statisticsMapper
@@ -69,7 +64,6 @@ class Controller extends Base
      */
     public function __construct(
         News\Mapper $newsMapper,
-        News\Policy\Mapper $policyMapper,
         TopicMapper $topicMapper,
         News\SaveForLater\Mapper $saveForLaterMapper,
         News\Statistics\Mapper $statisticsMapper,
@@ -78,7 +72,6 @@ class Controller extends Base
         ArticleResolver $articleResolver
     ) {
         $this->newsMapper                 = $newsMapper;
-        $this->policyMapper               = $policyMapper;
         $this->topicMapper                = $topicMapper;
         $this->saveForLaterMapper         = $saveForLaterMapper;
         $this->statisticsMapper           = $statisticsMapper;
@@ -149,7 +142,8 @@ class Controller extends Base
         $topicData = (new News\Lists(
             (int)$this->getConfigLoader()->get('search_type_limit'),
             $this->newsMapper,
-            $this->policyMapper,
+            $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+            $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
             $this->saveForLaterMapper,
             $this->statisticsMapper,
             $this->statisticsCumulativeMapper,

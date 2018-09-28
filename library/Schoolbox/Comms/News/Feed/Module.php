@@ -112,7 +112,6 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'newsMapper'                 => $this->getMapperFactory()->getLazy(News\Mapper::class),
-            'policyMapper'               => $this->getMapperFactory()->getLazy(News\Policy\Mapper::class),
             'topicMapper'                => $this->getMapperFactory()->getLazy(TopicMapper::class),
             'saveForLaterMapper'         => $this->getMapperFactory()->getLazy(News\SaveForLater\Mapper::class),
             'statisticsMapper'           => $this->getMapperFactory()->getLazy(News\Statistics\Mapper::class),

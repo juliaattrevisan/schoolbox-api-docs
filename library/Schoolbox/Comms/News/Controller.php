@@ -17,9 +17,9 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Comms\News\Policy;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -34,16 +34,10 @@ use Schoolbox\UserMapper;
 class Controller extends Base
 {
 
-
     /**
      * @var Mapper
      */
     private $newsMapper;
-
-    /**
-     * @var Policy\Mapper
-     */
-    private $policyMapper;
 
     /**
      * @var TopicMapper
@@ -106,7 +100,6 @@ class Controller extends Base
 
     /**
      * @param Mapper                       $newsMapper
-     * @param Policy\Mapper                $policyMapper
      * @param TopicMapper                  $topicMapper
      * @param SaveForLater\Mapper          $saveForLaterMapper
      * @param Statistics\Mapper            $statisticsMapper
@@ -121,7 +114,6 @@ class Controller extends Base
      */
     public function __construct(
         Mapper $newsMapper,
-        Policy\Mapper $policyMapper,
         TopicMapper $topicMapper,
         SaveForLater\Mapper $saveForLaterMapper,
         Statistics\Mapper $statisticsMapper,
@@ -135,7 +127,6 @@ class Controller extends Base
         Validation\Factory $validSpecFactory
     ) {
         $this->newsMapper                 = $newsMapper;
-        $this->policyMapper               = $policyMapper;
         $this->topicMapper                = $topicMapper;
         $this->saveForLaterMapper         = $saveForLaterMapper;
         $this->statisticsMapper           = $statisticsMapper;
@@ -162,8 +153,6 @@ class Controller extends Base
      */
     public function getCreate(): void
     {
-        $policies = $this->policyMapper->findAll()->indexBy('identifier');
-
         /* Spawn an empty news with default settings
          */
         $article = $this->newsMapper->createModel()
@@ -172,18 +161,18 @@ class Controller extends Base
 
         /* Policies: Publish Date Offset
          */
-        $policy = $policies->getOffset('publish_date_offset');
+        $publishDateOffset = (string)$this->getConfigLoader()->get(ConfigMapper::_PUBLISH_DATE_OFFSET);
 
-        if ((new ValidDateOffset())->isSatisfiedBy($policy)) {
-            $article->getPublishAt()->modify($policy->getValue())->endOfDay();
+        if ((new ValidDateOffset())->isSatisfiedBy($publishDateOffset)) {
+            $article->getPublishAt()->modify($publishDateOffset)->endOfDay();
         }
 
         /* Policies: Expiry Date Offset
          */
-        $policy = $policies->getOffset('expiry_date_offset');
+        $expireDateOffset = (string)$this->getConfigLoader()->get(ConfigMapper::_EXPIRY_DATE_OFFSET);
 
-        if ((new ValidDateOffset())->isSatisfiedBy($policy)) {
-            $article->getExpiresAt()->modify($policy->getValue())->endOfDay();
+        if ((new ValidDateOffset())->isSatisfiedBy($expireDateOffset)) {
+            $article->getExpiresAt()->modify($expireDateOffset)->endOfDay();
         }
 
         /* Feature image
@@ -214,7 +203,6 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
-            'policies'         => $policies,
             'action'           => 'Create',
             'article'          => $article,
             'featureImageZone' => $zone->getTwigContext(),
@@ -266,8 +254,6 @@ class Controller extends Base
      */
     public function getUpdate(Model $article): void
     {
-        $policies = $this->policyMapper->findAll()->indexBy('identifier');
-
         /* Feature image
          */
         $zone = (new Zone('featureImage'))
@@ -313,7 +299,6 @@ class Controller extends Base
 
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
-            'policies'               => $policies,
             'action'                 => 'Update',
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
@@ -493,13 +478,11 @@ class Controller extends Base
      */
     public function getDetail(Model $article): void
     {
-        $policies = $this->policyMapper->findAll()->indexBy('identifier');
-
-        $moderationEnabled = (bool)$policies->getOffset('global_moderation')->getValue();
+        $moderationEnabled = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
 
         /* Figure out if this was Saved For Later for the current user
          */
-        $saveForLater    = $policies->getOffset('save_for_later')->getValue();
+        $saveForLater    = $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER);
         $isSavedForLater = false;
 
         if ($saveForLater) {
@@ -552,7 +535,6 @@ class Controller extends Base
 
         } else {
             $data = [
-                'policies'           => $policies,
                 'article'            => $article,
                 'moderationEnabled'  => $moderationEnabled,
                 'isSavedForLater'    => $isSavedForLater,
@@ -611,7 +593,7 @@ class Controller extends Base
             'slug' => $params->getSlug()
         ]));
     }
-    
+
     /**
      * Delete an article
      *
@@ -1000,7 +982,8 @@ class Controller extends Base
         $topicData = (new Lists(
             $searchLimit,
             $this->newsMapper,
-            $this->policyMapper,
+            $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+            $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
             $this->saveForLaterMapper,
             $this->statisticsMapper,
             $this->statisticsCumulativeMapper,
@@ -1060,8 +1043,6 @@ class Controller extends Base
      */
     private function isGlobalModerationEnabled(): bool
     {
-        /** @var Policy\Model $policy */
-        $policy = $this->policyMapper->findByColumn('identifier', 'global_moderation')->first();
-        return (bool)$policy->getValue();
+        return $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
     }
 }

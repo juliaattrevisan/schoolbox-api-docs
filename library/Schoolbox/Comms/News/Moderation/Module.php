@@ -19,7 +19,6 @@ use Schoolbox\Comms\News\Authorizer\Rule\CanModerateAudience;
 use Schoolbox\Comms\News\Authorizer\Rule\IsModerationEnabled;
 use Schoolbox\Comms\News\Authorizer\Rule\IsArticleAuthor;
 use Schoolbox\Comms\News;
-use Schoolbox\Comms\News\Policy;
 use Schoolbox\Error;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -58,7 +57,7 @@ class Module extends BaseModule
                 new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
                 new CanModerateAudience($this->getFolderMapper()),
                 new Rule\All(
-                    new IsModerationEnabled($this->getPolicyMapper()),
+                    new IsModerationEnabled($this->getConfig()),
                     new IsArticleAuthor()
                 )
             )
@@ -174,7 +173,6 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'newsMapper'       => $this->getMapperFactory()->getLazy(News\Mapper::class),
-            'policyMapper'     => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
             'validSpecFactory' => $injector->lazy(function () {
                 return new News\Validation\Factory();
             }),
@@ -218,15 +216,5 @@ class Module extends BaseModule
     private function getFolderMapper(): Folder\Mapper
     {
         return $this->getMapperFactory()->get(Folder\Mapper::class);
-    }
-
-
-    /**
-     * @return Mapper|Policy\Mapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    private function getPolicyMapper(): Policy\Mapper
-    {
-        return $this->getMapperFactory()->get(Policy\Mapper::class);
     }
 }

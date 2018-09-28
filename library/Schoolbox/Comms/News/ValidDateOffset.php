@@ -16,11 +16,11 @@ class ValidDateOffset
      * Determine if one of the date offset policies contains a parseable value
      * Use string to time to decide with its linguistical bmf
      *
-     * @param Policy\Model $policy
+     * @param string $dateOffset
      * @return bool
      */
-    public function isSatisfiedBy(Policy\Model $policy): bool
+    public function isSatisfiedBy(string $dateOffset): bool
     {
-        return false !== strtotime(trim($policy->getValue()));
+        return false !== strtotime(trim($dateOffset));
     }
 }
