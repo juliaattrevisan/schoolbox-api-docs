@@ -12,10 +12,12 @@ class Alaress_Byte_Format {
 	/**
 	 * Converts a size in bytes to human readable size
 	 *
-	 * @param  $size
+	 * @param  int|float|string $size
+	 * @param  int              $precision
 	 * @return string
 	 */
-	static public function bytesToString($size, $precision = 2) {
+	static public function bytesToString($size, int $precision = 2): string
+    {
 		$a = array('B', 'KB', 'MB', 'GB', 'TB', 'PB');
 
 		for ($i = 0; $size >= 1024; $i++) {
@@ -28,10 +30,11 @@ class Alaress_Byte_Format {
     /**
 	 * Converts human readable size into an integer
 	 *
-	 * @param  $size
-	 * @return string
+	 * @param  string $size
+	 * @return int
 	 */
-	static public function stringToBytes($size) {
+	static public function stringToBytes(string $size): int
+    {
 
 	    // All numeric
 	    if(preg_match('/\d+/', trim($size), $match)){
@@ -58,6 +61,6 @@ class Alaress_Byte_Format {
 			$bytes = $match[1] * 1024 * 1024 * 1024 * 1024;
 		}
 
-        return round($bytes,0);
+        return (int)round($bytes,0);
 	}
 }
