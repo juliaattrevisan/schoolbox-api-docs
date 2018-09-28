@@ -1,0 +1,108 @@
+{#
+    siteVersion:              string
+    hasColourPicker:          bool        - Does this set of config options include an editable colour picker?
+    hasHtmlEditor:            bool        - Does this set of config options include an editable html editor?
+    hasResourcePicker:        bool        - Does this set of config options include an editable resource picker?
+    hasTimePicker:            bool        - Does this set of config options include an editable timepicker?
+    isEditable                bool        - Is the form editable?
+    postRoute:                string      - Where to post form to
+#}
+{# TODO only include required resources #}
+<link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
+<script type="text/javascript" src="/javascript/components/schoolbox-masonry.min.js?v={{ siteVersion }}"></script>
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        {% if hasColourPicker %}
+        $("[data-colour-picker]").spectrum({
+            allowEmpty: false,
+            showAlpha: true,
+            showInput: true,
+            preferredFormat: 'rgb',
+            clickoutFiresChange: true,
+            showInitial: true,
+            change: function(color) {
+                $(this).val(color.toRgbString());
+            }
+        });
+        {% endif %}
+
+        {% if hasHtmlEditor %}
+        $.fn.alaressEditor({
+            targetElements: $('#settings').find('[data-html-editor]')
+        });
+        {% endif %}
+
+        {% if hasResourcePicker %}
+        // Homepage selector
+        var settings = $('form[data-action="saveSettings"]');
+        settings.on('click', 'a[data-interaction="homepage_selector"]', function(e) {
+            e.preventDefault();
+            var inputName = $(this).data('input_name');
+            $('#resource-browser').socialstreamBrowser({
+                title: 'Choose a folder',
+                mimeFilter: false,
+                categoryId: 0,
+                submitCallback: function(url) {
+                    settings.find('input[name="'+inputName+'"]').val(url);
+                }
+            });
+        });
+        settings.alaressValidate();
+        {% endif %}
+    });
+</script>
+
+
+{% if hasTimePicker %}
+    <script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('#settings input[data-timepicker]').timepicker({
+                timeFormat: "H:i",
+                // It's meant to stop at 23:00 by default but doesn't, and the show2400 option does nothing.
+                maxTime: "2300",
+                step: 60,
+                appendTo: function ($input) {
+                    return $input.closest('.timepick');
+                }
+            });
+        });
+    </script>
+{% endif %}
+
+
+<div class="row">
+    <div class="small-12 island">
+        <form data-action="saveSettings" id="settings" method="post" action="{{ postRoute }}">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        {% for setting in settings %}
+                            {% set data = setting.data %}
+                            <label for="{{ data.name }}">
+                                {{ data.title }}
+                                <span data-tooltip class="has-tip tip-top hint" title="{{ data.description }}">?</span>
+                            </label>
+
+                            {% if not data.editable %}
+                                <p>{{ data.value }}</p>
+                            {% else %}
+                                {% include '@settings/fieldType/' ~ setting.template with data only %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </fieldset>
+            </section>
+
+            {% if isEditable %}
+                <input type="submit" value="Save"/>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+{# TODO only render if required #}
+<div id="resource-browser" class="hide"></div>

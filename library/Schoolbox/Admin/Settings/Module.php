@@ -12,6 +12,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Alaress\Authorizer\Rule;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class Module extends \Alaress\Module\Module
 {
@@ -25,7 +26,7 @@ class Module extends \Alaress\Module\Module
     {
         $isSuper = new Rule\IsSuperuser();
         $this->register('GET', '{/typeLabel}', 'getSettings', $isSuper);
-        $this->register('POST', '{/typeLabel}', 'postSettings', $isSuper);
+        $this->register('POST', '/{typeLabel}', 'postSettings', $isSuper);
     }
 
 
@@ -39,7 +40,7 @@ class Module extends \Alaress\Module\Module
         $injector->params[Controller::class] = [
             'configMapper'         => $this->getMapperFactory()->getLazy(ConfigMapper::class),
             'fieldRendererFactory' => $injector->lazy(function () {
-                return new FieldRendererFactory($this->getMapperFactory());
+                return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
             }),
         ];
     }

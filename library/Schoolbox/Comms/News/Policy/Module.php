@@ -1,7 +1,5 @@
 <?php
 /**
- * Module
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -14,10 +12,11 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Role;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 
 class Module extends BaseModule
@@ -63,29 +62,26 @@ class Module extends BaseModule
 
 
     /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
+     * @inheritdoc
      * @param Container|ContainerInterface $injector The dependency injection container.
      * @throws InvalidArgumentException
      */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
+    protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
-        /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-            'policyMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
-            'topicMapper' => $this->getMapperFactory()->getLazy(TopicMapper::class)
+            'configMapper'         => $this->getMapperFactory()->getLazy(ConfigMapper::class),
+            'userAccessMapper'     => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+            'topicMapper'          => $this->getMapperFactory()->getLazy(TopicMapper::class),
+            'fieldRendererFactory' => $injector->lazy(function () {
+                return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
+            }),
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector): void
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
@@ -93,7 +89,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

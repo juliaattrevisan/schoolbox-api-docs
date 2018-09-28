@@ -1,131 +1,43 @@
 {#
-    siteVersion:              string
-    hasTimePicker:            bool        - Does this set of config options include a timepicker?
-    pageCurrent:              string      - The current admin page we are on
     settingsTabs:             array
     settingsTabs['label']:    string      - human-friendly label
     settingsTabs['route']:    string
     settingsTabs['isActive']: bool
     isLocalisation:           bool        - Are we rendering the localisation settings?
     isSkinConfig:             bool        - Are we rendering the skin config settings?
-    settings:                 array
-    settings.template         string
-    settings.data             mixed[]
-    isEditable                bool        - Is the form editable?
+    configContext:            array       - Data required to render a config settings form
 #}
-<link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
-<script type="text/javascript" src="/javascript/components/schoolbox-masonry.min.js?v={{ siteVersion }}"></script>
-<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-
-<script type="text/javascript">
-    $(function() {
-        $("[data-colour-picker]").spectrum({
-            allowEmpty: false,
-            showAlpha: true,
-            showInput: true,
-            preferredFormat: 'rgb',
-            clickoutFiresChange: true,
-            showInitial: true,
-            change: function(color) {
-                $(this).val(color.toRgbString());
-            }
-        });
-
-        $.fn.alaressEditor({
-            targetElements: $('#settings').find('[data-html-editor]')
-        });
-
-        /**
-         * Homepage selector
-         */
-        var settings = $('form[data-action="saveSettings"]');
-        settings.on('click', 'a[data-interaction="homepage_selector"]', function(e) {
-            e.preventDefault();
-            var inputName = $(this).data('input_name');
-            $('#resource-browser').socialstreamBrowser({
-                title: 'Choose a folder',
-                mimeFilter: false,
-                categoryId: 0,
-                submitCallback: function(url) {
-                    settings.find('input[name="'+inputName+'"]').val(url);
-                }
-            });
-        });
-        settings.alaressValidate();
-    });
-</script>
-
-
-{% if hasTimePicker %}
-<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('#settings input[data-timepicker]').timepicker({
-            timeFormat: "H:i",
-            // It's meant to stop at 23:00 by default but doesn't, and the show2400 option does nothing.
-            maxTime: "2300",
-            step: 60,
-            appendTo: function ($input) {
-                return $input.closest('.timepick');
-            }
-        });
-    });
-</script>
-{% endif %}
-
-{# Shared navigation menu #}
 {{ renderAdminNavigation(pageCurrent) }}
 
 <div class="row">
-    <div class="small-12 columns">
-        <dl class="sub-nav">
-            {% for tab in settingsTabs %}
-                <dd class="{% if tab.isActive %}active{% endif %}"><a href="{{ tab.route }}">{{ tab.label }}</a></dd>
-            {% endfor %}
-        </dl>
-    </div>
+<div class="small-12 columns">
+    <dl class="sub-nav">
+        {% for tab in settingsTabs %}
+            <dd class="{% if tab.isActive %}active{% endif %}"><a href="{{ tab.route }}">{{ tab.label }}</a></dd>
+        {% endfor %}
+    </dl>
+</div>
 </div>
 
+{% if isLocalisation or isSkinConfig %}
 <div class="row">
     <div class="small-12 island">
-        <form data-action="saveSettings" id="settings" method="post" action="{{ routeLookup('settings.postSettings') }}">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        {% if isLocalisation %}
-                            {% include '@settings/fragments/localisation.twig' %}
-                        {% endif %}
-
-                        {% if isSkinConfig %}
+        <section>
+            <fieldset class="content">
+                <div class="small-12 columns">
+                    {% if isLocalisation %}
+                        {% include '@settings/fragments/localisation.twig' %}
+                    {% elseif isSkinConfig %}
                         <div class="alert-box warning">
                             Any changes made to the skin configuration will take up to 5 minutes to be applied.
                             Once we have built your new skin it will be available by pressing Ctrl-F5 in the browser.
                         </div>
-                        {% endif %}
-
-                        {% for setting in settings %}
-                            {% set data = setting.data %}
-                            <label for="{{ data.name }}">
-                                {{ data.title }}
-                                <span data-tooltip class="has-tip tip-top hint" title="{{ data.description }}">?</span>
-                            </label>
-
-                            {% if not data.editable %}
-                                <p>{{ data.value }}</p>
-                            {% else %}
-                                {% include '@settings/fieldType/' ~ setting.template with data only %}
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </fieldset>
-            </section>
-
-            {% if isEditable %}
-                <input type="submit" value="Save"/>
-            {% endif %}
-        </form>
+                    {% endif %}
+                </div>
+            </fieldset>
+        </section>
     </div>
 </div>
+{% endif %}
 
-<div id="resource-browser" class="hide"></div>
+{% include '@settings/moduleConfig.twig' with configContext only %}
