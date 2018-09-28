@@ -31,12 +31,4 @@ class Renderer extends Input\Renderer
     {
         return ConfigMapper::FIELD_BYTES;
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function serializeValue($value): string
-    {
-        return Alaress_Byte_Format::stringToBytes($value);
-    }
 }
