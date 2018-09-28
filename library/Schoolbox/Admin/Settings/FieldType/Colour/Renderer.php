@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Settings\FieldType\Colour;;
+namespace Schoolbox\Admin\Settings\FieldType\Colour;
 
 use Schoolbox\Admin\Settings\FieldType\AbstractRenderer;
 use Schoolbox\Config\ConfigMapper;
