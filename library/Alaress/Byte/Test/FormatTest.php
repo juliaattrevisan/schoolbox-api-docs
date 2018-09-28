@@ -14,6 +14,14 @@ use PHPUnit\Framework\TestCase;
 
 class FormatTest extends TestCase
 {
+    public function testBytesToB(): void
+    {
+        $input = '100';
+        $expected = '100 B';
+
+        $this->assertEquals(Alaress_Byte_Format::bytesToString($input), $expected);
+    }
+
     public function testBytesToMB()
     {
         $input = '1245873';
@@ -36,6 +44,14 @@ class FormatTest extends TestCase
         $expected = '11.6 GB';
 
         $this->assertEquals(Alaress_Byte_Format::bytesToString($input), $expected);
+    }
+
+    public function testBToBytes()
+    {
+        $input = '100 B';
+        $expected = 100;
+
+        $this->assertEquals(Alaress_Byte_Format::stringToBytes($input), $expected);
     }
 
     public function testMToBytes()
