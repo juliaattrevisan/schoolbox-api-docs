@@ -7,18 +7,34 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\Renderer;
 
+use Schoolbox\Config\Config;
+use Schoolbox\Config\ConfigMapper;
+
 class SelectKey extends Select
 {
 
-    public function getData(): array
+    /**
+     * @inheritdoc
+     */
+    protected function getData(Config $config): array
     {
         $options = [];
-        foreach (\explode(':', $this->getConfig()->getOptions()) as $keyAndValue) {
+        foreach (\explode(':', $config->getOptions()) as $keyAndValue) {
             [$key, $val] = \explode(';', $keyAndValue);
             $options[$key] = $val;
         }
-        return \array_merge(parent::getData(), [
+
+        return \array_merge(parent::getData($config), [
             'options' => $options,
         ]);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFieldId(): int
+    {
+        return ConfigMapper::FIELD_SELECT_KEY;
     }
 }

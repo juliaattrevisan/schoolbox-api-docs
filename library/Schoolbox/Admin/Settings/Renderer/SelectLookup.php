@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Settings\Renderer;
 
 use Schoolbox\Config\Config;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MapperFactory;
 
 class SelectLookup extends Select
@@ -18,24 +19,22 @@ class SelectLookup extends Select
 
 
     /**
-     * @param Config        $config
      * @param MapperFactory $mapperFactory
      */
-    public function __construct(Config $config, MapperFactory $mapperFactory)
+    public function __construct(MapperFactory $mapperFactory)
     {
-        parent::__construct($config);
         $this->mapperFactory = $mapperFactory;
     }
 
 
     /**
+     * @param Config $config
      * @return array
-     * @throws \InvalidArgumentException
      */
-    public function getData(): array
+    protected function getData(Config $config): array
     {
         // options: expected to contain mapper class
-        $lookupOptions  = \unserialize($this->getConfig()->getOptions() ?? '', [false]);
+        $lookupOptions  = \unserialize($config->getOptions() ?? '', [false]);
         $mapper         = $this->mapperFactory->get($lookupOptions['mapper']);
         $getKeyMethod   = $lookupOptions['getKeyMethod'] ?? 'getId';
         $getValueMethod = $lookupOptions['getValueMethod'] ?? 'getName';
@@ -46,8 +45,17 @@ class SelectLookup extends Select
             $options[$opt->$getKeyMethod()] = $opt->$getValueMethod();
         }
 
-        return \array_merge(parent::getData(), [
+        return \array_merge(parent::getData($config), [
             'options' => $options,
         ]);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFieldId(): int
+    {
+        return ConfigMapper::FIELD_SELECT_LOOKUP;
     }
 }

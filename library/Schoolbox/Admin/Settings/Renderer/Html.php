@@ -7,14 +7,25 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\Renderer;
 
+use Schoolbox\Config\ConfigMapper;
+
 class Html extends Base
 {
 
     /**
      * @inheritdoc
      */
-    public function getTemplate(): string
+    protected function getTemplate(): string
     {
         return 'html.twig';
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFieldId(): int
+    {
+        return ConfigMapper::FIELD_HTML;
     }
 }

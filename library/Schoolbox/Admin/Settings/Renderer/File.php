@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Settings\Renderer;
 
 use Schoolbox\Config\Config;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Zone;
 
 class File extends Base
@@ -16,19 +17,18 @@ class File extends Base
     /**
      * @inheritdoc
      */
-    public function getTemplate(): string
+    protected function getTemplate(): string
     {
         return 'file.twig';
     }
 
 
     /**
-     * @return array
+     * @inheritdoc
      * @throws \UnexpectedValueException
      */
-    public function getData(): array
+    protected function getData(Config $config): array
     {
-        $config     = $this->getConfig();
         $mimeFilter = (strpos($config->getName(), '_logo') || strpos($config->getName(), '_bg')) ? 'image/*' : '*/*';
 
         $zone = new Zone($config->getName());
@@ -45,7 +45,7 @@ class File extends Base
             $zone->attachFiles([$config->getValue()]);
         }
 
-        return \array_merge(parent::getData(), [
+        return \array_merge(parent::getData($config), [
             'attachzone' => $zone->getTwigContext(),
         ]);
     }
@@ -83,5 +83,14 @@ class File extends Base
         if ($config->getValue()) {
             $zone->attachFiles([$config->getValue()]);
         }
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFieldId(): int
+    {
+        return ConfigMapper::FIELD_FILE;
     }
 }

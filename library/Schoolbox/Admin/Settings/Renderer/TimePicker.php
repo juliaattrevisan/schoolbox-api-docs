@@ -7,14 +7,25 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\Renderer;
 
+use Schoolbox\Config\ConfigMapper;
+
 class TimePicker extends Base
 {
 
     /**
      * @inheritdoc
      */
-    public function getTemplate(): string
+    protected function getTemplate(): string
     {
         return 'timePicker.twig';
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFieldId(): int
+    {
+        return ConfigMapper::FIELD_TIME_PICKER;
     }
 }

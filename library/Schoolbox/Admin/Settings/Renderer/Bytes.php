@@ -9,6 +9,7 @@ namespace Schoolbox\Admin\Settings\Renderer;
 
 use Alaress_Byte_Format;
 use Schoolbox\Config\Config;
+use Schoolbox\Config\ConfigMapper;
 
 class Bytes extends Input
 {
@@ -19,5 +20,14 @@ class Bytes extends Input
     protected function getValue(Config $config): string
     {
         return Alaress_Byte_Format::bytesToString($config->getValue());
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFieldId(): int
+    {
+        return ConfigMapper::FIELD_BYTES;
     }
 }

@@ -19,6 +19,13 @@ class FieldRendererFactory
     /** @var MapperFactory */
     private $mapperFactory;
 
+    /**
+     * Indexed by field_id
+     *
+     * @var IConfigRenderer[]
+     */
+    private $cache = [];
+
 
     /**
      * @param MapperFactory $mapperFactory
@@ -32,40 +39,55 @@ class FieldRendererFactory
     /**
      * @param Config $config
      * @return IConfigRenderer
-     * @throws UnexpectedValueException
      */
     public function make(Config $config): IConfigRenderer
     {
+        if (!\array_key_exists($config->getFieldId(), $this->cache)) {
+            $this->cache[$config->getFieldId()] = $this->makeNew($config);
+        }
+
+        return $this->cache[$config->getFieldId()];
+    }
+
+
+    /**
+     * @param Config $config
+     * @return IConfigRenderer
+     * @throws UnexpectedValueException
+     */
+    private function makeNew(Config $config): IConfigRenderer
+    {
         switch ($config->getFieldId()) {
             case ConfigMapper::FIELD_INPUT:
-                return new Renderer\Input($config);
+                return new Renderer\Input();
             case ConfigMapper::FIELD_TEXT_AREA:
-                return new Renderer\TextArea($config);
+                return new Renderer\TextArea();
             case ConfigMapper::FIELD_BOOLEAN:
-            case ConfigMapper::FIELD_CHECKBOX:
-                return new Renderer\Checkbox($config);
+                return new Renderer\Boolean();
             case ConfigMapper::FIELD_SELECT:
-                return new Renderer\Select($config);
+                return new Renderer\Select();
+            case ConfigMapper::FIELD_CHECKBOX:
+                return new Renderer\Checkbox();
             case ConfigMapper::FIELD_BYTES:
-                return new Renderer\Bytes($config);
+                return new Renderer\Bytes();
             case ConfigMapper::FIELD_SELECT_KEY:
-                return new Renderer\SelectKey($config);
+                return new Renderer\SelectKey();
             case ConfigMapper::FIELD_HTML:
-                return new Renderer\Html($config);
+                return new Renderer\Html();
             case ConfigMapper::FIELD_RESOURCE:
-                return new Renderer\Resource($config);
+                return new Renderer\Resource();
             case ConfigMapper::FIELD_SELECT_LOOKUP:
-                return new Renderer\SelectLookup($config, $this->mapperFactory);
+                return new Renderer\SelectLookup($this->mapperFactory);
             case ConfigMapper::FIELD_COLOUR:
-                return new Renderer\Colour($config);
+                return new Renderer\Colour();
             case ConfigMapper::FIELD_FILE:
-                return new Renderer\File($config);
+                return new Renderer\File();
             case ConfigMapper::FIELD_FILE_MULTI:
-                return new Renderer\FileMulti($config);
+                return new Renderer\FileMulti();
             case ConfigMapper::FIELD_PASSWORD:
-                return new Renderer\Password($config);
+                return new Renderer\Password();
             case ConfigMapper::FIELD_TIME_PICKER:
-                return new Renderer\TimePicker($config);
+                return new Renderer\TimePicker();
         }
         throw new UnexpectedValueException("Unable to find a field renderer for config field '{$config->getFieldId()}'");
     }

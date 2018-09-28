@@ -8,16 +8,29 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Settings\Renderer;
 
 use Schoolbox\Config\Config;
+use Schoolbox\Config\ConfigMapper;
 
 class Input extends Base
 {
+
+    /**
+     * Returns the id of the field type this renderer relates to. Used to ensure we don't
+     * attempt to render a config of an incompatible type
+     *
+     * @return int
+     */
+    protected function getFieldId(): int
+    {
+        return ConfigMapper::FIELD_INPUT;
+    }
+
 
     /**
      * Returns the template fragment suitable for rendering this renderer's config field type
      *
      * @return string
      */
-    public function getTemplate(): string
+    protected function getTemplate(): string
     {
         return 'input.twig';
     }

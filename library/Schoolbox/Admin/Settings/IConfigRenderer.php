@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings;
 
+use Schoolbox\Config\Config;
+
 /**
  * Instances of this class are able to build a matching template and data pair
  * that can be rendered in the view layer.
@@ -15,17 +17,10 @@ interface IConfigRenderer
 {
 
     /**
-     * Returns the template fragment to render
+     * Returns the template and data to render into the template with keys 'template' and 'data'
      *
-     * @return string
+     * @param Config $config
+     * @return mixed
      */
-    public function getTemplate(): string;
-
-
-    /**
-     * Returns data suitable for the template fragment
-     *
-     * @return mixed[]
-     */
-    public function getData(): array;
+    public function getTemplateAndData(Config $config);
 }

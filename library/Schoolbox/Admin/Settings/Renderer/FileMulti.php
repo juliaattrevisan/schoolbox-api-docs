@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Settings\Renderer;
 
 use Schoolbox\Config\Config;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Zone;
 
 class FileMulti extends File
@@ -31,12 +32,24 @@ class FileMulti extends File
     }
 
 
+    /**
+     * @inheritdoc
+     */
     protected function attachFiles(Config $config, Zone $zone): void
     {
-        $paths = \explode(",", $config->getValue());
+        $paths = \explode(',', $config->getValue());
 
         if (\count($paths)) {
             $zone->attachFiles($paths);
         }
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFieldId(): int
+    {
+        return ConfigMapper::FIELD_FILE_MULTI;
     }
 }

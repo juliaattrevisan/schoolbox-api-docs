@@ -62,11 +62,7 @@ class Controller extends Base
             if ($config->getEditable()) {
                 $isEditable = true;
             }
-            $renderer   = $this->fieldRendererFactory->make($config);
-            $settings[] = [
-                'template' => $renderer->getTemplate(),
-                'data'     => $renderer->getData(),
-            ];
+            $settings[]  = $this->fieldRendererFactory->make($config)->getTemplateAndData($config);
         }
 
 
