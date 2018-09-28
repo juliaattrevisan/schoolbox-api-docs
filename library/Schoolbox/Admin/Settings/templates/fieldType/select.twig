@@ -7,6 +7,6 @@
 
 <select name="{{ name }}">
     {% for key, option in options %}
-    <option value="{{ key }}" {% if option == value %}selected="selected"{% endif %}>{{ option }}</option>
+    <option value="{{ key }}" {% if key == value %}selected="selected"{% endif %}>{{ option }}</option>
     {% endfor %}
 </select>
