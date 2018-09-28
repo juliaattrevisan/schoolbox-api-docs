@@ -22,6 +22,22 @@ class FormatTest extends TestCase
         $this->assertEquals($expected, Alaress_Byte_Format::bytesToString($input));
     }
 
+    public function testBytesToBytes(): void
+    {
+        $input = '100 B';
+        $expected = '100 B';
+
+        $this->assertEquals($expected, Alaress_Byte_Format::bytesToString($input));
+    }
+
+    public function testBytesToBytesNoSpace(): void
+    {
+        $input = '100B';
+        $expected = '100 B';
+
+        $this->assertEquals($expected, Alaress_Byte_Format::bytesToString($input));
+    }
+
     public function testBytesToMB()
     {
         $input = '1245873';
