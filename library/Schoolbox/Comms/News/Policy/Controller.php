@@ -31,23 +31,23 @@ class Controller extends Base
     private $configMapper;
 
     /** @var FieldStrategyFactory */
-    private $fieldRendererFactory;
+    private $fieldStrategyFactory;
 
 
     /**
      * @param ConfigMapper         $configMapper
-     * @param FieldStrategyFactory $fieldRendererFactory
+     * @param FieldStrategyFactory $fieldStrategyFactory
      * @param UserAccessMapper     $userAccessMapper
      * @param TopicMapper          $topicMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
-        FieldStrategyFactory $fieldRendererFactory,
+        FieldStrategyFactory $fieldStrategyFactory,
         UserAccessMapper $userAccessMapper,
         TopicMapper $topicMapper
     ) {
         $this->configMapper         = $configMapper;
-        $this->fieldRendererFactory = $fieldRendererFactory;
+        $this->fieldStrategyFactory = $fieldStrategyFactory;
         $this->userAccessMapper     = $userAccessMapper;
         $this->topicMapper          = $topicMapper;
     }
@@ -67,7 +67,7 @@ class Controller extends Base
      */
     public function getPolicies(): void
     {
-        $configContext = (new ModuleConfig($this->fieldRendererFactory))->getContext(
+        $configContext = (new ModuleConfig($this->fieldStrategyFactory))->getContext(
             $this->getConfigLoader()->get('site_version'),
             $this->configMapper->findByColumn(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_COMMS),
             $this->router->generate('commsNewsPolicy.postPolicies')
@@ -99,7 +99,7 @@ class Controller extends Base
 
         foreach ($this->request->post->get() as $name => $value) {
             $existingConfig  = $existingConfigs[$name];
-            $valueSerializer = $this->fieldRendererFactory->makeValueSerializer($existingConfig->getFieldId());
+            $valueSerializer = $this->fieldStrategyFactory->makeValueSerializer($existingConfig->getFieldId());
             $newValue        = $valueSerializer->serializeValue($value);
 
             if ($newValue !== $existingConfig->getValue()) {

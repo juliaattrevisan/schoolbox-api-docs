@@ -72,7 +72,7 @@ class Module extends BaseModule
             'configMapper'         => $this->getMapperFactory()->getLazy(ConfigMapper::class),
             'userAccessMapper'     => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
             'topicMapper'          => $this->getMapperFactory()->getLazy(TopicMapper::class),
-            'fieldRendererFactory' => $injector->lazy(function () {
+            'fieldStrategyFactory' => $injector->lazy(function () {
                 return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
             }),
         ];
