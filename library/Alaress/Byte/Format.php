@@ -16,7 +16,7 @@ class Alaress_Byte_Format {
 	 * @param  int              $precision
 	 * @return string
 	 */
-	static public function bytesToString($size, int $precision = 2): string
+	public static function bytesToString($size, int $precision = 2): string
     {
 		$a = array('B', 'KB', 'MB', 'GB', 'TB', 'PB');
 
@@ -33,7 +33,7 @@ class Alaress_Byte_Format {
 	 * @param  string $size
 	 * @return int
 	 */
-	static public function stringToBytes(string $size): int
+	public static function stringToBytes(string $size): int
     {
 
 	    // All numeric
