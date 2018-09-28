@@ -37,15 +37,15 @@ class Alaress_Byte_Format {
 			$bytes = $match[1] * 1024;
 		}
 
-		if (preg_match('/([0-9\.]+)\s?((MB)|(M))/i', $size, $match)) {
+		elseif (preg_match('/([0-9\.]+)\s?((MB)|(M))/i', $size, $match)) {
 			$bytes = $match[1] * 1024 * 1024;
 		}
 
-		if (preg_match('/([0-9\.]+)\s?((GB)|(G))/i', $size, $match)) {
+        elseif (preg_match('/([0-9\.]+)\s?((GB)|(G))/i', $size, $match)) {
 			$bytes = $match[1] * 1024 * 1024 * 1024;
 		}
 
-		if (preg_match('/([0-9\.]+)\s?((TB)|(T))/i', $size, $match)) {
+        elseif (preg_match('/([0-9\.]+)\s?((TB)|(T))/i', $size, $match)) {
 			$bytes = $match[1] * 1024 * 1024 * 1024 * 1024;
 		}
 
