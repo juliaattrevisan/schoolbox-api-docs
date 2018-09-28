@@ -191,7 +191,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
         // Perform this common action without the overhead of hydration
         foreach ($this->database->query("SELECT `name`, `value`, field_id FROM `{$this->getTable()}`") as $row) {
             $value = $row['value'];
-            switch ($row['field']) {
+            switch ($row['field_id']) {
                 case self::FIELD_BOOLEAN:
                 case self::FIELD_CHECKBOX:
                     $value = (bool)$value;
