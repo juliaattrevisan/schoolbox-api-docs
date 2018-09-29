@@ -6,6 +6,9 @@ ALTER TABLE config
 ALTER TABLE config
   CHANGE COLUMN module module ENUM ('settings', 'comms') NOT NULL;
 
+-- Fix configs that are set to boolean but are actually ints
+UPDATE config SET field_id = 1 WHERE name like 'search_all_limit' OR name like 'search_type_limit';
+
 -- Add/Update Comms News config settings
 
 -- Global moderation (new setting)
