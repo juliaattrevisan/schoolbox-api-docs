@@ -54,9 +54,9 @@ abstract class AbstractRenderer implements IConfigRenderer
      * Returns the config's value, applying any relevant transformations
      *
      * @param Config $config
-     * @return string
+     * @return null|string
      */
-    protected function getValue(Config $config): string
+    protected function getValue(Config $config): ?string
     {
         return $config->getValue();
     }
