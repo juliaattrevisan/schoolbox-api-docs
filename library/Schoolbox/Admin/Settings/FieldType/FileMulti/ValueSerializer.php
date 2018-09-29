@@ -20,13 +20,11 @@ class ValueSerializer extends File\ValueSerializer
         try {
             $newValue = '';
             if (\is_array($value)) {
-                foreach ($value as $file) {
-                    $image = $this->getCollectorFactory()->build([$file])->getFirst();
-                    if ($newValue !== '') {
-                        $newValue .= ',';
-                    }
-                    $newValue .= $image->getHash();
+                $hashes = [];
+                foreach ($this->getCollectorFactory()->build($value)->getAll() as $image) {
+                    $hashes[] = $image->getHash();
                 }
+                $newValue = \implode(',', $hashes);
             }
         } catch (\Schoolbox\Resource\Exception $e) {
             // File is empty or not found. Delete the record completely
