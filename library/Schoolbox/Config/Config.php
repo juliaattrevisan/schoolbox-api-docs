@@ -8,6 +8,8 @@
 
 namespace Schoolbox\Config;
 
+use Schoolbox\Admin\Settings\IConfigRenderer;
+use Schoolbox\Admin\Settings\IFieldValueSerializer;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 class Config
@@ -18,7 +20,15 @@ class Config
     /** @var string */
     private $name;
 
-    /** @var mixed */
+    /**
+     * While logically this may be of a type indicated by field_id, it is stored on this model
+     * as either null or string. It is up to callers to apply the relevant transformation
+     *
+     * @see IConfigRenderer
+     * @see IFieldValueSerializer
+     *
+     * @var null|string
+     */
     private $value;
 
     /** @var string */
@@ -70,9 +80,9 @@ class Config
 
 
     /**
-     * @return mixed
+     * @return null|string
      */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }
