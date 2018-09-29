@@ -42,9 +42,7 @@ class Renderer extends AbstractRenderer
         $zone->setFileVar($this->getFileVar($config));
         $zone->setMimeFilter($mimeFilter);
         $zone->setModalTitle('Select ' . strtolower($config->getTitle()));
-        if ($config->getValue()) {
-            $zone->attachFiles([$config->getValue()]);
-        }
+        $this->attachFiles($config, $zone);
 
         return \array_merge(parent::getData($config), [
             'attachzone' => $zone->getTwigContext(),
