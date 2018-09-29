@@ -76,7 +76,10 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
-                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
+                    new Rule\All(
+                        new Authorizer\Rule\InstructorsCanEditOthersArticles($this->getConfig()),
+                        new Authorizer\Rule\CanModerateAudience($this->getFolderMapper())
+                    ),
                     new Rule\All(
                         new Authorizer\Rule\IsArticleAuthor(),
                         new Authorizer\Rule\IsNotYetApproved()
