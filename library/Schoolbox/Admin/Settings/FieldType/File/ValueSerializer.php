@@ -32,7 +32,7 @@ class ValueSerializer implements IFieldValueSerializer
     public function serializeValue($value): string
     {
         try {
-            $result   = $this->collectorFactory->build($value)->getFirst();
+            $result   = $this->collectorFactory->build([$value])->getFirst();
             $newValue = $result->getHash();
         } catch (\Schoolbox\Resource\Exception $e) {
             // File is empty or not found. Delete the record completely
