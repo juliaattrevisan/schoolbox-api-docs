@@ -18,7 +18,7 @@ class Renderer extends Input\Renderer
     /**
      * @inheritdoc
      */
-    protected function getValue(Config $config): string
+    protected function getTransformedValue(Config $config): string
     {
         return Alaress_Byte_Format::bytesToString($config->getValue());
     }
