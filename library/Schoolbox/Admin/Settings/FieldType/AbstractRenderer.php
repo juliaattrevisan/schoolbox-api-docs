@@ -50,6 +50,17 @@ abstract class AbstractRenderer implements IConfigRenderer
      */
     abstract protected function getFieldId(): int;
 
+    /**
+     * Returns the config's value, applying any relevant transformations
+     *
+     * @param Config $config
+     * @return string
+     */
+    protected function getValue(Config $config): string
+    {
+        return $config->getValue();
+    }
+
 
     /**
      * @param Config $config
@@ -59,11 +70,12 @@ abstract class AbstractRenderer implements IConfigRenderer
     {
         return [
             'name'        => $config->getName(),
-            'value'       => $config->getValue(),
+            'value'       => $this->getValue($config),
             'title'       => $config->getTitle(),
             'description' => $config->getDescription(),
             'required'    => $config->getRequired(),
             'editable'    => $config->getEditable(),
+            'hidden'      => $config->getHidden(),
         ];
     }
 }

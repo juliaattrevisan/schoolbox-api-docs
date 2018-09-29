@@ -35,16 +35,4 @@ class Renderer extends AbstractRenderer
     {
         return 'input.twig';
     }
-
-
-    /**
-     * Returns the config's value, applying any relevant transformations
-     *
-     * @param Config $config
-     * @return string
-     */
-    protected function getValue(Config $config): string
-    {
-        return $config->getValue();
-    }
 }

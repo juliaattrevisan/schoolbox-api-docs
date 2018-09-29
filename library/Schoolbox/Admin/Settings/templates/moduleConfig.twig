@@ -81,15 +81,17 @@
                     <div class="small-12 columns">
                         {% for setting in settings %}
                             {% set data = setting.data %}
-                            <label for="{{ data.name }}">
-                                {{ data.title }}
-                                <span data-tooltip class="has-tip tip-top hint" title="{{ data.description }}">?</span>
-                            </label>
+                            {% if not data.hidden %}
+                                <label for="{{ data.name }}">
+                                    {{ data.title }}
+                                    <span data-tooltip class="has-tip tip-top hint" title="{{ data.description }}">?</span>
+                                </label>
 
-                            {% if not data.editable %}
-                                <p>{{ data.value }}</p>
-                            {% else %}
-                                {% include '@settings/fieldType/' ~ setting.template with data only %}
+                                {% if not data.editable %}
+                                    <p>{{ data.value }}</p>
+                                {% else %}
+                                    {% include '@settings/fieldType/' ~ setting.template with data only %}
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
                     </div>
