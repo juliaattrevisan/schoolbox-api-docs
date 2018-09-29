@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Settings\FieldType\Input;
 
 use Schoolbox\Admin\Settings\FieldType\AbstractRenderer;
-use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 
 class Renderer extends AbstractRenderer
