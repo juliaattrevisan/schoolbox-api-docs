@@ -94,26 +94,4 @@ class Renderer extends AbstractRenderer
     {
         return ConfigMapper::FIELD_FILE;
     }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function serializeValue($value): string
-    {
-        $factory = new \Schoolbox\Resource\Attachment\Collector\CollectorFactory();
-        try {
-            $result = $factory->build($value)->getFirst();
-            $value  = $result->getHash();
-        }
-        catch (\Schoolbox\Resource\Exception $e) {
-            // File is empty or not found. Delete the record completely
-            $value = '';
-        }
-        catch (\InvalidArgumentException $e) {
-            $value = '';
-        }
-
-        return $value;
-    }
 }

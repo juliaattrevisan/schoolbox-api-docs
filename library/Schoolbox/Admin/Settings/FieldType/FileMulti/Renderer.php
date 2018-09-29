@@ -53,31 +53,4 @@ class Renderer extends File\Renderer
     {
         return ConfigMapper::FIELD_FILE_MULTI;
     }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function serializeValue($value): string
-    {
-        $factory = new \Schoolbox\Resource\Attachment\Collector\CollectorFactory();
-        try {
-            $newValue = '';
-            if (\is_array($value)) {
-                foreach ($value as $file) {
-                    $image = $factory->build([$file])->getFirst();
-                    if ($newValue !== '') {
-                        $newValue .= ',';
-                    }
-                    $newValue .= $image->getHash();
-                }
-            }
-        } catch (\Schoolbox\Resource\Exception $e) {
-            // File is empty or not found. Delete the record completely
-            $newValue = '';
-        } catch (\InvalidArgumentException $e) {
-            $newValue = '';
-        }
-        return $newValue;
-    }
 }
