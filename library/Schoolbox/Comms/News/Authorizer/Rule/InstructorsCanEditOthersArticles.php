@@ -32,7 +32,7 @@ class InstructorsCanEditOthersArticles implements IAuthorizationRule
     /**
      * @inheritdoc
      */
-    public function authorize(array $params = array (), User $user = null): void
+    public function authorize(array $params = [], User $user = null): void
     {
         if (!$this->config->get(ConfigMapper::_NEWS_EDIT_OTHERS)) {
             throw new Unauthorized(ConfigMapper::_NEWS_EDIT_OTHERS . ' is disabled');
