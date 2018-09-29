@@ -8,8 +8,6 @@
 
 namespace Schoolbox\Config;
 
-use Schoolbox\Admin\Settings\IConfigRenderer;
-use Schoolbox\Admin\Settings\IFieldValueSerializer;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 class Config
