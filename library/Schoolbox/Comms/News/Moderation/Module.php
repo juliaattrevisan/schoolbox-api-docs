@@ -18,6 +18,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Authorizer\Rule\CanModerateAudience;
 use Schoolbox\Comms\News\Authorizer\Rule\IsModerationEnabled;
 use Schoolbox\Comms\News\Authorizer\Rule\IsArticleAuthor;
+use Schoolbox\Comms\News\Authorizer\Rule\InstructorsCanEditOthersArticles;
 use Schoolbox\Comms\News;
 use Schoolbox\Error;
 use Schoolbox\Mapper;
@@ -69,7 +70,10 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
-                new CanModerateAudience($this->getFolderMapper())
+                new Rule\All(
+                    new InstructorsCanEditOthersArticles($this->getConfig()),
+                    new CanModerateAudience($this->getFolderMapper())
+                )
             )
         );
 
@@ -79,7 +83,10 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
-                new CanModerateAudience($this->getFolderMapper())
+                new Rule\All(
+                    new InstructorsCanEditOthersArticles($this->getConfig()),
+                    new CanModerateAudience($this->getFolderMapper())
+                )
             )
         );
 
