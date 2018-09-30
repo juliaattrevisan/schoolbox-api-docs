@@ -190,7 +190,25 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
             }
         }
 
-        $teacherCodes = $classHandler->getTeachers($classCode);
+        // If the config flag is enabled, restrict to seeing only the teacher(s) of the class the student is
+        // actually enrolled in.
+
+        $classCodeString = $subject['folder']->getCodeString();
+
+        if (\Config::get('student_teacher_class_visibility')) {
+            $classCodesRetained = [];
+            $classCodesComplete = explode(",", $classCodeString);
+
+            foreach ($sessionUser->getSubjectCollection() as $subjectCurrent) {
+                if (in_array($subjectCurrent['code'], $classCodesComplete)) {
+                    $classCodesRetained[] = $subjectCurrent['code'];
+                }
+            }
+
+            $classCodeString = implode(",", $classCodesRetained);
+        }
+
+        $teacherCodes = $classHandler->getTeachers($classCodeString ?: $subject['code']);
 
         if (is_array($teacherCodes) && count($teacherCodes) > 0) {
             $subject['teachers'] = $userMapper->findByColumnList([
