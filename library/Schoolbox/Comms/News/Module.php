@@ -76,7 +76,10 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
-                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
+                    new Rule\All(
+                        new Authorizer\Rule\InstructorsCanEditOthersArticles($this->getConfig()),
+                        new Authorizer\Rule\CanModerateAudience($this->getFolderMapper())
+                    ),
                     new Rule\All(
                         new Authorizer\Rule\IsArticleAuthor(),
                         new Authorizer\Rule\IsNotYetApproved()
@@ -167,7 +170,6 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'newsMapper'                 => $this->getMapperFactory()->getLazy(Mapper::class),
-            'policyMapper'               => $this->getMapperFactory()->getLazy(Policy\Mapper::class),
             'topicMapper'                => $this->getMapperFactory()->getLazy(TopicMapper::class),
             'saveForLaterMapper'         => $this->getMapperFactory()->getLazy(SaveForLater\Mapper::class),
             'statisticsMapper'           => $this->getMapperFactory()->getLazy(Statistics\Mapper::class),

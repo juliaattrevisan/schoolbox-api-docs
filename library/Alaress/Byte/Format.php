@@ -12,10 +12,12 @@ class Alaress_Byte_Format {
 	/**
 	 * Converts a size in bytes to human readable size
 	 *
-	 * @param  $size
+	 * @param  int|float|string $size
+	 * @param  int              $precision
 	 * @return string
 	 */
-	static public function bytesToString($size, $precision = 2) {
+	public static function bytesToString($size, int $precision = 2): string
+    {
 		$a = array('B', 'KB', 'MB', 'GB', 'TB', 'PB');
 
 		for ($i = 0; $size >= 1024; $i++) {
@@ -28,27 +30,38 @@ class Alaress_Byte_Format {
     /**
 	 * Converts human readable size into an integer
 	 *
-	 * @param  $size
-	 * @return string
+	 * @param  string $size
+	 * @return int
 	 */
-	static public function stringToBytes($size) {
+	public static function stringToBytes(string $size): int
+    {
+        $trimmed = \trim($size);
 
-		if (preg_match('/([0-9\.]+)\s?((KB)|(K))/i', $size, $match)) {
+	    // All numeric
+	    if(preg_match('/^\d+$/', $trimmed, $match)){
+            $bytes = $match[0];
+        }
+        // Numeric with 'B'
+        elseif(preg_match('/(\d+)\s?B/i', $trimmed, $match)){
+            $bytes = $match[1];
+        }
+
+		elseif (preg_match('/([0-9\.]+)\s?((KB)|(K))/i', $trimmed, $match)) {
 			$bytes = $match[1] * 1024;
 		}
 
-		if (preg_match('/([0-9\.]+)\s?((MB)|(M))/i', $size, $match)) {
+		elseif (preg_match('/([0-9\.]+)\s?((MB)|(M))/i', $trimmed, $match)) {
 			$bytes = $match[1] * 1024 * 1024;
 		}
 
-		if (preg_match('/([0-9\.]+)\s?((GB)|(G))/i', $size, $match)) {
+        elseif (preg_match('/([0-9\.]+)\s?((GB)|(G))/i', $trimmed, $match)) {
 			$bytes = $match[1] * 1024 * 1024 * 1024;
 		}
 
-		if (preg_match('/([0-9\.]+)\s?((TB)|(T))/i', $size, $match)) {
+        elseif (preg_match('/([0-9\.]+)\s?((TB)|(T))/i', $trimmed, $match)) {
 			$bytes = $match[1] * 1024 * 1024 * 1024 * 1024;
 		}
 
-        return round($bytes,0);
+        return (int)round($bytes ?? 0, 0);
 	}
 }

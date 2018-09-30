@@ -1,14 +1,14 @@
 {##
  # A list of active social features that audiences can use
  #
- # @param Collection|Policy\Model[] policies
- # @param News\Model news
+ # @param saveForLaterEnabled bool
+ # @param news                News\Model
  #}
 
 {% if article.isAccepted %}
     {% set socialPolicies = {
         'save_for_later': {
-            'value': policies['save_for_later'].value,
+            'value': saveForLaterEnabled,
             'activator': '@commsNewsSaveForLater/activator.twig'
         }
     } %}

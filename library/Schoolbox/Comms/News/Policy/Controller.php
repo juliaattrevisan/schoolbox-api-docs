@@ -4,43 +4,52 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Comms\News\Policy;
 
 use Alaress\Web\Controller\Base;
+use Config;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Admin\Settings\ModuleConfig;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
-
 class Controller extends Base
 {
 
-    /**
-     * @var UserAccessMapper
-     */
+    /** @var UserAccessMapper */
     private $userAccessMapper;
 
-    /**
-     * @var Mapper
-     */
-    private $policyMapper;
-
-    /**
-     * @var TopicMapper
-     */
+    /** @var TopicMapper */
     private $topicMapper;
 
+    /** @var ConfigMapper */
+    private $configMapper;
+
+    /** @var FieldStrategyFactory */
+    private $fieldStrategyFactory;
+
+
     /**
-     * @param UserAccessMapper $userAccessMapper
-     * @param Mapper           $policyMapper
-     * @param TopicMapper      $topicMapper
+     * @param ConfigMapper         $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param UserAccessMapper     $userAccessMapper
+     * @param TopicMapper          $topicMapper
      */
-    public function __construct(UserAccessMapper $userAccessMapper, Mapper $policyMapper, TopicMapper $topicMapper)
-    {
-        $this->userAccessMapper = $userAccessMapper;
-        $this->policyMapper = $policyMapper;
-        $this->topicMapper = $topicMapper;
+    public function __construct(
+        ConfigMapper $configMapper,
+        FieldStrategyFactory $fieldStrategyFactory,
+        UserAccessMapper $userAccessMapper,
+        TopicMapper $topicMapper
+    ) {
+        $this->configMapper         = $configMapper;
+        $this->fieldStrategyFactory = $fieldStrategyFactory;
+        $this->userAccessMapper     = $userAccessMapper;
+        $this->topicMapper          = $topicMapper;
     }
 
 
@@ -54,22 +63,21 @@ class Controller extends Base
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function getPolicies()
+    public function getPolicies(): void
     {
-        $commsOfficers = $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getUnique('id')->indexBy('id');
-        $policies = $this->policyMapper->findAll();
-
-        /* Superusers and Comms Officers can change policy settings
-         */
-        $isConfigurable = $this->getUser()->isSuperuser() || $commsOfficers->getOffset($this->getUser()->getId());
+        $configContext = (new ModuleConfig($this->fieldStrategyFactory))->getContext(
+            $this->getConfigLoader()->get('site_version'),
+            $this->configMapper->findByColumn(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_COMMS),
+            $this->router->generate('commsNewsPolicy.postPolicies')
+        );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
-            'commsOfficers' => $commsOfficers,
-            'isConfigurable' => $isConfigurable,
-            'policies' => $policies,
-            'topics' => $this->topicMapper->findAll(['order' => ['sequence' => 'asc']]),
-            'pageCurrent' => 'news'
+            'pageCurrent'   => 'news',
+            'commsOfficers' => $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER),
+            'configContext' => $configContext,
+            'topics'        => $this->topicMapper->findAll(['order' => ['sequence' => 'asc']]),
         ])->setTitle('Comms Policies'));
     }
 
@@ -84,19 +92,20 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function postPolicies()
+    public function postPolicies(): void
     {
-        $policies = $this->policyMapper->findAll();
+        /** @var GenericCollection|Config[] $existingConfigs */
+        $existingConfigs = $this->configMapper->findByColumn(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_COMMS)->indexBy(ConfigMapper::COL_NAME);
 
-        foreach ($policies as $policy) {
-            if (isset($this->getRequest()->post['policy'][$policy->getIdentifier()])) {
-                $policy->setValue($this->getRequest()->post['policy'][$policy->getIdentifier()]);
-            }
-            else {
-                $policy->setValue('');
-            }
+        foreach ($this->request->post->get() as $name => $value) {
+            $existingConfig  = $existingConfigs[$name];
+            $valueSerializer = $this->fieldStrategyFactory->makeValueSerializer($existingConfig->getFieldId());
+            $newValue        = $valueSerializer->serializeValue($value);
 
-            $this->policyMapper->save($policy);
+            if ($newValue !== $existingConfig->getValue()) {
+                $existingConfig->setValue($newValue);
+                $this->configMapper->save($existingConfig);
+            }
         }
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('commsNewsPolicy.getPolicies'));

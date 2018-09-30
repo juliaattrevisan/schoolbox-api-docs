@@ -1,0 +1,35 @@
+{#
+    settingsTabs:             array
+    settingsTabs['label']:    string      - human-friendly label
+    settingsTabs['route']:    string
+    settingsTabs['isActive']: bool
+    isLocalisation:           bool        - Are we rendering the localisation settings?
+    isSkinConfig:             bool        - Are we rendering the skin config settings?
+    configContext:            array       - Data required to render a config settings form
+#}
+{{ renderAdminNavigation(pageCurrent) }}
+
+<div class="row">
+<div class="small-12 columns">
+    <dl class="sub-nav">
+        {% for tab in settingsTabs %}
+            <dd class="{% if tab.isActive %}active{% endif %}"><a href="{{ tab.route }}">{{ tab.label }}</a></dd>
+        {% endfor %}
+    </dl>
+</div>
+</div>
+
+{% if isLocalisation %}
+    {% include '@settings/fragments/localisation.twig' %}
+{% elseif isSkinConfig %}
+<div class="row">
+    <div class="small-12">
+        <div class="alert-box warning">
+            Any changes made to the skin configuration will take up to 5 minutes to be applied.
+            Once we have built your new skin it will be available by pressing Ctrl-F5 in the browser.
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% include '@settings/moduleConfig.twig' with configContext only %}

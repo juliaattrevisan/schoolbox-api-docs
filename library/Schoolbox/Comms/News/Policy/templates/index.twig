@@ -1,22 +1,13 @@
-<div class="row">
-    {{ renderAdminNavigation(pageCurrent) }}
-</div>
-{# Add a list of current Comms Officers
- # This should be busted out into is own module later, but ok
- #}
-{% include '@commsNewsPolicy/comms-officers.twig' with { commsOfficers: commsOfficers } %}
+{#
+    pageCurrent:    string
+    commsOfficers:  User[]
+    configContext:  array     - Data required to render a config settings form
+    topics:         Topic[]
+#}
+{{ renderAdminNavigation(pageCurrent) }}
 
-{# Show a list of configuration options that can be changed by super
- # Otherwise just show the conclusion to everyone else
- #}
-{% include '@commsNewsPolicy/policies.twig' with {
-    policies: policies,
-    configurable: isConfigurable
-} %}
+{% include '@commsNewsPolicy/comms-officers.twig' with {commsOfficers: commsOfficers} only %}
 
-{# Show a list of available Topics that authors can assign to their articles
- # These are configured specifically in adminv2; I haven't migrated it away
- #}
-{% include '@commsNewsPolicy/topics.twig' with {
-    topics: topics
-} %}
+{% include '@settings/moduleConfig.twig' with configContext only %}
+
+{% include '@commsNewsPolicy/topics.twig' with {topics: topics} only %}

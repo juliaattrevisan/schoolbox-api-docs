@@ -132,5 +132,9 @@ class Admin implements ModuleConfigInterface
         // News
         $news = new \Schoolbox\Comms\News\Policy\Module($di);
         $news->init('/adminv2/news');
+
+        // Settings
+        $news = new \Schoolbox\Admin\Settings\Module($di);
+        $news->init('/adminv2/setting');
     }
 } 

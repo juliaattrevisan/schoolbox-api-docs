@@ -1,0 +1,12 @@
+{#
+    name:          string
+    value:         string
+#}
+<div class="switch">
+    <input name="{{ name }}" value="0" type="hidden">
+    <input id="{{ name }}" name="{{ name }}" {% if value %}checked="checked"{% endif %} value="1" type="checkbox">
+    <label for="{{ name }}">
+        <span>On</span>
+        <span>Off</span>
+    </label>
+</div>

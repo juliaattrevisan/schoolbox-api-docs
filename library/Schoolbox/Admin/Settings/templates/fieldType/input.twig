@@ -1,0 +1,6 @@
+{#
+    name:          string
+    value:         string
+    required:      bool
+#}
+<input id="{{ name }}" {% if required %}class="required" required{% endif %} type="{% block inputType %}text{% endblock %}" name="{{ name }}" value="{{ value }}" />

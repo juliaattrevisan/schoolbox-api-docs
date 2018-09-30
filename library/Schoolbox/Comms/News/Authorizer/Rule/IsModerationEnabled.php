@@ -9,22 +9,23 @@ namespace Schoolbox\Comms\News\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
-use Schoolbox\Comms\News\Policy;
 
 class IsModerationEnabled implements IAuthorizationRule
 {
 
-    /** @var Policy\Mapper */
-    private $policyMapper;
+    /** @var IConfigLoader */
+    private $config;
 
 
     /**
-     * @param Policy\Mapper $policyMapper
+     * @param IConfigLoader $config
      */
-    public function __construct(Policy\Mapper $policyMapper)
+    public function __construct(IConfigLoader $config)
     {
-        $this->policyMapper = $policyMapper;
+        $this->config = $config;
     }
 
 
@@ -36,8 +37,7 @@ class IsModerationEnabled implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null): void
     {
-        $pb = $this->policyMapper->getPredicateBuilder()->equals('identifier', 'global_moderation');
-        if (!$this->policyMapper->findScalarByPredicates('value', $pb)[0]) {
+        if (!$this->config->get(ConfigMapper::_GLOBAL_MODERATION)) {
             throw new Unauthorized('Global moderation is disabled');
         }
     }

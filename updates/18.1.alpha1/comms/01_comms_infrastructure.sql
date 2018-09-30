@@ -1,15 +1,6 @@
 -- Comms Officer
 INSERT INTO lu_service (id, name) VALUES (11, 'Comms Officer');
 
--- News Policy
-CREATE TABLE `comms_news_policy` (
-  `id`         int(11)      PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `identifier` VARCHAR(255) NOT NULL,
-  `value`      VARCHAR(255) NULL
-);
-
-
-
 -- News Article
 -- Note the Character Set/Collation settings for that infernal storage table
 CREATE TABLE `comms_news_article` (
@@ -78,6 +69,29 @@ ALTER TABLE `comms_news_article_topic`
 ADD CONSTRAINT `fk_comms_news_article_topic_id`
 FOREIGN KEY (`topic_id`) REFERENCES `newsTopic` (`newsTopicID`)
 ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- Save for later
+CREATE TABLE `comms_news_saveforlater` (
+  `id`                 int(11)       PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `user_id`            int(11)       UNSIGNED NOT NULL,
+  `article_id`         int(11)       NOT NULL,
+  `created_at`         DATETIME      NOT NULL,
+  `updated_at`         DATETIME      NOT NULL,
+  `deleted_at`         DATETIME
+);
+
+ALTER TABLE `comms_news_saveforlater`
+  ADD CONSTRAINT `fk_comms_news_saveforlater_user_id`
+FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+  ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `comms_news_saveforlater`
+  ADD CONSTRAINT `fk_comms_news_saveforlater_article_id`
+FOREIGN KEY (`article_id`) REFERENCES `comms_news_article` (`id`)
+  ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+CREATE UNIQUE INDEX `idx_comms_news_saveforlater_user_id_article_id`
+  ON `comms_news_saveforlater` (user_id, article_id) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
 
 -- Error messages
 

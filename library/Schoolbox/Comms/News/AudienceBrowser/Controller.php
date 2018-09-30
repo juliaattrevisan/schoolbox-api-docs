@@ -12,10 +12,10 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Audience;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder;
 use PDO;
-use Schoolbox\Comms\News;
 use InvalidArgumentException;
 use UnexpectedValueException;
 
@@ -40,29 +40,23 @@ class Controller extends Base
      */
     private $roleAccessMapper;
 
-    /** @var News\Policy\Mapper */
-    private $policyMapper;
-
 
     /**
      * @param IConnector            $db
      * @param Folder\Mapper         $folderMapper
      * @param Audience\Mapper       $audienceMapper
      * @param RoleAccessMapper      $roleAccessMapper
-     * @param News\Policy\Mapper    $policyMapper
      */
     public function __construct(
         IConnector $db,
         Folder\Mapper $folderMapper,
         Audience\Mapper $audienceMapper,
-        RoleAccessMapper $roleAccessMapper,
-        News\Policy\Mapper $policyMapper
+        RoleAccessMapper $roleAccessMapper
     ) {
         $this->db               = $db;
         $this->folderMapper     = $folderMapper;
         $this->audienceMapper   = $audienceMapper;
         $this->roleAccessMapper = $roleAccessMapper;
-        $this->policyMapper     = $policyMapper;
     }
 
 
@@ -153,19 +147,6 @@ class Controller extends Base
 
 
     /**
-     * Returns whether global moderation is enabled
-     *
-     * @return bool
-     */
-    private function isGlobalModerationEnabled(): bool
-    {
-        /** @var News\Policy\Model $policy */
-        $policy = $this->policyMapper->findByColumn('identifier', 'global_moderation')->first();
-        return (bool)$policy->getValue();
-    }
-
-
-    /**
      * @return StrategyFactory
      */
     private function buildStrategyFactory(): StrategyFactory
@@ -174,7 +155,7 @@ class Controller extends Base
             $this->getUser(),
             $this->folderMapper,
             $this->roleAccessMapper,
-            $this->isGlobalModerationEnabled()
+            $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION)
         );
     }
 }
