@@ -121,7 +121,8 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
 
                 $classCodeString = $this->getContext()->getCodeString();
 
-                if ($this->getConfig('student_teacher_class_visibility')) {
+                if ($this->getConfigMapper()->get('student_teacher_class_visibility')) {
+
                     $classCodesRetained = [];
                     $classCodesComplete = explode(",", $classCodeString);
 
@@ -130,7 +131,6 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                             $classCodesRetained[] = $subjectCurrent['code'];
                         }
                     }
-
                     $classCodeString = implode(",", $classCodesRetained);
                 }
 
