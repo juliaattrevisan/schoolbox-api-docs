@@ -155,6 +155,9 @@
                         var $span = $row.parent().children('[data-group="' + $row.data('group') + '"][data-groupname]').children('[rowspan]');
                         $span.attr('rowspan', parseInt($span.attr('rowspan')) + 1);
 
+                        // and show the sequencer
+                        $span.find('[data-sequencer-v]').removeClass('hide');
+
                         // And apply the group ID from this element to the new one
                         // find data-sequencer-group=something
                         // update its ID to whatever is in this ID
