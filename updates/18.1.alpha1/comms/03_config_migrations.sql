@@ -12,3 +12,6 @@ SET FOREIGN_KEY_CHECKS=0;
 ALTER TABLE config
     CHANGE COLUMN field_id field_id INT(11) NOT NULL;
 SET FOREIGN_KEY_CHECKS=1;
+
+-- Remove news permissions other than moderate
+DELETE FROM userAccess WHERE service = 3 AND type < 2;

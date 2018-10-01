@@ -154,7 +154,7 @@ class Controller extends Base
             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => false,
-                'write' => false,
+                'write' => true,
                 'moderate' => true
             ]
         ],
