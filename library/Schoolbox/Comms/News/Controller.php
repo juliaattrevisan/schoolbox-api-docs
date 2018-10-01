@@ -190,12 +190,12 @@ class Controller extends Base
         $groupId = $this->getRequest()->query->get('groupId');
         $entityType = $this->getRequest()->query->get('type');
 
-        if ($groupId && $entityType && $entityType === 'folder') {
+        if ($groupId && $entityType && $entityType === Audience\Segment\Strategy\Folder::ENTITY_TYPE) {
             $codec = new Audience\Segment\Codec($this->audienceMapper);
             $label = $this->folderMapper->findCheaplyById($groupId)->getNameWithCodes();
 
             $audienceSegments = new Audience\SegmentSelectizeOption(
-                $codec->encodeSimpleAttributes($entityType, $groupId, 'self'),
+                $codec->encodeSimpleAttributes($entityType, $groupId, Audience\Model::RELATIONSHIP_SELF),
                 $label
             );
 
