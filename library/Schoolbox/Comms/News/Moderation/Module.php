@@ -86,7 +86,8 @@ class Module extends BaseModule
                 new Rule\All(
                     new InstructorsCanEditOthersArticles($this->getConfig()),
                     new CanModerateAudience($this->getFolderMapper())
-                )            )
+                )
+            )
         );
 
         $preloadArticle = function ($params) {
