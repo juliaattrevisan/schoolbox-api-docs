@@ -1,0 +1,116 @@
+{# Shared navigation profile #}
+{{ renderAdminNavigation(pageCurrent) }}
+
+{% if profile | length == 0 %}
+    <div class="row">
+        <div class="small-12 island">
+            <div class="empty-state">
+                <i class="icon-month-view"></i>
+                <p>You do not have any custom profile buttons configured.</p>
+                <p><a href="{{ routeLookup('adminProfileButton.getCreate') }}" title="Create profile page button">Create your first profile page button.</a></p>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="row hide" data-tabs-empty>
+        <div class="small-12 island">
+            <div class="empty-state">
+                <i class="icon-month-view"></i>
+                <p>Your button profile is empty.</p>
+                <p><a href="{{ routeLookup('adminProfileButton.getCreate') }}" title="Create profile page button">Create your first profile page button.</a></p>
+            </div>
+        </div>
+    </div>
+    <div class="row" data-tabs>
+
+        <div class="small-12 island">
+
+            <div class="row actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 island">
+                        <h2 class="subheader">Profile Items</h2>
+                    </div>
+                </div>
+                <nav>
+                    <a href="{{ routeLookup('adminProfileButton.getCreate') }}" class="icon-add" title="Add Profile Item"></a>
+                </nav>
+            </div>
+
+            <section>
+                <ul class="information-list sortable-card ui-sortable" data-sortable="">
+                    {% for item in profile %}
+                        <li data-profile-button="{{ item.id }}">
+                            <div class="actions-small-2">
+                                <div class="grip"></div>
+                                <div class="list-item">
+                                    <div class="card small-12">
+                                        <a>
+                                            <div class="icon-{{ item.icon }} size-32"></div>
+                                            <h3>{{ item.text }}</h3>
+                                            <p class="meta">{{ item.title }}</p>
+                                        </a>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a class="icon-modify" title="Edit profile item" href="{{ routeLookup('adminProfileButton.getModify', {id: item.id}) }}"></a>
+                                    <a class="icon-delete" data-delete="{{ item.id }}" title="Delete profile item"></a>
+                                </nav>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+        </div>
+    </div>
+
+{% endif %}
+
+<!-- BEGIN custom_head -->
+<script>
+    $(function () {
+        $('#content').find('ul[data-sortable]').sortable({
+            handle: '.grip',
+            axis: 'y',
+            update: function () {
+                var order = '';
+                // Update the sort order in the database
+                $('[data-profile-button]').each(function (e) {
+                    if (order != '') {
+                        order += ',';
+                    }
+                    order += $(this).data('profile-button');
+                });
+
+                $.post('{{ routeLookup('adminProfileButton.postOrder') }}', {
+                    order: order
+                })
+                        .success(function () {
+                        });
+            }
+        });
+
+        $('[data-delete]').click(function (event) {
+            event.preventDefault();
+            var id = $(this).data('delete');
+            var listItem = $(this).closest('li');
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this profile item?',
+                confirmEvent: function () {
+                    $.post('{{ routeLookup('adminProfileButton.postDelete') }}', {
+                        id: id
+                    }).success(function (e) {
+                        $(listItem).remove();
+
+                        if ($('[data-profile-button]').length == 0) {
+                            $('[data-tabs-empty]').removeClass('hide');
+                            $('[data-tabs]').addClass('hide');
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+<!-- END custom_head -->

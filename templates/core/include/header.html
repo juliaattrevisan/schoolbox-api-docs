@@ -10,7 +10,7 @@
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 
 <!-- BEGIN tour_script -->
-<script>window.tourData = {TOUR_JSON};</script>
+<script>window.tourUrl = '{TOUR_ROUTE}';</script>
 <!-- END tour_script -->
 
 <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={SITE_VERSION}"></script>
@@ -21,15 +21,15 @@
 <script async charset="utf-8" src="//cdn.iframe.ly/embed.js?api_key=94aa8fc28ac1089a2dfb28"></script>
 <script type="text/javascript">M.$mathQ = false; </script> <!-- Disables $ formula encoding -->
 <script type="text/javascript">
-    $(function() {
+    $(function () {
         $('#infoPanel').find('a[data-menu]').flyout();
         $('#nav').touchMenu()
-                 .scrollToTop({
-                    cancel: function () {
-                        return !$(this).parent().hasClass('has-submenu');
-                    }
-                 }
-        );
+            .scrollToTop({
+                cancel: function () {
+                    return !$(this).parent().hasClass('has-submenu');
+                }
+            }
+            );
 
         var s = $('#search');
         s.on('click', '[data-jsubmit]', function () {
@@ -42,25 +42,54 @@
          */
         $.fn.schoolboxResource_ProxyReplacment();
 
-        $('.right-small, .right-off-canvas-menu').hover(function(){
+        $('.right-small, .right-off-canvas-menu').hover(function () {
             $('.right-off-canvas-menu').addClass('overlap');
         },
-        function(){
-            $('.right-off-canvas-menu').removeClass('overlap');
-        });
+            function () {
+                $('.right-off-canvas-menu').removeClass('overlap');
+            });
 
-        $('.right-small a, .right-off-canvas-menu label').click(function() {
-            $('.inner-wrap').toggleClass('docking');
+        $('.right-small a, .right-off-canvas-menu label').on('click', function () {
+            $('.inner-wrap').toggleClass('right-open');
             $(this).toggleClass('raquo');
 
-            if ($('.inner-wrap').hasClass('docking')){
-                $.post('/ajax/notificationsTray', {state: 'show'}, function(responseText) {
+            if ($('.inner-wrap').hasClass('right-open')) {
+                $.post('/ajax/notificationsTray', { state: 'show' }, function (responseText) {
                 });
             }
             else {
-                $.post('/ajax/notificationsTray', {state: 'hide'}, function(responseText) {
+                $.post('/ajax/notificationsTray', { state: 'hide' }, function (responseText) {
                 });
             }
+        });
+
+        $('#drawer').on('click', function () {
+            $('.off-canvas-wrap').removeClass('move-right');
+            $('.inner-wrap').toggleClass('left-open');
+            $(this).toggleClass('open');
+
+            /* Sidenav toggle
+             */
+            if ($('.inner-wrap').hasClass('left-open')) {
+                $.post('/ajax/sidenav', { state: 'show' });
+            }
+            else {
+                $.post('/ajax/sidenav', { state: 'hide' });
+            }
+        });
+
+        /* Open / Close account menu
+         * + click outside div to close
+         */
+        var accountMenu = $('#account-content');
+
+        $('#profile-drop').on('click', function (e) {
+            e.stopPropagation();
+            accountMenu.toggleClass('open');
+        });
+
+        $('[data-offcanvas]').on('click', function () {
+            accountMenu.removeClass('open');
         });
 
         /* Ensure modals always appear in a visible location
@@ -70,18 +99,18 @@
          *
          * Also, arbitrary 6.25rem padding at top (in the design)
          */
-        var modalTop = 6.25*16;
+        var modalTop = 6.25 * 16;
 
         $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
-            $(this).css({'top': $(window).scrollTop() + modalTop + 'px'});
+            $(this).css({ 'top': $(window).scrollTop() + modalTop + 'px' });
         });
 
         $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
-            $(this).css({'top': $(window).scrollTop() + modalTop + 'px'});
+            $(this).css({ 'top': $(window).scrollTop() + modalTop + 'px' });
         });
 
         var splash, d, x, y, splashTimeout;
-        $(document).on('click', ".button, button, .sub-nav a, .pagination a, .flex-list a, [data-component-palette]", function(e) {
+        $(document).on('click', ".button, button, .sub-nav a, .pagination a, .flex-list a, [data-component-palette]", function (e) {
 
             splash = $(this).find(".splash");
             splash.removeClass('animate');
@@ -93,16 +122,16 @@
 
             if (!splash.height() && !splash.width()) {
                 d = Math.max($(this).outerWidth(), $(this).outerHeight());
-                splash.css({height: d, width: d});
+                splash.css({ height: d, width: d });
             }
 
-            x = e.pageX - $(this).offset().left - splash.width()/2;
-            y = e.pageY - $(this).offset().top - splash.height()/2;
+            x = e.pageX - $(this).offset().left - splash.width() / 2;
+            y = e.pageY - $(this).offset().top - splash.height() / 2;
 
-            splash.css({top: y+'px', left: x+'px'}).addClass("animate");
+            splash.css({ top: y + 'px', left: x + 'px' }).addClass("animate");
 
             // Remove the animation after a bit of time, otherwise this animation will happen every time the element hides and becomes visible again
-            splashTimeout = setTimeout(function() {
+            splashTimeout = setTimeout(function () {
                 splash.removeClass('animate');
             }, 300);
         });
@@ -112,18 +141,18 @@
     var siteLocation = "{SITE_LOCATION}";
 
     var dateDisplayFormats = {
-        datepicker: {DATEPICKER_FORMAT},
-        momentJs:   {MOMENTJS_FORMAT},
-        momentJsDatetime:   {MOMENTJS_FORMAT_DATETIME},
-        momentJsDateLong:   {MOMENTJS_FORMAT_LOCAL_LONG},
+        datepicker: { DATEPICKER_FORMAT },
+        momentJs: { MOMENTJS_FORMAT },
+        momentJsDatetime: { MOMENTJS_FORMAT_DATETIME },
+        momentJsDateLong: { MOMENTJS_FORMAT_LOCAL_LONG },
         localDate: "{LOCAL_DATE_FORMAT}",
         localDateTime: "{LOCAL_DATETIME_FORMAT}",
         calendarStartTime: "{CALENDAR_START_TIME}"
     };
 
     var schoolboxUser = {
-        name: {SITE_USER_FULLNAME},
-        email: {SITE_USER_EMAIL}
+        name: { SITE_USER_FULLNAME },
+        email: { SITE_USER_EMAIL }
     }
 
     $.datepicker.setDefaults({
@@ -139,7 +168,7 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-97642429-1"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments)};
+    function gtag() { dataLayer.push(arguments) };
     gtag('js', new Date());
 
     // Set tracking ID and map custom dimensions
@@ -156,19 +185,19 @@
     });
 
     // Send custom dimension events
-    gtag('event', 'site_school_code_dimension', {'site_school_code': '{SITE_SCHOOL_CODE}'});
-    gtag('event', 'site_type_dimension', {'site_type': '{SITE_TYPE}'});
-    gtag('event', 'site_version_dimension', {'site_version': '{SITE_VERSION}'});
-    <!-- BEGIN ga_user_events -->
-    gtag('event', 'role_name_dimension', {'role_name': '{ROLE_NAME}'});
-    gtag('event', 'role_type_dimension', {'role_type': '{ROLE_TYPE}'});
-    <!-- BEGIN ga_year_event -->
-    gtag('event', 'user_year_dimension', {'user_year': '{USER_YEAR}'});
-    <!-- END ga_year_event -->
-    <!-- BEGIN ga_impersonated -->
-    gtag('event', 'impersonated_dimension', {'impersonated': 1});
-    <!-- END ga_impersonated -->
-    <!-- END ga_user_events -->
+    gtag('event', 'site_school_code_dimension', { 'site_school_code': '{SITE_SCHOOL_CODE}' });
+    gtag('event', 'site_type_dimension', { 'site_type': '{SITE_TYPE}' });
+    gtag('event', 'site_version_dimension', { 'site_version': '{SITE_VERSION}' });
+    < !--BEGIN ga_user_events-- >
+        gtag('event', 'role_name_dimension', { 'role_name': '{ROLE_NAME}' });
+    gtag('event', 'role_type_dimension', { 'role_type': '{ROLE_TYPE}' });
+    < !--BEGIN ga_year_event-- >
+        gtag('event', 'user_year_dimension', { 'user_year': '{USER_YEAR}' });
+    < !--END ga_year_event-- >
+    < !--BEGIN ga_impersonated-- >
+        gtag('event', 'impersonated_dimension', { 'impersonated': 1 });
+    < !--END ga_impersonated-- >
+    < !--END ga_user_events-- >
 </script>
 <!-- END google_analytics -->
 {SITE_HEADER_SCRIPTS}
