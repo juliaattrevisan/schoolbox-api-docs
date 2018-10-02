@@ -229,7 +229,7 @@ class CapabilityMark extends TestCase
             $capabilityMarks
         );
         yield 'Capability mark 1 (null descriptors)'  => [$markedGrid->getCapabilityMarks()[1], 0];
-        yield 'Capability mark 2 (null capabilities)' => [$markedGrid->getCapabilityMarks()[2], 0];
+        yield 'Capability mark 2 (null capabilities)' => [$markedGrid->getCapabilityMarks()[2], 37.5];
     }
 
 
