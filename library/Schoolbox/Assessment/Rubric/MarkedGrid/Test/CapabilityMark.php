@@ -124,15 +124,126 @@ class CapabilityMark extends TestCase
      */
     public function testCalculateIndicatorMarkSum(
         RubricMarkedGrid\CapabilityMark $capabilityMark,
-        float $expected)
-    : void {
+        float $expected
+    ): void {
         $this->assertSame($expected, $capabilityMark->calculateIndicatorMarkSum());
     }
 
 
+    /**
+     * Data provider for `testRetrieveNormalizedMark`.
+     *
+     * @return iterable
+     */
+    public function getTestRetrieveNormalizedMarkData(): iterable
+    {
+        $generator        = new Generator();
+        $capabilities     = RowSetGenerator::TEST_CAPABILITIES;
+        $levels           = GridGenerator::TEST_LEVELS;
+        $capabilityUsages = GridGenerator::TEST_CAPABILITY_USAGES;
+        $capabilityMarks  = Generator::TEST_CAPABILITY_MARKS;
+
+
+        // No scaling on cap marks for this grid
+        $markedGrid = $generator->generateMarkedGrid(
+            $capabilities,
+            $levels,
+            $capabilityUsages,
+            $capabilityMarks
+        );
+        yield 'Capability mark 1 (unscaled)' => [$markedGrid->getCapabilityMarks()[1], 50];
+        yield 'Capability mark 2 (unscaled)' => [$markedGrid->getCapabilityMarks()[2], 37.5];
+
+
+        // The same grid, with scaling factors applied: scaling is ignored
+        $scaledCapabilityUsages = $capabilityUsages;
+        $scaledCapabilityUsages[1]['maxValue'] = 8;
+        $scaledCapabilityUsages[2]['maxValue'] = 32;
+        $markedGrid = $generator->generateMarkedGrid(
+            $capabilities,
+            $levels,
+            $scaledCapabilityUsages,
+            $capabilityMarks
+        );
+        yield 'Capability mark 1 (scaled 0.5x)' => [$markedGrid->getCapabilityMarks()[1], 50];
+        yield 'Capability mark 2 (scaled 2.0x)' => [$markedGrid->getCapabilityMarks()[2], 37.5];
+
+        // TODO add tests for null max values
+    }
+
+
+    /**
+     * @dataProvider getTestRetrieveNormalizedMarkData
+     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::retrieveNormalizedMark
+     *
+     * @param RubricMarkedGrid\CapabilityMark $capabilityMark
+     * @param float                           $expected
+     */
+    public function testRetrieveNormalizedMark(
+        RubricMarkedGrid\CapabilityMark $capabilityMark,
+        float $expected
+    ): void {
+        $this->assertSame($expected, $capabilityMark->retrieveNormalizedMark());
+    }
+
+
+    /**
+     * Data provider for `testRetrieveHumanReadableMark`.
+     *
+     * @return iterable
+     */
+    public function getTestRetrieveHumanReadableMarkData(): iterable
+    {
+        $generator        = new Generator();
+        $capabilities     = RowSetGenerator::TEST_CAPABILITIES;
+        $levels           = GridGenerator::TEST_LEVELS;
+        $capabilityUsages = GridGenerator::TEST_CAPABILITY_USAGES;
+        $capabilityMarks  = Generator::TEST_CAPABILITY_MARKS;
+
+
+        // No scaling on cap marks for this grid
+        $markedGrid = $generator->generateMarkedGrid(
+            $capabilities,
+            $levels,
+            $capabilityUsages,
+            $capabilityMarks
+        );
+        yield 'Capability mark 1 (unscaled)' => [$markedGrid->getCapabilityMarks()[1], '8 / 16'];
+        yield 'Capability mark 2 (unscaled)' => [$markedGrid->getCapabilityMarks()[2], '6 / 16'];
+
+
+        // The same grid, with scaling factors applied: scaling is ignored
+        $scaledCapabilityUsages = $capabilityUsages;
+        $scaledCapabilityUsages[1]['maxValue'] = 8;
+        $scaledCapabilityUsages[2]['maxValue'] = 32;
+        $markedGrid = $generator->generateMarkedGrid(
+            $capabilities,
+            $levels,
+            $scaledCapabilityUsages,
+            $capabilityMarks
+        );
+        yield 'Capability mark 1 (scaled 0.5x)' => [$markedGrid->getCapabilityMarks()[1], '4 / 8'];
+        yield 'Capability mark 2 (scaled 2.0x)' => [$markedGrid->getCapabilityMarks()[2], '12 / 32'];
+
+        // TODO add tests for null max values
+    }
+
+
+    /**
+     * @dataProvider getTestRetrieveHumanReadableMarkData
+     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::retrieveHumanReadableMark
+     *
+     * @param RubricMarkedGrid\CapabilityMark $capabilityMark
+     * @param null|string                     $expected
+     */
+    public function testRetrieveHumanReadableMark(
+        RubricMarkedGrid\CapabilityMark $capabilityMark,
+        ?string $expected
+    ): void {
+        $this->assertSame($expected, $capabilityMark->retrieveHumanReadableMark());
+    }
+
     // Testable methods:
-    // retrieveNormalizedMark
-    // retrieveHumanReadableMark
     // iterateIndicatorUsages
     // retrieveIndicatorMark
 }
