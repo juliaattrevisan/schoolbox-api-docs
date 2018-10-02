@@ -30,8 +30,8 @@ class Generator
      *                                (@see `\Schoolbox\Assessment\Rubric\Grid\Test\Generator::generateGrid`)
      * @param array $capabilityMarks  The marks given for capabilities in this grid.
      *                                [$capabilityId => [
-     *                                  'value'          => mark value (inferred from indicator marks if not set)
-     *                                  'indicatorMarks' => [$indicatorId => [
+     *                                  'value'      => mark value (inferred from indicator marks if not set)
+     *                                  'indicators' => [$indicatorId => [
      *                                      'value'        => mark value (inferred from descriptor if not set)
      *                                      'descriptorId' => selected descriptor
      *                                  ]],
@@ -65,14 +65,14 @@ class Generator
             );
             $capabilityMarkValue = $capabilityMark['value'] ?? null;
 
-            foreach ($capabilityMarks['indicatorMarks'] as $indicatorId => $indicatorMark) {
+            foreach ($capabilityMark['indicators'] as $indicatorId => $indicatorMark) {
                 $indicatorUsageObject = $grid->retrieveIndicatorUsage($rowSet->retrieveIndicator($indicatorId));
                 $indicatorMarkObject  = new RubricMarkedGrid\IndicatorMark($indicatorUsageObject);
 
                 // Which descriptor is selected?
                 $descriptor         = null;
                 $indicatorMarkValue = $indicatorMark['value'] ?? null;
-                if ($indicatorMark['descriptorId']) {
+                if ($indicatorMark['descriptorId'] ?? null) {
                     $descriptor = $indicatorUsageObject->getDescriptors()->getBy('id', $indicatorMark['descriptorId']);
                 }
                 if ($descriptor instanceof RubricGrid\Descriptor) {

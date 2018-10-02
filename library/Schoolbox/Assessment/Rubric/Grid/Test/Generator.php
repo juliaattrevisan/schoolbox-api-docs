@@ -64,7 +64,7 @@ class Generator
             $capabilityUsageObject = new RubricGrid\CapabilityUsage($rowSet->retrieveCapability($capabilityId));
             $capabilityMaxValue    = $capabilityUsage['maxValue'] ?? null;
 
-            foreach ($capabilityUsages['indicatorUsages'] as $indicatorId => $indicatorUsage) {
+            foreach ($capabilityUsage['indicators'] as $indicatorId => $indicatorUsage) {
                 $indicatorUsageObject = new RubricGrid\IndicatorUsage($rowSet->retrieveIndicator($indicatorId));
 
                 // Descriptors
