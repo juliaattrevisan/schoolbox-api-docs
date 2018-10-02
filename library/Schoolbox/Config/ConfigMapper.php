@@ -231,7 +231,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
             $pb->notEquals(self::COL_TYPE, self::TYPE_BOARD);
         }
 
-        return $this->findByPredicates($pb);
+        return $this->findByPredicates($pb, ['order'=>['configID'=>'ASC']]);
     }
 
 
