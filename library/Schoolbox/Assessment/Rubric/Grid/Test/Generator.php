@@ -20,9 +20,24 @@ class Generator
     /**
      * Build a grid.
      *
-     * @param array $capabilities
-     * @param array $levels
-     * @param array $capabilityUsages
+     * @param array $capabilities     The capabilities that comprise the grid's
+     *                                row set.
+     *                                (@see `\Schoolbox\Assessment\Rubric\RowSet\Test\Generator::generateRowSet`)
+     * @param array $levels           The levels in this rubric grid.
+     *                                [$levelId => ['name' => name]]
+     * @param array $capabilityUsages The usages of capabilities in this grid.
+     *                                [$capabilityId => [
+     *                                  'maxValue'   => capability max (inferred if not set),
+     *                                  'indicators' => [$indicatorId => [
+     *                                      'descriptors' => [$descriptorId => [
+     *                                          'levelId'     => level ID
+     *                                          'description' => description
+     *                                          'value'       => descriptor value
+     *                                          'minValue'    => descriptor min (value if not set)
+     *                                          'maxValue'    => descriptor max (value if not set)
+     *                                      ]],
+     *                                  ]],
+     *                                ]]
      *
      * @return RubricGrid\Grid
      */
@@ -53,15 +68,12 @@ class Generator
                 $indicatorUsageObject = new RubricGrid\IndicatorUsage($rowSet->retrieveIndicator($indicatorId));
 
                 // Descriptors
-                foreach ($grid->getLevels() as $levelId => $level) {
-                    $descriptor = $indicatorUsage['descriptors'][$levelId] ?? null;
-                    if (null !== $descriptor) {
-                        $indicatorUsageObject->getDescriptors()[$levelId] = (new RubricGrid\Descriptor())
-                            ->setId($levelId)
-                            ->setDescription($descriptor['description'])
-                            ->setMinValue($descriptor['minValue'] ?? $descriptor['value'])
-                            ->setMaxValue($descriptor['maxValue'] ?? $descriptor['value']);
-                    }
+                foreach ($indicatorUsage['descriptors'] as $descriptorId => $descriptor) {
+                    $indicatorUsageObject->getDescriptors()[$descriptor['levelId']] = (new RubricGrid\Descriptor())
+                        ->setId($descriptorId)
+                        ->setDescription($descriptor['description'])
+                        ->setMinValue($descriptor['minValue'] ?? $descriptor['value'])
+                        ->setMaxValue($descriptor['maxValue'] ?? $descriptor['value']);
                 }
 
                 $capabilityUsageObject->getIndicatorUsages()[$indicatorId] = $indicatorUsageObject;

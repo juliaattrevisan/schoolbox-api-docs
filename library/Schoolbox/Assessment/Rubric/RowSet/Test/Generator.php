@@ -12,14 +12,22 @@ use Schoolbox\Assessment\Rubric\RowSet as RubricRowSet;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * Class Generator
+ * Generator for test data for row set tests.
  */
 class Generator
 {
     /**
      * Build a row set.
      *
-     * @param array $capabilities
+     * @param array $capabilities The capabilities that comprise the row set.
+     *                            [$capabilityId => [
+     *                              'name'       => name,
+     *                              'indicators' => [
+     *                                  $indicatorId => [
+     *                                      'name' => name,
+     *                                  ]
+     *                              ],
+     *                            ]]
      *
      * @return RubricRowSet\RowSet
      */
