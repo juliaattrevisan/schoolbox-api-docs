@@ -54,7 +54,7 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
                     new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
                     new Authorizer\Rule\IsArticleAuthor(),
                     new Rule\All(
@@ -75,7 +75,7 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
                     new Rule\All(
                         new Authorizer\Rule\InstructorsCanEditOthersArticles($this->getConfig()),
                         new Authorizer\Rule\CanModerateAudience($this->getFolderMapper())
@@ -93,7 +93,7 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_COMMS_OFFICER, UserAccess::ACCESS_FULL),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
                     new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
                     new Authorizer\Rule\IsArticleAuthor()
                 )

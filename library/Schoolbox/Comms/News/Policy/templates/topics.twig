@@ -25,7 +25,13 @@
                         <li class="content">{{ topic.name }}</li>
                     {% endfor %}
                 </ul>
+                <div class="component-action">
+                    <section>
+                        <a href="/adminv2/lists/news-topic" class="button">Modify List</a>
+                    </section>
+                </div>
             </section>
+
         {% else %}
             <div class="empty-state">
                 <i class="icon-news"></i>

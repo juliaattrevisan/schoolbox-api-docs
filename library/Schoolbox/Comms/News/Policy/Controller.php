@@ -75,7 +75,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
             'pageCurrent'   => 'news',
-            'commsOfficers' => $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER),
+            'commsOfficers' => $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS),
             'configContext' => $configContext,
             'topics'        => $this->topicMapper->findAll(['order' => ['sequence' => 'asc']]),
         ])->setTitle('Comms Policies'));

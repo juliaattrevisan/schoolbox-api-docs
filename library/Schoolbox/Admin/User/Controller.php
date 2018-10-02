@@ -151,9 +151,9 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_NEWS => [
             'name' => 'News',
-            'identifier' => self::IDENTIFIER_CAMPUS,
+            'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
-                'read' => true,
+                'read' => false,
                 'write' => true,
                 'moderate' => true
             ]
@@ -205,15 +205,6 @@ class Controller extends Base
         ],
         UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
             'name' => 'Sports Administrator',
-            'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => false,
-                'write' => false,
-                'moderate' => true
-            ]
-        ],
-        UserAccess::SERVICE_COMMS_OFFICER => [
-            'name' => 'Comms Officer',
             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => false,

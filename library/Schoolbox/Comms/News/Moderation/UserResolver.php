@@ -94,7 +94,7 @@ class UserResolver implements IUserResolver
      */
     private function findCommsOfficerIds(): array
     {
-        return $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_COMMS_OFFICER)->getPropertyValues('id');
+        return $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS)->getPropertyValues('id');
     }
 
 }
