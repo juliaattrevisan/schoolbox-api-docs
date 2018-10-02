@@ -286,7 +286,19 @@ class CapabilityMark extends TestCase
         yield 'Capability mark 1 (scaled 0.5x)' => [$markedGrid->getCapabilityMarks()[1], '4 / 8'];
         yield 'Capability mark 2 (scaled 2.0x)' => [$markedGrid->getCapabilityMarks()[2], '12 / 32'];
 
-        // TODO add tests for null max values
+
+        // The same grid, with null values
+        $nullCapabilityUsages = $capabilityUsages;
+        $nullCapabilityUsages[1] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[1], true);
+        $nullCapabilityUsages[2] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[2], false);
+        $markedGrid = $generator->generateMarkedGrid(
+            $capabilities,
+            $levels,
+            $nullCapabilityUsages,
+            $capabilityMarks
+        );
+        yield 'Capability mark 1 (null descriptors)'  => [$markedGrid->getCapabilityMarks()[1], null];
+        yield 'Capability mark 2 (null capabilities)' => [$markedGrid->getCapabilityMarks()[2], '6 / 16'];
     }
 
 
