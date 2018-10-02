@@ -243,7 +243,59 @@ class CapabilityMark extends TestCase
         $this->assertSame($expected, $capabilityMark->retrieveHumanReadableMark());
     }
 
-    // Testable methods:
-    // iterateIndicatorUsages
-    // retrieveIndicatorMark
+
+    /**
+     * Data provider for `testIterateIndicatorUsages`.
+     *
+     * @return iterable
+     */
+    public function getTestIterateIndicatorUsagesData(): iterable
+    {
+        $generator        = new Generator();
+        $capabilities     = RowSetGenerator::TEST_CAPABILITIES;
+        $levels           = GridGenerator::TEST_LEVELS;
+        $capabilityUsages = GridGenerator::TEST_CAPABILITY_USAGES;
+        $capabilityMarks  = Generator::TEST_CAPABILITY_MARKS;
+        $markedGrid       = $generator->generateMarkedGrid(
+            $capabilities,
+            $levels,
+            $capabilityUsages,
+            $capabilityMarks
+        );
+
+        // Iterating the indicator usages gets me:
+        yield 'Capability mark 1' => [
+            $markedGrid->getCapabilityMarks()[1],
+            [
+                $markedGrid->getGrid()->getCapabilityUsages()[1]->getIndicatorUsages()[11],
+                $markedGrid->getGrid()->getCapabilityUsages()[1]->getIndicatorUsages()[12],
+            ]
+        ];
+        yield 'Capability mark 2' => [
+            $markedGrid->getCapabilityMarks()[2],
+            [
+                $markedGrid->getGrid()->getCapabilityUsages()[2]->getIndicatorUsages()[22],
+                $markedGrid->getGrid()->getCapabilityUsages()[2]->getIndicatorUsages()[23],
+            ]
+        ];
+    }
+
+
+    /**
+     * @dataProvider getTestIterateIndicatorUsagesData
+     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::iterateIndicatorUsages
+     *
+     * @param RubricMarkedGrid\CapabilityMark $capabilityMark
+     * @param array                           $expected
+     */
+    public function testIterateIndicatorUsages(
+        RubricMarkedGrid\CapabilityMark $capabilityMark,
+        array $expected
+    ): void {
+        $actual = [];
+        foreach ($capabilityMark->iterateIndicatorUsages() as $indicator) {
+            $actual[] = $indicator;
+        }
+        $this->assertSame($expected, $actual);
+    }
 }
