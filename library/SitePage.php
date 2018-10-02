@@ -1561,12 +1561,10 @@ class SitePage extends Page
         try {
             $router = $this->getDi()->get('router');
             return $router->generate($name, $params);
-        }
-        catch (\Aura\Di\Exception\ServiceNotFound $e) {
+        } catch (\Aura\Di\Exception\ServiceNotFound $e) {
+            return '';
+        } catch (\Aura\Router\Exception\RouteNotFound $e) {
             return '';
         }
-        catch (\Aura\Router\Exception\RouteNotFound $e) {
-            return '';
-        }
-        }
+    }
 }
