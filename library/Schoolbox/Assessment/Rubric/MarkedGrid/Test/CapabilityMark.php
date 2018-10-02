@@ -23,7 +23,7 @@ class CapabilityMark extends TestCase
      *
      * @return iterable
      */
-    public function getTestCalculateScaledMark(): iterable
+    public function getTestCalculateScaledMarkData(): iterable
     {
         $generator        = new Generator();
         $capabilities     = RowSetGenerator::TEST_CAPABILITIES;
@@ -55,11 +55,13 @@ class CapabilityMark extends TestCase
         );
         yield 'Capability mark 1 (scaled 0.5x)' => [$markedGrid->getCapabilityMarks()[1], 4];
         yield 'Capability mark 2 (scaled 2.0x)' => [$markedGrid->getCapabilityMarks()[2], 12];
+
+        // TODO add tests for null max values
     }
 
 
     /**
-     * @dataProvider getTestCalculateScaledMark
+     * @dataProvider getTestCalculateScaledMarkData
      * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::calculateScaledMark
      *
      * @param RubricMarkedGrid\CapabilityMark $capabilityMark
@@ -70,12 +72,13 @@ class CapabilityMark extends TestCase
         $this->assertSame($expected, $capabilityMark->calculateScaledMark());
     }
 
+
     /**
      * Data provider for `testCalculateIndicatorMarkSum`.
      *
      * @return iterable
      */
-    public function getTestCalculateIndicatorMarkSum(): iterable
+    public function getTestCalculateIndicatorMarkSumData(): iterable
     {
         $generator        = new Generator();
         $capabilities     = RowSetGenerator::TEST_CAPABILITIES;
@@ -107,11 +110,13 @@ class CapabilityMark extends TestCase
         );
         yield 'Capability mark 1 (scaled 0.5x)' => [$markedGrid->getCapabilityMarks()[1], 8];
         yield 'Capability mark 2 (scaled 2.0x)' => [$markedGrid->getCapabilityMarks()[2], 6];
+
+        // TODO add tests for null max values
     }
 
 
     /**
-     * @dataProvider getTestCalculateIndicatorMarkSum
+     * @dataProvider getTestCalculateIndicatorMarkSumData
      * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::calculateIndicatorMarkSum
      *
      * @param RubricMarkedGrid\CapabilityMark $capabilityMark
