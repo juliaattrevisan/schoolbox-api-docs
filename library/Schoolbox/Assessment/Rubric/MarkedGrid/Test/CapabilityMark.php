@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\MarkedGrid\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\Assessment\Rubric\Grid\Test\Generator as GridGenerator;
 use Schoolbox\Assessment\Rubric\MarkedGrid as RubricMarkedGrid;
 use Schoolbox\Assessment\Rubric\RowSet\Test\Generator as RowSetGenerator;
@@ -297,5 +298,64 @@ class CapabilityMark extends TestCase
             $actual[] = $indicator;
         }
         $this->assertSame($expected, $actual);
+    }
+
+
+    /**
+     * Data provider for `testRetrieveIndicatorMark`.
+     *
+     * @return iterable
+     */
+    public function getTestRetrieveIndicatorMarkData(): iterable
+    {
+        $generator        = new Generator();
+        $capabilities     = RowSetGenerator::TEST_CAPABILITIES;
+        $levels           = GridGenerator::TEST_LEVELS;
+        $capabilityUsages = GridGenerator::TEST_CAPABILITY_USAGES;
+        $capabilityMarks  = Generator::TEST_CAPABILITY_MARKS;
+        $markedGrid       = $generator->generateMarkedGrid(
+            $capabilities,
+            $levels,
+            $capabilityUsages,
+            $capabilityMarks
+        );
+
+        yield 'Capability mark 1, indicator usage 11' => [
+            $markedGrid->getCapabilityMarks()[1],
+            $markedGrid->getGrid()->getCapabilityUsages()[1]->getIndicatorUsages()[11],
+            $markedGrid->getCapabilityMarks()[1]->getIndicatorMarks()[11]
+        ];
+        yield 'Capability mark 1, indicator usage 12' => [
+            $markedGrid->getCapabilityMarks()[1],
+            $markedGrid->getGrid()->getCapabilityUsages()[1]->getIndicatorUsages()[12],
+            $markedGrid->getCapabilityMarks()[1]->getIndicatorMarks()[12]
+        ];
+        yield 'Capability mark 1, indicator usage 22' => [
+            $markedGrid->getCapabilityMarks()[1],
+            $markedGrid->getGrid()->getCapabilityUsages()[2]->getIndicatorUsages()[22],
+            null
+        ];
+        yield 'Capability mark 1, indicator usage 23' => [
+            $markedGrid->getCapabilityMarks()[1],
+            $markedGrid->getGrid()->getCapabilityUsages()[2]->getIndicatorUsages()[23],
+            null
+        ];
+    }
+
+
+    /**
+     * @dataProvider getTestRetrieveIndicatorMarkData
+     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::retrieveIndicatorMark
+     *
+     * @param RubricMarkedGrid\CapabilityMark     $capabilityMark
+     * @param IndicatorUsage                      $indicatorUsage
+     * @param null|RubricMarkedGrid\IndicatorMark $expected
+     */
+    public function testRetrieveIndicatorMark(
+        RubricMarkedGrid\CapabilityMark $capabilityMark,
+        IndicatorUsage $indicatorUsage,
+        ?RubricMarkedGrid\IndicatorMark $expected
+    ): void {
+        $this->assertSame($expected, $capabilityMark->retrieveIndicatorMark($indicatorUsage));
     }
 }
