@@ -126,6 +126,10 @@ class CapabilityMark
      */
     public function retrieveHumanReadableMark(): ?string
     {
+        $maxValue = $this->getCapabilityUsage()->calculateMaxValueFromIndicators();
+        if ($maxValue === 0.0) {
+            return null;
+        }
         return $this->markScheme->getHumanReadableMark($this->retrieveNormalizedMark());
     }
 
