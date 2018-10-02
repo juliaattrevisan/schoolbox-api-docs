@@ -435,13 +435,16 @@
                     break;
 
                 case 'percent':
-                    $groupSummary.find("[data-group-mark]").val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
+                    $gradeInput.val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
                     break;
 
                 default:
                     // TODO
                     // We have a "none" mark type
             }
+
+            // The grade input has changed: trigger save draft
+            $gradeInput.trigger('change');
 
             // Up for discussion, but I'd imagine the user would like the marks to update automatically
             // with descriptor changes once they've clicked this button
@@ -457,7 +460,7 @@
             parseFraction(rubricSummary, e.namespace);
             disableEnableAssignFromDescs();
             revalidateCapMarks();
-        })
+        });
 
 
         // Get an array of letter grade {value : letter} pairs
