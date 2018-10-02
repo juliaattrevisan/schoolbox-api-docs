@@ -23,19 +23,22 @@ class CapabilityMark extends TestCase
      * Test method: null out indicator usage data
      *
      * @param array $indicatorUsages
+     * @param bool  $nullDescriptors Are descriptors also set to null?
+     *
      * @return array
      */
-    private function createNullTestIndicatorUsageData(array $indicatorUsages): array
+    private function createNullTestIndicatorUsageData(array $indicatorUsages, bool $nullDescriptors): array
     {
         unset($indicatorUsages['maxValue']);
-        foreach ($indicatorUsages['indicators'] as &$indicator) {
-            foreach ($indicator['descriptors'] as &$descriptor) {
-                unset($descriptor['value']);
+        if ($nullDescriptors) {
+            foreach ($indicatorUsages['indicators'] as &$indicator) {
+                foreach ($indicator['descriptors'] as &$descriptor) {
+                    unset($descriptor['value'], $descriptor['minValue'], $descriptor['maxValue']);
+                }
+                unset($descriptor);
             }
-            unset($descriptor);
+            unset($indicator);
         }
-        unset($indicator);
-
         return $indicatorUsages;
     }
 
@@ -81,14 +84,16 @@ class CapabilityMark extends TestCase
 
         // The same grid, with null values
         $nullCapabilityUsages = $capabilityUsages;
-        $nullCapabilityUsages[1] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[1]);
+        $nullCapabilityUsages[1] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[1], true);
+        $nullCapabilityUsages[2] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[2], false);
         $markedGrid = $generator->generateMarkedGrid(
             $capabilities,
             $levels,
             $nullCapabilityUsages,
             $capabilityMarks
         );
-        yield 'Capability mark 1 (null)' => [$markedGrid->getCapabilityMarks()[1], 0];
+        yield 'Capability mark 1 (null descriptors)'  => [$markedGrid->getCapabilityMarks()[1], 0];
+        yield 'Capability mark 2 (null capabilities)' => [$markedGrid->getCapabilityMarks()[2], 6];
     }
 
 
@@ -143,7 +148,19 @@ class CapabilityMark extends TestCase
         yield 'Capability mark 1 (scaled 0.5x)' => [$markedGrid->getCapabilityMarks()[1], 8];
         yield 'Capability mark 2 (scaled 2.0x)' => [$markedGrid->getCapabilityMarks()[2], 6];
 
-        // TODO add tests for null max values
+
+        // The same grid, with null values
+        $nullCapabilityUsages = $capabilityUsages;
+        $nullCapabilityUsages[1] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[1], true);
+        $nullCapabilityUsages[2] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[2], false);
+        $markedGrid = $generator->generateMarkedGrid(
+            $capabilities,
+            $levels,
+            $nullCapabilityUsages,
+            $capabilityMarks
+        );
+        yield 'Capability mark 1 (null descriptors)'  => [$markedGrid->getCapabilityMarks()[1], 0];
+        yield 'Capability mark 2 (null capabilities)' => [$markedGrid->getCapabilityMarks()[2], 6];
     }
 
 
@@ -200,7 +217,19 @@ class CapabilityMark extends TestCase
         yield 'Capability mark 1 (scaled 0.5x)' => [$markedGrid->getCapabilityMarks()[1], 50];
         yield 'Capability mark 2 (scaled 2.0x)' => [$markedGrid->getCapabilityMarks()[2], 37.5];
 
-        // TODO add tests for null max values
+
+        // The same grid, with null values
+        $nullCapabilityUsages = $capabilityUsages;
+        $nullCapabilityUsages[1] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[1], true);
+        $nullCapabilityUsages[2] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[2], false);
+        $markedGrid = $generator->generateMarkedGrid(
+            $capabilities,
+            $levels,
+            $nullCapabilityUsages,
+            $capabilityMarks
+        );
+        yield 'Capability mark 1 (null descriptors)'  => [$markedGrid->getCapabilityMarks()[1], 0];
+        yield 'Capability mark 2 (null capabilities)' => [$markedGrid->getCapabilityMarks()[2], 0];
     }
 
 
