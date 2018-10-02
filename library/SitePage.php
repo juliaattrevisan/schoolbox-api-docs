@@ -1565,5 +1565,8 @@ class SitePage extends Page
         catch (\Aura\Di\Exception\ServiceNotFound $e) {
             return '';
         }
-    }
+        catch (\Aura\Router\Exception\RouteNotFound $e) {
+            return '';
+        }
+        }
 }
