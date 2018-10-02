@@ -70,10 +70,62 @@ class CapabilityMark extends TestCase
         $this->assertSame($expected, $capabilityMark->calculateScaledMark());
     }
 
+    /**
+     * Data provider for `testCalculateIndicatorMarkSum`.
+     *
+     * @return iterable
+     */
+    public function getTestCalculateIndicatorMarkSum(): iterable
+    {
+        $generator        = new Generator();
+        $capabilities     = RowSetGenerator::TEST_CAPABILITIES;
+        $levels           = GridGenerator::TEST_LEVELS;
+        $capabilityUsages = GridGenerator::TEST_CAPABILITY_USAGES;
+        $capabilityMarks  = Generator::TEST_CAPABILITY_MARKS;
+
+
+        // No scaling on cap marks for this grid
+        $markedGrid = $generator->generateMarkedGrid(
+            $capabilities,
+            $levels,
+            $capabilityUsages,
+            $capabilityMarks
+        );
+        yield 'Capability mark 1 (unscaled)' => [$markedGrid->getCapabilityMarks()[1], 8];
+        yield 'Capability mark 2 (unscaled)' => [$markedGrid->getCapabilityMarks()[2], 6];
+
+
+        // The same grid, with scaling factors applied: scaling is ignored
+        $scaledCapabilityUsages = $capabilityUsages;
+        $scaledCapabilityUsages[1]['maxValue'] = 8;
+        $scaledCapabilityUsages[2]['maxValue'] = 32;
+        $markedGrid = $generator->generateMarkedGrid(
+            $capabilities,
+            $levels,
+            $scaledCapabilityUsages,
+            $capabilityMarks
+        );
+        yield 'Capability mark 1 (scaled 0.5x)' => [$markedGrid->getCapabilityMarks()[1], 8];
+        yield 'Capability mark 2 (scaled 2.0x)' => [$markedGrid->getCapabilityMarks()[2], 6];
+    }
+
+
+    /**
+     * @dataProvider getTestCalculateIndicatorMarkSum
+     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark::calculateIndicatorMarkSum
+     *
+     * @param RubricMarkedGrid\CapabilityMark $capabilityMark
+     * @param float                           $expected
+     */
+    public function testCalculateIndicatorMarkSum(
+        RubricMarkedGrid\CapabilityMark $capabilityMark,
+        float $expected)
+    : void {
+        $this->assertSame($expected, $capabilityMark->calculateIndicatorMarkSum());
+    }
+
 
     // Testable methods:
-    // calculateScaledMark
-    // calculateIndicatorMarkSum
     // retrieveNormalizedMark
     // retrieveHumanReadableMark
     // iterateIndicatorUsages
