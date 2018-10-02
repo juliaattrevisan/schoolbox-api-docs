@@ -17,6 +17,29 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 class Generator
 {
     /**
+     * Very basic test capabilities.
+     */
+    public const TEST_CAPABILITIES = [
+        1 => [
+            'name'       => 'Capability 1',
+            'indicators' => [
+                11 => ['name' => 'Indicator 1.1'],
+                12 => ['name' => 'Indicator 1.2'],
+                13 => ['name' => 'Indicator 1.3'],
+            ],
+        ],
+        2 => [
+            'name'       => 'Capability 2',
+            'indicators' => [
+                21 => ['name' => 'Indicator 2.1'],
+                22 => ['name' => 'Indicator 2.2'],
+                23 => ['name' => 'Indicator 2.3'],
+            ],
+        ],
+    ];
+
+
+    /**
      * Build a row set.
      *
      * @param array $capabilities The capabilities that comprise the row set.

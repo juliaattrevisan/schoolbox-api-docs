@@ -19,6 +19,41 @@ use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 class Generator
 {
     /**
+     * Very basic capability usages.
+     *
+     * Uses the capability IDs specified in
+     * `\Schoolbox\Assessment\Rubric\RowSet\Test\Generator::TEST_CAPABILITIES`
+     * and the descriptor IDs specified in
+     * `\Schoolbox\Assessment\Rubric\Grid\Test\Generator::TEST_CAPABILITY_USAGES`.
+     */
+    public const TEST_CAPABILITY_MARKS = [
+        1 => [
+            'indicators' => [
+                11 => [
+                    // inferred value: 0
+                    'descriptorId' => 111,
+                ],
+                12 => [
+                    // inferred value: 8
+                    'descriptorId' => 125,
+                ],
+            ],
+        ],
+        2 => [
+            'indicators' => [
+                22 => [
+                    // inferred value: 6
+                    'descriptorId' => 224,
+                ],
+                23 => [
+                    // inferred value: 0
+                ],
+            ],
+        ],
+    ];
+
+
+    /**
      * Build a marked grid.
      *
      * @param array $capabilities     The capabilities that comprise the grid's

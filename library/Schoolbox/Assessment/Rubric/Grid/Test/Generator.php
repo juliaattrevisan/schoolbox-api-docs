@@ -18,6 +18,134 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 class Generator
 {
     /**
+     * Very basic test levels.
+     */
+    public const TEST_LEVELS = [
+        1 => ['name' => 'Poor',],
+        2 => ['name' => 'Okay',],
+        3 => ['name' => 'Good',],
+        4 => ['name' => 'Great',],
+        5 => ['name' => 'Excellent',],
+    ];
+
+
+    /**
+     * Very basic test capability usages.
+     *
+     * Uses the capability IDs specified in
+     * `\Schoolbox\Assessment\Rubric\RowSet\Test\Generator::TEST_CAPABILITIES`
+     * and the levels specified in
+     * `\Schoolbox\Assessment\Rubric\Grid\Test\Generator::TEST_LEVELS`.
+     */
+    public const TEST_CAPABILITY_USAGES = [
+        1 => [
+            'indicators' => [
+                11 => [
+                    'descriptors' => [
+                        111 => [
+                            'levelId'     => 1,
+                            'description' => 'Poor',
+                            'value'       => 0,
+                        ],
+                        112 => [
+                            'levelId'     => 2,
+                            'description' => 'Okay',
+                            'value'       => 2,
+                        ],
+                        114 => [
+                            'levelId'     => 4,
+                            'description' => 'Great',
+                            'value'       => 6,
+                        ],
+                        115 => [
+                            'levelId'     => 5,
+                            'description' => 'Excellent',
+                            'value'       => 8,
+                        ],
+                    ],
+                ],
+                12 => [
+                    'descriptors' => [
+                        121 => [
+                            'levelId'     => 1,
+                            'description' => 'Poor',
+                            'value'       => 0,
+                        ],
+                        122 => [
+                            'levelId'     => 2,
+                            'description' => 'Okay',
+                            'value'       => 2,
+                        ],
+                        123 => [
+                            'levelId'     => 3,
+                            'description' => 'Good',
+                            'value'       => 4,
+                        ],
+                        125 => [
+                            'levelId'     => 5,
+                            'description' => 'Excellent',
+                            'value'       => 8,
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        2 => [
+            'indicators' => [
+                22 => [
+                    'descriptors' => [
+                        222 => [
+                            'levelId'     => 2,
+                            'description' => 'Okay',
+                            'value'       => 2,
+                        ],
+                        223 => [
+                            'levelId'     => 3,
+                            'description' => 'Good',
+                            'value'       => 4,
+                        ],
+                        224 => [
+                            'levelId'     => 4,
+                            'description' => 'Great',
+                            'value'       => 6,
+                        ],
+                        225 => [
+                            'levelId'     => 5,
+                            'description' => 'Excellent',
+                            'value'       => 8,
+                        ],
+                    ],
+                ],
+                23 => [
+                    'descriptors' => [
+                        231 => [
+                            'levelId'     => 1,
+                            'description' => 'Poor',
+                            'value'       => 0,
+                        ],
+                        233 => [
+                            'levelId'     => 3,
+                            'description' => 'Good',
+                            'value'       => 4,
+                        ],
+                        234 => [
+                            'levelId'     => 4,
+                            'description' => 'Great',
+                            'value'       => 6,
+                        ],
+                        235 => [
+                            'levelId'     => 4,
+                            'description' => 'Excellent',
+                            'value'       => 8,
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+
+    /**
      * Build a grid.
      *
      * @param array $capabilities     The capabilities that comprise the grid's
