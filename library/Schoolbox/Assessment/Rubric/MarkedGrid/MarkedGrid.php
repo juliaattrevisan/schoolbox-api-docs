@@ -95,7 +95,6 @@ class MarkedGrid
         return $value;
     }
 
-
     /**
      * Convert the given mark to a percentage of the total available marks -
      * this is used by IMarkScheme implementations to generate human readable marks
@@ -104,10 +103,9 @@ class MarkedGrid
      */
     public function retrieveNormalizedMark(): float
     {
-        if( $this->calculateTotalAvailableMarks() > 0 ) {
+        if ($this->calculateTotalAvailableMarks() > 0) {
             return ($this->calculateScaledMark() / $this->calculateTotalAvailableMarks()) * 100;
-        }
-        else {
+        } else {
             return 0;
         }
     }

@@ -102,12 +102,10 @@ class CapabilityMark
     {
         if ($this->getCapabilityUsage()->calculateMaxValueFromIndicators() > 0) {
             return $this->value / $this->getCapabilityUsage()->calculateMaxValueFromIndicators() * 100;
-        }
-        else {
+        } else {
             return 0;
         }
     }
-
 
     /**
      * Render the capability's mark in human-readable format.
