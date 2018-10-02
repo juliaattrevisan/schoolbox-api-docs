@@ -136,7 +136,7 @@ class Factory
                         (new Descriptor())
                             ->setId($descriptorId)
                             ->setDescription($descriptorText)
-                            ->setMaxValue(null !== $descriptorValue ? (float)$descriptorValue : null);
+                            ->setMaxValue('' !== $descriptorValue ? (float)$descriptorValue : null);
                 }
             }
 

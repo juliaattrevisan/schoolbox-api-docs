@@ -104,7 +104,12 @@ class MarkedGrid
      */
     public function retrieveNormalizedMark(): float
     {
-        return ($this->calculateScaledMark() / $this->calculateTotalAvailableMarks()) * 100;
+        if( $this->calculateTotalAvailableMarks() > 0 ) {
+            return ($this->calculateScaledMark() / $this->calculateTotalAvailableMarks()) * 100;
+        }
+        else {
+            return 0;
+        }
     }
 
     /**
