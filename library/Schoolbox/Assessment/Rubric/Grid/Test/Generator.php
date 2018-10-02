@@ -13,7 +13,7 @@ use Schoolbox\Assessment\Rubric\RowSet as RubricRowSet;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 /**
- * Class Generator
+ * Generator for test data for grid tests.
  */
 class Generator
 {
@@ -61,8 +61,8 @@ class Generator
 
         // Build capability and indicator usage, and descriptors
         foreach ($capabilityUsages as $capabilityId => $capabilityUsage) {
-            $capabilityUsageObject = (new RubricGrid\CapabilityUsage($rowSet->retrieveCapability($capabilityId)))
-                ->setMaxValue($capabilityUsage['maxValue']);
+            $capabilityUsageObject = new RubricGrid\CapabilityUsage($rowSet->retrieveCapability($capabilityId));
+            $capabilityMaxValue    = $capabilityUsage['maxValue'] ?? null;
 
             foreach ($capabilityUsages['indicatorUsages'] as $indicatorId => $indicatorUsage) {
                 $indicatorUsageObject = new RubricGrid\IndicatorUsage($rowSet->retrieveIndicator($indicatorId));
@@ -78,6 +78,10 @@ class Generator
 
                 $capabilityUsageObject->getIndicatorUsages()[$indicatorId] = $indicatorUsageObject;
             }
+
+            $capabilityUsageObject->setMaxValue(
+                $capabilityMaxValue ?? $capabilityUsageObject->calculateMaxValueFromIndicators()
+            );
 
             $grid->getCapabilityUsages()[$capabilityId] = $capabilityUsageObject;
         }

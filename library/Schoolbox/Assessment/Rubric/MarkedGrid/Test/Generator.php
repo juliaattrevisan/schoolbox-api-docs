@@ -14,17 +14,28 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 
 /**
- * Class Generator
+ * Generator for test data for marked grid tests.
  */
 class Generator
 {
     /**
      * Build a marked grid.
      *
-     * @param array $capabilities
-     * @param array $levels
-     * @param array $capabilityUsages
-     * @param array $capabilityMarks
+     * @param array $capabilities     The capabilities that comprise the grid's
+     *                                row set.
+     *                                (@see `\Schoolbox\Assessment\Rubric\RowSet\Test\Generator::generateRowSet`)
+     * @param array $levels           The levels in this rubric grid.
+     *                                (@see `\Schoolbox\Assessment\Rubric\Grid\Test\Generator::generateGrid`)
+     * @param array $capabilityUsages The usages of capabilities in this grid.
+     *                                (@see `\Schoolbox\Assessment\Rubric\Grid\Test\Generator::generateGrid`)
+     * @param array $capabilityMarks  The marks given for capabilities in this grid.
+     *                                [$capabilityId => [
+     *                                  'value'          => mark value (inferred from indicator marks if not set)
+     *                                  'indicatorMarks' => [$indicatorId => [
+     *                                      'value'        => mark value (inferred from descriptor if not set)
+     *                                      'descriptorId' => selected descriptor
+     *                                  ]],
+     *                                ]]
      * @return RubricMarkedGrid\MarkedGrid
      */
     public function generateMarkedGrid(
@@ -52,28 +63,32 @@ class Generator
                 $capabilityUsageObject,
                 new TotalMarkFractional($capabilityUsageObject->getMaxValue())
             );
-            $capabilityMarkObject->setValue($capabilityMark['value']);
+            $capabilityMarkValue = $capabilityMark['value'] ?? null;
 
             foreach ($capabilityMarks['indicatorMarks'] as $indicatorId => $indicatorMark) {
                 $indicatorUsageObject = $grid->retrieveIndicatorUsage($rowSet->retrieveIndicator($indicatorId));
                 $indicatorMarkObject  = new RubricMarkedGrid\IndicatorMark($indicatorUsageObject);
 
                 // Which descriptor is selected?
-                $descriptor = null;
-                $markValue  = $indicatorMark['value'] ?? null;
+                $descriptor         = null;
+                $indicatorMarkValue = $indicatorMark['value'] ?? null;
                 if ($indicatorMark['descriptorId']) {
                     $descriptor = $indicatorUsageObject->getDescriptors()->getBy('id', $indicatorMark['descriptorId']);
                 }
                 if ($descriptor instanceof RubricGrid\Descriptor) {
                     $indicatorMarkObject->setDescriptor($descriptor);
-                    $markValue = $markValue ?? $descriptor->getMaxValue();
+                    $indicatorMarkValue = $indicatorMarkValue ?? $descriptor->getMaxValue();
                 }
 
                 // Set value depending on descriptor
-                $indicatorMarkObject->setValue($markValue);
+                $indicatorMarkObject->setValue($indicatorMarkValue);
 
                 $capabilityMarkObject->getIndicatorMarks()[$indicatorId] = $indicatorMarkObject;
             }
+
+            $capabilityMarkObject->setValue(
+                $capabilityMarkValue ?? $capabilityMarkObject->calculateIndicatorMarkSum()
+            );
 
             $markedGrid->getCapabilityMarks()[$capabilityId] = $capabilityMarkObject;
         }
