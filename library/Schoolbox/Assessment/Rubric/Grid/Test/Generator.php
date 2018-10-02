@@ -200,8 +200,8 @@ class Generator
                     $indicatorUsageObject->getDescriptors()[$descriptor['levelId']] = (new RubricGrid\Descriptor())
                         ->setId($descriptorId)
                         ->setDescription($descriptor['description'])
-                        ->setMinValue($descriptor['minValue'] ?? $descriptor['value'])
-                        ->setMaxValue($descriptor['maxValue'] ?? $descriptor['value']);
+                        ->setMinValue($descriptor['minValue'] ?? $descriptor['value'] ?? null)
+                        ->setMaxValue($descriptor['maxValue'] ?? $descriptor['value'] ?? null);
                 }
 
                 $capabilityUsageObject->getIndicatorUsages()[$indicatorId] = $indicatorUsageObject;

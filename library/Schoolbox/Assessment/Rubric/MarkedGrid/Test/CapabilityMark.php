@@ -20,6 +20,27 @@ use Schoolbox\Assessment\Rubric\RowSet\Test\Generator as RowSetGenerator;
 class CapabilityMark extends TestCase
 {
     /**
+     * Test method: null out indicator usage data
+     *
+     * @param array $indicatorUsages
+     * @return array
+     */
+    private function createNullTestIndicatorUsageData(array $indicatorUsages): array
+    {
+        unset($indicatorUsages['maxValue']);
+        foreach ($indicatorUsages['indicators'] as &$indicator) {
+            foreach ($indicator['descriptors'] as &$descriptor) {
+                unset($descriptor['value']);
+            }
+            unset($descriptor);
+        }
+        unset($indicator);
+
+        return $indicatorUsages;
+    }
+
+
+    /**
      * Data provider for `testCalculateScaledMark`.
      *
      * @return iterable
@@ -57,7 +78,17 @@ class CapabilityMark extends TestCase
         yield 'Capability mark 1 (scaled 0.5x)' => [$markedGrid->getCapabilityMarks()[1], 4];
         yield 'Capability mark 2 (scaled 2.0x)' => [$markedGrid->getCapabilityMarks()[2], 12];
 
-        // TODO add tests for null max values
+
+        // The same grid, with null values
+        $nullCapabilityUsages = $capabilityUsages;
+        $nullCapabilityUsages[1] = $this->createNullTestIndicatorUsageData($nullCapabilityUsages[1]);
+        $markedGrid = $generator->generateMarkedGrid(
+            $capabilities,
+            $levels,
+            $nullCapabilityUsages,
+            $capabilityMarks
+        );
+        yield 'Capability mark 1 (null)' => [$markedGrid->getCapabilityMarks()[1], 0];
     }
 
 
