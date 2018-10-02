@@ -9,9 +9,8 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid\Test;
 
 use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
-use Schoolbox\Assessment\Rubric\RowSet;
+use Schoolbox\Assessment\Rubric\RowSet as RubricRowSet;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
  * Class Generator
@@ -29,24 +28,8 @@ class Generator
      */
     public function generateGrid(array $capabilities, array $levels, array $capabilityUsages): RubricGrid\Grid
     {
-        // Build the row set
-        $folder = new FolderModel();
-        $rowSet = new Rowset\RowSet($folder);
-
-        // Build caps and indicators
-        foreach ($capabilities as $capabilityId => $capability) {
-            $capabilityObject = (new RowSet\Capability())
-                ->setId($capabilityId)
-                ->setName($capability['name']);
-            foreach ($capability['indicators'] as $indicatorId => $indicator) {
-                $indicatorObject = (new RowSet\Indicator())
-                    ->setId($indicatorId)
-                    ->setName($indicator['name']);
-                $capabilityObject->getIndicators()[$indicatorId] = $indicatorObject;
-            }
-
-            $rowSet->getCapabilities()[$capabilityId] = $capabilityObject;
-        }
+        // Build a row set
+        $rowSet = (new RubricRowSet\Test\Generator())->generateRowSet($capabilities);
 
 
         // Build a grid that uses the row set

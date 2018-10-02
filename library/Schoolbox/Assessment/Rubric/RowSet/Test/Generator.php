@@ -16,7 +16,6 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  */
 class Generator
 {
-
     /**
      * Build a row set.
      *

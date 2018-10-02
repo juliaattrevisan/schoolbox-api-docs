@@ -8,13 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid\Test;
 
-use Schoolbox\Assessment\Rubric\Grid;
+use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\MarkedGrid as RubricMarkedGrid;
-use Schoolbox\Assessment\Rubric\RowSet;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
  * Class Generator
@@ -37,63 +34,9 @@ class Generator
         array $capabilityMarks
     ): RubricMarkedGrid\MarkedGrid
     {
-        // Build the row set
-        $folder = new FolderModel();
-        $rowSet = new Rowset\RowSet($folder);
-
-        // Build caps and indicators
-        foreach ($capabilities as $capabilityId => $capability) {
-            $capabilityObject = (new RowSet\Capability())
-                ->setId($capabilityId)
-                ->setName($capability['name']);
-            foreach ($capability['indicators'] as $indicatorId => $indicator) {
-                $indicatorObject = (new RowSet\Indicator())
-                    ->setId($indicatorId)
-                    ->setName($indicator['name']);
-                $capabilityObject->getIndicators()[$indicatorId] = $indicatorObject;
-            }
-
-            $rowSet->getCapabilities()[$capabilityId] = $capabilityObject;
-        }
-
-
-        // Build a grid that uses the row set
-        $dueWork = new DueWork();
-        $grid    = new Grid\Grid($dueWork, $rowSet);
-
-        // Build and add levels
-        foreach ($levels as $levelId => $level) {
-            $grid->getLevels()[$levelId] = (new Grid\Level())
-                ->setId($levelId)
-                ->setName($level['name']);
-        }
-
-
-        // Build capability and indicator usage, and descriptors
-        foreach ($capabilityUsages as $capabilityId => $capabilityUsage) {
-            $capabilityUsageObject = (new Grid\CapabilityUsage($rowSet->retrieveCapability($capabilityId)))
-                ->setMaxValue($capabilityUsage['maxValue']);
-
-            foreach ($capabilityUsages['indicatorUsages'] as $indicatorId => $indicatorUsage) {
-                $indicatorUsageObject = new Grid\IndicatorUsage($rowSet->retrieveIndicator($indicatorId));
-
-                // Descriptors
-                foreach ($grid->getLevels() as $levelId => $level) {
-                    $descriptor = $indicatorUsage['descriptors'][$levelId] ?? null;
-                    if (null !== $descriptor) {
-                        $indicatorUsageObject->getDescriptors()[$levelId] = (new Grid\Descriptor())
-                            ->setId($levelId)
-                            ->setDescription($descriptor['description'])
-                            ->setMinValue($descriptor['minValue'] ?? $descriptor['value'])
-                            ->setMaxValue($descriptor['maxValue'] ?? $descriptor['value']);
-                    }
-                }
-
-                $capabilityUsageObject->getIndicatorUsages()[$indicatorId] = $indicatorUsageObject;
-            }
-
-            $grid->getCapabilityUsages()[$capabilityId] = $capabilityUsageObject;
-        }
+        // Build a grid and row set
+        $grid   = (new RubricGrid\Test\Generator())->generateGrid($capabilities, $levels, $capabilityUsages);
+        $rowSet = $grid->getRowSet();
 
 
         // Build a marked grid
@@ -121,7 +64,7 @@ class Generator
                 if ($indicatorMark['descriptorId']) {
                     $descriptor = $indicatorUsageObject->getDescriptors()->getBy('id', $indicatorMark['descriptorId']);
                 }
-                if ($descriptor instanceof Grid\Descriptor) {
+                if ($descriptor instanceof RubricGrid\Descriptor) {
                     $indicatorMarkObject->setDescriptor($descriptor);
                     $markValue = $markValue ?? $descriptor->getMaxValue();
                 }
