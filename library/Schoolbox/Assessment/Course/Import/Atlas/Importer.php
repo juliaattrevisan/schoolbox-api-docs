@@ -441,7 +441,8 @@ class Importer
                     $group,
                     $criterion,
                     $level,
-                    new Descriptor('', 1)
+                    new Descriptor('', 1),
+                    false
                 );
             }
 
