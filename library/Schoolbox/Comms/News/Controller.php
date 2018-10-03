@@ -354,11 +354,13 @@ class Controller extends Base
                 /* Form action should secretly update to the Update route
                  */
                 $formAction = $this->getRouter()->generate('commsNews.postUpdate', ['articleId' => $article->getId()]);
+                $formActionSubmit = $this->getRouteIfAuthorized('commsNewsModeration.postSubmit', ['article' => $article, 'articleId' => $article->getId()]);
 
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
                     'url' => $url,
-                    'formAction' => $formAction
+                    'formAction' => $formAction,
+                    'formActionSubmit' => $formActionSubmit
                 ]));
             } else {
 

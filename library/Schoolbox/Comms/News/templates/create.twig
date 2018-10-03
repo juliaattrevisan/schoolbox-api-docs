@@ -26,11 +26,15 @@
 
         {% if article.id %}
             {% set formAction = routeLookupIfAuthorized('commsNews.postUpdate', {article: article, articleId: article.id}) %}
+            {% set formActionSubmit = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
         {% else %}
             {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
+            {# No submitting allowed until a draft has saved -_- #}
+            {% set formActionSubmit = '' %}
         {% endif %}
 
-        <form id="createForm" action="{{ formAction }}" method="post">
+        {# formAction is used for draft saving and previewing, formActionSubmit is used for submitting the article #}
+        <form id="createForm" action="{{ formAction }}" data-action-submit="{{ formActionSubmit }}" method="post">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -239,7 +243,18 @@
                 </fieldset>
             </section>
 
-            <input type="submit" value="Preview" />
+            <div class="row">
+                <div class="small-12 columns">
+                    <ul class="flex-list buttons">
+                        <li>
+                            <button type="submit" id="news-preview" {% if not article.id %}disabled{% endif %}>Preview</button>
+                        </li>
+                        <li>
+                            <button type="submit" class="submit" id="news-submit" {% if not article.id %}disabled{% endif %}>Submit</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -297,14 +312,44 @@
             multiple: true
         });
 
+        var $createForm = $('#createForm');
+        var $submitButtons = $('#news-submit, #news-preview');
+
         {# Drafting mechanism #}
         {% if isAutoSavable %}
-            $('#createForm').draft({
-                inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search', '#news-topics'],
-                textareas: ['body', 'blurb'],
-                attachzones: ['attachment']
-            });
+        $createForm.draft({
+            inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search', '#news-topics'],
+            textareas: ['body', 'blurb'],
+            attachzones: ['attachment']
+        });
         {% endif %}
+
+        $('#news-submit').click(function(event) {
+            event.preventDefault();
+            submitForm('submit');
+        });
+
+        $('#news-preview').click(function(event) {
+            event.preventDefault();
+            submitForm('preview');
+        });
+
+        /**
+         * Submitting the create/update form
+         * Needs to do different things depending on whether 'preview' or 'submit' was clicked
+         *
+         * @param {string} action - 'preview' or 'submit'
+         */
+        function submitForm(action) {
+            // Disable both submits
+            $submitButtons.prop('disabled', true);
+
+            // Update the form's action based on what action was clicked
+            $createForm.attr('action', $createForm.data('action-' + action));
+
+            // Submit the form
+            $createForm.submit();
+        }
     });
 
     /**

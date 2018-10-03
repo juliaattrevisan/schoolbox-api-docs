@@ -244,6 +244,10 @@
                 /* Recycle the id ><
                  */
                 config.element.attr('action', responseText.formAction);
+                config.element.attr('data-action-submit', responseText.formActionSubmit);
+
+                // Enable submit buttons
+                config.element.find('button[type=submit]').prop('disabled', false);
 
                 /* hehe
                  */
