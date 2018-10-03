@@ -17,6 +17,12 @@ use Schoolbox\Mapper;
 
 class Controller extends Base
 {
+
+    /**
+     * Flash message text appears in this key
+     */
+    public const ARTICLE_FLASH_MESSAGE_KEY = 'ArticleFlashMessage';
+
     /* Moderation API error codes:
      *
      * These ensure the client has sufficient information to know what to do. HTTP response codes are insufficient to distinguish some cases.
@@ -117,6 +123,80 @@ class Controller extends Base
 
 
     /**
+     * Set a flash message about submitting articles
+     * Flash messages aren't needed in other contexts yet afaik
+     *
+     * @param Model $article
+     */
+    private function setSubmitFlashMessage(Model $article)
+    {
+        $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
+        $now = \Alaress_Date_Format::now();
+        $message = '';
+
+        /* TODO: Somehow these are determined?
+         */
+        $requiresModeration = false;
+        $notifsOn = false;
+
+        /* TODO: Fill with entire truth table in SA-7456
+         */
+        if ($moderationRequired) {
+            if ($requiresModeration) {
+                if ($notifsOn) {
+                    if ($now->lt($article->getPublishAt()) && $article->getPublishAt()->lt($article->getExpiresAt())) {
+                        $message = 'Your article has been submitted for moderation. You will receive a notification once your article has been assessed.';
+                    } elseif ($article->getPublishAt()->lt($now) && $now->lt($article->getExpiresAt())) {
+                    } elseif ($article->getPublishAt()->lt($article->getExpiresAt()) && $article->getExpiresAt()->lt($now)) {
+                    }
+                } else {
+                    if ($now->lt($article->getPublishAt()) && $article->getPublishAt()->lt($article->getExpiresAt())) {
+                        $message = 'Your article has been submitted for moderation.';
+                    } elseif ($article->getPublishAt()->lt($now) && $now->lt($article->getExpiresAt())) {
+                    } elseif ($article->getPublishAt()->lt($article->getExpiresAt()) && $article->getExpiresAt()->lt($now)) {
+                    }
+                }
+            }
+            else {
+                if ($notifsOn) {
+                    if ($now->lt($article->getPublishAt()) && $article->getPublishAt()->lt($article->getExpiresAt())) {
+                    } elseif ($article->getPublishAt()->lt($now) && $now->lt($article->getExpiresAt())) {
+                    } elseif ($article->getPublishAt()->lt($article->getExpiresAt()) && $article->getExpiresAt()->lt($now)) {
+                    }
+                } else {
+                    if ($now->lt($article->getPublishAt()) && $article->getPublishAt()->lt($article->getExpiresAt())) {
+                    } elseif ($article->getPublishAt()->lt($now) && $now->lt($article->getExpiresAt())) {
+                    } elseif ($article->getPublishAt()->lt($article->getExpiresAt()) && $article->getExpiresAt()->lt($now)) {
+                    }
+                }
+            }
+        } else {
+            if ($notifsOn) {
+                if ($now->lt($article->getPublishAt()) && $article->getPublishAt()->lt($article->getExpiresAt())) {
+                    $message = 'Your article will be published at the selected date and time.';
+                } elseif ($article->getPublishAt()->lt($now) && $now->lt($article->getExpiresAt())) {
+                } elseif ($article->getPublishAt()->lt($article->getExpiresAt()) && $article->getExpiresAt()->lt($now)) {
+                }
+            } else {
+                if ($now->lt($article->getPublishAt()) && $article->getPublishAt()->lt($article->getExpiresAt())) {
+                    $message = 'Your article will be published at the selected date and time.';
+                } elseif ($article->getPublishAt()->lt($now) && $now->lt($article->getExpiresAt())) {
+                    $message = 'Your article has been published.';
+                } elseif ($article->getPublishAt()->lt($article->getExpiresAt()) && $article->getExpiresAt()->lt($now)) {
+                }
+            }
+        }
+
+        /* If a message is provided, let it be available in the Comms\News\Controller namespace
+         */
+        if ('' !== $message) {
+            $segment = $this->getSession()->getSegment('Schoolbox\Comms\News\Controller');
+            $segment->setFlash(self::ARTICLE_FLASH_MESSAGE_KEY, $message);
+        }
+    }
+
+
+    /**
      * Submit For Moderation occurs here
      * A required action prior to Moderation taking place
      *
@@ -165,6 +245,11 @@ class Controller extends Base
         }
 
         if (200 === $httpCode) {
+
+            /* Set a flash message to tell people about what to do next when moderation is on
+             */
+            $this->setSubmitFlashMessage($article);
+
             // TODO. The client should be responsible for determining what to do after submission
             // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
             // TODO. THis should just return the outcome of the request, not a redirect.
