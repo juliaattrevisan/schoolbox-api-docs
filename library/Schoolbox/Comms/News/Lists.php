@@ -146,17 +146,15 @@ class Lists
          */
         $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
-        /* Articles that were audienced to $user
-         */
-        $articleIdsForUser = $this->articleResolver->findArticlesForUser($user);
-
         /* Limit to the $params->getFolderId() value, if one was specified
          * This limits you to the articles you can see in a given topic, for a specified homepage
          */
         if ($params->getFolderId()) {
-            $homepageArticleIds = $this->articleResolver->findArticlesForAudience(Strategy\Folder::ENTITY_TYPE, $params->getFolderId(), Audience\Model::RELATIONSHIP_SELF);
-
-            $articleIdsForUser = array_intersect($articleIdsForUser, $homepageArticleIds);
+            $articleIdsForUser = $this->articleResolver->findArticlesForAudience(Strategy\Folder::ENTITY_TYPE, $params->getFolderId(), Audience\Model::RELATIONSHIP_SELF);
+        }
+        else {
+            /* Articles that were audienced to $user */
+            $articleIdsForUser = $this->articleResolver->findArticlesForUser($user);
         }
 
         /* $articleIds:   Articles in $topicId that were audienced to $user
