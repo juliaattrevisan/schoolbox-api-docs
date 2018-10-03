@@ -28,7 +28,21 @@ Data:
     });
 </script>
 
-    {{ flashMessage }}
+{% if flashMessage|length %}
+    <script>
+        $(function() {
+            $('#flash').on('click', 'a', function(event) {
+                event.preventDefault();
+
+                $('#flash').remove();
+            });
+        });
+    </script>
+    <div id="flash" class="alert-box highlight">
+        {{ flashMessage }}
+        <a class="close">×</a>
+    </div>
+{% endif %}
 
 <div class="actions-small-2 row">
     <div class="list-item">
