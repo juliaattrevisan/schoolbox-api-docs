@@ -137,6 +137,25 @@ class CapabilityUsage
 
 
     /**
+     * Does this capability usage have any descriptors which have a value?
+     *
+     * If not, then the interface shouldn't prompt to assign a value from
+     * descriptors for this capability.
+     *
+     * @return bool
+     */
+    public function containsDescriptorsWithValue(): bool
+    {
+        foreach ($this->indicatorUsages as $indicatorUsage) {
+            if ($indicatorUsage->containsDescriptorsWithValue()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * @return Capability
      */
     public function getCapability(): Capability
