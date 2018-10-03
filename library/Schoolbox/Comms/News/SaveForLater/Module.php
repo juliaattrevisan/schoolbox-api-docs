@@ -135,12 +135,13 @@ class Module extends BaseModule
      * Returns an auth rule do determine if the user the user is logged in to view their 'save-for-later' list
      *
      * @return Rule\IAuthorizationRule
+     * @throws InvalidArgumentException
      */
     private function getAuthRuleCanViewList(): Rule\IAuthorizationRule
     {
         return new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsConfigOn(ConfigMapper::_SAVE_FOR_LATER,$this->getConfig())
+            new Rule\IsConfigOn(ConfigMapper::_SAVE_FOR_LATER, $this->getConfig())
         );
     }
 
