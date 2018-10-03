@@ -61,4 +61,14 @@ abstract class Base implements IStrategy
         // Safe default it to not permit relationship modification
         return [Audience\Model::RELATIONSHIP_SELF];
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canViewEntityValue(User $user, ?string $entityValue): bool
+    {
+        // TODO default to false for now
+        return false;
+    }
 }
