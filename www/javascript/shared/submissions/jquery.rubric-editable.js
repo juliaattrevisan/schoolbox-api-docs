@@ -126,7 +126,7 @@
                 groupId: groupId,
                 groupIndex: groupIndex,
                 name: name,
-                levelCount: $rb.children('thead').find('input').length,
+                levelCount: $rb.children('thead').find('input[data-level]').length,
                 folderId: $('input[name=folderId]').val(),
                 markPerCapability: $('#markPerCapability').prop('checked')
             };
