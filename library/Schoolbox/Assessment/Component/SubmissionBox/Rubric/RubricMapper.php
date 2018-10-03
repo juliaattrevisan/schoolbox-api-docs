@@ -1843,10 +1843,16 @@ class RubricMapper
                 // Has the value changed ?
                 $existingValue = $existingDescriptor->getMaxValue();
                 $newValue      = $newDescriptor->getMaxValue();
-                if ($existingValue != $newValue) {
+                if ($existingValue !== $newValue) {
                     $hasDescriptorValuesChanged = true;
                     break;
                 }
+            }
+
+            // Short-circuit if any desc values changed;
+            // this action invalidates ALL descriptors
+            if ($hasDescriptorValuesChanged) {
+                break;
             }
         }
 
