@@ -29,4 +29,15 @@ class Composite
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }
+
+
+    /**
+     * @return bool
+     * @todo integrate properly into IStrategy sub-interfaces
+     */
+    public function canTargetNullEntityValue(): bool
+    {
+        // Value is always null
+        return true;
+    }
 }
