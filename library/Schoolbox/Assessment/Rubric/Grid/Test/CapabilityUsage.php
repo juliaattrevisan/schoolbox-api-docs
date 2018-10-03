@@ -234,9 +234,95 @@ class CapabilityUsage extends TestCase
      * @param RubricGrid\CapabilityUsage $capabilityUsage
      * @param float                      $expected
      */
-    public function testCalculateMaxValueFromIndicators(RubricGrid\CapabilityUsage $groupUsage, float $expected): void
+    public function testCalculateMaxValueFromIndicators(
+        RubricGrid\CapabilityUsage $capabilityUsage,
+        float $expected
+    ): void
     {
-        $this->assertSame($expected, $groupUsage->calculateMaxValueFromIndicators());
+        $this->assertSame($expected, $capabilityUsage->calculateMaxValueFromIndicators());
+    }
+
+
+    /**
+     * Data provider for `testContainsDescriptorsWithValue`
+     *
+     * @return iterable
+     */
+    public function getTestContainsDescriptorsWithValueData(): iterable
+    {
+        $capability = (new RowSet\Capability())->setId(1)->setName('Capability 1');
+        $indicator1 = (new RowSet\Indicator())->setId(1)->setName('Indicator 1.1');
+        $indicator2 = (new RowSet\Indicator())->setId(2)->setName('Indicator 1.2');
+        $indicator3 = (new RowSet\Indicator())->setId(3)->setName('Indicator 1.3');
+        $indicator4 = (new RowSet\Indicator())->setId(4)->setName('Indicator 1.4');
+
+        $capability->getIndicators()[$indicator1->getId()] = $indicator1;
+        $capability->getIndicators()[$indicator2->getId()] = $indicator2;
+        $capability->getIndicators()[$indicator3->getId()] = $indicator3;
+        $capability->getIndicators()[$indicator4->getId()] = $indicator4;
+
+        // Indicator usage 1: max is 7
+        $indicatorUsage1 = new RubricGrid\IndicatorUsage($indicator1);
+        $indicatorUsage1->getDescriptors()[0] = new RubricGrid\Descriptor();
+        $indicatorUsage1->getDescriptors()[1] = (new RubricGrid\Descriptor())->setMaxValue(3);
+        $indicatorUsage1->getDescriptors()[2] = (new RubricGrid\Descriptor())->setMaxValue(5);
+        $indicatorUsage1->getDescriptors()[3] = (new RubricGrid\Descriptor())->setMaxValue(7);
+
+        // Indicator usage 2: max is 0 (no descriptors with marks)
+        $indicatorUsage2 = new RubricGrid\IndicatorUsage($indicator2);
+        $indicatorUsage2->getDescriptors()[1] = new RubricGrid\Descriptor();
+        $indicatorUsage2->getDescriptors()[2] = new RubricGrid\Descriptor();
+
+        // Indicator usage 2: max is 8
+        $indicatorUsage3 = new RubricGrid\IndicatorUsage($indicator3);
+        $indicatorUsage3->getDescriptors()[1] = (new RubricGrid\Descriptor())->setMaxValue(8);
+        $indicatorUsage3->getDescriptors()[2] = (new RubricGrid\Descriptor())->setMaxValue(5);
+        $indicatorUsage3->getDescriptors()[3] = (new RubricGrid\Descriptor())->setMaxValue(2);
+
+        // Indicator usage 4: max is 0 (no descriptors)
+        $indicatorUsage4 = new RubricGrid\IndicatorUsage($indicator4);
+
+
+        $capabilityUsage1 = new RubricGrid\CapabilityUsage($capability);
+
+        yield 'No indicators' => [$capabilityUsage1, false];
+
+
+        $capabilityUsage2                                             = new RubricGrid\CapabilityUsage($capability);
+        $capabilityUsage2->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4;
+
+        yield 'No indicators with descriptors' => [$capabilityUsage2, false];
+
+
+        $capabilityUsage3                                             = new RubricGrid\CapabilityUsage($capability);
+        $capabilityUsage3->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
+
+        yield 'No indicators with descriptors with marks' => [$capabilityUsage3, false];
+
+
+        $capabilityUsage4                                             = new RubricGrid\CapabilityUsage($capability);
+        $capabilityUsage4->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
+        $capabilityUsage4->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
+        $capabilityUsage4->getIndicatorUsages()[$indicator3->getId()] = $indicatorUsage3;
+        $capabilityUsage4->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4;
+
+        yield 'Descriptors with marks' => [$capabilityUsage4, true];
+    }
+
+
+    /**
+     * @dataProvider getTestContainsDescriptorsWithValueData
+     * @covers \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage::containsDescriptorsWithValue
+     *
+     * @param RubricGrid\CapabilityUsage $capabilityUsage
+     * @param bool                       $expected
+     */
+    public function testContainsDescriptorsWithValue(
+        RubricGrid\CapabilityUsage $capabilityUsage,
+        bool $expected
+    ): void
+    {
+        $this->assertSame($expected, $capabilityUsage->containsDescriptorsWithValue());
     }
 
 
