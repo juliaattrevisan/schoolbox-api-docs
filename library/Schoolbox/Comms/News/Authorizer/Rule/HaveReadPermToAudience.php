@@ -74,14 +74,15 @@ class HaveReadPermToAudience extends ArticleAttribute
     private function haveReadPermToSegmentAudience(User $user, Audience\Model $segment): bool
     {
         // Base Case
-        if (Audience\Model::ENTITY_TYPE_COMPOSITE !== $segment->getEntityType()) {
-            $strategy = $this->strategyFactory->make($segment->getEntityType(), $user);
-            return $strategy->canViewEntityValue($user, $segment->getEntityValue());
+        $entityType = $segment->getEntityType();
+        if (Audience\Model::ENTITY_TYPE_COMPOSITE !== $entityType) {
+            $strategy = $this->strategyFactory->make($entityType, $user);
+            return $strategy->canViewEntityValue($user, $entityType);
         }
 
         // Recursive Case - segment must have 1+ children, and user must have READ+ perm to them all
         $childSegments = $segment->getChildren();
-        if (!$childSegments || !$childSegments->count()) {
+        if (!$childSegments->count()) {
             return false;
         }
         foreach ($segment->getChildren() as $childSegment) {
