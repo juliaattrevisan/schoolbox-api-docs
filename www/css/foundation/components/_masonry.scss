@@ -305,8 +305,8 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-info;
   color: $icon-color-homepage-activity;
 }
-icon-masonry-Schoolbox_Comms_News_Component_Homepage_Controller:before {
-  @extend .icon-report;
+.icon-masonry-Schoolbox_Comms_News_Component_Homepage_Controller:before {
+  @extend .icon-news;
   color: $icon-color-homepage-news;
 }
 .icon-masonry-Component_Dashboard_CalendarController:before {
