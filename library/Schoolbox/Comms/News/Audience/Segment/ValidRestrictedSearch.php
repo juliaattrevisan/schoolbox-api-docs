@@ -7,16 +7,16 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
-use Schoolbox\Comms\News\ValidUserIsCommsOfficer;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 
 /**
- * Specification of a user that is restricted to only target groups/classes where they have READ+ access
+ * Specification of a user that is restricted to only audience to groups/classes where they have READ+ access
  *
  * A user is restricted if they are/have none of:
  * * a superuser
- * * a comms officer
+ * * a user with WRITE+ News Service perm
  * * READ+ CMS perm
  */
 class ValidRestrictedSearch
@@ -41,7 +41,7 @@ class ValidRestrictedSearch
      */
     public function isSatisfiedBy(User $user): bool
     {
-        return !$user->isSuperuser() && !$this->hasCMSPermission($user) && !$this->isCommsOfficer($user);
+        return !$user->isSuperuser() && !$this->hasCMSPermission($user) && !$this->hasNewsServiceWritePerm($user);
     }
 
 
@@ -71,14 +71,14 @@ class ValidRestrictedSearch
 
 
     /**
-     * Returns whether the specified user is a comms officer
+     * Returns whether the specified user has WRITE+ NewsService permissions
      *
      * @param User $user
      * @return bool
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function isCommsOfficer(User $user): bool
+    private function hasNewsServiceWritePerm(User $user): bool
     {
-        return (new ValidUserIsCommsOfficer())->isSatisfiedBy($user);
+        return UserAccessMapper::getInstance()->getAccess($user, null, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE;
     }
 }

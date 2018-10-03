@@ -26,8 +26,6 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
@@ -83,11 +81,6 @@ class Controller extends Base
     private $audienceMapper;
 
     /**
-     * @var RoleAccessMapper
-     */
-    private $roleAccessMapper;
-
-    /**
      * @var Audience\ArticleResolver
      */
     private $articleResolver;
@@ -100,8 +93,6 @@ class Controller extends Base
     /** @var Validation\Factory */
     private $validSpecFactory;
 
-    /** @var UserAccessMapper */
-    private $userAccessMapper;
 
     /** @var Audience\Segment\StrategyFactory */
     private $strategyFactory;
@@ -115,13 +106,11 @@ class Controller extends Base
      * @param Statistics\Mapper            $statisticsMapper
      * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
      * @param Audience\Mapper              $audienceMapper
-     * @param RoleAccessMapper             $roleAccessMapper
      * @param Folder\Mapper                $folderMapper
      * @param IConnector                   $databaseInternal
      * @param Audience\ArticleResolver     $articleResolver
      * @param Audience\UserResolver        $userResolver
      * @param Validation\Factory           $validSpecFactory
-     * @param UserAccessMapper             $userAccessMapper
      * @param Audience\Segment\StrategyFactory $strategyFactory
      */
     public function __construct(
@@ -131,13 +120,11 @@ class Controller extends Base
         Statistics\Mapper $statisticsMapper,
         Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         Audience\Mapper $audienceMapper,
-        RoleAccessMapper $roleAccessMapper,
         Folder\Mapper $folderMapper,
         IConnector $databaseInternal,
         Audience\ArticleResolver $articleResolver,
         Audience\UserResolver $userResolver,
         Validation\Factory $validSpecFactory,
-        UserAccessMapper $userAccessMapper,
         Audience\Segment\StrategyFactory $strategyFactory
     ) {
         $this->newsMapper                 = $newsMapper;
@@ -146,13 +133,11 @@ class Controller extends Base
         $this->statisticsMapper           = $statisticsMapper;
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
         $this->audienceMapper             = $audienceMapper;
-        $this->roleAccessMapper           = $roleAccessMapper;
         $this->folderMapper               = $folderMapper;
         $this->databaseInternal           = $databaseInternal;
         $this->validSpecFactory           = $validSpecFactory;
         $this->articleResolver            = $articleResolver;
         $this->userResolver               = $userResolver;
-        $this->userAccessMapper           = $userAccessMapper;
         $this->strategyFactory            = $strategyFactory;
     }
 
@@ -204,11 +189,9 @@ class Controller extends Base
         $groupId = $this->getRequest()->query->get('groupId');
         $entityType = $this->getRequest()->query->get('type');
 
-        $strategyFactory = $this->buildStrategyFactory();
-
         // Hard-coded to folder (for now)
         if ($groupId && $entityType && $entityType === Audience\Segment\EntityType\Folder\Strategy::ENTITY_TYPE) {
-            $folderStrategy = $strategyFactory->makeStrategy($entityType);
+            $folderStrategy = $this->strategyFactory->makeStrategy($entityType, $this->getUser());
             // Ensure the user is permitted to target this entity type
             if ($folderStrategy->canBeTargetedByUser($this->getUser())) {
                 // Ensure the user is permitted to target this entity value
@@ -272,6 +255,8 @@ class Controller extends Base
      * @level 18.1
      *
      * @param Model $article
+     * @throws InvalidArgumentException
+     * @throws MapperException\InsufficientHydrationException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException
      */
@@ -293,15 +278,9 @@ class Controller extends Base
 
         $translator = new Audience\Segment\Translator(
             $this->databaseInternal,
-            new Audience\Segment\StrategyFactory(
-                $this->userAccessMapper,
-                $this->getUser(),
-                $this->folderMapper,
-                $this->roleAccessMapper,
-                $this->getConfigLoader()->get(ConfigMapper::_STAFF_CAN_POST_NEWS)
-            )
+            $this->strategyFactory
         );
-        $translator->buildCache($article);
+        $translator->buildCache($article, $this->getUser());
 
         // Audiencing selectize data
         $audienceSegments = [];
@@ -329,7 +308,7 @@ class Controller extends Base
             'featureImageZone'       => $zone->getTwigContext(),
             'audienceSegments'       => $audienceSegments,
             'isAutoSavable'          => !$article->isApproved(),
-            'availableEntityTypes'   => $this->getAvailableAudienceStrategyEntityTypes($this->buildStrategyFactory()),
+            'availableEntityTypes'   => $this->getAvailableAudienceStrategyEntityTypes($this->strategyFactory),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -476,7 +455,6 @@ class Controller extends Base
 
         // Persist audience segments
         $transactor = new Audience\Segment\Transactor(
-            $this->userAccessMapper,
             $this->getUser(),
             $this->audienceMapper,
             new Audience\Segment\Codec($this->audienceMapper),
@@ -573,7 +551,6 @@ class Controller extends Base
                 'article'            => $article,
                 'moderationEnabled'  => $moderationEnabled,
                 'isSavedForLater'    => $isSavedForLater,
-                'isCommsOfficer'     => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
             ];
         }
 
@@ -1097,21 +1074,6 @@ class Controller extends Base
 
 
     /**
-     * @return StrategyFactory
-     */
-    private function buildStrategyFactory(): StrategyFactory
-    {
-        return new StrategyFactory(
-            $this->userAccessMapper,
-            $this->getUser(),
-            $this->folderMapper,
-            $this->roleAccessMapper,
-            $this->getConfigLoader()->get(ConfigMapper::_STAFF_CAN_POST_NEWS)
-        );
-    }
-
-
-    /**
      * @param StrategyFactory $strategyFactory
      * @return string[]
      * @throws InvalidArgumentException
@@ -1120,7 +1082,7 @@ class Controller extends Base
     private function getAvailableAudienceStrategyEntityTypes(StrategyFactory $strategyFactory): array
     {
         $availableStrategies = [];
-        foreach($strategyFactory->makeAllStrategies() as $strategy){
+        foreach($strategyFactory->makeAllStrategies($this->getUser()) as $strategy){
             if($strategy->canBeTargetedByUser($this->getUser())){
                 $availableStrategies[] = $strategy->getEntityType();
             }

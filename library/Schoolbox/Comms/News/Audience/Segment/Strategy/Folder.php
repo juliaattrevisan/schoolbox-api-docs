@@ -111,7 +111,6 @@ class Folder extends Base
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
      */
     public function getSearchSql(string $searchPlaceholder = null): string
     {

@@ -12,7 +12,6 @@ use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
 use Schoolbox\User;
 use InvalidArgumentException;
@@ -22,8 +21,6 @@ use InvalidArgumentException;
  */
 class Transactor
 {
-    /** @var UserAccessMapper */
-    private $userAccessMapper;
 
     /** @var User */
     private $sessionUser;
@@ -39,20 +36,17 @@ class Transactor
 
 
     /**
-     * @param UserAccessMapper $userAccessMapper
      * @param User             $sessionUser
      * @param Audience\Mapper  $audienceMapper
      * @param Codec            $codec
      * @param StrategyFactory  $strategyFactory
      */
     public function __construct(
-        UserAccessMapper $userAccessMapper,
         User $sessionUser,
         Audience\Mapper $audienceMapper,
         Codec $codec,
         StrategyFactory $strategyFactory
     ) {
-        $this->userAccessMapper    = $userAccessMapper;
         $this->sessionUser         = $sessionUser;
         $this->audienceMapper      = $audienceMapper;
         $this->codec               = $codec;

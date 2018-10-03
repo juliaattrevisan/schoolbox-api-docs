@@ -406,18 +406,22 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 function () use ($di) {
                     /**
                      * @var MapperFactory    $mapperFactory
+                     * @var UserAccessMapper $userAccessMapper
                      * @var Folder\Mapper    $folderMapper
                      * @var RoleAccessMapper $roleAccessMapper
                      * @var IConfigLoader    $config
                      */
                     $mapperFactory    = $di->get('mapperFactory');
+                    $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
                     $folderMapper     = $mapperFactory->get(Folder\Mapper::class);
                     $roleAccessMapper = $mapperFactory->get(RoleAccessMapper::class);
                     $config           = $di->get('config');
                     return new News\Audience\Segment\StrategyFactory(
+                        $userAccessMapper,
                         $folderMapper,
                         $roleAccessMapper,
-                        $config->get(ConfigMapper::_GLOBAL_MODERATION)
+                        $config->get(ConfigMapper::_GLOBAL_MODERATION),
+                        $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS)
                     );
                 }
             )

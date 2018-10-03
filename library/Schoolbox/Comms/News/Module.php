@@ -181,7 +181,6 @@ class Module extends BaseModule
             'statisticsMapper'           => $this->getMapperFactory()->getLazy(Statistics\Mapper::class),
             'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(Statistics\Cumulative\Mapper::class),
             'audienceMapper'             => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
-            'roleAccessMapper'           => $this->getMapperFactory()->getLazy(Access\RoleAccessMapper::class),
             'folderMapper'               => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
             'databaseInternal'           => $injector->lazyGet('databaseInternal'),
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
@@ -189,7 +188,6 @@ class Module extends BaseModule
             'validSpecFactory'           => $injector->lazy(function () {
                 return new Validation\Factory();
             }),
-            'userAccessMapper'           => $this->getMapperFactory()->getLazy(Access\UserAccessMapper::class),
             'strategyFactory'            => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
         ];
     }

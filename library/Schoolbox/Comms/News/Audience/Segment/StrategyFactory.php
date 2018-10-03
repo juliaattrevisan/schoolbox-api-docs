@@ -17,10 +17,12 @@ use UnexpectedValueException;
 
 /**
  * Responsible for enumeration of the IStrategy interface
+ *
  * @see IStrategy
  */
 class StrategyFactory
 {
+
     private const ENTITY_VALUES = [
         EntityType\Campus\Strategy::ENTITY_TYPE,
         EntityType\Folder\Strategy::ENTITY_TYPE,
@@ -47,8 +49,12 @@ class StrategyFactory
     /** @var bool */
     private $staffCanPost;
 
+    /** @var bool */
+    private $moderationRequired;
+
     /**
      * Cache the strategies so repeated calls to make() for the same strat will return the same instance
+     *
      * @var IStrategy[]
      */
     private $strategyCache = [];
@@ -58,14 +64,21 @@ class StrategyFactory
      * @param UserAccessMapper $userAccessMapper
      * @param Folder\Mapper    $folderMapper
      * @param RoleAccessMapper $roleAccessMapper
+     * @param bool             $moderationRequired
      * @param bool             $staffCanPost
      */
-    public function __construct(UserAccessMapper $userAccessMapper,Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $staffCanPost)
-    {
-        $this->userAccessMapper  = $userAccessMapper;
-        $this->folderMapper      = $folderMapper;
-        $this->roleAccessMapper  = $roleAccessMapper;
-        $this->staffCanPost      = $staffCanPost;
+    public function __construct(
+        UserAccessMapper $userAccessMapper,
+        Folder\Mapper $folderMapper,
+        RoleAccessMapper $roleAccessMapper,
+        bool $moderationRequired,
+        bool $staffCanPost
+    ) {
+        $this->userAccessMapper   = $userAccessMapper;
+        $this->folderMapper       = $folderMapper;
+        $this->roleAccessMapper   = $roleAccessMapper;
+        $this->moderationRequired = $moderationRequired;
+        $this->staffCanPost       = $staffCanPost;
     }
 
 
@@ -77,7 +90,7 @@ class StrategyFactory
      */
     public function makeStrategy(string $entityType, User $user): IStrategy
     {
-        if(!\array_key_exists($entityType, $this->strategyCache)) {
+        if (!\array_key_exists($entityType, $this->strategyCache)) {
             $this->strategyCache[$entityType] = $this->makeNewStrategyInstance($entityType, $user);
         }
         return $this->strategyCache[$entityType];
@@ -96,23 +109,23 @@ class StrategyFactory
             case EntityType\User\Strategy::ENTITY_TYPE:
                 return new EntityType\User\Strategy($this->userAccessMapper, $this->staffCanPost);
             case EntityType\Super\Strategy::ENTITY_TYPE:
-                return new EntityType\Super\Strategy($this->userAccessMapper,$this->staffCanPost);
+                return new EntityType\Super\Strategy($this->userAccessMapper, $this->staffCanPost);
             case EntityType\Campus\Strategy::ENTITY_TYPE:
-                return new EntityType\Campus\Strategy($this->userAccessMapper,$this->staffCanPost);
+                return new EntityType\Campus\Strategy($this->userAccessMapper, $this->staffCanPost);
             case EntityType\Role\Strategy::ENTITY_TYPE:
-                return new EntityType\Role\Strategy($this->userAccessMapper,$this->staffCanPost);
+                return new EntityType\Role\Strategy($this->userAccessMapper, $this->staffCanPost);
             case EntityType\RoleType\Strategy::ENTITY_TYPE:
-                return new EntityType\RoleType\Strategy($this->userAccessMapper,$this->staffCanPost);
+                return new EntityType\RoleType\Strategy($this->userAccessMapper, $this->staffCanPost);
             case EntityType\SchoolHouse\Strategy::ENTITY_TYPE:
-                return new EntityType\SchoolHouse\Strategy($this->userAccessMapper,$this->staffCanPost);
+                return new EntityType\SchoolHouse\Strategy($this->userAccessMapper, $this->staffCanPost);
             case EntityType\ResHouse\Strategy::ENTITY_TYPE:
-                return new EntityType\ResHouse\Strategy($this->userAccessMapper,$this->staffCanPost);
+                return new EntityType\ResHouse\Strategy($this->userAccessMapper, $this->staffCanPost);
             case EntityType\Year\Strategy::ENTITY_TYPE:
-                return new EntityType\Year\Strategy($this->userAccessMapper,$this->staffCanPost);
+                return new EntityType\Year\Strategy($this->userAccessMapper, $this->staffCanPost);
             case EntityType\Service\Strategy::ENTITY_TYPE:
-                return new EntityType\Service\Strategy($this->userAccessMapper,$this->staffCanPost);
+                return new EntityType\Service\Strategy($this->userAccessMapper, $this->staffCanPost);
             case EntityType\PastoralGroup\Strategy::ENTITY_TYPE:
-                return new EntityType\PastoralGroup\Strategy($this->userAccessMapper,$this->staffCanPost);
+                return new EntityType\PastoralGroup\Strategy($this->userAccessMapper, $this->staffCanPost);
             case EntityType\Folder\Strategy::ENTITY_TYPE:
                 return new EntityType\Folder\Strategy(
                     $this->userAccessMapper,
@@ -134,7 +147,7 @@ class StrategyFactory
     public function makeAllStrategies(User $user): GenericCollection
     {
         $c = new GenericCollection(IStrategy::class);
-        foreach(self::ENTITY_VALUES as $entityValue){
+        foreach (self::ENTITY_VALUES as $entityValue) {
             $c[$entityValue] = $this->makeStrategy($entityValue, $user);
         }
         return $c;

@@ -66,13 +66,11 @@ class Search implements ISearch
 
         if ((new ValidRestrictedSearch())->isSatisfiedBy($this->user)) {
 
-            $minAccessLevel = UserAccess::ACCESS_WRITE;
-
             // Get folders where user has required access via group/class individual permissions
-            $groupAndClassMembership = $this->folderMapper->findFolderIdsForUser($this->user, true, $minAccessLevel);
+            $groupAndClassMembership = $this->folderMapper->findFolderIdsForUser($this->user, true, UserAccess::ACCESS_WRITE);
 
             // Get folders where user has required access via their role permissions
-            $roleAccess = $this->findFolderIdsWithRoleAccess($minAccessLevel);
+            $roleAccess = $this->findFolderIdsWithRoleAccess(UserAccess::ACCESS_WRITE);
 
             // Combine the two
             $folderMembership = \array_unique(\array_merge($groupAndClassMembership, $roleAccess));

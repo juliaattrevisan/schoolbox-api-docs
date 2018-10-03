@@ -11,14 +11,12 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\GenericCollection;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Resource\Folder;
-use Schoolbox\User;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
 use PDO;
 use InvalidArgumentException;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use Schoolbox\User;
 
 /**
  * Render human-readable representations of audience segment entity values.
@@ -114,25 +112,26 @@ class Translator
      * Performs this in a single DB query for efficiency
      *
      * @param News\Model $article
+     * @param User       $user
      * @return $this
      * @throws InsufficientHydrationException
      * @throws InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    public function buildCache(News\Model $article): self
+    public function buildCache(News\Model $article, User $user): self
     {
         $segmentIds = [];
         $strategies = new GenericCollection(IStrategy::class);
         foreach ($article->getAudience() as $segment) {
             if ($segment->isSimple()) {
                 $segmentIds[] = $segment->getId();
-                $strategies[$segment->getEntityType()] = $this->strategyFactory->makeStrategy($segment->getEntityType());
+                $strategies[$segment->getEntityType()] = $this->strategyFactory->makeStrategy($segment->getEntityType(), $user);
                 continue;
             }
             foreach ($segment->getChildren() as $childSegment) {
                 $segmentIds[] = $childSegment->getId();
                 $entityType = $childSegment->getEntityType();
-                $strategies[$entityType] = $this->strategyFactory->makeStrategy($entityType);
+                $strategies[$entityType] = $this->strategyFactory->makeStrategy($entityType, $user);
 
             }
         }
@@ -140,9 +139,13 @@ class Translator
         if (!\count($segmentIds)) {
             return $this;
         }
-        $bindings   = Builder::getBindings($segmentIds, 'id');
-        $translator = new TranslatorRegistry($strategies);
-        $statement  = $this->database->executeQuery($translator->getTranslateSql($bindings->getPlaceholder()), $bindings->getParams());
+
+        $bindings  = Builder::getBindings($segmentIds, 'id');
+        $sqlPieces = [];
+        foreach ($strategies as $strategy) {
+            $sqlPieces[] = "({$strategy->getTranslateSql($bindings->getPlaceholder())})";
+        }
+        $statement = $this->database->executeQuery(\implode(' UNION ALL ', $sqlPieces), $bindings->getParams());
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
