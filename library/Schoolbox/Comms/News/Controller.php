@@ -97,6 +97,7 @@ class Controller extends Base
     /** @var Validation\Factory */
     private $validSpecFactory;
 
+    private const DEFAULT_SEARCH_LIMIT = 10;
 
     /**
      * @param Mapper                       $newsMapper
@@ -564,11 +565,8 @@ class Controller extends Base
     public function getListForHomepage() :void
     {
         $params = new Querystring($this->getRequest()->query);
-        $topics = $this->topicMapper->findAll();
 
-        $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
-
-        $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), null, null);
+        $partialData = $this->generatePartialForHomepage($params);
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
@@ -579,18 +577,11 @@ class Controller extends Base
             return;
         }
 
-        // Pass the readonly parameters into the template as well
-        $partialData['readonly'] = $params->getReadOnlyFlag();
-        $partialData['folderId'] = $params->getFolderId();
-
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'success' => true,
-            'title' => $this->getDi()->get('l10n')->translate('news', false, true),
-            'url' => $partialData['currentUrl'],
-            'fragment' => $content,
-            'slug' => $params->getSlug()
+            'fragment' => $content
         ]));
     }
 
@@ -975,9 +966,8 @@ class Controller extends Base
      */
     private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
-        $defaultSearchLimit    = 10;
         $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
-        $searchLimit           = null === $configuredSearchLimit ? $defaultSearchLimit : (int)$configuredSearchLimit;
+        $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
 
         $topicData = (new Lists(
             $searchLimit,
@@ -1008,6 +998,42 @@ class Controller extends Base
         ]);
 
         return $partialData;
+    }
+
+    /**
+     * Generate a partial fragment containing articles for homepage
+     *
+     * @param Querystring $params
+     * @return array
+     * @throws MapperException
+     */
+    private function generatePartialForHomepage(Querystring $params)
+    {
+        $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
+        $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
+
+        $topicData = (new Lists(
+            $searchLimit,
+            $this->newsMapper,
+            $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+            $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
+            $this->saveForLaterMapper,
+            $this->statisticsMapper,
+            $this->statisticsCumulativeMapper,
+            $this->databaseInternal,
+            $this->articleResolver
+        ))->findArticlesForHomepage(
+            $params,
+            $this->getUser()
+        );
+
+        return array_merge($topicData, [
+            'hidePaginator' => true,
+            'compactMode' => $params->getCompactMode(),
+            'referrer' => $params->getReferrer(),
+            'folderId' => $params->getFolderId(),
+            'readonly' => $params->getReadOnlyFlag()
+        ]);
     }
 
 

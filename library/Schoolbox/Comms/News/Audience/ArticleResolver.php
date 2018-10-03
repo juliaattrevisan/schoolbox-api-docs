@@ -597,4 +597,30 @@ class ArticleResolver implements IArticleResolver
         }
         return \array_unique($articleIds);
     }
+
+    public function findArticlesForHomepage($folderId, $limit): array
+    {
+        $pb = $this->db
+            ->buildPredicateBuilder(Mapper::TABLE_NAME)
+            ->equals(Mapper::FIELD_ENTITY_TYPE, Strategy\Folder::ENTITY_TYPE)
+            ->isNull(Mapper::FIELD_PARENT_ID)
+            ->equals(Mapper::FIELD_ENTITY_VALUE, $folderId)
+            ->equals(Mapper::FIELD_RELATIONSHIP, Model::RELATIONSHIP_SELF);
+
+        $whereClause = \implode(' AND ', $pb->getWhere());
+
+        $query = "
+              SELECT DISTINCT(comms_news_article_id)
+              FROM comms_news_audience
+              LEFT JOIN comms_news_article
+              ON comms_news_audience.comms_news_article_id = comms_news_article.id
+              WHERE {$whereClause}
+              ORDER BY publish_at DESC, created_at DESC";
+
+        if ($limit || $limit === null) {
+            $query .= ' LIMIT ' . $limit;
+        }
+
+        return $this->db->executeQuery($query, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
+    }
 }
