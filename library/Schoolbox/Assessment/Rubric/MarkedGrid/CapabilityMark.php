@@ -204,7 +204,7 @@ class CapabilityMark
      */
     public function setValue(?float $value): self
     {
-        $this->value = $value ?? 0.0;
+        $this->value = $value;
         return $this;
     }
 }

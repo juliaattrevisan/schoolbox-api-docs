@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Assessment\Rubric\MarkedGrid\ValidCapabilityMark;
 
 /**
  * Factory for building `MarkedGrid` objects.
@@ -21,6 +22,7 @@ class Factory
      * @param MarkedGrid $markedGrid A grid (which already contains an assessment and rowset)
      * @param array      $postData
      * @return MarkedGrid
+     * @throws \InvalidArgumentException if a bad capability mark is found
      */
     public function buildFromPostData(MarkedGrid $markedGrid, array $postData): MarkedGrid
     {
@@ -53,17 +55,26 @@ class Factory
 
 
             // Set its value
-            // TODO validate the value is within the cap's max mark bounds
             $capabilityId        = $capabilityUsage->getCapability()->getId();
-            $capabilityMarkValue = $isSelfReflection
-                ? null
-                : filter_var(
-                    $postCapabilities[$capabilityId]['unscaledMark'] ?? null,
-                    FILTER_VALIDATE_FLOAT,
-                    FILTER_NULL_ON_FAILURE
-                );
-            $capabilityMark->setValue($capabilityMarkValue);
 
+            // This is the literal string the user entered into the capability mark input field
+            // (or its percentage bracket equivalent, if letter grade)
+            $capabilityCustomMarkInput = $isSelfReflection
+                ? null
+                : $postCapabilities[$capabilityId]['customMark'];
+
+            // Validate the input string first
+            $capMarkSpec = new ValidCapabilityMark($capabilityUsage->getMaxValue(), $capabilityMark->getMarkScheme());
+            if ($capMarkSpec->isSatisfiedBy($capabilityCustomMarkInput)) {
+                // Set the capability mark normalised to a value out of the total descriptor points for the capability
+                $capabilityUnscaledMark = $isSelfReflection
+                    ? null
+                    : floatval($postCapabilities[$capabilityId]['unscaledMark']);
+
+                $capabilityMark->setValue($capabilityUnscaledMark);
+            } else {
+                throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
+            }
 
             // Set marks for indicators
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {

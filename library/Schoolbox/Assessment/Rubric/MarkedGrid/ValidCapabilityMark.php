@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
 
 use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
@@ -25,6 +25,11 @@ class ValidCapabilityMark extends \Alaress\Specification\Base
     // with the capability max to ensure it's within the range.
     public function isSatisfiedBy($capabilityMark) : bool
     {
+        if (null === $capabilityMark) {
+            // This is a self reflection, so null cap mark is expected
+            return true;
+        }
+
         // Percentage mark types (Letter Grade and Percentage) are always sent to the backend as values between 0-100
         $max = $this->markScheme instanceof TotalMarkAbstract ? $this->capabilityMax : 100;
 
