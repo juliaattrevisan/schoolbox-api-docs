@@ -14,8 +14,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use UnexpectedValueException;
 use Schoolbox\User;
-use Schoolbox\Resource\Folder;
-use Schoolbox\Permission\Access\RoleAccessMapper;
 use InvalidArgumentException;
 
 /**
@@ -27,45 +25,33 @@ class Transactor
     /** @var User */
     private $sessionUser;
 
-
     /** @var Audience\Mapper */
     private $audienceMapper;
 
     /** @var Codec */
     private $codec;
 
-    /** @var Folder\Mapper */
-    private $folderMapper;
-
-    /** @var RoleAccessMapper */
-    private $roleAccessMapper;
-
-    /** @var bool */
-    private $isModerationEnabled;
+    /** @var StrategyFactory */
+    private $strategyFactory;
 
 
     /**
      * @param User             $sessionUser
      * @param Audience\Mapper  $audienceMapper
      * @param Codec            $codec
-     * @param Folder\Mapper    $folderMapper
-     * @param RoleAccessMapper $roleAccessMapper
-     * @param bool             $isModerationEnabled
+     * @param StrategyFactory  $strategyFactory
      */
     public function __construct(
         User $sessionUser,
         Audience\Mapper $audienceMapper,
         Codec $codec,
-        Folder\Mapper $folderMapper,
-        RoleAccessMapper $roleAccessMapper,
-        bool $isModerationEnabled
+        StrategyFactory $strategyFactory
     ) {
         $this->sessionUser         = $sessionUser;
         $this->audienceMapper      = $audienceMapper;
         $this->codec               = $codec;
-        $this->folderMapper        = $folderMapper;
-        $this->roleAccessMapper    = $roleAccessMapper;
-        $this->isModerationEnabled = $isModerationEnabled;
+        $this->strategyFactory     = $strategyFactory;
+
     }
 
 
@@ -162,9 +148,7 @@ class Transactor
         $isSegmentsAdded = false;
         if ($segmentsToAdd->count()) {
 
-
-            $strategyFactory = new StrategyFactory($this->folderMapper, $this->roleAccessMapper, $this->isModerationEnabled);
-            $strategies      = $strategyFactory->makeAll();
+            $strategies      = $this->strategyFactory->makeAll();
 
             // Ensure the relationship is valid for the segment's entity type
             $validRelationships = [];

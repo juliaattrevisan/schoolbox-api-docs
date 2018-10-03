@@ -98,6 +98,9 @@ class Controller extends Base
     /** @var Validation\Factory */
     private $validSpecFactory;
 
+    /** @var Audience\Segment\StrategyFactory */
+    private $strategyFactory;
+
     private const DEFAULT_SEARCH_LIMIT = 10;
 
     /**
@@ -113,6 +116,7 @@ class Controller extends Base
      * @param Audience\ArticleResolver     $articleResolver
      * @param Audience\UserResolver        $userResolver
      * @param Validation\Factory           $validSpecFactory
+     * @param Audience\Segment\StrategyFactory $strategyFactory
      */
     public function __construct(
         Mapper $newsMapper,
@@ -126,7 +130,8 @@ class Controller extends Base
         IConnector $databaseInternal,
         Audience\ArticleResolver $articleResolver,
         Audience\UserResolver $userResolver,
-        Validation\Factory $validSpecFactory
+        Validation\Factory $validSpecFactory,
+        Audience\Segment\StrategyFactory $strategyFactory
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -140,6 +145,7 @@ class Controller extends Base
         $this->validSpecFactory           = $validSpecFactory;
         $this->articleResolver            = $articleResolver;
         $this->userResolver               = $userResolver;
+        $this->strategyFactory            = $strategyFactory;
     }
 
 
@@ -455,9 +461,7 @@ class Controller extends Base
             $this->getUser(),
             $this->audienceMapper,
             new Audience\Segment\Codec($this->audienceMapper),
-            $this->folderMapper,
-            $this->roleAccessMapper,
-            $this->isGlobalModerationEnabled()
+            $this->strategyFactory
         );
         $transactor->save($article, $data['audience'] ?? '');
     }

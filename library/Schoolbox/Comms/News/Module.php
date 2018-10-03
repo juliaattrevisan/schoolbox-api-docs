@@ -48,6 +48,8 @@ class Module extends BaseModule
          * and either publicly visible, or you are in the audience
          */
         $readerPerms = new Rule\LazyCallback(function () {
+
+
             /** @var UserResolver $userResolver */
             $userResolver = $this->getInjector()->get('commsNewsUserResolver');
             return new Rule\All(
@@ -183,6 +185,7 @@ class Module extends BaseModule
             'validSpecFactory'           => $injector->lazy(function () {
                 return new Validation\Factory();
             }),
+            'strategyFactory'            => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
         ];
     }
 

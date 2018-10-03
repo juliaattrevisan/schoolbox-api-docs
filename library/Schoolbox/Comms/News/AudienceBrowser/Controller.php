@@ -12,9 +12,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Audience;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Resource\Folder;
 use PDO;
 use InvalidArgumentException;
 use UnexpectedValueException;
@@ -25,38 +22,26 @@ class Controller extends Base
     /** @var IConnector */
     private $db;
 
-    /**
-     * @var Folder\Mapper
-     */
-    private $folderMapper;
-
-    /**
-     * @var Audience\Mapper
-     */
+    /** @var Audience\Mapper */
     private $audienceMapper;
 
-    /**
-     * @var RoleAccessMapper
-     */
-    private $roleAccessMapper;
+    /** @var StrategyFactory */
+    private $strategyFactory;
 
 
     /**
      * @param IConnector            $db
-     * @param Folder\Mapper         $folderMapper
      * @param Audience\Mapper       $audienceMapper
-     * @param RoleAccessMapper      $roleAccessMapper
+     * @param StrategyFactory       $strategyFactory
      */
     public function __construct(
         IConnector $db,
-        Folder\Mapper $folderMapper,
         Audience\Mapper $audienceMapper,
-        RoleAccessMapper $roleAccessMapper
+        StrategyFactory $strategyFactory
     ) {
         $this->db               = $db;
-        $this->folderMapper     = $folderMapper;
         $this->audienceMapper   = $audienceMapper;
-        $this->roleAccessMapper = $roleAccessMapper;
+        $this->strategyFactory  = $strategyFactory;
     }
 
 
@@ -72,8 +57,7 @@ class Controller extends Base
     public function getSearch(): void
     {
         $codec           = new Audience\Segment\Codec($this->audienceMapper);
-        $strategyFactory = $this->buildStrategyFactory();
-        $strategies      = $strategyFactory->makeAll($this->getUser());
+        $strategies      = $this->strategyFactory->makeAll($this->getUser());
         $searchRegistry  = new Audience\Segment\SearchRegistry($this->getUser(), $strategies);
         $placeholder     = 'keyword';
         $statement       = $this->db->prepareQuery($searchRegistry->getSearchSql($placeholder));
@@ -110,10 +94,8 @@ class Controller extends Base
      */
     public function getList(string $entityType): void
     {
-        $strategyFactory = $this->buildStrategyFactory();
-
         try{
-            $strategy = $strategyFactory->make($entityType, $this->getUser());
+            $strategy = $this->strategyFactory->make($entityType, $this->getUser());
         } catch (InvalidArgumentException $e){
             $this->sendError('Unrecognised entity type', [], 404);
             return;
@@ -143,19 +125,5 @@ class Controller extends Base
             'valueLabels'        => $valueLabels,
         ];
         $this->getResponse()->content->set($this->buildJsonOutput($data));
-    }
-
-
-    /**
-     * @return StrategyFactory
-     */
-    private function buildStrategyFactory(): StrategyFactory
-    {
-        return new StrategyFactory(
-            $this->getUser(),
-            $this->folderMapper,
-            $this->roleAccessMapper,
-            $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION)
-        );
     }
 }

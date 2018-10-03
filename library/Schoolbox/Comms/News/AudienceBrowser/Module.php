@@ -14,8 +14,6 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
 {
@@ -50,13 +48,7 @@ class Module extends BaseModule
     }
 
     /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
+     * @inheritdoc
      * @throws InvalidArgumentException
      */
     protected function preInitControllerDependencies(ContainerInterface $injector): void
@@ -64,9 +56,8 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'db'               => $injector->lazyGet('databaseInternal'),
-            'folderMapper'     => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
             'audienceMapper'   => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
-            'roleAccessMapper' => $this->getMapperFactory()->getLazy(RoleAccessMapper::class),
+            'strategyFactory'  => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
         ];
     }
 }
