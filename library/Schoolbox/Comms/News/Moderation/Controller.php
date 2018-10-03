@@ -136,8 +136,8 @@ class Controller extends Base
 
         /* TODO: Somehow these are determined?
          */
-        $requiresModeration = false;
-        $notifsOn = false;
+        $requiresModeration = true;
+        $notifsOn = true;
 
         /* TODO: Fill with entire truth table in SA-7456
          */
