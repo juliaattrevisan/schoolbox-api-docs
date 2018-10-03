@@ -31,6 +31,7 @@ use GuzzleHttp;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\CompositeSync;
 use Schoolbox\External\Connector\CustomSync;
 use Schoolbox\External\Connector\ICommunityPortal;
@@ -51,6 +52,7 @@ use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Revision\DataSource as PastoralRevisionDataSource;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
@@ -398,6 +400,26 @@ abstract class AbstractBootstrap implements BootstrapInterface
             )
         );
 
+        $di->set(
+            'commsNewsAudienceStrategyFactory',
+            $di->lazy(
+                function () use ($di) {
+                    /**
+                     * @var MapperFactory    $mapperFactory
+                     * @var Folder\Mapper    $folderMapper
+                     * @var RoleAccessMapper $roleAccessMapper
+                     * @var IConfigLoader    $config
+                     */
+                    $mapperFactory    = $di->get('mapperFactory');
+                    $folderMapper     = $mapperFactory->get(Folder\Mapper::class);
+                    $roleAccessMapper = $mapperFactory->get(RoleAccessMapper::class);
+                    $config           = $di->get('config');
+                    return new News\Audience\Segment\StrategyFactory(
+                        $folderMapper, $roleAccessMapper, $config->get(ConfigMapper::_GLOBAL_MODERATION)
+                    );
+                }
+            )
+        );
 
         // Web output class - currently uses Sitepage
         $di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
