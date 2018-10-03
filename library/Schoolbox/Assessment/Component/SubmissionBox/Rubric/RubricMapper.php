@@ -783,28 +783,32 @@ class RubricMapper
         $capabilityMarksToSave = $capabilityMarkMapper->createCollection();
         $indicatorMarksToSave  = $indicatorMarkMapper->createCollection();
         foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
-            // Create cap mark
-            $capabilityId    = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
-            $capabilityModel = $capabilityMapper->findById($capabilityId);
-            $capabilityMarksToSave[$capabilityId] = $capabilityMarkModel = $capabilityMarkMapper->createModel()
-                ->setSubmissionReturn($returnedWork)
-                ->setGroup($capabilityModel)
-                ->setValue($capabilityMark->getValue())
-                ->setValid(true);
-
-
-            // Create ind marks
-            foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
-                $indicatorId     = $indicatorMark->getIndicatorUsage()->getIndicator()->getId();
-                $descriptorModel = null;
-                if ($indicatorMark->getDescriptor()) {
-                    $descriptorModel = $descriptorMapper->findById($indicatorMark->getDescriptor()->getId());
-                }
-                $indicatorMarksToSave[$indicatorId] = $indicatorMarkMapper->createModel()
-                    ->setGroupMark($capabilityMarkModel)
-                    ->setDescriptor($descriptorModel)
-                    ->setValue($indicatorMark->getValue())
+            if ((new ValidCapabilityMark($capabilityMark->getCapabilityUsage()->getMaxValue(), $capabilityMark->getMarkScheme()))->isSatisfiedBy($capabilityMark->getValue())) {
+                // Create cap mark
+                $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
+                $capabilityModel = $capabilityMapper->findById($capabilityId);
+                $capabilityMarksToSave[$capabilityId] = $capabilityMarkModel = $capabilityMarkMapper->createModel()
+                    ->setSubmissionReturn($returnedWork)
+                    ->setGroup($capabilityModel)
+                    ->setValue($capabilityMark->getValue())
                     ->setValid(true);
+
+
+                // Create ind marks
+                foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                    $indicatorId = $indicatorMark->getIndicatorUsage()->getIndicator()->getId();
+                    $descriptorModel = null;
+                    if ($indicatorMark->getDescriptor()) {
+                        $descriptorModel = $descriptorMapper->findById($indicatorMark->getDescriptor()->getId());
+                    }
+                    $indicatorMarksToSave[$indicatorId] = $indicatorMarkMapper->createModel()
+                        ->setGroupMark($capabilityMarkModel)
+                        ->setDescriptor($descriptorModel)
+                        ->setValue($indicatorMark->getValue())
+                        ->setValid(true);
+                }
+            } else {
+                throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
             }
         }
 
