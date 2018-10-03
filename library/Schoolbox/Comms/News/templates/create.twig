@@ -246,9 +246,11 @@
             <div class="row">
                 <div class="small-12 columns">
                     <ul class="flex-list buttons">
+                        {% if not article.id or article.isDraft %}
                         <li>
                             <button type="submit" id="news-preview" {% if not article.id %}disabled{% endif %}>Preview</button>
                         </li>
+                        {% endif %}
                         <li>
                             <button type="submit" class="submit" id="news-submit" {% if not article.id %}disabled{% endif %}>Submit</button>
                         </li>
