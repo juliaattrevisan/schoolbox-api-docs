@@ -16,14 +16,20 @@
                                 <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
                             {% endif %}
                         {% endblock %}
+                        <a href="#" class="icon-more" data-dropdown="header-options" title="Actions" aria-expanded="false"></a>
 
-                        {% block rssLink %}
-                        {% endblock %}
                     </nav>
                 </div>
+                <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options" aria-hidden="true">
+                    {% block rssLink %}
+                    {% endblock %}
+                    {% set adminRoute = routeLookupIfAuthorized('commsNewsPolicy.getPolicies') %}
+                    {% if adminRoute %}
+                    <li><a class="icon-settings" href="{{ adminRoute }}">{{ locale.news | capitalize }} Administration</a></li>
+                    {% endif %}
+                </ul>
             {% endblock %}
         </div>
-
     </div>
 </div>
 

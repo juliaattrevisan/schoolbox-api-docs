@@ -23,7 +23,7 @@
 {% block rssLink %}
     {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key}) %}
     {% if rssRoute and slug %}
-        <a href="{{ rssRoute }}?topic={{ slug }}" class='icon-rss' title="Download RSS feed for this topic" id="rss"></a>
+        <li><a href="{{ rssRoute }}?topic={{ slug }}" class='icon-rss' title="Download RSS feed for this topic" id="rss">RSS Link</a></li>
     {% endif %}
 {% endblock %}
 
