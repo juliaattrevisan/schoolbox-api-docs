@@ -51,7 +51,6 @@ class Transactor
         $this->audienceMapper      = $audienceMapper;
         $this->codec               = $codec;
         $this->strategyFactory     = $strategyFactory;
-
     }
 
 

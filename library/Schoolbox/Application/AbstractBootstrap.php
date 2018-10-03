@@ -415,7 +415,9 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $roleAccessMapper = $mapperFactory->get(RoleAccessMapper::class);
                     $config           = $di->get('config');
                     return new News\Audience\Segment\StrategyFactory(
-                        $folderMapper, $roleAccessMapper, $config->get(ConfigMapper::_GLOBAL_MODERATION)
+                        $folderMapper,
+                        $roleAccessMapper,
+                        $config->get(ConfigMapper::_GLOBAL_MODERATION)
                     );
                 }
             )
