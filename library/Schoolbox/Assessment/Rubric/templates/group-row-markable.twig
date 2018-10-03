@@ -60,6 +60,7 @@
                         name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
                         id="group-{{ capabilityId }}-mark">
 
+                    <option value="" disabled {% if not letterGradeBracket %}selected{% endif %}>(no grade)</option>
                     {% for gradeLevel in rubricGrid.assessment.markScheme.gradeGroup.gradeLevels %}
                         <option value="{{ gradeLevel.rawGrade }}"
                                 {% if letterGradeBracket == gradeLevel.rawGrade %}selected{% endif %}
