@@ -13,6 +13,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Comms\News\Audience\UserResolver;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
@@ -48,10 +49,12 @@ class Module extends BaseModule
          * and either publicly visible, or you are in the audience
          */
         $readerPerms = new Rule\LazyCallback(function () {
-
-
-            /** @var UserResolver $userResolver */
-            $userResolver = $this->getInjector()->get('commsNewsUserResolver');
+            /**
+             * @var UserResolver $userResolver
+             * @var StrategyFactory $strategyFactory
+             */
+            $userResolver    = $this->getInjector()->get('commsNewsUserResolver');
+            $strategyFactory = $this->getInjector()->get('commsNewsAudienceStrategyFactory');
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
@@ -63,7 +66,8 @@ class Module extends BaseModule
                         new Authorizer\Rule\IsPublishedOrExpired(),
                         new Rule\Any(
                             new Authorizer\Rule\IsShareable(),
-                            new Authorizer\Rule\IsMemberOfArticleAudience($userResolver)
+                            new Authorizer\Rule\IsMemberOfArticleAudience($userResolver),
+                            new Authorizer\Rule\HaveReadPermToAudience($strategyFactory)
                         )
                     )
                 )
