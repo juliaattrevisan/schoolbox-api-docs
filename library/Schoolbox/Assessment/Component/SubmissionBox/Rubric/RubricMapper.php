@@ -1565,6 +1565,8 @@ class RubricMapper
     /**
      * Save rubrics selections for a particular feedback.
      *
+     * @deprecated use RubricMapper::persistMarkedGrid() instead
+     *
      * @param array[] $descriptors key = descriptor.id
      *                             val = [selected: is it selected?, value: what's its value?]
      * @param array[] $customGroupMarks      key = group.id
