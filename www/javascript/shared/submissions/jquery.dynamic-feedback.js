@@ -125,8 +125,6 @@
             $(config.assessmentList)
                 .on('keydown paste keypress', 'textarea', timeoutUpdate)
                 .on('change', ':input', timeoutUpdate)
-                .on('change', '[data-rubric-descriptor]', timeoutUpdate)
-                .on('blur', ':input:not([data-rubric-descriptor])', onFeedbackChanged)
                 .on('success.attachzone', '.attachzone', timeoutUpdate)
                 .on('removedfile.attachzone', '.attachzone', timeoutUpdate);
         }
