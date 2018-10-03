@@ -75,7 +75,7 @@ class HaveReadPermToAudience extends ArticleAttribute
     {
         // Base Case
         if (Audience\Model::ENTITY_TYPE_COMPOSITE !== $segment->getEntityType()) {
-            $strategy = $this->strategyFactory->make($segment->getEntityType());
+            $strategy = $this->strategyFactory->make($segment->getEntityType(), $user);
             return $strategy->canViewEntityValue($user, $segment->getEntityValue());
         }
 

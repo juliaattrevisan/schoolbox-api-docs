@@ -21,9 +21,6 @@ use UnexpectedValueException;
 class StrategyFactory
 {
 
-    /** @var User */
-    private $user;
-
     /** @var Folder\Mapper */
     private $folderMapper;
 
@@ -55,14 +52,12 @@ class StrategyFactory
 
 
     /**
-     * @param User             $user
      * @param Folder\Mapper    $folderMapper
      * @param RoleAccessMapper $roleAccessMapper
      * @param bool             $moderationEnabled
      */
-    public function __construct(User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $moderationEnabled)
+    public function __construct(Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $moderationEnabled)
     {
-        $this->user              = $user;
         $this->folderMapper      = $folderMapper;
         $this->roleAccessMapper  = $roleAccessMapper;
         $this->moderationEnabled = $moderationEnabled;
@@ -71,13 +66,14 @@ class StrategyFactory
 
     /**
      * @param string $entityType
+     * @param User   $user
      * @return IStrategy
      * @throws InvalidArgumentException
      */
-    public function make(string $entityType): IStrategy
+    public function make(string $entityType, User $user): IStrategy
     {
         if(!\array_key_exists($entityType, $this->strategyCache)) {
-            $this->strategyCache[$entityType] = $this->makeNewInstance($entityType);
+            $this->strategyCache[$entityType] = $this->makeNewInstance($entityType, $user);
         }
         return $this->strategyCache[$entityType];
     }
@@ -85,10 +81,11 @@ class StrategyFactory
 
     /**
      * @param string $entityType
+     * @param User   $user
      * @return IStrategy
      * @throws InvalidArgumentException
      */
-    private function makeNewInstance(string $entityType): IStrategy
+    private function makeNewInstance(string $entityType, User $user): IStrategy
     {
         switch ($entityType) {
             case Strategy\User::ENTITY_TYPE:
@@ -112,22 +109,23 @@ class StrategyFactory
             case Strategy\PastoralGroup::ENTITY_TYPE:
                 return new Strategy\PastoralGroup();
             case Strategy\Folder::ENTITY_TYPE:
-                return new Strategy\Folder($this->user, $this->folderMapper, $this->roleAccessMapper, $this->moderationEnabled);
+                return new Strategy\Folder($user, $this->folderMapper, $this->roleAccessMapper, $this->moderationEnabled);
         }
         throw new InvalidArgumentException("Unrecognised entity type: '{$entityType}'");
     }
 
 
     /**
+     * @param User $user
      * @return GenericCollection|IStrategy[]
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
-    public function makeAll(): GenericCollection
+    public function makeAll(User $user): GenericCollection
     {
         $c = new GenericCollection(IStrategy::class);
         foreach(self::ENTITY_VALUES as $entityValue){
-            $c[$entityValue] = $this->make($entityValue);
+            $c[$entityValue] = $this->make($entityValue, $user);
         }
         return $c;
     }

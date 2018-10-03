@@ -163,18 +163,13 @@ class Transactor
         if ($segmentsToAdd->count()) {
 
 
-            $strategyFactory = new StrategyFactory($this->sessionUser, $this->folderMapper, $this->roleAccessMapper, $this->isModerationEnabled);
+            $strategyFactory = new StrategyFactory($this->folderMapper, $this->roleAccessMapper, $this->isModerationEnabled);
             $strategies      = $strategyFactory->makeAll();
-            $composite       = new Audience\Segment\Strategy\Composite(); // TODO integrate into factory
 
             // Ensure the relationship is valid for the segment's entity type
-            $validRelationships = [
-                Audience\Model::ENTITY_TYPE_COMPOSITE => $composite->getValidRelationshipModifiers($this->sessionUser),
-            ];
+            $validRelationships = [];
             // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
-            $validNullEntities = [
-                Audience\Model::ENTITY_TYPE_COMPOSITE => $composite->canTargetNullEntityValue(),
-            ];
+            $validNullEntities = [];
             foreach ($strategies as $strategy) {
                 $validRelationships[$strategy->getEntityType()] = $strategy->getValidRelationshipModifiers($this->sessionUser);
                 $validNullEntities[$strategy->getEntityType()]  = $strategy->canTargetNullEntityValue();

@@ -73,7 +73,7 @@ class Controller extends Base
     {
         $codec           = new Audience\Segment\Codec($this->audienceMapper);
         $strategyFactory = $this->buildStrategyFactory();
-        $strategies      = $strategyFactory->makeAll();
+        $strategies      = $strategyFactory->makeAll($this->getUser());
         $searchRegistry  = new Audience\Segment\SearchRegistry($this->getUser(), $strategies);
         $placeholder     = 'keyword';
         $statement       = $this->db->prepareQuery($searchRegistry->getSearchSql($placeholder));
@@ -113,7 +113,7 @@ class Controller extends Base
         $strategyFactory = $this->buildStrategyFactory();
 
         try{
-            $strategy = $strategyFactory->make($entityType);
+            $strategy = $strategyFactory->make($entityType, $this->getUser());
         } catch (InvalidArgumentException $e){
             $this->sendError('Unrecognised entity type', [], 404);
             return;
