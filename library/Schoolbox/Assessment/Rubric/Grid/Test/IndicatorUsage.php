@@ -136,6 +136,73 @@ class IndicatorUsage extends TestCase
     }
 
 
+
+    /**
+     * Data provider for `testContainsDescriptorsWithValue`
+     *
+     * @return iterable
+     */
+    public function getTestContainsDescriptorsWithValueData(): iterable
+    {
+        $indicator1      = (new RowSet\Indicator())->setId(1)->setName('Indicator 1');
+        $indicatorUsage1 = new RubricGrid\IndicatorUsage($indicator1);
+
+        $level1 = (new RubricGrid\Level())->setId(1)->setName('Level 1');
+        $level2 = (new RubricGrid\Level())->setId(2)->setName('Level 2');
+        $level3 = (new RubricGrid\Level())->setId(3)->setName('Level 3');
+        $level4 = (new RubricGrid\Level())->setId(4)->setName('Level 4');
+        $level5 = (new RubricGrid\Level())->setId(5)->setName('Level 5');
+
+        $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.1')->setMaxValue(0);
+        $descriptor2 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.2')->setMaxValue(2);
+        $descriptor3 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.3')->setMaxValue(4);
+        $descriptor4 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.4')->setMaxValue(6);
+        $descriptor5 = (new RubricGrid\Descriptor())->setDescription('Descriptor 1.5')->setMaxValue(8);
+
+        $indicatorUsage1->getDescriptors()[$level1->getId()] = $descriptor1;
+        $indicatorUsage1->getDescriptors()[$level2->getId()] = $descriptor2;
+        $indicatorUsage1->getDescriptors()[$level3->getId()] = $descriptor3;
+        $indicatorUsage1->getDescriptors()[$level4->getId()] = $descriptor4;
+        $indicatorUsage1->getDescriptors()[$level5->getId()] = $descriptor5;
+
+        yield 'indicator 1: descriptors' => [$indicatorUsage1, true];
+
+
+        $indicator2      = (new RowSet\Indicator())->setId(2)->setName('Indicator 2');
+        $indicatorUsage2 = new RubricGrid\IndicatorUsage($indicator2);
+
+        yield 'indicator 2: no descriptors' => [$indicatorUsage2, false];
+
+
+        $indicator3      = (new RowSet\Indicator())->setId(3)->setName('Indicator 3');
+        $indicatorUsage3 = new RubricGrid\IndicatorUsage($indicator3);
+
+        $descriptor6 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.1');
+        $descriptor7 = (new RubricGrid\Descriptor())->setDescription('Descriptor 3.2')->setMaxValue(null);
+
+        $indicatorUsage1->getDescriptors()[$level1->getId()] = $descriptor6;
+        $indicatorUsage1->getDescriptors()[$level2->getId()] = $descriptor7;
+
+        yield 'indicator 3: no non-null descriptors' => [$indicatorUsage3, false];
+    }
+
+
+    /**
+     * @dataProvider getTestContainsDescriptorsWithValueData
+     * @covers \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::containsDescriptorsWithValue
+     *
+     * @param RubricGrid\IndicatorUsage $indicatorUsage
+     * @param bool                      $expected
+     */
+    public function testContainsDescriptorsWithValue(
+        RubricGrid\IndicatorUsage $indicatorUsage,
+        bool $expected
+    ): void
+    {
+        $this->assertSame($expected, $indicatorUsage->containsDescriptorsWithValue());
+    }
+
+
     /**
      * Data provider for `testApplyDescriptorMinValues`.
      *
