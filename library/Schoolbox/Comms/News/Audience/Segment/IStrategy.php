@@ -52,4 +52,17 @@ interface IStrategy extends ISearch, ITranslate
      * @return string[]
      */
     public function getValidRelationshipModifiers(User $user): array;
+
+
+    /**
+     * Returns whether the specified user can view an article that is audienced to this value
+     *
+     * eg, consider an article that is audienced to English3/4 homepage, and a user with READ+ role perms to that homepage.
+     *     The user is not in the audience, but should be able to see the article by virtue of being able to see the articles audience
+     *
+     * @param User        $user
+     * @param null|string $entityValue
+     * @return bool
+     */
+    public function canViewEntityValue(User $user, ?string $entityValue): bool;
 }
