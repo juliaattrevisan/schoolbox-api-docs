@@ -24,16 +24,22 @@
 <div class="row">
     <div class="small-12 island">
 
-        {% if article.id %}
+        {# Create two possible routes:
+              * formAction: used for draft saving by the draft jQuery plugin, and for the secondary action of preview
+              * formActionSubmit: used for the primary action- either submitting (an unsubmitted article), or updating (a submitted article)
+        #}
+        {% if article.id and not article.isSubmitted %}
             {% set formAction = routeLookupIfAuthorized('commsNews.postUpdate', {article: article, articleId: article.id}) %}
             {% set formActionSubmit = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
+        {% elseif article.id and article.isSubmitted %}
+            {% set formAction = '' %} {# No drafting or previewing if the article is submitted #}
+            {% set formActionSubmit = routeLookupIfAuthorized('commsNews.postUpdate', {article: article, articleId: article.id}) %}
         {% else %}
             {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
             {# No submitting allowed until a draft has saved -_- #}
             {% set formActionSubmit = '' %}
         {% endif %}
 
-        {# formAction is used for draft saving and previewing, formActionSubmit is used for submitting the article #}
         <form id="createForm" action="{{ formAction }}" data-action-submit="{{ formActionSubmit }}" method="post">
             <section>
                 <fieldset class="content">
