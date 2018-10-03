@@ -8,6 +8,7 @@
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience\Segment\ValidRestrictedSearch;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -42,6 +43,9 @@ class Folder extends Base
     /** @var bool */
     private $moderationEnabled;
 
+    /** @var Access */
+    private $access;
+
 
     /**
      * Folder constructor.
@@ -57,6 +61,7 @@ class Folder extends Base
         $this->folderMapper      = $folderMapper;
         $this->roleAccessMapper  = $roleAccessMapper;
         $this->moderationEnabled = $moderationEnabled;
+        $this->access            = Access::getInstance(); // TODO inject this
     }
 
 
@@ -209,5 +214,14 @@ class Folder extends Base
     public function getValidRelationshipModifiers(User $user): array
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canViewEntityValue(User $user, ?string $entityValue): bool
+    {
+        return $this->access->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_READ;
     }
 }
