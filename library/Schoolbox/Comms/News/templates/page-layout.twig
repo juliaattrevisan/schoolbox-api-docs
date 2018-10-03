@@ -25,7 +25,7 @@
                     {% endblock %}
                     {% set adminRoute = routeLookupIfAuthorized('commsNewsPolicy.getPolicies') %}
                     {% if adminRoute %}
-                    <li><a class="icon-settings" href="{{ adminRoute }}">{{ locale.news | capitalize }} Administration</a></li>
+                    <li><a class="icon-settings" href="{{ adminRoute }}">{{ locale.news.proper }} Administration</a></li>
                     {% endif %}
                 </ul>
             {% endblock %}
@@ -43,7 +43,7 @@
                     {% set indexRoute = routeLookupIfAuthorized('commsNews.getIndex') %}
                     {% if indexRoute %}
                         <li {% if page == indexRoute %}class="active"{% endif %} role="menuitem">
-                            <a href="{{ indexRoute }}">{{ locale.news | capitalize }} Feed</a>
+                            <a href="{{ indexRoute }}">{{ locale.news.proper }} Feed</a>
                         </li>
                     {% endif %}
 
@@ -82,14 +82,14 @@
                     {% set savedRoute = routeLookupIfAuthorized('commsNewsSaveForLater.getList') %}
                     {% if savedRoute %}
                         <li {% if page == savedRoute %}class="active"{% endif %} role="menuitem">
-                            <a href="{{ savedRoute }}">My Saved {{ locale.news | capitalize }}</a>
+                            <a href="{{ savedRoute }}">My Saved {{ locale.news.proper }}</a>
                         </li>
                     {% endif %}
 
                     {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') %}
                     {% if archiveRoute %}
                         <li {% if pageWithoutParams == archiveRoute %}class="active"{% endif %} role="menuitem">
-                            <a href="{{ archiveRoute }}">{{ locale.news | capitalize }} Archive</a>
+                            <a href="{{ archiveRoute }}">{{ locale.news.proper }} Archive</a>
                         </li>
                     {% endif %}
                 </ul>
