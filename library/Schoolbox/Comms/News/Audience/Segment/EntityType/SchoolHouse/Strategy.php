@@ -5,37 +5,37 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
+namespace Schoolbox\Comms\News\Audience\Segment\EntityType\SchoolHouse;
 
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Segment\EntityType\StrategyBase;
 use Schoolbox\User;
 
-class PastoralGroup extends Base
+class Strategy extends StrategyBase
 {
-    public const ENTITY_TYPE = 'pastoral_group';
-
+    public const ENTITY_TYPE = 'school_house';
 
     /**
      * @inheritdoc
      */
     public function canBeTargetedByUser(User $user): bool
     {
-        return $user->getRole()->isStaff();
+        if (parent::canBeTargetedByUser($user)) {
+            return true;
+        }
+        return $this->getStaffCanPost() && $user->getRole()->isStaff();
     }
-
 
     /**
      * @inheritdoc
      */
     public function getSearchSql(string $searchPlaceholder = null): string
     {
-        $keywordFilter = null === $searchPlaceholder ? '' : "AND `name` LIKE :{$searchPlaceholder}";
+        $keywordFilter = null === $searchPlaceholder ? '' : "WHERE house LIKE :{$searchPlaceholder}";
 
-        // Note that we need to collate the output so the result set can be UNIONed with other result sets
         return "
-            SELECT id, name COLLATE utf8mb4_general_ci, '{$this->getEntityType()}' AS entity_type
-            FROM `pastoral_group`
-            WHERE deleted_at IS NULL
+            SELECT id, house AS name, '{$this->getEntityType()}' AS entity_type
+            FROM house
             {$keywordFilter}
         ";
     }
@@ -47,9 +47,9 @@ class PastoralGroup extends Base
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
         return "
-            SELECT DISTINCT cna.entity_type, cna.entity_value, pastoral_group.`name` COLLATE utf8mb4_general_ci AS `name`
+            SELECT DISTINCT cna.entity_type, cna.entity_value, house.house AS `name`
             FROM comms_news_audience cna
-            INNER JOIN pastoral_group ON entity_type = '{$this->getEntityType()}' AND cna.entity_value = pastoral_group.id
+            INNER JOIN house ON cna.entity_type = '{$this->getEntityType()}' AND cna.entity_value = house.id
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }
@@ -59,7 +59,7 @@ class PastoralGroup extends Base
      */
     public function canTargetNullEntityValue(): bool
     {
-        // Quite likely a user is not in any pastoral groups
+        // User's may not have a school house
         return true;
     }
 

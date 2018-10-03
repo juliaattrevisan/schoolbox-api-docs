@@ -10,12 +10,15 @@ namespace Schoolbox\Comms\News\Audience\Segment;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Comms\News\Audience\Model;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
 use PDO;
+use InvalidArgumentException;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 
 /**
  * Render human-readable representations of audience segment entity values.
@@ -27,28 +30,9 @@ use PDO;
 class Translator
 {
 
-    /**
-     * @var IConnector
-     */
+    /** @var IConnector */
     private $database;
 
-    /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var Folder\Mapper
-     */
-    private $folderMapper;
-
-    /**
-     * @var RoleAccessMapper
-     */
-    private $roleAccessMapper;
-
-    /** @var bool */
-    private $isModerationEnabled;
 
     /**
      * This array is of the structure:
@@ -72,21 +56,18 @@ class Translator
      */
     private $cache = [];
 
+    /** @var StrategyFactory */
+    private $strategyFactory;
+
 
     /**
-     * @param IConnector       $db
-     * @param User             $user
-     * @param Folder\Mapper    $folderMapper
-     * @param RoleAccessMapper $roleAccessMapper
-     * @param bool             $isModerationEnabled
+     * @param IConnector      $db
+     * @param StrategyFactory $strategyFactory
      */
-    public function __construct(IConnector $db, User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $isModerationEnabled)
+    public function __construct(IConnector $db, StrategyFactory $strategyFactory)
     {
-        $this->database            = $db;
-        $this->user                = $user;
-        $this->folderMapper        = $folderMapper;
-        $this->roleAccessMapper    = $roleAccessMapper;
-        $this->isModerationEnabled = $isModerationEnabled;
+        $this->database        = $db;
+        $this->strategyFactory = $strategyFactory;
     }
 
 
@@ -134,18 +115,25 @@ class Translator
      *
      * @param News\Model $article
      * @return $this
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws InsufficientHydrationException
+     * @throws InvalidArgumentException
+     * @throws \UnexpectedValueException
      */
     public function buildCache(News\Model $article): self
     {
         $segmentIds = [];
+        $strategies = new GenericCollection(IStrategy::class);
         foreach ($article->getAudience() as $segment) {
             if ($segment->isSimple()) {
                 $segmentIds[] = $segment->getId();
+                $strategies[$segment->getEntityType()] = $this->strategyFactory->makeStrategy($segment->getEntityType());
                 continue;
             }
             foreach ($segment->getChildren() as $childSegment) {
                 $segmentIds[] = $childSegment->getId();
+                $entityType = $childSegment->getEntityType();
+                $strategies[$entityType] = $this->strategyFactory->makeStrategy($entityType);
+
             }
         }
 
@@ -153,7 +141,7 @@ class Translator
             return $this;
         }
         $bindings   = Builder::getBindings($segmentIds, 'id');
-        $translator = new TranslatorRegistry($this->user, $this->folderMapper, $this->roleAccessMapper, $this->isModerationEnabled);
+        $translator = new TranslatorRegistry($strategies);
         $statement  = $this->database->executeQuery($translator->getTranslateSql($bindings->getPlaceholder()), $bindings->getParams());
 
         /** @noinspection PhpAssignmentInConditionInspection */

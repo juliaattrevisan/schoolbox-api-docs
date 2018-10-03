@@ -5,33 +5,29 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
+namespace Schoolbox\Comms\News\Audience\Segment\EntityType\PastoralGroup;
 
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Segment\EntityType\StrategyBase;
 use Schoolbox\User;
 
-class Campus extends Base
+class Strategy extends StrategyBase
 {
-    public const ENTITY_TYPE = 'campus';
+    public const ENTITY_TYPE = 'pastoral_group';
 
-    /**
-     * @inheritdoc
-     */
-    public function canBeTargetedByUser(User $user): bool
-    {
-        return true;
-    }
 
     /**
      * @inheritdoc
      */
     public function getSearchSql(string $searchPlaceholder = null): string
     {
-        $keywordFilter = null === $searchPlaceholder ? '' : "WHERE `name` LIKE :{$searchPlaceholder}";
+        $keywordFilter = null === $searchPlaceholder ? '' : "AND `name` LIKE :{$searchPlaceholder}";
 
+        // Note that we need to collate the output so the result set can be UNIONed with other result sets
         return "
-            SELECT id, name, '{$this->getEntityType()}' AS entity_type
-            FROM luCampus
+            SELECT id, name COLLATE utf8mb4_general_ci, '{$this->getEntityType()}' AS entity_type
+            FROM `pastoral_group`
+            WHERE deleted_at IS NULL
             {$keywordFilter}
         ";
     }
@@ -43,9 +39,9 @@ class Campus extends Base
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
         return "
-            SELECT DISTINCT cna.entity_type, cna.entity_value, luCampus.name
+            SELECT DISTINCT cna.entity_type, cna.entity_value, pastoral_group.`name` COLLATE utf8mb4_general_ci AS `name`
             FROM comms_news_audience cna
-            INNER JOIN luCampus ON cna.entity_type = '{$this->getEntityType()}' AND cna.entity_value = luCampus.id
+            INNER JOIN pastoral_group ON entity_type = '{$this->getEntityType()}' AND cna.entity_value = pastoral_group.id
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }
@@ -55,9 +51,10 @@ class Campus extends Base
      */
     public function canTargetNullEntityValue(): bool
     {
-        // From a schema level, a user has 0:N campus
+        // Quite likely a user is not in any pastoral groups
         return true;
     }
+
 
     /**
      * @inheritdoc

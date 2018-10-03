@@ -5,12 +5,13 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
+namespace Schoolbox\Comms\News\Audience\Segment\EntityType\RoleType;
 
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Segment\EntityType\StrategyBase;
 use Schoolbox\User;
 
-class RoleType extends Base
+class Strategy extends StrategyBase
 {
 
     public const ENTITY_TYPE = 'role_type';
@@ -20,7 +21,7 @@ class RoleType extends Base
      */
     public function getSearchSql(string $searchPlaceholder = null): string
     {
-        return 'TODO'; // TODO
+        return "SELECT 0, 'name todo', 'type todo' from dual WHERE false"; // TODO
     }
 
 
@@ -29,7 +30,7 @@ class RoleType extends Base
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
-        return 'TODO'; // TODO
+        return ''; // TODO
     }
 
 

@@ -5,21 +5,25 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
+namespace Schoolbox\Comms\News\Audience\Segment\EntityType\Campus;
 
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Segment\EntityType\StrategyBase;
 use Schoolbox\User;
 
-class SchoolHouse extends Base
+class Strategy extends StrategyBase
 {
-    public const ENTITY_TYPE = 'school_house';
+    public const ENTITY_TYPE = 'campus';
 
     /**
      * @inheritdoc
      */
     public function canBeTargetedByUser(User $user): bool
     {
-        return true;
+        if (parent::canBeTargetedByUser($user)) {
+            return true;
+        }
+        return $this->getStaffCanPost() && $user->getRole()->isStaff();
     }
 
     /**
@@ -27,11 +31,11 @@ class SchoolHouse extends Base
      */
     public function getSearchSql(string $searchPlaceholder = null): string
     {
-        $keywordFilter = null === $searchPlaceholder ? '' : "WHERE house LIKE :{$searchPlaceholder}";
+        $keywordFilter = null === $searchPlaceholder ? '' : "WHERE `name` LIKE :{$searchPlaceholder}";
 
         return "
-            SELECT id, house AS name, '{$this->getEntityType()}' AS entity_type
-            FROM house
+            SELECT id, name, '{$this->getEntityType()}' AS entity_type
+            FROM luCampus
             {$keywordFilter}
         ";
     }
@@ -43,9 +47,9 @@ class SchoolHouse extends Base
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
         return "
-            SELECT DISTINCT cna.entity_type, cna.entity_value, house.house AS `name`
+            SELECT DISTINCT cna.entity_type, cna.entity_value, luCampus.name
             FROM comms_news_audience cna
-            INNER JOIN house ON cna.entity_type = '{$this->getEntityType()}' AND cna.entity_value = house.id
+            INNER JOIN luCampus ON cna.entity_type = '{$this->getEntityType()}' AND cna.entity_value = luCampus.id
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }
@@ -55,10 +59,9 @@ class SchoolHouse extends Base
      */
     public function canTargetNullEntityValue(): bool
     {
-        // User's may not have a school house
+        // From a schema level, a user has 0:N campus
         return true;
     }
-
 
     /**
      * @inheritdoc

@@ -13,7 +13,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Comms\News\Audience\Segment\Strategy;
+use Schoolbox\Comms\News\Audience\Segment\EntityType;
 
 class Model
 {
@@ -22,27 +22,27 @@ class Model
 
     // Simple audience segments - TODO deprecated. Use the IStrategy::getEntityType() interface instead.
     /** @deprecated */
-    public const ENTITY_TYPE_USER           = Strategy\User::ENTITY_TYPE;               // Values = [1,2,...]
+    public const ENTITY_TYPE_USER           = EntityType\User\Strategy::ENTITY_TYPE;               // Values = [1,2,...]
     /** @deprecated */
-    public const ENTITY_TYPE_SUPER          = Strategy\Super::ENTITY_TYPE;              // Values = [1]
+    public const ENTITY_TYPE_SUPER          = EntityType\Super\Strategy::ENTITY_TYPE;              // Values = [1]
     /** @deprecated */
-    public const ENTITY_TYPE_CAMPUS         = Strategy\Campus::ENTITY_TYPE;             // Values = [1,2,...]
+    public const ENTITY_TYPE_CAMPUS         = EntityType\Campus\Strategy::ENTITY_TYPE;             // Values = [1,2,...]
     /** @deprecated */
-    public const ENTITY_TYPE_ROLE           = Strategy\Role::ENTITY_TYPE;               // Values = [1,2,...]
+    public const ENTITY_TYPE_ROLE           = EntityType\Role\Strategy::ENTITY_TYPE;               // Values = [1,2,...]
     /** @deprecated */
-    public const ENTITY_TYPE_ROLE_TYPE      = Strategy\RoleType::ENTITY_TYPE;           // Values = []
+    public const ENTITY_TYPE_ROLE_TYPE      = EntityType\RoleType\Strategy::ENTITY_TYPE;           // Values = []
     /** @deprecated */
-    public const ENTITY_TYPE_SCHOOL_HOUSE   = Strategy\SchoolHouse::ENTITY_TYPE;        // Values = [NULL,1,2,...]
+    public const ENTITY_TYPE_SCHOOL_HOUSE   = EntityType\SchoolHouse\Strategy::ENTITY_TYPE;        // Values = [NULL,1,2,...]
     /** @deprecated */
-    public const ENTITY_TYPE_RES_HOUSE      = Strategy\ResHouse::ENTITY_TYPE;           // Values = [NULL,1,2,...]
+    public const ENTITY_TYPE_RES_HOUSE      = EntityType\ResHouse\Strategy::ENTITY_TYPE;           // Values = [NULL,1,2,...]
     /** @deprecated */
-    public const ENTITY_TYPE_YEAR           = Strategy\Year::ENTITY_TYPE;               // Values = [NULL,1,2,...]
+    public const ENTITY_TYPE_YEAR           = EntityType\Year\Strategy::ENTITY_TYPE;               // Values = [NULL,1,2,...]
     /** @deprecated */
-    public const ENTITY_TYPE_SERVICE        = Strategy\Service::ENTITY_TYPE;            // Values = ['1.43.3','2.3.*',...]
+    public const ENTITY_TYPE_SERVICE        = EntityType\Service\Strategy::ENTITY_TYPE;            // Values = ['1.43.3','2.3.*',...]
     /** @deprecated */
-    public const ENTITY_TYPE_PASTORAL_GROUP = Strategy\PastoralGroup::ENTITY_TYPE;      // Values = [NULL,1,2,...]
+    public const ENTITY_TYPE_PASTORAL_GROUP = EntityType\PastoralGroup\Strategy::ENTITY_TYPE;      // Values = [NULL,1,2,...]
     /** @deprecated */
-    public const ENTITY_TYPE_FOLDER         = Strategy\Folder::ENTITY_TYPE;             // Values = [NULL,1,2,...]
+    public const ENTITY_TYPE_FOLDER         = EntityType\Folder\Strategy::ENTITY_TYPE;             // Values = [NULL,1,2,...]
 
     // Any audience modifier?
     public const RELATIONSHIP_SELF        = 'self';                 // eg, Audience = the user 15

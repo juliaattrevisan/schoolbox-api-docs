@@ -37,10 +37,7 @@ class ValidRestrictedSearch
      *
      * @param User $user
      * @return bool
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
      */
     public function isSatisfiedBy(User $user): bool
     {
@@ -78,10 +75,7 @@ class ValidRestrictedSearch
      *
      * @param User $user
      * @return bool
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
      */
     private function isCommsOfficer(User $user): bool
     {

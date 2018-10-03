@@ -12,8 +12,14 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Audience;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 use PDO;
 use InvalidArgumentException;
+use Schoolbox\User;
 use UnexpectedValueException;
 
 class Controller extends Base
@@ -28,20 +34,26 @@ class Controller extends Base
     /** @var StrategyFactory */
     private $strategyFactory;
 
+    /** @var UserAccessMapper */
+    private $userAccessMapper;
+
 
     /**
-     * @param IConnector            $db
-     * @param Audience\Mapper       $audienceMapper
-     * @param StrategyFactory       $strategyFactory
+     * @param IConnector       $db
+     * @param Audience\Mapper  $audienceMapper
+     * @param StrategyFactory  $strategyFactory
+     * @param UserAccessMapper $userAccessMapper
      */
     public function __construct(
         IConnector $db,
         Audience\Mapper $audienceMapper,
-        StrategyFactory $strategyFactory
+        StrategyFactory $strategyFactory,
+        UserAccessMapper $userAccessMapper
     ) {
         $this->db               = $db;
         $this->audienceMapper   = $audienceMapper;
         $this->strategyFactory  = $strategyFactory;
+        $this->userAccessMapper = $userAccessMapper;
     }
 
 
@@ -57,10 +69,17 @@ class Controller extends Base
     public function getSearch(): void
     {
         $codec           = new Audience\Segment\Codec($this->audienceMapper);
-        $strategies      = $this->strategyFactory->makeAll($this->getUser());
-        $searchRegistry  = new Audience\Segment\SearchRegistry($this->getUser(), $strategies);
+        $strategies      = $this->strategyFactory->makeAllStrategies($this->getUser());
         $placeholder     = 'keyword';
-        $statement       = $this->db->prepareQuery($searchRegistry->getSearchSql($placeholder));
+        $pieces          = [];
+
+        foreach ($strategies as $strategy) {
+            if($strategy->canBeTargetedByUser($this->getUser())){
+                $pieces[] = "({$strategy->getSearchSql($placeholder)})";
+            }
+        }
+        // We can UNION ALL and avoid de-duplication logic as each sub-query has a distinct entity type
+        $statement       = $this->db->prepareQuery(\implode(' UNION ALL ', $pieces));
         $escapedKeyword  = $this->db->escapeForLike($this->getRequest()->query['query']);
 
         $statement->execute([$placeholder => "%{$escapedKeyword}%"]);
@@ -90,12 +109,15 @@ class Controller extends Base
      * Provides a list of available entity values of this entity type for the current user
      *
      * @param string $entityType
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Alaress\Web\Controller\Exception
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getList(string $entityType): void
     {
         try{
-            $strategy = $this->strategyFactory->make($entityType, $this->getUser());
+            $strategy = $this->strategyFactory->makeStrategy($entityType);
         } catch (InvalidArgumentException $e){
             $this->sendError('Unrecognised entity type', [], 404);
             return;
@@ -107,12 +129,20 @@ class Controller extends Base
         }
 
         $codec         = new Audience\Segment\Codec($this->audienceMapper);
-        $stmt          = $this->db->executeQuery($strategy->getSearchSql());
         $valueLabels   = [];
 
-        /** @noinspection PhpAssignmentInConditionInspection */
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-            $valueLabels[$codec->encodeValue($row['id'])] = $row['name'];
+        // Special case for folder, only show involved folders in the list
+        if (Audience\Segment\EntityType\Folder\Strategy::ENTITY_TYPE === $entityType) {
+            $involvedFolders = $this->folderMapper->findForUser($this->getUser());
+            foreach ($involvedFolders as $folder) {
+                $valueLabels[$codec->encodeValue((string)$folder->getId())] = $folder->getNameWithCodes();
+            }
+        } else {
+            $stmt = $this->db->executeQuery($strategy->getSearchSql());
+            /** @noinspection PhpAssignmentInConditionInspection */
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $valueLabels[$codec->encodeValue($row['id'])] = $row['name'];
+            }
         }
 
         \uasort($valueLabels, function (string $left, string $right) {

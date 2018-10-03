@@ -13,6 +13,14 @@ interface ITranslate
 {
 
     /**
+     * Returns this implementation's entityType
+     *
+     * @return string
+     */
+    public function getEntityType(): string;
+
+
+    /**
      * Translate this ITranslate instance from an entity_type to a human-readable version
      *
      * This sql fragment is used as part of a larger UNIONed query with other instances.
@@ -31,7 +39,7 @@ interface ITranslate
      * used to prepopulate selectize's values from a known set of audiencing segments,
      * but present it in a nice way via a twig fragment
      *
-     * @param string $segmentIdsPlaceholder  eg ':id_1, :id_2, :id_3';
+     * @param string $segmentIdsPlaceholder eg ':id_1, :id_2, :id_3';
      * @return string
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string;

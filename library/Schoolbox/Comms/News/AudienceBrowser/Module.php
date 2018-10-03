@@ -14,6 +14,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Permission\Access\UserAccessMapper;
 
 class Module extends BaseModule
 {
@@ -57,6 +58,7 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'db'               => $injector->lazyGet('databaseInternal'),
             'audienceMapper'   => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
+            'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
             'strategyFactory'  => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
         ];
     }

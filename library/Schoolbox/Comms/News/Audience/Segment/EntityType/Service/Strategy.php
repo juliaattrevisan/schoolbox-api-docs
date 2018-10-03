@@ -5,9 +5,11 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
+namespace Schoolbox\Comms\News\Audience\Segment\EntityType\Service;
 
-class Service extends Base
+use Schoolbox\Comms\News\Audience\Segment\EntityType\StrategyBase;
+
+class Strategy extends StrategyBase
 {
 
     public const ENTITY_TYPE = 'service';
@@ -17,7 +19,7 @@ class Service extends Base
      */
     public function getSearchSql(string $searchPlaceholder = null): string
     {
-        return 'TODO'; // TODO
+        return "SELECT 0, 'name todo', 'type todo' from dual WHERE false"; // TODO
     }
 
 
@@ -26,7 +28,7 @@ class Service extends Base
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
-        return 'TODO'; // TODO
+        return ''; // TODO
     }
 
     /**

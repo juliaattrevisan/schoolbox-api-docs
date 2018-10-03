@@ -19,7 +19,7 @@ use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\News\Topic;
 use Schoolbox\User;
-use Schoolbox\Comms\News\Audience\Segment\Strategy;
+use Schoolbox\Comms\News\Audience\Segment\EntityType;
 
 class Lists
 {

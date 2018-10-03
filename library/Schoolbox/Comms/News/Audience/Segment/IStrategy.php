@@ -12,11 +12,11 @@ use Schoolbox\User;
 /**
  * A type of audience segmentation, eg 'folder', 'role', 'user' etc
  */
-interface IStrategy extends ISearch, ITranslate
+interface IStrategy extends ISearch, ITranslate, IAudience, IModerate
 {
 
     /**
-     * Returns the entity type for this strategy
+     * Returns this implementation's entityType
      *
      * @return string
      */
@@ -26,10 +26,13 @@ interface IStrategy extends ISearch, ITranslate
     /**
      * Returns whether the specified user audience to segments of this entity type?
      *
+     * Always returns TRUE if the user is a SU or has News Service WRITE+ perm
+     *
      * @param User $user
      * @return bool
      */
     public function canBeTargetedByUser(User $user): bool;
+
 
     /**
      * Returns whether this segment can target null entities. Eg 'users who are not in any classes or groups'
@@ -46,6 +49,7 @@ interface IStrategy extends ISearch, ITranslate
      *
      * Note this is distinct from 'can user audience to entity value'.
      * That must be true before this is considered.
+     *
      * @see ISearch::getSearchSql()
      *
      * @param User $user

@@ -5,9 +5,11 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
+namespace Schoolbox\Comms\News\Audience\Segment\EntityType;
 
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use Schoolbox\Comms\News\Audience\Segment\IStrategy;
 use UnexpectedValueException;
@@ -15,31 +17,63 @@ use UnexpectedValueException;
 /**
  * Common logic and safe-defaults for Audience segment strategies
  */
-abstract class Base implements IStrategy
+abstract class StrategyBase implements IStrategy
 {
 
     public const ENTITY_TYPE = '';  // concrete classes must override
 
-    /** @noinspection PhpDocMissingThrowsInspection */
+    /** @var UserAccessMapper */
+    private $userAccessMapper;
+
+    /** @var bool */
+    private $staffCanPost;
+
+
+    /**
+     * @param UserAccessMapper $userAccessMapper
+     * @param bool             $staffCanPost
+     */
+    public function __construct(UserAccessMapper $userAccessMapper, bool $staffCanPost)
+    {
+        $this->userAccessMapper = $userAccessMapper;
+        $this->staffCanPost     = $staffCanPost;
+    }
+
+
     /**
      * @return string
+     * @throws UnexpectedValueException
      */
     public function getEntityType(): string
     {
-        if(!static::ENTITY_TYPE){
-            /** @noinspection PhpUnhandledExceptionInspection */
+        if (!static::ENTITY_TYPE) {
             throw new UnexpectedValueException('Concrete classes must implement.');
         }
         return static::ENTITY_TYPE;
     }
 
+
     /**
      * @inheritdoc
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function canBeTargetedByUser(User $user): bool
     {
-        // Default to restricted.
-        return false;
+        // Default to only SU and users with WRITE+ News Service Perm
+        return $user->isSuperuser() || $this->hasNewsServiceWritePerm($user);
+    }
+
+
+    /**
+     * Returns whether the user has WRITE+ News Service permission
+     *
+     * @param User $user
+     * @return bool
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function hasNewsServiceWritePerm(User $user): bool
+    {
+        return $this->userAccessMapper->getAccess($user, null, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE;
     }
 
 
@@ -60,6 +94,15 @@ abstract class Base implements IStrategy
     {
         // Safe default it to not permit relationship modification
         return [Audience\Model::RELATIONSHIP_SELF];
+    }
+
+
+    /**
+     * @return bool
+     */
+    protected function getStaffCanPost(): bool
+    {
+        return $this->staffCanPost;
     }
 
 

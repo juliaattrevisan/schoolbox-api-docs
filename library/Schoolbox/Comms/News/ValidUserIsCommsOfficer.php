@@ -23,21 +23,10 @@ class ValidUserIsCommsOfficer
      *
      * @param User $user
      * @return bool
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
      */
     public function isSatisfiedBy(User $user): bool
     {
-        if ($user->isSuperuser()) {
-            return true;
-        }
-
-        return UserAccessMapper::getInstance()
-            ->findUsersForService(UserAccess::SERVICE_NEWS)
-            ->getUnique('id')
-            ->indexBy('id')
-            ->offsetExists($user->getId());
+        return UserAccess::ACCESS_FULL === UserAccessMapper::getInstance()->getAccess($user, null, UserAccess::SERVICE_NEWS);
     }
 }

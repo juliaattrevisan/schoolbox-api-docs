@@ -34,4 +34,15 @@ interface ISearch
      * @return string
      */
     public function getSearchSql(string $searchPlaceholder = null): string;
+
+
+    /**
+     * Returns the type of entity this search instance is for.
+     *
+     * Used internally for building query, and also a validation to ensure when combining components for
+     * the composite strategy interface that each component is of the same entityType
+     *
+     * @return string
+     */
+    public function getEntityType(): string;
 }

@@ -54,15 +54,15 @@ class ValidRelationship extends Specification\Leaf
             throw new InsufficientHydrationException('Cannot determine valid relationships if entity type is not defined');
         }
 
+        $validRelationships = $this->validModifiers[$entityType];
 
         // Base case:
         if (Audience\Model::ENTITY_TYPE_COMPOSITE !== $entityType) {
-            return $this->validModifiers[$entityType];
+            return $validRelationships;
         }
 
         // Recursive case:
-        // Composites have their own inherent limitations, but also respect the limitations of any sub-segment.
-        $validRelationships = $this->validModifiers[$entityType];
+        // Intersection of composite segment components
         foreach ($audienceSegment->getChildren() as $subSegment) {
             $validRelationships = \array_intersect($validRelationships, $this->getValidRelationships($subSegment));
         }

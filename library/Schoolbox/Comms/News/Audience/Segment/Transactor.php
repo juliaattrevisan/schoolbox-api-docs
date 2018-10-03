@@ -12,6 +12,7 @@ use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
 use Schoolbox\User;
 use InvalidArgumentException;
@@ -21,6 +22,8 @@ use InvalidArgumentException;
  */
 class Transactor
 {
+    /** @var UserAccessMapper */
+    private $userAccessMapper;
 
     /** @var User */
     private $sessionUser;
@@ -36,17 +39,20 @@ class Transactor
 
 
     /**
+     * @param UserAccessMapper $userAccessMapper
      * @param User             $sessionUser
      * @param Audience\Mapper  $audienceMapper
      * @param Codec            $codec
      * @param StrategyFactory  $strategyFactory
      */
     public function __construct(
+        UserAccessMapper $userAccessMapper,
         User $sessionUser,
         Audience\Mapper $audienceMapper,
         Codec $codec,
         StrategyFactory $strategyFactory
     ) {
+        $this->userAccessMapper    = $userAccessMapper;
         $this->sessionUser         = $sessionUser;
         $this->audienceMapper      = $audienceMapper;
         $this->codec               = $codec;
@@ -147,10 +153,13 @@ class Transactor
         $isSegmentsAdded = false;
         if ($segmentsToAdd->count()) {
 
-            $strategies      = $this->strategyFactory->makeAll();
+            $strategies = $this->strategyFactory->makeAllStrategies();
 
             // Ensure the relationship is valid for the segment's entity type
-            $validRelationships = [];
+            // TODO remove this hard-code hack, should be provided by the factory
+            $validRelationships = [
+                Audience\Model::ENTITY_TYPE_COMPOSITE => (new Audience\Segment\EntityType\Composite())->getValidRelationshipModifiers($this->sessionUser),
+            ];
             // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
             $validNullEntities = [];
             foreach ($strategies as $strategy) {

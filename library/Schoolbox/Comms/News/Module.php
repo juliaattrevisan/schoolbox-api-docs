@@ -59,7 +59,7 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_WRITE),
                     new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
                     new Authorizer\Rule\IsArticleAuthor(),
                     new Rule\All(
@@ -189,6 +189,7 @@ class Module extends BaseModule
             'validSpecFactory'           => $injector->lazy(function () {
                 return new Validation\Factory();
             }),
+            'userAccessMapper'           => $this->getMapperFactory()->getLazy(Access\UserAccessMapper::class),
             'strategyFactory'            => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
         ];
     }

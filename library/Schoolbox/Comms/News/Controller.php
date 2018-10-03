@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Config\ConfigMapper;
@@ -26,6 +27,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
@@ -98,6 +100,9 @@ class Controller extends Base
     /** @var Validation\Factory */
     private $validSpecFactory;
 
+    /** @var UserAccessMapper */
+    private $userAccessMapper;
+
     /** @var Audience\Segment\StrategyFactory */
     private $strategyFactory;
 
@@ -116,6 +121,7 @@ class Controller extends Base
      * @param Audience\ArticleResolver     $articleResolver
      * @param Audience\UserResolver        $userResolver
      * @param Validation\Factory           $validSpecFactory
+     * @param UserAccessMapper             $userAccessMapper
      * @param Audience\Segment\StrategyFactory $strategyFactory
      */
     public function __construct(
@@ -131,6 +137,7 @@ class Controller extends Base
         Audience\ArticleResolver $articleResolver,
         Audience\UserResolver $userResolver,
         Validation\Factory $validSpecFactory,
+        UserAccessMapper $userAccessMapper,
         Audience\Segment\StrategyFactory $strategyFactory
     ) {
         $this->newsMapper                 = $newsMapper;
@@ -145,6 +152,7 @@ class Controller extends Base
         $this->validSpecFactory           = $validSpecFactory;
         $this->articleResolver            = $articleResolver;
         $this->userResolver               = $userResolver;
+        $this->userAccessMapper           = $userAccessMapper;
         $this->strategyFactory            = $strategyFactory;
     }
 
@@ -152,7 +160,7 @@ class Controller extends Base
     /**
      * Provide form to create a news article
      *
-     * @api GET /comms/news/create
+     * @api   GET /comms/news/create
      * @level 18.1
      *
      * @throws MapperException
@@ -191,31 +199,43 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setMimeFilter('image/*');
 
-        /**
-         * Prefill audience
-         */
+        // Prefill audience
         $audienceSegments = [];
         $groupId = $this->getRequest()->query->get('groupId');
         $entityType = $this->getRequest()->query->get('type');
 
-        if ($groupId && $entityType && $entityType === Audience\Segment\Strategy\Folder::ENTITY_TYPE) {
-            $codec = new Audience\Segment\Codec($this->audienceMapper);
-            $label = $this->folderMapper->findCheaplyById($groupId)->getNameWithCodes();
+        $strategyFactory = $this->buildStrategyFactory();
 
-            $audienceSegments = new Audience\SegmentSelectizeOption(
-                $codec->encodeSimpleAttributes($entityType, $groupId, Audience\Model::RELATIONSHIP_SELF),
-                $label
-            );
+        // Hard-coded to folder (for now)
+        if ($groupId && $entityType && $entityType === Audience\Segment\EntityType\Folder\Strategy::ENTITY_TYPE) {
+            $folderStrategy = $strategyFactory->makeStrategy($entityType);
+            // Ensure the user is permitted to target this entity type
+            if ($folderStrategy->canBeTargetedByUser($this->getUser())) {
+                // Ensure the user is permitted to target this entity value
+                $availableFolders   = $this->databaseInternal->executeQuery($folderStrategy->getSearchSql())->fetchAll();
+                $availableFolderIds = \array_column($availableFolders, 'id');
+                if (\in_array($groupId, $availableFolderIds, false)) {
+                    $codec = new Audience\Segment\Codec($this->audienceMapper);
+                    $label = $this->folderMapper->findCheaplyById($groupId)->getNameWithCodes();
 
-            $audienceSegments->addLabel($entityType, $codec->encodeValue($groupId), $label);
+                    $audienceSegment = new Audience\SegmentSelectizeOption(
+                        $codec->encodeSimpleAttributes($entityType, $groupId, Audience\Model::RELATIONSHIP_SELF),
+                        $label
+                    );
+
+                    $audienceSegment->addLabel($entityType, $codec->encodeValue($groupId), $label);
+                    $audienceSegments[] = $audienceSegment;
+                }
+            }
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
-            'action'           => 'Create',
-            'article'          => $article,
-            'featureImageZone' => $zone->getTwigContext(),
-            'isAutoSavable'    => !$article->isApproved(),
-            'audienceSegments' => $audienceSegments,
+            'action'               => 'Create',
+            'article'              => $article,
+            'featureImageZone'     => $zone->getTwigContext(),
+            'isAutoSavable'        => !$article->isApproved(),
+            'audienceSegments'     => $audienceSegments,
+            'availableEntityTypes' => $this->getAvailableAudienceStrategyEntityTypes($strategyFactory),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -252,13 +272,8 @@ class Controller extends Base
      * @level 18.1
      *
      * @param Model $article
-     * @throws MapperException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
-     * @throws \Schoolbox\Application\Exception\Exception
-     * @throws MapperException\InsufficientHydrationException
      */
     public function getUpdate(Model $article): void
     {
@@ -278,10 +293,13 @@ class Controller extends Base
 
         $translator = new Audience\Segment\Translator(
             $this->databaseInternal,
-            $this->getUser(),
-            $this->folderMapper,
-            $this->roleAccessMapper,
-            $this->isGlobalModerationEnabled()
+            new Audience\Segment\StrategyFactory(
+                $this->userAccessMapper,
+                $this->getUser(),
+                $this->folderMapper,
+                $this->roleAccessMapper,
+                $this->getConfigLoader()->get(ConfigMapper::_STAFF_CAN_POST_NEWS)
+            )
         );
         $translator->buildCache($article);
 
@@ -305,13 +323,13 @@ class Controller extends Base
             $audienceSegments[] = $option;
         }
 
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action'                 => 'Update',
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
             'audienceSegments'       => $audienceSegments,
             'isAutoSavable'          => !$article->isApproved(),
+            'availableEntityTypes'   => $this->getAvailableAudienceStrategyEntityTypes($this->buildStrategyFactory()),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -319,7 +337,7 @@ class Controller extends Base
     /**
      * Update a news article
      *
-     * @api POST /comms/news/{articleId}
+     * @api   POST /comms/news/{articleId}
      * @level 18.1
      *
      * @param Model $article
@@ -458,6 +476,7 @@ class Controller extends Base
 
         // Persist audience segments
         $transactor = new Audience\Segment\Transactor(
+            $this->userAccessMapper,
             $this->getUser(),
             $this->audienceMapper,
             new Audience\Segment\Codec($this->audienceMapper),
@@ -1078,12 +1097,34 @@ class Controller extends Base
 
 
     /**
-     * Returns whether global moderation is enabled
-     *
-     * @return bool
+     * @return StrategyFactory
      */
-    private function isGlobalModerationEnabled(): bool
+    private function buildStrategyFactory(): StrategyFactory
     {
-        return $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
+        return new StrategyFactory(
+            $this->userAccessMapper,
+            $this->getUser(),
+            $this->folderMapper,
+            $this->roleAccessMapper,
+            $this->getConfigLoader()->get(ConfigMapper::_STAFF_CAN_POST_NEWS)
+        );
+    }
+
+
+    /**
+     * @param StrategyFactory $strategyFactory
+     * @return string[]
+     * @throws InvalidArgumentException
+     * @throws \UnexpectedValueException
+     */
+    private function getAvailableAudienceStrategyEntityTypes(StrategyFactory $strategyFactory): array
+    {
+        $availableStrategies = [];
+        foreach($strategyFactory->makeAllStrategies() as $strategy){
+            if($strategy->canBeTargetedByUser($this->getUser())){
+                $availableStrategies[] = $strategy->getEntityType();
+            }
+        }
+        return $availableStrategies;
     }
 }

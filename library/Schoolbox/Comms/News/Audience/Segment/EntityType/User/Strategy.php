@@ -5,9 +5,11 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
+namespace Schoolbox\Comms\News\Audience\Segment\EntityType\User;
 
-class User extends Base
+use Schoolbox\Comms\News\Audience\Segment\EntityType\StrategyBase;
+
+class Strategy extends StrategyBase
 {
     public const ENTITY_TYPE = 'user';
 
@@ -16,7 +18,10 @@ class User extends Base
      */
     public function canBeTargetedByUser(\Schoolbox\User $user): bool
     {
-        return $user->getRole()->isStaff();
+        if (parent::canBeTargetedByUser($user)) {
+            return true;
+        }
+        return $this->getStaffCanPost() && $user->getRole()->isStaff();
     }
 
     /**
