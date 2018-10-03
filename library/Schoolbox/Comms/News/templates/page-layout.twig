@@ -13,7 +13,7 @@
                         {% block createLink %}
                             {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
                             {% if createRoute %}
-                                <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news }}"></a>
+                                <a href="{{ createRoute }}" class="icon-add" title="Create {{ locale.news.proper }}"></a>
                             {% endif %}
                         {% endblock %}
                         <a href="#" class="icon-more" data-dropdown="header-options" title="Actions" aria-expanded="false"></a>
@@ -25,7 +25,7 @@
                     {% endblock %}
                     {% set adminRoute = routeLookupIfAuthorized('commsNewsPolicy.getPolicies') %}
                     {% if adminRoute %}
-                    <li><a class="icon-settings" href="{{ adminRoute }}">{{ locale.news | capitalize }} Administration</a></li>
+                    <li><a class="icon-settings" href="{{ adminRoute }}">{{ locale.news.proper }} Administration</a></li>
                     {% endif %}
                 </ul>
             {% endblock %}
