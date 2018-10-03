@@ -758,6 +758,7 @@ class RubricMapper
      *
      * @param MarkedGrid $markedGrid
      * @throws MapperException if something wasn't found
+     * @throws \InvalidArgumentException if a bad capability mark is found
      */
     public function persistMarkedGrid(MarkedGrid $markedGrid): void
     {
@@ -783,6 +784,7 @@ class RubricMapper
         $capabilityMarksToSave = $capabilityMarkMapper->createCollection();
         $indicatorMarksToSave  = $indicatorMarkMapper->createCollection();
         foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
+            // TODO need to get exact value user entered, not the normalised value returned by $capabilityMark->getValue()
             if ((new ValidCapabilityMark($capabilityMark->getCapabilityUsage()->getMaxValue(), $capabilityMark->getMarkScheme()))->isSatisfiedBy($capabilityMark->getValue())) {
                 // Create cap mark
                 $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
