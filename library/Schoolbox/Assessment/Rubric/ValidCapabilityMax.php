@@ -20,7 +20,7 @@ class ValidCapabilityMax extends \Alaress\Specification\Base
     public function isSatisfiedBy($capabilityMax) : bool
     {
         if ($this->markPerCap) {
-            return is_numeric($capabilityMax) && $capabilityMax >= 0;
+            return is_numeric($capabilityMax) && $capabilityMax > 0;
         }
         return true;
     }
