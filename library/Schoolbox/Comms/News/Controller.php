@@ -29,6 +29,7 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -358,8 +359,25 @@ class Controller extends Base
 
                 /* Form action should secretly update to the Update route
                  */
-                $formAction = $this->getRouter()->generate('commsNews.postUpdate', ['articleId' => $article->getId()]);
-                $formActionSubmit = $this->getRouteIfAuthorized('commsNewsModeration.postSubmit', ['article' => $article, 'articleId' => $article->getId()]);
+                $formAction = $this->getRouter()->generate('commsNews.postUpdate', $routeParams);
+
+                // Submit action: approve if I can and am the author, otherwise preview
+                $formActionSubmit = false;
+                if ($article->canBeApproved()) {
+                    $author = $article->getAuthor();
+                    if ($author instanceof User && $author->getId() === $this->getUser()->getId()) {
+                        $formActionSubmit = $this->getRouteIfAuthorized(
+                            'commsNewsModeration.postApprove',
+                            $routeParams
+                        );
+                    }
+                }
+                if (!$formActionSubmit) {
+                    $formActionSubmit = $this->getRouteIfAuthorized(
+                        'commsNewsModeration.postSubmit',
+                        $routeParams
+                    );
+                }
 
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
