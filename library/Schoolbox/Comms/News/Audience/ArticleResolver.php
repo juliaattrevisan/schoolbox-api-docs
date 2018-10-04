@@ -598,7 +598,12 @@ class ArticleResolver implements IArticleResolver
         return \array_unique($articleIds);
     }
 
-    public function findArticlesForHomepage($folderId, $limit): array
+    /**
+     * @param int $folderId
+     * @param int $limit
+     * @return array
+     */
+    public function findArticlesForHomepage(int $folderId, ?int $limit): array
     {
         $pb = $this->db
             ->buildPredicateBuilder(Mapper::TABLE_NAME)
@@ -612,12 +617,12 @@ class ArticleResolver implements IArticleResolver
         $query = "
               SELECT DISTINCT(comms_news_article_id)
               FROM comms_news_audience
-              LEFT JOIN comms_news_article
+              INNER JOIN comms_news_article
               ON comms_news_audience.comms_news_article_id = comms_news_article.id
               WHERE {$whereClause}
               ORDER BY publish_at DESC, created_at DESC";
 
-        if ($limit || $limit === null) {
+        if ($limit && null !== $limit) {
             $query .= ' LIMIT ' . $limit;
         }
 
