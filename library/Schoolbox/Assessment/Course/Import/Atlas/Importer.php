@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler\IAttachmentHandler;
 use Schoolbox\Assessment\Course\Import\Atlas\Validator\AssessmentSpecification;
@@ -31,9 +32,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMap
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpec;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\HomepageConfigMapper;
@@ -70,6 +69,12 @@ class Importer
 
 
     /**
+     * @var CourseConfigMapper
+     */
+    private $courseConfigMapper;
+
+
+    /**
      * @var CourseSpecMapper
      */
     private $courseSpecMapper;
@@ -82,15 +87,9 @@ class Importer
 
 
     /**
-     * @var Access
+     * @var RoleAccessMapper
      */
-    private $access;
-
-
-    /**
-     * @var UserAccessMapper
-     */
-    private $userAccessMapper;
+    private $roleAccessMapper;
 
 
     /**
@@ -153,10 +152,10 @@ class Importer
      * @param FolderMapper           $folderMapper
      * @param HomepageConfigMapper   $homepageConfigMapper
      * @param HomepageTemplateMapper $homepageTemplateMapper
+     * @param CourseConfigMapper     $courseConfigMapper
      * @param CourseSpecMapper       $courseSpecMapper
      * @param UnitSpecMapper         $unitSpecMapper
-     * @param Access                 $access
-     * @param UserAccessMapper       $userAccessMapper
+     * @param RoleAccessMapper       $roleAccessMapper
      * @param Rubric\GroupMapper     $rubricGroupMapper
      * @param Rubric\CriterionMapper $rubricCriterionMapper
      * @param AssessmentDataSource   $assessmentDataSource
@@ -169,10 +168,10 @@ class Importer
         FolderMapper $folderMapper,
         HomepageConfigMapper $homepageConfigMapper,
         HomepageTemplateMapper $homepageTemplateMapper,
+        CourseConfigMapper $courseConfigMapper,
         CourseSpecMapper $courseSpecMapper,
         UnitSpecMapper $unitSpecMapper,
-        Access $access,
-        UserAccessMapper $userAccessMapper,
+        RoleAccessMapper $roleAccessMapper,
         Rubric\GroupMapper $rubricGroupMapper,
         Rubric\CriterionMapper $rubricCriterionMapper,
         AssessmentDataSource $assessmentDataSource,
@@ -185,10 +184,10 @@ class Importer
         $this->folderMapper           = $folderMapper;
         $this->homepageConfigMapper   = $homepageConfigMapper;
         $this->homepageTemplateMapper = $homepageTemplateMapper;
+        $this->courseConfigMapper     = $courseConfigMapper;
         $this->courseSpecMapper       = $courseSpecMapper;
         $this->unitSpecMapper         = $unitSpecMapper;
-        $this->access                 = $access;
-        $this->userAccessMapper       = $userAccessMapper;
+        $this->roleAccessMapper       = $roleAccessMapper;
         $this->rubricGroupMapper      = $rubricGroupMapper;
         $this->rubricCriterionMapper  = $rubricCriterionMapper;
         $this->assessmentDataSource   = $assessmentDataSource;
@@ -297,9 +296,7 @@ class Importer
         $this->folderMapper->save($courseSpecFolder);
 
 
-        // Allow the current user to write to the course folder
-        // (if for some reason they can't).
-        $this->ensureCurrentUserHasWriteAccess($courseSpecFolder);
+        $this->applyPermissions($courseSpecFolder, 'course');
 
 
         // Apply the course builder homepage template
@@ -336,9 +333,7 @@ class Importer
         $this->folderMapper->save($unitSpecFolder);
 
 
-        // Allow the current user to write to the course folder
-        // (if for some reason they can't).
-        $this->ensureCurrentUserHasWriteAccess($unitSpecFolder);
+        $this->applyPermissions($unitSpecFolder, 'unit');
 
 
         // Apply the course builder homepage template
@@ -695,22 +690,21 @@ class Importer
 
 
     /**
-     * Ensures that the current user has write access to `$folder`, as long as
-     * the folder doesn't have inherit permissions.
+     * Applies the course builder's configured permission setting to this
+     * newly-created course or unit folder, if it doesn't inherit permissions.
      *
-     * @param Folder $folder The folder to grant access for
-     * @throws \Schoolbox\Mapper\Exception if for some reason a model couldn't be created?
+     * @param Folder $folder     The folder to grant access to
+     * @param string $folderType The type of folder this is: used to retrieve
+     *                           the course builder permission settings
      */
-    private function ensureCurrentUserHasWriteAccess(Folder $folder): void
+    private function applyPermissions(Folder $folder, string $folderType): void
     {
-        if (!$folder->getInherit()
-            && $this->access->getFolderAccess($this->currentUser, $folder->getId()) > UserAccess::ACCESS_WRITE
-        ) {
-            $userAccess = $this->userAccessMapper->createModel()
-                ->setUser($this->currentUser)
-                ->setService(UserAccess::SERVICE_HOMEPAGE)
-                ->setAccessLevel(UserAccess::ACCESS_WRITE);
-            $this->userAccessMapper->save($userAccess);
+        if (!$folder->getInherit()) {
+            $rolePermissions = [];
+            foreach ($this->courseConfigMapper->findByColumn('page', $folderType) as $courseConfig) {
+                $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
+            }
+            $this->roleAccessMapper->savePermissions($folder, $rolePermissions, false);
         }
     }
 

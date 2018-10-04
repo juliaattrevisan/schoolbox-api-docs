@@ -87,7 +87,6 @@ class Module extends \Alaress\Module\Module
                                 $injector->get('user'),
                                 $this->getConfig(),
                                 $this->getMapperFactory(),
-                                Access::getInstance(),
                                 $injector->get('assessmentDataSource')
                             ))->build();
                         }
