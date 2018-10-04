@@ -24,7 +24,6 @@ use Schoolbox\Error;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
 {
@@ -51,44 +50,53 @@ class Module extends BaseModule
         );
 
         // loggedIn && (SU || CO || moderator || (moderationEnabled && author))
-        $canSubmit = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                new CanModerateAudience($this->getFolderMapper()),
-                new Rule\All(
-                    new IsModerationEnabled($this->getConfig()),
-                    new IsArticleAuthor()
+        $canSubmit = new Rule\LazyCallback(function(){
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
+                    new CanModerateAudience($this->getStrategyFactory()),
+                    new Rule\All(
+                        new IsModerationEnabled($this->getConfig()),
+                        new IsArticleAuthor()
+                    )
                 )
-            )
-        );
+            );
+        });
+
+
 
         // loggedIn && (SU || CO || moderator)
-        $canApprove = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                new Rule\All(
-                    new InstructorsCanEditOthersArticles($this->getConfig()),
-                    new CanModerateAudience($this->getFolderMapper())
+        $canApprove = new Rule\LazyCallback(function(){
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
+                    new Rule\All(
+                        new InstructorsCanEditOthersArticles($this->getConfig()),
+                        new CanModerateAudience($this->getStrategyFactory())
+                    )
                 )
-            )
-        );
+            );
+        });
+
 
         // loggedIn && (SU || CO || moderator)
-        $canReject = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                new Rule\All(
-                    new InstructorsCanEditOthersArticles($this->getConfig()),
-                    new CanModerateAudience($this->getFolderMapper())
+        $canReject = new Rule\LazyCallback(function(){
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
+                    new Rule\All(
+                        new InstructorsCanEditOthersArticles($this->getConfig()),
+                        new CanModerateAudience($this->getStrategyFactory())
+                    )
                 )
-            )
-        );
+            );
+        });
 
         $preloadArticle = function ($params) {
             return $this->preloadArticleWithAudience($params);
@@ -117,7 +125,7 @@ class Module extends BaseModule
             try {
                 $article = $this->getArticleMapper()->findById($params['articleId']);
             } catch (MapperException $e) {
-                throw new NotFound($this->getErrorMapper()->getMessageById(Error\Mapper::ERROR_GENERIC_NOT_FOUND));
+                throw new NotFound($this->getErrorMapper()->getMessageById(Error\Mapper::ERROR_GENERIC_NOT_FOUND), 0, $e);
             }
         }
 
@@ -181,7 +189,7 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'newsMapper'       => $this->getMapperFactory()->getLazy(News\Mapper::class),
             'validSpecFactory' => $injector->lazy(function () {
-                return new News\Validation\Factory();
+                return new News\Validation\Factory($this->getStrategyFactory());
             }),
         ];
     }
@@ -217,11 +225,11 @@ class Module extends BaseModule
 
 
     /**
-     * @return Mapper|Folder\Mapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @return News\Audience\Segment\StrategyFactory|object
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    private function getFolderMapper(): Folder\Mapper
+    private function getStrategyFactory(): News\Audience\Segment\StrategyFactory
     {
-        return $this->getMapperFactory()->get(Folder\Mapper::class);
+        return $this->injector->get('commsNewsAudienceStrategyFactory');
     }
 }

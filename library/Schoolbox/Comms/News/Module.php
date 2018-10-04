@@ -60,7 +60,7 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_WRITE),
-                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
+                    new Authorizer\Rule\CanModerateAudience($this->getStrategyFactory()),
                     new Authorizer\Rule\IsArticleAuthor(),
                     new Rule\All(
                         new Authorizer\Rule\IsPublishedOrExpired(),
@@ -86,7 +86,7 @@ class Module extends BaseModule
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
                     new Rule\All(
                         new Authorizer\Rule\InstructorsCanEditOthersArticles($this->getConfig()),
-                        new Authorizer\Rule\CanModerateAudience($this->getFolderMapper())
+                        new Authorizer\Rule\CanModerateAudience($this->getStrategyFactory())
                     ),
                     new Rule\All(
                         new Authorizer\Rule\IsArticleAuthor(),
@@ -102,7 +102,7 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
+                    new Authorizer\Rule\CanModerateAudience($this->getStrategyFactory()),
                     new Authorizer\Rule\IsArticleAuthor()
                 )
             );
@@ -262,11 +262,11 @@ class Module extends BaseModule
 
 
     /**
-     * @return \Schoolbox\Mapper|Folder\Mapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @return StrategyFactory|object
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    private function getFolderMapper(): Folder\Mapper
+    private function getStrategyFactory(): StrategyFactory
     {
-        return $this->getMapperFactory()->get(Folder\Mapper::class);
+        return $this->injector->get('commsNewsAudienceStrategyFactory');
     }
 }
