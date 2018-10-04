@@ -215,7 +215,7 @@ class StrategyFactory
                     $this->staffCanPost,
                     $this->moderationRequired,
                     $this->folderMapper,
-                    $this->roleAccessMapper.
+                    $this->roleAccessMapper,
                     $this->access
                 );
         }
