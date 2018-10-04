@@ -724,14 +724,23 @@ class Importer
      */
     private function applyPermissions(Folder $folder, string $folderType): void
     {
-        if (!$folder->getInherit()
-            && $this->access->getFolderAccess($this->currentUser, $folder->getId()) > UserAccess::ACCESS_WRITE
-        ) {
-            $userAccess = $this->userAccessMapper->createModel()
-                ->setUser($this->currentUser)
-                ->setService(UserAccess::SERVICE_HOMEPAGE)
-                ->setAccessLevel(UserAccess::ACCESS_WRITE);
-            $this->userAccessMapper->save($userAccess);
+        if (!$folder->getInherit()) {
+            // Ensure that the current user can write to this new folder
+            // TODO is this even required if folder access exists?
+            if ($this->access->getFolderAccess($this->currentUser, $folder->getId()) > UserAccess::ACCESS_WRITE) {
+                $userAccess = $this->userAccessMapper->createModel()
+                    ->setUser($this->currentUser)
+                    ->setService(UserAccess::SERVICE_HOMEPAGE)
+                    ->setAccessLevel(UserAccess::ACCESS_WRITE);
+                $this->userAccessMapper->save($userAccess);
+            }
+
+            // Apply folder role permissions
+            $rolePermissions = [];
+            foreach ($this->courseConfigMapper->findByColumn('page', $folderType) as $courseConfig) {
+                $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
+            }
+            $this->roleAccessMapper->savePermissions($folder, $rolePermissions, false);
         }
     }
 
