@@ -140,7 +140,7 @@
                 current = $(key).val();
 
                 if (
-                    (_.isArray(registry[key]) && _.difference(current, registry[key]).length) ||
+                    (_.isArray(registry[key]) && !_.isEqual(current.sort(), registry[key].sort())) ||
                     (!_.isArray(registry[key]) && registry[key] !== current)
                 ) {
                     contentChanged = true;
