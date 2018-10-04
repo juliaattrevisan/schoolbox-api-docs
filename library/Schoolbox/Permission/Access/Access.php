@@ -153,37 +153,29 @@ class Access
 
         // Check CMS service access level
         $userAccessMapper = UserAccessMapper::getInstance();
-        try {
-            /* Note there is no folderId specified for the CMS service. The effect of this is that if the user
-             * has FULL CMS access, we will cache FULL access for whatever folderId is specified.
-             * We don't need to cache the value locally, we can rely on the Query Cache to do it for us.
-             */
-            $groupAccessLevel = $userAccessMapper->getAccess($user, null, UserAccess::SERVICE_CMS)->getAccessLevel();
-            $accessLevels[] = $groupAccessLevel;
 
-            // Short-circuit if full access
-            if (UserAccess::ACCESS_FULL === $groupAccessLevel) {
-                $this->cachedFolderAccess[$user->getId()][$folderId] = UserAccess::ACCESS_FULL;
-                return UserAccess::ACCESS_FULL;
-            }
-        } catch (Mapper\Exception $e) {
-            $accessLevels[] = UserAccess::ACCESS_DENY;
+        /* Note there is no folderId specified for the CMS service. The effect of this is that if the user
+         * has FULL CMS access, we will cache FULL access for whatever folderId is specified.
+         * We don't need to cache the value locally, we can rely on the Query Cache to do it for us.
+         */
+        $groupAccessLevel = $userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_CMS);
+        $accessLevels[] = $groupAccessLevel;
+
+        // Short-circuit if full access
+        if (UserAccess::ACCESS_FULL === $groupAccessLevel) {
+            $this->cachedFolderAccess[$user->getId()][$folderId] = UserAccess::ACCESS_FULL;
+            return UserAccess::ACCESS_FULL;
         }
 
         // Check Group access level
-        try {
-            $groupAccessLevel = $userAccessMapper->getAccess($user, $folderId, UserAccess::SERVICE_HOMEPAGE)->getAccessLevel();
-            $accessLevels[] = $groupAccessLevel;
+        $groupAccessLevel = $userAccessMapper->getAccessLevel($user, $folderId, UserAccess::SERVICE_HOMEPAGE);
+        $accessLevels[] = $groupAccessLevel;
 
-            // Short-circuit if full access
-            if (UserAccess::ACCESS_FULL === $groupAccessLevel) {
-                $this->cachedFolderAccess[$user->getId()][$folderId] = UserAccess::ACCESS_FULL;
-                return UserAccess::ACCESS_FULL;
-            }
-        } catch (Mapper\Exception $e) {
-            $accessLevels[] = UserAccess::ACCESS_DENY;
+        // Short-circuit if full access
+        if (UserAccess::ACCESS_FULL === $groupAccessLevel) {
+            $this->cachedFolderAccess[$user->getId()][$folderId] = UserAccess::ACCESS_FULL;
+            return UserAccess::ACCESS_FULL;
         }
-
 
         // Check role access level
         $roleAccessMapper = RoleAccessMapper::getInstance();

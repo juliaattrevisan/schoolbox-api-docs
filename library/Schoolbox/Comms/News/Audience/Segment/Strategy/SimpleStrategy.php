@@ -11,7 +11,6 @@ use Schoolbox\Comms\News\Audience;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
-use Schoolbox\Mapper;
 use Schoolbox\Comms\News\Audience\Segment\ISimpleStrategy;
 
 /**
@@ -45,7 +44,6 @@ abstract class SimpleStrategy implements ISimpleStrategy
 
     /**
      * @inheritdoc
-     * @throws \Schoolbox\Mapper\Exception
      */
     public function canAudienceToEntityType(User $user): bool
     {
@@ -56,7 +54,6 @@ abstract class SimpleStrategy implements ISimpleStrategy
 
     /**
      * @inheritdoc
-     * @throws \Schoolbox\Mapper\Exception
      */
     public function canAudienceToEntityValue(User $user, ?string $entityValue): bool
     {
@@ -71,11 +68,10 @@ abstract class SimpleStrategy implements ISimpleStrategy
      * @param User $user
      * @param int  $accessLevel
      * @return bool
-     * @throws \Schoolbox\Mapper\Exception
      */
     protected function hasNewsServicePerm(User $user, int $accessLevel): bool
     {
-        return $this->userAccessMapper->getAccess($user, null, UserAccess::SERVICE_NEWS) >= $accessLevel;
+        return $this->userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_NEWS) >= $accessLevel;
     }
 
 
@@ -101,7 +97,6 @@ abstract class SimpleStrategy implements ISimpleStrategy
 
     /**
      * @@inheritdoc
-     * @throws Mapper\Exception
      */
     public function canModerate(User $user, ?string $entityValue): bool
     {

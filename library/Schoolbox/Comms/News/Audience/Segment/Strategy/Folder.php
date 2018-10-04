@@ -147,11 +147,10 @@ class Folder extends SimpleStrategy
      * @param User $user
      * @param int  $level
      * @return bool
-     * @throws Mapper\Exception
      */
     private function hasCmsServicePerm(User $user, int $level): bool
     {
-        return $this->getUserAccessMapper()->getAccess($user, null, UserAccess::SERVICE_CMS) >= $level;
+        return $this->getUserAccessMapper()->getAccessLevel($user, null, UserAccess::SERVICE_CMS) >= $level;
     }
 
 
