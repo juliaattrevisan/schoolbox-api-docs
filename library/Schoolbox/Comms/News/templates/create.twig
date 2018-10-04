@@ -34,8 +34,8 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label for="title">Title</label>
-                        <input id="title" name="title" type="text" maxlength="255" value="{{ article.title }}" />
+                        <label for="news-title">Title</label>
+                        <input id="news-title" name="title" type="text" maxlength="255" value="{{ article.title }}" />
                     </div>
 
                     <div class="small-12 columns">
@@ -214,9 +214,9 @@
 
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>Topics</label>
+                        <label for="news-topics">Topics</label>
                         <p class="meta">You can assign multiple <a href="{{ routeLookup('commsNewsPolicy.getPolicies') }}#topics" title="Find a list of available topics" target="_blank">topics</a> to this {{ locale.news }} to adjust its exposure.</p>
-                        <select data-topics name="topics[]" multiple></select>
+                        <select data-topics name="topics[]" id="news-topics" multiple></select>
                     </div>
                 </fieldset>
 
@@ -280,15 +280,6 @@
             removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe,link'
         });
 
-        {# Drafting mechanism #}
-        {% if isAutoSavable %}
-        $('#createForm').draft({
-            inputs: ['title', 'publishAt', 'expiresAt', 'audience'],
-            textareas: ['body', 'blurb'],
-            attachzones: ['attachment']
-        });
-        {% endif %}
-
         $('[data-topics]').selectizeSelector({
             ajax: {
                 url:      '{{ routeLookup('commsNews.getTopics') }}',
@@ -305,6 +296,15 @@
             ],
             multiple: true
         });
+
+        {# Drafting mechanism #}
+        {% if isAutoSavable %}
+            $('#createForm').draft({
+                inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search', '#news-topics'],
+                textareas: ['body', 'blurb'],
+                attachzones: ['attachment']
+            });
+        {% endif %}
     });
 
     /**
