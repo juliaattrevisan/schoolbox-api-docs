@@ -18,7 +18,6 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Authorizer\Rule\CanModerateAudience;
 use Schoolbox\Comms\News\Authorizer\Rule\IsModerationEnabled;
 use Schoolbox\Comms\News\Authorizer\Rule\IsArticleAuthor;
-use Schoolbox\Comms\News\Authorizer\Rule\InstructorsCanEditOthersArticles;
 use Schoolbox\Comms\News;
 use Schoolbox\Error;
 use Schoolbox\Mapper;
