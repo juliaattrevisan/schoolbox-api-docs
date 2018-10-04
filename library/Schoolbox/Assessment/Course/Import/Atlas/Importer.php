@@ -10,6 +10,8 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
+use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler\IAttachmentHandler;
 use Schoolbox\Assessment\Course\Import\Atlas\Validator\AssessmentSpecification;
@@ -67,6 +69,12 @@ class Importer
      * @var HomepageTemplateMapper
      */
     private $homepageTemplateMapper;
+
+
+    /**
+     * @var CourseConfigMapper
+     */
+    private $courseConfigMapper;
 
 
     /**
@@ -153,6 +161,7 @@ class Importer
      * @param FolderMapper           $folderMapper
      * @param HomepageConfigMapper   $homepageConfigMapper
      * @param HomepageTemplateMapper $homepageTemplateMapper
+     * @param CourseConfigMapper     $courseConfigMapper
      * @param CourseSpecMapper       $courseSpecMapper
      * @param UnitSpecMapper         $unitSpecMapper
      * @param Access                 $access
@@ -169,6 +178,7 @@ class Importer
         FolderMapper $folderMapper,
         HomepageConfigMapper $homepageConfigMapper,
         HomepageTemplateMapper $homepageTemplateMapper,
+        CourseConfigMapper $courseConfigMapper,
         CourseSpecMapper $courseSpecMapper,
         UnitSpecMapper $unitSpecMapper,
         Access $access,
@@ -185,6 +195,7 @@ class Importer
         $this->folderMapper           = $folderMapper;
         $this->homepageConfigMapper   = $homepageConfigMapper;
         $this->homepageTemplateMapper = $homepageTemplateMapper;
+        $this->courseConfigMapper     = $courseConfigMapper;
         $this->courseSpecMapper       = $courseSpecMapper;
         $this->unitSpecMapper         = $unitSpecMapper;
         $this->access                 = $access;

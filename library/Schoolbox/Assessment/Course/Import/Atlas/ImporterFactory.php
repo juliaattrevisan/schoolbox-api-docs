@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 use Component_InstanceMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper as RubricCriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper as RubricGroupMapper;
+use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
@@ -106,6 +107,7 @@ class ImporterFactory
             $this->mapperFactory->get(FolderMapper::class),
             $this->mapperFactory->get(HomepageConfigMapper::class),
             $this->mapperFactory->get(HomepageTemplateMapper::class),
+            $this->mapperFactory->get(CourseConfigMapper::class),
             $this->mapperFactory->get(CourseSpecMapper::class),
             $this->mapperFactory->get(UnitSpecMapper::class),
             $this->access,
