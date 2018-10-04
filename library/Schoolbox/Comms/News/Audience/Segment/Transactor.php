@@ -36,14 +36,11 @@ class Transactor
      * @param Codec            $codec
      * @param StrategyFactory  $strategyFactory
      */
-    public function __construct(
-        Audience\Mapper $audienceMapper,
-        Codec $codec,
-        StrategyFactory $strategyFactory
-    ) {
-        $this->audienceMapper      = $audienceMapper;
-        $this->codec               = $codec;
-        $this->strategyFactory     = $strategyFactory;
+    public function __construct(Audience\Mapper $audienceMapper, Codec $codec, StrategyFactory $strategyFactory)
+    {
+        $this->audienceMapper  = $audienceMapper;
+        $this->codec           = $codec;
+        $this->strategyFactory = $strategyFactory;
     }
 
 
