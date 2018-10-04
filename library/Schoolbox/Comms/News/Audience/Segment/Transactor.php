@@ -137,16 +137,11 @@ class Transactor
         $isSegmentsAdded = false;
         if ($segmentsToAdd->count()) {
 
-            $strategies = $this->strategyFactory->makeAllSimpleStrategies();
-
             // Ensure the relationship is valid for the segment's entity type
-            // TODO remove this hard-code hack, should be provided by the factory
-            $validRelationships = [
-                Strategy\Composite::getEntityType() => (new Strategy\Composite())::getValidRelationshipModifiers(),
-            ];
+            $validRelationships = [];
             // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
             $validNullEntities = [];
-            foreach ($strategies as $strategy) {
+            foreach ($this->strategyFactory->makeAllStrategies() as $strategy) {
                 $validRelationships[$strategy::getEntityType()] = $strategy::getValidRelationshipModifiers();
                 $validNullEntities[$strategy::getEntityType()]  = $strategy::isValidNullEntityValue();
             }

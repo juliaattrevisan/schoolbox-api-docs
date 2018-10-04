@@ -33,6 +33,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Storage;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -1087,6 +1088,7 @@ class Controller extends Base
      *
      * @return string[]
      * @throws UnknownEntityTypeException
+     * @throws UnexpectedValueException
      */
     private function getAvailableAudienceTypeStrategies(): array
     {

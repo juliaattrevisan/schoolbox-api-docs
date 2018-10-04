@@ -78,6 +78,7 @@ class StrategyFactory
 
     /**
      * Indexed by entity type
+     *
      * @return bool[]
      */
     public static function getValidNullEntities(): array
@@ -85,14 +86,16 @@ class StrategyFactory
         $validNullEntities = [
             Composite::getEntityType() => Composite::isValidNullEntityValue(),
         ];
-        foreach(self::getAllSimpleStrategies() as $strategyClass){
+        foreach (self::getAllSimpleStrategies() as $strategyClass) {
             $validNullEntities[$strategyClass::getEntityType()] = $strategyClass::isValidNullEntityValue();
         }
         return $validNullEntities;
     }
 
+
     /**
      * Indexed by entity type
+     *
      * @return bool[]
      */
     public static function getValidRelationshipModifiers(): array
@@ -100,7 +103,7 @@ class StrategyFactory
         $validModifiers = [
             Composite::getEntityType() => Composite::getValidRelationshipModifiers(),
         ];
-        foreach(self::getAllSimpleStrategies() as $strategyClass){
+        foreach (self::getAllSimpleStrategies() as $strategyClass) {
             $validModifiers[$strategyClass::getEntityType()] = $strategyClass::getValidRelationshipModifiers();
         }
         return $validModifiers;
@@ -118,7 +121,7 @@ class StrategyFactory
         $validSegmentRelationships = self::getValidRelationshipModifiers();
 
         $relationshipEntityMap = [];
-        foreach(Model::getRelationships() as $relationship){
+        foreach (Model::getRelationships() as $relationship) {
             $validEntities = [];
             foreach ($validSegmentRelationships as $entity => $relationships) {
                 if (\in_array($relationship, $relationships, true)) {
@@ -166,6 +169,7 @@ class StrategyFactory
         }
         return $this->strategyCache[$entityType];
     }
+
 
     /**
      * @param string $entityType
@@ -224,7 +228,23 @@ class StrategyFactory
 
 
     /**
-     * Returns the set of all Audience entityType strategies
+     * Returns the set of all Audience entityType strategies (including composite)
+     *
+     * @return GenericCollection|ISimpleStrategy[]
+     * @throws UnknownEntityTypeException
+     * @throws UnexpectedValueException If we attempt to insert something other than a simple strategy into the collection
+     */
+    public function makeAllStrategies(): GenericCollection
+    {
+        $c             = $this->makeAllSimpleStrategies();
+        $compositeType = Strategy\Composite::getEntityType();
+        $c->setOffset($compositeType, $this->makeStrategy($compositeType));
+        return $c;
+    }
+
+
+    /**
+     * Returns the set of all Audience simple entityType strategies
      *
      * @return GenericCollection|ISimpleStrategy[]
      * @throws UnknownEntityTypeException
@@ -234,7 +254,7 @@ class StrategyFactory
     {
         $c = new GenericCollection(ISimpleStrategy::class);
         foreach (self::getAllSimpleStrategies() as $strategy) {
-            $entityType     = $strategy::getEntityType();
+            $entityType = $strategy::getEntityType();
             $c->setOffset($entityType, $this->makeStrategy($entityType));
         }
         return $c;
