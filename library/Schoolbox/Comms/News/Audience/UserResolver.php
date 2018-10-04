@@ -13,7 +13,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use External_ClassInterface;
 use PDO;
 use UnexpectedValueException;
-use Schoolbox\Comms\News\Audience\Segment\EntityType;
 
 /**
  * Responsible for:

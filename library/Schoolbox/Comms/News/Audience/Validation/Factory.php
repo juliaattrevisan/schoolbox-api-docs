@@ -11,8 +11,6 @@ namespace Schoolbox\Comms\News\Audience\Validation;
 use Alaress\Specification;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
-use Schoolbox\User;
-use Schoolbox\Comms\News\Audience\Segment\EntityType;
 
 /**
  * Responsible for building valid audience segment specifications
