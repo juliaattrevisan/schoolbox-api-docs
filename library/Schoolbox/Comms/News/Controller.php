@@ -232,7 +232,21 @@ class Controller extends Base
         /* Set YOU as the initial author
          * Otherwise, when a moderator edits your article, they might assume direct authorship instead
          */
-        $article = $this->newsMapper->createModel()->setAuthor($this->getUser());
+        $currentUser = $this->getUser();
+        $article     = $this->newsMapper->createModel()->setAuthor($currentUser);
+
+        // Maybe I have approval rights on this article?
+        // If I do: approve it?
+        if ($this->authorizer->isPathAuthorizedForUser(
+            'commsNewsModeration.postApprove',
+            [
+                'articleId' => null,
+                'article'   => $article,
+            ],
+            $this->getUser()
+        )) {
+            $article->approve($currentUser);
+        }
 
         $this->postUpdate($article);
     }
