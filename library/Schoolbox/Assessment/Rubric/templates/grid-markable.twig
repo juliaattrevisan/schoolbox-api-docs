@@ -407,7 +407,7 @@
 
         // Overwrite any custom mark in the capability mark field with the scaled mark calculated from descriptor values
         $("[data-use-descriptor-values]").click(function(e) {
-            var $button = $(e.target);
+            var $button = $(this);
             var $gradeInput = $button.siblings('[data-group-mark]');
             var rubricId = $button.closest('[data-group-summary]').attr('data-rubric-id');
             var groupId = $button.closest('[data-group-summary]').attr('data-group-id');
@@ -435,13 +435,16 @@
                     break;
 
                 case 'percent':
-                    $groupSummary.find("[data-group-mark]").val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
+                    $gradeInput.val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
                     break;
 
                 default:
                     // TODO
                     // We have a "none" mark type
             }
+
+            // The grade input has changed: trigger save draft
+            $gradeInput.trigger('change');
 
             // Up for discussion, but I'd imagine the user would like the marks to update automatically
             // with descriptor changes once they've clicked this button
@@ -457,7 +460,7 @@
             parseFraction(rubricSummary, e.namespace);
             disableEnableAssignFromDescs();
             revalidateCapMarks();
-        })
+        });
 
 
         // Get an array of letter grade {value : letter} pairs
@@ -490,6 +493,7 @@
         }
 
         // Given a percentage mark, find the letter grade that corresponds to its bracket in the marking scheme
+        // TODO this function seems to not be calculating brackets the same way twig is; who is wrong?
         function getLetterGradeFromNumeric(numericMark, grades) {
             var gradesLength = grades.length;
             for (var i = 0; i < gradesLength; i++) {

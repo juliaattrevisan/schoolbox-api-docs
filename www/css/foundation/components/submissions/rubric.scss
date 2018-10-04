@@ -23,8 +23,11 @@ table.rb {
                 }
             }
             .groupMark {
-                width: 5rem;
+                min-width: 8rem;
                 display: inline-block;
+            }
+            select.groupMark {
+                width: initial;
             }
         }
 

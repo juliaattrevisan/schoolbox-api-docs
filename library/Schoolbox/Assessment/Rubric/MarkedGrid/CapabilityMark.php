@@ -86,12 +86,24 @@ class CapabilityMark
         }
 
         // Otherwise, just use the given marks directly
+        return $this->calculateIndicatorMarkSum();
+    }
+
+
+    /**
+     * Calculates the sum of all indicator marks in this capability mark.
+     *
+     * @return float
+     */
+    public function calculateIndicatorMarkSum(): float
+    {
         $indicatorMarkSum = 0;
-        foreach($this->indicatorMarks as $indicatorMark) {
+        foreach ($this->indicatorMarks as $indicatorMark) {
             $indicatorMarkSum += $indicatorMark->getValue();
         }
         return $indicatorMarkSum;
     }
+
 
     /**
      * Render the capability's mark in normalized format.

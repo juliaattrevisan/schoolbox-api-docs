@@ -15,9 +15,16 @@
     {% set letterGradeValue   = '' %}
 
     {# TODO assumes values are always descending which might not be the case? #}
-    {% for gradeLevel in rubricMarkedGrid.markScheme.gradeGroup.gradeLevels %}
-        {# Is this below the last? If so use the last one #}
-        {% if not letterGradeBracket and (capabilityNormMark >= gradeLevel.lowerBound or loop.last) %}
+    {% for gradeLevel in rubricGrid.assessment.markScheme.gradeGroup.gradeLevels %}
+        {# If cap mark has been given, find the bracket that matches the given mark #}
+        {% if capabilityMark.value != null %}
+            {# Is this below the last? If so use the last one #}
+            {% if not letterGradeBracket and (capabilityNormMark >= gradeLevel.lowerBound or loop.last) %}
+                {% set letterGradeBracket = gradeLevel.rawGrade %}
+                {% set letterGradeValue   = gradeLevel.caption %}
+            {% endif %}
+        {% elseif loop.last %}
+            {# If no cap mark has been given yet, default to selecting the lowest bracket in the dropdown #}
             {% set letterGradeBracket = gradeLevel.rawGrade %}
             {% set letterGradeValue   = gradeLevel.caption %}
         {% endif %}
