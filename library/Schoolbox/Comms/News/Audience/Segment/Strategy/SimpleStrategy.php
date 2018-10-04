@@ -44,12 +44,6 @@ abstract class SimpleStrategy implements ISimpleStrategy
 
 
     /**
-     * @return string
-     */
-    abstract public static function getEntityType(): string;
-
-
-    /**
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
      */
