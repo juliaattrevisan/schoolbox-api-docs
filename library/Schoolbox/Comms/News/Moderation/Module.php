@@ -74,10 +74,7 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                    new Rule\All(
-                        new InstructorsCanEditOthersArticles($this->getConfig()),
-                        new CanModerateAudience($this->getStrategyFactory())
-                    )
+                    new CanModerateAudience($this->getStrategyFactory())
                 )
             );
         });
@@ -90,10 +87,7 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                    new Rule\All(
-                        new InstructorsCanEditOthersArticles($this->getConfig()),
-                        new CanModerateAudience($this->getStrategyFactory())
-                    )
+                    new CanModerateAudience($this->getStrategyFactory())
                 )
             );
         });
