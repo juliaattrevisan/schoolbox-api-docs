@@ -7,8 +7,6 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience\Segment\Strategy\SimpleStrategy;
-
 class User extends SimpleStrategy
 {
 
