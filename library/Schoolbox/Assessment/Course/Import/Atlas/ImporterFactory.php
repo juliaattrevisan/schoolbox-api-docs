@@ -24,7 +24,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMap
 use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -57,12 +56,6 @@ class ImporterFactory
 
 
     /**
-     * @var Access
-     */
-    private $access;
-
-
-    /**
      * @var AssessmentDataSource
      */
     private $assessmentDataSource;
@@ -74,14 +67,12 @@ class ImporterFactory
      * @param User                 $user
      * @param IConfigLoader        $config
      * @param MapperFactory        $mapperFactory
-     * @param Access               $access
      * @param AssessmentDataSource $assessmentDataSource
      */
     public function __construct(
         User $user,
         IConfigLoader $config,
         MapperFactory $mapperFactory,
-        Access $access,
         AssessmentDataSource $assessmentDataSource
     ) {
         // I'm aware that passing a DI container (which the mapper factory
@@ -90,7 +81,6 @@ class ImporterFactory
         $this->user                 = $user;
         $this->config               = $config;
         $this->mapperFactory        = $mapperFactory;
-        $this->access               = $access;
         $this->assessmentDataSource = $assessmentDataSource;
     }
 
@@ -111,8 +101,6 @@ class ImporterFactory
             $this->mapperFactory->get(CourseConfigMapper::class),
             $this->mapperFactory->get(CourseSpecMapper::class),
             $this->mapperFactory->get(UnitSpecMapper::class),
-            $this->access,
-            $this->mapperFactory->get(UserAccessMapper::class),
             $this->mapperFactory->get(RoleAccessMapper::class),
             $this->mapperFactory->get(RubricGroupMapper::class),
             $this->mapperFactory->get(RubricCriterionMapper::class),

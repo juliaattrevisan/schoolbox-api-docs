@@ -32,9 +32,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMap
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpec;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -87,18 +84,6 @@ class Importer
      * @var UnitSpecMapper
      */
     private $unitSpecMapper;
-
-
-    /**
-     * @var Access
-     */
-    private $access;
-
-
-    /**
-     * @var UserAccessMapper
-     */
-    private $userAccessMapper;
 
 
     /**
@@ -170,8 +155,6 @@ class Importer
      * @param CourseConfigMapper     $courseConfigMapper
      * @param CourseSpecMapper       $courseSpecMapper
      * @param UnitSpecMapper         $unitSpecMapper
-     * @param Access                 $access
-     * @param UserAccessMapper       $userAccessMapper
      * @param RoleAccessMapper       $roleAccessMapper
      * @param Rubric\GroupMapper     $rubricGroupMapper
      * @param Rubric\CriterionMapper $rubricCriterionMapper
@@ -188,8 +171,6 @@ class Importer
         CourseConfigMapper $courseConfigMapper,
         CourseSpecMapper $courseSpecMapper,
         UnitSpecMapper $unitSpecMapper,
-        Access $access,
-        UserAccessMapper $userAccessMapper,
         RoleAccessMapper $roleAccessMapper,
         Rubric\GroupMapper $rubricGroupMapper,
         Rubric\CriterionMapper $rubricCriterionMapper,
@@ -206,8 +187,6 @@ class Importer
         $this->courseConfigMapper     = $courseConfigMapper;
         $this->courseSpecMapper       = $courseSpecMapper;
         $this->unitSpecMapper         = $unitSpecMapper;
-        $this->access                 = $access;
-        $this->userAccessMapper       = $userAccessMapper;
         $this->roleAccessMapper       = $roleAccessMapper;
         $this->rubricGroupMapper      = $rubricGroupMapper;
         $this->rubricCriterionMapper  = $rubricCriterionMapper;
