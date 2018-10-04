@@ -526,12 +526,12 @@ class ArticleResolver implements IArticleResolver
                 INNER JOIN comms_news_article ON comms_news_audience.comms_news_article_id = comms_news_article.id
                 WHERE {$whereClause}";
 
-            if(\count($orderBy)){
+            if (\count($orderBy)) {
                 $sql .= "
                     {$this->folderMapper::buildOrderByClause(Mapper::TABLE_NAME, $orderBy, $this->db)}";
             }
 
-            if($limit){
+            if ($limit) {
                 $sql .= "
                     LIMIT :limit";
             }

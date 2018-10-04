@@ -49,7 +49,7 @@ class Module extends BaseModule
         );
 
         // loggedIn && (SU || CO || moderator || (moderationEnabled && author))
-        $canSubmit = new Rule\LazyCallback(function(){
+        $canSubmit = new Rule\LazyCallback(function() {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
@@ -67,7 +67,7 @@ class Module extends BaseModule
 
 
         // loggedIn && (SU || CO || moderator)
-        $canApprove = new Rule\LazyCallback(function(){
+        $canApprove = new Rule\LazyCallback(function() {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
@@ -80,7 +80,7 @@ class Module extends BaseModule
 
 
         // loggedIn && (SU || CO || moderator)
-        $canReject = new Rule\LazyCallback(function(){
+        $canReject = new Rule\LazyCallback(function() {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(

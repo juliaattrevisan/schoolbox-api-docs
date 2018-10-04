@@ -284,17 +284,17 @@ class Controller extends Base
 
         // Audiencing selectize data
         $audienceSegments = [];
-        foreach($article->getAudience() as $segment){
+        foreach ($article->getAudience() as $segment) {
             // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
             // Labels are used in brick rendering
             $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
 
             // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
-            if($segment->isSimple()) {
+            if ($segment->isSimple()) {
                 $encodedValue = $codec->encodeValue($segment->getEntityValue());
                 $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
             } else {
-                foreach($segment->getChildren() as $child){
+                foreach ($segment->getChildren() as $child) {
                     $encodedValue = $codec->encodeValue($child->getEntityValue());
                     $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
                 }
@@ -1093,8 +1093,8 @@ class Controller extends Base
     private function getAvailableAudienceTypeStrategies(): array
     {
         $availableStrategies = [];
-        foreach($this->strategyFactory->makeAllSimpleStrategies() as $strategy){
-            if($strategy->canAudienceToEntityType($this->getUser())){
+        foreach ($this->strategyFactory->makeAllSimpleStrategies() as $strategy) {
+            if ($strategy->canAudienceToEntityType($this->getUser())) {
                 $availableStrategies[] = $strategy::getEntityType();
             }
         }
