@@ -48,9 +48,9 @@
                  */
                 toaster: $('#saveDraft'),
 
-                /* Save every 5 seconds by default
+                /* Save every 3 seconds by default
                  */
-                interval: 5,
+                interval: 3,
 
                 /* Array of selectors which will have .val() checked for changes
                  */
@@ -67,7 +67,7 @@
                 /* Activation element
                  * The thing that gets disabled while saving
                  */
-                activator: element.find('input[type=submit]'),
+                activator: element.find('button[type=submit]'),
 
                 /**
                  * Called on successful save.
@@ -244,6 +244,7 @@
                 /* Recycle the id ><
                  */
                 config.element.attr('action', responseText.formAction);
+                config.element.attr('data-action-submit', responseText.formActionSubmit);
 
                 /* hehe
                  */
