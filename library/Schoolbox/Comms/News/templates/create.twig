@@ -214,9 +214,9 @@
 
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>Topics</label>
+                        <label for="news-topics">Topics</label>
                         <p class="meta">You can assign multiple <a href="{{ routeLookup('commsNewsPolicy.getPolicies') }}#topics" title="Find a list of available topics" target="_blank">topics</a> to this {{ locale.news }} to adjust its exposure.</p>
-                        <select data-topics name="topics[]" multiple></select>
+                        <select data-topics name="topics[]" id="news-topics" multiple></select>
                     </div>
                 </fieldset>
 
@@ -263,6 +263,7 @@
 <script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
+<script src="/javascript/components/schoolbox-lodash.min.js"></script>
 <script>
     'use strict';
 
@@ -283,7 +284,7 @@
         {# Drafting mechanism #}
         {% if isAutoSavable %}
         $('#createForm').draft({
-            inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search'],
+            inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search', '#news-topics'],
             textareas: ['body', 'blurb'],
             attachzones: ['attachment']
         });
