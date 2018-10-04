@@ -23,6 +23,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
@@ -112,6 +113,7 @@ class ImporterFactory
             $this->mapperFactory->get(UnitSpecMapper::class),
             $this->access,
             $this->mapperFactory->get(UserAccessMapper::class),
+            $this->mapperFactory->get(RoleAccessMapper::class),
             $this->mapperFactory->get(RubricGroupMapper::class),
             $this->mapperFactory->get(RubricCriterionMapper::class),
             $this->assessmentDataSource,

@@ -11,7 +11,6 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
-use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler\IAttachmentHandler;
 use Schoolbox\Assessment\Course\Import\Atlas\Validator\AssessmentSpecification;
@@ -36,6 +35,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\HomepageConfigMapper;
@@ -99,6 +99,12 @@ class Importer
      * @var UserAccessMapper
      */
     private $userAccessMapper;
+
+
+    /**
+     * @var RoleAccessMapper
+     */
+    private $roleAccessMapper;
 
 
     /**
@@ -166,6 +172,7 @@ class Importer
      * @param UnitSpecMapper         $unitSpecMapper
      * @param Access                 $access
      * @param UserAccessMapper       $userAccessMapper
+     * @param RoleAccessMapper       $roleAccessMapper
      * @param Rubric\GroupMapper     $rubricGroupMapper
      * @param Rubric\CriterionMapper $rubricCriterionMapper
      * @param AssessmentDataSource   $assessmentDataSource
@@ -183,6 +190,7 @@ class Importer
         UnitSpecMapper $unitSpecMapper,
         Access $access,
         UserAccessMapper $userAccessMapper,
+        RoleAccessMapper $roleAccessMapper,
         Rubric\GroupMapper $rubricGroupMapper,
         Rubric\CriterionMapper $rubricCriterionMapper,
         AssessmentDataSource $assessmentDataSource,
@@ -200,6 +208,7 @@ class Importer
         $this->unitSpecMapper         = $unitSpecMapper;
         $this->access                 = $access;
         $this->userAccessMapper       = $userAccessMapper;
+        $this->roleAccessMapper       = $roleAccessMapper;
         $this->rubricGroupMapper      = $rubricGroupMapper;
         $this->rubricCriterionMapper  = $rubricCriterionMapper;
         $this->assessmentDataSource   = $assessmentDataSource;
