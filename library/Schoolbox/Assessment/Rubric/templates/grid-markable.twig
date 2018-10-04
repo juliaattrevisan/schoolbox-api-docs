@@ -483,10 +483,6 @@
             // Default option index if no other selected: the last one
             var optionIndex = grades.length - 1;
             for (var i = 0; i < grades.length; i++) {
-                // Allow for a "no grade" value: don't attempt to set it
-                if (typeof grades[i].letter === "undefined") {
-                    continue;
-                }
                 // TODO assumes values are always descending which might not be the case?
                 if (numericMark >= grades[i].value) {
                     optionIndex = i;
@@ -500,10 +496,6 @@
         function getLetterGradeFromNumeric(numericMark, grades) {
             var gradesLength = grades.length;
             for (var i = 0; i < gradesLength; i++) {
-                // Allow for a "no grade" value: don't attempt to set it
-                if (typeof grades[i].letter === "undefined") {
-                    continue;
-                }
                 // TODO assumes values are always descending which might not be the case?
                 if (numericMark >= grades[i].value) {
                     return grades[i].letter;
