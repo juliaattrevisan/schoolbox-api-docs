@@ -15,9 +15,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
 use PDO;
-use InvalidArgumentException;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
-use Schoolbox\User;
 
 /**
  * Render human-readable representations of audience segment entity values.
@@ -121,19 +119,18 @@ class Translator
     public function buildCache(News\Model $article): self
     {
         $segmentIds = [];
-        /** @var ISimpleStrategy[] $simpleStrategies */
-        $simpleStrategies = new GenericCollection(IStrategy::class);
+        /** @var ISimpleStrategy[] $strategiesInUse */
+        $strategiesInUse = new GenericCollection(ISimpleStrategy::class);
         foreach ($article->getAudience() as $segment) {
             if ($segment->isSimple()) {
                 $segmentIds[] = $segment->getId();
-                $simpleStrategies[$segment->getEntityType()] = $this->strategyFactory->makeStrategy($segment->getEntityType());
+                $strategiesInUse[$segment->getEntityType()] = $this->strategyFactory->makeStrategy($segment->getEntityType());
                 continue;
             }
             foreach ($segment->getChildren() as $childSegment) {
                 $segmentIds[] = $childSegment->getId();
                 $entityType = $childSegment->getEntityType();
-                $simpleStrategies[$entityType] = $this->strategyFactory->makeStrategy($entityType);
-
+                $strategiesInUse[$entityType] = $this->strategyFactory->makeStrategy($entityType);
             }
         }
 
@@ -143,7 +140,7 @@ class Translator
 
         $bindings  = Builder::getBindings($segmentIds, 'id');
         $sqlPieces = [];
-        foreach ($simpleStrategies as $strategy) {
+        foreach ($strategiesInUse as $strategy) {
             $sqlPieces[] = "({$strategy->getTranslateSql($bindings->getPlaceholder())})";
         }
         $statement = $this->database->executeQuery(\implode(' UNION ALL ', $sqlPieces), $bindings->getParams());
