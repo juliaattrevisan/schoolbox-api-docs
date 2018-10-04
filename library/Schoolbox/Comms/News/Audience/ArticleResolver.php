@@ -536,7 +536,6 @@ class ArticleResolver implements IArticleResolver
                     LIMIT :limit";
             }
 
-
             $articleIds = $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
 
             return \array_unique($articleIds);
