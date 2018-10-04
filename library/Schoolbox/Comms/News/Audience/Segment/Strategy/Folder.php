@@ -124,7 +124,6 @@ class Folder extends SimpleStrategy
 
     /**
      * @inheritdoc
-     * @throws Mapper\Exception
      */
     public function canAudienceToEntityValue(User $user, ?string $entityValue): bool
     {
@@ -158,7 +157,6 @@ class Folder extends SimpleStrategy
      * @inheritdoc
      * @throws InvalidColumnException
      * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
      */
     public function getSearchSql(User $user, string $searchPlaceholder = null): string
     {
@@ -225,7 +223,6 @@ class Folder extends SimpleStrategy
 
     /**
      * @@inheritdoc
-     * @throws Mapper\Exception
      */
     public function canModerate(User $user, ?string $entityValue): bool
     {
@@ -243,7 +240,6 @@ class Folder extends SimpleStrategy
      *
      * @param User $user
      * @return bool
-     * @throws Mapper\Exception
      */
     private function canAudienceToAnyClassOrGroup(User $user): bool
     {

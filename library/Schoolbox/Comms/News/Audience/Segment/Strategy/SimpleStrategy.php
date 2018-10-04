@@ -58,7 +58,11 @@ abstract class SimpleStrategy implements ISimpleStrategy
     public function canAudienceToEntityValue(User $user, ?string $entityValue): bool
     {
         // Superusers and News Moderators can audience to any entity value
-        return $user->isSuperuser() || $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE);
+        return
+            $user->isSuperuser() ||
+            $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE) ||
+            ($this->staffCanPost && $user->getRole()->isStaff());
+
     }
 
 

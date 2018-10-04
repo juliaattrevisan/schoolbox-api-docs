@@ -48,7 +48,8 @@ class ValidUserCanAudienceTo extends Specification\Leaf
 
 
     /**
-     * @inheritdoc
+     * @param News\Model $candidate
+     * @return bool
      * @throws UnknownEntityTypeException
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
