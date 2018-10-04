@@ -52,7 +52,7 @@
                  */
                 interval: 5,
 
-                /* Inputs to check
+                /* Array of selectors which will have .val() checked for changes
                  */
                 inputs: [],
 
@@ -86,7 +86,7 @@
             var i;
 
             for (i = 0; i < config.inputs.length; i++) {
-                registry[config.inputs[i]] = $('input[name="'+config.inputs[i]+'"]').val();
+                registry[config.inputs[i]] = $(config.inputs[i]).val();
             }
 
             for (i = 0; i < config.textareas.length; i++) {
@@ -98,7 +98,7 @@
             for (i = 0; i < config.attachzones.length; i++) {
                 registry[config.attachzones[i]] = [];
 
-                $.each($('input[name="'+config.attachzones[i]+'[]"]'), function(index, element) {
+                $.each($(config.attachzones[i]), function(index, element) {
                     if ($(element).val() !== '') {
                         registry[config.attachzones[i]].push($(element).val());
                     }
@@ -138,7 +138,7 @@
             for (i = 0; i < config.inputs.length; i++) {
                 key = config.inputs[i];
 
-                current = config.element.find('input[name="'+key+'"]').val();
+                current = config.element.find(key).val();
 
                 if (registry[key] !== current) {
                     contentChanged = true;

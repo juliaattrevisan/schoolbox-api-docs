@@ -34,8 +34,8 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label for="title">Title</label>
-                        <input id="title" name="title" type="text" maxlength="255" value="{{ article.title }}" />
+                        <label for="news-title">Title</label>
+                        <input id="news-title" name="title" type="text" maxlength="255" value="{{ article.title }}" />
                     </div>
 
                     <div class="small-12 columns">
@@ -283,7 +283,7 @@
         {# Drafting mechanism #}
         {% if isAutoSavable %}
         $('#createForm').draft({
-            inputs: ['title', 'publishAt', 'expiresAt', 'audience'],
+            inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search'],
             textareas: ['body', 'blurb'],
             attachzones: ['attachment']
         });
