@@ -43,10 +43,10 @@ class Factory
      */
     public function __construct(Rubric $prototype = null)
     {
-        trigger_error(
-            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\Grid\Factory" instead',
-            E_USER_DEPRECATED
-        );
+//        trigger_error(
+//            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\Grid\Factory" instead',
+//            E_USER_DEPRECATED
+//        );
         $this->prototype = $prototype ?: new Rubric();
     }
 

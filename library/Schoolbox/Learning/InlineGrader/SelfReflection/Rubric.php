@@ -57,10 +57,10 @@ class Rubric
         ?DueWork\Response\Model $response,
         RubricContext $rubricContext
     ) {
-        trigger_error(
-            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}" instead',
-            E_USER_DEPRECATED
-        );
+//        trigger_error(
+//            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}" instead',
+//            E_USER_DEPRECATED
+//        );
         $this->assessment = $assessment;
         $this->participant = $participant;
         $this->response = $response;

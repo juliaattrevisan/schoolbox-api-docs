@@ -24,16 +24,16 @@ use SplObjectStorage;
 
 class CalculableAggregator extends SplObjectStorage implements Calculable
 {
-    /**
-     * Deprecation warning
-     */
-    public function __construct()
-    {
-        trigger_error(
-            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}" instead',
-            E_USER_DEPRECATED
-        );
-    }
+//    /**
+//     * Deprecation warning
+//     */
+//    public function __construct()
+//    {
+//        trigger_error(
+//            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}" instead',
+//            E_USER_DEPRECATED
+//        );
+//    }
 
     /**
      * Summate the marks given for a Calculable
