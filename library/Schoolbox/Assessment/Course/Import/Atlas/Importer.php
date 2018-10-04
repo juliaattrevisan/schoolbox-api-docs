@@ -308,9 +308,7 @@ class Importer
         $this->folderMapper->save($courseSpecFolder);
 
 
-        // Allow the current user to write to the course folder
-        // (if for some reason they can't).
-        $this->ensureCurrentUserHasWriteAccess($courseSpecFolder);
+        $this->applyPermissions($courseSpecFolder, 'course');
 
 
         // Apply the course builder homepage template
@@ -347,9 +345,7 @@ class Importer
         $this->folderMapper->save($unitSpecFolder);
 
 
-        // Allow the current user to write to the course folder
-        // (if for some reason they can't).
-        $this->ensureCurrentUserHasWriteAccess($unitSpecFolder);
+        $this->applyPermissions($unitSpecFolder, 'unit');
 
 
         // Apply the course builder homepage template
@@ -706,13 +702,18 @@ class Importer
 
 
     /**
-     * Ensures that the current user has write access to `$folder`, as long as
-     * the folder doesn't have inherit permissions.
+     * Applies permissions to this newly-created course or unit folder.
      *
-     * @param Folder $folder The folder to grant access for
+     * If the folder doesn't inherit permissions:
+     * * ensures that the current user has write access to `$folder`
+     * * applies the course builder permission settings
+     *
+     * @param Folder $folder     The folder to grant access to
+     * @param string $folderType The type of folder this is: used to retrieve
+     *                           the course builder permission settings
      * @throws \Schoolbox\Mapper\Exception if for some reason a model couldn't be created?
      */
-    private function ensureCurrentUserHasWriteAccess(Folder $folder): void
+    private function applyPermissions(Folder $folder, string $folderType): void
     {
         if (!$folder->getInherit()
             && $this->access->getFolderAccess($this->currentUser, $folder->getId()) > UserAccess::ACCESS_WRITE
