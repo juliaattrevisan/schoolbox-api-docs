@@ -493,6 +493,7 @@
         }
 
         // Given a percentage mark, find the letter grade that corresponds to its bracket in the marking scheme
+        // TODO this function seems to not be calculating brackets the same way twig is; who is wrong?
         function getLetterGradeFromNumeric(numericMark, grades) {
             var gradesLength = grades.length;
             for (var i = 0; i < gradesLength; i++) {
