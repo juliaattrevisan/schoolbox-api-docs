@@ -77,6 +77,17 @@ class IndicatorUsage
 
 
     /**
+     * Does this indicator usage have any descriptors which have a value?
+     *
+     * @return bool
+     */
+    public function containsDescriptorsWithValue(): bool
+    {
+        return ($this->calculateMaxValueFromDescriptors() ?? 0) > 0;
+    }
+
+
+    /**
      * Apply the min values for all the descriptors in this indicator.
      *
      * @param bool $useValueRanges Does the rubric grid this is a part of even

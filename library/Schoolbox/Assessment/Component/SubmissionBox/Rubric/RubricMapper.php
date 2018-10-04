@@ -571,7 +571,7 @@ class RubricMapper
             $capabilityMaxValue = $capabilityUsage->getMaxValue();
             if (!$spec->isSatisfiedBy($capabilityMaxValue)) {
                 throw new \InvalidArgumentException(
-                    'provide capability maximum points that are numeric and greater than or equal to 0'
+                    'provide capability maximum points that are numeric and greater than 0'
                 );
             }
 

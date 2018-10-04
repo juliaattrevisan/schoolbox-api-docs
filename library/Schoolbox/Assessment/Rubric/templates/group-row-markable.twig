@@ -10,7 +10,7 @@
 {% set markType = rubricGrid.assessment.markScheme.generateContext %}
 
 {% if showGroupTotal and markType.mode != "none" %}
-    {% set percentageMark     = capabilityMaxSum > 0 ? capabilityMark.value * (100 / capabilityMaxSum) : 0 %}
+    {% set percentageMark     = capabilityMark.value * (100 / capabilityMaxSum) %}
     {% set letterGradeBracket = false %}
     {% set letterGradeValue   = '' %}
 
@@ -81,7 +81,7 @@
 
             {# TODO why is markSchemeName null when student is self-assessing (note: will be addressed in SA-7242) #}
 
-            {% if capabilityMaxSum > 0 %}
+            {% if groupUsage.containsDescriptorsWithValue %}
                 {# TODO these need to be the descriptor sum! #}
                 <button data-use-descriptor-values>Assign <span class="descriptor-sum" data-group-descriptor-sum>
                     {% if markType.mode == 'raw' %}

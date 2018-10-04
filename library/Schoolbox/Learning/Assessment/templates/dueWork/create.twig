@@ -394,7 +394,7 @@
                 $(this).rules("add", {
                     required: true,
                     number: true,
-                    min: 0,
+                    greaterThanZero: true,
                     messages: {
                         number: "Please enter a numeric value"
                     }
