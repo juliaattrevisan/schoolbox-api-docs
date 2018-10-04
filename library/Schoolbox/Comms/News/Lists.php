@@ -146,18 +146,8 @@ class Lists
          */
         $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
-        /* Articles that were audienced to $user
-         */
+        /* Articles that were audienced to $user */
         $articleIdsForUser = $this->articleResolver->findArticlesForUser($user);
-
-        /* Limit to the $params->getFolderId() value, if one was specified
-         * This limits you to the articles you can see in a given topic, for a specified homepage
-         */
-        if ($params->getFolderId()) {
-            $homepageArticleIds = $this->articleResolver->findArticlesForAudience(Strategy\Folder::ENTITY_TYPE, $params->getFolderId(), Audience\Model::RELATIONSHIP_SELF);
-
-            $articleIdsForUser = array_intersect($articleIdsForUser, $homepageArticleIds);
-        }
 
         /* $articleIds:   Articles in $topicId that were audienced to $user
          * $availableIds: The total available articles that were audienced to user
@@ -167,35 +157,7 @@ class Lists
         $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $params->getLimit(), $params->getPageNum(), $year, $month);
         $availableIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, 0, 0, $year, $month);
 
-        /* Hydrate the objects and hope for the best; reorder them in the order requested
-         */
-        $records = $this->newsMapper->findByColumn('id', $articleIds)->indexBy('id');
-
-        $articles = $this->newsMapper->createCollection();
-
-        foreach ($articleIds as $articleId) {
-            $record = $records->getOffset($articleId);
-
-            if (null !== $record) {
-                $articles->add($records->getOffset($articleId));
-
-                /* Statistics: save an impression record
-                 * Load the referrer value from $params
-                 * Also increment a tally elsewhere
-                 */
-                (new ImpressionsConversionsOpens(
-                    $this->databaseInternal,
-                    $this->statisticsMapper,
-                    $this->statisticsCumulativeMapper
-                ))->saveImpression(
-                    $record,
-                    $user->getId(),
-                    $user->getRole()->getType(),
-                    $user->getRole()->getId(),
-                    $params->getReferrer()
-                );
-            }
-        }
+        $articles = $this->loadArticleByIds($articleIds, $params, $user);
 
         /* Get an accompanying paginator
          */
@@ -319,5 +281,65 @@ class Lists
             ->setParam(Querystring::PAGE_NUMBER);
 
         return $urlPaginator;
+    }
+
+    /**
+     * @param Querystring $params
+     * @param User $user
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function findArticlesForHomepage(Querystring $params, User $user) :array
+    {
+        $articleIds = $this->articleResolver->findArticlesForHomepage($params->getFolderId(), $params->getLimit());
+
+        return [
+            'articles' => $this->loadArticleByIds($articleIds, $params, $user),
+            'readMore' => $this->readMoreText,
+            'saveForLater' => $this->saveForLaterEnabled,
+            'savedArticleIds' => $this->findSavedArticles($user, $this->saveForLaterEnabled),
+            'unsaved' => SaveForLater\Mapper::UNSAVED,
+        ];
+    }
+
+    /**
+     * @param array $articleIds
+     * @param Querystring $params
+     * @param User $user
+     * @return \Schoolbox\GenericCollection
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function loadArticleByIds(array $articleIds, Querystring $params, User $user) :\Schoolbox\GenericCollection
+    {
+        $records = $this->newsMapper->findByColumn('id', $articleIds)->indexBy('id');
+
+        $articles = $this->newsMapper->createCollection();
+
+        foreach ($articleIds as $articleId) {
+            $record = $records->getOffset($articleId);
+
+            if (null !== $record) {
+                $articles->add($records->getOffset($articleId));
+
+                /* Statistics: save an impression record
+                 * Load the referrer value from $params
+                 * Also increment a tally elsewhere
+                 */
+
+                (new ImpressionsConversionsOpens(
+                    $this->databaseInternal,
+                    $this->statisticsMapper,
+                    $this->statisticsCumulativeMapper
+                ))->saveImpression(
+                    $record,
+                    $user->getId(),
+                    $user->getRole()->getType(),
+                    $user->getRole()->getId(),
+                    $params->getReferrer()
+                );
+            }
+        }
+
+        return $articles;
     }
 }
