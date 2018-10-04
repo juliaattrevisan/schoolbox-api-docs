@@ -672,7 +672,7 @@ class Controller extends Base
     public function getListByTopic(?int $year, ?int $month): void
     {
         $params = new Querystring($this->getRequest()->query);
-        $topics = $this->topicMapper->findAll();
+        $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
 
         /* The requested data set to load, given the params provided
          */
@@ -734,7 +734,7 @@ class Controller extends Base
         $params = new Querystring($this->getRequest()->query);
         $params->setReferrer(Statistics\Mapper::REFERRER_ARCHIVE);
 
-        $topics = $this->topicMapper->findAll();
+        $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
 
         /* The initial data set to load, given the params provided
          * Compact Mode is hardcoded to be disabled from this context
@@ -806,7 +806,7 @@ class Controller extends Base
         $params = new Querystring($this->getRequest()->query);
         $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
 
-        $topics = $this->topicMapper->findAll();
+        $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
         $lists = new Moderation\Lists($this->newsMapper);
 
         /* The initial data set to load, given the params provided
