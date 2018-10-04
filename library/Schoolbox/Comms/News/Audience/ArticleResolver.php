@@ -494,32 +494,12 @@ class ArticleResolver implements IArticleResolver
 
 
     /**
-     * Returns the ids of the set of articles that were targeted to this audience.
-     *
-     * Examples: articleA.audience = [folder:X ∪ role:Y]     // users in folderX OR roleY
-     *           articleB.audience = [folder:X ∩ role:Y]     // users in folderX AND roleY
-     *
-     *           findArticlesForAudience([folder:X])
-     *              should include articleA                  // as [folder:X] is a subset of [folder:X ∪ role:Y]
-     *              should NOT include articleB              // as [folder:X] is not a subset of [folder:X ∩ role:Y]. The difference being [!folder:X ∩ role:Y]
-     *
-     *           findArticlesForAudience([folder:X ∪ role:Y])
-     *              should include articleA                  // as [folder:X ∪ role:Y] is a subset of [folder:X ∪ role:Y]
-     *              should NOT include articleB              // as [folder:X ∪ role:Y] is not a subset of [folder:X ∩ role:Y]
-     *
-     *           findArticlesForAudience([folder:X ∩ role:Y])
-     *              should include articleA                  // as [folder:X ∩ role:Y] is a subset of [folder:X ∪ role:Y]
-     *              should include articleB                  // as [folder:X ∩ role:Y] is a subset of [folder:X ∩ role:Y]
-     *
-     * @param string                $entityType
-     * @param int|string|null|array $entityValue  Null is a valid value to match on.
-     * @param string|null           $relationship Null means don't don't filter by relationship modifier.
-     * @return int[]
-     * @throws InvalidArgumentException If called to perform a composite search and the value does not match required format
+     * @inheritdoc
+     * @throws InvalidArgumentException
      * @todo Currently only working for $relationship == 'self'. Need to update for other relationship types.
      * @todo This is written recursively for composite audiences. It should be updated to do this in a single db query.
      */
-    public function findArticlesForAudience(string $entityType, $entityValue, string $relationship = null): array
+    public function findArticlesForAudience(string $entityType, $entityValue, ?string $relationship, array $orderBy = [], int $limit = null): array
     {
         // Simple equality case
         if (Strategy\Composite::getEntityType() !== $entityType) {
@@ -543,7 +523,19 @@ class ArticleResolver implements IArticleResolver
             $sql = "
                 SELECT comms_news_article_id
                 FROM comms_news_audience
+                INNER JOIN comms_news_article ON comms_news_audience.comms_news_article_id = comms_news_article.id
                 WHERE {$whereClause}";
+
+            if(\count($orderBy)){
+                $sql .= "
+                    {$this->folderMapper::buildOrderByClause(Mapper::TABLE_NAME, $orderBy, $this->db)}";
+            }
+
+            if($limit){
+                $sql .= "
+                    LIMIT :limit";
+            }
+
 
             $articleIds = $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
 
@@ -599,40 +591,10 @@ class ArticleResolver implements IArticleResolver
         // Check more generally-audienced articles
         /** @var array $entityValue */
         foreach ($entityValue as $type => $value) {
+            // Note we don't pass ORDER BY or LIMIT recursively
             /** @noinspection SlowArrayOperationsInLoopInspection */
-            $articleIds = \array_merge($articleIds, $this->findArticlesForAudience($type, $value));
+            $articleIds = \array_merge($articleIds, $this->findArticlesForAudience($type, $value, $relationship));
         }
         return \array_unique($articleIds);
-    }
-
-    /**
-     * @param int $folderId
-     * @param int $limit
-     * @return array
-     */
-    public function findArticlesForHomepage(int $folderId, ?int $limit): array
-    {
-        $pb = $this->db
-            ->buildPredicateBuilder(Mapper::TABLE_NAME)
-            ->equals(Mapper::FIELD_ENTITY_TYPE, Strategy\Folder::getEntityType())
-            ->isNull(Mapper::FIELD_PARENT_ID)
-            ->equals(Mapper::FIELD_ENTITY_VALUE, $folderId)
-            ->equals(Mapper::FIELD_RELATIONSHIP, Model::RELATIONSHIP_SELF);
-
-        $whereClause = \implode(' AND ', $pb->getWhere());
-
-        $query = "
-              SELECT DISTINCT(comms_news_article_id)
-              FROM comms_news_audience
-              INNER JOIN comms_news_article
-              ON comms_news_audience.comms_news_article_id = comms_news_article.id
-              WHERE {$whereClause}
-              ORDER BY publish_at DESC, created_at DESC";
-
-        if ($limit && null !== $limit) {
-            $query .= ' LIMIT ' . $limit;
-        }
-
-        return $this->db->executeQuery($query, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
     }
 }

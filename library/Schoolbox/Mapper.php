@@ -2171,29 +2171,11 @@ abstract class Mapper implements IMapper, Serializable
             $query .= ' WHERE ' . $this->getPredicateBuilder()->all($predicate)->getWhere()[0];
         }
 
-        // Build ORDER part (in an injection-safe way)
-        $order_parts = array();
-        if (!empty($options['order'])) {
-            foreach ($options['order'] as $column => $order_option) {
-                // Is there a . in escaped_name? Assume it's a sort on a join
-                $parts = explode('.', $column, 2);
-                if (count($parts) === 1) {
-                    $prefix     = $quoted_table;
-                    $columnName = $this->database->quoteIdentifier($column);
-                } else {
-                    $prefix     = $this->database->quoteIdentifier($parts[0]);
-                    $columnName = $this->database->quoteIdentifier($parts[1]);
-                }
+        // Build ORDER BY part
+        if (isset($options['order']) && \is_array($options['order']) && \count($options['order'])) {
+            $query .= self::buildOrderByClause($quoted_table, $options['order'], $this->database);
+        }
 
-                $order_option = strtoupper($order_option);
-                if (in_array($order_option, array('ASC', 'DESC'))) {
-                    $order_parts[] = "$prefix.$columnName $order_option";
-                }
-            }
-        }
-        if (!empty($order_parts)) {
-            $query .= ' ORDER BY ' . (implode(', ', $order_parts));
-        }
         // Build LIMIT and OFFSET part (should bind as parameters instead)
         $limit  = null;
         $offset = null;
@@ -2229,6 +2211,40 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         return $statement;
+    }
+
+
+    /**
+     * Returns an 'ORDER BY' clause
+     *
+     * @param string   $quoted_table
+     * @param string[] $order            Map of columnName to orderOption, eg ['id' => 'ASC]
+     * @param IQuoter  $db
+     * @return string
+     */
+    public static function buildOrderByClause(string $quoted_table, array $order, IQuoter $db): string
+    {
+        // Build ORDER part (in an injection-safe way)
+        $order_parts = array();
+        if (!empty($order)) {
+            foreach ($order as $column => $order_option) {
+                // Is there a . in escaped_name? Assume it's a sort on a join
+                $parts = \explode('.', $column, 2);
+                if (\count($parts) === 1) {
+                    $prefix     = $quoted_table;
+                    $columnName = $db->quoteIdentifier($column);
+                } else {
+                    $prefix     = $db->quoteIdentifier($parts[0]);
+                    $columnName = $db->quoteIdentifier($parts[1]);
+                }
+
+                $order_option = \strtoupper($order_option);
+                if (\in_array($order_option, array('ASC', 'DESC'))) {
+                    $order_parts[] = "$prefix.$columnName $order_option";
+                }
+            }
+        }
+        return empty($order_parts) ? '' : ' ORDER BY ' . \implode(', ', $order_parts);
     }
 
 
