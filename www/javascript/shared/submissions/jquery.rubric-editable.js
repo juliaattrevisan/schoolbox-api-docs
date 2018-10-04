@@ -126,7 +126,7 @@
                 groupId: groupId,
                 groupIndex: groupIndex,
                 name: name,
-                levelCount: $rb.children('thead').find('input').length,
+                levelCount: $rb.children('thead').find('input[data-level]').length,
                 folderId: $('input[name=folderId]').val(),
                 markPerCapability: $('#markPerCapability').prop('checked')
             };
@@ -337,7 +337,7 @@
                 var $clone = $td.clone();
 
                 // start hidden away so we can all slide out together
-                var inputs = $clone.addClass(opt.hideHorizontalClass).find(opt.inputSelector);
+                var inputs = $clone.addClass(opt.hideHorizontalClass).find(opt.inputSelector + ', input[type="hidden"]');
 
                 // assign levelname by default
                 inputs.val(levelName);

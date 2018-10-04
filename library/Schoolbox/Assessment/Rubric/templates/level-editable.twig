@@ -1,4 +1,7 @@
 <th class="rb-level" data-sequencer-group="levels">
+    <input type="hidden"
+           value="{{ level.id }}"
+           name="{{ formField }}[{{ rubricGrid.id }}][level][{{ levelIndex }}][id]" />
     <input data-level
            placeholder="{{ locale.translate('rubricLevel', false, true) }} name"
            type="text"

@@ -10,8 +10,8 @@
         <a class="icon-down-arrow" data-sequencer-down title="Move down"></a>
     </span>
 
-    <input type="hidden" readonly name="{{ critInput }}[id]" value="{{ crit.id }}" />
-    <input type="hidden" readonly name="{{ critInput }}[groupId]" value="{{ group.id }}" data-group-id />
+    <input type="hidden" name="{{ critInput }}[id]" value="{{ crit.id }}" />
+    <input type="hidden" name="{{ critInput }}[groupId]" value="{{ group.id }}" data-group-id />
     <input  id="{{ critInput }}[on]" data-criterion-name="{{ crit.name }}" name="{{ critInput }}[on]" type="checkbox" value="1" {% if checkChecked %}checked="checked"{% endif %} />
 
     {%- if crit.inUseExcluding(rubricGrid.assessment) -%}
@@ -35,6 +35,7 @@
 {% for levelIndex, level in rubricGrid.levels -%}
     {% set descriptor = criterionUsage.retrieveDescriptor(levelIndex) %}
     <td data-descriptor class="{{ cellClass }}">
+        <input type="hidden" name="{{ descInput }}[{{ levelIndex }}][id]" value="{{ descriptor.id }}" />
         <textarea {% if not checkChecked %} disabled="disabled"{% endif %}
                 data-descriptor-text
                 placeholder="Descriptor"

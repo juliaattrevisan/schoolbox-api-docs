@@ -662,16 +662,16 @@ class RubricMapper
         // * Descriptor marks
         // ** more correctly known as indicator marks, which reference a descriptor
         /** @var GenericCollection|GroupMark[] $capabilityMarkModels */
-        $capabilityMarkModels = GroupMarkMapper::getInstance()->findByColumn(
-            'return_id',
-            $feedback->getId()
-        );
+        $capabilityMarkModels = GroupMarkMapper::getInstance()->findByColumnList([
+            'return_id' => $feedback->getId(),
+            'valid'     => true,
+        ]);
 
         /** @var Collection|GenericCollection[]|DescriptorMark[][] $indicatorMarkModelsByCapability */
-        $indicatorMarkModelsByCapability = DescriptorMarkMapper::getInstance()->findByColumn(
-            'rubric_group_mark_id',
-            $capabilityMarkModels->getPropertyValues('id')
-        )->filter(function (DescriptorMark $indicatorMark) {
+        $indicatorMarkModelsByCapability = DescriptorMarkMapper::getInstance()->findByColumnList([
+            'rubric_group_mark_id' => $capabilityMarkModels->getPropertyValues('id'),
+            'valid'                => true,
+        ])->filter(function (DescriptorMark $indicatorMark) {
             return null !== $indicatorMark->getDescriptor();
         })->groupByCallback(
             function (DescriptorMark $indicatorMark) {
@@ -1843,10 +1843,16 @@ class RubricMapper
                 // Has the value changed ?
                 $existingValue = $existingDescriptor->getMaxValue();
                 $newValue      = $newDescriptor->getMaxValue();
-                if ($existingValue != $newValue) {
+                if ($existingValue !== $newValue) {
                     $hasDescriptorValuesChanged = true;
                     break;
                 }
+            }
+
+            // Short-circuit if any desc values changed;
+            // this action invalidates ALL descriptors
+            if ($hasDescriptorValuesChanged) {
+                break;
             }
         }
 
