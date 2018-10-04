@@ -48,9 +48,9 @@
                  */
                 toaster: $('#saveDraft'),
 
-                /* Save every 5 seconds by default
+                /* Save every 3 seconds by default
                  */
-                interval: 5,
+                interval: 3,
 
                 /* Array of selectors which will have .val() checked for changes
                  */
