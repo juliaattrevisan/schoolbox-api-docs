@@ -137,12 +137,13 @@
              */
             for (i = 0; i < config.inputs.length; i++) {
                 key = config.inputs[i];
+                current = $(key).val();
 
-                current = config.element.find(key).val();
-
-                if (registry[key] !== current) {
+                if (
+                    (_.isArray(registry[key]) && _.difference(registry[key], current).length) ||
+                    (!_.isArray(registry[key]) && registry[key] !== current)
+                ) {
                     contentChanged = true;
-
                     registry[key] = current;
                 }
             }
@@ -156,7 +157,6 @@
 
                 if (registry[key] !== current) {
                     contentChanged = true;
-
                     registry[key] = current;
                 }
             }
