@@ -79,6 +79,8 @@ class Composite implements IStrategy
      */
     public function canModerate(User $user, ?string $entityValue): bool
     {
+        // No users can inherently prevented from moderating composites per se, although they may not be able
+        // to moderate the composite due to its children.
         return true;
     }
 }

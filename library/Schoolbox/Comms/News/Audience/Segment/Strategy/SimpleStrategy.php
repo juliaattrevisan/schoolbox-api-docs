@@ -108,7 +108,13 @@ abstract class SimpleStrategy implements ISimpleStrategy
         return
             $user->isSuperuser() ||
             $this->hasNewsServicePerm($user, UserAccess::ACCESS_FULL) ||
-            ($user->getRole()->isStaff() && !$this->moderationRequired);
+            (
+                !$this->moderationRequired &&
+                (
+                    ($user->getRole()->isStaff() && $this->staffCanPost) ||
+                    $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE)
+                )
+            );
     }
 
 
