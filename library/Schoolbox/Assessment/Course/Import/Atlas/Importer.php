@@ -720,21 +720,10 @@ class Importer
      * @param Folder $folder     The folder to grant access to
      * @param string $folderType The type of folder this is: used to retrieve
      *                           the course builder permission settings
-     * @throws \Schoolbox\Mapper\Exception if for some reason a model couldn't be created?
      */
     private function applyPermissions(Folder $folder, string $folderType): void
     {
         if (!$folder->getInherit()) {
-            // Ensure that the current user can write to this new folder
-            // TODO is this even required if folder access exists?
-            if ($this->access->getFolderAccess($this->currentUser, $folder->getId()) > UserAccess::ACCESS_WRITE) {
-                $userAccess = $this->userAccessMapper->createModel()
-                    ->setUser($this->currentUser)
-                    ->setService(UserAccess::SERVICE_HOMEPAGE)
-                    ->setAccessLevel(UserAccess::ACCESS_WRITE);
-                $this->userAccessMapper->save($userAccess);
-            }
-
             // Apply folder role permissions
             $rolePermissions = [];
             foreach ($this->courseConfigMapper->findByColumn('page', $folderType) as $courseConfig) {
