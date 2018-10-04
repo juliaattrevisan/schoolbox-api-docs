@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience\Segment\Strategy\SimpleStrategy;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -210,7 +209,6 @@ class Folder extends SimpleStrategy
             {$keywordFilter}
             {$folderMembershipSql}
             AND folder.deleted_at IS NULL
-            {$noFolderSql}
             GROUP BY folder.id
             ORDER BY folder.name
         ";
