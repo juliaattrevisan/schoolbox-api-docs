@@ -690,11 +690,8 @@ class Importer
 
 
     /**
-     * Applies permissions to this newly-created course or unit folder.
-     *
-     * If the folder doesn't inherit permissions:
-     * * ensures that the current user has write access to `$folder`
-     * * applies the course builder permission settings
+     * Applies the course builder's configured permission setting to this
+     * newly-created course or unit folder, if it doesn't inherit permissions.
      *
      * @param Folder $folder     The folder to grant access to
      * @param string $folderType The type of folder this is: used to retrieve
@@ -703,7 +700,6 @@ class Importer
     private function applyPermissions(Folder $folder, string $folderType): void
     {
         if (!$folder->getInherit()) {
-            // Apply folder role permissions
             $rolePermissions = [];
             foreach ($this->courseConfigMapper->findByColumn('page', $folderType) as $courseConfig) {
                 $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
