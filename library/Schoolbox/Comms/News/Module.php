@@ -76,6 +76,8 @@ class Module extends BaseModule
 
         // Can modify if any of: Supers, Comms Officers, Article audience moderators, or
         // You are the author, and the article is not yet accepted
+        // Note we do not check the user audience to the proposed audience as the audience may be changing
+        // eg we need to enable a user to access this route to remove audience segments they no longer have permission to audience to.
         $canModify = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
@@ -185,8 +187,10 @@ class Module extends BaseModule
             'databaseInternal'           => $injector->lazyGet('databaseInternal'),
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
             'userResolver'               => $injector->lazyGet('commsNewsUserResolver'),
-            'validSpecFactory'           => $injector->lazy(function () {
-                return new Validation\Factory();
+            'validSpecFactory'           => $injector->lazy(function () use ($injector) {
+                /** @var StrategyFactory $strategyFactory */
+                $strategyFactory = $injector->get('commsNewsAudienceStrategyFactory');
+                return new Validation\Factory($strategyFactory);
             }),
             'strategyFactory'            => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
         ];

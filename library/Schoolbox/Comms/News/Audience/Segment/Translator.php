@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News\Audience\Segment;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Comms\News\Audience\Model;
+use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
@@ -112,26 +113,26 @@ class Translator
      * Performs this in a single DB query for efficiency
      *
      * @param News\Model $article
-     * @param User       $user
      * @return $this
      * @throws InsufficientHydrationException
-     * @throws InvalidArgumentException
+     * @throws UnknownEntityTypeException
      * @throws \UnexpectedValueException
      */
-    public function buildCache(News\Model $article, User $user): self
+    public function buildCache(News\Model $article): self
     {
         $segmentIds = [];
-        $strategies = new GenericCollection(IStrategy::class);
+        /** @var ISimpleStrategy[] $simpleStrategies */
+        $simpleStrategies = new GenericCollection(IStrategy::class);
         foreach ($article->getAudience() as $segment) {
             if ($segment->isSimple()) {
                 $segmentIds[] = $segment->getId();
-                $strategies[$segment->getEntityType()] = $this->strategyFactory->makeStrategy($segment->getEntityType(), $user);
+                $simpleStrategies[$segment->getEntityType()] = $this->strategyFactory->makeStrategy($segment->getEntityType());
                 continue;
             }
             foreach ($segment->getChildren() as $childSegment) {
                 $segmentIds[] = $childSegment->getId();
                 $entityType = $childSegment->getEntityType();
-                $strategies[$entityType] = $this->strategyFactory->makeStrategy($entityType, $user);
+                $simpleStrategies[$entityType] = $this->strategyFactory->makeStrategy($entityType);
 
             }
         }
@@ -142,7 +143,7 @@ class Translator
 
         $bindings  = Builder::getBindings($segmentIds, 'id');
         $sqlPieces = [];
-        foreach ($strategies as $strategy) {
+        foreach ($simpleStrategies as $strategy) {
             $sqlPieces[] = "({$strategy->getTranslateSql($bindings->getPlaceholder())})";
         }
         $statement = $this->database->executeQuery(\implode(' UNION ALL ', $sqlPieces), $bindings->getParams());

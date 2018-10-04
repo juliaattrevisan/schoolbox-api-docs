@@ -7,10 +7,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
-use InvalidArgumentException;
+use Schoolbox\Comms\News\Audience\Model;
+use Schoolbox\Comms\News\Audience\Segment\Strategy\Composite;
+use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\GenericCollection;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use UnexpectedValueException;
@@ -23,20 +25,6 @@ use UnexpectedValueException;
 class StrategyFactory
 {
 
-    private const ENTITY_VALUES = [
-        EntityType\Campus\Strategy::ENTITY_TYPE,
-        EntityType\Folder\Strategy::ENTITY_TYPE,
-        EntityType\PastoralGroup\Strategy::ENTITY_TYPE,
-        EntityType\ResHouse\Strategy::ENTITY_TYPE,
-        EntityType\Role\Strategy::ENTITY_TYPE,
-        EntityType\RoleType\Strategy::ENTITY_TYPE,
-        EntityType\SchoolHouse\Strategy::ENTITY_TYPE,
-        EntityType\Service\Strategy::ENTITY_TYPE,
-        EntityType\Super\Strategy::ENTITY_TYPE,
-        EntityType\User\Strategy::ENTITY_TYPE,
-        EntityType\Year\Strategy::ENTITY_TYPE,
-    ];
-
     /** @var UserAccessMapper */
     private $userAccessMapper;
 
@@ -45,6 +33,9 @@ class StrategyFactory
 
     /** @var RoleAccessMapper */
     private $roleAccessMapper;
+
+    /** @var Access */
+    private $access;
 
     /** @var bool */
     private $staffCanPost;
@@ -62,36 +53,129 @@ class StrategyFactory
 
     /**
      * @param UserAccessMapper $userAccessMapper
+     * @param bool             $staffCanPost
+     * @param bool             $moderationRequired
      * @param Folder\Mapper    $folderMapper
      * @param RoleAccessMapper $roleAccessMapper
-     * @param bool             $moderationRequired
-     * @param bool             $staffCanPost
+     * @param Access           $access
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
+        bool $staffCanPost,
+        bool $moderationRequired,
         Folder\Mapper $folderMapper,
         RoleAccessMapper $roleAccessMapper,
-        bool $moderationRequired,
-        bool $staffCanPost
+        Access $access
     ) {
         $this->userAccessMapper   = $userAccessMapper;
+        $this->staffCanPost       = $staffCanPost;
+        $this->moderationRequired = $moderationRequired;
         $this->folderMapper       = $folderMapper;
         $this->roleAccessMapper   = $roleAccessMapper;
-        $this->moderationRequired = $moderationRequired;
-        $this->staffCanPost       = $staffCanPost;
+        $this->access             = $access;
+    }
+
+
+    /**
+     * Indexed by entity type
+     * @return bool[]
+     */
+    public static function getValidNullEntities(): array
+    {
+        $validNullEntities = [
+            Composite::getEntityType() => Composite::isValidNullEntityValue(),
+        ];
+        foreach(self::getAllSimpleStrategies() as $strategyClass){
+            $validNullEntities[$strategyClass::getEntityType()] = $strategyClass::isValidNullEntityValue();
+        }
+        return $validNullEntities;
+    }
+
+    /**
+     * Indexed by entity type
+     * @return bool[]
+     */
+    public static function getValidRelationshipModifiers(): array
+    {
+        $validModifiers = [
+            Composite::getEntityType() => Composite::getValidRelationshipModifiers(),
+        ];
+        foreach(self::getAllSimpleStrategies() as $strategyClass){
+            $validModifiers[$strategyClass::getEntityType()] = $strategyClass::getValidRelationshipModifiers();
+        }
+        return $validModifiers;
+    }
+
+
+    /**
+     * Returns a map of relationshipModifier to set of valid entities
+     *
+     * @return string[][]
+     */
+    public static function getValidRelationshipEntityMap(): array
+    {
+        // Maps entityType to relationships
+        $validSegmentRelationships = self::getValidRelationshipModifiers();
+
+        $relationshipEntityMap = [];
+        foreach(Model::getRelationships() as $relationship){
+            $validEntities = [];
+            foreach ($validSegmentRelationships as $entity => $relationships) {
+                if (\in_array($relationship, $relationships, true)) {
+                    $validEntities[] = $entity;
+                }
+            }
+            $relationshipEntityMap[$relationship] = $validEntities;
+        }
+        return $relationshipEntityMap;
+    }
+
+
+    /**
+     * Returns all simple (ie non-composite) entity types
+     *
+     * @return IStrategy[]
+     */
+    private static function getAllSimpleStrategies(): array
+    {
+        return [
+            Strategy\Campus::class,
+            Strategy\Folder::class,
+            Strategy\PastoralGroup::class,
+            Strategy\ResHouse::class,
+            Strategy\Role::class,
+            Strategy\RoleType::class,
+            Strategy\SchoolHouse::class,
+            Strategy\Service::class,
+            Strategy\Super::class,
+            Strategy\User::class,
+            Strategy\Year::class,
+        ];
     }
 
 
     /**
      * @param string $entityType
-     * @param User   $user
      * @return IStrategy
-     * @throws InvalidArgumentException
+     * @throws UnknownEntityTypeException
      */
-    public function makeStrategy(string $entityType, User $user): IStrategy
+    public function makeStrategy(string $entityType): IStrategy
     {
         if (!\array_key_exists($entityType, $this->strategyCache)) {
-            $this->strategyCache[$entityType] = $this->makeNewStrategyInstance($entityType, $user);
+            $this->strategyCache[$entityType] = $this->makeNewInstance($entityType);
+        }
+        return $this->strategyCache[$entityType];
+    }
+
+    /**
+     * @param string $entityType
+     * @return ISimpleStrategy
+     * @throws UnknownEntityTypeException
+     */
+    public function makeSimpleStrategy(string $entityType): IStrategy
+    {
+        if (!\array_key_exists($entityType, $this->strategyCache)) {
+            $this->strategyCache[$entityType] = $this->makeNewInstance($entityType);
         }
         return $this->strategyCache[$entityType];
     }
@@ -99,56 +183,59 @@ class StrategyFactory
 
     /**
      * @param string $entityType
-     * @param User   $user
      * @return IStrategy
-     * @throws InvalidArgumentException
+     * @throws UnknownEntityTypeException
      */
-    private function makeNewStrategyInstance(string $entityType, User $user): IStrategy
+    private function makeNewInstance(string $entityType): IStrategy
     {
         switch ($entityType) {
-            case EntityType\User\Strategy::ENTITY_TYPE:
-                return new EntityType\User\Strategy($this->userAccessMapper, $this->staffCanPost);
-            case EntityType\Super\Strategy::ENTITY_TYPE:
-                return new EntityType\Super\Strategy($this->userAccessMapper, $this->staffCanPost);
-            case EntityType\Campus\Strategy::ENTITY_TYPE:
-                return new EntityType\Campus\Strategy($this->userAccessMapper, $this->staffCanPost);
-            case EntityType\Role\Strategy::ENTITY_TYPE:
-                return new EntityType\Role\Strategy($this->userAccessMapper, $this->staffCanPost);
-            case EntityType\RoleType\Strategy::ENTITY_TYPE:
-                return new EntityType\RoleType\Strategy($this->userAccessMapper, $this->staffCanPost);
-            case EntityType\SchoolHouse\Strategy::ENTITY_TYPE:
-                return new EntityType\SchoolHouse\Strategy($this->userAccessMapper, $this->staffCanPost);
-            case EntityType\ResHouse\Strategy::ENTITY_TYPE:
-                return new EntityType\ResHouse\Strategy($this->userAccessMapper, $this->staffCanPost);
-            case EntityType\Year\Strategy::ENTITY_TYPE:
-                return new EntityType\Year\Strategy($this->userAccessMapper, $this->staffCanPost);
-            case EntityType\Service\Strategy::ENTITY_TYPE:
-                return new EntityType\Service\Strategy($this->userAccessMapper, $this->staffCanPost);
-            case EntityType\PastoralGroup\Strategy::ENTITY_TYPE:
-                return new EntityType\PastoralGroup\Strategy($this->userAccessMapper, $this->staffCanPost);
-            case EntityType\Folder\Strategy::ENTITY_TYPE:
-                return new EntityType\Folder\Strategy(
+            case Strategy\User::getEntityType():
+                return new Strategy\User($this->userAccessMapper, $this->staffCanPost, $this->moderationRequired);
+            case Strategy\Super::getEntityType():
+                return new Strategy\Super($this->userAccessMapper, $this->staffCanPost, $this->moderationRequired);
+            case Strategy\Campus::getEntityType():
+                return new Strategy\Campus($this->userAccessMapper, $this->staffCanPost, $this->moderationRequired);
+            case Strategy\Role::getEntityType():
+                return new Strategy\Role($this->userAccessMapper, $this->staffCanPost, $this->moderationRequired);
+            case Strategy\RoleType::getEntityType():
+                return new Strategy\RoleType($this->userAccessMapper, $this->staffCanPost, $this->moderationRequired);
+            case Strategy\SchoolHouse::getEntityType():
+                return new Strategy\SchoolHouse($this->userAccessMapper, $this->staffCanPost, $this->moderationRequired);
+            case Strategy\ResHouse::getEntityType():
+                return new Strategy\ResHouse($this->userAccessMapper, $this->staffCanPost, $this->moderationRequired);
+            case Strategy\Year::getEntityType():
+                return new Strategy\Year($this->userAccessMapper, $this->staffCanPost, $this->moderationRequired);
+            case Strategy\Service::getEntityType():
+                return new Strategy\Service($this->userAccessMapper, $this->staffCanPost, $this->moderationRequired);
+            case Strategy\PastoralGroup::getEntityType():
+                return new Strategy\PastoralGroup($this->userAccessMapper, $this->staffCanPost, $this->moderationRequired);
+            case Strategy\Folder::getEntityType():
+                return new Strategy\Folder(
                     $this->userAccessMapper,
                     $this->staffCanPost,
-                    new EntityType\Folder\Search($user, $this->folderMapper, $this->roleAccessMapper)
+                    $this->moderationRequired,
+                    $this->folderMapper,
+                    $this->roleAccessMapper.
+                    $this->access
                 );
         }
-        throw new InvalidArgumentException("Unrecognised entity type: '{$entityType}'");
+        throw new UnknownEntityTypeException("Unrecognised entity type: '{$entityType}'");
     }
 
 
     /**
-     * @param User $user
-     * @return GenericCollection|IStrategy[]
-     * @throws InvalidArgumentException
-     * @throws UnexpectedValueException
-     * @todo Review usages to determine if they really need the IStrategy interface, or just a subset
+     * Returns the set of all Audience entityType strategies
+     *
+     * @return GenericCollection|ISimpleStrategy[]
+     * @throws UnknownEntityTypeException
+     * @throws UnexpectedValueException If we attempt to insert something other than a simple strategy into the collection
      */
-    public function makeAllStrategies(User $user): GenericCollection
+    public function makeAllSimpleStrategies(): GenericCollection
     {
-        $c = new GenericCollection(IStrategy::class);
-        foreach (self::ENTITY_VALUES as $entityValue) {
-            $c[$entityValue] = $this->makeStrategy($entityValue, $user);
+        $c = new GenericCollection(ISimpleStrategy::class);
+        foreach (self::getAllSimpleStrategies() as $strategy) {
+            $entityType     = $strategy::getEntityType();
+            $c->setOffset($entityType, $this->makeStrategy($entityType));
         }
         return $c;
     }

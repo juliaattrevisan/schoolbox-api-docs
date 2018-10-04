@@ -5,22 +5,35 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\EntityType\Year;
+namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Comms\News\Audience\Segment\EntityType\StrategyBase;
+use Schoolbox\Comms\News\Audience\Segment\Strategy\SimpleStrategy;
 use Schoolbox\User;
 
-class Strategy extends StrategyBase
+class Year extends SimpleStrategy
 {
-    public const ENTITY_TYPE = 'year';
+    public static function getEntityType(): string
+    {
+        return 'year';
+    }
 
     /**
      * @inheritdoc
      */
-    public function canBeTargetedByUser(User $user): bool
+    public static function isValidNullEntityValue(): bool
     {
-        if (parent::canBeTargetedByUser($user)) {
+        // A user may have no year
+        return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canAudienceToEntityType(User $user): bool
+    {
+        if (parent::canAudienceToEntityType($user)) {
             return true;
         }
         return $this->getStaffCanPost() && $user->getRole()->isStaff();
@@ -29,16 +42,17 @@ class Strategy extends StrategyBase
     /**
      * @inheritdoc
      */
-    public function getSearchSql(string $searchPlaceholder = null): string
+    public function getSearchSql(User $user, string $searchPlaceholder = null): string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "AND year LIKE :{$searchPlaceholder}";
 
         // If user.year is numeric, prefix 'Year ' to read like 'Year 9'
+        $entityType = self::getEntityType();
         return "
             SELECT DISTINCT
               year AS id,
               IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) AS name,
-              '{$this->getEntityType()}' AS entity_type
+              '{$entityType}' AS entity_type
             FROM `user`
             WHERE deleted_at IS NULL
             AND year IS NOT NULL
@@ -52,28 +66,20 @@ class Strategy extends StrategyBase
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
+        $entityType = self::getEntityType();
         return "
             SELECT DISTINCT cna.entity_type, cna.entity_value, IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) AS name
             FROM comms_news_audience cna
-            INNER JOIN `user` ON cna.entity_type = '{$this->getEntityType()}' AND cna.entity_value = `user`.year
+            INNER JOIN `user` ON cna.entity_type = '{$entityType}' AND cna.entity_value = `user`.year
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function canTargetNullEntityValue(): bool
-    {
-        // User's may not have a year
-        return true;
-    }
-
 
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(User $user): array
+    public static function getValidRelationshipModifiers(): array
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }

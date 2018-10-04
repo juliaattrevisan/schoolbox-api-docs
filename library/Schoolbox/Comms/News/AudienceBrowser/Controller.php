@@ -12,14 +12,9 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Audience;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Resource\Folder;
 use PDO;
-use InvalidArgumentException;
-use Schoolbox\User;
 use UnexpectedValueException;
 
 class Controller extends Base
@@ -34,26 +29,27 @@ class Controller extends Base
     /** @var StrategyFactory */
     private $strategyFactory;
 
-    /** @var UserAccessMapper */
-    private $userAccessMapper;
+    /** @var Folder\Mapper */
+    private $folderMapper;
 
 
     /**
-     * @param IConnector       $db
-     * @param Audience\Mapper  $audienceMapper
-     * @param StrategyFactory  $strategyFactory
-     * @param UserAccessMapper $userAccessMapper
+     * @param IConnector      $db
+     * @param Audience\Mapper $audienceMapper
+     * @param StrategyFactory $strategyFactory
+     * @param Folder\Mapper   $folderMapper
      */
     public function __construct(
         IConnector $db,
         Audience\Mapper $audienceMapper,
-        StrategyFactory $strategyFactory,
-        UserAccessMapper $userAccessMapper
+        Folder\Mapper $folderMapper,
+        StrategyFactory $strategyFactory
+
     ) {
-        $this->db               = $db;
-        $this->audienceMapper   = $audienceMapper;
-        $this->strategyFactory  = $strategyFactory;
-        $this->userAccessMapper = $userAccessMapper;
+        $this->db              = $db;
+        $this->audienceMapper  = $audienceMapper;
+        $this->folderMapper    = $folderMapper;
+        $this->strategyFactory = $strategyFactory;
     }
 
 
@@ -62,20 +58,20 @@ class Controller extends Base
      *
      * @api   /comms/news/audiencebrowser/search
      * @level 18.1
-     * @throws InvalidArgumentException
-     * @throws UnexpectedValueException
+     * @throws UnknownEntityTypeException
      * @throws \Alaress\Database\Exception
+     * @throws UnexpectedValueException
      */
     public function getSearch(): void
     {
-        $codec           = new Audience\Segment\Codec($this->audienceMapper);
-        $strategies      = $this->strategyFactory->makeAllStrategies($this->getUser());
-        $placeholder     = 'keyword';
-        $pieces          = [];
+        $codec            = new Audience\Segment\Codec($this->audienceMapper);
+        $simpleStrategies = $this->strategyFactory->makeAllSimpleStrategies();
+        $placeholder      = 'keyword';
+        $pieces           = [];
 
-        foreach ($strategies as $strategy) {
-            if($strategy->canBeTargetedByUser($this->getUser())){
-                $pieces[] = "({$strategy->getSearchSql($placeholder)})";
+        foreach ($simpleStrategies as $strategy) {
+            if($strategy->canAudienceToEntityType($this->getUser())){
+                $pieces[] = "({$strategy->getSearchSql($this->getUser(), $placeholder)})";
             }
         }
         // We can UNION ALL and avoid de-duplication logic as each sub-query has a distinct entity type
@@ -93,7 +89,7 @@ class Controller extends Base
             $name         = $row['name'];
             $encodedValue = $codec->encodeValue($value);
 
-            foreach($strategies[$entityType]->getValidRelationshipModifiers($this->getUser()) as $modifier){
+            foreach($simpleStrategies[$entityType]::getValidRelationshipModifiers() as $modifier){
                 $key = $codec->encodeSimpleAttributes($entityType, $value, $modifier);
                 $option = new Audience\SegmentSelectizeOption($key, $name);
                 $option->addLabel($entityType, $encodedValue, $name);
@@ -109,21 +105,18 @@ class Controller extends Base
      * Provides a list of available entity values of this entity type for the current user
      *
      * @param string $entityType
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Alaress\Web\Controller\Exception
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
      */
     public function getList(string $entityType): void
     {
         try{
-            $strategy = $this->strategyFactory->makeStrategy($entityType);
-        } catch (InvalidArgumentException $e){
+            $strategy = $this->strategyFactory->makeSimpleStrategy($entityType);
+        } catch (UnknownEntityTypeException $e){
             $this->sendError('Unrecognised entity type', [], 404);
             return;
         }
 
-        if(!$strategy->canBeTargetedByUser($this->getUser())){
+        if(!$strategy->canAudienceToEntityType($this->getUser())){
             $this->sendError('You cannot audience articles to this audience type', [], 403);
             return;
         }
@@ -132,13 +125,13 @@ class Controller extends Base
         $valueLabels   = [];
 
         // Special case for folder, only show involved folders in the list
-        if (Audience\Segment\EntityType\Folder\Strategy::ENTITY_TYPE === $entityType) {
+        if (Audience\Segment\Strategy\Folder::getEntityType() === $entityType) {
             $involvedFolders = $this->folderMapper->findForUser($this->getUser());
             foreach ($involvedFolders as $folder) {
                 $valueLabels[$codec->encodeValue((string)$folder->getId())] = $folder->getNameWithCodes();
             }
         } else {
-            $stmt = $this->db->executeQuery($strategy->getSearchSql());
+            $stmt = $this->db->executeQuery($strategy->getSearchSql($this->getUser()));
             /** @noinspection PhpAssignmentInConditionInspection */
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $valueLabels[$codec->encodeValue($row['id'])] = $row['name'];
@@ -150,8 +143,8 @@ class Controller extends Base
         });
 
         $data = [
-            'availableModifiers' => $strategy->getValidRelationshipModifiers($this->getUser()),
-            'canTargetNull'      => $strategy->canTargetNullEntityValue(),
+            'availableModifiers' => $strategy::getValidRelationshipModifiers(),
+            'canTargetNull'      => $strategy->canAudienceToEntityValue($this->getUser(), NULL),
             'valueLabels'        => $valueLabels,
         ];
         $this->getResponse()->content->set($this->buildJsonOutput($data));

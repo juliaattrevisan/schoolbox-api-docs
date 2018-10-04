@@ -9,35 +9,76 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\User;
+use Schoolbox\Comms\News\Audience\Segment\IStrategy;
 
-class Composite
+class Composite implements IStrategy
 {
 
     /**
-     * Returns the set of available relationship modifiers for this strategy
-     *
-     * Note this is distinct from 'can user audience to entity value'.
-     * That must be true before this is considered.
-     *
-     * @see  ISearch::getSearchSql()
-     *
-     * @param User $user
-     * @return string[]
-     * @todo This should be the implementation of an appropriate interface
+     * @inheritdoc
      */
-    public function getValidRelationshipModifiers(User $user): array
+    public static function getEntityType(): string
+    {
+        return 'composite';
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public static function getValidRelationshipModifiers(): array
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }
 
 
     /**
-     * @return bool
-     * @todo integrate properly into IStrategy sub-interfaces
+     * @inheritdoc
      */
-    public function canTargetNullEntityValue(): bool
+    public static function isValidNullEntityValue(): bool
     {
-        // Value is always null
+        // Composites always have a null entity value
+        return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canAudienceToEntityType(User $user): bool
+    {
+        // All users can audience to composites
+        return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canAudienceToEntityValue(User $user, ?string $entityValue): bool
+    {
+        // The value is always null. All users can audience to this.
+        return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canViewArticleAudiencedToEntityValue(User $user, ?string $entityValue, string $modifier): bool
+    {
+        // Consider a composite segment in isolation (ie ignore the fact it likely has children)
+        // Should such an article for readable by a user due to the user's relationship to 'composite'.
+        // No, that wouldn't make sense.
+        return false;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canModerate(User $user, ?string $entityValue): bool
+    {
         return true;
     }
 }

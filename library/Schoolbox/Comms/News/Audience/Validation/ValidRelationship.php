@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\Audience\Validation;
 use Schoolbox\Comms\News\Audience;
 use Alaress\Specification;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use Schoolbox\Comms\News\Audience\Segment\EntityType;
 
 /**
  * Ensures the combination of entity and relationship are allowed
@@ -57,7 +58,7 @@ class ValidRelationship extends Specification\Leaf
         $validRelationships = $this->validModifiers[$entityType];
 
         // Base case:
-        if (Audience\Model::ENTITY_TYPE_COMPOSITE !== $entityType) {
+        if (Audience\Segment\Strategy\Composite::getEntityType() !== $entityType) {
             return $validRelationships;
         }
 

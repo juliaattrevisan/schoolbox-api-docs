@@ -5,27 +5,42 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\EntityType\PastoralGroup;
+namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Comms\News\Audience\Segment\EntityType\StrategyBase;
+use Schoolbox\Comms\News\Audience\Segment\Strategy\SimpleStrategy;
 use Schoolbox\User;
 
-class Strategy extends StrategyBase
+class PastoralGroup extends SimpleStrategy
 {
-    public const ENTITY_TYPE = 'pastoral_group';
+
+    public static function getEntityType(): string
+    {
+        return 'pastoral_group';
+    }
 
 
     /**
      * @inheritdoc
      */
-    public function getSearchSql(string $searchPlaceholder = null): string
+    public static function isValidNullEntityValue(): bool
+    {
+        // A user may not belong to any pastoral groups
+        return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(User $user, string $searchPlaceholder = null): string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "AND `name` LIKE :{$searchPlaceholder}";
 
         // Note that we need to collate the output so the result set can be UNIONed with other result sets
+        $entityType = self::getEntityType();
         return "
-            SELECT id, name COLLATE utf8mb4_general_ci, '{$this->getEntityType()}' AS entity_type
+            SELECT id, name COLLATE utf8mb4_general_ci, '{$entityType}' AS entity_type
             FROM `pastoral_group`
             WHERE deleted_at IS NULL
             {$keywordFilter}
@@ -38,28 +53,20 @@ class Strategy extends StrategyBase
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
+        $entityType = self::getEntityType();
         return "
             SELECT DISTINCT cna.entity_type, cna.entity_value, pastoral_group.`name` COLLATE utf8mb4_general_ci AS `name`
             FROM comms_news_audience cna
-            INNER JOIN pastoral_group ON entity_type = '{$this->getEntityType()}' AND cna.entity_value = pastoral_group.id
+            INNER JOIN pastoral_group ON entity_type = '{$entityType}' AND cna.entity_value = pastoral_group.id
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function canTargetNullEntityValue(): bool
-    {
-        // Quite likely a user is not in any pastoral groups
-        return true;
-    }
-
 
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(User $user): array
+    public static function getValidRelationshipModifiers(): array
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }

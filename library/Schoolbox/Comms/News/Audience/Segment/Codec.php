@@ -79,7 +79,7 @@ class Codec
      */
     public function decode(string $encodedSegment): Audience\Model
     {
-        return 0 !== strpos($encodedSegment, Audience\Model::ENTITY_TYPE_COMPOSITE)
+        return 0 !== strpos($encodedSegment, Strategy\Composite::getEntityType())
             ? $this->decodeSimple($encodedSegment)
             : $this->decodeComposite($encodedSegment);
     }

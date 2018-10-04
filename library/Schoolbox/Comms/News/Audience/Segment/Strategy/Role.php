@@ -5,21 +5,35 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\EntityType\Role;
+namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience\Segment\EntityType\StrategyBase;
+use Schoolbox\Comms\News\Audience\Segment\Strategy\SimpleStrategy;
 use Schoolbox\User;
 
-class Strategy extends StrategyBase
+class Role extends SimpleStrategy
 {
-    public const ENTITY_TYPE = 'role';
+    public static function getEntityType(): string
+    {
+        return 'role';
+    }
+
 
     /**
      * @inheritdoc
      */
-    public function canBeTargetedByUser(User $user): bool
+    public static function isValidNullEntityValue(): bool
     {
-        if (parent::canBeTargetedByUser($user)) {
+        // All users have a role
+        return false;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canAudienceToEntityType(User $user): bool
+    {
+        if (parent::canAudienceToEntityType($user)) {
             return true;
         }
         return $this->getStaffCanPost() && $user->getRole()->isStaff();
@@ -28,12 +42,13 @@ class Strategy extends StrategyBase
     /**
      * @inheritdoc
      */
-    public function getSearchSql(string $searchPlaceholder = null): string
+    public function getSearchSql(User $user, string $searchPlaceholder = null): string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "AND `name` LIKE :{$searchPlaceholder}";
 
+        $entityType = self::getEntityType();
         return "
-            SELECT id, name, '{$this->getEntityType()}' AS entity_type
+            SELECT id, name, '{$entityType}' AS entity_type
             FROM groups
             WHERE deleted_at IS NULL
             {$keywordFilter}
@@ -46,10 +61,11 @@ class Strategy extends StrategyBase
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
+        $entityType = self::getEntityType();
         return "
             SELECT DISTINCT cna.entity_type, cna.entity_value, groups.name AS `name`
             FROM comms_news_audience cna
-            INNER JOIN groups ON cna.entity_type = '{$this->getEntityType()}' AND cna.entity_value = groups.id
+            INNER JOIN groups ON cna.entity_type = '{$entityType}' AND cna.entity_value = groups.id
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }

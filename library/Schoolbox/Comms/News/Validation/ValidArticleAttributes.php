@@ -17,6 +17,7 @@ use Alaress\Specification;
  * * publish date
  * * expiry data
  * * publish <= expiry
+ * * an audience of some sort
  */
 class ValidArticleAttributes extends Specification\Leaf
 {
@@ -35,7 +36,8 @@ class ValidArticleAttributes extends Specification\Leaf
         $hasTitle =  '' !== trim($article->getTitle() ?? '');
         $hasPublishDate = $article->getPublishAt() !== null && !$article->getPublishAt()->isNull();
         $hasExpiryDate = $article->getExpiresAt() !== null && !$article->getExpiresAt()->isNull();
+        $hasAudience = $article->getAudience()->count() > 0;
 
-        return $hasTitle && $hasPublishDate && $hasExpiryDate && $article->getPublishAt()->lte($article->getExpiresAt());
+        return $hasTitle && $hasPublishDate && $hasExpiryDate && $article->getPublishAt()->lte($article->getExpiresAt()) && $hasAudience;
     }
 }

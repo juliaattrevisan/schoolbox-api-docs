@@ -43,6 +43,7 @@ class HaveReadPermToAudience extends ArticleAttribute
      * @inheritdoc
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
     public function authorize(array $params = [], User $user = null): void
     {
@@ -70,14 +71,14 @@ class HaveReadPermToAudience extends ArticleAttribute
      * @param Audience\Model $segment
      * @return bool
      * @throws InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      */
     private function haveReadPermToSegmentAudience(User $user, Audience\Model $segment): bool
     {
         // Base Case
-        $entityType = $segment->getEntityType();
-        if (Audience\Model::ENTITY_TYPE_COMPOSITE !== $entityType) {
-            $strategy = $this->strategyFactory->make($entityType, $user);
-            return $strategy->canViewEntityValue($user, $entityType);
+        if ($segment->isSimple()) {
+            $strategy = $this->strategyFactory->makeStrategy($segment->getEntityType());
+            return $strategy->canViewArticleAudiencedToEntityValue($user, $segment->getEntityType(), $segment->getRelationship());
         }
 
         // Recursive Case - segment must have 1+ children, and user must have READ+ perm to them all

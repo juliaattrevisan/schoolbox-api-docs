@@ -1,0 +1,138 @@
+<?php
+/**
+ * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+declare(strict_types=1);
+
+namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
+
+use Schoolbox\Comms\News\Audience;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\User;
+use Schoolbox\Mapper;
+use Schoolbox\Comms\News\Audience\Segment\ISimpleStrategy;
+
+/**
+ * Common logic and safe-defaults for simple (ie not composite) Audience segment strategies
+ */
+abstract class SimpleStrategy implements ISimpleStrategy
+{
+
+    /** @var UserAccessMapper */
+    private $userAccessMapper;
+
+    /** @var bool */
+    private $staffCanPost;
+
+    /** @var bool */
+    private $moderationRequired;
+
+
+    /**
+     * @param UserAccessMapper $userAccessMapper
+     * @param bool             $staffCanPost
+     * @param bool             $moderationRequired
+     */
+    public function __construct(UserAccessMapper $userAccessMapper, bool $staffCanPost, bool $moderationRequired)
+    {
+        $this->userAccessMapper   = $userAccessMapper;
+        $this->staffCanPost       = $staffCanPost;
+        $this->moderationRequired = $moderationRequired;
+    }
+
+
+    /**
+     * @return string
+     */
+    abstract public static function getEntityType(): string;
+
+
+    /**
+     * @inheritdoc
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function canAudienceToEntityType(User $user): bool
+    {
+        // Default to only SU and users with WRITE+ News Service Perm
+        return $user->isSuperuser() || $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE);
+    }
+
+
+    /**
+     * @inheritdoc
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function canAudienceToEntityValue(User $user, ?string $entityValue): bool
+    {
+        // Superusers and News Moderators can audience to any entity value
+        return $user->isSuperuser() || $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE);
+    }
+
+
+    /**
+     * Returns whether the user has at least the specified News Service permission
+     *
+     * @param User $user
+     * @param int  $accessLevel
+     * @return bool
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    protected function hasNewsServicePerm(User $user, int $accessLevel): bool
+    {
+        return $this->userAccessMapper->getAccess($user, null, UserAccess::SERVICE_NEWS) >= $accessLevel;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public static function getValidRelationshipModifiers(): array
+    {
+        // Safe default it to not permit relationship modification
+        return [Audience\Model::RELATIONSHIP_SELF];
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canViewArticleAudiencedToEntityValue(User $user, ?string $entityValue, string $modifier): bool
+    {
+        // TODO default to false for now
+        return false;
+    }
+
+
+    /**
+     * @@inheritdoc
+     * @throws Mapper\Exception
+     */
+    public function canModerate(User $user, ?string $entityValue): bool
+    {
+        // Default implementation
+        return
+            $user->isSuperuser() ||
+            $this->hasNewsServicePerm($user, UserAccess::ACCESS_FULL) ||
+            ($user->getRole()->isStaff() && !$this->moderationRequired);
+    }
+
+
+    /**
+     * @return bool
+     */
+    protected function getStaffCanPost(): bool
+    {
+        return $this->staffCanPost;
+    }
+
+
+    /**
+     * @return UserAccessMapper
+     */
+    protected function getUserAccessMapper(): UserAccessMapper
+    {
+        return $this->userAccessMapper;
+    }
+}

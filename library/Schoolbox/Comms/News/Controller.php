@@ -17,7 +17,7 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
+use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Config\ConfigMapper;
@@ -31,6 +31,7 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Resource\Storage;
 
 class Controller extends Base
 {
@@ -151,6 +152,8 @@ class Controller extends Base
      * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException
+     * @throws InvalidArgumentException
+     * @throws UnknownEntityTypeException
      */
     public function getCreate(): void
     {
@@ -190,12 +193,12 @@ class Controller extends Base
         $entityType = $this->getRequest()->query->get('type');
 
         // Hard-coded to folder (for now)
-        if ($groupId && $entityType && $entityType === Audience\Segment\EntityType\Folder\Strategy::ENTITY_TYPE) {
-            $folderStrategy = $this->strategyFactory->makeStrategy($entityType, $this->getUser());
+        if ($groupId && $entityType && $entityType === Audience\Segment\Strategy\Folder::getEntityType()) {
+            $folderStrategy = $this->strategyFactory->makeSimpleStrategy($entityType);
             // Ensure the user is permitted to target this entity type
-            if ($folderStrategy->canBeTargetedByUser($this->getUser())) {
+            if ($folderStrategy->canAudienceToEntityType($this->getUser())) {
                 // Ensure the user is permitted to target this entity value
-                $availableFolders   = $this->databaseInternal->executeQuery($folderStrategy->getSearchSql())->fetchAll();
+                $availableFolders   = $this->databaseInternal->executeQuery($folderStrategy->getSearchSql($this->getUser()))->fetchAll();
                 $availableFolderIds = \array_column($availableFolders, 'id');
                 if (\in_array($groupId, $availableFolderIds, false)) {
                     $codec = new Audience\Segment\Codec($this->audienceMapper);
@@ -218,7 +221,7 @@ class Controller extends Base
             'featureImageZone'     => $zone->getTwigContext(),
             'isAutoSavable'        => !$article->isApproved(),
             'audienceSegments'     => $audienceSegments,
-            'availableEntityTypes' => $this->getAvailableAudienceStrategyEntityTypes($strategyFactory),
+            'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -226,7 +229,7 @@ class Controller extends Base
     /**
      * Create a news article
      *
-     * @api POST /comms/news/create
+     * @api   POST /comms/news/create
      * @level 18.1
      *
      * @throws InvalidArgumentException
@@ -236,6 +239,7 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
     public function postCreate(): void
     {
@@ -280,7 +284,7 @@ class Controller extends Base
             $this->databaseInternal,
             $this->strategyFactory
         );
-        $translator->buildCache($article, $this->getUser());
+        $translator->buildCache($article);
 
         // Audiencing selectize data
         $audienceSegments = [];
@@ -308,7 +312,7 @@ class Controller extends Base
             'featureImageZone'       => $zone->getTwigContext(),
             'audienceSegments'       => $audienceSegments,
             'isAutoSavable'          => !$article->isApproved(),
-            'availableEntityTypes'   => $this->getAvailableAudienceStrategyEntityTypes($this->strategyFactory),
+            'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -327,6 +331,7 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
     public function postUpdate(Model $article): void
     {
@@ -408,12 +413,13 @@ class Controller extends Base
      * @param Model                          $article
      * @param array|\Aura\Web\Request\Values $data
      * @return void
-     * @throws InvalidArgumentException
+     * @throws UnknownEntityTypeException
      * @throws MapperException
      * @throws MapperException\InsufficientHydrationException
      * @throws \PDOException
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
     private function persist(Model $article, array $data): void
     {
@@ -446,7 +452,9 @@ class Controller extends Base
          * Otherwise clear it (remove a Feature Image)
          */
         if (\is_array($data['attachment'])) {
-            $article->setFeatureImage((new CollectorFactory())->build($data['attachment'] ?: [])->getFirst());
+            /** @var Storage\Model $featureImage */
+            $featureImage = (new CollectorFactory())->build($data['attachment'] ?: [])->getFirst();
+            $article->setFeatureImage($featureImage);
         } else {
             $article->setFeatureImage(null);
         }
@@ -564,14 +572,22 @@ class Controller extends Base
         $this->response->content->set($output);
     }
 
+
     /**
      * Get a list of articles that are audienced to me for homepage component
      *
      * @api GET /comms/news/lists/homepage
      *
+     * @throws InvalidArgumentException
      * @throws MapperException
      * @throws RouteNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
+     * @throws \OutOfRangeException
+     * @throws \PDOException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     public function getListForHomepage() :void
     {
@@ -871,6 +887,7 @@ class Controller extends Base
      * @api GET /comms/news/me
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getAuthored($status, $pageNum)
     {
@@ -1074,17 +1091,17 @@ class Controller extends Base
 
 
     /**
-     * @param StrategyFactory $strategyFactory
+     * Returns the set of audience type strategies which the session user is permitted to audience to
+     *
      * @return string[]
-     * @throws InvalidArgumentException
-     * @throws \UnexpectedValueException
+     * @throws UnknownEntityTypeException
      */
-    private function getAvailableAudienceStrategyEntityTypes(StrategyFactory $strategyFactory): array
+    private function getAvailableAudienceTypeStrategies(): array
     {
         $availableStrategies = [];
-        foreach($strategyFactory->makeAllStrategies($this->getUser()) as $strategy){
-            if($strategy->canBeTargetedByUser($this->getUser())){
-                $availableStrategies[] = $strategy->getEntityType();
+        foreach($this->strategyFactory->makeAllSimpleStrategies() as $strategy){
+            if($strategy->canAudienceToEntityType($this->getUser())){
+                $availableStrategies[] = $strategy::getEntityType();
             }
         }
         return $availableStrategies;

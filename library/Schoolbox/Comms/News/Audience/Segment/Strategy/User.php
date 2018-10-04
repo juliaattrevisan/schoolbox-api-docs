@@ -5,20 +5,37 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Comms\News\Audience\Segment\EntityType\User;
+namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience\Segment\EntityType\StrategyBase;
+use Schoolbox\Comms\News\Audience\Segment\Strategy\SimpleStrategy;
 
-class Strategy extends StrategyBase
+class User extends SimpleStrategy
 {
-    public const ENTITY_TYPE = 'user';
+
+    /**
+     * @return string
+     */
+    public static function getEntityType(): string
+    {
+        return 'user';
+    }
 
     /**
      * @inheritdoc
      */
-    public function canBeTargetedByUser(\Schoolbox\User $user): bool
+    public static function isValidNullEntityValue(): bool
     {
-        if (parent::canBeTargetedByUser($user)) {
+        // All users are users
+        return false;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canAudienceToEntityType(\Schoolbox\User $user): bool
+    {
+        if (parent::canAudienceToEntityType($user)) {
             return true;
         }
         return $this->getStaffCanPost() && $user->getRole()->isStaff();
@@ -27,12 +44,13 @@ class Strategy extends StrategyBase
     /**
      * @inheritdoc
      */
-    public function getSearchSql(string $searchPlaceholder = null): string
+    public function getSearchSql(\Schoolbox\User $user, string $searchPlaceholder = null): string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "AND (firstname LIKE :{$searchPlaceholder} OR lastname LIKE :{$searchPlaceholder})";
 
+        $entityType = self::getEntityType();
         return "
-            SELECT id, CONCAT(firstname, ' ', lastname) AS name, '{$this->getEntityType()}' AS entity_type
+            SELECT id, CONCAT(firstname, ' ', lastname) AS name, '{$entityType}' AS entity_type
             FROM `user`
             WHERE deleted_at IS NULL
             {$keywordFilter}
@@ -45,10 +63,11 @@ class Strategy extends StrategyBase
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
+        $entityType = self::getEntityType();
         return "
             SELECT DISTINCT cna.entity_type, cna.entity_value, CONCAT(firstname, ' ', lastname) AS `name`
             FROM comms_news_audience cna
-            INNER JOIN `user` ON cna.entity_type = '{$this->getEntityType()}' AND cna.entity_value = `user`.id
+            INNER JOIN `user` ON cna.entity_type = '{$entityType}' AND cna.entity_value = `user`.id
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }

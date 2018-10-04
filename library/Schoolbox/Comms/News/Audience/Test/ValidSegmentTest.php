@@ -15,8 +15,10 @@ use Schoolbox\Role;
 use Alaress\Specification;
 use Schoolbox\Comms\News\Audience\Validation;
 use Schoolbox\Comms\News\Audience\Segment\EntityType;
-use Schoolbox\User;
 
+/**
+ * For testing a segment is inherently validly constructed, as opposed to any user authorisation logic
+ */
 class ValidSegmentTest extends PHPUnit\Framework\TestCase
 {
 
@@ -32,42 +34,12 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
         parent::setUp();
 
         // Ensure the relationship is valid for the segment's entity type
-        // TODO should be able to pull these from the IStrategy interface sub-interface instead of having to Mock
-        $validRelationships = [
-            Audience\Model::ENTITY_TYPE_COMPOSITE          => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
-
-            EntityType\User\Strategy::ENTITY_TYPE          => [Audience\Model::RELATIONSHIP_SELF],
-            EntityType\Super\Strategy::ENTITY_TYPE         => [Audience\Model::RELATIONSHIP_SELF],
-            EntityType\Campus\Strategy::ENTITY_TYPE        => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
-            EntityType\Role\Strategy::ENTITY_TYPE          => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
-            EntityType\RoleType\Strategy::ENTITY_TYPE      => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
-            EntityType\SchoolHouse\Strategy::ENTITY_TYPE   => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
-            EntityType\ResHouse\Strategy::ENTITY_TYPE      => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
-            EntityType\Year\Strategy::ENTITY_TYPE          => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
-            EntityType\Service\Strategy::ENTITY_TYPE       => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
-            EntityType\PastoralGroup\Strategy::ENTITY_TYPE => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
-            EntityType\Folder\Strategy::ENTITY_TYPE        => [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF],
-        ];
-
+        $validRelationships = Audience\Segment\StrategyFactory::getValidRelationshipModifiers();
 
         // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
-        // TODO should be able to pull these from the IStrategy interface sub-interface instead of having to Mock
-        $validNullEntities = [
-            Audience\Model::ENTITY_TYPE_COMPOSITE          => true,
-            EntityType\User\Strategy::ENTITY_TYPE          => false,
-            EntityType\Super\Strategy::ENTITY_TYPE         => false,
-            EntityType\Campus\Strategy::ENTITY_TYPE        => true,
-            EntityType\Role\Strategy::ENTITY_TYPE          => false,
-            EntityType\RoleType\Strategy::ENTITY_TYPE      => false,
-            EntityType\SchoolHouse\Strategy::ENTITY_TYPE   => true,
-            EntityType\ResHouse\Strategy::ENTITY_TYPE      => true,
-            EntityType\Year\Strategy::ENTITY_TYPE          => true,
-            EntityType\Service\Strategy::ENTITY_TYPE       => false,
-            EntityType\PastoralGroup\Strategy::ENTITY_TYPE => true,
-            EntityType\Folder\Strategy::ENTITY_TYPE        => true,
-        ];
+        $validNullEntities      = Audience\Segment\StrategyFactory::getValidNullEntities();
         $factory                = new Validation\Factory($validRelationships, $validNullEntities);
-        $this->validSegmentSpec = $factory->makeValidSegmentSpecification(new User());
+        $this->validSegmentSpec = $factory->makeValidSegmentSpecification();
     }
 
 
@@ -119,7 +91,6 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
 
     /**
      * @return array
-     * @throws \UnexpectedValueException
      */
     public function provider_validSimpleRootSegment(): array
     {
@@ -128,7 +99,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 (new Audience\Model())
                     ->setId(1)
                     ->setCommsNewsArticle(new News\Model())
-                    ->setEntityType(EntityType\User\Strategy::ENTITY_TYPE)
+                    ->setEntityType(Audience\Segment\Strategy\User::getEntityType())
                     ->setEntityValue('230')
                     ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
             ],
@@ -136,15 +107,15 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 (new Audience\Model())
                     ->setId(2)
                     ->setCommsNewsArticle(new News\Model())
-                    ->setEntityType(EntityType\Super\Strategy::ENTITY_TYPE)
-                    ->setEntityValue(Audience\Model::ENTITY_VALUE_SUPER)
+                    ->setEntityType(Audience\Segment\Strategy\Super::getEntityType())
+                    ->setEntityValue(Audience\Segment\Strategy\Super::ENTITY_VALUE)
                     ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
             ],
             [
                 (new Audience\Model())
                     ->setId(3)
                     ->setCommsNewsArticle(new News\Model())
-                    ->setEntityType(EntityType\Campus\Strategy::ENTITY_TYPE)
+                    ->setEntityType(Audience\Segment\Strategy\Campus::getEntityType())
                     ->setEntityValue('2')
                     ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
             ],
@@ -152,7 +123,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 (new Audience\Model())
                     ->setId(4)
                     ->setCommsNewsArticle(new News\Model())
-                    ->setEntityType(EntityType\RoleType\Strategy::ENTITY_TYPE)
+                    ->setEntityType(Audience\Segment\Strategy\RoleType::getEntityType())
                     ->setEntityValue(Role::STUDENT)
                     ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
             ],
@@ -162,7 +133,6 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
 
     /**
      * @return array
-     * @throws \UnexpectedValueException
      */
     public function provider_invalidSimpleRootSegment(): array
     {
@@ -170,7 +140,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
             [
                 (new Audience\Model())
                     ->setId(1)
-                    ->setEntityType(EntityType\User\Strategy::ENTITY_TYPE)
+                    ->setEntityType(Audience\Segment\Strategy\User::getEntityType())
                     ->setEntityValue('230')
                     ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
                 Specification\ExclusiveOr::class,
@@ -181,8 +151,8 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                     ->setId(2)
                     ->setCommsNewsArticle(new News\Model())
                     ->setParent(new Audience\Model())
-                    ->setEntityType(EntityType\Super\Strategy::ENTITY_TYPE)
-                    ->setEntityValue(Audience\Model::ENTITY_VALUE_SUPER)
+                    ->setEntityType(Audience\Segment\Strategy\Super::getEntityType())
+                    ->setEntityValue(Audience\Segment\Strategy\Super::ENTITY_VALUE)
                     ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
                 Specification\ExclusiveOr::class,
                 'Article and parent',
@@ -191,7 +161,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 (new Audience\Model())
                     ->setId(3)
                     ->setCommsNewsArticle(new News\Model())
-                    ->setEntityType(EntityType\RoleType\Strategy::ENTITY_TYPE)
+                    ->setEntityType(Audience\Segment\Strategy\RoleType::getEntityType())
                     ->setEntityValue(Role::STUDENT),
                 Specification\Conjunction::class,
                 'No relationship',
@@ -200,7 +170,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 (new Audience\Model())
                     ->setId(4)
                     ->setCommsNewsArticle(new News\Model())
-                    ->setEntityType(Audience\Model::ENTITY_TYPE_COMPOSITE)
+                    ->setEntityType(Audience\Segment\Strategy\Composite::getEntityType())
                     ->setRelationship(Audience\Model::RELATIONSHIP_SELF),
                 Specification\ExclusiveOr::class,
                 'No children of composite',
@@ -211,7 +181,6 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
 
     /**
      * @return array
-     * @throws \UnexpectedValueException
      */
     public function provider_invalidSegmentTrees(): array
     {
@@ -219,19 +188,19 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
         $grandparent = (new Audience\Model())
             ->setId(1)
             ->setCommsNewsArticle(new News\Model())
-            ->setEntityType(Audience\Model::ENTITY_TYPE_COMPOSITE)
+            ->setEntityType(Audience\Segment\Strategy\Composite::getEntityType())
             ->setRelationship(Audience\Model::RELATIONSHIP_SELF);
 
         $parent = (new Audience\Model())
             ->setId(2)
             ->setParent($grandparent)
-            ->setEntityType(Audience\Model::ENTITY_TYPE_COMPOSITE)
+            ->setEntityType(Audience\Segment\Strategy\Composite::getEntityType())
             ->setRelationship(Audience\Model::RELATIONSHIP_SELF);
 
         $grandchild = (new Audience\Model())
             ->setId(2)
             ->setParent($parent)
-            ->setEntityType(EntityType\User\Strategy::ENTITY_TYPE)
+            ->setEntityType(Audience\Segment\Strategy\User::getEntityType())
             ->setRelationship(Audience\Model::RELATIONSHIP_SELF);
 
         $grandparent->getChildren()[] = $parent;

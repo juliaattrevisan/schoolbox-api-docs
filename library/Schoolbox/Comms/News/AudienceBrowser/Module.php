@@ -1,7 +1,5 @@
 <?php
 /**
- * Module
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -14,7 +12,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
 {
@@ -58,7 +56,7 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'db'               => $injector->lazyGet('databaseInternal'),
             'audienceMapper'   => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
-            'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+            'folderMapper'     => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
             'strategyFactory'  => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
         ];
     }

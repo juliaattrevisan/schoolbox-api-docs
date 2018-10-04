@@ -74,7 +74,7 @@ class UserResolver implements IUserResolver
         /** @var Audience $segment */
         $segment = $rootSegments->first();
 
-        if ($segment->getEntityType() !== EntityType\Folder\Strategy::ENTITY_TYPE || $segment->getRelationship() !== Audience::RELATIONSHIP_SELF) {
+        if ($segment->getEntityType() !== \Schoolbox\Comms\News\Audience\Segment\Strategy\Folder::getEntityType() || $segment->getRelationship() !== Audience::RELATIONSHIP_SELF) {
             // not a trivial folder segment; bounce this
             return $moderators;
         }

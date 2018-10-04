@@ -13,48 +13,15 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Comms\News\Audience\Segment\EntityType;
 
 class Model
 {
-    // A composite audience segment is composed of the intersection of 2 or more simple segments
-    public const ENTITY_TYPE_COMPOSITE      = 'composite';          // Values = [NULL]
-
-    // Simple audience segments - TODO deprecated. Use the IStrategy::getEntityType() interface instead.
-    /** @deprecated */
-    public const ENTITY_TYPE_USER           = EntityType\User\Strategy::ENTITY_TYPE;               // Values = [1,2,...]
-    /** @deprecated */
-    public const ENTITY_TYPE_SUPER          = EntityType\Super\Strategy::ENTITY_TYPE;              // Values = [1]
-    /** @deprecated */
-    public const ENTITY_TYPE_CAMPUS         = EntityType\Campus\Strategy::ENTITY_TYPE;             // Values = [1,2,...]
-    /** @deprecated */
-    public const ENTITY_TYPE_ROLE           = EntityType\Role\Strategy::ENTITY_TYPE;               // Values = [1,2,...]
-    /** @deprecated */
-    public const ENTITY_TYPE_ROLE_TYPE      = EntityType\RoleType\Strategy::ENTITY_TYPE;           // Values = []
-    /** @deprecated */
-    public const ENTITY_TYPE_SCHOOL_HOUSE   = EntityType\SchoolHouse\Strategy::ENTITY_TYPE;        // Values = [NULL,1,2,...]
-    /** @deprecated */
-    public const ENTITY_TYPE_RES_HOUSE      = EntityType\ResHouse\Strategy::ENTITY_TYPE;           // Values = [NULL,1,2,...]
-    /** @deprecated */
-    public const ENTITY_TYPE_YEAR           = EntityType\Year\Strategy::ENTITY_TYPE;               // Values = [NULL,1,2,...]
-    /** @deprecated */
-    public const ENTITY_TYPE_SERVICE        = EntityType\Service\Strategy::ENTITY_TYPE;            // Values = ['1.43.3','2.3.*',...]
-    /** @deprecated */
-    public const ENTITY_TYPE_PASTORAL_GROUP = EntityType\PastoralGroup\Strategy::ENTITY_TYPE;      // Values = [NULL,1,2,...]
-    /** @deprecated */
-    public const ENTITY_TYPE_FOLDER         = EntityType\Folder\Strategy::ENTITY_TYPE;             // Values = [NULL,1,2,...]
-
     // Any audience modifier?
     public const RELATIONSHIP_SELF        = 'self';                 // eg, Audience = the user 15
     public const RELATIONSHIP_PARENTS_OF  = 'parents_of';           // eg, Audience = parents of user 15
     public const RELATIONSHIP_TEACHERS_OF = 'teachers_of';          // eg, Audience = teachers of user 15
 
-    // The value of segments targeted to superusers
-    public const ENTITY_VALUE_SUPER       = '1';
-
-
     public const DEPTH_SEGMENT_TREE_MAX   = 1;
-
 
     /**
      * Returns the set of valid relationship modifiers
@@ -109,7 +76,7 @@ class Model
         if (null === $this->entityType) {
             throw new InsufficientHydrationException('Cannot determine if simple/composite if not hydrated');
         }
-        return self::ENTITY_TYPE_COMPOSITE === $this->entityType;
+        return Segment\Strategy\Composite::getEntityType() === $this->entityType;
     }
 
 

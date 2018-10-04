@@ -5,21 +5,35 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Comms\News\Audience\Segment\EntityType\RoleType;
+namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Comms\News\Audience\Segment\EntityType\StrategyBase;
+use Schoolbox\Comms\News\Audience\Segment\Strategy\SimpleStrategy;
 use Schoolbox\User;
 
-class Strategy extends StrategyBase
+class ResHouse extends SimpleStrategy
 {
 
-    public const ENTITY_TYPE = 'role_type';
+    public static function getEntityType(): string
+    {
+        return 'res_house';
+    }
 
     /**
      * @inheritdoc
      */
-    public function getSearchSql(string $searchPlaceholder = null): string
+    public static function isValidNullEntityValue(): bool
+    {
+        // Users have 0:1 residential houses
+        return true;
+    }
+
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(User $user, string $searchPlaceholder = null): string
     {
         return "SELECT 0, 'name todo', 'type todo' from dual WHERE false"; // TODO
     }
@@ -37,9 +51,8 @@ class Strategy extends StrategyBase
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(User $user): array
+    public static function getValidRelationshipModifiers(): array
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }
 }
-

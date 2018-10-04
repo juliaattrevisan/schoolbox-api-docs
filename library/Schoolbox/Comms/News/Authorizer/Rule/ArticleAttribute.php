@@ -21,7 +21,7 @@ abstract class ArticleAttribute implements IAuthorizationRule
      * @param array  $params
      * @param string $key
      * @return News\Model
-     * @throws UnexpectedValueException
+     * @throws UnexpectedValueException If no article found in params
      */
     protected function findArticleInParams(array $params, string $key = 'article'): News\Model
     {

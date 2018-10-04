@@ -206,7 +206,7 @@ function createSchoolNewsUserAudience(IDatabase $db, int $oldId, int $articleId,
          */
         $db->query("
             INSERT INTO `comms_news_audience` (comms_news_article_id, entity_type,  entity_value, relationship)
-            VALUES ('{$articleId}', '". EntityType\User\Strategy::ENTITY_TYPE."', '{$user['id']}', '".Model::RELATIONSHIP_SELF."')
+            VALUES ('{$articleId}', '". \Schoolbox\Comms\News\Audience\Segment\Strategy\User::getEntityType()."', '{$user['id']}', '".Model::RELATIONSHIP_SELF."')
         ");
 
         /* Log it
@@ -242,7 +242,7 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
              */
             $db->query("
                 INSERT INTO `comms_news_audience` (comms_news_article_id, entity_type, relationship)
-                VALUES ('{$articleId}', '".Model::ENTITY_TYPE_COMPOSITE."', '".Model::RELATIONSHIP_SELF."');
+                VALUES ('{$articleId}', '". \Schoolbox\Comms\News\Audience\Segment\Strategy\Composite::getEntityType()."', '".Model::RELATIONSHIP_SELF."');
             ");
 
             $compositeSegmentId = $db->lastInsertId();
@@ -255,7 +255,7 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
              */
             $db->query("
                 INSERT INTO `comms_news_audience` (parent_id, entity_type, entity_value, relationship)
-                VALUES ('{$compositeSegmentId}', '". EntityType\Campus\Strategy::ENTITY_TYPE."', '{$campusId}', '".Model::RELATIONSHIP_SELF."')
+                VALUES ('{$compositeSegmentId}', '". \Schoolbox\Comms\News\Audience\Segment\Strategy\Campus::getEntityType()."', '{$campusId}', '".Model::RELATIONSHIP_SELF."')
             ");
 
             /* Log it
@@ -266,7 +266,7 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
              */
             $db->query("
                 INSERT INTO `comms_news_audience` (parent_id, entity_type, entity_value, relationship)
-                VALUES ('{$compositeSegmentId}', '". EntityType\Role\Strategy::ENTITY_TYPE."', '{$roleId}', '".Model::RELATIONSHIP_SELF."')
+                VALUES ('{$compositeSegmentId}', '". \Schoolbox\Comms\News\Audience\Segment\Strategy\Role::getEntityType()."', '{$roleId}', '".Model::RELATIONSHIP_SELF."')
             ");
 
             /* Log it
@@ -425,7 +425,7 @@ function createHomepageNewsAudience(IDatabase $db, int $oldId, int $articleId, L
     foreach ($folders as $folder) {
         $db->query("
             INSERT INTO `comms_news_audience` (comms_news_article_id, entity_type,  entity_value, relationship)
-            VALUES ('{$articleId}', '" . EntityType\Folder\Strategy::ENTITY_TYPE . "', '{$folder['id']}', '" . Model::RELATIONSHIP_SELF . "')
+            VALUES ('{$articleId}', '" . \Schoolbox\Comms\News\Audience\Segment\Strategy\Folder::getEntityType() . "', '{$folder['id']}', '" . Model::RELATIONSHIP_SELF . "')
         ");
 
         /* Log it

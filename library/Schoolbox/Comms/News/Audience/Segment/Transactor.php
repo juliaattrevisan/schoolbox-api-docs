@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News\Audience\Segment;
 use Alaress\Specification\Exception\UnsatisfiedException;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use UnexpectedValueException;
@@ -68,7 +69,7 @@ class Transactor
      * @throws Mapper\Exception\InsufficientHydrationException
      * @throws \DomainException
      * @throws UnexpectedValueException
-     * @throws InvalidArgumentException
+     * @throws UnknownEntityTypeException
      */
     public function save(News\Model $article, string $selectizeAudienceSegments): bool
     {
@@ -139,7 +140,7 @@ class Transactor
      * @return bool
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
-     * @throws InvalidArgumentException
+     * @throws UnknownEntityTypeException
      * @throws UnsatisfiedException
      */
     private function saveAddedSegments(News\Model $article, GenericCollection $segmentsToAdd): bool
@@ -147,22 +148,22 @@ class Transactor
         $isSegmentsAdded = false;
         if ($segmentsToAdd->count()) {
 
-            $strategies = $this->strategyFactory->makeAllStrategies();
+            $strategies = $this->strategyFactory->makeAllSimpleStrategies();
 
             // Ensure the relationship is valid for the segment's entity type
             // TODO remove this hard-code hack, should be provided by the factory
             $validRelationships = [
-                Audience\Model::ENTITY_TYPE_COMPOSITE => (new Audience\Segment\EntityType\Composite())->getValidRelationshipModifiers($this->sessionUser),
+                Strategy\Composite::getEntityType() => (new Strategy\Composite())::getValidRelationshipModifiers(),
             ];
             // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
             $validNullEntities = [];
             foreach ($strategies as $strategy) {
-                $validRelationships[$strategy->getEntityType()] = $strategy->getValidRelationshipModifiers($this->sessionUser);
-                $validNullEntities[$strategy->getEntityType()]  = $strategy->canTargetNullEntityValue();
+                $validRelationships[$strategy::getEntityType()] = $strategy::getValidRelationshipModifiers();
+                $validNullEntities[$strategy::getEntityType()]  = $strategy::isValidNullEntityValue();
             }
 
             $validSegmentSpecFactory = new Audience\Validation\Factory($validRelationships, $validNullEntities);
-            $validSegmentSpec        = $validSegmentSpecFactory->makeValidSegmentSpecification($this->sessionUser);
+            $validSegmentSpec        = $validSegmentSpecFactory->makeValidSegmentSpecification();
 
 
             foreach ($segmentsToAdd as $segmentToAdd) {
