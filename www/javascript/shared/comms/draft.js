@@ -67,7 +67,7 @@
                 /* Activation element
                  * The thing that gets disabled while saving
                  */
-                activator: element.find('input[type=submit]'),
+                activator: element.find('button[type=submit]'),
 
                 /**
                  * Called on successful save.
@@ -245,9 +245,6 @@
                  */
                 config.element.attr('action', responseText.formAction);
                 config.element.attr('data-action-submit', responseText.formActionSubmit);
-
-                // Enable submit buttons
-                config.element.find('button[type=submit]').prop('disabled', false);
 
                 /* hehe
                  */
