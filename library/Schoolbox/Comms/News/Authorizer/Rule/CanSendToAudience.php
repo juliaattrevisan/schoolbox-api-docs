@@ -13,6 +13,7 @@ use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\Validation\ValidUserCanAudienceTo;
 use Schoolbox\User;
 use UnexpectedValueException;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 
 /**
  * Checks the user is permitted to audience to the article's proposed audience
@@ -45,6 +46,7 @@ class CanSendToAudience extends ArticleAttribute
      * @inheritdoc
      * @throws UnexpectedValueException If no article found in params
      * @throws UnknownEntityTypeException
+     * @throws InsufficientHydrationException
      */
     public function authorize(array $params = [], User $user = null): void
     {
