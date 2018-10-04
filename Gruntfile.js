@@ -137,7 +137,10 @@ var jsSrc = {
 
         // Feature tours
         'www/javascript/components/intro.js/intro.js',
-        'www/javascript/shared/tour/tour.js'
+        'www/javascript/shared/tour/tour.js',
+
+        // Lodash
+        'node_modules/lodash/lodash.js'
     ],
     masonry: [
         // Colour handling

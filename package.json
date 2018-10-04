@@ -5,6 +5,7 @@
   "description": "Schoolbox LMS",
   "dependencies": {
     "axios": "^0.18.0",
+    "lodash": "^4.17.11",
     "vue": "^2.5.16",
     "vuejs-paginate": "^2.0.1"
   },
