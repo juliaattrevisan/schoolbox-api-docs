@@ -62,7 +62,6 @@ class Controller extends Base
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
      * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getPolicies(): void
@@ -75,7 +74,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
             'pageCurrent'   => 'news',
-            'commsOfficers' => $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS),
+            'commsOfficers' => $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS, null, UserAccess::ACCESS_FULL),
             'configContext' => $configContext,
             'topics'        => $this->topicMapper->findAll(['order' => ['sequence' => 'asc']]),
         ])->setTitle('Comms Policies'));
