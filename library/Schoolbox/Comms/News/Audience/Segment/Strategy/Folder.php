@@ -165,12 +165,9 @@ class Folder extends SimpleStrategy
     public function getSearchSql(User $user, string $searchPlaceholder = null): string
     {
         $folderMembershipSql = '';
-        $noFolderSql         = '';
         $entityType          = self::getEntityType();
 
-        if ($this->canAudienceToAnyClassOrGroup($user)) {
-            $noFolderSql = " UNION  (SELECT NULL, 'None', '{$entityType}') ";
-        } else {
+        if (!$this->canAudienceToAnyClassOrGroup($user)) {
             // Get folders where user has required access via group/class individual permissions
             $groupAndClassMembership = $this->folderMapper->findFolderIdsForUser($user, true, UserAccess::ACCESS_WRITE);
 
