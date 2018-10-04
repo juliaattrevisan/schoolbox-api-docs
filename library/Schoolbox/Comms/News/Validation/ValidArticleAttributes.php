@@ -17,7 +17,6 @@ use Alaress\Specification;
  * * publish date
  * * expiry data
  * * publish <= expiry
- * * an audience of some sort
  */
 class ValidArticleAttributes extends Specification\Leaf
 {

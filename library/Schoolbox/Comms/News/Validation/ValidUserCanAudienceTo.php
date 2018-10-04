@@ -56,7 +56,7 @@ class ValidUserCanAudienceTo extends Specification\Leaf
     public function isSatisfiedBy($candidate): bool
     {
         // Articles must have an audience
-        if (!$candidate->getAudience() || !$candidate->getAudience()->count()) {
+        if (!$candidate->getAudience()->count()) {
             return false;
         }
 
