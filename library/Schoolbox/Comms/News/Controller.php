@@ -101,18 +101,19 @@ class Controller extends Base
 
     private const DEFAULT_SEARCH_LIMIT = 10;
 
+
     /**
-     * @param Mapper                       $newsMapper
-     * @param TopicMapper                  $topicMapper
-     * @param SaveForLater\Mapper          $saveForLaterMapper
-     * @param Statistics\Mapper            $statisticsMapper
-     * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
-     * @param Audience\Mapper              $audienceMapper
-     * @param Folder\Mapper                $folderMapper
-     * @param IConnector                   $databaseInternal
-     * @param Audience\ArticleResolver     $articleResolver
-     * @param Audience\UserResolver        $userResolver
-     * @param Validation\Factory           $validSpecFactory
+     * @param Mapper                           $newsMapper
+     * @param TopicMapper                      $topicMapper
+     * @param SaveForLater\Mapper              $saveForLaterMapper
+     * @param Statistics\Mapper                $statisticsMapper
+     * @param Statistics\Cumulative\Mapper     $statisticsCumulativeMapper
+     * @param Audience\Mapper                  $audienceMapper
+     * @param Folder\Mapper                    $folderMapper
+     * @param IConnector                       $databaseInternal
+     * @param Audience\ArticleResolver         $articleResolver
+     * @param Audience\UserResolver            $userResolver
+     * @param Validation\Factory               $validSpecFactory
      * @param Audience\Segment\StrategyFactory $strategyFactory
      */
     public function __construct(
@@ -646,11 +647,7 @@ class Controller extends Base
              *
              * TODO: Otherwise go...somewhere else? I don't have a component or dashboard yet
              */
-            $nextStep = '/';
-
-            if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
-                $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
-            }
+            $nextStep = $this->getRouteIfAuthorized('commsNewsModeration.getList') ?: '/';
 
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->content->set($this->buildJsonOutput([
