@@ -13,6 +13,7 @@ use Schoolbox\Comms\News\Audience;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use PDO;
 use UnexpectedValueException;
@@ -126,7 +127,7 @@ class Controller extends Base
 
         // Special case for folder, only show involved folders in the list
         if (Audience\Segment\Strategy\Folder::getEntityType() === $entityType) {
-            $involvedFolders = $this->folderMapper->findForUser($this->getUser());
+            $involvedFolders = $this->folderMapper->findForUser($this->getUser(), true, UserAccess::ACCESS_WRITE);
             foreach ($involvedFolders as $folder) {
                 $valueLabels[$codec->encodeValue((string)$folder->getId())] = $folder->getNameWithCodes();
             }
