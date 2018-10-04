@@ -92,10 +92,6 @@ class Controller extends Base
      */
     private $userResolver;
 
-    /** @var Validation\Factory */
-    private $validSpecFactory;
-
-
     /** @var Audience\Segment\StrategyFactory */
     private $strategyFactory;
 
@@ -113,7 +109,6 @@ class Controller extends Base
      * @param IConnector                       $databaseInternal
      * @param Audience\ArticleResolver         $articleResolver
      * @param Audience\UserResolver            $userResolver
-     * @param Validation\Factory               $validSpecFactory
      * @param Audience\Segment\StrategyFactory $strategyFactory
      */
     public function __construct(
@@ -127,7 +122,6 @@ class Controller extends Base
         IConnector $databaseInternal,
         Audience\ArticleResolver $articleResolver,
         Audience\UserResolver $userResolver,
-        Validation\Factory $validSpecFactory,
         Audience\Segment\StrategyFactory $strategyFactory
     ) {
         $this->newsMapper                 = $newsMapper;
@@ -138,7 +132,6 @@ class Controller extends Base
         $this->audienceMapper             = $audienceMapper;
         $this->folderMapper               = $folderMapper;
         $this->databaseInternal           = $databaseInternal;
-        $this->validSpecFactory           = $validSpecFactory;
         $this->articleResolver            = $articleResolver;
         $this->userResolver               = $userResolver;
         $this->strategyFactory            = $strategyFactory;
@@ -467,7 +460,6 @@ class Controller extends Base
 
         // Persist audience segments
         $transactor = new Audience\Segment\Transactor(
-            $this->getUser(),
             $this->audienceMapper,
             new Audience\Segment\Codec($this->audienceMapper),
             $this->strategyFactory

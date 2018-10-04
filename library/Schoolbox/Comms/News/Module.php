@@ -187,11 +187,6 @@ class Module extends BaseModule
             'databaseInternal'           => $injector->lazyGet('databaseInternal'),
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
             'userResolver'               => $injector->lazyGet('commsNewsUserResolver'),
-            'validSpecFactory'           => $injector->lazy(function () use ($injector) {
-                /** @var StrategyFactory $strategyFactory */
-                $strategyFactory = $injector->get('commsNewsAudienceStrategyFactory');
-                return new Validation\Factory($strategyFactory);
-            }),
             'strategyFactory'            => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
         ];
     }

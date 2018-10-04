@@ -14,17 +14,12 @@ use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use UnexpectedValueException;
-use Schoolbox\User;
-use InvalidArgumentException;
 
 /**
  * Responsible for the intricacies of news article audience segment persistence.
  */
 class Transactor
 {
-
-    /** @var User */
-    private $sessionUser;
 
     /** @var Audience\Mapper */
     private $audienceMapper;
@@ -37,18 +32,15 @@ class Transactor
 
 
     /**
-     * @param User             $sessionUser
      * @param Audience\Mapper  $audienceMapper
      * @param Codec            $codec
      * @param StrategyFactory  $strategyFactory
      */
     public function __construct(
-        User $sessionUser,
         Audience\Mapper $audienceMapper,
         Codec $codec,
         StrategyFactory $strategyFactory
     ) {
-        $this->sessionUser         = $sessionUser;
         $this->audienceMapper      = $audienceMapper;
         $this->codec               = $codec;
         $this->strategyFactory     = $strategyFactory;
