@@ -96,7 +96,7 @@ class StrategyFactory
     /**
      * Indexed by entity type
      *
-     * @return bool[]
+     * @return string[]
      */
     public static function getValidRelationshipModifiers(): array
     {
