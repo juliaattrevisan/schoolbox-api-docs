@@ -280,19 +280,6 @@
             removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe,link'
         });
 
-        {# Drafting mechanism #}
-        {% if isAutoSavable %}
-            {# Give selectizes a couple seconds to load their values before init'ing this,
-                otherwise they get registered as being empty, and a draft triggers when it gets populated #}
-            setTimeout(function() {
-                $('#createForm').draft({
-                    inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search', '#news-topics'],
-                    textareas: ['body', 'blurb'],
-                    attachzones: ['attachment']
-                });
-            }, 2000);
-        {% endif %}
-
         $('[data-topics]').selectizeSelector({
             ajax: {
                 url:      '{{ routeLookup('commsNews.getTopics') }}',
@@ -309,6 +296,15 @@
             ],
             multiple: true
         });
+
+        {# Drafting mechanism #}
+        {% if isAutoSavable %}
+            $('#createForm').draft({
+                inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search', '#news-topics'],
+                textareas: ['body', 'blurb'],
+                attachzones: ['attachment']
+            });
+        {% endif %}
     });
 
     /**
