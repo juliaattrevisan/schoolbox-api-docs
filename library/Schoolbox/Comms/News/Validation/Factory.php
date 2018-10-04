@@ -26,19 +26,6 @@ class Factory
 
 
     /**
-     * Returns a spec that defines an article able to be drafted:
-     * * Article cannot be audienced to segments where the user does not have READ+ perm
-     *
-     * @param User $effector
-     * @return ISpecification
-     */
-    public function buildSpecValidAudience(User $effector): ISpecification
-    {
-        return new ValidUserCanAudienceTo($effector, $this->strategyFactory);
-    }
-
-
-    /**
      * Returns a spec that encapsulates rules:
      * * Article cannot be audienced to segments where the user does not have READ+ perm
      * * Article has a title

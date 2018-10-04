@@ -20,6 +20,7 @@ use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\Comms\News\Validation\ValidUserCanAudienceTo;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
@@ -320,6 +321,10 @@ class Controller extends Base
     /**
      * Update a news article
      *
+     * Must not attempt to submit/un-submit/approve/reject an article.
+     *
+     * It may change the approved subState, eg AwaitingPublication/Published/Expired
+     *
      * @api   POST /comms/news/{articleId}
      * @level 18.1
      *
@@ -335,9 +340,7 @@ class Controller extends Base
      */
     public function postUpdate(Model $article): void
     {
-        $validAudience = $this->validSpecFactory->buildSpecValidAudience($this->getUser());
-
-        if (!$validAudience->isSatisfiedBy($article)) {
+        if (!$article->isDraft() && !(new ValidUserCanAudienceTo($this->getUser(), $this->strategyFactory))->isSatisfiedBy($article)) {
             $this->getResponse()->status->set(400);
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => false,
