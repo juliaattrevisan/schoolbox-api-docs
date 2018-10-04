@@ -82,7 +82,7 @@ INSERT INTO config (name, value, title, description, field_id, options, type_id,
 
 -- Staff can post to non-folder audiences (existing setting)
 UPDATE config SET
-  title       = 'Allow staff to post to all audiences',
+  title       = 'Allow staff to post to all non-folder audiences',
   description = 'If enabled, staff members can send news to campuses, roles, houses and year levels. Note that if moderation is enabled, articles will need to be approved by a moderator before going public.',
   module      = 'comms'
 WHERE name = 'news_staff_post_enabled';
