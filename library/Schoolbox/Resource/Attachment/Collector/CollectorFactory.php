@@ -104,10 +104,12 @@ class CollectorFactory
                         $this->loaders[$type] = false;
                     }
                     break;
+                default:
+                    throw new InvalidArgumentException("Loader for '$type' not defined.");
             }
         }
         if (empty($this->loaders[$type])) {
-            throw new InvalidArgumentException("Loader for '$type' not defined.");
+            throw new InvalidArgumentException("Unable to load handler for '$type'");
         }
 
         return $this->loaders[$type];
