@@ -1127,7 +1127,7 @@
         delimiters: ['${', '}'],
         data: {
             articleId: '{{ article.id }}',
-            requiresModeration: {{ not (approveRoute) }},
+            requiresModeration: '{{ not (approveRoute) }}',
             isSubmitted: '{{ not not (article.isSubmitted) }}'
         },
         computed: {
@@ -1138,7 +1138,7 @@
                     return 'Save';
                 }
 
-                return 'Publish';
+                return 'Publish {{ locale.news }}';
             }
         }
     });
