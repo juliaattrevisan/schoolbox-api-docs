@@ -10,6 +10,7 @@
  */
 class DAV_ExtendedClient extends Sabre\DAV\Client
 {
+
     /**
      * Uploads a file via a PUT request
      *
@@ -17,6 +18,7 @@ class DAV_ExtendedClient extends Sabre\DAV\Client
      * @param string|resource $file Path to source file, or a file resource
      *
      * @return array
+     * @throws InvalidArgumentException If we attempt to create an HTTP Request with invalid method
      */
     public function put($path, $file)
     {

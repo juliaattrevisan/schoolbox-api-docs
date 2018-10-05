@@ -10,7 +10,6 @@
 use Alaress\File\Remote\FetcherInterface;
 use Sabre\HTTP\ClientHttpException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\MimetypeMapper;
@@ -20,7 +19,6 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Resource\Folder\ILocator as FolderLocatorInterface;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\WebDav\LegacyConfiguration\Factory as LegacyConfigFactory;
 use Schoolbox\WebDav\Mapper as WebDavMapper;
@@ -108,11 +106,13 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     /** @var self $instance */
     private static $instance = null;
 
+
     /**
      * @param bool $lite
      * @return PortfolioWebDAV
      * @throws DomainException if no legacy config exists
      * @throws UnexpectedValueException if no user is logged in
+     * @throws InvalidArgumentException If code attempts to create a DAV client with invalid HTTP method
      */
     public static function factory($lite = false)
     {
