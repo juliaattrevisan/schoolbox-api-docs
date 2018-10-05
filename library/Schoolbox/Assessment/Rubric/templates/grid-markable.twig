@@ -49,11 +49,7 @@
                  #}
                 {% set capabilityMark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
 
-                {% if capabilityMark.value != 0 %}
-                    {% set rowspan = groupUsage.indicatorUsages|length + (showGroupTotal and rubricGrid.assessment.markPerCapability and markType.mode != "none" ? 1 : 0) %}
-                {% else %}
-                    {% set rowspan = (groupUsage.indicatorUsages|length + (showGroupTotal and rubricGrid.assessment.markPerCapability and markType.mode != "none" ? 1 : 0)) - 1 %}
-                {% endif %}
+                {% set rowspan = groupUsage.indicatorUsages|length + (showGroupTotal and rubricGrid.assessment.markPerCapability and markType.mode != "none" and groupUsage.maxValue > 0 ? 1 : 0) %}
 
                 {% for critIndex, critUsage in groupUsage.indicatorUsages %}
                 <tr data-group="{{ rubricId }}-{{ groupUsage.capability.id }}">
