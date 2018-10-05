@@ -389,12 +389,10 @@
                 $closestMaxMarkInput.removeAttr("data-customised");
             });
 
-            // TODO get validation error message to appear UNDERNEATH not BETWEEN input and button
             $("[data-group-max-value]").each(function() {
                 $(this).rules("add", {
                     required: true,
                     number: true,
-                    greaterThanZero: true,
                     messages: {
                         number: "Please enter a numeric value"
                     }
