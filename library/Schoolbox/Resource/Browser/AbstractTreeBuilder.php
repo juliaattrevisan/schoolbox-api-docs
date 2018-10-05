@@ -162,7 +162,7 @@ abstract class AbstractTreeBuilder
 
         // Did I ask for the root node? get it
         if ($folderId === IFolder::ROOT_PARENT_ID) {
-            $folder = $this->folderLocator->findById(0);
+            $folder = $this->folderLocator->findById(IFolder::ROOT_ID);
             $output[] = $this->generateNodeArray(
                 $folder->getId(),
                 $folder->getParent()->getId(),
@@ -171,7 +171,7 @@ abstract class AbstractTreeBuilder
                 null,
                 null,
                 [
-                    'data-permission' => $this->getFolderPermission($folderId),
+                    'data-permission' => UserAccess::ACCESS_READ,
                     'data-type' => 'folder'
                 ]
             );
