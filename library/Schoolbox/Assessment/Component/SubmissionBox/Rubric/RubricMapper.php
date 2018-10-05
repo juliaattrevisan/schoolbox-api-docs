@@ -784,7 +784,7 @@ class RubricMapper
         $indicatorMarksToSave  = $indicatorMarkMapper->createCollection();
         foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
             // Create cap mark
-            $capabilityId    = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
+            $capabilityId = $capabilityMark->getCapabilityUsage()->getCapability()->getId();
             $capabilityModel = $capabilityMapper->findById($capabilityId);
             $capabilityMarksToSave[$capabilityId] = $capabilityMarkModel = $capabilityMarkMapper->createModel()
                 ->setSubmissionReturn($returnedWork)
@@ -795,7 +795,7 @@ class RubricMapper
 
             // Create ind marks
             foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
-                $indicatorId     = $indicatorMark->getIndicatorUsage()->getIndicator()->getId();
+                $indicatorId = $indicatorMark->getIndicatorUsage()->getIndicator()->getId();
                 $descriptorModel = null;
                 if ($indicatorMark->getDescriptor()) {
                     $descriptorModel = $descriptorMapper->findById($indicatorMark->getDescriptor()->getId());
@@ -1555,6 +1555,8 @@ class RubricMapper
 
     /**
      * Save rubrics selections for a particular feedback.
+     *
+     * @deprecated use RubricMapper::persistMarkedGrid() instead
      *
      * @param array[] $descriptors key = descriptor.id
      *                             val = [selected: is it selected?, value: what's its value?]
