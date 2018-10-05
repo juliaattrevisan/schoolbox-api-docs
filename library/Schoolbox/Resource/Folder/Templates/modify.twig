@@ -249,14 +249,14 @@
                         </div>
                     </div>
                     <div class="small-12 medium-6 columns">
-                        <label class="row">
-                            <span class="small-12 column">
-                                Colour
-                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a colour that will be used for this folder">?</span>
-                            </span>
-                            <span class="small-12 column">
-                                <input type="text" value="{{ folder.colour.asRgb }}" id="colour" name="colour" data-colour-picker />
-                            </span>
+                        <label>
+                            Colour
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a colour that will be used for this folder">?</span>
+                            <div class="row collapse">
+                                <div class="small-12 columns">
+                                    <input type="text" value="{{ folder.colour.asRgb }}" id="colour" name="colour" data-colour-picker />
+                                </div>
+                            </div>
                         </label>
                     </div>
                     <div class="small-12 columns">
@@ -390,22 +390,21 @@
 
                     {% if curriculumTagging %}
 
-                        <div class="small-12 large-10 columns">
+                        <div class="small-12 columns">
                             <label>
                                 Curriculum Codes
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this folder with a corresponding curriculum area, you can link multiple curriculum areas to this folder">?</span>
                             </label>
-                            {%
-                                include 'sub/curriculumCodeSelector.twig' with
-                                {
-                                    'codeList' : folder.getCurriculumNodes,
-                                    'renderButton' : false
-                                }
-                            %}
-                        </div>
-                        <div class="small-12 large-2 columns">
-                            <label>Browse</label>
-                            {% include 'sub/curriculumBrowseButton.twig' %}
+                            <div class="input-group">
+                                {%
+                                    include 'sub/curriculumCodeSelector.twig' with
+                                    {
+                                        'codeList' : folder.getCurriculumNodes,
+                                        'renderButton' : false
+                                    }
+                                %}
+                                {% include 'sub/curriculumBrowseButton.twig' %}
+                            </div>
                         </div>
 
                     {% endif %}

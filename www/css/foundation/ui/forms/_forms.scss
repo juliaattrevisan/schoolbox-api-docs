@@ -607,10 +607,6 @@ select.visibility {
 	display: none;
 	padding: rem-calc(($base-font-size));
 
-	input[type=radio]:not(.plain) + label.radio-label,
-	input[type=checkbox]:not(.plain) + label.checkbox-label{
-		display: inline-block;
-	}
     // Ensure that the source form input type is spaced like the others
     .source{
         margin: 0 0 $form-spacing 0;
