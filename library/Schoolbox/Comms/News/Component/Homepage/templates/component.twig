@@ -21,14 +21,10 @@ Data:
         'l=' ~ limit,
         'f=' ~ folderId,
         'hp=1',
-        'ref=' ~ referrer
-    ] %}
+        'ref=' ~ referrer,
+        'ro=' ~ (readonly ? '1' : '0')
+    ] |join('&') %}
 
-    {% if readonly %}
-    {% set querystringParams = querystringParams|merge(['ro=1']) %}
-    {% endif %}
-
-    {% set querystringParams = querystringParams|join('&') %}
     {% set getListHomePagePath = routeLookup('commsNews.getListForHomepage')|replace({'{folderId}':''}) ~ folderId %}
 
     $(function() {
