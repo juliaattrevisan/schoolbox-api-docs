@@ -17,7 +17,6 @@ Data:
     {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key, folderId: folderId}) %}
 
     {% set querystringParams = [
-        'topic=' ~ slug,
         'c=' ~ compactMode,
         'l=' ~ limit,
         'f=' ~ folderId,
