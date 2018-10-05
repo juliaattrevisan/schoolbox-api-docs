@@ -122,7 +122,7 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="news-title">Title</label>
-                        <input id="news-title" name="title" type="text" maxlength="255" value="{{ article.title }}" />
+                        <input id="news-title" name="title" type="text" maxlength="255" value="{{ article.title }}" required />
                     </div>
 
                     <div class="small-12 columns">
@@ -133,6 +133,10 @@
                     <div class="small-12 columns">
                         <label for="blurb">Blurb</label>
                         <textarea id="blurb" name="blurb">{{ article.blurb }}</textarea>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>Feature Image</label>
+                        {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
                     </div>
                 </fieldset>
 
@@ -288,23 +292,13 @@
 
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>Feature Image</label>
-                        <p class="meta">Attach a feature image to represent your {{ locale.article.proper }} article.</p>
-
-                        {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
-                    </div>
-                </fieldset>
-
-                <fieldset class="content">
-                    <div class="small-12 columns">
                         <label for="news-topics">Topics</label>
-                        <p class="meta">You can assign multiple topics to this {{ locale.news }} to adjust its exposure.</p>
+                        <p class="meta">You can assign multiple topics to this {{ locale.news }} to help identify its purpose.</p>
                         <select data-topics name="topics[]" id="news-topics" multiple></select>
                     </div>
                 </fieldset>
 
                 <fieldset class="content">
-                    <legend>Availability</legend>
                     <div class="small-12 large-6 columns">
                         <label for="publishAt">
                             Publish Date
@@ -373,7 +367,17 @@
 
         $.fn.alaressEditor({
             targetElements: $('#createForm textarea[name=blurb]'),
-            removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe,link'
+            removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe,link',
+            toolbarGroups: [
+                {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                {name: 'links', groups: ['links']},
+                /* Custom schoolbox-specific plugin stuff can go here
+                 * This is a hole into which you may put once-off abilities
+                 * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
+                 * This is typically not used for anything else for now
+                 */
+                {name: 'schoolbox', groups: ['schoolboxlink']},
+            ]
         });
 
         $('[data-topics]').selectizeSelector({
@@ -429,6 +433,8 @@
             event.preventDefault();
             submitForm('preview');
         });
+
+        $createForm.alaressValidate();
 
         /**
          * Submitting the create/update form
