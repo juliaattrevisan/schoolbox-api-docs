@@ -235,7 +235,7 @@ class Module extends BaseModule
         $args = $this->preloadArticle($params);
         /** @var Model $article */
         $article = $args['article'];
-        $article->setAudience($this->getAudienceMapper()->findForArticle($article->getId()));
+        $article->setAudience($this->getAudienceMapper()->findForArticles([$article->getId()]));
         return $args;
     }
 

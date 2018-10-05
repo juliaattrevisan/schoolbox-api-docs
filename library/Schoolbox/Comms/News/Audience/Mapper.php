@@ -113,16 +113,18 @@ class Mapper extends \Schoolbox\Mapper
         }
         return $segments;
     }
+
+
     /**
-     * Efficiently returns an article's audience segment structure for attaching to an article
+     * Efficiently returns structured audience segments structure for attaching to a set of articles
      *
-     * @param int   $articleId
+     * @param int[] $articleIds
      * @param array $options
      * @return GenericCollection|Model[]
      */
-    public function findForArticle(int $articleId, array $options = []): GenericCollection
+    public function findForArticles(array $articleIds, array $options = []): GenericCollection
     {
-        return $this->findByColumn(self::FIELD_COMMS_NEWS_ARTICLE_ID, $articleId, $options);
+        return $this->findByColumn(self::FIELD_COMMS_NEWS_ARTICLE_ID, $articleIds, $options);
     }
 
 

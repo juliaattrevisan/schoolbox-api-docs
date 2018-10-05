@@ -143,7 +143,7 @@ class Module extends BaseModule
         $args = $this->preloadNews($params);
         /** @var News\Model $article */
         $article = $args['article'];
-        $article->setAudience($this->getAudienceMapper()->findForArticle($article->getId()));
+        $article->setAudience($this->getAudienceMapper()->findForArticles([$article->getId()]));
         return $args;
     }
 
