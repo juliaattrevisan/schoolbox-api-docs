@@ -426,6 +426,7 @@
 
         $('#news-submit').click(function(event) {
             event.preventDefault();
+            $createForm.alaressValidate();
             submitForm('submit');
         });
 
@@ -434,7 +435,6 @@
             submitForm('preview');
         });
 
-        $createForm.alaressValidate();
 
         /**
          * Submitting the create/update form
