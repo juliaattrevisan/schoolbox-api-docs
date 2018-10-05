@@ -13,11 +13,13 @@ use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Browser\Office365\Locator;
 use Schoolbox\Resource\Browser\Office365\Tenant;
-use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
+use Schoolbox\Resource\My\File as MyFile;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\File\IStorageWrapper;
-use Schoolbox\Resource\File\Mapper as FileMapper;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\Storage;
+use DomainException;
+use UnexpectedValueException;
 
 class CollectorFactory
 {
@@ -25,13 +27,13 @@ class CollectorFactory
     /** @var IStorageWrapper */
     private $wrapper;
 
-    /** @var StorageMapper */
+    /** @var Storage\Mapper */
     private $storage;
 
-    /** @var FileMapper */
+    /** @var File\Mapper */
     private $file;
 
-    /** @var MyFileMapper */
+    /** @var MyFile\Mapper */
     private $myFile;
 
     /** @var IConfigLoader */
@@ -56,17 +58,17 @@ class CollectorFactory
         $this->wrapper = $wrapper;
 
         // TODO inject these service dependencies
-        $this->storage = StorageMapper::getInstance();
-        $this->file    = FileMapper::getInstance();
-        $this->myFile  = MyFileMapper::getInstance();
+        $this->storage = Storage\Mapper::getInstance();
+        $this->file    = File\Mapper::getInstance();
+        $this->myFile  = MyFile\Mapper::getInstance();
         $this->conf    = new Loader();
     }
 
 
     /**
      * @param string $type
-     * @throws InvalidArgumentException  If code attempts to create a DAV client with invalid HTTP method
-     * @throws \UnexpectedValueException If you call this when no user is logged on for the webDav loader
+     * @throws InvalidArgumentException If code attempts to create a DAV client with invalid HTTP method
+     * @throws UnexpectedValueException If you call this when no user is logged on for the webDav loader
      * @return TypeHandlerInterface
      */
     private function get(string $type): TypeHandlerInterface
@@ -86,16 +88,16 @@ class CollectorFactory
                     break;
                 case NodeFactory::WEBDAV:
                     try {
-                        $dav = PortfolioWebDAV::factory();
+                        $dav                  = PortfolioWebDAV::factory();
                         $this->loaders[$type] = new ExternalFileSystemHandler($dav, $this->storage, $dav, $this->wrapper);
-                    } catch (\DomainException $e) {
+                    } catch (DomainException $e) {
                         // DAV isn't configured. we're ok with that.
                         $this->loaders[$type] = false;
                     }
                     break;
                 case NodeFactory::OFFICE:
                     try {
-                        $locator = new Locator(new Tenant($this->conf->get('office365_tenant')), $_SESSION['azureAccessToken']);
+                        $locator              = new Locator(new Tenant($this->conf->get('office365_tenant')), $_SESSION['azureAccessToken']);
                         $this->loaders[$type] = new ExternalFileSystemHandler($locator, $this->storage, $locator, $this->wrapper);
                     } catch (InvalidArgumentException $e) {
                         // Office 365 isn't configured. we're ok with that.
@@ -117,8 +119,8 @@ class CollectorFactory
      *
      * @param string[] $attachments
      * @return Collector
-     * @throws InvalidArgumentException  If code attempts to create a DAV client with invalid HTTP method
-     * @throws \UnexpectedValueException If you attempt to build a WebDav attachment and no user is logged in
+     * @throws InvalidArgumentException If code attempts to create a DAV client with invalid HTTP method
+     * @throws UnexpectedValueException If you attempt to build a WebDav attachment and no user is logged in
      */
     public function build(array $attachments): Collector
     {
