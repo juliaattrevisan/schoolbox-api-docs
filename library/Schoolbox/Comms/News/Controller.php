@@ -29,6 +29,7 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -341,6 +342,11 @@ class Controller extends Base
 
             $this->persist($article, $this->getRequest()->post->getArrayCopy());
 
+            $routeParams  = [
+                'articleId' => $article->getId(),
+                'article'   => $article,
+            ];
+
             /* Save a draft of the news article
              * This can occur from either the Create or Update context
              * Update the form action accordingly
@@ -349,12 +355,26 @@ class Controller extends Base
 
                 /* Current url should secretly update to the Update route
                  */
-                $url = $this->getRouter()->generate('commsNews.getUpdate', ['articleId' => $article->getId()]);
+                $url = $this->getRouter()->generate('commsNews.getUpdate', $routeParams);
 
                 /* Form action should secretly update to the Update route
                  */
-                $formAction = $this->getRouter()->generate('commsNews.postUpdate', ['articleId' => $article->getId()]);
-                $formActionSubmit = $this->getRouteIfAuthorized('commsNewsModeration.postSubmit', ['article' => $article, 'articleId' => $article->getId()]);
+                $formAction = $this->getRouter()->generate('commsNews.postUpdate', $routeParams);
+
+                // Submit action: approve if I can, otherwise submit for moderation
+                $formActionSubmit = false;
+                if ($article->canBeApproved()) {
+                    $formActionSubmit = $this->getRouteIfAuthorized(
+                        'commsNewsModeration.postApprove',
+                        $routeParams
+                    );
+                }
+                if (!$formActionSubmit) {
+                    $formActionSubmit = $this->getRouteIfAuthorized(
+                        'commsNewsModeration.postSubmit',
+                        $routeParams
+                    );
+                }
 
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
@@ -368,7 +388,7 @@ class Controller extends Base
                  * Go to the detail screen to see the outcome of your changes
                  * and also use that screen to advance to the next step
                  */
-                $nextStep = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
+                $nextStep = $this->getRouter()->generate('commsNews.getDetail', $routeParams);
                 $this->getResponse()->redirect->afterPost($nextStep);
                 return;
             }
