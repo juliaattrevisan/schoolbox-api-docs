@@ -13,8 +13,8 @@ CREATE TABLE `comms_news_article` (
   `rejected_by`        int(11)       UNSIGNED,
   `rejected_at`        DATETIME,
   `rejected_reason`    text,
-  `publish_at`         DATETIME      NOT NULL,
-  `expires_at`         DATETIME      NOT NULL,
+  `publish_at`         DATETIME,
+  `expires_at`         DATETIME,
   `created_at`         DATETIME      NOT NULL,
   `updated_at`         DATETIME      NOT NULL,
   `deleted_at`         DATETIME
