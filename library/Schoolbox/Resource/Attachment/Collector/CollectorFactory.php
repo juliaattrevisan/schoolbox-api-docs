@@ -25,22 +25,22 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 class CollectorFactory {
 
     /** @var StorageMapper */
-    protected $storage;
+    private $storage;
 
     /** @var FileMapper */
-    protected $file;
+    private $file;
 
     /** @var MyFileMapper */
-    protected $myFile;
+    private $myFile;
 
     /** @var PortfolioWebDAV */
-    protected $dav;
+    private $dav;
 
     /** @var IConfigLoader */
-    protected $conf;
+    private $conf;
 
     /** @var callable[] */
-    protected $loaders;
+    private $loaders;
 
     /**
      * The mapper passed in here defines the model that will be returned by self->build()->get*();
@@ -95,7 +95,7 @@ class CollectorFactory {
      * @param string $type
      * @param callable $lazyload
      */
-    protected function add($type, $lazyload) {
+    private function add($type, $lazyload) {
         if (is_callable($lazyload)) {
             $this->loaders[$type] = $lazyload;
         }
@@ -107,7 +107,7 @@ class CollectorFactory {
      * @throws InvalidArgumentException
      * @return TypeHandlerInterface
      */
-    protected function get($type)
+    private function get($type)
     {
         if(empty($this->loaders[$type])) {
             throw new InvalidArgumentException("Loader for '$type' not defined.");
@@ -157,5 +157,4 @@ class CollectorFactory {
 
         return new Collector($indexedAttachments, $handlers);
     }
-
 }
