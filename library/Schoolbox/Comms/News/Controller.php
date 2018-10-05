@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Json\Decorator\PropertyDecorator;
+use Alaress\Specification\Exception\UnsatisfiedException;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
 use Aura\Router\Exception\RouteNotFound;
@@ -20,8 +21,10 @@ use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Validation\ValidUserCanAudienceTo;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -335,18 +338,31 @@ class Controller extends Base
      */
     public function postUpdate(Model $article): void
     {
-        if (!$article->isDraft() && !(new ValidUserCanAudienceTo($this->getUser(), $this->strategyFactory))->isSatisfiedBy($article)) {
-            $this->getResponse()->status->set(400);
-            $this->getResponse()->content->set($this->buildJsonOutput([
-                'success' => false,
-                'message' => "Article audience appears to be invalid",
-            ]));
-            return;
-        }
-
         try {
+            // We need to mutate the article before validation to check whether what the user is trying to do is valid,
+            // rather than the validation of the article's prior state
+            $data = $this->getRequest()->post->getArrayCopy();
+            $this->updateArticleAttributes($article, $data);
 
-            $this->persist($article, $this->getRequest()->post->getArrayCopy());
+            $this->updateAudience($article, $data['audience']);
+
+            // Don't validate drafts or rejected articles
+            $isDraftOrRejected = $article->isDraft() || $article->isRejected();
+            if (!$isDraftOrRejected && !(new Factory($this->strategyFactory))->buildSpecCanBeSubmitted($this->getUser())->isSatisfiedBy($article)) {
+                $this->getResponse()->status->set(400);
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'success' => false,
+                    'message' => "Article audience appears to be invalid",
+                ]));
+                return;
+            }
+
+            // Article is valid, or we don't care, persist
+            $this->newsMapper->save($article);
+            $this->saveArticleAudience($article);
+//            // TODO save audience
+//
+//$this->persist($article, $this->getRequest()->post->getArrayCopy());
 
             $routeParams  = [
                 'articleId' => $article->getId(),
@@ -420,41 +436,7 @@ class Controller extends Base
      */
     private function persist(Model $article, array $data): void
     {
-        $article
-            ->setTitle($data['title'])
-            ->setBody($data['body'])
-            ->setBlurb($data['blurb'])
-            ->setTopics($this->topicMapper->findByColumn('newsTopicID', $data['topics']));
 
-        /* Once it's passed Moderation, only Moderators can alter contents.
-         * Tough luck, wren; in accordance with the po-po
-         */
-
-        /* Exception thrown when an invalid date is submitted; use last known value instead
-         * This can occur with bad input; or when datepicker is still processing strtotime shuriken
-         */
-        try {
-            $article->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']));
-        } catch (InvalidArgumentException $e) {
-            // noop
-        }
-
-        try {
-            $article->setExpiresAt(\Alaress_Date_Format::newLocal($data['expiresAt']));
-        } catch (InvalidArgumentException $e) {
-            // noop
-        }
-
-        /* If any Feature Image was provided, remember it
-         * Otherwise clear it (remove a Feature Image)
-         */
-        if (\is_array($data['attachment'])) {
-            /** @var Storage\Model $featureImage */
-            $featureImage = (new CollectorFactory())->build($data['attachment'] ?: [])->getFirst();
-            $article->setFeatureImage($featureImage);
-        } else {
-            $article->setFeatureImage(null);
-        }
 
         $this->newsMapper->save($article);
 
@@ -1098,5 +1080,142 @@ class Controller extends Base
             }
         }
         return $availableStrategies;
+    }
+
+
+    /**
+     * Updates an article's attributes with post data payload
+     *
+     * @param Model $article
+     * @param array $postData
+     * @throws \Schoolbox\Resource\Exception
+     */
+    private function updateArticleAttributes(Model $article, array $postData): void
+    {
+        $article
+            ->setTitle($postData['title'])
+            ->setBody($postData['body'])
+            ->setBlurb($postData['blurb'])
+            ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics']));
+
+        // Exception thrown when an invalid date is submitted; use last known value instead
+        // This can occur with bad input; or when datepicker is still processing strtotime shuriken
+        try {
+            $article->setPublishAt(\Alaress_Date_Format::newLocal($postData['publishAt']));
+        } catch (InvalidArgumentException $e) {
+            // noop
+        }
+        try {
+            $article->setExpiresAt(\Alaress_Date_Format::newLocal($postData['expiresAt']));
+        } catch (InvalidArgumentException $e) {
+            // noop
+        }
+
+        /* If any Feature Image was provided, remember it
+         * Otherwise clear it (remove a Feature Image)
+         */
+        if (\is_array($postData['attachment'])) {
+            /** @var Storage\Model $featureImage */
+            $featureImage = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
+            $article->setFeatureImage($featureImage);
+        } else {
+            $article->setFeatureImage(null);
+        }
+    }
+
+
+    /**
+     * @param Model                              $article
+     * @param string                             $selectizeAudienceSegments
+     * @throws MapperException
+     * @throws MapperException\InsufficientHydrationException
+     * @throws \DomainException
+     */
+    private function updateAudience(Model $article, string $selectizeAudienceSegments): void
+    {
+        // TODO do this properly, just a temp hack for now
+        $codec = new Audience\Segment\Codec($this->audienceMapper);
+        $article->setAudience($codec->decodeSelectizeValues($selectizeAudienceSegments));
+        foreach ($article->getAudience() as $segment) {
+            $segment->setCommsNewsArticle($article);
+        }
+//
+//
+//        $article->setAudience($article->getAudience()->emptyClone());
+//
+//        foreach($postedSegments as $postedSegment){
+//            $article->getAudience()->add($postedSegment)
+//        }
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//        $codec = new Audience\Segment\Codec($this->audienceMapper);
+//
+//        /** @var Audience\Model[]|GenericCollection $existingSegments */
+//        $existingSegments = $article->getAudience()->indexBy($this->audienceMapper->getIdentifierProperty());
+//
+//        $postedSegments   = $codec->decodeSelectizeValues($selectizeAudienceSegments);
+//
+//        // Delete any segment that currently exists, but was not posted from form (ie it's been removed by user)
+//        foreach ($existingSegments as $existingSegment) {
+//            $found = false;
+//            foreach ($postedSegments as $postedSegment) {
+//                if ($existingSegment->equals($postedSegment)) {
+//                    $found = true;
+//                    break;
+//                }
+//            }
+//            if (!$found) {
+//                $segmentsToDelete->add($existingSegment);
+//            }
+//        }
+//        // Add any segment that was posted but is not currently persisted
+//        foreach ($postedSegments as $postedSegment) {
+//            $found = false;
+//            foreach ($existingSegments as $existingSegment) {
+//                if ($existingSegment->equals($postedSegment)) {
+//                    $found = true;
+//                    break;
+//                }
+//            }
+//            if (!$found) {
+//                $segmentsToAdd->add($postedSegment);
+//            }
+//        }
+//
+//        $isSegmentsDeleted = $this->deleteRemovedSegments($article, $segmentsToDelete);
+//        $isSegmentsAdded   = $this->saveAddedSegments($article, $segmentsToAdd);
+//
+//        return $isSegmentsDeleted || $isSegmentsAdded;
+    }
+
+
+    /**
+     * @param Model $article
+     * @throws MapperException
+     * @throws UnsatisfiedException
+     */
+    private function saveArticleAudience(Model $article): void
+    {
+        if ($article->getAudience()->count()) {
+            $validSegmentSpecFactory = new Audience\Validation\Factory(
+                $this->strategyFactory::getValidRelationshipModifiers(),
+                $this->strategyFactory::getValidNullEntities()
+            );
+            $validSegmentSpec        = $validSegmentSpecFactory->makeValidSegmentSpecification();
+
+            foreach ($article->getAudience() as $segment) {
+                if (!$validSegmentSpec->isSatisfiedBy($segment)) {
+                    throw new UnsatisfiedException($segment, $validSegmentSpec);
+                }
+                $this->audienceMapper->saveSegment($segment);
+            }
+        }
     }
 }
