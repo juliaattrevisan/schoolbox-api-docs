@@ -23,22 +23,17 @@ class Transactor
     /** @var Audience\Mapper */
     private $audienceMapper;
 
-    /** @var Codec */
-    private $codec;
-
     /** @var StrategyFactory */
     private $strategyFactory;
 
 
     /**
      * @param Audience\Mapper  $audienceMapper
-     * @param Codec            $codec
      * @param StrategyFactory  $strategyFactory
      */
-    public function __construct(Audience\Mapper $audienceMapper, Codec $codec, StrategyFactory $strategyFactory)
+    public function __construct(Audience\Mapper $audienceMapper, StrategyFactory $strategyFactory)
     {
         $this->audienceMapper  = $audienceMapper;
-        $this->codec           = $codec;
         $this->strategyFactory = $strategyFactory;
     }
 
@@ -51,18 +46,16 @@ class Transactor
      * Does not perform DB mutations unless logical changes to the audience have been made
      *
      * @param News\Model $article
-     * @param string     $selectizeAudienceSegments
+     * @param GenericCollection|Audience\Model[] $postedSegments
      * @return bool
      * @throws Mapper\Exception
      * @throws Mapper\Exception\InsufficientHydrationException
-     * @throws \DomainException
      * @throws UnexpectedValueException
      */
-    public function save(News\Model $article, string $selectizeAudienceSegments): bool
+    public function save(News\Model $article, GenericCollection $postedSegments): bool
     {
         /** @var Audience\Model[]|GenericCollection $existingSegments */
         $existingSegments = $article->getAudience()->indexBy($this->audienceMapper->getIdentifierProperty());
-        $postedSegments   = $this->codec->decodeSelectizeValues($selectizeAudienceSegments);
 
         $segmentsToAdd    = $this->audienceMapper->createCollection();
         $segmentsToDelete = $this->audienceMapper->createCollection();

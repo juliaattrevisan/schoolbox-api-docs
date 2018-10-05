@@ -327,7 +327,6 @@ class Controller extends Base
      * @level 18.1
      *
      * @param Model $article
-     * @throws InvalidArgumentException
      * @throws MapperException
      * @throws MapperException\InsufficientHydrationException
      * @throws RouteNotFound
@@ -338,115 +337,78 @@ class Controller extends Base
      */
     public function postUpdate(Model $article): void
     {
-        try {
-            // We need to mutate the article before validation to check whether what the user is trying to do is valid,
-            // rather than the validation of the article's prior state
-            $data = $this->getRequest()->post->getArrayCopy();
-            $this->updateArticleAttributes($article, $data);
+        $data = $this->getRequest()->post->getArrayCopy();
 
-            $this->updateAudience($article, $data['audience']);
+        // Update article with proposed attributes
+        $this->updateArticleAttributes($article, $data);
 
-            // Don't validate drafts or rejected articles
-            $isDraftOrRejected = $article->isDraft() || $article->isRejected();
-            if (!$isDraftOrRejected && !(new Factory($this->strategyFactory))->buildSpecCanBeSubmitted($this->getUser())->isSatisfiedBy($article)) {
-                $this->getResponse()->status->set(400);
-                $this->getResponse()->content->set($this->buildJsonOutput([
-                    'success' => false,
-                    'message' => "Article audience appears to be invalid",
-                ]));
-                return;
-            }
+        // Update article with proposed audience. Cache existing audience for later efficient persistence
+        $existingAudience = $article->getAudience()->indexBy($this->audienceMapper->getIdentifierProperty())->shallowClone();
+        $this->updateArticleAudience($article, $data['audience']);
 
-            // Article is valid, or we don't care, persist
-            $this->newsMapper->save($article);
-            $this->saveArticleAudience($article);
-//            // TODO save audience
-//
-//$this->persist($article, $this->getRequest()->post->getArrayCopy());
-
-            $routeParams  = [
-                'articleId' => $article->getId(),
-                'article'   => $article,
-            ];
-
-            /* Save a draft of the news article
-             * This can occur from either the Create or Update context
-             * Update the form action accordingly
-             */
-            if ($this->getRequest()->isXhr()) {
-
-                // Send the update page route, JS will update the window state to this
-                $url = $this->getRouter()->generate('commsNews.getUpdate', $routeParams);
-
-                // Send all the possible routes, JS will determine which ones to show where
-                $updateRoute = $this->getRouter()->generate('commsNews.postUpdate', $routeParams);
-                $submitRoute = $this->getRouteIfAuthorized('commsNewsModeration.postSubmit', $routeParams);
-                $approveRoute = false;
-                if ($article->canBeApproved()) {
-                    $approveRoute = $this->getRouteIfAuthorized('commsNewsModeration.postApprove', $routeParams);
-                }
-
-                $this->getResponse()->content->set($this->buildJsonOutput([
-                    'success' => true,
-                    'url' => $url,
-                    'updateRoute' => $updateRoute,
-                    'submitRoute' => $submitRoute,
-                    'approveRoute' => $approveRoute
-                ]));
-            } else {
-
-                /* Otherwise, you're the creator and you're editing this thing normally
-                 * Go to the detail screen to see the outcome of your changes
-                 * and also use that screen to advance to the next step
-                 */
-                $nextStep = $this->getRouter()->generate('commsNews.getDetail', $routeParams);
-                $this->getResponse()->redirect->afterPost($nextStep);
-                return;
-            }
-
+        // Validate proposed article + audience
+        try{
+            $this->validateArticleAndAudience($article);
+        } catch (UnsatisfiedException $e){
+            $this->getResponse()->status->set(400);
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]));
             return;
-        } catch (MapperException|RouteNotFound|\PDOException|\UnexpectedValueException|\Schoolbox\Resource\Exception $e) {
-            if ($this->getRequest()->isXhr()) {
-                $this->getResponse()->status->set(400);
-                $this->getResponse()->content->set($this->buildJsonOutput([
-                    'success' => false,
-                    'message' => $e->getMessage()
-                ]));
-
-                return;
-            }
-
-            throw $e;
         }
-    }
 
-
-    /**
-     * Persist model to db during news article authorship
-     *
-     * @param Model                          $article
-     * @param array|\Aura\Web\Request\Values $data
-     * @return void
-     * @throws MapperException
-     * @throws MapperException\InsufficientHydrationException
-     * @throws \PDOException
-     * @throws \Schoolbox\Resource\Exception
-     * @throws \UnexpectedValueException
-     * @throws \DomainException
-     */
-    private function persist(Model $article, array $data): void
-    {
-
-
+        // Persist article
         $this->newsMapper->save($article);
 
-        // Persist audience segments
-        $transactor = new Audience\Segment\Transactor(
-            $this->audienceMapper,
-            new Audience\Segment\Codec($this->audienceMapper),
-            $this->strategyFactory
-        );
-        $transactor->save($article, $data['audience'] ?? '');
+        // Restore existing audience onto article, and then update with posted audience
+        $postedAudience = $article->getAudience()->shallowClone();
+        $article->setAudience($existingAudience);
+
+        // Perform intelligent update and persistence is specialised helper class
+        $audienceTransactor = new Audience\Segment\Transactor($this->audienceMapper, $this->strategyFactory);
+        $audienceTransactor->save($article, $postedAudience);
+
+        $routeParams  = [
+            'articleId' => $article->getId(),
+            'article'   => $article,
+        ];
+
+
+        /* Save a draft of the news article
+         * This can occur from either the Create or Update context
+         * Update the form action accordingly
+         */
+        if ($this->getRequest()->isXhr()) {
+
+            // Send the update page route, JS will update the window state to this
+            $url = $this->getRouter()->generate('commsNews.getUpdate', $routeParams);
+
+            // Send all the possible routes, JS will determine which ones to show where
+            $updateRoute = $this->getRouter()->generate('commsNews.postUpdate', $routeParams);
+            $submitRoute = $this->getRouteIfAuthorized('commsNewsModeration.postSubmit', $routeParams);
+            $approveRoute = false;
+            if ($article->canBeApproved()) {
+                $approveRoute = $this->getRouteIfAuthorized('commsNewsModeration.postApprove', $routeParams);
+            }
+
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'success' => true,
+                'url' => $url,
+                'updateRoute' => $updateRoute,
+                'submitRoute' => $submitRoute,
+                'approveRoute' => $approveRoute
+            ]));
+        } else {
+
+            /* Otherwise, you're the creator and you're editing this thing normally
+             * Go to the detail screen to see the outcome of your changes
+             * and also use that screen to advance to the next step
+             */
+            $nextStep = $this->getRouter()->generate('commsNews.getDetail', $routeParams);
+            $this->getResponse()->redirect->afterPost($nextStep);
+            return;
+        }
     }
 
 
@@ -1131,90 +1093,46 @@ class Controller extends Base
      * @throws MapperException\InsufficientHydrationException
      * @throws \DomainException
      */
-    private function updateAudience(Model $article, string $selectizeAudienceSegments): void
+    private function updateArticleAudience(Model $article, string $selectizeAudienceSegments): void
     {
-        // TODO do this properly, just a temp hack for now
         $codec = new Audience\Segment\Codec($this->audienceMapper);
         $article->setAudience($codec->decodeSelectizeValues($selectizeAudienceSegments));
         foreach ($article->getAudience() as $segment) {
             $segment->setCommsNewsArticle($article);
         }
-//
-//
-//        $article->setAudience($article->getAudience()->emptyClone());
-//
-//        foreach($postedSegments as $postedSegment){
-//            $article->getAudience()->add($postedSegment)
-//        }
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//        $codec = new Audience\Segment\Codec($this->audienceMapper);
-//
-//        /** @var Audience\Model[]|GenericCollection $existingSegments */
-//        $existingSegments = $article->getAudience()->indexBy($this->audienceMapper->getIdentifierProperty());
-//
-//        $postedSegments   = $codec->decodeSelectizeValues($selectizeAudienceSegments);
-//
-//        // Delete any segment that currently exists, but was not posted from form (ie it's been removed by user)
-//        foreach ($existingSegments as $existingSegment) {
-//            $found = false;
-//            foreach ($postedSegments as $postedSegment) {
-//                if ($existingSegment->equals($postedSegment)) {
-//                    $found = true;
-//                    break;
-//                }
-//            }
-//            if (!$found) {
-//                $segmentsToDelete->add($existingSegment);
-//            }
-//        }
-//        // Add any segment that was posted but is not currently persisted
-//        foreach ($postedSegments as $postedSegment) {
-//            $found = false;
-//            foreach ($existingSegments as $existingSegment) {
-//                if ($existingSegment->equals($postedSegment)) {
-//                    $found = true;
-//                    break;
-//                }
-//            }
-//            if (!$found) {
-//                $segmentsToAdd->add($postedSegment);
-//            }
-//        }
-//
-//        $isSegmentsDeleted = $this->deleteRemovedSegments($article, $segmentsToDelete);
-//        $isSegmentsAdded   = $this->saveAddedSegments($article, $segmentsToAdd);
-//
-//        return $isSegmentsDeleted || $isSegmentsAdded;
     }
 
 
     /**
+     * Validates a proposed article and audience
+     *
      * @param Model $article
-     * @throws MapperException
      * @throws UnsatisfiedException
      */
-    private function saveArticleAudience(Model $article): void
+    private function validateArticleAndAudience(Model $article): void
     {
+        // Don't validate drafts or rejected articles.
+        if ($article->isDraft() || $article->isRejected()) {
+            return;
+        }
+
+        // Validate article + authenticate proposed audience
+        $validSubmittedArticleSpec = (new Factory($this->strategyFactory))->buildSpecCanBeSubmitted($this->getUser());
+        if (!$validSubmittedArticleSpec->isSatisfiedBy($article)) {
+            throw new UnsatisfiedException($article, $validSubmittedArticleSpec, "Article audience appears to be invalid");
+        }
+
+        // Validate the audience segments
         if ($article->getAudience()->count()) {
             $validSegmentSpecFactory = new Audience\Validation\Factory(
                 $this->strategyFactory::getValidRelationshipModifiers(),
                 $this->strategyFactory::getValidNullEntities()
             );
             $validSegmentSpec        = $validSegmentSpecFactory->makeValidSegmentSpecification();
-
             foreach ($article->getAudience() as $segment) {
                 if (!$validSegmentSpec->isSatisfiedBy($segment)) {
-                    throw new UnsatisfiedException($segment, $validSegmentSpec);
+                    throw new UnsatisfiedException($article, $validSubmittedArticleSpec, "Audience segment appears to be invalid");
                 }
-                $this->audienceMapper->saveSegment($segment);
             }
         }
     }
