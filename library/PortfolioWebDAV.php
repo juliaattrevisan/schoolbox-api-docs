@@ -106,11 +106,13 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     /** @var self $instance */
     private static $instance = null;
 
+
     /**
      * @param bool $lite
      * @return PortfolioWebDAV
      * @throws DomainException if no legacy config exists
      * @throws UnexpectedValueException if no user is logged in
+     * @throws InvalidArgumentException If code attempts to create a DAV client with invalid HTTP method
      */
     public static function factory($lite = false)
     {
