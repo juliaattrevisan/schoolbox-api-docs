@@ -10,17 +10,31 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\User;
 
-class RoleType extends Base
+class RoleType extends SimpleStrategy
 {
 
-    public const ENTITY_TYPE = 'role_type';
+    public static function getEntityType(): string
+    {
+        return 'role_type';
+    }
 
     /**
      * @inheritdoc
      */
-    public function getSearchSql(string $searchPlaceholder = null): string
+    public static function isValidNullEntityValue(): bool
     {
-        return 'TODO'; // TODO
+        // All users have a role type
+        return false;
+    }
+
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(User $user, string $searchPlaceholder = null): string
+    {
+        return "SELECT 0, 'name todo', 'type todo' from dual WHERE false"; // TODO
     }
 
 
@@ -29,14 +43,14 @@ class RoleType extends Base
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
-        return 'TODO'; // TODO
+        return ''; // TODO
     }
 
 
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(User $user): array
+    public static function getValidRelationshipModifiers(): array
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }

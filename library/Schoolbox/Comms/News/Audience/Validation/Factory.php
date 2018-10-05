@@ -11,7 +11,6 @@ namespace Schoolbox\Comms\News\Audience\Validation;
 use Alaress\Specification;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
-use Schoolbox\User;
 
 /**
  * Responsible for building valid audience segment specifications
@@ -39,10 +38,9 @@ class Factory
     /**
      * Defines what is a valid audience segment
      *
-     * @param User $user
      * @return Specification\ISpecification
      */
-    public function makeValidSegmentSpecification(User $user): Specification\ISpecification
+    public function makeValidSegmentSpecification(): Specification\ISpecification
     {
         // Candidate must be of correct class
         $instanceOfSegment = new Specification\IsInstanceOf(Audience\Model::class);
@@ -66,7 +64,7 @@ class Factory
         // * must have children
         // * cannot be children of another composite segment
         $compositeWithChildren = new Specification\Conjunction([
-            new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_ENTITY_TYPE), Audience\Model::ENTITY_TYPE_COMPOSITE),
+            new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_ENTITY_TYPE), Audience\Segment\Strategy\Composite::getEntityType()),
             new HasChildren(),
             new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_PARENT_ID), null),
         ]);
@@ -74,7 +72,7 @@ class Factory
         // Simple segments:
         // * cannot have children
         $simpleWithoutChildren = new Specification\Conjunction([
-            new Specification\Negation(new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_ENTITY_TYPE), Audience\Model::ENTITY_TYPE_COMPOSITE)),
+            new Specification\Negation(new Specification\Equals($this->columnToProperty(Audience\Mapper::FIELD_ENTITY_TYPE), Audience\Segment\Strategy\Composite::getEntityType())),
             new Specification\Negation(new HasChildren()),
         ]);
         $compositeOrSimple     = new Specification\ExclusiveOr([$compositeWithChildren, $simpleWithoutChildren]);

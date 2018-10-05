@@ -54,9 +54,8 @@ class ValidRelationship extends Specification\Leaf
             throw new InsufficientHydrationException('Cannot determine valid relationships if entity type is not defined');
         }
 
-
         // Base case:
-        if (Audience\Model::ENTITY_TYPE_COMPOSITE !== $entityType) {
+        if (Audience\Segment\Strategy\Composite::getEntityType() !== $entityType) {
             return $this->validModifiers[$entityType];
         }
 

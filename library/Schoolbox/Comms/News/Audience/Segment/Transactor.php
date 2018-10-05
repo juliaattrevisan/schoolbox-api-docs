@@ -13,10 +13,6 @@ use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use UnexpectedValueException;
-use Schoolbox\User;
-use Schoolbox\Resource\Folder;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use InvalidArgumentException;
 
 /**
  * Responsible for the intricacies of news article audience segment persistence.
@@ -24,48 +20,21 @@ use InvalidArgumentException;
 class Transactor
 {
 
-    /** @var User */
-    private $sessionUser;
-
-
     /** @var Audience\Mapper */
     private $audienceMapper;
 
-    /** @var Codec */
-    private $codec;
-
-    /** @var Folder\Mapper */
-    private $folderMapper;
-
-    /** @var RoleAccessMapper */
-    private $roleAccessMapper;
-
-    /** @var bool */
-    private $isModerationEnabled;
+    /** @var StrategyFactory */
+    private $strategyFactory;
 
 
     /**
-     * @param User             $sessionUser
      * @param Audience\Mapper  $audienceMapper
-     * @param Codec            $codec
-     * @param Folder\Mapper    $folderMapper
-     * @param RoleAccessMapper $roleAccessMapper
-     * @param bool             $isModerationEnabled
+     * @param StrategyFactory  $strategyFactory
      */
-    public function __construct(
-        User $sessionUser,
-        Audience\Mapper $audienceMapper,
-        Codec $codec,
-        Folder\Mapper $folderMapper,
-        RoleAccessMapper $roleAccessMapper,
-        bool $isModerationEnabled
-    ) {
-        $this->sessionUser         = $sessionUser;
-        $this->audienceMapper      = $audienceMapper;
-        $this->codec               = $codec;
-        $this->folderMapper        = $folderMapper;
-        $this->roleAccessMapper    = $roleAccessMapper;
-        $this->isModerationEnabled = $isModerationEnabled;
+    public function __construct(Audience\Mapper $audienceMapper, StrategyFactory $strategyFactory)
+    {
+        $this->audienceMapper  = $audienceMapper;
+        $this->strategyFactory = $strategyFactory;
     }
 
 
@@ -77,19 +46,16 @@ class Transactor
      * Does not perform DB mutations unless logical changes to the audience have been made
      *
      * @param News\Model $article
-     * @param string     $selectizeAudienceSegments
+     * @param GenericCollection|Audience\Model[] $postedSegments
      * @return bool
      * @throws Mapper\Exception
      * @throws Mapper\Exception\InsufficientHydrationException
-     * @throws \DomainException
      * @throws UnexpectedValueException
-     * @throws InvalidArgumentException
      */
-    public function save(News\Model $article, string $selectizeAudienceSegments): bool
+    public function save(News\Model $article, GenericCollection $postedSegments): bool
     {
         /** @var Audience\Model[]|GenericCollection $existingSegments */
         $existingSegments = $article->getAudience()->indexBy($this->audienceMapper->getIdentifierProperty());
-        $postedSegments   = $this->codec->decodeSelectizeValues($selectizeAudienceSegments);
 
         $segmentsToAdd    = $this->audienceMapper->createCollection();
         $segmentsToDelete = $this->audienceMapper->createCollection();
@@ -154,35 +120,17 @@ class Transactor
      * @return bool
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
-     * @throws InvalidArgumentException
      * @throws UnsatisfiedException
      */
     private function saveAddedSegments(News\Model $article, GenericCollection $segmentsToAdd): bool
     {
         $isSegmentsAdded = false;
         if ($segmentsToAdd->count()) {
-
-
-            $strategyFactory = new StrategyFactory($this->sessionUser, $this->folderMapper, $this->roleAccessMapper, $this->isModerationEnabled);
-            $strategies      = $strategyFactory->makeAll();
-            $composite       = new Audience\Segment\Strategy\Composite(); // TODO integrate into factory
-
-            // Ensure the relationship is valid for the segment's entity type
-            $validRelationships = [
-                Audience\Model::ENTITY_TYPE_COMPOSITE => $composite->getValidRelationshipModifiers($this->sessionUser),
-            ];
-            // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
-            $validNullEntities = [
-                Audience\Model::ENTITY_TYPE_COMPOSITE => $composite->canTargetNullEntityValue(),
-            ];
-            foreach ($strategies as $strategy) {
-                $validRelationships[$strategy->getEntityType()] = $strategy->getValidRelationshipModifiers($this->sessionUser);
-                $validNullEntities[$strategy->getEntityType()]  = $strategy->canTargetNullEntityValue();
-            }
-
-            $validSegmentSpecFactory = new Audience\Validation\Factory($validRelationships, $validNullEntities);
-            $validSegmentSpec        = $validSegmentSpecFactory->makeValidSegmentSpecification($this->sessionUser);
-
+            $validSegmentSpecFactory = new Audience\Validation\Factory(
+                $this->strategyFactory::getValidRelationshipModifiers(),
+                $this->strategyFactory::getValidNullEntities()
+            );
+            $validSegmentSpec        = $validSegmentSpecFactory->makeValidSegmentSpecification();
 
             foreach ($segmentsToAdd as $segmentToAdd) {
                 $segmentToAdd->setCommsNewsArticle($article);

@@ -110,12 +110,14 @@ class GenericCollection extends Collection
         return $this;
     }
 
+
     /**
      * {@inheritDoc}
      *
-     * @param int $index
+     * @param int    $index
      * @param object $value
      * @return static
+     * @throws UnexpectedValueException If $value is of an invalid type
      */
     public function setOffset($index, $value)
     {

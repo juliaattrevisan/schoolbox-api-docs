@@ -41,9 +41,11 @@ interface IArticleResolver
      *              should include articleB                  // as [folder:X ∩ role:Y] is a subset of [folder:X ∩ role:Y]
      *
      * @param string                $entityType
-     * @param int|string|null|array $entityValue     Null is a valid value to match on. Arrays are used in complex searches
-     * @param string|null           $relationship    Null means don't don't filter by relationship modifier.
+     * @param int|string|null|array $entityValue  Null is a valid value to match on. Arrays are used in complex searches
+     * @param string|null           $relationship Null means don't don't filter by relationship modifier.
+     * @param array                 $orderBy
+     * @param null|int              $limit
      * @return int[]
      */
-    public function findArticlesForAudience(string $entityType, $entityValue, string $relationship = null): array;
+    public function findArticlesForAudience(string $entityType, $entityValue, ?string $relationship, array $orderBy = [], int $limit = null): array;
 }

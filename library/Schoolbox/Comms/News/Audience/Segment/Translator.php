@@ -10,12 +10,12 @@ namespace Schoolbox\Comms\News\Audience\Segment;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Comms\News\Audience\Model;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Resource\Folder;
-use Schoolbox\User;
+use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
+use Schoolbox\GenericCollection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
 use PDO;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 
 /**
  * Render human-readable representations of audience segment entity values.
@@ -27,28 +27,9 @@ use PDO;
 class Translator
 {
 
-    /**
-     * @var IConnector
-     */
+    /** @var IConnector */
     private $database;
 
-    /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var Folder\Mapper
-     */
-    private $folderMapper;
-
-    /**
-     * @var RoleAccessMapper
-     */
-    private $roleAccessMapper;
-
-    /** @var bool */
-    private $isModerationEnabled;
 
     /**
      * This array is of the structure:
@@ -72,21 +53,18 @@ class Translator
      */
     private $cache = [];
 
+    /** @var StrategyFactory */
+    private $strategyFactory;
+
 
     /**
-     * @param IConnector       $db
-     * @param User             $user
-     * @param Folder\Mapper    $folderMapper
-     * @param RoleAccessMapper $roleAccessMapper
-     * @param bool             $isModerationEnabled
+     * @param IConnector      $db
+     * @param StrategyFactory $strategyFactory
      */
-    public function __construct(IConnector $db, User $user, Folder\Mapper $folderMapper, RoleAccessMapper $roleAccessMapper, bool $isModerationEnabled)
+    public function __construct(IConnector $db, StrategyFactory $strategyFactory)
     {
-        $this->database            = $db;
-        $this->user                = $user;
-        $this->folderMapper        = $folderMapper;
-        $this->roleAccessMapper    = $roleAccessMapper;
-        $this->isModerationEnabled = $isModerationEnabled;
+        $this->database        = $db;
+        $this->strategyFactory = $strategyFactory;
     }
 
 
@@ -134,27 +112,38 @@ class Translator
      *
      * @param News\Model $article
      * @return $this
-     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws InsufficientHydrationException
+     * @throws UnknownEntityTypeException
+     * @throws \UnexpectedValueException
      */
     public function buildCache(News\Model $article): self
     {
         $segmentIds = [];
+        /** @var ISimpleStrategy[] $strategiesInUse */
+        $strategiesInUse = new GenericCollection(ISimpleStrategy::class);
         foreach ($article->getAudience() as $segment) {
             if ($segment->isSimple()) {
                 $segmentIds[] = $segment->getId();
+                $strategiesInUse[$segment->getEntityType()] = $this->strategyFactory->makeStrategy($segment->getEntityType());
                 continue;
             }
             foreach ($segment->getChildren() as $childSegment) {
                 $segmentIds[] = $childSegment->getId();
+                $entityType = $childSegment->getEntityType();
+                $strategiesInUse[$entityType] = $this->strategyFactory->makeStrategy($entityType);
             }
         }
 
         if (!\count($segmentIds)) {
             return $this;
         }
-        $bindings   = Builder::getBindings($segmentIds, 'id');
-        $translator = new TranslatorRegistry($this->user, $this->folderMapper, $this->roleAccessMapper, $this->isModerationEnabled);
-        $statement  = $this->database->executeQuery($translator->getTranslateSql($bindings->getPlaceholder()), $bindings->getParams());
+
+        $bindings  = Builder::getBindings($segmentIds, 'id');
+        $sqlPieces = [];
+        foreach ($strategiesInUse as $strategy) {
+            $sqlPieces[] = "({$strategy->getTranslateSql($bindings->getPlaceholder())})";
+        }
+        $statement = $this->database->executeQuery(\implode(' UNION ALL ', $sqlPieces), $bindings->getParams());
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {

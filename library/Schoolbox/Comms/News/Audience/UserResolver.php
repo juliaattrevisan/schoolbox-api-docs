@@ -21,8 +21,11 @@ use UnexpectedValueException;
 class UserResolver implements IUserResolver
 {
 
-    /** @var BusinessRules */
-    private $businessRules;
+    /**
+     * Indexed by segment.entityType
+     * @var bool[]
+     */
+    private $validNullEntities;
 
     /** @var Database\Connector\IConnector */
     private $db;
@@ -38,20 +41,20 @@ class UserResolver implements IUserResolver
 
 
     /**
-     * @param BusinessRules                 $businessRules
+     * @param bool[]                        $validNullEntities
      * @param Database\Connector\IConnector $db
      * @param External_ClassInterface       $externalClass
      * @param RelationshipFilterer          $relationshipFilterer
      * @param Mapper                        $audienceMapper
      */
     public function __construct(
-        BusinessRules $businessRules,
+        array $validNullEntities,
         Database\Connector\IConnector $db,
         External_ClassInterface $externalClass,
         RelationshipFilterer $relationshipFilterer,
         Mapper $audienceMapper
     ) {
-        $this->businessRules        = $businessRules;
+        $this->validNullEntities    = $validNullEntities;
         $this->db                   = $db;
         $this->externalClass        = $externalClass;
         $this->relationshipFilterer = $relationshipFilterer;
@@ -97,7 +100,7 @@ class UserResolver implements IUserResolver
         $entityType = $audienceSegment->getEntityType();
 
         // Simple base case:
-        if (Model::ENTITY_TYPE_COMPOSITE !== $entityType) {
+        if (Segment\Strategy\Composite::getEntityType() !== $entityType) {
             $userIds = $this->getUserIds($audienceSegment->getEntityType(), $audienceSegment->getEntityValue());
             return $this->applyRelationshipFilter($userIds, $audienceSegment->getRelationship());
         }
@@ -164,8 +167,9 @@ class UserResolver implements IUserResolver
     private function getUserIds(string $entityType, ?string $entityValue): array
     {
         if (null === $entityValue) {
-            // Is null a valid segment entity value?
-            if (!$this->businessRules->canTargetNullEntity($entityType)) {
+            // Is null not a valid segment entity value?
+            if (!$this->validNullEntities[$entityType]) {
+                // Silently return empty set
                 return [];
             }
             $predicate  = 'IS NULL';
@@ -179,31 +183,31 @@ class UserResolver implements IUserResolver
         // TODO  pairs have their implementations inside a single class in adjacent methods.
 
         switch ($entityType) {
-            case Model::ENTITY_TYPE_USER:
+            case Segment\Strategy\User::getEntityType():
                 return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.id {$predicate} AND u.deleted_at IS NULL", $parameters)
                                 ->fetchAll(PDO::FETCH_COLUMN);
-            case Model::ENTITY_TYPE_SUPER:
+            case Segment\Strategy\Super::getEntityType():
                 return $this->db->executeQuery('SELECT u.id FROM user u JOIN superusers su ON u.id = su.id AND u.deleted_at IS NULL', $parameters)
                                 ->fetchAll(PDO::FETCH_COLUMN);
-            case Model::ENTITY_TYPE_CAMPUS:
+            case Segment\Strategy\Campus::getEntityType():
                 return $this->db->executeQuery("SELECT u.id FROM user u JOIN userCampus uc ON u.id = uc.uid WHERE uc.campus {$predicate} AND u.deleted_at IS NULL", $parameters)
                                 ->fetchAll(PDO::FETCH_COLUMN);
-            case Model::ENTITY_TYPE_ROLE:
+            case Segment\Strategy\Role::getEntityType():
                 return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.group_id {$predicate} AND u.deleted_at IS NULL", $parameters)
                                 ->fetchAll(PDO::FETCH_COLUMN);
-            case Model::ENTITY_TYPE_ROLE_TYPE:
+            case Segment\Strategy\RoleType::getEntityType():
                 return $this->db->executeQuery("SELECT u.id FROM user u JOIN groups g ON u.group_id = g.id WHERE g.group_type {$predicate} AND u.deleted_at IS NULL", $parameters)
                                 ->fetchAll(PDO::FETCH_COLUMN);
-            case Model::ENTITY_TYPE_SCHOOL_HOUSE:
+            case Segment\Strategy\SchoolHouse::getEntityType():
                 return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.house {$predicate} AND u.deleted_at IS NULL", $parameters)
                                 ->fetchAll(PDO::FETCH_COLUMN);
-            case Model::ENTITY_TYPE_RES_HOUSE:
+            case Segment\Strategy\ResHouse::getEntityType():
                 return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.residential_house_id {$predicate} AND u.deleted_at IS NULL", $parameters)
                                 ->fetchAll(PDO::FETCH_COLUMN);
-            case Model::ENTITY_TYPE_YEAR:
+            case Segment\Strategy\Year::getEntityType():
                 return $this->db->executeQuery("SELECT u.id FROM user u WHERE u.year {$predicate} AND u.deleted_at IS NULL", $parameters)
                                 ->fetchAll(PDO::FETCH_COLUMN);
-            case Model::ENTITY_TYPE_SERVICE:
+            case Segment\Strategy\Service::getEntityType():
                 if (null === $entityValue) {
                     return $this->db->executeQuery("SELECT u.id FROM user u LEFT JOIN userAccess ua ON u.id = ua.uid WHERE ua.uid {$predicate} AND u.deleted_at IS NULL", $parameters)
                                     ->fetchAll(PDO::FETCH_COLUMN);
@@ -226,10 +230,10 @@ class UserResolver implements IUserResolver
                 $whereClause = \count($whereClauses) ? \implode(' AND ', $whereClauses) : 'TRUE';
                 return $this->db->executeQuery("SELECT u.id FROM user u JOIN userAccess ua ON u.id = ua.uid WHERE {$whereClause} AND u.deleted_at IS NULL", $parameters)
                                 ->fetchAll(PDO::FETCH_COLUMN);
-            case Model::ENTITY_TYPE_PASTORAL_GROUP:
+            case Segment\Strategy\PastoralGroup::getEntityType():
                 return $this->db->executeQuery("SELECT u.id FROM user u LEFT JOIN pastoral_group_member pgm ON pgm.user_id = u.id WHERE pgm.group_id {$predicate} AND u.deleted_at IS NULL", $parameters)
                                 ->fetchAll(PDO::FETCH_COLUMN);
-            case Model::ENTITY_TYPE_FOLDER:
+            case Segment\Strategy\Folder::getEntityType():
                 // Get group users, regardless of whether they have read/write/mod perms. (but not deny)
                 $innerPbGroup = (new Database\Predicate\Builder($this->db, 'user'))
                     ->equals('ua.service', UserAccess::SERVICE_HOMEPAGE)

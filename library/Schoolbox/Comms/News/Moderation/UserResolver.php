@@ -13,7 +13,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Comms\News\Audience\Mapper as AudienceMapper;
 use Schoolbox\Comms\News\Audience\Model as Audience;
 use PDO;
-use Schoolbox\Comms\News\Audience\Segment\Strategy;
+use Schoolbox\Comms\News\Audience\Segment\EntityType;
 
 /**
  * Responsible for:
@@ -74,7 +74,7 @@ class UserResolver implements IUserResolver
         /** @var Audience $segment */
         $segment = $rootSegments->first();
 
-        if ($segment->getEntityType() !== Strategy\Folder::ENTITY_TYPE || $segment->getRelationship() !== Audience::RELATIONSHIP_SELF) {
+        if ($segment->getEntityType() !== \Schoolbox\Comms\News\Audience\Segment\Strategy\Folder::getEntityType() || $segment->getRelationship() !== Audience::RELATIONSHIP_SELF) {
             // not a trivial folder segment; bounce this
             return $moderators;
         }

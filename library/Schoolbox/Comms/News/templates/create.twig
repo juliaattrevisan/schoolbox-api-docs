@@ -1,11 +1,81 @@
 {#
-    action            string ['Create','Update']
-    article           News\Article\Model
-    featureImageZone  array
-    audienceSegments  null|array,
+    action                string ['Create','Update']
+    article               News\Article\Model
+    featureImageZone      array
+    audienceSegments      null|array,
+    isAutoSavable         bool
+    availableEntityTypes  string[]         The set of entity types that can be audienced by the current user
 #}
 
 {% import '@commsNews/indicator.twig' as indicator %}
+
+{% set entityTypesData = {
+    campus: {
+        name:         'Campus',
+        namePlural:    'Campuses',
+        icon:          'location',
+        selfModifier:  'Users in campus',
+        ajaxRoute:     routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'campus'}),
+        hideFromModal: false,
+        isMulti:       true
+    },
+    role: {
+        name:         'Role',
+        namePlural:    'Roles',
+        icon:          'staff-students',
+        selfModifier:  'Users in role',
+        ajaxRoute:     routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'role'}),
+        hideFromModal: false,
+        isMulti:       false
+    },
+    school_house: {
+        name:         'House',
+        namePlural:    'Houses',
+        icon:          'home',
+        selfModifier:  'House members',
+        ajaxRoute:     routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'school_house'}),
+        hideFromModal: false,
+        isMulti:       false
+    },
+    year: {
+        name:         'Year Level',
+        namePlural:    'Year Levels',
+        icon:          'teacher',
+        selfModifier:  'Users in year level/s',
+        ajaxRoute:     routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'year'}),
+        hideFromModal: false,
+        isMulti:       false
+    },
+    folder: {
+        name:         'Class/Group',
+        namePlural:    'Classes & Groups',
+        icon:          'group',
+        selfModifier:  'Class/group members',
+        ajaxRoute:     routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'folder'}),
+        hideFromModal: false,
+        isMulti:       true
+    },
+    user: {
+        name:         'User',
+        namePlural:    'Users',
+        icon:          'user',
+        selfModifier:  'Users',
+        ajaxRoute:     routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'user'}),
+        hideFromModal: true,
+        isMulti:       false
+    }
+} %}
+
+
+{# Build Placeholder text #}
+{% set availableNames = [] %}
+{% for entityType in availableEntityTypes %}
+    {# TODO implement other types for comms officers #}
+    {% if entityTypesData[entityType] %}
+        {% set availableNames = availableNames|merge([entityTypesData[entityType].namePlural|lower]) %}
+    {% endif %}
+{% endfor %}
+{% set audiencePlaceholder = 'Search for ' ~ availableNames|join(', ') ~ '...' %}
 
 <div class="row">
     <div class="small-12 columns">
@@ -66,13 +136,7 @@
                     </div>
                 </fieldset>
 
-                <fieldset class="content" id="audience-select-container">
-
-                    {% if USER.role.staff %}
-                        {% set audiencePlaceholder = 'Search for classes, groups, year levels, roles, campuses, individual users...' %}
-                    {% else %}
-                        {% set audiencePlaceholder = 'Search for classes or groups...' %}
-                    {% endif %}
+                <fieldset class="content" id="audience-select-container" v-if="countModalSegmentTypes">
 
                     <div class="small-12 columns">
                         <label>Audience</label>
@@ -103,22 +167,24 @@
 
                         <div class="input-group">
                             <input type="text" id="audience-search" name="audience" placeholder="{{ audiencePlaceholder }}" />
-                            <button class="button icon-drag-drop" @click.prevent="{{ (USER.role.staff) ? 'openBrowseModal' : 'openBrowseModalRead' }}">Browse&hellip;</button>
+                            <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse&hellip;</button>
                         </div>
                     </div>
 
                     {# audience browser modal #}
                     <div data-reveal id="audience-browse" class="reveal-modal no-pad">
 
-                        <dl class="tabs text-center" role="tablist">
-                            <dd :class="{ active: pageShow.index || pageShow.valueSelect }" role="presentation"><a @click="showPage('index')">Select Simple Audience</a></dd>
-                            <dd :class="{ active: pageShow.intersect }" role="presentation"><a @click="advancedToggle()">Create Complex Audience</a></dd>
-                        </dl>
+                        <template v-if="canCreateComplex">
+                            <dl class="tabs text-center" role="tablist">
+                                <dd :class="{ active: pageShow.index || pageShow.valueSelect }" role="presentation"><a @click="showPage('index')">Select Simple Audience</a></dd>
+                                <dd :class="{ active: pageShow.intersect }" role="presentation"><a @click="advancedToggle()">Create Complex Audience</a></dd>
+                            </dl>
+                        </template>
 
                         <a class="close-reveal-modal" aria-label="Close">×</a>
 
                         <div v-show="pageShow.index" class="reveal-modal-tab-content">
-                            <div class="small-12 medium-4 columns left" v-for="audienceOption in audienceOptions.base" v-if="audienceOption.displayInModal">
+                            <div class="small-12 medium-4 columns left" v-for="audienceOption in audienceOptions.base" v-if="!audienceOption.hideFromModal">
                                 <button class="button-block" @click="changePage(audienceOption)">
                                     <i :class="'icon-' + audienceOption.icon"></i>
                                     ${ audienceOption.namePlural }
@@ -129,7 +195,7 @@
                         <div v-show="pageShow.valueSelect" class="reveal-modal-tab-content">
                             <div class="row">
                                 <div class="small-12 columns">
-                                    <ul class="breadcrumb" v-show="writeOnly">
+                                    <ul class="breadcrumb" v-show="countModalSegmentTypes > 1">
                                         <li><a href="#" @click.prevent="showPage('index')">Audience Types</a></li>
                                         <li class="active"><a>${ selectedAudienceOption.namePlural }</a></li>
                                     </ul>
@@ -184,8 +250,8 @@
                                         <legend>
                                             <label for="">Audience Type ${ index + 1 }:</label>
                                             <select @change="updateIntersectList(key)" v-model="intersect[key]">
-                                                <option :value="audienceOption" v-for="audienceOption in audienceOptions.intersect[key]" v-if="audienceOption.displayInModal">
-                                                    ${ audienceOption.label }
+                                                <option :value="audienceOption" v-for="audienceOption in audienceOptions.intersect[key]" v-if="!audienceOption.hideFromModal">
+                                                    ${ audienceOption.name }
                                                 </option>
                                             </select>
                                         </legend>
@@ -386,22 +452,23 @@
      * Encapsulates information about a type of audience, eg 'folder' or 'campus'
      *
      * @param {string}  entityType
-     * @param {string}  label
+     * @param {string}  name
      * @param {string}  namePlural
      * @param {string}  icon
      * @param {string}  selfModifier
-     * @param {boolean} displayInModal
+     * @param {string}  ajaxRoute
+     * @param {boolean} hideFromModal    For case when we need labels to render bricks, but don't want this entity type in the modal
      * @param {boolean} isMulti          Is this entityType 1:N from users? eg target users in [Eng34 ∩ Chem12]
      * @constructor
      */
-    var AudienceOption = function(entityType, label, namePlural, icon, selfModifier, displayInModal, isMulti){
+    var AudienceOption = function(entityType, name, namePlural, icon, selfModifier, ajaxRoute, hideFromModal, isMulti){
         this.entityType     = entityType;
-        this.label          = label;
+        this.name           =  name;
         this.namePlural     = namePlural;
         this.icon           = icon;
         this.selfModifier   = selfModifier;
-        this.ajax           = '{{ routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'entityType'}) }}'.replace('entityType', entityType);
-        this.displayInModal = displayInModal;
+        this.ajax           = ajaxRoute;
+        this.hideFromModal  = hideFromModal;
         this.isMulti        = isMulti;
 
         // We'll populate these via ajax on first time this audience type is displayed in the modal
@@ -411,17 +478,25 @@
         this.valueLabels        = undefined;    // will maps encoded values to human-friendly labels
     };
 
-    {% set isStaff = USER.role.staff ? 'true' : 'false' %}
-
     /** @var {AudienceOption[]|Object} audienceOptions */
-    var audienceOptions = {
-        campus:         new AudienceOption('campus', 'Campus', 'Campuses', 'location', 'Users in campus', {{ isStaff }}, true),
-        role:           new AudienceOption('role', 'Role', 'Roles', 'staff-students', 'Users in role', {{ isStaff }}, false),
-        school_house:   new AudienceOption('school_house', 'House', 'Houses', 'home', 'House members', {{ isStaff }}, false),
-        year:           new AudienceOption('year', 'Year Level', 'Year Levels', 'teacher', 'Users in year level/s', {{ isStaff }}, false),
-        folder:         new AudienceOption('folder', 'Class/Group', 'Classes & Groups', 'group', 'Class/group members', true, true),
-        user:           new AudienceOption('user', 'User', 'Users', 'user', 'Users', false, false)
-    };
+    var audienceOptions = {};
+    {% for entityType in availableEntityTypes %}
+        {% set data = entityTypesData[entityType] %}
+        {# TODO implement other types for comms officers #}
+        {% if data %}
+            audienceOptions['{{ entityType }}'] = new AudienceOption(
+                '{{ entityType }}',
+                '{{ data.name }}',
+                '{{ data.namePlural | raw }}',
+                '{{ data.icon }}',
+                '{{ data.selfModifier }}',
+                '{{ data.ajaxRoute }}',
+                {% if data.hideFromModal %}true{% else %}false{% endif %},
+                {% if data.isMulti %}true{% else %}false{% endif %}
+            );
+        {% endif %}
+    {% endfor %}
+
 
     // Bricks need to render various human-friendly labels, so inject the entityType labels
     // into the BrickManager so it can supply it to Bricks that it creates.
@@ -433,7 +508,7 @@
     };
     for (var entityType in audienceOptions) {
         entityTypeLabelMap[entityType] = {
-            singular: audienceOptions[entityType].label,
+            singular: audienceOptions[entityType].name,
             plural: audienceOptions[entityType].namePlural
         };
     }
@@ -442,6 +517,50 @@
         self:        'Self',
         parents_of:  'Parents of students',
         teachers_of: 'Teachers of students'
+    };
+
+    /**
+     * Returns which audience options to show in the specified composite dropdown list
+     *
+     * Needs to consider defaults, and fall-back values if defaults are not available.
+     * @param {string}                  list ['primary'|'secondary']
+     * @param {Object|AudienceOption[]} audienceOptions
+     * @return {AudienceOption}
+     */
+    var getDefaultIntersectAudience = function (list, audienceOptions) {
+        switch (list) {
+            case 'primary':
+                if (audienceOptions.hasOwnProperty('role')) {
+                    return audienceOptions.role;
+                }
+                // Return first available
+                for (var i in audienceOptions) {
+                    if (audienceOptions.hasOwnProperty(i)) {
+                        return audienceOptions[i];
+                    }
+                }
+                break;
+            case 'secondary':
+                if (audienceOptions.hasOwnProperty('campus')) {
+                    return audienceOptions.campus;
+                }
+                // Return second available if exists, otherwise first if multi
+                var firstOption = null;
+                for (var j in audienceOptions) {
+                    if (audienceOptions.hasOwnProperty(j)) {
+                        if (!firstOption) {
+                            firstOption = audienceOptions[j];
+                        } else {
+                            return audienceOptions[j];
+                        }
+                    }
+                }
+                if (firstOption && firstOption.isMulti) {
+                    return firstOption;
+                }
+                break;
+        }
+        return null;
     };
 
     // Audience audienceSelectize where user can search for simple audience segments. The first is the jQuery DOM wrapper, the latter the Selecize plugin.
@@ -491,7 +610,7 @@
 
                             var $option = $audienceSelectizeItemTemplate.clone();
                             $option.find('[data-name]').html(escape(item.name));
-                            $option.find('[data-entityType]').html('(' + audienceOptions[entityType].label + ')');
+                            $option.find('[data-entityType]').html('(' + audienceOptions[entityType].name + ')');
                             if ('self' !== modifier) {
                                 $option.find('[data-modifier]').html('[' + modifierLabelMap[modifier] + ']');
                             } else {
@@ -592,16 +711,11 @@
             includeParents: false,
             includeTeachers: false,
 
-            // Whether the user should see the write version of the modal or not.
-            // Read users will not see the write options even if this is set to true (because of twig conditionals), this just makes the experience easier
-            // for read users
-            writeOnly: {{ (USER.role.staff) ? 'true' : 'false' }},
-
             // The selected intersect groups
             // Default to campus and role
             intersect: {
-                'primary': audienceOptions.role,
-                'secondary': audienceOptions.campus
+                'primary': getDefaultIntersectAudience('primary', audienceOptions),
+                'secondary': getDefaultIntersectAudience('secondary', audienceOptions)
             },
 
             // The models for the checkboxes
@@ -619,23 +733,25 @@
         methods: {
             /**
              * Opening the 'browse...' modal
+             * If only one audience type is available, just shows that. Otherwise displays an index page.
              */
             openBrowseModal: function () {
-                // Reset everythang
-                this.showPage('index');
                 this.resetModal();
 
-                // Open the modal
-                $('#audience-browse').foundation('reveal', 'open');
-            },
-
-            /**
-             * Opening the 'browse...' modal as a read user
-             * You get sent straight to the folder select option
-             */
-            openBrowseModalRead: function () {
-                this.resetModal();
-                this.changePage(this.audienceOptions.base.folder);
+                if (1 === this.countModalSegmentTypes) {
+                    // If only one audience type available, jump straight to that
+                    var audienceOption = null;
+                    for (var type in this.audienceOptions.base) {
+                        if (this.audienceOptions.base.hasOwnProperty(type)) {
+                            audienceOption = this.audienceOptions.base[type];
+                            break;
+                        }
+                    }
+                    this.changePage(this.audienceOptions.base[audienceOption.entityType]);
+                } else {
+                    // Reset everythang
+                    this.showPage('index');
+                }
 
                 // Open the modal
                 $('#audience-browse').foundation('reveal', 'open');
@@ -979,6 +1095,29 @@
                     modifiers.push('teachers_of');
                 }
                 return modifiers;
+            },
+            // Returns the number of different audience segment entity-types available in the modal
+            countModalSegmentTypes: function(){
+                var count = 0;
+                for(var i in audienceOptions){
+                    if(audienceOptions.hasOwnProperty(i) && !audienceOptions[i].hideFromModal){
+                        count++;
+                    }
+                }
+                return count;
+            },
+            // Returns whether the user can create a complex audience
+            canCreateComplex: function(){
+                if(this.countModalSegmentTypes > 1){
+                    return true;
+                }
+                for(var i in audienceOptions){
+                    console.log(audienceOptions[i]);
+                    if(audienceOptions.hasOwnProperty(i) && !audienceOptions[i].hideFromModal && audienceOptions[i].isMulti){
+                        return true;
+                    }
+                }
+                return false;
             }
         }
     });

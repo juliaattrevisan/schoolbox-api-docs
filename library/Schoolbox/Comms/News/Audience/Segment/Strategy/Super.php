@@ -7,17 +7,32 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-class Super extends Base
-{
+use Schoolbox\User;
 
-    public const ENTITY_TYPE = 'super';
+class Super extends SimpleStrategy
+{
+    public const ENTITY_VALUE = '1';
+    public static function getEntityType(): string
+    {
+        return 'super';
+    }
 
     /**
      * @inheritdoc
      */
-    public function getSearchSql(string $searchPlaceholder = null): string
+    public static function isValidNullEntityValue(): bool
     {
-        return 'TODO'; // TODO
+        // Only valid entityValue is TRUE (TODO update comment to reference where this is defined)
+        return false;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(User $user, string $searchPlaceholder = null): string
+    {
+        return "SELECT 0, 'name todo', 'type todo' from dual WHERE false"; // TODO
     }
 
 
@@ -26,6 +41,6 @@ class Super extends Base
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
-        return 'TODO'; // TODO
+        return ''; // TODO
     }
 }

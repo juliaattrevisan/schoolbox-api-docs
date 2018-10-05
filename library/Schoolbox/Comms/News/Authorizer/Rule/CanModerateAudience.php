@@ -8,49 +8,45 @@
 namespace Schoolbox\Comms\News\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
-use InvalidArgumentException;
-use Schoolbox\GenericCollection;
-use Schoolbox\Permission\Access\UserAccess;
+use UnexpectedValueException;
 use Schoolbox\User;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
+use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 
+/**
+ * Checks whether a user can moderate an article's *current* audience.
+ *
+ * WARNING. Note that if you use this rule in a route where the audience is being mutated, this rule will not inherently block the addition
+ *          of audience segments where the user does not have moderate permission.
+ */
 class CanModerateAudience extends ArticleAttribute
 {
 
-    /** @var Folder\Mapper */
-    private $folderMapper;
-
-    /**
-     * Just compute this once per user. Indexed by user.id, folder.id
-     *
-     * @var GenericCollection[]|Folder\Model[][]
-     */
-    private $folderCache = [];
+    /** @var StrategyFactory */
+    private $strategyFactory;
 
 
     /**
-     * @param Folder\Mapper $folderMapper
+     * @param StrategyFactory $strategyFactory
      */
-    public function __construct(Folder\Mapper $folderMapper)
+    public function __construct(StrategyFactory $strategyFactory)
     {
-        $this->folderMapper = $folderMapper;
+        $this->strategyFactory = $strategyFactory;
     }
 
 
     /**
-     * @param array     $params
-     * @param User|null $user
+     * @inheritdoc
      * @throws InsufficientHydrationException
-     * @throws InvalidArgumentException
-     * @throws Unauthorized
-     * @throws \UnexpectedValueException
+     * @throws UnknownEntityTypeException
+     * @throws UnexpectedValueException If no article found in params
      */
     public function authorize(array $params = [], User $user = null): void
     {
         if (!$user) {
-            throw new InvalidArgumentException('$user must be provided');
+            throw new Unauthorized('$user must be provided');
         }
 
         $article = $this->findArticleInParams($params);
@@ -74,35 +70,24 @@ class CanModerateAudience extends ArticleAttribute
      * @param Audience\Model $segment
      * @return bool
      * @throws InsufficientHydrationException
+     * @throws UnknownEntityTypeException
      */
     private function canModerate(User $user, Audience\Model $segment): bool
     {
-        // Recursive case
-        if ($segment->isComposite()) {
-            // Since composite children are an INTERSECT, the user must have moderation permission to ANY of the children.
-            foreach ($segment->getChildren() as $child) {
-                if ($this->canModerate($user, $child)) {
-                    return true;
-                }
-            }
+        // Base Case
+        if ($segment->isSimple()) {
+            return $this->strategyFactory->makeStrategy($segment->getEntityType())->canModerate($user, $segment->getEntityValue());
+        }
+
+        // Recursive case - Since composite children are an INTERSECT, the user can have moderation permission to ANY of the children.
+        if (!$segment->getChildren()->count()) {
             return false;
         }
-
-        // Base Cases
-
-        // Implicit folder moderation permission if you have WRITE+ permission to the folder
-        if (Audience\Model::ENTITY_TYPE_FOLDER === $segment->getEntityType()) {
-            if (!\array_key_exists($user->getId(), $this->folderCache)) {
-                $this->folderCache[$user->getId()] = $this->folderMapper->findForUser($user, true, UserAccess::ACCESS_WRITE)
-                                                                        ->indexBy($this->folderMapper->getIdentifierProperty());
+        foreach ($segment->getChildren() as $childSegment) {
+            if ($this->canModerate($user, $childSegment)) {
+                return true;
             }
-
-            return $this->folderCache[$user->getId()]->keyExists($segment->getEntityValue());
         }
-
-        // TODO add tests for other implicit moderation permissions.
-        // TODO add tests for explicitly-assigned moderation permissions.
-
         return false;
     }
 }

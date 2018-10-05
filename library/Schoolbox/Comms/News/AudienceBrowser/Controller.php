@@ -12,11 +12,10 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News\Audience;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use PDO;
-use InvalidArgumentException;
 use UnexpectedValueException;
 
 class Controller extends Base
@@ -25,38 +24,33 @@ class Controller extends Base
     /** @var IConnector */
     private $db;
 
-    /**
-     * @var Folder\Mapper
-     */
-    private $folderMapper;
-
-    /**
-     * @var Audience\Mapper
-     */
+    /** @var Audience\Mapper */
     private $audienceMapper;
 
-    /**
-     * @var RoleAccessMapper
-     */
-    private $roleAccessMapper;
+    /** @var StrategyFactory */
+    private $strategyFactory;
+
+    /** @var Folder\Mapper */
+    private $folderMapper;
 
 
     /**
-     * @param IConnector            $db
-     * @param Folder\Mapper         $folderMapper
-     * @param Audience\Mapper       $audienceMapper
-     * @param RoleAccessMapper      $roleAccessMapper
+     * @param IConnector      $db
+     * @param Audience\Mapper $audienceMapper
+     * @param StrategyFactory $strategyFactory
+     * @param Folder\Mapper   $folderMapper
      */
     public function __construct(
         IConnector $db,
-        Folder\Mapper $folderMapper,
         Audience\Mapper $audienceMapper,
-        RoleAccessMapper $roleAccessMapper
+        Folder\Mapper $folderMapper,
+        StrategyFactory $strategyFactory
+
     ) {
-        $this->db               = $db;
-        $this->folderMapper     = $folderMapper;
-        $this->audienceMapper   = $audienceMapper;
-        $this->roleAccessMapper = $roleAccessMapper;
+        $this->db              = $db;
+        $this->audienceMapper  = $audienceMapper;
+        $this->folderMapper    = $folderMapper;
+        $this->strategyFactory = $strategyFactory;
     }
 
 
@@ -65,18 +59,24 @@ class Controller extends Base
      *
      * @api   /comms/news/audiencebrowser/search
      * @level 18.1
-     * @throws InvalidArgumentException
-     * @throws UnexpectedValueException
+     * @throws UnknownEntityTypeException
      * @throws \Alaress\Database\Exception
+     * @throws UnexpectedValueException
      */
     public function getSearch(): void
     {
-        $codec           = new Audience\Segment\Codec($this->audienceMapper);
-        $strategyFactory = $this->buildStrategyFactory();
-        $strategies      = $strategyFactory->makeAll();
-        $searchRegistry  = new Audience\Segment\SearchRegistry($this->getUser(), $strategies);
-        $placeholder     = 'keyword';
-        $statement       = $this->db->prepareQuery($searchRegistry->getSearchSql($placeholder));
+        $codec            = new Audience\Segment\Codec($this->audienceMapper);
+        $simpleStrategies = $this->strategyFactory->makeAllSimpleStrategies();
+        $placeholder      = 'keyword';
+        $pieces           = [];
+
+        foreach ($simpleStrategies as $strategy) {
+            if ($strategy->canAudienceToEntityType($this->getUser())) {
+                $pieces[] = "({$strategy->getSearchSql($this->getUser(), $placeholder)})";
+            }
+        }
+        // We can UNION ALL and avoid de-duplication logic as each sub-query has a distinct entity type
+        $statement       = $this->db->prepareQuery(\implode(' UNION ALL ', $pieces));
         $escapedKeyword  = $this->db->escapeForLike($this->getRequest()->query['query']);
 
         $statement->execute([$placeholder => "%{$escapedKeyword}%"]);
@@ -90,7 +90,7 @@ class Controller extends Base
             $name         = $row['name'];
             $encodedValue = $codec->encodeValue($value);
 
-            foreach($strategies[$entityType]->getValidRelationshipModifiers($this->getUser()) as $modifier){
+            foreach ($simpleStrategies[$entityType]::getValidRelationshipModifiers() as $modifier) {
                 $key = $codec->encodeSimpleAttributes($entityType, $value, $modifier);
                 $option = new Audience\SegmentSelectizeOption($key, $name);
                 $option->addLabel($entityType, $encodedValue, $name);
@@ -110,27 +110,33 @@ class Controller extends Base
      */
     public function getList(string $entityType): void
     {
-        $strategyFactory = $this->buildStrategyFactory();
-
         try{
-            $strategy = $strategyFactory->make($entityType);
-        } catch (InvalidArgumentException $e){
+            $strategy = $this->strategyFactory->makeSimpleStrategy($entityType);
+        } catch (UnknownEntityTypeException $e){
             $this->sendError('Unrecognised entity type', [], 404);
             return;
         }
 
-        if(!$strategy->canBeTargetedByUser($this->getUser())){
+        if (!$strategy->canAudienceToEntityType($this->getUser())) {
             $this->sendError('You cannot audience articles to this audience type', [], 403);
             return;
         }
 
         $codec         = new Audience\Segment\Codec($this->audienceMapper);
-        $stmt          = $this->db->executeQuery($strategy->getSearchSql());
         $valueLabels   = [];
 
-        /** @noinspection PhpAssignmentInConditionInspection */
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-            $valueLabels[$codec->encodeValue($row['id'])] = $row['name'];
+        // Special case for folder, only show involved folders in the list
+        if (Audience\Segment\Strategy\Folder::getEntityType() === $entityType) {
+            $involvedFolders = $this->folderMapper->findForUser($this->getUser(), true, UserAccess::ACCESS_WRITE);
+            foreach ($involvedFolders as $folder) {
+                $valueLabels[$codec->encodeValue((string)$folder->getId())] = $folder->getNameWithCodes();
+            }
+        } else {
+            $stmt = $this->db->executeQuery($strategy->getSearchSql($this->getUser()));
+            /** @noinspection PhpAssignmentInConditionInspection */
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $valueLabels[$codec->encodeValue($row['id'])] = $row['name'];
+            }
         }
 
         \uasort($valueLabels, function (string $left, string $right) {
@@ -138,24 +144,10 @@ class Controller extends Base
         });
 
         $data = [
-            'availableModifiers' => $strategy->getValidRelationshipModifiers($this->getUser()),
-            'canTargetNull'      => $strategy->canTargetNullEntityValue(),
+            'availableModifiers' => $strategy::getValidRelationshipModifiers(),
+            'canTargetNull'      => $strategy->canAudienceToEntityValue($this->getUser(), NULL),
             'valueLabels'        => $valueLabels,
         ];
         $this->getResponse()->content->set($this->buildJsonOutput($data));
-    }
-
-
-    /**
-     * @return StrategyFactory
-     */
-    private function buildStrategyFactory(): StrategyFactory
-    {
-        return new StrategyFactory(
-            $this->getUser(),
-            $this->folderMapper,
-            $this->roleAccessMapper,
-            $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION)
-        );
     }
 }

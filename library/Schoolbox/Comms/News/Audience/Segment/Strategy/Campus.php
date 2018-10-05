@@ -10,27 +10,47 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\User;
 
-class Campus extends Base
+class Campus extends SimpleStrategy
 {
-    public const ENTITY_TYPE = 'campus';
-
     /**
-     * @inheritdoc
+     * @return string
      */
-    public function canBeTargetedByUser(User $user): bool
+    public static function getEntityType(): string
     {
-        return true;
+        return 'campus';
     }
 
     /**
      * @inheritdoc
      */
-    public function getSearchSql(string $searchPlaceholder = null): string
+    public static function isValidNullEntityValue(): bool
+    {
+        // From a schema level, a user has 0:N campus
+        return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canAudienceToEntityType(User $user): bool
+    {
+        if (parent::canAudienceToEntityType($user)) {
+            return true;
+        }
+        return $this->getStaffCanPost() && $user->getRole()->isStaff();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(User $user, string $searchPlaceholder = null): string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "WHERE `name` LIKE :{$searchPlaceholder}";
 
+        $entityType = self::getEntityType();
         return "
-            SELECT id, name, '{$this->getEntityType()}' AS entity_type
+            SELECT id, name, '{$entityType}' AS entity_type
             FROM luCampus
             {$keywordFilter}
         ";
@@ -42,10 +62,11 @@ class Campus extends Base
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
+        $entityType = self::getEntityType();
         return "
             SELECT DISTINCT cna.entity_type, cna.entity_value, luCampus.name
             FROM comms_news_audience cna
-            INNER JOIN luCampus ON cna.entity_type = '{$this->getEntityType()}' AND cna.entity_value = luCampus.id
+            INNER JOIN luCampus ON cna.entity_type = '{$entityType}' AND cna.entity_value = luCampus.id
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }
@@ -53,16 +74,7 @@ class Campus extends Base
     /**
      * @inheritdoc
      */
-    public function canTargetNullEntityValue(): bool
-    {
-        // From a schema level, a user has 0:N campus
-        return true;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getValidRelationshipModifiers(User $user): array
+    public static function getValidRelationshipModifiers(): array
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }

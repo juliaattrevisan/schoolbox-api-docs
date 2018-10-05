@@ -10,17 +10,31 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\User;
 
-class ResHouse extends Base
+class ResHouse extends SimpleStrategy
 {
 
-    public const ENTITY_TYPE = 'res_house';
+    public static function getEntityType(): string
+    {
+        return 'res_house';
+    }
 
     /**
      * @inheritdoc
      */
-    public function getSearchSql(string $searchPlaceholder = null): string
+    public static function isValidNullEntityValue(): bool
     {
-        return 'TODO'; // TODO
+        // Users have 0:1 residential houses
+        return true;
+    }
+
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(User $user, string $searchPlaceholder = null): string
+    {
+        return "SELECT 0, 'name todo', 'type todo' from dual WHERE false"; // TODO
     }
 
 
@@ -29,23 +43,14 @@ class ResHouse extends Base
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
-        return 'TODO'; // TODO
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function canTargetNullEntityValue(): bool
-    {
-        // Users have 0:1 residential houses
-        return true;
+        return ''; // TODO
     }
 
 
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(User $user): array
+    public static function getValidRelationshipModifiers(): array
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }

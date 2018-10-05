@@ -136,6 +136,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      *                                                new Alaress_Date_Locale_Config()
      *
      * @return static
+     * @throws InvalidArgumentException If unable to build date
      */
     public static function newLocal(
         $dateTime,
@@ -305,6 +306,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * @param string|array                  $dateFormat If array, try each in turn until it works
      * @param DateTimeZone                  $timezone The timezone of the date, or null to use default
      * @param Alaress_Date_Locale_Interface $locale
+     * @throws InvalidArgumentException If unable to build date
      */
     public function __construct($dateTime = null, $dateFormat = null, DateTimeZone $timezone = null, $locale = null)
     {

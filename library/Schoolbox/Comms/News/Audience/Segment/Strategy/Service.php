@@ -7,17 +7,35 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-class Service extends Base
+use Schoolbox\User;
+
+class Service extends SimpleStrategy
 {
 
-    public const ENTITY_TYPE = 'service';
+    /**
+     * @return string
+     */
+    public static function getEntityType(): string
+    {
+        return 'service';
+    }
 
     /**
      * @inheritdoc
      */
-    public function getSearchSql(string $searchPlaceholder = null): string
+    public static function isValidNullEntityValue(): bool
     {
-        return 'TODO'; // TODO
+        // A user may have no service permissions
+        return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(User $user, string $searchPlaceholder = null): string
+    {
+        return "SELECT 0, 'name todo', 'type todo' from dual WHERE false"; // TODO
     }
 
 
@@ -26,15 +44,6 @@ class Service extends Base
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
-        return 'TODO'; // TODO
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function canTargetNullEntityValue(): bool
-    {
-        // Users may not have any service perms
-        return true;
+        return ''; // TODO
     }
 }

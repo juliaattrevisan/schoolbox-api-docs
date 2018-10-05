@@ -31,6 +31,8 @@ use GuzzleHttp;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\CompositeSync;
 use Schoolbox\External\Connector\CustomSync;
 use Schoolbox\External\Connector\ICommunityPortal;
@@ -51,6 +53,8 @@ use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Revision\DataSource as PastoralRevisionDataSource;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
@@ -346,7 +350,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $externalUser    = $di->get('externalUser');
                     $externalClass   = $di->get('externalClass');
                     $articleResolver = new News\Audience\ArticleResolver(
-                        new News\Audience\BusinessRules(),
+                        StrategyFactory::getValidNullEntities(),
+                        StrategyFactory::getValidRelationshipEntityMap(),
                         $db,
                         $di->get('mapperFactory')->get(UserAccessMapper::class),
                         $di->get('mapperFactory')->get(Folder\Mapper::class),
@@ -379,7 +384,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $externalUser    = $di->get('externalUser');
                     $externalClass   = $di->get('externalClass');
                     $userResolver = new News\Audience\UserResolver(
-                        new News\Audience\BusinessRules(),
+                        StrategyFactory::getValidNullEntities(),
                         $db,
                         $externalClass,
                         new News\Audience\RelationshipFilterer(
@@ -398,6 +403,36 @@ abstract class AbstractBootstrap implements BootstrapInterface
             )
         );
 
+        $di->set(
+            'commsNewsAudienceStrategyFactory',
+            $di->lazy(
+                function () use ($di) {
+                    /**
+                     * @var MapperFactory    $mapperFactory
+                     * @var UserAccessMapper $userAccessMapper
+                     * @var Folder\Mapper    $folderMapper
+                     * @var RoleAccessMapper $roleAccessMapper
+                     * @var Access           $access
+                     * @var IConfigLoader    $config
+                     */
+                    $mapperFactory    = $di->get('mapperFactory');
+                    $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
+                    $folderMapper     = $mapperFactory->get(Folder\Mapper::class);
+                    $roleAccessMapper = $mapperFactory->get(RoleAccessMapper::class);
+                    $access           = $mapperFactory->get(Access::class);
+                    $config           = $di->get('config');
+                    return new News\Audience\Segment\StrategyFactory(
+                        $userAccessMapper,
+                        $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS),
+                        $config->get(ConfigMapper::_GLOBAL_MODERATION),
+                        $folderMapper,
+                        $roleAccessMapper,
+                        $access
+
+                    );
+                }
+            )
+        );
 
         // Web output class - currently uses Sitepage
         $di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');

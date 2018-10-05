@@ -13,6 +13,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Comms\News\Audience\UserResolver;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
@@ -48,20 +49,25 @@ class Module extends BaseModule
          * and either publicly visible, or you are in the audience
          */
         $readerPerms = new Rule\LazyCallback(function () {
-            /** @var UserResolver $userResolver */
-            $userResolver = $this->getInjector()->get('commsNewsUserResolver');
+            /**
+             * @var UserResolver $userResolver
+             * @var StrategyFactory $strategyFactory
+             */
+            $userResolver    = $this->getInjector()->get('commsNewsUserResolver');
+            $strategyFactory = $this->getInjector()->get('commsNewsAudienceStrategyFactory');
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_WRITE),
+                    new Authorizer\Rule\CanModerateAudience($this->getStrategyFactory()),
                     new Authorizer\Rule\IsArticleAuthor(),
                     new Rule\All(
                         new Authorizer\Rule\IsPublishedOrExpired(),
                         new Rule\Any(
                             new Authorizer\Rule\IsShareable(),
-                            new Authorizer\Rule\IsMemberOfArticleAudience($userResolver)
+                            new Authorizer\Rule\IsMemberOfArticleAudience($userResolver),
+                            new Authorizer\Rule\HaveReadPermToAudience($strategyFactory)
                         )
                     )
                 )
@@ -70,6 +76,8 @@ class Module extends BaseModule
 
         // Can modify if any of: Supers, Comms Officers, Article audience moderators, or
         // You are the author, and the article is not yet accepted
+        // Note we do not check the user audience to the proposed audience as the audience may be changing
+        // eg we need to enable a user to access this route to remove audience segments they no longer have permission to audience to.
         $canModify = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
@@ -77,8 +85,11 @@ class Module extends BaseModule
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
                     new Rule\All(
-                        new Authorizer\Rule\InstructorsCanEditOthersArticles($this->getConfig()),
-                        new Authorizer\Rule\CanModerateAudience($this->getFolderMapper())
+                        new Rule\Any(
+                            new Authorizer\Rule\IsArticleAuthor(),
+                            new Authorizer\Rule\InstructorsCanEditOthersArticles($this->getConfig())
+                        ),
+                        new Authorizer\Rule\CanModerateAudience($this->getStrategyFactory())
                     ),
                     new Rule\All(
                         new Authorizer\Rule\IsArticleAuthor(),
@@ -94,7 +105,7 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper()),
+                    new Authorizer\Rule\CanModerateAudience($this->getStrategyFactory()),
                     new Authorizer\Rule\IsArticleAuthor()
                 )
             );
@@ -175,14 +186,11 @@ class Module extends BaseModule
             'statisticsMapper'           => $this->getMapperFactory()->getLazy(Statistics\Mapper::class),
             'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(Statistics\Cumulative\Mapper::class),
             'audienceMapper'             => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
-            'roleAccessMapper'           => $this->getMapperFactory()->getLazy(Access\RoleAccessMapper::class),
             'folderMapper'               => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
             'databaseInternal'           => $injector->lazyGet('databaseInternal'),
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
             'userResolver'               => $injector->lazyGet('commsNewsUserResolver'),
-            'validSpecFactory'           => $injector->lazy(function () {
-                return new Validation\Factory();
-            }),
+            'strategyFactory'            => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
         ];
     }
 
@@ -252,11 +260,11 @@ class Module extends BaseModule
 
 
     /**
-     * @return \Schoolbox\Mapper|Folder\Mapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @return StrategyFactory|object
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    private function getFolderMapper(): Folder\Mapper
+    private function getStrategyFactory(): StrategyFactory
     {
-        return $this->getMapperFactory()->get(Folder\Mapper::class);
+        return $this->injector->get('commsNewsAudienceStrategyFactory');
     }
 }

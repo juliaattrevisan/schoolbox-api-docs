@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Json\Decorator\PropertyDecorator;
+use Alaress\Specification\Exception\UnsatisfiedException;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
 use Aura\Router\Exception\RouteNotFound;
@@ -17,20 +18,25 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\Comms\News\Validation\Factory;
+use Schoolbox\Comms\News\Validation\ValidUserCanAudienceTo;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Resource\Storage;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -81,11 +87,6 @@ class Controller extends Base
     private $audienceMapper;
 
     /**
-     * @var RoleAccessMapper
-     */
-    private $roleAccessMapper;
-
-    /**
      * @var Audience\ArticleResolver
      */
     private $articleResolver;
@@ -95,24 +96,24 @@ class Controller extends Base
      */
     private $userResolver;
 
-    /** @var Validation\Factory */
-    private $validSpecFactory;
+    /** @var Audience\Segment\StrategyFactory */
+    private $strategyFactory;
 
     private const DEFAULT_SEARCH_LIMIT = 10;
 
+
     /**
-     * @param Mapper                       $newsMapper
-     * @param TopicMapper                  $topicMapper
-     * @param SaveForLater\Mapper          $saveForLaterMapper
-     * @param Statistics\Mapper            $statisticsMapper
-     * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
-     * @param Audience\Mapper              $audienceMapper
-     * @param RoleAccessMapper             $roleAccessMapper
-     * @param Folder\Mapper                $folderMapper
-     * @param IConnector                   $databaseInternal
-     * @param Audience\ArticleResolver     $articleResolver
-     * @param Audience\UserResolver        $userResolver
-     * @param Validation\Factory           $validSpecFactory
+     * @param Mapper                           $newsMapper
+     * @param TopicMapper                      $topicMapper
+     * @param SaveForLater\Mapper              $saveForLaterMapper
+     * @param Statistics\Mapper                $statisticsMapper
+     * @param Statistics\Cumulative\Mapper     $statisticsCumulativeMapper
+     * @param Audience\Mapper                  $audienceMapper
+     * @param Folder\Mapper                    $folderMapper
+     * @param IConnector                       $databaseInternal
+     * @param Audience\ArticleResolver         $articleResolver
+     * @param Audience\UserResolver            $userResolver
+     * @param Audience\Segment\StrategyFactory $strategyFactory
      */
     public function __construct(
         Mapper $newsMapper,
@@ -121,12 +122,11 @@ class Controller extends Base
         Statistics\Mapper $statisticsMapper,
         Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         Audience\Mapper $audienceMapper,
-        RoleAccessMapper $roleAccessMapper,
         Folder\Mapper $folderMapper,
         IConnector $databaseInternal,
         Audience\ArticleResolver $articleResolver,
         Audience\UserResolver $userResolver,
-        Validation\Factory $validSpecFactory
+        Audience\Segment\StrategyFactory $strategyFactory
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -134,24 +134,25 @@ class Controller extends Base
         $this->statisticsMapper           = $statisticsMapper;
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
         $this->audienceMapper             = $audienceMapper;
-        $this->roleAccessMapper           = $roleAccessMapper;
         $this->folderMapper               = $folderMapper;
         $this->databaseInternal           = $databaseInternal;
-        $this->validSpecFactory           = $validSpecFactory;
         $this->articleResolver            = $articleResolver;
         $this->userResolver               = $userResolver;
+        $this->strategyFactory            = $strategyFactory;
     }
 
 
     /**
      * Provide form to create a news article
      *
-     * @api GET /comms/news/create
+     * @api   GET /comms/news/create
      * @level 18.1
      *
      * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException
+     * @throws InvalidArgumentException
+     * @throws UnknownEntityTypeException
      */
     public function getCreate(): void
     {
@@ -185,31 +186,41 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setMimeFilter('image/*');
 
-        /**
-         * Prefill audience
-         */
+        // Prefill audience
         $audienceSegments = [];
         $groupId = $this->getRequest()->query->get('groupId');
         $entityType = $this->getRequest()->query->get('type');
 
-        if ($groupId && $entityType && $entityType === Audience\Segment\Strategy\Folder::ENTITY_TYPE) {
-            $codec = new Audience\Segment\Codec($this->audienceMapper);
-            $label = $this->folderMapper->findCheaplyById($groupId)->getNameWithCodes();
+        // Hard-coded to folder (for now)
+        if ($groupId && $entityType && $entityType === Audience\Segment\Strategy\Folder::getEntityType()) {
+            $folderStrategy = $this->strategyFactory->makeSimpleStrategy($entityType);
+            // Ensure the user is permitted to target this entity type
+            if ($folderStrategy->canAudienceToEntityType($this->getUser())) {
+                // Ensure the user is permitted to target this entity value
+                $availableFolders   = $this->databaseInternal->executeQuery($folderStrategy->getSearchSql($this->getUser()))->fetchAll();
+                $availableFolderIds = \array_column($availableFolders, 'id');
+                if (\in_array($groupId, $availableFolderIds, false)) {
+                    $codec = new Audience\Segment\Codec($this->audienceMapper);
+                    $label = $this->folderMapper->findCheaplyById($groupId)->getNameWithCodes();
 
-            $audienceSegments = new Audience\SegmentSelectizeOption(
-                $codec->encodeSimpleAttributes($entityType, $groupId, Audience\Model::RELATIONSHIP_SELF),
-                $label
-            );
+                    $audienceSegment = new Audience\SegmentSelectizeOption(
+                        $codec->encodeSimpleAttributes($entityType, $groupId, Audience\Model::RELATIONSHIP_SELF),
+                        $label
+                    );
 
-            $audienceSegments->addLabel($entityType, $codec->encodeValue($groupId), $label);
+                    $audienceSegment->addLabel($entityType, $codec->encodeValue($groupId), $label);
+                    $audienceSegments[] = $audienceSegment;
+                }
+            }
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
-            'action'           => 'Create',
-            'article'          => $article,
-            'featureImageZone' => $zone->getTwigContext(),
-            'isAutoSavable'    => !$article->isApproved(),
-            'audienceSegments' => $audienceSegments,
+            'action'               => 'Create',
+            'article'              => $article,
+            'featureImageZone'     => $zone->getTwigContext(),
+            'isAutoSavable'        => !$article->isApproved(),
+            'audienceSegments'     => $audienceSegments,
+            'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -217,7 +228,7 @@ class Controller extends Base
     /**
      * Create a news article
      *
-     * @api POST /comms/news/create
+     * @api   POST /comms/news/create
      * @level 18.1
      *
      * @throws InvalidArgumentException
@@ -227,6 +238,7 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
     public function postCreate(): void
     {
@@ -246,13 +258,10 @@ class Controller extends Base
      * @level 18.1
      *
      * @param Model $article
-     * @throws MapperException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
-     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws InvalidArgumentException
      * @throws MapperException\InsufficientHydrationException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \UnexpectedValueException
      */
     public function getUpdate(Model $article): void
     {
@@ -272,26 +281,23 @@ class Controller extends Base
 
         $translator = new Audience\Segment\Translator(
             $this->databaseInternal,
-            $this->getUser(),
-            $this->folderMapper,
-            $this->roleAccessMapper,
-            $this->isGlobalModerationEnabled()
+            $this->strategyFactory
         );
         $translator->buildCache($article);
 
         // Audiencing selectize data
         $audienceSegments = [];
-        foreach($article->getAudience() as $segment){
+        foreach ($article->getAudience() as $segment) {
             // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
             // Labels are used in brick rendering
             $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
 
             // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
-            if($segment->isSimple()) {
+            if ($segment->isSimple()) {
                 $encodedValue = $codec->encodeValue($segment->getEntityValue());
                 $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
             } else {
-                foreach($segment->getChildren() as $child){
+                foreach ($segment->getChildren() as $child) {
                     $encodedValue = $codec->encodeValue($child->getEntityValue());
                     $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
                 }
@@ -299,13 +305,13 @@ class Controller extends Base
             $audienceSegments[] = $option;
         }
 
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action'                 => 'Update',
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
             'audienceSegments'       => $audienceSegments,
             'isAutoSavable'          => !$article->isApproved(),
+            'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -313,153 +319,97 @@ class Controller extends Base
     /**
      * Update a news article
      *
-     * @api POST /comms/news/{articleId}
+     * Must not attempt to submit/un-submit/approve/reject an article.
+     *
+     * It may change the approved subState, eg AwaitingPublication/Published/Expired
+     *
+     * @api   POST /comms/news/{articleId}
      * @level 18.1
      *
      * @param Model $article
-     * @throws InvalidArgumentException
      * @throws MapperException
      * @throws MapperException\InsufficientHydrationException
      * @throws RouteNotFound
      * @throws \PDOException
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
+     * @throws \DomainException
      */
     public function postUpdate(Model $article): void
     {
-        $validAudience = $this->validSpecFactory->buildSpecValidAudience($this->getUser());
+        $data = $this->getRequest()->post->getArrayCopy();
 
-        if (!$validAudience->isSatisfiedBy($article)) {
+        // Update article with proposed attributes
+        $this->updateArticleAttributes($article, $data);
+
+        // Update article with proposed audience. Cache existing audience for later efficient persistence
+        $existingAudience = $article->getAudience()->indexBy($this->audienceMapper->getIdentifierProperty())->shallowClone();
+        $this->updateArticleAudience($article, $data['audience']);
+
+        // Validate proposed article + audience
+        // (This protects against DOM manipulation + logic bugs, it should not be shown on normal work-flows)
+        try{
+            $this->validateArticleAndAudience($article);
+        } catch (UnsatisfiedException $e){
             $this->getResponse()->status->set(400);
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => false,
-                'message' => "Article audience appears to be invalid",
+                'message' => $e->getMessage(),
             ]));
             return;
         }
 
-        try {
-
-            $this->persist($article, $this->getRequest()->post->getArrayCopy());
-
-            $routeParams  = [
-                'articleId' => $article->getId(),
-                'article'   => $article,
-            ];
-
-            /* Save a draft of the news article
-             * This can occur from either the Create or Update context
-             * Update the form action accordingly
-             */
-            if ($this->getRequest()->isXhr()) {
-
-                // Send the update page route, JS will update the window state to this
-                $url = $this->getRouter()->generate('commsNews.getUpdate', $routeParams);
-
-                // Send all the possible routes, JS will determine which ones to show where
-                $updateRoute = $this->getRouter()->generate('commsNews.postUpdate', $routeParams);
-                $submitRoute = $this->getRouteIfAuthorized('commsNewsModeration.postSubmit', $routeParams);
-                $approveRoute = false;
-                if ($article->canBeApproved()) {
-                    $approveRoute = $this->getRouteIfAuthorized('commsNewsModeration.postApprove', $routeParams);
-                }
-
-                $this->getResponse()->content->set($this->buildJsonOutput([
-                    'success' => true,
-                    'url' => $url,
-                    'updateRoute' => $updateRoute,
-                    'submitRoute' => $submitRoute,
-                    'approveRoute' => $approveRoute
-                ]));
-            } else {
-
-                /* Otherwise, you're the creator and you're editing this thing normally
-                 * Go to the detail screen to see the outcome of your changes
-                 * and also use that screen to advance to the next step
-                 */
-                $nextStep = $this->getRouter()->generate('commsNews.getDetail', $routeParams);
-                $this->getResponse()->redirect->afterPost($nextStep);
-                return;
-            }
-
-            return;
-        } catch (MapperException|RouteNotFound|\PDOException|\UnexpectedValueException|\Schoolbox\Resource\Exception $e) {
-            if ($this->getRequest()->isXhr()) {
-                $this->getResponse()->status->set(400);
-                $this->getResponse()->content->set($this->buildJsonOutput([
-                    'success' => false,
-                    'message' => $e->getMessage()
-                ]));
-
-                return;
-            }
-
-            throw $e;
-        }
-    }
-
-
-    /**
-     * Persist model to db during news article authorship
-     *
-     * @param Model                          $article
-     * @param array|\Aura\Web\Request\Values $data
-     * @return void
-     * @throws InvalidArgumentException
-     * @throws MapperException
-     * @throws MapperException\InsufficientHydrationException
-     * @throws \PDOException
-     * @throws \Schoolbox\Resource\Exception
-     * @throws \UnexpectedValueException
-     */
-    private function persist(Model $article, array $data): void
-    {
-        $article
-            ->setTitle($data['title'])
-            ->setBody($data['body'])
-            ->setBlurb($data['blurb'])
-            ->setTopics($this->topicMapper->findByColumn('newsTopicID', $data['topics']));
-
-        /* Once it's passed Moderation, only Moderators can alter contents.
-         * Tough luck, wren; in accordance with the po-po
-         */
-
-        /* Exception thrown when an invalid date is submitted; use last known value instead
-         * This can occur with bad input; or when datepicker is still processing strtotime shuriken
-         */
-        try {
-            $article->setPublishAt(\Alaress_Date_Format::newLocal($data['publishAt']));
-        } catch (InvalidArgumentException $e) {
-            // noop
-        }
-
-        try {
-            $article->setExpiresAt(\Alaress_Date_Format::newLocal($data['expiresAt']));
-        } catch (InvalidArgumentException $e) {
-            // noop
-        }
-
-        /* If any Feature Image was provided, remember it
-         * Otherwise clear it (remove a Feature Image)
-         */
-        if (\is_array($data['attachment'])) {
-            $article->setFeatureImage((new CollectorFactory())->build($data['attachment'] ?: [])->getFirst());
-        } else {
-            $article->setFeatureImage(null);
-        }
-
+        // Persist article
         $this->newsMapper->save($article);
 
-        // Persist audience segments
-        $transactor = new Audience\Segment\Transactor(
-            $this->getUser(),
-            $this->audienceMapper,
-            new Audience\Segment\Codec($this->audienceMapper),
-            $this->folderMapper,
-            $this->roleAccessMapper,
-            $this->isGlobalModerationEnabled()
-        );
-        $transactor->save($article, $data['audience'] ?? '');
+        // Restore existing audience onto article, and then update with posted audience
+        $postedAudience = $article->getAudience()->shallowClone();
+        $article->setAudience($existingAudience);
+
+        // Perform intelligent update and persistence in specialised helper class
+        $audienceTransactor = new Audience\Segment\Transactor($this->audienceMapper, $this->strategyFactory);
+        $audienceTransactor->save($article, $postedAudience);
+
+        $routeParams  = [
+            'articleId' => $article->getId(),
+            'article'   => $article,
+        ];
+
+
+        /* Save a draft of the news article
+         * This can occur from either the Create or Update context
+         * Update the form action accordingly
+         */
+        if ($this->getRequest()->isXhr()) {
+
+            // Send the update page route, JS will update the window state to this
+            $url = $this->getRouter()->generate('commsNews.getUpdate', $routeParams);
+
+            // Send all the possible routes, JS will determine which ones to show where
+            $updateRoute = $this->getRouter()->generate('commsNews.postUpdate', $routeParams);
+            $submitRoute = $this->getRouteIfAuthorized('commsNewsModeration.postSubmit', $routeParams);
+            $approveRoute = false;
+            if ($article->canBeApproved()) {
+                $approveRoute = $this->getRouteIfAuthorized('commsNewsModeration.postApprove', $routeParams);
+            }
+
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'success' => true,
+                'url' => $url,
+                'updateRoute' => $updateRoute,
+                'submitRoute' => $submitRoute,
+                'approveRoute' => $approveRoute
+            ]));
+        } else {
+
+            /* Otherwise, you're the creator and you're editing this thing normally
+             * Go to the detail screen to see the outcome of your changes
+             * and also use that screen to advance to the next step
+             */
+            $nextStep = $this->getRouter()->generate('commsNews.getDetail', $routeParams);
+            $this->getResponse()->redirect->afterPost($nextStep);
+            return;
+        }
     }
 
 
@@ -550,7 +500,6 @@ class Controller extends Base
                 'article'            => $article,
                 'moderationEnabled'  => $moderationEnabled,
                 'isSavedForLater'    => $isSavedForLater,
-                'isCommsOfficer'     => (new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser()),
             ];
         }
 
@@ -564,14 +513,22 @@ class Controller extends Base
         $this->response->content->set($output);
     }
 
+
     /**
      * Get a list of articles that are audienced to me for homepage component
      *
      * @api GET /comms/news/lists/homepage
      *
+     * @throws InvalidArgumentException
      * @throws MapperException
      * @throws RouteNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
+     * @throws \OutOfRangeException
+     * @throws \PDOException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     public function getListForHomepage() :void
     {
@@ -627,11 +584,7 @@ class Controller extends Base
              *
              * TODO: Otherwise go...somewhere else? I don't have a component or dashboard yet
              */
-            $nextStep = '/';
-
-            if ((new ValidUserIsCommsOfficer())->isSatisfiedBy($this->getUser())) {
-                $nextStep = $this->getRouter()->generate('commsNewsModeration.getList');
-            }
+            $nextStep = $this->getRouteIfAuthorized('commsNewsModeration.getList') ?: '/';
 
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->content->set($this->buildJsonOutput([
@@ -871,6 +824,7 @@ class Controller extends Base
      * @api GET /comms/news/me
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getAuthored($status, $pageNum)
     {
@@ -1074,12 +1028,113 @@ class Controller extends Base
 
 
     /**
-     * Returns whether global moderation is enabled
+     * Returns the set of audience type strategies which the session user is permitted to audience to
      *
-     * @return bool
+     * @return string[]
+     * @throws UnknownEntityTypeException
+     * @throws UnexpectedValueException
      */
-    private function isGlobalModerationEnabled(): bool
+    private function getAvailableAudienceTypeStrategies(): array
     {
-        return $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
+        $availableStrategies = [];
+        foreach ($this->strategyFactory->makeAllSimpleStrategies() as $strategy) {
+            if ($strategy->canAudienceToEntityType($this->getUser())) {
+                $availableStrategies[] = $strategy::getEntityType();
+            }
+        }
+        return $availableStrategies;
+    }
+
+
+    /**
+     * Updates an article's attributes with post data payload
+     *
+     * @param Model $article
+     * @param array $postData
+     * @throws \Schoolbox\Resource\Exception
+     */
+    private function updateArticleAttributes(Model $article, array $postData): void
+    {
+        $article
+            ->setTitle($postData['title'])
+            ->setBody($postData['body'])
+            ->setBlurb($postData['blurb'])
+            ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics']));
+
+        // Exception thrown when an invalid date is submitted; use last known value instead
+        // This can occur with bad input; or when datepicker is still processing strtotime shuriken
+        try {
+            $article->setPublishAt(\Alaress_Date_Format::newLocal($postData['publishAt']));
+        } catch (InvalidArgumentException $e) {
+            // noop
+        }
+        try {
+            $article->setExpiresAt(\Alaress_Date_Format::newLocal($postData['expiresAt']));
+        } catch (InvalidArgumentException $e) {
+            // noop
+        }
+
+        /* If any Feature Image was provided, remember it
+         * Otherwise clear it (remove a Feature Image)
+         */
+        if (\is_array($postData['attachment'])) {
+            /** @var Storage\Model $featureImage */
+            $featureImage = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
+            $article->setFeatureImage($featureImage);
+        } else {
+            $article->setFeatureImage(null);
+        }
+    }
+
+
+    /**
+     * @param Model                              $article
+     * @param string                             $selectizeAudienceSegments
+     * @throws MapperException
+     * @throws MapperException\InsufficientHydrationException
+     * @throws \DomainException
+     */
+    private function updateArticleAudience(Model $article, string $selectizeAudienceSegments): void
+    {
+        $codec = new Audience\Segment\Codec($this->audienceMapper);
+        $article->setAudience($codec->decodeSelectizeValues($selectizeAudienceSegments));
+        foreach ($article->getAudience() as $segment) {
+            $segment->setCommsNewsArticle($article);
+        }
+    }
+
+
+    /**
+     * Validates a proposed article and audience
+     *
+     * @param Model $article
+     * @throws UnsatisfiedException
+     */
+    private function validateArticleAndAudience(Model $article): void
+    {
+        // Don't validate drafts or rejected articles.
+        if ($article->isDraft() || $article->isRejected()) {
+            return;
+        }
+
+        // Validate article + authenticate proposed audience
+        $validSubmittedArticleSpec = (new Factory($this->strategyFactory))->buildSpecCanBeSubmitted($this->getUser());
+        if (!$validSubmittedArticleSpec->isSatisfiedBy($article)) {
+            throw new UnsatisfiedException($article, $validSubmittedArticleSpec, "Article audience appears to be invalid");
+        }
+
+        // Validate the audience segments
+        if ($article->getAudience()->count()) {
+            $validSegmentSpecFactory = new Audience\Validation\Factory(
+                $this->strategyFactory::getValidRelationshipModifiers(),
+                $this->strategyFactory::getValidNullEntities()
+            );
+            $validSegmentSpec        = $validSegmentSpecFactory->makeValidSegmentSpecification();
+            foreach ($article->getAudience() as $segment) {
+                if (!$validSegmentSpec->isSatisfiedBy($segment)) {
+                    throw new UnsatisfiedException($article, $validSubmittedArticleSpec, "Audience segment appears to be invalid");
+                }
+            }
+        }
     }
 }

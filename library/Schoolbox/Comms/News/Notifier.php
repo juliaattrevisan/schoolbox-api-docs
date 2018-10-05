@@ -11,13 +11,12 @@ namespace Schoolbox\Comms\News;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
-use Schoolbox\Comms\News\Audience\BusinessRules;
 use Schoolbox\Comms\News\Audience\IUserResolver;
 use Schoolbox\Comms\News\Audience\RelationshipFilterer;
+use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Comms\News\Audience\UserResolver;
 use Schoolbox\Comms\News\Moderation\UserResolver as ModeratorResolver;
 use Schoolbox\Comms\News\Moderation\IUserResolver as IModeratorResolver;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MapperFactory;
@@ -77,7 +76,7 @@ class Notifier extends AbstractModuleNotifier
         ]);
 
         $userResolver = $di->lazyNew(UserResolver::class, [
-            'businessRules'        => $di->lazyNew(BusinessRules::class),
+            'validNullEntities'    => StrategyFactory::getValidNullEntities(),
             'db'                   => $di->lazyGet('databaseInternal'),
             'externalClass'        => $di->lazyGet('externalClass'),
             'relationshipFilterer' => $relationshipFilterer,

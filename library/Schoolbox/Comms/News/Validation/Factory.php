@@ -9,6 +9,7 @@ namespace Schoolbox\Comms\News\Validation;
 
 use Alaress\Specification\Conjunction;
 use Alaress\Specification\ISpecification;
+use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\User;
 
 /**
@@ -16,17 +17,11 @@ use Schoolbox\User;
  */
 class Factory
 {
+    private $strategyFactory;
 
-    /**
-     * Returns a spec that defines an article able to be drafted:
-     * * Article cannot be audienced to segments where the user does not have READ+ perm
-     *
-     * @param User $effector
-     * @return ISpecification
-     */
-    public function buildSpecValidAudience(User $effector): ISpecification
+    public function __construct(StrategyFactory $strategyFactory)
     {
-        return new ValidAudience($effector);
+        $this->strategyFactory = $strategyFactory;
     }
 
 
@@ -45,7 +40,7 @@ class Factory
     {
         return new Conjunction([
             new ValidArticleAttributes(),
-            new ValidAudience($effector),
+            new ValidUserCanAudienceTo($effector, $this->strategyFactory),
         ]);
     }
 }

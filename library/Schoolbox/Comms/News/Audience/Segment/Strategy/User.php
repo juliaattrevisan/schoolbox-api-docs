@@ -7,27 +7,48 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-class User extends Base
+class User extends SimpleStrategy
 {
-    public const ENTITY_TYPE = 'user';
 
     /**
-     * @inheritdoc
+     * @return string
      */
-    public function canBeTargetedByUser(\Schoolbox\User $user): bool
+    public static function getEntityType(): string
     {
-        return $user->getRole()->isStaff();
+        return 'user';
     }
 
     /**
      * @inheritdoc
      */
-    public function getSearchSql(string $searchPlaceholder = null): string
+    public static function isValidNullEntityValue(): bool
+    {
+        // All users are users
+        return false;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function canAudienceToEntityType(\Schoolbox\User $user): bool
+    {
+        if (parent::canAudienceToEntityType($user)) {
+            return true;
+        }
+        return $this->getStaffCanPost() && $user->getRole()->isStaff();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(\Schoolbox\User $user, string $searchPlaceholder = null): string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "AND (firstname LIKE :{$searchPlaceholder} OR lastname LIKE :{$searchPlaceholder})";
 
+        $entityType = self::getEntityType();
         return "
-            SELECT id, CONCAT(firstname, ' ', lastname) AS name, '{$this->getEntityType()}' AS entity_type
+            SELECT id, CONCAT(firstname, ' ', lastname) AS name, '{$entityType}' AS entity_type
             FROM `user`
             WHERE deleted_at IS NULL
             {$keywordFilter}
@@ -40,10 +61,11 @@ class User extends Base
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
+        $entityType = self::getEntityType();
         return "
             SELECT DISTINCT cna.entity_type, cna.entity_value, CONCAT(firstname, ' ', lastname) AS `name`
             FROM comms_news_audience cna
-            INNER JOIN `user` ON cna.entity_type = '{$this->getEntityType()}' AND cna.entity_value = `user`.id
+            INNER JOIN `user` ON cna.entity_type = '{$entityType}' AND cna.entity_value = `user`.id
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }

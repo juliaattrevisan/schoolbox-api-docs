@@ -17,7 +17,6 @@ use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Authorizer;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder;
 
 class Module extends BaseModule
 {
@@ -40,7 +39,7 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                    new Authorizer\Rule\CanModerateAudience($this->getFolderMapper())
+                    new Authorizer\Rule\CanModerateAudience($this->getStrategyFactory())
                 )
             );
         });
@@ -132,11 +131,11 @@ class Module extends BaseModule
 
 
     /**
-     * @return \Schoolbox\Mapper|Folder\Mapper
-     * @throws \InvalidArgumentException If cannot find mapper class
+     * @return News\Audience\Segment\StrategyFactory|object
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    private function getFolderMapper(): Folder\Mapper
+    private function getStrategyFactory(): News\Audience\Segment\StrategyFactory
     {
-        return $this->getMapperFactory()->get(Folder\Mapper::class);
+        return $this->injector->get('commsNewsAudienceStrategyFactory');
     }
 }

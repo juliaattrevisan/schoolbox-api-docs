@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Permission\Access\UserAccess;
+
 class News extends DeprecatedModel
 {
     public function __construct()
@@ -81,7 +83,7 @@ class News extends DeprecatedModel
     public function hasWrite($newsID)
     {
         $userAccessMapper = \Schoolbox\Permission\Access\UserAccessMapper::getInstance();
-        $permLevel = $userAccessMapper->getAccess($_SESSION['user'],null,\Schoolbox\Permission\Access\UserAccess::SERVICE_NEWS);
+        $permLevel        = $userAccessMapper->getAccessLevel($_SESSION['user'], null, UserAccess::SERVICE_NEWS);
 
         $news = $this->getById($newsID);
         if (($permLevel >= 2 && $news['item_owner'] == $_SESSION['id']) || $permLevel >= 3) {

@@ -27,9 +27,17 @@ use InvalidArgumentException;
  */
 class ArticleResolver implements IArticleResolver
 {
+    /**
+     * Indexed by segment.entityType
+     * @var bool[]
+     */
+    private $validNullEntities;
 
-    /** @var BusinessRules */
-    private $businessRules;
+    /**
+     * Indexed by segment.relationship
+     * @var string[][]
+     */
+    private $modifierEntityMap;
 
     /** @var Database\Connector\IConnector */
     private $db;
@@ -48,7 +56,8 @@ class ArticleResolver implements IArticleResolver
 
 
     /**
-     * @param BusinessRules                 $businessRules
+     * @param bool[]                        $validNullEntities
+     * @param array                         $modifierEntityMap
      * @param Database\Connector\IConnector $db
      * @param UserAccessMapper              $userAccessMapper
      * @param Folder\Mapper                 $folderMapper
@@ -56,14 +65,16 @@ class ArticleResolver implements IArticleResolver
      * @param RelationshipFilterer          $relationshipFilter
      */
     public function __construct(
-        BusinessRules $businessRules,
+        array $validNullEntities,
+        array $modifierEntityMap,
         Database\Connector\IConnector $db,
         UserAccessMapper $userAccessMapper,
         Folder\Mapper $folderMapper,
         External_UserInterface $externalUser,
         RelationshipFilterer $relationshipFilter
     ) {
-        $this->businessRules      = $businessRules;
+        $this->validNullEntities  = $validNullEntities;
+        $this->modifierEntityMap  = $modifierEntityMap;
         $this->db                 = $db;
         $this->userAccessMapper   = $userAccessMapper;
         $this->folderMapper       = $folderMapper;
@@ -79,7 +90,6 @@ class ArticleResolver implements IArticleResolver
      * @return int[]
      * @throws \UnderflowException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
@@ -183,7 +193,7 @@ class ArticleResolver implements IArticleResolver
      */
     private function buildCompositeSubquery(string $compositeRelationship, string $whereClause): string
     {
-        $compositeType = Model::ENTITY_TYPE_COMPOSITE;
+        $compositeType = Strategy\Composite::getEntityType();
 
         return "
         SELECT t1.comms_news_article_id
@@ -213,11 +223,10 @@ class ArticleResolver implements IArticleResolver
      * @param Collection|string[] $whereClauses
      * @param Collection|mixed[]  $whereParams
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
      */
     private function addSelfClauses(User $user, Collection $whereClauses, Collection $whereParams): void
     {
-        $validEntities = $this->businessRules->getValidEntities(Model::RELATIONSHIP_SELF);
+        $validEntities = $this->modifierEntityMap[Model::RELATIONSHIP_SELF];
 
         if (!\count($validEntities)) {
             // In the unlikely event you cannot target audience segments that lack a relationship modifier
@@ -236,7 +245,6 @@ class ArticleResolver implements IArticleResolver
      * @param Collection|mixed[]  $whereParams
      * @param Collection|string[] $relatedWhereClauses
      * @throws Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
      * @throws \UnderflowException
      */
     private function addParentsOfClauses(
@@ -249,7 +257,7 @@ class ArticleResolver implements IArticleResolver
             return;
         }
 
-        $validEntities = $this->businessRules->getValidEntities(Model::RELATIONSHIP_PARENTS_OF);
+        $validEntities = $this->modifierEntityMap[Model::RELATIONSHIP_PARENTS_OF];
         if (!\count($validEntities)) {
             // If the system is configured to not allow targeting of parents of users in some audience segment
             return;
@@ -286,7 +294,6 @@ class ArticleResolver implements IArticleResolver
      * @param Collection|mixed[]  $whereParams
      * @param Collection|string[] $relatedWhereClauses
      * @throws Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
      * @throws \UnderflowException
      */
     private function addTeachersOfClauses(
@@ -299,7 +306,7 @@ class ArticleResolver implements IArticleResolver
             return;
         }
 
-        $validEntities = $this->businessRules->getValidEntities(Model::RELATIONSHIP_TEACHERS_OF);
+        $validEntities = $this->modifierEntityMap[Model::RELATIONSHIP_TEACHERS_OF];
         if (!\count($validEntities)) {
             // In the system is configured to not allow targeting of teachers of users in some audience segment
             return;
@@ -350,73 +357,73 @@ class ArticleResolver implements IArticleResolver
         $userId        = $user->getId();
 
         // Targeted to a user
-        if (\array_key_exists(Strategy\User::ENTITY_TYPE, $validEntities)) {
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\User::ENTITY_TYPE, $userId, $relationship);
+        if (\array_key_exists(Strategy\User::getEntityType(), $validEntities)) {
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\User::getEntityType(), $userId, $relationship);
         }
 
         // Targeted to superusers
-        if (\array_key_exists(Strategy\Super::ENTITY_TYPE, $validEntities) && $user->isSuperuser()) {
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Super::ENTITY_TYPE, Model::ENTITY_VALUE_SUPER, $relationship);
+        if (\array_key_exists(Strategy\Super::getEntityType(), $validEntities) && $user->isSuperuser()) {
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Super::getEntityType(), Strategy\Super::ENTITY_VALUE, $relationship);
         }
 
         // Targeted to a campus
-        if (\array_key_exists(Strategy\Campus::ENTITY_TYPE, $validEntities) && $this->businessRules->canTargetNullEntity(Strategy\Campus::ENTITY_TYPE)) {
+        if (\array_key_exists(Strategy\Campus::getEntityType(), $validEntities) && Strategy\Campus::isValidNullEntityValue()) {
             $this->buildClause(
                 $whereClauses,
                 $whereParams,
                 $paramSuffix,
-                Strategy\Campus::ENTITY_TYPE,
+                Strategy\Campus::getEntityType(),
                 $user->getCampusCollection()->getPropertyValues('id'),
                 $relationship
             );
         }
 
         // Targeted to a Role
-        if (\array_key_exists(Strategy\Role::ENTITY_TYPE, $validEntities)) {
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Role::ENTITY_TYPE, $user->getRole()->getId(), $relationship);
+        if (\array_key_exists(Strategy\Role::getEntityType(), $validEntities)) {
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Role::getEntityType(), $user->getRole()->getId(), $relationship);
         }
 
         // Targeted to a RoleType
-        if (\array_key_exists(Strategy\RoleType::ENTITY_TYPE, $validEntities)) {
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\RoleType::ENTITY_TYPE, $user->getRole()->getType(), $relationship);
+        if (\array_key_exists(Strategy\RoleType::getEntityType(), $validEntities)) {
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\RoleType::getEntityType(), $user->getRole()->getType(), $relationship);
         }
 
         // Targeted to a School House
-        if (\array_key_exists(Strategy\SchoolHouse::ENTITY_TYPE, $validEntities)) {
+        if (\array_key_exists(Strategy\SchoolHouse::getEntityType(), $validEntities)) {
             $schoolHouseId = $user->getSchoolHouse() ? $user->getSchoolHouse()->getId() : null;
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\SchoolHouse::ENTITY_TYPE, $schoolHouseId, $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\SchoolHouse::getEntityType(), $schoolHouseId, $relationship);
         }
 
         // Targeted to a Residential House
-        if (\array_key_exists(Strategy\ResHouse::ENTITY_TYPE, $validEntities)) {
+        if (\array_key_exists(Strategy\ResHouse::getEntityType(), $validEntities)) {
             $residentialHouseId = $user->getResidentialHouse() ? $user->getResidentialHouse()->getId() : null;
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\ResHouse::ENTITY_TYPE, $residentialHouseId, $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\ResHouse::getEntityType(), $residentialHouseId, $relationship);
         }
 
         // Targeted to a Year
-        if (\array_key_exists(Strategy\Year::ENTITY_TYPE, $validEntities)) {
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Year::ENTITY_TYPE, $user->getYear(), $relationship);
+        if (\array_key_exists(Strategy\Year::getEntityType(), $validEntities)) {
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Year::getEntityType(), $user->getYear(), $relationship);
         }
 
         // Targeted to a service permission (including homepage learners + instructors)
-        if (\array_key_exists(Strategy\Service::ENTITY_TYPE, $validEntities)) {
+        if (\array_key_exists(Strategy\Service::getEntityType(), $validEntities)) {
             // TODO - For now, assume that we cannot target to audiences such as 'all service moderators' ('*.*.3') etc
             $services = [];
             foreach ($this->userAccessMapper->findByColumn('uid', $userId) as $access) {
                 $services[] = "{$access->getService()}.{$access->getServiceIdentifier()}.{$access->getAccessLevel()}";
             }
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Service::ENTITY_TYPE, \array_unique($services), $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Service::getEntityType(), \array_unique($services), $relationship);
         }
 
         // Targeted to a pastoral group
-        if (\array_key_exists(Strategy\PastoralGroup::ENTITY_TYPE, $validEntities)) {
+        if (\array_key_exists(Strategy\PastoralGroup::getEntityType(), $validEntities)) {
             $sql      = "SELECT group_id FROM pastoral_group_member WHERE user_id = {$userId} AND deleted_at IS NULL";
             $groupIds = $this->db->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN);
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\PastoralGroup::ENTITY_TYPE, $groupIds, $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\PastoralGroup::getEntityType(), $groupIds, $relationship);
         }
 
         // Targeted to a folder (includes class && group association)
-        if (\array_key_exists(Strategy\Folder::ENTITY_TYPE, $validEntities)) {
+        if (\array_key_exists(Strategy\Folder::getEntityType(), $validEntities)) {
             // Get groups where learner or instructor (but not admin)
             $pb             = $this->userAccessMapper->getPredicateBuilder()
                                                      ->equals('uid', $userId)
@@ -425,7 +432,7 @@ class ArticleResolver implements IArticleResolver
             $groupFolderIds = $this->userAccessMapper->findScalarByPredicates('sid', $pb);
             $classFolderIds = $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($user))->getPropertyValues('id');
             $foldersIds     = \array_unique(\array_merge($groupFolderIds, $classFolderIds));
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Folder::ENTITY_TYPE, $foldersIds, $relationship);
+            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Folder::getEntityType(), $foldersIds, $relationship);
         }
     }
 
@@ -453,7 +460,7 @@ class ArticleResolver implements IArticleResolver
         string $relationship
     ): void {
         // Don't attempt to match a segment if the system is not configured to permit null entity values for the given entity type
-        if (!$this->businessRules->canTargetNullEntity($entityType) && (null === $entityValue || (\is_iterable($entityValue) && !\count($entityValue)))) {
+        if (!$this->validNullEntities[$entityType] && (null === $entityValue || (\is_iterable($entityValue) && !\count($entityValue)))) {
             return;
         }
 
@@ -487,35 +494,15 @@ class ArticleResolver implements IArticleResolver
 
 
     /**
-     * Returns the ids of the set of articles that were targeted to this audience.
-     *
-     * Examples: articleA.audience = [folder:X ∪ role:Y]     // users in folderX OR roleY
-     *           articleB.audience = [folder:X ∩ role:Y]     // users in folderX AND roleY
-     *
-     *           findArticlesForAudience([folder:X])
-     *              should include articleA                  // as [folder:X] is a subset of [folder:X ∪ role:Y]
-     *              should NOT include articleB              // as [folder:X] is not a subset of [folder:X ∩ role:Y]. The difference being [!folder:X ∩ role:Y]
-     *
-     *           findArticlesForAudience([folder:X ∪ role:Y])
-     *              should include articleA                  // as [folder:X ∪ role:Y] is a subset of [folder:X ∪ role:Y]
-     *              should NOT include articleB              // as [folder:X ∪ role:Y] is not a subset of [folder:X ∩ role:Y]
-     *
-     *           findArticlesForAudience([folder:X ∩ role:Y])
-     *              should include articleA                  // as [folder:X ∩ role:Y] is a subset of [folder:X ∪ role:Y]
-     *              should include articleB                  // as [folder:X ∩ role:Y] is a subset of [folder:X ∩ role:Y]
-     *
-     * @param string                $entityType
-     * @param int|string|null|array $entityValue  Null is a valid value to match on.
-     * @param string|null           $relationship Null means don't don't filter by relationship modifier.
-     * @return int[]
-     * @throws InvalidArgumentException If called to perform a composite search and the value does not match required format
+     * @inheritdoc
+     * @throws InvalidArgumentException
      * @todo Currently only working for $relationship == 'self'. Need to update for other relationship types.
      * @todo This is written recursively for composite audiences. It should be updated to do this in a single db query.
      */
-    public function findArticlesForAudience(string $entityType, $entityValue, string $relationship = null): array
+    public function findArticlesForAudience(string $entityType, $entityValue, ?string $relationship, array $orderBy = [], int $limit = null): array
     {
         // Simple equality case
-        if (Model::ENTITY_TYPE_COMPOSITE !== $entityType) {
+        if (Strategy\Composite::getEntityType() !== $entityType) {
             $pb = $this->db
                 ->buildPredicateBuilder(Mapper::TABLE_NAME)
                 ->equals(Mapper::FIELD_ENTITY_TYPE, $entityType)
@@ -536,7 +523,18 @@ class ArticleResolver implements IArticleResolver
             $sql = "
                 SELECT comms_news_article_id
                 FROM comms_news_audience
+                INNER JOIN comms_news_article ON comms_news_audience.comms_news_article_id = comms_news_article.id
                 WHERE {$whereClause}";
+
+            if (\count($orderBy)) {
+                $sql .= "
+                    {$this->folderMapper::buildOrderByClause(Mapper::TABLE_NAME, $orderBy, $this->db)}";
+            }
+
+            if ($limit) {
+                $sql .= "
+                    LIMIT :limit";
+            }
 
             $articleIds = $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
 
@@ -592,40 +590,10 @@ class ArticleResolver implements IArticleResolver
         // Check more generally-audienced articles
         /** @var array $entityValue */
         foreach ($entityValue as $type => $value) {
+            // Note we don't pass ORDER BY or LIMIT recursively
             /** @noinspection SlowArrayOperationsInLoopInspection */
-            $articleIds = \array_merge($articleIds, $this->findArticlesForAudience($type, $value));
+            $articleIds = \array_merge($articleIds, $this->findArticlesForAudience($type, $value, $relationship));
         }
         return \array_unique($articleIds);
-    }
-
-    /**
-     * @param int $folderId
-     * @param int $limit
-     * @return array
-     */
-    public function findArticlesForHomepage(int $folderId, ?int $limit): array
-    {
-        $pb = $this->db
-            ->buildPredicateBuilder(Mapper::TABLE_NAME)
-            ->equals(Mapper::FIELD_ENTITY_TYPE, Strategy\Folder::ENTITY_TYPE)
-            ->isNull(Mapper::FIELD_PARENT_ID)
-            ->equals(Mapper::FIELD_ENTITY_VALUE, $folderId)
-            ->equals(Mapper::FIELD_RELATIONSHIP, Model::RELATIONSHIP_SELF);
-
-        $whereClause = \implode(' AND ', $pb->getWhere());
-
-        $query = "
-              SELECT DISTINCT(comms_news_article_id)
-              FROM comms_news_audience
-              INNER JOIN comms_news_article
-              ON comms_news_audience.comms_news_article_id = comms_news_article.id
-              WHERE {$whereClause}
-              ORDER BY publish_at DESC, created_at DESC";
-
-        if ($limit && null !== $limit) {
-            $query .= ' LIMIT ' . $limit;
-        }
-
-        return $this->db->executeQuery($query, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
     }
 }

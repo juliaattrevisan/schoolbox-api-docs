@@ -15,11 +15,11 @@ namespace Schoolbox\Comms\News;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Paginator\Paginator as BasePaginator;
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
+use Schoolbox\Comms\News\Audience\IArticleResolver;
+use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\News\Topic;
 use Schoolbox\User;
-use Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 class Lists
 {
@@ -64,7 +64,7 @@ class Lists
     private $databaseInternal;
 
     /**
-     * @var ArticleResolver
+     * @var IArticleResolver
      */
     private $articleResolver;
 
@@ -80,7 +80,7 @@ class Lists
      * @param Statistics\Mapper            $statisticsMapper
      * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
      * @param IConnector                   $databaseInternal
-     * @param ArticleResolver              $articleResolver
+     * @param IArticleResolver             $articleResolver
      */
     public function __construct(
         int $defaultLimit,
@@ -91,7 +91,7 @@ class Lists
         Statistics\Mapper $statisticsMapper,
         Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
-        ArticleResolver $articleResolver
+        IArticleResolver $articleResolver
     ) {
         $this->defaultLimit               = $defaultLimit;
         $this->newsMapper                 = $newsMapper;
@@ -283,15 +283,26 @@ class Lists
         return $urlPaginator;
     }
 
+
     /**
      * @param Querystring $params
-     * @param User $user
+     * @param User        $user
      * @return array
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \InvalidArgumentException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function findArticlesForHomepage(Querystring $params, User $user) :array
     {
-        $articleIds = $this->articleResolver->findArticlesForHomepage($params->getFolderId(), $params->getLimit());
+        $articleTable = Mapper::getInstance()->getTable();
+
+        $articleIds = $this->articleResolver->findArticlesForAudience(
+            Folder::getEntityType(),
+            $params->getFolderId(),
+            Audience\Model::RELATIONSHIP_SELF,
+            [ "$articleTable.publish_at" => 'DESC', "$articleTable.created_at" => 'DESC'],
+            $params->getLimit()
+        );
 
         return [
             'articles' => $this->loadArticleByIds($articleIds, $params, $user),
