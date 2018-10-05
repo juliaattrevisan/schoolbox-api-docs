@@ -411,7 +411,6 @@ class Controller extends Base
      * @param Model                          $article
      * @param array|\Aura\Web\Request\Values $data
      * @return void
-     * @throws UnknownEntityTypeException
      * @throws MapperException
      * @throws MapperException\InsufficientHydrationException
      * @throws \PDOException

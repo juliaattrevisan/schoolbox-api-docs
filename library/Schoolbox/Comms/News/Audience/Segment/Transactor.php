@@ -10,7 +10,6 @@ namespace Schoolbox\Comms\News\Audience\Segment;
 use Alaress\Specification\Exception\UnsatisfiedException;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use UnexpectedValueException;
@@ -58,7 +57,6 @@ class Transactor
      * @throws Mapper\Exception\InsufficientHydrationException
      * @throws \DomainException
      * @throws UnexpectedValueException
-     * @throws UnknownEntityTypeException
      */
     public function save(News\Model $article, string $selectizeAudienceSegments): bool
     {
