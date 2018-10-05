@@ -135,14 +135,10 @@ class Transactor
     {
         $isSegmentsAdded = false;
         if ($segmentsToAdd->count()) {
-
-            // Ensure the relationship is valid for the segment's entity type
-            $validRelationships = $this->strategyFactory::getValidRelationshipModifiers();
-
-            // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
-            $validNullEntities = $this->strategyFactory::getValidNullEntities();
-
-            $validSegmentSpecFactory = new Audience\Validation\Factory($validRelationships, $validNullEntities);
+            $validSegmentSpecFactory = new Audience\Validation\Factory(
+                $this->strategyFactory::getValidRelationshipModifiers(),
+                $this->strategyFactory::getValidNullEntities()
+            );
             $validSegmentSpec        = $validSegmentSpecFactory->makeValidSegmentSpecification();
 
             foreach ($segmentsToAdd as $segmentToAdd) {
