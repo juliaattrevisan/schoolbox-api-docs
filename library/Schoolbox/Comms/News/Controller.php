@@ -353,34 +353,23 @@ class Controller extends Base
              */
             if ($this->getRequest()->isXhr()) {
 
-                /* Current url should secretly update to the Update route
-                 */
+                // Send the update page route, JS will update the window state to this
                 $url = $this->getRouter()->generate('commsNews.getUpdate', $routeParams);
 
-                /* Form action should secretly update to the Update route
-                 */
-                $formAction = $this->getRouter()->generate('commsNews.postUpdate', $routeParams);
-
-                // Submit action: approve if I can, otherwise submit for moderation
-                $formActionSubmit = false;
+                // Send all the possible routes, JS will determine which ones to show where
+                $updateRoute = $this->getRouter()->generate('commsNews.postUpdate', $routeParams);
+                $submitRoute = $this->getRouteIfAuthorized('commsNewsModeration.postSubmit', $routeParams);
+                $approveRoute = false;
                 if ($article->canBeApproved()) {
-                    $formActionSubmit = $this->getRouteIfAuthorized(
-                        'commsNewsModeration.postApprove',
-                        $routeParams
-                    );
-                }
-                if (!$formActionSubmit) {
-                    $formActionSubmit = $this->getRouteIfAuthorized(
-                        'commsNewsModeration.postSubmit',
-                        $routeParams
-                    );
+                    $approveRoute = $this->getRouteIfAuthorized('commsNewsModeration.postApprove', $routeParams);
                 }
 
                 $this->getResponse()->content->set($this->buildJsonOutput([
                     'success' => true,
                     'url' => $url,
-                    'formAction' => $formAction,
-                    'formActionSubmit' => $formActionSubmit
+                    'updateRoute' => $updateRoute,
+                    'submitRoute' => $submitRoute,
+                    'approveRoute' => $approveRoute
                 ]));
             } else {
 

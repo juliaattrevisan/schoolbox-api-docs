@@ -335,7 +335,22 @@
         $createForm.draft({
             inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search', '#news-topics'],
             textareas: ['body', 'blurb'],
-            attachzones: ['attachment']
+            attachzones: ['attachment'],
+            onSaveSuccess: function (response) {
+                // Update the form actions
+                $createForm.attr('action', response.updateRoute);
+                if (response.approveRoute) {
+                    $createForm.attr('data-action-submit', response.approveRoute);
+                } else {
+                    $createForm.attr('data-action-submit', response.submitRoute);
+                }
+
+                // Update the window history
+                window.history.pushState({}, null, response.url);
+
+                // Update the Vue property for requiring moderation
+                formActionsApp.requiresModeration = !(response.approveRoute);
+            }
         });
         {% endif %}
 
