@@ -24,6 +24,9 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 class CollectorFactory {
 
+    /** @var IStorageWrapper */
+    private $wrapper;
+
     /** @var StorageMapper */
     private $storage;
 
@@ -33,13 +36,13 @@ class CollectorFactory {
     /** @var MyFileMapper */
     private $myFile;
 
-    /** @var PortfolioWebDAV */
-    private $dav;
-
     /** @var IConfigLoader */
     private $conf;
 
-    /** @var callable[] */
+    /**
+     * Set to false if not available so we can distinguish between not yet loaded, and not available
+     * @var callable[]|bool[]
+     */
     private $loaders;
 
     /**
@@ -50,44 +53,13 @@ class CollectorFactory {
      */
     public function __construct(IStorageWrapper $wrapper = null)
     {
-        $storage  = StorageMapper::getInstance();
-        $file     = FileMapper::getInstance();
-        $myFile   = MyFileMapper::getInstance();
+        $this->wrapper = $wrapper;
 
+        // TODO inject these service dependencies
+        $this->storage  = StorageMapper::getInstance();
+        $this->file     = FileMapper::getInstance();
+        $this->myFile   = MyFileMapper::getInstance();
         $this->conf = new Loader();
-
-        $this->add(NodeFactory::STORE, function () use ($storage, $wrapper) {
-            return new StorageHandler($storage, $wrapper);
-        });
-
-        $this->add(NodeFactory::SBFS, function () use ($file, $wrapper) {
-            return new FileSystemHandler($file, $wrapper);
-        });
-
-        $this->add(NodeFactory::MYFILE, function () use ($myFile, $wrapper) {
-            return new FileSystemHandler($myFile, $wrapper);
-        });
-
-        try {
-            $dav = PortfolioWebDAV::factory();
-            $this->add(NodeFactory::WEBDAV, function () use ($dav, $wrapper, $storage) {
-                return new ExternalFileSystemHandler($dav, $storage, $dav, $wrapper); // yup. totally passing things in multiple times
-            });
-
-        } catch (\DomainException $e) {
-            // DAV isn't configured. we're ok with that.
-        }
-
-        try {
-            $locator = new Locator(new Tenant($this->conf->get('office365_tenant')), $_SESSION['azureAccessToken']);
-
-            $this->add(NodeFactory::OFFICE, function () use ($locator, $wrapper, $storage) {
-                return new ExternalFileSystemHandler($locator, $storage, $locator, $wrapper);
-            });
-
-        } catch (InvalidArgumentException $e) {
-            // Office 365 isn't configured. we're ok with that.
-        }
     }
 
 
@@ -95,8 +67,9 @@ class CollectorFactory {
      * @param string $type
      * @param callable $lazyload
      */
-    private function add($type, $lazyload) {
-        if (is_callable($lazyload)) {
+    private function add(string $type, $lazyload): void
+    {
+        if (\is_callable($lazyload)) {
             $this->loaders[$type] = $lazyload;
         }
     }
@@ -104,11 +77,55 @@ class CollectorFactory {
 
     /**
      * @param string $type
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException  If code attempts to create a DAV client with invalid HTTP method
+     * @throws \UnexpectedValueException If you call this when no user is logged on for the webDav loader
      * @return TypeHandlerInterface
      */
     private function get(string $type): TypeHandlerInterface
     {
+        // check cache
+        if(!isset($this->loaders[$type])){
+            // Try to load cache
+            switch($type){
+                case NodeFactory::STORE:
+                    $this->add($type, function () {
+                        return new StorageHandler($this->storage, $this->wrapper);
+                    });
+                    break;
+                case NodeFactory::SBFS:
+                    $this->add($type, function () {
+                        return new FileSystemHandler($this->file, $this->wrapper);
+                    });
+                    break;
+                case NodeFactory::MYFILE:
+                    $this->add($type, function () {
+                        return new FileSystemHandler($this->myFile, $this->wrapper);
+                    });
+                    break;
+                case NodeFactory::WEBDAV:
+                    try {
+                        $dav = PortfolioWebDAV::factory();
+                        $this->add($type, function () use ($dav) {
+                            return new ExternalFileSystemHandler($dav, $this->storage, $dav, $this->wrapper); // yup. totally passing things in multiple times
+                        });
+                    } catch (\DomainException $e) {
+                        // DAV isn't configured. we're ok with that.
+                        $this->loaders[$type] = false;
+                    }
+                    break;
+                case NodeFactory::OFFICE:
+                    try {
+                        $locator = new Locator(new Tenant($this->conf->get('office365_tenant')), $_SESSION['azureAccessToken']);
+                        $this->add($type, function () use ($locator) {
+                            return new ExternalFileSystemHandler($locator, $this->storage, $locator, $this->wrapper);
+                        });
+                    } catch (InvalidArgumentException $e) {
+                        // Office 365 isn't configured. we're ok with that.
+                        $this->loaders[$type] = false;
+                    }
+                    break;
+            }
+        }
         if(empty($this->loaders[$type])) {
             throw new InvalidArgumentException("Loader for '$type' not defined.");
         }
@@ -122,8 +139,10 @@ class CollectorFactory {
      *
      * @param string[] $attachments
      * @return Collector
+     * @throws InvalidArgumentException  If code attempts to create a DAV client with invalid HTTP method
+     * @throws \UnexpectedValueException If you attempt to build a WebDav attachment and no user is logged in
      */
-    public function build(array $attachments)
+    public function build(array $attachments): Collector
     {
         $handlers = array();
 
@@ -142,7 +161,7 @@ class CollectorFactory {
             $xpl = explode(':', $attachment, 2);
 
             // check valid count
-            if(count($xpl) != 2) {
+            if(\count($xpl) !== 2) {
                 continue;
             }
 
