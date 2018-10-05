@@ -18,6 +18,7 @@ use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\IArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\GenericCollection;
 use Schoolbox\News\Topic;
 use Schoolbox\User;
 
@@ -305,8 +306,19 @@ class Lists
             $params->getLimit()
         );
 
+        $idProperty = $this->newsMapper->getIdentifierProperty();
+
+        /** @var GenericCollection|Model[] $articles */
+        $articles = $this->loadArticleByIds($articleIds, $params, $user)->indexBy($idProperty);
+
+        // Load audiences so module auth rules work in rendered templates
+        $rootSegments = Audience\Mapper::getInstance()->findForArticles($articles->getPropertyValues($idProperty));
+        foreach ($rootSegments as $rootSegment) {
+            $articles[$rootSegment->getCommsNewsArticle()->getId()]->getAudience()[$rootSegment->getId()] = $rootSegment;
+        }
+
         return [
-            'articles' => $this->loadArticleByIds($articleIds, $params, $user),
+            'articles' => $articles,
             'readMore' => $this->readMoreText,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $this->findSavedArticles($user, $this->saveForLaterEnabled),
