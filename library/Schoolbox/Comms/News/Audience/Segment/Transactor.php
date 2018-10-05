@@ -129,7 +129,6 @@ class Transactor
      * @return bool
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
-     * @throws UnknownEntityTypeException
      * @throws UnsatisfiedException
      */
     private function saveAddedSegments(News\Model $article, GenericCollection $segmentsToAdd): bool
@@ -138,17 +137,13 @@ class Transactor
         if ($segmentsToAdd->count()) {
 
             // Ensure the relationship is valid for the segment's entity type
-            $validRelationships = [];
+            $validRelationships = $this->strategyFactory::getValidRelationshipModifiers();
+
             // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
-            $validNullEntities = [];
-            foreach ($this->strategyFactory->makeAllStrategies() as $strategy) {
-                $validRelationships[$strategy::getEntityType()] = $strategy::getValidRelationshipModifiers();
-                $validNullEntities[$strategy::getEntityType()]  = $strategy::isValidNullEntityValue();
-            }
+            $validNullEntities = $this->strategyFactory::getValidNullEntities();
 
             $validSegmentSpecFactory = new Audience\Validation\Factory($validRelationships, $validNullEntities);
             $validSegmentSpec        = $validSegmentSpecFactory->makeValidSegmentSpecification();
-
 
             foreach ($segmentsToAdd as $segmentToAdd) {
                 $segmentToAdd->setCommsNewsArticle($article);
