@@ -258,7 +258,7 @@
                         </li>
                         {% endif %}
                         <li>
-                            <button type="submit" class="submit" id="news-submit" {% if not article.id %}disabled{% endif %}>Submit</button>
+                            <button type="submit" class="submit" id="news-submit" {% if not article.id %}disabled{% endif %}>${ submitText }</button>
                         </li>
                     </ul>
                 </div>
@@ -963,6 +963,11 @@
 
     var formActionsApp = new Vue({
         el: '#create-form-actions',
-        delimiters: ['${', '}']
+        delimiters: ['${', '}'],
+        computed: {
+            submitText: function() {
+                return 'Submit';
+            }
+        }
     });
 </script>
