@@ -1127,12 +1127,15 @@
         delimiters: ['${', '}'],
         data: {
             articleId: '{{ article.id }}',
-            requiresModeration: {{ (approveRoute) ? 'false' : 'true' }}
+            requiresModeration: {{ not (approveRoute) }},
+            isSubmitted: '{{ not not (article.isSubmitted) }}'
         },
         computed: {
             submitText: function() {
                 if (this.requiresModeration && this.articleId) {
                     return 'Submit for moderation';
+                } else if (this.isSubmitted) {
+                    return 'Save';
                 }
 
                 return 'Publish';
