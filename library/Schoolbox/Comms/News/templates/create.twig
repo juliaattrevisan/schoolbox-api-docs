@@ -130,10 +130,13 @@
                         <textarea id="body" name="body">{{ article.body }}</textarea>
                     </div>
 
-                    <div class="small-12 columns">
+                    <legend data-collapser="optional-section" class="icon-down-arrow" >Include a blurb to be displayed alongside the title</legend>
+                    <div class="column small-12 hide" data-collapsable="optional-section" data-collapse-state="collapsed" >
                         <label for="blurb">Blurb</label>
                         <textarea id="blurb" name="blurb">{{ article.blurb }}</textarea>
                     </div>
+                </fieldset>
+                <fieldset class="content">
                     <div class="small-12 columns">
                         <label>Feature Image</label>
                         {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
@@ -379,6 +382,8 @@
                 {name: 'schoolbox', groups: ['schoolboxlink']},
             ]
         });
+
+        $('[data-collapser]').collapsable();
 
         $('[data-topics]').selectizeSelector({
             ajax: {
