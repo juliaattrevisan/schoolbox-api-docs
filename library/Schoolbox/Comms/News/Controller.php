@@ -347,6 +347,7 @@ class Controller extends Base
         $this->updateArticleAudience($article, $data['audience']);
 
         // Validate proposed article + audience
+        // (This protects against DOM manipulation, it should not be shown on normal work-flows)
         try{
             $this->validateArticleAndAudience($article);
         } catch (UnsatisfiedException $e){
