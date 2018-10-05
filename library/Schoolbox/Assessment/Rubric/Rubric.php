@@ -191,7 +191,7 @@ class Rubric implements Twiggable
 
         foreach ($this->criteriaGroups as $group)
         {
-            $os->attach($group, $group->getMark());
+            $os->attach($group, $group->calculateMark());
         }
 
         return $os;
@@ -207,7 +207,7 @@ class Rubric implements Twiggable
 
         foreach ($this->criteriaGroups as $group)
         {
-            $os->attach($group, $group->getMax());
+            $os->attach($group, $group->calculateMax());
         }
 
         return $os;
