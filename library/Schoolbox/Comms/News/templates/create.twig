@@ -304,14 +304,14 @@
                             Publish Date
                         </label>
                         <p class="meta">This article becomes available to its audience once this date and time is reached.</p>
-                        <input type="text" class="required" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ article.publishAt.local }}"/>
+                        <input type="text" class="required" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ article.publishAt.local }}" required />
                     </div>
                     <div class="small-12 large-6 columns">
                         <label for="expiresAt">
                             Expiry Date
                         </label>
                         <p class="meta">This article is automatically archived once this expiry date is reached.</p>
-                        <input type="text" class="required" name="expiresAt" id="expiresAt" data-datepicker data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}"/>
+                        <input type="text" class="required" name="expiresAt" id="expiresAt" data-datepicker data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}" required />
                     </div>
                 </fieldset>
             </section>
