@@ -153,7 +153,7 @@ class Controller extends Base
             $urlPrefix,
             $params,
             $user,
-            $this->topicMapper->findAll(),
+            $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]),
             null,
             null
         );

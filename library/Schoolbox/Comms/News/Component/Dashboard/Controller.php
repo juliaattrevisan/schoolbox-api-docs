@@ -65,7 +65,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute(): bool
     {
-        $this->topics = $this->topicMapper->findAll();
+        $this->topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
 
         /* Figure out the first topic to select by default
          * This initiates an async to load actual articles
