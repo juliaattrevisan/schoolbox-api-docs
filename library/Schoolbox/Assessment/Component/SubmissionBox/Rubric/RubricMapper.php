@@ -1539,7 +1539,7 @@ class RubricMapper
 
                     // Now go thru its descriptors
                     $criterionMaxValue = 0;
-                    foreach ($postdata['descriptor'][$criterionId] as $descriptor) {
+                    foreach ($postdata['descriptor'][$criterionId] ?? [] as $descriptor) {
                         $criterionMaxValue = max($criterionMaxValue, $descriptor['points']);
                     }
 
