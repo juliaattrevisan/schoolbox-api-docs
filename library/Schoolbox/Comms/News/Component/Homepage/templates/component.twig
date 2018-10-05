@@ -25,7 +25,7 @@ Data:
         'ro=' ~ (readonly ? '1' : '0')
     ] |join('&') %}
 
-    {% set getListHomePagePath = routeLookup('commsNews.getListForHomepage')|replace({'{folderId}':''}) ~ folderId %}
+    {% set getListHomePagePath = routeLookup('commsNews.getListForHomepage', {folderId: folderId}) %}
 
     $(function() {
         $('#news-container-{{ componentInstanceId }}').articleTabs({
