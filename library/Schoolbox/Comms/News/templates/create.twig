@@ -121,7 +121,7 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label for="news-title">Title</label>
+                        <label for="news-title" class="required">Title</label>
                         <input id="news-title" name="title" type="text" maxlength="255" value="{{ article.title }}" required />
                     </div>
 
@@ -143,7 +143,7 @@
                 <fieldset class="content" id="audience-select-container" v-if="countModalSegmentTypes">
 
                     <div class="small-12 columns">
-                        <label>Audience</label>
+                        <label class="required">Audience</label>
                         <p class="meta">Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of available options.</p>
 
                         <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4 audience-grid" v-show="audienceBricks.length">
@@ -300,18 +300,18 @@
 
                 <fieldset class="content">
                     <div class="small-12 large-6 columns">
-                        <label for="publishAt">
+                        <label for="publishAt" class="required">
                             Publish Date
                         </label>
                         <p class="meta">This article becomes available to its audience once this date and time is reached.</p>
-                        <input type="text" class="required" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ article.publishAt.local }}" required />
+                        <input type="text" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ article.publishAt.local }}" required />
                     </div>
                     <div class="small-12 large-6 columns">
-                        <label for="expiresAt">
+                        <label for="expiresAt" class="required">
                             Expiry Date
                         </label>
                         <p class="meta">This article is automatically archived once this expiry date is reached.</p>
-                        <input type="text" class="required" name="expiresAt" id="expiresAt" data-datepicker data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}" required />
+                        <input type="text" name="expiresAt" id="expiresAt" data-datepicker data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}" required />
                     </div>
                 </fieldset>
             </section>

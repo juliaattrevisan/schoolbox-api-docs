@@ -132,6 +132,10 @@ form {
 
 label {
 	display: initial;
+	&.required:after {
+		content: ' *';
+		color: $alert-color;
+	}
 }
 
 input,
