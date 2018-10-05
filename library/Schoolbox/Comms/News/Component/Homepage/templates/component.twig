@@ -14,8 +14,6 @@ Data:
 <script src="/javascript/shared/comms/articletabs.js"></script>
 <script src="/javascript/shared/comms/saveforlater.js"></script>
 <script>
-    {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key, folderId: folderId}) %}
-
     {% set querystringParams = [
         'c=' ~ compactMode,
         'l=' ~ limit,
@@ -27,27 +25,21 @@ Data:
 
     {% set getListHomePagePath = routeLookup('commsNews.getListForHomepage', {folderId: folderId}) %}
 
-    $(function() {
-        $('#news-container-{{ componentInstanceId }}').articleTabs({
-            'selectedUrl': "{{ getListHomePagePath }}?{{ querystringParams|raw }}",
-            'topicTabs': $("#news-topics-{{ componentInstanceId }}"),
-            onChange: function() {
-                // Hide the component action bar
-                $('#news-component-actions-{{ componentInstanceId }}').addClass('hide');
-            },
-            onChangeSuccess: function (response) {
-                if ($('#news-container-{{ componentInstanceId }}').find('.information-list').length > 0) {
-                    $('#news-component-actions-{{ componentInstanceId }}').removeClass('hide');
-                }
+    $(function () {
+        var $articleList = $('#news-container-{{ componentInstanceId }}'),
+            $actionBar = $('#news-component-actions-{{ componentInstanceId }}');
 
-                {% if rssRoute %}
-                /* Update the RSS button too
-                 */
-                $('#news-component-actions-{{ componentInstanceId }}')
-                    .find('[data-rss]')
-                    .attr('href', '{{ rssRoute }}?topic=' + response.slug);
-                {% endif %}
+        $.ajax({
+            type: 'GET',
+            url: "{{ getListHomePagePath }}?{{ querystringParams|raw }}",
+            dataType: 'json'
+        }).success(function (response) {
+            $articleList.html(response.fragment);
+            if ($articleList.find('.information-list').length > 0) {
+                $actionBar.removeClass('hide');
             }
+        }).error(function (response) {
+            console.log(response);
         });
 
         $('#news-container-{{ componentInstanceId }}').saveForLater();
@@ -58,20 +50,23 @@ Data:
     <div class="loader"></div>
 </div>
 
+{% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key, folderId: folderId}) %}
+{% set createRoute = readonly ? false : routeLookupIfAuthorized('commsNews.getCreate') %}
+{% if rssRoute or createRoute %}
 <div class="component-action hide" id="news-component-actions-{{ componentInstanceId }}">
     <section>
         {% if rssRoute %}
-            <a href="{{ rssRoute }}?topic={{ slug }}" class="button" title="Download RSS feed for this topic" data-rss>RSS</a>
+            <a href="{{ rssRoute }}" class="button" title="Download RSS feed for this topic" data-rss>RSS</a>
+            {# ^ href is populated by js in articletabs.js #}
         {% endif %}
-        {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-        {% if createRoute and not readonly %}
+
+        {% if createRoute %}
             {% set createNewsQuerystringParams = [
                 'groupId=' ~ folderId,
                 'type=folder'
             ]|join('&') %}
             <a href="{{ createRoute }}?{{ createNewsQuerystringParams|raw }}" class="button">Create {{ locale.news }}</a>
         {% endif %}
-        
-        {# ^ href is populated by js in articletabs.js #}
     </section>
 </div>
+{% endif %}
