@@ -120,7 +120,7 @@ class CollectorFactory {
     /**
      * Build method for the default Collector used most places
      *
-     * @param array $attachments
+     * @param string[] $attachments
      * @return Collector
      */
     public function build(array $attachments)
