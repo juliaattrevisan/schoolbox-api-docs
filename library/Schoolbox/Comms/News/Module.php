@@ -85,7 +85,10 @@ class Module extends BaseModule
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
                     new Rule\All(
-                        new Authorizer\Rule\InstructorsCanEditOthersArticles($this->getConfig()),
+                        new Rule\Any(
+                            new Authorizer\Rule\IsArticleAuthor(),
+                            new Authorizer\Rule\InstructorsCanEditOthersArticles($this->getConfig())
+                        ),
                         new Authorizer\Rule\CanModerateAudience($this->getStrategyFactory())
                     ),
                     new Rule\All(
