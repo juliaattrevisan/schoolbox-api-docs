@@ -107,13 +107,13 @@ class CollectorFactory {
      * @throws InvalidArgumentException
      * @return TypeHandlerInterface
      */
-    private function get($type)
+    private function get(string $type): TypeHandlerInterface
     {
         if(empty($this->loaders[$type])) {
             throw new InvalidArgumentException("Loader for '$type' not defined.");
         }
 
-        return call_user_func($this->loaders[$type]);
+        return \call_user_func($this->loaders[$type]);
     }
 
 
