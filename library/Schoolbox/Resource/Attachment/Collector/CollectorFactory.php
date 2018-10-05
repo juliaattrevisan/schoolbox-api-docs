@@ -40,7 +40,7 @@ class CollectorFactory
     /**
      * Set to false if not available so we can distinguish between not yet loaded, and not available
      *
-     * @var callable[]|bool[]
+     * @var TypeHandlerInterface[]|bool[]
      */
     private $loaders;
 
@@ -64,18 +64,6 @@ class CollectorFactory
 
 
     /**
-     * @param string   $type
-     * @param callable $lazyLoad
-     */
-    private function add(string $type, $lazyLoad): void
-    {
-        if (\is_callable($lazyLoad)) {
-            $this->loaders[$type] = $lazyLoad;
-        }
-    }
-
-
-    /**
      * @param string $type
      * @throws InvalidArgumentException  If code attempts to create a DAV client with invalid HTTP method
      * @throws \UnexpectedValueException If you call this when no user is logged on for the webDav loader
@@ -88,26 +76,18 @@ class CollectorFactory
             // Try to load cache
             switch ($type) {
                 case NodeFactory::STORE:
-                    $this->add($type, function () {
-                        return new StorageHandler($this->storage, $this->wrapper);
-                    });
+                    $this->loaders[$type] = new StorageHandler($this->storage, $this->wrapper);
                     break;
                 case NodeFactory::SBFS:
-                    $this->add($type, function () {
-                        return new FileSystemHandler($this->file, $this->wrapper);
-                    });
+                    $this->loaders[$type] = new FileSystemHandler($this->file, $this->wrapper);
                     break;
                 case NodeFactory::MYFILE:
-                    $this->add($type, function () {
-                        return new FileSystemHandler($this->myFile, $this->wrapper);
-                    });
+                    $this->loaders[$type] = new FileSystemHandler($this->myFile, $this->wrapper);
                     break;
                 case NodeFactory::WEBDAV:
                     try {
                         $dav = PortfolioWebDAV::factory();
-                        $this->add($type, function () use ($dav) {
-                            return new ExternalFileSystemHandler($dav, $this->storage, $dav, $this->wrapper); // yup. totally passing things in multiple times
-                        });
+                        $this->loaders[$type] = new ExternalFileSystemHandler($dav, $this->storage, $dav, $this->wrapper);
                     } catch (\DomainException $e) {
                         // DAV isn't configured. we're ok with that.
                         $this->loaders[$type] = false;
@@ -116,9 +96,7 @@ class CollectorFactory
                 case NodeFactory::OFFICE:
                     try {
                         $locator = new Locator(new Tenant($this->conf->get('office365_tenant')), $_SESSION['azureAccessToken']);
-                        $this->add($type, function () use ($locator) {
-                            return new ExternalFileSystemHandler($locator, $this->storage, $locator, $this->wrapper);
-                        });
+                        $this->loaders[$type] = new ExternalFileSystemHandler($locator, $this->storage, $locator, $this->wrapper);
                     } catch (InvalidArgumentException $e) {
                         // Office 365 isn't configured. we're ok with that.
                         $this->loaders[$type] = false;
@@ -130,7 +108,7 @@ class CollectorFactory
             throw new InvalidArgumentException("Loader for '$type' not defined.");
         }
 
-        return \call_user_func($this->loaders[$type]);
+        return $this->loaders[$type];
     }
 
 
