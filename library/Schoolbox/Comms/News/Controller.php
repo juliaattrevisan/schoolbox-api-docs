@@ -365,7 +365,7 @@ class Controller extends Base
         $postedAudience = $article->getAudience()->shallowClone();
         $article->setAudience($existingAudience);
 
-        // Perform intelligent update and persistence is specialised helper class
+        // Perform intelligent update and persistence in specialised helper class
         $audienceTransactor = new Audience\Segment\Transactor($this->audienceMapper, $this->strategyFactory);
         $audienceTransactor->save($article, $postedAudience);
 
