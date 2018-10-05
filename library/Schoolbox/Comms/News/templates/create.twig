@@ -24,19 +24,26 @@
 <div class="row">
     <div class="small-12 island">
 
+        {% set createRoute = routeLookupIfAuthorized('commsNews.postCreate') %}
+        {% if article.id %}
+            {% set updateRoute = routeLookupIfAuthorized('commsNews.postUpdate', {article: article, articleId: article.id}) %}
+            {% set submitRoute = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
+            {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
+        {% endif %}
+
         {# Create two possible routes:
               * formAction: used for draft saving by the draft jQuery plugin, and for the secondary action of preview
               * formActionSubmit: used for the primary action- either submitting (an unapproved article), or updating (an approved article)
         #}
         {% if article.id and not article.isApproved %}
-            {% set formAction = routeLookupIfAuthorized('commsNews.postUpdate', {article: article, articleId: article.id}) %}
-            {% set formActionSubmit = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
+            {% set formAction = updateRoute %}
+            {% set formActionSubmit = submitRoute %}
         {% elseif article.id and article.isApproved %}
             {% set formAction = '' %} {# No drafting or previewing if the article is approved #}
-            {% set formActionSubmit = routeLookupIfAuthorized('commsNews.postUpdate', {article: article, articleId: article.id}) %}
+            {% set formActionSubmit = updateRoute %}
         {% else %}
-            {% set formAction = routeLookupIfAuthorized('commsNews.postCreate') %}
-            {# No submitting allowed until a draft has saved -_- #}
+            {% set formAction = createRoute %}
+            {# No submitting allowed until a draft has saved #}
             {% set formActionSubmit = '' %}
         {% endif %}
 
@@ -964,8 +971,16 @@
     var formActionsApp = new Vue({
         el: '#create-form-actions',
         delimiters: ['${', '}'],
+        data: {
+          requiresModeration: {{ (approveRoute) ? 'false' : 'true' }}
+        },
         computed: {
             submitText: function() {
+                if (!this.requiresModeration) {
+                    return 'Publish';
+                }
+
+                // Default to a generic 'Submit'
                 return 'Submit';
             }
         }
