@@ -251,7 +251,7 @@
 
             <div class="row">
                 <div class="small-12 columns">
-                    <ul class="flex-list buttons">
+                    <ul class="flex-list buttons" id="create-form-actions">
                         {% if not article.id or not article.isApproved %}
                         <li>
                             <button type="submit" id="news-preview" {% if not article.id %}disabled{% endif %}>Preview</button>
@@ -959,5 +959,10 @@
                 return modifiers;
             }
         }
+    });
+
+    var formActionsApp = new Vue({
+        el: '#create-form-actions',
+        delimiters: ['${', '}']
     });
 </script>
