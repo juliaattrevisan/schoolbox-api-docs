@@ -1126,16 +1126,16 @@
         el: '#create-form-actions',
         delimiters: ['${', '}'],
         data: {
-          requiresModeration: {{ (approveRoute) ? 'false' : 'true' }}
+            articleId: '{{ article.id }}',
+            requiresModeration: {{ (approveRoute) ? 'false' : 'true' }}
         },
         computed: {
             submitText: function() {
-                if (!this.requiresModeration) {
-                    return 'Publish';
+                if (this.requiresModeration && this.articleId) {
+                    return 'Submit for moderation';
                 }
 
-                // Default to a generic 'Submit'
-                return 'Submit';
+                return 'Publish';
             }
         }
     });
