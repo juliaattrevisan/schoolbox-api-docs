@@ -361,16 +361,13 @@ class Controller extends Base
                  */
                 $formAction = $this->getRouter()->generate('commsNews.postUpdate', $routeParams);
 
-                // Submit action: approve if I can and am the author, otherwise preview
+                // Submit action: approve if I can, otherwise submit for moderation
                 $formActionSubmit = false;
                 if ($article->canBeApproved()) {
-                    $author = $article->getAuthor();
-                    if ($author instanceof User && $author->getId() === $this->getUser()->getId()) {
-                        $formActionSubmit = $this->getRouteIfAuthorized(
-                            'commsNewsModeration.postApprove',
-                            $routeParams
-                        );
-                    }
+                    $formActionSubmit = $this->getRouteIfAuthorized(
+                        'commsNewsModeration.postApprove',
+                        $routeParams
+                    );
                 }
                 if (!$formActionSubmit) {
                     $formActionSubmit = $this->getRouteIfAuthorized(
