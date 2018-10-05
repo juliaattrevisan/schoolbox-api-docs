@@ -1,14 +1,11 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Resource\Attachment\Collector;
-
 
 use InvalidArgumentException;
 use PortfolioWebDAV;
@@ -22,7 +19,8 @@ use Schoolbox\Resource\File\IStorageWrapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
-class CollectorFactory {
+class CollectorFactory
+{
 
     /** @var IStorageWrapper */
     private $wrapper;
@@ -41,9 +39,11 @@ class CollectorFactory {
 
     /**
      * Set to false if not available so we can distinguish between not yet loaded, and not available
+     *
      * @var callable[]|bool[]
      */
     private $loaders;
+
 
     /**
      * The mapper passed in here defines the model that will be returned by self->build()->get*();
@@ -56,21 +56,21 @@ class CollectorFactory {
         $this->wrapper = $wrapper;
 
         // TODO inject these service dependencies
-        $this->storage  = StorageMapper::getInstance();
-        $this->file     = FileMapper::getInstance();
-        $this->myFile   = MyFileMapper::getInstance();
-        $this->conf = new Loader();
+        $this->storage = StorageMapper::getInstance();
+        $this->file    = FileMapper::getInstance();
+        $this->myFile  = MyFileMapper::getInstance();
+        $this->conf    = new Loader();
     }
 
 
     /**
-     * @param string $type
-     * @param callable $lazyload
+     * @param string   $type
+     * @param callable $lazyLoad
      */
-    private function add(string $type, $lazyload): void
+    private function add(string $type, $lazyLoad): void
     {
-        if (\is_callable($lazyload)) {
-            $this->loaders[$type] = $lazyload;
+        if (\is_callable($lazyLoad)) {
+            $this->loaders[$type] = $lazyLoad;
         }
     }
 
@@ -84,9 +84,9 @@ class CollectorFactory {
     private function get(string $type): TypeHandlerInterface
     {
         // check cache
-        if(!isset($this->loaders[$type])){
+        if (!isset($this->loaders[$type])) {
             // Try to load cache
-            switch($type){
+            switch ($type) {
                 case NodeFactory::STORE:
                     $this->add($type, function () {
                         return new StorageHandler($this->storage, $this->wrapper);
@@ -126,7 +126,7 @@ class CollectorFactory {
                     break;
             }
         }
-        if(empty($this->loaders[$type])) {
+        if (empty($this->loaders[$type])) {
             throw new InvalidArgumentException("Loader for '$type' not defined.");
         }
 
@@ -144,30 +144,30 @@ class CollectorFactory {
      */
     public function build(array $attachments): Collector
     {
-        $handlers = array();
+        $handlers = [];
 
-        $map = array(
+        $map = [
             NodeFactory::STORE  => Collector::TYPE_STORAGE,
             NodeFactory::SBFS   => Collector::TYPE_SBFS,
             NodeFactory::MYFILE => Collector::TYPE_MYFILE,
             NodeFactory::WEBDAV => Collector::TYPE_WEBDAV,
-            NodeFactory::OFFICE => Collector::TYPE_OFFICE
-        );
+            NodeFactory::OFFICE => Collector::TYPE_OFFICE,
+        ];
 
-        $indexedAttachments = array();
+        $indexedAttachments = [];
 
         // detect which handlers we are going to need and lazy them in
         foreach ($attachments as $attachment) {
             $xpl = explode(':', $attachment, 2);
 
             // check valid count
-            if(\count($xpl) !== 2) {
+            if (\count($xpl) !== 2) {
                 continue;
             }
 
             $mapped = $map[$xpl[0]];
 
-            if(empty($handlers[$xpl[0]])) {
+            if (empty($handlers[$xpl[0]])) {
                 $handlers[$mapped] = $this->get($xpl[0]);
             }
 
