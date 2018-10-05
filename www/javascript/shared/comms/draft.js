@@ -240,22 +240,12 @@
                  */
                 config.activator.prop('disabled', false);
             }).success(function (responseText) {
-
-                /* Recycle the id ><
-                 */
-                config.element.attr('action', responseText.formAction);
-                config.element.attr('data-action-submit', responseText.formActionSubmit);
-
-                /* hehe
-                 */
-                window.history.pushState({}, null, responseText.url);
-
                 config.toaster.toastTimeout({
                     text: 'Draft Saved',
                     css: 'success'
                 });
 
-                config.onSaveSuccess(true);
+                config.onSaveSuccess(responseText);
             }).error(function (response) {
                 var temp = $.parseJSON(response.responseText);
 
