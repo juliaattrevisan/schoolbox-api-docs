@@ -1,14 +1,14 @@
-{##
- # A list of all the available Topics to chooze
- # Sets up a container for async article loading
- #
- # @param int componentInstanceId
- # @param Collection|Topic[] topics
- # @param int topicAll
- # @param string slug
- # @param int compactMode
- # @param int limit
- # @param string referrer
+{#
+Sets up a container for async article loading.
+
+Data:
+    componentInstanceId int
+    compactMode         int
+    limit               int
+    folderId            int
+    key                 string
+    referrer            string
+    readonly            bool
  #}
 <div id="toast" class="toast"></div>
 <script src="/javascript/shared/comms/articletabs.js"></script>
