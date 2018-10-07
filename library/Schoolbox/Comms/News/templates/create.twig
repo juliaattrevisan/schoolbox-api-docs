@@ -1128,7 +1128,7 @@
         data: {
             articleId: '{{ article.id }}',
             requiresModeration: '{{ not (approveRoute) }}',
-            isSubmitted: '{{ not not (article.isSubmitted) }}'
+            isSubmitted: '{{ (article.isSubmitted) }}'
         },
         computed: {
             submitText: function() {
