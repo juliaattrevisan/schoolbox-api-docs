@@ -536,6 +536,15 @@ class Controller extends Base
 
         $partialData = $this->generatePartialForHomepage($params);
 
+        // Filter out articles the current user is not authorised to see
+        /** @var GenericCollection|Model[] $articles */
+        $articles = $partialData['articles'];
+        foreach ($articles as $idx => $article) {
+            if (!$this->getRouteIfAuthorized('commsNews.getDetail', ['article' => $article, 'articleId' => $article->getId()])) {
+                $articles->offsetUnset($idx);
+            }
+        }
+
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
             $this->response->content->set($this->buildJsonOutput([
