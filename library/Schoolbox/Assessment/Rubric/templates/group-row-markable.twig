@@ -85,11 +85,8 @@
                        name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
                        value="{{ percentageMark }}"/> %
             {% endif %}
-
-            {# TODO why is markSchemeName null when student is self-assessing (note: will be addressed in SA-7242) #}
-
+            
             {% if groupUsage.containsDescriptorsWithValue %}
-                {# TODO these need to be the descriptor sum! #}
                 <button data-use-descriptor-values>Assign <span class="descriptor-sum" data-group-descriptor-sum>
                     {% if markType.mode == 'raw' %}
                         {{ capabilityScaledMark }}
