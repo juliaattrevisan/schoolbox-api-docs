@@ -166,7 +166,6 @@
                     // Otherwise, range is between 0 and capability max
                     var capMax = $(this).closest("[data-group-summary]").attr("data-max");
 
-                    // TODO capMax seems to be using the validation for the most recently added item rather than having unique ones for each cap - why?
                     $(this).rules('add', {
                         range: [0, parseFloat(capMax)]
                     });
