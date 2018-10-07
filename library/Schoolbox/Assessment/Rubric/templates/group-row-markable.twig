@@ -4,13 +4,12 @@
 
 {# What could the difference between these two things possibly be? #}
 {% set capabilityMaxValue = groupUsage.maxValue %}
-{% set capabilityMaxSum   = groupUsage.calculateMaxValueFromIndicators %}
+{% set capabilityMaxFromIndicators   = groupUsage.calculateMaxValueFromIndicators %}
 {% set capabilityNormMark = capabilityMark.retrieveNormalizedMark %}
 
 {% set markType = rubricGrid.assessment.markScheme.generateContext %}
-
-{% if showGroupTotal and markType.mode != "none" and capabilityMark.value != 0 %}
-    {% set percentageMark     = capabilityMark.value * (100 / capabilityMaxSum) %}
+{% if showGroupTotal and markType.mode != "none" and capabilityMaxValue != 0 %}
+    {% set percentageMark     = capabilityMark.value * (100 / capabilityMaxFromIndicators) %}
     {% set letterGradeBracket = false %}
     {% set letterGradeValue   = '' %}
 
@@ -35,7 +34,7 @@
               data-mark="{{ capabilityMark.value }}"
               data-scaled-mark="{{ capabilityScaledMark }}"
               data-max="{{ capabilityMaxValue }}"
-              data-row-max-sum="{{ capabilityMaxSum }}"
+              data-row-max-sum="{{ capabilityMaxFromIndicators }}"
               data-group-id="{{ capabilityId }}"
               data-rubric-id="{{ rubricGrid.id }}">
 
