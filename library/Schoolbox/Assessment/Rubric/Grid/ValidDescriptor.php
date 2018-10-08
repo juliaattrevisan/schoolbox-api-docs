@@ -33,6 +33,6 @@ class ValidDescriptor extends \Alaress\Specification\Base
      */
     private function hasDecimals(Descriptor $descriptor) : bool
     {
-       return preg_match('/\.\d+$/', $descriptor->getValue()) === 1;
+       return preg_match('/\.\d+$/', $descriptor->getMaxValue()) === 1;
     }
 }
