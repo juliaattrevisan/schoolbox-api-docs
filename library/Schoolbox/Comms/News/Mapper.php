@@ -182,6 +182,7 @@ class Mapper extends \Schoolbox\Mapper
      * Returns a predicate for getting articles that are awaiting moderation
      * @param User $author
      * @return Builder
+     * @TODO Move non-state related considerations out of this method so it can be re-used
      */
     public function getPredicateDraft(User $author) {
         return $this->getPredicateBuilder()
@@ -195,6 +196,7 @@ class Mapper extends \Schoolbox\Mapper
      * Returns a predicate for getting articles that are awaiting moderation
      * @param User $author
      * @return Builder
+     * @TODO Move non-state related considerations out of this method so it can be re-used
      */
     public function getPredicateRejected(User $author) {
         return $this->getPredicateBuilder()
@@ -207,6 +209,7 @@ class Mapper extends \Schoolbox\Mapper
      * Returns a predicate for getting articles that are awaiting moderation
      * @param User $author
      * @return Builder
+     * @TODO Move non-state related considerations out of this method so it can be re-used
      */
     public function getPredicateAwaitingModeration(User $author) {
         return $this->getPredicateBuilder()
