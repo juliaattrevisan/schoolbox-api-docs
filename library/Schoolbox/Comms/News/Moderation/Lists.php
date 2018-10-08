@@ -57,6 +57,7 @@ class Lists
     {
         $builder = (new Builder($this->newsMapper->getDatabase(), 'comms_news_article'))
             ->notNull('submitted_at')
+            ->isNull('rejected_at')
             ->isNull('accepted_at');
 
         return $this->newsMapper->findByPredicates($builder, [
@@ -74,11 +75,7 @@ class Lists
      */
     public function getNeedModerationCount(): int
     {
-        $builder = (new Builder($this->newsMapper->getDatabase(), 'comms_news_article'))
-            ->notNull('submitted_at')
-            ->isNull('accepted_at');
-
-        return $this->newsMapper->countByPredicates($builder);
+        return $this->getNeedModeration()->count();
     }
 
 
