@@ -1159,11 +1159,12 @@
         data: {
             articleId: '{{ article.id }}',
             requiresModeration: '{{ not (approveRoute) }}',
-            isSubmitted: '{{ (article.isSubmitted) }}'
+            isSubmitted: '{{ (article.isSubmitted) }}',
+            isRejected: '{{ (article.isRejected) }}'
         },
         computed: {
             submitText: function() {
-                if (this.isSubmitted) {
+                if (this.isSubmitted && !this.isRejected) {
                     return 'Save';
                 } else if (this.requiresModeration && this.articleId) {
                     return 'Submit for moderation';
