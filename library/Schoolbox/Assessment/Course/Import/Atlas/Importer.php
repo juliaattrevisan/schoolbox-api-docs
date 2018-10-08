@@ -676,7 +676,7 @@ class Importer
      */
     private function findOrCreateCurriculumNodeFromStandard(Api\Standard $standard, Node $parent): ?Node
     {
-        if ('' !== $standard->getCode()) {
+        if ('' !== $standard->getCode() AND null !== $standard->getCode() ) {
             return $this->findOrCreateCurriculumNode(
                 $standard->getTitle(),
                 $standard->getCode(),
