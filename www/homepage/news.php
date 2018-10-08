@@ -12,7 +12,7 @@
 var_dump($this->arg);
 if(isset($this->arg[1]) && is_numeric($this->arg[1])) {
     $article_id = $this->db->getOne("SELECT migration_id FROM subject_news WHERE id = {$this->db->smartQuote($this->arg[1])}");
-    $this->localRedir('/news/' . $article_id);
+    $this::localRedir('/news/' . $article_id);
 } else {
     $this->pageNotFound();
 }
