@@ -395,6 +395,7 @@ class Controller extends Base
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
+                'articleId' => $article->getId(),
                 'url' => $url,
                 'updateRoute' => $updateRoute,
                 'submitRoute' => $submitRoute,
