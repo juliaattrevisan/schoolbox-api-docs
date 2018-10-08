@@ -182,16 +182,16 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * Returns a predicate for getting articles that are awaiting moderation
-     * @param User $author
+     *
      * @return Builder
-     * @TODO Move non-state related considerations out of this method so it can be re-used
+     * @throws InvalidColumnException
      */
-    public function getPredicateDraft(User $author) {
+    public function getPredicateDraft(): IBuilder
+    {
         return $this->getPredicateBuilder()
-            ->equals('author_id',$author->getId())
-            ->isNull('submitted_at')
-            ->isNull('rejected_at')
-            ->isNull('deleted_at');
+                    ->isNull('submitted_at')
+                    ->isNull('rejected_at')
+                    ->isNull('deleted_at');
     }
 
     /**

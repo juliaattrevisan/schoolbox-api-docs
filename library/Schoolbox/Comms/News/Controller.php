@@ -800,8 +800,12 @@ class Controller extends Base
             'moderationCount' => $lists->getNeedModerationCount(),
             'authoredCounts' => [
                 'Drafted' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateDraft($this->getUser())),
-                        'labelClass' => 'unsubmitted'
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateDraft()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'unsubmitted',
                 ],
                 'Awaiting Moderation' => [
                     'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
@@ -851,8 +855,12 @@ class Controller extends Base
             'moderationCount' => $lists->getNeedModerationCount(),
             'authoredCounts' => [
                 'Drafted' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateDraft($this->getUser())),
-                    'labelClass' => 'unsubmitted'
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateDraft()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'unsubmitted',
                 ],
                 'Awaiting Moderation' => [
                     'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
