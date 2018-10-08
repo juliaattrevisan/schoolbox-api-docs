@@ -529,7 +529,7 @@ class ArticleResolver implements IArticleResolver
             $whereClause = \implode(' AND ', $pb->getWhere());
 
             $sql = "
-                SELECT comms_news_article_id
+                SELECT DISTINCT comms_news_article_id
                 FROM comms_news_audience
                 INNER JOIN comms_news_article ON comms_news_audience.comms_news_article_id = comms_news_article.id
                 WHERE {$whereClause}";
@@ -545,9 +545,7 @@ class ArticleResolver implements IArticleResolver
                 $pb->putParam('limit', $limit);
             }
 
-            $articleIds = $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
-
-            return \array_unique($articleIds);
+            return $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
         }
 
         // Complex intersect case
