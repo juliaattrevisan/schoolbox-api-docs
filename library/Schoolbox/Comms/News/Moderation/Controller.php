@@ -68,24 +68,24 @@ class Controller extends Base
     public function getList(): void
     {
         $lists = new Lists($this->newsMapper);
-        $articles = new Collection();
+        $articlesNeedModeration = new Collection();
 
         try {
             $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
-            $articles           = $lists->getNeedModeration();
+            $articlesNeedModeration = $lists->getNeedModeration();
         } catch (Mapper\Exception $e) {
             $moderationRequired = false;
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
-            'articles' => $articles,
+            'articles' => $articlesNeedModeration,
             'recentlyAcceptedArticles' => $lists->getRecentlyAccepted(),
             'recentlyRejectedArticles' => $lists->getRecentlyRejected(),
             'moderationRequired' => $moderationRequired,
 
             // Vars for the nav sidebar
             'page' => $this->getRequest()->query['page'],
-            'moderationCount' => $lists->getNeedModerationCount(),
+            'moderationCount' => $articlesNeedModeration->count(),
             'authoredCounts' => [
                 'Drafted' => [
                     'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateDraft($this->getUser())),
