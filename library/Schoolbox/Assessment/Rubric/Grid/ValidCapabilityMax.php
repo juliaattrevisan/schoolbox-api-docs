@@ -40,7 +40,7 @@ class ValidCapabilityMax extends \Alaress\Specification\Base
      */
     public function isSatisfiedBy($capabilityMax) : bool
     {
-        // TODO please no
+        // TODO this is necessary because the assessment doesn't enforce strict typing and doesn't cast toggle values to bool...ugh
         if ($this->markPerCap === true || $this->markPerCap === 'on') {
             return is_numeric($capabilityMax) && $capabilityMax > 0;
         }
