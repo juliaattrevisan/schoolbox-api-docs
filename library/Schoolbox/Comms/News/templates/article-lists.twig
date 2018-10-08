@@ -47,10 +47,12 @@
                 {% if modifyRoute and not readonly %}
                     <a class="icon-modify" href="{{ modifyRoute }}" title="Modify this {{ locale.news }}"></a>
                 {% endif %}
+                {% if config.save_for_later %}
                 {% include '@commsNewsSaveForLater/activator.twig' with {
                     article: article,
                     isSaved: savedArticleIds[article.id]
                 } only %}
+                {% endif %}
             </nav>
 
             {# Hide the article tag when there's no content to show, or when compactMode is on #}

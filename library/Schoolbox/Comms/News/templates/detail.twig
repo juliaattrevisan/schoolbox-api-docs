@@ -124,12 +124,14 @@ Data:
             });
         </script>
 
+        {% if config.save_for_later %}
         <span id="saveforlater-container">
             {% include '@commsNewsSaveForLater/activator.twig' with {
                 article: article,
                 isSaved: isSavedForLater
             } only %}
         </span>
+        {% endif %}
 
         {% if hasDropDownRoutes %}
             <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
