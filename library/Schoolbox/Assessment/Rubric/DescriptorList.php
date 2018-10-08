@@ -13,6 +13,11 @@ namespace Schoolbox\Assessment\Rubric;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 
+/**
+ * Class DescriptorList
+ *
+ * @deprecated use `\Schoolbox\Assessment\Rubric\Grid\Grid` as a descriptor container instead
+ */
 abstract class DescriptorList implements Twiggable, Calculable
 {
 
@@ -34,6 +39,10 @@ abstract class DescriptorList implements Twiggable, Calculable
      */
     function __construct($id = null, $name = '')
     {
+//        trigger_error(
+//            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\Grid\Grid" as a descriptor container instead',
+//            E_USER_DEPRECATED
+//        );
         $this->setName($name);
         $this->setId($id);
         $this->descriptors = new CalculableAggregator();

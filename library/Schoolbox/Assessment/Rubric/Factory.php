@@ -17,6 +17,12 @@ use Schoolbox\Assessment\Rubric\Criteria\Criterion;
 use Schoolbox\Assessment\Rubric\Criteria\Group;
 use Schoolbox\Resource\Folder;
 
+
+/**
+ * Rubric factory
+ *
+ * @deprecated see `\Schoolbox\Assessment\Rubric\Grid\Factory`
+ */
 class Factory
 {
 
@@ -37,6 +43,10 @@ class Factory
      */
     public function __construct(Rubric $prototype = null)
     {
+//        trigger_error(
+//            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\Grid\Factory" instead',
+//            E_USER_DEPRECATED
+//        );
         $this->prototype = $prototype ?: new Rubric();
     }
 

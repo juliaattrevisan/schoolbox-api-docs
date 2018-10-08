@@ -17,11 +17,23 @@ use SplObjectStorage;
  * Class CalculableAggregator
  * Superclass for rubric elements that need to summate values on collections of children, in order to calculate overall grades.
  *
+ * @deprecated use `\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}` instead
+ *
  * @package Schoolbox\Assessment\Rubric
  */
 
 class CalculableAggregator extends SplObjectStorage implements Calculable
 {
+//    /**
+//     * Deprecation warning
+//     */
+//    public function __construct()
+//    {
+//        trigger_error(
+//            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}" instead',
+//            E_USER_DEPRECATED
+//        );
+//    }
 
     /**
      * Summate the marks given for a Calculable

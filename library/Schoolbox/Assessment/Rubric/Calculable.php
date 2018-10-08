@@ -10,6 +10,11 @@
 namespace Schoolbox\Assessment\Rubric;
 
 
+/**
+ * Interface Calculable
+ *
+ * @deprecated this has no further use now that everything that uses it is deprecated
+ */
 interface Calculable
 {
 

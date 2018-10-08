@@ -13,6 +13,11 @@ namespace Schoolbox\Assessment\Rubric;
 use Schoolbox\Assessment\Rubric\Competency\Level;
 use Schoolbox\Assessment\Rubric\Criteria\Criterion;
 
+/**
+ * Class Descriptor
+ *
+ * @deprecated use `\Schoolbox\Assessment\Rubric\Grid\Descriptor` instead
+ */
 class Descriptor implements Calculable, Twiggable
 {
 
@@ -62,6 +67,10 @@ class Descriptor implements Calculable, Twiggable
      */
     public function __construct($text = '', $value = null, $id = null, $selected = false, $selectedValue = null)
     {
+//        trigger_error(
+//            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\Grid\Descriptor" instead',
+//            E_USER_DEPRECATED
+//        );
         $this->id            = $id;
         $this->text          = $text;
         $this->value         = $value;

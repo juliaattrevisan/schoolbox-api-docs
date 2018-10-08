@@ -16,6 +16,12 @@ use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 
+
+/**
+ * Class Rubric
+ *
+ * @deprecated use `\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}` classes instead
+ */
 class Rubric
 {
 
@@ -67,6 +73,10 @@ class Rubric
         bool $isInteractionLocked,
         RubricContext $rubricContext
     ) {
+//        trigger_error(
+//            'This class is deprecated; use "\Schoolbox\Assessment\Rubric\{RowSet,Grid,MarkedGrid}" instead',
+//            E_USER_DEPRECATED
+//        );
         $this->assessment = $assessment;
         $this->participant = $participant;
         $this->currentUser = $currentUser;
