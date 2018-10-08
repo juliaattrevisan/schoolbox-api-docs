@@ -5,12 +5,13 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+declare(strict_types=1);
+
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
 use Config\ModuleLoader;
 use Schoolbox\Comms\News;
-
 
 class Comms extends ModuleLoader
 {
@@ -20,10 +21,8 @@ class Comms extends ModuleLoader
      * @param Kernel $kernel
      * @return void
      */
-    public function configure($kernel)
+    public function configure($kernel): void
     {
-        $namespace = 'comms';
-
         $this->loadModule($kernel, News\AudienceBrowser\Module::class, "/news/audiencebrowser");
         $this->loadModule($kernel, News\Moderation\Module::class, "/news/moderation");
         $this->loadModule($kernel, News\SaveForLater\Module::class, "/news/saved");
