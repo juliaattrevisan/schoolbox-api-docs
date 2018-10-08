@@ -734,7 +734,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * @return boolean
      */
-    public function getUseMarkRange()
+    public function getUseMarkRange() : bool
     {
         return $this->useMarkRange;
     }
@@ -743,7 +743,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * @param boolean $useMarkRange
      * @return $this
      */
-    public function setUseMarkRange($useMarkRange)
+    public function setUseMarkRange(bool $useMarkRange)
     {
         $this->useMarkRange = $useMarkRange;
         return $this;

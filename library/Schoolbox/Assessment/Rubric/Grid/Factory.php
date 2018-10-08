@@ -158,7 +158,7 @@ class Factory
                 // Validate descriptor
                 $descriptorSpec = new ValidDescriptor($usesMarkRange);
                 if (! $descriptorSpec->isSatisfiedBy($indicatorUsage->getDescriptors()[$levelSequence]) ) {
-                    throw new InvalidArgumentException("disable Mark Range to use decimal places in descriptor point values");
+                    throw new \InvalidArgumentException("disable Mark Range to use decimal places in descriptor point values");
                 }
             }
 

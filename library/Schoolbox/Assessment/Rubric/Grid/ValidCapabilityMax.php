@@ -24,7 +24,7 @@ class ValidCapabilityMax extends \Alaress\Specification\Base
      *
      * @param bool $markPerCap Is the assessment using mark per capability?
      */
-    public function __construct($markPerCap)
+    public function __construct(bool $markPerCap)
     {
         $this->markPerCap = $markPerCap;
     }
@@ -40,8 +40,7 @@ class ValidCapabilityMax extends \Alaress\Specification\Base
      */
     public function isSatisfiedBy($capabilityMax) : bool
     {
-        // TODO this is necessary because the assessment doesn't enforce strict typing and doesn't cast toggle values to bool...ugh
-        if ($this->markPerCap === true || $this->markPerCap === 'on') {
+        if ($this->markPerCap) {
             return is_numeric($capabilityMax) && $capabilityMax > 0;
         }
         return true;
