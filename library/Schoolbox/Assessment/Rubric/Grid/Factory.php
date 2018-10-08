@@ -30,11 +30,16 @@ class Factory
         // we're only going to take the first one... this could be converted to foreach easily enough
         $rubricData   = reset($postData);
 
-        $assessment             = $grid->getAssessment();
+        $assessment   = $grid->getAssessment();
         $levels       = $rubricData['level']      ?: [];
         $capabilities = $rubricData['group']      ?: [];
         $indicators   = $rubricData['criterion']  ?: [];
         $descriptors  = $rubricData['descriptor'] ?: [];
+
+        if ($assessment instanceof DueWork) {
+            $usesMarkRange = $assessment->getUseMarkRange();
+            $markPerCap = $assessment->getMarkPerCapability();
+        }
 
         /** @var Level[] $levelCache */
         $levelCache = [];
@@ -50,7 +55,6 @@ class Factory
 
             $grid->getLevels()->add($levelCache[$levelSequence]);
         }
-
 
         // Must assume that all capabilities in formdata exist:
         // they will, because it was created when the capability was added
@@ -79,17 +83,14 @@ class Factory
             if (empty($capabilityIdsInUse[$capabilityId])) {
                 continue;
             }
+
             // Validate capability max value
             $capabilityMaxValue = isset($capability['maxValue']) ? (float)$capability['maxValue'] : null;
-            if ($assessment instanceof DueWork) {
-                $markPerCap = $assessment->getMarkPerCapability();
-
-                $spec = new ValidCapabilityMax($markPerCap);
-                if (!$spec->isSatisfiedBy($capabilityMaxValue)) {
-                    throw new \InvalidArgumentException(
-                        'provide capability maximum points that are numeric and greater than 0'
-                    );
-                }
+            $capabilityMaxSpec = new ValidCapabilityMax($markPerCap);
+            if (!$capabilityMaxSpec->isSatisfiedBy($capabilityMaxValue)) {
+                throw new \InvalidArgumentException(
+                    'provide capability maximum points that are numeric and greater than 0'
+                );
             }
 
             $capability         = $grid->getRowSet()->retrieveCapability($capabilityId);
@@ -153,6 +154,18 @@ class Factory
                             ->setDescription($descriptorText)
                             ->setMaxValue('' !== $descriptorValue ? (float)$descriptorValue : null);
                 }
+
+                // Validate descriptor
+                $descriptorSpec = new ValidDescriptor($usesMarkRange);
+                if (! $descriptorSpec->isSatisfiedBy($indicatorUsage->getDescriptors()[$levelSequence]) ) {
+                    throw new InvalidArgumentException("disable Mark Range to use decimal places in descriptor point values");
+                }
+            }
+
+            // Validate sequence of descriptor points
+            $descriptorRowSpec = new ValidDescriptorRow($usesMarkRange);
+            if (! $descriptorRowSpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
+                throw new \InvalidArgumentException("only use descriptor values that form an ascending or descending sequence within a row");
             }
 
             $capabilityUsage                                     = $grid->retrieveCapabilityUsage($capability);

@@ -6,7 +6,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric;
+namespace Schoolbox\Assessment\Rubric\Grid;
 
 use Schoolbox\Collection;
 
