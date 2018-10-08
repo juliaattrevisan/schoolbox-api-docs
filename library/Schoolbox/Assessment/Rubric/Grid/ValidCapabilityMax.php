@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric;
+namespace Schoolbox\Assessment\Rubric\Grid;
 
 
 /**
@@ -24,7 +24,7 @@ class ValidCapabilityMax extends \Alaress\Specification\Base
      *
      * @param bool $markPerCap Is the assessment using mark per capability?
      */
-    public function __construct(bool $markPerCap)
+    public function __construct($markPerCap)
     {
         $this->markPerCap = $markPerCap;
     }
@@ -40,7 +40,8 @@ class ValidCapabilityMax extends \Alaress\Specification\Base
      */
     public function isSatisfiedBy($capabilityMax) : bool
     {
-        if ($this->markPerCap) {
+        // TODO please no
+        if ($this->markPerCap === true || $this->markPerCap === 'on') {
             return is_numeric($capabilityMax) && $capabilityMax > 0;
         }
         return true;

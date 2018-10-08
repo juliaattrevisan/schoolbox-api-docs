@@ -508,10 +508,6 @@ class RubricMapper
         $existingLevelIds    = $levelMapper->findIdsByColumn('box_id', $submissionBox->getId());
         $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
 
-        // Spec for valid capability max marks
-        $assessment = $grid->getAssessment();
-        $markPerCap = $assessment instanceof DueWork\Model && $assessment->getMarkPerCapability();
-        $spec       = new ValidCapabilityMax($markPerCap);
 
         // First, persist the levels
         $levelModels   = $levelMapper->createCollection();
@@ -566,14 +562,7 @@ class RubricMapper
         $capabilityUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
 
         foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
-
-            // Validate cap against spec
             $capabilityMaxValue = $capabilityUsage->getMaxValue();
-            if (!$spec->isSatisfiedBy($capabilityMaxValue)) {
-                throw new \InvalidArgumentException(
-                    'provide capability maximum points that are numeric and greater than 0'
-                );
-            }
 
             $capabilityUsageModel = $capabilityUsageMapper->createModel()
                 ->setSubmissionBox($submissionBox)

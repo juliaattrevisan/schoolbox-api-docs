@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid;
 
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 /**
  * Class Factory
@@ -22,16 +23,18 @@ class Factory
      * @param Grid  $grid A grid (which already contains an assessment and rowset)
      * @param array $postData
      * @return Grid
+     * @throws \InvalidArgumentException
      */
     public function buildFromPostData(Grid $grid, array $postData): Grid
     {
         // we're only going to take the first one... this could be converted to foreach easily enough
         $rubricData   = reset($postData);
+
+        $assessment             = $grid->getAssessment();
         $levels       = $rubricData['level']      ?: [];
         $capabilities = $rubricData['group']      ?: [];
         $indicators   = $rubricData['criterion']  ?: [];
         $descriptors  = $rubricData['descriptor'] ?: [];
-
 
         /** @var Level[] $levelCache */
         $levelCache = [];
@@ -76,7 +79,19 @@ class Factory
             if (empty($capabilityIdsInUse[$capabilityId])) {
                 continue;
             }
+            // Validate capability max value
             $capabilityMaxValue = isset($capability['maxValue']) ? (float)$capability['maxValue'] : null;
+            if ($assessment instanceof DueWork) {
+                $markPerCap = $assessment->getMarkPerCapability();
+
+                $spec = new ValidCapabilityMax($markPerCap);
+                if (!$spec->isSatisfiedBy($capabilityMaxValue)) {
+                    throw new \InvalidArgumentException(
+                        'provide capability maximum points that are numeric and greater than 0'
+                    );
+                }
+            }
+
             $capability         = $grid->getRowSet()->retrieveCapability($capabilityId);
 
             // If $group is null, then that's a problem; we're trying to save
