@@ -193,15 +193,18 @@ class Mapper extends \Schoolbox\Mapper
                     ->isNull('submitted_at');
     }
 
+
     /**
-     * Returns a predicate for getting articles that are awaiting moderation
-     * @param User $author
+     * Returns a predicate for getting articles that are rejected
+     *
      * @return Builder
-     * @TODO Move non-state related considerations out of this method so it can be re-used
+     * @throws InvalidColumnException
+     * @see Model::getDiscreteState()
      */
-    public function getPredicateRejected() {
+    public function getPredicateRejected(): IBuilder
+    {
         return $this->getPredicateBuilder()
-            ->notNull('rejected_at');
+                    ->notNull('rejected_at');
     }
 
     /**
