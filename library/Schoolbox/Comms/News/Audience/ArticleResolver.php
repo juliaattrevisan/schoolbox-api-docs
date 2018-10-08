@@ -21,6 +21,7 @@ use PDO;
 use Alaress\Database\Predicate;
 use Schoolbox\Comms\News\Audience\Segment\Strategy;
 use InvalidArgumentException;
+use Schoolbox\Comms\News;
 
 /**
  * Responsible for returning the set of articles whose audience contains a specific user.
@@ -496,10 +497,11 @@ class ArticleResolver implements IArticleResolver
     /**
      * @inheritdoc
      * @throws InvalidArgumentException
+     * @throws Predicate\InvalidColumnException
      * @todo Currently only working for $relationship == 'self'. Need to update for other relationship types.
      * @todo This is written recursively for composite audiences. It should be updated to do this in a single db query.
      */
-    public function findArticlesForAudience(string $entityType, $entityValue, ?string $relationship, array $orderBy = [], int $limit = null): array
+    public function findArticlesForAudience(string $entityType, $entityValue, ?string $relationship, bool $publishedOnly = true, array $orderBy = [], int $limit = null): array
     {
         // Simple equality case
         if (Strategy\Composite::getEntityType() !== $entityType) {
@@ -516,6 +518,12 @@ class ArticleResolver implements IArticleResolver
 
             if (null !== $relationship) {
                 $pb->equals(Mapper::FIELD_RELATIONSHIP, $relationship);
+            }
+
+            if ($publishedOnly) {
+                // TODO inject mapper dependency
+                $publishedPb = News\Mapper::getInstance()->getPredicatePublished();
+                $pb          = $pb->all($publishedPb);
             }
 
             $whereClause = \implode(' AND ', $pb->getWhere());
