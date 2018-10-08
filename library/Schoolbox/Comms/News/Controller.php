@@ -218,7 +218,7 @@ class Controller extends Base
             'action'               => 'Create',
             'article'              => $article,
             'featureImageZone'     => $zone->getTwigContext(),
-            'isAutoSavable'        => !$article->isSubmitted() || $article->isRejected(),
+            'isAutoSavable'        => true,
             'audienceSegments'     => $audienceSegments,
             'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
