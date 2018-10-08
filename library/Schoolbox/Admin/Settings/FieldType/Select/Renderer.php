@@ -28,10 +28,10 @@ class Renderer extends AbstractRenderer
      */
     protected function getData(Config $config): array
     {
-        $select = [];
+        $select  = [];
         $options = \explode(':', $config->getOptions());
 
-        foreach($options as $value) {
+        foreach ($options as $value) {
             $select[$value] = $value;
         }
         return \array_merge(parent::getData($config), ['options' => $select]);
