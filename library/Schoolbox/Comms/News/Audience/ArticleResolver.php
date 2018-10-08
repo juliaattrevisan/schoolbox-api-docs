@@ -534,6 +534,7 @@ class ArticleResolver implements IArticleResolver
             if ($limit) {
                 $sql .= "
                     LIMIT :limit";
+                $pb->putParam('limit', $limit);
             }
 
             $articleIds = $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
