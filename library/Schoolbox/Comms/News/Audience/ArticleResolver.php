@@ -508,7 +508,8 @@ class ArticleResolver implements IArticleResolver
             $pb = $this->db
                 ->buildPredicateBuilder(Mapper::TABLE_NAME)
                 ->equals(Mapper::FIELD_ENTITY_TYPE, $entityType)
-                ->isNull(Mapper::FIELD_PARENT_ID);
+                ->isNull(Mapper::FIELD_PARENT_ID)
+                ->isNull('comms_news_article.deleted_at');
 
             if (null === $entityValue) {
                 $pb->isNull(Mapper::FIELD_ENTITY_VALUE);
@@ -599,7 +600,7 @@ class ArticleResolver implements IArticleResolver
         foreach ($entityValue as $type => $value) {
             // Note we don't pass ORDER BY or LIMIT recursively
             /** @noinspection SlowArrayOperationsInLoopInspection */
-            $articleIds = \array_merge($articleIds, $this->findArticlesForAudience($type, $value, $relationship));
+            $articleIds = \array_merge($articleIds, $this->findArticlesForAudience($type, $value, $relationship, $publishedOnly, $orderBy, $limit));
         }
         return \array_unique($articleIds);
     }
