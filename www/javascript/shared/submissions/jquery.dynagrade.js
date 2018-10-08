@@ -65,7 +65,7 @@
     function calcPercent(callback) {
         var scaledMark = this.attr('data-scaled-mark'),
             max        = this.attr('data-max'),
-            percentage = parseInt(scaledMark / max * 100);
+            percentage = parseFloat(scaledMark / max * 100);
 
         if (isNaN(percentage)) {
             percentage = 0;
@@ -78,7 +78,7 @@
         // start by getting the percentage
         var scaledMark = this.attr('data-scaled-mark'),
             max        = this.attr('data-max'),
-            percentage = parseInt(scaledMark / max * 100),
+            percentage = parseFloat(scaledMark / max * 100),
             $el        = this;
 
         if (isNaN(percentage)) {
