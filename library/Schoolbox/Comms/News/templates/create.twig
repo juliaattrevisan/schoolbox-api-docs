@@ -431,14 +431,27 @@
 
         $('#news-submit').click(function(event) {
             event.preventDefault();
-            $createForm.alaressValidate();
-            submitForm('submit');
+
+            if (!$createForm.valid()) {
+                // Scroll to error
+                $createForm.data('validator').errorList[0].element.focus();
+            } else {
+                submitForm('submit');
+            }
         });
 
         $('#news-preview').click(function(event) {
             event.preventDefault();
-            submitForm('preview');
+
+            if (!$createForm.valid()) {
+                // Scroll to error
+                $createForm.data('validator').errorList[0].element.focus();
+            } else {
+                submitForm('preview');
+            }
         });
+
+        $createForm.alaressValidate();
 
 
         /**
