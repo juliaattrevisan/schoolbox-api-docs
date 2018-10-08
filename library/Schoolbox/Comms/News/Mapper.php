@@ -204,6 +204,7 @@ class Mapper extends \Schoolbox\Mapper
     public function getPredicateRejected(): IBuilder
     {
         return $this->getPredicateBuilder()
+                    ->notNull('submitted_at')
                     ->notNull('rejected_at');
     }
 
