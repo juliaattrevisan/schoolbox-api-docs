@@ -99,6 +99,9 @@ FOREIGN KEY (`article_id`) REFERENCES `comms_news_article` (`id`)
 CREATE UNIQUE INDEX `idx_comms_news_saveforlater_user_id_article_id`
   ON `comms_news_saveforlater` (user_id, article_id) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
 
+CREATE INDEX comms_news_saveforlater_deleted_at_index ON comms_news_saveforlater (deleted_at);
+
+
 -- Error messages
 
 INSERT INTO `error` (id, message)

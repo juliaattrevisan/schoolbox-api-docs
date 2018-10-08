@@ -45,40 +45,6 @@ class Lists
         $this->newsMapper = $newsMapper;
     }
 
-
-    /**
-     * Submitted articles that require moderation
-     * Oldest article is listed first
-     *
-     * @return GenericCollection
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     */
-    public function getNeedModeration(): GenericCollection
-    {
-        $builder = (new Builder($this->newsMapper->getDatabase(), 'comms_news_article'))
-            ->notNull('submitted_at')
-            ->isNull('rejected_at')
-            ->isNull('accepted_at');
-
-        return $this->newsMapper->findByPredicates($builder, [
-            'order' => [
-                'publish_at' => 'asc'
-            ]
-        ]);
-    }
-
-    /**
-     * A count of articles that require moderation
-     *
-     * @return int
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     */
-    public function getNeedModerationCount(): int
-    {
-        return $this->getNeedModeration()->count();
-    }
-
-
     /**
      * A list of recently-accepted articles
      * Most recently accepted article is listed first

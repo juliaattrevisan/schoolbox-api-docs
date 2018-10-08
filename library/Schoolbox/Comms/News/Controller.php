@@ -797,7 +797,7 @@ class Controller extends Base
 
             // Vars for the nav sidebar
             'page' => $this->getRequest()->query['page'],
-            'moderationCount' => $lists->getNeedModerationCount(),
+            'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
             'authoredCounts' => [
                 'Drafted' => [
                     'count'      => $this->newsMapper->countByPredicates(
@@ -860,7 +860,7 @@ class Controller extends Base
 
             // Vars for the nav sidebar
             'page' => $this->getRequest()->query['page'],
-            'moderationCount' => $lists->getNeedModerationCount(),
+            'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
             'authoredCounts' => [
                 'Drafted' => [
                     'count'      => $this->newsMapper->countByPredicates(

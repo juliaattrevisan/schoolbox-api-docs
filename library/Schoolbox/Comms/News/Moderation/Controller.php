@@ -72,7 +72,7 @@ class Controller extends Base
 
         try {
             $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
-            $articlesNeedModeration = $lists->getNeedModeration();
+            $articlesNeedModeration = $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration());
         } catch (Mapper\Exception $e) {
             $moderationRequired = false;
         }
