@@ -310,7 +310,7 @@ class Controller extends Base
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
             'audienceSegments'       => $audienceSegments,
-            'isAutoSavable'          => !$article->isApproved(),
+            'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
         ])->setTitle("Update {$article->getTitle()}"));
     }

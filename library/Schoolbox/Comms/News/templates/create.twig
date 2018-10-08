@@ -322,7 +322,7 @@
             <div class="row">
                 <div class="small-12 columns">
                     <ul class="flex-list buttons" id="create-form-actions">
-                        {% if not article.id or not article.isApproved %}
+                        {% if isAutoSavable %}
                         <li>
                             <button type="submit" id="news-preview" {% if not article.id %}disabled{% endif %}>Preview</button>
                         </li>
