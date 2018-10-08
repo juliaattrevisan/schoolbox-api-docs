@@ -1165,10 +1165,10 @@
         },
         computed: {
             submitText: function() {
-                if (this.requiresModeration && this.articleId) {
-                    return 'Submit for moderation';
-                } else if (this.isSubmitted) {
+                if (this.isSubmitted) {
                     return 'Save';
+                } else if (this.requiresModeration && this.articleId) {
+                    return 'Submit for moderation';
                 }
 
                 return 'Publish {{ locale.news }}';
