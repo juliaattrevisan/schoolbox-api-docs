@@ -218,7 +218,7 @@ class Controller extends Base
             'action'               => 'Create',
             'article'              => $article,
             'featureImageZone'     => $zone->getTwigContext(),
-            'isAutoSavable'        => !$article->isApproved(),
+            'isAutoSavable'        => true,
             'audienceSegments'     => $audienceSegments,
             'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
@@ -310,7 +310,7 @@ class Controller extends Base
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
             'audienceSegments'       => $audienceSegments,
-            'isAutoSavable'          => !$article->isApproved(),
+            'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
         ])->setTitle("Update {$article->getTitle()}"));
     }
@@ -395,6 +395,7 @@ class Controller extends Base
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => true,
+                'articleId' => $article->getId(),
                 'url' => $url,
                 'updateRoute' => $updateRoute,
                 'submitRoute' => $submitRoute,

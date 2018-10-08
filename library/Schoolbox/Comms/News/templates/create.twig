@@ -322,7 +322,7 @@
             <div class="row">
                 <div class="small-12 columns">
                     <ul class="flex-list buttons" id="create-form-actions">
-                        {% if not article.id or not article.isApproved %}
+                        {% if isAutoSavable %}
                         <li>
                             <button type="submit" id="news-preview" {% if not article.id %}disabled{% endif %}>Preview</button>
                         </li>
@@ -424,7 +424,8 @@
                 window.history.pushState({}, null, response.url);
 
                 // Update the Vue property for requiring moderation
-                formActionsApp.requiresModeration = !(response.approveRoute);
+                formActionsApp.approveRoute = response.approveRoute;
+                formActionsApp.articleId = response.articleId;
             }
         });
         {% endif %}
@@ -1143,7 +1144,6 @@
                     return true;
                 }
                 for(var i in audienceOptions){
-                    console.log(audienceOptions[i]);
                     if(audienceOptions.hasOwnProperty(i) && !audienceOptions[i].hideFromModal && audienceOptions[i].isMulti){
                         return true;
                     }
@@ -1158,18 +1158,24 @@
         delimiters: ['${', '}'],
         data: {
             articleId: '{{ article.id }}',
-            requiresModeration: '{{ not (approveRoute) }}',
-            isSubmitted: '{{ (article.isSubmitted) }}'
+            approveRoute: '{{ approveRoute }}',
+            globalModeration: '{{ config.global_moderation }}',
+            isSubmitted: '{{ (article.isSubmitted) }}',
+            isRejected: '{{ (article.isRejected) }}'
         },
         computed: {
             submitText: function() {
-                if (this.requiresModeration && this.articleId) {
-                    return 'Submit for moderation';
-                } else if (this.isSubmitted) {
+                if (this.isSubmitted && !this.isRejected) {
                     return 'Save';
+                } else if (this.requiresModeration && this.articleId) {
+                    return 'Submit for moderation';
                 }
 
                 return 'Publish {{ locale.news }}';
+            },
+
+            requiresModeration: function() {
+                return this.globalModeration && !this.approveRoute;
             }
         }
     });
