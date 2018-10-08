@@ -652,6 +652,7 @@
                      * @param {jQuery} $item - The jQuery wrapper of the DOM element that is displayed in default audienceSelectize
                      */
                     onItemAdd: function(key, $item) {
+                        var selectize = this;
 
                         // Selectize doesn't give us all the data of the selected item, find the item in the full list -_-
                         var selectedItem = this.options[key];
@@ -667,6 +668,10 @@
                         // The audienceSelectize dropdown doesn't position correctly for some reason with this setup so force reposition again after a very short timeout
                         setTimeout(function() {
                             audienceSelectize.positionDropdown();
+
+                            // Trigger a blur on the selectize so that validation updates
+                            // This has to happen on a slight delay as well for some reason
+                            selectize.$input.blur();
                         }, 1);
                     },
                     /**
