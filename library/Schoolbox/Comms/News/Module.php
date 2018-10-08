@@ -136,6 +136,7 @@ class Module extends BaseModule
         $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $viewRecipients, $preloadArticle);// Find out who will receive this article
         $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', $canModify, $preloadArticle);           // Delete article
         $this->register('GET', '/{articleId:\d+}', 'getDetail', $readerPerms, $preloadArticle);                  // View news article
+        $this->register('GET', '/item/{articleId:\d+}', 'getDetail', $readerPerms, $preloadArticle);             // legacy url for news item
         $this->register('GET', '/list{/year,month}', 'getListByTopic', $loggedIn);                               // (async) Get a list of articles audienced to me, by topic
         $this->register('GET', '/archive{/year,month}', 'getArchive', $loggedIn);                                // News Archive
         $this->register('GET', '', 'getIndex', $loggedIn);                                                       // Index of articles audienced to you

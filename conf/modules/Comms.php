@@ -23,13 +23,13 @@ class Comms extends ModuleLoader
     {
         $namespace = 'comms';
 
-        $this->loadModule($kernel, News\AudienceBrowser\Module::class, "/{$namespace}/news/audiencebrowser");
-        $this->loadModule($kernel, News\Moderation\Module::class, "/{$namespace}/news/moderation");
-        $this->loadModule($kernel, News\SaveForLater\Module::class, "/{$namespace}/news/saved");
-        $this->loadModule($kernel, News\Component\Dashboard\Module::class, "/{$namespace}/news/component/dashboard");
-        $this->loadModule($kernel, News\Component\Homepage\Module::class, "/{$namespace}/news/component/homepage");
-        $this->loadModule($kernel, News\Feed\Module::class, "/{$namespace}/news/feed");
-        $this->loadModule($kernel, News\Statistics\Module::class, "/{$namespace}/news/statistics");
-        $this->loadModule($kernel, News\Module::class, "/{$namespace}/news");
+        $this->loadModule($kernel, News\AudienceBrowser\Module::class, "/news/audiencebrowser");
+        $this->loadModule($kernel, News\Moderation\Module::class, "/news/moderation");
+        $this->loadModule($kernel, News\SaveForLater\Module::class, "/news/saved");
+        $this->loadModule($kernel, News\Component\Dashboard\Module::class, "/news/component/dashboard");
+        $this->loadModule($kernel, News\Component\Homepage\Module::class, "/news/component/homepage");
+        $this->loadModule($kernel, News\Feed\Module::class, "/news/feed");
+        $this->loadModule($kernel, News\Statistics\Module::class, "/news/statistics");
+        $this->loadModule($kernel, News\Module::class, "/news");
     }
 }
