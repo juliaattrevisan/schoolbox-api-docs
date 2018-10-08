@@ -6,8 +6,9 @@
  # @param News\Model article   The article the session user wishes to add/remove from saved list
  # @param bool       isSaved   Is this article currently saved to user's list?
  #}
-{% set routeAdd    = routeLookupIfAuthorized('commsNewsSaveForLater.postAdd', {article: article, articleId: article.id}) %}
-{% set routeRemove = routeLookupIfAuthorized('commsNewsSaveForLater.postRemove', {article: article, articleId: article.id}) %}
+
+{% set routeAdd    = routeLookup('commsNewsSaveForLater.postAdd', {article: article, articleId: article.id}) %}
+{% set routeRemove = routeLookup('commsNewsSaveForLater.postRemove', {article: article, articleId: article.id}) %}
 
 <span data-save-for-later="{{ article.id }}">
     {# Add to List #}

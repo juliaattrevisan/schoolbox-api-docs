@@ -182,44 +182,46 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * Returns a predicate for getting articles that are awaiting moderation
-     * @param User $author
+     *
      * @return Builder
-     * @TODO Move non-state related considerations out of this method so it can be re-used
+     * @throws InvalidColumnException
+     * @see Model::getDiscreteState()
      */
-    public function getPredicateDraft(User $author) {
+    public function getPredicateDraft(): IBuilder
+    {
         return $this->getPredicateBuilder()
-            ->equals('author_id',$author->getId())
-            ->isNull('submitted_at')
-            ->isNull('rejected_at')
-            ->isNull('deleted_at');
+                    ->isNull('submitted_at');
     }
+
+
+    /**
+     * Returns a predicate for getting articles that are rejected
+     *
+     * @return Builder
+     * @throws InvalidColumnException
+     * @see Model::getDiscreteState()
+     */
+    public function getPredicateRejected(): IBuilder
+    {
+        return $this->getPredicateBuilder()
+                    ->notNull('submitted_at')
+                    ->notNull('rejected_at');
+    }
+
 
     /**
      * Returns a predicate for getting articles that are awaiting moderation
-     * @param User $author
+     *
      * @return Builder
-     * @TODO Move non-state related considerations out of this method so it can be re-used
+     * @throws InvalidColumnException
+     * @see Model::getDiscreteState()
      */
-    public function getPredicateRejected(User $author) {
+    public function getPredicateAwaitingModeration(): IBuilder
+    {
         return $this->getPredicateBuilder()
-            ->equals('author_id',$author->getId())
-            ->notNull('rejected_at')
-            ->isNull('deleted_at');
-    }
-
-    /**
-     * Returns a predicate for getting articles that are awaiting moderation
-     * @param User $author
-     * @return Builder
-     * @TODO Move non-state related considerations out of this method so it can be re-used
-     */
-    public function getPredicateAwaitingModeration(User $author) {
-        return $this->getPredicateBuilder()
-            ->equals('author_id',$author->getId())
-            ->notNull('submitted_at')
-            ->isNull('rejected_at')
-            ->isNull('accepted_at')
-            ->isNull('deleted_at');
+                    ->notNull('submitted_at')
+                    ->isNull('rejected_at')
+                    ->isNull('accepted_at');
     }
 
 

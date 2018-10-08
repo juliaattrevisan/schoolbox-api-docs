@@ -10,14 +10,23 @@ CREATE TABLE `comms_news_article` (
   `submitted_at`       DATETIME,
   `accepted_by`        int(11)       UNSIGNED,
   `accepted_at`        DATETIME,
-  `rejected_by`        int(11)       UNSIGNED,
+  `rejected_by`        INT(11)       UNSIGNED NULL,
   `rejected_at`        DATETIME,
   `rejected_reason`    text,
   `publish_at`         DATETIME,
   `expires_at`         DATETIME,
   `created_at`         DATETIME      NOT NULL,
   `updated_at`         DATETIME      NOT NULL,
-  `deleted_at`         DATETIME
+  `deleted_at`         DATETIME,
+  CONSTRAINT fk_comms_news_article_rejected_by FOREIGN KEY (`rejected_by`) REFERENCES user (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  INDEX idx_comms_news_article_submitted_at (submitted_at),
+  INDEX idx_comms_news_article_accepted_at (accepted_at),
+  INDEX idx_comms_news_article_rejected_at (rejected_at),
+  INDEX idx_comms_news_article_publish_at (publish_at),
+  INDEX idx_comms_news_article_expires_at (expires_at),
+  INDEX idx_comms_news_article_created_at (created_at),
+  INDEX idx_comms_news_article_updated_at (updated_at),
+  INDEX idx_comms_news_article_deleted_at (deleted_at)
 );
 
 ALTER TABLE `comms_news_article`
@@ -89,6 +98,9 @@ FOREIGN KEY (`article_id`) REFERENCES `comms_news_article` (`id`)
 
 CREATE UNIQUE INDEX `idx_comms_news_saveforlater_user_id_article_id`
   ON `comms_news_saveforlater` (user_id, article_id) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
+
+CREATE INDEX comms_news_saveforlater_deleted_at_index ON comms_news_saveforlater (deleted_at);
+
 
 -- Error messages
 

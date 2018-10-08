@@ -29,6 +29,9 @@ CREATE UNIQUE INDEX `idx_cnas_article_id_user_id_type_referrer`
 ON `comms_news_article_statistics` (`article_id`, `user_id`, `type`, `referrer`, `role_type`, `role_id`)
 COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT;
 
+CREATE INDEX comms_news_article_statistics_deleted_at_index ON comms_news_article_statistics (deleted_at);
+
+
 -- Cumulative statistics per day, over all time
 CREATE TABLE `comms_news_article_statistics_cumulative` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,

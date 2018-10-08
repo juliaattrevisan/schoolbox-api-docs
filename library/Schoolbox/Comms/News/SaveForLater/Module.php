@@ -63,11 +63,15 @@ class Module extends BaseModule
      */
     private function preloadNews(array $params) :array
     {
-        try {
-            $article = $this->getNewsMapper()->findById($params['articleId']);
-        } /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (MapperException $e) {
-            throw new NotFound($this->getErrorMapper()->getMessageById(ErrorMapper::ERROR_GENERIC_NOT_FOUND));
+        if (\array_key_exists('article', $params)) {
+            $article = $params['article'];
+        } else {
+            try {
+                $article = $this->getNewsMapper()->findById($params['articleId']);
+            } /** @noinspection PhpRedundantCatchClauseInspection */
+            catch (MapperException $e) {
+                throw new NotFound($this->getErrorMapper()->getMessageById(ErrorMapper::ERROR_GENERIC_NOT_FOUND));
+            }
         }
 
         return [
@@ -159,7 +163,12 @@ class Module extends BaseModule
                     throw new InvalidPath('This feature has been disabled.');
                 }
                 try {
-                    $article = $this->getNewsMapper()->findById($params['articleId']);
+                    if ($params['article']) {
+                        $article = $params['article'];
+                    }
+                    else {
+                        $article = $this->getNewsMapper()->findById($params['articleId']);
+                    }
                 } catch (MapperException $e) {
                     throw new InvalidPath("Article ({$params['articleId']}) not found", 0, $e);
                 }
@@ -185,11 +194,6 @@ class Module extends BaseModule
                 // Intentionally not catching mapper exception, that's a 5xx, not 4xx
                 if (!$this->getConfig()->get(ConfigMapper::_SAVE_FOR_LATER)) {
                     throw new InvalidPath('This feature has been disabled.');
-                }
-                try {
-                    $this->getNewsMapper()->findById($params['articleId']);
-                } catch (MapperException $e) {
-                    throw new InvalidPath("Article ({$params['articleId']}) not found", 0, $e);
                 }
                 return true;
             });

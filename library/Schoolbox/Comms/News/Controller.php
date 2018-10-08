@@ -797,19 +797,31 @@ class Controller extends Base
 
             // Vars for the nav sidebar
             'page' => $this->getRequest()->query['page'],
-            'moderationCount' => $lists->getNeedModerationCount(),
+            'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
             'authoredCounts' => [
                 'Drafted' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateDraft($this->getUser())),
-                        'labelClass' => 'unsubmitted'
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateDraft()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'unsubmitted',
                 ],
                 'Awaiting Moderation' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
-                    'labelClass' => 'submitted'
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateAwaitingModeration()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'submitted',
                 ],
                 'Rejected' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
-                    'labelClass' => 'submitted-late'
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateRejected()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'submitted-late',
                 ],
 
             ]
@@ -848,19 +860,31 @@ class Controller extends Base
 
             // Vars for the nav sidebar
             'page' => $this->getRequest()->query['page'],
-            'moderationCount' => $lists->getNeedModerationCount(),
+            'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
             'authoredCounts' => [
                 'Drafted' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateDraft($this->getUser())),
-                    'labelClass' => 'unsubmitted'
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateDraft()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'unsubmitted',
                 ],
                 'Awaiting Moderation' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
-                    'labelClass' => 'submitted'
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateAwaitingModeration()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'submitted',
                 ],
                 'Rejected' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
-                    'labelClass' => 'submitted-late'
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateRejected()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'submitted-late',
                 ]
             ]
         ]));
