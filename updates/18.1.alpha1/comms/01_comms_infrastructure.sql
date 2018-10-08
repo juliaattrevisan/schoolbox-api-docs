@@ -94,3 +94,6 @@ CREATE UNIQUE INDEX `idx_comms_news_saveforlater_user_id_article_id`
 
 INSERT INTO `error` (id, message)
 VALUES (224, 'This topic could not be found.');
+
+-- Migration data
+ALTER TABLE subject_news ADD migration_id int NULL;
