@@ -17,7 +17,15 @@ CREATE TABLE `comms_news_article` (
   `expires_at`         DATETIME,
   `created_at`         DATETIME      NOT NULL,
   `updated_at`         DATETIME      NOT NULL,
-  `deleted_at`         DATETIME
+  `deleted_at`         DATETIME,
+  INDEX idx_comms_news_article_submitted_at (submitted_at),
+  INDEX idx_comms_news_article_accepted_at (accepted_at),
+  INDEX idx_comms_news_article_rejected_at (rejected_at),
+  INDEX idx_comms_news_article_publish_at (publish_at),
+  INDEX idx_comms_news_article_expires_at (expires_at),
+  INDEX idx_comms_news_article_created_at (created_at),
+  INDEX idx_comms_news_article_updated_at (updated_at),
+  INDEX idx_comms_news_article_deleted_at (deleted_at)
 );
 
 ALTER TABLE `comms_news_article`
