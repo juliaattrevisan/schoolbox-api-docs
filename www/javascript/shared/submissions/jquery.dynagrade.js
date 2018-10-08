@@ -71,6 +71,11 @@
             percentage = 0;
         }
 
+        // If sum isn't a whole number: round to 2dp
+        if(percentage % 1 !== 0){
+            percentage = percentage.toFixed(2);
+        }
+
         callback.call(this, percentage + ' %');
     }
 
@@ -83,6 +88,11 @@
 
         if (isNaN(percentage)) {
             percentage = 0;
+        }
+
+        // If sum isn't a whole number: round to 2dp
+        if(percentage % 1 !== 0){
+            percentage = percentage.toFixed(2);
         }
 
         var rev = [];
