@@ -812,8 +812,12 @@ class Controller extends Base
                     'labelClass' => 'submitted'
                 ],
                 'Rejected' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
-                    'labelClass' => 'submitted-late'
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateRejected()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'submitted-late',
                 ],
 
             ]
@@ -867,8 +871,12 @@ class Controller extends Base
                     'labelClass' => 'submitted'
                 ],
                 'Rejected' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateRejected($this->getUser())),
-                    'labelClass' => 'submitted-late'
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateRejected()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'submitted-late',
                 ]
             ]
         ]));

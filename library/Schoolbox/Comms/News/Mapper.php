@@ -185,6 +185,7 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @return Builder
      * @throws InvalidColumnException
+     * @see Model::getDiscreteState()
      */
     public function getPredicateDraft(): IBuilder
     {
@@ -198,9 +199,8 @@ class Mapper extends \Schoolbox\Mapper
      * @return Builder
      * @TODO Move non-state related considerations out of this method so it can be re-used
      */
-    public function getPredicateRejected(User $author) {
+    public function getPredicateRejected() {
         return $this->getPredicateBuilder()
-            ->equals('author_id',$author->getId())
             ->notNull('rejected_at')
             ->isNull('deleted_at');
     }
