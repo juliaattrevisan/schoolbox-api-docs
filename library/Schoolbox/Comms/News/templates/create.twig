@@ -426,7 +426,6 @@
                 // Update the Vue property for requiring moderation
                 formActionsApp.requiresModeration = !(response.approveRoute);
                 formActionsApp.articleId = response.articleId;
-                console.log(!(response.approveRoute));
             }
         });
         {% endif %}
@@ -1145,7 +1144,6 @@
                     return true;
                 }
                 for(var i in audienceOptions){
-                    console.log(audienceOptions[i]);
                     if(audienceOptions.hasOwnProperty(i) && !audienceOptions[i].hideFromModal && audienceOptions[i].isMulti){
                         return true;
                     }
