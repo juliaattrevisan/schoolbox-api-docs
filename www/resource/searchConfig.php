@@ -26,14 +26,14 @@ $handle = array(
 //        'handler' => new File(),
 //        'renderer' => new \Schoolbox\File\Search\Renderer($this, '', '', 0, $keyword),
 //    ),
-    'sitenews' => array(
+/*    'sitenews' => array(
         'handler' => new News(),
         'renderer' => new \Schoolbox\News\Search\Renderer($this, '', '', 0, $keyword),
     ),
     'homepagenews' => array(
         'handler' => new CategoryNews(),
         'renderer' => new \Schoolbox\Folder\News\Search\Renderer($this, '', '', 0, $keyword),
-    ),
+    ),*/
     'blog' => array(
         'handler' => new Blog(),
         'renderer' => new \Schoolbox\Blog\Homepage\Search\Renderer($this, '', '', 0, $keyword),
@@ -56,8 +56,8 @@ $type_list = array(
     'all' => 'All',
     'user' => 'People',
     'file' => 'Files',
-    'sitenews' => 'School News',
-    'homepagenews' => 'Homepage News',
+    //'sitenews' => 'School News',
+    //'homepagenews' => 'Homepage News',
     'blog' => 'Blogs',
     'wiki' => 'Wikis',
     'forum' => 'Forums',
