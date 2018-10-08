@@ -10,11 +10,13 @@
 namespace Schoolbox\Comms\News;
 
 use Alaress\Database\Predicate\Builder;
-use Schoolbox\Collection;
+use Alaress\Database\Predicate\IBuilder;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Alaress_Date_Format;
 
 /**
  * Class Mapper
@@ -182,6 +184,7 @@ class Mapper extends \Schoolbox\Mapper
      * Returns a predicate for getting articles that are awaiting moderation
      * @param User $author
      * @return Builder
+     * @TODO Move non-state related considerations out of this method so it can be re-used
      */
     public function getPredicateDraft(User $author) {
         return $this->getPredicateBuilder()
@@ -195,6 +198,7 @@ class Mapper extends \Schoolbox\Mapper
      * Returns a predicate for getting articles that are awaiting moderation
      * @param User $author
      * @return Builder
+     * @TODO Move non-state related considerations out of this method so it can be re-used
      */
     public function getPredicateRejected(User $author) {
         return $this->getPredicateBuilder()
@@ -207,6 +211,7 @@ class Mapper extends \Schoolbox\Mapper
      * Returns a predicate for getting articles that are awaiting moderation
      * @param User $author
      * @return Builder
+     * @TODO Move non-state related considerations out of this method so it can be re-used
      */
     public function getPredicateAwaitingModeration(User $author) {
         return $this->getPredicateBuilder()
@@ -215,6 +220,26 @@ class Mapper extends \Schoolbox\Mapper
             ->isNull('rejected_at')
             ->isNull('accepted_at')
             ->isNull('deleted_at');
+    }
+
+
+    /**
+     * Returns a predicate for getting articles that are awaiting moderation
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return Builder
+     * @throws InvalidColumnException
+     * @see Model::getDiscreteState()
+     */
+    public function getPredicatePublished(Alaress_Date_Format $now = null): IBuilder
+    {
+        $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
+        return $this->getPredicateBuilder()
+                    ->notNull('submitted_at')
+                    ->isNull('rejected_at')
+                    ->notNull('accepted_at')
+                    ->lessThanOrEqualTo('publish_at', $nowDatabase)
+                    ->greaterThan('expires_at', $nowDatabase);
     }
 
     /**

@@ -33,8 +33,14 @@ class MockArticleResolver implements IArticleResolver
      *
      * @inheritdoc
      */
-    public function findArticlesForAudience(string $entityType, $entityValue, ?string $relationship, array $orderBy = [], int $limit = null): array
-    {
+    public function findArticlesForAudience(
+        string $entityType,
+        $entityValue,
+        ?string $relationship,
+        bool $publishedOnly = true,
+        array $orderBy = [],
+        int $limit = null
+    ): array {
         $allArticleIds   = \array_keys(MockUserResolver::ARTICLE_AUDIENCES);
         $countArticleIds = \count($allArticleIds);
 

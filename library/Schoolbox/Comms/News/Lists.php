@@ -300,6 +300,7 @@ class Lists
             Folder::getEntityType(),
             $params->getFolderId(),
             Audience\Model::RELATIONSHIP_SELF,
+            true,
             [ "$articleTable.publish_at" => 'DESC', "$articleTable.created_at" => 'DESC'],
             $params->getLimit()
         );
