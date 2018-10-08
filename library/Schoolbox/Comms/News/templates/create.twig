@@ -121,8 +121,8 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label for="news-title">Title</label>
-                        <input id="news-title" name="title" type="text" maxlength="255" value="{{ article.title }}" />
+                        <label for="news-title" class="required">Title</label>
+                        <input id="news-title" name="title" type="text" maxlength="255" value="{{ article.title }}" required />
                     </div>
 
                     <div class="small-12 columns">
@@ -130,16 +130,23 @@
                         <textarea id="body" name="body">{{ article.body }}</textarea>
                     </div>
 
-                    <div class="small-12 columns">
+                    <legend data-collapser="optional-section" class="icon-down-arrow" >Include a blurb to be displayed alongside the title</legend>
+                    <div class="column small-12 hide" data-collapsable="optional-section" data-collapse-state="collapsed" >
                         <label for="blurb">Blurb</label>
                         <textarea id="blurb" name="blurb">{{ article.blurb }}</textarea>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>Feature Image</label>
+                        {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
                     </div>
                 </fieldset>
 
                 <fieldset class="content" id="audience-select-container" v-if="countModalSegmentTypes">
 
                     <div class="small-12 columns">
-                        <label>Audience</label>
+                        <label class="required">Audience</label>
                         <p class="meta">Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of available options.</p>
 
                         <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4 audience-grid" v-show="audienceBricks.length">
@@ -166,7 +173,7 @@
                         </ul>
 
                         <div class="input-group">
-                            <input type="text" id="audience-search" name="audience" placeholder="{{ audiencePlaceholder }}" />
+                            <input type="text" id="audience-search" name="audience" placeholder="{{ audiencePlaceholder }}" required />
                             <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse&hellip;</button>
                         </div>
                     </div>
@@ -288,36 +295,26 @@
 
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>Feature Image</label>
-                        <p class="meta">Attach a feature image to represent your {{ locale.article.proper }} article.</p>
-
-                        {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
-                    </div>
-                </fieldset>
-
-                <fieldset class="content">
-                    <div class="small-12 columns">
                         <label for="news-topics">Topics</label>
-                        <p class="meta">You can assign multiple topics to this {{ locale.news }} to adjust its exposure.</p>
+                        <p class="meta">You can assign multiple topics to this {{ locale.news }} to help identify its purpose.</p>
                         <select data-topics name="topics[]" id="news-topics" multiple></select>
                     </div>
                 </fieldset>
 
                 <fieldset class="content">
-                    <legend>Availability</legend>
                     <div class="small-12 large-6 columns">
-                        <label for="publishAt">
+                        <label for="publishAt" class="required">
                             Publish Date
                         </label>
-                        <p class="meta">This article becomes available to its audience once this date and time is reached.</p>
-                        <input type="text" class="required" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ article.publishAt.local }}"/>
+                        <p class="meta">This article becomes available to its audience once this date is reached.</p>
+                        <input type="text" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ article.publishAt.local }}" required />
                     </div>
                     <div class="small-12 large-6 columns">
-                        <label for="expiresAt">
+                        <label for="expiresAt" class="required">
                             Expiry Date
                         </label>
                         <p class="meta">This article is automatically archived once this expiry date is reached.</p>
-                        <input type="text" class="required" name="expiresAt" id="expiresAt" data-datepicker data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}"/>
+                        <input type="text" name="expiresAt" id="expiresAt" data-datepicker data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}" required />
                     </div>
                 </fieldset>
             </section>
@@ -373,8 +370,20 @@
 
         $.fn.alaressEditor({
             targetElements: $('#createForm textarea[name=blurb]'),
-            removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe,link'
+            removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe,link',
+            toolbarGroups: [
+                {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                {name: 'links', groups: ['links']},
+                /* Custom schoolbox-specific plugin stuff can go here
+                 * This is a hole into which you may put once-off abilities
+                 * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
+                 * This is typically not used for anything else for now
+                 */
+                {name: 'schoolbox', groups: ['schoolboxlink']},
+            ]
         });
+
+        $('[data-collapser]').collapsable();
 
         $('[data-topics]').selectizeSelector({
             ajax: {
@@ -422,13 +431,30 @@
 
         $('#news-submit').click(function(event) {
             event.preventDefault();
-            submitForm('submit');
+
+            if (!$createForm.valid()) {
+                // Scroll to error
+                // TODO: this doesn't scroll to the audience selector. we'll need to rebase our fork of selectize before we can fix this
+                $createForm.data('validator').errorList[0].element.focus();
+            } else {
+                submitForm('submit');
+            }
         });
 
         $('#news-preview').click(function(event) {
             event.preventDefault();
-            submitForm('preview');
+
+            if (!$createForm.valid()) {
+                // Scroll to error
+                // TODO: this doesn't scroll to the audience selector. we'll need to rebase our fork of selectize before we can fix this
+                $createForm.data('validator').errorList[0].element.focus();
+            } else {
+                submitForm('preview');
+            }
         });
+
+        $createForm.alaressValidate();
+
 
         /**
          * Submitting the create/update form
@@ -628,6 +654,7 @@
                      * @param {jQuery} $item - The jQuery wrapper of the DOM element that is displayed in default audienceSelectize
                      */
                     onItemAdd: function(key, $item) {
+                        var selectize = this;
 
                         // Selectize doesn't give us all the data of the selected item, find the item in the full list -_-
                         var selectedItem = this.options[key];
@@ -643,6 +670,10 @@
                         // The audienceSelectize dropdown doesn't position correctly for some reason with this setup so force reposition again after a very short timeout
                         setTimeout(function() {
                             audienceSelectize.positionDropdown();
+
+                            // Trigger a blur on the selectize so that validation updates
+                            // This has to happen on a slight delay as well for some reason
+                            selectize.$input.blur();
                         }, 1);
                     },
                     /**
