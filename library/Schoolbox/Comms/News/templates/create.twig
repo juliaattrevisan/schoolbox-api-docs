@@ -434,6 +434,7 @@
 
             if (!$createForm.valid()) {
                 // Scroll to error
+                // TODO: this doesn't scroll to the audience selector. we'll need to rebase our fork of selectize before we can fix this
                 $createForm.data('validator').errorList[0].element.focus();
             } else {
                 submitForm('submit');
@@ -445,6 +446,7 @@
 
             if (!$createForm.valid()) {
                 // Scroll to error
+                // TODO: this doesn't scroll to the audience selector. we'll need to rebase our fork of selectize before we can fix this
                 $createForm.data('validator').errorList[0].element.focus();
             } else {
                 submitForm('preview');
