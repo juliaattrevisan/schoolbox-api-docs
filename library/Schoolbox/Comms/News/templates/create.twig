@@ -424,7 +424,7 @@
                 window.history.pushState({}, null, response.url);
 
                 // Update the Vue property for requiring moderation
-                formActionsApp.requiresModeration = !(response.approveRoute);
+                formActionsApp.approveRoute = response.approveRoute;
                 formActionsApp.articleId = response.articleId;
             }
         });
@@ -1153,12 +1153,15 @@
         }
     });
 
+    var something = '{{ config.global_moderation }}';
+
     var formActionsApp = new Vue({
         el: '#create-form-actions',
         delimiters: ['${', '}'],
         data: {
             articleId: '{{ article.id }}',
-            requiresModeration: '{{ not (approveRoute) }}',
+            approveRoute: '{{ approveRoute }}',
+            globalModeration: '{{ config.global_moderation }}',
             isSubmitted: '{{ (article.isSubmitted) }}',
             isRejected: '{{ (article.isRejected) }}'
         },
@@ -1171,6 +1174,10 @@
                 }
 
                 return 'Publish {{ locale.news }}';
+            },
+
+            requiresModeration: function() {
+                return this.globalModeration && !this.approveRoute;
             }
         }
     });
