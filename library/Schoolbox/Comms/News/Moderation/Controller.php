@@ -96,8 +96,12 @@ class Controller extends Base
                     'labelClass' => 'unsubmitted'
                 ],
                 'Awaiting Moderation' => [
-                    'count' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration($this->getUser())),
-                    'labelClass' => 'submitted'
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateAwaitingModeration()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'submitted',
                 ],
                 'Rejected' => [
                     'count'      => $this->newsMapper->countByPredicates(

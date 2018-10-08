@@ -214,9 +214,8 @@ class Mapper extends \Schoolbox\Mapper
      * @return Builder
      * @TODO Move non-state related considerations out of this method so it can be re-used
      */
-    public function getPredicateAwaitingModeration(User $author) {
+    public function getPredicateAwaitingModeration() {
         return $this->getPredicateBuilder()
-            ->equals('author_id',$author->getId())
             ->notNull('submitted_at')
             ->isNull('rejected_at')
             ->isNull('accepted_at')
