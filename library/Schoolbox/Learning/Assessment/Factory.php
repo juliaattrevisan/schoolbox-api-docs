@@ -152,8 +152,19 @@ class Factory
         $this->setMarkType(trim($post['markType']));
         $this->setGradingScheme(trim($post['gradingScheme']));
         $this->setUseRubric(trim($post['useRubric']));
-        $this->setMarkPerCapability(trim($post['markPerCapability']));
-        $this->setUseMarkRange(trim($post['useMarkRange']));
+
+        if (trim($post['markPerCapability']) === 'on') {
+            $this->setMarkPerCapability(true);
+        } else {
+            $this->setMarkPerCapability(false);
+        }
+
+        if (trim($post['useMarkRange']) === 'on') {
+            $this->setUseMarkRange(true);
+        } else {
+            $this->setUseMarkRange(false);
+        }
+
         $this->setMaxMark(trim($post['maxMark']));
 
         if (isset($post['self_reviewable'])) {
