@@ -11,6 +11,7 @@ use Alaress\Application\Kernel;
 use Config\ModuleLoader;
 use Schoolbox\Comms\News;
 
+
 class Comms extends ModuleLoader
 {
     /**

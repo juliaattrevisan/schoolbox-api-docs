@@ -401,6 +401,8 @@ function createHomepageNewsArticle(IDatabase $db, array $row, LoggerInterface $l
      */
     $log->debug("Homepage News {$row['id']} {$row['heading']} is now article_id {$lastInsertId}");
 
+    $query = "UPDATE subject_news SET migration_id = :migrate_id WHERE id = :article_id";
+    $db->prepare($query)->execute([':migrate_id'=>$lastInsertId,':article_id'=>$row['id']]);
     return $lastInsertId;
 }
 
