@@ -189,9 +189,7 @@ class Mapper extends \Schoolbox\Mapper
     public function getPredicateDraft(): IBuilder
     {
         return $this->getPredicateBuilder()
-                    ->isNull('submitted_at')
-                    ->isNull('rejected_at')
-                    ->isNull('deleted_at');
+                    ->isNull('submitted_at');
     }
 
     /**
