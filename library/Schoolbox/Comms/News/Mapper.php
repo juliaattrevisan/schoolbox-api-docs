@@ -221,8 +221,7 @@ class Mapper extends \Schoolbox\Mapper
         return $this->getPredicateBuilder()
                     ->notNull('submitted_at')
                     ->isNull('rejected_at')
-                    ->isNull('accepted_at')
-                    ->isNull('deleted_at');
+                    ->isNull('accepted_at');
     }
 
 
