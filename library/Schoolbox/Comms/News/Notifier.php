@@ -44,8 +44,9 @@ class Notifier extends AbstractModuleNotifier
     // These patterns need to be consts to ensure consistency between methods (revocation relies on these strings matching)
 
     private const PATTERN_POSTED_TITLE = ':user posted :title';
-    private const PATTERN_POSTED_HREF = '/comms/news/%d?ref=' . Statistics\Mapper::REFERRER_EMAIL;
-    private const PATTERN_ARTICLE_HREF  = '/comms/news/%d';
+    private const PATTERN_SUBMITTED_TITLE = ':user submitted an article, :title';
+    private const PATTERN_POSTED_HREF = '/news/%d?ref=' . Statistics\Mapper::REFERRER_EMAIL;
+    private const PATTERN_ARTICLE_HREF = '/news/%d';
 
     /** @var IUserResolver */
     private $audienceResolver;
@@ -270,23 +271,50 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifySystemDeleted(Article $article): Envelope
     {
-        return $this->retractPosted($article);
+        $envelope  = new Envelope();
+        return $this->retractPosted($envelope, $article);
     }
 
     /**
      * Retracts a given article.
      *
+     * @param Envelope $envelope
      * @param Article $article
      * @return Envelope
      */
-    private function retractPosted(Article $article): Envelope
+    private function retractPosted(Envelope $envelope, Article $article): Envelope
     {
-        $envelope  = new Envelope();
         $bob       = new Builder(false);
         $articleId = $article->getId();
         $bob->setTitle(self::PATTERN_POSTED_TITLE)
             ->setHref(sprintf(self::PATTERN_POSTED_HREF, $articleId))
             ->addTopic("news.$articleId." . self::TRIGGER_POSTED);
+
+        // Empty params for completeness?
+        $bob->setParams([
+            'user'  => new Param(''),
+            'title' => new Param(''),
+        ]);
+
+        // Only broadcast to superusers as there's no system channel
+        $envelope->retractAllLike($bob->build());
+        return $envelope;
+    }
+
+    /**
+     * Retracts a given article.
+     *
+     * @param Envelope $envelope
+     * @param Article $article
+     * @return Envelope
+     */
+    private function retractSubmitted(Envelope $envelope, Article $article): Envelope
+    {
+        $bob       = new Builder(false);
+        $articleId = $article->getId();
+        $bob->setTitle(self::PATTERN_SUBMITTED_TITLE)
+            ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $articleId))
+            ->addTopic("news.$articleId." . self::TRIGGER_SUBMITTED);
 
         // Empty params for completeness?
         $bob->setParams([
@@ -307,7 +335,8 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifySystemExpired(Article $article): Envelope
     {
-        return $this->retractPosted($article);
+        $envelope = new Envelope();
+        return $this->retractPosted($envelope, $article);
     }
 
     /**
@@ -318,12 +347,16 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifySystemModerated(Article $article): Envelope
     {
+        $envelope = new Envelope();
         // Retract when rejected or unpublished (in rejected status for now).
         // Article is unlikely to be in draft status, at this point. However, we should probably retract it, if it is.
         if ($article->isDraft() || $article->isRejected()) {
-            return $this->retractPosted($article);
+            // Retracting submit notification for rejected article
+            // to increase visibility of when the article is re-submitted.
+            $envelope = $this->retractSubmitted($envelope, $article);
+            return $this->retractPosted($envelope, $article);
         }
-        return new Envelope();
+        return $envelope;
     }
 
     /**
@@ -353,7 +386,7 @@ class Notifier extends AbstractModuleNotifier
 
         $bob = new Builder();
 
-        $bob->setTitle(':user submitted an article, :title')
+        $bob->setTitle(self::PATTERN_SUBMITTED_TITLE)
             ->setNamespace($this->getSlug())
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
             ->setSeverity(Logger::INFO)
