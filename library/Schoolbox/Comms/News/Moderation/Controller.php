@@ -131,60 +131,20 @@ class Controller extends Base
     private function setSubmitFlashMessage(Model $article)
     {
         $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
-        $now = \Alaress_Date_Format::now();
         $message = '';
 
-        /* TODO: Somehow these are determined?
-         */
-        $requiresModeration = true;
         $notifsOn = true;
 
-        /* TODO: Fill with entire truth table in SA-7456
-         */
-        if ($moderationRequired) {
-            if ($requiresModeration) {
+        if (!$article->isExpired()) {
+            if ($moderationRequired) {
                 if ($notifsOn) {
-                    if ($now->lt($article->getPublishAt()) && $article->getPublishAt()->lt($article->getExpiresAt())) {
-                        $message = 'Your article has been submitted for moderation. You will receive a notification once your article has been assessed.';
-                    } elseif ($article->getPublishAt()->lt($now) && $now->lt($article->getExpiresAt())) {
-                    } elseif ($article->getPublishAt()->lt($article->getExpiresAt()) && $article->getExpiresAt()->lt($now)) {
-                    }
+                    $message = 'Your article has been submitted for moderation. You will receive a notification when your article is rejected or approved';
                 } else {
-                    if ($now->lt($article->getPublishAt()) && $article->getPublishAt()->lt($article->getExpiresAt())) {
-                        $message = 'Your article has been submitted for moderation.';
-                    } elseif ($article->getPublishAt()->lt($now) && $now->lt($article->getExpiresAt())) {
-                    } elseif ($article->getPublishAt()->lt($article->getExpiresAt()) && $article->getExpiresAt()->lt($now)) {
-                    }
+                    $message = 'Your article has been submitted for moderation.';
                 }
             }
-            else {
-                if ($notifsOn) {
-                    if ($now->lt($article->getPublishAt()) && $article->getPublishAt()->lt($article->getExpiresAt())) {
-                    } elseif ($article->getPublishAt()->lt($now) && $now->lt($article->getExpiresAt())) {
-                    } elseif ($article->getPublishAt()->lt($article->getExpiresAt()) && $article->getExpiresAt()->lt($now)) {
-                    }
-                } else {
-                    if ($now->lt($article->getPublishAt()) && $article->getPublishAt()->lt($article->getExpiresAt())) {
-                    } elseif ($article->getPublishAt()->lt($now) && $now->lt($article->getExpiresAt())) {
-                    } elseif ($article->getPublishAt()->lt($article->getExpiresAt()) && $article->getExpiresAt()->lt($now)) {
-                    }
-                }
-            }
-        } else {
-            if ($notifsOn) {
-                if ($now->lt($article->getPublishAt()) && $article->getPublishAt()->lt($article->getExpiresAt())) {
-                    $message = 'Your article will be published at the selected date and time.';
-                } elseif ($article->getPublishAt()->lt($now) && $now->lt($article->getExpiresAt())) {
-                } elseif ($article->getPublishAt()->lt($article->getExpiresAt()) && $article->getExpiresAt()->lt($now)) {
-                }
-            } else {
-                if ($now->lt($article->getPublishAt()) && $article->getPublishAt()->lt($article->getExpiresAt())) {
-                    $message = 'Your article will be published at the selected date and time.';
-                } elseif ($article->getPublishAt()->lt($now) && $now->lt($article->getExpiresAt())) {
-                    $message = 'Your article has been published.';
-                } elseif ($article->getPublishAt()->lt($article->getExpiresAt()) && $article->getExpiresAt()->lt($now)) {
-                }
-            }
+        } elseif ($article->isAwaitingPublication()) {
+            $message = 'Your article will be published on ' . $article->getPublishAt(); // TODO format this date
         }
 
         /* If a message is provided, let it be available in the Comms\News\Controller namespace
