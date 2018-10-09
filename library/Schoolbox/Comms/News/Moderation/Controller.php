@@ -128,7 +128,7 @@ class Controller extends Base
      *
      * @param Model $article
      */
-    private function setSubmitFlashMessage(Model $article)
+    private function generateSubmitFlashMessage(Model $article)
     {
         $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
         $message = '';
@@ -208,7 +208,7 @@ class Controller extends Base
 
             /* Set a flash message to tell people about what to do next when moderation is on
              */
-            $this->setSubmitFlashMessage($article);
+            $this->generateSubmitFlashMessage($article);
 
             // TODO. The client should be responsible for determining what to do after submission
             // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
