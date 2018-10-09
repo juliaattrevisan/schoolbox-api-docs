@@ -87,7 +87,7 @@ class Controller extends Base
      *
      * An optional ?topic= can be used to filter this
      *
-     * @api /comms/news/feed/{key}{/folderId}
+     * @api /news/feed/{key}{/folderId}
      *
      * @param User              $user
      * @param null|Folder\Model $folder

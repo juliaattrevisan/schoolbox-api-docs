@@ -56,7 +56,7 @@ class Controller extends Base
     /**
      * Provide form
      *
-     * @api GET /comms/news/policy
+     * @api GET /news/policy
      *
      * @throws MapperException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -84,7 +84,7 @@ class Controller extends Base
     /**
      * Save policy settings
      *
-     * @api POST /comms/news/policy
+     * @api POST /news/policy
      *
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound

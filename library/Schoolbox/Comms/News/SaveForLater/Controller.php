@@ -46,7 +46,7 @@ class Controller extends Base
     /**
      * A list of articles that you saved for later
      *
-     * @api GET /comms/news/saved
+     * @api GET /news/saved
      *
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
@@ -102,7 +102,7 @@ class Controller extends Base
      *
      * No error if item is already added to list when this is called.
      *
-     * @api POST /comms/news/saved/{articleId}
+     * @api POST /news/saved/{articleId}
      *
      * @param News\Model $article
      */
