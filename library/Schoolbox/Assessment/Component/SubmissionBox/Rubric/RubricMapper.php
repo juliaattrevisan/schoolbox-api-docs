@@ -1940,70 +1940,139 @@ class RubricMapper
             return [];
         }
 
+
+        // Find the most recent feedback for each of these due works
         $pb = new Builder($this->database, '');
+        $pb->in('a.id', $dueWorks->getPropertyValues('id'))
+           ->isNull('a.deleted_at')
+           ->equals('sr.owner', $student->getId())
+           ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+           ->notNull('sr.published_at')
+           ->isNull('sr.deleted_at');
+        $where             = implode(' AND ', $pb->getWhere());
+        $feedbackStatement = $this->database->prepare("
+            SELECT
+                sr.id AS feedbackId,
+                a.id  AS assessmentId
+            FROM submission_return sr
+            INNER JOIN submission_box sb ON sr.box_id = sb.id
+            INNER JOIN assessment      a ON sb.assessment_id = a.id
+            WHERE {$where}
+            ORDER BY sr.published_at ASC
+        ");
+        $feedbackStatement->execute($pb->getParams());
 
-        $pb
-            ->in('sb.assessment_id', $dueWorks->getPropertyValues('id'))
-            ->equals('sr.owner', $student->getId())
-            ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->notNull('sr.published_at')
-            ->isTrue('rgm.valid')
-            ->isNull('sr.deleted_at')
-            ->isNull('rd.deleted_at')
-            ->isNull('rl.deleted_at')
-            ->isNull('rc.deleted_at')
-            ->isNull('rg.deleted_at')
-            ->isNull('a.deleted_at');
+        $feedbackIds = [];
+        foreach ($feedbackStatement as $row) {
+            $feedbackIds[$row['assessmentId']] = $row['feedbackId'];
+        }
+        unset($pb);
 
-        $where = implode(' AND ', $pb->getWhere());
 
-        // While MariaDB appears to return the desired value in a column not in a group aggregate function, this
-        // behaviour is NOT guaranteed, the value in such cases is officially indeterminate.
+        // Find the descriptors selected for each of these feedback IDs
+        $pb = new Builder($this->database, '');
+        $pb->in('sr.id', $feedbackIds);
 
-        // We have two implementation options here:
-        // 1. Get more results than we really want, sort in order so that the last per group is
-        //    the only one we want, then discard some results during processing, or
-        // 2. More complex query to only get results we want
-
-        // While the former is simpler, it's too fragile and will break if someone changes the sorting.
-        // The below query is complex, but is the standard pattern:
-        // see http://stackoverflow.com/questions/7745609/sql-select-only-rows-with-max-value-on-a-column
-
-        $stmt = $this->database->prepare("
-            SELECT rg.name AS grouping, rc.name, a.id, a.title, rd.description
-            FROM assessment              a
-            JOIN submission_box         sb ON  a.id = sb.assessment_id
-            JOIN rubric_level           rl ON sb.id = rl.box_id
-            JOIN rubric_descriptor      rd ON rl.id = rd.level_id
-            JOIN rubric_criterion       rc ON rc.id = rd.criterion_id
-            JOIN rubric_group           rg ON rg.id = rc.rubric_group_id
-            JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
-            JOIN submission_return      sr ON sr.id = rgm.return_id
-            JOIN (
-                SELECT a.id AS 'a.id', rc.id AS 'rc.id', max(sr.published_at) AS 'sr.max_published_at'
-                FROM rubric_descriptor_mark rm
-                JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id
-                JOIN rubric_criterion       rc ON rc.id = rd.criterion_id
-                JOIN rubric_group           rg ON rg.id = rc.rubric_group_id
-                JOIN rubric_level           rl ON rl.id = rd.level_id
-                JOIN submission_box         sb ON sb.id = rl.box_id
-                JOIN assessment              a ON  a.id = sb.assessment_id
-                JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
-                JOIN submission_return      sr ON sr.id = rgm.return_id
-                WHERE {$where}
-                GROUP BY sb.assessment_id, rd.criterion_id
-            ) t ON `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `sr`.`published_at` = `t`.`sr.max_published_at`
+        $where               = implode(' AND ', $pb->getWhere());
+        $descriptorStatement = $this->database->prepare("
+            SELECT
+                rg.name AS grouping,
+                rc.name,
+                a.id,
+                a.title,
+                rd.description
+            FROM assessment                a
+            INNER JOIN submission_box     sb ON  a.id = sb.assessment_id
+            INNER JOIN rubric_level       rl ON sb.id = rl.box_id
+            INNER JOIN rubric_descriptor  rd ON rl.id = rd.level_id
+            INNER JOIN rubric_criterion   rc ON rc.id = rd.criterion_id
+            INNER JOIN rubric_group       rg ON rg.id = rc.rubric_group_id
+            INNER JOIN rubric_group_mark rgm ON rg.id = rgm.rubric_group_id
+            INNER JOIN submission_return  sr ON sr.id = rgm.return_id
             WHERE {$where}
             ORDER BY rg.name ASC, rc.name ASC, a.due_date DESC;
         ");
 
-        $stmt->execute($pb->getParams());
+
+
+
+
+
+
+
+
+//        $pb = new Builder($this->database, '');
+//
+//        $pb
+//            ->in('sb.assessment_id', $dueWorks->getPropertyValues('id'))
+//            ->equals('sr.owner', $student->getId())
+//            ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+//            ->notNull('sr.published_at')
+//            ->isTrue('rgm.valid')
+//            ->isNull('sr.deleted_at')
+//            ->isNull('rd.deleted_at')
+//            ->isNull('rl.deleted_at')
+//            ->isNull('rc.deleted_at')
+//            ->isNull('rg.deleted_at')
+//            ->isNull('a.deleted_at');
+//
+//        $where = implode(' AND ', $pb->getWhere());
+//
+//        // While MariaDB appears to return the desired value in a column not in a group aggregate function, this
+//        // behaviour is NOT guaranteed, the value in such cases is officially indeterminate.
+//
+//        // We have two implementation options here:
+//        // 1. Get more results than we really want, sort in order so that the last per group is
+//        //    the only one we want, then discard some results during processing, or
+//        // 2. More complex query to only get results we want
+//
+//        // While the former is simpler, it's too fragile and will break if someone changes the sorting.
+//        // The below query is complex, but is the standard pattern:
+//        // see http://stackoverflow.com/questions/7745609/sql-select-only-rows-with-max-value-on-a-column
+//
+//        $stmt = $this->database->prepare("
+//            SELECT
+//                rg.name AS grouping,
+//                rc.name,
+//                a.id,
+//                a.title,
+//                rd.description
+//            FROM assessment              a
+//            JOIN submission_box         sb ON  a.id = sb.assessment_id
+//            JOIN rubric_level           rl ON sb.id = rl.box_id
+//            JOIN rubric_descriptor      rd ON rl.id = rd.level_id
+//            JOIN rubric_criterion       rc ON rc.id = rd.criterion_id
+//            JOIN rubric_group           rg ON rg.id = rc.rubric_group_id
+//            JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
+//            JOIN submission_return      sr ON sr.id = rgm.return_id
+//            JOIN (
+//                SELECT
+//                    a.id AS 'a.id',
+//                    rc.id AS 'rc.id',
+//                    MAX(sr.published_at) AS 'sr.max_published_at'
+//                FROM rubric_descriptor_mark rm
+//                JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id
+//                JOIN rubric_criterion       rc ON rc.id = rd.criterion_id
+//                JOIN rubric_group           rg ON rg.id = rc.rubric_group_id
+//                JOIN rubric_level           rl ON rl.id = rd.level_id
+//                JOIN submission_box         sb ON sb.id = rl.box_id
+//                JOIN assessment              a ON  a.id = sb.assessment_id
+//                JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
+//                JOIN submission_return      sr ON sr.id = rgm.return_id
+//                WHERE {$where}
+//                GROUP BY a.id, rc.id
+//            ) t ON `a`.`id` = `t`.`a.id` AND `rc`.`id` = `t`.`rc.id` AND `sr`.`published_at` = `t`.`sr.max_published_at`
+//            WHERE {$where}
+//            ORDER BY rg.name ASC, rc.name ASC, a.due_date DESC;
+//        ");
+
+        $descriptorStatement->execute($pb->getParams());
 
         $longitude = [];
 
-        while ($r = $stmt->fetch(\PDO::FETCH_NUM)) {
+        while ($r = $descriptorStatement->fetch(\PDO::FETCH_NUM)) {
 
-            list ($capability, $indicator, $assessmentId, $assessmentTitle, $descriptor) = $r;
+            [$capability, $indicator, $assessmentId, $assessmentTitle, $descriptor] = $r;
 
             $longitude[$capability]['name']                                                = $capability;
             $longitude[$capability]['indicators'][$indicator]['name']                      = $indicator;
