@@ -146,7 +146,7 @@ class Controller extends Base
                 }
             }
         } elseif ($article->isAwaitingPublication()) {
-            $message = 'Your article will be published on ' . $article->getPublishAt(); // TODO format this date
+            $message = 'Your article will be published on ' . (new \Alaress_Date_Format($article->getPublishAt(), 'Y-m-d H:i:s'))->getRelativeDay(); // TODO format this date
         }
 
         return $message;
