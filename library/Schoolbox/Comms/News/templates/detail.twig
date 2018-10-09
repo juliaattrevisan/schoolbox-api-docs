@@ -31,7 +31,7 @@ Data:
 {% if flashMessage|length %}
     <script>
         $(function() {
-            $('#flash').on('click', 'a', function(event) {
+            $('#flash').on('click', '.close', function(event) {
                 event.preventDefault();
 
                 $('#flash').remove();
