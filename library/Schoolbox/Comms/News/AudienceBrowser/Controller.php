@@ -57,7 +57,7 @@ class Controller extends Base
     /**
      * Look for all the audience pieces that might somehow match $keyword
      *
-     * @api   /comms/news/audiencebrowser/search
+     * @api   /news/audiencebrowser/search
      * @level 18.1
      * @throws UnknownEntityTypeException
      * @throws \Alaress\Database\Exception

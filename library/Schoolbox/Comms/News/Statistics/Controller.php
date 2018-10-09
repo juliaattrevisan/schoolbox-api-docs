@@ -50,7 +50,7 @@ class Controller extends Base
     /**
      * Statistical overview for $article
      *
-     * @api GET /comms/news/statistics/{articleId}
+     * @api GET /news/statistics/{articleId}
      *
      * @param News\Model $article
      * @throws \Alaress\Database\Exception
@@ -101,7 +101,7 @@ class Controller extends Base
      * Get the json payload to populate "Conversions, Impressions vs Time" graph so that
      * when you change scale, only the graph updates, instead of the whole page kek
      *
-     * @api GET /comms/news/statistics/{articleId}/interactions
+     * @api GET /news/statistics/{articleId}/interactions
      *
      * @param News\Model $article
      * @throws \Alaress\Database\Exception

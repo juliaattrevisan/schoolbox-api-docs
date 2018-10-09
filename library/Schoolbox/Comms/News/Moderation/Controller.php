@@ -60,7 +60,7 @@ class Controller extends Base
     /**
      * Get a list of articles that need moderation
      *
-     * @api GET /comms/news/moderation
+     * @api GET /news/moderation
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -123,7 +123,7 @@ class Controller extends Base
      * Does not automatically approve an article if session user can moderate.
      * @see $this->postApprove
      *
-     * @api POST /comms/news/moderation/{articleId}/submit
+     * @api POST /news/moderation/{articleId}/submit
      *
      * @param Model $article
      * @throws Mapper\Exception
@@ -179,7 +179,7 @@ class Controller extends Base
     /**
      * Approve an article for publishing to its audience
      *
-     * @api POST /comms/news/moderation/{articleId}/accept
+     * @api POST /news/moderation/{articleId}/accept
      *
      * @param Model $article
      * @throws Mapper\Exception
@@ -245,7 +245,7 @@ class Controller extends Base
      * Rejecting an article will send it back to the Compose/Preview phase, as if it had
      * never succeeded before lol (but it'll remember that you failed, and if stated, why)
      *
-     * @api POST /comms/news/moderation/{articleId}/reject
+     * @api POST /news/moderation/{articleId}/reject
      *
      * @param Model $article
      * @throws Mapper\Exception

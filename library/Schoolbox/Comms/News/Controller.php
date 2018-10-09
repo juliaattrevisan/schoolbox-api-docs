@@ -145,7 +145,7 @@ class Controller extends Base
     /**
      * Provide form to create a news article
      *
-     * @api   GET /comms/news/create
+     * @api   GET /news/create
      * @level 18.1
      *
      * @throws MapperException
@@ -228,7 +228,7 @@ class Controller extends Base
     /**
      * Create a news article
      *
-     * @api   POST /comms/news/create
+     * @api   POST /news/create
      * @level 18.1
      *
      * @throws InvalidArgumentException
@@ -254,7 +254,7 @@ class Controller extends Base
     /**
      * Provide form to update a news article
      *
-     * @api   GET /comms/news/{articleId}/update
+     * @api   GET /news/{articleId}/update
      * @level 18.1
      *
      * @param Model $article
@@ -323,7 +323,7 @@ class Controller extends Base
      *
      * It may change the approved subState, eg AwaitingPublication/Published/Expired
      *
-     * @api   POST /comms/news/{articleId}
+     * @api   POST /news/{articleId}
      * @level 18.1
      *
      * @param Model $article
@@ -417,7 +417,7 @@ class Controller extends Base
     /**
      * Get a list of available news topics that can be assigned to an article
      *
-     * @api GET /comms/news/topics
+     * @api GET /news/topics
      * @level 18.1
      */
     public function getTopics(): void
@@ -429,7 +429,7 @@ class Controller extends Base
     /**
      * Load a news article so you can read its contents (the detail screen)
      *
-     * @api GET /comms/news/{articleId}
+     * @api GET /news/{articleId}
      * @level 18.1
      *
      * @param Model $article
@@ -518,7 +518,7 @@ class Controller extends Base
     /**
      * Get a list of articles that are audienced to me for homepage component
      *
-     * @api GET /comms/news/lists/homepage
+     * @api GET /news/lists/homepage
      *
      * @throws InvalidArgumentException
      * @throws MapperException
@@ -557,7 +557,7 @@ class Controller extends Base
     /**
      * Delete an article
      *
-     * @api POST /comms/news/{articleId}/delete
+     * @api POST /news/{articleId}/delete
      * @level 18.1
      *
      * @param Model $article
@@ -616,7 +616,7 @@ class Controller extends Base
      * Get a list of articles that were audienced to me
      * This is the central piece of the puzzle
      *
-     * @api GET /comms/news/list
+     * @api GET /news/list
      * @level 18.1
      *
      * @param int|null $year
@@ -673,7 +673,7 @@ class Controller extends Base
     /**
      * News Archive
      *
-     * @api GET /comms/news/archive{/year,month}
+     * @api GET /news/archive{/year,month}
      * @level 18.1
      *
      * @param int|null $year
@@ -747,7 +747,7 @@ class Controller extends Base
     /**
      * Get a list of articles audienced to you
      *
-     * @api GET /comms/news
+     * @api GET /news
      * @level 18.1
      *
      * @throws InvalidArgumentException
@@ -834,7 +834,7 @@ class Controller extends Base
     /**
      * Index of articles you've authored
      *
-     * @api GET /comms/news/me
+     * @api GET /news/me
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -894,7 +894,7 @@ class Controller extends Base
     /**
      * Get a list of articles that the logged in user authored
      *
-     * @api GET /comms/news/me/articles
+     * @api GET /news/me/articles
      */
     public function getAuthoredArticles()
     {
@@ -1030,7 +1030,7 @@ class Controller extends Base
     /**
      * Compute the recipients so author can identify
      *
-     * @api /comms/news/:articleId/recipients
+     * @api /news/:articleId/recipients
      * @level 18.1
      *
      * @param Model $article
