@@ -202,7 +202,7 @@ class Controller extends Base
 
         if (200 === $httpCode) {
 
-            /* Set a flash message to tell people about what to do next when moderation is on
+            /* Set a flash message to tell people what they can expect to happen to their article next
              */
             $message = $this->generateSubmitFlashMessage($article);
 
