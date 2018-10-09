@@ -540,7 +540,7 @@ class ArticleResolver implements IArticleResolver
                     {$this->folderMapper::buildOrderByClause(Mapper::TABLE_NAME, $orderBy, $this->db)}";
             }
 
-            if ($limit) {
+            if (null !== $limit) {
                 $sql .= "
                     LIMIT :limit";
                 $pb->putParam('limit', $limit);
