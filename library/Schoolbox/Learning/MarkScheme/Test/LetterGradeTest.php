@@ -72,10 +72,10 @@ class LetterGradeTest extends TestCase
             [-5,     'Needs Attention'],
             [0,      'Needs Attention'],
             [39,     'Needs Attention'],
-            [39.999, 'Needs Attention'],
+            [39.99,  'Needs Attention'],
             [45,     'Acceptable'],
             [60,     'Good'],
-            [89.999, 'Very Good'],
+            [89.99,  'Very Good'],
             [89.99999999999, 'Excellent'],  // testing for floating point accuracy beyond our reach
             [90,     'Excellent'],
             [100,    'Excellent'],
