@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\IResponse;
 class Percentage extends AbstractMarkScheme
 {
     public const SLUG = 'percent';
+    public const PRECISION = 2;
 
     const TITLE = 'Percentage';
 
@@ -37,7 +38,7 @@ class Percentage extends AbstractMarkScheme
 
         $normalisedMark = $this->filterNormalisedMark($normalisedMark);
 
-        $percentage = round($normalisedMark);
+        $percentage = round($normalisedMark, $this::PRECISION);
         return "$percentage %";
     }
 

@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment\IResponse;
 class LetterGrade extends AbstractMarkScheme
 {
     public const SLUG = 'letter';
+    public const PRECISION = 2;
 
     const TITLE = 'Letter Grade';
 
@@ -55,7 +56,7 @@ class LetterGrade extends AbstractMarkScheme
         $lowestGradeLevel = null;
         foreach ($this->getGradeGroup()->getGradeLevels() as $gradeLevel) {
             $lowestGradeLevel = $gradeLevel;
-            if (round($normalisedMark, 5) >= round($gradeLevel->getLowerBound(), 5)) {
+            if (round($normalisedMark, $this::PRECISION) >= round($gradeLevel->getLowerBound(), $this::PRECISION)) {
                 return $gradeLevel->getCaption();
             }
         }

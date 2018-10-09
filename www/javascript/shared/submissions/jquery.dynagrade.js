@@ -65,10 +65,15 @@
     function calcPercent(callback) {
         var scaledMark = this.attr('data-scaled-mark'),
             max        = this.attr('data-max'),
-            percentage = parseInt(scaledMark / max * 100);
+            percentage = parseFloat(scaledMark / max * 100);
 
         if (isNaN(percentage)) {
             percentage = 0;
+        }
+
+        // If sum isn't a whole number: round to 2dp
+        if(percentage % 1 !== 0){
+            percentage = percentage.toFixed(2);
         }
 
         callback.call(this, percentage + ' %');
@@ -78,11 +83,16 @@
         // start by getting the percentage
         var scaledMark = this.attr('data-scaled-mark'),
             max        = this.attr('data-max'),
-            percentage = parseInt(scaledMark / max * 100),
+            percentage = parseFloat(scaledMark / max * 100),
             $el        = this;
 
         if (isNaN(percentage)) {
             percentage = 0;
+        }
+
+        // If sum isn't a whole number: round to 2dp
+        if(percentage % 1 !== 0){
+            percentage = percentage.toFixed(2);
         }
 
         var rev = [];
