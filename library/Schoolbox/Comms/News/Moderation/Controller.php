@@ -137,15 +137,17 @@ class Controller extends Base
         $notifsOn = true; // TODO actually assign this
 
         if (!$article->isExpired()) {
+
             if ($moderationRequired) {
                 if ($notifsOn) {
                     $message = 'Your article has been submitted for moderation. You will receive a notification when your article is rejected or approved.';
                 } else {
                     $message = 'Your article has been submitted for moderation.';
                 }
+            } elseif ($article->isAwaitingPublication()) {
+                $message = 'Your article will be published on ' . (new \Alaress_Date_Format($article->getPublishAt(), 'Y-m-d H:i:s'))->getRelativeDay() . '.'; // TODO format this date
             }
-        } elseif ($article->isAwaitingPublication()) {
-            $message = 'Your article will be published on ' . (new \Alaress_Date_Format($article->getPublishAt(), 'Y-m-d H:i:s'))->getRelativeDay() . '.'; // TODO format this date
+
         }
 
         /* If a message is provided, let it be available in the Comms\News\Controller namespace */
