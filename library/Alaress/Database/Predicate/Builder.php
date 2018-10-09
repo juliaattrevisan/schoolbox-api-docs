@@ -711,13 +711,9 @@ class Builder implements IBuilder
 
 
     /**
-     * Just be careful using this: this is for if you need custom params in your joins
-     *
-     * @param string $param
-     * @param mixed  $value
-     * @return static
+     * @inheritdoc
      */
-    public function putParam(string $param, $value): self
+    public function putParam(string $param, $value): IBuilder
     {
         $this->params[$param] = $value;
         return $this;

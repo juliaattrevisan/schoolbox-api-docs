@@ -9,6 +9,9 @@
  */
 class Component_Config_Size extends Component_Config_Abstract
 {
+    // The magic value the semantically means 'all' or 'no limit'
+    // This is a string, not an int, because that's how config.value is stored and hydrated.
+    public const SIZE_ALL = '0';
 
     /**
      * Returns the options to display in the dropdown

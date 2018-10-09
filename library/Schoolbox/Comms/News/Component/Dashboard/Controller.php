@@ -8,6 +8,7 @@
  */
 namespace Schoolbox\Comms\News\Component\Dashboard;
 
+use Component_Config_Size;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
@@ -19,6 +20,8 @@ use SitePage;
 
 class Controller extends Component_Dashboard_ControllerAbstract
 {
+    // Max number of articles to show if 'size' config is set to 'ALL'
+    private const HARD_LIMIT = 50;
 
     /**
      * @var News\Mapper
@@ -91,13 +94,17 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle): bool
     {
+        $limit = Component_Config_Size::SIZE_ALL === $this->getConfig('size')
+            ? self::HARD_LIMIT
+            : (int)$this->getConfig('size');
+
         return $this->renderTwigTemplate($templateHandle, '@commsNewsDashboard/component.twig', [
             'componentInstanceId' => $this->getInstance()->getId(),
             'topics' => $this->topics,
             'topicAll' => News\Mapper::TOPIC_ALL_SLUG,
             'slug' => $this->slug,
             'compactMode' => $this->getConfig('compactMode'),
-            'limit' => (int)$this->getConfig('size'),
+            'limit' => $limit,
             'referrer' => News\Statistics\Mapper::REFERRER_DASHBOARD
         ]);
     }

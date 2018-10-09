@@ -211,4 +211,14 @@ interface IBuilder
      * @return mixed[]
      */
     public function getParams();
+
+
+    /**
+     * Just be careful using this: this is for if you need custom params in your joins
+     *
+     * @param string $param
+     * @param mixed  $value
+     * @return static
+     */
+    public function putParam(string $param, $value): IBuilder;
 }
