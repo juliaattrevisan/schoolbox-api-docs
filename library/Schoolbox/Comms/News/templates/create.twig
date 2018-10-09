@@ -103,13 +103,13 @@
 
         {# Create two possible routes:
               * formAction: used for draft saving by the draft jQuery plugin, and for the secondary action of preview
-              * formActionSubmit: used for the primary action- either submitting (an unapproved article), or updating (an approved article)
+              * formActionSubmit: used for the primary action- either submitting (an unsubmitted article), or updating (a submitted article)
         #}
-        {% if article.id and not article.isApproved %}
+        {% if article.id and isAutoSavable %}
             {% set formAction = updateRoute %}
             {% set formActionSubmit = submitRoute %}
-        {% elseif article.id and article.isApproved %}
-            {% set formAction = '' %} {# No drafting or previewing if the article is approved #}
+        {% elseif article.id and not isAutosavable %}
+            {% set formAction = '' %} {# No drafting or previewing if the article is submitted (not auto-savable) #}
             {% set formActionSubmit = updateRoute %}
         {% else %}
             {% set formAction = createRoute %}
