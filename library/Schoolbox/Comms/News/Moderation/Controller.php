@@ -127,8 +127,9 @@ class Controller extends Base
      * Flash messages aren't needed in other contexts yet afaik
      *
      * @param Model $article
+     * @return string
      */
-    private function generateSubmitFlashMessage(Model $article)
+    private function generateSubmitFlashMessage(Model $article) : string
     {
         $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
         $message = '';
@@ -147,12 +148,7 @@ class Controller extends Base
             $message = 'Your article will be published on ' . $article->getPublishAt(); // TODO format this date
         }
 
-        /* If a message is provided, let it be available in the Comms\News\Controller namespace
-         */
-        if ('' !== $message) {
-            $segment = $this->getSession()->getSegment('Schoolbox\Comms\News\Controller');
-            $segment->setFlash(self::ARTICLE_FLASH_MESSAGE_KEY, $message);
-        }
+        return $message;
     }
 
 
@@ -208,7 +204,13 @@ class Controller extends Base
 
             /* Set a flash message to tell people about what to do next when moderation is on
              */
-            $this->generateSubmitFlashMessage($article);
+            $message = $this->generateSubmitFlashMessage($article);
+
+            /* If a message is provided, let it be available in the Comms\News\Controller namespace */
+            if ('' !== $message) {
+                $segment = $this->getSession()->getSegment('Schoolbox\Comms\News\Controller');
+                $segment->setFlash(self::ARTICLE_FLASH_MESSAGE_KEY, $message);
+            }
 
             // TODO. The client should be responsible for determining what to do after submission
             // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
