@@ -78,7 +78,7 @@ class HaveReadPermToAudience extends ArticleAttribute
         // Base Case
         if ($segment->isSimple()) {
             $strategy = $this->strategyFactory->makeStrategy($segment->getEntityType());
-            return $strategy->canViewArticleAudiencedToEntityValue($user, $segment->getEntityType(), $segment->getRelationship());
+            return $strategy->canViewArticleAudiencedToEntityValue($user, $segment->getEntityValue(), $segment->getRelationship());
         }
 
         // Recursive Case - segment must have 1+ children, and user must have READ+ perm to them all
