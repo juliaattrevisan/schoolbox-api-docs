@@ -131,10 +131,11 @@ class Controller extends Base
      */
     private function generateSubmitFlashMessage(Model $article) : string
     {
+        // TODO this probably needs to check if user has any perms that cause moderation to be overridden
         $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
         $message = '';
 
-        $notifsOn = true;
+        $notifsOn = true; // TODO actually assign this
 
         if (!$article->isExpired()) {
             if ($moderationRequired) {
