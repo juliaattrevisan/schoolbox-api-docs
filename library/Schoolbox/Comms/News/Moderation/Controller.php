@@ -130,7 +130,6 @@ class Controller extends Base
      */
     private function generateSubmitFlashMessage(Model $article)
     {
-        // TODO this probably needs to check if user has any perms that cause moderation to be overridden
         $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
         $message = '';
 
@@ -144,9 +143,10 @@ class Controller extends Base
                 } else {
                     $message = 'Your article has been submitted for moderation.';
                 }
-            } elseif ($article->isAwaitingPublication()) {
-                $message = 'Your article will be published on ' . (new \Alaress_Date_Format($article->getPublishAt(), 'Y-m-d H:i:s'))->getRelativeDay() . '.'; // TODO format this date
             }
+//            elseif ($article->isAwaitingPublication()) {
+//                $message = 'Your article will be published on ' . (new \Alaress_Date_Format($article->getPublishAt(), 'Y-m-d H:i:s'))->getRelativeDay() . '.';
+//            }
 
         }
 
