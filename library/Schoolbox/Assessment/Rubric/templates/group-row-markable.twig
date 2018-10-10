@@ -10,7 +10,7 @@
 {% set markType = rubricGrid.assessment.markScheme.generateContext %}
 
 {% if showGroupTotal and markType.mode != "none" %}
-    {% set percentageMark     = capabilityMark.value * (100 / capabilityMaxSum) %}
+    {% set percentageMark     = (capabilityMark.value * (100 / capabilityMaxSum)) | round(2) %}
     {% set letterGradeBracket = false %}
     {% set letterGradeValue   = '' %}
 
