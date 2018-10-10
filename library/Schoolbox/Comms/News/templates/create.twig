@@ -408,44 +408,14 @@
 
         var $createForm = $('#createForm');
         var $submitButtons = $('#news-submit, #news-preview');
+        var $submitButton = $('#news-submit');
 
-        {# Drafting mechanism #}
-        {% if isAutoSavable %}
-        $createForm.draft({
-            inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search', '#news-topics'],
-            textareas: ['body', 'blurb'],
-            attachzones: ['attachment'],
-            onSaveSuccess: function (response) {
-                // Update the form actions
-                $createForm.attr('action', response.updateRoute);
-                if (response.approveRoute) {
-                    $createForm.attr('data-action-submit', response.approveRoute);
-                } else {
-                    $createForm.attr('data-action-submit', response.submitRoute);
-                }
+        // Init validation
+        $createForm.alaressValidate();
 
-                // Update the window history
-                window.history.pushState({}, null, response.url);
-
-                // Update the Vue property for requiring moderation
-                formActionsApp.approveRoute = response.approveRoute;
-                formActionsApp.articleId = response.articleId;
-            }
-        });
-        {% endif %}
-
-        $('#news-submit').click(function(event) {
-            event.preventDefault();
-
-            if (!$createForm.valid()) {
-                // Scroll to error
-                // TODO: this doesn't scroll to the audience selector. we'll need to rebase our fork of selectize before we can fix this
-                $createForm.data('validator').errorList[0].element.focus();
-            } else {
-                submitForm('submit');
-            }
-        });
-
+        /*
+         * Listen for a click on the preview button
+         */
         $('#news-preview').click(function(event) {
             event.preventDefault();
 
@@ -458,8 +428,71 @@
             }
         });
 
-        $createForm.alaressValidate();
+        /**
+         * Listen for a click on the submit button
+         * This bypasses the staller because the event is assigned directly to the element (rather than doing $(document).on)
+         */
+        $submitButton.click(function() {
+            if ($createForm.valid()) {
+                // Disable both submits
+                // TODO: can't quite do this yet, this stops the click event from being able to happen eventually
+                // $submitButtons.prop('disabled', true);
 
+                // Update the text on the button clicked
+                $(this).text('Working...');
+            }
+        });
+
+        /**
+         * Listen for a click on the submit button
+         * This is the event that will be stalled (if isAutosavable)
+         */
+        $(document).on('click', '#news-submit', function (event) {
+            event.preventDefault();
+
+            if (!$createForm.valid()) {
+                // Scroll to error
+                // TODO: this doesn't scroll to the audience selector. we'll need to rebase our fork of selectize before we can fix this
+                $createForm.data('validator').errorList[0].element.focus();
+            } else {
+                submitForm('submit');
+            }
+        });
+
+        {% if isAutoSavable %}
+            // Init a stall submit on the submit click
+            // We will install a deferred on this inside the draft plugin, so that this waits for draft to finish saving
+            $submitButton.stallSubmit({
+                event: 'click'
+            });
+
+            // Init draft plugin
+            $createForm.draft({
+                inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search', '#news-topics'],
+                textareas: ['body', 'blurb'],
+                attachzones: ['attachment'],
+                staller: $submitButton,
+                onSaveSuccess: function (response) {
+                    // Update the form actions
+                    $createForm.attr('action', response.updateRoute);
+                    if (response.approveRoute) {
+                        $createForm.attr('data-action-submit', response.approveRoute);
+                    } else {
+                        $createForm.attr('data-action-submit', response.submitRoute);
+                    }
+
+                    // Update the window history
+                    window.history.pushState({}, null, response.url);
+
+                    // Update the Vue property for requiring moderation
+                    formActionsApp.approveRoute = response.approveRoute;
+                    formActionsApp.articleId = response.articleId;
+
+                    // Enable the submit buttons (this is just for the case where you're creating and they are disabled until an initial draft is saved)
+                    $submitButtons.prop('disabled', false);
+                }
+            });
+        {% endif %}
 
         /**
          * Submitting the create/update form
@@ -468,9 +501,6 @@
          * @param {string} action - 'preview' or 'submit'
          */
         function submitForm(action) {
-            // Disable both submits
-            $submitButtons.prop('disabled', true);
-
             // Update the form's action based on what action was clicked
             $createForm.attr('action', $createForm.data('action-' + action));
 

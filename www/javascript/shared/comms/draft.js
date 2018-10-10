@@ -24,10 +24,6 @@
          */
         initRegistry();
 
-        /* Set up custom event
-         */
-        $(config.element).on('draft', save);
-
         /* Watch the content for changes
          */
         initAutosave();
@@ -67,7 +63,10 @@
                  * Called on successful save.
                  * @param {bool} wasAutoSave
                  */
-                onSaveSuccess: $.noop
+                onSaveSuccess: $.noop,
+
+                // The infamous stallSubmit
+                staller: null
             };
 
             return $.extend(defaults, options);
@@ -105,19 +104,32 @@
          */
         function initAutosave() {
             var draftSave;
+            var deferred;
 
             $(document).on('change keyup', config.inputs, function () { // TODO: listen for changes to textareas and attachzones also
                 if (isDifferent()) {
-                    // kill any other timeout pending
+                    // kill any other timeout pending, and resolve the deferred
                     clearTimeout(draftSave);
+                    if (deferred !== undefined) {
+                        deferred.resolve();
+                    }
 
+                    // (re)set the deferred
+                    deferred = $.Deferred();
+
+                    // Set a timeout for the draft to save
                     draftSave = setTimeout(function() {
                         config.toaster.toastActivate({
                             text: 'Saving...'
                         });
 
-                        $(config.element).trigger('draft');
+                        save(deferred);
                     }, config.interval * 1000);
+
+                    // install the deferred as stalling form submit
+                    if (config.staller) {
+                        config.staller.stallSubmit(deferred);
+                    }
                 }
             });
         }
@@ -201,7 +213,7 @@
         /**
          * Actually save the data
          */
-        function save() {
+        function save(deferred) {
             var formContents = $(config.element).serializeArray();
 
             /* Special treatment because ck reasons
@@ -215,10 +227,6 @@
             /* Send draft flag
              */
             formContents.push({name: 'draft', value: true});
-
-            /* Disable inputs
-             */
-            config.activator.prop('disabled', true);
 
             /* Transact
              */
@@ -234,6 +242,8 @@
                 });
 
                 config.onSaveSuccess(responseText);
+
+                deferred.resolve();
             }).error(function (response) {
                 var temp = $.parseJSON(response.responseText);
 
