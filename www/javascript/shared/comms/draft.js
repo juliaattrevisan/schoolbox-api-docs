@@ -14,7 +14,6 @@
         options = options || {};
 
         var config = init(options, $(this));
-        var autosaveInterval;
 
         /* A registry of current values that change over time while content is created
          * Used to determine when to initiate actual save transaction
@@ -44,24 +43,19 @@
             var defaults = {
                 element: element,
 
-                /* Toaster
-                 */
+                // Toast element
                 toaster: $('#saveDraft'),
 
-                /* Save every 3 seconds by default
-                 */
+                // The grace period for after a user makes a change and when the draft save trigger (in seconds)
                 interval: 3,
 
-                /* Array of selectors which will have .val() checked for changes
-                 */
+                // Array of selectors which will have .val() checked for changes
                 inputs: [],
 
-                /* Textareas to check
-                 */
+                // CKEditors to listen for changes on
                 textareas: [],
 
-                /* Attachzones to check
-                 */
+                // Attachzones to listen for changes on
                 attachzones: [],
 
                 /* Activation element
@@ -110,15 +104,22 @@
          * Initiate an autosave - activate toast and save it
          */
         function initAutosave() {
-            autosaveInterval = setInterval(function() {
-                if (isDifferent()) {
-                    config.toaster.toastActivate({
-                        text: 'Autosaving'
-                    });
+            var draftSave;
 
-                    $(config.element).trigger('draft');
+            $(document).on('change keyup', config.inputs, function () { // TODO: listen for changes to textareas and attachzones also
+                if (isDifferent()) {
+                    // kill any other timeout pending
+                    clearTimeout(draftSave);
+
+                    draftSave = setTimeout(function() {
+                        config.toaster.toastActivate({
+                            text: 'Saving...'
+                        });
+
+                        $(config.element).trigger('draft');
+                    }, config.interval * 1000);
                 }
-            }, config.interval * 1000);
+            });
         }
 
         /**
@@ -219,10 +220,6 @@
              */
             config.activator.prop('disabled', true);
 
-            /* Clear the autosave interval; it reactivates after drafts transaction occurs
-             */
-            clearInterval(autosaveInterval);
-
             /* Transact
              */
             $.ajax({
@@ -230,18 +227,9 @@
                 url: config.element.attr('action'),
                 data: formContents,
                 dataType: 'json'
-            }).done(function () {
-
-                /* Re-init the autosave interval
-                 */
-                initAutosave();
-
-                /* Re-enable submit
-                 */
-                config.activator.prop('disabled', false);
             }).success(function (responseText) {
                 config.toaster.toastTimeout({
-                    text: 'Draft Saved',
+                    text: 'Saved',
                     css: 'success'
                 });
 
