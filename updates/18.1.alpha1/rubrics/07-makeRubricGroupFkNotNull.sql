@@ -1,7 +1,9 @@
--- First, don't even try to import rubric criteria which don't have a group
-DELETE FROM rubric_criterion WHERE rubric_group_id IS NULL;
-
--- Then, set rubric_criterion.rubric_group_id to non-nullable
+/**
+ * Set rubric_criterion.rubric_group_id to non-nullable.
+ *
+ * If this raises an error, then there are some rubric_criterion rows without a rubric_group.
+ * This is an error, and must be reported.
+ */
 ALTER TABLE rubric_criterion
     DROP FOREIGN KEY `rubric_criterion_rubric_group`;
 ALTER TABLE rubric_criterion
