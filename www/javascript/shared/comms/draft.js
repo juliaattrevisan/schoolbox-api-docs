@@ -15,17 +15,7 @@
 
         var config = init(options, $(this));
 
-        /* A registry of current values that change over time while content is created
-         * Used to determine when to initiate actual save transaction
-         */
-        var registry = {};
-
-        /* Set initial state
-         */
-        initRegistry();
-
-        /* Watch the content for changes
-         */
+        // Watch the content for changes
         initAutosave();
 
         /**
@@ -73,33 +63,6 @@
         }
 
         /**
-         * Remember what the initial values were at the start
-         */
-        function initRegistry() {
-            var i;
-
-            for (i = 0; i < config.inputs.length; i++) {
-                registry[config.inputs[i]] = $(config.inputs[i]).val();
-            }
-
-            for (i = 0; i < config.textareas.length; i++) {
-                registry[config.textareas[i]] = CKEDITOR.instances[config.textareas[i]].getData();
-            }
-
-            /* Files that were in the attachzones initially
-             */
-            for (i = 0; i < config.attachzones.length; i++) {
-                registry[config.attachzones[i]] = [];
-
-                $.each($(config.attachzones[i]), function(index, element) {
-                    if ($(element).val() !== '') {
-                        registry[config.attachzones[i]].push($(element).val());
-                    }
-                });
-            }
-        }
-
-        /**
          * Initiate an autosave - activate toast and save it
          */
         function initAutosave() {
@@ -124,109 +87,31 @@
 
             /**
              * The common function triggered on the listeners above:
-             * Checks if anything is different- if so- it will reset the draft timeout and deferreds and line up another draft save
+             * It will reset the draft timeout and deferreds and line up another draft save
              *
              * I've deliberately put this inside the scope of initAutosave in order to directly modify the draftTimeout & deferred vars
              * Alternatively I could've returned the vars in this function and reassigned them above.
              */
             function checkForChanges() {
-                if (isDifferent()) {
-                    // kill any other timeout pending, and resolve the deferred
-                    clearTimeout(draftTimeout);
-                    if (deferred !== undefined) {
-                        deferred.resolve();
-                    }
+                // kill any other timeout pending, and resolve the deferred
+                clearTimeout(draftTimeout);
+                if (deferred !== undefined) {
+                    deferred.resolve();
+                }
 
-                    // (re)set the deferred
-                    deferred = $.Deferred();
+                // (re)set the deferred
+                deferred = $.Deferred();
 
-                    // Set a timeout for the draft to save
-                    draftTimeout = setTimeout(function() {
-                        save(deferred);
-                    }, config.interval * 1000);
+                // Set a timeout for the draft to save
+                draftTimeout = setTimeout(function() {
+                    save(deferred);
+                }, config.interval * 1000);
 
-                    // install the deferred as stalling form submit
-                    if (config.staller) {
-                        config.staller.stallSubmit(deferred);
-                    }
+                // install the deferred as stalling form submit
+                if (config.staller) {
+                    config.staller.stallSubmit(deferred);
                 }
             }
-        }
-
-        /**
-         * Find out if any textareas changed
-         * Update registry of known values
-         *
-         * @returns {boolean}
-         */
-        function isDifferent() {
-            var contentChanged = false;
-            var key;
-            var current;
-            var i, j;
-
-            /* Check inputs
-             */
-            for (i = 0; i < config.inputs.length; i++) {
-                key = config.inputs[i];
-                current = $(key).val();
-
-                if (
-                    (_.isArray(registry[key]) && !_.isEqual(current.sort(), registry[key].sort())) ||
-                    (!_.isArray(registry[key]) && registry[key] !== current)
-                ) {
-                    contentChanged = true;
-                    registry[key] = current;
-                }
-            }
-
-            /* Check textareas
-             */
-            for (i = 0; i < config.textareas.length; i++) {
-                key = config.textareas[i];
-
-                current = CKEDITOR.instances[key].getData();
-
-                if (registry[key] !== current) {
-                    contentChanged = true;
-                    registry[key] = current;
-                }
-            }
-
-            /* Check attachzones
-             */
-            for (i = 0; i < config.attachzones.length; i++) {
-                key = config.attachzones[i];
-
-                current = config.element.find('input[name="'+config.attachzones[i]+'[]"]');
-
-                var currentFiles = [];
-
-                /* Check whether there's a different file in the attachzone than the ones we knew
-                 */
-                for (j = 0; j < current.length; j++) {
-                    currentFiles.push($(current[j]).val());
-
-                    if (registry[key].indexOf($(current[j]).val()) === -1) {
-                        contentChanged = true;
-                    }
-                }
-
-                /* If a file has been removed from the list, contentChanged might still be false
-                 * because the current list of files is a subset of what was initially there
-                 * Now check the length to ensure that a) no new files were added and b) no existing
-                 * files were removed
-                 */
-                if (currentFiles.length !== registry[key].length) {
-                    contentChanged = true;
-                }
-
-                /* Remember the current state of things
-                 */
-                registry[key] = currentFiles;
-            }
-
-            return contentChanged;
         }
 
         /**
