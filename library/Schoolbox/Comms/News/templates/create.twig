@@ -434,9 +434,9 @@
          */
         $submitButton.click(function() {
             if ($createForm.valid()) {
-                // Disable both submits
-                // TODO: can't quite do this yet, this stops the click event from being able to happen eventually
-                // $submitButtons.prop('disabled', true);
+                // Make submit buttons readonly
+                // Can't use disabled because then the click event below won't work
+                $submitButtons.attr('readonly', 'readonly');
 
                 // Update the text on the button clicked
                 $(this).text('Working...');
