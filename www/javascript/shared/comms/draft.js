@@ -103,13 +103,36 @@
          * Initiate an autosave - activate toast and save it
          */
         function initAutosave() {
-            var draftSave;
+            var draftTimeout;
             var deferred;
 
-            $(document).on('change keyup', config.inputs, function () { // TODO: listen for changes to textareas and attachzones also
+            // Listen for changes on inputs
+            $(document).on('change keyup', config.inputs, function () {
+                checkForChanges(draftTimeout, deferred);
+            });
+
+            // Listen for changes on CKEditors
+            for (i = 0; i < config.textareas.length; i++) {
+                var key = config.textareas[i];
+                CKEDITOR.instances[key].on('change', function() { // CKE seems to trigger change on keyup so no need to listen for that here
+                    checkForChanges(draftTimeout, deferred);
+                });
+            }
+
+            // TODO: Listen for changes on attachzones
+
+
+            /**
+             * The common function triggered on the listeners above:
+             * Checks if anything is different- if so- it will reset the draft timeout and deferreds and line up another draft save
+             *
+             * I've deliberately put this inside the scope of initAutosave in order to directly modify the draftTimeout & deferred vars
+             * Alternatively I could've returned the vars in this function and reassigned them above.
+             */
+            function checkForChanges() {
                 if (isDifferent()) {
                     // kill any other timeout pending, and resolve the deferred
-                    clearTimeout(draftSave);
+                    clearTimeout(draftTimeout);
                     if (deferred !== undefined) {
                         deferred.resolve();
                     }
@@ -118,11 +141,7 @@
                     deferred = $.Deferred();
 
                     // Set a timeout for the draft to save
-                    draftSave = setTimeout(function() {
-                        config.toaster.toastActivate({
-                            text: 'Saving...'
-                        });
-
+                    draftTimeout = setTimeout(function() {
                         save(deferred);
                     }, config.interval * 1000);
 
@@ -131,7 +150,7 @@
                         config.staller.stallSubmit(deferred);
                     }
                 }
-            });
+            }
         }
 
         /**
@@ -214,6 +233,11 @@
          * Actually save the data
          */
         function save(deferred) {
+            // Init toast
+            config.toaster.toastActivate({
+                text: 'Saving...'
+            });
+
             var formContents = $(config.element).serializeArray();
 
             /* Special treatment because ck reasons
@@ -243,6 +267,7 @@
 
                 config.onSaveSuccess(responseText);
 
+                // Resolve the deferred for stallSubmit
                 deferred.resolve();
             }).error(function (response) {
                 var temp = $.parseJSON(response.responseText);
