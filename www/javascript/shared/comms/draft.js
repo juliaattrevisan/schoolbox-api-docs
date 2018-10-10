@@ -63,7 +63,7 @@
         }
 
         /**
-         * Initiate an autosave - activate toast and save it
+         * Init listeners for changes, firing save() when there's changes (with a timeout)
          */
         function initAutosave() {
             var draftTimeout;
@@ -115,7 +115,9 @@
         }
 
         /**
-         * Actually save the data
+         * Save the data via ajax, showing a toast for the user
+         *
+         * @param {jQuery.Deferred} deferred - a deferred object to resolve on successful save
          */
         function save(deferred) {
             // Init toast
