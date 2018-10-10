@@ -432,7 +432,7 @@
          * Listen for a click on the submit button
          * This bypasses the staller because the event is assigned directly to the element (rather than doing $(document).on)
          */
-        $submitButton.click(function() {
+        $submitButtons.click(function() {
             if ($createForm.valid()) {
                 // Make submit buttons readonly
                 // Can't use disabled because then the click event below won't work
@@ -447,7 +447,7 @@
          * Listen for a click on the submit button
          * This is the event that will be stalled (if isAutosavable)
          */
-        $(document).on('click', '#news-submit', function (event) {
+        $createForm.on('click', '#news-submit', function (event) {
             event.preventDefault();
 
             if (!$createForm.valid()) {
