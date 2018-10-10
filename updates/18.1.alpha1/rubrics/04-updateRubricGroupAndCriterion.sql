@@ -13,7 +13,7 @@ SELECT
 FROM `rubric_criterion`
 WHERE `rubric_group_id` IS NULL
 GROUP BY `grouping`, `parent_id`, `parent_type`
-ORDER BY `parent_type`, `parent_id`, `grouping`
+ORDER BY `parent_type`, `parent_id`, `grouping`;
 
 -- Associate criteria with their group
 UPDATE rubric_criterion rc
