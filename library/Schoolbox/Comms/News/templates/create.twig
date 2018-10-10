@@ -470,7 +470,7 @@
             $createForm.draft({
                 inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search', '#news-topics'],
                 textareas: ['body', 'blurb'],
-                attachzones: ['attachment'],
+                attachzones: ['#{{ featureImageZone.id }}-zone'],
                 staller: $submitButton,
                 onSaveSuccess: function (response) {
                     // Update the form actions

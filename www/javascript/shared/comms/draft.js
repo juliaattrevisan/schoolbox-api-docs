@@ -70,19 +70,23 @@
             var deferred;
 
             // Listen for changes on inputs
-            $(document).on('change keyup', config.inputs, function () {
-                checkForChanges(draftTimeout, deferred);
+            config.element.on('change keyup', config.inputs.join(', '), function (event) {
+                checkForChanges();
             });
 
             // Listen for changes on CKEditors
+            var i;
             for (i = 0; i < config.textareas.length; i++) {
                 var key = config.textareas[i];
-                CKEDITOR.instances[key].on('change', function() { // CKE seems to trigger change on keyup so no need to listen for that here
-                    checkForChanges(draftTimeout, deferred);
+                CKEDITOR.instances[key].on('change', function () { // CKE seems to trigger change on keyup so no need to listen for that here
+                    checkForChanges();
                 });
             }
 
-            // TODO: Listen for changes on attachzones
+            // Listen for changes to attachzones
+            config.element.on('success.attachzone removedfile.attachzone', config.attachzones.join(', '), function() {
+                checkForChanges();
+            });
 
 
             /**
