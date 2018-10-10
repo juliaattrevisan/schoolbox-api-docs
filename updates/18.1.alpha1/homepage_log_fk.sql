@@ -11,14 +11,14 @@ LEFT JOIN folder ON folder.id = homepage_log.folder_id
 WHERE folder.id IS NULL;
 
 
-ALTER TABLE `schoolbox`.`homepage_log`
+ALTER TABLE `homepage_log`
   ADD CONSTRAINT `fk_homepage_log_user_id`
 FOREIGN KEY (`user_id`)
-REFERENCES `schoolbox`.`user` (`id`)
+REFERENCES `user` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_homepage_log_folder_id`
 FOREIGN KEY (`folder_id`)
-REFERENCES `schoolbox`.`folder` (`id`)
+REFERENCES `folder` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
