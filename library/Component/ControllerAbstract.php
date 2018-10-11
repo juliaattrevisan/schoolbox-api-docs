@@ -594,6 +594,7 @@ abstract class Component_ControllerAbstract
         $page->parse('config_element_block', 'config_element', true);
     }
 
+
     /**
      * Renders a Twig component.
      *
@@ -601,15 +602,18 @@ abstract class Component_ControllerAbstract
      *
      * @param string $templateHandle Some PHPLib BS which I don't understand. Just pass $templateHandle from
      *                               $this->renderTemplate($templateHandle).
-     * @param string $twigTemplate The path to a Twig template.
-     * @param array $twigData Data to pass into the Twig template.
-     * @param bool $renderHeader Set to false if you don't want the PHPLib controlled header to show.
-     * @param bool $renderConfig Set to false if you don't want the PHPLib controlled configuration to show.
+     * @param string $twigTemplate   The path to a Twig template.
+     * @param array  $twigData       Data to pass into the Twig template.
+     * @param bool   $renderHeader   Set to false if you don't want the PHPLib controlled header to show.
+     * @param bool   $renderConfig   Set to false if you don't want the PHPLib controlled configuration to show.
      *                               (Dashboard components show the collapse controls if this is true.)
-     * @param bool $contentRaw This is a flag that lets you dump the twig raw rather than using standard header block
+     * @param bool   $contentRaw     This is a flag that lets you dump the twig raw rather than using standard header block
      * @param bool   $renderInIsland Set to false if you need to render directly into ocean
      * @return bool Was the template renderable?
-     * @throws Exception
+     * @throws Twig_Error_Loader  When the template cannot be found
+     * @throws Twig_Error_Syntax  When an error occurred during compilation
+     * @throws Twig_Error_Runtime When an error occurred during rendering
+     * @throws RuntimeException   When Twig renderer not found in this Sitepage object's dependency injector.
      */
     protected function renderTwigTemplate(
         $templateHandle,
@@ -651,19 +655,7 @@ abstract class Component_ControllerAbstract
         }
 
         // Render the twig template
-
-        try {
-            $content = $this->sitepage->getTwig()->render($twigTemplate, $twigData);
-        } catch (\Exception $e) {
-            // Are we in debug mode?
-            if ($this->configMapper->get('debug_mode')) {
-                // Ka-boom!
-                throw $e;
-            } else {
-                // Silently discard erroneous component and continue with rest of page
-                return false;
-            }
-        }
+        $content = $this->sitepage->getTwig()->render($twigTemplate, $twigData);
 
         if ($renderInIsland) {
             // If we are rending raw we want to dump the TWIG content into the header rather than COMPONENT_CONTENT block
