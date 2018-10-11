@@ -155,16 +155,18 @@ class Factory
                     $indicatorUsage->getDescriptors()[$levelSequence] =
                         (new Descriptor())
                             ->setId($descriptorId)
-                            ->setDescription($descriptorText)
-                            ->setMaxValue('' !== $descriptorValue ? (float)$descriptorValue : null);
-                }
+                            ->setDescription($descriptorText);
 
-                // Validate descriptor
-                if ($validate) {
-                    $descriptorSpec = new ValidDescriptor($usesMarkRange);
-                    if (! $descriptorSpec->isSatisfiedBy($indicatorUsage->getDescriptors()[$levelSequence]) ) {
-                        throw new \InvalidArgumentException("disable Mark Range to use decimal places in descriptor point values");
+                    // Validate descriptor
+                    if ($validate) {
+                        $descriptorSpec = new ValidDescriptor($usesMarkRange);
+                        if (! $descriptorSpec->isSatisfiedBy($descriptorValue) ) {
+                            throw new \InvalidArgumentException("disable Mark Range to use decimal places in descriptor point values");
+                        }
                     }
+
+                    // Only set the descriptor's value if it was valid
+                    $indicatorUsage->getDescriptors()[$levelSequence]->setMaxValue('' !== $descriptorValue ? (float)$descriptorValue : null);
                 }
 
             }

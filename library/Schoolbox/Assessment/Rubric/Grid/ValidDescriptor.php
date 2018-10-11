@@ -19,27 +19,26 @@ class ValidDescriptor extends \Alaress\Specification\Base
     }
 
     /**
-     * @param Descriptor $descriptor
+     * @param string $descriptorValue
      * @return bool
      */
-    public function isSatisfiedBy($descriptor) : bool
+    public function isSatisfiedBy($descriptorValue) : bool
     {
-        // Null descriptors are ok.
-        if (null === $descriptor) {
+        // Null descriptor points are ok.
+        if ('' === $descriptorValue) {
             return true;
         }
-        $isADescriptor = $descriptor instanceof Descriptor;
         $usesMarkRange = $this->usesMarkRange;
-        $hasDecimals = $this->hasDecimals($descriptor);
-        return $isADescriptor && !($usesMarkRange && $hasDecimals);
+        $hasDecimals = $this->hasDecimals($descriptorValue);
+        return is_numeric($descriptorValue) && (float)$descriptorValue >= 0 && !($usesMarkRange && $hasDecimals);
     }
 
     /**
-     * @param Descriptor $descriptor
+     * @param string $descriptorValue
      * @return bool
      */
-    private function hasDecimals(Descriptor $descriptor) : bool
+    private function hasDecimals(string $descriptorValue) : bool
     {
-        return preg_match('/\.\d+$/', $descriptor->getMaxValue()) === 1;
+        return preg_match('/\.\d+$/', $descriptorValue) === 1;
     }
 }
