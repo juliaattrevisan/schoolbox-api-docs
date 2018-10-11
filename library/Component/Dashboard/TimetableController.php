@@ -180,6 +180,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         try {
             return $this->getFolderMapper()->findByCode($subjectCode)->getName();
         } catch (MapperException $e) {
+            // Is ok to ignore. $subjectCode is coming from SIS and may not be present in Schoolbox.
             return '';
         }
     }
