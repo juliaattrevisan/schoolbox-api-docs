@@ -69,7 +69,7 @@ class ValidCapabilityMarkTest extends TestCase
         yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkNull, true];
 
         /* Total Mark type */
-        // The mark needs to respect the cap max
+        // The mark needs to respect the cap max; 0 is permitted
         yield [$capabilityMax1, $markSchemeTotalMark, $capabilityMark1, false];
         yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMark1, true];
         yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMark13, false];
