@@ -22,10 +22,11 @@ class Factory
      *
      * @param Grid  $grid A grid (which already contains an assessment and rowset)
      * @param array $postData
+     * @param bool $validate Whether to run the backend validation on this data - should be FALSE for CSV import
      * @return Grid
      * @throws \InvalidArgumentException
      */
-    public function buildFromPostData(Grid $grid, array $postData): Grid
+    public function buildFromPostData(Grid $grid, array $postData, bool $validate): Grid
     {
         // we're only going to take the first one... this could be converted to foreach easily enough
         $rubricData   = reset($postData);
