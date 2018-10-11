@@ -649,7 +649,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         // This is neither a PRE or POST action - it is the action.
         /** @var AssessmentMapper $assessmentMapper */
         $assessmentMapper = $this->getJoinMapper('assessmentModel');
-        $assessmentMapper->softDelete($object->getAssessmentModel());
+        foreach ($collection as $model) {
+            $assessmentMapper->softDelete($model->getAssessmentModel());
+        }
 
         // Trigger the post-trigger
         foreach ($collection as $model) {
