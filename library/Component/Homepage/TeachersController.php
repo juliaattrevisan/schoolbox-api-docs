@@ -121,6 +121,10 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                     foreach ($listSyns as $synid) {
                         try {
                             $teacher = $userMapper->findByExternalId($synid, Role::STAFF);
+                        } catch (\Schoolbox\Mapper\Exception $e) {
+                            // Ok to silently ignore. Teacher exists in SIS by not in SB
+                            continue;
+                        }
 
                             $this->setVar([
                                 'PERSON_UID'         => $teacher->getId(),
@@ -159,12 +163,6 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                             /* Clear children after parsing out the parent
                              */
                             $this->setVar('photo_block', '');
-
-                        } catch (\Schoolbox\Mapper\Exception $e) {
-
-                            /* $teacher not found, nothing to show
-                             */
-                        }
                     }
                 }
             }
