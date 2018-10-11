@@ -153,17 +153,8 @@ class Factory
         $this->setGradingScheme(trim($post['gradingScheme']));
         $this->setUseRubric(trim($post['useRubric']));
 
-        if (trim($post['markPerCapability']) === 'on') {
-            $this->setMarkPerCapability(true);
-        } else {
-            $this->setMarkPerCapability(false);
-        }
-
-        if (trim($post['useMarkRange']) === 'on') {
-            $this->setUseMarkRange(true);
-        } else {
-            $this->setUseMarkRange(false);
-        }
+        $this->setMarkPerCapability(trim($post['markPerCapability']) === 'on');
+        $this->setUseMarkRange(trim($post['useMarkRange']) === 'on');
 
         $this->setMaxMark(trim($post['maxMark']));
 
