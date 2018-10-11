@@ -161,7 +161,7 @@ class Factory
                     if ($validate) {
                         $descriptorSpec = new ValidDescriptor($usesMarkRange);
                         if (! $descriptorSpec->isSatisfiedBy($descriptorValue) ) {
-                            throw new \InvalidArgumentException("disable Mark Range to use decimal places in descriptor point values");
+                            throw new \InvalidArgumentException("use positive numbers only, and disable Mark Range to use decimal places in descriptor point values");
                         }
                     }
 
