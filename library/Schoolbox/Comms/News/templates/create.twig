@@ -413,27 +413,17 @@
         // Init validation
         $createForm.alaressValidate();
 
-        /*
-         * Listen for a click on the preview button
+        /**
+         * Listen for a click on one of the submit buttons
+         * This bypasses the staller because the event is assigned directly to the element (rather than doing $(document).on)
+         * So this will be called first, then one of the two event below will fire once stallSubmit resolves
          */
-        $('#news-preview').click(function(event) {
-            event.preventDefault();
-
+        $submitButtons.click(function() {
             if (!$createForm.valid()) {
                 // Scroll to error
                 // TODO: this doesn't scroll to the audience selector. we'll need to rebase our fork of selectize before we can fix this
                 $createForm.data('validator').errorList[0].element.focus();
             } else {
-                submitForm('preview');
-            }
-        });
-
-        /**
-         * Listen for a click on the submit button
-         * This bypasses the staller because the event is assigned directly to the element (rather than doing $(document).on)
-         */
-        $submitButtons.click(function() {
-            if ($createForm.valid()) {
                 // Make submit buttons readonly
                 // Can't use disabled because then the click event below won't work
                 $submitButtons.attr('readonly', 'readonly');
@@ -449,14 +439,15 @@
          */
         $createForm.on('click', '#news-submit', function (event) {
             event.preventDefault();
+            submitForm('submit');
+        });
 
-            if (!$createForm.valid()) {
-                // Scroll to error
-                // TODO: this doesn't scroll to the audience selector. we'll need to rebase our fork of selectize before we can fix this
-                $createForm.data('validator').errorList[0].element.focus();
-            } else {
-                submitForm('submit');
-            }
+        /*
+         * Listen for a click on the preview button
+         */
+        $('#news-preview').click(function(event) {
+            event.preventDefault();
+            submitForm('preview');
         });
 
         {% if isAutoSavable %}
