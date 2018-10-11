@@ -13,7 +13,11 @@ use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
+use Alaress\Authorizer\Failure\Unauthorized;
+
 
 class Controller extends Base
 {
@@ -43,6 +47,11 @@ class Controller extends Base
     private $statisticsCumulativeMapper;
 
     /**
+     * @var Access
+     */
+    private $access;
+
+    /**
      * @var IConnector
      */
     private $databaseInternal;
@@ -61,6 +70,7 @@ class Controller extends Base
      * @param News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper
      * @param IConnector                        $databaseInternal
      * @param ArticleResolver                   $articleResolver
+     * @param Access                            $accessMapper
      */
     public function __construct(
         News\Mapper $newsMapper,
@@ -69,7 +79,8 @@ class Controller extends Base
         News\Statistics\Mapper $statisticsMapper,
         News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
-        ArticleResolver $articleResolver
+        ArticleResolver $articleResolver,
+        Access $access
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -78,6 +89,7 @@ class Controller extends Base
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
         $this->databaseInternal           = $databaseInternal;
         $this->articleResolver            = $articleResolver;
+        $this->access                     = $access;
     }
 
 
@@ -104,42 +116,11 @@ class Controller extends Base
      */
     public function getFeed(User $user, ?Folder\Model $folder)
     {
-
-        /* This is only used for paginating the article set but the rss feed has no pagination
-         */
-        $urlPrefix = '';
-
         /* Manufacture params
-         * Compact Mode, Page Number, Hide Paginator aren't used here
          */
         $args = [];
 
-        /* If a topic slug exists, use it
-         * Otherwise, get articles across all topics
-         */
-        $args[News\Querystring::TOPIC_SLUG] = News\Mapper::TOPIC_ALL_SLUG;
-
-        $slug = $this->getRequest()->query[News\Querystring::TOPIC_SLUG];
-
-        if (\strlen($slug)) {
-            $args[News\Querystring::TOPIC_SLUG] = $slug;
-        }
-
-        /* No limit to the number of articles
-         */
-        $args[News\Querystring::LIMIT] = 0;
-
-        /* If a folder was specified, get the feed for that folder
-         */
-        if (null !== $folder) {
-            $args[News\Querystring::FOLDER] = $folder->getId();
-        }
-
-        $params = new News\Querystring($args);
-
-        /* Get all the articles across all topics
-         */
-        $topicData = (new News\Lists(
+        $newsList = (new News\Lists(
             (int)$this->getConfigLoader()->get('search_type_limit'),
             $this->newsMapper,
             $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
@@ -149,15 +130,54 @@ class Controller extends Base
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
             $this->articleResolver
-        ))->findForTopic(
-            $urlPrefix,
-            $params,
-            $user,
-            $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]),
-            null,
-            null
-        );
+        ));
 
+        /* If a folder was specified, get the feed for that folder
+         */
+        if (null !== $folder) {
+
+            // Look for this homepage's permission
+            $permission = $this->access->getFolderAccess($user, $folder->getId());
+            if ($permission < UserAccess::ACCESS_READ) {
+                throw new Unauthorized();
+            }
+
+            $args[News\Querystring::FOLDER] = $folder->getId();
+            $params = new News\Querystring($args);
+
+            /* Get all the articles for the homepage
+             */
+            $topicData = $newsList->findArticlesForHomepage(
+                $params,
+                $user
+            );
+        }
+        else {
+
+            /* If a topic slug exists, use it
+             * Otherwise, get articles across all topics
+             */
+            $args[News\Querystring::TOPIC_SLUG] = News\Mapper::TOPIC_ALL_SLUG;
+
+            $slug = $this->getRequest()->query[News\Querystring::TOPIC_SLUG];
+
+            if (\strlen($slug)) {
+                $args[News\Querystring::TOPIC_SLUG] = $slug;
+            }
+            $params = new News\Querystring($args);
+
+            /* Get all the articles across all topics
+             */
+            $topicData = $newsList->findForTopic(
+                '',
+                $params,
+                $user,
+                $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]),
+                null,
+                null
+            );
+
+        }
 
         /* I haven't seen an outputter for xml in Web/Output
          */

@@ -11,6 +11,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
@@ -72,7 +73,7 @@ class Module extends BaseModule
             }
         }
         catch (MapperException $e) {
-            throw new NotFound();
+            throw new Unauthorized();
         }
 
         return [
