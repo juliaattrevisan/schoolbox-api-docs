@@ -148,6 +148,10 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                     try {
                         $user = $userMapper->findByExternalId($currentStudent['synergy_id']);
+                    } catch (MapperException $e) {
+                        // Ok to silently ignore. This just means the SIS has students who are not in SB
+                        continue;
+                    }
 
                         /* Accumulate this for a giant parent-based bcc
                             */
@@ -204,10 +208,6 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                         }
 
                         $this->parse('person_block', 'person', true);
-
-                    } catch (MapperException $e) {
-                        //noop
-                    }
                 }
 
                 /* Student bulk email
