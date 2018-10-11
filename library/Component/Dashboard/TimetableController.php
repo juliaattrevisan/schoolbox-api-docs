@@ -201,6 +201,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             }
             return '';
         } catch (MapperException $e) {
+            // We're ignoring this as $subjectCode is being supplied from the SIS and it simply means this SIS class is not
+            // present in Schoolbox
             return '';
         }
     }
