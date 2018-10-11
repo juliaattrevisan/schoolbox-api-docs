@@ -594,7 +594,6 @@ abstract class Component_ControllerAbstract
         $page->parse('config_element_block', 'config_element', true);
     }
 
-
     /**
      * Renders a Twig component.
      *
