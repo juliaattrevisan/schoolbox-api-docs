@@ -9,8 +9,9 @@
 
 {% set markType = rubricGrid.assessment.markScheme.generateContext %}
 
+
 {% if showGroupTotal and markType.mode != "none" %}
-    {% set percentageMark     = capabilityMark.value * (100 / capabilityMaxSum) %}
+    {% set percentageMark     = (capabilityMark.value * (100 / capabilityMaxSum)) | round(2) %}
     {% set letterGradeBracket = false %}
     {% set letterGradeValue   = '' %}
 
@@ -83,7 +84,6 @@
                        type="tel"
                        name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
                        value="{{ percentageMark }}"/> %
-
             {% endif %}
 
             {# TODO why is markSchemeName null when student is self-assessing (note: will be addressed in SA-7242) #}
@@ -103,6 +103,10 @@
                     {% endif %}
                     </span> from Descriptors</button>
             {% endif %}
+            {% if markType.mode == 'letter' or markType.mode == 'percent' %}
+                <p>This {{ locale.rubricGroup }} contributes {{ (capabilityMaxValue / rubricGrid.calculateMaxValueFromCapabilities * 100) | round(2) }}% to the total mark</p>
+            {% endif %}
+
         </span>
 
         {# Self-Assessment #}
