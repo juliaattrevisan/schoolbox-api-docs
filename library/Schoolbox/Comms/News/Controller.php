@@ -226,6 +226,31 @@ class Controller extends Base
 
 
     /**
+     * Redirects to `getCreate`, with a predefined audience brick for the given
+     * folder.
+     *
+     * Implemented so that it can be permissioned uniquely to creating news.
+     *
+     * @api   GET /news/create/folder/{folderId:\d+}
+     * @level 18.1
+     *
+     * @param int $folderId
+     * @throws RouteNotFound
+     */
+    public function getCreateInFolder(int $folderId): void
+    {
+        // Redirect somewhere
+        $params = [
+            'groupId' => $folderId,
+            'type'    => 'folder',
+        ];
+        $this->response->redirect->to(
+            $this->router->generate('commsNews.getCreate') . '?' . http_build_query($params)
+        );
+    }
+
+
+    /**
      * Create a news article
      *
      * @api   POST /news/create
