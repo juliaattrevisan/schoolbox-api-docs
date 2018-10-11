@@ -4,6 +4,7 @@
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid\Test;
 
@@ -22,14 +23,14 @@ class ValidDescriptorRowTest extends TestCase
         $descriptorNullPoints = new Descriptor();
 
         // We don't have to worry about nonsensical desc values in here, cause ValidDescriptor already caught it
-        $descriptor0 = (new Descriptor())->setMaxValue("0");
-        $descriptor1 = (new Descriptor())->setMaxValue("1");
-        $descriptor2point75 = (new Descriptor())->setMaxValue("2.75");
-        $descriptor3= (new Descriptor())->setMaxValue("3");
-        $descriptor4point5 = (new Descriptor())->setMaxValue("4.5");
-        $descriptor5 = (new Descriptor())->setMaxValue("5");
-        $descriptor6 = (new Descriptor())->setMaxValue("6");
-        $descriptor7 = (new Descriptor())->setMaxValue("7");
+        $descriptor0 = (new Descriptor())->setMaxValue(0.0);
+        $descriptor1 = (new Descriptor())->setMaxValue(1.0);
+        $descriptor2point75 = (new Descriptor())->setMaxValue(2.75);
+        $descriptor3= (new Descriptor())->setMaxValue(3.0);
+        $descriptor4point5 = (new Descriptor())->setMaxValue(4.5);
+        $descriptor5 = (new Descriptor())->setMaxValue(5.0);
+        $descriptor6 = (new Descriptor())->setMaxValue(6.0);
+        $descriptor7 = (new Descriptor())->setMaxValue(7.0);
 
         /* Monotonic descriptor rows */
         $descriptorRowMonotonic1 = new Collection();
