@@ -61,7 +61,7 @@ class ValidDescriptorRow extends \Alaress\Specification\Base
                 $diff = $val - $prevVal;
 
                 // No increase/decrease ?
-                if(0 === $diff){
+                if(0.0 === $diff){
                     return false;
                 }
 
