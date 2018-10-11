@@ -84,6 +84,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
             try {
                 $this->defaultVideo = $videoResourceMapper->findByFileId($this->getConfig('video'));
             } catch (\Schoolbox\Mapper\Exception $e) {
+                // Ok to ignore. The video referenced by config no longer exists
                 $this->defaultVideo = $this->outputList->first();
             }
         } else {
