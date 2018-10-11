@@ -67,7 +67,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         $folder = $this->getSource();
 
         // Ensure this CourseBuilder component is being placed on a Folder which has a UnitSpec
-        if(!$folder->getUnitSpecification() instanceof UnitSpecification || !$folder->getUnitSpecification()->getId()){
+        if(!$folder->getUnitSpecification() instanceof UnitSpecification){
             return $this->renderNotAUnitSpecification($templateHandle);
         }
 
