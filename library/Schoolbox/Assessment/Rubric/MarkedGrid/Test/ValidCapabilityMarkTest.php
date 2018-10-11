@@ -46,7 +46,7 @@ class ValidCapabilityMarkTest extends TestCase
         $capabilityMark6 = "99";
         $capabilityMark7 = "24.6";
         $capabilityMark8 = "87.67";
-        $capabilityMark9 = "0";
+        $capabilityMark9 = "0.01";
         $capabilityMark10 = "13";
         $capabilityMark11 = "45.3";
         $capabilityMark12 = "100.01";
