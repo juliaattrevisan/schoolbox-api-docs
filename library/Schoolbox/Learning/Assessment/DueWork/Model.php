@@ -725,7 +725,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * @param boolean $markPerCapability
      * @return $this
      */
-    public function setMarkPerCapability($markPerCapability)
+    public function setMarkPerCapability(bool $markPerCapability)
     {
         $this->markPerCapability = $markPerCapability;
         return $this;
