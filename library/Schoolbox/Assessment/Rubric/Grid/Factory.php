@@ -87,11 +87,14 @@ class Factory
 
             // Validate capability max value
             $capabilityMaxValue = isset($capability['maxValue']) ? (float)$capability['maxValue'] : null;
-            $capabilityMaxSpec = new ValidCapabilityMax($markPerCap);
-            if (!$capabilityMaxSpec->isSatisfiedBy($capabilityMaxValue)) {
-                throw new \InvalidArgumentException(
-                    'provide capability maximum points that are numeric and greater than 0'
-                );
+
+            if ($validate) {
+                $capabilityMaxSpec = new ValidCapabilityMax($markPerCap);
+                if (!$capabilityMaxSpec->isSatisfiedBy($capabilityMaxValue)) {
+                    throw new \InvalidArgumentException(
+                        'provide capability maximum points that are numeric and greater than 0'
+                    );
+                }
             }
 
             $capability         = $grid->getRowSet()->retrieveCapability($capabilityId);
@@ -157,16 +160,21 @@ class Factory
                 }
 
                 // Validate descriptor
-                $descriptorSpec = new ValidDescriptor($usesMarkRange);
-                if (! $descriptorSpec->isSatisfiedBy($indicatorUsage->getDescriptors()[$levelSequence]) ) {
-                    throw new \InvalidArgumentException("disable Mark Range to use decimal places in descriptor point values");
+                if ($validate) {
+                    $descriptorSpec = new ValidDescriptor($usesMarkRange);
+                    if (! $descriptorSpec->isSatisfiedBy($indicatorUsage->getDescriptors()[$levelSequence]) ) {
+                        throw new \InvalidArgumentException("disable Mark Range to use decimal places in descriptor point values");
+                    }
                 }
+
             }
 
             // Validate sequence of descriptor points
-            $descriptorRowSpec = new ValidDescriptorRow($usesMarkRange);
-            if (! $descriptorRowSpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
-                throw new \InvalidArgumentException("only use descriptor values that form an ascending or descending sequence within a row");
+            if ($validate) {
+                $descriptorRowSpec = new ValidDescriptorRow($usesMarkRange);
+                if (! $descriptorRowSpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
+                    throw new \InvalidArgumentException("only use descriptor values that form an ascending or descending sequence within a row");
+                }
             }
 
             $capabilityUsage                                     = $grid->retrieveCapabilityUsage($capability);
