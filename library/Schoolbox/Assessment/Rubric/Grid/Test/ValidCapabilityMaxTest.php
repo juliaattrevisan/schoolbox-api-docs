@@ -44,14 +44,14 @@ class ValidCapabilityMaxTest extends TestCase
         yield [$hasMarkPerCap, $capabilityMax5, true];
         yield [$hasMarkPerCap, $capabilityMax6, true];
         yield [$hasMarkPerCap, $capabilityMax7, true];
-        yield [$noMarkPerCap, $capabilityMaxInvalid1, false];
-        yield [$noMarkPerCap, $capabilityMaxInvalid2, false];
-        yield [$noMarkPerCap, $capabilityMaxInvalid3, false];
-        yield [$noMarkPerCap, $capabilityMaxInvalid4, false];
-        yield [$noMarkPerCap, $capabilityMaxInvalid5, false];
-        yield [$noMarkPerCap, $capabilityMaxInvalid6, false];
-        yield [$noMarkPerCap, $capabilityMaxInvalid7, false];
-        yield [$noMarkPerCap, $capabilityMaxInvalid8, false];
+        yield [$hasMarkPerCap, $capabilityMaxInvalid1, false];
+        yield [$hasMarkPerCap, $capabilityMaxInvalid2, false];
+        yield [$hasMarkPerCap, $capabilityMaxInvalid3, false];
+        yield [$hasMarkPerCap, $capabilityMaxInvalid4, false];
+        yield [$hasMarkPerCap, $capabilityMaxInvalid5, false];
+        yield [$hasMarkPerCap, $capabilityMaxInvalid6, false];
+        yield [$hasMarkPerCap, $capabilityMaxInvalid7, false];
+        yield [$hasMarkPerCap, $capabilityMaxInvalid8, false];
 
         // If mark per cap is off, we consider the input to always be valid
         yield [$noMarkPerCap, $capabilityMax1, true];
