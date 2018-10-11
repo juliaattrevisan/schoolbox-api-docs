@@ -38,6 +38,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
  *
  * @method Model createModel($id=null)
  * @method Model findById($id)
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  * @method Model findOneByColumnList($columnList, $order = [], $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
