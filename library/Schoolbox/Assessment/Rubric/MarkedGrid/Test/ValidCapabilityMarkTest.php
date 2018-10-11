@@ -50,6 +50,8 @@ class ValidCapabilityMarkTest extends TestCase
         $capabilityMark10 = "13";
         $capabilityMark11 = "45.3";
         $capabilityMark12 = "100.01";
+        $capabilityMark13 = "8.33";
+        $capabilityMark14 = "9";
 
         /* Always-invalid cap marks */
         $capabilityMarkInvalid1 = "abc";
@@ -65,6 +67,18 @@ class ValidCapabilityMarkTest extends TestCase
         yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkNull, true];
         yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkNull, true];
         yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkNull, true];
+
+        /* Total Mark type */
+        // The mark needs to respect the cap max
+        yield [$capabilityMax1, $markSchemeTotalMark, $capabilityMark1, false];
+        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMark1, true];
+        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMark13, false];
+        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMark14, false];
+        yield [$capabilityMax3, $markSchemeTotalMark, $capabilityMark10, true];
+        yield [$capabilityMax4, $markSchemeTotalMark, $capabilityMark9, true];
+        yield [$capabilityMax4, $markSchemeTotalMark, $capabilityMark3, true];
+        yield [$capabilityMax5, $markSchemeTotalMark, $capabilityMark12, false];
+        yield [$capabilityMax6, $markSchemeTotalMark, $capabilityMark4, false];
 
         /* Percentage based marks */
         // Percentage mark type always has max of 100, so cap max shouldn't make any difference
