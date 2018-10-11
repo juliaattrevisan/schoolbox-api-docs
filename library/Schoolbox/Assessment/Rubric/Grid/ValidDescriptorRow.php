@@ -45,7 +45,7 @@ class ValidDescriptorRow extends \Alaress\Specification\Base
         // (Descriptors with no points OR description simply don't get posted, so we don't need to worry about them)
         $descriptorHasValue = function ($desc) {
             /** @var Descriptor $desc */
-            return \strlen($desc->getMaxValue()) > 0;
+            return $desc->getMaxValue() !== null;
         };
 
         $descriptorValue = function ($desc) {
