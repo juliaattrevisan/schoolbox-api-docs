@@ -74,6 +74,22 @@ class Module extends BaseModule
             );
         });
 
+        // Can I create news in this folder?
+        $canCreateInFolder = new Rule\All(
+            $loggedIn,
+            new Rule\LazyCallback(function () {
+                return new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_WRITE),
+                    new Rule\HasHomepageAccess(
+                        UserAccess::ACCESS_WRITE,
+                        function ($params) { return $params['folderId']; },
+                        Access\Access::getInstance()
+                    )
+                );
+            })
+        );
+
         // Can modify if any of: Supers, Comms Officers, Article audience moderators, or
         // You are the author, and the article is not yet accepted
         // Note we do not check the user audience to the proposed audience as the audience may be changing
@@ -129,6 +145,7 @@ class Module extends BaseModule
         };
 
         $this->register('GET', '/create', 'getCreate', $loggedIn);                                               // Create news article
+        $this->register('GET', '/create/folder/{folderId:\d+}', 'getCreateInFolder', $canCreateInFolder);
         $this->register('POST', '/create', 'postCreate', $loggedIn);
         $this->register('GET', '/topics', 'getTopics', $loggedIn);                                               // (async) Get a list of topics to chooze
         $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $canModify, $preloadArticle);             // Update news article

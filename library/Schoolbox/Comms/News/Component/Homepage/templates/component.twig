@@ -51,7 +51,7 @@ Data:
 </div>
 
 {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key, folderId: folderId}) %}
-{% set createRoute = readonly ? false : routeLookupIfAuthorized('commsNews.getCreate') %}
+{% set createRoute = routeLookupIfAuthorized('commsNews.getCreateInFolder', {folderId: folderId}) %}
 {% if rssRoute or createRoute %}
 <div class="component-action hide" id="news-component-actions-{{ componentInstanceId }}">
     <section>
@@ -61,11 +61,7 @@ Data:
         {% endif %}
 
         {% if createRoute %}
-            {% set createNewsQuerystringParams = [
-                'groupId=' ~ folderId,
-                'type=folder'
-            ]|join('&') %}
-            <a href="{{ createRoute }}?{{ createNewsQuerystringParams|raw }}" class="button">Create {{ locale.news }}</a>
+            <a href="{{ createRoute }}" class="button">Create {{ locale.news }}</a>
         {% endif %}
     </section>
 </div>
