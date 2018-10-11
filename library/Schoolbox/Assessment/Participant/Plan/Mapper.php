@@ -15,6 +15,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use PDO;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 /**
  * @method Model hydrate(array $row, $alias = '', $callback = null)
@@ -41,6 +42,35 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'verifyNoParticipants']);
+    }
+
+
+    /**
+     * Pre-soft delete hook to ensure we don't delete a plan that still has participants.
+     *
+     * This is because:
+     * * participants are not soft-deletable, and
+     * * a user has 0:1 (never N) participant records per assessment
+     *
+     * If we allow participant records to be linked to soft-deleted plans, the state is ambiguous and complicated.
+     * Much simpler to either either:
+     * * hard-delete the participant records first if no interactions, or
+     * * link the participant record to a different plan (likely the dynamic one)
+     * Both of these are the responsibility of the caller.
+     *
+     * @param Model $plan
+     * @return bool
+     * @throws UnexpectedValueException
+     */
+    protected function verifyNoParticipants(Model $plan): bool
+    {
+        $participants = Participant\Mapper::getInstance()->findByColumn('participant_plan_id', $plan->getId());
+        if ($participants->count()) {
+            throw new UnexpectedValueException("Cannot delete plan ({$plan->getId()}), it still has linked {$participants->count()} participant records");
+        }
+        return true;
     }
 
 
