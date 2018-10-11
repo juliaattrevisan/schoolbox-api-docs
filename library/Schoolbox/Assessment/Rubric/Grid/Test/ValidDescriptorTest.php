@@ -19,23 +19,23 @@ class ValidDescriptorTest extends TestCase
         $noMarkRange = false;
 
         // Always valid
-        $descriptorNullPoints = new Descriptor();
-        $descriptorZeroPoints = (new Descriptor())->setMaxValue("0");
-        $descriptorValid1 = (new Descriptor())->setMaxValue("1");
-        $descriptorValid2 = (new Descriptor())->setMaxValue("100");
+        $descriptorNullPoints = '';
+        $descriptorZeroPoints = '0';
+        $descriptorValid1 = '1';
+        $descriptorValid2 = '100';
 
         /* Invalid only if mark range is on */
-        $descriptor1 = (new Descriptor())->setMaxValue("1.5");
-        $descriptor2 = (new Descriptor())->setMaxValue("0.75");
+        $descriptor1 = '1.5';
+        $descriptor2 = '0.75';
 
         /* Always invalid descriptors */
-        $descriptorInvalid1 = (new Descriptor())->setMaxValue("-1");
-        $descriptorInvalid2 = (new Descriptor())->setMaxValue("abc");
-        $descriptorInvalid3= (new Descriptor())->setMaxValue("-8");
-        $descriptorInvalid4 = (new Descriptor())->setMaxValue("-0.5");
-        $descriptorInvalid5 = (new Descriptor())->setMaxValue("f00d");
-        $descriptorInvalid6 = (new Descriptor())->setMaxValue("l8");
-        $descriptorInvalid7 = (new Descriptor())->setMaxValue("1inux");
+        $descriptorInvalid1 = '-1';
+        $descriptorInvalid2 = 'abc';
+        $descriptorInvalid3= '-8';
+        $descriptorInvalid4 = '-0.5';
+        $descriptorInvalid5 = 'f00d';
+        $descriptorInvalid6 = 'l8';
+        $descriptorInvalid7 = '1inux';
 
         // Blank desc points, or desc points of 0, are always fine
         yield [$hasMarkRange, $descriptorNullPoints, true];
@@ -47,8 +47,8 @@ class ValidDescriptorTest extends TestCase
         yield [$noMarkRange, $descriptorValid1, true];
         yield [$noMarkRange, $descriptorValid2, true];
 
-        yield [$hasMarkRange, $descriptorValid1, false];
-        yield [$hasMarkRange, $descriptorValid2, false];
+        yield [$hasMarkRange, $descriptorValid1, true];
+        yield [$hasMarkRange, $descriptorValid2, true];
 
         /* Invalid only if mark range is on */
         yield [$noMarkRange, $descriptor1, true];
@@ -80,10 +80,10 @@ class ValidDescriptorTest extends TestCase
      * @covers \Schoolbox\Assessment\Rubric\Grid\ValidDescriptor::isSatisfiedBy
      *
      * @param bool $usesMarkRange
-     * @param Descriptor $descriptor
+     * @param string $descriptor
      * @param bool $expected                 Whether this test should assert true or false
      */
-    public function testIsSatisfiedBy(bool $usesMarkRange, Descriptor $descriptor, bool $expected)
+    public function testIsSatisfiedBy(bool $usesMarkRange, string $descriptor, bool $expected)
     {
         $spec = new ValidDescriptor($usesMarkRange);
         $this->assertSame($expected, $spec->isSatisfiedBy($descriptor));
