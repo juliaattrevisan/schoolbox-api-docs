@@ -26,7 +26,7 @@ class Factory
      * @return Grid
      * @throws \InvalidArgumentException
      */
-    public function buildFromPostData(Grid $grid, array $postData, bool $validate): Grid
+    public function buildFromPostData(Grid $grid, array $postData, bool $validate=true): Grid
     {
         // we're only going to take the first one... this could be converted to foreach easily enough
         $rubricData   = reset($postData);
