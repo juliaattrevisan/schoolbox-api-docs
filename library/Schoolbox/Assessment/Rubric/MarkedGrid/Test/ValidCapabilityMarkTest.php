@@ -34,17 +34,82 @@ class ValidCapabilityMarkTest extends TestCase
         $capabilityMax3 = 16;
         $capabilityMax4 = 1;
         $capabilityMax5 = 100;
+        $capabilityMax6 = 55;
 
         /* Cap marks */
         $capabilityMarkNull = null;
-        $capabilityMarkPercentage1 = 6;
-        $capabilityMarkPercentage2 = 101;
-        $capabilityMarkPercentage3 = 0;
-        $capabilityMarkPercentage4 = 55.55;
-        $capabilityMarkPercentage5 = 110;
-        $capabilityMarkPercentage6 = 99;
+        $capabilityMark1 = "6";
+        $capabilityMark2 = "101";
+        $capabilityMark3 = "0";
+        $capabilityMark4 = "55.55";
+        $capabilityMark5 = "110";
+        $capabilityMark6 = "99";
+        $capabilityMark7 = "24.6";
+        $capabilityMark8 = "87.67";
+        $capabilityMark9 = "0";
+        $capabilityMark10 = "13";
+        $capabilityMark11 = "45.3";
+        $capabilityMark12 = "100.01";
 
-        yield [$capabilityMax1, $markSchemePercentage, $capabilityMarkPercentage1, true];
+        /* Always-invalid cap marks */
+        $capabilityMarkInvalid1 = "abc";
+        $capabilityMarkInvalid2 = "-1";
+        $capabilityMarkInvalid3 = "-8";
+        $capabilityMarkInvalid4 = "-0.5";
+        $capabilityMarkInvalid5 = "f00d";
+        $capabilityMarkInvalid6 = "l8";
+        $capabilityMarkInvalid7 = "1inux";
+
+        /* Null cap mark */
+        // means we are self-reflecting, so should always return true as cap marks are not given in reflection
+        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkNull, true];
+        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkNull, true];
+        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkNull, true];
+
+        /* Percentage marks */
+        // Percentage mark type always has max of 100, so cap max shouldn't make any difference
+        yield [$capabilityMax1, $markSchemePercentage, $capabilityMark1, true];
+        yield [$capabilityMax2, $markSchemePercentage, $capabilityMark2, false];
+        yield [$capabilityMax3, $markSchemePercentage, $capabilityMark3, true];
+        yield [$capabilityMax4, $markSchemePercentage, $capabilityMark4, true];
+        yield [$capabilityMax5, $markSchemePercentage, $capabilityMark5, false];
+        yield [$capabilityMax6, $markSchemePercentage, $capabilityMark6, true];
+        yield [$capabilityMax1, $markSchemePercentage, $capabilityMark7, true];
+        yield [$capabilityMax2, $markSchemePercentage, $capabilityMark8, true];
+        yield [$capabilityMax3, $markSchemePercentage, $capabilityMark9, true];
+        yield [$capabilityMax4, $markSchemePercentage, $capabilityMark10, true];
+        yield [$capabilityMax5, $markSchemePercentage, $capabilityMark11, true];
+        yield [$capabilityMax6, $markSchemePercentage, $capabilityMark12, false];
+
+        /* Always invalid marks */
+        // Nonsensical values are always nonsensical and should fail, regardless of mark type.
+        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid1, false];
+        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid1, false];
+        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid1, false];
+
+        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid2, false];
+        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid2, false];
+        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid2, false];
+
+        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid3, false];
+        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid3, false];
+        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid3, false];
+
+        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid4, false];
+        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid4, false];
+        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid4, false];
+
+        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid5, false];
+        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid5, false];
+        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid5, false];
+
+        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid6, false];
+        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid6, false];
+        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid6, false];
+
+        yield [$capabilityMax2, $markSchemePercentage, $capabilityMarkInvalid7, false];
+        yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkInvalid7, false];
+        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkInvalid7, false];
     }
 
     /**
@@ -59,6 +124,6 @@ class ValidCapabilityMarkTest extends TestCase
     public function testIsSatisfiedBy(float $capabilityMax, IMarkScheme $markScheme, $capabilityMark, bool $expected)
     {
         $spec = new ValidCapabilityMark($capabilityMax, $markScheme);
-        $this->assertTrue($spec->isSatisfiedBy($capabilityMark));
+        $this->assertSame($expected, $spec->isSatisfiedBy($capabilityMark));
     }
 }
