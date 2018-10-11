@@ -66,7 +66,7 @@ class ValidCapabilityMarkTest extends TestCase
         yield [$capabilityMax2, $markSchemeTotalMark, $capabilityMarkNull, true];
         yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMarkNull, true];
 
-        /* Percentage marks */
+        /* Percentage based marks */
         // Percentage mark type always has max of 100, so cap max shouldn't make any difference
         yield [$capabilityMax1, $markSchemePercentage, $capabilityMark1, true];
         yield [$capabilityMax2, $markSchemePercentage, $capabilityMark2, false];
@@ -80,6 +80,20 @@ class ValidCapabilityMarkTest extends TestCase
         yield [$capabilityMax4, $markSchemePercentage, $capabilityMark10, true];
         yield [$capabilityMax5, $markSchemePercentage, $capabilityMark11, true];
         yield [$capabilityMax6, $markSchemePercentage, $capabilityMark12, false];
+
+        // This should also be the case for letter grade mark type
+        yield [$capabilityMax1, $markSchemeLetterGrade, $capabilityMark1, true];
+        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMark2, false];
+        yield [$capabilityMax3, $markSchemeLetterGrade, $capabilityMark3, true];
+        yield [$capabilityMax4, $markSchemeLetterGrade, $capabilityMark4, true];
+        yield [$capabilityMax5, $markSchemeLetterGrade, $capabilityMark5, false];
+        yield [$capabilityMax6, $markSchemeLetterGrade, $capabilityMark6, true];
+        yield [$capabilityMax1, $markSchemeLetterGrade, $capabilityMark7, true];
+        yield [$capabilityMax2, $markSchemeLetterGrade, $capabilityMark8, true];
+        yield [$capabilityMax3, $markSchemeLetterGrade, $capabilityMark9, true];
+        yield [$capabilityMax4, $markSchemeLetterGrade, $capabilityMark10, true];
+        yield [$capabilityMax5, $markSchemeLetterGrade, $capabilityMark11, true];
+        yield [$capabilityMax6, $markSchemeLetterGrade, $capabilityMark12, false];
 
         /* Always invalid marks */
         // Nonsensical values are always nonsensical and should fail, regardless of mark type.
