@@ -217,6 +217,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      * @param array               $campusList
      * @param int                 $campusId
      * @return string
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RuntimeException
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     private function getAttendanceLink(array $class, Alaress_Date_Format $now, array $period, array $campusList, int $campusId): string
     {
@@ -256,14 +259,11 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     'periodcode'  => $period['periodNumber'],
                     'daycode'     => $this->dayNumber[$campusId],
                 ];
-                try {
-                    /** @var Router $router */
-                    $router   = $this->getSitePage()->getDi()->get('router');
-                    $deepLink = urlencode(http_build_query($deepLinkParams));
-                    return "{$router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}";
-                } catch (\Throwable $e) {
-                    return '';
-                }
+
+                /** @var Router $router */
+                $router   = $this->getSitePage()->getDi()->get('router');
+                $deepLink = urlencode(http_build_query($deepLinkParams));
+                return "{$router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}";
             default:
                 return '';
         }
@@ -278,6 +278,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      * @param array               $timetable
      * @param Alaress_Date_Format $now
      * @return array
+     * @throws RuntimeException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function buildTimetableContext(array $campusList, int $campusId, array $timetable, Alaress_Date_Format $now): array
     {
@@ -310,6 +313,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      * @param string[][][]        $period
      * @param Alaress_Date_Format $now
      * @return array
+     * @throws RuntimeException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function buildPeriodContext(array $campusList, int $campusId, ?array $currentPeriod, array $period, Alaress_Date_Format $now): array
     {
@@ -341,6 +347,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      * @param Alaress_Date_Format $now
      * @param array               $class
      * @return array
+     * @throws RuntimeException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function buildClassContext(array $campusList, int $campusId, array $period, Alaress_Date_Format $now, array $class): array
     {
