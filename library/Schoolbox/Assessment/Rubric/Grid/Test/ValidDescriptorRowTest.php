@@ -145,7 +145,7 @@ class ValidDescriptorRowTest extends TestCase
      * @param Collection $descriptorRow
      * @param bool $expected                 Whether this test should assert true or false
      */
-    public function testIsSatisfiedBy($usesMarkRange, $descriptorRow, $expected)
+    public function testIsSatisfiedBy(bool $usesMarkRange, Collection $descriptorRow, bool $expected)
     {
         $spec = new ValidDescriptorRow($usesMarkRange);
         $this->assertSame($expected, $spec->isSatisfiedBy($descriptorRow));

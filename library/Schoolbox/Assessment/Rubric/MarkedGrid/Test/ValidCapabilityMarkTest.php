@@ -145,10 +145,10 @@ class ValidCapabilityMarkTest extends TestCase
      *
      * @param float $capabilityMax
      * @param IMarkScheme $markScheme
-     * @param $capabilityMark
+     * @param string $capabilityMark
      * @param bool $expected                 Whether this test should assert true or false
     */
-    public function testIsSatisfiedBy(float $capabilityMax, IMarkScheme $markScheme, $capabilityMark, bool $expected)
+    public function testIsSatisfiedBy(float $capabilityMax, IMarkScheme $markScheme, string $capabilityMark, bool $expected)
     {
         $spec = new ValidCapabilityMark($capabilityMax, $markScheme);
         $this->assertSame($expected, $spec->isSatisfiedBy($capabilityMark));

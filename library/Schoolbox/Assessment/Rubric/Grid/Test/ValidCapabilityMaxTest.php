@@ -75,10 +75,10 @@ class ValidCapabilityMaxTest extends TestCase
      * @covers \Schoolbox\Assessment\Rubric\Grid\ValidCapabilityMax::isSatisfiedBy
      *
      * @param bool $markPerCap
-     * @param bool $capabilityMax
+     * @param string $capabilityMax
      * @param bool $expected                 Whether this test should assert true or false
      */
-    public function testIsSatisfiedBy($markPerCap, $capabilityMax, $expected)
+    public function testIsSatisfiedBy(bool $markPerCap, string $capabilityMax, bool $expected)
     {
         $spec = new ValidCapabilityMax($markPerCap);
         $this->assertSame($expected, $spec->isSatisfiedBy($capabilityMax));

@@ -83,7 +83,7 @@ class ValidDescriptorTest extends TestCase
      * @param Descriptor $descriptor
      * @param bool $expected                 Whether this test should assert true or false
      */
-    public function testIsSatisfiedBy($usesMarkRange, $descriptor, $expected)
+    public function testIsSatisfiedBy(bool $usesMarkRange, Descriptor $descriptor, bool $expected)
     {
         $spec = new ValidDescriptor($usesMarkRange);
         $this->assertSame($expected, $spec->isSatisfiedBy($descriptor));
