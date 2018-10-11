@@ -9,6 +9,7 @@
 namespace Schoolbox\Assessment\Rubric\Grid\Test;
 
 use Schoolbox\Assessment\Rubric\Grid\ValidDescriptorRow;
+use \Schoolbox\Assessment\Rubric\Grid\Descriptor;
 use \Schoolbox\Collection;
 use PHPUnit\Framework\TestCase;
 
