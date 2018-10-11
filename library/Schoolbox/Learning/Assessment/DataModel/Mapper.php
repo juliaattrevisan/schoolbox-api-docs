@@ -324,13 +324,15 @@ class Mapper extends BaseMapper
      * @param Model $assessment
      * @return bool
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
+     * @throws \UnexpectedValueException      If a callback fails and we need to halt
      */
     public function softDeleteDueWork(Model $assessment): bool
     {
         if ($assessment->getDueWork() instanceof SubmissionBox) {
+            /** @var SubmissionBoxMapper $submissionBoxMapper */
             $submissionBoxMapper = $this->getJoinMapper('duework');
-            $submissionBox       = $submissionBoxMapper->findByColumn('assessment_id', $assessment->getId());
-            $submissionBoxMapper->softDelete($submissionBox);
+            $submissionBoxes     = $submissionBoxMapper->findByColumn('assessment_id', $assessment->getId());
+            $submissionBoxMapper->softDelete($submissionBoxes);
         }
         return true;
     }
