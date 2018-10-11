@@ -34,9 +34,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         try {
             $this->textbox = \Schoolbox\Resource\Textbox\Mapper::getInstance()->findById($this->getConfig('textbox'));
-            if ($this->textbox->isDeleted()) {
-                throw new \Schoolbox\Mapper\Exception("Requested textbox has been deleted");
-            }
         } catch (\Schoolbox\Mapper\Exception $e) {
             // didn't find it or it's been deleted: create a blank template box instead
             $this->textbox = new \Schoolbox\Resource\Textbox\Model();
