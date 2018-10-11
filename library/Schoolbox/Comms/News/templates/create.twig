@@ -444,8 +444,9 @@
 
         /*
          * Listen for a click on the preview button
+         * This event doesn't need to be stalled because the backend will save the post data
          */
-        $('#news-preview').click(function(event) {
+        $createForm.on('click', '#news-preview', function(event) {
             event.preventDefault();
             submitForm('preview');
         });
@@ -475,7 +476,7 @@
                     // Update the window history
                     window.history.pushState({}, null, response.url);
 
-                    // Update the Vue property for requiring moderation
+                    // Update the Vue properties
                     formActionsApp.approveRoute = response.approveRoute;
                     formActionsApp.articleId = response.articleId;
 
