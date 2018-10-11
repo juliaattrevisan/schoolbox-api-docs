@@ -37,20 +37,11 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Anyone can see the feed
-         */
-        $getPerms = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, function (array $params) {
-                return $params['folderId'];
-            }, Access\Access::getInstance())
-        );
-
         $preloadUserAndFolder = function ($params) {
             return $this->preloadUserAndFolder($params);
         };
 
-        $this->register('GET', '/{key}{/folderId}', 'getFeed', $getPerms, $preloadUserAndFolder);
+        $this->register('GET', '/{key}{/folderId}', 'getFeed', null, $preloadUserAndFolder);
     }
 
     /**
