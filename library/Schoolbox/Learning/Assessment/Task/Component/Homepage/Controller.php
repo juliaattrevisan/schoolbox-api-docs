@@ -10,7 +10,6 @@
 namespace Schoolbox\Learning\Assessment\Task\Component\Homepage;
 
 use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Mapper\Exception as MapperException;
 
 class Controller extends \Schoolbox\Learning\Assessment\Component\Homepage\Controller
 {
