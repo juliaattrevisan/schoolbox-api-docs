@@ -13,7 +13,11 @@ use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
+use Alaress\Authorizer\Failure\Unauthorized;
+
 
 class Controller extends Base
 {
@@ -43,6 +47,11 @@ class Controller extends Base
     private $statisticsCumulativeMapper;
 
     /**
+     * @var Access
+     */
+    private $access;
+
+    /**
      * @var IConnector
      */
     private $databaseInternal;
@@ -61,6 +70,7 @@ class Controller extends Base
      * @param News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper
      * @param IConnector                        $databaseInternal
      * @param ArticleResolver                   $articleResolver
+     * @param Access                            $accessMapper
      */
     public function __construct(
         News\Mapper $newsMapper,
@@ -69,7 +79,8 @@ class Controller extends Base
         News\Statistics\Mapper $statisticsMapper,
         News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
-        ArticleResolver $articleResolver
+        ArticleResolver $articleResolver,
+        Access $access
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -78,6 +89,7 @@ class Controller extends Base
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
         $this->databaseInternal           = $databaseInternal;
         $this->articleResolver            = $articleResolver;
+        $this->access                     = $access;
     }
 
 
@@ -123,6 +135,13 @@ class Controller extends Base
         /* If a folder was specified, get the feed for that folder
          */
         if (null !== $folder) {
+
+            // Look for this homepage's permission
+            $permission = $this->access->getFolderAccess($user, $folder->getId());
+            if ($permission < UserAccess::ACCESS_READ) {
+                throw new Unauthorized();
+            }
+
             $args[News\Querystring::FOLDER] = $folder->getId();
             $params = new News\Querystring($args);
 
