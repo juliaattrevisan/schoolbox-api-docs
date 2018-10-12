@@ -39,13 +39,6 @@ $capRepair = new class extends Daemon\App
     // A debug flag that can be used for testing to perform a dry run
     private const IS_DRY_RUN = false;
 
-    /**
-     * The create/update time to use on all inserted records
-     *
-     * @var string
-     */
-    private $nowDatabase;
-
     /** @var LoggerInterface */
     private $log;
 
@@ -70,9 +63,8 @@ $capRepair = new class extends Daemon\App
      */
     public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
     {
-        $this->nowDatabase = Alaress_Date_Format::now()->getDatabase();
-        $this->log         = $log;
-        $this->db          = $di->get('databaseInternal');
+        $this->log = $log;
+        $this->db  = $di->get('databaseInternal');
 
         $this->prepareStatements();
 
@@ -151,55 +143,25 @@ $capRepair = new class extends Daemon\App
     private function insertTaskPlans(): void
     {
         $sql = "
-            SELECT a.id, a.created_at
-
-            -- Get all the interactions
-            FROM assessment a
-            JOIN task t ON a.id = t.assessment_id
-            JOIN task_completion tc ON t.id = tc.task_id
-            
-            -- Is there a participation record?
-            LEFT JOIN participant_plan pp ON a.id = pp.assessment_id
-            LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = tc.student_id
-            
-            -- Also get assessments dynamic plan details
-            LEFT JOIN participant_plan dpp ON a.id = dpp.assessment_id AND dpp.is_dynamic
-            
-            -- Where no participation record for the interaction, and no dynamic plan
-            WHERE p.id IS NULL AND dpp.id IS NULL
-            GROUP BY a.id
+            SELECT t1.id, t1.created_at
+            FROM (
+                -- Find the assessments
+                SELECT DISTINCT a.id, a.created_at
+                -- that have interactions
+                FROM assessment a
+                JOIN task t ON t.assessment_id = a.id
+                JOIN task_completion tc ON t.id = tc.task_id
+    
+                -- that have no participation records across all plans
+                LEFT JOIN participant_plan pp ON t.assessment_id = pp.assessment_id
+                LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = tc.student_id
+                GROUP BY t.assessment_id, tc.student_id
+                HAVING COUNT(p.id) = 0
+            ) t1
+            LEFT JOIN participant_plan pp ON t1.id = pp.assessment_id AND pp.is_dynamic
+            WHERE pp.id IS NULL;
         ";
-
         $this->insertDynamicPlans('task', $sql);
-    }
-
-
-    /**
-     * Inserts records for each task participant that does not have a participation record
-     */
-    private function insertTaskParticipants(): void
-    {
-        $sql = "
-            SELECT dpp.id, tc.student_id
-            
-            -- Get interaction details
-            FROM assessment a
-            JOIN task t ON a.id = t.assessment_id 
-            JOIN task_completion tc ON t.id = tc.task_id
-            
-            -- Is there a participation record?
-            LEFT JOIN participant_plan pp ON a.id = pp.assessment_id
-            LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = tc.student_id
-            
-            -- Get dynamic plan details
-            LEFT JOIN participant_plan dpp ON a.id = dpp.assessment_id AND dpp.is_dynamic
-            
-            -- Where no participation record
-            WHERE p.id IS NULL
-            GROUP BY dpp.id, tc.student_id
-            ORDER BY a.id, tc.student_id";
-
-        $this->insertParticipants('task', $sql);
     }
 
 
@@ -211,75 +173,36 @@ $capRepair = new class extends Daemon\App
     private function insertDueWorkPlans(): void
     {
         $sql = "
-            SELECT a.id, a.created_at
-
-            -- Get all the interactions
-            FROM assessment a
-            JOIN (
-              -- Get all assessment/student combos where the student has due-work interactions that are not deleted
-              SELECT * FROM (
-                SELECT sb.assessment_id, ss.owner
-                FROM submission_box sb
-                JOIN student_submission ss on sb.id = ss.box_id
-                  UNION
-                SELECT sb.assessment_id, sr.owner
-                FROM submission_box sb
-                JOIN submission_return sr on sb.id = sr.box_id
-              ) t1 GROUP BY t1.assessment_id, t1.owner
-            ) t2 ON t2.assessment_id = a.id
-            
-            -- Is there a participation record?
-            LEFT JOIN participant_plan pp ON a.id = pp.assessment_id
-            LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = t2.owner
-            
-            -- Also get assessments dynamic plan details
-            LEFT JOIN participant_plan dpp ON a.id = dpp.assessment_id AND dpp.is_dynamic
-            
-            -- Where no participation record for the interaction, and no dynamic plan
-            WHERE p.id IS NULL AND dpp.id IS NULL
-            GROUP BY a.id
+            SELECT t1.id, t1.created_at
+            FROM (
+                -- Find the assessments
+                SELECT DISTINCT a.id, a.created_at
+                -- that have interactions
+                FROM assessment a
+                JOIN (
+                  -- Get all assessment/student combos where the student has due-work interactions
+                  SELECT * FROM (
+                    SELECT sb.assessment_id, ss.owner
+                    FROM submission_box sb
+                    JOIN student_submission ss on sb.id = ss.box_id
+                      UNION
+                    SELECT sb.assessment_id, sr.owner
+                    FROM submission_box sb
+                    JOIN submission_return sr on sb.id = sr.box_id
+                  ) t1 GROUP BY t1.assessment_id, t1.owner
+                ) t2 ON t2.assessment_id = a.id
+    
+                -- that have no participation records across all plans
+                LEFT JOIN participant_plan pp ON t2.assessment_id = pp.assessment_id
+                LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = t2.owner
+                GROUP BY t2.assessment_id, t2.owner
+                HAVING COUNT(p.id) = 0
+            ) t1
+            LEFT JOIN participant_plan pp ON t1.id = pp.assessment_id AND pp.is_dynamic
+            WHERE pp.id IS NULL;
         ";
 
         $this->insertDynamicPlans('due-work', $sql);
-    }
-
-
-    /**
-     * Inserts records for each due-work participant that does not have a participation record
-     */
-    private function insertDueWorkParticipants(): void
-    {
-        $sql = "
-            SELECT dpp.id, t2.owner
-            
-            -- Get interaction details
-            FROM assessment a
-            JOIN (
-              -- Get all assessment/student combos where the student has due-work interactions that are not deleted
-              SELECT * FROM (
-                SELECT sb.id, sb.assessment_id, ss.owner
-                FROM submission_box sb
-                JOIN student_submission ss on sb.id = ss.box_id
-                  UNION
-                SELECT sb.id, sb.assessment_id, sr.owner
-                FROM submission_box sb
-                JOIN submission_return sr on sb.id = sr.box_id
-              ) t1 GROUP BY t1.assessment_id, t1.owner
-            ) t2 ON t2.assessment_id = a.id
-            
-            -- Is there a participation record?
-            LEFT JOIN participant_plan pp ON a.id = pp.assessment_id
-            LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = t2.owner
-            
-            -- Get dynamic plan details
-            LEFT JOIN participant_plan dpp ON a.id = dpp.assessment_id AND dpp.is_dynamic
-            
-            -- Where no participation record
-            WHERE p.id IS NULL
-            GROUP BY dpp.id, t2.owner
-            ORDER BY a.id, t2.owner";
-
-        $this->insertParticipants('due-work', $sql);
     }
 
 
@@ -291,26 +214,103 @@ $capRepair = new class extends Daemon\App
     private function insertQuizPlans(): void
     {
         $sql = "
-            SELECT a.id, a.created_at
+            SELECT t1.id, t1.created_at
+            FROM (
+                -- Find the assessments
+                SELECT DISTINCT a.id, a.created_at
+                -- that have interactions
+                FROM assessment a
+                JOIN assess q on a.id = q.assessment_id
+                JOIN assess_attempt qa ON q.assess_id = qa.assess_id
+    
+                -- that have no participation records across all plans
+                LEFT JOIN participant_plan pp ON a.id = pp.assessment_id
+                LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = qa.user_id
+                
+                -- Special case for quiz, ignore surveys
+                WHERE availability = 'assess'
 
-            -- Get all the interactions
-            FROM assessment a
-            JOIN assess q on a.id = q.assessment_id
-            JOIN assess_attempt qa ON q.assess_id = qa.assess_id
-            
-            -- Is there a participation record?
-            LEFT JOIN participant_plan pp ON a.id = pp.assessment_id
-            LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = qa.user_id
-            
-            -- Also get assessments dynamic plan details
-            LEFT JOIN participant_plan dpp ON a.id = dpp.assessment_id AND dpp.is_dynamic
-            
-            -- Where no participation record for the interaction, and no dynamic plan
-            WHERE p.id IS NULL AND dpp.id IS NULL
-            GROUP BY a.id
+                GROUP BY q.assessment_id, qa.user_id
+                HAVING COUNT(p.id) = 0
+            ) t1
+            LEFT JOIN participant_plan pp ON t1.id = pp.assessment_id AND pp.is_dynamic
+            WHERE pp.id IS NULL;
         ";
 
         $this->insertDynamicPlans('quiz', $sql);
+    }
+
+
+    /**
+     * Inserts records for each task participant that does not have a participation record
+     */
+    private function insertTaskParticipants(): void
+    {
+        $sql = "
+            SELECT dpp.id, t2.student_id, t2.min_date
+            FROM (
+                SELECT t1.assessment_id, t1.student_id, min_date
+                FROM (
+                    -- Get first interaction details
+                    SELECT t.assessment_id, tc.student_id, MIN(tc.completion_date) 'min_date'
+                    FROM task t
+                    JOIN task_completion tc on t.id = tc.task_id
+                    GROUP BY t.assessment_id, tc.student_id
+                ) t1
+                
+                -- Is there a participation record?
+                LEFT JOIN participant_plan pp ON pp.assessment_id = t1.assessment_id
+                LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = t1.student_id
+                
+                -- Where no participation records (there may be multiple plans)
+                GROUP BY t1.assessment_id, t1.student_id
+                HAVING COUNT(p.id) = 0
+            ) t2
+            
+            -- left join to support dry run and possibly no plan yet. (In real run, dynamic plan will exist due to prior query)
+            LEFT JOIN participant_plan dpp ON t2.assessment_id = dpp.assessment_id AND dpp.is_dynamic
+        ";
+        $this->insertParticipants('task', $sql);
+    }
+
+
+    /**
+     * Inserts records for each due-work participant that does not have a participation record
+     */
+    private function insertDueWorkParticipants(): void
+    {
+        $sql = "
+            SELECT dpp.id, t3.owner, t3.min_date
+            FROM (
+                SELECT t2.assessment_id, t2.owner, t2.min_date
+                FROM (
+                    -- Get the first interaction details for each assessment/student
+                    SELECT t1.assessment_id, t1.owner, MIN(t1.created_at) AS 'min_date' FROM (
+                        -- Get all due work interactions
+                        SELECT sb.assessment_id, ss.owner, ss.created_at
+                        FROM submission_box sb
+                        JOIN student_submission ss on sb.id = ss.box_id
+                            UNION
+                        SELECT sb.assessment_id, sr.owner, sr.created_at
+                        FROM submission_box sb
+                        JOIN submission_return sr on sb.id = sr.box_id
+                    ) t1
+                    GROUP BY t1.assessment_id, t1.owner
+                ) t2
+                
+                -- Is there a participation record?
+                LEFT JOIN participant_plan pp ON pp.assessment_id = t2.assessment_id
+                LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = t2.owner
+                
+                -- Where no participation records (there may be multiple plans)
+                GROUP BY t2.assessment_id, t2.owner
+                HAVING COUNT(p.id) = 0
+            ) t3
+            
+            -- left join to support dry run and possibly no plan yet. (In real run, dynamic plan will exist due to prior query)
+            LEFT JOIN participant_plan dpp ON t3.assessment_id = dpp.assessment_id AND dpp.is_dynamic;
+        ";
+        $this->insertParticipants('due-work', $sql);
     }
 
 
@@ -320,25 +320,32 @@ $capRepair = new class extends Daemon\App
     private function insertQuizParticipants(): void
     {
         $sql = "
-            SELECT dpp.id, qa.user_id
+            SELECT dpp.id, t2.user_id, t2.min_date
+            FROM (
+                SELECT t1.assessment_id, t1.user_id, min_date
+                FROM (
+                    -- Get first interaction details
+                    SELECT q.assessment_id, qa.user_id, MIN(qa.start) 'min_date'
+                    FROM assess q
+                    JOIN assess_attempt qa ON qa.assess_id = q.assess_id
+                    
+                    -- Special case for quiz, ignore surveys
+                    WHERE availability = 'assess'
+                    GROUP BY q.assessment_id, qa.user_id
+                ) t1
+                
+                -- Is there a participation record?
+                LEFT JOIN participant_plan pp ON pp.assessment_id = t1.assessment_id
+                LEFT JOIN participant p ON pp.id = p.participant_plan_id AND p.user_id = t1.user_id
+                
+                -- Where no participation records (there may be multiple plans)
+                GROUP BY t1.assessment_id, t1.user_id
+                HAVING COUNT(p.id) = 0
+            ) t2
             
-            -- Get interaction details
-            FROM assessment a
-            JOIN assess q ON q.assessment_id = a.id
-            JOIN assess_attempt qa ON qa.assess_id = q.assess_id
-            
-            -- Is there a participation record?
-            LEFT JOIN participant_plan pp ON a.id = pp.assessment_id
-            LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = qa.user_id
-            
-            -- Get dynamic plan details
-            LEFT JOIN participant_plan dpp ON a.id = dpp.assessment_id AND dpp.is_dynamic
-            
-            -- Where no participation record
-            WHERE p.id IS NULL
-            GROUP BY dpp.id, qa.user_id
-            ORDER BY a.id, qa.user_id";
-
+            -- left join to support dry run and possibly no plan yet. (In real run, dynamic plan will exist due to prior query)
+            LEFT JOIN participant_plan dpp ON t2.assessment_id = dpp.assessment_id AND dpp.is_dynamic;
+        ";
         $this->insertParticipants('quiz', $sql);
     }
 
@@ -378,7 +385,7 @@ $capRepair = new class extends Daemon\App
      * and inserts a participant records into the dynamic plan.
      *
      * @param string $assessmentType One of ['task', 'due-work', 'quiz']
-     * @param string $sql            A query that will return columns [plan.id, user.id]
+     * @param string $sql            A query that will return columns [plan.id, user.id, created_at]
      */
     private function insertParticipants(string $assessmentType, string $sql): void
     {
@@ -387,13 +394,13 @@ $capRepair = new class extends Daemon\App
         $this->log->log(\count($data) ? Logger::WARNING : Logger::INFO, $msg);
 
         $participantId = null;
-        foreach ($data as [$dynamicPlanId, $userId]) {
+        foreach ($data as [$dynamicPlanId, $userId, $firstDate]) {
             if (!self::IS_DRY_RUN) {
                 $this->insertParticipantStatement->execute([
                     'plan_id'    => $dynamicPlanId,
                     'user_id'    => $userId,
-                    'created_at' => $this->nowDatabase,
-                    'updated_at' => $this->nowDatabase,
+                    'created_at' => $firstDate,
+                    'updated_at' => $firstDate,
                 ]);
                 $participantId = $this->db->lastInsertId();
             }
