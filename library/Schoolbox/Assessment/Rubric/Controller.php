@@ -246,7 +246,7 @@ class Controller extends BaseController
                 ->setUseMarkRange($usingMarkRange);
             $rubricGrid   = new Grid($dummyDueWork, $rubricRowSet);
             $rubricGrid   = (new GridFactory())
-                ->buildFromPostData($rubricGrid, [$box->getAssessmentModel()->getId() => $postData]);
+                ->buildFromPostData($rubricGrid, [$box->getAssessmentModel()->getId() => $postData], false);
 
         } catch (\Exception $e) {
 
@@ -295,7 +295,8 @@ class Controller extends BaseController
 
         $grid     = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($box, false),
-            $post
+            $post,
+            false
         );
         $basename = (new Url($box->getTitle()))->getSlug();
         $content  = $this->array2csv((new ArrayExporter())->export($grid));

@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid;
 
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 /**
  * Class Factory
@@ -21,17 +22,25 @@ class Factory
      *
      * @param Grid  $grid A grid (which already contains an assessment and rowset)
      * @param array $postData
+     * @param bool $validate Whether to run the backend validation on this data - should be FALSE for CSV import
      * @return Grid
+     * @throws \InvalidArgumentException
      */
-    public function buildFromPostData(Grid $grid, array $postData): Grid
+    public function buildFromPostData(Grid $grid, array $postData, bool $validate=true): Grid
     {
         // we're only going to take the first one... this could be converted to foreach easily enough
         $rubricData   = reset($postData);
+
+        $assessment   = $grid->getAssessment();
         $levels       = $rubricData['level']      ?: [];
         $capabilities = $rubricData['group']      ?: [];
         $indicators   = $rubricData['criterion']  ?: [];
         $descriptors  = $rubricData['descriptor'] ?: [];
 
+        if ($assessment instanceof DueWork) {
+            $usesMarkRange = $assessment->getUseMarkRange();
+            $markPerCap = $assessment->getMarkPerCapability();
+        }
 
         /** @var Level[] $levelCache */
         $levelCache = [];
@@ -47,7 +56,6 @@ class Factory
 
             $grid->getLevels()->add($levelCache[$levelSequence]);
         }
-
 
         // Must assume that all capabilities in formdata exist:
         // they will, because it was created when the capability was added
@@ -76,7 +84,19 @@ class Factory
             if (empty($capabilityIdsInUse[$capabilityId])) {
                 continue;
             }
+
+            // Validate capability max value
             $capabilityMaxValue = isset($capability['maxValue']) ? (float)$capability['maxValue'] : null;
+
+            if ($validate) {
+                $capabilityMaxSpec = new ValidCapabilityMax($markPerCap);
+                if (!$capabilityMaxSpec->isSatisfiedBy($capabilityMaxValue)) {
+                    throw new \InvalidArgumentException(
+                        'provide capability maximum points that are numeric and greater than 0'
+                    );
+                }
+            }
+
             $capability         = $grid->getRowSet()->retrieveCapability($capabilityId);
 
             // If $group is null, then that's a problem; we're trying to save
@@ -135,8 +155,27 @@ class Factory
                     $indicatorUsage->getDescriptors()[$levelSequence] =
                         (new Descriptor())
                             ->setId($descriptorId)
-                            ->setDescription($descriptorText)
-                            ->setMaxValue('' !== $descriptorValue ? (float)$descriptorValue : null);
+                            ->setDescription($descriptorText);
+
+                    // Validate descriptor
+                    if ($validate) {
+                        $descriptorSpec = new ValidDescriptor($usesMarkRange);
+                        if (! $descriptorSpec->isSatisfiedBy($descriptorValue) ) {
+                            throw new \InvalidArgumentException("use positive numbers only, and disable Mark Range to use decimal places in descriptor point values");
+                        }
+                    }
+
+                    // Only set the descriptor's value if it was valid
+                    $indicatorUsage->getDescriptors()[$levelSequence]->setMaxValue('' !== $descriptorValue ? (float)$descriptorValue : null);
+                }
+
+            }
+
+            // Validate sequence of descriptor points
+            if ($validate) {
+                $descriptorRowSpec = new ValidDescriptorRow($usesMarkRange);
+                if (! $descriptorRowSpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
+                    throw new \InvalidArgumentException("only use descriptor values that form an ascending or descending sequence within a row");
                 }
             }
 

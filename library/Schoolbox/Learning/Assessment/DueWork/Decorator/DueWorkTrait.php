@@ -148,7 +148,7 @@ trait DueWorkTrait
     /**
      * @return boolean
      */
-    protected function getMarkPerCapability()
+    protected function getMarkPerCapability() : bool
     {
         return $this->markPerCapability;
     }
@@ -157,7 +157,7 @@ trait DueWorkTrait
      * @param boolean $markPerCapability
      * @return $this
      */
-    protected function setMarkPerCapability($markPerCapability)
+    protected function setMarkPerCapability(bool $markPerCapability)
     {
         $this->markPerCapability = $markPerCapability;
         return $this;

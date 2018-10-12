@@ -5,8 +5,9 @@
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Rubric;
+namespace Schoolbox\Assessment\Rubric\Grid;
 
 use Schoolbox\Collection;
 
@@ -44,12 +45,12 @@ class ValidDescriptorRow extends \Alaress\Specification\Base
         // (Descriptors with no points OR description simply don't get posted, so we don't need to worry about them)
         $descriptorHasValue = function ($desc) {
             /** @var Descriptor $desc */
-            return \strlen($desc->getValue()) > 0;
+            return $desc->getMaxValue() !== null;
         };
 
         $descriptorValue = function ($desc) {
             /** @var Descriptor $desc */
-            return $desc->getValue();
+            return $desc->getMaxValue();
         };
 
         $descriptors = $descriptors->filter($descriptorHasValue)->map($descriptorValue);
@@ -61,7 +62,7 @@ class ValidDescriptorRow extends \Alaress\Specification\Base
                 $diff = $val - $prevVal;
 
                 // No increase/decrease ?
-                if(0 === $diff){
+                if(0.0 === $diff){
                     return false;
                 }
 
