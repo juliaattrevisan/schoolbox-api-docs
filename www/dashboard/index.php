@@ -48,10 +48,10 @@ foreach ($componentCollection as $component) {
             throw $e;
         }
 
-        try {
-            $this->getDi()->get('sentry')->captureException($e);
-        } catch (\Aura\Di\Exception $e) {
-            // ¯\_(ツ)_/¯
+        if ($this->getDi()->has('sentry')) {
+            /** @var Raven_Client $sentry */
+            $sentry = $this->getDi()->get('sentry');
+            $sentry->captureException($e);
         }
     }
 }
