@@ -1,4 +1,4 @@
-{% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+{% set createRoute = routeLookupIfAuthorized('commsNews.getCreateInFolder', {folderId: folderId}) %}
 <div class="empty-state no-margin">
     <i class="icon-news"></i>
     <p>
