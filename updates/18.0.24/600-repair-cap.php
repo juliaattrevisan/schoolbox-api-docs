@@ -192,7 +192,7 @@ $capRepair = new class extends Daemon\App
             LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = tc.student_id
             
             -- Get dynamic plan details
-            JOIN participant_plan dpp ON a.id = dpp.assessment_id AND dpp.is_dynamic
+            LEFT JOIN participant_plan dpp ON a.id = dpp.assessment_id AND dpp.is_dynamic
             
             -- Where no participation record
             WHERE p.id IS NULL
@@ -272,7 +272,7 @@ $capRepair = new class extends Daemon\App
             LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = t2.owner
             
             -- Get dynamic plan details
-            JOIN participant_plan dpp ON a.id = dpp.assessment_id AND dpp.is_dynamic
+            LEFT JOIN participant_plan dpp ON a.id = dpp.assessment_id AND dpp.is_dynamic
             
             -- Where no participation record
             WHERE p.id IS NULL
@@ -332,7 +332,7 @@ $capRepair = new class extends Daemon\App
             LEFT JOIN participant p on pp.id = p.participant_plan_id AND p.user_id = qa.user_id
             
             -- Get dynamic plan details
-            JOIN participant_plan dpp ON a.id = dpp.assessment_id AND dpp.is_dynamic
+            LEFT JOIN participant_plan dpp ON a.id = dpp.assessment_id AND dpp.is_dynamic
             
             -- Where no participation record
             WHERE p.id IS NULL
