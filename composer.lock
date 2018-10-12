@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "8deddf311cce032ae6d10d3c9a2f0517",
+    "content-hash": "0f3bf8299b98fbe5f7cc15276420dbca",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -1257,23 +1257,24 @@
         },
         {
             "name": "imagine/imagine",
-            "version": "dev-0.6.2-patches",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/armatronic/Imagine.git",
-                "reference": "a5e3d12de2d7bba9afa50a9d9383e49bec126f3a"
+                "url": "https://github.com/avalanche123/Imagine.git",
+                "reference": "f2f39f5900ed69480dfc2f23cb56b591b282d501"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/armatronic/Imagine/zipball/a5e3d12de2d7bba9afa50a9d9383e49bec126f3a",
-                "reference": "a5e3d12de2d7bba9afa50a9d9383e49bec126f3a",
+                "url": "https://api.github.com/repos/avalanche123/Imagine/zipball/f2f39f5900ed69480dfc2f23cb56b591b282d501",
+                "reference": "f2f39f5900ed69480dfc2f23cb56b591b282d501",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.2"
             },
             "require-dev": {
-                "sami/sami": "dev-master"
+                "friendsofphp/php-cs-fixer": "2.2.*",
+                "symfony/phpunit-bridge": "^3.2 || ^4.0"
             },
             "suggest": {
                 "ext-gd": "to use the GD implementation",
@@ -1287,10 +1288,11 @@
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Imagine": "lib/"
+                "psr-4": {
+                    "Imagine\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1309,10 +1311,7 @@
                 "image manipulation",
                 "image processing"
             ],
-            "support": {
-                "source": "https://github.com/armatronic/Imagine/tree/0.6.2+patches"
-            },
-            "time": "2015-06-24T06:51:42+00:00"
+            "time": "2018-09-27T12:22:55+00:00"
         },
         {
             "name": "jenssegers/date",
@@ -1773,6 +1772,7 @@
                 "user agent",
                 "user-agent"
             ],
+            "abandoned": true,
             "time": "2016-04-23T18:18:10+00:00"
         },
         {
@@ -1837,6 +1837,7 @@
                 "Wurfl",
                 "cache"
             ],
+            "abandoned": true,
             "time": "2016-08-06T11:25:21+00:00"
         },
         {
@@ -6862,7 +6863,6 @@
         "predis/predis-async": 20,
         "react/stomp": 20,
         "0x46616c6b/etherpad-lite-client": 20,
-        "imagine/imagine": 20,
         "phpoffice/phpexcel": 20,
         "roave/security-advisories": 20,
         "lox/xhprof": 20
