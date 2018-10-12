@@ -24,10 +24,6 @@
         {
             "type": "vcs",
             "url":  "https://github.com/alaress/etherpad-lite-client"
-        },
-        {
-            "type": "vcs",
-            "url":  "https://github.com/armatronic/Imagine"
         }
     ],
     "require": {
