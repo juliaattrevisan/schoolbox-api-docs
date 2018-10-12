@@ -251,7 +251,7 @@ Data:
             {% endif %}
             {% if approveRoute or submitRoute %}
                 {% if approveRoute %}
-                    {% set buttonText = 'Approve' %}
+                    {% set buttonText = 'Publish ' ~ locale.news %}
                 {% elseif article.isRejected %}
                     {% set buttonText = 'Resubmit for moderation' %}
                 {% else %}
