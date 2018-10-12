@@ -189,6 +189,7 @@ class Controller extends WebController\Base
             ]));
 
         } catch (Filter\BrokenFilterException $e) {
+            $this->captureException($e);
             $data = [
                 'status'  => 500,
                 'message' => "Sorry, the {$e->getFilterName()} filter appears to be broken. Please deselect all options and try again",
@@ -203,6 +204,7 @@ class Controller extends WebController\Base
             }
             $this->getResponse()->content->set($this->buildJsonOutput($data));
         } catch (Throwable $e) {
+            $this->captureException($e);
             $this->returnJsonError($e);
         }
     }
