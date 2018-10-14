@@ -107,7 +107,11 @@
         #}
         {% if article.id and isAutoSavable %}
             {% set formAction = updateRoute %}
-            {% set formActionSubmit = submitRoute %}
+            {% if approveRoute %}
+                {% set formActionSubmit = approveRoute %}
+            {% else %}
+                {% set formActionSubmit = submitRoute %}
+            {% endif %}
         {% elseif article.id and not isAutosavable %}
             {% set formAction = '' %} {# No drafting or previewing if the article is submitted (not auto-savable) #}
             {% set formActionSubmit = updateRoute %}
