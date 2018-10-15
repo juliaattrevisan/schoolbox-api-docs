@@ -158,7 +158,12 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
             return parent::getMimetype();
         }
 
-        return $this->getMimetype()->getMime();
+        if($this->getMimetype() instanceof Mimetype) {
+            return $this->getMimetype()->getMime();
+        }
+        else {
+            return '';
+        }
     }
 
     /**
