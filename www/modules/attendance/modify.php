@@ -196,6 +196,21 @@ if ($class) {
 
         $absenceDropdownOptions = $attendanceHandler->findAbsenceDropdownOptions();
         $reasonDropdownOptions = $attendanceHandler->findReasonDropdownOptions();
+        $filteredReasons = [];
+
+        foreach ($reasonDropdownOptions as $absenceReason) {
+            if ($absenceReason['AbsenceTypeCode'] === '' && trim($absenceReason['Code']) !== '') {
+                foreach ($absenceDropdownOptions as $absenceType) {
+                    $filteredReasons[] = [
+                        'Code'            => $absenceReason['Code'],
+                        'AbsenceTypeCode' => $absenceType['Code'],
+                        'Description'     => $absenceReason['Description'],
+                    ];
+                }
+            } else {
+                $filteredReasons[] = $absenceReason;
+            }
+        }
 
         // Iterate each student
 
@@ -237,22 +252,6 @@ if ($class) {
                 'absence_options', $absenceDropdownOptions, $abscenceCode, 'student',
                 array('Code' => 'ABSENCE_OPTIONS_VALUE', 'Description' => 'ABSENCE_OPTIONS_DESCRIPTION')
             );
-
-            $filteredReasons = [];
-
-            foreach ($reasonDropdownOptions as $absenceReason) {
-                if ($absenceReason['AbsenceTypeCode'] === '' && trim($absenceReason['Code']) !== '') {
-                    foreach ($absenceDropdownOptions as $absenceType) {
-                        $filteredReasons[] = [
-                            'Code'            => $absenceReason['Code'],
-                            'AbsenceTypeCode' => $absenceType['Code'],
-                            'Description'     => $absenceReason['Description'],
-                        ];
-                    }
-                } else {
-                    $filteredReasons[] = $absenceReason;
-                }
-            }
 
 
             $reasonCode = $currentStudent['ActualAbsenceReasonCode'] ? $currentStudent['ActualAbsenceReasonCode'] : $currentStudent['PossibleReasonCode'];
