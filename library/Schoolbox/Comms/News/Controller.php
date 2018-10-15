@@ -22,6 +22,7 @@ use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Comms\News\Validation\Factory;
+use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
 use Schoolbox\Comms\News\Validation\ValidUserCanAudienceTo;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
@@ -522,8 +523,10 @@ class Controller extends Base
             unset($data['article']['featureImage']['_links']['fetch']);
 
         } else {
+            $segment = $this->getSession()->getSegment('Schoolbox\Comms\News\Controller');
             $data = [
                 'article'            => $article,
+                'flashMessage'       => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
                 'moderationEnabled'  => $moderationEnabled,
                 'isSavedForLater'    => $isSavedForLater,
             ];

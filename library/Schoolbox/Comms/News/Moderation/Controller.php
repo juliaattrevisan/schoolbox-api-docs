@@ -17,6 +17,12 @@ use Schoolbox\Mapper;
 
 class Controller extends Base
 {
+
+    /**
+     * Flash message text appears in this key
+     */
+    public const ARTICLE_FLASH_MESSAGE_KEY = 'ArticleFlashMessage';
+
     /* Moderation API error codes:
      *
      * These ensure the client has sufficient information to know what to do. HTTP response codes are insufficient to distinguish some cases.
@@ -117,6 +123,35 @@ class Controller extends Base
 
 
     /**
+     * Set a flash message about submitting articles
+     * Flash messages aren't needed in other contexts yet afaik
+     *
+     * @param Model $article
+     */
+    private function generateSubmitFlashMessage(Model $article)
+    {
+        $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
+        $message = '';
+
+        $notifsOn = true; // TODO actually assign this
+
+        if (!$article->isExpired() && $moderationRequired) {
+            if ($notifsOn) {
+                $message = 'Your article has been submitted for moderation. You will receive a notification when your article is rejected or approved.';
+            } else {
+                $message = 'Your article has been submitted for moderation.';
+            }
+        }
+
+        /* If a message is provided, let it be available in the Comms\News\Controller namespace */
+        if ('' !== $message) {
+            $segment = $this->getSession()->getSegment('Schoolbox\Comms\News\Controller');
+            $segment->setFlash(self::ARTICLE_FLASH_MESSAGE_KEY, $message);
+        }
+    }
+
+
+    /**
      * Submit For Moderation occurs here
      * A required action prior to Moderation taking place
      *
@@ -165,6 +200,11 @@ class Controller extends Base
         }
 
         if (200 === $httpCode) {
+
+            /* Set a flash message to tell people what they can expect to happen to their article next
+             */
+            $this->generateSubmitFlashMessage($article);
+
             // TODO. The client should be responsible for determining what to do after submission
             // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
             // TODO. THis should just return the outcome of the request, not a redirect.

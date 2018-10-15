@@ -28,9 +28,27 @@ Data:
     });
 </script>
 
-<div class="actions-small-2 row">
-    <div class="list-item">
-        <div class="small-12 columns">
+{% if flashMessage|length %}
+    <script>
+        $(function() {
+            $('#flash').on('click', '.close', function(event) {
+                event.preventDefault();
+
+                $('#flash').remove();
+            });
+        });
+    </script>
+    <div class="small-12 columns">
+        <div id="flash" class="alert-box success">
+            {{ flashMessage }}
+            <a class="close">×</a>
+        </div>
+    </div>
+{% endif %}
+
+<div class="small-12 columns">
+    <div class="actions-small-2 row">
+        <div class="list-item">
             <h1>{{ article.title }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
 
             <ul class="meta">
@@ -58,106 +76,106 @@ Data:
                 {% endif %}
             </ul>
         </div>
-    </div>
-
-    {% if deleteRoute %}
-        <script>
-            $(function() {
-                $('#header-options').on('click', 'a[data-delete]', function(event) {
-                    event.preventDefault();
-
-                    var $element = $(this);
-                    var $toast = $('#toast');
-                    var title = $element.attr('data-delete');
-
-                    $element.confirmDialog({
-                        text: 'Are you sure you want to delete ' + title + '?',
-                        confirmEvent: function() {
-                            $toast.toastActivate({
-                                text: 'Deleting ' + title
-                            });
-
-                            $.ajax({
-                                type: 'POST',
-                                url: $element.attr('href'),
-                                data: {articleId: {{ article.id }}},
-                                dataType: 'json'
-                            }).success(function (response) {
-                                $toast.toastTimeout({
-                                    text: title + ' was deleted',
-                                    css: 'success'
-                                });
-
-                                window.location.href = response.redirect;
-                            }).error(function (response) {
-                                var temp = $.parseJSON(response.responseText);
-
-                                $toast.toastTimeout({
-                                    text: 'Error: ' + temp.message,
-                                    css: 'alert'
-                                });
-                            });
-                        }
-                    });
-                });
-            });
-        </script>
-    {% endif %}
-
-    {# Unpublish article (just a reject renamed to unpublish when the article is published or archived) #}
-    {% if article.canBeRejected %}
-        {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
-    {% endif %}
-
-    {# Statistics link: must be author or comms officer and article must be published #}
-    {#{% set statisticsRoute = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {article: article, articleId: article.id}) %}#}
-
-    {#{% set hasDropDownRoutes = modifyRoute or deleteRoute or rejectRoute or statisticsRoute %}#}
-    {% set hasDropDownRoutes = modifyRoute or deleteRoute or rejectRoute %}
-
-    <nav>
-        {# Save For Later #}
-        <script src="/javascript/shared/comms/saveforlater.js"></script>
-        <script>
-            $(function() {
-                $('#saveforlater-container').saveForLater();
-            });
-        </script>
-
-        {% if config.save_for_later %}
-        <span id="saveforlater-container">
-            {% include '@commsNewsSaveForLater/activator.twig' with {
-                article: article,
-                isSaved: isSavedForLater
-            } only %}
-        </span>
-        {% endif %}
-
-        {% if hasDropDownRoutes %}
-            <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
-        {% endif %}
-    </nav>
-
-    {% if hasDropDownRoutes %}
-    <ul id="header-options" class="f-dropdown" data-dropdown-content>
-
-        {% if modifyRoute %}
-            <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
-        {% endif %}
 
         {% if deleteRoute %}
-            <li><a class="icon-delete" href="{{ deleteRoute }}" data-delete="{{ article.title }}">Delete</a></li>
+            <script>
+                $(function() {
+                    $('#header-options').on('click', 'a[data-delete]', function(event) {
+                        event.preventDefault();
+
+                        var $element = $(this);
+                        var $toast = $('#toast');
+                        var title = $element.attr('data-delete');
+
+                        $element.confirmDialog({
+                            text: 'Are you sure you want to delete ' + title + '?',
+                            confirmEvent: function() {
+                                $toast.toastActivate({
+                                    text: 'Deleting ' + title
+                                });
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: $element.attr('href'),
+                                    data: {articleId: {{ article.id }}},
+                                    dataType: 'json'
+                                }).success(function (response) {
+                                    $toast.toastTimeout({
+                                        text: title + ' was deleted',
+                                        css: 'success'
+                                    });
+
+                                    window.location.href = response.redirect;
+                                }).error(function (response) {
+                                    var temp = $.parseJSON(response.responseText);
+
+                                    $toast.toastTimeout({
+                                        text: 'Error: ' + temp.message,
+                                        css: 'alert'
+                                    });
+                                });
+                            }
+                        });
+                    });
+                });
+            </script>
         {% endif %}
 
-        {% if rejectRoute %}
-            <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
+        {# Unpublish article (just a reject renamed to unpublish when the article is published or archived) #}
+        {% if article.canBeRejected %}
+            {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
         {% endif %}
 
-        {#{% if statisticsRoute %}#}
-            {#<li><a class="icon-progress" href="{{ statisticsRoute }}">Statistics</a></li>#}
-        {#{% endif %}#}
-    </ul>
-    {% endif %}
+        {# Statistics link: must be author or comms officer and article must be published #}
+        {#{% set statisticsRoute = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {article: article, articleId: article.id}) %}#}
+
+        {#{% set hasDropDownRoutes = modifyRoute or deleteRoute or rejectRoute or statisticsRoute %}#}
+        {% set hasDropDownRoutes = modifyRoute or deleteRoute or rejectRoute %}
+
+        <nav>
+            {# Save For Later #}
+            <script src="/javascript/shared/comms/saveforlater.js"></script>
+            <script>
+                $(function() {
+                    $('#saveforlater-container').saveForLater();
+                });
+            </script>
+
+            {% if config.save_for_later %}
+            <span id="saveforlater-container">
+                {% include '@commsNewsSaveForLater/activator.twig' with {
+                    article: article,
+                    isSaved: isSavedForLater
+                } only %}
+            </span>
+            {% endif %}
+
+            {% if hasDropDownRoutes %}
+                <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+            {% endif %}
+        </nav>
+
+        {% if hasDropDownRoutes %}
+        <ul id="header-options" class="f-dropdown" data-dropdown-content>
+
+            {% if modifyRoute %}
+                <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
+            {% endif %}
+
+            {% if deleteRoute %}
+                <li><a class="icon-delete" href="{{ deleteRoute }}" data-delete="{{ article.title }}">Delete</a></li>
+            {% endif %}
+
+            {% if rejectRoute %}
+                <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
+            {% endif %}
+
+            {#{% if statisticsRoute %}#}
+                {#<li><a class="icon-progress" href="{{ statisticsRoute }}">Statistics</a></li>#}
+            {#{% endif %}#}
+        </ul>
+        {% endif %}
+    </div>
 </div>
 
 <div class="row">
