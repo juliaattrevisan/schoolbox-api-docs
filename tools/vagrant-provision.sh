@@ -72,7 +72,7 @@ getS3file() {
         predir=`pwd`;
         cd $cachedir;
 
-        curletag=`curl -I $data_source/$S3file 2>/dev/null`;
+        curletag=`curl -I -H 'Referer: JIFrHts6WT7CeAU8xvlEFcG6VV3J89BO3CZMrQwF' $data_source/$S3file 2>/dev/null`;
         if [ $? -eq 0 ];
         then
             responsecode=`echo "$curletag" | egrep 'HTTP/(1.0|1.1|2)' | cut -d' ' -f2`;
@@ -210,7 +210,7 @@ then
             # Check if we've already found a matching file
             if [ "$vendorfile" == '' ];
             then
-                etag=`curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
+                etag=`curl -I -H 'Referer: JIFrHts6WT7CeAU8xvlEFcG6VV3J89BO3CZMrQwF' https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
                 if [ $? -eq 0 ];
                 then
                     checketag=`grep $etag vendor.etag.cache 2>/dev/null | wc -l`;
@@ -358,7 +358,7 @@ then
             # Check if we've already found a matching file
             if [ "$npmfile" == '' ];
             then
-                etag=`curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
+                etag=`curl -I -H 'Referer: JIFrHts6WT7CeAU8xvlEFcG6VV3J89BO3CZMrQwF' https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
                 if [ $? -eq 0 ];
                 then
                     checketag=`grep $etag npm.etag.cache 2>/dev/null | wc -l`;
@@ -448,7 +448,7 @@ then
             # Check if we've already found a matching file
             if [ "$bowerfile" == '' ];
             then
-                etag=`curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
+                etag=`curl -I -H 'Referer: JIFrHts6WT7CeAU8xvlEFcG6VV3J89BO3CZMrQwF' https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2`;
                 if [ $? -eq 0 ];
                 then
                     checketag=`grep $etag bower.etag.cache 2>/dev/null | wc -l`;
