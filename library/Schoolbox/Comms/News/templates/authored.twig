@@ -46,7 +46,7 @@
                             </div>
                         </div>
                         <nav>
-                            <a :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
+                            <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
                         </nav>
                     </li>
                 </ul>
