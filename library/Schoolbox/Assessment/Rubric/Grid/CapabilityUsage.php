@@ -159,7 +159,8 @@ class CapabilityUsage
      * Should capability marks show for this capability usage?
      *
      * Marks will only show if the max value for this capability is greater
-     * than zero, and mark-per-capability is on.
+     * than zero. (and if the assessment's mark-per-capability field is on;
+     * this is not knowable by this object, though.)
      *
      * @return bool
      */
