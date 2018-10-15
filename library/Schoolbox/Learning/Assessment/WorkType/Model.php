@@ -4,10 +4,11 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\WorkType;
 
-use Schoolbox;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 
 class Model
 {
@@ -30,6 +31,9 @@ class Model
      * @var boolean
      */
     private $showOnGradesPage;
+
+    /** @var bool */
+    private $staffOrInstructorVisibleOnly;
 
     /**
      * @return bool
@@ -112,5 +116,42 @@ class Model
     public function getExternalResultType()
     {
         return $this->externalResultType;
+    }
+
+
+    /**
+     * Human friendly getter
+     *
+     * @return bool
+     * @throws InsufficientHydrationException
+     */
+    public function isStaffOrInstructorVisibleOnly(): bool
+    {
+        if (null === $this->staffOrInstructorVisibleOnly) {
+            throw new InsufficientHydrationException('Cannot determine visibility from NULL property');
+        }
+        return $this->staffOrInstructorVisibleOnly;
+    }
+
+
+    /**
+     * Mapper-compatible getter.
+     *
+     * @return bool
+     */
+    public function getStaffOrInstructorVisibleOnly(): ?bool
+    {
+        return $this->staffOrInstructorVisibleOnly;
+    }
+
+
+    /**
+     * @param bool $staffOrInstructorVisibleOnly
+     * @return $this
+     */
+    public function setStaffOrInstructorVisibleOnly(bool $staffOrInstructorVisibleOnly): self
+    {
+        $this->staffOrInstructorVisibleOnly = $staffOrInstructorVisibleOnly;
+        return $this;
     }
 }

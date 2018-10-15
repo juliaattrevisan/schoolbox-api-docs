@@ -4,6 +4,7 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\WorkType;
 
@@ -20,7 +21,7 @@ class Mapper extends Schoolbox\Mapper
     /**
      * @inheritdoc
      */
-    protected function mapping()
+    protected function mapping(): void
     {
         $this->hasTable('lu_work_type');
         $this->hasModel(Model::class);
@@ -28,30 +29,6 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('name', self::TYPE_STRING);
         $this->uses('external_result_type', self::TYPE_STRING);
         $this->uses('show_on_grades_page', self::TYPE_BOOLEAN);
-    }
-
-
-    /**
-     * @param int $id
-     * @return string|bool
-     */
-    public function findNameById($id)
-    {
-        try {
-            return $this->selectScalarByColumnList('name', ['id' => $id])->fetchColumn();
-        } catch (\UnderflowException $e) {
-            return false;
-        }
-    }
-
-
-    /**
-     * @param int $id
-     * @return Schoolbox\GenericCollection
-     * @throws Schoolbox\Mapper\Exception
-     */
-    public function findAllExcept($id)
-    {
-        return $this->findByPredicates($this->getPredicateBuilder()->notEquals('id', $id));
+        $this->uses('staff_or_instructor_visible_only', self::TYPE_BOOLEAN);
     }
 }
