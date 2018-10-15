@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 /**
@@ -207,6 +208,31 @@ class Grid
     {
         $capabilityUsage = $this->retrieveCapabilityUsage($capability);
         return $capabilityUsage ? $capabilityUsage->iterateIndicators() : $capability->getIndicators();
+    }
+
+
+    /**
+     * Should capability marks show for the given capability usage?
+     *
+     * Marks will only show if:
+     * * this grid is on a due work which supports mark-per-capability
+     * * the max value for this grid's usage of `$capability` is > 0
+     *
+     * @param Capability $capability
+     * @return bool
+     */
+    public function isCapabilityMarkShown(Capability $capability): bool
+    {
+        if (!($this->assessment instanceof DueWork && $this->assessment->getMarkPerCapability())) {
+            return false;
+        }
+
+        $capabilityUsage = $this->retrieveCapabilityUsage($capability);
+        if ($capabilityUsage instanceof CapabilityUsage) {
+            return false;
+        }
+
+        return $capabilityUsage->isCapabilityMarkShown();
     }
 
 
