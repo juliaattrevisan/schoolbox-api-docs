@@ -509,6 +509,7 @@ class Controller extends Base {
         );
         // Not the best place to put it but it will do for now
         $this->getResponse()->content->set([
+            'format' => 'noContent',
             'postOutput' => [
                 function() use ($rulesetId, $provisioner) {
                     $this->syncCallback($rulesetId, $provisioner, true);
