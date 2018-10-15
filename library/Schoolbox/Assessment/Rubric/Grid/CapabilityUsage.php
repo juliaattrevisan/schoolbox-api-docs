@@ -164,7 +164,7 @@ class CapabilityUsage
      *
      * @return bool
      */
-    public function isCapabililtyMarkShown(): bool
+    public function isCapabilityMarkShown(): bool
     {
         return $this->maxValue > 0;
     }
