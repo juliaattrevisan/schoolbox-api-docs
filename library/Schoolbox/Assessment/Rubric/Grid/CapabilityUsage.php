@@ -156,6 +156,20 @@ class CapabilityUsage
 
 
     /**
+     * Should capability marks show for this capability usage?
+     *
+     * Marks will only show if the max value for this capability is greater
+     * than zero, and mark-per-capability is on.
+     *
+     * @return bool
+     */
+    public function showCapabilityMark(): bool
+    {
+        return $this->maxValue > 0;
+    }
+
+
+    /**
      * @return Capability
      */
     public function getCapability(): Capability
