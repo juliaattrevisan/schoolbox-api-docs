@@ -434,7 +434,9 @@ class CapabilityUsage extends TestCase
      */
     public function getTestIsCapabilityMarkShownData(): iterable
     {
-        $capabilityUsage = $this->generateCapabilityUsage(['indicators' => []]);
+        $capabilityUsage = $this->generateCapabilityUsage([
+            'indicators' => [],
+        ]);
         yield 'Empty capability' => [$capabilityUsage, false];
 
 
@@ -458,7 +460,7 @@ class CapabilityUsage extends TestCase
                             'levelId'     => 2,
                             'description' => 'Okay',
                         ],
-                    ]
+                    ],
                 ],
                 12 => [
                     'descriptors' => [
@@ -478,6 +480,7 @@ class CapabilityUsage extends TestCase
 
 
         $capabilityUsage = $this->generateCapabilityUsage([
+            'maxValue'   => 4,
             'indicators' => [
                 11 => [
                     'descriptors' => [
@@ -491,7 +494,7 @@ class CapabilityUsage extends TestCase
                             'description' => 'Okay',
                             'value'       => 2,
                         ],
-                    ]
+                    ],
                 ],
                 12 => [
                     'descriptors' => [
