@@ -371,6 +371,20 @@
                 $(this).attr("data-customised", true);
             });
 
+            // Determine disabled-ness of assign from rubric buttons on page load
+            $("[data-use-criterion-values]").each(function() {
+                var $closestMaxMarkInput = $(this).prev("[data-group-max-value]");
+                var groupIdentifier = $(this).closest("[data-group]").attr("data-group");
+                var groupTotal = calculateGroupTotal(groupIdentifier);
+
+                // Only disable if mark is the same (which it always should be in this case, but...be safe)
+                if (groupTotal == $closestMaxMarkInput.val()) {
+                    $(this).attr("disabled", true);
+                } else {
+                    $(this).removeAttr("disabled");
+                }
+            });
+
             $("[data-use-criterion-values]").click(function($e) {
                 $e.preventDefault();
                 var $closestMaxMarkInput = $(this).prev("[data-group-max-value]");
@@ -389,12 +403,10 @@
                 $closestMaxMarkInput.removeAttr("data-customised");
             });
 
-            // TODO get validation error message to appear UNDERNEATH not BETWEEN input and button
             $("[data-group-max-value]").each(function() {
                 $(this).rules("add", {
                     required: true,
                     number: true,
-                    greaterThanZero: true,
                     messages: {
                         number: "Please enter a numeric value"
                     }
