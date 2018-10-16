@@ -116,21 +116,21 @@ class Visibility
 
 
     /**
-     * Is the assessable visible to the Learner? (Treats the user as a learner, even if they really have greater folder access)
+     * Is the assessable visible to a non-instructor? (ie a user with DENY or READ access to the assessment's folder context)
      *
      * @param IAssessable         $assessable
-     * @param User                $learner
+     * @param User                $nonInstructor
      * @param bool                $showClosed Should we show assessments after their closed date?
      * @param Alaress_Date_Format $now
      * @return bool
      */
-    private function isVisibleToNonInstructor(IAssessable $assessable, User $learner, bool $showClosed, Alaress_Date_Format $now): bool
+    private function isVisibleToNonInstructor(IAssessable $assessable, User $nonInstructor, bool $showClosed, Alaress_Date_Format $now): bool
     {
-        if ($assessable->isStaffOrInstructorVisibleOnly() && !$learner->getRole()->isStaff()) {
+        if ($assessable->isStaffOrInstructorVisibleOnly() && !$nonInstructor->getRole()->isStaff()) {
             // Staff learners can still see SIVO assessments as they are staff
             return false;
         }
-        $participant = $assessable->getParticipantIfExtant($learner);
+        $participant = $assessable->getParticipantIfExtant($nonInstructor);
         if (!$participant || $participant->isExcluded()) {
             return false;
         }
