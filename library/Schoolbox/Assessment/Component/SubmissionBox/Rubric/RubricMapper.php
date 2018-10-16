@@ -2306,7 +2306,7 @@ class RubricMapper
                 AND rm.valid
                 AND sr.published_at IS NOT NULL
                 GROUP BY sr.owner, sr.box_id, sr.id
-            ) t ON t.r_id = rm.return_id
+            ) t ON t.r_id = rgm.return_id
             WHERE {$whereClauseOuter}
             AND rm.valid
             AND sr.published_at IS NOT NULL;
@@ -2318,7 +2318,7 @@ class RubricMapper
         $pb = new Builder($this->database, '');
         $pb->in('rg.parent_id', $folderIds)
            ->equals('rg.parent_type', Group::PARENT_TYPE_CATEGORY)
-           ->greaterThan('rd.value', 0.0);
+           ->greaterThan('rd.max_value', 0.0);
         $whereClause = implode(' AND ', $pb->getWhere());
         $stmt        = $this->database->prepare("
             SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rg.name AS grouping, rc.name, MAX(rd.max_value) AS 'max_mark'
