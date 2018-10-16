@@ -67,10 +67,43 @@ class Result extends Base
             Access\Access::getInstance()
         );
 
-        $folderStrategy = $strategyFactory->makeSimpleStrategy('folder');
+        /* The chain of readability
+         */
+
+        /* Superuser check
+         */
+        $isSuperuser = $user->isSuperuser();
+
+        /* Are you a news moderator?
+         */
+        $accessList = $user->getAccessList();
+
+        $hasNewsServicePermission = false;
+
+        if (!empty($accessList)) {
+            foreach ($accessList as $access) {
+                $hasNewsServicePermission = $access->getService() === Access\UserAccess::SERVICE_NEWS;
+            }
+        }
+
+        /* Are you the author?
+         */
+        $isAuthor = false;
+
+        /* Is the article published or expired?
+         */
+        $isPublishedOrExpired = false;
+
+        /* Is the article shareable?
+         */
+        $isShareable = false;
+
+        /* Is $user in the audience of the article?
+         */
 
         /* These are the folders to which the user has read+ access
          */
+        $folderStrategy = $strategyFactory->makeSimpleStrategy('folder');
         $foldersWithRoleBasedPermissions = $folderStrategy->getSearchSql($user);
 
         foreach ($stmt as $row) {
