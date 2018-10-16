@@ -10,7 +10,6 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-
 use Schoolbox\User;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
