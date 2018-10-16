@@ -495,6 +495,7 @@ class Module extends BaseModule
                 )
             ),
             new Rule\All(
+                new CanViewAssessable(new Visibility($this->getAccess())),
                 new Rule\IsUser('studentId'),
                 new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                 new IsAssessmentOpen(),
