@@ -2251,16 +2251,8 @@ class RubricMapper
             return [];
         }
 
-        /* 1. Get latest student published marks per criterion and dueWork
-         * 2. Find the max descriptor value per criterion and dueWork.
-         * 3. Convert each student mark into a normalised value
-         *
-         * We could perform steps 1+2 in a single query using a correlated subquery, but
-         * that would mean the subquery is executed for every row fetched by the outer query.
-         * In our case it is much faster to just fetch the max descriptors in a subsequent light-weight query.
-         * (eg, consider there is no point executing the subquery for different students)
-         * @see http://www.sqlservice.se/sql-server-performance-death-by-correlated-subqueries/
-         */
+
+        // Step 1: figure out the due works in the term for the given folders
         $pb = new Builder($this->database, '');
         $pb->in('rg.parent_id', $folderIds)
            ->equals('rg.parent_type', Group::PARENT_TYPE_CATEGORY)
@@ -2275,11 +2267,7 @@ class RubricMapper
             $pb->lessThan('a.due_date', $finish->getDatabase());
         }
 
-        $whereClauseInner = implode(' AND ', $pb->getWhere());
-        $whereClauseOuter = implode(' AND ', $pb->getWhere());
-
-
-        // Step 1: figure out the due works in the term for the given folders
+        $where               = implode(' AND ', $pb->getWhere());
         $assessmentStatement = $this->database->prepare("
             SELECT
                 sr.owner AS studentId,
@@ -2290,7 +2278,7 @@ class RubricMapper
             INNER JOIN rubric_group_usage rgu ON sb.id = rgu.submission_box_id
             INNER JOIN rubric_group        rg ON rgu.rubric_group_id = rg.id
             INNER JOIN assessment           a ON sb.assessment_id = a.id
-            WHERE {$whereClauseInner}
+            WHERE {$where}
             ORDER BY sr.published_at ASC
         ");
         $assessmentStatement->execute($pb->getParams());
@@ -2309,13 +2297,14 @@ class RubricMapper
         sort($feedbackIds);
 
 
-        // Step 2: Get max mark per criterion and dueWork
+        // Step 2: Get max mark per criterion and dueWork for each due work
         $results = [];
         $pb = new Builder($this->database, '');
         $pb->in('rg.parent_id', $folderIds)
            ->equals('rg.parent_type', Group::PARENT_TYPE_CATEGORY)
            ->greaterThan('rd.max_value', 0.0);
-        $whereClause = implode(' AND ', $pb->getWhere());
+
+        $where             = implode(' AND ', $pb->getWhere());
         $maxMarksStatement = $this->database->prepare("
             SELECT
                 rl.box_id AS boxId,
@@ -2327,7 +2316,7 @@ class RubricMapper
             JOIN rubric_criterion rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
             JOIN rubric_group     rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
             JOIN rubric_level     rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
-            WHERE {$whereClause}
+            WHERE {$where}
             GROUP BY rl.box_id, rc.id
             ORDER BY rl.box_id, rc.id
         ");
