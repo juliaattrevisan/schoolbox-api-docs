@@ -47,14 +47,15 @@ class Visibility
      * Instructor - is considered any user with WRITE+ perm to folder
      * Learner    - is considered any user with READ perm to folder
      *
-     * @param IAssessable $assessment Must have plans and participants loaded if viewer is a learner
-     * @param User        $viewer
-     * @param bool        $showClosed Should we exclude assessments if their close date has passed?
+     * @param IAssessable              $assessment Must have plans and participants loaded if viewer is a learner
+     * @param User                     $viewer
+     * @param bool                     $showClosed Should we exclude assessments if their close date has passed?
+     * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed): bool
+    public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed, Alaress_Date_Format $now = null): bool
     {
-        $now = Alaress_Date_Format::now();
+        $now = $now ?? Alaress_Date_Format::now();
 
         /** @noinspection NotOptimalIfConditionsInspection */
         if ($viewer->getRole()->isStaff() && $this->isVisibleToStaff($assessment, $viewer, $showClosed, $now)) {
@@ -130,7 +131,7 @@ class Visibility
      * @param Alaress_Date_Format $now
      * @return bool
      */
-    public function isVisibleToLearner(IAssessable $assessable, User $learner, bool $showClosed, Alaress_Date_Format $now): bool
+    private function isVisibleToLearner(IAssessable $assessable, User $learner, bool $showClosed, Alaress_Date_Format $now): bool
     {
         if ($assessable->isStaffOrInstructorVisibleOnly() && !$learner->getRole()->isStaff()) {
             // Staff learners can still see SIVO assessments as they are staff

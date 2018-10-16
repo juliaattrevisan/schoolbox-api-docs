@@ -95,7 +95,8 @@ class AssessmentListMutator
         $this->visibilityCache[$assessmentId] = $this->visibility->isVisibleToUser(
             $assessment,
             $this->user,
-            $this->showClosed
+            $this->showClosed,
+            $this->now
         );
         if ($this->visibilityCache[$assessmentId]) {
             return $assessment;
@@ -105,7 +106,7 @@ class AssessmentListMutator
         // based on that factor
         foreach ($this->user->getChildren() as $child) {
             if ($assessment->isParticipant($child)) {
-                if ($this->visibility->isVisibleToLearner($assessment, $child, $this->showClosed, $this->now)) {
+                if ($this->visibility->isVisibleToUser($assessment, $child, $this->showClosed, $this->now)) {
                     $this->visibilityCache[$assessmentId] = true;
                 } else {
                     $assessment->unsetUserParticipation($child);
