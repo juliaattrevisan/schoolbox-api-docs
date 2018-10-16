@@ -42,21 +42,14 @@ class DifferTest extends TestCase
     /**
      * Test various invalid diff cases
      *
-     * @expectedException \InvalidArgumentException
      * @dataProvider getTestDiffInvalidValuesData
      * @param array $a
      * @param array $b
-     * @param string $expectedExceptionValue
+     * @param array $expected
      */
-    public function testDiffInvalidValues(array $a, array $b, string $expectedExceptionValue): void
+    public function testDiffInvalidValues(array $a, array $b, array $expected): void
     {
-        try {
-            $this->differ->diff($a, $b);
-        } catch (\InvalidArgumentException $e) {
-            // Verify text matches $expectedExceptionValue, then rethrow
-            $this->assertContains($expectedExceptionValue, $e->getMessage());
-            throw $e;
-        }
+        $this->assertEquals($this->differ->diff($a, $b), $expected);
     }
 
     /**
@@ -119,12 +112,12 @@ class DifferTest extends TestCase
             'flat with array and scalar value' => [
                 ['a' => 1, '1234567890' => 2],
                 ['a' => 1, '1234567890' => ['c' => 3]],
-                '1234567890',
+                ['1234567890'=>[2,['c'=>3]]],
             ],
             'recursive with array and scalar value' => [
                 ['a' => 1, '1234567890' => ['0987654321' => 2,]],
                 ['a' => 1, '1234567890' => ['0987654321' => ['d' => 3]]],
-                '1234567890.0987654321',
+                ['1234567890'=>['0987654321'=>[2,['d'=>3]]]],
             ],
         ];
     }

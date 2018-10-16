@@ -62,11 +62,6 @@ class Differ
             // If one is and another isn't: that's an error
             $aIsArray = \is_array($aValue);
             $bIsArray = \is_array($bValue);
-            if ($aIsArray xor $bIsArray) {
-                throw new \InvalidArgumentException(
-                    sprintf('Cannot diff array with a non-array in key "%s"', $thisPath)
-                );
-            }
 
             // Is this scalar? Diff it now, otherwise recurse
             if ($aIsArray && $bIsArray) {
