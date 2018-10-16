@@ -37,11 +37,15 @@ class Visibility
      *
      * * Staff       - can see anytime (so long as not past close and we are hiding closed)
      * * Instructor  - can see anytime (so long as not past close and we are hiding closed)
-     * * Learner     - can only see if a participant (or parent of participant), and after publish date, and not SIVO
+     * * Learner     - can only see if a participant, and after publish date, and not SIVO
+     * * No Perms    - can only see if a participant, and after publish date, and not SIVO
      *
      * Staff      - is considered any user with role-type of 'staff'
      * Instructor - is considered any user with WRITE+ perm to folder
      * Learner    - is considered any user with READ perm to folder
+     * No Perms   - where a user has DENY perm to a folder
+     *
+     * SIVO => 'Staff/Instructor visible only' - derived from the assessment's workType
      *
      * @param IAssessable              $assessment Must have plans and participants loaded if viewer is a learner
      * @param User                     $viewer
