@@ -228,7 +228,7 @@ class Grid
         }
 
         $capabilityUsage = $this->retrieveCapabilityUsage($capability);
-        if ($capabilityUsage instanceof CapabilityUsage) {
+        if (!$capabilityUsage instanceof CapabilityUsage) {
             return false;
         }
 
