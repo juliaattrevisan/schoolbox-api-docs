@@ -47,8 +47,9 @@
                  # This is only off when self-reflecting with a grid that doesn't show descriptor points
                  # and groups - here, it never shows the group subtotal, and rowspan calcs are off
                  #}
-                {% set rowspan        = groupUsage.indicatorUsages|length + (showGroupTotal and rubricGrid.assessment.markPerCapability and markType.mode != "none" ? 1 : 0) %}
                 {% set capabilityMark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
+
+                {% set rowspan = groupUsage.indicatorUsages|length + (showGroupTotal and markType.mode != "none" ? 1 : 0) %}
 
                 {% for critIndex, critUsage in groupUsage.indicatorUsages %}
                 <tr data-group="{{ rubricId }}-{{ groupUsage.capability.id }}">

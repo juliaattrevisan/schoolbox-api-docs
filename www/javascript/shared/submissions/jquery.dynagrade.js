@@ -63,9 +63,18 @@
     }
 
     function calcPercent(callback) {
+        var percentage = 0;
+
         var scaledMark = this.attr('data-scaled-mark'),
-            max        = this.attr('data-max'),
-            percentage = parseFloat(scaledMark / max * 100);
+            maxFromIndicators = this.attr('data-row-max-sum'),
+            capMax = parseInt(this.attr('data-max'));
+
+        // If capability max is 0, use the max calculated from the indicators instead
+        if (capMax >= 0) {
+            percentage = parseInt(scaledMark / capMax * 100);
+        } else {
+            percentage = parseInt(scaledMark / maxFromIndicators * 100);
+        }
 
         if (isNaN(percentage)) {
             percentage = 0;

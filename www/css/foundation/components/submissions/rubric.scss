@@ -29,6 +29,10 @@ table.rb {
             select.groupMark {
                 width: initial;
             }
+
+            .meta {
+                color: darken($aluminum, 15%);
+            }
         }
 
         input[type=checkbox], input[type=radio] {

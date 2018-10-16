@@ -4,14 +4,12 @@
 
 {# What could the difference between these two things possibly be? #}
 {% set capabilityMaxValue = groupUsage.maxValue %}
-{% set capabilityMaxSum   = groupUsage.calculateMaxValueFromIndicators %}
+{% set capabilityMaxFromIndicators   = groupUsage.calculateMaxValueFromIndicators %}
 {% set capabilityNormMark = capabilityMark.retrieveNormalizedMark %}
 
 {% set markType = rubricGrid.assessment.markScheme.generateContext %}
-
-
 {% if showGroupTotal and markType.mode != "none" %}
-    {% set percentageMark     = (capabilityMark.value * (100 / capabilityMaxSum)) | round(2) %}
+    {% set percentageMark     = capabilityMark.value * (100 / capabilityMaxFromIndicators) %}
     {% set letterGradeBracket = false %}
     {% set letterGradeValue   = '' %}
 
@@ -36,72 +34,78 @@
               data-mark="{{ capabilityMark.value }}"
               data-scaled-mark="{{ capabilityScaledMark }}"
               data-max="{{ capabilityMaxValue }}"
-              data-row-max-sum="{{ capabilityMaxSum }}"
+              data-row-max-sum="{{ capabilityMaxFromIndicators }}"
               data-group-id="{{ capabilityId }}"
               data-rubric-id="{{ rubricGrid.id }}">
 
-            {# This is the value we insert into the database. #}
-            <input type="hidden"
-                   data-db-mark
-                   value="{{ capabilityMark.value }}"
-                   name="{{ formField }}[groups][{{ capabilityId }}][unscaledMark]">
+            {% if rubricGrid.isCapabilityMarkShown(groupUsage.capability) %}
 
-            {# This is the maximum capability mark, which wouldn't get POSTed otherwise #}
-            {# TODO don't post this: instead use the marked grid to calculate it #}
-            <input type="hidden"
-                   value="{{ capabilityMaxValue }}"
-                   name="{{ formField }}[groups][{{ capabilityId }}][max]">
+                {# This is the value we insert into the database. #}
+                <input type="hidden"
+                       data-db-mark
+                       value="{{ capabilityMark.value }}"
+                       name="{{ formField }}[groups][{{ capabilityId }}][unscaledMark]">
 
-            <label for="group-{{ capabilityId }}-mark">{{ locale.rubricGroup.proper }} mark</label>
+                {# This is the maximum capability mark, which wouldn't get POSTed otherwise #}
+                {# TODO don't post this: instead use the marked grid to calculate it #}
+                <input type="hidden"
+                       value="{{ capabilityMaxValue }}"
+                       name="{{ formField }}[groups][{{ capabilityId }}][max]">
 
-            {% if markType.mode == 'raw' %}
-                <input data-group-mark
-                       class="groupMark"
-                       id="group-{{ capabilityId }}-mark"
-                       type="tel"
-                       name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                       value="{{ capabilityScaledMark }}"/> / {{ capabilityMaxValue }}
+                <label for="group-{{ capabilityId }}-mark">{{ locale.rubricGroup.proper }} mark</label>
 
-            {% elseif markType.mode == 'letter' %}
-                <select data-group-mark
-                        class="groupMark"
-                        name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                        id="group-{{ capabilityId }}-mark">
+                {% if markType.mode == 'raw' %}
+                    <input data-group-mark
+                           class="groupMark"
+                           id="group-{{ capabilityId }}-mark"
+                           type="tel"
+                           name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
+                           value="{{ capabilityScaledMark }}"/> / {{ capabilityMaxValue }}
 
-                    {% for gradeLevel in rubricGrid.assessment.markScheme.gradeGroup.gradeLevels %}
-                        <option value="{{ gradeLevel.lowerBound }}"
-                                {% if letterGradeBracket == gradeLevel.lowerBound %}selected{% endif %}
-                                data-letter="{{ gradeLevel.caption }}">
-                            {{ gradeLevel.caption }}
-                        </option>
-                    {% endfor %}
-                </select>
+                {% elseif markType.mode == 'letter' %}
+                    <select data-group-mark
+                            class="groupMark"
+                            name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
+                            id="group-{{ capabilityId }}-mark">
 
-            {% elseif markType.mode == 'percent' %}
-                <input data-group-mark
-                       class="groupMark"
-                       id="group-{{ capabilityId }}-mark"
-                       type="tel"
-                       name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                       value="{{ percentageMark }}"/> %
-            {% endif %}
+                        {% for gradeLevel in rubricGrid.assessment.markScheme.gradeGroup.gradeLevels %}
+                            <option value="{{ gradeLevel.lowerBound }}"
+                                    {% if letterGradeBracket == gradeLevel.lowerBound %}selected{% endif %}
+                                    data-letter="{{ gradeLevel.caption }}">
+                                {{ gradeLevel.caption }}
+                            </option>
+                        {% endfor %}
+                    </select>
 
-            {% if groupUsage.containsDescriptorsWithValue %}
-                <button data-use-descriptor-values>Assign <span class="descriptor-sum" data-group-descriptor-sum>
-                    {% if markType.mode == 'raw' %}
-                        {{ capabilityScaledMark }}
+                {% elseif markType.mode == 'percent' %}
+                    <input data-group-mark
+                           class="groupMark"
+                           id="group-{{ capabilityId }}-mark"
+                           type="tel"
+                           name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
+                           value="{{ percentageMark }}"/> %
+                {% endif %}
 
-                    {% elseif markType.mode == 'letter' %}
-                        {{ letterGradeValue }}
+                {% if groupUsage.containsDescriptorsWithValue %}
+                    <button data-use-descriptor-values>Assign <span class="descriptor-sum" data-group-descriptor-sum>
+                        {% if markType.mode == 'raw' %}
+                            {{ capabilityScaledMark }}
 
-                    {% elseif markType.mode == 'percent' %}
-                        {{ percentageMark }}
+                        {% elseif markType.mode == 'letter' %}
+                            {{ letterGradeValue }}
 
-                    {% endif %}
-                    </span> from Descriptors</button>
-            {% endif %}
-            {% if markType.mode == 'letter' or markType.mode == 'percent' %}
-                <p>This {{ locale.rubricGroup }} contributes {{ (capabilityMaxValue / rubricGrid.calculateMaxValueFromCapabilities * 100) | round(2) }}% to the total mark</p>
+                        {% elseif markType.mode == 'percent' %}
+                            {{ percentageMark }}
+
+                        {% endif %}
+                        </span> from Descriptors</button>
+                {% endif %}
+                {% if markType.mode == 'letter' or markType.mode == 'percent' %}
+                    <p class="meta">This {{ locale.rubricGroup }} contributes {{ (capabilityMaxValue / rubricGrid.calculateMaxValueFromCapabilities * 100) | round(2) }}% to the total mark</p>
+                {% endif %}
+
+            {% else %}
+                <p class="meta">Descriptors in this {{ locale.rubricGroup }} do not contribute to the total mark, because the {{ locale.rubricGroup }}'s maximum points are 0.</p>
             {% endif %}
 
         </span>
