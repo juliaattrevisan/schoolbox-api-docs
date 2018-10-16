@@ -122,7 +122,7 @@ class Visibility
 
 
     /**
-     * Is the assessable visible to the Learner? (Assumes user is a learner)
+     * Is the assessable visible to the Learner? (Treats the user as a learner, even if they really have greater folder access)
      *
      * @param IAssessable         $assessable
      * @param User                $learner
