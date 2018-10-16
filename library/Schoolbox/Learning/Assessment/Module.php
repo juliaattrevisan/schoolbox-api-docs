@@ -17,6 +17,7 @@ use Schoolbox\Learning\Authorizer\Rule\CanAcknowledgeAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanPreview;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
+use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\ValidAssessmentType;
 use Schoolbox\Learning\Authorizer\Rule\IsDeletionUnLocked;
@@ -40,7 +41,6 @@ use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkRespons
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -607,6 +607,7 @@ class Module extends BaseModule
         return new Rule\All(
             new Rule\IsLoggedIn(),
             new AssessmentNotDeleted(),
+            new CanViewAssessable(new Visibility($this->getAccess())),
             new Rule\Any(
                 // Normal participants (whether explicit or dynamic participants)
                 new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions')),
