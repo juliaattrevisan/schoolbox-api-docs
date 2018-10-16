@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\Assessment\Participant\Test;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit_Framework_MockObject_MockObject;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -67,10 +68,14 @@ class AssessmentListMutatorTest extends TestCase
 
     /**
      * Test list mutator as a participant.
+     *
+     * @throws \PHPUnit_Framework_MockObject_RuntimeException
+     * @throws \PHPUnit\Framework\Exception
      */
-    public function testUser()
+    public function testUser(): void
     {
         // mock of visibility: pretend 1 visible, 2 not
+        /** @var Visibility|PHPUnit_Framework_MockObject_MockObject $mockVisibility */
         $mockVisibility = $this->createMock(Visibility::class);
         $mockVisibility
             ->expects($this->any())
@@ -78,10 +83,6 @@ class AssessmentListMutatorTest extends TestCase
             ->willReturnCallback(function (IAssessable $v) {
                 return $v->getId() === 1;
             });
-        $mockVisibility
-            ->expects($this->any())
-            ->method('isVisibleToLearner')
-            ->willReturn(false);
 
         $mutator = new AssessmentListMutator($this->student, $mockVisibility, \Alaress_Date_Format::now(), true);
 
@@ -98,20 +99,21 @@ class AssessmentListMutatorTest extends TestCase
         $this->assertArrayNotHasKey(2, $filteredAssessments);
     }
 
+
     /**
      * Test list mutator as the parent of a participant.
+     *
+     * @throws \PHPUnit_Framework_MockObject_RuntimeException
+     * @throws \PHPUnit\Framework\Exception
      */
-    public function testParentOfUser()
+    public function testParentOfUser(): void
     {
         // mock of visibility: pretend 2 visible, 1 not
+        /** @var Visibility|PHPUnit_Framework_MockObject_MockObject $mockVisibility */
         $mockVisibility = $this->createMock(Visibility::class);
         $mockVisibility
             ->expects($this->any())
             ->method('isVisibleToUser')
-            ->willReturn(false);
-        $mockVisibility
-            ->expects($this->any())
-            ->method('isVisibleToLearner')
             ->willReturnCallback(function (IAssessable $v) {
                 return $v->getId() === 2;
             });
