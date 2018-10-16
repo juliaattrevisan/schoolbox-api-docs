@@ -40,7 +40,7 @@ class Visibility
      *
      * * Staff       - can see anytime (so long as not past close and we are hiding closed)
      * * Instructor  - can see anytime (so long as not past close and we are hiding closed)
-     * * Learner     - can only see if a participant (or parent of participant), and after publish date
+     * * Learner     - can only see if a participant (or parent of participant), and after publish date, and not SIVO
      *
      * Staff      - is considered any user with role-type of 'staff'
      * Instructor - is considered any user with WRITE+ perm to folder
