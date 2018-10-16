@@ -91,14 +91,14 @@
                             </div>
                         </td>
                         <td class="hide-for-small">
-                            <select id='absenceType{STUDENT_UID}' name='PossibleAbsenceCode[]'>
+                            <select id='absenceType{STUDENT_SYNERGY_ID}' name='PossibleAbsenceCode[]'>
                                 <!-- BEGIN absence_options -->
                                 <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_VALUE_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
                                 <!-- END absence_options -->
                             </select>
                         </td>
                         <td class="hide-for-small">
-                            <select id='absenceReason{STUDENT_UID}' name='PossibleReasonCode[]'>
+                            <select id='absenceReason{STUDENT_SYNERGY_ID}' name='PossibleReasonCode[]'>
                                 <!-- BEGIN reason_options -->
                                 <option value='{REASON_OPTIONS_VALUE}' data-chained="{REASON_OPTIONS_TYPE}" {REASON_OPTIONS_VALUE_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
                                 <!-- END reason_options -->
@@ -116,7 +116,7 @@
                     </tr>
                     <script>
                         $(function() {
-                           $('#absenceReason{STUDENT_UID}').chained('#absenceType{STUDENT_UID}');
+                           $('#absenceReason{STUDENT_SYNERGY_ID}').chained('#absenceType{STUDENT_SYNERGY_ID}');
                         })
                     </script>
                     <!-- END student -->
