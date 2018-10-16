@@ -88,7 +88,7 @@ class Visibility
      * @param Alaress_Date_Format $now
      * @return bool
      */
-    public function isVisibleToInstructor(IAssessable $assessable, User $instructor, bool $showClosed, Alaress_Date_Format $now): bool
+    private function isVisibleToInstructor(IAssessable $assessable, User $instructor, bool $showClosed, Alaress_Date_Format $now): bool
     {
         if ($showClosed) {
             return true;
@@ -109,7 +109,7 @@ class Visibility
      * @param Alaress_Date_Format $now
      * @return bool
      */
-    public function isVisibleToStaff(IAssessable $assessable, User $staff, bool $showClosed, Alaress_Date_Format $now): bool
+    private function isVisibleToStaff(IAssessable $assessable, User $staff, bool $showClosed, Alaress_Date_Format $now): bool
     {
         if ($showClosed) {
             return true;
