@@ -147,7 +147,7 @@
              */
             $.ajax({
                 type: config.element.attr('method'),
-                url: config.element.attr('action'),
+                url: config.element.attr('data-action-draft'),
                 data: formContents,
                 dataType: 'json'
             }).success(function (responseText) {

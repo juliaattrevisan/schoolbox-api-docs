@@ -121,7 +121,7 @@
             {% set formActionSubmit = '' %}
         {% endif %}
 
-        <form id="createForm" action="{{ formAction }}" data-action-submit="{{ formActionSubmit }}" method="post">
+        <form id="createForm" action="{{ formAction }}" data-action-draft="{{ formAction }}" data-action-submit="{{ formActionSubmit }}" method="post">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -470,7 +470,7 @@
                 staller: $submitButton,
                 onSaveSuccess: function (response) {
                     // Update the form actions
-                    $createForm.attr('action', response.updateRoute);
+                    $createForm.attr('data-action-draft', response.updateRoute);
                     if (response.approveRoute) {
                         $createForm.attr('data-action-submit', response.approveRoute);
                     } else {
