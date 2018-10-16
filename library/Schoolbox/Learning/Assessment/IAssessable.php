@@ -457,6 +457,14 @@ interface IAssessable extends ISoftDeletable
      */
     public function getCountFeedbacks(bool $includeDrafts = false): int;
 
+
+    /**
+     * Returns whether this assessment should only visible to staff and instructors
+     *
+     * @return bool
+     */
+    public function isStaffOrInstructorVisibleOnly(): bool;
+
     /* Getters/Setters
      */
 
@@ -760,6 +768,7 @@ interface IAssessable extends ISoftDeletable
      * @return string
      */
     public function getFeedbackClass();
+
 
     /**
      * A collection of Curriculum Nodes

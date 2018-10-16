@@ -576,6 +576,19 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * @inheritdoc
+     * @throws InsufficientHydrationException
+     */
+    public function isStaffOrInstructorVisibleOnly(): bool
+    {
+        if (null === $this->workType) {
+            return false;
+        }
+        return $this->workType->isStaffOrInstructorVisibleOnly();
+    }
+
+
+    /**
      * The friendly, uninformative version of assertValidDates
      *
      * @return bool
