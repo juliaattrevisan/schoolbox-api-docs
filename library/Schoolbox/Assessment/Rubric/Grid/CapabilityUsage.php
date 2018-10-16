@@ -156,6 +156,23 @@ class CapabilityUsage
 
 
     /**
+     * Should capability marks show for this capability usage?
+     *
+     * Marks will only show if:
+     * * the max value for this capability is greater than zero
+     * * if the assessment's mark-per-capability field is on
+     *   (this is not knowable by this object:
+     *   @see \Schoolbox\Assessment\Rubric\Grid\Grid::isCapabilityMarkShown)
+     *
+     * @return bool
+     */
+    public function isCapabilityMarkShown(): bool
+    {
+        return $this->maxValue > 0;
+    }
+
+
+    /**
      * @return Capability
      */
     public function getCapability(): Capability

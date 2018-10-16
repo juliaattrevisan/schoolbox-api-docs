@@ -406,4 +406,142 @@ class CapabilityUsage extends TestCase
     {
         $this->assertSame($expected, $capabilityUsage->calculateMarkMultiplier());
     }
+
+
+    /**
+     * Helper for generating capability usage objects.
+     *
+     * @param array $capabilityUsage A single capability usage
+     *                               (@see `\Schoolbox\Assessment\Rubric\Grid\Test\Generator::generateGrid`)
+     * @return RubricGrid\CapabilityUsage
+     */
+    private function generateCapabilityUsage(array $capabilityUsage): RubricGrid\CapabilityUsage
+    {
+        $generator = new Generator();
+        $testGrid  = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            [1 => $capabilityUsage]
+        );
+        return $testGrid->retrieveCapabilityUsage($testGrid->getRowSet()->retrieveCapability(1));
+    }
+
+
+    /**
+     * Data provider for `testIsCapabilityMarkShown`.
+     *
+     * @return iterable
+     */
+    public function getTestIsCapabilityMarkShownData(): iterable
+    {
+        $capabilityUsage = $this->generateCapabilityUsage([
+            'maxValue'   => 0,
+            'indicators' => [],
+        ]);
+        yield 'Empty capability' => [$capabilityUsage, false];
+
+
+        $capabilityUsage = $this->generateCapabilityUsage([
+            'maxValue'   => 0,
+            'indicators' => [
+                11 => [],
+            ],
+        ]);
+        yield 'Empty indicators' => [$capabilityUsage, false];
+
+
+        $capabilityUsage = $this->generateCapabilityUsage([
+            'maxValue'   => 0,
+            'indicators' => [
+                11 => [
+                    'descriptors' => [
+                        111 => [
+                            'levelId'     => 1,
+                            'description' => 'Poor',
+                        ],
+                        112 => [
+                            'levelId'     => 2,
+                            'description' => 'Okay',
+                        ],
+                    ],
+                ],
+                12 => [
+                    'descriptors' => [
+                        121 => [
+                            'levelId'     => 1,
+                            'description' => 'Poor',
+                        ],
+                        122 => [
+                            'levelId'     => 2,
+                            'description' => 'Okay',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        yield 'Indicators with no value descriptors' => [$capabilityUsage, false];
+
+
+        $capabilityUsage = $this->generateCapabilityUsage([
+            'maxValue'   => 4,
+            'indicators' => [
+                11 => [
+                    'descriptors' => [
+                        111 => [
+                            'levelId'     => 1,
+                            'description' => 'Poor',
+                            'value'       => 0,
+                        ],
+                        112 => [
+                            'levelId'     => 2,
+                            'description' => 'Okay',
+                            'value'       => 2,
+                        ],
+                    ],
+                ],
+                12 => [
+                    'descriptors' => [
+                        121 => [
+                            'levelId'     => 1,
+                            'description' => 'Poor',
+                            'value'       => 0,
+                        ],
+                        112 => [
+                            'levelId'     => 2,
+                            'description' => 'Okay',
+                            'value'       => 2,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        yield 'Indicators with valued descriptors' => [$capabilityUsage, true];
+
+
+        $capabilityUsage = $this->generateCapabilityUsage([
+            'maxValue'   => 12,
+            'indicators' => [],
+        ]);
+        yield 'Capability with max value' => [$capabilityUsage, true];
+
+
+        $capabilityUsage = $this->generateCapabilityUsage([
+            'maxValue'   => 0,
+            'indicators' => [],
+        ]);
+        yield 'Capability without max value' => [$capabilityUsage, false];
+    }
+
+
+    /**
+     * @dataProvider getTestIsCapabilityMarkShownData
+     * @covers \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage::isCapabilityMarkShown
+     *
+     * @param RubricGrid\CapabilityUsage $capabilityUsage
+     * @param bool                       $expected
+     */
+    public function testIsCapabilityMarkShown(RubricGrid\CapabilityUsage $capabilityUsage, bool $expected): void
+    {
+        $this->assertSame($expected, $capabilityUsage->isCapabilityMarkShown());
+    }
 }
