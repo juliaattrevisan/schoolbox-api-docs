@@ -59,17 +59,14 @@ class Visibility
         }
 
         // Is viewer an instructor?
-        $folderAccessLevel = $this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId());
-        if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
+        if ($this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId()) >= UserAccess::ACCESS_WRITE) {
             if ($this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now)) {
                 return true;
             }
-        } // Is viewer a learner?
-        elseif ($folderAccessLevel === UserAccess::ACCESS_READ) {
-            // Is the viewer a participant themselves?
-            if ($this->isVisibleToLearner($assessment, $viewer, $showClosed, $now)) {
-                return true;
-            }
+        }
+        // Not an instructor. Can they see due to their participation?
+        elseif($this->isVisibleToNonInstructor($assessment, $viewer, $showClosed, $now)) {
+            return true;
         }
 
         return false;
@@ -127,7 +124,7 @@ class Visibility
      * @param Alaress_Date_Format $now
      * @return bool
      */
-    private function isVisibleToLearner(IAssessable $assessable, User $learner, bool $showClosed, Alaress_Date_Format $now): bool
+    private function isVisibleToNonInstructor(IAssessable $assessable, User $learner, bool $showClosed, Alaress_Date_Format $now): bool
     {
         if ($assessable->isStaffOrInstructorVisibleOnly() && !$learner->getRole()->isStaff()) {
             // Staff learners can still see SIVO assessments as they are staff
