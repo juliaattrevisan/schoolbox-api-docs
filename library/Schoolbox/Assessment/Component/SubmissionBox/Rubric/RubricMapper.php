@@ -2265,7 +2265,10 @@ class RubricMapper
         $pb->in('rg.parent_id', $folderIds)
            ->equals('rg.parent_type', Group::PARENT_TYPE_CATEGORY)
            ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase())
-           ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
+           ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+           ->isNull('a.deleted_at')
+           ->notNull('sr.published_at')
+           ->isNull('sr.deleted_at');
 
         $finish = $term->getActualFinish();
         if (null !== $finish && !$finish->isNull()) {
@@ -2275,9 +2278,49 @@ class RubricMapper
         $whereClauseInner = implode(' AND ', $pb->getWhere());
         $whereClauseOuter = implode(' AND ', $pb->getWhere());
 
+
+        // Step 1: figure out the due works in the term for the given folders
+        $assessmentStatement = $this->database->prepare("
+            SELECT
+                sr.owner AS studentId,
+                sr.id    AS feedbackId,
+                a.id     AS assessmentId
+            FROM submission_return sr
+            INNER JOIN submission_box      sb ON sr.box_id = sb.id
+            INNER JOIN rubric_group_usage rgu ON sb.id = rgu.submission_box_id
+            INNER JOIN rubric_group        rg ON rgu.rubric_group_id = rg.id
+            INNER JOIN assessment           a ON sb.assessment_id = a.id
+            WHERE {$whereClauseInner}
+            ORDER BY sr.published_at ASC
+        ");
+        $assessmentStatement->execute($pb->getParams());
+
+        $groupedFeedbackIds = [];
+        foreach ($assessmentStatement as $row) {
+            $groupedFeedbackIds[$row['assessmentId']][$row['studentId']] = $row['feedbackId'];
+        }
+
+        // We don't care about the assessment ID; only that the feedback is the
+        // most recent for that assessment.
+        $feedbackIds = [];
+        foreach ($groupedFeedbackIds as $assessmentId => $feedbackIdsByStudent) {
+            $feedbackIds = array_merge($feedbackIds, $feedbackIdsByStudent);
+        }
+        sort($feedbackIds);
+
+
+        // Step 2: pass to getLongitudinal or similar?
+
+
+
+
         // 1. Get latest published student marks
         $stmt = $this->database->prepare("
-            SELECT sr.owner, sb.id AS 'sb.id', rc.id AS 'rc.id', rm.value AS 'mark'
+            SELECT
+                sr.owner,
+                sb.id    AS 'sb.id',
+                rc.id    AS 'rc.id',
+                rm.value AS 'mark'
             FROM rubric_descriptor_mark rm
             JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
             JOIN rubric_criterion       rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
@@ -2321,7 +2364,12 @@ class RubricMapper
            ->greaterThan('rd.max_value', 0.0);
         $whereClause = implode(' AND ', $pb->getWhere());
         $stmt        = $this->database->prepare("
-            SELECT rl.box_id AS 'sb.id', rc.id AS 'rc.id', rg.name AS grouping, rc.name, MAX(rd.max_value) AS 'max_mark'
+            SELECT
+                rl.box_id AS 'sb.id',
+                rc.id     AS 'rc.id',
+                rg.name   AS grouping,
+                rc.name,
+                MAX(rd.max_value) AS 'max_mark'
             FROM rubric_descriptor rd
             JOIN rubric_criterion rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
             JOIN rubric_group     rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
