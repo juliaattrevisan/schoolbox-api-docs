@@ -656,8 +656,8 @@ class CohortAnalysis
 
         /** @var Collection|Collection[]|FolderLog[][] $accessLogs */
         $accessLogs = FolderLogMapper::getInstance()->findByColumnList([
-            'user' => $userIds,
-            'cid'  => $folderIds,
+            'user_id'   => $userIds,
+            'folder_id' => $folderIds,
         ])->groupByCallback(function (FolderLog $log) {
             return $log->getUser()->getId();
         });
