@@ -2316,11 +2316,15 @@ class RubricMapper
         $where               = implode(' AND ', $pb->getWhere());
         $descriptorStatement = $this->database->prepare("
             SELECT
-                rg.name AS grouping,
+                sb.id    AS boxId,
+                sr.owner AS studentId,
+                rc.id    AS criterionId,
+                rg.name  AS grouping,
                 rc.name,
                 a.id,
                 a.title,
-                rd.description
+                rd.description,
+                rdm.value
             FROM       rubric_descriptor_mark rdm
             INNER JOIN rubric_group_mark      rgm ON rdm.rubric_group_mark_id = rgm.id
             INNER JOIN rubric_group            rg ON rgm.rubric_group_id = rg.id
@@ -2335,108 +2339,130 @@ class RubricMapper
         $descriptorStatement->execute($pb->getParams());
 
 
-
-
-        // 1. Get latest published student marks
-        $stmt = $this->database->prepare("
-            SELECT
-                sr.owner,
-                sb.id    AS 'sb.id',
-                rc.id    AS 'rc.id',
-                rm.value AS 'mark'
-            FROM rubric_descriptor_mark rm
-            JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
-            JOIN rubric_criterion       rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
-            JOIN rubric_group           rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
-            JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
-            JOIN submission_return      sr ON sr.id = rgm.return_id
-            JOIN submission_box         sb ON sb.id = sr.box_id
-            JOIN assessment              a ON  a.id = sb.assessment_id
-            JOIN (
-                -- ^Changed from LEFT JOIN to JOIN to allow filter out deleted feedbacks 
-                -- Get the latest published marks
-                SELECT
-                    MAX(sr.published_at) AS 'max_published_at',
-                    sr.id AS r_id,
-                    sr.owner AS 'student_id',
-                    sr.box_id AS 'sb_id'
-                FROM rubric_descriptor_mark rm
-                JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
-                JOIN rubric_criterion       rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
-                JOIN rubric_group           rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
-                JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
-                JOIN submission_return      sr ON sr.id = rgm.return_id
-                JOIN submission_box         sb ON sb.id = sr.box_id
-                JOIN assessment              a ON  a.id = sb.assessment_id
-                WHERE {$whereClauseInner}
-                AND rm.valid
-                AND sr.published_at IS NOT NULL
-                GROUP BY sr.owner, sr.box_id, sr.id
-            ) t ON t.r_id = rgm.return_id
-            WHERE {$whereClauseOuter}
-            AND rm.valid
-            AND sr.published_at IS NOT NULL;
-        ");
-        $stmt->execute($pb->getParams());
-        $studentMarks = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // 2. Get max mark per criterion and dueWork
-        $pb = new Builder($this->database, '');
-        $pb->in('rg.parent_id', $folderIds)
-           ->equals('rg.parent_type', Group::PARENT_TYPE_CATEGORY)
-           ->greaterThan('rd.max_value', 0.0);
-        $whereClause = implode(' AND ', $pb->getWhere());
-        $stmt        = $this->database->prepare("
-            SELECT
-                rl.box_id AS 'sb.id',
-                rc.id     AS 'rc.id',
-                rg.name   AS grouping,
-                rc.name,
-                MAX(rd.max_value) AS 'max_mark'
-            FROM rubric_descriptor rd
-            JOIN rubric_criterion rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
-            JOIN rubric_group     rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
-            JOIN rubric_level     rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
-            WHERE {$whereClause}
-            GROUP BY rl.box_id, rc.id
-            ORDER BY rl.box_id, rc.id
-        ");
-        $stmt->execute($pb->getParams());
-        // 3. Convert each student mark into a normalised value
+        // Step 3: smoosh them all together
         $results = [];
+        foreach ($descriptorStatement as $row) {
+            $boxId       = $row['boxId'];
+            $criterionId = $row['criterionId'];
 
-        /** @noinspection PhpAssignmentInConditionInspection */
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $boxId       = $row['sb.id'];
-            $criterionId = $row['rc.id'];
-
-            if (!is_array($results[$boxId])) {
-                $results[$boxId] = [];
+            if (!isset($results[$boxId][$criterionId])) {
+                // Don't know max mark yet
+                $results[$boxId][$criterionId] = [
+                    'grouping' => $row['grouping'],
+                    'name'     => $row['name'],
+                    'maxMark'  => $row['max_mark'],
+                    'marks'    => [],
+                ];
             }
-            $results[$boxId][$criterionId] = [
-                'grouping' => $row['grouping'],
-                'name'     => $row['name'],
-                'maxMark'  => $row['max_mark'],
-                'marks'    => [],
-            ];
+
+            $mark = $row['value'];
+            $results[$boxId][$criterionId]['marks'][$row['studentId']] = $mark;
+//            $results[$boxId][$criterionId]['marks'][$row['studentId']] = 100.0 * $mark / $maxMark;
         }
 
-        foreach ($studentMarks as $row) {
-            $mark = $row['mark'];
-            if (null === $mark) {
-                // If student does not have a numeric mark, cannot calculate normalised mark
-                continue;
-            }
-            $boxId       = $row['sb.id'];
-            $criterionId = $row['rc.id'];
-            $maxMark     = $results[$boxId][$criterionId]['maxMark'] ?? null;
-            if (null === $maxMark) {
-                // This criterion has a max mark of 0.0 and therefore was not fetched into results array. Cannot calculate a normalised mark
-                continue;
-            }
 
-            $results[$boxId][$criterionId]['marks'][$row['owner']] = 100.0 * $mark / $maxMark;
-        }
+
+
+//        // 1. Get latest published student marks
+//        $stmt = $this->database->prepare("
+//            SELECT
+//                sr.owner,
+//                sb.id    AS 'sb.id',
+//                rc.id    AS 'rc.id',
+//                rm.value AS 'mark'
+//            FROM rubric_descriptor_mark rm
+//            JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
+//            JOIN rubric_criterion       rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+//            JOIN rubric_group           rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
+//            JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
+//            JOIN submission_return      sr ON sr.id = rgm.return_id
+//            JOIN submission_box         sb ON sb.id = sr.box_id
+//            JOIN assessment              a ON  a.id = sb.assessment_id
+//            JOIN (
+//                -- ^Changed from LEFT JOIN to JOIN to allow filter out deleted feedbacks
+//                -- Get the latest published marks
+//                SELECT
+//                    MAX(sr.published_at) AS 'max_published_at',
+//                    sr.id AS r_id,
+//                    sr.owner AS 'student_id',
+//                    sr.box_id AS 'sb_id'
+//                FROM rubric_descriptor_mark rm
+//                JOIN rubric_descriptor      rd ON rd.id = rm.descriptor_id AND rd.deleted_at IS NULL
+//                JOIN rubric_criterion       rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+//                JOIN rubric_group           rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
+//                JOIN rubric_group_mark     rgm ON rg.id = rgm.rubric_group_id
+//                JOIN submission_return      sr ON sr.id = rgm.return_id
+//                JOIN submission_box         sb ON sb.id = sr.box_id
+//                JOIN assessment              a ON  a.id = sb.assessment_id
+//                WHERE {$whereClauseInner}
+//                AND rm.valid
+//                AND sr.published_at IS NOT NULL
+//                GROUP BY sr.owner, sr.box_id, sr.id
+//            ) t ON t.r_id = rgm.return_id
+//            WHERE {$whereClauseOuter}
+//            AND rm.valid
+//            AND sr.published_at IS NOT NULL;
+//        ");
+//        $stmt->execute($pb->getParams());
+//        $studentMarks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+//
+//        // 2. Get max mark per criterion and dueWork
+//        $pb = new Builder($this->database, '');
+//        $pb->in('rg.parent_id', $folderIds)
+//           ->equals('rg.parent_type', Group::PARENT_TYPE_CATEGORY)
+//           ->greaterThan('rd.max_value', 0.0);
+//        $whereClause = implode(' AND ', $pb->getWhere());
+//        $stmt        = $this->database->prepare("
+//            SELECT
+//                rl.box_id AS 'sb.id',
+//                rc.id     AS 'rc.id',
+//                rg.name   AS grouping,
+//                rc.name,
+//                MAX(rd.max_value) AS 'max_mark'
+//            FROM rubric_descriptor rd
+//            JOIN rubric_criterion rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+//            JOIN rubric_group     rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
+//            JOIN rubric_level     rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
+//            WHERE {$whereClause}
+//            GROUP BY rl.box_id, rc.id
+//            ORDER BY rl.box_id, rc.id
+//        ");
+//        $stmt->execute($pb->getParams());
+//        // 3. Convert each student mark into a normalised value
+//        $results = [];
+//
+//        /** @noinspection PhpAssignmentInConditionInspection */
+//        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+//            $boxId       = $row['sb.id'];
+//            $criterionId = $row['rc.id'];
+//
+//            if (!is_array($results[$boxId])) {
+//                $results[$boxId] = [];
+//            }
+//            $results[$boxId][$criterionId] = [
+//                'grouping' => $row['grouping'],
+//                'name'     => $row['name'],
+//                'maxMark'  => $row['max_mark'],
+//                'marks'    => [],
+//            ];
+//        }
+//
+//        foreach ($studentMarks as $row) {
+//            $mark = $row['mark'];
+//            if (null === $mark) {
+//                // If student does not have a numeric mark, cannot calculate normalised mark
+//                continue;
+//            }
+//            $boxId       = $row['sb.id'];
+//            $criterionId = $row['rc.id'];
+//            $maxMark     = $results[$boxId][$criterionId]['maxMark'] ?? null;
+//            if (null === $maxMark) {
+//                // This criterion has a max mark of 0.0 and therefore was not fetched into results array. Cannot calculate a normalised mark
+//                continue;
+//            }
+//
+//            $results[$boxId][$criterionId]['marks'][$row['owner']] = 100.0 * $mark / $maxMark;
+//        }
         return $results;
     }
 
