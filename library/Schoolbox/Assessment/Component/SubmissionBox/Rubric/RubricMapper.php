@@ -2310,6 +2310,29 @@ class RubricMapper
 
 
         // Step 2: pass to getLongitudinal or similar?
+        $pb = new Builder($this->database, '');
+        $pb->in('sr.id', $feedbackIds);
+
+        $where               = implode(' AND ', $pb->getWhere());
+        $descriptorStatement = $this->database->prepare("
+            SELECT
+                rg.name AS grouping,
+                rc.name,
+                a.id,
+                a.title,
+                rd.description
+            FROM       rubric_descriptor_mark rdm
+            INNER JOIN rubric_group_mark      rgm ON rdm.rubric_group_mark_id = rgm.id
+            INNER JOIN rubric_group            rg ON rgm.rubric_group_id = rg.id
+            INNER JOIN rubric_descriptor       rd ON rdm.descriptor_id = rd.id
+            INNER JOIN rubric_criterion        rc ON rd.criterion_id = rc.id
+            INNER JOIN submission_return       sr ON rgm.return_id = sr.id
+            INNER JOIN submission_box          sb ON sr.box_id = sb.id
+            INNER JOIN assessment               a ON sb.assessment_id = a.id
+            WHERE {$where}
+            ORDER BY rg.name ASC, rc.name ASC, a.due_date DESC;
+        ");
+        $descriptorStatement->execute($pb->getParams());
 
 
 
