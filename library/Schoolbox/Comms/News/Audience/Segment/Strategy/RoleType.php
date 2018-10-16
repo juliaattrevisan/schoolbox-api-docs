@@ -32,7 +32,7 @@ class RoleType extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getSearchSql(User $user, string $searchPlaceholder = null): string
+    public function getAudiencingSql(User $user, string $searchPlaceholder = null): string
     {
         return "SELECT 0, 'name todo', 'type todo' from dual WHERE false"; // TODO
     }

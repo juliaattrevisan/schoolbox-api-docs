@@ -41,7 +41,7 @@ class SchoolHouse extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getSearchSql(User $user, string $searchPlaceholder = null): string
+    public function getAudiencingSql(User $user, string $searchPlaceholder = null): string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "WHERE house LIKE :{$searchPlaceholder}";
 

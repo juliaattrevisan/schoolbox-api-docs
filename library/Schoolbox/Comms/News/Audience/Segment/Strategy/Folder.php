@@ -158,7 +158,7 @@ class Folder extends SimpleStrategy
      * @throws InvalidColumnException
      * @throws Mapper\DefinitionException
      */
-    public function getSearchSql(User $user, string $searchPlaceholder = null): string
+    public function getAudiencingSql(User $user, string $searchPlaceholder = null): string
     {
         $folderMembershipSql = '';
         $entityType          = self::getEntityType();

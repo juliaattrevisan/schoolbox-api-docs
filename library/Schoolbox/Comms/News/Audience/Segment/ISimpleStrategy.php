@@ -37,7 +37,7 @@ interface ISimpleStrategy extends IStrategy
      * @param string $searchPlaceholder If specified, include a WHERE clause to filter by keyword
      * @return string
      */
-    public function getSearchSql(User $user, string $searchPlaceholder = null): string;
+    public function getAudiencingSql(User $user, string $searchPlaceholder = null): string;
 
 
     /**
