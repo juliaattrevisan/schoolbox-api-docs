@@ -409,51 +409,10 @@
         var $createForm = $('#createForm');
         var $submitButtons = $('#news-submit, #news-preview');
         var $submitButton = $('#news-submit');
+        var validationDeferred;
 
         // Init validation
         $createForm.alaressValidate();
-
-        /**
-         * Listen for a click on one of the submit buttons
-         * This bypasses the staller because the event is assigned directly to the element (rather than doing $(document).on)
-         * So this will be called first, then one of the two event below will fire once stallSubmit resolves
-         */
-        $submitButtons.click(function() {
-            if (!$createForm.valid()) {
-                // Scroll to error
-                // TODO: this doesn't scroll to the audience selector. we'll need to rebase our fork of selectize before we can fix this
-                $createForm.data('validator').errorList[0].element.focus();
-            } else {
-                // Make submit buttons readonly
-                // Can't use disabled because then the click event below won't work
-                $submitButtons.attr('readonly', 'readonly');
-
-                // Update the text on the button clicked
-                $(this).text('Working...');
-            }
-        });
-
-        /**
-         * Listen for a click on the submit button
-         * This is the event that will be stalled (if isAutosavable)
-         */
-        $createForm.on('click', '#news-submit', function (event) {
-            event.preventDefault();
-            if ($createForm.valid()) {
-                submitForm('submit');
-            }
-        });
-
-        /*
-         * Listen for a click on the preview button
-         * This event doesn't need to be stalled because the backend will save the post data
-         */
-        $createForm.on('click', '#news-preview', function(event) {
-            event.preventDefault();
-            if ($createForm.valid()) {
-                submitForm('preview');
-            }
-        });
 
         {% if isAutoSavable %}
             // Init a stall submit on the submit click
@@ -489,6 +448,61 @@
                 }
             });
         {% endif %}
+
+        /**
+         * Listen for a click on one of the submit buttons
+         * This bypasses the staller because the event is assigned directly to the element (rather than doing $(document).on)
+         * So this will be called first, then one of the two event below will fire once stallSubmit resolves
+         */
+        $submitButtons.click(function() {
+            if (!$createForm.valid()) {
+                // Scroll to error
+                // TODO: this doesn't scroll to the audience selector. we'll need to rebase our fork of selectize before we can fix this
+                $createForm.data('validator').errorList[0].element.focus();
+
+                {% if isAutoSavable %}
+                    if (validationDeferred === undefined || (validationDeferred && validationDeferred.state === 'resolved')) {
+                        // Add another deferred object for validation
+                        validationDeferred = $.Deferred();
+                        $submitButton.stallSubmit(validationDeferred);
+                    }
+                {% endif %}
+            } else {
+                // Make submit buttons readonly
+                // Can't use disabled because then the click event below won't work
+                $submitButtons.attr('readonly', 'readonly');
+
+                // Update the text on the button clicked
+                $(this).text('Working...');
+
+                // Resolve validation defer
+                if (validationDeferred !== undefined) {
+                    validationDeferred.resolve();
+                }
+            }
+        });
+
+        /**
+         * Listen for a click on the submit button
+         * This is the event that will be stalled (if isAutosavable)
+         */
+        $createForm.on('click', '#news-submit', function (event) {
+            event.preventDefault();
+            if ($createForm.valid()) {
+                submitForm('submit');
+            }
+        });
+
+        /*
+         * Listen for a click on the preview button
+         * This event doesn't need to be stalled because the backend will save the post data
+         */
+        $createForm.on('click', '#news-preview', function(event) {
+            event.preventDefault();
+            if ($createForm.valid()) {
+                submitForm('preview');
+            }
+        });
 
         /**
          * Submitting the create/update form
