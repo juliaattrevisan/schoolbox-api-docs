@@ -479,6 +479,9 @@
                 if (validationDeferred !== undefined) {
                     validationDeferred.resolve();
                 }
+
+                // TODO: Would be nice to clear the draft timeout at this point, so that this doesn't provide the 3 second grace period
+                //       It will require a new public method on the draft plugin to clear it
             }
         });
 
