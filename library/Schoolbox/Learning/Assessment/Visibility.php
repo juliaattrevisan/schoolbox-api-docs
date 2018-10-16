@@ -132,6 +132,10 @@ class Visibility
      */
     public function isVisibleToLearner(IAssessable $assessable, User $learner, bool $showClosed, Alaress_Date_Format $now): bool
     {
+        if ($assessable->isStaffOrInstructorVisibleOnly() && !$learner->getRole()->isStaff()) {
+            // Staff learners can still see SIVO assessments as they are staff
+            return false;
+        }
         $participant = $assessable->getParticipantIfExtant($learner);
         if (!$participant || $participant->isExcluded()) {
             return false;
