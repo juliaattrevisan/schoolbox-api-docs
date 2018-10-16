@@ -66,12 +66,6 @@ class Results implements Searchable
     private $result;
 
     /**
-     * The thing you searched for
-     * @var string
-     */
-    private $keyword = '';
-
-    /**
      * Constructor
      *
      * $type is 'all' or specific to which tab you selected e.g. 'link'
