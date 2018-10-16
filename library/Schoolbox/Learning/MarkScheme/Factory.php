@@ -120,7 +120,7 @@ class Factory
                 if ($maxMark > 0) {
                     return new TotalMarkFractional($maxMark);
                 }
-                throw new \UnexpectedValueException("Invalid MaxMark value for Total Mark MarkType: " . $maxMark);
+                return new None();
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
             default:
