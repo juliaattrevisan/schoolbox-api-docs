@@ -85,6 +85,20 @@ class Folder extends SimpleStrategy
     /**
      * @inheritdoc
      */
+    public function getSearchSql(User $user): string
+    {
+        $query = '
+            SELECT cid
+            FROM perms
+            WHERE gid = ' . $user->getRole()->getId() . ' 
+            AND type > ' . UserAccess::ACCESS_DENY;
+
+        return $query;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function canAudienceToEntityType(User $user): bool
     {
         // All users can always create folder audience segments

@@ -68,4 +68,12 @@ class Role extends SimpleStrategy
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(User $user): string
+    {
+        return '';
+    }
 }

@@ -46,4 +46,12 @@ class Service extends SimpleStrategy
     {
         return ''; // TODO
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(User $user): string
+    {
+        return '';
+    }
 }

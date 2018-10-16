@@ -8,13 +8,18 @@
  */
 namespace Schoolbox\Comms\News\Search;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\Segment;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Search\MapperResult\Base;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
 
 class Result extends Base
 {
+
     /**
      * Get all the search results
      *
@@ -23,7 +28,7 @@ class Result extends Base
      * @param Sanitiser $sanitiser
      * @return Collection
      * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
+     * @throws \Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException
      */
     protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser): Collection
     {
@@ -48,17 +53,41 @@ class Result extends Base
 
         $collection = $mapper->createCollection();
 
-        foreach ($this->buildSearchResult($stmt, $user, 'n.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
-            $article = $mapper->hydrate($row, 'n');
+        $config = new \Schoolbox\Config\Loader();
 
-            if ($article) {
-                $author = $mapper->hydrateJoin($row, 'author', 'a');
+        /* I don't have access to a SitePage here atm
+         * so I guess imma spawn this from darkness for now
+         */
+        $strategyFactory = new Segment\StrategyFactory(
+            Access\UserAccessMapper::getInstance(),
+            $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS),
+            $config->get(ConfigMapper::_GLOBAL_MODERATION),
+            Folder\Mapper::getInstance(),
+            Access\RoleAccessMapper::getInstance(),
+            Access\Access::getInstance()
+        );
 
-                $article->setAuthor($author);
+        $folderStrategy = $strategyFactory->makeSimpleStrategy('folder');
 
-                $collection->add($article);
-            }
+        /* These are the folders to which the user has read+ access
+         */
+        $foldersWithRoleBasedPermissions = $folderStrategy->getSearchSql($user);
+
+        foreach ($stmt as $row) {
+            new \Alaress_Probe();
         }
+//
+//        foreach ($this->buildSearchResult($stmt, $user, 'n.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
+//            $article = $mapper->hydrate($row, 'n');
+//
+//            if ($article) {
+//                $author = $mapper->hydrateJoin($row, 'author', 'a');
+//
+//                $article->setAuthor($author);
+//
+//                $collection->add($article);
+//            }
+//        }
 
         return $collection;
     }

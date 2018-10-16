@@ -69,4 +69,12 @@ class User extends SimpleStrategy
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(\Schoolbox\User $user): string
+    {
+        return '';
+    }
 }

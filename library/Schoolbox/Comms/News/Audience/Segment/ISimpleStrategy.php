@@ -63,4 +63,13 @@ interface ISimpleStrategy extends IStrategy
      * @return string
      */
     public function getTranslateSql(string $segmentIdsPlaceholder): string;
+
+    /**
+     * An sql fragment that's used to generate a list of folders which the user has read+ access,
+     * in order to identify limitations in a search results set for news articles
+     *
+     * @param User $user
+     * @return string
+     */
+    public function getSearchSql(User $user): string;
 }
