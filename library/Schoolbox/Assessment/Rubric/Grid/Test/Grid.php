@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
@@ -350,5 +351,87 @@ class Grid extends TestCase
             $actual[] = $group;
         }
         $this->assertSame($expected, $actual);
+    }
+
+
+    /**
+     * Data provider for `testIsCapabilityMarkShown`.
+     *
+     * @return iterable
+     */
+    public function getTestIsCapabilityMarkShownData(): iterable
+    {
+        $rowSet      = new Rowset\RowSet(new Folder());
+        $capability1 = (new RowSet\Capability())->setId(1)->setName('Capability 1');
+        $capability2 = (new RowSet\Capability())->setId(2)->setName('Capability 2');
+        $indicator1  = (new RowSet\Indicator())->setId(1)->setName('Indicator 1.1');
+        $indicator2  = (new RowSet\Indicator())->setId(2)->setName('Indicator 1.2');
+        $indicator3  = (new RowSet\Indicator())->setId(3)->setName('Indicator 1.3');
+        $indicator4  = (new RowSet\Indicator())->setId(4)->setName('Indicator 2.1');
+        $indicator5  = (new RowSet\Indicator())->setId(5)->setName('Indicator 2.1');
+        $indicator6  = (new RowSet\Indicator())->setId(6)->setName('Indicator 2.2');
+
+        $capability1->getIndicators()[$indicator1->getId()] = $indicator1;
+        $capability1->getIndicators()[$indicator2->getId()] = $indicator2;
+        $capability1->getIndicators()[$indicator3->getId()] = $indicator3;
+
+        $capability2->getIndicators()[$indicator4->getId()] = $indicator4;
+        $capability2->getIndicators()[$indicator5->getId()] = $indicator5;
+        $capability2->getIndicators()[$indicator6->getId()] = $indicator6;
+
+        $rowSet->getCapabilities()[$capability1->getId()] = $capability1;
+        $rowSet->getCapabilities()[$capability2->getId()] = $capability2;
+
+        $capabilityUsage1 = (new RubricGrid\CapabilityUsage($capability1))->setMaxValue(0);
+        $capabilityUsage2 = (new RubricGrid\CapabilityUsage($capability2))->setMaxValue(1);
+
+
+        $grid = new RubricGrid\Grid(new Task(), $rowSet);
+        $grid->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2;
+        yield 'Not a due work' => [$grid, $capability2, false];
+
+
+        $grid = new RubricGrid\Grid(
+            (new DueWork())->setMarkPerCapability(false),
+            $rowSet
+        );
+        $grid->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2;
+        yield 'Not mark-per-capability' => [$grid, $capability2, false];
+
+
+        $grid = new RubricGrid\Grid(
+            (new DueWork())->setMarkPerCapability(true),
+            $rowSet
+        );
+        $grid->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage1;
+        yield 'Capability not in grid' => [$grid, $capability1, false];
+
+
+        $grid = new RubricGrid\Grid(
+            (new DueWork())->setMarkPerCapability(true),
+            $rowSet
+        );
+        $grid->getCapabilityUsages()[$capability1->getId()] = $capabilityUsage1;
+        $grid->getCapabilityUsages()[$capability2->getId()] = $capabilityUsage2;
+        yield 'Capability with max = 0' => [$grid, $capability1, false];
+        yield 'Capability with max > 0' => [$grid, $capability2, true];
+    }
+
+
+    /**
+     * @dataProvider getTestIsCapabilityMarkShownData
+     * @covers \Schoolbox\Assessment\Rubric\Grid\Grid::isCapabilityMarkShown
+     *
+     * @param RubricGrid\Grid   $grid
+     * @param RowSet\Capability $capability
+     * @param bool              $expected
+     */
+    public function testIsCapabilityMarkShown(
+        RubricGrid\Grid $grid,
+        RowSet\Capability $capability,
+        bool $expected
+    ): void
+    {
+        $this->assertSame($expected, $grid->isCapabilityMarkShown($capability));
     }
 }
