@@ -449,8 +449,10 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         if (!$limit) {
             $limit = self::DEFAULT_LIMIT;
         }
+
         $searcher = new Search\Result();
         $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
+
         return $searcher;
     }
 }

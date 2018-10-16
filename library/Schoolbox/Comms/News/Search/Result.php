@@ -62,6 +62,7 @@ class Result extends Base
 
         return $collection;
     }
+
     /**
      * The total number of items found by the search
      *
