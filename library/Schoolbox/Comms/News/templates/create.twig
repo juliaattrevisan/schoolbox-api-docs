@@ -486,33 +486,25 @@
          * Listen for a click on the submit button
          * This is the event that will be stalled (if isAutosavable)
          */
-        $createForm.on('click', '#news-submit', function (event) {
-            event.preventDefault();
-            if ($createForm.valid()) {
-                submitForm('submit');
-            }
-        });
+        $createForm.on('click', '#news-submit', {action: 'submit'}, submitForm);
 
         /*
          * Listen for a click on the preview button
          * This event doesn't need to be stalled because the backend will save the post data
          */
-        $createForm.on('click', '#news-preview', function(event) {
-            event.preventDefault();
-            if ($createForm.valid()) {
-                submitForm('preview');
-            }
-        });
+        $createForm.on('click', '#news-preview', {action: 'preview'}, submitForm);
 
         /**
          * Submitting the create/update form
          * Needs to do different things depending on whether 'preview' or 'submit' was clicked
          *
-         * @param {string} action - 'preview' or 'submit'
+         * @param {jQuery.Event} event
          */
-        function submitForm(action) {
+        function submitForm(event) {
+            event.preventDefault();
+
             // Update the form's action based on what action was clicked
-            $createForm.attr('action', $createForm.data('action-' + action));
+            $createForm.attr('action', $createForm.data('action-' + event.data.action));
 
             // Submit the form
             $createForm.submit();
