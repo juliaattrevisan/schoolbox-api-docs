@@ -97,7 +97,9 @@
                 </tr>
             {% endfor %}
 
-            {% include '@rubric/group-row-markable.twig' %}
+            {% if rubricGrid.isCapabilityMarkShown(groupUsage.capability) %}
+                {% include '@rubric/group-row-markable.twig' %}
+            {% endif %}
 
     {% endfor %}
 

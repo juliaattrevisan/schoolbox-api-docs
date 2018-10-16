@@ -8,7 +8,7 @@
 {% set capabilityNormMark = capabilityMark.retrieveNormalizedMark %}
 
 {% set markType = rubricGrid.assessment.markScheme.generateContext %}
-{% if showGroupTotal and markType.mode != "none" and capabilityMaxValue != 0 %}
+{% if showGroupTotal and markType.mode != "none" %}
     {% set percentageMark     = capabilityMark.value * (100 / capabilityMaxFromIndicators) %}
     {% set letterGradeBracket = false %}
     {% set letterGradeValue   = '' %}
