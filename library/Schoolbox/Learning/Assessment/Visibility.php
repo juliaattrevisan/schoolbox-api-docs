@@ -130,7 +130,7 @@ class Visibility
     private function isVisibleToNonInstructor(IAssessable $assessable, User $nonInstructor, bool $showClosed, Alaress_Date_Format $now): bool
     {
         if ($assessable->isStaffOrInstructorVisibleOnly() && !$nonInstructor->getRole()->isStaff()) {
-            // Staff learners can still see SIVO assessments as they are staff
+            // Staff can always see SIVO assessments, regardless of folder perm
             return false;
         }
         $participant = $assessable->getParticipantIfExtant($nonInstructor);
