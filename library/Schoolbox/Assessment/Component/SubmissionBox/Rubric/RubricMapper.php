@@ -641,7 +641,8 @@ class RubricMapper
         $markSchemeFactory = new MarkSchemeFactory();
         $gridMarkScheme    = $markSchemeFactory->spawnMarkSchemeFor(
             $feedback->getAssessable(),
-            $grid->calculateMaxValueFromCapabilities()
+            $grid->calculateMaxValueFromCapabilities(),
+            true
         );
 
         $markedGrid = new MarkedGrid($feedback, $grid, $gridMarkScheme);
@@ -697,7 +698,8 @@ class RubricMapper
             // Create the cap mark
             $capabilityMarkScheme = $markSchemeFactory->spawnMarkSchemeFor(
                 $feedback->getAssessable(),
-                $capabilityUsage->getMaxValue()
+                $capabilityUsage->getMaxValue(),
+                true
             );
             $capabilityMark = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
                 ->setValue($capabilityMarkModel->getValue());
