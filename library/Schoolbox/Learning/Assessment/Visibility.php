@@ -33,6 +33,9 @@ class Visibility
     /**
      * Determines if the specified user can see an IAssessable (but not necessarily its details or participant interactions)
      *
+     * Does not consider whether a parent can see the assessment because one of their children can. This is to ensure the caller
+     * can distinguish the case where a parent can view the assessment themselves, vs seeing it due to their child's visibility.
+     *
      * * Staff                    - can see anytime (so long as not past close and we are hiding closed)
      * * Instructor               - can see anytime (so long as not past close and we are hiding closed)
      * * NonStaff + NonInstructor - can only see if a participant, and after publish date, and not SIVO
