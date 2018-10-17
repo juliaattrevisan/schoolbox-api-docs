@@ -128,6 +128,7 @@ class VisibilityTests extends TestCase
 
         // Exhaustive combination test.
         return [
+            // Participating student non-instructor, no work type
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNone, $unpublished, $showClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNone, $unpublished, $hideClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNone, $upcoming, $showClosed, $now, true],
@@ -138,6 +139,8 @@ class VisibilityTests extends TestCase
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNone, $overdue, $hideClosed, $now, true],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
+
+            // Participating student non-instructor, non-SIVO work type
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $unpublished, $showClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
@@ -148,6 +151,8 @@ class VisibilityTests extends TestCase
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+
+            // Participating student non-instructor, SIVO work type
             [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $unpublished, $showClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $upcoming, $showClosed, $now, false],
@@ -158,6 +163,8 @@ class VisibilityTests extends TestCase
             [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $overdue, $hideClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $closed, $showClosed, $now, false],
             [$isParticipant, $studentRole, $nonInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+
+            // Participating student instructor, no work type
             [$isParticipant, $studentRole, $isInstructor, $workTypeNone, $unpublished, $showClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeNone, $unpublished, $hideClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeNone, $upcoming, $showClosed, $now, true],
@@ -168,6 +175,8 @@ class VisibilityTests extends TestCase
             [$isParticipant, $studentRole, $isInstructor, $workTypeNone, $overdue, $hideClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
+
+            // Participating student instructor, non-SIVO work type
             [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $unpublished, $showClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
@@ -178,6 +187,8 @@ class VisibilityTests extends TestCase
             [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+
+            // Participating student instructor, SIVO work type
             [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $unpublished, $showClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $upcoming, $showClosed, $now, true],
@@ -188,6 +199,8 @@ class VisibilityTests extends TestCase
             [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $overdue, $hideClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $closed, $showClosed, $now, true],
             [$isParticipant, $studentRole, $isInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+
+            // Participating staff non-instructor, no work type
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNone, $unpublished, $showClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNone, $unpublished, $hideClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNone, $upcoming, $showClosed, $now, true],
@@ -198,6 +211,8 @@ class VisibilityTests extends TestCase
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNone, $overdue, $hideClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
+
+            // Participating staff non-instructor, non-SIVO work type
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $unpublished, $showClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
@@ -208,6 +223,8 @@ class VisibilityTests extends TestCase
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+
+            // Participating staff non-instructor, SIVO work type
             [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $unpublished, $showClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $upcoming, $showClosed, $now, true],
@@ -218,6 +235,8 @@ class VisibilityTests extends TestCase
             [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $overdue, $hideClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $closed, $showClosed, $now, true],
             [$isParticipant, $staffRole, $nonInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+
+            // Participating staff instructor, no work type
             [$isParticipant, $staffRole, $isInstructor, $workTypeNone, $unpublished, $showClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeNone, $unpublished, $hideClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeNone, $upcoming, $showClosed, $now, true],
@@ -228,6 +247,8 @@ class VisibilityTests extends TestCase
             [$isParticipant, $staffRole, $isInstructor, $workTypeNone, $overdue, $hideClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
+
+            // Participating staff instructor, non-SIVO work type
             [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $unpublished, $showClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
@@ -238,6 +259,8 @@ class VisibilityTests extends TestCase
             [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+
+            // Participating staff instructor, SIVO work type
             [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $unpublished, $showClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $upcoming, $showClosed, $now, true],
@@ -248,6 +271,8 @@ class VisibilityTests extends TestCase
             [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $overdue, $hideClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $closed, $showClosed, $now, true],
             [$isParticipant, $staffRole, $isInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+
+            // Non-participating student non-instructor, no work type
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNone, $unpublished, $showClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNone, $unpublished, $hideClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNone, $upcoming, $showClosed, $now, false],
@@ -258,6 +283,8 @@ class VisibilityTests extends TestCase
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNone, $overdue, $hideClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNone, $closed, $showClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
+
+            // Non-participating student non-instructor, non-SIVO work type
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $unpublished, $showClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $upcoming, $showClosed, $now, false],
@@ -268,6 +295,8 @@ class VisibilityTests extends TestCase
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $overdue, $hideClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $closed, $showClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+
+            // Non-participating student non-instructor, SIVO work type
             [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $unpublished, $showClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $upcoming, $showClosed, $now, false],
@@ -278,6 +307,8 @@ class VisibilityTests extends TestCase
             [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $overdue, $hideClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $closed, $showClosed, $now, false],
             [$notParticipant, $studentRole, $nonInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+
+            // Non-participating student instructor, no work type
             [$notParticipant, $studentRole, $isInstructor, $workTypeNone, $unpublished, $showClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeNone, $unpublished, $hideClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeNone, $upcoming, $showClosed, $now, true],
@@ -288,6 +319,8 @@ class VisibilityTests extends TestCase
             [$notParticipant, $studentRole, $isInstructor, $workTypeNone, $overdue, $hideClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
+
+            // Non-participating student instructor, non-SIVO work type
             [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $unpublished, $showClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
@@ -298,6 +331,8 @@ class VisibilityTests extends TestCase
             [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+
+            // Non-participating student instructor, SIVO work type
             [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $unpublished, $showClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $upcoming, $showClosed, $now, true],
@@ -308,6 +343,8 @@ class VisibilityTests extends TestCase
             [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $overdue, $hideClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $closed, $showClosed, $now, true],
             [$notParticipant, $studentRole, $isInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+
+            // Non-participating staff non-instructor, no work type
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNone, $unpublished, $showClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNone, $unpublished, $hideClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNone, $upcoming, $showClosed, $now, true],
@@ -318,6 +355,8 @@ class VisibilityTests extends TestCase
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNone, $overdue, $hideClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
+
+            // Non-participating staff non-instructor, non-SIVO work type
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $unpublished, $showClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
@@ -328,6 +367,8 @@ class VisibilityTests extends TestCase
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+
+            // Non-participating staff non-instructor, SIVO work type
             [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $unpublished, $showClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $upcoming, $showClosed, $now, true],
@@ -338,6 +379,8 @@ class VisibilityTests extends TestCase
             [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $overdue, $hideClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $closed, $showClosed, $now, true],
             [$notParticipant, $staffRole, $nonInstructor, $workTypeSivo, $closed, $hideClosed, $now, false],
+
+            // Non-participating staff instructor, SIVO work type
             [$notParticipant, $staffRole, $isInstructor, $workTypeNone, $unpublished, $showClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeNone, $unpublished, $hideClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeNone, $upcoming, $showClosed, $now, true],
@@ -348,6 +391,8 @@ class VisibilityTests extends TestCase
             [$notParticipant, $staffRole, $isInstructor, $workTypeNone, $overdue, $hideClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeNone, $closed, $showClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeNone, $closed, $hideClosed, $now, false],
+
+            // Non-participating staff instructor, non-SIVO work type
             [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $unpublished, $showClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $unpublished, $hideClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $upcoming, $showClosed, $now, true],
@@ -358,6 +403,8 @@ class VisibilityTests extends TestCase
             [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $overdue, $hideClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $closed, $showClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeNormal, $closed, $hideClosed, $now, false],
+
+            // Non-participating staff instructor, SIVO work type
             [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $unpublished, $showClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $unpublished, $hideClosed, $now, true],
             [$notParticipant, $staffRole, $isInstructor, $workTypeSivo, $upcoming, $showClosed, $now, true],
