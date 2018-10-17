@@ -166,11 +166,6 @@ class Factory
                 }
 
             }
-
-            if (! (new ValidDescriptorRow($usesMarkRange))->isSatisfiedBy($c->getAllDescriptors()) ) {
-                throw new InvalidArgumentException("only use descriptor values that form an ascending or descending sequence within a row");
-            }
-
         }
 
         return $rubric;

@@ -12,7 +12,6 @@ namespace Schoolbox\Assessment\Rubric;
 
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\Competency;
-use Scrub;
 use SplObjectStorage;
 
 /**
@@ -123,10 +122,6 @@ class Rubric implements Twiggable
         bool               $usesMarkRange
     )
     {
-        // Are we using a mark range AND have a decimal descriptor val? Can't do dat!
-        if (! (new ValidDescriptor($usesMarkRange))->isSatisfiedBy($descriptor) ) {
-            throw new InvalidArgumentException("disable Mark Range to use decimal places in descriptor point values");
-        }
 
         // ensure both the group and the level exist
         $this->putGroup($group);
