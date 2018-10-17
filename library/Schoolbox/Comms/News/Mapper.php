@@ -12,6 +12,7 @@ namespace Schoolbox\Comms\News;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Storage;
@@ -433,25 +434,27 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         return $articlesInTopic;
     }
 
+
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
      *
-     * @param User   $user
-     * @param string $keyword
-     * @param int    $offset
-     * @param int    $limit
-     * @param string $sortProperty
-     * @param string $sortDirection
+     * @param ArticleResolver $articleResolver
+     * @param User            $user
+     * @param string          $keyword
+     * @param int             $offset
+     * @param int             $limit
+     * @param string          $sortProperty
+     * @param string          $sortDirection
      * @return Search\Result
      */
-    public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC'): Search\Result
+    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC'): Search\Result
     {
         if (!$limit) {
             $limit = self::DEFAULT_LIMIT;
         }
 
         $searcher = new Search\Result();
-        $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
+        $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
         return $searcher;
     }

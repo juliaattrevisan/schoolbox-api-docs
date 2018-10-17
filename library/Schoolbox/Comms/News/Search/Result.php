@@ -8,6 +8,7 @@
  */
 namespace Schoolbox\Comms\News\Search;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
@@ -23,14 +24,15 @@ class Result extends Base
     /**
      * Get all the search results
      *
-     * @param User      $user
-     * @param Mapper    $mapper
-     * @param Sanitiser $sanitiser
+     * @param ArticleResolver $articleResolver
+     * @param User            $user
+     * @param Mapper          $mapper
+     * @param Sanitiser       $sanitiser
      * @return Collection
      * @throws Mapper\DefinitionException
      * @throws \Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException
      */
-    protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser): Collection
+    protected function executeSearch(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser): Collection
     {
         $query = "
             SELECT
@@ -107,7 +109,6 @@ class Result extends Base
         $foldersWithRoleBasedPermissions = $folderStrategy->getSearchSql($user);
 
         foreach ($stmt as $row) {
-            new \Alaress_Probe();
         }
 //
 //        foreach ($this->buildSearchResult($stmt, $user, 'n.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
@@ -125,16 +126,18 @@ class Result extends Base
         return $collection;
     }
 
+
     /**
      * The total number of items found by the search
      *
+     * @param ArticleResolver   $articleResolver
      * @param User              $user
      * @param \Schoolbox\Mapper $mapper
      * @param Sanitiser         $sanitiser
      * @return int
      * @throws Mapper\DefinitionException
      */
-    protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser): int
+    protected function executeSearchCount(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser): int
     {
         $query = "
             SELECT

@@ -27,8 +27,11 @@ $type = 'news';
  *
  * Everything here is self-contained
  */
+$articleResolver = $this->getDi()->get('commsNewsArticleResolver');
+
 $mapper = new \Schoolbox\Resource\Search\Results($page, $type);
 $mapper->search(
+    $articleResolver,
     $_SESSION['user'],
     $keyword,
     ($current_page - 1) * Cfg::get('search_type_limit'),

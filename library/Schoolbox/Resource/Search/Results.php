@@ -24,6 +24,7 @@ namespace Schoolbox\Resource\Search;
 
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\File\Search\Renderer as FileRenderer;
@@ -89,9 +90,11 @@ class Results implements Searchable
         $this->registry->add(new Definition('news', new News\Mapper(), new News\Search\Renderer($page)));
     }
 
+
     /**
      * Search using each mapper's custom implementation of Search()
      *
+     * @param ArticleResolver $articleResolver
      * @param \Schoolbox\User $user
      * @param string          $keyword
      * @param int             $offset
@@ -100,7 +103,7 @@ class Results implements Searchable
      * @param string          $sortDirection
      * @return Collection|void
      */
-    public function search($user, $keyword, $offset = 0, $limit = null, $sortProperty = '', $sortDirection = 'DESC'): void
+    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = null, $sortProperty = '', $sortDirection = 'DESC'): void
     {
         $result = new Collection();
 
@@ -109,7 +112,7 @@ class Results implements Searchable
          */
         foreach ($this->registry as $currentDefinition) {
             if (($this->type === 'all') || ($currentDefinition->getType() === $this->type)) {
-                $searcher = $currentDefinition->getMapper()->search($user, $keyword, $offset, $limit, $sortProperty, $sortDirection);
+                $searcher = $currentDefinition->getMapper()->search($articleResolver, $user, $keyword, $offset, $limit, $sortProperty, $sortDirection);
 
                 $result->setOffset($currentDefinition->getType(), $searcher);
             }

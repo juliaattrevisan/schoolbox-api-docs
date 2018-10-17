@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Category;
 use Alaress\Database\Predicate\Builder;
 use PDO;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
@@ -138,18 +139,23 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface
         return $this->findByPredicates($pb, $options);
     }
 
+
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
      *
-     * @param User   $user
-     * @param string $keyword
-     * @param int    $offset
-     * @param int    $limit
-     * @param string $sortProperty
-     * @param string $sortDirection
+     * @param ArticleResolver $articleResolver
+     * @param User            $user
+     * @param string          $keyword
+     * @param int             $offset
+     * @param int             $limit
+     * @param string          $sortProperty
+     * @param string          $sortDirection
      * @return Collection
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
      */
     public function search(
+        ArticleResolver $articleResolver,
         $user,
         $keyword,
         $offset = 0,

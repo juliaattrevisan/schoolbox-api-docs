@@ -13,6 +13,7 @@ use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Column\Model;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Searchable;
@@ -346,16 +347,19 @@ class ArticleMapper extends Mapper implements Searchable
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
      *
-     * @param User   $user
-     * @param string $keyword
-     * @param int    $offset
-     * @param int    $limit
-     * @param string $sortProperty
-     * @param string $sortDirection
+     * @param ArticleResolver $articleResolver
+     * @param User            $user
+     * @param string          $keyword
+     * @param int             $offset
+     * @param int             $limit
+     * @param string          $sortProperty
+     * @param string          $sortDirection
      *
      * @return Collection
+     * @throws Mapper\DefinitionException
      */
     public function search(
+        ArticleResolver $articleResolver,
         $user,
         $keyword,
         $offset = 0,

@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Folder\Search;
 
 use PDO;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
@@ -28,15 +29,20 @@ class Result extends Base
      */
     const NO_LIMIT = 999;
 
+
     /**
      * Get all the search results
      *
-     * @param User $user
+     * @param ArticleResolver      $articleResolver
+     * @param User                 $user
      * @param Folder\Mapper|Mapper $mapper
-     * @param Sanitiser $sanitiser
+     * @param Sanitiser            $sanitiser
      * @return Collection
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser)
+    protected function executeSearch(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         /** @var Folder\Code\Mapper $code_mapper */
         $code_mapper = $mapper->getJoinMapper('codes');
@@ -106,15 +112,18 @@ class Result extends Base
         return $results;
     }
 
+
     /**
      * The total number of items found by the search
      *
-     * @param User $user
+     * @param ArticleResolver   $articleResolver
+     * @param User              $user
      * @param \Schoolbox\Mapper $mapper
-     * @param Sanitiser $sanitiser
+     * @param Sanitiser         $sanitiser
      * @return int
+     * @throws Mapper\DefinitionException
      */
-    protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser)
+    protected function executeSearchCount(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
             SELECT DISTINCT id
