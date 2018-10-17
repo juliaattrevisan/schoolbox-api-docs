@@ -62,8 +62,7 @@ class Factory
         IAssessable $assessable,
         ?float $totalMark = null,
         bool $allowFallback = false
-    ): ?IMarkScheme
-    {
+    ): ?IMarkScheme {
         $markType = $assessable->getMarkType();
         if (null === $markType) {
             return null;
