@@ -1,15 +1,11 @@
 <?php
 /**
- * Visibility
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Learning\Assessment;
-
 
 use Schoolbox\User;
 use Schoolbox\Permission\Access\Access;
@@ -26,8 +22,6 @@ class Visibility
 
 
     /**
-     * Visibility constructor.
-     *
      * @param Access $access
      */
     public function __construct(Access $access)
@@ -39,22 +33,24 @@ class Visibility
     /**
      * Determines if the specified user can see an IAssessable (but not necessarily its details or participant interactions)
      *
-     * * Staff       - can see anytime (so long as not past close and we are hiding closed)
-     * * Instructor  - can see anytime (so long as not past close and we are hiding closed)
-     * * Learner     - can only see if a participant (or parent of participant), and after publish date
+     * * Staff                    - can see anytime (so long as not past close and we are hiding closed)
+     * * Instructor               - can see anytime (so long as not past close and we are hiding closed)
+     * * NonStaff + NonInstructor - can only see if a participant, and after publish date, and not SIVO
      *
      * Staff      - is considered any user with role-type of 'staff'
      * Instructor - is considered any user with WRITE+ perm to folder
-     * Learner    - is considered any user with READ perm to folder
      *
-     * @param IAssessable $assessment Must have plans and participants loaded if viewer is a learner
-     * @param User        $viewer
-     * @param bool        $showClosed Should we exclude assessments if their close date has passed?
+     * SIVO => 'Staff/Instructor visible only' - derived from the assessment's workType
+     *
+     * @param IAssessable              $assessment Must have plans and participants loaded if viewer is a participant
+     * @param User                     $viewer
+     * @param bool                     $showClosed Should we exclude assessments if their close date has passed?
+     * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed): bool
+    public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed, Alaress_Date_Format $now = null): bool
     {
-        $now = Alaress_Date_Format::now();
+        $now = $now ?? Alaress_Date_Format::now();
 
         /** @noinspection NotOptimalIfConditionsInspection */
         if ($viewer->getRole()->isStaff() && $this->isVisibleToStaff($assessment, $viewer, $showClosed, $now)) {
@@ -62,17 +58,13 @@ class Visibility
         }
 
         // Is viewer an instructor?
-        $folderAccessLevel = $this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId());
-        if ($folderAccessLevel >= UserAccess::ACCESS_WRITE) {
+        if ($this->access->getFolderAccess($viewer, $assessment->getBaseContext()->getFolder()->getId()) >= UserAccess::ACCESS_WRITE) {
             if ($this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now)) {
                 return true;
             }
-        } // Is viewer a learner?
-        elseif ($folderAccessLevel === UserAccess::ACCESS_READ) {
-            // Is the viewer a participant themselves?
-            if ($this->isVisibleToLearner($assessment, $viewer, $showClosed, $now)) {
-                return true;
-            }
+        } // Not an instructor. Can they see due to their participation?
+        elseif ($this->isVisibleToNonInstructor($assessment, $viewer, $showClosed, $now)) {
+            return true;
         }
 
         return false;
@@ -88,7 +80,7 @@ class Visibility
      * @param Alaress_Date_Format $now
      * @return bool
      */
-    public function isVisibleToInstructor(IAssessable $assessable, User $instructor, bool $showClosed, Alaress_Date_Format $now): bool
+    private function isVisibleToInstructor(IAssessable $assessable, User $instructor, bool $showClosed, Alaress_Date_Format $now): bool
     {
         if ($showClosed) {
             return true;
@@ -109,7 +101,7 @@ class Visibility
      * @param Alaress_Date_Format $now
      * @return bool
      */
-    public function isVisibleToStaff(IAssessable $assessable, User $staff, bool $showClosed, Alaress_Date_Format $now): bool
+    private function isVisibleToStaff(IAssessable $assessable, User $staff, bool $showClosed, Alaress_Date_Format $now): bool
     {
         if ($showClosed) {
             return true;
@@ -122,17 +114,21 @@ class Visibility
 
 
     /**
-     * Is the assessable visible to the Learner? (Assumes user is a learner)
+     * Is the assessable visible to a non-instructor? (ie a user with DENY or READ access to the assessment's folder context)
      *
      * @param IAssessable         $assessable
-     * @param User                $learner
+     * @param User                $nonInstructor
      * @param bool                $showClosed Should we show assessments after their closed date?
      * @param Alaress_Date_Format $now
      * @return bool
      */
-    public function isVisibleToLearner(IAssessable $assessable, User $learner, bool $showClosed, Alaress_Date_Format $now): bool
+    private function isVisibleToNonInstructor(IAssessable $assessable, User $nonInstructor, bool $showClosed, Alaress_Date_Format $now): bool
     {
-        $participant = $assessable->getParticipantIfExtant($learner);
+        if ($assessable->isStaffOrInstructorVisibleOnly() && !$nonInstructor->getRole()->isStaff()) {
+            // Staff can always see SIVO assessments, regardless of folder perm
+            return false;
+        }
+        $participant = $assessable->getParticipantIfExtant($nonInstructor);
         if (!$participant || $participant->isExcluded()) {
             return false;
         }
