@@ -2296,6 +2296,12 @@ class RubricMapper
         foreach ($groupedFeedbackIds as $assessmentId => $feedbackIdsByStudent) {
             $feedbackIds = array_merge($feedbackIds, $feedbackIdsByStudent);
         }
+
+        // Short-circuit if there's no feedback
+        if (empty($feedbackIds)) {
+            return [];
+        }
+
         sort($feedbackIds);
 
 
