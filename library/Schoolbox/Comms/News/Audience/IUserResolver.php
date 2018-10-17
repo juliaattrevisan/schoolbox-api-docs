@@ -17,6 +17,6 @@ interface IUserResolver
      * @param \Schoolbox\Comms\News\Model $article
      * @return int[]
      */
-    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article): array;
+    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article, bool $excludeMuted): array;
 
 }

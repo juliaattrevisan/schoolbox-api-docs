@@ -551,7 +551,7 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
-        $recipientIds = $this->audienceResolver->findUsersForArticle($article);
+        $recipientIds = $this->audienceResolver->findUsersForArticle($article, true);
 
         if (empty($recipientIds)) {
             // no recipients? do nothing
