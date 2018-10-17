@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Quiz;
 
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Alaress_Date_Format;
 use Schoolbox\Permission\Access\UserAccess;
@@ -34,6 +35,9 @@ class ActionValidator
     /** @var Access */
     private $access;
 
+    /** @var Visibility */
+    private $visibility;
+
 
     /**
      * @param Alaress_Date_Format $now
@@ -41,8 +45,9 @@ class ActionValidator
      */
     public function __construct(Alaress_Date_Format $now, Access $access)
     {
-        $this->now    = $now;
-        $this->access = $access;
+        $this->now        = $now;
+        $this->access     = $access;
+        $this->visibility = new Visibility($access);
     }
 
 
@@ -51,51 +56,11 @@ class ActionValidator
      *
      * @param User       $user
      * @param Quiz\Model $quiz
-     * @param bool       $restrictStudentSubmissions Are parents restricted from viewing student submissions?
      * @return bool
      */
-    public function canSeeQuiz(User $user, Quiz\Model $quiz, bool $restrictStudentSubmissions): bool
+    public function canSeeQuiz(User $user, Quiz\Model $quiz): bool
     {
-        $folder       = $quiz->getBaseContext()->getFolder();
-        $isInstructor = $this->access->isInstructor($user, $folder);
-        $isStaff      = $user->getRole()->isStaff();
-
-        // Instructors/Staff can always view the assessment (regardless of whether they can interact with it)
-        if ($isInstructor || $isStaff) {
-            return true;
-        }
-
-        // Does user have a participation record?
-        $participant = $quiz->getParticipantIfExtant($user);
-        if ($participant) {
-            // Excluded Learners can never see the quiz
-            if ($participant->isExcluded()) {
-                return false;
-            }
-            // Non-excluded Learners can only see assessment after publishing
-            return $this->now->gte($participant->getPublishDate());
-        }
-
-        // Am I a parent?
-        // I can see the quiz if:
-        // * I have access to its folder
-        // * I'm not blocked by config.restrict_student_submissions
-        // * one of my kids is a participant
-        if (!$restrictStudentSubmissions
-            && $this->access->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ
-        ) {
-            foreach ($quiz->getAllParticipants() as $participant) {
-                if ($participant->isExcluded() || $this->now->lt($participant->getPublishDate())) {
-                    continue;
-                }
-                if ($this->now->gte($participant->getPublishDate()) && $user->isParentOf($participant->getUser())) {
-                    return true;
-                }
-            }
-        }
-
-        // Not an instructor/staff, and no participation record.
-        return false;
+        return $this->visibility->isVisibleToUser($quiz, $user, true, $this->now);
     }
 
 
