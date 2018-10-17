@@ -39,30 +39,12 @@ class Result extends Base
      */
     protected function executeSearch(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser): Collection
     {
-        $query = "
-            SELECT
-                {$mapper->getColumnString('n')},
-                {$mapper->getJoinColumnString('author', 'a')},
-                MATCH(n.title, n.blurb, n.body) AGAINST ({$sanitiser->getKeyword()}) AS `score`
-            FROM
-                `{$mapper->getTable()}` `n`
-            INNER JOIN {$mapper->getJoinSql('author', 'n', 'a', true)}
-            WHERE
-                n.deleted_at IS NULL
-                AND MATCH(n.title, n.blurb, n.body) AGAINST ({$sanitiser->getKeyword()})
-            ORDER BY {$sanitiser->getSortByWithAlias('n')} {$sanitiser->getSortDir()}
-        ";
 
-        $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute();
-
-        $collection = $mapper->createCollection();
-
+        /* I don't have access to a di to do this atm
+         * Spawn from darkness for now
+         */
         $config = new \Schoolbox\Config\Loader();
 
-        /* I don't have access to a SitePage here atm
-         * so I guess imma spawn this from darkness for now
-         */
         $strategyFactory = new Segment\StrategyFactory(
             Access\UserAccessMapper::getInstance(),
             $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS),
@@ -84,9 +66,20 @@ class Result extends Base
          */
         $articlesWithRoleBasedPermissions = $this->foldersWithReadAccess($user, $mapper, $strategyFactory);
 
+        /* Hydrated articles end up in here
+         */
+        $collection = $mapper->createCollection();
+
+        /* Generate result set that matched $keyword
+         * then start filtering it based on access rules
+         */
+        $resultSet = $this->generateResultSet($mapper, $sanitiser);
+
         /* TODO: Implement shareable and throw it in as the last arg
          */
-        foreach ($stmt as $row) {
+        $i = 0;
+
+        foreach ($resultSet as $row) {
             if ($this->isVisible(
                 $user,
                 $hasServicePermission,
@@ -98,14 +91,29 @@ class Result extends Base
                 $articlesWithRoleBasedPermissions,
                 false)
             ) {
-                $article = $mapper->hydrate($row, 'n');
 
-                if ($article) {
-                    $author = $mapper->hydrateJoin($row, 'author', 'a');
+                /* Skip to the offset
+                 */
+                if ($i < $sanitiser->getOffset()) {
+                    continue;
+                }
 
-                    $article->setAuthor($author);
+                /* Only obtain $limit items
+                 * Once you've got the limit of items, break out
+                 */
+                if ($collection->count() <= $sanitiser->getLimit()) {
+                    $article = $mapper->hydrate($row, 'n');
 
-                    $collection->add($article);
+                    if ($article) {
+                        $author = $mapper->hydrateJoin($row, 'author', 'a');
+
+                        $article->setAuthor($author);
+
+                        $collection->add($article);
+                    }
+                }
+                else {
+                    break;
                 }
             }
         }
@@ -113,6 +121,21 @@ class Result extends Base
         return $collection;
     }
 
+
+    /**
+     * The total number of items found by the search
+     *
+     * @param ArticleResolver   $articleResolver
+     * @param User              $user
+     * @param \Schoolbox\Mapper $mapper
+     * @param Sanitiser         $sanitiser
+     * @return int
+     * @throws Mapper\DefinitionException
+     */
+    protected function executeSearchCount(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser): int
+    {
+        return 2348;
+    }
 
     /**
      * $user has role-based read+ perms to the folders returned
@@ -175,6 +198,41 @@ class Result extends Base
         return $hasNewsServicePermission;
     }
 
+    /**
+     * Get a list of articles that match the keyword
+     *
+     * @param Mapper    $mapper
+     * @param Sanitiser $sanitiser
+     * @return array
+     * @throws Mapper\DefinitionException
+     */
+    private function generateResultSet(Mapper $mapper, Sanitiser $sanitiser): array
+    {
+        $query = "
+            SELECT
+                {$mapper->getColumnString('n')},
+                {$mapper->getJoinColumnString('author', 'a')},
+                MATCH(n.title, n.blurb, n.body) AGAINST ({$sanitiser->getKeyword()}) AS `score`
+            FROM
+                `{$mapper->getTable()}` `n`
+            INNER JOIN {$mapper->getJoinSql('author', 'n', 'a', true)}
+            WHERE
+                n.deleted_at IS NULL
+                AND MATCH(n.title, n.blurb, n.body) AGAINST ({$sanitiser->getKeyword()})
+            ORDER BY {$sanitiser->getSortByWithAlias('n')} {$sanitiser->getSortDir()}
+        ";
+
+        $stmt = $mapper->getDatabase()->prepare($query);
+        $stmt->execute();
+
+        $resultSet = [];
+
+        foreach ($stmt as $row) {
+            $resultSet[] = $row;
+        }
+
+        return $resultSet;
+    }
 
     /**
      * Find out if an article is searchable for $user prior to hydrating it
@@ -243,36 +301,5 @@ class Result extends Base
         }
 
         return false;
-    }
-
-    /**
-     * The total number of items found by the search
-     *
-     * @param ArticleResolver   $articleResolver
-     * @param User              $user
-     * @param \Schoolbox\Mapper $mapper
-     * @param Sanitiser         $sanitiser
-     * @return int
-     * @throws Mapper\DefinitionException
-     */
-    protected function executeSearchCount(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser): int
-    {
-        $query = "
-            SELECT
-                n.id
-            FROM
-                `{$mapper->getTable()}` `n`
-            INNER JOIN {$mapper->getJoinSql('author', 'n', 'a', true)}
-            WHERE
-                n.deleted_at IS NULL
-                AND n.publish_at <= NOW()
-                AND n.accepted_at <= NOW()
-                AND MATCH(n.title, n.blurb, n.body) AGAINST ({$sanitiser->getKeyword()})
-        ";
-
-        $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute();
-
-        return $this->buildSearchCount($stmt, $user, 'id');
     }
 }
