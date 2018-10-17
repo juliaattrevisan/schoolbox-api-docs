@@ -73,6 +73,10 @@ class ActionValidator
      */
     public function canAttemptQuiz(User $user, Quiz\Model $quiz): bool
     {
+        if (!$this->canSeeQuiz($user, $quiz)) {
+            return false;
+        }
+
         $isInstructor = $this->access->isInstructor($user, $quiz->getContext()->getFolder());
         $participant  = $quiz->getParticipantIfExtant($user);
 
