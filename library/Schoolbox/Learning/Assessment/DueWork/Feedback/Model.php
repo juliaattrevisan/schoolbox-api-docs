@@ -160,7 +160,7 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
     /**
      * @return MarkedGrid
      */
-    public function getRubricMarkedGrid(): MarkedGrid
+    public function getRubricMarkedGrid(): ?MarkedGrid
     {
         return $this->rubricMarkedGrid;
     }

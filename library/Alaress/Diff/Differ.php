@@ -21,27 +21,20 @@ class Differ
      * @return array A summary of the differences between `$a` and `$b`.
      *               This will have the same key structure as its inputs, and
      *               the value will be [`$a.value`, `$b.value`].
-     * @throws \InvalidArgumentException if somewhere in the process an array
-     *                                   gets diffed with a non-null scalar
      */
     public function diff(array $a, array $b): array
     {
-        return $this->diffInternal($a, $b, '');
+        return $this->diffInternal($a, $b);
     }
 
     /**
-     * Internal diff generation: it tracks the path that is being diffed, so
-     * that if an `\InvalidArgumentException` is raised the user is informed of
-     * where in the array the diff failed (see the throws annotation).
+     * Internal diff generation
      *
      * @param array  $a
      * @param array  $b
-     * @param string $path
      * @return array
-     * @throws \InvalidArgumentException if somewhere in the process an array
-     *                                   gets diffed with a non-null scalar
      */
-    private function diffInternal(array $a, array $b, string $path): array
+    private function diffInternal(array $a, array $b): array
     {
         $diff = [];
 
@@ -56,16 +49,15 @@ class Differ
         // Check each value
         foreach ($a as $key => $aValue) {
             $bValue   = $b[$key];
-            $thisPath = $path . $key;
 
             // Both $aValue and $bValue must be arrays, or neither may be.
-            // If one is and another isn't: that's an error
+            // If one is and another isn't: that a difference
             $aIsArray = \is_array($aValue);
             $bIsArray = \is_array($bValue);
 
             // Is this scalar? Diff it now, otherwise recurse
             if ($aIsArray && $bIsArray) {
-                $recursiveDiff = $this->diffInternal($aValue, $bValue, $thisPath . '.');
+                $recursiveDiff = $this->diffInternal($aValue, $bValue);
                 if (!empty($recursiveDiff)) {
                     $diff[$key] = $recursiveDiff;
                 }
