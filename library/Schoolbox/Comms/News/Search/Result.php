@@ -49,8 +49,6 @@ class Result extends Base
             INNER JOIN {$mapper->getJoinSql('author', 'n', 'a', true)}
             WHERE
                 n.deleted_at IS NULL
-                AND n.publish_at <= NOW()
-                AND n.accepted_at <= NOW()
                 AND MATCH(n.title, n.blurb, n.body) AGAINST ({$sanitiser->getKeyword()})
             ORDER BY {$sanitiser->getSortByWithAlias('n')} {$sanitiser->getSortDir()}
         ";
