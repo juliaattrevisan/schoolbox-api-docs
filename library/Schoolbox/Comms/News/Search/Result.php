@@ -95,6 +95,8 @@ class Result extends Base
                 /* Skip to the offset
                  */
                 if ($i < $sanitiser->getOffset()) {
+                    $i++;
+
                     continue;
                 }
 
