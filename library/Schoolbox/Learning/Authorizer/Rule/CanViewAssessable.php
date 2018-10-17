@@ -51,8 +51,19 @@ class CanViewAssessable extends AbstractAssessableRule
 
         $assessable = $this->findAssessable($params);
 
-        if (!$this->visibility->isVisibleToUser($assessable, $user, $this->showClosed, $this->now)) {
-            throw new Unauthorized("User '{$user->getId()}' is not permitted to see assessment '{$assessable->getId()}'");
+        // Can the user see the assessment because of their own relationship?
+        if ($this->visibility->isVisibleToUser($assessable, $user, $this->showClosed, $this->now)) {
+            return;
         }
+
+        // Can the user see the assessment because their child can?
+        if ($user->getRole()->isParent()) {
+            foreach ($user->getChildren() as $child) {
+                if ($this->visibility->isVisibleToUser($assessable, $child, $this->showClosed, $this->now)) {
+                    return;
+                }
+            }
+        }
+        throw new Unauthorized("User '{$user->getId()}' is not permitted to see assessment '{$assessable->getId()}'");
     }
 }
