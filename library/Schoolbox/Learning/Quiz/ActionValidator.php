@@ -60,7 +60,17 @@ class ActionValidator
      */
     public function canSeeQuiz(User $user, Quiz\Model $quiz): bool
     {
-        return $this->visibility->isVisibleToUser($quiz, $user, true, $this->now);
+        if ($this->visibility->isVisibleToUser($quiz, $user, true, $this->now)) {
+            return true;
+        }
+        if ($user->getRole()->isParent()) {
+            foreach ($user->getChildren() as $child) {
+                if ($this->visibility->isVisibleToUser($quiz, $child, true, $this->now)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
