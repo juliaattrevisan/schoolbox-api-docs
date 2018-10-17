@@ -300,6 +300,11 @@
         "is-arrayish": "0.2.1"
       }
     },
+    "es6-object-assign": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/es6-object-assign/-/es6-object-assign-1.1.0.tgz",
+      "integrity": "sha1-wsNYJlYkfDnqEHyx5mUrb58kUjw="
+    },
     "escape-string-regexp": {
       "version": "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz",
       "integrity": "sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=",
@@ -1048,7 +1053,7 @@
     "lodash": {
       "version": "4.17.11",
       "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.11.tgz",
-      "integrity": "sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg=="
+      "integrity": "sha1-s56mIp72B+zYniyN8SU2iRysm40="
     },
     "lodash.assign": {
       "version": "https://registry.npmjs.org/lodash.assign/-/lodash.assign-4.2.0.tgz",
@@ -1268,6 +1273,11 @@
       "version": "https://registry.npmjs.org/process-nextick-args/-/process-nextick-args-1.0.7.tgz",
       "integrity": "sha1-FQ4gt1ZZCtP5EJPyWk8q2L/zC6M=",
       "dev": true
+    },
+    "promise-polyfill": {
+      "version": "8.1.0",
+      "resolved": "https://registry.npmjs.org/promise-polyfill/-/promise-polyfill-8.1.0.tgz",
+      "integrity": "sha512-OzSf6gcCUQ01byV4BgwyUCswlaQQ6gzXc23aLQWhicvfX9kfsUiUhgt3CCQej8jDnl8/PhGF31JdHX2/MzF3WA=="
     },
     "raw-body": {
       "version": "https://registry.npmjs.org/raw-body/-/raw-body-2.1.7.tgz",

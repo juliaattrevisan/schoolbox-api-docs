@@ -4,10 +4,12 @@
   "author": "Alaress Pty Ltd",
   "description": "Schoolbox LMS",
   "dependencies": {
-    "axios": "^0.18.0",
-    "lodash": "^4.17.11",
-    "vue": "^2.5.16",
-    "vuejs-paginate": "^2.0.1"
+    "axios": "0.18.0",
+    "es6-object-assign": "1.1.0",
+    "lodash": "4.17.11",
+    "promise-polyfill": "8.1.0",
+    "vue": "2.5.16",
+    "vuejs-paginate": "2.0.1"
   },
   "devDependencies": {
     "bower": "^1.8.4",
