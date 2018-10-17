@@ -84,7 +84,7 @@ class Result extends Base
 
         /* These are the folders to which the user has read+ access
          */
-        $foldersWithRoleBasedPermissions = $this->foldersWithReadAccess($user, $mapper, $strategyFactory);
+        $articlesWithRoleBasedPermissions = $this->foldersWithReadAccess($user, $mapper, $strategyFactory);
 
         /* TODO: Implement shareable and throw it in as the last arg
          */
@@ -97,7 +97,7 @@ class Result extends Base
                 (int)$row['n.author_id'],
                 $row['n.publish_at'],
                 $row['n.expires_at'],
-                $foldersWithRoleBasedPermissions,
+                $articlesWithRoleBasedPermissions,
                 false)
             ) {
                 $article = $mapper->hydrate($row, 'n');
@@ -128,16 +128,34 @@ class Result extends Base
     private function foldersWithReadAccess(User $user, Mapper $mapper, Segment\StrategyFactory $strategyFactory): array
     {
         $foldersWithRoleBasedPermissions = [];
+        $articlesWithRoleBasedPermissions = [];
 
-        $folderStrategy = $strategyFactory->makeSimpleStrategy('folder');
+        $statement = $mapper->getDatabase()->query($strategyFactory->makeSimpleStrategy('folder')->getSearchSql($user));
 
-        $statement = $mapper->getDatabase()->query($folderStrategy->getSearchSql($user));
-
+        /* Make a list of folders to which you have role-based read+ perms
+         */
         foreach ($statement as $row) {
-            $foldersWithRoleBasedPermissions[] = $row['cid'];
+            $foldersWithRoleBasedPermissions[$row['cid']] = true;
         }
 
-        return $foldersWithRoleBasedPermissions;
+        /* Find a list of folders that are in an article's audience
+         * See if there's an intersection; if there is, you can see the article
+         */
+        $audienceMapper = \Schoolbox\Comms\News\Audience\Mapper::getInstance();
+
+        $result = $audienceMapper->getDatabase()->query("
+            SELECT comms_news_article_id, entity_value
+            FROM {$audienceMapper->getTable()}
+            WHERE entity_type = 'folder'
+        ");
+
+        foreach ($result as $row) {
+            if (array_key_exists($row['entity_value'], $foldersWithRoleBasedPermissions)) {
+                $articlesWithRoleBasedPermissions[$row['comms_news_article_id']] = true;
+            }
+        }
+
+        return $articlesWithRoleBasedPermissions;
     }
 
     /**
@@ -170,7 +188,7 @@ class Result extends Base
      * @param int    $authorId
      * @param string $publishAt
      * @param string $expiresAt
-     * @param array  $foldersWithRoleBasedPermissions
+     * @param array  $articlesWithRoleBasedPermissions
      * @param bool   $isShareable
      * @return bool
      * @throws \InvalidArgumentException
@@ -183,7 +201,7 @@ class Result extends Base
         int $authorId,
         string $publishAt,
         string $expiresAt,
-        array $foldersWithRoleBasedPermissions,
+        array $articlesWithRoleBasedPermissions,
         bool $isShareable
     ): bool
     {
@@ -215,6 +233,13 @@ class Result extends Base
             }
 
             if (\in_array($articleId, $articleIds, true)) {
+                return true;
+            }
+
+            /* If the article has a folder in its audience and $user has read+ access
+             * to that folder via role-based permissions
+             */
+            if (array_key_exists($articleId, $articlesWithRoleBasedPermissions)) {
                 return true;
             }
         }
