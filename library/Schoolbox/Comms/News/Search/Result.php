@@ -66,14 +66,14 @@ class Result extends Base
          */
         $articlesWithRoleBasedPermissions = $this->foldersWithReadAccess($user, $mapper, $strategyFactory);
 
-        /* Hydrated articles end up in here
-         */
-        $collection = $mapper->createCollection();
-
         /* Generate result set that matched $keyword
          * then start filtering it based on access rules
          */
         $resultSet = $this->generateResultSet($mapper, $sanitiser);
+
+        /* Hydrated articles end up in here
+         */
+        $collection = $mapper->createCollection();
 
         /* TODO: Implement shareable and throw it in as the last arg
          */
@@ -131,10 +131,66 @@ class Result extends Base
      * @param Sanitiser         $sanitiser
      * @return int
      * @throws Mapper\DefinitionException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     protected function executeSearchCount(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser): int
     {
-        return 2348;
+        /* I don't have access to a di to do this atm
+         * Spawn from darkness for now
+         */
+        $config = new \Schoolbox\Config\Loader();
+
+        $strategyFactory = new Segment\StrategyFactory(
+            Access\UserAccessMapper::getInstance(),
+            $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS),
+            $config->get(ConfigMapper::_GLOBAL_MODERATION),
+            Folder\Mapper::getInstance(),
+            Access\RoleAccessMapper::getInstance(),
+            Access\Access::getInstance()
+        );
+
+        /* Is $user in the audience of the article?
+         */
+        $articleIds = $articleResolver->findArticlesForUser($user);
+
+        /* Does $user have the News Moderator service permission?
+         */
+        $hasServicePermission = $this->hasServicePermission($user);
+
+        /* These are the folders to which the user has read+ access
+         */
+        $articlesWithRoleBasedPermissions = $this->foldersWithReadAccess($user, $mapper, $strategyFactory);
+
+        /* Generate result set that matched $keyword
+         * then start filtering it based on access rules
+         */
+        $resultSet = $this->generateResultSet($mapper, $sanitiser);
+
+        /* TODO: Implement shareable and throw it in as the last arg
+         */
+        $i = 0;
+
+        foreach ($resultSet as $row) {
+            if ($this->isVisible(
+                $user,
+                $hasServicePermission,
+                (int)$row['n.id'],
+                $articleIds,
+                (int)$row['n.author_id'],
+                $row['n.publish_at'],
+                $row['n.expires_at'],
+                $articlesWithRoleBasedPermissions,
+                false)
+            ) {
+                $i++;
+            }
+        }
+
+        return $i;
     }
 
     /**
