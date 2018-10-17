@@ -55,9 +55,8 @@
                                 {% for id, criterion in criteria %}
                                     {% set mark = marks[participant.user.id][id] %}
                                     <td>
-                                        {# TODO verify this is the actual value selected from the dropdown (if present) when writeback gets implemented #}
                                         <p>{{ mark.text }}</p>
-                                        <p>{{ mark.value }}</p>
+                                        <p>{{ mark.selectedValue }}</p>
                                     </td>
                                 {% endfor %}
                             {% endfor %}
