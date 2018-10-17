@@ -34,7 +34,7 @@ class ValidCapabilityMax extends \Alaress\Specification\Base
     /**
      * `$capabilityMax` satisfies this pattern if either:
      * * `$this->markPerCap` is false
-     * * `$capabilityMax` is numeric and > 0
+     * * `$capabilityMax` is numeric and >= 0
      *
      * @param mixed $capabilityMax
      * @return bool
