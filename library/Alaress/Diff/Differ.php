@@ -51,7 +51,7 @@ class Differ
             $bValue   = $b[$key];
 
             // Both $aValue and $bValue must be arrays, or neither may be.
-            // If one is and another isn't: that a difference
+            // If one is and another isn't the two arrays will be returned as the different values
             $aIsArray = \is_array($aValue);
             $bIsArray = \is_array($bValue);
 
