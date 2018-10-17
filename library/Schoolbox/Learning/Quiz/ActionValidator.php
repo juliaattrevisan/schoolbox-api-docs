@@ -137,6 +137,11 @@ class ActionValidator
             return false;
         }
 
+        // Ensure user is permitted to see the quiz
+        if (!$this->canSeeQuiz($user, $quiz)) {
+            return false;
+        }
+
         // Instructors can see attempts, as long as student is participating
         if ($this->access->isInstructor($user, $folder)) {
             return true;
