@@ -48,12 +48,21 @@ class Factory
 
     /**
      * @param IAssessable $assessable
-     * @param float|null $totalMark
+     * @param float|null  $totalMark
+     * @param bool        $allowFallback If true and the mark scheme that would
+     *                                   be created is invalid:
+     *                                   create a `None` scheme instead.
+     *                                   Currently this covers only `TotalMark`
+     *                                   if its total is zero.
      * @return null|IMarkScheme
      * @throws \DomainException If MarkType is invalid for the assessment
      * @throws \InvalidArgumentException If assessment class not registered
      */
-    public function spawnMarkSchemeFor(IAssessable $assessable, ?float $totalMark = null): ?IMarkScheme
+    public function spawnMarkSchemeFor(
+        IAssessable $assessable,
+        ?float $totalMark = null,
+        bool $allowFallback = false
+    ): ?IMarkScheme
     {
         $markType = $assessable->getMarkType();
         if (null === $markType) {
@@ -66,7 +75,7 @@ class Factory
             return $this->spawnForQuiz($assessable);
         }
         if ($assessable instanceof DueWork) {
-            return $this->spawnForDueWork($assessable, $totalMark);
+            return $this->spawnForDueWork($assessable, $totalMark, $allowFallback);
         }
         if ($assessable instanceof Project) {
             return $this->spawnForProject($assessable);
@@ -104,11 +113,12 @@ class Factory
     }
 
     /**
-     * @param DueWork $dueWork
+     * @param DueWork    $dueWork
      * @param float|null $totalMark
+     * @param bool       $allowFallback
      * @return IMarkScheme
      */
-    protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null)
+    protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null, bool $allowFallback = false)
     {
         switch ($dueWork->getMarkType()->getId()) {
             case MarkType::TYPE_PERCENT:
@@ -120,7 +130,10 @@ class Factory
                 if ($maxMark > 0) {
                     return new TotalMarkFractional($maxMark);
                 }
-                return new None();
+                if ($allowFallback) {
+                    return new None();
+                }
+                throw new \UnexpectedValueException("Invalid MaxMark value for Total Mark MarkType: " . $maxMark);
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
             default:
