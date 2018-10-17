@@ -39,18 +39,6 @@ class DifferTest extends TestCase
         $this->assertEquals($this->differ->diff($a, $b), $expected);
     }
 
-    /**
-     * Test various invalid diff cases
-     *
-     * @dataProvider getTestDiffInvalidValuesData
-     * @param array $a
-     * @param array $b
-     * @param array $expected
-     */
-    public function testDiffInvalidValues(array $a, array $b, array $expected): void
-    {
-        $this->assertEquals($this->differ->diff($a, $b), $expected);
-    }
 
     /**
      * Data provider for `testDiff`
@@ -98,17 +86,6 @@ class DifferTest extends TestCase
                 ['a' => null, 'b' => null],
                 ['b' => [2, null]],
             ],
-        ];
-    }
-
-    /**
-     * Data provider for `testDiffInvalidValues`
-     *
-     * @return array
-     */
-    public function getTestDiffInvalidValuesData(): array
-    {
-        return [
             'flat with array and scalar value' => [
                 ['a' => 1, '1234567890' => 2],
                 ['a' => 1, '1234567890' => ['c' => 3]],
@@ -121,4 +98,5 @@ class DifferTest extends TestCase
             ],
         ];
     }
+
 }
