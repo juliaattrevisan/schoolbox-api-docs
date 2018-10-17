@@ -11,6 +11,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
 use InvalidArgumentException;
+use Alaress_Date_Format;
 
 class CanViewAssessable extends AbstractAssessableRule
 {
@@ -21,15 +22,20 @@ class CanViewAssessable extends AbstractAssessableRule
     /** @var bool */
     private $showClosed;
 
+    /** @var Alaress_Date_Format */
+    private $now;
+
 
     /**
-     * @param Visibility $visibility
-     * @param bool       $showClosed
+     * @param Visibility               $visibility
+     * @param bool                     $showClosed
+     * @param Alaress_Date_Format|null $now
      */
-    public function __construct(Visibility $visibility, bool $showClosed = true)
+    public function __construct(Visibility $visibility, bool $showClosed = true, Alaress_Date_Format $now = null)
     {
         $this->visibility = $visibility;
         $this->showClosed = $showClosed;
+        $this->now        = $now;
     }
 
 
@@ -45,7 +51,7 @@ class CanViewAssessable extends AbstractAssessableRule
 
         $assessable = $this->findAssessable($params);
 
-        if (!$this->visibility->isVisibleToUser($assessable, $user, $this->showClosed)) {
+        if (!$this->visibility->isVisibleToUser($assessable, $user, $this->showClosed, $this->now)) {
             throw new Unauthorized("User '{$user->getId()}' is not permitted to see assessment '{$assessable->getId()}'");
         }
     }
