@@ -1,6 +1,6 @@
 {# Take down this elephant one leg at a time #}
 {% set capabilityId         = groupUsage.capability.id %}
-{% set capabilityScaledMark = capabilityMark.calculateScaledMark %}
+{% set capabilityScaledMark = capabilityMark.calculateScaledMark ?? 0 %}
 
 {# What could the difference between these two things possibly be? #}
 {% set capabilityMaxValue = groupUsage.maxValue %}
