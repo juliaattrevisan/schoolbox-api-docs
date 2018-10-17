@@ -30,7 +30,12 @@ class Result extends Base
      * @param Sanitiser       $sanitiser
      * @return Collection
      * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
      * @throws \Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     protected function executeSearch(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser): Collection
     {
@@ -69,15 +74,78 @@ class Result extends Base
             Access\Access::getInstance()
         );
 
-        /* The chain of readability
+        /* Is $user in the audience of the article?
          */
+        $articleIds = $articleResolver->findArticlesForUser($user);
 
-        /* Superuser check
+        /* Does $user have the News Moderator service permission?
          */
-        $isSuperuser = $user->isSuperuser();
+        $hasServicePermission = $this->hasServicePermission($user);
 
-        /* Are you a news moderator?
+        /* These are the folders to which the user has read+ access
          */
+        $foldersWithRoleBasedPermissions = $this->foldersWithReadAccess($user, $mapper, $strategyFactory);
+
+        /* TODO: Implement shareable and throw it in as the last arg
+         */
+        foreach ($stmt as $row) {
+            if ($this->isVisible(
+                $user,
+                $hasServicePermission,
+                (int)$row['n.id'],
+                $articleIds,
+                (int)$row['n.author_id'],
+                $row['n.publish_at'],
+                $row['n.expires_at'],
+                $foldersWithRoleBasedPermissions,
+                false)
+            ) {
+                $article = $mapper->hydrate($row, 'n');
+
+                if ($article) {
+                    $author = $mapper->hydrateJoin($row, 'author', 'a');
+
+                    $article->setAuthor($author);
+
+                    $collection->add($article);
+                }
+            }
+        }
+
+        return $collection;
+    }
+
+
+    /**
+     * $user has role-based read+ perms to the folders returned
+     *
+     * @param User                    $user
+     * @param Mapper                  $mapper
+     * @param Segment\StrategyFactory $strategyFactory
+     * @return array
+     * @throws \Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException
+     */
+    private function foldersWithReadAccess(User $user, Mapper $mapper, Segment\StrategyFactory $strategyFactory): array
+    {
+        $foldersWithRoleBasedPermissions = [];
+
+        $folderStrategy = $strategyFactory->makeSimpleStrategy('folder');
+
+        $statement = $mapper->getDatabase()->query($folderStrategy->getSearchSql($user));
+
+        foreach ($statement as $row) {
+            $foldersWithRoleBasedPermissions[] = $row['cid'];
+        }
+
+        return $foldersWithRoleBasedPermissions;
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    private function hasServicePermission(User $user): bool
+    {
         $accessList = $user->getAccessList();
 
         $hasNewsServicePermission = false;
@@ -88,44 +156,71 @@ class Result extends Base
             }
         }
 
-        /* Are you the author?
-         */
-        $isAuthor = false;
-
-        /* Is the article published or expired?
-         */
-        $isPublishedOrExpired = false;
-
-        /* Is the article shareable?
-         */
-        $isShareable = false;
-
-        /* Is $user in the audience of the article?
-         */
-
-        /* These are the folders to which the user has read+ access
-         */
-        $folderStrategy = $strategyFactory->makeSimpleStrategy('folder');
-        $foldersWithRoleBasedPermissions = $folderStrategy->getSearchSql($user);
-
-        foreach ($stmt as $row) {
-        }
-//
-//        foreach ($this->buildSearchResult($stmt, $user, 'n.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
-//            $article = $mapper->hydrate($row, 'n');
-//
-//            if ($article) {
-//                $author = $mapper->hydrateJoin($row, 'author', 'a');
-//
-//                $article->setAuthor($author);
-//
-//                $collection->add($article);
-//            }
-//        }
-
-        return $collection;
+        return $hasNewsServicePermission;
     }
 
+
+    /**
+     * Find out if an article is searchable for $user prior to hydrating it
+     *
+     * @param User   $user
+     * @param bool   $hasServicePermission
+     * @param int    $articleId
+     * @param array  $articleIds
+     * @param int    $authorId
+     * @param string $publishAt
+     * @param string $expiresAt
+     * @param array  $foldersWithRoleBasedPermissions
+     * @param bool   $isShareable
+     * @return bool
+     * @throws \InvalidArgumentException
+     */
+    private function isVisible(
+        User $user,
+        bool $hasServicePermission,
+        int $articleId,
+        array $articleIds,
+        int $authorId,
+        string $publishAt,
+        string $expiresAt,
+        array $foldersWithRoleBasedPermissions,
+        bool $isShareable
+    ): bool
+    {
+        /* If $user is a superuser
+         */
+        if ($user->isSuperuser()) {
+            return true;
+        }
+
+        /* If $user has News service permissions
+         */
+        if ($hasServicePermission) {
+            return true;
+        }
+
+        /* If $user is the author
+         */
+        if ($user->getId() === $authorId) {
+            return true;
+        }
+
+        $publishAt = new \Alaress_Date_Format($publishAt, \Alaress_Date_Format::DATABASE_FORMAT);
+        $expiresAt = new \Alaress_Date_Format($expiresAt, \Alaress_Date_Format::DATABASE_FORMAT);
+        $now = \Alaress_Date_Format::now();
+
+        if ($publishAt->lte($now) || $expiresAt->lte($now)) {
+            if ($isShareable) {
+                return true;
+            }
+
+            if (\in_array($articleId, $articleIds, true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * The total number of items found by the search
