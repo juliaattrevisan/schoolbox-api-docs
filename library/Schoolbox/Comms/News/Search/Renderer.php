@@ -38,5 +38,45 @@ class Renderer extends Base
      */
     public function render(MapperResult $mapperResult, $type): void
     {
+        if ($mapperResult->getCount()) {
+            $this->getPage()->setFile('news_t', 'resource/news/search/results.html');
+            $this->getPage()->setBlock('news_t', 'news', 'news_block');
+            $this->getPage()->setBlock('news_t', 'see_more', 'see_more_block');
+
+            $this->getPage()->setVar(array(
+                'see_more_block' => ''
+            ));
+
+            $this->getPage()->setVar(array(
+                'NEWS_DISP_COUNT' => $mapperResult->getResult()->count(),
+                'NEWS_COUNT' => $mapperResult->getCount(),
+            ));
+
+            /* phplib
+             */
+            foreach ($mapperResult->getResult() as $currentArticle) {
+                $this->getPage()->setVar(array(
+                    'NEWS_ID' => $currentArticle->getId(),
+                    'NEWS_LINK' => $this->getPage()->getDi()->get('router')->generate('commsNews.getDetail', ['articleId' => $currentArticle->getId()]),
+                    'NEWS_TITLE' => $currentArticle->getTitle(),
+                    'NEWS_AUTHOR_ID' => $currentArticle->getAuthor()->getId(),
+                    'NEWS_AUTHOR_NAME' => $currentArticle->getAuthor()->getFullname(),
+                    'NEWS_PUBLISH_AT_LONG' => $currentArticle->getPublishAt()->getLong(),
+                    'NEWS_PUBLISH_AT' => $currentArticle->getPublishAt()->getRelativeTime(),
+                    'NEWS_BLURB' => \TextFormatter::cutSentence(strip_tags($currentArticle->getBody()), 300)
+                ));
+
+                $this->getPage()->parse('news_block', 'news', true);
+            }
+
+            /* "outputMore"
+             */
+            if ($type === 'all' && $mapperResult->getCount() > \Cfg::get('search_all_limit')) {
+                $this->getPage()->setVar('MORE_COUNT', $mapperResult->getCount());
+                $this->getPage()->parse('see_more_block', 'see_more');
+            }
+
+            $this->getPage()->parse('RESULT', 'news_t', true);
+        }
     }
 }
