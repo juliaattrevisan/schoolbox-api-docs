@@ -3938,30 +3938,29 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param string $join
      * @param object $model
+     * @throws Mapper\DefinitionException if join `$join` isn't on this mapper
+     * @throws \UnexpectedValueException  if join `$join` isn't on this mapper
      */
     protected function assertJoinedModelNotChanged(string $join, $model): void
     {
-        // No identifier? I can't tell if this is changed or not
+        // Does this mapper have an identifier column?
+        // If not I can't tell if this is changed or not.
         if (!$this->hasIdentifier()) {
             return;
         }
 
-        // What's the identifier? (If it's new, the FK isn't changed)
+        // What's the model's identifier value?
+        // If it is empty, then the model is not yet persisted, and can't be
+        // considered to be changed.
         $id = $this->getModelProperty($model, $this->getIdentifierProperty());
         if (!$id) {
             return;
         }
 
-        // What's the relation?
-        $joinDefinition = $this->joins[$join] ?? [];
-        if (!$joinDefinition) {
-            // This is an Я0ЯЯ3
-            return;
-        }
-        $foreignKey   = $joinDefinition['this_key'];
-        $joinProperty = $this->getPropertyFromColumn($foreignKey);
-        $newFkValue   = $this->getModelProperty($model, $joinProperty);
-
+        // Verify that this model's joined model hasn't changed
+        $joinDefinition   = $this->getJoinDefinition($join);
+        $foreignKey       = $joinDefinition['this_key'];
+        $newFkValue       = $this->getModelProperty($model, $this->getPropertyFromColumn($foreignKey));
         $existingFkValues = $this->findScalarByPredicates(
             $foreignKey,
             $this->getPredicateBuilder()->equals($this->getIdentifierColumn(), $id)
