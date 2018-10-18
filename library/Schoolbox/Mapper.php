@@ -3936,12 +3936,10 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Asserts that the value of this join hasn't changed.
      *
-     * @param string $join
      * @param object $model
-     * @throws Mapper\DefinitionException if join `$join` isn't on this mapper
-     * @throws \UnexpectedValueException  if join `$join` isn't on this mapper
+     * @param string $join
      */
-    protected function assertJoinedModelNotChanged(string $join, $model): void
+    protected function assertJoinedModelNotChanged($model, string $join): void
     {
         // Does this mapper have an identifier column?
         // If not I can't tell if this is changed or not.

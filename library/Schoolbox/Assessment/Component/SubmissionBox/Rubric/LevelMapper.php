@@ -61,7 +61,7 @@ class LevelMapper extends Mapper
      */
     public function validateBoxIdNotChanged(Level $level): bool
     {
-        $this->assertJoinedModelNotChanged('box', $level);
+        $this->assertJoinedModelNotChanged($level, 'box');
         return true;
     }
 
