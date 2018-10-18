@@ -429,10 +429,11 @@ class Controller extends Assessment\Controller
         }
 
         $rubric = $this->rubricMapper->findByDueWork($assessment);
+        $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
         $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
         $basename = (new \Url($assessment->getTitle()))->getSlug();
-        $content = $this->array2csv($this->collateResultSquare($rubric, $assessment->getAllParticipants()));
+        $content = $this->array2csv($this->collateResultSquare($rubricGrid, $assessment->getAllParticipants()));
         $headers = $this->getResponse()->headers;
 
         $headers->set('Pragma', ' ');
@@ -540,17 +541,17 @@ class Controller extends Assessment\Controller
     }
 
     /**
-     * @param Rubric\Rubric $rubric
+     * @param Grid                     $grid
      * @param Collection|Participant[] $participants
      * @return array
      */
-    protected function collateResultSquare(Rubric\Rubric $rubric, Collection $participants)
+    protected function collateResultSquare(Grid $grid, Collection $participants)
     {
         // array inside an array that's *nearly* empty...
         $data = [['Name', 'External ID']];
 
         // put header row in array
-        foreach ($this->getRubricHeaders($rubric) as $grouping => $criteria) {
+        foreach ($this->getRubricGridHeaders($grid) as $grouping => $criteria) {
             foreach ($criteria as $id => $criterion) {
                 $data[0][] = "$grouping - $criterion";
                 $data[0][] = '';
@@ -567,7 +568,7 @@ class Controller extends Assessment\Controller
             return $participant->getUser()->getId();
         })->getAll();
 
-        foreach ($this->getMarks($rubric, $participants) as $studentId => $marks) {
+        foreach ($this->getRubricMarks($participants) as $studentId => $marks) {
             /** @var Participant $participant */
             $participant = $participantsGrouped[$studentId]->first();
             $studentName = $participant->getUser()->formatName('{lastname}, {firstname}');
@@ -577,8 +578,9 @@ class Controller extends Assessment\Controller
 
             if (count($marks)) {
                 foreach ($marks as $mark) {
-                    if ($mark instanceof RubricDescriptor) {
-                        $row[] = $mark->getText();
+                    if ($mark instanceof IndicatorMark) {
+                        $descriptor = $mark->getDescriptor();
+                        $row[] = $descriptor ? $descriptor->getDescription() : '';
                         $row[] = $mark->getValue();
                         $sum += $mark->getValue();
                     } else {
