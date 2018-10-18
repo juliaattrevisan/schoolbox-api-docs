@@ -111,11 +111,10 @@ class Factory
     /**
      * @param DueWork    $dueWork
      * @param float|null $totalMark
-     * @param bool       $allowFallback
      * @return IMarkScheme
      * @throws \RangeException
      */
-    protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null, bool $allowFallback = false)
+    protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null)
     {
         switch ($dueWork->getMarkType()->getId()) {
             case MarkType::TYPE_PERCENT:
@@ -138,15 +137,14 @@ class Factory
      *
      * @param DueWork    $dueWork
      * @param float|null $totalMark
-     * @param bool       $allowFallback
      * @return IMarkScheme
      * @throws \RangeException
      */
-    protected function spawnForCapability(DueWork $dueWork, ?float $totalMark = null, bool $allowFallback = false)
+    protected function spawnForCapability(DueWork $dueWork, ?float $totalMark = null)
     {
         $maxMark = $totalMark ?? $dueWork->getMaxMark();
 
-        if ($maxMark <= 0 && $allowFallback) {
+        if ($maxMark <= 0) {
             return new None();
         }
 
