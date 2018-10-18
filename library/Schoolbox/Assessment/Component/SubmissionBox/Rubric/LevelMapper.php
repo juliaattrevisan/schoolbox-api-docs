@@ -45,7 +45,37 @@ class LevelMapper extends Mapper
         $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'box');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateBoxIdNotChanged']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDescriptors']);
+    }
+
+
+    /**
+     * Verify this level belongs to the same box it always belonged to.
+     *
+     * @param Level $level
+     * @return bool
+     */
+    public function validateBoxIdNotChanged(Level $level): bool
+    {
+        $id       = $level->getId();
+        $newBoxId = (int)$level->getSubmissionBox()->getId();
+        if ($id) {
+            $existingBoxIds = $this->findScalarByPredicates(
+                'box_id',
+                $this->getPredicateBuilder()->equals('id', $level->getId())
+            );
+            if (!empty($existingBoxIds)) {
+                $existingBoxId = (int)array_pop($existingBoxIds);
+                if ($newBoxId !== $existingBoxId) {
+                    throw new \UnexpectedValueException(
+                        'Rubric levels may not be transferred between due works'
+                    );
+                }
+            }
+        }
+
+        return true;
     }
 
 
