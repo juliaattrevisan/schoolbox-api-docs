@@ -45,8 +45,6 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Zip\Zip;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\InlineGrader\Kami;
 
