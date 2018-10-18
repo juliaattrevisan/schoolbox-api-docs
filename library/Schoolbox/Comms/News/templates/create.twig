@@ -430,9 +430,10 @@
         {% if isAutoSavable %}
             // Init draft plugin
             $createForm.draft({
-                inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search', '#news-topics'],
+                inputs: ['#news-title', '#audience-search', '#news-topics'],
                 textareas: ['body', 'blurb'],
                 attachzones: ['#{{ featureImageZone.id }}-zone'],
+                datepickers: ['#publishAt', '#expiresAt'],
                 staller: $submitButton,
                 onSaveSuccess: function (response) {
                     // Update the form actions
