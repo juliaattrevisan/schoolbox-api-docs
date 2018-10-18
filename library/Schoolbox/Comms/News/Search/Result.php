@@ -344,7 +344,7 @@ class Result extends Base
 
             /* If one of your read+ folders is in the article's audience
              */
-            if (\in_array($articleId, $articleIds, true)) {
+            if (\in_array($articleId, $articleIds, false)) {
                 return true;
             }
 
