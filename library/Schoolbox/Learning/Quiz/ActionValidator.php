@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Quiz;
 
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Alaress_Date_Format;
 use Schoolbox\Permission\Access\UserAccess;
@@ -32,17 +33,21 @@ class ActionValidator
     private $now;
 
     /** @var Access */
-    private $accessHelper;
+    private $access;
+
+    /** @var Visibility */
+    private $visibility;
 
 
     /**
      * @param Alaress_Date_Format $now
-     * @param Access              $accessHelper
+     * @param Access              $access
      */
-    public function __construct(Alaress_Date_Format $now, Access $accessHelper)
+    public function __construct(Alaress_Date_Format $now, Access $access)
     {
-        $this->now          = $now;
-        $this->accessHelper = $accessHelper;
+        $this->now        = $now;
+        $this->access     = $access;
+        $this->visibility = new Visibility($access);
     }
 
 
@@ -51,50 +56,20 @@ class ActionValidator
      *
      * @param User       $user
      * @param Quiz\Model $quiz
-     * @param bool       $restrictStudentSubmissions Are parents restricted from viewing student submissions?
      * @return bool
      */
-    public function canSeeQuiz(User $user, Quiz\Model $quiz, bool $restrictStudentSubmissions): bool
+    public function canSeeQuiz(User $user, Quiz\Model $quiz): bool
     {
-        $folder       = $quiz->getBaseContext()->getFolder();
-        $isInstructor = $this->accessHelper->isInstructor($user, $folder);
-        $isStaff      = $user->getRole()->isStaff();
-
-        // Instructors/Staff can always view the assessment (regardless of whether they can interact with it)
-        if ($isInstructor || $isStaff) {
+        if ($this->visibility->isVisibleToUser($quiz, $user, true, $this->now)) {
             return true;
         }
-
-        // Does user have a participation record?
-        $participant = $quiz->getParticipantIfExtant($user);
-        if ($participant) {
-            // Excluded Learners can never see the quiz
-            if ($participant->isExcluded()) {
-                return false;
-            }
-            // Non-excluded Learners can only see assessment after publishing
-            return $this->now->gte($participant->getPublishDate());
-        }
-
-        // Am I a parent?
-        // I can see the quiz if:
-        // * I have access to its folder
-        // * I'm not blocked by config.restrict_student_submissions
-        // * one of my kids is a participant
-        if (!$restrictStudentSubmissions
-            && $this->accessHelper->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ
-        ) {
-            foreach ($quiz->getAllParticipants() as $participant) {
-                if ($participant->isExcluded() || $this->now->lt($participant->getPublishDate())) {
-                    continue;
-                }
-                if ($this->now->gte($participant->getPublishDate()) && $user->isParentOf($participant->getUser())) {
+        if ($user->getRole()->isParent()) {
+            foreach ($user->getChildren() as $child) {
+                if ($this->visibility->isVisibleToUser($quiz, $child, true, $this->now)) {
                     return true;
                 }
             }
         }
-
-        // Not an instructor/staff, and no participation record.
         return false;
     }
 
@@ -108,7 +83,11 @@ class ActionValidator
      */
     public function canAttemptQuiz(User $user, Quiz\Model $quiz): bool
     {
-        $isInstructor = $this->accessHelper->isInstructor($user, $quiz->getContext()->getFolder());
+        if (!$this->canSeeQuiz($user, $quiz)) {
+            return false;
+        }
+
+        $isInstructor = $this->access->isInstructor($user, $quiz->getContext()->getFolder());
         $participant  = $quiz->getParticipantIfExtant($user);
 
         // Does user have a participation for this assessment?
@@ -142,7 +121,7 @@ class ActionValidator
      */
     public function canReviewAttempts(User $reviewer, User $reviewee, Quiz\Model $quiz): bool
     {
-        $isInstructor  = $this->accessHelper->isInstructor($reviewer, $quiz->getContext()->getFolder());
+        $isInstructor  = $this->access->isInstructor($reviewer, $quiz->getContext()->getFolder());
         $isParticipant = $quiz->isParticipant($reviewee);
 
         // Only instructors can review, and reviewee cannot be excluded.
@@ -172,8 +151,13 @@ class ActionValidator
             return false;
         }
 
+        // Ensure user is permitted to see the quiz
+        if (!$this->canSeeQuiz($user, $quiz)) {
+            return false;
+        }
+
         // Instructors can see attempts, as long as student is participating
-        if ($this->accessHelper->isInstructor($user, $folder)) {
+        if ($this->access->isInstructor($user, $folder)) {
             return true;
         }
 
@@ -192,7 +176,7 @@ class ActionValidator
         // (as long as config.restrict_student_submissions is off)
         return !$restrictStudentSubmissions
             && $user->isParentOf($student)
-            && $this->accessHelper->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ;
+            && $this->access->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_READ;
     }
 
 
@@ -228,7 +212,7 @@ class ActionValidator
      */
     public function canDeleteAttempts(User $deleter, User $participantUser, Quiz\Model $quiz): bool
     {
-        $isInstructor  = $this->accessHelper->isInstructor($deleter, $quiz->getContext()->getFolder());
+        $isInstructor  = $this->access->isInstructor($deleter, $quiz->getContext()->getFolder());
         $isParticipant = $quiz->isParticipant($participantUser);
 
         // Only instructors can delete, and participant cannot be excluded.

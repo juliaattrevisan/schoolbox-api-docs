@@ -26,6 +26,8 @@ use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
+use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
 use Schoolbox\Learning\Authorizer\Rule\ParentCanViewFeedback;
 use Schoolbox\Learning\Authorizer\Rule\StudentCanViewFeedback;
 use Schoolbox\Learning\InlineGrader\Kami;
@@ -67,7 +69,8 @@ class Module extends BaseModule
 
         $hasKamiAccess = new Rule\All(
             new Rule\IsLoggedIn(),
-            $this->buildRuleCanAccessKami()
+            $this->buildRuleCanAccessKami(),
+            new CanViewAssessable(new Visibility(Access::getInstance()))
         );
 
         $hasInlineAccess = new Rule\All(
@@ -75,7 +78,8 @@ class Module extends BaseModule
             new Rule\Any(
                 $this->buildRuleHasWriteAccess(),
                 new CanSelfAssess()
-            )
+            ),
+            new CanViewAssessable(new Visibility(Access::getInstance()))
         );
 
         $hasPlagscanAccess = new Rule\All(
@@ -86,7 +90,8 @@ class Module extends BaseModule
                     new Rule\IsUser('studentId'),
                     new Rule\IsConfigOn('plagscan_allow_students_report_access', $this->getConfigLoader())
                 )
-            )
+            ),
+            new CanViewAssessable(new Visibility(Access::getInstance()))
         );
 
         $plagscanPattern    = '/plagscans/{assessmentId:\d+}/{responseId:\d+}/{plagscanId:\d+}';
