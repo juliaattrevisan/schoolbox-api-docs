@@ -44,9 +44,10 @@
                     {% for participant in dueWork.allParticipants %}
                     <tr>
                         <td>
-                            <div class="card small-12">
-                                <a href="/search/user/{{ participant.user.id }}" title="View Profile">
-                                    <h3>{{ participant.user.formatName('{lastname}, {firstname}') }}</h3>
+                            <div class="card wrap-down small-12 ">
+                                <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.user.id}) }}" title="View Profile">
+                                    <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullname }}">
+                                    <p>{{ participant.user.fullname}}</p>
                                 </a>
                             </div>
                         </td>
@@ -55,8 +56,8 @@
                                 {% for id, criterion in criteria %}
                                     {% set mark = marks[participant.user.id][id] %}
                                     <td>
-                                        <p>{{ mark.text }}</p>
-                                        <p>{{ mark.selectedValue }}</p>
+                                        <p>{{ mark.descriptor.description }}</p>
+                                        <p>{{ mark.value }}</p>
                                     </td>
                                 {% endfor %}
                             {% endfor %}

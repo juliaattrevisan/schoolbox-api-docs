@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
+use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
@@ -44,8 +45,6 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Zip\Zip;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\InlineGrader\Kami;
 
@@ -397,13 +396,13 @@ class Controller extends Assessment\Controller
             'dueWork'     => $assessment,
         ];
 
-        if($assessment->getUseRubric()){
-            $rubric = $this->rubricMapper->findByDueWork($assessment);
+        if ($assessment->getUseRubric()) {
+            $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
             $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
             $data = array_merge($data, [
-                'headers'  => $this->getRubricHeaders($rubric),
-                'marks'    => $this->getMarks($rubric, $assessment->getAllParticipants()),
+                'headers'  => $this->getRubricHeaders($rubricGrid),
+                'marks'    => $this->getMarks($assessment->getAllParticipants()),
             ]);
         }
 
@@ -427,11 +426,11 @@ class Controller extends Assessment\Controller
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        $rubric = $this->rubricMapper->findByDueWork($assessment);
+        $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
         $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
         $basename = (new \Url($assessment->getTitle()))->getSlug();
-        $content = $this->array2csv($this->collateResultSquare($rubric, $assessment->getAllParticipants()));
+        $content = $this->array2csv($this->collateResultSquare($rubricGrid, $assessment->getAllParticipants()));
         $headers = $this->getResponse()->headers;
 
         $headers->set('Pragma', ' ');
@@ -447,58 +446,74 @@ class Controller extends Assessment\Controller
         ]);
     }
 
+
     /**
-     * @param Rubric\Rubric $rubric
-     * @return string[][] Indexed by group.name then criterion.id
+     * Get headers for the rubric report or CSV download.
+     *
+     * @param Grid $grid
+     * @return string[][] Grouped by capability name, then indicator ID
      */
-    protected function getRubricHeaders(Rubric\Rubric $rubric)
+    private function getRubricHeaders(Grid $grid): array
     {
         $headers = [];
-
-        foreach ($rubric->getTotalPerGroup() as $group) {
-            foreach ($group->getAllCriteria() as $criterion) {
-                $headers[$group->getName()][$criterion->getId()] = $criterion->getName();
+        foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
+            foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+                $capability = $capabilityUsage->getCapability();
+                $indicator  = $indicatorUsage->getIndicator();
+                $headers[$capability->getName()][$indicator->getId()] = $indicator->getName();
             }
         }
         return $headers;
     }
 
+
     /**
-     * @param Rubric\Rubric $rubric
+     * Get rubric marks given for each indicator.
+     *
      * @param \ICollection|Participant[] $participants
-     * @return RubricDescriptor[][] Grouped in sets indexed by user.id
+     * @return IndicatorMark[][] Grouped in sets indexed by user.id
      */
-    protected function getMarks(Rubric\Rubric $rubric, \ICollection $participants)
+    private function getMarks(\ICollection $participants): array
     {
         $marks = [];
 
         foreach ($participants as $participant) {
+            $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
+            if (!$feedback) {
+                continue;
+            }
+
+            try {
+                $markedGrid = $this->rubricMapper->retrieveMarkedGrid($feedback);
+            } catch (MapperException $e) {
+                // can't really do anything
+                continue;
+            }
             $studentId = $participant->getUser()->getId();
-
-            // this will modify the "selection" of descriptors in the grid
-            (new Rubric\GridGenerator($this->rubricMapper, $rubric, $participant->getUser()))->applyInstructorGivenMark(true);
-
-            foreach ($rubric->getSumPerGroup() as $group) {
-                foreach ($group->getAllCriteria() as $criterion) {
-                    $marks[$studentId][$criterion->getId()] = $criterion->getSelectedDescriptors()->first();
+            foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
+                foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                    $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()] = $indicatorMark;
                 }
             }
         }
         return $marks;
     }
 
+
     /**
-     * @param Rubric\Rubric $rubric
+     * Creates a CSV structure for this rubric grid and its participants.
+     *
+     * @param Grid                     $grid
      * @param Collection|Participant[] $participants
      * @return array
      */
-    protected function collateResultSquare(Rubric\Rubric $rubric, Collection $participants)
+    private function collateResultSquare(Grid $grid, Collection $participants): array
     {
         // array inside an array that's *nearly* empty...
         $data = [['Name', 'External ID']];
 
         // put header row in array
-        foreach ($this->getRubricHeaders($rubric) as $grouping => $criteria) {
+        foreach ($this->getRubricHeaders($grid) as $grouping => $criteria) {
             foreach ($criteria as $id => $criterion) {
                 $data[0][] = "$grouping - $criterion";
                 $data[0][] = '';
@@ -515,7 +530,7 @@ class Controller extends Assessment\Controller
             return $participant->getUser()->getId();
         })->getAll();
 
-        foreach ($this->getMarks($rubric, $participants) as $studentId => $marks) {
+        foreach ($this->getMarks($participants) as $studentId => $marks) {
             /** @var Participant $participant */
             $participant = $participantsGrouped[$studentId]->first();
             $studentName = $participant->getUser()->formatName('{lastname}, {firstname}');
@@ -525,8 +540,9 @@ class Controller extends Assessment\Controller
 
             if (count($marks)) {
                 foreach ($marks as $mark) {
-                    if ($mark instanceof RubricDescriptor) {
-                        $row[] = $mark->getText();
+                    if ($mark instanceof IndicatorMark) {
+                        $descriptor = $mark->getDescriptor();
+                        $row[] = $descriptor ? $descriptor->getDescription() : '';
                         $row[] = $mark->getValue();
                         $sum += $mark->getValue();
                     } else {
