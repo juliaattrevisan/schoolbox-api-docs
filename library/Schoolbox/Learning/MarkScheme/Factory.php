@@ -132,31 +132,37 @@ class Factory
      * Capabilities have their own markscheme. Currently, the type of mark scheme is inferred from the due work they are used on.
      * In the future we might add the ability to choose a different markscheme for each capability.
      *
-     * @param DueWork    $dueWork
+     * @param IAssessable    $assessable
      * @param float|null $totalMark
      * @return IMarkScheme
      * @throws \RangeException
      */
-    public function spawnForCapability(DueWork $dueWork, ?float $totalMark = null)
+    public function spawnForCapability(IAssessable $assessable, ?float $totalMark = null)
     {
-        $maxMark = $totalMark ?? $dueWork->getMaxMark();
+        if ($assessable instanceof DueWork) {
+            $maxMark = $totalMark ?? $assessable->getMaxMark();
 
-        if ($maxMark <= 0) {
-            return new None();
-        }
-
-        switch ($dueWork->getMarkType()->getId()) {
-            case MarkType::TYPE_PERCENT:
-                return new Percentage();
-            case MarkType::TYPE_NONE:
+            if ($maxMark <= 0) {
                 return new None();
-            case MarkType::TYPE_TOTAL:
-                return new TotalMarkFractional($maxMark);
-            case MarkType::TYPE_LETTER:
-                return new LetterGrade($dueWork->getGradeGroup());
-            default:
-                throw new \DomainException("Invalid MarkType for DueWork: " . $dueWork->getMarkType()->getName());
+            }
+
+            switch ($assessable->getMarkType()->getId()) {
+                case MarkType::TYPE_PERCENT:
+                    return new Percentage();
+                case MarkType::TYPE_NONE:
+                    return new None();
+                case MarkType::TYPE_TOTAL:
+                    return new TotalMarkFractional($maxMark);
+                case MarkType::TYPE_LETTER:
+                    return new LetterGrade($assessable->getGradeGroup());
+                default:
+                    throw new \DomainException("Invalid MarkType for DueWork: " . $assessable->getMarkType()->getName());
+            }
         }
+
+        // TODO we should NEVER hit this because $assessable should always be a due work, but the ways this was built
+        // using IAssessable rather than DueWork forces us to do it this way
+        return new None();
     }
 
     /**
