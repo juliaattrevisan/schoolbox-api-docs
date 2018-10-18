@@ -403,8 +403,8 @@ class Controller extends Assessment\Controller
             $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
             $data = array_merge($data, [
-                'headers'  => $this->getRubricGridHeaders($rubricGrid),
-                'marks'    => $this->getRubricMarks($assessment->getAllParticipants()),
+                'headers'  => $this->getRubricHeaders($rubricGrid),
+                'marks'    => $this->getMarks($assessment->getAllParticipants()),
             ]);
         }
 
@@ -456,7 +456,7 @@ class Controller extends Assessment\Controller
      * @param Grid $grid
      * @return string[][] Grouped by capability name, then indicator ID
      */
-    private function getRubricGridHeaders(Grid $grid): array
+    private function getRubricHeaders(Grid $grid): array
     {
         $headers = [];
         foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
@@ -478,7 +478,7 @@ class Controller extends Assessment\Controller
      * @throws MapperException if the marked grid for each feedback couldn't be
      *                         retrieved
      */
-    private function getRubricMarks(\ICollection $participants): array
+    private function getMarks(\ICollection $participants): array
     {
         $marks = [];
 
@@ -501,57 +501,19 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * @param Rubric\Rubric $rubric
-     * @return string[][] Indexed by group.name then criterion.id
-     */
-    protected function getRubricHeaders(Rubric\Rubric $rubric)
-    {
-        $headers = [];
-
-        foreach ($rubric->getTotalPerGroup() as $group) {
-            foreach ($group->getAllCriteria() as $criterion) {
-                $headers[$group->getName()][$criterion->getId()] = $criterion->getName();
-            }
-        }
-        return $headers;
-    }
-
-    /**
-     * @param Rubric\Rubric $rubric
-     * @param \ICollection|Participant[] $participants
-     * @return RubricDescriptor[][] Grouped in sets indexed by user.id
-     */
-    protected function getMarks(Rubric\Rubric $rubric, \ICollection $participants)
-    {
-        $marks = [];
-
-        foreach ($participants as $participant) {
-            $studentId = $participant->getUser()->getId();
-
-            // this will modify the "selection" of descriptors in the grid
-            (new Rubric\GridGenerator($this->rubricMapper, $rubric, $participant->getUser()))->applyInstructorGivenMark(true);
-
-            foreach ($rubric->getSumPerGroup() as $group) {
-                foreach ($group->getAllCriteria() as $criterion) {
-                    $marks[$studentId][$criterion->getId()] = $criterion->getSelectedDescriptors()->first();
-                }
-            }
-        }
-        return $marks;
-    }
-
-    /**
+     * Creates a CSV structure for this rubric grid and its participants.
+     *
      * @param Grid                     $grid
      * @param Collection|Participant[] $participants
      * @return array
      */
-    protected function collateResultSquare(Grid $grid, Collection $participants)
+    protected function collateResultSquare(Grid $grid, Collection $participants): array
     {
         // array inside an array that's *nearly* empty...
         $data = [['Name', 'External ID']];
 
         // put header row in array
-        foreach ($this->getRubricGridHeaders($grid) as $grouping => $criteria) {
+        foreach ($this->getRubricHeaders($grid) as $grouping => $criteria) {
             foreach ($criteria as $id => $criterion) {
                 $data[0][] = "$grouping - $criterion";
                 $data[0][] = '';
@@ -568,7 +530,7 @@ class Controller extends Assessment\Controller
             return $participant->getUser()->getId();
         })->getAll();
 
-        foreach ($this->getRubricMarks($participants) as $studentId => $marks) {
+        foreach ($this->getMarks($participants) as $studentId => $marks) {
             /** @var Participant $participant */
             $participant = $participantsGrouped[$studentId]->first();
             $studentName = $participant->getUser()->formatName('{lastname}, {firstname}');
