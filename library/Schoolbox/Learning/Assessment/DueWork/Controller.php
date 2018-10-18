@@ -507,7 +507,7 @@ class Controller extends Assessment\Controller
      * @param Collection|Participant[] $participants
      * @return array
      */
-    protected function collateResultSquare(Grid $grid, Collection $participants): array
+    private function collateResultSquare(Grid $grid, Collection $participants): array
     {
         // array inside an array that's *nearly* empty...
         $data = [['Name', 'External ID']];
