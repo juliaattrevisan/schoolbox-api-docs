@@ -3931,4 +3931,48 @@ abstract class Mapper implements IMapper, Serializable
         }
         return $collection;
     }
+
+
+    /**
+     * Asserts that the value of this join hasn't changed.
+     *
+     * @param string $join
+     * @param object $model
+     */
+    protected function assertJoinedModelNotChanged(string $join, $model): void
+    {
+        // No identifier? I can't tell if this is changed or not
+        if (!$this->hasIdentifier()) {
+            return;
+        }
+
+        // What's the identifier? (If it's new, the FK isn't changed)
+        $id = $this->getModelProperty($model, $this->getIdentifierProperty());
+        if (!$id) {
+            return;
+        }
+
+        // What's the relation?
+        $joinDefinition = $this->joins[$join] ?? [];
+        if (!$joinDefinition) {
+            // This is an Я0ЯЯ3
+            return;
+        }
+        $foreignKey   = $joinDefinition['this_key'];
+        $joinProperty = $this->getPropertyFromColumn($foreignKey);
+        $newFkValue   = $this->getModelProperty($model, $joinProperty);
+
+        $existingFkValues = $this->findScalarByPredicates(
+            $foreignKey,
+            $this->getPredicateBuilder()->equals($this->getIdentifierColumn(), $id)
+        );
+        if (!empty($existingFkValues)) {
+            $existingFkValue = array_pop($existingFkValues);
+            if ($newFkValue !== $existingFkValue) {
+                throw new \UnexpectedValueException(
+                    'Rubric levels may not be transferred between due works'
+                );
+            }
+        }
+    }
 }

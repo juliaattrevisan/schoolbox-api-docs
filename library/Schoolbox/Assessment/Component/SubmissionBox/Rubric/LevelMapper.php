@@ -61,23 +61,7 @@ class LevelMapper extends Mapper
      */
     public function validateBoxIdNotChanged(Level $level): bool
     {
-        $id       = $level->getId();
-        $newBoxId = (int)$level->getSubmissionBox()->getId();
-        if ($id) {
-            $existingBoxIds = $this->findScalarByPredicates(
-                'box_id',
-                $this->getPredicateBuilder()->equals('id', $level->getId())
-            );
-            if (!empty($existingBoxIds)) {
-                $existingBoxId = (int)array_pop($existingBoxIds);
-                if ($newBoxId !== $existingBoxId) {
-                    throw new \UnexpectedValueException(
-                        'Rubric levels may not be transferred between due works'
-                    );
-                }
-            }
-        }
-
+        $this->assertJoinedModelNotChanged('box', $level);
         return true;
     }
 
