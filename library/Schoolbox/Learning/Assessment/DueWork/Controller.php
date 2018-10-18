@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
+use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
@@ -446,6 +447,57 @@ class Controller extends Assessment\Controller
             'data'   => $content
         ]);
     }
+
+
+    /**
+     * Get headers for the rubric report or CSV download.
+     *
+     * @param Grid $grid
+     * @return string[][] Grouped by capability name, then indicator ID
+     */
+    private function getRubricGridHeaders(Grid $grid): array
+    {
+        $headers = [];
+        foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
+            foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+                $capability = $capabilityUsage->getCapability();
+                $indicator  = $indicatorUsage->getIndicator();
+                $headers[$capability->getName()][$indicator->getId()] = $indicator->getName();
+            }
+        }
+        return $headers;
+    }
+
+
+    /**
+     * Get rubric marks given for each indicator.
+     *
+     * @param \ICollection|Participant[] $participants
+     * @return IndicatorMark[][] Grouped in sets indexed by user.id
+     * @throws MapperException if the marked grid for each feedback couldn't be
+     *                         retrieved
+     */
+    private function getRubricMarks(\ICollection $participants): array
+    {
+        $marks = [];
+
+        foreach ($participants as $participant) {
+            $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
+            if (!$feedback) {
+                continue;
+            }
+
+            $markedGrid = $this->rubricMapper->retrieveMarkedGrid($feedback);
+            $studentId  = $participant->getUser()->getId();
+            foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
+                foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                    $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()] = $indicatorMark;
+                }
+            }
+        }
+        return $marks;
+    }
+
 
     /**
      * @param Rubric\Rubric $rubric
