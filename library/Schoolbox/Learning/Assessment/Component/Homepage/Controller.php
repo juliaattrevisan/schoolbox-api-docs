@@ -58,7 +58,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
      *
      * @return bool Whether to continue on and attempt Component render
      */
-    public function execute()
+    public function execute(): bool
     {
         if (!parent::execute()) {
             return false;
