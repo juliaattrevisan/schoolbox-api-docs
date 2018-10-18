@@ -3971,7 +3971,7 @@ abstract class Mapper implements IMapper, Serializable
         if (!empty($existingFkValues)) {
             $existingFkValue = array_pop($existingFkValues);
             if ($newFkValue !== $existingFkValue) {
-                throw new \UnexpectedValueException('Joined model has changed' ?? $message);
+                throw new \UnexpectedValueException($message ?? 'Joined model has changed');
             }
         }
     }
