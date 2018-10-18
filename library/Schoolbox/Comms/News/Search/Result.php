@@ -113,8 +113,7 @@ class Result extends Base
 
                         $collection->add($article);
                     }
-                }
-                else {
+                } else {
                     break;
                 }
             }
@@ -342,10 +341,15 @@ class Result extends Base
         $now = \Alaress_Date_Format::now();
 
         if ($publishAt->lte($now) || $expiresAt->lte($now)) {
+
+            /* TODO: Implement shareable
+             */
             if ($isShareable) {
                 return true;
             }
 
+            /* If one of your read+ folders is in the article's audience
+             */
             if (\in_array($articleId, $articleIds, true)) {
                 return true;
             }
