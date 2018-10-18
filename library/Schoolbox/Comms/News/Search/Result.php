@@ -276,13 +276,7 @@ class Result extends Base
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute();
 
-        $resultSet = [];
-
-        foreach ($stmt as $row) {
-            $resultSet[] = $row;
-        }
-
-        return $resultSet;
+        return $stmt->fetchAll();
     }
 
     /**
