@@ -30,7 +30,7 @@
     {% endfor %}
 
     {% if rubricGrid.isCapabilityMarkShown(groupUsage.capability) %}
-<tr>
+<tr xmlns="http://www.w3.org/1999/html">
     <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 1 }}">
         <span data-group-summary="{{ rubricId }}-{{ capabilityId }}"
               data-mark="{{ capabilityMark.value }}"
@@ -111,7 +111,7 @@
         {# Self-Assessment #}
         {% if selfAssessmentFeedback.isSelfGrading %}
             {% set selfAssessmentCapabilityMark = selfAssessmentFeedback.rubricMarkedGrid.retrieveCapabilityMark(groupUsage) %}
-            ({{ selfAssessmentCapabilityMark.retrieveHumanReadableMark }} given in {{ locale.selfAssessment }})
+            <p class="meta">{{ selfAssessmentCapabilityMark.retrieveHumanReadableMark }} given in {{ locale.selfAssessment }}</p>
         {% endif %}
     </th>
 </tr>
