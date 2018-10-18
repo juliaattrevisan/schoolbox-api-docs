@@ -49,11 +49,8 @@ class Factory
     /**
      * @param IAssessable $assessable
      * @param float|null  $totalMark
-     * @param bool        $allowFallback If true and the mark scheme that would
-     *                                   be created is invalid:
+     * @param bool        $allowFallback If true and the total mark is <= 0:
      *                                   create a `None` scheme instead.
-     *                                   Currently this covers only `TotalMark`
-     *                                   if its total is zero.
      * @return null|IMarkScheme
      * @throws \DomainException If MarkType is invalid for the assessment
      * @throws \InvalidArgumentException If assessment class not registered
