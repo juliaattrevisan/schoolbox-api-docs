@@ -48,8 +48,8 @@ class TotalMarkFractional extends TotalMarkAbstract
      */
     protected function rangeCheck($totalMark)
     {
-        if($totalMark < 0){
-            throw new \RangeException("Total mark cannot be negative: $totalMark");
+        if($totalMark <= 0){
+            throw new \RangeException("Total mark $totalMark needs to be greater than 0");
         }
     }
 

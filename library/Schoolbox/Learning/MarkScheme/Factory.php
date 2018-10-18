@@ -116,23 +116,23 @@ class Factory
      * @param float|null $totalMark
      * @param bool       $allowFallback
      * @return IMarkScheme
+     * @throws \RangeException
      */
     protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null, bool $allowFallback = false)
     {
+        $maxMark = $totalMark ?? $dueWork->getMaxMark();
+
+        if ($maxMark <= 0 && $allowFallback) {
+            return new None();
+        }
+
         switch ($dueWork->getMarkType()->getId()) {
             case MarkType::TYPE_PERCENT:
                 return new Percentage();
             case MarkType::TYPE_NONE:
                 return new None();
             case MarkType::TYPE_TOTAL:
-                $maxMark = $totalMark ?? $dueWork->getMaxMark();
-                if ($maxMark > 0) {
-                    return new TotalMarkFractional($maxMark);
-                }
-                if ($allowFallback) {
-                    return new None();
-                }
-                throw new \UnexpectedValueException("Invalid MaxMark value for Total Mark MarkType: " . $maxMark);
+               return new TotalMarkFractional($maxMark);
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
             default:
