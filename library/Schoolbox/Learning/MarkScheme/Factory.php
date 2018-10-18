@@ -140,7 +140,7 @@ class Factory
      * @return IMarkScheme
      * @throws \RangeException
      */
-    protected function spawnForCapability(DueWork $dueWork, ?float $totalMark = null)
+    public function spawnForCapability(DueWork $dueWork, ?float $totalMark = null)
     {
         $maxMark = $totalMark ?? $dueWork->getMaxMark();
 
