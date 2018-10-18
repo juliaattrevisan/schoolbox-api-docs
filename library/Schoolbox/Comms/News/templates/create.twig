@@ -311,14 +311,14 @@
                             Publish Date
                         </label>
                         <p class="meta">This article becomes available to its audience once this date is reached.</p>
-                        <input type="text" name="publishAt" id="publishAt" data-datepicker data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ article.publishAt.local }}" required />
+                        <input type="text" name="publishAt" id="publishAt" data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ article.publishAt.local }}" required />
                     </div>
                     <div class="small-12 large-6 columns">
                         <label for="expiresAt" class="required">
                             Expiry Date
                         </label>
                         <p class="meta">This article is automatically archived once this expiry date is reached.</p>
-                        <input type="text" name="expiresAt" id="expiresAt" data-datepicker data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}" required />
+                        <input type="text" name="expiresAt" id="expiresAt" data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}" required />
                     </div>
                 </fieldset>
             </section>
@@ -409,18 +409,25 @@
         var $createForm = $('#createForm');
         var $submitButtons = $('#news-submit, #news-preview');
         var $submitButton = $('#news-submit');
+        var $dateInputs = $('#publishAt, #expiresAt');
         var validationDeferred;
 
         // Init validation
         $createForm.alaressValidate();
 
-        {% if isAutoSavable %}
-            // Init a stall submit on the submit click
-            // We will install a deferred on this inside the draft plugin, so that this waits for draft to finish saving
-            $submitButton.stallSubmit({
-                event: 'click'
-            });
+        // Init a stall submit on the submit click
+        // We will install a deferred on this inside the draft plugin, so that this waits for draft to finish saving
+        $submitButton.stallSubmit({
+            event: 'click'
+        });
 
+        // Init datepickers with staller
+        $dateInputs.alaressDateTimePicker({
+            staller: $submitButton
+        });
+       
+
+        {% if isAutoSavable %}
             // Init draft plugin
             $createForm.draft({
                 inputs: ['#news-title', '#publishAt', '#expiresAt', '#audience-search', '#news-topics'],
