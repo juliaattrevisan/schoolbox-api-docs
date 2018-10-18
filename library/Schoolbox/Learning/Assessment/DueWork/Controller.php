@@ -475,8 +475,6 @@ class Controller extends Assessment\Controller
      *
      * @param \ICollection|Participant[] $participants
      * @return IndicatorMark[][] Grouped in sets indexed by user.id
-     * @throws MapperException if the marked grid for each feedback couldn't be
-     *                         retrieved
      */
     private function getMarks(\ICollection $participants): array
     {
@@ -488,8 +486,13 @@ class Controller extends Assessment\Controller
                 continue;
             }
 
-            $markedGrid = $this->rubricMapper->retrieveMarkedGrid($feedback);
-            $studentId  = $participant->getUser()->getId();
+            try {
+                $markedGrid = $this->rubricMapper->retrieveMarkedGrid($feedback);
+            } catch (MapperException $e) {
+                // can't really do anything
+                continue;
+            }
+            $studentId = $participant->getUser()->getId();
             foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
                 foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
                     $marks[$studentId][$indicatorMark->getIndicatorUsage()->getIndicator()->getId()] = $indicatorMark;
