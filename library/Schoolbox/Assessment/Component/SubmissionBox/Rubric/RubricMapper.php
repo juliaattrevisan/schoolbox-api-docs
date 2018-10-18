@@ -696,10 +696,10 @@ class RubricMapper
             }
 
             // Create the cap mark
-            $capabilityMarkScheme = $markSchemeFactory->spawnMarkSchemeFor(
+            // TODO need to pass in due work, not iassessable; how?
+            $capabilityMarkScheme = $markSchemeFactory->spawnForCapability(
                 $feedback->getAssessable(),
-                $capabilityUsage->getMaxValue(),
-                true
+                $capabilityUsage->getMaxValue()
             );
             $capabilityMark = (new CapabilityMark($capabilityUsage, $capabilityMarkScheme))
                 ->setValue($capabilityMarkModel->getValue());
