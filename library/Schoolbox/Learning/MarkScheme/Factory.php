@@ -117,6 +117,33 @@ class Factory
      */
     protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null, bool $allowFallback = false)
     {
+        switch ($dueWork->getMarkType()->getId()) {
+            case MarkType::TYPE_PERCENT:
+                return new Percentage();
+            case MarkType::TYPE_NONE:
+                return new None();
+            case MarkType::TYPE_TOTAL:
+                $maxMark = $totalMark ?? $dueWork->getMaxMark();
+                return new TotalMarkFractional($maxMark);
+            case MarkType::TYPE_LETTER:
+                return new LetterGrade($dueWork->getGradeGroup());
+            default:
+                throw new \DomainException("Invalid MarkType for DueWork: " . $dueWork->getMarkType()->getName());
+        }
+    }
+
+    /**
+     * Capabilities have their own markscheme. Currently, the type of mark scheme is inferred from the due work they are used on.
+     * In the future we might add the ability to choose a different markscheme for each capability.
+     *
+     * @param DueWork    $dueWork
+     * @param float|null $totalMark
+     * @param bool       $allowFallback
+     * @return IMarkScheme
+     * @throws \RangeException
+     */
+    protected function spawnForCapability(DueWork $dueWork, ?float $totalMark = null, bool $allowFallback = false)
+    {
         $maxMark = $totalMark ?? $dueWork->getMaxMark();
 
         if ($maxMark <= 0 && $allowFallback) {
@@ -129,7 +156,7 @@ class Factory
             case MarkType::TYPE_NONE:
                 return new None();
             case MarkType::TYPE_TOTAL:
-               return new TotalMarkFractional($maxMark);
+                return new TotalMarkFractional($maxMark);
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
             default:
