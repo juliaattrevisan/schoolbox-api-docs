@@ -195,9 +195,9 @@
                 }
 
                 if (displayedMark === customMark) {
-                    $(this).find("[data-use-descriptor-values]").prop("disabled", true);
+                    $(this).find("[data-use-descriptor-values]").hide();
                 } else {
-                    $(this).find("[data-use-descriptor-values]").prop("disabled", false);
+                    $(this).find("[data-use-descriptor-values]").show();
                 }
             })
         }

@@ -88,7 +88,7 @@
                 {% endif %}
 
                 {% if groupUsage.containsDescriptorsWithValue %}
-                    <button data-use-descriptor-values>Assign <span class="descriptor-sum" data-group-descriptor-sum>
+                    <a data-use-descriptor-values style="font-weight:normal">Assign <span class="descriptor-sum" data-group-descriptor-sum>
                         {% if markType.mode == 'raw' %}
                             {{ capabilityScaledMark }}
 
@@ -99,7 +99,7 @@
                             {{ percentageMark }}
 
                         {% endif %}
-                        </span> from Descriptors</button>
+                        </span> from Descriptors</a>
                 {% endif %}
                 {% if markType.mode == 'letter' or markType.mode == 'percent' %}
                     <!-- <p class="meta">This {{ locale.rubricGroup }} contributes {{ (capabilityMaxValue / rubricGrid.calculateMaxValueFromCapabilities * 100) | round(2) }}% to the total mark</p> -->
