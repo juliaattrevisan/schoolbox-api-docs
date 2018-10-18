@@ -49,16 +49,13 @@ class Factory
     /**
      * @param IAssessable $assessable
      * @param float|null  $totalMark
-     * @param bool        $allowFallback If true and the total mark is <= 0:
-     *                                   create a `None` scheme instead.
      * @return null|IMarkScheme
      * @throws \DomainException If MarkType is invalid for the assessment
      * @throws \InvalidArgumentException If assessment class not registered
      */
     public function spawnMarkSchemeFor(
         IAssessable $assessable,
-        ?float $totalMark = null,
-        bool $allowFallback = false
+        ?float $totalMark = null
     ): ?IMarkScheme {
         $markType = $assessable->getMarkType();
         if (null === $markType) {
@@ -71,7 +68,7 @@ class Factory
             return $this->spawnForQuiz($assessable);
         }
         if ($assessable instanceof DueWork) {
-            return $this->spawnForDueWork($assessable, $totalMark, $allowFallback);
+            return $this->spawnForDueWork($assessable, $totalMark);
         }
         if ($assessable instanceof Project) {
             return $this->spawnForProject($assessable);
