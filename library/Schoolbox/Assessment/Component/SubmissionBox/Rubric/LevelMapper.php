@@ -53,9 +53,6 @@ class LevelMapper extends Mapper
     /**
      * Verify this level belongs to the same box it always belonged to.
      *
-     * TODO consider some way of making this generic
-     * (as dependent objects shouldn't change parent as a general rule)
-     *
      * @param Level $level
      * @return bool
      */
