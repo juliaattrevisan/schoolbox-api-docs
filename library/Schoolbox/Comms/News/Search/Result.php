@@ -103,7 +103,7 @@ class Result extends Base
                 /* Only obtain $limit items
                  * Once you've got the limit of items, break out
                  */
-                if ($collection->count() <= $sanitiser->getLimit()) {
+                if ($collection->count() < $sanitiser->getLimit()) {
                     $article = $mapper->hydrate($row, 'n');
 
                     if ($article) {
