@@ -398,13 +398,13 @@ class Controller extends Assessment\Controller
             'dueWork'     => $assessment,
         ];
 
-        if($assessment->getUseRubric()){
-            $rubric = $this->rubricMapper->findByDueWork($assessment);
+        if ($assessment->getUseRubric()) {
+            $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
             $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
             $data = array_merge($data, [
-                'headers'  => $this->getRubricHeaders($rubric),
-                'marks'    => $this->getMarks($rubric, $assessment->getAllParticipants()),
+                'headers'  => $this->getRubricGridHeaders($rubricGrid),
+                'marks'    => $this->getRubricMarks($assessment->getAllParticipants()),
             ]);
         }
 
