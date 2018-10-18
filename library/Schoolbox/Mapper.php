@@ -3934,12 +3934,17 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * Asserts that the value of this join hasn't changed.
+     * Asserts that the joined model that `$model` joins to is the same as what
+     * is persisted.
      *
-     * @param object $model
-     * @param string $join
+     * @param object      $model   The object to check
+     * @param string      $join    The join to check
+     * @param null|string $message If `$model`'s joined model has changed,
+     *                             throw an exception with this message.
+     * @throws Mapper\DefinitionException if join `$join` isn't on this mapper
+     * @throws \UnexpectedValueException  if `$model`'s joined model has changed
      */
-    protected function assertJoinedModelNotChanged($model, string $join): void
+    protected function assertJoinedModelNotChanged($model, string $join, ?string $message = null): void
     {
         // Does this mapper have an identifier column?
         // If not I can't tell if this is changed or not.
@@ -3966,9 +3971,7 @@ abstract class Mapper implements IMapper, Serializable
         if (!empty($existingFkValues)) {
             $existingFkValue = array_pop($existingFkValues);
             if ($newFkValue !== $existingFkValue) {
-                throw new \UnexpectedValueException(
-                    'Rubric levels may not be transferred between due works'
-                );
+                throw new \UnexpectedValueException('Joined model has changed' ?? $message);
             }
         }
     }

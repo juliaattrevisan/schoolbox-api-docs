@@ -61,7 +61,7 @@ class LevelMapper extends Mapper
      */
     public function validateBoxIdNotChanged(Level $level): bool
     {
-        $this->assertJoinedModelNotChanged($level, 'box');
+        $this->assertJoinedModelNotChanged($level, 'box', 'Rubric levels may not be transferred between due works');
         return true;
     }
 
