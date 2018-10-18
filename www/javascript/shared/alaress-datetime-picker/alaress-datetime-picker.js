@@ -690,15 +690,16 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
 
             // Hide any validation error
             $fieldError.hide();
-
-            // Fire a custom event for completion of this
-            $(t).trigger("datepickerChange");
           }
         })
         .always(function() {
           $(t).prop("readonly", false);
           $(t).prop("disabled", false);
         });
+
+      // Fire a custom event for change of this
+      // This has to happen here (rather than on xhr done above) so that the staller can pick up on this
+      $(t).trigger("datepickerChange");
 
       // this listener needs to be installed last in this case
       if (staller) {
