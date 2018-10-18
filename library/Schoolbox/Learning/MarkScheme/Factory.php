@@ -133,15 +133,13 @@ class Factory
      * In the future we might add the ability to choose a different markscheme for each capability.
      *
      * @param IAssessable    $assessable
-     * @param float|null $totalMark
+     * @param float $maxMark
      * @return IMarkScheme
      * @throws \RangeException
      */
-    public function spawnForCapability(IAssessable $assessable, ?float $totalMark = null)
+    public function spawnForCapability(IAssessable $assessable, float $maxMark = null)
     {
         if ($assessable instanceof DueWork) {
-            $maxMark = $totalMark ?? $assessable->getMaxMark();
-
             if ($maxMark <= 0) {
                 return new None();
             }
