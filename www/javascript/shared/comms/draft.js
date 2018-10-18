@@ -1,259 +1,185 @@
 (function() {
+  /**
+   * The Draft plugin detects differences in the elements listed in config.inputs
+   * and config.textareas and asynchronously saves when needed
+   *
+   * This also quietly updates the url and form action so if you refresh the page
+   * without hitting the submit button, you won't reload what the screen originally
+   * did which might actually be a Create screen.
+   *
+   * @param options
+   */
+  $.fn.draft = function(options) {
+    options = options || {};
+
+    var config = init(options, $(this));
+
+    // Watch the content for changes
+    initAutosave();
 
     /**
-     * The Draft plugin detects differences in the elements listed in config.inputs
-     * and config.textareas and asynchronously saves when needed
-     *
-     * This also quietly updates the url and form action so if you refresh the page
-     * without hitting the submit button, you won't reload what the screen originally
-     * did which might actually be a Create screen.
+     * Init
      *
      * @param options
+     * @param element
+     * @returns {*}
      */
-    $.fn.draft = function(options) {
-        options = options || {};
+    function init(options, element) {
+      var defaults = {
+        element: element,
 
-        var config = init(options, $(this));
-        var autosaveInterval;
+        // Toast element
+        toaster: $("#saveDraft"),
 
-        /* A registry of current values that change over time while content is created
-         * Used to determine when to initiate actual save transaction
-         */
-        var registry = {};
+        // The grace period for after a user makes a change and when the draft save trigger (in seconds)
+        interval: 3,
 
-        /* Set initial state
-         */
-        initRegistry();
+        // Array of selectors which will have .val() checked for changes
+        inputs: [],
 
-        /* Set up custom event
-         */
-        $(config.element).on('draft', save);
+        // CKEditors to listen for changes on
+        textareas: [],
 
-        /* Watch the content for changes
-         */
-        initAutosave();
+        // Attachzones to listen for changes on
+        attachzones: [],
 
-        /**
-         * Init
-         *
-         * @param options
-         * @param element
-         * @returns {*}
-         */
-        function init(options, element) {
-            var defaults = {
-                element: element,
+        // Datepickers to listen for changes on
+        // These shouldn't go into 'inputs' because of the strtotime functionality we have on date fields
+        datepickers: [],
 
-                /* Toaster
-                 */
-                toaster: $('#saveDraft'),
-
-                /* Save every 3 seconds by default
-                 */
-                interval: 3,
-
-                /* Array of selectors which will have .val() checked for changes
-                 */
-                inputs: [],
-
-                /* Textareas to check
-                 */
-                textareas: [],
-
-                /* Attachzones to check
-                 */
-                attachzones: [],
-
-                /* Activation element
+        /* Activation element
                  * The thing that gets disabled while saving
                  */
-                activator: element.find('button[type=submit]'),
-
-                /**
-                 * Called on successful save.
-                 * @param {bool} wasAutoSave
-                 */
-                onSaveSuccess: $.noop
-            };
-
-            return $.extend(defaults, options);
-        }
+        activator: element.find("button[type=submit]"),
 
         /**
-         * Remember what the initial values were at the start
+         * Called on successful save.
+         * @param {bool} wasAutoSave
          */
-        function initRegistry() {
-            var i;
+        onSaveSuccess: $.noop,
 
-            for (i = 0; i < config.inputs.length; i++) {
-                registry[config.inputs[i]] = $(config.inputs[i]).val();
-            }
+        // The infamous stallSubmit
+        staller: null
+      };
 
-            for (i = 0; i < config.textareas.length; i++) {
-                registry[config.textareas[i]] = CKEDITOR.instances[config.textareas[i]].getData();
-            }
-
-            /* Files that were in the attachzones initially
-             */
-            for (i = 0; i < config.attachzones.length; i++) {
-                registry[config.attachzones[i]] = [];
-
-                $.each($(config.attachzones[i]), function(index, element) {
-                    if ($(element).val() !== '') {
-                        registry[config.attachzones[i]].push($(element).val());
-                    }
-                });
-            }
-        }
-
-        /**
-         * Initiate an autosave - activate toast and save it
-         */
-        function initAutosave() {
-            autosaveInterval = setInterval(function() {
-                if (isDifferent()) {
-                    config.toaster.toastActivate({
-                        text: 'Autosaving'
-                    });
-
-                    $(config.element).trigger('draft');
-                }
-            }, config.interval * 1000);
-        }
-
-        /**
-         * Find out if any textareas changed
-         * Update registry of known values
-         *
-         * @returns {boolean}
-         */
-        function isDifferent() {
-            var contentChanged = false;
-            var key;
-            var current;
-            var i, j;
-
-            /* Check inputs
-             */
-            for (i = 0; i < config.inputs.length; i++) {
-                key = config.inputs[i];
-                current = $(key).val();
-
-                if (
-                    (_.isArray(registry[key]) && !_.isEqual(current.sort(), registry[key].sort())) ||
-                    (!_.isArray(registry[key]) && registry[key] !== current)
-                ) {
-                    contentChanged = true;
-                    registry[key] = current;
-                }
-            }
-
-            /* Check textareas
-             */
-            for (i = 0; i < config.textareas.length; i++) {
-                key = config.textareas[i];
-
-                current = CKEDITOR.instances[key].getData();
-
-                if (registry[key] !== current) {
-                    contentChanged = true;
-                    registry[key] = current;
-                }
-            }
-
-            /* Check attachzones
-             */
-            for (i = 0; i < config.attachzones.length; i++) {
-                key = config.attachzones[i];
-
-                current = config.element.find('input[name="'+config.attachzones[i]+'[]"]');
-
-                var currentFiles = [];
-
-                /* Check whether there's a different file in the attachzone than the ones we knew
-                 */
-                for (j = 0; j < current.length; j++) {
-                    currentFiles.push($(current[j]).val());
-
-                    if (registry[key].indexOf($(current[j]).val()) === -1) {
-                        contentChanged = true;
-                    }
-                }
-
-                /* If a file has been removed from the list, contentChanged might still be false
-                 * because the current list of files is a subset of what was initially there
-                 * Now check the length to ensure that a) no new files were added and b) no existing
-                 * files were removed
-                 */
-                if (currentFiles.length !== registry[key].length) {
-                    contentChanged = true;
-                }
-
-                /* Remember the current state of things
-                 */
-                registry[key] = currentFiles;
-            }
-
-            return contentChanged;
-        }
-
-        /**
-         * Actually save the data
-         */
-        function save() {
-            var formContents = $(config.element).serializeArray();
-
-            /* Special treatment because ck reasons
-             */
-            for (var i = 0; i < config.textareas.length; i++) {
-                var key = config.textareas[i];
-
-                formContents.push({name: key, value: CKEDITOR.instances[key].getData()});
-            }
-
-            /* Send draft flag
-             */
-            formContents.push({name: 'draft', value: true});
-
-            /* Disable inputs
-             */
-            config.activator.prop('disabled', true);
-
-            /* Clear the autosave interval; it reactivates after drafts transaction occurs
-             */
-            clearInterval(autosaveInterval);
-
-            /* Transact
-             */
-            $.ajax({
-                type: config.element.attr('method'),
-                url: config.element.attr('action'),
-                data: formContents,
-                dataType: 'json'
-            }).done(function () {
-
-                /* Re-init the autosave interval
-                 */
-                initAutosave();
-
-                /* Re-enable submit
-                 */
-                config.activator.prop('disabled', false);
-            }).success(function (responseText) {
-                config.toaster.toastTimeout({
-                    text: 'Draft Saved',
-                    css: 'success'
-                });
-
-                config.onSaveSuccess(responseText);
-            }).error(function (response) {
-                var temp = $.parseJSON(response.responseText);
-
-                config.toaster.toastTimeout({
-                    text: 'Error: ' + temp.message,
-                    css: 'alert'
-                });
-            });
-        }
+      return $.extend(defaults, options);
     }
-}(jQuery));
+
+    /**
+     * Init listeners for changes, firing save() when there's changes (with a timeout)
+     */
+    function initAutosave() {
+      var draftTimeout;
+      var deferred;
+
+      // Listen for changes on inputs
+      config.element.on(
+        "change keyup",
+        config.inputs.join(", "),
+        checkForChanges
+      );
+
+      // Listen for changes on CKEditors
+      var i;
+      for (i = 0; i < config.textareas.length; i++) {
+        var key = config.textareas[i];
+        CKEDITOR.instances[key].on("change", checkForChanges); // CKE seems to trigger change on keyup so no need to listen for that here
+      }
+
+      // Listen for changes to attachzones
+      config.element.on(
+        "success.attachzone removedfile.attachzone",
+        config.attachzones.join(", "),
+        checkForChanges
+      );
+
+      // Listen for changes to datepicker fields
+      config.element.on("datepickerChange", checkForChanges);
+
+      /**
+       * The common function triggered on the listeners above:
+       * It will reset the draft timeout and deferreds and line up another draft save
+       *
+       * I've deliberately put this inside the scope of initAutosave in order to directly modify the draftTimeout & deferred vars
+       * Alternatively I could've returned the vars in this function and reassigned them above.
+       */
+      function checkForChanges() {
+        // kill any other timeout pending, and resolve the deferred
+        clearTimeout(draftTimeout);
+        if (deferred !== undefined) {
+          deferred.resolve();
+        }
+
+        // (re)set the deferred
+        deferred = $.Deferred();
+
+        // Set a timeout for the draft to save
+        draftTimeout = setTimeout(function() {
+          save(deferred);
+        }, config.interval * 1000);
+
+        // install the deferred as stalling form submit
+        if (config.staller) {
+          config.staller.stallSubmit(deferred);
+        }
+      }
+    }
+
+    /**
+     * Save the data via ajax, showing a toast for the user
+     *
+     * @param {jQuery.Deferred} deferred - a deferred object to resolve on successful save
+     */
+    function save(deferred) {
+      // Init toast
+      config.toaster.toastActivate({
+        text: "Saving..."
+      });
+
+      var formContents = $(config.element).serializeArray();
+
+      /* Special treatment because ck reasons
+             */
+      for (var i = 0; i < config.textareas.length; i++) {
+        var key = config.textareas[i];
+
+        formContents.push({
+          name: key,
+          value: CKEDITOR.instances[key].getData()
+        });
+      }
+
+      /* Send draft flag
+             */
+      formContents.push({ name: "draft", value: true });
+
+      /* Transact
+             */
+      $.ajax({
+        type: config.element.attr("method"),
+        url: config.element.attr("data-action-draft"),
+        data: formContents,
+        dataType: "json"
+      })
+        .success(function(responseText) {
+          config.toaster.toastTimeout({
+            text: "Saved",
+            css: "success"
+          });
+
+          config.onSaveSuccess(responseText);
+
+          // Resolve the deferred for stallSubmit
+          deferred.resolve();
+        })
+        .error(function(response) {
+          var temp = $.parseJSON(response.responseText);
+
+          config.toaster.toastTimeout({
+            text: "Error: " + temp.message,
+            css: "alert"
+          });
+        });
+    }
+  };
+})(jQuery);
