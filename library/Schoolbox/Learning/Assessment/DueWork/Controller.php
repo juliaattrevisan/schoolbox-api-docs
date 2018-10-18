@@ -428,7 +428,6 @@ class Controller extends Assessment\Controller
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        $rubric = $this->rubricMapper->findByDueWork($assessment);
         $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
         $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
