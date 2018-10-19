@@ -37,6 +37,9 @@ class Factory
         $indicators   = $rubricData['criterion']  ?: [];
         $descriptors  = $rubricData['descriptor'] ?: [];
 
+        // Level ordering is important
+        ksort($levels);
+
         if ($assessment instanceof DueWork) {
             $usesMarkRange = $assessment->getUseMarkRange();
             $markPerCap = $assessment->getMarkPerCapability();
