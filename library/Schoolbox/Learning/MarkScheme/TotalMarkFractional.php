@@ -54,6 +54,8 @@ class TotalMarkFractional extends TotalMarkAbstract
             // Why the funny wording? It's because users will most likely encounter this in the ajax error on due work creation
             // which has certain...grammar requirements.
             // I'm also using the term "maximum available marks" to be consistent with the field this corresponds to on due work creation.
+            // (The reason this will only be seen on due work creation is because other assessment types have a null total mark,
+            // so wouldn't even execute this code path)
             throw new \RangeException("have maximum available marks greater than 0");
         }
     }
