@@ -66,6 +66,7 @@
     }
 } %}
 
+{% set audienceIsReadOnly = article.isApproved %}
 
 {# Build Placeholder text #}
 {% set availableNames = [] %}
@@ -99,6 +100,7 @@
             {% set updateRoute = routeLookupIfAuthorized('commsNews.postUpdate', {article: article, articleId: article.id}) %}
             {% set submitRoute = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
             {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
+            {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
         {% endif %}
 
         {# Create two possible routes:
