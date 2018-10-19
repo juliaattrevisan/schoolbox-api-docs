@@ -48,7 +48,9 @@ class TotalMarkFractional extends TotalMarkAbstract
      */
     protected function rangeCheck($totalMark)
     {
-        if($totalMark <= 0){
+        // Because certain assessment types rely on null total marks (i.e. quiz) we have to make sure we're not comparing a null value
+        // or it will cause false positives due to type coercion
+        if(null !== $totalMark && $totalMark <= 0){
             throw new \RangeException("Total mark $totalMark needs to be greater than 0");
         }
     }
