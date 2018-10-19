@@ -192,7 +192,16 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         $method = $bundle->getMethod();
-        if ($method === Mapper::METHOD_DELETE) {
+
+        $diff = $bundle->getEvent()->getDiff();
+        $changedToInvisible = (\array_key_exists('assessment', $diff)
+            && \array_key_exists('workType', $diff['assessment'])
+            && $assessment->getWorkType()
+            && $assessment->getWorkType()->isStaffOrInstructorVisibleOnly());
+        // TODO: This is not working
+
+        if ($method === Mapper::METHOD_DELETE || $changedToInvisible) {
+            // TODO: retract?
             $bundle->detachEach([
                 self::TRIGGER_OPEN,
                 self::TRIGGER_UPCOMING,
@@ -201,49 +210,50 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 self::TRIGGER_CLOSED,
             ]);
 
-        } else {
-            // Bundle triggers
+            return;
+        }
 
-            // I need a close date to determine if I should trigger anything:
-            // if it's in the past, trigger nothing except update.
-            $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
-            if ($closeDate && $closeDate->isFuture()) {
+        // Bundle triggers
 
-                // Open is now always bundled, as long as it is set
-                // However, if its open date is in the past don't bundle if this is an update
-                $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
-                if ($openDate && ($method === Mapper::METHOD_CREATE || $openDate->isFuture())) {
-                    $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
-                }
+        // I need a close date to determine if I should trigger anything:
+        // if it's in the past, trigger nothing except update.
+        $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
+        if ($closeDate && $closeDate->isFuture()) {
 
-                // Due and upcoming: always bundled as long as due date is set
-                $dueDate = $this->coalesceDates($plan->getDueDate(), $assessment->getDueDate());
-                if ($dueDate) {
-                    // Quiz and Due Work have different logic for when notification happens
-                    // Quiz: 2 hours before
-                    // Due Work: 2 days before
-                    $upcomingDate = null;
-                    if ($assessment->getQuiz()) {
-                        $upcomingDate = (clone $dueDate)->addHours(-self::QUIZ_UPCOMING_WINDOW);
-                    } elseif ($assessment->getDueWork()) {
-                        $upcomingDate = (clone $dueDate)->addHours(-self::DUEWORK_UPCOMING_WINDOW);
-                    }
-                    // if the upcoming date is before the open date, push upcoming to 1 minute after open,
-                    // rounded to the nearest 5 minutes?
-                    if ($upcomingDate) {
-                        if ($upcomingDate->lt($openDate)) {
-                            $upcomingDate = (clone $openDate)->addMinutes(1);
-                        }
-                        if ($upcomingDate->isFuture()) {
-                            $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
-                        }
-                    }
-                    $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
-                }
-
-                // Close: always bundled
-                $bundle->attach(self::TRIGGER_CLOSED, $closeDate->getUnixTimeStamp());
+            // Open is now always bundled, as long as it is set
+            // However, if its open date is in the past don't bundle if this is an update
+            $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
+            if ($openDate && ($method === Mapper::METHOD_CREATE || $openDate->isFuture())) {
+                $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
             }
+
+            // Due and upcoming: always bundled as long as due date is set
+            $dueDate = $this->coalesceDates($plan->getDueDate(), $assessment->getDueDate());
+            if ($dueDate) {
+                // Quiz and Due Work have different logic for when notification happens
+                // Quiz: 2 hours before
+                // Due Work: 2 days before
+                $upcomingDate = null;
+                if ($assessment->getQuiz()) {
+                    $upcomingDate = (clone $dueDate)->addHours(-self::QUIZ_UPCOMING_WINDOW);
+                } elseif ($assessment->getDueWork()) {
+                    $upcomingDate = (clone $dueDate)->addHours(-self::DUEWORK_UPCOMING_WINDOW);
+                }
+                // if the upcoming date is before the open date, push upcoming to 1 minute after open,
+                // rounded to the nearest 5 minutes?
+                if ($upcomingDate) {
+                    if ($upcomingDate->lt($openDate)) {
+                        $upcomingDate = (clone $openDate)->addMinutes(1);
+                    }
+                    if ($upcomingDate->isFuture()) {
+                        $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
+                    }
+                }
+                $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
+            }
+
+            // Close: always bundled
+            $bundle->attach(self::TRIGGER_CLOSED, $closeDate->getUnixTimeStamp());
 
             // Generic updated trigger
             if ($method === Mapper::METHOD_UPDATE) {
@@ -285,9 +295,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $notifsForPlans = [];
         foreach ($assessments as $assessment) {
             // Go thru each plan and raise in THAT context
-
-            // TODO: come back here later
-
             foreach ($assessment->getPlans() as $domainModelPlan) {
                 $openDate = $this->coalesceDates($domainModelPlan->getOpenDate(), $assessment->getOpenAt());
                 $dueDate  = $this->coalesceDates($domainModelPlan->getDueDate(), $assessment->getDueAt());

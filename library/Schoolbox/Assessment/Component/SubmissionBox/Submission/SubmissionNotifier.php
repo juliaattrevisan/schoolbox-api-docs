@@ -4,8 +4,9 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
@@ -56,7 +57,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * @return string
      */
-    protected function getSlug()
+    protected function getSlug(): string
     {
         return NSMapper::NS_DUEWORK;
     }
@@ -68,7 +69,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
      * @param mixed $dependencies
      * @return void
      */
-    public function loadDependencies($dependencies = null)
+    public function loadDependencies($dependencies = null): void
     {
         $dependencies['submissionBoxMapper'] = isset($dependencies['submissionBoxMapper']) ? $dependencies['submissionBoxMapper'] : SubmissionBoxMapper::getInstance();
         $dependencies['userMapper']          = isset($dependencies['userMapper']) ? $dependencies['userMapper'] : UserMapper::getInstance();
@@ -83,7 +84,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
      * @param SubmissionBoxMapper $submissionBoxMapper
      * @return static
      */
-    protected function setSubmissionBoxMapper($submissionBoxMapper)
+    protected function setSubmissionBoxMapper(SubmissionBoxMapper $submissionBoxMapper): self
     {
         $this->submissionBoxMapper = $submissionBoxMapper;
         return $this;
@@ -94,7 +95,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
      * @param UserMapper $userMapper
      * @return static
      */
-    protected function setUserMapper($userMapper)
+    protected function setUserMapper(UserMapper $userMapper): self
     {
         $this->userMapper = $userMapper;
         return $this;
@@ -105,7 +106,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
      * @param  UserAccessMapper $userAccessMapper
      * @return $this
      */
-    public function setUserAccessMapper($userAccessMapper)
+    public function setUserAccessMapper(UserAccessMapper $userAccessMapper): self
     {
         $this->userAccessMapper = $userAccessMapper;
         return $this;
@@ -119,7 +120,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
      * @throws ScheduleException
      * @return void
      */
-    public function bundleTriggers($bundle)
+    public function bundleTriggers($bundle): void
     {
         $method     = $bundle->getMethod();
         $submission = $bundle->getEvent()->getObject();
@@ -194,13 +195,18 @@ class SubmissionNotifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    protected function submissionNotification($type, $submission, $user, $diff = null)
+    protected function submissionNotification(string $type, Submission $submission, User $user, $diff = null): Envelope
     {
         $envelope = new Envelope();
 
         $studentExtId = $user->getExternalId();
 
-        $box = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
+        try {
+            $box = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
+        } catch (Mapper\Exception $e) {
+            return $envelope;
+        }
+
         $folder = $box->getAssessmentModel()->getAssessmentContext()->getFolder();
 
         $boxId = $box->getId();
@@ -243,7 +249,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStaffSubmitted($submission, $user, $diff = null)
+    public function notifyStaffSubmitted(Submission $submission, User $user, $diff = null): Envelope
     {
         return $this->submissionNotification(self::TRIGGER_SUBMITTED, $submission, $user, $diff);
     }
@@ -257,7 +263,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStaffResubmitted($submission, $user, $diff = null)
+    public function notifyStaffResubmitted(Submission $submission, User $user, $diff = null): Envelope
     {
         return $this->submissionNotification(self::TRIGGER_RESUBMITTED, $submission, $user, $diff);
     }
@@ -271,7 +277,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentDeleted($submission, $user, $diff = null)
+    public function notifyStudentDeleted(Submission $submission, User $user, $diff = null): Envelope
     {
         $envelope = new Envelope();
 
@@ -280,7 +286,6 @@ class SubmissionNotifier extends AbstractModuleNotifier
 
         try {
             $box = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
-
         } catch (Mapper\Exception $e) {
             // Suppress notification if box is also deleted.
             return $envelope;
@@ -305,7 +310,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
                     'catname' => new CategoryParam($folder)
                 )
             )
-            ->setIcon("/images/icon?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']))
+            ->setIcon("/portrait.php?userId={$user->getExternalId()}&size={$this->iconSize}")
             ->setHref("/learning/assessments/{$box->getAssessmentId()}/$studentId")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
