@@ -52,6 +52,7 @@ class Factory
      * @return null|IMarkScheme
      * @throws \DomainException If MarkType is invalid for the assessment
      * @throws \InvalidArgumentException If assessment class not registered
+     * @throws \RangeException
      */
     public function spawnMarkSchemeFor(
         IAssessable $assessable,
@@ -73,7 +74,7 @@ class Factory
         if ($assessable instanceof Project) {
             return $this->spawnForProject($assessable);
         }
-        throw new \InvalidArgumentException('Unknown IAssessable class: ' . get_class($assessable));
+        throw new \InvalidArgumentException('Unknown IAssessable class: ' . \get_class($assessable));
     }
 
     /**
@@ -94,6 +95,8 @@ class Factory
     /**
      * @param Quiz $quiz
      * @return TotalMarkFractional
+     * @throws \DomainException
+     * @throws \RangeException
      */
     protected function spawnForQuiz(Quiz $quiz)
     {
@@ -110,6 +113,7 @@ class Factory
      * @param float|null $totalMark
      * @return IMarkScheme
      * @throws \RangeException
+     * @throws \DomainException
      */
     protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null)
     {
@@ -135,9 +139,10 @@ class Factory
      * @param IAssessable    $assessable
      * @param float $maxMark
      * @return IMarkScheme
+     * @throws \DomainException
      * @throws \RangeException
      */
-    public function spawnForCapability(IAssessable $assessable, float $maxMark = null)
+    public function spawnForCapability(IAssessable $assessable, float $maxMark = null) : IMarkScheme
     {
         if ($assessable instanceof DueWork) {
             if ($maxMark <= 0) {
@@ -166,6 +171,7 @@ class Factory
     /**
      * @param Project $project
      * @return IMarkScheme
+     * @throws \DomainException
      */
     protected function spawnForProject(Project $project)
     {
