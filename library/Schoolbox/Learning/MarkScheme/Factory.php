@@ -144,28 +144,22 @@ class Factory
      */
     public function spawnForCapability(IAssessable $assessable, float $maxMark = null) : IMarkScheme
     {
-        if ($assessable instanceof DueWork) {
-            if ($maxMark <= 0) {
-                return new None();
-            }
-
-            switch ($assessable->getMarkType()->getId()) {
-                case MarkType::TYPE_PERCENT:
-                    return new Percentage();
-                case MarkType::TYPE_NONE:
-                    return new None();
-                case MarkType::TYPE_TOTAL:
-                    return new TotalMarkFractional($maxMark);
-                case MarkType::TYPE_LETTER:
-                    return new LetterGrade($assessable->getGradeGroup());
-                default:
-                    throw new \DomainException("Invalid MarkType for DueWork: " . $assessable->getMarkType()->getName());
-            }
+        if ($maxMark <= 0) {
+            return new None();
         }
 
-        // TODO we should NEVER hit this because $assessable should always be a due work, but the ways this was built
-        // using IAssessable rather than DueWork forces us to do it this way
-        return new None();
+        switch ($assessable->getMarkType()->getId()) {
+            case MarkType::TYPE_PERCENT:
+                return new Percentage();
+            case MarkType::TYPE_NONE:
+                return new None();
+            case MarkType::TYPE_TOTAL:
+                return new TotalMarkFractional($maxMark);
+            case MarkType::TYPE_LETTER:
+                return new LetterGrade($assessable->getGradeGroup());
+            default:
+                throw new \DomainException("Invalid MarkType for DueWork: " . $assessable->getMarkType()->getName());
+        }
     }
 
     /**
