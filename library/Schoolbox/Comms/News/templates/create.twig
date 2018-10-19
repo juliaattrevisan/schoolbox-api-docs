@@ -68,6 +68,7 @@
 
 {% set audienceIsReadOnly = article.isApproved %}
 
+{% if not audienceIsReadOnly %}
 {# Build Placeholder text #}
 {% set availableNames = [] %}
 {% for entityType in availableEntityTypes %}
@@ -77,6 +78,7 @@
     {% endif %}
 {% endfor %}
 {% set audiencePlaceholder = 'Search for ' ~ availableNames|join(', ') ~ '...' %}
+{% endif %}
 
 <div class="row">
     <div class="small-12 columns">
@@ -198,6 +200,7 @@
                         </div>
                     </div>
 
+                    {% if not audienceIsReadOnly %}
                     {# audience browser modal #}
                     <div data-reveal id="audience-browse" class="reveal-modal no-pad">
 
@@ -298,6 +301,7 @@
                         </div>
 
                     </div>
+                    {% endif %}
 
                     {# composite info modal #}
                     <div data-reveal id="audience-composite" class="reveal-modal">
@@ -359,12 +363,14 @@
 
 <div class="toast" id="saveDraft"></div>
 
+{% if not audienceIsReadOnly %}
 {# custom HTML for the audience selecize dropdown options. Client-side to ensure consitent human-readable entity types #}
 <div id="audience-selectize-dropdown-option">
     <span data-name></span>
     <span data-entityType class="meta"></span>
     <span data-modifier class="meta"></span>
 </div>
+{% endif %}
 
 {# le scripts #}
 <script src="/javascript/ckeditor/ckeditor.js"></script>
@@ -378,9 +384,9 @@
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 <script>
     'use strict';
-
     // HTML template for rendering audience audienceSelectize dropdown options.
     var $audienceSelectizeItemTemplate = $('#audience-selectize-dropdown-option').detach();
+    var audienceIsReadOnly = {{ audienceIsReadOnly }};
 
     $(function () {
         {# CKEditors #}
@@ -473,51 +479,53 @@
             });
         {% endif %}
 
-        {% if audienceIsReadOnly and rejectRoute %}
-        {% set rejectVerb = 'Unpublish' %}
-        var $unpublishButton = $('#unpublish-article');
-        $unpublishButton.click(function(event) {
-            event.preventDefault();
+        if (audienceIsReadOnly) {
+            var $unpublishButton = $('#unpublish-article');
+            var unpublishVerb = 'Unpublish';
+            $('.audience-selectize-group').remove();
 
-            var $element = $(this);
-            var $toast = $('#toast');
-            var title = $element.attr('data-reject');
+            $unpublishButton.click(function(event) {
+                event.preventDefault();
 
-            $element.confirmDialog({
-                header: '{{ rejectVerb }} ' + title,
-                format: 'html',
-                text: 'Provide brief feedback for {{ rejectVerb|lower }}ing this article to help the author improve their content. <textarea id="rejectedReason" rows="5"></textarea>',
-                confirmLabel: '{{ rejectVerb }}',
-                cancelLabel: 'Cancel',
-                confirmEvent: function() {
-                    $toast.toastActivate({
-                        text: '{{ rejectVerb }}ing ' + title
-                    });
+                var $element = $(this);
+                var $toast = $('#toast');
+                var title = $element.attr('data-reject');
 
-                    $.ajax({
-                        type: 'POST',
-                        url: $element.attr('href'),
-                        data: {articleId: {{ article.id }}, rejectedReason: $('#rejectedReason').val()},
-                        dataType: 'json'
-                    }).success(function (response) {
-                        $toast.toastTimeout({
-                            text: title + ' was {{ rejectVerb|lower }}ed',
-                            css: 'success'
+                $element.confirmDialog({
+                    header: unpublishVerb + ' ' + title,
+                    format: 'html',
+                    text: 'Provide brief feedback for '+ unpublishVerb.toLowerCase() +'ing this article to help the author improve their content. <textarea id="rejectedReason" rows="5"></textarea>',
+                    confirmLabel: unpublishVerb,
+                    cancelLabel: 'Cancel',
+                    confirmEvent: function() {
+                        $toast.toastActivate({
+                            text: unpublishVerb + 'ing ' + title
                         });
 
-                        window.location.href = response.redirect;
-                    }).error(function (response) {
-                        var temp = $.parseJSON(response.responseText);
+                        $.ajax({
+                            type: 'POST',
+                            url: $element.attr('href'),
+                            data: {articleId: {{ article.id }}, rejectedReason: $('#rejectedReason').val()},
+                            dataType: 'json'
+                        }).success(function (response) {
+                            $toast.toastTimeout({
+                                text: title + ' was '+ unpublishVerb +'ed',
+                                css: 'success'
+                            });
 
-                        $toast.toastTimeout({
-                            text: 'Error: ' + temp.message,
-                            css: 'alert'
+                            window.location.href = response.redirect;
+                        }).error(function (response) {
+                            var temp = $.parseJSON(response.responseText);
+
+                            $toast.toastTimeout({
+                                text: 'Error: ' + temp.message,
+                                css: 'alert'
+                            });
                         });
-                    });
-                }
+                    }
+                });
             });
-        });
-        {% endif %}
+        }
 
         /**
          * Listen for a click on one of the submit buttons
@@ -718,10 +726,6 @@
 
             $audienceSelectize = $('#audience-search');
 
-            {% if audienceIsReadOnly %}
-                $('.audience-selectize-group').remove();
-            {% endif %}
-
             // Audience Selectize
             // A blend of Vue and jQuery, what a world
             audienceSelectize = $audienceSelectize.selectizeSelector({
@@ -743,20 +747,21 @@
                          * @return {string}
                          */
                         option: function (item, escape) {
+                            if (!audienceIsReadOnly) {
+                                var segment = codec.decode(item.key),
+                                    entityType = segment.getEntityType(),
+                                    modifier = segment.getModifier();
 
-                            var segment    = codec.decode(item.key),
-                                entityType = segment.getEntityType(),
-                                modifier   = segment.getModifier();
-
-                            var $option = $audienceSelectizeItemTemplate.clone();
-                            $option.find('[data-name]').html(escape(item.name));
-                            $option.find('[data-entityType]').html('(' + audienceOptions[entityType].name + ')');
-                            if ('self' !== modifier) {
-                                $option.find('[data-modifier]').html('[' + modifierLabelMap[modifier] + ']');
-                            } else {
-                                $option.find('[data-modifier]').remove();
+                                var $option = $audienceSelectizeItemTemplate.clone();
+                                $option.find('[data-name]').html(escape(item.name));
+                                $option.find('[data-entityType]').html('(' + audienceOptions[entityType].name + ')');
+                                if ('self' !== modifier) {
+                                    $option.find('[data-modifier]').html('[' + modifierLabelMap[modifier] + ']');
+                                } else {
+                                    $option.find('[data-modifier]').remove();
+                                }
+                                return '<div>' + $option.html() + '</div>';
                             }
-                            return '<div>' + $option.html() + '</div>';
                         }
                     },
                     /**
@@ -775,20 +780,22 @@
 
                         brickManager.onAddSegment(audienceSelectize, vue.audienceBricks, key, selectedItem.name, $item, selectedItem.labels);
 
-                        // Hide this item from the audienceSelectize list
-                        $item.addClass('hide');
+                        if (!audienceIsReadOnly) {
+                            // Hide this item from the audienceSelectize list
+                            $item.addClass('hide');
 
-                        // Selectize hides the placeholder once an item is added- we want to keep it, quite hacky
-                        $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
+                            // Selectize hides the placeholder once an item is added- we want to keep it, quite hacky
+                            $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
 
-                        // The audienceSelectize dropdown doesn't position correctly for some reason with this setup so force reposition again after a very short timeout
-                        setTimeout(function() {
-                            audienceSelectize.positionDropdown();
+                            // The audienceSelectize dropdown doesn't position correctly for some reason with this setup so force reposition again after a very short timeout
+                            setTimeout(function () {
+                                audienceSelectize.positionDropdown();
 
-                            // Trigger a blur on the selectize so that validation updates
-                            // This has to happen on a slight delay as well for some reason
-                            selectize.$input.blur();
-                        }, 1);
+                                // Trigger a blur on the selectize so that validation updates
+                                // This has to happen on a slight delay as well for some reason
+                                selectize.$input.blur();
+                            }, 1);
+                        }
                     },
                     /**
                      * Called when we remove an item from audienceSelectize. (either because we clicked X icon on audienceSelectize item, or programmatically)
@@ -1192,7 +1199,7 @@
                     this.loadAudienceOptions(audienceOption, callback);
                 }
             },
-
+            
             /**
              * Populate and show a modal with info on a composite audience segment
              * @param {Brick} audienceBrick
