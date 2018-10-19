@@ -115,9 +115,12 @@ class Controller extends Component_Homepage_ControllerAbstract
         // Get the list of units for this course, as well as who has actually
         // completed each unit.
 
-        $courseImplId = $this->getConfig('importedCourse');
+        if(!$courseImplId = $this->getConfig('importedCourse')) {
+            return true;
+        }
 
         $this->courseImplementation = null;
+
         try {
             $this->courseImplementation = $this->courseImplementationMapper->findById($courseImplId);
             $this->courseImplementation->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImplId));
