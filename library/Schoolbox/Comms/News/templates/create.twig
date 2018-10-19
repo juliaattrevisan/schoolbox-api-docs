@@ -171,9 +171,11 @@
                                             <template v-if="audienceBrick.isSimple()">${ audienceBrick.modifierLabel }</template>
                                         </p>
                                     </div>
+                                    {% if not audienceIsReadOnly %}
                                     <nav>
                                         <a class="icon-close size-8" :title="'Remove ' + audienceBrick.nameLabel + ' from audience'" @click="removeAudienceBrick(audienceBrick)"></a>
                                     </nav>
+                                    {% endif %}
                                 </div>
                             </li>
                         </ul>
