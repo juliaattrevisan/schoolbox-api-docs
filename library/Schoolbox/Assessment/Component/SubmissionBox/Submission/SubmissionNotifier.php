@@ -277,12 +277,17 @@ class SubmissionNotifier extends AbstractModuleNotifier
 
         $student      = $submission->getOwner();
         $studentId    = $student->getId();
-        $studentExtId = $student->getExternalId();
 
         try {
             $box = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
-        } catch (Mapper\Exception\Deleted $e) {
+
+        } catch (Mapper\Exception $e) {
             // Suppress notification if box is also deleted.
+            return $envelope;
+        }
+
+        $worktype = $box->getAssessmentModel()->getWorkType();
+        if ($worktype && $worktype->isStaffOrInstructorVisibleOnly()) {
             return $envelope;
         }
 
@@ -300,7 +305,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
                     'catname' => new CategoryParam($folder)
                 )
             )
-            ->setIcon("/portrait.php?userId=$studentExtId&size={$this->iconSize}")
+            ->setIcon("/images/icon?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']))
             ->setHref("/learning/assessments/{$box->getAssessmentId()}/$studentId")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)

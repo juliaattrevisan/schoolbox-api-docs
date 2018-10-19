@@ -89,6 +89,11 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
             return;
         }
 
+        $worktype = $box->getAssessmentModel()->getWorkType();
+        if ($worktype && $worktype->isStaffOrInstructorVisibleOnly()) {
+            return;
+        }
+
         /*
          * This now on the assessment, will need to be updated to get from the assessment
         if ($box->isDeleted()) {

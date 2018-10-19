@@ -285,6 +285,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $notifsForPlans = [];
         foreach ($assessments as $assessment) {
             // Go thru each plan and raise in THAT context
+
+            // TODO: come back here later
+
             foreach ($assessment->getPlans() as $domainModelPlan) {
                 $openDate = $this->coalesceDates($domainModelPlan->getOpenDate(), $assessment->getOpenAt());
                 $dueDate  = $this->coalesceDates($domainModelPlan->getDueDate(), $assessment->getDueAt());
@@ -1169,6 +1172,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private function isNotifiableAtAll(IAssessable $assessment, string $label): bool
     {
+        // If the assessment is visible to staff only, do not trigger notification at all even to staff,
+        // since notifications for staff here are to notify them participation status of students.
+        if ($assessment->isStaffOrInstructorVisibleOnly()) {
+            return false;
+        }
+
         switch ($label) {
             case self::TRIGGER_OPEN:
             case self::TRIGGER_UPDATED:
