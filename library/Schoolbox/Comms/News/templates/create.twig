@@ -192,7 +192,7 @@
                             </li>
                         </ul>
 
-                        <div class="input-group">
+                        <div class="input-group audience-selectize-group">
                             <input type="text" id="audience-search" name="audience" placeholder="{{ audiencePlaceholder }}" required />
                             <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse&hellip;</button>
                         </div>
@@ -717,6 +717,10 @@
             brickManager = new BrickManager(vue, codec, entityTypeLabelMap);
 
             $audienceSelectize = $('#audience-search');
+
+            {% if audienceIsReadOnly %}
+                $('.audience-selectize-group').remove();
+            {% endif %}
 
             // Audience Selectize
             // A blend of Vue and jQuery, what a world
