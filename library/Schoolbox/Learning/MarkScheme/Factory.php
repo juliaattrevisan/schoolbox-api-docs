@@ -49,19 +49,14 @@ class Factory
     /**
      * @param IAssessable $assessable
      * @param float|null  $totalMark
-     * @param bool        $allowFallback If true and the mark scheme that would
-     *                                   be created is invalid:
-     *                                   create a `None` scheme instead.
-     *                                   Currently this covers only `TotalMark`
-     *                                   if its total is zero.
      * @return null|IMarkScheme
      * @throws \DomainException If MarkType is invalid for the assessment
      * @throws \InvalidArgumentException If assessment class not registered
+     * @throws \RangeException
      */
     public function spawnMarkSchemeFor(
         IAssessable $assessable,
-        ?float $totalMark = null,
-        bool $allowFallback = false
+        ?float $totalMark = null
     ): ?IMarkScheme {
         $markType = $assessable->getMarkType();
         if (null === $markType) {
@@ -74,12 +69,12 @@ class Factory
             return $this->spawnForQuiz($assessable);
         }
         if ($assessable instanceof DueWork) {
-            return $this->spawnForDueWork($assessable, $totalMark, $allowFallback);
+            return $this->spawnForDueWork($assessable, $totalMark);
         }
         if ($assessable instanceof Project) {
             return $this->spawnForProject($assessable);
         }
-        throw new \InvalidArgumentException('Unknown IAssessable class: ' . get_class($assessable));
+        throw new \InvalidArgumentException('Unknown IAssessable class: ' . \get_class($assessable));
     }
 
     /**
@@ -100,6 +95,8 @@ class Factory
     /**
      * @param Quiz $quiz
      * @return TotalMarkFractional
+     * @throws \DomainException
+     * @throws \RangeException
      */
     protected function spawnForQuiz(Quiz $quiz)
     {
@@ -114,10 +111,11 @@ class Factory
     /**
      * @param DueWork    $dueWork
      * @param float|null $totalMark
-     * @param bool       $allowFallback
      * @return IMarkScheme
+     * @throws \RangeException
+     * @throws \DomainException
      */
-    protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null, bool $allowFallback = false)
+    protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null)
     {
         switch ($dueWork->getMarkType()->getId()) {
             case MarkType::TYPE_PERCENT:
@@ -126,13 +124,7 @@ class Factory
                 return new None();
             case MarkType::TYPE_TOTAL:
                 $maxMark = $totalMark ?? $dueWork->getMaxMark();
-                if ($maxMark > 0) {
-                    return new TotalMarkFractional($maxMark);
-                }
-                if ($allowFallback) {
-                    return new None();
-                }
-                throw new \UnexpectedValueException("Invalid MaxMark value for Total Mark MarkType: " . $maxMark);
+                return new TotalMarkFractional($maxMark);
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
             default:
@@ -141,8 +133,39 @@ class Factory
     }
 
     /**
+     * Capabilities have their own markscheme. Currently, the type of mark scheme is inferred from the due work they are used on.
+     * In the future we might add the ability to choose a different markscheme for each capability.
+     *
+     * @param IAssessable    $assessable
+     * @param float|null $maxMark
+     * @return IMarkScheme
+     * @throws \DomainException
+     * @throws \RangeException
+     */
+    public function spawnForCapability(IAssessable $assessable, ?float $maxMark = null) : IMarkScheme
+    {
+        if (null !== $maxMark && $maxMark <= 0) {
+            return new None();
+        }
+
+        switch ($assessable->getMarkType()->getId()) {
+            case MarkType::TYPE_PERCENT:
+                return new Percentage();
+            case MarkType::TYPE_NONE:
+                return new None();
+            case MarkType::TYPE_TOTAL:
+                return new TotalMarkFractional($maxMark);
+            case MarkType::TYPE_LETTER:
+                return new LetterGrade($assessable->getGradeGroup());
+            default:
+                throw new \DomainException("Invalid MarkType for DueWork: " . $assessable->getMarkType()->getName());
+        }
+    }
+
+    /**
      * @param Project $project
      * @return IMarkScheme
+     * @throws \DomainException
      */
     protected function spawnForProject(Project $project)
     {

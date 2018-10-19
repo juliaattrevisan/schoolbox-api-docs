@@ -32,7 +32,7 @@ class MarkType
     const SLUG_LETTER     = 'letter';
     const SLUG_TOTAL      = 'raw';
     const SLUG_FREE       = 'free';
-    const SLUG_RUBRIC     = 'rubric';
+    const SLUG_RUBRIC     = 'rubric'; // TODO whatttt is this
     const SLUG_NONE       = 'none';
     const SLUG_COMPLETION = 'completion';
 
