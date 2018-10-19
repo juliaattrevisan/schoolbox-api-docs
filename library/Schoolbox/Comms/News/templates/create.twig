@@ -153,7 +153,19 @@
 
                     <div class="small-12 columns">
                         <label class="required">Audience</label>
-                        <p class="meta">Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of available options.</p>
+                        <p class="meta">
+                            {% if not audienceIsReadOnly %}
+                            Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of available options.
+                            {% else %}
+                                This audience can no longer be updated because the article is published. If you wish to update the audience.
+                                {% set unpublishLabel = 'Unpublish this ' ~ locale.news %}
+                                {% if rejectRoute %}
+                                    <a id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ unpublishLabel }}</a>
+                                {% else %}
+                                    {{ unpublishLabel }}
+                                {% endif %}
+                            {% endif %}
+                        </p>
 
                         <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4 audience-grid" v-show="audienceBricks.length">
                             <li v-for="audienceBrick in audienceBricks">
@@ -459,6 +471,52 @@
                     $submitButtons.prop('disabled', false);
                 }
             });
+        {% endif %}
+
+        {% if audienceIsReadOnly and rejectRoute %}
+        {% set rejectVerb = 'Unpublish' %}
+        var $unpublishButton = $('#unpublish-article');
+        $unpublishButton.click(function(event) {
+            event.preventDefault();
+
+            var $element = $(this);
+            var $toast = $('#toast');
+            var title = $element.attr('data-reject');
+
+            $element.confirmDialog({
+                header: '{{ rejectVerb }} ' + title,
+                format: 'html',
+                text: 'Provide brief feedback for {{ rejectVerb|lower }}ing this article to help the author improve their content. <textarea id="rejectedReason" rows="5"></textarea>',
+                confirmLabel: '{{ rejectVerb }}',
+                cancelLabel: 'Cancel',
+                confirmEvent: function() {
+                    $toast.toastActivate({
+                        text: '{{ rejectVerb }}ing ' + title
+                    });
+
+                    $.ajax({
+                        type: 'POST',
+                        url: $element.attr('href'),
+                        data: {articleId: {{ article.id }}, rejectedReason: $('#rejectedReason').val()},
+                        dataType: 'json'
+                    }).success(function (response) {
+                        $toast.toastTimeout({
+                            text: title + ' was {{ rejectVerb|lower }}ed',
+                            css: 'success'
+                        });
+
+                        window.location.href = response.redirect;
+                    }).error(function (response) {
+                        var temp = $.parseJSON(response.responseText);
+
+                        $toast.toastTimeout({
+                            text: 'Error: ' + temp.message,
+                            css: 'alert'
+                        });
+                    });
+                }
+            });
+        });
         {% endif %}
 
         /**
