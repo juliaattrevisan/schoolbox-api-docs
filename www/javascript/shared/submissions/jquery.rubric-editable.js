@@ -343,7 +343,10 @@
                 inputs.val(levelName);
 
                 // override to the value if this is a value field
-                inputs.filter('input.rb-value').val(descriptorValue);
+                inputs.filter('[data-descriptor-value]').val(descriptorValue);
+
+                // ID for added levels and descriptors must always be empty
+                inputs.filter('[data-id]').val('');
 
                 // rename inputs to accommodate new level "identity"
                 inputs.each(function () {
@@ -492,7 +495,7 @@
             var $row = $(this);
 
             // Renumber IDs
-            $row.find('[data-level]').each(function(i) {
+            $row.find('[data-id]').each(function(i) {
                 this.name = this.name.replace(/\[\d+]\[id]$/, '[' + String(i) + '][id]');
             });
 
