@@ -12,6 +12,7 @@ namespace Schoolbox\Resource;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Notif\Notif;
@@ -274,28 +275,30 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         $notif->notice("CRUD", $logEntry);
     }
 
+
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
      *
      * This also returns a count of all the items found in the search, not limited
      * by params
      *
-     * @param User $user
-     * @param string $keyword
-     * @param int $offset
-     * @param int $limit
-     * @param string $sortProperty
-     * @param string $sortDirection
-     * @return Collection
+     * @param ArticleResolver $articleResolver
+     * @param User            $user
+     * @param string          $keyword
+     * @param int             $offset
+     * @param int             $limit
+     * @param string          $sortProperty
+     * @param string          $sortDirection
+     * @return Result
      */
-    public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
+    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
     {
         if ($limit == 0) {
             $limit = self::DEFAULT_LIMIT;
         }
 
         $searcher = new Result();
-        $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
+        $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
         return $searcher;
     }

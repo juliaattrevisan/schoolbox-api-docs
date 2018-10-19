@@ -41,7 +41,7 @@ class Role extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getSearchSql(User $user, string $searchPlaceholder = null): string
+    public function getAudiencingSql(User $user, string $searchPlaceholder = null): string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "AND `name` LIKE :{$searchPlaceholder}";
 
@@ -67,5 +67,13 @@ class Role extends SimpleStrategy
             INNER JOIN groups ON cna.entity_type = '{$entityType}' AND cna.entity_value = groups.id
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(User $user): string
+    {
+        return '';
     }
 }

@@ -62,7 +62,6 @@ abstract class SimpleStrategy implements ISimpleStrategy
             $user->isSuperuser() ||
             $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE) ||
             ($this->staffCanPost && $user->getRole()->isStaff());
-
     }
 
 

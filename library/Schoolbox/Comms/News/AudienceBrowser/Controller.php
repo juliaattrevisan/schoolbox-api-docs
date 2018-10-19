@@ -72,7 +72,7 @@ class Controller extends Base
 
         foreach ($simpleStrategies as $strategy) {
             if ($strategy->canAudienceToEntityType($this->getUser())) {
-                $pieces[] = "({$strategy->getSearchSql($this->getUser(), $placeholder)})";
+                $pieces[] = "({$strategy->getAudiencingSql($this->getUser(), $placeholder)})";
             }
         }
         // We can UNION ALL and avoid de-duplication logic as each sub-query has a distinct entity type
@@ -132,7 +132,7 @@ class Controller extends Base
                 $valueLabels[$codec->encodeValue((string)$folder->getId())] = $folder->getNameWithCodes();
             }
         } else {
-            $stmt = $this->db->executeQuery($strategy->getSearchSql($this->getUser()));
+            $stmt = $this->db->executeQuery($strategy->getAudiencingSql($this->getUser()));
             /** @noinspection PhpAssignmentInConditionInspection */
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $valueLabels[$codec->encodeValue($row['id'])] = $row['name'];

@@ -18,6 +18,7 @@ use PDOStatement;
 use Psr\Log\NullLogger;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -1513,28 +1514,30 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
     }
 
+
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
      *
      * This also returns a count of all the items found in the search, not limited
      * by params
      *
-     * @param User $user
-     * @param string $keyword
-     * @param int $offset
-     * @param int $limit
-     * @param string $sortProperty
-     * @param string $sortDirection
+     * @param ArticleResolver $articleResolver
+     * @param User            $user
+     * @param string          $keyword
+     * @param int             $offset
+     * @param int             $limit
+     * @param string          $sortProperty
+     * @param string          $sortDirection
      * @return Result
      */
-    public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
+    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
     {
         if ($limit == 0) {
             $limit = self::DEFAULT_LIMIT;
         }
 
         $searcher = new Result();
-        $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
+        $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
         return $searcher;
     }

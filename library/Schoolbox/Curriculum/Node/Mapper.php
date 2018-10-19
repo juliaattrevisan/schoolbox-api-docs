@@ -8,6 +8,7 @@
 namespace Schoolbox\Curriculum\Node;
 
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\GenericCollection;
@@ -88,7 +89,9 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         );
     }
 
+
     /**
+     * @param ArticleResolver $articleResolver
      * @param \Schoolbox\User $user
      * @param string          $keyword
      * @param int             $offset
@@ -99,6 +102,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
      * @return Collection|Model[]
      */
     public function search(
+        ArticleResolver $articleResolver,
         $user,
         $keyword,
         $offset = 0,

@@ -13,64 +13,54 @@ define('AJAX_DISABLED', 0);
 $page = $this;
 $page->localise();
 
-$handle = array(
-    'all' => array(
+$handle = [
+    'all' => [
         'handler' => null,
         'renderer' => null,
-    ),
-    'user' => array(
+    ],
+    'user' => [
         'handler' => new User(),
-        'renderer' => new \Schoolbox\User\Search\Renderer($this, '', '', 0, $keyword),
-    ),
-//    'file' => array(
-//        'handler' => new File(),
-//        'renderer' => new \Schoolbox\File\Search\Renderer($this, '', '', 0, $keyword),
-//    ),
-/*    'sitenews' => array(
-        'handler' => new News(),
-        'renderer' => new \Schoolbox\News\Search\Renderer($this, '', '', 0, $keyword),
-    ),
-    'homepagenews' => array(
-        'handler' => new CategoryNews(),
-        'renderer' => new \Schoolbox\Folder\News\Search\Renderer($this, '', '', 0, $keyword),
-    ),*/
-    'blog' => array(
+        'renderer' => new \Schoolbox\User\Search\Renderer($this, [], [], 0),
+    ],
+    'blog' => [
         'handler' => new Blog(),
-        'renderer' => new \Schoolbox\Blog\Homepage\Search\Renderer($this, '', '', 0, $keyword),
-    ),
-    'wiki' => array(
+        'renderer' => new \Schoolbox\Blog\Homepage\Search\Renderer($this, [], [], 0),
+    ],
+    'wiki' => [
         'handler' => new Wiki(),
-        'renderer' => new \Schoolbox\Wiki\Search\Renderer($this, '', '', 0, $keyword),
-    ),
-    'forum' => array(
+        'renderer' => new \Schoolbox\Wiki\Search\Renderer($this, [], [], 0),
+    ],
+    'forum' => [
         'handler' => new Forum(),
-        'renderer' => new \Schoolbox\Forum\Search\Renderer($this, '', '', 0, $keyword),
-    ),
-    'event' => array(
+        'renderer' => new \Schoolbox\Forum\Search\Renderer($this, [], [], 0),
+    ],
+    'event' => [
         'handler' => new Calendar(),
-        'renderer' => new \Schoolbox\Calendar\Event\Search\Renderer($this, '', '', 0, $keyword),
-    ),
-);
+        'renderer' => new \Schoolbox\Calendar\Event\Search\Renderer($this, [], [], 0),
+    ],
+];
 
-$type_list = array(
+$type_list = [
     'all' => 'All',
     'user' => 'People',
     'file' => 'Files',
-    //'sitenews' => 'School News',
-    //'homepagenews' => 'Homepage News',
     'blog' => 'Blogs',
     'wiki' => 'Wikis',
     'forum' => 'Forums',
     'event' => 'Calendar',
-);
+];
 
 /* Omaha Beach
  * These handlers have been mapperised and shouldn't appear in the
  * old search.php contexts
  */
-$omaha = array(
-    'folder', 'file', 'link', 'textbox',
-);
+$omaha = [
+    'folder',
+    'file',
+    'link',
+    'textbox',
+    'news'
+];
 
 // Order of results, independent of whether it has landed on Omaha or not
 $order = [
@@ -78,8 +68,7 @@ $order = [
     'file',
     'category',
     'link',
-    'sitenews',
-    'homepagenews',
+    'news',
     'blog',
     'wiki',
     'forum',

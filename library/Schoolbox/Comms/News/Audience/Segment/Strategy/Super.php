@@ -30,7 +30,7 @@ class Super extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getSearchSql(User $user, string $searchPlaceholder = null): string
+    public function getAudiencingSql(User $user, string $searchPlaceholder = null): string
     {
         return "SELECT 0, 'name todo', 'type todo' from dual WHERE false"; // TODO
     }
@@ -42,5 +42,13 @@ class Super extends SimpleStrategy
     public function getTranslateSql(string $segmentIdsPlaceholder): string
     {
         return ''; // TODO
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(User $user): string
+    {
+        return '';
     }
 }

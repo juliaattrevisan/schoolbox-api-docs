@@ -42,8 +42,10 @@ $count['all'] = array_sum($count);
 
 /* Omaha Beach!
  */
+$articleResolver = $this->getDi()->get('commsNewsArticleResolver');
+
 $mapper = new \Schoolbox\Resource\Search\Results($page, $type);
-$mapper->search($_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'), 'score', 'desc');
+$mapper->search($articleResolver, $_SESSION['user'], $keyword, 0, Cfg::get('search_all_limit'), 'score', 'desc');
 
 /* Omaha Beach
  *

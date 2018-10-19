@@ -32,7 +32,7 @@ class ResHouse extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getSearchSql(User $user, string $searchPlaceholder = null): string
+    public function getAudiencingSql(User $user, string $searchPlaceholder = null): string
     {
         return "SELECT 0, 'name todo', 'type todo' from dual WHERE false"; // TODO
     }
@@ -53,5 +53,13 @@ class ResHouse extends SimpleStrategy
     public static function getValidRelationshipModifiers(): array
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(User $user): string
+    {
+        return '';
     }
 }

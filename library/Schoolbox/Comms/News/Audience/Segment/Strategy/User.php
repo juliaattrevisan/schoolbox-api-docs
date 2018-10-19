@@ -42,7 +42,7 @@ class User extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getSearchSql(\Schoolbox\User $user, string $searchPlaceholder = null): string
+    public function getAudiencingSql(\Schoolbox\User $user, string $searchPlaceholder = null): string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "AND (firstname LIKE :{$searchPlaceholder} OR lastname LIKE :{$searchPlaceholder})";
 
@@ -68,5 +68,13 @@ class User extends SimpleStrategy
             INNER JOIN `user` ON cna.entity_type = '{$entityType}' AND cna.entity_value = `user`.id
             WHERE cna.id IN ($segmentIdsPlaceholder)
         ";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(\Schoolbox\User $user): string
+    {
+        return '';
     }
 }

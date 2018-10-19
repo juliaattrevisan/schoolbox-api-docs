@@ -83,4 +83,12 @@ class Composite implements IStrategy
         // to moderate the composite due to its children.
         return true;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSearchSql(User $user): string
+    {
+        return '';
+    }
 }

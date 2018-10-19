@@ -13,6 +13,7 @@ namespace Schoolbox\Blog\Homepage\Post;
 use PDO;
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Searchable;
@@ -68,15 +69,19 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
      *
-     * @param User $user
-     * @param string $keyword
-     * @param int $offset
-     * @param int $limit
-     * @param string $sortProperty
-     * @param string $sortDirection
-     * @return Collection
+     * @param ArticleResolver $articleResolver
+     * @param User            $user
+     * @param string          $keyword
+     * @param int             $offset
+     * @param int             $limit
+     * @param string          $sortProperty
+     * @param string          $sortDirection
+     * @return void
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
      */
     public function search(
+        ArticleResolver $articleResolver,
         $user,
         $keyword,
         $offset = 0,
