@@ -57,8 +57,6 @@ class Result extends Base
                 (int)$row['n.id'],
                 $deps['articleIds'],
                 (int)$row['n.author_id'],
-                $row['n.publish_at'],
-                $row['n.expires_at'],
                 $deps['articlesWithRoleBasedPermissions'],
                 false)
             ) {
@@ -124,8 +122,6 @@ class Result extends Base
                 (int)$row['n.id'],
                 $deps['articleIds'],
                 (int)$row['n.author_id'],
-                $row['n.publish_at'],
-                $row['n.expires_at'],
                 $deps['articlesWithRoleBasedPermissions'],
                 false)
             ) {
@@ -250,7 +246,7 @@ class Result extends Base
     }
 
     /**
-     * Get a list of articles that match the keyword
+     * Get a list of articles that match the keyword and are currently visible (published and not deleted or rejected)
      *
      * @param Mapper    $mapper
      * @param Sanitiser $sanitiser
@@ -268,7 +264,10 @@ class Result extends Base
                 `{$mapper->getTable()}` `n`
             INNER JOIN {$mapper->getJoinSql('author', 'n', 'a', true)}
             WHERE
-                n.deleted_at IS NULL
+                n.deleted_at IS NULL 
+                AND n.accepted_at IS NOT NULL
+                AND n.publish_at < NOW()
+                AND n.rejected_at IS NULL
                 AND MATCH(n.title, n.blurb, n.body) AGAINST ({$sanitiser->getKeyword()})
             ORDER BY {$sanitiser->getSortByWithAlias('n')} {$sanitiser->getSortDir()}
         ";
@@ -287,8 +286,6 @@ class Result extends Base
      * @param int    $articleId
      * @param array  $articleIds
      * @param int    $authorId
-     * @param string $publishAt
-     * @param string $expiresAt
      * @param array  $articlesWithRoleBasedPermissions
      * @param bool   $isShareable
      * @return bool
@@ -300,8 +297,6 @@ class Result extends Base
         int $articleId,
         array $articleIds,
         int $authorId,
-        string $publishAt,
-        string $expiresAt,
         array $articlesWithRoleBasedPermissions,
         bool $isShareable
     ): bool
@@ -324,30 +319,23 @@ class Result extends Base
             return true;
         }
 
-        $publishAt = new \Alaress_Date_Format($publishAt, \Alaress_Date_Format::DATABASE_FORMAT);
-        $expiresAt = new \Alaress_Date_Format($expiresAt, \Alaress_Date_Format::DATABASE_FORMAT);
-        $now = \Alaress_Date_Format::now();
+        /* TODO: Implement shareable
+         */
+        if ($isShareable) {
+            return true;
+        }
 
-        if ($publishAt->lte($now) || $expiresAt->lte($now)) {
+        /* If one of your read+ folders is in the article's audience
+         */
+        if (\in_array($articleId, $articleIds, false)) {
+            return true;
+        }
 
-            /* TODO: Implement shareable
-             */
-            if ($isShareable) {
-                return true;
-            }
-
-            /* If one of your read+ folders is in the article's audience
-             */
-            if (\in_array($articleId, $articleIds, false)) {
-                return true;
-            }
-
-            /* If the article has a folder in its audience and $user has read+ access
-             * to that folder via role-based permissions
-             */
-            if (array_key_exists($articleId, $articlesWithRoleBasedPermissions)) {
-                return true;
-            }
+        /* If the article has a folder in its audience and $user has read+ access
+         * to that folder via role-based permissions
+         */
+        if (array_key_exists($articleId, $articlesWithRoleBasedPermissions)) {
+            return true;
         }
 
         return false;
