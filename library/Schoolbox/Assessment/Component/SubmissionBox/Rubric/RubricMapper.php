@@ -22,7 +22,6 @@ use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
-use Schoolbox\Assessment\Rubric\ValidCapabilityMax;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
@@ -35,7 +34,6 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
-use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\IStorage;
@@ -1540,100 +1538,6 @@ class RubricMapper
         }
 
         return [$postdata, $markPerCapability, $useMarkRange];
-    }
-
-    /**
-     * Save rubrics selections for a particular feedback.
-     *
-     * @deprecated use RubricMapper::persistMarkedGrid() instead
-     *
-     * @param array[] $descriptors key = descriptor.id
-     *                             val = [selected: is it selected?, value: what's its value?]
-     * @param array[] $customGroupMarks      key = group.id
-     *                             val = [value: what's its value? (only if set manually)]
-     * @param IMarkScheme $markScheme
-     * @param int     $returnId    Feedback
-     * @throws \InvalidArgumentException
-     */
-    public function saveForFeedback(array $descriptors, array $customGroupMarks, IMarkScheme $markScheme, int $returnId): void
-    {
-        $groupMapper     = GroupMapper::getInstance();
-        $descriptorMapper     = DescriptorMapper::getInstance();
-
-        $descriptorMarkMapper = DescriptorMarkMapper::getInstance();
-        $groupMarkMapper      = GroupMarkMapper::getInstance();
-        $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
-
-        // Blow away any previous descriptor records with the feedback
-        $descriptorMarkMapper->deleteFeedbackMarks($returnId);
-        $groupMarkMapper->deleteFeedbackMarks($returnId);
-
-        $groupMarksToSave      = $groupMarkMapper->createCollection();
-        $descriptorMarksToSave = $descriptorMarkMapper->createCollection();
-
-        // What actually got saved? We may have:
-        // - optionally, marks from the custom mark-per-cap input fields (only if mark-per-cap is enabled. may be empty array)
-        // - optionally, selected descriptor values (may be empty array)
-
-        $selectedDescriptors = [];
-        foreach ($descriptors as $id => $descriptor) {
-            if (!empty($descriptor['selected'])) {
-                $selectedDescriptors[$id] = $descriptor['value'];
-            }
-        }
-
-        $returnedWork     = $returnedWorkMapper->findById($returnId);
-
-        // Pass 1.5: is a custom max mark for the group set?
-        foreach ($customGroupMarks as $groupId => $markData) {
-
-            // TODO I should be validating against unscaled mark, not custom mark
-            if ((new ValidCapabilityMark($markData['max'], $markScheme))->isSatisfiedBy($markData['customMark'])) {
-                // Find a record for its group
-                $group = $groupMapper->findById($groupId);
-
-                // If it doesn't exist: make a new one
-                // TODO under what circumstance would it be possible to mark a group that doesn't exist??
-                if (!$groupMarksToSave[$groupId]) {
-                    $groupMarksToSave[$groupId] = $groupMarkMapper->createModel()
-                        ->setSubmissionReturn($returnedWork)
-                        ->setGroup($group)
-                        ->setValid(true);
-                }
-
-                // Save the unscaled mark if provided; otherwise just 0
-                // TODO confirm this w/ d-baker
-                $groupMarksToSave[$groupId]->setValue($markData['unscaledMark']);
-            } else {
-                // TODO handle this somewhere else?
-                throw new \InvalidArgumentException("Capability mark must be between 0 and " . $markData['max']);
-            }
-        }
-
-        // Pass 2: build set of descriptor marks
-        foreach ($selectedDescriptors as $descriptorId => $value) {
-
-            // If this isn't set: this is an issue
-            $descriptor = $descriptorMapper->findById($descriptorId);
-
-            // Find the record for its group
-            $groupId = $descriptor->getCriterion()->getGroup()->getId();
-
-            // Save the descriptor group
-            // Take value from form preferentially, then descriptor
-            $savedValue = $value ?? $descriptor->getMaxValue();
-            $descriptorMarksToSave->add(
-                $descriptorMarkMapper->createModel()
-                    ->setGroupMark($groupMarksToSave[$groupId])
-                    ->setDescriptor($descriptor)
-                    ->setValid(true)
-                    ->setValue($savedValue)
-            );
-        }
-
-        // Save marks for groups as well
-        $groupMarkMapper->save($groupMarksToSave);
-        $descriptorMarkMapper->save($descriptorMarksToSave);
     }
 
     /**

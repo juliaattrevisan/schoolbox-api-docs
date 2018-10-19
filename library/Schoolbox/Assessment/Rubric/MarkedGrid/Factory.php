@@ -63,6 +63,8 @@ class Factory
                 ? null
                 : $postCapabilities[$capabilityId]['customMark'];
 
+            $capabilityCustomMarkInput = $capabilityCustomMarkInput ?: null;
+
             // Validate the input string first
             $capMarkSpec = new ValidCapabilityMark($capabilityUsage->getMaxValue(), $capabilityMark->getMarkScheme());
             if ($capMarkSpec->isSatisfiedBy($capabilityCustomMarkInput)) {
