@@ -93,13 +93,10 @@
                          #}
                         {% if canWrite %}
                             <p class="meta">
-                                <span class="{{ urgency.marks(completionGradient) }}">{{ completionCount }}/{{ studentCount }} students completed</span>
-                            </p>
-                            <p class="meta spaced">
-                                <span class="unit-task-due-date">{{ dueDate.assessment(assessment) }}</span>
+                                {{ dueDate.assessment(assessment) }}&nbsp;|&nbsp; <span class="{{ urgency.marks(completionGradient) }}">{{ completionCount }}/{{ studentCount }} students completed</span>
                             </p>
                         {% else %}
-                            <p class="meta spaced">
+                            <p class="meta">
                                 <span class="unit-task-due-date">{{ dueDate.dueDate(assessment, USER) }}</span>
                             </p>
                         {% endif %}
