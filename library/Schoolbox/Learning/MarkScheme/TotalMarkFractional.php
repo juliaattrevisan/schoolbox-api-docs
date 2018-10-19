@@ -51,7 +51,10 @@ class TotalMarkFractional extends TotalMarkAbstract
         // Because certain assessment types rely on null total marks (i.e. quiz) we have to make sure we're not comparing a null value
         // or it will cause false positives due to type coercion
         if(null !== $totalMark && $totalMark <= 0){
-            throw new \RangeException("Total mark $totalMark needs to be greater than 0");
+            // Why the funny wording? It's because users will most likely encounter this in the ajax error on due work creation
+            // which has certain...grammar requirements.
+            // I'm also using the term "maximum available marks" to be consistent with the field this corresponds to on due work creation.
+            throw new \RangeException("have maximum available marks greater than 0");
         }
     }
 
