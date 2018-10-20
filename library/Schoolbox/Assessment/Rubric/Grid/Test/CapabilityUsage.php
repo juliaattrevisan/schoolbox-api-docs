@@ -367,7 +367,7 @@ class CapabilityUsage extends TestCase
         yield 'No max cap mark, no indicators' => [$capabilityUsage1, 0];
 
         $capabilityUsage2 = (new RubricGrid\CapabilityUsage($capability))->setMaxValue(10);
-        yield 'Max cap mark, no indicators' => [$capabilityUsage2, 10];
+        yield 'Max cap mark, no indicators' => [$capabilityUsage2, 0];
 
         $capabilityUsage3 = (new RubricGrid\CapabilityUsage($capability))->setMaxValue(16);
         $capabilityUsage3->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
@@ -391,7 +391,7 @@ class CapabilityUsage extends TestCase
 
         $capabilityUsage7 = (new RubricGrid\CapabilityUsage($capability))->setMaxValue(24);
         $capabilityUsage7->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
-        yield 'Max cap mark, no indicators with values' => [$capabilityUsage7, 24];
+        yield 'Max cap mark, no indicators with values' => [$capabilityUsage7, 0];
     }
 
 
