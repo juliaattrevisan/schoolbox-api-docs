@@ -112,11 +112,8 @@ class CapabilityMark
      */
     public function retrieveNormalizedMark(): float
     {
-        if ($this->getCapabilityUsage()->calculateMaxValueFromIndicators() > 0) {
-            return $this->value / $this->getCapabilityUsage()->calculateMaxValueFromIndicators() * 100;
-        } else {
-            return 0;
-        }
+        $maxIndicatorValue = $this->getCapabilityUsage()->calculateMaxValueFromIndicators();
+        return $maxIndicatorValue ? $this->value / $maxIndicatorValue : 0;
     }
 
     /**

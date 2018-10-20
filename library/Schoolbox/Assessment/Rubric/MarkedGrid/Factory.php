@@ -45,7 +45,7 @@ class Factory
             if (!$capabilityMark) {
                 $capabilityMark = new CapabilityMark(
                     $capabilityUsage,
-                    $markSchemeFactory->spawnMarkSchemeFor(
+                    $markSchemeFactory->spawnForCapability(
                         $markedGrid->getGrid()->getAssessment(),
                         $capabilityUsage->calculateMaxValueFromIndicators()
                     )
