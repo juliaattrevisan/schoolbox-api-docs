@@ -102,12 +102,18 @@ class Factory
                     $capabilityMark->getIndicatorMarks()->add($indicatorMark);
                 }
 
-                $indicatorMarkValue = $isSelfReflection
-                    ? null
-                    : filter_var($descriptorMark, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
-                $indicatorMark
-                    ->setDescriptor($selectedDescriptor)
-                    ->setValue($indicatorMarkValue);
+                $indicatorMark->setDescriptor($selectedDescriptor);
+                if ($isSelfReflection) {
+                    $indicatorMark->setValue(null);
+                } else {
+                    $indicatorMarkValue = filter_var($descriptorMark, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+                    $indicatorMarkSpec  = new ValidIndicatorMark($selectedDescriptor);
+                    if ($indicatorMarkSpec->isSatisfiedBy($indicatorMarkValue)) {
+                        $indicatorMark->setValue($indicatorMarkValue);
+                    } else {
+                        throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
+                    }
+                }
             }
         }
 
