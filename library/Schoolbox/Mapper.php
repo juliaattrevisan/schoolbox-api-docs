@@ -3931,4 +3931,48 @@ abstract class Mapper implements IMapper, Serializable
         }
         return $collection;
     }
+
+
+    /**
+     * Asserts that the joined model that `$model` joins to is the same as what
+     * is persisted.
+     *
+     * @param object      $model   The object to check
+     * @param string      $join    The join to check
+     * @param null|string $message If `$model`'s joined model has changed,
+     *                             throw an exception with this message.
+     * @throws Mapper\DefinitionException if join `$join` isn't on this mapper
+     * @throws \UnexpectedValueException  if `$model`'s joined model has changed
+     */
+    protected function assertJoinedModelNotChanged($model, string $join, ?string $message = null): void
+    {
+        // Does this mapper have an identifier column?
+        // If not I can't tell if this is changed or not.
+        if (!$this->hasIdentifier()) {
+            return;
+        }
+
+        // What's the model's identifier value?
+        // If it is empty, then the model is not yet persisted, and can't be
+        // considered to be changed.
+        $id = $this->getModelProperty($model, $this->getIdentifierProperty());
+        if (!$id) {
+            return;
+        }
+
+        // Verify that this model's joined model hasn't changed
+        $joinDefinition   = $this->getJoinDefinition($join);
+        $foreignKey       = $joinDefinition['this_key'];
+        $newFkValue       = $this->getModelProperty($model, $this->getPropertyFromColumn($foreignKey));
+        $existingFkValues = $this->findScalarByPredicates(
+            $foreignKey,
+            $this->getPredicateBuilder()->equals($this->getIdentifierColumn(), $id)
+        );
+        if (!empty($existingFkValues)) {
+            $existingFkValue = array_pop($existingFkValues);
+            if ($newFkValue !== $existingFkValue) {
+                throw new \UnexpectedValueException($message ?? 'Joined model has changed');
+            }
+        }
+    }
 }

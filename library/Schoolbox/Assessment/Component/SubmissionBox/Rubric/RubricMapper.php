@@ -1537,6 +1537,14 @@ class RubricMapper
             }
         }
 
+
+        // Get rid of level IDs
+        foreach ($postdata['level'] as &$level) {
+            unset($level['id']);
+        }
+        unset($level);
+
+
         return [$postdata, $markPerCapability, $useMarkRange];
     }
 
