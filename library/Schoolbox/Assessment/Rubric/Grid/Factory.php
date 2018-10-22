@@ -45,19 +45,14 @@ class Factory
             $markPerCap = $assessment->getMarkPerCapability();
         }
 
-        /** @var Level[] $levelCache */
-        $levelCache = [];
-
         // cache levels and ensure all exist in the rubric
         foreach ($levels as $levelSequence => $level) {
             $levelName = $level['name'];
-            $levelId   = $level['id'] ?? null;
+            $levelId   = (int)$level['id'] ?? null;
 
-            $levelCache[$levelSequence] = (new Level())
-                ->setId($levelId)
-                ->setName($levelName);
-
-            $grid->getLevels()->add($levelCache[$levelSequence]);
+            if(!$levelId || $grid->getLevels()->filterBy('id',$levelId)->count() == 0) {
+                $grid->getLevels()->add((new Level())->setName($levelName)->setId($levelId));
+            }
         }
 
         // Must assume that all capabilities in formdata exist:
@@ -143,7 +138,7 @@ class Factory
 
             $indicatorUsage = new IndicatorUsage($indicator);
 
-            foreach ($levelCache as $levelSequence => $level) {
+            foreach ($grid->getLevels() as $levelSequence => $level) {
 
                 if (empty($descriptors[$indicatorId][$levelSequence])) {
                     continue;
