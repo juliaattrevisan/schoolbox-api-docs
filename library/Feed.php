@@ -235,6 +235,7 @@ class Feed {
 
         $userHandler = new User();
 
+        $onlineAssessments = [];
         while ($row = $this->db->getNextArray()) {
             $onlineAssessments[] = array(
                 'date' => $row['start'],
