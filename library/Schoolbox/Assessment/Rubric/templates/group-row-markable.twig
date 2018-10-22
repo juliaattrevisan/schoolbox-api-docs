@@ -30,7 +30,7 @@
     {% endfor %}
 
     {% if rubricGrid.isCapabilityMarkShown(groupUsage.capability) %}
-<tr xmlns="http://www.w3.org/1999/html">
+<tr>
     <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 1 }}">
         <span data-group-summary="{{ rubricId }}-{{ capabilityId }}"
               data-mark="{{ capabilityMark.value }}"
@@ -115,9 +115,7 @@
         {% endif %}
     </th>
 </tr>
-    {% else %}
-        <!-- <p class="meta">Descriptors in this {{ locale.rubricGroup }} do not contribute to the total mark, because the {{ locale.rubricGroup }}'s maximum points are 0.</p> -->
-    {% endif %}
-
-
+{% else %}
+    <!-- <p class="meta">Descriptors in this {{ locale.rubricGroup }} do not contribute to the total mark, because the {{ locale.rubricGroup }}'s maximum points are 0.</p> -->
+{% endif %}
 {% endif %}
