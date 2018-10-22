@@ -133,7 +133,7 @@ class Controller extends Base
     /**
      * Redirect user to their own grades page for the current term
      */
-    public function getGradesForCurrentUser()
+    public function getGradesForCurrentUser(): void
     {
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate(
@@ -159,7 +159,7 @@ class Controller extends Base
      * @throws LogicException If cyclic graph detected during translation
      * @throws UnexpectedValueException If unable to merge project participant collections
      */
-    public function getGrades(User $viewee, Term\Model $term)
+    public function getGrades(User $viewee, Term\Model $term): void
     {
         $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
 
@@ -221,15 +221,18 @@ class Controller extends Base
         ])->setTab('grade'));
     }
 
+
     /**
      *
      * @param User                     $viewee
      * @param Collection|IAssessable[] $assessments
-     * @param null|int                 $year         Null if looking at a term, instead of a full-year
+     * @param null|int                 $year Null if looking at a term, instead of a full-year
      * @param Term\Model               $term
+     * @param Collection               $workTypes
      * @throws ServiceNotFound If unable to find mail handler service
+     * @throws UnexpectedValueException
      */
-    protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term, Collection $workTypes)
+    protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term, Collection $workTypes): void
     {
         $workTypeNames = $workTypes->getPropertyValues('name');
 
@@ -607,7 +610,7 @@ class Controller extends Base
      * @param User                            $student
      * @return array
      */
-    protected function getLongitudinalRubricData(GenericCollection $assessments, User $student)
+    protected function getLongitudinalRubricData(GenericCollection $assessments, User $student): array
     {
         if(!$this->getConfigLoader()->get('enable_grades_criteria')) {
             // only populate this if we're actually allowed to see it
@@ -635,7 +638,7 @@ class Controller extends Base
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws UnexpectedValueException If unable to merge student collections
      */
-    private function findByFiltersWithParticipants(array $filters, User $viewee, bool $loadOtherParticipantInteractions)
+    private function findByFiltersWithParticipants(array $filters, User $viewee, bool $loadOtherParticipantInteractions): GenericCollection
     {
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         // Fetch assessments & participants
