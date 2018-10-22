@@ -434,8 +434,13 @@ class Controller extends Base
             || ($viewee->getDisplayGradeGraph() && $this->getConfigLoader()
                                                         ->get('display_grade_graph'));
 
+        $visibility = new Visibility($this->access);
         // Need to load other participants if we can see graph to get assessment mark statistics
-        $assessments = $this->findByFiltersWithParticipants($filters, $viewee, $canSeeGraph);
+        $assessments = $this
+            ->findByFiltersWithParticipants($filters, $viewee, $canSeeGraph)
+            ->filter(function (IAssessable $a) use ($visibility) {
+                return $visibility->isVisibleToUser($a, $this->getUser(), true);
+            });
 
         // Only show the "send to showcase" trophy button to teachers and students, not parents
         $canSeeShowcaseButton = $this->getUser()->getRole()->isStaff() || $this->getUser()->getRole()->isStudent();
