@@ -162,14 +162,12 @@ class Controller extends Base
 
         // Add folders with response or feedback
         $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
-        $assessmentVisibility = new Visibility($this->access);
 
         // Get all assessments for this user in the specified term, grouped by folder
         $assessmentsPerFolder = $this->assessmentMapperProxy
             ->findAllByStudent($viewee, false, $term)
-            ->filter(function (IAssessable $a) use ($viewee, $assessmentVisibility) {
-                return $assessmentVisibility->isVisibleToUser($a, $viewee, true);
-
+            ->filter(function (IAssessable $a) use ($viewee) {
+                return $a->isPublished($viewee) && $a->isParticipant($viewee);
             })
             ->groupByCallback(function (IAssessable $assessment) {
                 return $assessment->getBaseContext()->getFolder()->getId();
