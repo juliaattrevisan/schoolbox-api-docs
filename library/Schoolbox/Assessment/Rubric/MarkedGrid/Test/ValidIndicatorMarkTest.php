@@ -25,6 +25,7 @@ class ValidIndicatorMarkTest extends TestCase
         yield 'null descriptor, zero value' => [null, 0, false];
         yield 'null descriptor, positive value' => [null, 0.5, false];
         yield 'null descriptor, negative value' => [null, -0.5, false];
+        yield 'null descriptor, non-numeric value' => [null, 'qqqqq', false];
 
 
         $nullDescriptor = (new Descriptor())
@@ -34,6 +35,7 @@ class ValidIndicatorMarkTest extends TestCase
         yield 'descriptor without value, zero value' => [$nullDescriptor, 0, false];
         yield 'descriptor without value, positive value' => [$nullDescriptor, 0.5, false];
         yield 'descriptor without value, negative value' => [$nullDescriptor, -0.5, false];
+        yield 'descriptor without value, non-numeric value' => [$nullDescriptor, 'qqqqq', false];
 
 
         $descriptorWithoutRange = (new Descriptor())
@@ -43,6 +45,7 @@ class ValidIndicatorMarkTest extends TestCase
         yield 'descriptor without range, equal to allowed value' => [$descriptorWithoutRange, 1, true];
         yield 'descriptor without range, greater than allowed value' => [$descriptorWithoutRange, 2, false];
         yield 'descriptor without range, less than allowed value' => [$descriptorWithoutRange, 0, false];
+        yield 'descriptor without range, non-numeric value' => [$descriptorWithoutRange, 'qqqqq', false];
 
 
         $descriptorWithRange = (new Descriptor())
@@ -54,6 +57,7 @@ class ValidIndicatorMarkTest extends TestCase
         yield 'descriptor with range, between min and max value' => [$descriptorWithRange, 2, true];
         yield 'descriptor with range, greater than max value' => [$descriptorWithRange, 7, false];
         yield 'descriptor with range, less than min value' => [$descriptorWithRange, 0, false];
+        yield 'descriptor with range, non-numeric value' => [$descriptorWithRange, 'qqqqq', false];
     }
 
 
@@ -65,7 +69,7 @@ class ValidIndicatorMarkTest extends TestCase
      * @param float|null      $value
      * @param bool            $expected
      */
-    public function testIsSatisfiedBy(?Descriptor $descriptor, ?float $value, bool $expected): void
+    public function testIsSatisfiedBy(?Descriptor $descriptor, $value, bool $expected): void
     {
         $spec = new ValidIndicatorMark($descriptor);
         $this->assertSame($expected, $spec->isSatisfiedBy($value));
