@@ -48,6 +48,13 @@ class ValidIndicatorMarkTest extends TestCase
         yield 'descriptor without range, non-numeric value' => [$descriptorWithoutRange, 'qqqqq', false];
 
 
+        $fractionalDescriptorWithoutRange = (new Descriptor())
+            ->setMinValue(0.5)
+            ->setMaxValue(0.5);
+        yield 'fractional descriptor without range, equal to allowed value' =>
+            [$fractionalDescriptorWithoutRange, 0.5, true];
+
+
         $descriptorWithRange = (new Descriptor())
             ->setMinValue(0)
             ->setMaxValue(5);
