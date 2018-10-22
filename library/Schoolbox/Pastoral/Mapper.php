@@ -872,12 +872,12 @@ class Mapper extends BaseMapper
 
         if ($before_date instanceof Alaress_Date_Format && !$before_date instanceof Alaress_Date_NullDate) {
             $this->bindings[':beforeDate'] = $before_date->endOfDay()->toIso8601String();
-            $this->filters[]               = '`created_at` <= :beforeDate';
+            $this->filters[]               = '`pastoral`.`created_at` <= :beforeDate';
         }
 
         if ($after_date instanceof Alaress_Date_Format && !$after_date instanceof Alaress_Date_NullDate) {
             $this->bindings[':afterDate'] = $after_date->startOfDay()->toIso8601String();
-            $this->filters[]              = '`created_at` >= :afterDate';
+            $this->filters[]              = '`pastoral`.`created_at` >= :afterDate';
         }
 
         if (!empty($severity) && $this->getConfigLoader()->get('pastoral_severity')) {
