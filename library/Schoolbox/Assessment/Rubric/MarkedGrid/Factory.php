@@ -110,7 +110,16 @@ class Factory
                     if ($indicatorMarkSpec->isSatisfiedBy($indicatorMarkValue)) {
                         $indicatorMark->setValue($indicatorMarkValue);
                     } else {
-                        throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
+                        if ($selectedDescriptor && $selectedDescriptor->hasValue()) {
+                            $message = sprintf(
+                                "Indicator mark must be between %s and %s",
+                                $selectedDescriptor->getMinValue(),
+                                $selectedDescriptor->getMaxValue()
+                            );
+                        } else {
+                            $message = "Indicator mark must be null";
+                        }
+                        throw new \InvalidArgumentException($message);
                     }
                 }
             }
