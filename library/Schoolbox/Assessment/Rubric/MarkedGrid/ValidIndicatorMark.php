@@ -47,10 +47,25 @@ class ValidIndicatorMark extends \Alaress\Specification\Base
     public function isSatisfiedBy($candidate): bool
     {
         if ($this->descriptor instanceof Descriptor && $this->descriptor->hasValue()) {
-            $minValue = $this->descriptor->getMinValue();
-            $maxValue = $this->descriptor->getMaxValue();
-            return ($minValue <= $candidate && $candidate <= $maxValue);
+            $minValue  = $this->descriptor->getMinValue();
+            $maxValue  = $this->descriptor->getMaxValue();
+            $value     = filter_var($candidate, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+            if (null === $value) {
+                return false;
+            }
+
+            $isInRange = $minValue <= $candidate && $candidate <= $maxValue;
+
+            // Is this a ranged value? If so for now it must be a whole number
+            if ($this->descriptor->hasRange()) {
+                $intValue = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+                if (null === $intValue) {
+                    return false;
+                }
+            }
+
+            return $isInRange;
         }
-        return null === $candidate;
+        return '' === (string)$candidate;
     }
 }
