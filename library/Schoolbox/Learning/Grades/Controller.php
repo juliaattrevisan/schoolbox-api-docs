@@ -245,7 +245,7 @@ class Controller extends Base
 
         $showOverallGrade = $this->getConfigLoader()->get('show_overall_grade');
 
-        $folders = $this->getFolderMapper()->createCollection();
+        $folders = $this->folderMapper->createCollection();
 
         /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {
@@ -658,15 +658,6 @@ class Controller extends Base
      */
 
     /**
-     * @return Error\Mapper
-     */
-    protected function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-
-    /**
      * @return AssessmentMapperProxy
      */
     protected function getAssessmentMapperProxy()
@@ -681,23 +672,5 @@ class Controller extends Base
     protected function getTermMapper()
     {
         return $this->termMapper;
-    }
-
-
-    /**
-     * @return Folder\Mapper
-     */
-    protected function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-
-    /**
-     * @return GradeGroup\Model
-     */
-    protected function getDefaultGradeGroup()
-    {
-        return $this->defaultGradeGroup;
     }
 }
