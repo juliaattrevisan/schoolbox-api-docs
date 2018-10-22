@@ -105,7 +105,7 @@ class UserResolver implements IUserResolver
         // Simple base case:
         if (Segment\Strategy\Composite::getEntityType() !== $entityType) {
             $userIds = $this->getUserIds($audienceSegment->getEntityType(), $audienceSegment->getEntityValue());
-
+            $userIds = $this->applyRelationshipFilter($userIds, $audienceSegment->getRelationship());
             // Exclude the users who has muted the current folder.
             if ($excludeMuted && $audienceSegment->getEntityType() === Segment\Strategy\Folder::getEntityType()) {
                 $parameters = [
@@ -120,8 +120,7 @@ class UserResolver implements IUserResolver
                     $userIds = array_diff($userIds, $mutedUserIds);
                 }
             }
-
-            return $this->applyRelationshipFilter($userIds, $audienceSegment->getRelationship());
+            return $userIds;
         }
 
         // Recursive composite case:
