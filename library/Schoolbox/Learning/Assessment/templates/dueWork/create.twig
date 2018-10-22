@@ -296,7 +296,7 @@
 
             function setRubricMarkButtonText(groupIdentifier) {
                 var $closestInput = $("[data-group-max-value-row][data-group='" + groupIdentifier + "']").find("input");
-                $closestInput.next("button").find("[data-rubric-sum]").text(calculateGroupTotal(groupIdentifier));
+                $closestInput.next("a").find("[data-rubric-sum]").text(calculateGroupTotal(groupIdentifier));
             }
 
             /**
@@ -364,9 +364,9 @@
                 var groupIdentifier = $(this).closest("[data-group]").attr("data-group");
                 var $closestAssignButton = $(this).next("[data-use-criterion-values]");
                 if (! ($(this).val() == calculateGroupTotal(groupIdentifier)) ) {
-                    $closestAssignButton.removeAttr("disabled");
+                    $closestAssignButton.show();
                 } else {
-                    $closestAssignButton.attr("disabled", true);
+                    $closestAssignButton.hide();
                 }
                 $(this).attr("data-customised", true);
             });
@@ -379,9 +379,9 @@
 
                 // Only disable if mark is the same (which it always should be in this case, but...be safe)
                 if (groupTotal == $closestMaxMarkInput.val()) {
-                    $(this).attr("disabled", true);
+                    $(this).hide();
                 } else {
-                    $(this).removeAttr("disabled");
+                    $(this).show();
                 }
             });
 
@@ -395,9 +395,9 @@
 
                 // Only disable if mark is the same (which it always should be in this case, but...be safe)
                 if (groupTotal == $closestMaxMarkInput.val()) {
-                    $(this).attr("disabled", true);
+                    $(this).hide();
                 } else {
-                    $(this).removeAttr("disabled");
+                    $(this).show();
                 }
 
                 $closestMaxMarkInput.removeAttr("data-customised");

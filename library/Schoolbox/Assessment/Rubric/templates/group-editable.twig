@@ -63,6 +63,6 @@
                data-group-max-value
                {% if not showGroupMaxValue %}disabled class="hide"{% endif %}
         />
-        <button data-use-criterion-values>Assign <span data-rubric-sum></span> from rubric</button>
+        <a data-use-criterion-values class="fieldAssign">Assign <span data-rubric-sum></span> from {{ locale.translate('rubricCriterion',true) }}</a>
     </th>
 </tr>
