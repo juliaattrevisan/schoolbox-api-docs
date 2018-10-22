@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term;
@@ -219,6 +220,7 @@ class Controller extends Base
      * @param Collection               $workTypes
      * @throws ServiceNotFound If unable to find mail handler service
      * @throws UnexpectedValueException
+     * @throws InsufficientHydrationException
      */
     protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term, Collection $workTypes): void
     {
@@ -245,8 +247,16 @@ class Controller extends Base
                     $folders->add($folder);
                 }
 
-                if ($assessment instanceof DueWork\Model && $assessment->getWorkType()
-                    && \in_array($assessment->getWorkType()->getName(), $workTypeNames, true)
+                if (
+                    $assessment instanceof DueWork\Model &&
+                    $assessment->getWorkType() &&
+                    \in_array($assessment->getWorkType()->getName(), $workTypeNames, true) &&
+                    (
+                        // Hide SIVO assessments from users who are not staff or instructors
+                        !$assessment->isStaffOrInstructorVisibleOnly() ||
+                        $this->getUser()->getRole()->isStaff() ||
+                        $this->access->isInstructor($this->getUser(), $folder)
+                    )
                 ) {
                     if (!isset($assessmentTasks[$folder->getId()])) {
                         $assessmentTasks[$folder->getId()] = [];
