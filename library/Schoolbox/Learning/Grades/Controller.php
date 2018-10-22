@@ -640,12 +640,12 @@ class Controller extends Base
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         // Fetch assessments & participants
         $user        = $loadOtherParticipantInteractions ? null : $viewee;
-        $assessmentVisibility = new Visibility($this->access);
 
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
         $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $user)
-                                                   ->filter(function (IAssessable $a) use ($viewee, $assessmentVisibility) {
-                                                       return $assessmentVisibility->isVisibleToUser($a, $viewee, true);
+                                                   ->filter(function (IAssessable $a) use ($viewee) {
+                                                       // Note that we the assessment list is already filtered to published assessments due to filters
+                                                       return $a->isParticipant($viewee);
                                                    });
         return $assessments;
     }
