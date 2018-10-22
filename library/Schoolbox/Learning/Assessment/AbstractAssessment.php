@@ -342,9 +342,9 @@ abstract class AbstractAssessment implements IAssessable
 
         // Intentionally calls getter rather than direct access to enable assessment-specific date acrobatics
         $participant = $student ? $this->getParticipantIfExtant($student) : null;
-        $publishAt   = $participant ? $participant->getPublishDate() : $this->getPublishAt();
+        $publishDate = $participant ? $participant->getPublishDate() : $this->getPublishAt();
 
-        return $now->gte($publishAt);
+        return $now->gte($publishDate);
     }
 
 
