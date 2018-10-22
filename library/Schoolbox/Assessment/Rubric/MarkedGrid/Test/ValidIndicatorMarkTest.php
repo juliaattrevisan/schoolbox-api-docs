@@ -58,6 +58,7 @@ class ValidIndicatorMarkTest extends TestCase
         yield 'descriptor with range, greater than max value' => [$descriptorWithRange, 7, false];
         yield 'descriptor with range, less than min value' => [$descriptorWithRange, 0, false];
         yield 'descriptor with range, non-numeric value' => [$descriptorWithRange, 'qqqqq', false];
+        yield 'descriptor with range, between min and max value but fractional' => [$descriptorWithRange, 3.5, false];
     }
 
 
