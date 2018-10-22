@@ -343,7 +343,10 @@
                 inputs.val(levelName);
 
                 // override to the value if this is a value field
-                inputs.filter('input.rb-value').val(descriptorValue);
+                inputs.filter('[data-descriptor-value]').val(descriptorValue);
+
+                // ID for added levels and descriptors must always be empty
+                inputs.filter('[data-id]').val('');
 
                 // rename inputs to accommodate new level "identity"
                 inputs.each(function () {
@@ -487,9 +490,14 @@
         var $rb = $(this.element),
             rows = $rb.find('tr');
 
-        // Re-number all the levels, descriptors and values in the rubric grid
+        // Re-number all the IDs, levels, descriptors and values in the rubric grid
         rows.each(function() {
             var $row = $(this);
+
+            // Renumber IDs
+            $row.find('[data-id]').each(function(i) {
+                this.name = this.name.replace(/\[\d+]\[id]$/, '[' + String(i) + '][id]');
+            });
 
             // Renumber levels
             $row.find('[data-level]').each(function(i) {
