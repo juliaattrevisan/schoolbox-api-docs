@@ -660,7 +660,7 @@ class Controller extends Base
     /**
      * @return AssessmentMapperProxy
      */
-    protected function getAssessmentMapperProxy()
+    protected function getAssessmentMapperProxy(): AssessmentMapperProxy
     {
         return $this->assessmentMapperProxy;
     }
@@ -669,7 +669,7 @@ class Controller extends Base
     /**
      * @return Term\Mapper
      */
-    protected function getTermMapper()
+    protected function getTermMapper(): Term\Mapper
     {
         return $this->termMapper;
     }
