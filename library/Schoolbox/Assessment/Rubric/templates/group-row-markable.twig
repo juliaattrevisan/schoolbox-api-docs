@@ -9,7 +9,6 @@
 
 {% set markType = rubricGrid.assessment.markScheme.generateContext %}
 {% if showGroupTotal and markType.mode != "none" %}
-    {% set percentageMark     = capabilityMark.value * (100 / capabilityMaxFromIndicators) %}
     {% set letterGradeBracket = false %}
     {% set letterGradeValue   = '' %}
 
@@ -83,7 +82,7 @@
                            id="group-{{ capabilityId }}-mark"
                            type="tel"
                            name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                           value="{{ percentageMark }}"/> %
+                           value="{{ capabilityMark.retrieveNormalizedMark  }}"/> %
                 {% endif %}
 
                 {% if groupUsage.containsDescriptorsWithValue %}
@@ -95,7 +94,7 @@
                             {{ letterGradeValue }}
 
                         {% elseif markType.mode == 'percent' %}
-                            {{ percentageMark }}
+                            {{ capabilityMark.retrieveNormalizedMark  }}
 
                         {% endif %}
                         </span> from Descriptors</button>
