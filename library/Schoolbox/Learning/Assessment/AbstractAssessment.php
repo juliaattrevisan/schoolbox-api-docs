@@ -334,14 +334,17 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function isPublished(Alaress_Date_Format $now = null)
+    public function isPublished(?User $student, Alaress_Date_Format $now = null): bool
     {
         if (null === $now || $now->isNull()) {
             $now = Alaress_Date_Format::now();
         }
 
         // Intentionally calls getter rather than direct access to enable assessment-specific date acrobatics
-        return $now->gte($this->getPublishAt());
+        $participant = $student ? $this->getParticipantIfExtant($student) : null;
+        $publishAt   = $participant ? $participant->getPublishDate() : $this->getPublishAt();
+
+        return $now->gte($publishAt);
     }
 
 
