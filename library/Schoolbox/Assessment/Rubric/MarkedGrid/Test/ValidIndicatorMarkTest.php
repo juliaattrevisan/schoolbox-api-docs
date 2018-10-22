@@ -39,25 +39,27 @@ class ValidIndicatorMarkTest extends TestCase
 
 
         $descriptorWithoutRange = (new Descriptor())
-            ->setMinValue(1)
-            ->setMaxValue(1);
+            ->setMinValue(0)
+            ->setMaxValue(0);
         yield 'descriptor without range, null value' => [$descriptorWithoutRange, null, false];
-        yield 'descriptor without range, equal to allowed value' => [$descriptorWithoutRange, 1, true];
-        yield 'descriptor without range, greater than allowed value' => [$descriptorWithoutRange, 2, false];
-        yield 'descriptor without range, less than allowed value' => [$descriptorWithoutRange, 0, false];
+        yield 'descriptor without range, equal to allowed value' => [$descriptorWithoutRange, 0, true];
+        yield 'descriptor without range, greater than allowed value' => [$descriptorWithoutRange, 1, false];
+        yield 'descriptor without range, less than allowed value' => [$descriptorWithoutRange, -1, false];
         yield 'descriptor without range, non-numeric value' => [$descriptorWithoutRange, 'qqqqq', false];
 
 
         $descriptorWithRange = (new Descriptor())
-            ->setMinValue(1)
+            ->setMinValue(0)
             ->setMaxValue(5);
         yield 'descriptor with range, null value' => [$descriptorWithRange, null, false];
-        yield 'descriptor with range, equal to min value' => [$descriptorWithRange, 1, true];
+        yield 'descriptor with range, equal to min value' => [$descriptorWithRange, 0, true];
         yield 'descriptor with range, equal to max value' => [$descriptorWithRange, 5, true];
         yield 'descriptor with range, between min and max value' => [$descriptorWithRange, 2, true];
         yield 'descriptor with range, greater than max value' => [$descriptorWithRange, 7, false];
-        yield 'descriptor with range, less than min value' => [$descriptorWithRange, 0, false];
+        yield 'descriptor with range, less than min value' => [$descriptorWithRange, -1, false];
         yield 'descriptor with range, non-numeric value' => [$descriptorWithRange, 'qqqqq', false];
+        // Fractional values are currently not allowed, even if within range.
+        // This may change later.
         yield 'descriptor with range, between min and max value but fractional' => [$descriptorWithRange, 3.5, false];
     }
 
