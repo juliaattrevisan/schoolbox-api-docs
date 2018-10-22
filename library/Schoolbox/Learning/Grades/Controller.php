@@ -13,7 +13,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
-use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -59,11 +58,6 @@ class Controller extends Base
     private $folderMapper;
 
     /**
-     * @var Error\Mapper
-     */
-    private $errorMapper;
-
-    /**
      * @var AssessmentMapperProxy
      */
     private $assessmentMapperProxy;
@@ -92,7 +86,6 @@ class Controller extends Base
 
 
     /**
-     * @param Error\Mapper                     $errorMapper
      * @param AssessmentMapperProxy            $assessmentMapperProxy
      * @param Folder\Mapper                    $folderMapper
      * @param Term\Mapper                      $termMapper
@@ -104,7 +97,6 @@ class Controller extends Base
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
      */
     public function __construct(
-        Error\Mapper $errorMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         Folder\Mapper $folderMapper,
         Term\Mapper $termMapper,
@@ -116,7 +108,6 @@ class Controller extends Base
         AssessmentFilters\FactoryFactory $filterFactoryFactory
     )
     {
-        $this->errorMapper           = $errorMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->termMapper            = $termMapper;
         $this->folderMapper          = $folderMapper;

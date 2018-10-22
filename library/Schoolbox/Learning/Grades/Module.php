@@ -125,7 +125,6 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'errorMapper'                => $this->getMapperFactory()->getLazy(Error\Mapper::class),
             'assessmentMapperProxy'      => $this->getInjector()->lazyGet('assessmentDataSource'),
             'termMapper'                 => $this->getMapperFactory()->getLazy(Term\Mapper::class),
             'folderMapper'               => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
