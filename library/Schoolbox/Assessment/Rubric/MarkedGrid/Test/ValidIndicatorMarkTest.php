@@ -84,4 +84,19 @@ class ValidIndicatorMarkTest extends TestCase
         $spec = new ValidIndicatorMark($descriptor);
         $this->assertSame($expected, $spec->isSatisfiedBy($value));
     }
+
+
+    /**
+     * @dataProvider getTestIsSatisfiedByData
+     * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\ValidIndicatorMark::isSatisfiedBy
+     *
+     * @param null|Descriptor $descriptor
+     * @param float|null      $value
+     * @param bool            $expected
+     */
+    public function testIsSatisfiedByStringValues(?Descriptor $descriptor, $value, bool $expected): void
+    {
+        $spec = new ValidIndicatorMark($descriptor);
+        $this->assertSame($expected, $spec->isSatisfiedBy((string)$value));
+    }
 }
