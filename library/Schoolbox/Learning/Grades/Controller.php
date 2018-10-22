@@ -235,7 +235,6 @@ class Controller extends Base
 
         $folders = $this->folderMapper->createCollection();
 
-        /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {
             $folder = $assessment->getContext()->getFolder();
 
