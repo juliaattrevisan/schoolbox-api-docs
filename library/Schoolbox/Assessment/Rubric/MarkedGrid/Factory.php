@@ -88,7 +88,6 @@ class Factory
                     // Find which descriptor was actually selected
                     $isDescriptorSelected = !empty($postDescriptors[$descriptorId]['selected']);
                     if ($isDescriptorSelected) {
-                        // TODO validate descriptor mark is between min/max?
                         $descriptorMark     = $postDescriptors[$descriptorId]['value'] ?? $descriptor->getMaxValue();
                         $selectedDescriptor = $descriptor;
                         break;
