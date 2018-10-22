@@ -178,13 +178,13 @@ class Feed {
     /**
      * Get a list of online assessments that were created.
      *
-     * @param  $folderId
+     * @param  $folderIds
      * @param  $limit
      * @return
      */
-    public function getOnlineAssessments($folderId, $limit) {
+    public function getOnlineAssessments($folderIds, $limit) {
 
-        $where = $this->getFilterFromCategoryId($folderId);
+        $where = $this->getFilterFromCategoryId($folderIds);
 
         $query = "
           SELECT
