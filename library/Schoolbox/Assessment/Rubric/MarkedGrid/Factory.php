@@ -105,10 +105,15 @@ class Factory
                 if ($isSelfReflection) {
                     $indicatorMark->setValue(null);
                 } else {
-                    $indicatorMarkValue = filter_var($descriptorMark, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
-                    $indicatorMarkSpec  = new ValidIndicatorMark($selectedDescriptor);
-                    if ($indicatorMarkSpec->isSatisfiedBy($indicatorMarkValue)) {
-                        $indicatorMark->setValue($indicatorMarkValue);
+                    $indicatorMarkSpec = new ValidIndicatorMark($selectedDescriptor);
+                    if ($indicatorMarkSpec->isSatisfiedBy($descriptorMark)) {
+                        $indicatorMark->setValue(
+                            filter_var(
+                                $descriptorMark,
+                                FILTER_VALIDATE_FLOAT,
+                                FILTER_NULL_ON_FAILURE
+                            )
+                        );
                     } else {
                         if ($selectedDescriptor && $selectedDescriptor->hasValue()) {
                             $message = sprintf(
