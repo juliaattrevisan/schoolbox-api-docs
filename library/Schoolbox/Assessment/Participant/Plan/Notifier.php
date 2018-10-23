@@ -198,6 +198,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function bundleTriggers($bundle): void
     {
+        //TODO: updating an assessment executes post update method twice??
+
         /** @var Model $plan */
         $plan = $bundle->getEvent()->getObject();
 
@@ -210,26 +212,56 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         $method = $bundle->getMethod();
-
         $diff = $bundle->getEvent()->getDiff();
+        /**
+         * No Change
+         */
+        if ($diff === null || \count($diff) === 0) {
+            return;
+        }
 
-        // "hidden" here means that the assessment is visible to staff or instructor only
-        $changedToHidden = false;
+        /**
+         * Newly created assessment is isStaffOrInstructorVisibleOnly or closed
+         */
+        $isCurrentHidden = false;
+        if ($method === Mapper::METHOD_CREATE) {
+            try {
+                $isCurrentHidden = $assessment->getWorkType() === null ? false :
+                    $this->workTypeMapper->findById($assessment->getWorkType()->getId())->isStaffOrInstructorVisibleOnly();
+                if ($isCurrentHidden) {
+                    return;
+                }
+            } catch (BaseMapper\Exception $e) {
+                // noop;
+            }
+        }
+        $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
+        if ($method === Mapper::METHOD_CREATE && $closeDate && $closeDate->isPast()) {
+            return;
+        }
+
+        /**
+         * Deleted, closed or changed to isStaffOrInstructorVisibleOnly
+         */
+        $isPreviousHidden = false;
         if ($method === Mapper::METHOD_UPDATE
             && \array_key_exists('assessment', $diff)
             && \array_key_exists('workType', $diff['assessment'])) {
             try {
                 $isPreviousHidden = $diff['assessment']['workType'][1] === null ? false :
                     $this->workTypeMapper->findById(intval($diff['assessment']['workType'][1]))->isStaffOrInstructorVisibleOnly();
-                $isCurrentHidden = $assessment->getWorkType() === null ? false :
-                    $this->workTypeMapper->findById($assessment->getWorkType()->getId())->isStaffOrInstructorVisibleOnly();
-                $changedToHidden = $isCurrentHidden && !$isPreviousHidden;
+                if ($isPreviousHidden && $isCurrentHidden) {
+                    // no notification
+                    return;
+                }
             } catch (BaseMapper\Exception $e) {
                 // noop;
             }
         }
 
-        if ($method === Mapper::METHOD_DELETE || $changedToHidden) {
+        if ($method === Mapper::METHOD_DELETE
+            || (!$isPreviousHidden && $isCurrentHidden)
+            || ($closeDate && $closeDate->isPast())) {
             $bundle->detachEach([
                 self::TRIGGER_OPEN,
                 self::TRIGGER_UPCOMING,
@@ -239,58 +271,70 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             ]);
             // trigger to retract existing notifications
             $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
-
             return;
         }
 
-        // Bundle triggers
+        /**
+         * If any date has been changed, detach triggers before attaching triggers.
+         * If isStaffOrInstructorVisibleOnly was true in previous state, no need to worry.
+         */
+        if ($method === Mapper::METHOD_UPDATE && !$isPreviousHidden
+            && \array_key_exists('assessment', $diff)
+            && \array_intersect(['openDate', 'publishDate', 'dueDate', 'closeDate'], \array_keys($diff['assessment']))) {
+            $bundle->detachEach([
+                self::TRIGGER_OPEN,
+                self::TRIGGER_UPCOMING,
+                self::TRIGGER_UPDATED,
+                self::TRIGGER_OVERDUE,
+                self::TRIGGER_CLOSED,
+            ]);
 
-        // I need a close date to determine if I should trigger anything:
-        // if it's in the past, trigger nothing except update.
-        $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
-        if ($closeDate && $closeDate->isFuture()) {
+            // TODO: If publish date has been changed from past to future, retract.
+        }
 
-            // Open is now always bundled, as long as it is set
-            // However, if its open date is in the past don't bundle if this is an update
-            $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
-            if ($openDate && ($method === Mapper::METHOD_CREATE || $openDate->isFuture())) {
-                $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
-            }
+        $triggerUpdate = $method === Mapper::METHOD_UPDATE;
 
-            // Due and upcoming: always bundled as long as due date is set
+        // Open is now always bundled, as long as it is set
+        // However, if its open date is in the past don't bundle if this is an update
+        $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
+        if ($openDate && ($method === Mapper::METHOD_CREATE || $openDate->isFuture() || ($isPreviousHidden && !$isCurrentHidden))) {
+            $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
+            $triggerUpdate = false;
+        }
+
+        // Due and upcoming: always bundled as long as due date is set
             $dueDate = $this->coalesceDates($plan->getDueDate(), $assessment->getDueDate());
-            if ($dueDate) {
-                // Quiz and Due Work have different logic for when notification happens
-                // Quiz: 2 hours before
-                // Due Work: 2 days before
-                $upcomingDate = null;
-                if ($assessment->getQuiz()) {
-                    $upcomingDate = (clone $dueDate)->addHours(-self::QUIZ_UPCOMING_WINDOW);
-                } elseif ($assessment->getDueWork()) {
-                    $upcomingDate = (clone $dueDate)->addHours(-self::DUEWORK_UPCOMING_WINDOW);
-                }
-                // if the upcoming date is before the open date, push upcoming to 1 minute after open,
-                // rounded to the nearest 5 minutes?
-                if ($upcomingDate) {
-                    if ($upcomingDate->lt($openDate)) {
-                        $upcomingDate = (clone $openDate)->addMinutes(1);
-                    }
-                    if ($upcomingDate->isFuture()) {
-                        $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
-                    }
-                }
-                $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
+        if ($dueDate) {
+            // Quiz and Due Work have different logic for when notification happens
+            // Quiz: 2 hours before
+            // Due Work: 2 days before
+            $upcomingDate = null;
+            if ($assessment->getQuiz()) {
+                $upcomingDate = (clone $dueDate)->addHours(-self::QUIZ_UPCOMING_WINDOW);
+            } elseif ($assessment->getDueWork()) {
+                $upcomingDate = (clone $dueDate)->addHours(-self::DUEWORK_UPCOMING_WINDOW);
             }
-
-            // Close: always bundled
-            $bundle->attach(self::TRIGGER_CLOSED, $closeDate->getUnixTimeStamp());
-
-            // Generic updated trigger
-            if ($method === Mapper::METHOD_UPDATE) {
-                $publishDate = $this->coalesceDates($plan->getPublishDate(), $assessment->getPublishDate());
-                if ($publishDate && $publishDate->isPast()) {
-                    $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+            // if the upcoming date is before the open date, push upcoming to 1 minute after open,
+            // rounded to the nearest 5 minutes?
+            if ($upcomingDate) {
+                if ($upcomingDate->lt($openDate)) {
+                    $upcomingDate = (clone $openDate)->addMinutes(1);
                 }
+                if ($upcomingDate->isFuture()) {
+                    $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
+                }
+            }
+            $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
+        }
+
+        // Close: always bundled
+        $bundle->attach(self::TRIGGER_CLOSED, $closeDate->getUnixTimeStamp());
+
+        // Generic updated trigger
+        if ($triggerUpdate) {
+            $publishDate = $this->coalesceDates($plan->getPublishDate(), $assessment->getPublishDate());
+            if ($publishDate && $publishDate->isPast()) {
+                $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
             }
         }
     }

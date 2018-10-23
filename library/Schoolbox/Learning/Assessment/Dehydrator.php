@@ -149,6 +149,10 @@ class Dehydrator
             'title'          => $assessment->getTitle(),
             'weight'         => $assessment->getWeight(),
             'markVisibility' => $assessment->getMarkVisibility(),
+            'openDate'       => $assessment->getOpenAt() ? $assessment->getOpenAt()->getDatabase() : null,
+            'publishDate'    => $assessment->getPublishAt() ? $assessment->getPublishAt()->getDatabase() : null,
+            'dueDate'        => $assessment->getDueAt() ? $assessment->getDueAt()->getDatabase() : null,
+            'closeDate'      => $assessment->getCloseAt() ? $assessment->getCloseAt()->getDatabase() : null,
             'workType'       => $assessment->getWorkType()
                 ? $assessment->getWorkType()->getId()
                 : null,
