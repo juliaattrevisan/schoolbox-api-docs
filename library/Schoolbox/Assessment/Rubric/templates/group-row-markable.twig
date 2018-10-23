@@ -28,6 +28,8 @@
             {% set letterGradeValue   = gradeLevel.caption %}
         {% endif %}
     {% endfor %}
+
+    {% if rubricGrid.isCapabilityMarkShown(groupUsage.capability) %}
 <tr>
     <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 1 }}">
         <span data-group-summary="{{ rubricId }}-{{ capabilityId }}"
@@ -38,7 +40,6 @@
               data-group-id="{{ capabilityId }}"
               data-rubric-id="{{ rubricGrid.id }}">
 
-            {% if rubricGrid.isCapabilityMarkShown(groupUsage.capability) %}
 
                 {# This is the value we insert into the database. #}
                 <input type="hidden"
@@ -87,7 +88,7 @@
                 {% endif %}
 
                 {% if groupUsage.containsDescriptorsWithValue %}
-                    <button data-use-descriptor-values>Assign <span class="descriptor-sum" data-group-descriptor-sum>
+                    <a data-use-descriptor-values class="fieldAssign">Assign <span class="descriptor-sum" data-group-descriptor-sum>
                         {% if markType.mode == 'raw' %}
                             {{ capabilityScaledMark }}
 
@@ -98,24 +99,21 @@
                             {{ percentageMark }}
 
                         {% endif %}
-                        </span> from Descriptors</button>
+                        </span> from descriptors</a>
                 {% endif %}
                 {% if markType.mode == 'letter' or markType.mode == 'percent' %}
-                    <p class="meta">This {{ locale.rubricGroup }} contributes {{ (capabilityMaxValue / rubricGrid.calculateMaxValueFromCapabilities * 100) | round(2) }}% to the total mark</p>
+                    <!-- <p class="meta">This {{ locale.rubricGroup }} contributes {{ (capabilityMaxValue / rubricGrid.calculateMaxValueFromCapabilities * 100) | round(2) }}% to the total mark</p> -->
                 {% endif %}
-
-            {% else %}
-                <p class="meta">Descriptors in this {{ locale.rubricGroup }} do not contribute to the total mark, because the {{ locale.rubricGroup }}'s maximum points are 0.</p>
-            {% endif %}
-
         </span>
 
         {# Self-Assessment #}
         {% if selfAssessmentFeedback.isSelfGrading %}
             {% set selfAssessmentCapabilityMark = selfAssessmentFeedback.rubricMarkedGrid.retrieveCapabilityMark(groupUsage) %}
-            ({{ selfAssessmentCapabilityMark.retrieveHumanReadableMark }} given in {{ locale.selfAssessment }})
+            <p class="meta">{{ selfAssessmentCapabilityMark.retrieveHumanReadableMark }} given in {{ locale.selfAssessment }}</p>
         {% endif %}
     </th>
 </tr>
-
+{% else %}
+    <!-- <p class="meta">Descriptors in this {{ locale.rubricGroup }} do not contribute to the total mark, because the {{ locale.rubricGroup }}'s maximum points are 0.</p> -->
+{% endif %}
 {% endif %}

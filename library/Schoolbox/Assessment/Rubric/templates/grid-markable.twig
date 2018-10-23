@@ -49,7 +49,7 @@
                  #}
                 {% set capabilityMark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
 
-                {% set rowspan = groupUsage.indicatorUsages|length + (showGroupTotal and markType.mode != "none" ? 1 : 0) %}
+                {% set rowspan = groupUsage.indicatorUsages|length + (showGroupTotal and rubricGrid.isCapabilityMarkShown(groupUsage.capability) and markType.mode != "none" ? 1 : 0) %}
 
                 {% for critIndex, critUsage in groupUsage.indicatorUsages %}
                 <tr data-group="{{ rubricId }}-{{ groupUsage.capability.id }}">
@@ -195,9 +195,9 @@
                 }
 
                 if (displayedMark === customMark) {
-                    $(this).find("[data-use-descriptor-values]").prop("disabled", true);
+                    $(this).find("[data-use-descriptor-values]").hide();
                 } else {
-                    $(this).find("[data-use-descriptor-values]").prop("disabled", false);
+                    $(this).find("[data-use-descriptor-values]").show();
                 }
             })
         }
