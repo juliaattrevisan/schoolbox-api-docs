@@ -38,7 +38,7 @@
                                             {{ article.author.fullname }}
                                         {% endif %}
 
-                                        <time title="{{ article.updatedAt.long }}">{{ article.updatedAt.relativeTime }}</time>
+                                        <time title="{{ article.submittedAt.long }}">{{ article.submittedAt.relativeTime }}</time>
                                     </p>
 
                                     {% if article.topics|length %}
@@ -81,7 +81,7 @@
                                     {% else %}
                                         {{ article.author.fullname }}
                                     {% endif %}
-                                    <time title="{{ article.createdAt.long }}">{{ article.createdAt.relativeTime }}</time>
+                                    <time title="{{ article.submittedAt.long }}">{{ article.submittedAt.relativeTime }}</time>
                                 </p>
 
                                 <p class="meta">Approved by
@@ -135,7 +135,7 @@
                                             {{ article.author.fullname }}
                                         {% endif %}
 
-                                        <time title="{{ article.createdAt.long }}">{{ article.createdAt.relativeTime }}</time>
+                                        <time title="{{ article.submittedAt.long }}">{{ article.submittedAt.relativeTime }}</time>
                                     </p>
 
                                     <p class="meta">Rejected by
