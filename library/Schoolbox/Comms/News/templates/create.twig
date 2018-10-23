@@ -382,6 +382,7 @@
 <script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
+{% autoescape 'js' %}
 <script>
     'use strict';
     // HTML template for rendering audience audienceSelectize dropdown options.
@@ -1300,3 +1301,4 @@
         }
     });
 </script>
+{% endautoescape %}
