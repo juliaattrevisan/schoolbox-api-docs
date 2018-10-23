@@ -12,6 +12,7 @@ use Alaress\Database;
 use Schoolbox\Permission\Access\UserAccess;
 use External_ClassInterface;
 use PDO;
+use Schoolbox\Realtime\Message\RoutePermission;
 use UnexpectedValueException;
 
 /**
@@ -66,13 +67,14 @@ class UserResolver implements IUserResolver
      * Returns the ids of users who are in the article's audience
      *
      * @param \Schoolbox\Comms\News\Model $article
+     * @param bool $excludeMuted set this true to exclude users who has muted folders
      * @return int[]
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws UnexpectedValueException If we attempt to build a query with an unrecognised entity type
      * @throws \UnderflowException
      * @TODO This is too poorly implemented and needs to be optimised. See SA-7431
      */
-    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article): array
+    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article, bool $excludeMuted = false): array
     {
         $userIds = [];
         $rootSegments = $this->audienceMapper->findByColumn(Mapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
@@ -80,7 +82,7 @@ class UserResolver implements IUserResolver
         foreach ($rootSegments as $rootAudienceSegment) {
             // Root level segments are always a UNION
             /** @noinspection SlowArrayOperationsInLoopInspection */
-            $userIds = \array_merge($userIds, $this->findUsersForAudienceSegment($rootAudienceSegment));
+            $userIds = \array_merge($userIds, $this->findUsersForAudienceSegment($rootAudienceSegment, $excludeMuted));
         }
         return \array_unique($userIds);
     }
@@ -90,19 +92,35 @@ class UserResolver implements IUserResolver
      * Returns the ids of users in an audience segment
      *
      * @param Model $audienceSegment
+     * @param bool $excludeMuted
      * @return int[]
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws UnexpectedValueException If we attempt to build a query with an unrecognised entity type
      * @throws \UnderflowException
      */
-    private function findUsersForAudienceSegment(Model $audienceSegment): array
+    private function findUsersForAudienceSegment(Model $audienceSegment, bool $excludeMuted = false): array
     {
         $entityType = $audienceSegment->getEntityType();
 
         // Simple base case:
         if (Segment\Strategy\Composite::getEntityType() !== $entityType) {
             $userIds = $this->getUserIds($audienceSegment->getEntityType(), $audienceSegment->getEntityValue());
-            return $this->applyRelationshipFilter($userIds, $audienceSegment->getRelationship());
+            $userIds = $this->applyRelationshipFilter($userIds, $audienceSegment->getRelationship());
+            // Exclude the users who has muted the current folder.
+            if ($excludeMuted && $audienceSegment->getEntityType() === Segment\Strategy\Folder::getEntityType()) {
+                $parameters = [
+                    'routeKey' => sprintf('service.%s.%s', UserAccess::SERVICE_HOMEPAGE, $audienceSegment->getEntityValue()),
+                    'delivery' => RoutePermission::MUTE,
+                ];
+                $mutedUserIds = $this->db->executeQuery(
+                    "SELECT mro.user_id FROM msg_reroute_override mro WHERE `msg_route_key` = :routeKey AND `delivery` = :delivery",
+                    $parameters)
+                    ->fetchAll(PDO::FETCH_COLUMN);
+                if ($mutedUserIds) {
+                    $userIds = array_diff($userIds, $mutedUserIds);
+                }
+            }
+            return $userIds;
         }
 
         // Recursive composite case:

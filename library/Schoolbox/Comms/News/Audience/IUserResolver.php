@@ -15,8 +15,9 @@ interface IUserResolver
      * Returns the ids of users who are in this article's audience
      *
      * @param \Schoolbox\Comms\News\Model $article
+     * @param bool $excludeMuted
      * @return int[]
      */
-    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article): array;
+    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article, bool $excludeMuted = false): array;
 
 }
