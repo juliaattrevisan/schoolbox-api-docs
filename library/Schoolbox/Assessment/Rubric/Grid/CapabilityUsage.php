@@ -99,8 +99,6 @@ class CapabilityUsage
      * Differs from `getMaxValue` in that this is the inferred value from this
      * group's indicators, instead of the actually set value.
      *
-     * This value will never be less than 1, as it's used in order to scale the
-     * capability mark; if it were zero, capability marks would always be zero.
      *
      * @return float
      */
@@ -113,7 +111,7 @@ class CapabilityUsage
                 $maxValues[] = $maxValue;
             }
         }
-        return max(1, (!empty($maxValues) ? array_sum($maxValues) : 0));
+        return !empty($maxValues) ? array_sum($maxValues) : 0;
     }
 
 

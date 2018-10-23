@@ -202,19 +202,19 @@ class CapabilityUsage extends TestCase
 
         $capabilityUsage1 = new RubricGrid\CapabilityUsage($capability);
 
-        yield 'No indicators (min value: 1)' => [$capabilityUsage1, 1];
+        yield 'No indicators' => [$capabilityUsage1, 0];
 
 
         $capabilityUsage2                                             = new RubricGrid\CapabilityUsage($capability);
         $capabilityUsage2->getIndicatorUsages()[$indicator4->getId()] = $indicatorUsage4;
 
-        yield 'No indicators with descriptors (min value: 1)' => [$capabilityUsage2, 1];
+        yield 'No indicators with descriptors' => [$capabilityUsage2, 0];
 
 
         $capabilityUsage3                                             = new RubricGrid\CapabilityUsage($capability);
         $capabilityUsage3->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
 
-        yield 'No indicators with descriptors with marks (min value: 1)' => [$capabilityUsage3, 1];
+        yield 'No indicators with descriptors with marks' => [$capabilityUsage3, 0];
 
 
         $capabilityUsage4                                             = new RubricGrid\CapabilityUsage($capability);
@@ -367,7 +367,7 @@ class CapabilityUsage extends TestCase
         yield 'No max cap mark, no indicators' => [$capabilityUsage1, 0];
 
         $capabilityUsage2 = (new RubricGrid\CapabilityUsage($capability))->setMaxValue(10);
-        yield 'Max cap mark, no indicators' => [$capabilityUsage2, 10];
+        yield 'Max cap mark, no indicators' => [$capabilityUsage2, 0];
 
         $capabilityUsage3 = (new RubricGrid\CapabilityUsage($capability))->setMaxValue(16);
         $capabilityUsage3->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
@@ -391,7 +391,7 @@ class CapabilityUsage extends TestCase
 
         $capabilityUsage7 = (new RubricGrid\CapabilityUsage($capability))->setMaxValue(24);
         $capabilityUsage7->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
-        yield 'Max cap mark, no indicators with values' => [$capabilityUsage7, 24];
+        yield 'Max cap mark, no indicators with values' => [$capabilityUsage7, 0];
     }
 
 
