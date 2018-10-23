@@ -150,10 +150,7 @@ class Dehydrator
             'weight'         => $assessment->getWeight(),
             'markVisibility' => $assessment->getMarkVisibility(),
             'workType'       => $assessment->getWorkType()
-                ? [
-                    'id'   => $assessment->getWorkType()->getId(),
-                    'name' => $assessment->getWorkType()->getName(),
-                ]
+                ? $assessment->getWorkType()->getId()
                 : null,
         ];
 

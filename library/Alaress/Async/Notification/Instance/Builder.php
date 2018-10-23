@@ -10,6 +10,7 @@
 namespace Alaress\Async\Notification\Instance;
 
 use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Html\ToText as Html2Text;
 use InvalidArgumentException;
 use OutOfBoundsException;
@@ -109,6 +110,18 @@ class Builder implements BuilderInterface
 		$this->href = $href;
 		return $this;
 	}
+
+
+	public function fillParams() {
+	    if (empty($this->title)) {
+	        return;
+        }
+        if (preg_match_all('`:([A-Za-z_]\w*)`', $this->title, $matches)) {
+            foreach ($matches[1] as $match) {
+                $this->setParam($match, new Param(''));
+            }
+        }
+    }
 
 
 	/**

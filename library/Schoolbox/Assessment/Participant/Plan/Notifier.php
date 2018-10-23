@@ -24,6 +24,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizFeedbackMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Permission\Access\Access;
@@ -55,6 +56,15 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private const TRIGGER_UPCOMING = 'upcoming';
     private const TRIGGER_OVERDUE  = 'overdue';
     private const TRIGGER_CLOSED   = 'closed';
+
+    private const PATTERN_OPEN_PARENT_TITLE     = ':boxType :assessment opened in :cat for :child';
+    private const PATTERN_OPEN_STAFF_TITLE     = ':assessment has opened for %d student%s';
+    private const PATTERN_OPEN_STUDENT_TITLE = ':boxType :assessment opened in :cat';
+    private const PATTERN_UPDATED_TITLE  = 'updated';
+    private const PATTERN_UPCOMING_TITLE = 'upcoming';
+    private const PATTERN_OVERDUE_TITLE  = 'overdue';
+    private const PATTERN_CLOSED_TITLE   = 'closed';
+
 
     /**
      * Hours in advance to inform a user that due work is upcoming.
@@ -89,6 +99,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @var QuizFeedbackMapper
      */
     private $quizFeedbackMapper;
+
+    /**
+     * @var WorkTypeMapper;
+     */
+    private $workTypeMapper;
 
     /**
      * Irrelevant as this could notify about different things, but must exist.
@@ -152,6 +167,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         if (empty($dependencies['quizFeedbackMapper'])) {
             $dependencies['quizFeedbackMapper'] = QuizFeedbackMapper::getInstance();
         }
+        if (empty($dependencies['workTypeMapper'])) {
+            $dependencies['workTypeMapper'] = WorkTypeMapper::getInstance();
+        }
         parent::loadDependencies($dependencies);
     }
 
@@ -194,14 +212,24 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $method = $bundle->getMethod();
 
         $diff = $bundle->getEvent()->getDiff();
-        $changedToInvisible = (\array_key_exists('assessment', $diff)
-            && \array_key_exists('workType', $diff['assessment'])
-            && $assessment->getWorkType()
-            && $assessment->getWorkType()->isStaffOrInstructorVisibleOnly());
-        // TODO: This is not working
 
-        if ($method === Mapper::METHOD_DELETE || $changedToInvisible) {
-            // TODO: retract?
+        // "hidden" here means that the assessment is visible to staff or instructor only
+        $changedToHidden = false;
+        if ($method === Mapper::METHOD_UPDATE
+            && \array_key_exists('assessment', $diff)
+            && \array_key_exists('workType', $diff['assessment'])) {
+            try {
+                $isPreviousHidden = $diff['assessment']['workType'][1] === null ? false :
+                    $this->workTypeMapper->findById(intval($diff['assessment']['workType'][1]))->isStaffOrInstructorVisibleOnly();
+                $isCurrentHidden = $assessment->getWorkType() === null ? false :
+                    $this->workTypeMapper->findById($assessment->getWorkType()->getId())->isStaffOrInstructorVisibleOnly();
+                $changedToHidden = $isCurrentHidden && !$isPreviousHidden;
+            } catch (BaseMapper\Exception $e) {
+                // noop;
+            }
+        }
+
+        if ($method === Mapper::METHOD_DELETE || $changedToHidden) {
             $bundle->detachEach([
                 self::TRIGGER_OPEN,
                 self::TRIGGER_UPCOMING,
@@ -209,6 +237,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 self::TRIGGER_OVERDUE,
                 self::TRIGGER_CLOSED,
             ]);
+            // trigger to retract existing notifications
+            $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
 
             return;
         }
@@ -457,14 +487,15 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
             $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                        ->setTitle("$boxType :assessment opened in :cat for :child");
+                        ->setTitle(self::PATTERN_OPEN_PARENT_TITLE)
+                        ->setParam('boxType', new Param($boxType));
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
 
         // For feed only: build for staff
         if ($forFeed && $participantCount > 0) {
             $title = sprintf(
-                ":assessment has opened for %d student%s",
+                self::PATTERN_OPEN_STAFF_TITLE,
                 $participantCount,
                 $participantCount === 1 ? '' : 's'
             );
@@ -516,7 +547,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         $bob = $this->buildGenericBuilder($assessment)
-                    ->setTitle("$boxType :assessment opened in :cat")
+                    ->setTitle(self::PATTERN_OPEN_STUDENT_TITLE)
+                    ->setParam('boxType', new Param($boxType))
                     ->addTopic("$topicStub.$topicSuffix")
                     ->setSeverity(Logger::NOTICE);
         $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
@@ -969,6 +1001,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         return $envelope;
     }
 
+    /**
+     * Retracts a deleted/hidden plan.
+     *
+     * @param Model $plan
+     * @return Envelope
+     */
+    public function notifyDeleted(Model $plan, User $effector, array $diff = null): Envelope
+    {
+        $envelope  = new Envelope();
+        return $this->retract($envelope, $plan, $effector, $diff);
+    }
 
     /**
      * Convenience helper to build a route to the status page.
@@ -1035,6 +1078,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     }
 
     /**
+     * @param WorkTypeMapper $workTypeMapper
+     * @return static
+     */
+    protected function setWorkTypeMapper(WorkTypeMapper $workTypeMapper): self
+    {
+        $this->workTypeMapper = $workTypeMapper;
+        return $this;
+    }
+
+
+    /**
      * Get the first non-null date in `$dates`, or null otherwise.
      *
      * Currently only needed for triggering a bundle for a plan.
@@ -1077,7 +1131,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private function retrieveAssessmentTopicStub(IAssessable $assessment): ?string
     {
-        $dataModel = $this->assessmentMapper->findById($assessment->getId());
+        try {
+            $dataModel = $this->assessmentMapper->findById($assessment->getId());
+        } catch (BaseMapper\Exception\Deleted $e) {
+            $dataModel = $e->getDeletedObject();
+        }
         if ($dataModel->getDueWork()) {
             return "duework." . $dataModel->getDueWork()->getId();
         }
@@ -1246,4 +1304,48 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         return !($this->conf->get('restrict_student_submissions') || $this->conf->get('restrict_parent_duework_access'));
     }
+
+
+    /**
+     * Retracts a given article.
+     *
+     * @param Envelope $envelope
+     * @param Model $plan
+     * @return Envelope
+     */
+    private function retract(Envelope $envelope, Model $plan, User $effector, array $diff = null): Envelope
+    {
+
+        try {
+            $assessment = $this->assessmentDataSource->findByIdForReview($plan->getAssessment()->getId());
+        } catch (BaseMapper\Exception\Deleted $e) {
+            $assessment = $e->getDeletedObject();
+        }
+        if ($assessment instanceof DueWork) {
+            $topicSuffix = "open";
+        }
+        if ($assessment instanceof Quiz) {
+            $topicSuffix = "upcoming";
+        }
+        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
+
+        if (!isset($topicStub)) {
+            return $envelope;
+        }
+
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
+
+            $bob = new Builder(false);
+            $href = $this->buildParticipantRoute($assessment, $participant->getUser());
+            $bob->setTitle(self::PATTERN_OPEN_STUDENT_TITLE)
+                ->setHref($href)
+                ->addTopic("user.{$participant->getUser()->getId()}.$topicStub.$topicSuffix");
+            $bob->fillParams();
+            $envelope->retractAllLike($bob->build());
+        }
+
+        // Only broadcast to superusers as there's no system channel
+        return $envelope;
+    }
+
 }
