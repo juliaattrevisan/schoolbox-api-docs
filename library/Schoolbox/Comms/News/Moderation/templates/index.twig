@@ -8,10 +8,10 @@
 {% block newsContent %}
     <dl class="tabs" data-tab>
         <dd class="active">
-            <a href="#awaiting-acceptance">Awaiting Acceptance</a>
+            <a href="#awaiting-acceptance">Requiring Moderation</a>
         </dd>
         <dd>
-            <a href="#accepted-articles">Recently Accepted</a>
+            <a href="#accepted-articles">Recently Approved</a>
         </dd>
         <dd {{ selected|purify }}>
             <a href="#rejected-articles">Recently Rejected</a>
@@ -30,7 +30,7 @@
                             <div class="list-item">
                                 <div class="small-12 card">
                                     <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
-                                    <p class="meta">Published by
+                                    <p class="meta">Submitted by
 
                                         {% if article.author.deletedAt.isNull %}
                                             <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
@@ -75,7 +75,7 @@
                         <div class="list-item">
                             <div class="small-12 card">
                                 <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
-                                <p class="meta">Published by
+                                <p class="meta">Submitted by
                                     {% if article.author.deletedAt.isNull %}
                                         <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
                                     {% else %}
@@ -84,7 +84,7 @@
                                     <time title="{{ article.createdAt.long }}">{{ article.createdAt.relativeTime }}</time>
                                 </p>
 
-                                <p class="meta">Accepted by
+                                <p class="meta">Approved by
                                     {% if article.acceptedBy.deletedAt.isNull %}
                                         <a href="/search/user/{{ article.acceptedBy.id }}" title="View Profile">{{ article.acceptedBy.fullname }}</a>
                                     {% else %}
@@ -127,7 +127,7 @@
                             <div class="list-item">
                                 <div class="small-12 card">
                                     <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}">{{ article.title }}</a></h3>
-                                    <p class="meta">Published by
+                                    <p class="meta">Submitted by
 
                                         {% if article.author.deletedAt.isNull %}
                                             <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
