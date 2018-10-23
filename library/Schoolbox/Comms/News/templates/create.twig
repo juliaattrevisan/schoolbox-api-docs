@@ -66,7 +66,7 @@
     }
 } %}
 
-{% set audienceIsReadOnly = article.isApproved %}
+{% set audienceIsReadOnly = article.isApproved%}
 
 {% if not audienceIsReadOnly %}
 {# Build Placeholder text #}
@@ -159,12 +159,12 @@
                             {% if not audienceIsReadOnly %}
                             Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of available options.
                             {% else %}
-                                This audience can no longer be updated because the article is published. If you wish to update the audience.
-                                {% set unpublishLabel = 'Unpublish this ' ~ locale.news %}
+                                This audience can no longer be updated because the article is published. If you wish to update the audience,
+                                {% set unpublishLabel = 'unpublish this ' ~ locale.news %}
                                 {% if rejectRoute %}
-                                    <a id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ unpublishLabel }}</a>
+                                    <a id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ unpublishLabel }}.</a>
                                 {% else %}
-                                    {{ unpublishLabel }}
+                                    {{ unpublishLabel }}.
                                 {% endif %}
                             {% endif %}
                         </p>
@@ -386,7 +386,7 @@
     'use strict';
     // HTML template for rendering audience audienceSelectize dropdown options.
     var $audienceSelectizeItemTemplate = $('#audience-selectize-dropdown-option').detach();
-    var audienceIsReadOnly = {{ audienceIsReadOnly }};
+    var audienceIsReadOnly = {{ audienceIsReadOnly ? 1 : 0 }};
 
     $(function () {
         {# CKEditors #}
