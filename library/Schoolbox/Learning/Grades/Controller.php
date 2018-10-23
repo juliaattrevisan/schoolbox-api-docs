@@ -439,7 +439,18 @@ class Controller extends Base
         $assessments = $this
             ->findByFiltersWithParticipants($filters, $viewee, $canSeeGraph)
             ->filter(function (IAssessable $a) use ($visibility) {
-                return $visibility->isVisibleToUser($a, $this->getUser(), true);
+                $viewer = $this->getUser();
+                if ($visibility->isVisibleToUser($a, $viewer, true)) {
+                    return true;
+                }
+                if ($viewer->getRole()->isParent()) {
+                    foreach ($viewer->getChildren() as $child) {
+                        if ($visibility->isVisibleToUser($a, $child, true)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
             });
 
         // Only show the "send to showcase" trophy button to teachers and students, not parents
