@@ -60,7 +60,7 @@
                            id="group-{{ capabilityId }}-mark"
                            type="tel"
                            name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                           value="{{ capabilityScaledMark }}"/> / {{ capabilityMaxValue }}
+                           value="{{ capabilityMark.value }}"/> / {{ capabilityMaxValue }}
 
                 {% elseif markType.mode == 'letter' %}
                     <select data-group-mark
@@ -83,19 +83,19 @@
                            id="group-{{ capabilityId }}-mark"
                            type="tel"
                            name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
-                           value="{{ capabilityMark.retrieveNormalizedMark  }}"/> %
+                           value="{{ capabilityMark.retrieveNormalizedMark | round(2) }}"/> %
                 {% endif %}
 
                 {% if groupUsage.containsDescriptorsWithValue %}
                     <a data-use-descriptor-values class="fieldAssign">Assign <span class="descriptor-sum" data-group-descriptor-sum>
                         {% if markType.mode == 'raw' %}
-                            {{ capabilityScaledMark }}
+                            {{ capabilityMark.value }}
 
                         {% elseif markType.mode == 'letter' %}
                             {{ letterGradeValue }}
 
                         {% elseif markType.mode == 'percent' %}
-                            {{ capabilityMark.retrieveNormalizedMark  }}
+                            {{ capabilityMark.retrieveNormalizedMark | round(2)  }}
 
                         {% endif %}
                         </span> from descriptors</a>

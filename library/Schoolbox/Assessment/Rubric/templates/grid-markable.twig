@@ -202,55 +202,6 @@
             })
         }
 
-        // Calculate the sum of selected descriptors on page load,
-        // so we can render the correct value in the Assign From Descs button text
-        // This cannot come from twig because the twig data only includes the actual mark given,
-        // which may have been customised using mark-per-cap discretion
-        function initialiseAssignFromDescs() {
-            var $groups = $rb.find("[data-group-summary]");
-
-            $groups.each(function() {
-                var groupId  = $(this).attr('data-group-id');
-                var rubricId = $(this).attr('data-rubric-id');
-                var rowSelector = '[data-group="rb-' + rubricId + '-' + groupId + '"]';
-                var $groupRows = $(rowSelector);
-                var $descriptorCheckboxes = $groupRows.find('input');
-
-                var descriptorSum = scale($(this), summateDescriptors($descriptorCheckboxes));
-
-                switch(markType) {
-                    case 'raw':
-                        // Simply use the number as-is
-                        $(this).find("[data-group-descriptor-sum]").text(descriptorSum);
-                        break;
-
-                    case 'letter':
-                        // Turn the numeric value into a letter grade
-                        // Don't use scaled values when working with percentages
-                        descriptorSum = summateDescriptors($descriptorCheckboxes);
-                        var percentage = getPercentage($(this), descriptorSum);
-                        $(this).find("[data-group-descriptor-sum]").text(
-                            getLetterGradeFromNumeric( percentage, getLetterGrades($(this).find("[data-group-mark]")) )
-                        );
-                        break;
-
-                    case 'percent':
-                        // Turn the numeric value into a percentage and append percent sign]
-                        // Don't use scaled values when working with percentages
-                        descriptorSum = summateDescriptors($descriptorCheckboxes);
-                        var percentage = getPercentage($(this), descriptorSum);
-                        $(this).find("[data-group-descriptor-sum]").text(percentage + "%");
-                        break;
-
-                    default:
-                        // TODO
-                        // We have a "none" mark type
-                }
-
-            })
-        }
-
-        initialiseAssignFromDescs();
         disableEnableAssignFromDescs();
 
         // initialise dynamic mark display
@@ -273,12 +224,15 @@
                 var $groupSummary = $rb.find(groupSummarySelector);
                 var $descriptorCheckboxes = $groupRows.find('input');
 
-                var scaledGroupMark =scale($groupSummary, summateDescriptors($descriptorCheckboxes));
-                var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
+                var indicatorMark = summateDescriptors($descriptorCheckboxes);
+                if (indicatorMark > 0) {
+                    var scaledGroupMark = scale($groupSummary, indicatorMark);
+                    var unscaledGroupMark = scaledGroupMark;
 
-                $groupSummary.attr('data-scaled-mark', scaledGroupMark);
-                $groupSummary.attr('data-mark', unscaledGroupMark);
-                $groupSummary.find('[data-db-mark]').val(unscaledGroupMark);
+                    $groupSummary.attr('data-scaled-mark', scaledGroupMark);
+                    $groupSummary.attr('data-mark', unscaledGroupMark);
+                    $groupSummary.find('[data-db-mark]').val(unscaledGroupMark);
+                }
 
                 // Update button text with mark calculated from descriptors
                 switch(markType) {
@@ -387,13 +341,17 @@
                 switch (markType) {
                     case 'raw':
                         // We got a scaled numeric mark. We need to make it unscaled.
-                        normalised = customMark * (rowMaxSum / capMax);
+                        //if (rowMaxSum > 0) {
+                        //    normalised = customMark * (rowMaxSum / capMax);
+                        //} else {
+                            normalised = customMark;
+                        //}
                         break;
 
                     case 'letter':
                     case 'percent':
                         // What is x percent of the total possible (unscaled) marks?
-                        normalised = customMark * (rowMaxSum / 100);
+                        normalised = customMark * (capMax / 100);
                         break;
 
                     default:
@@ -419,7 +377,7 @@
 
             var $descriptorCheckboxes = $groupRows.find('input');
             var scaledGroupMark = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
-            var unscaledGroupMark = summateDescriptors($descriptorCheckboxes);
+            var unscaledGroupMark = scaledGroupMark;
 
             $groupSummary.attr('data-scaled-mark', scaledGroupMark);
             $groupSummary.attr('data-mark', unscaledGroupMark);
@@ -509,8 +467,13 @@
 
         // Turn a specified value into a percentage of the max marks for a group
         function getPercentage($groupSummary, value) {
-            var floatValue = parseFloat(value).toFixed(2);
-            var percentage = $groupSummary.attr('data-row-max-sum') > 0 ? floatValue * (100 / $groupSummary.attr('data-row-max-sum')) : 0;
+                var floatValue = parseFloat(value).toFixed(2);
+            if (!isNaN(floatValue)) {
+                var percentage = $groupSummary.attr('data-max') > 0 ? floatValue * (100 / $groupSummary.attr('data-max')) : 0;
+            }
+            else {
+                var percentage = 0;
+            }
 
             // Known bug: due to javascript rounding errors, with some values the percentage will wrongly be identified as not divisible by 1
             if (percentage % 1 !== 0) {
@@ -552,7 +515,12 @@
             var groupMax = $groupSummary.attr('data-max');
             var groupRowMaxSum = $groupSummary.attr('data-row-max-sum');
 
-            var scaledGroupSum = value * (groupMax / groupRowMaxSum);
+            if (groupRowMaxSum > 0) {
+                var scaledGroupSum = value * (groupMax / groupRowMaxSum);
+            }
+            else {
+                var scaledGroupSum = value;
+            }
 
             if(scaledGroupSum % 1 != 0){
                 scaledGroupSum = scaledGroupSum.toFixed(2);
