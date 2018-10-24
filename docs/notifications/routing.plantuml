@@ -1,0 +1,57 @@
+@startuml
+
+participant "Router\n<size:10>//\Schoolbox\Realtime\Routing\Subscription\Handler//</size>" as Router
+participant "RouterMessageBroker\n<size:10>//\Schoolbox\Realtime\Routing\Broker//</size>" as RouterMessageBroker
+participant "RouterSignalQueue\n<size:10>//\Alaress\Redis\Async\Client//</size>" as RouterSignalQueue
+participant "Resolver\n<size:10>//\Schoolbox\Realtime\Routing\Subscription\Resolver//</size>" as Resolver
+participant "RouterTransmitterReceiver\n<size:10>//\Schoolbox\Realtime\Routing\RouteTXRX//</size>" as RouterTransmitterReceiver
+'participant "RouterTransaction\n<size:10>//\Alaress\WorkerCrew\Transaction\DispatchTransaction//</size>" as RouterTransaction
+'participant "Dispatcher\n<size:10>//\Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy//</size>" as Dispatcher
+participant "Worker\n<size:10>//\Schoolbox\Realtime\Routing\Worker//</size>" as Worker
+participant "QueueSorter\n<size:10>//\Schoolbox\Realtime\Routing\QueueSorter//</size>" as QueueSorter
+participant "PermissionMapper\n<size:10>//\Schoolbox\Realtime\Message\RoutePermissionMapper//</size>" as PermissionMapper
+participant "DeliveryQueue\n<size:10>//\Alaress\Async\Queue\QueueInterface//</size>" as DeliveryQueue
+
+
+
+==Startup==
+
+Router -> RouterMessageBroker : registerConsumer()
+Router -> RouterSignalQueue : psubscribe()
+
+==On consume from RouterMessageBroker==
+
+Router <- RouterMessageBroker : onMessage()
+Router <- Router : handleMessage()
+Router <-> Resolver : getSubscribedUserIds()
+
+Router -> RouterMessageBroker : acknowledge()
+Router -> RouterTransmitterReceiver : send()
+
+' something about a transaction
+'RouterTransmitterReceiver -> RouterTransaction : put()
+
+' there's a whole heap of intermediary classes between the router and the dispatcher
+
+' Massive missing piece: the route trie
+' that deserves its own document
+
+group Worker Process
+RouterTransmitterReceiver <- Worker : receive()
+RouterTransmitterReceiver -> QueueSorter : process()
+note left
+    process knows to whom messages are sent:
+    its job is to determine the delivery mechanism
+    through which they're sent.
+end note
+QueueSorter <-> PermissionMapper : getReroutedLevel()
+QueueSorter -> DeliveryQueue : push()
+note left
+    getReroutedLevel is used to determine exactly
+    which DeliveryQueue instance is pushed to,
+    and therefore the delivery mechanism for the
+    message.
+end note
+end group
+
+@enduml

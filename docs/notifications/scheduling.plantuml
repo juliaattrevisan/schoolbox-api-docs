@@ -1,0 +1,71 @@
+@startuml
+
+participant "Scheduler\n<size:10>//\Schoolbox\Realtime\Schedule\Scheduler//</size>" as Scheduler
+participant "ScheduleMessageBroker\n<size:10>//\Schoolbox\Realtime\Schedule\Broker//</size>" as ScheduleMessageBroker
+participant "RouterMessageBroker\n<size:10>//\Schoolbox\Realtime\Routing\Broker//</size>" as RouterMessageBroker
+participant "ScheduleSignalQueue\n<size:10>//\Alaress\Redis\Async\Client//</size>" as ScheduleSignalQueue
+participant "EventLoop\n<size:10>//\React\EventLoop\LoopInterface//</size>" as EventLoop
+participant "Dispatcher\n<size:10>//\Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy//</size>" as Dispatcher
+participant "WorkerPool\n<size:10>//\Alaress\WorkerCrew\PoolInterface//</size>" as WorkerPool
+participant "Worker\n<size:10>//\Alaress\WorkerCrew\Worker\Worker//</size>" as Worker
+participant "Notifier\n<size:10>//\Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface//</size>" as Notifier
+participant "Envelope\n<size:10>//\Schoolbox\Realtime\Notification\Envelope//</size>" as Envelope
+
+==Startup==
+
+Scheduler -> ScheduleMessageBroker : registerConsumer()
+Scheduler -> ScheduleSignalQueue : psubscribe()
+
+==On consume from ScheduleMessageBroker==
+
+' Workflow on receive msg from msg broker
+Scheduler <- ScheduleMessageBroker : onMessage()
+'Scheduler -> Scheduler : scheduleNotification()
+'Scheduler -> Scheduler : schedule()
+
+alt notification is in future
+Scheduler -> EventLoop : addTimer()
+...
+Scheduler <- EventLoop : callback
+end
+note right
+    The notification may be
+    dispatched immediately,
+    or deferred until its
+    trigger time.
+end note
+
+'Scheduler -> Scheduler : dispatchTrigger()
+Scheduler -> Dispatcher : enqueue()
+'Dispatcher -> Dispatcher : dispatch()
+Dispatcher -> WorkerPool : accept()
+'WorkerPool -> WorkerPool : attachWorker()
+note left
+    The WorkerPool is listening on
+    the Worker's output streams.
+end note
+WorkerPool -> Worker : setTask()
+
+group Worker Process
+Worker -> Notifier : notify{roleType}{action}()
+Notifier -> Envelope : __construct()
+end group
+
+Scheduler <- WorkerPool : handleResponse()
+note right
+    The WorkerPool determined from the Worker's
+    output stream that the command finished.
+end note
+
+Scheduler -> RouterMessageBroker : publish()
+
+==On receive from ScheduleSignalQueue==
+
+Scheduler <- ScheduleSignalQueue : handle()
+Scheduler -> Scheduler : onHangup()
+note right
+    onHangup releases any workers in
+    the Scheduler's WorkerPool.
+end note
+
+@enduml

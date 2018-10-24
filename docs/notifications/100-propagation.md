@@ -156,7 +156,10 @@ system (such as the digest, or web-app notifications); the delivery system
 doesn't know that the object has been deleted, and will therefore send
 notifications that reference deleted objects.
 
-A solution to this limitation is being considered.
+If a notification needs to be retracted from the router completely, it can be
+retracted by issuing a retraction in a `notify` method of the notifier.
+(This is a responsibility of the scheduling sub-system, and will be documented
+there.)
 
 
 ### `\Alaress\Async\Broker\IBroker::publish`
