@@ -80,8 +80,6 @@ class Decorator implements DecoratorInterface
             $assessment->setAcceptsMultiple();
         }
 
-        $assessment->setMaxMark($this->getMaxMark());
-
         /* TODO: Replace old classes and stuff?
          */
         $gradingGroup = new \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model();
@@ -122,6 +120,9 @@ class Decorator implements DecoratorInterface
             // the max mark from its capabilities
             $markMax = $newGrid->calculateMaxValueFromCapabilities();
             $assessment->setMaxMark($markMax);
+        } else {
+            // The max mark is always whatever got sent in the form
+            $assessment->setMaxMark($this->getMaxMark());
         }
 
         // Only spawn the mark scheme after the max mark is finalized
