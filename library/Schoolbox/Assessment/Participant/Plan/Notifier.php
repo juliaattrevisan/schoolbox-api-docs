@@ -62,11 +62,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private const PATTERN_OPEN_STUDENT_TITLE = ':boxType :assessment opened in :cat';
     private const PATTERN_OPEN_PARENT_TITLE = ':boxType :assessment opened in :cat for :child';
 
-    private const PATTERN_UPCOMING_DUEWORK_STUDENT_TITLE = 'You have :when left to submit :assessment in :cat';
-    private const PATTERN_UPCOMING_DUEWORK_PARENT_TITLE = ':child has :when left to submit :assessment in :cat';
-
-    private const PATTERN_UPCOMING_QUIZ_STUDENT_TITLE = 'You have :when left to attempt :assessment in :cat';
-    private const PATTERN_UPCOMING_QUIZ_PARENT_TITLE = ':child has :when left to attempt :assessment in :cat';
+    private const PATTERN_UPCOMING_STUDENT_TITLE = 'You have :when left to :verb :assessment in :cat';
+    private const PATTERN_UPCOMING_PARENT_TITLE = ':child has :when left to :verb :assessment in :cat';
 
     private const PATTERN_OVERDUE_DUEWORK_STUDENT_TITLE = ':assessment is now overdue in :cat';
     private const PATTERN_OVERDUE_DUEWORK_PARENT_TITLE = ':child did not submit work for :assessment in :cat';
@@ -221,7 +218,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function bundleTriggers($bundle): void
     {
-        //TODO: updating an assessment executes post update method twice??
+        //TODO: This happens to be triggered more than once - the number of plans associated with the assessment.
 
         /** @var Model $plan */
         $plan = $bundle->getEvent()->getObject();
@@ -654,6 +651,13 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         $assessment = $this->retrieveAssessmentDomainModel($plan);
         $envelope   = new Envelope();
+        if ($assessment instanceof DueWork) {
+            $verb = 'submit';
+        } elseif ($assessment instanceof Quiz) {
+            $verb = 'attempt';
+        } else {
+            return $envelope;
+        }
         $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
             return $envelope;
@@ -664,7 +668,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         $bob = $this->buildGenericBuilder($assessment)
                     ->setSeverity(Logger::WARNING)
-                    ->addTopic("$topicStub.upcoming");
+                    ->addTopic("$topicStub.upcoming")
+                    ->setParam('verb', new Param($verb, null, Param::STACKING_APPEND));
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
@@ -674,19 +679,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // Title varies for due work and quiz
             $when = $participant->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
-            if ($assessment instanceof DueWork) {
-                $studentTitle = self::PATTERN_UPCOMING_DUEWORK_STUDENT_TITLE;
-                $parentTitle  = self::PATTERN_UPCOMING_DUEWORK_PARENT_TITLE;
-            } elseif ($assessment instanceof Quiz) {
-                $studentTitle = self::PATTERN_UPCOMING_QUIZ_STUDENT_TITLE;
-                $parentTitle  = self::PATTERN_UPCOMING_QUIZ_PARENT_TITLE;
-            } else {
-                continue;
-            }
 
             // build for student
             $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                        ->setTitle($studentTitle)
+                        ->setTitle(self::PATTERN_UPCOMING_STUDENT_TITLE)
                         ->setParam('when', new Param($when))
                         ->setBody($participant->getDescription());
             $envelope->targetToUser($participant->getUser(), $bob->build());
@@ -696,7 +692,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
             $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                        ->setTitle($parentTitle)
+                        ->setTitle(self::PATTERN_UPCOMING_PARENT_TITLE)
                         ->setParam('when', new Param($when));
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
@@ -1026,7 +1022,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                                    ->setTitle(self::PATTERN_DATE_CHANGED_STUDENT_TITLE)
                                    ->setParam('date', new Param($dateformat))
                                    ->setParam('boxType', new Param($boxType))
-                                   ->setParam('verb', new Param($verb))
+                                   ->setParam('verb', new Param($verb, null, Param::STACKING_APPEND))
                                    ->setTopics(["$topicStub.$suffix"]);
                     $envelope->targetToUser($participant->getUser(), $bob->build());
 
@@ -1035,7 +1031,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                         $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                                     ->setTitle(self::PATTERN_DATE_CHANGED_PARENT_TITLE)
                                     ->setParam('boxType', new Param($parentBoxType))
-                                    ->setParam('verb', new Param($verb));
+                                    ->setParam('verb', new Param($verb, null, Param::STACKING_APPEND));
                         $envelope->targetToParent($participant->getUser(), $bob->build());
                     }
 
@@ -1421,10 +1417,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $titles = [
             self::PATTERN_OPEN_STUDENT_TITLE,
             self::PATTERN_OPEN_PARENT_TITLE,
-            self::PATTERN_UPCOMING_DUEWORK_STUDENT_TITLE,
-            self::PATTERN_UPCOMING_DUEWORK_PARENT_TITLE,
-            self::PATTERN_UPCOMING_QUIZ_STUDENT_TITLE,
-            self::PATTERN_UPCOMING_QUIZ_PARENT_TITLE,
+            self::PATTERN_UPCOMING_STUDENT_TITLE,
+            self::PATTERN_UPCOMING_PARENT_TITLE,
             self::PATTERN_OVERDUE_DUEWORK_STUDENT_TITLE,
             self::PATTERN_OVERDUE_DUEWORK_PARENT_TITLE,
             self::PATTERN_OVERDUE_QUIZ_STUDENT_TITLE,
