@@ -100,9 +100,9 @@ class StrategyFactory
 
 
     /**
-     * Indexed by entity type
+     * Grouped by by entity_type
      *
-     * @return string[]
+     * @return string[][]
      * @throws UnexpectedValueException
      * @throws UnknownEntityTypeException
      */
