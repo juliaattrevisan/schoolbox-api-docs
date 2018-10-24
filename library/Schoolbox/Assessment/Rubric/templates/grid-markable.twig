@@ -227,11 +227,10 @@
                 var indicatorMark = summateDescriptors($descriptorCheckboxes);
                 if (indicatorMark > 0) {
                     var scaledGroupMark = scale($groupSummary, indicatorMark);
-                    var unscaledGroupMark = scaledGroupMark;
 
                     $groupSummary.attr('data-scaled-mark', scaledGroupMark);
-                    $groupSummary.attr('data-mark', unscaledGroupMark);
-                    $groupSummary.find('[data-db-mark]').val(unscaledGroupMark);
+                    $groupSummary.attr('data-mark', scaledGroupMark);
+                    $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
                 }
 
                 // Update button text with mark calculated from descriptors
@@ -340,12 +339,7 @@
                 var rowCount = $groupRows.length;
                 switch (markType) {
                     case 'raw':
-                        // We got a scaled numeric mark. We need to make it unscaled.
-                        //if (rowMaxSum > 0) {
-                        //    normalised = customMark * (rowMaxSum / capMax);
-                        //} else {
-                            normalised = customMark;
-                        //}
+                        normalised = customMark;
                         break;
 
                     case 'letter':
@@ -377,11 +371,10 @@
 
             var $descriptorCheckboxes = $groupRows.find('input');
             var scaledGroupMark = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
-            var unscaledGroupMark = scaledGroupMark;
 
             $groupSummary.attr('data-scaled-mark', scaledGroupMark);
-            $groupSummary.attr('data-mark', unscaledGroupMark);
-            $groupSummary.find('[data-db-mark]').val(unscaledGroupMark);
+            $groupSummary.attr('data-mark', scaledGroupMark);
+            $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
 
             switch(markType) {
                 case 'raw':
