@@ -80,9 +80,9 @@ class CapabilityMark
      */
     public function calculateScaledMark(): float
     {
-        // If a capability mark has been provided and is non-zero, use it to scale the given marks
-        if (null !== $this->value & $this->value > 0) {
-            return $this->value * $this->capabilityUsage->calculateMarkMultiplier();
+        // If a capability mark has been provided, use it
+        if (null !== $this->value) {
+            return $this->value;
         }
 
         // Otherwise, just use the given marks directly
