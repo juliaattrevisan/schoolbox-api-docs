@@ -46,7 +46,7 @@ class Results implements Searchable
     /**
      * Registry of mappers
      *
-     * @var Collection
+     * @var Collection|Definition[]
      */
     private $registry;
 

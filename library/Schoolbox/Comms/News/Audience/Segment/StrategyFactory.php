@@ -43,6 +43,9 @@ class StrategyFactory
     /** @var bool */
     private $moderationRequired;
 
+    /** @var bool */
+    private $canTargetTeachersOfUsersInFolder;
+
     /**
      * Cache the strategies so repeated calls to make() for the same strat will return the same instance
      *
@@ -55,6 +58,7 @@ class StrategyFactory
      * @param UserAccessMapper $userAccessMapper
      * @param bool             $staffCanPost
      * @param bool             $moderationRequired
+     * @param bool             $canTargetTeachersOfUsersInFolder
      * @param Folder\Mapper    $folderMapper
      * @param RoleAccessMapper $roleAccessMapper
      * @param Access           $access
@@ -63,16 +67,18 @@ class StrategyFactory
         UserAccessMapper $userAccessMapper,
         bool $staffCanPost,
         bool $moderationRequired,
+        bool $canTargetTeachersOfUsersInFolder,
         Folder\Mapper $folderMapper,
         RoleAccessMapper $roleAccessMapper,
         Access $access
     ) {
-        $this->userAccessMapper   = $userAccessMapper;
-        $this->staffCanPost       = $staffCanPost;
-        $this->moderationRequired = $moderationRequired;
-        $this->folderMapper       = $folderMapper;
-        $this->roleAccessMapper   = $roleAccessMapper;
-        $this->access             = $access;
+        $this->userAccessMapper                 = $userAccessMapper;
+        $this->staffCanPost                     = $staffCanPost;
+        $this->moderationRequired               = $moderationRequired;
+        $this->canTargetTeachersOfUsersInFolder = $canTargetTeachersOfUsersInFolder;
+        $this->folderMapper                     = $folderMapper;
+        $this->roleAccessMapper                 = $roleAccessMapper;
+        $this->access                           = $access;
     }
 
 
@@ -218,6 +224,7 @@ class StrategyFactory
                     $this->userAccessMapper,
                     $this->staffCanPost,
                     $this->moderationRequired,
+                    $this->canTargetTeachersOfUsersInFolder,
                     $this->folderMapper,
                     $this->roleAccessMapper,
                     $this->access

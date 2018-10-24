@@ -425,10 +425,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         $userAccessMapper,
                         $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS),
                         $config->get(ConfigMapper::_GLOBAL_MODERATION),
+                        $config->get(ConfigMapper::_AUDIENCE_TO_FOLDER_TEACHERS),
                         $folderMapper,
                         $roleAccessMapper,
                         $access
-
                     );
                 }
             )
