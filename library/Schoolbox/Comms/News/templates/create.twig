@@ -194,7 +194,7 @@
                             </li>
                         </ul>
 
-                        <div class="input-group audience-selectize-group">
+                        <div class="input-group" id="audience-selectize-group">
                             <input type="text" id="audience-search" name="audience" placeholder="{{ audiencePlaceholder }}" required />
                             <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse&hellip;</button>
                         </div>
@@ -483,7 +483,7 @@
         if (audienceIsReadOnly) {
             var $unpublishButton = $('#unpublish-article');
             var unpublishVerb = 'Unpublish';
-            $('.audience-selectize-group').remove();
+            $('#audience-selectize-group').remove();
 
             $unpublishButton.click(function(event) {
                 event.preventDefault();
