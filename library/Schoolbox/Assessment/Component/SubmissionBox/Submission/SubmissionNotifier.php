@@ -45,6 +45,8 @@ class SubmissionNotifier extends AbstractModuleNotifier
     const TRIGGER_RESUBMITTED = 'resubmitted';
     const TRIGGER_DELETED     = 'deleted';
 
+    const PATTERN_DELETED_TITLE = ':owner removed your previous submission to :boxname in :catname, you can now resubmit';
+
     /** @var SubmissionBoxMapper */
     protected $submissionBoxMapper;
 
@@ -302,7 +304,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
 
         $bob = new Builder();
 
-        $bob->setTitle(":owner removed your previous submission to :boxname in :catname, you can now resubmit")
+        $bob->setTitle(self::PATTERN_DELETED_TITLE)
             ->setParams(
                 array(
                     'owner'   => new UserParam($user),

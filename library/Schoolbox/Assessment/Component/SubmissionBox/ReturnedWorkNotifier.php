@@ -35,6 +35,8 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
 {
 
     const TRIGGER_RETURNED = 'returned';
+    const PATTERN_MARKED_STUDENT_TITLE = ':teacher has marked your work for :boxname in :catname';
+    const PATTERN_MARKED_PARENT_TITLE = ':teacher has marked :student\'s work for :boxname in :catname';
 
     /** @var UserMapper */
     protected $userMapper;
@@ -52,8 +54,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      * Instantiate all your dependencies within yourself.
      *
      * @param mixed $dependencies
-     * @throws \Aura\Di\Exception\ServiceNotFound if somehow my assessment data
-     *                                            source wasn't found
+     * @throws \Aura\Di\Exception\ServiceNotFound if somehow my assessment data source wasn't found
      * @return void
      */
     public function loadDependencies($dependencies = null)
@@ -191,7 +192,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
                 ->setNamespace($this->getSlug())
                 ->addTopic("duework.$boxId.returned")
                 ->setSeverity(Logger::NOTICE)
-                ->setTitle(":teacher has marked your work for :boxname in :catname")
+                ->setTitle(self::PATTERN_MARKED_STUDENT_TITLE)
                 ->setHref($href)
                 ->setParam('teacher', new UserParam($effector))
                 ->setParam('boxname', new Param($boxName, "/learning/assessments/{$box->getAssessmentId()}/$studentId"))
@@ -211,7 +212,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
                 ->setNamespace($this->getSlug())
                 ->addTopic("duework.$boxId.returned")
                 ->setSeverity(Logger::NOTICE)
-                ->setTitle(":teacher has marked :student's work for :boxname in :catname")
+                ->setTitle(self::PATTERN_MARKED_PARENT_TITLE)
                 ->setHref($href)
                 ->setParam('teacher', new UserParam($effector))
                 ->setParam('student', new UserParam($student))
