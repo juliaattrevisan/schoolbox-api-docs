@@ -1180,7 +1180,7 @@ class Controller extends Base
         // Validate the audience segments
         if ($article->getAudience()->count()) {
             $validSegmentSpecFactory = new Audience\Validation\Factory(
-                $this->strategyFactory::getValidRelationshipModifiers(),
+                $this->strategyFactory->getValidRelationshipModifiers(),
                 $this->strategyFactory::getValidNullEntities()
             );
             $validSegmentSpec        = $validSegmentSpecFactory->makeValidSegmentSpecification();

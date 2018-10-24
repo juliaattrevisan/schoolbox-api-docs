@@ -345,13 +345,15 @@ abstract class AbstractBootstrap implements BootstrapInterface
                      * @var IConnector              $db
                      * @var External_UserInterface  $externalUser
                      * @var External_ClassInterface $externalClass
+                     * @var StrategyFactory         $strategyFactory
                      */
                     $db              = $di->get('databaseInternal');
                     $externalUser    = $di->get('externalUser');
                     $externalClass   = $di->get('externalClass');
+                    $strategyFactory = $di->get('commsNewsAudienceStrategyFactory');
                     $articleResolver = new News\Audience\ArticleResolver(
                         StrategyFactory::getValidNullEntities(),
-                        StrategyFactory::getValidRelationshipEntityMap(),
+                        $strategyFactory->getValidRelationshipEntityMap(),
                         $db,
                         $di->get('mapperFactory')->get(UserAccessMapper::class),
                         $di->get('mapperFactory')->get(Folder\Mapper::class),
