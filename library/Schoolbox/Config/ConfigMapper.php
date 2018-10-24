@@ -91,6 +91,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const _STAFF_CAN_POST_NEWS   = 'news_staff_post_enabled';
     public const _NEWS_EDIT_OTHERS      = 'news_edit_other';
     public const _BOARDER_LEAVE_ENABLED = 'boarder_leave_enabled';
+    public const _AUDIENCE_TO_FOLDER_TEACHERS = 'audience_to_folder_users_teachers';
 
     /** @var array */
     protected $cache = array();
