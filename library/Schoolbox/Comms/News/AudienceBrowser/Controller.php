@@ -90,7 +90,7 @@ class Controller extends Base
             $name         = $row['name'];
             $encodedValue = $codec->encodeValue($value);
 
-            foreach ($simpleStrategies[$entityType]::getValidRelationshipModifiers() as $modifier) {
+            foreach ($simpleStrategies[$entityType]->getValidRelationshipModifiers() as $modifier) {
                 $key = $codec->encodeSimpleAttributes($entityType, $value, $modifier);
                 $option = new Audience\SegmentSelectizeOption($key, $name);
                 $option->addLabel($entityType, $encodedValue, $name);
@@ -144,7 +144,7 @@ class Controller extends Base
         });
 
         $data = [
-            'availableModifiers' => $strategy::getValidRelationshipModifiers(),
+            'availableModifiers' => $strategy->getValidRelationshipModifiers(),
             'canTargetNull'      => $strategy->canAudienceToEntityValue($this->getUser(), NULL),
             'valueLabels'        => $valueLabels,
         ];

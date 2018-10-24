@@ -360,6 +360,7 @@ class Controller extends Base
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
      * @throws \DomainException
+     * @throws UnknownEntityTypeException
      */
     public function postUpdate(Model $article): void
     {
