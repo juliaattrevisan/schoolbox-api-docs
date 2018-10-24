@@ -44,6 +44,10 @@ class DehydratorTest extends TestCase
         'markVisibility' => true,
         'workType'       => true,
         'participants'   => true,
+        'publishDate'    => null,
+        'openDate'       => null,
+        'dueDate'        => null,
+        'closeDate'      => null,
     ];
 
     /**
@@ -80,6 +84,10 @@ class DehydratorTest extends TestCase
             'markVisibility' => $dueWork->getMarkVisibility(),
             'workType'       => null,
             'participants'   => [],
+            'publishDate'    => null,
+            'openDate'       => null,
+            'dueDate'        => null,
+            'closeDate'      => null,
         ];
         $actual = $this->dehydrator->dehydrateAssessment($dueWork);
         $this->assertEquals($expected, array_intersect_key($actual, $this->commonFields));
@@ -444,6 +452,10 @@ class DehydratorTest extends TestCase
                 'workType'          => null,
                 'acceptOnline'      => $dueWork->getAcceptOnline(),
                 'selfReviewability' => $dueWork->getSelfReviewability(),
+                'publishDate'       => $dueWork->getPublishAt()->getDatabase(),
+                'openDate'          => $dueWork->getOpenAt()->getDatabase(),
+                'dueDate'           => $dueWork->getDueAt()->getDatabase(),
+                'closeDate'         => $dueWork->getCloseAt()->getDatabase(),
             ],
         ];
 
@@ -466,6 +478,10 @@ class DehydratorTest extends TestCase
             'workType'          => null,
             'acceptOnline'      => DueWork::ACCEPT_ONLINE_MULTI,
             'selfReviewability' => SubmissionBox::SELF_REVIEWABILITY_NONE,
+            'publishDate'       => '2018-01-01 00:00:00',
+            'openDate'          => '2018-01-02 00:00:00',
+            'dueDate'           => '2018-01-03 00:00:00',
+            'closeDate'         => '2018-01-04 00:00:00',
         ];
         $expectedParticipants = [
             1 => [
@@ -547,6 +563,10 @@ class DehydratorTest extends TestCase
             'workType'          => null,
             'acceptOnline'      => DueWork::ACCEPT_ONLINE_MULTI,
             'selfReviewability' => SubmissionBox::SELF_REVIEWABILITY_NONE,
+            'publishDate'       => '2018-01-01 00:00:00',
+            'openDate'          => '2018-01-02 00:00:00',
+            'dueDate'           => '2018-01-03 00:00:00',
+            'closeDate'         => '2018-01-04 00:00:00',
         ];
         $expectedDynamicPlan = [
             'id'           => 1,
