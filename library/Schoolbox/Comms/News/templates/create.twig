@@ -506,7 +506,7 @@
                         $.ajax({
                             type: 'POST',
                             url: $element.attr('href'),
-                            data: {articleId: {{ article.id }}, rejectedReason: $('#rejectedReason').val()},
+                            data: {articleId: {{ article.id is defined ?: null }}, rejectedReason: $('#rejectedReason').val()},
                             dataType: 'json'
                         }).success(function (response) {
                             $toast.toastTimeout({
