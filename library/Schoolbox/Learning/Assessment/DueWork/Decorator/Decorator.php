@@ -80,8 +80,6 @@ class Decorator implements DecoratorInterface
             $assessment->setAcceptsMultiple();
         }
 
-        $assessment->setMaxMark($this->getMaxMark());
-
         /* TODO: Replace old classes and stuff?
          */
         $gradingGroup = new \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model();
@@ -94,11 +92,6 @@ class Decorator implements DecoratorInterface
         $markType = new \Schoolbox\Assessment\Component\SubmissionBox\MarkType();
         $markType->setId($this->getMarkType());
         $assessment->setMarkType($markType);
-
-        $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
-        $markScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
-
-        $assessment->setMarkScheme($markScheme);
 
         $assessment->setUseRubric($this->getUseRubric());
         $assessment->setMarkPerCapability($this->getMarkPerCapability());
@@ -123,10 +116,19 @@ class Decorator implements DecoratorInterface
             $newGrid = $gridFactory->buildFromPostData($existingGrid, $this->getRubricData());
             $assessment->setRubricGrid($newGrid);
 
-            // TODO validate here??
+            // The max mark for a rubric-using assessment is always the same as
+            // the max mark from its capabilities
             $markMax = $newGrid->calculateMaxValueFromCapabilities();
             $assessment->setMaxMark($markMax);
+        } else {
+            // The max mark is always whatever got sent in the form
+            $assessment->setMaxMark($this->getMaxMark());
         }
+
+        // Only spawn the mark scheme after the max mark is finalized
+        // (as it might have changed from what was submitted to the form)
+        $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
+        $assessment->setMarkScheme($markSchemeFactory->spawnMarkSchemeFor($assessment));
 
         /* If there were attachments, accumulate them
          * Otherwise set attachedFiles to an empty collection

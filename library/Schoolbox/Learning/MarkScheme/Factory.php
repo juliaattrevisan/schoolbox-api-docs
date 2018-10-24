@@ -48,16 +48,13 @@ class Factory
 
     /**
      * @param IAssessable $assessable
-     * @param float|null  $totalMark
      * @return null|IMarkScheme
      * @throws \DomainException If MarkType is invalid for the assessment
      * @throws \InvalidArgumentException If assessment class not registered
      * @throws \RangeException
      */
-    public function spawnMarkSchemeFor(
-        IAssessable $assessable,
-        ?float $totalMark = null
-    ): ?IMarkScheme {
+    public function spawnMarkSchemeFor(IAssessable $assessable): ?IMarkScheme
+    {
         $markType = $assessable->getMarkType();
         if (null === $markType) {
             return null;
@@ -69,7 +66,7 @@ class Factory
             return $this->spawnForQuiz($assessable);
         }
         if ($assessable instanceof DueWork) {
-            return $this->spawnForDueWork($assessable, $totalMark);
+            return $this->spawnForDueWork($assessable);
         }
         if ($assessable instanceof Project) {
             return $this->spawnForProject($assessable);
