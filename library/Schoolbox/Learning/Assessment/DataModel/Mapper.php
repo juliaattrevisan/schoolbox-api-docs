@@ -213,7 +213,7 @@ class Mapper extends BaseMapper
      * @param Builder $pb
      * @param User    $student
      * @param array   $options
-     * @return GenericCollection|IAssessable[]
+     * @return GenericCollection|IAssessable[] Indexed by assessment.id
      * @throws BaseMapper\DefinitionException
      */
     public function findByPredicatesForParticipant(Builder $pb, User $student, array $options = [])
@@ -221,7 +221,7 @@ class Mapper extends BaseMapper
         if (empty($options['order']['sequence'])) {
             $options['order']['sequence'] = 'asc';
         }
-        return $this->executeSelect($this->getSelectStringForParticipant($student), $this->getFromString(), $pb, [], $options);
+        return $this->executeSelect($this->getSelectStringForParticipant($student), $this->getFromString(), $pb, [], $options)->indexBy('id');
     }
 
 
