@@ -168,15 +168,15 @@ class ArticleResolver implements IArticleResolver
 
         // Case 3. User is parent or staff, and matches a composite root segment targeted at *one* their children or students
         //         Note that we have to UNION per child/student as `[A && B]^parent/teacher !== [A]^parent/teacher && [B]^parent/teacher`
-        if ($relatedWhereClauses->count()) {
-            foreach ($relatedWhereClauses as $whereClauses) {
-                $compositeRelationship = $user->getRole()->isStaff()
-                    ? Model::RELATIONSHIP_TEACHERS_OF
-                    : Model::RELATIONSHIP_PARENTS_OF;
-                $whereClause           = \implode(" OR \n", $whereClauses->getAll());
-                $queries[]             = $this->buildCompositeSubquery($compositeRelationship, $whereClause);
-            }
-        }
+//        if ($relatedWhereClauses->count()) {
+//            foreach ($relatedWhereClauses as $whereClauses) {
+//                $compositeRelationship = $user->getRole()->isStaff()
+//                    ? Model::RELATIONSHIP_TEACHERS_OF
+//                    : Model::RELATIONSHIP_PARENTS_OF;
+//                $whereClause           = \implode(" OR \n", $whereClauses->getAll());
+//                $queries[]             = $this->buildCompositeSubquery($compositeRelationship, $whereClause);
+//            }
+//        }
 
         // We are not guaranteed to have independent subsets, but better to remove duplicates in DB to leverage caching.
         $query = \implode("\nUNION\n", $queries);
