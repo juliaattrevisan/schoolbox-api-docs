@@ -163,7 +163,7 @@ class ArticleResolver implements IArticleResolver
         ";
 
         // Case 2. User matches a composite root segment, where segment is targeted to 'self'
-        $queries[] = $this->buildCompositeSubquery(Model::RELATIONSHIP_SELF, $whereClause);
+        $queries[] = $this->buildCompositeSubquery(/*Model::RELATIONSHIP_SELF,*/ $whereClause);
 
 
         // Case 3. User is parent or staff, and matches a composite root segment targeted at *one* their children or students
@@ -188,11 +188,11 @@ class ArticleResolver implements IArticleResolver
     /**
      * Returns a sub-query that will match composite audience segments
      *
-     * @param string $compositeRelationship
+//     * @param string $compositeRelationship
      * @param string $whereClause
      * @return string
      */
-    private function buildCompositeSubquery(string $compositeRelationship, string $whereClause): string
+    private function buildCompositeSubquery(/*string $compositeRelationship, */ string $whereClause): string
     {
         $compositeType = Strategy\Composite::getEntityType();
 
@@ -201,7 +201,7 @@ class ArticleResolver implements IArticleResolver
             SELECT parent.comms_news_article_id
             FROM comms_news_audience comms_news_audience
             JOIN comms_news_audience parent ON comms_news_audience.parent_id = parent.id
-            WHERE parent.relationship = '{$compositeRelationship}' AND parent.entity_type = '{$compositeType}' AND (
+            WHERE parent.entity_type = '{$compositeType}' AND (
               {$whereClause}
             )
             GROUP BY comms_news_audience.parent_id
