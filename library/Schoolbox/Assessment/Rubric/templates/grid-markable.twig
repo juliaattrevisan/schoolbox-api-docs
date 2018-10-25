@@ -224,14 +224,14 @@
                 var $groupSummary = $rb.find(groupSummarySelector);
                 var $descriptorCheckboxes = $groupRows.find('input');
 
+                var scaledGroupMark = 0;
                 var indicatorMark = summateDescriptors($descriptorCheckboxes);
                 if (indicatorMark > 0) {
-                    var scaledGroupMark = scale($groupSummary, indicatorMark);
-
-                    $groupSummary.attr('data-scaled-mark', scaledGroupMark);
-                    $groupSummary.attr('data-mark', scaledGroupMark);
-                    $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
+                    scaledGroupMark = scale($groupSummary, indicatorMark);
                 }
+                $groupSummary.attr('data-scaled-mark', scaledGroupMark);
+                $groupSummary.attr('data-mark', scaledGroupMark);
+                $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
 
                 // Update button text with mark calculated from descriptors
                 switch(markType) {
