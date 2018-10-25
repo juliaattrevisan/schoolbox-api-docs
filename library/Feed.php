@@ -1,4 +1,8 @@
 <?php
+
+use Schoolbox\Resource\Folder;
+use Schoolbox\Permission\Access\Access;
+
 /************************************************************
  *                                                           *
  *         Copyright (c) 2013 Alaress Pty Ltd                *
@@ -7,11 +11,18 @@
 
 class Feed {
 
-	/**
-	 * @deprecated use \Schoolbox\Feed
-	 */
-	function __construct() {
-	    $this->db = DeprecatedDatabase::getInstance();
+    /** @var Schoolbox\User */
+    private $user;
+
+
+    /**
+     * @deprecated use \Schoolbox\Feed
+     * @param Schoolbox\User $user
+     */
+    public function __construct(DeprecatedDatabase $db, Schoolbox\User $user)
+    {
+        $this->db   = $db;
+        $this->user = $user;
     }
 
 	/**
@@ -176,15 +187,31 @@ class Feed {
     }
 
     /**
-     * Get a list of online assessments that were created.
+     * Get a list of online assessments (aka 'quizzes') that were created.
      *
-     * @param  $folderId
+     * @param  $folderIds
      * @param  $limit
-     * @return
+     * @return array
      */
-    public function getOnlineAssessments($folderId, $limit) {
+    public function getOnlineAssessments($folderIds, $limit): array
+    {
+        $where = $this->getFilterFromCategoryId($folderIds);
 
-        $where = $this->getFilterFromCategoryId($folderId);
+        // Apply SIVO filter
+        if ($this->user->getRole()->isStaff()) {
+            // If staff, then we don't care about folder access.
+            $sivoClause = 'OR TRUE';
+        } else {
+            // Not staff, only show assessments from folders where the user is an instructor
+            $foldersWithWriteAccess = [];
+            $access                 = Access::getInstance();
+            foreach ($folderIds as $folderId) {
+                if ($access->isInstructor($this->user, (new Folder\Model())->setId($folderId))) {
+                    $foldersWithWriteAccess[] = $folderId;
+                }
+            }
+            $sivoClause = \count($foldersWithWriteAccess) ? " OR assess.category_id IN (" . \implode(',', $foldersWithWriteAccess) . ')' : '';
+        }
 
         $query = "
           SELECT
@@ -192,12 +219,15 @@ class Feed {
               u.title, u.firstname, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
               c.name as cat_name, c.id as cat_id
           FROM assess
+          JOIN assessment a on assess.assessment_id = a.id
+          LEFT JOIN lu_work_type lwt ON lwt.id = a.work_type_id
           LEFT JOIN user u ON assess.user_id = u.id
           LEFT JOIN folder c ON c.id = assess.category_id
           WHERE assess.category_id $where
           AND assess.start < NOW()
           AND assess.deleted_at IS NULL
           AND assess.availability = 'assess'
+          AND (COALESCE(lwt.staff_or_instructor_visible_only, FALSE) = FALSE {$sivoClause})
           ORDER BY assess.created_at DESC LIMIT 0, $limit
         ";
 
@@ -205,6 +235,7 @@ class Feed {
 
         $userHandler = new User();
 
+        $onlineAssessments = [];
         while ($row = $this->db->getNextArray()) {
             $onlineAssessments[] = array(
                 'date' => $row['start'],

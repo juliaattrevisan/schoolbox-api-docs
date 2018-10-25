@@ -20,7 +20,7 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
      */
     public function execute()
     {
-        $feedHandler = new Feed();
+        $feedHandler = new Feed(DeprecatedDatabase::getInstance(), $this->getUser());
         $groupHandler = new Group();
 
         $userAccess = $groupHandler->involvedInCategoryList(

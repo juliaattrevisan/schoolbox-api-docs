@@ -98,10 +98,13 @@ interface IAssessable extends ISoftDeletable
     /**
      * Is now after the published date?
      *
+     * Optionally for a specific user.
+     *
+     * @param null|User                $student
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isPublished(Alaress_Date_Format $now = null);
+    public function isPublished(?User $student, Alaress_Date_Format $now = null): bool;
 
 
     /**

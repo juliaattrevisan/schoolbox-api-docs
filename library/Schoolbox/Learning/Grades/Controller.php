@@ -13,8 +13,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
-use Schoolbox\Error;
-use Schoolbox\File\Exception;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -22,6 +20,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term;
@@ -60,11 +59,6 @@ class Controller extends Base
     private $folderMapper;
 
     /**
-     * @var Error\Mapper
-     */
-    private $errorMapper;
-
-    /**
      * @var AssessmentMapperProxy
      */
     private $assessmentMapperProxy;
@@ -93,7 +87,6 @@ class Controller extends Base
 
 
     /**
-     * @param Error\Mapper                     $errorMapper
      * @param AssessmentMapperProxy            $assessmentMapperProxy
      * @param Folder\Mapper                    $folderMapper
      * @param Term\Mapper                      $termMapper
@@ -105,7 +98,6 @@ class Controller extends Base
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
      */
     public function __construct(
-        Error\Mapper $errorMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         Folder\Mapper $folderMapper,
         Term\Mapper $termMapper,
@@ -117,7 +109,6 @@ class Controller extends Base
         AssessmentFilters\FactoryFactory $filterFactoryFactory
     )
     {
-        $this->errorMapper           = $errorMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->termMapper            = $termMapper;
         $this->folderMapper          = $folderMapper;
@@ -133,7 +124,7 @@ class Controller extends Base
     /**
      * Redirect user to their own grades page for the current term
      */
-    public function getGradesForCurrentUser()
+    public function getGradesForCurrentUser(): void
     {
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate(
@@ -159,7 +150,7 @@ class Controller extends Base
      * @throws LogicException If cyclic graph detected during translation
      * @throws UnexpectedValueException If unable to merge project participant collections
      */
-    public function getGrades(User $viewee, Term\Model $term)
+    public function getGrades(User $viewee, Term\Model $term): void
     {
         $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
 
@@ -172,14 +163,12 @@ class Controller extends Base
 
         // Add folders with response or feedback
         $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
-        $assessmentVisibility = new Visibility($this->access);
 
         // Get all assessments for this user in the specified term, grouped by folder
         $assessmentsPerFolder = $this->assessmentMapperProxy
             ->findAllByStudent($viewee, false, $term)
-            ->filter(function (IAssessable $a) use ($viewee, $assessmentVisibility) {
-                return $assessmentVisibility->isVisibleToUser($a, $viewee, true);
-
+            ->filter(function (IAssessable $a) use ($viewee) {
+                return $a->isPublished($viewee) && $a->isParticipant($viewee);
             })
             ->groupByCallback(function (IAssessable $assessment) {
                 return $assessment->getBaseContext()->getFolder()->getId();
@@ -221,15 +210,19 @@ class Controller extends Base
         ])->setTab('grade'));
     }
 
+
     /**
      *
      * @param User                     $viewee
      * @param Collection|IAssessable[] $assessments
-     * @param null|int                 $year         Null if looking at a term, instead of a full-year
+     * @param null|int                 $year Null if looking at a term, instead of a full-year
      * @param Term\Model               $term
+     * @param Collection               $workTypes
      * @throws ServiceNotFound If unable to find mail handler service
+     * @throws UnexpectedValueException
+     * @throws InsufficientHydrationException
      */
-    protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term, Collection $workTypes)
+    protected function getCustomGrades(User $viewee, Collection $assessments, $year, Term\Model $term, Collection $workTypes): void
     {
         $workTypeNames = $workTypes->getPropertyValues('name');
 
@@ -242,9 +235,8 @@ class Controller extends Base
 
         $showOverallGrade = $this->getConfigLoader()->get('show_overall_grade');
 
-        $folders = $this->getFolderMapper()->createCollection();
+        $folders = $this->folderMapper->createCollection();
 
-        /** @var IAssessable $assessment */
         foreach ($assessments as $assessment) {
             $folder = $assessment->getContext()->getFolder();
 
@@ -255,8 +247,16 @@ class Controller extends Base
                     $folders->add($folder);
                 }
 
-                if ($assessment instanceof DueWork\Model && $assessment->getWorkType()
-                    && \in_array($assessment->getWorkType()->getName(), $workTypeNames, true)
+                if (
+                    $assessment instanceof DueWork\Model &&
+                    $assessment->getWorkType() &&
+                    \in_array($assessment->getWorkType()->getName(), $workTypeNames, true) &&
+                    (
+                        // Hide SIVO assessments from users who are not staff or instructors
+                        !$assessment->isStaffOrInstructorVisibleOnly() ||
+                        $this->getUser()->getRole()->isStaff() ||
+                        $this->access->isInstructor($this->getUser(), $folder)
+                    )
                 ) {
                     if (!isset($assessmentTasks[$folder->getId()])) {
                         $assessmentTasks[$folder->getId()] = [];
@@ -434,8 +434,24 @@ class Controller extends Base
             || ($viewee->getDisplayGradeGraph() && $this->getConfigLoader()
                                                         ->get('display_grade_graph'));
 
+        $visibility = new Visibility($this->access);
         // Need to load other participants if we can see graph to get assessment mark statistics
-        $assessments = $this->findByFiltersWithParticipants($filters, $viewee, $canSeeGraph);
+        $assessments = $this
+            ->findByFiltersWithParticipants($filters, $viewee, $canSeeGraph)
+            ->filter(function (IAssessable $a) use ($visibility) {
+                $viewer = $this->getUser();
+                if ($visibility->isVisibleToUser($a, $viewer, true)) {
+                    return true;
+                }
+                if ($viewer->getRole()->isParent()) {
+                    foreach ($viewer->getChildren() as $child) {
+                        if ($visibility->isVisibleToUser($a, $child, true)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            });
 
         // Only show the "send to showcase" trophy button to teachers and students, not parents
         $canSeeShowcaseButton = $this->getUser()->getRole()->isStaff() || $this->getUser()->getRole()->isStudent();
@@ -607,7 +623,7 @@ class Controller extends Base
      * @param User                            $student
      * @return array
      */
-    protected function getLongitudinalRubricData(GenericCollection $assessments, User $student)
+    protected function getLongitudinalRubricData(GenericCollection $assessments, User $student): array
     {
         if(!$this->getConfigLoader()->get('enable_grades_criteria')) {
             // only populate this if we're actually allowed to see it
@@ -635,17 +651,17 @@ class Controller extends Base
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws UnexpectedValueException If unable to merge student collections
      */
-    private function findByFiltersWithParticipants(array $filters, User $viewee, bool $loadOtherParticipantInteractions)
+    private function findByFiltersWithParticipants(array $filters, User $viewee, bool $loadOtherParticipantInteractions): GenericCollection
     {
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         // Fetch assessments & participants
         $user        = $loadOtherParticipantInteractions ? null : $viewee;
-        $assessmentVisibility = new Visibility($this->access);
 
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
         $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, $user)
-                                                   ->filter(function (IAssessable $a) use ($viewee, $assessmentVisibility) {
-                                                       return $assessmentVisibility->isVisibleToUser($a, $viewee, true);
+                                                   ->filter(function (IAssessable $a) use ($viewee) {
+                                                       // Note that we the assessment list is already filtered to published assessments due to filters
+                                                       return $a->isParticipant($viewee);
                                                    });
         return $assessments;
     }
@@ -655,18 +671,9 @@ class Controller extends Base
      */
 
     /**
-     * @return Error\Mapper
-     */
-    protected function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-
-    /**
      * @return AssessmentMapperProxy
      */
-    protected function getAssessmentMapperProxy()
+    protected function getAssessmentMapperProxy(): AssessmentMapperProxy
     {
         return $this->assessmentMapperProxy;
     }
@@ -675,26 +682,8 @@ class Controller extends Base
     /**
      * @return Term\Mapper
      */
-    protected function getTermMapper()
+    protected function getTermMapper(): Term\Mapper
     {
         return $this->termMapper;
-    }
-
-
-    /**
-     * @return Folder\Mapper
-     */
-    protected function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-
-    /**
-     * @return GradeGroup\Model
-     */
-    protected function getDefaultGradeGroup()
-    {
-        return $this->defaultGradeGroup;
     }
 }
