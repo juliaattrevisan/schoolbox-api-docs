@@ -140,7 +140,7 @@
         $("[data-feedback-form]").validate(
             {
                 errorPlacement: function (error, element) {
-                    var $nextEl = element.next("button");
+                    var $nextEl = element.next("[data-use-descriptor-values]");
                     error.insertAfter($nextEl);
                 }
             }
@@ -149,12 +149,11 @@
         // Add validation rules for per-capability marks
         $("[data-group-mark]").each(function() {
 
-            // TODO not sure how to validate the letter grade dropdown, so skip it for now
+            // Can't validate letter grade dropdown as its values are preset on the frontend
             if (markType !== 'letter') {
 
                 // Percentage and total mark types must be numeric
                 $(this).rules('add', {
-                    required: true,
                     number: true
                 });
 
