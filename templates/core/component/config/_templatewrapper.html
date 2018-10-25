@@ -1,12 +1,10 @@
 <div data-component id="component{COMPONENT_INSTANCE_ID}" class="row component">
     <div class="row collapse">
         <div class="small-12 columns">
-            <ul class="component-titlebar">
-                <li class="actions-small-3">
+            <div class="component-titlebar">
+                <div class="actions-small-3">
                     <div class="list-item">
-                        <div class="small-12 card">
-                            <h2 title="{component.definition.name}" data-component-handle><a href="">{component.definition.name}</a></h2>
-                        </div>
+                        <h2 title="{component.definition.name}" data-component-handle><a href="">{component.definition.name}</a></h2>
                     </div>
                     <nav>
                         <!-- BEGIN settings_link -->
@@ -19,8 +17,8 @@
                         <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
                         <!-- END settings_close -->
                     </nav>
-                </li>
-            </ul>
+                </div>
+            </div>
 
             <!-- BEGIN settings_panel -->
             <div data-component-panel="settings" class="editPanel small-12 ">
