@@ -121,18 +121,17 @@ class MarkedGrid extends TestCase
         );
 
         // Remember, the value is NOT scaled here
-        $capabilityMark1->setValue(15);
+        $capabilityMark1->setValue(4);
         $capabilityMark2->setValue(3);
 
         $markedGrid->getCapabilityMarks()[$capability1->getId()] = $capabilityMark1;
         $markedGrid->getCapabilityMarks()[$capability2->getId()] = $capabilityMark2;
 
-        // Value should be: (15/16) * (8/12) + (3/16) * (4/12) => .625 + .0625 => .6875
         yield [
             $markedGrid, [
-                'normalizedMark'    => 68.75,
-                'scaledMark'        => 8.25,
-                'humanReadableMark' => '8.25 / 12',
+                'normalizedMark'    => 58.33,
+                'scaledMark'        => 7.00,
+                'humanReadableMark' => '7 / 12',
             ]
         ];
     }
