@@ -234,6 +234,11 @@ th, td{
 		@include switch-label;
 	}
 
+	&.inline {
+		display: inline-block;
+		margin-bottom: 0;
+	}
+
 	@include switch-label(0.5rem);
 	vertical-align: middle;
 
