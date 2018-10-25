@@ -15,22 +15,26 @@
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
-<div class="row">
-    <div class="small-12 island" style="overflow-x: scroll;">
+{# Legend + Notch titles #}
+{% set labelNoPublishedMark     = 'No published mark' %}
+{% set labelPubMarkDraftPending = 'Unpublished draft' %}
+{% set labelPublishedMark       = 'Mark Published' %}
 
+<div class="row">
+    <div class="small-12 island">
         <div class="checklist" style="float:right;">
             <input type="checkbox" id="show-drafts">
             <label for="show-drafts">
                 Show Drafts
             </label>
         </div>
-
         <div class="legend" style="float:right;">
-            <p class="meta"><span class="indicator indicator-none"></span>No published mark</p>
-            <p class="meta"><span class="indicator indicator-pending"></span>Published mark, draft pending</p>
-            <p class="meta"><span class="indicator indicator-published"></span>Published mark</p>
+            <p class="meta"><span class="indicator indicator-none"></span>{{ labelNoPublishedMark }}</p>
+            <p class="meta"><span class="indicator indicator-pending"></span>{{ labelPubMarkDraftPending }}</p>
+            <p class="meta"><span class="indicator indicator-published"></span>{{ labelPublishedMark }}</p>
         </div>
-
+    </div>
+    <div class="small-12 island" style="overflow-x: scroll;">
         <table class="square-grid marksheet" data-mark-sheet>
             <thead>
             <tr class="rotate-headers">
@@ -174,12 +178,16 @@
                                     {% if taskProgressComplete == progressStatus %}
                                         {% set indicator = 'published' %}
                                         {% set progressClass = 'reviewed' %}
+                                        {% set notchTitle = labelPublishedMark %}
                                     {% elseif taskProgressPending == progressStatus %}
-                                        {% set indicator = 'pending' %}
+                                        {# note there is no such thing as draft task masks #}
+                                        {% set indicator = 'published' %}
                                         {% set progressClass = 'pending' %}
+                                        {% set notchTitle = labelPublishedMark %}
                                     {% else %}
                                         {% set indicator = 'none' %}
                                         {% set progressClass = 'readonly' %}
+                                        {% set notchTitle = labelNoPublishedMark %}
                                     {% endif %}
 
                                     <div
@@ -194,7 +202,18 @@
                                     {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] %}
                                     {% set publishedMark      = marks.published %}
                                     {% set draftMark          = marks.draft %}
-                                    {% set indicator = (marks.published is defined) ? (marks.draft is defined ? 'pending' : 'published') : 'none' %}
+                                    {% if marks.published is defined %}
+                                        {% if marks.draft is defined %}
+                                            {% set indicator = 'pending' %}
+                                            {% set notchTitle = labelPubMarkDraftPending %}
+                                        {% else %}
+                                            {% set indicator = 'published' %}
+                                            {% set notchTitle = labelPublishedMark %}
+                                        {% endif %}
+                                    {% else %}
+                                        {% set indicator = 'none' %}
+                                        {% set notchTitle = labelNoPublishedMark %}
+                                    {% endif %}
 
                                     {% if publishedMark %}
                                         <a href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %} title="{{ comment }}" >{{ publishedMark['hr'] | default('–') }}</a>
@@ -206,7 +225,7 @@
                                         <a href="#" data-draft-mark style="display: none" data-tooltip="right" class="has-tip tip-right meta" data-width="105" title="Draft Mark">{{ draftMark['hr'] | default('–') }}</a>
                                     {% endif %}
                                 {% endif %}
-                                    <span class="indicator indicator-{{ indicator }}"></span>
+                                    <span class="indicator indicator-{{ indicator }}" title="{{ notchTitle }}"></span>
                                 </td>
                             {% else %}
                                 <td class="na"></td>
