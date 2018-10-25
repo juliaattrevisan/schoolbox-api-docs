@@ -20,6 +20,8 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
  */
 class CapabilityMark
 {
+    private const PRECISION = 2;
+
     /**
      * The capability usage for which this mark is for.
      *
@@ -113,7 +115,8 @@ class CapabilityMark
     public function retrieveNormalizedMark(): float
     {
         $maxCapabilityValue = $this->getCapabilityUsage()->getMaxValue();
-        return $maxCapabilityValue ? ($this->value / $maxCapabilityValue) * 100 : 0;
+        $normMark = $maxCapabilityValue ? ($this->value / $maxCapabilityValue) * 100 : 0;
+        return round($normMark, self::PRECISION);
     }
 
     /**
