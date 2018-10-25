@@ -196,23 +196,16 @@ class ArticleResolver implements IArticleResolver
     {
         $compositeType = Strategy\Composite::getEntityType();
 
+        // Find all matching audience sub-segments that are a child of a composite segment. Group by parent segment
         return "
-        SELECT t1.comms_news_article_id
-                FROM (
-                    -- Find all matching audience sub-segments that are a child of a composite^self segment. Group by parent segment
-                    SELECT parent.comms_news_article_id, comms_news_audience.parent_id, COUNT(*) as child_count
-                    FROM comms_news_audience comms_news_audience
-                    JOIN comms_news_audience parent ON comms_news_audience.parent_id = parent.id
-                    WHERE parent.relationship = '{$compositeRelationship}' AND parent.entity_type = '{$compositeType}' AND (
-                      {$whereClause}
-                    )
-                    GROUP BY parent.id
-                ) t1
-                JOIN (
-                    -- Group all child segments by parent to get count of parents' children.
-                    -- If count-matching children == count-available children, then composite segment is a match
-                    SELECT parent_id, COUNT(*) as child_count FROM comms_news_audience WHERE parent_id IS NOT NULL GROUP BY parent_id
-                ) t2 ON t1.parent_id = t2.parent_id AND t1.child_count = t2.child_count
+            SELECT parent.comms_news_article_id
+            FROM comms_news_audience comms_news_audience
+            JOIN comms_news_audience parent ON comms_news_audience.parent_id = parent.id
+            WHERE parent.relationship = '{$compositeRelationship}' AND parent.entity_type = '{$compositeType}' AND (
+              {$whereClause}
+            )
+            GROUP BY comms_news_audience.parent_id
+            HAVING COUNT(comms_news_audience.parent_id) = 2;
         ";
     }
 
