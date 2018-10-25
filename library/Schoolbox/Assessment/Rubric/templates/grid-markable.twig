@@ -314,7 +314,7 @@
 
             if ($groupSummary.length) {
                 var normalisedMark = getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'), $groupSummary.attr('data-max'));
-                $groupSummary.attr('data-scaled-mark', scale($groupSummary, normalisedMark));
+                $groupSummary.attr('data-scaled-mark', normalisedMark);
                 $groupSummary.attr('data-mark', normalisedMark);
                 $groupSummary.find('[data-db-mark]').val(normalisedMark);
                 $groupSummary.attr('data-customised', true);
