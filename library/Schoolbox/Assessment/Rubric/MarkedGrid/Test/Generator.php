@@ -12,7 +12,9 @@ use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\MarkedGrid as RubricMarkedGrid;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
-
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+use Schoolbox\Learning\MarkScheme\None;
 /**
  * Generator for test data for marked grid tests.
  */
@@ -85,18 +87,19 @@ class Generator
         $rowSet = $grid->getRowSet();
 
 
-        // Build a marked grid
-        $feedback   = new DueWorkFeedback();
-        $markScheme = new TotalMarkFractional($grid->calculateMaxValueFromCapabilities());
-        $markedGrid = new RubricMarkedGrid\MarkedGrid($feedback, $grid, $markScheme);
+        // Build the factory and collection of mark objects
+        $markSchemeFactory     = new MarkSchemeFactory();
+        $capabilityMarkObjects = new GenericCollection(RubricMarkedGrid\CapabilityMark::class);
 
 
         // Add cap and ind marks to it
         foreach ($capabilityMarks as $capabilityId => $capabilityMark) {
             $capabilityUsageObject = $grid->retrieveCapabilityUsage($rowSet->retrieveCapability($capabilityId));
+            $capabilityMaxValue    = $capabilityUsageObject->getMaxValue();
+            $capabilityMarkScheme  = $markSchemeFactory->spawnForCapability($grid->getAssessment(), $capabilityMaxValue);
             $capabilityMarkObject  = new RubricMarkedGrid\CapabilityMark(
                 $capabilityUsageObject,
-                new TotalMarkFractional($capabilityUsageObject->getMaxValue())
+                $capabilityMarkScheme
             );
             $capabilityMarkValue = $capabilityMark['value'] ?? null;
 
@@ -125,9 +128,17 @@ class Generator
                 $capabilityMarkValue ?? $capabilityMarkObject->calculateIndicatorMarkSum()
             );
 
-            $markedGrid->getCapabilityMarks()[$capabilityId] = $capabilityMarkObject;
+            $capabilityMarkObjects[$capabilityId] = $capabilityMarkObject;
         }
 
+        // Build a marked grid
+        $feedback   = new DueWorkFeedback();
+        $maxValue   = $grid->calculateMaxValueFromCapabilities();
+        $markScheme = $maxValue > 0
+            ? new TotalMarkFractional($maxValue)
+            : new None();
+        $markedGrid = new RubricMarkedGrid\MarkedGrid($feedback, $grid, $markScheme);
+        $markedGrid->setCapabilityMarks($capabilityMarkObjects);
         return $markedGrid;
     }
 }
