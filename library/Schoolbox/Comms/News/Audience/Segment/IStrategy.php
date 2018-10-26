@@ -26,16 +26,6 @@ interface IStrategy
 
 
     /**
-     * Returns the set of valid relationship modifiers for this strategy.
-     *
-     * Note this is a inherent validity concern, not an authorisation concern.
-     *
-     * @return string[]
-     */
-    public static function getValidRelationshipModifiers(): array;
-
-
-    /**
      * Returns whether this segment can logically target null entities. Eg 'users who are not in any classes or groups'
      *
      * This is an inherent property of the entityType's relationship to users
@@ -67,6 +57,16 @@ interface IStrategy
      * @return bool
      */
     public function canAudienceToEntityValue(User $user, ?string $entityValue): bool;
+
+
+    /**
+     * Returns the set of valid relationship modifiers for this strategy.
+     *
+     * Note this is a inherent validity concern, not an authorisation concern.
+     *
+     * @return string[]
+     */
+    public function getValidRelationshipModifiers(): array;
 
 
     /**

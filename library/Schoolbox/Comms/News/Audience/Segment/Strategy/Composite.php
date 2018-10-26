@@ -26,7 +26,7 @@ class Composite implements IStrategy
     /**
      * @inheritdoc
      */
-    public static function getValidRelationshipModifiers(): array
+    public function getValidRelationshipModifiers(): array
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }

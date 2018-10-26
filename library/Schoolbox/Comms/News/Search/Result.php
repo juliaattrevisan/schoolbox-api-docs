@@ -155,6 +155,7 @@ class Result extends Base
             Access\UserAccessMapper::getInstance(),
             $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS),
             $config->get(ConfigMapper::_GLOBAL_MODERATION),
+            $config->get(ConfigMapper::_AUDIENCE_TO_FOLDER_TEACHERS),
             Folder\Mapper::getInstance(),
             Access\RoleAccessMapper::getInstance(),
             Access\Access::getInstance());

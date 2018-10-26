@@ -45,12 +45,13 @@ class Transactor
      *
      * Does not perform DB mutations unless logical changes to the audience have been made
      *
-     * @param News\Model $article
+     * @param News\Model                         $article
      * @param GenericCollection|Audience\Model[] $postedSegments
      * @return bool
      * @throws Mapper\Exception
      * @throws Mapper\Exception\InsufficientHydrationException
      * @throws UnexpectedValueException
+     * @throws News\Exceptions\UnknownEntityTypeException
      */
     public function save(News\Model $article, GenericCollection $postedSegments): bool
     {
@@ -121,13 +122,14 @@ class Transactor
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
      * @throws UnsatisfiedException
+     * @throws News\Exceptions\UnknownEntityTypeException
      */
     private function saveAddedSegments(News\Model $article, GenericCollection $segmentsToAdd): bool
     {
         $isSegmentsAdded = false;
         if ($segmentsToAdd->count()) {
             $validSegmentSpecFactory = new Audience\Validation\Factory(
-                $this->strategyFactory::getValidRelationshipModifiers(),
+                $this->strategyFactory->getValidRelationshipModifiers(),
                 $this->strategyFactory::getValidNullEntities()
             );
             $validSegmentSpec        = $validSegmentSpecFactory->makeValidSegmentSpecification();

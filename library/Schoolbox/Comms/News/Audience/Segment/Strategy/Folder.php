@@ -17,9 +17,11 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 
-
 class Folder extends SimpleStrategy
 {
+
+    /** @var bool */
+    private $canTargetTeachersOfUsersInFolder;
 
     /** @var FolderMapper */
     private $folderMapper;
@@ -51,34 +53,40 @@ class Folder extends SimpleStrategy
 
 
     /**
-     * @inheritdoc
-     */
-    public static function getValidRelationshipModifiers(): array
-    {
-        return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
-    }
-
-
-    /**
      * @param UserAccessMapper $userAccessMapper
      * @param bool             $staffCanPost
      * @param bool             $moderationRequired
+     * @param bool             $canTargetTeachersOfUsersInFolder
      * @param FolderMapper     $folderMapper
      * @param RoleAccessMapper $roleAccessMapper
      * @param Access           $access
+
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
         bool $staffCanPost,
         bool $moderationRequired,
+        bool $canTargetTeachersOfUsersInFolder,
         FolderMapper $folderMapper,
         RoleAccessMapper $roleAccessMapper,
         Access $access
     ) {
         parent::__construct($userAccessMapper, $staffCanPost, $moderationRequired);
-        $this->folderMapper     = $folderMapper;
-        $this->roleAccessMapper = $roleAccessMapper;
-        $this->access           = $access;
+        $this->canTargetTeachersOfUsersInFolder = $canTargetTeachersOfUsersInFolder;
+        $this->folderMapper                     = $folderMapper;
+        $this->roleAccessMapper                 = $roleAccessMapper;
+        $this->access                           = $access;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getValidRelationshipModifiers(): array
+    {
+        return $this->canTargetTeachersOfUsersInFolder
+            ? [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF]
+            : [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF];
     }
 
 

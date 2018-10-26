@@ -81,7 +81,7 @@ abstract class SimpleStrategy implements ISimpleStrategy
     /**
      * @inheritdoc
      */
-    public static function getValidRelationshipModifiers(): array
+    public function getValidRelationshipModifiers(): array
     {
         // Safe default it to not permit relationship modification
         return [Audience\Model::RELATIONSHIP_SELF];

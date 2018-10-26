@@ -11,10 +11,13 @@ namespace Schoolbox\Comms\News\Audience\Test;
 use PHPUnit;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Alaress\Specification;
 use Schoolbox\Comms\News\Audience\Validation;
-use Schoolbox\Comms\News\Audience\Segment\EntityType;
+use Schoolbox\Resource\Folder;
 
 /**
  * For testing a segment is inherently validly constructed, as opposed to any user authorisation logic
@@ -25,16 +28,25 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     /** @var Specification\ISpecification */
     private $validSegmentSpec;
 
-
     /**
      * @inheritdoc
+     * @throws News\Exceptions\UnknownEntityTypeException
+     * @throws \UnexpectedValueException
      */
     public function setUp()
     {
         parent::setUp();
 
         // Ensure the relationship is valid for the segment's entity type
-        $validRelationships = Audience\Segment\StrategyFactory::getValidRelationshipModifiers();
+        $validRelationships = (new Audience\Segment\StrategyFactory(
+            UserAccessMapper::getInstance(),
+            true,
+            true,
+            true,
+            Folder\Mapper::getInstance(),
+            RoleAccessMapper::getInstance(),
+            Access::getInstance()
+        ))->getValidRelationshipModifiers();
 
         // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
         $validNullEntities      = Audience\Segment\StrategyFactory::getValidNullEntities();
