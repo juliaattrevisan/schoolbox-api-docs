@@ -133,10 +133,7 @@ class Generator
 
         // Build a marked grid
         $feedback   = new DueWorkFeedback();
-        $maxValue   = $grid->calculateMaxValueFromCapabilities();
-        $markScheme = $maxValue > 0
-            ? new TotalMarkFractional($maxValue)
-            : new None();
+        $markScheme = $markSchemeFactory->spawnMarkSchemeFor($grid->getAssessment());
         $markedGrid = new RubricMarkedGrid\MarkedGrid($feedback, $grid, $markScheme);
         $markedGrid->setCapabilityMarks($capabilityMarkObjects);
         return $markedGrid;
