@@ -7,11 +7,18 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience;
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\Builder;
+use PDO;
+use Schoolbox\GenericCollection;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 
 class PastoralGroup extends SimpleStrategy
 {
+
+    /** @var IConnector */
+    private $db;
 
     public static function getEntityType(): string
     {
@@ -26,6 +33,17 @@ class PastoralGroup extends SimpleStrategy
     {
         // A user may not belong to any pastoral groups
         return true;
+    }
+
+
+    /**
+     * @inheritdoc
+     * @param IConnector $db
+     */
+    public function __construct(UserAccessMapper $userAccessMapper, bool $staffCanPost, bool $moderationRequired, IConnector $db)
+    {
+        parent::__construct($userAccessMapper, $staffCanPost, $moderationRequired);
+        $this->db = $db;
     }
 
 
@@ -65,16 +83,30 @@ class PastoralGroup extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(): array
-    {
-        return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getSearchSql(User $user): string
     {
         return '';
+    }
+
+    /**
+     * @param GenericCollection|User[] $users
+     * @return array
+     */
+    public function getValues(GenericCollection $users): array
+    {
+        $userIds = $users->getPropertyValues('id');
+        if(!\count($userIds)){
+            return [];
+        }
+
+        $bindings = Builder::getBindings($userIds, 'user');
+
+        $sql = "
+            SELECT group_id
+            FROM pastoral_group_member WHERE user_id IN ({$bindings->getPlaceholder()})
+            AND deleted_at IS NULL
+        ";
+
+        return $this->db->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN);
     }
 }

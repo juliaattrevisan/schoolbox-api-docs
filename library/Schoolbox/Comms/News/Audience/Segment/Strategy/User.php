@@ -7,6 +7,8 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\GenericCollection;
+
 class User extends SimpleStrategy
 {
 
@@ -76,5 +78,15 @@ class User extends SimpleStrategy
     public function getSearchSql(\Schoolbox\User $user): string
     {
         return '';
+    }
+
+
+    /**
+     * @param GenericCollection|User[] $users
+     * @return array
+     */
+    public function getValues(GenericCollection $users): array
+    {
+        return \array_unique($users->getPropertyValues('id'));
     }
 }

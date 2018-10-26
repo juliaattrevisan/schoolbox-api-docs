@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
@@ -83,8 +82,8 @@ abstract class SimpleStrategy implements ISimpleStrategy
      */
     public function getValidRelationshipModifiers(): array
     {
-        // Safe default it to not permit relationship modification
-        return [Audience\Model::RELATIONSHIP_SELF];
+        // Default to being disabled
+        return [];
     }
 
 

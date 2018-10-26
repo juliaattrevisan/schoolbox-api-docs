@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 /**
@@ -72,4 +73,13 @@ interface ISimpleStrategy extends IStrategy
      * @return string
      */
     public function getSearchSql(User $user): string;
+
+
+    /**
+     * Returns a set of entity_values from a set of users, suitable for insertion into SQL queries
+     *
+     * @param GenericCollection|User[] $users
+     * @return string[]|null[]
+     */
+    public function getValues(GenericCollection $users): array;
 }
