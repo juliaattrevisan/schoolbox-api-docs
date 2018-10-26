@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au/
  */
 namespace Schoolbox\Comms\News\Search;
+use Alaress\Database\Connector\IConnector;
+use Alaress\IDatabase;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment;
@@ -17,9 +19,18 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Search\MapperResult\Base;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
+use External_User;
 
 class Result extends Base
 {
+    /** @var IConnector */
+    private $database;
+
+    public function __construct(IConnector $database, \Schoolbox\Permission\Access\Access $accessor = null)
+    {
+        parent::__construct($accessor);
+        $this->database = $database;
+    }
 
 
     /**
@@ -132,6 +143,7 @@ class Result extends Base
         return $i;
     }
 
+
     /**
      * I don't have access to a di to do this atm
      * Spawn from darkness for now
@@ -146,6 +158,7 @@ class Result extends Base
      * @throws \Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @throws \Exception
      */
     private function prepareSearchDependencies(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser): array
     {
@@ -158,7 +171,10 @@ class Result extends Base
             $config->get(ConfigMapper::_AUDIENCE_TO_FOLDER_TEACHERS),
             Folder\Mapper::getInstance(),
             Access\RoleAccessMapper::getInstance(),
-            Access\Access::getInstance());
+            Access\Access::getInstance(),
+            new External_User(),
+            $this->database
+        );
 
         /* Is $user in the audience of the article?
          */

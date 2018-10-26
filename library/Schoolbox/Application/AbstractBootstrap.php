@@ -340,32 +340,39 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $di->set(
             'commsNewsArticleResolver',
             $di->lazy(
-                function() use ($di) {
+                function () use ($di) {
                     /**
-                     * @var IConnector              $db
-                     * @var External_UserInterface  $externalUser
-                     * @var External_ClassInterface $externalClass
-                     * @var StrategyFactory         $strategyFactory
+                     * @var IConnector                            $db
+                     * @var External_UserInterface                $externalUser
+                     * @var External_ClassInterface               $externalClass
+                     * @var News\Audience\Segment\StrategyFactory $strategyFactory
+                     * @var MapperFactory                         $mapperFactory
+                     * @var UserAccessMapper                      $userAccessMapper
+                     * @var Folder\Mapper                         $folderMapper
+                     * @var UserMapper                            $userMapper
                      */
-                    $db              = $di->get('databaseInternal');
-                    $externalUser    = $di->get('externalUser');
-                    $externalClass   = $di->get('externalClass');
-                    $strategyFactory = $di->get('commsNewsAudienceStrategyFactory');
-                    $articleResolver = new News\Audience\ArticleResolver(
+                    $db               = $di->get('databaseInternal');
+                    $externalUser     = $di->get('externalUser');
+                    $externalClass    = $di->get('externalClass');
+                    $strategyFactory  = $di->get('commsNewsAudienceStrategyFactory');
+                    $mapperFactory    = $di->get('mapperFactory');
+                    $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
+                    $folderMapper     = $mapperFactory->get(Folder\Mapper::class);
+                    $userMapper       = $mapperFactory->get(UserMapper::class);
+                    $articleResolver  = new News\Audience\ArticleResolver(
                         StrategyFactory::getValidNullEntities(),
                         $strategyFactory->getValidRelationshipEntityMap(),
                         $db,
-                        $di->get('mapperFactory')->get(UserAccessMapper::class),
-                        $di->get('mapperFactory')->get(Folder\Mapper::class),
-                        $externalUser,
+                        $folderMapper,
                         new News\Audience\RelationshipFilterer(
                             $db,
-                            $di->get('mapperFactory')->get(UserMapper::class),
+                            $userMapper,
                             $externalUser,
-                            $di->get('mapperFactory')->get(Folder\Mapper::class),
+                            $folderMapper,
                             $externalClass,
-                            $di->get('mapperFactory')->get(UserAccessMapper::class)
-                        )
+                            $userAccessMapper
+                        ),
+                        $strategyFactory->makeAllSimpleStrategies()
                     );
 
                     return $articleResolver;
@@ -410,12 +417,14 @@ abstract class AbstractBootstrap implements BootstrapInterface
             $di->lazy(
                 function () use ($di) {
                     /**
-                     * @var MapperFactory    $mapperFactory
-                     * @var UserAccessMapper $userAccessMapper
-                     * @var Folder\Mapper    $folderMapper
-                     * @var RoleAccessMapper $roleAccessMapper
-                     * @var Access           $access
-                     * @var IConfigLoader    $config
+                     * @var MapperFactory          $mapperFactory
+                     * @var UserAccessMapper       $userAccessMapper
+                     * @var Folder\Mapper          $folderMapper
+                     * @var RoleAccessMapper       $roleAccessMapper
+                     * @var Access                 $access
+                     * @var IConfigLoader          $config
+                     * @var External_UserInterface $externalUser
+                     * @var IConnector             $db
                      */
                     $mapperFactory    = $di->get('mapperFactory');
                     $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
@@ -423,6 +432,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $roleAccessMapper = $mapperFactory->get(RoleAccessMapper::class);
                     $access           = $mapperFactory->get(Access::class);
                     $config           = $di->get('config');
+                    $externalUser     = $di->get('externalUser');
+                    $db               = $di->get('databaseInternal');
                     return new News\Audience\Segment\StrategyFactory(
                         $userAccessMapper,
                         $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS),
@@ -430,7 +441,9 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         $config->get(ConfigMapper::_AUDIENCE_TO_FOLDER_TEACHERS),
                         $folderMapper,
                         $roleAccessMapper,
-                        $access
+                        $access,
+                        $externalUser,
+                        $db
                     );
                 }
             )
