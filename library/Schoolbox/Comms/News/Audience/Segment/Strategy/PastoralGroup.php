@@ -32,7 +32,8 @@ class PastoralGroup extends SimpleStrategy
     public static function isValidNullEntityValue(): bool
     {
         // A user may not belong to any pastoral groups
-        return true;
+        return false;
+//        return true; // TODO Turned off as not-yet implemented in front-end so no need to include in query
     }
 
 

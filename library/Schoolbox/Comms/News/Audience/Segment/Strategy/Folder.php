@@ -54,7 +54,8 @@ class Folder extends SimpleStrategy
     public static function isValidNullEntityValue(): bool
     {
         // A user may have no involved folders
-        return true;
+        return false;
+//        return true; // TODO Turned off as not-yet implemented in front-end so no need to include in query
     }
 
 

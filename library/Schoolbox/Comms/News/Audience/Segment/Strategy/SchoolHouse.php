@@ -24,7 +24,8 @@ class SchoolHouse extends SimpleStrategy
     public static function isValidNullEntityValue(): bool
     {
         // A user may have no School House
-        return true;
+        return false;
+//        return true; // TODO Turned off as not-yet implemented in front-end so no need to include in query
     }
 
 

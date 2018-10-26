@@ -24,7 +24,8 @@ class ResHouse extends SimpleStrategy
     public static function isValidNullEntityValue(): bool
     {
         // Users have 0:1 residential houses
-        return true;
+        return false;
+//        return true; // TODO Turned off as not-yet implemented in front-end so no need to include in query
     }
 
 

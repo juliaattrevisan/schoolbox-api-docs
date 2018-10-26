@@ -27,7 +27,8 @@ class Campus extends SimpleStrategy
     public static function isValidNullEntityValue(): bool
     {
         // From a schema level, a user has 0:N campus
-        return true;
+        return false;
+//        return true; // TODO Turned off as not-yet implemented in front-end so no need to include in query
     }
 
 
