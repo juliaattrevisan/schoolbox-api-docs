@@ -75,6 +75,7 @@ class Factory
                         ? null
                         : (float)$postCapabilities[$capabilityId]['unscaledMark'];
 
+                    $capabilityUnscaledMark = $capabilityUnscaledMark ?: null;
                     $capabilityMark->setValue($capabilityUnscaledMark);
                 } else {
                     throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
