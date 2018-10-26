@@ -177,7 +177,7 @@ class ArticleResolver implements IArticleResolver
 
         if($hasRelated){
             $relationship = $role->isParent() ? Model::RELATIONSHIP_PARENTS_OF : Model::RELATIONSHIP_TEACHERS_OF;
-            $relatedWhereClauses = $this->buildWhereClauses($selfAttributes, $relationship, $whereParams);
+            $relatedWhereClauses = $this->buildWhereClauses($relatedAttributes, $relationship, $whereParams);
         } else {
             $relatedWhereClauses = new Collection();
         }
