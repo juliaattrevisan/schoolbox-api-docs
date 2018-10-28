@@ -91,7 +91,7 @@ class ArticleResolver implements IArticleResolver
          * * An articles is targeted to 0:N audience segments.
          * * An audience segment may be simple or composite.
          * * Simple segments are targeted to a entity type and value.
-         * * Composite segments are composed of 1:N simple segments.
+         * * Composite segments are composed of 2 simple segments.
          * * Audience segments may be root segments or child segments.
          * * There is a maximum of one level of nesting (ie no children of child segments).
          * * Hence, child segments are always simple.
@@ -101,8 +101,7 @@ class ArticleResolver implements IArticleResolver
          * * * self        => user must match segment
          * * * parents_of  => user's child must match segment
          * * * teachers_of => user's students must match segment
-         * * If a composite segment targets 'parents_of'/'teachers_of', all child segments must target 'self'.
-         *   (this avoid having to find eg, children of children, which is nonsensical)
+         * * Composite segments do not have modifiers on either the parent or children
          * * For users with role type 'student' or 'guest', they can only match:
          * * 1. segments targeted to 'self'
          * * For users with role type 'parent', they can match:
@@ -111,14 +110,12 @@ class ArticleResolver implements IArticleResolver
          * * For users with role type 'teacher', they can match:
          * * 1. segments targeted to 'self' if the segment matches themselves, or
          * * 2. segments targeted to 'teachers_of' if the segment matches one of their taught students
-         * * Hence there are 3 independent methods for matching an article to a user:
+         * * Hence there are 2 independent methods for matching an article to a user:
          * * 1. Simple root segment targeted to user, or children/students of user
-         * * 2. Composite root segment targeted to user, composed of child segments that target user or children/students of user
-         * * 3. Composite root segment targeted to parents_of/teachers_of, composed of segments that target children/students of user
-         * * The last method does not apply if the user does not have role type of 'parent' or 'teacher'
+         * * 2. Composite root segment targeted to user, composed of child segments that target user
          *
-         * Hence we can build 3 queries, the first two using the same predicates, the latter with a
-         * related set of predicates, then UNION ALL them together.
+         * Hence we can build 2 queries, both using the 'self' predicates, the simple segments also
+         * checking 'related' user attributes, then UNION ALL them together.
          */
 
         /**
