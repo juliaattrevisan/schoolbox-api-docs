@@ -124,18 +124,17 @@ class ArticleResolver implements IArticleResolver
         /**
          * @var Collection|string[]|null[] $selfAttributes     Indexed by [entityType]
          * @var Collection|string[]|null[] $relatedAttributes  Indexed by [entityType]
+         * @var Collection|mixed[]         $whereParams
          */
         $selfAttributes    = new Collection();                  // ['folder' => [1,2,3], 'role' => [1,2,3], ...]
         $relatedAttributes = new Collection();                  // ['folder' => [1,2,3], 'role' => [1,2,3], ...]
-
-        // Do we need to check related users attributes?
-        $role = $user->getRole();
-        $hasRelated = $role->isParent() || $role->isStaff();
+        $whereParams       = new Collection();
 
         // Fetch all the data we need for our query from
         // * the user, and
         // * any relevant related users (eg students/children) if relevant (ie staff/parent)
 
+        // Build query for user themself.
         $validSelfEntities = $this->modifierEntityMap[Model::RELATIONSHIP_SELF];
         if (\count($validSelfEntities)) {
             foreach ($this->simpleStrategies as $strategy) {
@@ -144,18 +143,20 @@ class ArticleResolver implements IArticleResolver
                 }
             }
         }
+        $selfWhereClauses = $this->buildWhereClauses($selfAttributes, Model::RELATIONSHIP_SELF, $whereParams);
 
+        // Build query for related users?
+        $role       = $user->getRole();
+        $hasRelated = $role->isParent() || $role->isStaff();
         if ($hasRelated) {
-
-            $validRelatedEntities = $this->modifierEntityMap[$role->isParent()
-                ? Model::RELATIONSHIP_PARENTS_OF
-                : Model::RELATIONSHIP_TEACHERS_OF];
+            $relationship         = $role->isParent() ? Model::RELATIONSHIP_PARENTS_OF : Model::RELATIONSHIP_TEACHERS_OF;
+            $validRelatedEntities = $this->modifierEntityMap[$relationship];
 
             if (\count($validRelatedEntities)) {
                 // Don't bother fetching these if there's no valid relationships currently configured
                 $relatedUsers = $this->getRelatedUsers($user);
 
-                if(\count($relatedUsers)) {
+                if (\count($relatedUsers)) {
                     foreach ($this->simpleStrategies as $strategy) {
                         if (\in_array($strategy::getEntityType(), $validRelatedEntities, true)) {
                             $relatedAttributes[$strategy::getEntityType()] = $strategy->getValues($relatedUsers);
@@ -163,30 +164,21 @@ class ArticleResolver implements IArticleResolver
                     }
                 }
             }
+            $relatedWhereClauses = $this->buildWhereClauses($relatedAttributes, $relationship, $whereParams);
+        } else {
+            $relatedWhereClauses = new Collection();
         }
-
 
         // Check for the unlikely case where the system is configured to not permit targeting to any segment types
         if (!$selfAttributes->count() && !$relatedAttributes->count()) {
             return [];
         }
 
-        // Build the clauses and params
-        $whereParams = new Collection();
-        $selfWhereClauses = $this->buildWhereClauses($selfAttributes, Model::RELATIONSHIP_SELF, $whereParams);
-
-        if($hasRelated){
-            $relationship = $role->isParent() ? Model::RELATIONSHIP_PARENTS_OF : Model::RELATIONSHIP_TEACHERS_OF;
-            $relatedWhereClauses = $this->buildWhereClauses($relatedAttributes, $relationship, $whereParams);
-        } else {
-            $relatedWhereClauses = new Collection();
-        }
-
         // Simple segments permit related modifiers, composites do not
         $simpleClause  = "\n" . \implode(" OR \n", \array_merge($selfWhereClauses, $relatedWhereClauses));
         $complexClause = "\n" . \implode(" OR \n", $selfWhereClauses);
 
-        $parameters  = $whereParams->getAll();
+        $parameters = $whereParams->getAll();
 
         $query = "
             SELECT comms_news_article_id
