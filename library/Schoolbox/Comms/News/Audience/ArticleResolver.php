@@ -140,7 +140,7 @@ class ArticleResolver implements IArticleResolver
         if (\count($validSelfEntities)) {
             foreach ($this->simpleStrategies as $strategy) {
                 if (\in_array($strategy::getEntityType(), $validSelfEntities, true)) {
-                    $selfAttributes[$strategy::getEntityType()] = $strategy->getValues(new GenericCollection(User::class, [$user])); // TODO implement interface method
+                    $selfAttributes[$strategy::getEntityType()] = $strategy->getValues(new GenericCollection(User::class, [$user]));
                 }
             }
         }
