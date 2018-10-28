@@ -243,7 +243,7 @@ class ArticleResolver implements IArticleResolver
                 $parts[] = "$table.$colEntityValue IS NULL";
             }
             if(\count($parts)){
-                $whereClauses[] = "($table.$colRelationship = '$relationship' AND $table.$colEntityType = '$entityType' AND ". \implode(' OR ', $parts) .")";
+                $whereClauses[] = "($table.$colRelationship = '$relationship' AND $table.$colEntityType = '$entityType' AND (". \implode(' OR ', $parts) ."))";
             }
         }
         return $whereClauses;
