@@ -81,10 +81,12 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
 
         $this->getSitePage()->setBlock($targetHandle, 'drag_handle', 'drag_handle_block');
 
-        if ($this->hasContextWriteAccess()) {
-            $this->getSitePage()->parse('drag_handle_block', 'drag_handle');
-        } else {
-            $this->getSitePage()->setVar('drag_handle_block', '');
+        if(!$is_for_template) {
+            if ($this->hasContextWriteAccess()) {
+                $this->getSitePage()->parse('drag_handle_block', 'drag_handle');
+            } else {
+                $this->getSitePage()->setVar('drag_handle_block', '');
+            }
         }
 
         return true;
