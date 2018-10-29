@@ -1,0 +1,15 @@
+{# This will eventually become a Vue component, once we have a bundler #}
+
+<div id="news-component">
+    News component here
+</div>
+
+<script src="/javascript/components/schoolbox-vue.min.js"></script>
+<script>
+    'use strict';
+
+    var app = new Vue({
+        el: '#news-component',
+        delimiters: ['${', '}']
+    });
+</script>

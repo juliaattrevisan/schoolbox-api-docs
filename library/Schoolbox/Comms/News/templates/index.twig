@@ -29,23 +29,7 @@
 
 {% block newsContent %}
     <section>
-        {% include '@commsNews/tabs.twig' with {
-            url: routeLookup('commsNews.getListByTopic'),
-            topicContainerId: 'news-topics',
-            topics: topics,
-            topicAll: topicAll,
-            slug: slug,
-            compactMode: false,
-            limit: limit,
-            referrer: referrer
-        } %}
-
-        <div id="news-container">
-            {# TODO: Purifying pre-built content strips data-saveforlater var
-             # For now, presume this was previously filtered elsewhere server-side
-             #}
-            {{ initialContent|raw }}
-        </div>
+        {% include '@commsNews/article-list.twig' %}
     </section>
 {% endblock %}
 
