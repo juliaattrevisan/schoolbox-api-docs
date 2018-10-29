@@ -282,7 +282,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             && \array_key_exists('workType', $diff['assessment'])) {
             try {
                 $isPreviousHidden = $diff['assessment']['workType'][1] === null ? false :
-                    $this->workTypeMapper->findById(intval($diff['assessment']['workType'][1]))->isStaffOrInstructorVisibleOnly();
+                    $this->workTypeMapper->findById($diff['assessment']['workType'][1])->isStaffOrInstructorVisibleOnly();
                 if ($isPreviousHidden && $isCurrentHidden) {
                     // no notification
                     return;
