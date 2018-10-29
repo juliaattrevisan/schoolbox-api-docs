@@ -322,7 +322,7 @@ class Builder implements BuilderInterface
 			$this->title, $this->namespace, $this->icon, $this->href,
 			$this->params, $this->severity, $this->topics,
 			// optional args
-			$this->time, $this->meta, $this->context
+			$this->time, $this->meta, $this->context, $this->validate
 		);
 	}
 }

@@ -164,6 +164,7 @@ class Instance implements JsonSerializable
      * @param int                  $time
      * @param array                $meta
      * @param array                $context
+     * @param bool                 $validate
      * @throws RuntimeException
      * @throws OutOfBoundsException
      */
@@ -177,7 +178,8 @@ class Instance implements JsonSerializable
         $topics,
         $time = null,
         $meta = null,
-        $context = null
+        $context = null,
+        $validate = true
     ) {
 
         if (preg_match_all('`:([A-Za-z_]\w*)`', $text, $matches)) {
@@ -194,8 +196,15 @@ class Instance implements JsonSerializable
 
         // test template vs tokens
         if (!$this->arraysIdentical(array_keys($params), $this->tokens)) {
-            foreach (\array_diff($this->tokens, \array_keys($params)) as $missing) {
-                $params[$missing] = new SimpleParam('');
+            if ($validate) {
+                $a = json_encode($this->tokens);
+                $b = json_encode(array_keys($params));
+                throw new OutOfBoundsException("Parameters supplied must exactly match the :tokens in the message string: expected $a, got $b");
+            } else {
+                // filling in missing parameters with empty string.
+                foreach (\array_diff($this->tokens, \array_keys($params)) as $missing) {
+                    $params[$missing] = new SimpleParam('');
+                }
             }
         }
 
