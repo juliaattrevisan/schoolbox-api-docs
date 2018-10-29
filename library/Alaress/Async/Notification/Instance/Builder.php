@@ -4,13 +4,13 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+declare(strict_types=1);
 
 namespace Alaress\Async\Notification\Instance;
 
 use Alaress\Async\Notification\Parameter\ParameterInterface;
-use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Html\ToText as Html2Text;
 use InvalidArgumentException;
 use OutOfBoundsException;
@@ -110,19 +110,6 @@ class Builder implements BuilderInterface
 		$this->href = $href;
 		return $this;
 	}
-
-
-	public function fillParams() {
-	    if (empty($this->title)) {
-	        return;
-        }
-        if (preg_match_all('`:([A-Za-z_]\w*)`', $this->title, $matches)) {
-            foreach ($matches[1] as $match) {
-                $this->setParam($match, new Param(''));
-            }
-        }
-    }
-
 
 	/**
      * Set body, converting to plaintext as you go (we can't support markup in the body)

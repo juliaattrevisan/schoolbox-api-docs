@@ -228,8 +228,11 @@
                         return (a.time == b.time ? 0 : (a.time < b.time ? 1 : -1));
                     });
 
-                    var i, stack = [];
+                    var i, stack = [], plain = false;
                     for(i = 0; i < instances.length; ++i) {
+                        if(instances[i].mode == 2) {
+                            plain = true;
+                        }
                         if(instances[i].mode < 0) {
                             if(i == 0) {
                                 stack = [instances[i].text];
@@ -251,8 +254,11 @@
 
                     // All stack items must be HTML-escaped
                     stack = stack.map(escapeHtmlChars);
-
-                    string = string.replace(':'+token, b + stack.join(_b + ', ' + b) + _b);
+                    if (plain) {
+                        string = string.replace(':'+token, stack.join(', '));
+                    } else {
+                        string = string.replace(':'+token, b + stack.join(_b + ', ' + b) + _b);
+                    }
                 });
                 return string.replaceLast(_b + ',', b + ' ' + settings.dictItemAnd);
             }

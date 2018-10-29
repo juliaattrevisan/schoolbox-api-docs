@@ -4,8 +4,9 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+declare(strict_types=1);
 
 namespace Alaress\Async\Notification\Instance;
 
@@ -17,6 +18,7 @@ use InvalidArgumentException;
 use JsonSerializable;
 use OutOfBoundsException;
 use RuntimeException;
+use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use TextFormatter;
 
 /**
@@ -192,9 +194,9 @@ class Instance implements JsonSerializable
 
         // test template vs tokens
         if (!$this->arraysIdentical(array_keys($params), $this->tokens)) {
-            $a = json_encode($this->tokens);
-            $b = json_encode(array_keys($params));
-            throw new OutOfBoundsException("Parameters supplied must exactly match the :tokens in the message string: expected $a, got $b");
+            foreach (\array_diff($this->tokens, \array_keys($params)) as $missing) {
+                $params[$missing] = new SimpleParam('');
+            }
         }
 
         foreach ($params as $p) {

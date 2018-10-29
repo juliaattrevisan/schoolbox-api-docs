@@ -106,12 +106,17 @@ class NotifierProxy
      */
     public function notify(IAssessable $assessment, User $effector, array $before): void
     {
+        $diff = $this->differ->diff($this->dehydrate($assessment), $before);
         if ($assessment->isDeleted()) {
             $action = PlanMapper::METHOD_DELETE;
+        } else if (empty($before)) {
+            $action = PlanMapper::METHOD_CREATE;
+        } else if ($diff === null || \count($diff) === 0) {
+            // updated without any change
+            return;
         } else {
-            $action = empty($before) ? PlanMapper::METHOD_CREATE : PlanMapper::METHOD_UPDATE;
+            $action = PlanMapper::METHOD_UPDATE;
         }
-        $diff = $this->differ->diff($this->dehydrate($assessment), $before);
 
         // Now, trigger notifiers
         // Participant object has little idea of whether assessment was created or updated,

@@ -124,6 +124,7 @@ class Notification {
 			switch($param->getMode()) {
 				// replace existing
 				case ParameterInterface::STACKING_REPLACE:
+                case ParameterInterface::STACKING_REPLACE_NO_DECORATION:
 					$this->params[$token] = array($instance->getTime() => $param);
 					break;
 

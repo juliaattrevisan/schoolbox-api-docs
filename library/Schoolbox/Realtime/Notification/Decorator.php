@@ -287,6 +287,7 @@ class Decorator extends NotificationBundle
             foreach ($params as $param) {
                 switch ($param->getMode()) {
                     case ParameterInterface::STACKING_REPLACE:
+                    case ParameterInterface::STACKING_REPLACE_NO_DECORATION:
                         $subst = $this->param2html($param, $fqdn);
                         break;
                     case ParameterInterface::STACKING_APPEND:
@@ -333,6 +334,9 @@ class Decorator extends NotificationBundle
     {
         if ($param->getHref()) {
             return sprintf('<a href="%s%s">%s</a>', $fqdn, $param->getHref(), $param->getText());
+        }
+        if ($param->getMode() === $param::STACKING_REPLACE_NO_DECORATION) {
+            return $param->getText();
         }
         return "<a>{$param->getText()}</a>";
     }

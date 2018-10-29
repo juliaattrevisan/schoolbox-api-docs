@@ -4,9 +4,9 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
+declare(strict_types=1);
 
 namespace Alaress\Async\Notification\Parameter;
 
@@ -32,6 +32,10 @@ interface ParameterInterface extends JsonSerializable {
 	 */
 	const STACKING_APPEND  = 1;
 
+    /**
+     * Same as STACKING_REPLACE except for no decoration
+     */
+    const STACKING_REPLACE_NO_DECORATION = 2;
 
     /**
      * @return string
