@@ -163,7 +163,7 @@ class ArticleResolver implements IArticleResolver
             }
             $relatedWhereClauses = $this->buildWhereClauses($relatedAttributes, $relationship, $whereParams);
         } else {
-            $relatedWhereClauses = new Collection();
+            $relatedWhereClauses = [];
         }
 
         // Check for the unlikely case where the system is configured to not permit targeting to any segment types
