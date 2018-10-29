@@ -225,6 +225,38 @@ class Controller extends Base
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
+    private function getAudienceSegments($article) :array
+    {
+        $audienceSegments = [];
+
+        $codec = new Audience\Segment\Codec($this->audienceMapper);
+
+        $translator = new Audience\Segment\Translator(
+            $this->databaseInternal,
+            $this->strategyFactory
+        );
+        $translator->buildCache($article);
+
+        foreach ($article->getAudience() as $segment) {
+            // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
+            // Labels are used in brick rendering
+            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
+
+            // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
+            if ($segment->isSimple()) {
+                $encodedValue = $codec->encodeValue($segment->getEntityValue());
+                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
+            } else {
+                foreach ($segment->getChildren() as $child) {
+                    $encodedValue = $codec->encodeValue($child->getEntityValue());
+                    $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
+                }
+            }
+            $audienceSegments[] = $option;
+        }
+
+        return $audienceSegments;
+    }
 
     /**
      * Redirects to `getCreate`, with a predefined audience brick for the given
@@ -303,39 +335,11 @@ class Controller extends Base
             $zone->attachFiles([$article->getFeatureImage()->getHash()]);
         }
 
-        $codec = new Audience\Segment\Codec($this->audienceMapper);
-
-        $translator = new Audience\Segment\Translator(
-            $this->databaseInternal,
-            $this->strategyFactory
-        );
-        $translator->buildCache($article);
-
-        // Audiencing selectize data
-        $audienceSegments = [];
-        foreach ($article->getAudience() as $segment) {
-            // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
-            // Labels are used in brick rendering
-            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
-
-            // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
-            if ($segment->isSimple()) {
-                $encodedValue = $codec->encodeValue($segment->getEntityValue());
-                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
-            } else {
-                foreach ($segment->getChildren() as $child) {
-                    $encodedValue = $codec->encodeValue($child->getEntityValue());
-                    $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
-                }
-            }
-            $audienceSegments[] = $option;
-        }
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action'                 => 'Update',
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
-            'audienceSegments'       => $audienceSegments,
+            'audienceSegments'       => $this->getAudienceSegments($article),
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
             'returnUrl'              => $this->getReturnUrl(),
@@ -545,6 +549,7 @@ class Controller extends Base
                 'moderationEnabled' => $moderationEnabled,
                 'isSavedForLater'   => $isSavedForLater,
                 'returnUrl'         => $this->getReturnUrl(),
+                'audienceSegments'   => $this->getAudienceSegments($article),
             ];
         }
 
@@ -717,7 +722,7 @@ class Controller extends Base
      * @level 18.1
      *
      * @deprecated Article lists should now be done on the front-end, with an XHR calls
-     * 
+     *
      * @param int|null $year
      * @param int|null $month
      * @throws InvalidArgumentException
