@@ -124,8 +124,16 @@ class Generator
                 $capabilityMarkObject->getIndicatorMarks()[$indicatorId] = $indicatorMarkObject;
             }
 
+            // If $capabilityMarkValue is null:
+            // set the value based on scaling factor
+            $indicatorMaxValue = $capabilityUsageObject->calculateMaxValueFromIndicators();
+            $scalingFactor     = $indicatorMaxValue
+                ? $capabilityMaxValue / $indicatorMaxValue
+                : 0
+            ;
             $capabilityMarkObject->setValue(
-                $capabilityMarkValue ?? $capabilityMarkObject->calculateIndicatorMarkSum()
+                $capabilityMarkValue
+                ?? ($capabilityMarkObject->calculateIndicatorMarkSum() * $scalingFactor)
             );
 
             $capabilityMarkObjects[$capabilityId] = $capabilityMarkObject;
