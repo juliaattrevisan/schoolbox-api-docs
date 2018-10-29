@@ -22,6 +22,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
@@ -45,7 +46,8 @@ class SubmissionNotifier extends AbstractModuleNotifier
     const TRIGGER_RESUBMITTED = 'resubmitted';
     const TRIGGER_DELETED     = 'deleted';
 
-    const PATTERN_DELETED_TITLE = ':owner removed your previous submission to :boxname in :catname, you can now resubmit';
+    const PATTERN_DELETED_TITLE   = ':owner removed your previous submission to :boxname in :catname, you can now resubmit';
+    const PATTERN_SUBMITTED_TITLE = ':student :type work to :boxname in :catname';
 
     /** @var SubmissionBoxMapper */
     protected $submissionBoxMapper;
@@ -215,12 +217,13 @@ class SubmissionNotifier extends AbstractModuleNotifier
 
         $bob = new Builder();
 
-        $bob->setTitle(":student $type work to :boxname in :catname")
+        $bob->setTitle(self::PATTERN_SUBMITTED_TITLE)
             ->setParams(
                 array(
                     'student' => new UserParam($user),
                     'boxname' => new Param($box->getName(), "/learning/assessments/{$box->getAssessmentId()}/{$user->getId()}"),
-                    'catname' => new CategoryParam($folder)
+                    'catname' => new CategoryParam($folder),
+                    'type'    => new SimpleParam($type),
                 )
             )
             ->setIcon("/portrait.php?userId=$studentExtId&size={$this->iconSize}")

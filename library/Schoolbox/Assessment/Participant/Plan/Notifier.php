@@ -292,9 +292,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
         }
 
-        if ($method === Mapper::METHOD_DELETE
-            || (!$isPreviousHidden && $isCurrentHidden)
-            || ($closeDate && $closeDate->isPast())) {
+        if ((!$isPreviousHidden && $isCurrentHidden) || ($closeDate && $closeDate->isPast())) {
             $bundle->detachEach([
                 self::TRIGGER_OPEN,
                 self::TRIGGER_UPCOMING,
