@@ -140,9 +140,11 @@ class Generator
         }
 
         // Build a marked grid
-        $feedback   = new DueWorkFeedback();
-        $markScheme = $markSchemeFactory->spawnMarkSchemeFor($grid->getAssessment());
-        $markedGrid = new RubricMarkedGrid\MarkedGrid($feedback, $grid, $markScheme);
+        $markedGrid = new RubricMarkedGrid\MarkedGrid(
+            new DueWorkFeedback(),
+            $grid,
+            $grid->getAssessment()->getMarkScheme()
+        );
         $markedGrid->setCapabilityMarks($capabilityMarkObjects);
         return $markedGrid;
     }
