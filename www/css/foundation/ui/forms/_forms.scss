@@ -234,6 +234,12 @@ th, td{
 		@include switch-label;
 	}
 
+	&.medium {
+		@include wide-switch(6rem);
+		@include switch-label;
+	}
+
+
 	&.inline {
 		display: inline-block;
 		margin-bottom: 0;
