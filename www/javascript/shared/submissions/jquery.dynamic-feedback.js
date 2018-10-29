@@ -127,7 +127,14 @@
                 .on('change', ':input', timeoutUpdate)
                 .on('success.attachzone', '.attachzone', timeoutUpdate)
                 .on('removedfile.attachzone', '.attachzone', timeoutUpdate);
+
+            // Trigger change on final grade input when using the Assign From Rubric button to update it
+            $(config.assessmentList).find("#use-rubric-value").click(function() {
+                $("[data-mark-input]").trigger("change");
+            });
         }
+
+
 
         /**
          * Set up actions to occur when Publishing Feedback

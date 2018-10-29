@@ -29,6 +29,8 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
  */
 class MarkedGrid
 {
+    private const PRECISION = 2;
+
     /**
      * The feedback which this marked grid is assigned to.
      *
@@ -104,7 +106,7 @@ class MarkedGrid
     public function retrieveNormalizedMark(): float
     {
         if ($this->calculateTotalAvailableMarks() > 0) {
-            return ($this->calculateScaledMark() / $this->calculateTotalAvailableMarks()) * 100;
+            return round(($this->calculateScaledMark() / $this->calculateTotalAvailableMarks()) * 100, self::PRECISION);
         } else {
             return 0;
         }

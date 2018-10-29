@@ -68,7 +68,7 @@ class CapabilityMark extends TestCase
         yield 'Capability mark 2 (unscaled)' => [$markedGrid->getCapabilityMarks()[2], 6];
 
 
-        // The same grid, with scaling factors applied
+        // The same grid, with customised capability maximums
         $scaledCapabilityUsages = $capabilityUsages;
         $scaledCapabilityUsages[1]['maxValue'] = 8;
         $scaledCapabilityUsages[2]['maxValue'] = 32;
@@ -204,7 +204,7 @@ class CapabilityMark extends TestCase
         yield 'Capability mark 2 (unscaled)' => [$markedGrid->getCapabilityMarks()[2], 37.5];
 
 
-        // The same grid, with scaling factors applied: scaling is ignored
+        // The same grid, with custom capability maximums: scaling is ignored
         $scaledCapabilityUsages = $capabilityUsages;
         $scaledCapabilityUsages[1]['maxValue'] = 8;
         $scaledCapabilityUsages[2]['maxValue'] = 32;
@@ -273,7 +273,7 @@ class CapabilityMark extends TestCase
         yield 'Capability mark 2 (unscaled)' => [$markedGrid->getCapabilityMarks()[2], '6 / 16'];
 
 
-        // The same grid, with scaling factors applied: scaling is ignored
+        // The same grid, with custom capability maximums: scaling is ignored
         $scaledCapabilityUsages = $capabilityUsages;
         $scaledCapabilityUsages[1]['maxValue'] = 8;
         $scaledCapabilityUsages[2]['maxValue'] = 32;
@@ -297,7 +297,7 @@ class CapabilityMark extends TestCase
             $nullCapabilityUsages,
             $capabilityMarks
         );
-        yield 'Capability mark 1 (null descriptors)'  => [$markedGrid->getCapabilityMarks()[1], '0 / 1'];
+        yield 'Capability mark 1 (null descriptors)'  => [$markedGrid->getCapabilityMarks()[1], null];
         yield 'Capability mark 2 (null capabilities)' => [$markedGrid->getCapabilityMarks()[2], '6 / 16'];
     }
 

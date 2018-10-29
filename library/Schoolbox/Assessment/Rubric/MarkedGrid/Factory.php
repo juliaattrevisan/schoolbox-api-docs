@@ -57,25 +57,31 @@ class Factory
             // Set its value
             $capabilityId        = $capabilityUsage->getCapability()->getId();
 
-            // This is the literal string the user entered into the capability mark input field
-            // (or its percentage bracket equivalent, if letter grade)
-            $capabilityCustomMarkInput = $isSelfReflection
-                ? null
-                : $postCapabilities[$capabilityId]['customMark'];
-
-            $capabilityCustomMarkInput = $capabilityCustomMarkInput ?: null;
-
-            // Validate the input string first
-            $capMarkSpec = new ValidCapabilityMark($capabilityUsage->getMaxValue(), $capabilityMark->getMarkScheme());
-            if ($capMarkSpec->isSatisfiedBy($capabilityCustomMarkInput)) {
-                // Set the capability mark normalised to a value out of the total descriptor points for the capability
-                $capabilityUnscaledMark = $isSelfReflection
+            // If mark per cap is off, this will be empty as no capability data gets posted
+            if ($postCapabilities) {
+                // This is the literal string the user entered into the capability mark input field
+                // (or its percentage bracket equivalent, if letter grade)
+                $capabilityCustomMarkInput = $isSelfReflection
                     ? null
-                    : floatval($postCapabilities[$capabilityId]['unscaledMark']);
+                    : $postCapabilities[$capabilityId]['customMark'];
 
-                $capabilityMark->setValue($capabilityUnscaledMark);
+                $capabilityCustomMarkInput = $capabilityCustomMarkInput ?: null;
+
+                // Validate the input string first
+                $capMarkSpec = new ValidCapabilityMark($capabilityUsage->getMaxValue(), $capabilityMark->getMarkScheme());
+                if ($capMarkSpec->isSatisfiedBy($capabilityCustomMarkInput)) {
+                    // Set the capability mark normalised to a value out of the total descriptor points for the capability
+                    $capabilityUnscaledMark = $isSelfReflection
+                        ? null
+                        : (float)$postCapabilities[$capabilityId]['unscaledMark'];
+
+                    $capabilityMark->setValue($capabilityUnscaledMark);
+                } else {
+                    throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
+                }
             } else {
-                throw new \InvalidArgumentException("Capability mark must be between 0 and " . $capabilityMark->getCapabilityUsage()->getMaxValue());
+                // If mark per cap is off, set capability mark to null; the model knows how to handle this.
+                $capabilityMark->setValue(null);
             }
 
             // Set marks for indicators

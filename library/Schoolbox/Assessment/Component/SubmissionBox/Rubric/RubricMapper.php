@@ -637,10 +637,7 @@ class RubricMapper
         $rowSet     = $grid->getRowSet();
 
         $markSchemeFactory = new MarkSchemeFactory();
-        $gridMarkScheme    = $markSchemeFactory->spawnForCapability(
-            $feedback->getAssessable(),
-            $grid->calculateMaxValueFromCapabilities()
-        );
+        $gridMarkScheme    = $feedback->getAssessable()->getMarkScheme();
 
         $markedGrid = new MarkedGrid($feedback, $grid, $gridMarkScheme);
 

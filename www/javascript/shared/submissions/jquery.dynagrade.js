@@ -67,13 +67,13 @@
 
         var scaledMark = this.attr('data-scaled-mark'),
             maxFromIndicators = this.attr('data-row-max-sum'),
-            capMax = parseInt(this.attr('data-max'));
+            capMax = parseFloat(this.attr('data-max'));
 
         // If capability max is 0, use the max calculated from the indicators instead
         if (capMax >= 0) {
-            percentage = parseInt(scaledMark / capMax * 100);
+            percentage = parseFloat(scaledMark / capMax * 100);
         } else {
-            percentage = parseInt(scaledMark / maxFromIndicators * 100);
+            percentage = parseFloat(scaledMark / maxFromIndicators * 100);
         }
 
         if (isNaN(percentage)) {
