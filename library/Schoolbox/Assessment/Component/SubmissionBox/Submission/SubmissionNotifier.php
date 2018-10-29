@@ -48,6 +48,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
 
     const PATTERN_DELETED_TITLE   = ':owner removed your previous submission to :boxname in :catname, you can now resubmit';
     const PATTERN_SUBMITTED_TITLE = ':student :type work to :boxname in :catname';
+    const PATTERN_SUBMITTED_ON_BEHALF_OF_TITLE = ':teacher :type work on behalf of :student to :boxname in :catname';
 
     /** @var SubmissionBoxMapper */
     protected $submissionBoxMapper;
@@ -195,15 +196,13 @@ class SubmissionNotifier extends AbstractModuleNotifier
     /**
      * @param string $type
      * @param Submission $submission
-     * @param User $user
+     * @param User $effector
      * @param array|null $diff
      * @return Envelope
      */
-    protected function submissionNotification(string $type, Submission $submission, User $user, $diff = null): Envelope
+    protected function submissionNotification(string $type, Submission $submission, User $effector, $diff = null): Envelope
     {
         $envelope = new Envelope();
-
-        $studentExtId = $user->getExternalId();
 
         try {
             $box = $this->submissionBoxMapper->findById($submission->getSubmissionBox()->getId());
@@ -215,19 +214,32 @@ class SubmissionNotifier extends AbstractModuleNotifier
 
         $boxId = $box->getId();
 
-        $bob = new Builder();
+        $student = $submission->getOwner();
+        $params = [
+            'boxname' => new Param($box->getName(), "/learning/assessments/{$box->getAssessmentId()}/{$student->getId()}"),
+            'catname' => new CategoryParam($folder),
+            'type'    => new SimpleParam($type),
+        ];
 
-        $bob->setTitle(self::PATTERN_SUBMITTED_TITLE)
-            ->setParams(
-                array(
-                    'student' => new UserParam($user),
-                    'boxname' => new Param($box->getName(), "/learning/assessments/{$box->getAssessmentId()}/{$user->getId()}"),
-                    'catname' => new CategoryParam($folder),
-                    'type'    => new SimpleParam($type),
-                )
-            )
-            ->setIcon("/portrait.php?userId=$studentExtId&size={$this->iconSize}")
-            ->setHref("/learning/assessments/{$box->getAssessmentId()}/{$user->getId()}")
+        if ($effector->getId() === $student->getId()) {
+            $params['student'] = new UserParam($effector);
+            $title = self::PATTERN_SUBMITTED_TITLE;
+        } else {
+            $title = self::PATTERN_SUBMITTED_ON_BEHALF_OF_TITLE;
+            $params['teacher'] = new UserParam($effector);
+            try {
+                $student = $this->userMapper->findById($submission->getOwner()->getId());
+            } catch (Mapper\Exception $e) {
+                return $envelope;
+            }
+            $params['student'] = new UserParam($student);
+        }
+
+        $bob = new Builder();
+        $bob->setTitle($title)
+            ->setParams($params)
+            ->setIcon("/portrait.php?userId={$student->getExternalId()}&size={$this->iconSize}")
+            ->setHref("/learning/assessments/{$box->getAssessmentId()}/{$student->getId()}")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addTopic("duework.$boxId.$type")

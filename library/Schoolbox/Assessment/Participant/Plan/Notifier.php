@@ -694,7 +694,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $bob = $this->buildGenericBuilder($assessment)
                     ->setSeverity(Logger::WARNING)
                     ->addTopic("$topicStub.upcoming")
-                    ->setParam('verb', new Param($verb, null, Param::STACKING_APPEND));
+                    ->setParam('verb', new SimpleParam($verb));
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
