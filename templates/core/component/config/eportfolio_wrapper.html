@@ -1,14 +1,14 @@
 <div class="row">
     <div class="small-12 columns">
-        <ul class="component-titlebar">
-            <li class="actions-small-{COMPONENT_ACTION_COUNT}">
+        <div class="component-titlebar">
+            <div class="actions-small-{COMPONENT_ACTION_COUNT}">
                 <div class="list-item">
-                    <div class="small-12 card">
-                        <h2 title="{COMPONENT_NAME}">
-                            <!-- BEGIN drag_handle --><a href="#" class="icon-grip" id="drag{COMPONENT_INSTANCE_ID}" data-component-handle></a>
-                            <!-- END drag_handle -->
-                            {COMPONENT_NAME}</h2>
-                    </div>
+                    <h2 title="{COMPONENT_NAME}">
+                        <!-- BEGIN drag_handle -->
+                        <a href="#" class="icon-grip" id="drag{COMPONENT_INSTANCE_ID}" data-component-handle></a>
+                        <!-- END drag_handle -->
+                        {COMPONENT_NAME}
+                    </h2>
                 </div>
                 <nav>
                     <!-- BEGIN settings_link -->
@@ -21,8 +21,9 @@
                     <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
                     <!-- END settings_close -->
                 </nav>
-            </li>
-        </ul>
+            </div>
+        </div>
+
         <!-- BEGIN settings_panel -->
         <div data-component-panel="settings" class="editPanel small-12">
             <section>
