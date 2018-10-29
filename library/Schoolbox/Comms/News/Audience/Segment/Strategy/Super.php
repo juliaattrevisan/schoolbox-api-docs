@@ -53,14 +53,15 @@ class Super extends SimpleStrategy
         return '';
     }
 
+
     /**
      * @inheritdoc
      * @param GenericCollection|User[] $users
      */
     public function getValues(GenericCollection $users): array
     {
-        foreach($users as $user){
-            if($user->isSuperuser()){
+        foreach ($users as $user) {
+            if ($user->isSuperuser()) {
                 return [self::ENTITY_VALUE];
             }
         }

@@ -89,6 +89,7 @@ class PastoralGroup extends SimpleStrategy
         return '';
     }
 
+
     /**
      * @param GenericCollection|User[] $users
      * @return array
@@ -96,7 +97,7 @@ class PastoralGroup extends SimpleStrategy
     public function getValues(GenericCollection $users): array
     {
         $userIds = $users->getPropertyValues('id');
-        if(!\count($userIds)){
+        if (!\count($userIds)) {
             return [];
         }
 

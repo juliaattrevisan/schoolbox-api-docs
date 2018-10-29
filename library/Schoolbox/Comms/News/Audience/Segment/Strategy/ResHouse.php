@@ -56,6 +56,7 @@ class ResHouse extends SimpleStrategy
         return '';
     }
 
+
     /**
      * @inheritdoc
      * @param GenericCollection|User[] $users

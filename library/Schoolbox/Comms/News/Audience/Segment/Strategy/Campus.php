@@ -98,12 +98,12 @@ class Campus extends SimpleStrategy
     public function getValues(GenericCollection $users): array
     {
         $values = [];
-        foreach($users as $user){
+        foreach ($users as $user) {
             $campuses = $user->getCampusCollection();
-            if(!\count($campuses)){
+            if (!\count($campuses)) {
                 $values[] = null;
             } else {
-                foreach($campuses as $campus){
+                foreach ($campuses as $campus) {
                     $values[] = $campus->getId();
                 }
             }

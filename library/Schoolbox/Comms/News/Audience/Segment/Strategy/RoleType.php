@@ -55,6 +55,7 @@ class RoleType extends SimpleStrategy
         return '';
     }
 
+
     /**
      * @inheritdoc
      * @param GenericCollection|User[] $users
