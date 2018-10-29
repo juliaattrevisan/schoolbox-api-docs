@@ -214,25 +214,25 @@ class ArticleResolver implements IArticleResolver
         $colEntityValue  = Mapper::FIELD_ENTITY_VALUE;
 
         $whereClauses = [];
-        foreach($attributes as $entityType => $values){
+        foreach ($attributes as $entityType => $values) {
             $matchNull = $this->simpleStrategies[$entityType]::isValidNullEntityValue() && \in_array(null, $values, true);
             $filtered  = \array_filter($values, function ($value) {
                 return null !== $value;
             });
-            $parts = [];
-            if(\count($filtered)){
-                $prefix  = "{$entityType}_{$relationship[0]}";
+            $parts     = [];
+            if (\count($filtered)) {
+                $prefix   = "{$entityType}_{$relationship[0]}";
                 $bindings = Predicate\Builder::getBindings($filtered, $prefix);
                 $parts[]  = "$table.$colEntityValue IN ({$bindings->getPlaceholder()})";
                 foreach ($bindings->getParams() as $placeholder => $val) {
                     $whereParams[$placeholder] = $val;
                 }
             }
-            if($matchNull){
+            if ($matchNull) {
                 $parts[] = "$table.$colEntityValue IS NULL";
             }
-            if(\count($parts)){
-                $whereClauses[] = "($table.$colRelationship = '$relationship' AND $table.$colEntityType = '$entityType' AND (". \implode(' OR ', $parts) ."))";
+            if (\count($parts)) {
+                $whereClauses[] = "($table.$colRelationship = '$relationship' AND $table.$colEntityType = '$entityType' AND (" . \implode(' OR ', $parts) . "))";
             }
         }
         return $whereClauses;
