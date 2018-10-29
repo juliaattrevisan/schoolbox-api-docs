@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet as RubricRowSet;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 
 /**
  * Generator for test data for grid tests.
@@ -181,6 +182,12 @@ class Generator
             ->setMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL))
             ->setMaxMark(100);
         $grid    = new RubricGrid\Grid($dueWork, $rowSet);
+
+
+        // Create the mark scheme
+        $markSchemeFactory = new MarkSchemeFactory();
+        $dueWork->setMarkScheme($markSchemeFactory->spawnMarkSchemeFor($dueWork));
+
 
         // Build and add levels
         foreach ($levels as $levelId => $level) {

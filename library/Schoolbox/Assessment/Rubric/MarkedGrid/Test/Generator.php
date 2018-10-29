@@ -11,10 +11,8 @@ namespace Schoolbox\Assessment\Rubric\MarkedGrid\Test;
 use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\MarkedGrid as RubricMarkedGrid;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
-use Schoolbox\Learning\MarkScheme\None;
 /**
  * Generator for test data for marked grid tests.
  */
