@@ -112,7 +112,11 @@ class DescriptorTest extends TestCase
             ->setDirectionAscending();
         yield 'null values, ascending' => [$descriptor, null, null];
 
-        $descriptor->setDirectionDescending();
+        $descriptor = new Descriptor();
+        $descriptor
+            ->setMinValue(null)
+            ->setMaxValue(null)
+            ->setDirectionDescending();
         yield 'null values, descending' => [$descriptor, null, null];
 
 
@@ -124,7 +128,11 @@ class DescriptorTest extends TestCase
             ->setDirectionAscending();
         yield 'no range, ascending' => [$descriptor, 8, 8];
 
-        $descriptor->setDirectionDescending();
+        $descriptor = new Descriptor();
+        $descriptor
+            ->setMinValue(8)
+            ->setMaxValue(8)
+            ->setDirectionDescending();
         yield 'no range, descending' => [$descriptor, 8, 8];
 
 
@@ -136,7 +144,11 @@ class DescriptorTest extends TestCase
             ->setDirectionAscending();
         yield 'range, ascending' => [$descriptor, 1, 8];
 
-        $descriptor->setDirectionDescending();
+        $descriptor = new Descriptor();
+        $descriptor
+            ->setMinValue(1)
+            ->setMaxValue(8)
+            ->setDirectionDescending();
         yield 'range, descending' => [$descriptor, 8, 1];
     }
 
