@@ -240,7 +240,7 @@ class IndicatorUsage extends TestCase
         yield 'Ascending 8' => [$indicatorUsage1, $level5->getId(), 7];
 
 
-        // Descending: [8, 6, 4, 2, 0] => [7..8, 5..6, 3..4, 1..2, 0]
+        // Descending: [8, 6, 4, 2, 0] => [8..7, 6..5, 4..3, 2..1, 0]
         $indicatorUsage2 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 2.1')->setMaxValue(8);
@@ -316,7 +316,7 @@ class IndicatorUsage extends TestCase
         yield 'Ascending skip-null-start 10'   => [$indicatorUsage5, $level3->getId(), 6];
 
 
-        // Desc, skip null before: [10, null, 5, 0] => [6..10, null, 1..5, 0]
+        // Desc, skip null before: [10, null, 5, 0] => [10..6, null, 5..1, 0]
         $indicatorUsage6 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 6.1')->setMaxValue(10);
@@ -335,7 +335,7 @@ class IndicatorUsage extends TestCase
         yield 'Descending skip-null-before 10'   => [$indicatorUsage6, $level4->getId(), 0];
 
 
-        // Desc, skip null after: [10, 5, null, 0] => [6..10, 1..5, null, 0]
+        // Desc, skip null after: [10, 5, null, 0] => [10..6, 5..1, null, 0]
         $indicatorUsage7 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 7.1')->setMaxValue(10);
@@ -354,7 +354,7 @@ class IndicatorUsage extends TestCase
         yield 'Descending skip-null-after 10'   => [$indicatorUsage7, $level4->getId(), 0];
 
 
-        // Asc+Desc: [0, 4, 8, 3, 0]  => [0, 1..4, 5..8, 1..3, 0] (use highest max below this max)
+        // Asc+Desc: [0, 4, 8, 3, 0]  => [0, 1..4, 5..8, 3..1, 0] (use highest max below this max)
         $indicatorUsage8 = new RubricGrid\IndicatorUsage($indicator);
 
         $descriptor1 = (new RubricGrid\Descriptor())->setDescription('Descriptor 8.1')->setMaxValue(0);
