@@ -147,27 +147,11 @@
         );
 
 
-        // Determine the capability mark type on a per-cap basis
-        var determineCapabilityMarkType = function (element) {
-            // element might be the mark type element, or the child of one
-            var $element                  = $(element),
-                capabilitySummarySelector = '[data-group-summary]',
-                markTypeAttribute         = 'data-mark-type';
-            if ($element.is(capabilitySummarySelector)) {
-                return $element.attr(markTypeAttribute);
-            }
-            return $element.closest(capabilitySummarySelector).attr(markTypeAttribute);
-        };
-
-
         // Add validation rules for per-capability marks
         $("[data-group-mark]").each(function() {
 
-            var markType = determineCapabilityMarkType(this);
-
             // Can't validate letter grade dropdown as its values are preset on the frontend
             if (markType !== 'letter') {
-
                 // Percentage and total mark types must be numeric
                 $(this).rules('add', {
                     number: true
@@ -203,8 +187,7 @@
             $groups.each(function() {
                 var $this         = $(this),
                     displayedMark = $this.find("[data-group-descriptor-sum]").text().replace(/%/, '').trim(),
-                    customMark    = $this.find("[data-group-mark]").val(),
-                    markType      = determineCapabilityMarkType($this);
+                    customMark    = $this.find("[data-group-mark]").val();
 
                 if (markType === 'letter') {
                     var grades = getLetterGrades($this);
@@ -231,8 +214,7 @@
                 rubricId        = $changed.attr('data-rubric'),
                 rowSelector     = '[data-group="rb-' + rubricId + '-' + groupId + '"]',
                 $groupRows      = $(rowSelector),
-                rubricTotalMark = 0,
-                markType        = determineCapabilityMarkType($changed);
+                rubricTotalMark = 0;
 
             if ($groupRows.length) {
                 var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
