@@ -95,6 +95,38 @@ class Descriptor
 
 
     /**
+     * Retrieve the left-side value of this descriptor.
+     *
+     * @return float|null
+     * @throws \UnexpectedValueException if `assertValidity` fails
+     */
+    public function retrieveLeftValue(): ?float
+    {
+        $this->assertValidity();
+        if (!$this->hasValue()) {
+            return null;
+        }
+        return $this->direction === self::DIRECTION_ASC ? $this->minValue : $this->maxValue;
+    }
+
+
+    /**
+     * Retrieve the right-side value of this descriptor.
+     *
+     * @return float|null
+     * @throws \UnexpectedValueException if `assertValidity` fails
+     */
+    public function retrieveRightValue(): ?float
+    {
+        $this->assertValidity();
+        if (!$this->hasValue()) {
+            return null;
+        }
+        return $this->direction === self::DIRECTION_ASC ? $this->maxValue : $this->minValue;
+    }
+
+
+    /**
      * @return null|string
      */
     public function getDescription(): ?string
