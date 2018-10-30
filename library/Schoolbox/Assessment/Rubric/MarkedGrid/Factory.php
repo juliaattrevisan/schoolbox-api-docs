@@ -86,7 +86,7 @@ class Factory
 
             // Set marks for indicators
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
-                $descriptorMark     = null;
+                $indicatorMarkValue = null;
                 $selectedDescriptor = null;
                 foreach ($indicatorUsage->getDescriptors() as $descriptor) {
                     $descriptorId = $descriptor->getId();
@@ -94,8 +94,7 @@ class Factory
                     // Find which descriptor was actually selected
                     $isDescriptorSelected = !empty($postDescriptors[$descriptorId]['selected']);
                     if ($isDescriptorSelected) {
-                        // TODO validate descriptor mark is between min/max?
-                        $descriptorMark     = $postDescriptors[$descriptorId]['value'] ?? $descriptor->getMaxValue();
+                        $indicatorMarkValue = $postDescriptors[$descriptorId]['value'] ?? $descriptor->getMaxValue();
                         $selectedDescriptor = $descriptor;
                         break;
                     }
@@ -108,12 +107,32 @@ class Factory
                     $capabilityMark->getIndicatorMarks()->add($indicatorMark);
                 }
 
-                $indicatorMarkValue = $isSelfReflection
-                    ? null
-                    : filter_var($descriptorMark, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
-                $indicatorMark
-                    ->setDescriptor($selectedDescriptor)
-                    ->setValue($indicatorMarkValue);
+                $indicatorMark->setDescriptor($selectedDescriptor);
+                if ($isSelfReflection) {
+                    $indicatorMark->setValue(null);
+                } else {
+                    $indicatorMarkSpec = new ValidIndicatorMark($selectedDescriptor);
+                    if ($indicatorMarkSpec->isSatisfiedBy($indicatorMarkValue)) {
+                        $indicatorMark->setValue(
+                            filter_var(
+                                $indicatorMarkValue,
+                                FILTER_VALIDATE_FLOAT,
+                                FILTER_NULL_ON_FAILURE
+                            )
+                        );
+                    } else {
+                        if ($selectedDescriptor && $selectedDescriptor->hasValue()) {
+                            $message = sprintf(
+                                "Indicator mark must be between %s and %s",
+                                $selectedDescriptor->getMinValue(),
+                                $selectedDescriptor->getMaxValue()
+                            );
+                        } else {
+                            $message = "Indicator mark must be null";
+                        }
+                        throw new \InvalidArgumentException($message);
+                    }
+                }
             }
         }
 

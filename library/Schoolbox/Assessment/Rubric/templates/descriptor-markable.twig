@@ -17,7 +17,7 @@
     {% set descriptorHasMarkRange = rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
 
     {# Just show a text value if the descriptor is not selected #}
-    {% if descriptor.hasValue and showDescriptorValue  %}
+    {% if descriptor.hasValue and showDescriptorValue %}
         <span class="rb-value {% if not descriptorHasMarkRange %}used {% elseif isDescriptorSelected %}hide{% endif %}">
             {% if descriptorHasMarkRange %}
                 {{ descriptor.minValue }}–{{ descriptor.maxValue }}
@@ -29,7 +29,7 @@
 </label>
 
 {# TODO this select needs a label; technically it should be the one above but that's already in use for the descriptor checkbox #}
-{% if rubricGrid.assessment.useMarkRange %}
+{% if descriptorHasMarkRange %}
     {# Render a dropdown to select a value from the range #}
 
     <select id="rangeDropdown-{{ descriptor.id }}"
