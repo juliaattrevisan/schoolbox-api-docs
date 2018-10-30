@@ -28,9 +28,9 @@
 {% endblock %}
 
 {% block newsContent %}
-    <section>
-        {% include '@commsNews/article-list.twig' %}
-    </section>
+    {% include '@commsNews/article-list.twig' with {
+        initialPage: initialPage
+    } %}
 {% endblock %}
 
 {% block newsScripts %}

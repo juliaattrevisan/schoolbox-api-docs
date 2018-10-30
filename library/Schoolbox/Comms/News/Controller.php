@@ -825,6 +825,9 @@ class Controller extends Base
              */
             'key' => $this->getUser()->getKey(),
 
+            // For pagination
+            'initialPage' => $params->getPageNum(),
+
             // Vars for the nav sidebar
             'page' => $this->getRequest()->query['page'],
             'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
