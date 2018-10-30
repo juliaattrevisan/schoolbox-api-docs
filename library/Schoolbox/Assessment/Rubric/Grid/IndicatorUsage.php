@@ -143,29 +143,38 @@ class IndicatorUsage
                 continue;
             }
 
-            $candidateMinValues = [];
+            $leftMaxValue  = null;
+            $rightMaxValue = null;
 
             // What's the nearest non-null value to the left of this?
             $previousNonNullDescriptor = $this->retrieveAdjacentNonNullDescriptor($i, $keys, -1);
             if ($previousNonNullDescriptor && $previousNonNullDescriptor->getMaxValue() < $maxValue) {
-                $candidateMinValues[] = $previousNonNullDescriptor->getMaxValue();
+                $leftMaxValue = $previousNonNullDescriptor->getMaxValue();
             }
 
             // And what's the nearest non-null value to the right?
             $nextNonNullDescriptor = $this->retrieveAdjacentNonNullDescriptor($i, $keys, 1);
             if ($nextNonNullDescriptor && $nextNonNullDescriptor->getMaxValue() < $maxValue) {
-                $candidateMinValues[] = $nextNonNullDescriptor->getMaxValue();
+                $rightMaxValue = $nextNonNullDescriptor->getMaxValue();
             }
 
             // No candidates: use max value
             $minValue = $maxValue;
-            if (!empty($candidateMinValues)) {
-                $floorValue = max($candidateMinValues);
-                if (null !== $floorValue) {
-                    // Don't allow to be greater than max
-                    // (in case validation allowed decimals for ranged)
-                    $minValue = min($floorValue + $step, $maxValue);
+            if ($leftMaxValue !== null || $rightMaxValue !== null) {
+                // The greater of left and right gets used.
+                // Left:  ascending
+                // Right: descending
+                if ($leftMaxValue < $rightMaxValue) {
+                    $floorValue = $rightMaxValue;
+                    $descriptor->setDirectionDescending();
+                } else {
+                    $floorValue = $leftMaxValue;
+                    $descriptor->setDirectionAscending();
                 }
+
+                // Don't allow to be greater than max
+                // (in case validation allowed decimals for ranged)
+                $minValue = min($floorValue + $step, $maxValue);
             }
             $descriptor->setMinValue($minValue);
         }
