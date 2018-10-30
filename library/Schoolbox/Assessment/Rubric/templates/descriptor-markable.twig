@@ -20,7 +20,7 @@
     {% if descriptor.hasValue and showDescriptorValue %}
         <span class="rb-value {% if not descriptorHasMarkRange %}used {% elseif isDescriptorSelected %}hide{% endif %}">
             {% if descriptorHasMarkRange %}
-                {{ descriptor.minValue }}–{{ descriptor.maxValue }}
+                {{ descriptor.retrieveLeftValue }}–{{ descriptor.retrieveRightValue }}
             {% else %}
                 {{ descriptor.maxValue }}
             {% endif %}
