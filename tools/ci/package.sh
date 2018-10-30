@@ -135,3 +135,5 @@ then
 fi
 
 mv -v package.tar.gz package-artifacts/;
+mv -v schoolbox_*.orig.tar.gz package-artifacts/schoolbox_"$version".orig.tar.gz;
+mv -v schoolboxdev_*.orig.tar.gz package-artifacts/schoolboxdev_"$version".orig.tar.gz;
