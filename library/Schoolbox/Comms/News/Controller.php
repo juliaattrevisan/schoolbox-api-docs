@@ -225,9 +225,19 @@ class Controller extends Base
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
-    private function getAudienceSegments($article) :array
+    /**
+     * Generate article's audience segments with an option to filter the audiences that can be seen by the user on article view
+     * based on the account access permission. If the logged in user is a member of a staff, filtering will be skipped.
+     * 
+     * @param $article
+     * @param bool $detailView
+     * @return array
+     */
+    private function getAudienceSegments($article, $detailView = true) :array
     {
         $audienceSegments = [];
+        $accessLists = [];
+        $filterAudiences = $detailView && !$this->getUser()->getRole()->isStaff();
 
         $codec = new Audience\Segment\Codec($this->audienceMapper);
 
@@ -237,25 +247,54 @@ class Controller extends Base
         );
         $translator->buildCache($article);
 
-        foreach ($article->getAudience() as $segment) {
-            // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
-            // Labels are used in brick rendering
-            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
+        if ($filterAudiences) {
+            $accessLists = $this->getUserAccessLists();
+        }
 
-            // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
-            if ($segment->isSimple()) {
-                $encodedValue = $codec->encodeValue($segment->getEntityValue());
-                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
-            } else {
-                foreach ($segment->getChildren() as $child) {
-                    $encodedValue = $codec->encodeValue($child->getEntityValue());
-                    $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
-                }
+        foreach ($article->getAudience() as $segment) {
+            if ($filterAudiences && (\count($accessLists) > 0 && !\in_array($segment->getEntityValue(), $accessLists, false))) {
+                continue;
             }
-            $audienceSegments[] = $option;
+
+            if ($detailView) {
+                $segmentName = $translator->getSegmentName($segment);
+                $audienceSegments[$segmentName] = $segmentName;
+            } else {
+                // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
+                // Labels are used in brick rendering
+                $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
+
+                // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
+                if ($segment->isSimple()) {
+                    $encodedValue = $codec->encodeValue($segment->getEntityValue());
+                    $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
+                } else {
+                    foreach ($segment->getChildren() as $child) {
+                        $encodedValue = $codec->encodeValue($child->getEntityValue());
+                        $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
+                    }
+                }
+
+                $audienceSegments[] = $option;
+            }
         }
 
         return $audienceSegments;
+    }
+
+    /**
+     * Return user access lists by ids
+     * @return array
+     */
+    private function getUserAccessLists() :array
+    {
+        $userAccessIds = [];
+
+        foreach ($this->getUser()->getAccessList() as $access) {
+            $userAccessIds[] = $access->getServiceIdentifier();
+        }
+
+        return $userAccessIds;
     }
 
     /**
@@ -339,7 +378,7 @@ class Controller extends Base
             'action'                 => 'Update',
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
-            'audienceSegments'       => $this->getAudienceSegments($article),
+            'audienceSegments'       => $this->getAudienceSegments($article, false),
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
             'returnUrl'              => $this->getReturnUrl(),
