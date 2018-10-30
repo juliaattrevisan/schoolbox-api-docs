@@ -20,6 +20,10 @@ class Descriptor
     use Id;
 
 
+    public const DIRECTION_ASC = 'asc';
+    public const DIRECTION_DESC = 'desc';
+
+
     /**
      * @var string|null
      */
@@ -36,6 +40,14 @@ class Descriptor
      * @var float|null
      */
     private $maxValue;
+
+
+    /**
+     * What direction does the capability render in?
+     *
+     * @var string
+     */
+    private $direction = self::DIRECTION_ASC;
 
 
     /**

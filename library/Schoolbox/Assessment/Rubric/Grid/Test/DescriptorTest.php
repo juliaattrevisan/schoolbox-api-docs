@@ -84,17 +84,25 @@ class DescriptorTest extends TestCase
      * @dataProvider getTestRetrieveLeftRightValue
      *
      * @covers \Schoolbox\Assessment\Rubric\Grid\Descriptor::retrieveLeftValue
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Descriptor::retrieveRightValue
      * @param Descriptor $descriptor
      * @param float|null $expectedLeft
+     */
+    public function testRetrieveLeftValue(Descriptor $descriptor, ?float $expectedLeft): void
+    {
+        $this->assertSame($expectedLeft, $descriptor->retrieveLeftValue());
+    }
+
+
+    /**
+     * @dataProvider getTestRetrieveLeftRightValue
+     *
+     * @covers \Schoolbox\Assessment\Rubric\Grid\Descriptor::retrieveRightValue
+     * @param Descriptor $descriptor
+     * @param float|null $_
      * @param float|null $expectedRight
      */
-    public function testRetrieveLeftRightValue(
-        Descriptor $descriptor,
-        ?float $expectedLeft,
-        ?float $expectedRight
-    ): void {
-        $this->assertSame($expectedLeft, $descriptor->retrieveLeftValue());
+    public function testRetrieveLeftRightValue(Descriptor $descriptor, ?float $_, ?float $expectedRight): void
+    {
         $this->assertSame($expectedRight, $descriptor->retrieveRightValue());
     }
 }
