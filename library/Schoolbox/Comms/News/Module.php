@@ -7,6 +7,7 @@
 namespace Schoolbox\Comms\News;
 
 use Alaress\Authorizer\Rule;
+use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
@@ -42,6 +43,15 @@ class Module extends BaseModule
         $loggedIn = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn()
+            );
+        });
+
+        $canCreate = new Rule\LazyCallback(function () {
+            /** @var IConnector $db */
+            $db = $this->getInjector()->get('databaseInternal');
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Authorizer\Rule\HasAudiencesAvailable($this->getStrategyFactory()->makeAllSimpleStrategies(), $db)
             );
         });
 
@@ -144,7 +154,7 @@ class Module extends BaseModule
             return $this->preloadArticleWithAudience($params);
         };
 
-        $this->register('GET', '/create', 'getCreate', $loggedIn);                                               // Create news article
+        $this->register('GET', '/create', 'getCreate', $canCreate);                                              // Create news article
         $this->register('GET', '/create/folder/{folderId:\d+}', 'getCreateInFolder', $canCreateInFolder);
         $this->register('POST', '/create', 'postCreate', $loggedIn);
         $this->register('GET', '/topics', 'getTopics', $loggedIn);                                               // (async) Get a list of topics to chooze
