@@ -9,7 +9,7 @@
 
 {% set markScheme = capabilityMark.markScheme ?? rubricGrid.assessment.markScheme %}
 {% set markType   = markScheme.generateContext %}
-{% if showGroupTotal and markType.mode != "none" %}
+{% if showGroupTotal %}
     {% set letterGradeBracket = false %}
     {% set letterGradeValue   = '' %}
 
@@ -38,7 +38,8 @@
                       data-max="{{ capabilityMaxValue }}"
                       data-row-max-sum="{{ capabilityMaxFromIndicators }}"
                       data-group-id="{{ capabilityId }}"
-                      data-rubric-id="{{ rubricGrid.id }}">
+                      data-rubric-id="{{ rubricGrid.id }}"
+                      data-mark-type="{{ markType.mode }}">
                     
                     {# This is the value we insert into the database. #}
                     <input type="hidden"
@@ -54,7 +55,7 @@
 
                     <label for="group-{{ capabilityId }}-mark">{{ locale.rubricGroup.proper }} mark</label>
 
-                    {% if markType.mode == 'raw' %}
+                    {% if markType.mode == 'raw' or markType.mode == 'none' %}
                         <input data-group-mark
                                class="groupMark"
                                id="group-{{ capabilityId }}-mark"
