@@ -56,7 +56,13 @@ class DescriptorTest extends TestCase
 
 
     /**
-     * Data provider for `testAssertValidityInvalid`.
+     * Data provider for:
+     * * `testAssertValidityInvalid`
+     * * `testRetrieveLeftValueInvalid`
+     * * `testRetrieveRightValueInvalid`
+     *
+     * (All of these methods will fail an assertion if the descriptor is in an
+     *  invalid state.)
      *
      * @return iterable
      */
