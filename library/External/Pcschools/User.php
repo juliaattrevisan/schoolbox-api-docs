@@ -831,6 +831,27 @@ class External_Pcschools_User implements External_UserInterface
                 }
             }
             $statement->close();
+
+            $classArray = $statement = $this->getDatabase()->getAll("
+                SELECT DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
+                FROM TIMEFILE tf
+                            INNER JOIN SUB su ON tf.[YEAR] = su.[YEAR] AND tf.SUBJECT = su.SUBJECT_NO AND tf.CLASS = su.CLASS AND tf.TIME_PERIOD = su.PERIOD_ID
+                            INNER JOIN SUBJECT s ON tf.SUBJECT = s.NO
+                            INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
+                WHERE st.CURRENT_YEAR <> '99'
+                  AND (st.STUDKEY = '" . $this->getDatabase()->quote($studentExternalId) . "' AND tf.TIME_PERIOD = '" . $this->getDatabase()->quote($timePeriod) . "');
+            ");
+
+            foreach ($classArray as $class)
+            {
+                $code = $timePeriod . '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
+                $classes[$code] = [
+                    'code'       => $code,
+                    'name'       => $class['DESC'],
+                    'classType'  => '',
+                    'campusCode' => $timePeriod,
+                ];
+            }
         }
         return array_values($classes);
     }
