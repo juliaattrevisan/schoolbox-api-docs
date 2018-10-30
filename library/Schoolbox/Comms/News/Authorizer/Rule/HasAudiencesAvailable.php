@@ -53,13 +53,17 @@ class HasAudiencesAvailable implements IAuthorizationRule
                 $pieces[] = "({$strategy->getAudiencingSql($user)})";
             }
         }
+        if (!\count($pieces)) {
+            throw new Unauthorized("User does not have any audiences types available");
+        }
+
         // We can UNION ALL and avoid de-duplication logic as each sub-query has a distinct entity type
         $statement             = $this->db->executeQuery(\implode(' UNION ALL ', $pieces));
         $hasAudiencesAvailable = $statement->rowCount() > 0;
         $statement->close();
 
         if (!$hasAudiencesAvailable) {
-            throw new Unauthorized("User does not have any audiences available");
+            throw new Unauthorized("User does not have any audiences values available");
         }
     }
 }
