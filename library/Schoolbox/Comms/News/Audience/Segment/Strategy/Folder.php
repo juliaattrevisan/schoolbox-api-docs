@@ -199,7 +199,7 @@ class Folder extends SimpleStrategy
              * I'm restricted from seeing any folders
              */
             if (!\count($folderMembership)) {
-                return '';
+                return "SELECT 0, 'name', 'folder' from dual WHERE FALSE";
             }
 
             /* Otherwise, restrict my search results to these folders only
