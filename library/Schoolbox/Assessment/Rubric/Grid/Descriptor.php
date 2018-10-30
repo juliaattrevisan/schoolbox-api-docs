@@ -20,8 +20,8 @@ class Descriptor
     use Id;
 
 
-    public const DIRECTION_ASC = 'asc';
-    public const DIRECTION_DESC = 'desc';
+    private const DIRECTION_ASC = 'asc';
+    private const DIRECTION_DESC = 'desc';
 
 
     /**
@@ -187,11 +187,20 @@ class Descriptor
 
 
     /**
-     * @return string
+     * @return bool
      */
-    public function getDirection(): string
+    public function isDirectionAscending(): bool
     {
-        return $this->direction;
+        return $this->direction === self::DIRECTION_ASC;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isDirectionDescending(): bool
+    {
+        return $this->direction === self::DIRECTION_DESC;
     }
 
 
