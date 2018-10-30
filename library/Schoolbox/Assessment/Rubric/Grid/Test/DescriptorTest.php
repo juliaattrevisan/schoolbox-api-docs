@@ -98,7 +98,7 @@ class DescriptorTest extends TestCase
 
 
     /**
-     * Data provider for `testRetrieveLeftRightValue`.
+     * Data provider for `testRetrieveLeftValue` and `testRetrieveRightValue`.
      *
      * @return iterable
      */
@@ -114,29 +114,6 @@ class DescriptorTest extends TestCase
 
         $descriptor->setDirectionDescending();
         yield 'null values, descending' => [$descriptor, null, null];
-
-
-        // Single null value: should not exist, but treat as a null value one.
-        // Either both min and max must be null, or neither must be.
-        $descriptor = new Descriptor();
-        $descriptor
-            ->setMinValue(null)
-            ->setMaxValue(5)
-            ->setDirectionAscending();
-        yield 'no min value, ascending' => [$descriptor, null, null];
-
-        $descriptor->setDirectionDescending();
-        yield 'no min value, descending' => [$descriptor, null, null];
-
-        $descriptor = new Descriptor();
-        $descriptor
-            ->setMinValue(0)
-            ->setMaxValue(null)
-            ->setDirectionAscending();
-        yield 'no max value, ascending' => [$descriptor, null, null];
-
-        $descriptor->setDirectionDescending();
-        yield 'no max value, descending' => [$descriptor, null, null];
 
 
         // No range
@@ -185,8 +162,34 @@ class DescriptorTest extends TestCase
      * @param float|null $_
      * @param float|null $expectedRight
      */
-    public function testRetrieveLeftRightValue(Descriptor $descriptor, ?float $_, ?float $expectedRight): void
+    public function testRetrieveRightValue(Descriptor $descriptor, ?float $_, ?float $expectedRight): void
     {
         $this->assertSame($expectedRight, $descriptor->retrieveRightValue());
+    }
+
+
+    /**
+     * @dataProvider getTestAssertValidityInvalidData
+     *
+     * @covers \Schoolbox\Assessment\Rubric\Grid\Descriptor::retrieveLeftValue
+     * @param Descriptor $descriptor
+     */
+    public function testRetrieveLeftValueInvalid(Descriptor $descriptor): void
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        $descriptor->retrieveLeftValue();
+    }
+
+
+    /**
+     * @dataProvider getTestAssertValidityInvalidData
+     *
+     * @covers \Schoolbox\Assessment\Rubric\Grid\Descriptor::retrieveRightValue
+     * @param Descriptor $descriptor
+     */
+    public function testRetrieveRightValueInvalid(Descriptor $descriptor): void
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        $descriptor->retrieveLeftValue();
     }
 }
