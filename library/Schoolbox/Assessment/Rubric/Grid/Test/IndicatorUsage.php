@@ -440,17 +440,39 @@ class IndicatorUsage extends TestCase
      *
      * @param RubricGrid\IndicatorUsage $indicatorUsage
      * @param int                       $levelIndex
-     * @param float|null                $expected
+     * @param float|null                $expectedLeft
      */
-    public function testApplyDescriptorMinValues(
+    public function testApplyDescriptorMinValuesLeft(
         RubricGrid\IndicatorUsage $indicatorUsage,
         int $levelIndex,
-        ?float $expected
+        ?float $expectedLeft
     ): void {
         $indicatorUsage->applyDescriptorMinValues(true);
         $descriptor = $indicatorUsage->retrieveDescriptor($levelIndex);
         $this->assertNotNull($descriptor);
-        $this->assertSame($expected, $descriptor->getMinValue());
+        $this->assertSame($expectedLeft, $descriptor->retrieveLeftValue());
+    }
+
+
+    /**
+     * @dataProvider getTestApplyDescriptorMinValuesData
+     * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::applyDescriptorMinValues
+     *
+     * @param RubricGrid\IndicatorUsage $indicatorUsage
+     * @param int                       $levelIndex
+     * @param float|null                $_
+     * @param float|null                $expectedRight
+     */
+    public function testApplyDescriptorMinValuesRight(
+        RubricGrid\IndicatorUsage $indicatorUsage,
+        int $levelIndex,
+        ?float $_,
+        ?float $expectedRight
+    ): void {
+        $indicatorUsage->applyDescriptorMinValues(true);
+        $descriptor = $indicatorUsage->retrieveDescriptor($levelIndex);
+        $this->assertNotNull($descriptor);
+        $this->assertSame($expectedRight, $descriptor->retrieveRightValue());
     }
 
 
