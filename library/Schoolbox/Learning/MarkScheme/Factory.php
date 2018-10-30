@@ -8,7 +8,6 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
@@ -149,6 +148,11 @@ class Factory
             case MarkType::TYPE_PERCENT:
                 return new Percentage();
             case MarkType::TYPE_NONE:
+                // Special case for mark type None:
+                // If mark-per-cap is on, then use the fractional type.
+                if ($assessable instanceof DueWork && $assessable->getMarkPerCapability()) {
+                    return new TotalMarkFractional($maxMark);
+                }
                 return new None();
             case MarkType::TYPE_TOTAL:
                 return new TotalMarkFractional($maxMark);
