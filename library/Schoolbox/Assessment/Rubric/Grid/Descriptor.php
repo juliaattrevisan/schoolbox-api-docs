@@ -152,4 +152,33 @@ class Descriptor
         $this->maxValue = $maxValue;
         return $this;
     }
+
+
+    /**
+     * @return string
+     */
+    public function getDirection(): string
+    {
+        return $this->direction;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function setDirectionAscending(): self
+    {
+        $this->direction = self::DIRECTION_ASC;
+        return $this;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function setDirectionDescending(): self
+    {
+        $this->direction = self::DIRECTION_DESC;
+        return $this;
+    }
 }
