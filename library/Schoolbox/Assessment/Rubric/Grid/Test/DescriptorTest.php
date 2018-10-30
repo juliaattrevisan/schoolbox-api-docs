@@ -14,6 +14,90 @@ use Schoolbox\Assessment\Rubric\Grid\Descriptor;
 class DescriptorTest extends TestCase
 {
     /**
+     * Data provider for `testAssertValidityValid`.
+     *
+     * @return iterable
+     */
+    public function getTestAssertValidityValidData(): iterable
+    {
+        $descriptor = new Descriptor();
+        $descriptor
+            ->setMinValue(null)
+            ->setMaxValue(null);
+        yield 'null' => [$descriptor];
+
+
+        $descriptor = new Descriptor();
+        $descriptor
+            ->setMinValue(5)
+            ->setMaxValue(5);
+        yield 'not null, no range' => [$descriptor];
+
+
+        $descriptor = new Descriptor();
+        $descriptor
+            ->setMinValue(5)
+            ->setMaxValue(6);
+        yield 'not null, has range' => [$descriptor];
+    }
+
+
+    /**
+     * @dataProvider getTestAssertValidityValidData
+     * @doesNotPerformAssertions
+     *
+     * @covers \Schoolbox\Assessment\Rubric\Grid\Descriptor::assertValidity
+     * @param Descriptor $descriptor
+     */
+    public function testAssertValidityValid(Descriptor $descriptor): void
+    {
+        $descriptor->assertValidity();
+    }
+
+
+    /**
+     * Data provider for `testAssertValidityInvalid`.
+     *
+     * @return iterable
+     */
+    public function getTestAssertValidityInvalidData(): iterable
+    {
+        $descriptor = new Descriptor();
+        $descriptor
+            ->setMinValue(null)
+            ->setMaxValue(1);
+        yield 'max value only' => [$descriptor];
+
+
+        $descriptor = new Descriptor();
+        $descriptor
+            ->setMinValue(5)
+            ->setMaxValue(null);
+        yield 'min value only' => [$descriptor];
+
+
+        $descriptor = new Descriptor();
+        $descriptor
+            ->setMinValue(15)
+            ->setMaxValue(6);
+        yield 'min value > max value' => [$descriptor];
+    }
+
+
+    /**
+     * @dataProvider getTestAssertValidityInvalidData
+     *
+     * @covers \Schoolbox\Assessment\Rubric\Grid\Descriptor::assertValidity
+     * @param Descriptor $descriptor
+     */
+    public function testAssertValidityInvalid(Descriptor $descriptor): void
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        $descriptor->assertValidity();
+    }
+
+
+    /**
      * Data provider for `testRetrieveLeftRightValue`.
      *
      * @return iterable
