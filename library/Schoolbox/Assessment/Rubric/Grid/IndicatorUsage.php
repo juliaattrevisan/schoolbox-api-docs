@@ -143,32 +143,37 @@ class IndicatorUsage
                 continue;
             }
 
-            $leftMaxValue  = null;
-            $rightMaxValue = null;
+            $leftMaxValue       = null;
+            $isLeftValueLesser  = false;
+            $rightMaxValue      = null;
+            $isRightValueLesser = false;
 
             // What's the nearest non-null value to the left of this?
             $previousNonNullDescriptor = $this->retrieveAdjacentNonNullDescriptor($i, $keys, -1);
-            if ($previousNonNullDescriptor && $previousNonNullDescriptor->getMaxValue() < $maxValue) {
-                $leftMaxValue = $previousNonNullDescriptor->getMaxValue();
+            if ($previousNonNullDescriptor) {
+                $leftMaxValue      = $previousNonNullDescriptor->getMaxValue();
+                $isLeftValueLesser = ($leftMaxValue < $maxValue);
             }
 
             // And what's the nearest non-null value to the right?
             $nextNonNullDescriptor = $this->retrieveAdjacentNonNullDescriptor($i, $keys, 1);
-            if ($nextNonNullDescriptor && $nextNonNullDescriptor->getMaxValue() < $maxValue) {
-                $rightMaxValue = $nextNonNullDescriptor->getMaxValue();
+            if ($nextNonNullDescriptor) {
+                $rightMaxValue      = $nextNonNullDescriptor->getMaxValue();
+                $isRightValueLesser = ($rightMaxValue < $maxValue);
             }
 
             // No candidates: use max value
             $minValue = $maxValue;
-            if ($leftMaxValue !== null || $rightMaxValue !== null) {
+            if ($isLeftValueLesser || $isRightValueLesser) {
                 // If either left or right max are null: use the other one.
                 // Otherwise, the greater of left and right gets used.
-                // In either case: if we use the left it's ascending, if we use
-                // the right it's descending
-                if ($leftMaxValue === null) {
+                // In either case:
+                // * if we use the left it's ascending
+                // * if we use the right it's descending
+                if (!$isLeftValueLesser) {
                     $floorValue = $rightMaxValue;
                     $descriptor->setDirectionDescending();
-                } elseif ($rightMaxValue === null) {
+                } elseif (!$isRightValueLesser) {
                     $floorValue = $leftMaxValue;
                     $descriptor->setDirectionAscending();
                 } elseif ($leftMaxValue < $rightMaxValue) {
