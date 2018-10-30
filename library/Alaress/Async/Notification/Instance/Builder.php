@@ -4,8 +4,9 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+declare(strict_types=1);
 
 namespace Alaress\Async\Notification\Instance;
 
@@ -109,7 +110,6 @@ class Builder implements BuilderInterface
 		$this->href = $href;
 		return $this;
 	}
-
 
 	/**
      * Set body, converting to plaintext as you go (we can't support markup in the body)
@@ -322,7 +322,7 @@ class Builder implements BuilderInterface
 			$this->title, $this->namespace, $this->icon, $this->href,
 			$this->params, $this->severity, $this->topics,
 			// optional args
-			$this->time, $this->meta, $this->context
+			$this->time, $this->meta, $this->context, $this->validate
 		);
 	}
 }

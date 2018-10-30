@@ -4,8 +4,9 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
@@ -17,7 +18,6 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -26,7 +26,6 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -36,12 +35,11 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
 {
 
     const TRIGGER_RETURNED = 'returned';
+    const PATTERN_MARKED_STUDENT_TITLE = ':teacher has marked your work for :boxname in :catname';
+    const PATTERN_MARKED_PARENT_TITLE = ':teacher has marked :student\'s work for :boxname in :catname';
 
     /** @var UserMapper */
     protected $userMapper;
-
-    /** @var FolderMapper */
-    protected $catMapper;
 
     /** @var SubmissionBoxMapper */
     protected $boxMapper;
@@ -56,12 +54,12 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      * Instantiate all your dependencies within yourself.
      *
      * @param mixed $dependencies
+     * @throws \Aura\Di\Exception\ServiceNotFound if somehow my assessment data source wasn't found
      * @return void
      */
     public function loadDependencies($dependencies = null)
     {
         $this->userMapper = UserMapper::getInstance();
-        $this->catMapper = FolderMapper::getInstance();
         $this->boxMapper = SubmissionBoxMapper::getInstance();
         $this->termMapper = Term\Mapper::getInstance();
         $this->assessmentDataSource = Mapper::getDi()->get("assessmentDataSource");
@@ -75,14 +73,23 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      * @throws ScheduleException
      * @return void
      */
-    public function bundleTriggers($bundle)
+    public function bundleTriggers($bundle): void
     {
 
         /** @var ReturnedWork $mark */
         $mark = $bundle->getEvent()->getObject();
 
+        if ($mark->isDraft()) {
+            // Not published: don't even bother here either
+            return;
+        }
+
         /** @var SubmissionBox $box */
-        $box = $this->boxMapper->findByIdWithFallback($mark->getSubmissionBox()->getId());
+        try {
+            $box = $this->boxMapper->findByIdWithFallback($mark->getSubmissionBox()->getId());
+        } catch (Mapper\Exception $e) {
+            return;
+        }
 
         if ($box->getId() === null) {
             // don't. even. bother.
@@ -101,8 +108,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
             return;
         }
 
-        if ($mark->isDraft()) {
-            // Not published: don't even bother here either
+        // As this notifier is for student and parents, if it's only visible to staff, return.
+        $worktype = $box->getAssessmentModel()->getWorkType();
+        if ($worktype && $worktype->isStaffOrInstructorVisibleOnly()) {
             return;
         }
 
@@ -129,7 +137,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      * @param array|null   $diff
      * @return Envelope
      */
-    public function notifyStudentReturned($returnedWork, $user, $diff = null)
+    public function notifyStudentReturned(ReturnedWork $returnedWork, User $user, $diff = null): Envelope
     {
         return $this->generateMessage(Role::STUDENT, $returnedWork, $user, $diff);
     }
@@ -137,34 +145,34 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
     /**
      * @param string       $target
      * @param ReturnedWork $returnedWork
-     * @param User         $user
+     * @param User         $effector
      * @param array|null   $diff
      * @return Envelope
      */
-    protected function generateMessage($target, $returnedWork, $user, $diff = null)
+    protected function generateMessage(string $target, ReturnedWork $returnedWork, User $effector, $diff = null): Envelope
     {
         $envelope = new Envelope();
 
-        /** @var User $student */
-        $student = $this->userMapper->findById($returnedWork->getOwner()->getId());
-        /** @var User $teacher */
-        $teacher = $this->userMapper->findById($user->getId());
+        $student = $returnedWork->getOwner();
         /** @var SubmissionBox $box */
-        $box = $this->boxMapper->findById($returnedWork->getSubmissionBox()->getId());
-
-        $assessment = $this->assessmentDataSource->findByIdForReview($box->getAssessmentId(), $student);
+        try {
+            $box = $this->boxMapper->findById($returnedWork->getSubmissionBox()->getId());
+            $assessment = $this->assessmentDataSource->findByIdForReview($box->getAssessmentId(), $student);
+        } catch (Mapper\Exception $e) {
+            return $envelope;
+        }
 
         $participant = $assessment->getParticipantIfExtant($student);
 
         //Don't send a notification for an item that the user cannot see
-        if (\Alaress_Date_Format::now()->lt($participant->getPublishDate())) {
+        if ($participant->getPublishDate()->isFuture()) {
             return $envelope;
         }
 
         /** @var Folder $cat */
-        $cat = $this->catMapper->findById($box->getCategory()->getId());
+        $cat = $assessment->getBaseContext()->getFolder();
 
-        $teacherExtId = $teacher->getExternalId();
+        $teacherExtId = $effector->getExternalId();
 
         $studentId = $student->getId();
 
@@ -184,9 +192,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
                 ->setNamespace($this->getSlug())
                 ->addTopic("duework.$boxId.returned")
                 ->setSeverity(Logger::NOTICE)
-                ->setTitle(":teacher has marked your work for :boxname in :catname")
+                ->setTitle(self::PATTERN_MARKED_STUDENT_TITLE)
                 ->setHref($href)
-                ->setParam('teacher', new UserParam($teacher))
+                ->setParam('teacher', new UserParam($effector))
                 ->setParam('boxname', new Param($boxName, "/learning/assessments/{$box->getAssessmentId()}/$studentId"))
                 ->setParam('catname', new CategoryParam($cat))
                 ->addFilter('roletype', [Role::STUDENT]);
@@ -204,9 +212,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
                 ->setNamespace($this->getSlug())
                 ->addTopic("duework.$boxId.returned")
                 ->setSeverity(Logger::NOTICE)
-                ->setTitle(":teacher has marked :student's work for :boxname in :catname")
+                ->setTitle(self::PATTERN_MARKED_PARENT_TITLE)
                 ->setHref($href)
-                ->setParam('teacher', new UserParam($teacher))
+                ->setParam('teacher', new UserParam($effector))
                 ->setParam('student', new UserParam($student))
                 ->setParam('boxname', new Param($boxName, "/learning/assessments/{$box->getAssessmentId()}/$studentId"))
                 ->setParam('catname', new Param($catName, "/learning/grades/$studentId/{$term->getCode()}/$catId"))
@@ -224,7 +232,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
     /**
      * @return string
      */
-    protected function getSlug()
+    protected function getSlug(): string
     {
         return NSMapper::NS_DUEWORK;
     }
@@ -233,7 +241,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      * @param SubmissionBox $box
      * @return bool
      */
-    protected function parentCanView($box)
+    protected function parentCanView(SubmissionBox $box): bool
     {
         return $box->getMarkVisibility() >= IAssessable::MARK_VISIBILITY_PARENT_STUDENT && !$this->conf->get('restrict_parent_duework_access');
     }
@@ -246,7 +254,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      * @param array|null   $diff
      * @return Envelope
      */
-    public function notifyParentReturned($returnedWork, $user, $diff = null)
+    public function notifyParentReturned(ReturnedWork $returnedWork, User $user, $diff = null)
     {
         return $this->generateMessage(Role::PARENT, $returnedWork, $user, $diff);
     }

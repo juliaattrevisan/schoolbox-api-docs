@@ -41,7 +41,7 @@ use Schoolbox\User;
  *
  * @method SubmissionBoxMapper getMapper()
  * @deprecated Due work notifications are handled by `\Schoolbox\Assessment\Participant\Plan\Notifier`
- * @todo delete this in 18.1, when no more bundled triggers exist for this notifier
+ * @todo delete this once no 17.5 schools exist (this should happen in Feb 2019, when all schools will be upgraded to Ubuntu 18.04)
  */
 class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInterface
 {

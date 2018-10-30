@@ -44,6 +44,10 @@ class DehydratorTest extends TestCase
         'markVisibility' => true,
         'workType'       => true,
         'participants'   => true,
+        'publishDate'    => null,
+        'openDate'       => null,
+        'dueDate'        => null,
+        'closeDate'      => null,
     ];
 
     /**
@@ -80,6 +84,10 @@ class DehydratorTest extends TestCase
             'markVisibility' => $dueWork->getMarkVisibility(),
             'workType'       => null,
             'participants'   => [],
+            'publishDate'    => null,
+            'openDate'       => null,
+            'dueDate'        => null,
+            'closeDate'      => null,
         ];
         $actual = $this->dehydrator->dehydrateAssessment($dueWork);
         $this->assertEquals($expected, array_intersect_key($actual, $this->commonFields));
@@ -301,16 +309,21 @@ class DehydratorTest extends TestCase
                     'closeDate'   => $participantA->getCloseDate()->getDatabase(),
                     'excluded'    => $participantA->isExcluded(),
                     'plan'        => [
-                        'id'      => $dynamicPlan->getId(),
-                        'name'    => $dynamicPlan->getName(),
-                        'dynamic' => $dynamicPlan->getIsDynamic(),
+                        'id'          => $dynamicPlan->getId(),
+                        'name'        => $dynamicPlan->getName(),
+                        'dynamic'     => $dynamicPlan->getIsDynamic(),
+                        'publishDate' => null,
+                        'openDate'    => null,
+                        'dueDate'     => null,
+                        'closeDate'   => null,
                     ],
                     'user'          => [
                         'id'        => $participantA->getUser()->getId(),
                         'title'     => $participantA->getUser()->getTitle(),
                         'firstname' => $participantA->getUser()->getFirstname(),
                         'lastname'  => $participantA->getUser()->getLastname(),
-                    ]
+                    ],
+                    'planId'      => $dynamicPlan->getId(),
                 ],
                 $participantB->getUser()->getId() => [
                     'description' => $participantB->getDescription(),
@@ -320,16 +333,21 @@ class DehydratorTest extends TestCase
                     'closeDate'   => $participantB->getCloseDate()->getDatabase(),
                     'excluded'    => $participantB->isExcluded(),
                     'plan'        => [
-                        'id'      => $dynamicPlan->getId(),
-                        'name'    => $dynamicPlan->getName(),
-                        'dynamic' => $dynamicPlan->getIsDynamic(),
+                        'id'          => $dynamicPlan->getId(),
+                        'name'        => $dynamicPlan->getName(),
+                        'dynamic'     => $dynamicPlan->getIsDynamic(),
+                        'publishDate' => null,
+                        'openDate'    => null,
+                        'dueDate'     => null,
+                        'closeDate'   => null,
                     ],
                     'user'          => [
                         'id'        => $participantB->getUser()->getId(),
                         'title'     => $participantB->getUser()->getTitle(),
                         'firstname' => $participantB->getUser()->getFirstname(),
                         'lastname'  => $participantB->getUser()->getLastname(),
-                    ]
+                    ],
+                    'planId'      => $dynamicPlan->getId(),
                 ],
                 $participantC->getUser()->getId() => [
                     'description' => $participantC->getDescription(),
@@ -339,16 +357,21 @@ class DehydratorTest extends TestCase
                     'closeDate'   => $participantC->getCloseDate()->getDatabase(),
                     'excluded'    => $participantC->isExcluded(),
                     'plan'        => [
-                        'id'      => $customPlan->getId(),
-                        'name'    => $customPlan->getName(),
-                        'dynamic' => $customPlan->getIsDynamic(),
+                        'id'          => $customPlan->getId(),
+                        'name'        => $customPlan->getName(),
+                        'dynamic'     => $customPlan->getIsDynamic(),
+                        'publishDate' => $customPlan->getPublishDate()->getDatabase(),
+                        'openDate'    => $customPlan->getOpenDate()->getDatabase(),
+                        'dueDate'     => $customPlan->getDueDate()->getDatabase(),
+                        'closeDate'   => $customPlan->getCloseDate()->getDatabase(),
                     ],
                     'user'          => [
                         'id'        => $participantC->getUser()->getId(),
                         'title'     => $participantC->getUser()->getTitle(),
                         'firstname' => $participantC->getUser()->getFirstname(),
                         'lastname'  => $participantC->getUser()->getLastname(),
-                    ]
+                    ],
+                    'planId'      => $customPlan->getId(),
                 ],
             ],
         ];
@@ -405,6 +428,10 @@ class DehydratorTest extends TestCase
             'id'           => $plan->getId(),
             'name'         => $plan->getName(),
             'dynamic'      => $plan->getIsDynamic(),
+            'publishDate'  => null,
+            'openDate'     => null,
+            'dueDate'      => null,
+            'closeDate'    => null,
             'participants' => [
                 $participantA->getUser()->getId() => [
                     'description' => $participantA->getDescription(),
@@ -413,6 +440,7 @@ class DehydratorTest extends TestCase
                     'dueDate'     => $participantA->getDueDate()->getDatabase(),
                     'closeDate'   => $participantA->getCloseDate()->getDatabase(),
                     'excluded'    => $participantA->isExcluded(),
+                    'planId'      => $plan->getId(),
                     'user'          => [
                         'id'        => $participantA->getUser()->getId(),
                         'title'     => $participantA->getUser()->getTitle(),
@@ -427,6 +455,7 @@ class DehydratorTest extends TestCase
                     'dueDate'     => $participantB->getDueDate()->getDatabase(),
                     'closeDate'   => $participantB->getCloseDate()->getDatabase(),
                     'excluded'    => $participantB->isExcluded(),
+                    'planId'      => $plan->getId(),
                     'user'          => [
                         'id'        => $participantB->getUser()->getId(),
                         'title'     => $participantB->getUser()->getTitle(),
@@ -444,6 +473,10 @@ class DehydratorTest extends TestCase
                 'workType'          => null,
                 'acceptOnline'      => $dueWork->getAcceptOnline(),
                 'selfReviewability' => $dueWork->getSelfReviewability(),
+                'publishDate'       => $dueWork->getPublishAt()->getDatabase(),
+                'openDate'          => $dueWork->getOpenAt()->getDatabase(),
+                'dueDate'           => $dueWork->getDueAt()->getDatabase(),
+                'closeDate'         => $dueWork->getCloseAt()->getDatabase(),
             ],
         ];
 
@@ -466,6 +499,10 @@ class DehydratorTest extends TestCase
             'workType'          => null,
             'acceptOnline'      => DueWork::ACCEPT_ONLINE_MULTI,
             'selfReviewability' => SubmissionBox::SELF_REVIEWABILITY_NONE,
+            'publishDate'       => '2018-01-01 00:00:00',
+            'openDate'          => '2018-01-02 00:00:00',
+            'dueDate'           => '2018-01-03 00:00:00',
+            'closeDate'         => '2018-01-04 00:00:00',
         ];
         $expectedParticipants = [
             1 => [
@@ -475,6 +512,7 @@ class DehydratorTest extends TestCase
                 'dueDate'     => '2018-01-03 00:00:00',
                 'closeDate'   => '2018-01-04 00:00:00',
                 'excluded'    => false,
+                'planId'      => 1,
                 'user'        => [
                     'id'        => 1,
                     'title'     => '',
@@ -489,6 +527,7 @@ class DehydratorTest extends TestCase
                 'dueDate'     => '2018-01-03 00:00:00',
                 'closeDate'   => '2018-01-04 00:00:00',
                 'excluded'    => true,
+                'planId'      => 1,
                 'user'        => [
                     'id'        => 2,
                     'title'     => '',
@@ -503,6 +542,7 @@ class DehydratorTest extends TestCase
                 'dueDate'     => '2018-02-03 00:00:00',
                 'closeDate'   => '2018-02-04 00:00:00',
                 'excluded'    => false,
+                'planId'      => 2,
                 'user'        => [
                     'id'        => 3,
                     'title'     => '',
@@ -518,6 +558,10 @@ class DehydratorTest extends TestCase
                 'dynamic'      => true,
                 'participants' => $expectedParticipants,
                 'assessment'   => $expectedAssessment,
+                'publishDate'  => null,
+                'openDate'     => null,
+                'dueDate'      => null,
+                'closeDate'    => null,
             ],
             2 => [
                 'id'           => 2,
@@ -525,6 +569,10 @@ class DehydratorTest extends TestCase
                 'dynamic'      => false,
                 'participants' => $expectedParticipants,
                 'assessment'   => $expectedAssessment,
+                'publishDate'  => '2018-02-01 00:00:00',
+                'openDate'     => '2018-02-02 00:00:00',
+                'dueDate'      => '2018-02-03 00:00:00',
+                'closeDate'    => '2018-02-04 00:00:00',
             ],
         ];
 
@@ -547,16 +595,28 @@ class DehydratorTest extends TestCase
             'workType'          => null,
             'acceptOnline'      => DueWork::ACCEPT_ONLINE_MULTI,
             'selfReviewability' => SubmissionBox::SELF_REVIEWABILITY_NONE,
+            'publishDate'       => '2018-01-01 00:00:00',
+            'openDate'          => '2018-01-02 00:00:00',
+            'dueDate'           => '2018-01-03 00:00:00',
+            'closeDate'         => '2018-01-04 00:00:00',
         ];
         $expectedDynamicPlan = [
             'id'           => 1,
             'name'         => 'Dynamic Plan',
             'dynamic'      => true,
+            'publishDate'  => null,
+            'openDate'     => null,
+            'dueDate'      => null,
+            'closeDate'    => null,
         ];
         $expectedCustomPlan = [
             'id'           => 2,
             'name'         => 'Custom Plan',
             'dynamic'      => false,
+            'publishDate'  => '2018-02-01 00:00:00',
+            'openDate'     => '2018-02-02 00:00:00',
+            'dueDate'      => '2018-02-03 00:00:00',
+            'closeDate'    => '2018-02-04 00:00:00',
         ];
         $expectedParticipants = [
             1 => [
@@ -566,7 +626,7 @@ class DehydratorTest extends TestCase
                 'dueDate'     => '2018-01-03 00:00:00',
                 'closeDate'   => '2018-01-04 00:00:00',
                 'excluded'    => false,
-                'plan'        => $expectedDynamicPlan,
+                'planId'      => $expectedDynamicPlan['id'],
                 'user'        => [
                     'id'        => 1,
                     'title'     => '',
@@ -581,7 +641,7 @@ class DehydratorTest extends TestCase
                 'dueDate'     => '2018-01-03 00:00:00',
                 'closeDate'   => '2018-01-04 00:00:00',
                 'excluded'    => true,
-                'plan'        => $expectedDynamicPlan,
+                'planId'      => $expectedDynamicPlan['id'],
                 'user'        => [
                     'id'        => 2,
                     'title'     => '',
@@ -596,7 +656,7 @@ class DehydratorTest extends TestCase
                 'dueDate'     => '2018-02-03 00:00:00',
                 'closeDate'   => '2018-02-04 00:00:00',
                 'excluded'    => false,
-                'plan'        => $expectedCustomPlan,
+                'planId'      => $expectedCustomPlan['id'],
                 'user'        => [
                     'id'        => 3,
                     'title'     => '',
@@ -608,6 +668,7 @@ class DehydratorTest extends TestCase
         $expected = [
             'participants' => $expectedParticipants,
             'assessment'   => $expectedAssessment,
+            'plan'         => [1 => $expectedDynamicPlan, 2 => $expectedCustomPlan],
         ];
 
         $this->assertEquals($expected, $this->dehydrator->dehydrateAssessmentIntoParticipants($assessment));

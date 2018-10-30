@@ -14,6 +14,8 @@ use Alaress\Async\Notification\Parameter\Param;
 use Alaress_Date_Format;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as DueWorkFeedbackMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkNotifier;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionNotifier;
 use Schoolbox\Assessment\Participant\Mapper as ParticipantMapper;
 use Schoolbox\Collection;
 use Schoolbox\Feed\SourceInterface;
@@ -24,6 +26,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizFeedbackMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Permission\Access\Access;
@@ -32,6 +35,7 @@ use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\ChildParam;
+use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\User;
@@ -55,6 +59,30 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private const TRIGGER_UPCOMING = 'upcoming';
     private const TRIGGER_OVERDUE  = 'overdue';
     private const TRIGGER_CLOSED   = 'closed';
+
+    private const PATTERN_OPEN_STUDENT_TITLE = ':boxType :assessment opened in :cat';
+    private const PATTERN_OPEN_PARENT_TITLE = ':boxType :assessment opened in :cat for :child';
+
+    private const PATTERN_UPCOMING_STUDENT_TITLE = 'You have :when left to :verb :assessment in :cat';
+    private const PATTERN_UPCOMING_PARENT_TITLE = ':child has :when left to :verb :assessment in :cat';
+
+    private const PATTERN_OVERDUE_STUDENT_TITLE = ':assessment :overdue in :cat';
+    private const PATTERN_OVERDUE_PARENT_TITLE = ':child did not :submit :assessment in :cat';
+
+    private const PATTERN_RENAMED_STUDENT_TITLE = ':boxType was renamed from :oldname to :assessment in :cat';
+    private const PATTERN_RENAMED_PARENT_TITLE = ':child\'s :boxType was renamed from :oldname to :assessment in :cat';
+
+    private const PATTERN_DATE_CHANGED_STUDENT_TITLE = ':boxType :assessment closing date was :verb to :date in :cat';
+    private const PATTERN_DATE_CHANGED_PARENT_TITLE = ':child\'s :boxType :assessment closing date was :verb to :date in :cat';
+
+    private const PATTERN_NO_SUBMIT_STUDENT_TITLE = 'You no longer need to submit online for :assessment in :cat';
+    private const PATTERN_ACCEPT_ONLINE_STUDENT_TITLE = 'You now need to submit online for :assessment in :cat';
+
+    private const PATTERN_NO_SUBMIT_PARENT_TITLE = ':child no longer need to submit online for :assessment in :cat';
+    private const PATTERN_ACCEPT_ONLINE_PARENT_TITLE = ':child needs to submit online for :assessment in :cat';
+
+    private const PATTERN_UPDATE_STUDENT_TITLE = ':boxType :assessment was updated in :cat';
+    private const PATTERN_UPDATE_PARENT_TITLE = ':child\'s :boxType :assessment was updated in :cat';
 
     /**
      * Hours in advance to inform a user that due work is upcoming.
@@ -89,6 +117,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @var QuizFeedbackMapper
      */
     private $quizFeedbackMapper;
+
+    /**
+     * @var WorkTypeMapper;
+     */
+    private $workTypeMapper;
 
     /**
      * Irrelevant as this could notify about different things, but must exist.
@@ -152,6 +185,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         if (empty($dependencies['quizFeedbackMapper'])) {
             $dependencies['quizFeedbackMapper'] = QuizFeedbackMapper::getInstance();
         }
+        if (empty($dependencies['workTypeMapper'])) {
+            $dependencies['workTypeMapper'] = WorkTypeMapper::getInstance();
+        }
         parent::loadDependencies($dependencies);
     }
 
@@ -180,6 +216,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function bundleTriggers($bundle): void
     {
+        // TODO: handle the case where a plan has been changed for a student.
+
         /** @var Model $plan */
         $plan = $bundle->getEvent()->getObject();
 
@@ -192,6 +230,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         $method = $bundle->getMethod();
+        $diff = $bundle->getEvent()->getDiff();
+
+        /**
+         * Deleted
+         */
         if ($method === Mapper::METHOD_DELETE) {
             $bundle->detachEach([
                 self::TRIGGER_OPEN,
@@ -200,61 +243,160 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 self::TRIGGER_OVERDUE,
                 self::TRIGGER_CLOSED,
             ]);
+            // trigger to retract existing notifications
+            $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+            return;
+        }
 
+        /**
+         * No Change
+         */
+        if ($diff === null || \count($diff) === 0) {
+            return;
+        }
+
+        /**
+         * Newly created assessment is isStaffOrInstructorVisibleOnly or closed
+         */
+        $isCurrentHidden = false;
+        try {
+            $isCurrentHidden = $assessment->getWorkType() === null ? false :
+                $this->workTypeMapper->findById($assessment->getWorkType()->getId())->isStaffOrInstructorVisibleOnly();
+        } catch (BaseMapper\Exception $e) {
+            // noop;
+        }
+        if ($method === Mapper::METHOD_CREATE && $isCurrentHidden) {
+            return;
+        }
+        $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
+        if ($method === Mapper::METHOD_CREATE && $closeDate && $closeDate->isPast()) {
+            return;
+        }
+
+        /**
+         * Closed or changed to isStaffOrInstructorVisibleOnly
+         */
+        $isPreviousHidden = false;
+        if ($method === Mapper::METHOD_UPDATE
+            && \array_key_exists('assessment', $diff)
+            && \array_key_exists('workType', $diff['assessment'])) {
+            try {
+                $isPreviousHidden = $diff['assessment']['workType'][1] === null ? false :
+                    $this->workTypeMapper->findById($diff['assessment']['workType'][1])->isStaffOrInstructorVisibleOnly();
+                if ($isPreviousHidden && $isCurrentHidden) {
+                    // no notification
+                    return;
+                }
+            } catch (BaseMapper\Exception $e) {
+                // noop;
+            }
+        }
+
+        if ((!$isPreviousHidden && $isCurrentHidden) || ($closeDate && $closeDate->isPast())) {
+            $bundle->detachEach([
+                self::TRIGGER_OPEN,
+                self::TRIGGER_UPCOMING,
+                self::TRIGGER_UPDATED,
+                self::TRIGGER_OVERDUE,
+                self::TRIGGER_CLOSED,
+            ]);
+            // trigger to retract existing notifications
+            $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+            return;
+        }
+
+        /**
+         * Check whether any dates has been changed for the current plan.
+         */
+        $changedDates = [];
+        if ($plan->isDynamic() && \array_key_exists('assessment', $diff)) {
+            $changedDates = \array_intersect(
+                ['openDate', 'publishDate', 'dueDate', 'closeDate'], \array_keys($diff['assessment']));
+        } else if (\array_key_exists('plan', $diff) && \array_key_exists($plan->getId(), $diff['plan'])) {
+            $changedDates = \array_intersect(
+                ['openDate', 'publishDate', 'dueDate', 'closeDate'], \array_keys($diff['plan'][$plan->getId()]));
+        }
+
+        // If no date change, just attach generic update trigger only.
+        $publishDate = $this->coalesceDates($plan->getPublishDate(), $assessment->getPublishDate());
+        if (!$publishDate) {
+            // this date shouldn't be null
+            return;
+        }
+        if (\count($changedDates) === 0 && $publishDate->isPast()) {
+            $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+            return;
+        }
+
+        /**
+         * Get dates.
+         */
+        // Open is now always bundled, as long as it is set
+        // However, if its open date is in the past don't bundle if this is an update
+        $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
+        // Due and upcoming: always bundled as long as due date is set
+        $dueDate = $this->coalesceDates($plan->getDueDate(), $assessment->getDueDate());
+        if (!$openDate || !$dueDate) {
+            // this date shouldn't be null
+            return;
+        }
+
+        // Quiz and Due Work have different logic for when notification happens
+        // Quiz: 2 hours before
+        // Due Work: 2 days before <- ??
+        // if the upcoming date is before the open date, push upcoming to 1 minute after open,
+        // rounded to the nearest 5 minutes?
+        $upcomingDate = null;
+        if ($assessment->getQuiz()) {
+            $upcomingDate = (clone $dueDate)->addHours(-self::QUIZ_UPCOMING_WINDOW);
+        } elseif ($assessment->getDueWork()) {
+            $upcomingDate = (clone $dueDate)->addHours(-self::DUEWORK_UPCOMING_WINDOW);
+        }
+        if ($upcomingDate->lt($openDate)) {
+            $upcomingDate = (clone $openDate)->addMinutes(1);
+        }
+
+        /**
+         * Trigger.
+         */
+        // New or just switched from is isStaffOrInstructorVisibleOnly to visible status
+        if ($method === Mapper::METHOD_CREATE || ($isPreviousHidden && !$isCurrentHidden)) {
+            $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
+            $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
+            $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
+            $bundle->attach(self::TRIGGER_CLOSED, $closeDate->getUnixTimeStamp());
         } else {
-            // Bundle triggers
-
-            // I need a close date to determine if I should trigger anything:
-            // if it's in the past, trigger nothing except update.
-            $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
-            if ($closeDate && $closeDate->isFuture()) {
-
-                // Open is now always bundled, as long as it is set
-                // However, if its open date is in the past don't bundle if this is an update
-                $openDate = $this->coalesceDates($plan->getOpenDate(), $assessment->getOpenDate());
-                if ($openDate && ($method === Mapper::METHOD_CREATE || $openDate->isFuture())) {
+            if (\in_array('publishDate', $changedDates)) {
+                if ($publishDate->isFuture()) {
+                    // trigger to retract existing notifications
+                    $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+                }
+            }
+            if (\in_array('openDate', $changedDates)) {
+                $bundle->detach(self::TRIGGER_OPEN);
+                if ($openDate->isFuture()) {
                     $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
                 }
-
-                // Due and upcoming: always bundled as long as due date is set
-                $dueDate = $this->coalesceDates($plan->getDueDate(), $assessment->getDueDate());
-                if ($dueDate) {
-                    // Quiz and Due Work have different logic for when notification happens
-                    // Quiz: 2 hours before
-                    // Due Work: 2 days before
-                    $upcomingDate = null;
-                    if ($assessment->getQuiz()) {
-                        $upcomingDate = (clone $dueDate)->addHours(-self::QUIZ_UPCOMING_WINDOW);
-                    } elseif ($assessment->getDueWork()) {
-                        $upcomingDate = (clone $dueDate)->addHours(-self::DUEWORK_UPCOMING_WINDOW);
-                    }
-                    // if the upcoming date is before the open date, push upcoming to 1 minute after open,
-                    // rounded to the nearest 5 minutes?
-                    if ($upcomingDate) {
-                        if ($upcomingDate->lt($openDate)) {
-                            $upcomingDate = (clone $openDate)->addMinutes(1);
-                        }
-                        if ($upcomingDate->isFuture()) {
-                            $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
-                        }
-                    }
-                    $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
-                }
-
-                // Close: always bundled
-                $bundle->attach(self::TRIGGER_CLOSED, $closeDate->getUnixTimeStamp());
             }
-
-            // Generic updated trigger
-            if ($method === Mapper::METHOD_UPDATE) {
-                $publishDate = $this->coalesceDates($plan->getPublishDate(), $assessment->getPublishDate());
-                if ($publishDate && $publishDate->isPast()) {
-                    $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+            if (\in_array('dueDate', $changedDates)) {
+                $bundle->detach(self::TRIGGER_OVERDUE);
+                $bundle->detach(self::TRIGGER_UPCOMING);
+                if ($dueDate->isFuture()) {
+                    $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
+                    $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
                 }
+            }
+            if (\in_array('closeDate', $changedDates)) {
+                if ($closeDate->isFuture()) {
+                    $bundle->detach(self::TRIGGER_CLOSED);
+                    $bundle->attach(self::TRIGGER_CLOSED, $closeDate->getUnixTimeStamp());
+                }
+            }
+            if ($publishDate->isPast()) {
+                $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
             }
         }
     }
-
 
     /**
      * @inheritdoc
@@ -407,6 +549,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function internalNotifyOpen(IAssessable $assessment, Model $plan, bool $forFeed): Envelope
     {
         $envelope = new Envelope();
+        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_OPEN)) {
+            return $envelope;
+        }
+
         if ($assessment instanceof DueWork) {
             $topicSuffix = "open";
         } elseif ($assessment instanceof Quiz) {
@@ -417,9 +563,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         $topicStub = $this->retrieveAssessmentTopicStub($assessment);
         if (!$topicStub) {
-            return $envelope;
-        }
-        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_OPEN)) {
             return $envelope;
         }
 
@@ -447,14 +590,15 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
             $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                        ->setTitle("$boxType :assessment opened in :cat for :child");
+                        ->setTitle(self::PATTERN_OPEN_PARENT_TITLE)
+                        ->setParam('boxType', new SimpleParam($boxType));
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
 
         // For feed only: build for staff
         if ($forFeed && $participantCount > 0) {
             $title = sprintf(
-                ":assessment has opened for %d student%s",
+                ':assessment has opened for %d student%s',
                 $participantCount,
                 $participantCount === 1 ? '' : 's'
             );
@@ -506,7 +650,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         $bob = $this->buildGenericBuilder($assessment)
-                    ->setTitle("$boxType :assessment opened in :cat")
+                    ->setTitle(self::PATTERN_OPEN_STUDENT_TITLE)
+                    ->setParam('boxType', new SimpleParam($boxType))
                     ->addTopic("$topicStub.$topicSuffix")
                     ->setSeverity(Logger::NOTICE);
         $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
@@ -530,17 +675,26 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         $assessment = $this->retrieveAssessmentDomainModel($plan);
         $envelope   = new Envelope();
-        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
-        if (!$topicStub) {
+        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_UPCOMING)) {
             return $envelope;
         }
-        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_UPCOMING)) {
+
+        if ($assessment instanceof DueWork) {
+            $verb = 'submit';
+        } elseif ($assessment instanceof Quiz) {
+            $verb = 'attempt';
+        } else {
+            return $envelope;
+        }
+        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
+        if (!$topicStub) {
             return $envelope;
         }
 
         $bob = $this->buildGenericBuilder($assessment)
                     ->setSeverity(Logger::WARNING)
-                    ->addTopic("$topicStub.upcoming");
+                    ->addTopic("$topicStub.upcoming")
+                    ->setParam('verb', new SimpleParam($verb));
 
         // Customise and send to every participant in this plan only
         foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
@@ -550,21 +704,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // Title varies for due work and quiz
             $when = $participant->getDueDate()->getRelativeTime(Alaress_Date_Format::now()->addMinutes(-5), true);
-            if ($assessment instanceof DueWork) {
-                $studentTitle = "You have $when left to submit :assessment in :cat";
-                $parentTitle  = ":child has $when left to submit :assessment in :cat";
-
-            } elseif ($assessment instanceof Quiz) {
-                $studentTitle = "You have $when left to attempt :assessment in :cat";
-                $parentTitle  = ":child has $when left to attempt :assessment in :cat";
-
-            } else {
-                continue;
-            }
 
             // build for student
             $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                        ->setTitle($studentTitle)
+                        ->setTitle(self::PATTERN_UPCOMING_STUDENT_TITLE)
+                        ->setParam('when', new Param($when))
                         ->setBody($participant->getDescription());
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
@@ -573,7 +717,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
             $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                        ->setTitle($parentTitle);
+                        ->setTitle(self::PATTERN_UPCOMING_PARENT_TITLE)
+                        ->setParam('when', new Param($when));
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
 
@@ -593,13 +738,25 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyOverdue(Model $plan): Envelope
     {
-        $assessment = $this->retrieveAssessmentDomainModel($plan);
         $envelope   = new Envelope();
-        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
-        if (!$topicStub) {
+        $assessment = $this->retrieveAssessmentDomainModel($plan);
+        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_OVERDUE)) {
             return $envelope;
         }
-        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_OVERDUE)) {
+
+        // TODO figure out if overdue should really be different for quiz and duework
+        if ($assessment instanceof DueWork) {
+            $overdue = 'is now overdue';
+            $submit = 'submit work for';
+        } elseif ($assessment instanceof Quiz) {
+            $overdue = 'has closed';
+            $submit = 'attempt';
+        } else {
+            return $envelope;
+        }
+
+        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
+        if (!$topicStub) {
             return $envelope;
         }
 
@@ -613,20 +770,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
 
-            // TODO figure out if overdue should really be different for quiz and duework
-            if ($assessment instanceof DueWork) {
-                $studentTitle = ":assessment is now overdue in :cat";
-                $parentTitle  = ":child did not submit work for :assessment in :cat";
-            } elseif ($assessment instanceof Quiz) {
-                $studentTitle = ":assessment has closed in :cat";
-                $parentTitle  = ":child did not attempt :assessment in :cat";
-            } else {
-                continue;
-            }
-
             // build for student
             $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                        ->setTitle($studentTitle)
+                        ->setTitle(self::PATTERN_OVERDUE_STUDENT_TITLE)
+                        ->setParam('overdue', new SimpleParam($overdue))
                         ->setBody($participant->getDescription());
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
@@ -635,7 +782,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 continue;
             }
             $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                        ->setTitle($parentTitle);
+                        ->setTitle(self::PATTERN_OVERDUE_PARENT_TITLE)
+                        ->setParam('submit', new SimpleParam($submit));
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
 
@@ -671,11 +819,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function internalNotifyClosed(IAssessable $assessment, Model $plan, bool $forFeed): Envelope
     {
         $envelope  = new Envelope();
-        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
-        if (!$topicStub) {
+        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_CLOSED)) {
             return $envelope;
         }
-        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_CLOSED)) {
+        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
+        if (!$topicStub) {
             return $envelope;
         }
 
@@ -775,17 +923,26 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         $assessment = $this->retrieveAssessmentDomainModel($plan);
         $envelope   = new Envelope();
-        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
-        if (!$topicStub) {
+        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_UPDATED)) {
             return $envelope;
         }
-        if (!$this->isNotifiableAtAll($assessment, self::TRIGGER_UPDATED)) {
+
+        $topicStub  = $this->retrieveAssessmentTopicStub($assessment);
+        if (!$topicStub) {
             return $envelope;
         }
 
         // Build a box type
         $boxType       = $assessment->getTypeName();
         $parentBoxType = mb_strtolower($boxType);
+
+        // Figure out which mapper to use
+        $feedbackMapper = null;
+        if ($assessment instanceof DueWork) {
+            $feedbackMapper = $this->dueWorkFeedbackMapper;
+        } elseif ($assessment instanceof Quiz) {
+            $feedbackMapper = $this->quizFeedbackMapper;
+        }
 
         // All updated notifs have the same icon, namespace, severity
         $bob = $this->buildGenericBuilder($assessment)
@@ -806,19 +963,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if (isset($assessmentDiff['markVisibility'])) {
                 [$new, $old] = $assessmentDiff['markVisibility'];
                 if ($new > $old) {
-
                     // Trigger notification about this item
                     $authoritativeFeedback = $assessment->getAuthoritativeFeedback($participant, true);
                     if ($authoritativeFeedback) {
-
-                        // Figure out which mapper to use
-                        $feedbackMapper = null;
-                        if ($assessment instanceof DueWork) {
-                            $feedbackMapper = $this->dueWorkFeedbackMapper;
-                        } elseif ($assessment instanceof Quiz) {
-                            $feedbackMapper = $this->quizFeedbackMapper;
-                        }
-
                         // and raise a notification against it
                         if ($feedbackMapper instanceof BaseMapper) {
                             $this->raiseNotification(
@@ -848,15 +995,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 // Topic depends on type of assessment
                 $suffix = $assessment instanceof Quiz ? 'updated' : 'renamed';
                 $bob    = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                               ->setTitle("$boxType was renamed from :oldname to :assessment in :cat")
+                               ->setTitle(self::PATTERN_RENAMED_STUDENT_TITLE)
                                ->setParam('oldname', new Param($oldName))
+                               ->setParam('boxType', new SimpleParam($boxType))
                                ->setTopics(["$topicStub.$suffix"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
                 if ($this->isParentTargetable()) {
                     $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                                ->setTitle(":child's $parentBoxType was renamed from :oldname to :assessment in :cat");
+                                ->setTitle(self::PATTERN_RENAMED_PARENT_TITLE)
+                                ->setParam('boxType', new SimpleParam($parentBoxType));
                     $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
 
@@ -897,19 +1046,24 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     // Topic depends on type of assessment
                     $suffix = $assessment instanceof Quiz ? 'updated' : 'datechanged';
                     $bob    = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                                   ->setTitle("$boxType :assessment closing date was $verb to :date in :cat")
+                                   ->setTitle(self::PATTERN_DATE_CHANGED_STUDENT_TITLE)
                                    ->setParam('date', new Param($dateformat))
+                                   ->setParam('boxType', new Param($boxType))
+                                   ->setParam('verb', new Param($verb, null, Param::STACKING_APPEND))
                                    ->setTopics(["$topicStub.$suffix"]);
                     $envelope->targetToUser($participant->getUser(), $bob->build());
 
                     // Parents
                     if ($this->isParentTargetable()) {
                         $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                                    ->setTitle(":child's $parentBoxType :assessment closing date was $verb to :date in :cat");
+                                    ->setTitle(self::PATTERN_DATE_CHANGED_PARENT_TITLE)
+                                    ->setParam('boxType', new Param($parentBoxType))
+                                    ->setParam('verb', new Param($verb, null, Param::STACKING_APPEND));
                         $envelope->targetToParent($participant->getUser(), $bob->build());
                     }
 
                     $bob->unsetParam('date');
+                    $bob->unsetParam('verb');
                 }
             }
 
@@ -918,8 +1072,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if ($assessment instanceof DueWork && !empty($assessmentDiff['acceptOnline'])) {
                 // Students
                 $m = $assessment->isAcceptNone()
-                    ? 'You no longer need to submit online for :assessment in :cat'
-                    : 'You now need to submit online for :assessment in :cat';
+                    ? self::PATTERN_NO_SUBMIT_STUDENT_TITLE
+                    : self::PATTERN_ACCEPT_ONLINE_STUDENT_TITLE;
                 $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                             ->setTitle($m)
                             ->setTopics(["$topicStub.updated"]);
@@ -928,8 +1082,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 // Parents
                 if ($this->isParentTargetable()) {
                     $m   = $assessment->isAcceptNone()
-                        ? ':child no longer need to submit online for :assessment in :cat'
-                        : ':child needs to submit online for :assessment in :cat';
+                        ? self::PATTERN_NO_SUBMIT_PARENT_TITLE
+                        : self::PATTERN_ACCEPT_ONLINE_PARENT_TITLE;
                     $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                                 ->setTitle($m);
                     $envelope->targetToParent($participant->getUser(), $bob->build());
@@ -940,17 +1094,19 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
             // generic: only if there's something left in the diff.
             // Not sure if there's any point to this notif, but raise it anyway
-            if (!empty($assessmentDiff)) {
+            if (\array_intersect(\array_keys($assessmentDiff), ['type', 'weight', 'workType'])) {
                 // Students
                 $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
-                            ->setTitle("$boxType :assessment was updated in :cat")
+                            ->setTitle(self::PATTERN_UPDATE_STUDENT_TITLE)
+                            ->setParam('boxType', new Param($boxType))
                             ->setTopics(["$topicStub.updated"]);
                 $envelope->targetToUser($participant->getUser(), $bob->build());
 
                 // Parents
                 if ($this->isParentTargetable()) {
                     $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
-                                ->setTitle(":child's $parentBoxType :assessment was updated in :cat");
+                                ->setTitle(self::PATTERN_UPDATE_PARENT_TITLE)
+                                ->setParam('boxType', new Param($parentBoxType));
                     $envelope->targetToParent($participant->getUser(), $bob->build());
                 }
             }
@@ -959,6 +1115,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         return $envelope;
     }
 
+    /**
+     * Retracts a deleted/hidden plan.
+     *
+     * @param Model $plan
+     * @return Envelope
+     */
+    public function notifyDeleted(Model $plan): Envelope
+    {
+        $envelope  = new Envelope();
+        return $this->retract($envelope, $plan);
+    }
 
     /**
      * Convenience helper to build a route to the status page.
@@ -1025,6 +1192,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     }
 
     /**
+     * @param WorkTypeMapper $workTypeMapper
+     * @return static
+     */
+    protected function setWorkTypeMapper(WorkTypeMapper $workTypeMapper): self
+    {
+        $this->workTypeMapper = $workTypeMapper;
+        return $this;
+    }
+
+
+    /**
      * Get the first non-null date in `$dates`, or null otherwise.
      *
      * Currently only needed for triggering a bundle for a plan.
@@ -1067,7 +1245,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private function retrieveAssessmentTopicStub(IAssessable $assessment): ?string
     {
-        $dataModel = $this->assessmentMapper->findById($assessment->getId());
+        try {
+            $dataModel = $this->assessmentMapper->findById($assessment->getId());
+        } catch (BaseMapper\Exception\Deleted $e) {
+            $dataModel = $e->getDeletedObject();
+        }
         if ($dataModel->getDueWork()) {
             return "duework." . $dataModel->getDueWork()->getId();
         }
@@ -1169,6 +1351,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     private function isNotifiableAtAll(IAssessable $assessment, string $label): bool
     {
+        // If the assessment is visible to staff only, do not trigger notification at all even to staff,
+        // since notifications for staff here are to notify them participation status of students.
+        if ($assessment->isStaffOrInstructorVisibleOnly()) {
+            return false;
+        }
+
         switch ($label) {
             case self::TRIGGER_OPEN:
             case self::TRIGGER_UPDATED:
@@ -1230,4 +1418,66 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         return !($this->conf->get('restrict_student_submissions') || $this->conf->get('restrict_parent_duework_access'));
     }
+
+
+    /**
+     * Retracts notifications related to the given plan.
+     *
+     * @param Envelope $envelope
+     * @param Model $plan
+     * @return Envelope
+     */
+    private function retract(Envelope $envelope, Model $plan): Envelope
+    {
+
+        try {
+            $assessment = $this->assessmentDataSource->findByIdForReview($plan->getAssessment()->getId());
+        } catch (BaseMapper\Exception\Deleted $e) {
+            $assessment = $e->getDeletedObject();
+        }
+        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
+
+        if (!isset($topicStub)) {
+            return $envelope;
+        }
+
+        $titles = [
+            self::PATTERN_OPEN_STUDENT_TITLE,
+            self::PATTERN_OPEN_PARENT_TITLE,
+            self::PATTERN_UPCOMING_STUDENT_TITLE,
+            self::PATTERN_UPCOMING_PARENT_TITLE,
+            self::PATTERN_OVERDUE_STUDENT_TITLE,
+            self::PATTERN_OVERDUE_PARENT_TITLE,
+            self::PATTERN_RENAMED_STUDENT_TITLE,
+            self::PATTERN_RENAMED_PARENT_TITLE,
+            self::PATTERN_DATE_CHANGED_STUDENT_TITLE,
+            self::PATTERN_DATE_CHANGED_PARENT_TITLE,
+            self::PATTERN_NO_SUBMIT_STUDENT_TITLE,
+            self::PATTERN_ACCEPT_ONLINE_STUDENT_TITLE,
+            self::PATTERN_NO_SUBMIT_PARENT_TITLE,
+            self::PATTERN_ACCEPT_ONLINE_PARENT_TITLE,
+            self::PATTERN_UPDATE_STUDENT_TITLE,
+            self::PATTERN_UPDATE_PARENT_TITLE,
+            ReturnedWorkNotifier::PATTERN_MARKED_STUDENT_TITLE,
+            ReturnedWorkNotifier::PATTERN_MARKED_PARENT_TITLE,
+            SubmissionNotifier::PATTERN_DELETED_TITLE,
+        ];
+
+        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
+            $href = $this->buildParticipantRoute($assessment, $participant->getUser());
+            $userId = $participant->getUser()->getId();
+
+            foreach ($titles as $key => $title) {
+                $bob = new Builder(false);
+                $bob->setTitle($title)
+                    ->setHref($href)
+                    ->addTopic("$topicStub.$key.$userId"); // needs to be identical
+                $envelope->retractAllLike($bob->build());
+            }
+        }
+
+        // Only broadcast to superusers as there's no system channel
+        return $envelope;
+    }
+
 }

@@ -123,10 +123,10 @@ class Dehydrator
         $dehydrated['assessment'] = $this->internalDehydrateAssessment($assessment);
         foreach ($assessment->getPlans() as $plan) {
             $dehydratedPlan = $this->internalDehydratePlan($plan);
+            $dehydrated['plan'][$plan->getId()] = $dehydratedPlan;
             foreach ($plan->getParticipants() as $participant) {
                 $dehydratedParticipant         = $this->internalDehydrateParticipant($participant);
                 $dehydratedParticipant['user'] = $this->internalDehydrateUser($participant->getUser());
-                $dehydratedParticipant['plan'] = $dehydratedPlan;
                 $dehydrated['participants'][$participant->getUser()->getId()] = $dehydratedParticipant;
             }
         }
@@ -149,11 +149,21 @@ class Dehydrator
             'title'          => $assessment->getTitle(),
             'weight'         => $assessment->getWeight(),
             'markVisibility' => $assessment->getMarkVisibility(),
+            'publishDate'    => $assessment->getPublishAt() && !$assessment->getPublishAt()->isNull()
+                ? $assessment->getPublishAt()->getDatabase()
+                : null,
+            'openDate'       => $assessment->getOpenAt() && !$assessment->getOpenAt()->isNull()
+                ? $assessment->getOpenAt()->getDatabase()
+                : null,
+            'dueDate'        => $assessment->getDueAt() && !$assessment->getDueAt()->isNull()
+                ? $assessment->getDueAt()->getDatabase()
+                : null,
+            'closeDate'      => $assessment->getCloseAt() && !$assessment->getCloseAt()->isNull()
+                ? $assessment->getCloseAt()->getDatabase()
+                : null,
             'workType'       => $assessment->getWorkType()
-                ? [
-                    'id'   => $assessment->getWorkType()->getId(),
-                    'name' => $assessment->getWorkType()->getName(),
-                ]
+                // TODO remove explicit type-coercion once model hydration is fixed SA-4539
+                ? (int)$assessment->getWorkType()->getId()
                 : null,
         ];
 
@@ -195,6 +205,7 @@ class Dehydrator
     private function internalDehydrateParticipant(Participant $participant): array
     {
         return [
+            'planId'      => $participant->getPlan()->getId(),
             'description' => $participant->getDescription(),
             'publishDate' => $participant->getPublishDate()->getDatabase(),
             'openDate'    => $participant->getOpenDate()->getDatabase(),
@@ -214,9 +225,21 @@ class Dehydrator
     private function internalDehydratePlan(Plan $plan): array
     {
         return [
-            'id'      => $plan->getId(),
-            'name'    => $plan->getName(),
-            'dynamic' => $plan->getIsDynamic(),
+            'id'          => $plan->getId(),
+            'name'        => $plan->getName(),
+            'dynamic'     => $plan->getIsDynamic(),
+            'publishDate' => $plan->getPublishDate() && !$plan->getPublishDate()->isNull()
+                ? $plan->getPublishDate()->getDatabase()
+                : null,
+            'openDate'    => $plan->getOpenDate() && !$plan->getOpenDate()->isNull()
+                ? $plan->getOpenDate()->getDatabase()
+                : null,
+            'dueDate'     => $plan->getDueDate() && !$plan->getDueDate()->isNull()
+                ? $plan->getDueDate()->getDatabase()
+                : null,
+            'closeDate'   => $plan->getCloseDate() && !$plan->getCloseDate()->isNull()
+                ? $plan->getCloseDate()->getDatabase()
+                : null,
         ];
     }
 
