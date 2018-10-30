@@ -161,10 +161,17 @@ class IndicatorUsage
             // No candidates: use max value
             $minValue = $maxValue;
             if ($leftMaxValue !== null || $rightMaxValue !== null) {
-                // The greater of left and right gets used.
-                // Left:  ascending
-                // Right: descending
-                if ($leftMaxValue < $rightMaxValue) {
+                // If either left or right max are null: use the other one.
+                // Otherwise, the greater of left and right gets used.
+                // In either case: if we use the left it's ascending, if we use
+                // the right it's descending
+                if ($leftMaxValue === null) {
+                    $floorValue = $rightMaxValue;
+                    $descriptor->setDirectionDescending();
+                } elseif ($rightMaxValue === null) {
+                    $floorValue = $leftMaxValue;
+                    $descriptor->setDirectionAscending();
+                } elseif ($leftMaxValue < $rightMaxValue) {
                     $floorValue = $rightMaxValue;
                     $descriptor->setDirectionDescending();
                 } else {
