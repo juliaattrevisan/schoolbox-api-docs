@@ -51,6 +51,28 @@ class Descriptor
 
 
     /**
+     * Is this descriptor valid?
+     * * Either both or neither min and max value may be null: one may not be
+     *   null and the other not null
+     * * Min value may not be greater than max value
+     *
+     * @throws \UnexpectedValueException if it's not valid
+     */
+    public function assertValidity(): void
+    {
+        $minValueNull = null === $this->minValue;
+        $maxValueNull = null === $this->maxValue;
+        if ($minValueNull xor $maxValueNull) {
+            throw new \UnexpectedValueException('Either both or neither min or max value must be set');
+        }
+
+        if ($this->minValue > $this->maxValue) {
+            throw new \UnexpectedValueException('Min value must not be higher than max value');
+        }
+    }
+
+
+    /**
      * Does this descriptor have either a min or max value?
      *
      * @return bool
