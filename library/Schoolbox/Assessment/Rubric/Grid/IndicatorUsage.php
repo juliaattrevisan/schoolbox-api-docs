@@ -143,30 +143,65 @@ class IndicatorUsage
                 continue;
             }
 
-            $candidateMinValues = [];
+            $leftMaxValue       = null;
+            $isLeftValueLesser  = false;
+            $rightMaxValue      = null;
+            $isRightValueLesser = false;
 
             // What's the nearest non-null value to the left of this?
             $previousNonNullDescriptor = $this->retrieveAdjacentNonNullDescriptor($i, $keys, -1);
-            if ($previousNonNullDescriptor && $previousNonNullDescriptor->getMaxValue() < $maxValue) {
-                $candidateMinValues[] = $previousNonNullDescriptor->getMaxValue();
+            if ($previousNonNullDescriptor) {
+                $leftMaxValue      = $previousNonNullDescriptor->getMaxValue();
+                $isLeftValueLesser = ($leftMaxValue < $maxValue);
             }
 
             // And what's the nearest non-null value to the right?
             $nextNonNullDescriptor = $this->retrieveAdjacentNonNullDescriptor($i, $keys, 1);
-            if ($nextNonNullDescriptor && $nextNonNullDescriptor->getMaxValue() < $maxValue) {
-                $candidateMinValues[] = $nextNonNullDescriptor->getMaxValue();
+            if ($nextNonNullDescriptor) {
+                $rightMaxValue      = $nextNonNullDescriptor->getMaxValue();
+                $isRightValueLesser = ($rightMaxValue < $maxValue);
             }
 
-            // No candidates: use max value
-            $minValue = $maxValue;
-            if (!empty($candidateMinValues)) {
-                $floorValue = max($candidateMinValues);
-                if (null !== $floorValue) {
-                    // Don't allow to be greater than max
-                    // (in case validation allowed decimals for ranged)
-                    $minValue = min($floorValue + $step, $maxValue);
+            // Set the min value based on the left and right values
+            if ($isLeftValueLesser || $isRightValueLesser) {
+                // Either the left or right value is less than this value:
+                // that means the min value is dependent on the left or right.
+
+                if ($isLeftValueLesser && $isRightValueLesser) {
+                    // It should never happen that both left and right value
+                    // are less than this value: that means that I created a
+                    // descriptor sequence that both ascends and descends,
+                    // which is invalid.
+                    // Nonetheless: attempt to handle this case by using the
+                    // greater of left and right.
+                    if ($leftMaxValue > $rightMaxValue) {
+                        $floorValue = $leftMaxValue;
+                        $descriptor->setDirectionAscending();
+                    } else {
+                        $floorValue = $rightMaxValue;
+                        $descriptor->setDirectionDescending();
+                    }
+                } elseif ($isLeftValueLesser) {
+                    // Left value is less than this value: use left value as
+                    // the floor value for this descriptor's min value.
+                    $floorValue = $leftMaxValue;
+                    $descriptor->setDirectionAscending();
+                } else {
+                    // Right value is less than this value: use left value as
+                    // the floor value for this descriptor's min value.
+                    $floorValue = $rightMaxValue;
+                    $descriptor->setDirectionDescending();
                 }
+
+                // Don't allow to be greater than max
+                // (in case validation allowed decimals for ranged)
+                $minValue = min($floorValue + $step, $maxValue);
+            } else {
+                // Neither left or right value are less than this value:
+                // this is not a ranged descriptor.
+                $minValue = $maxValue;
             }
+
             $descriptor->setMinValue($minValue);
         }
     }

@@ -20,6 +20,10 @@ class Descriptor
     use Id;
 
 
+    private const DIRECTION_ASC = 'asc';
+    private const DIRECTION_DESC = 'desc';
+
+
     /**
      * @var string|null
      */
@@ -36,6 +40,36 @@ class Descriptor
      * @var float|null
      */
     private $maxValue;
+
+
+    /**
+     * What direction does the capability render in?
+     *
+     * @var string
+     */
+    private $direction = self::DIRECTION_ASC;
+
+
+    /**
+     * Is this descriptor valid?
+     * * Either both or neither min and max value may be null: one may not be
+     *   null and the other not null
+     * * Min value may not be greater than max value
+     *
+     * @throws \UnexpectedValueException if it's not valid
+     */
+    public function assertValidity(): void
+    {
+        $minValueNull = null === $this->minValue;
+        $maxValueNull = null === $this->maxValue;
+        if ($minValueNull xor $maxValueNull) {
+            throw new \UnexpectedValueException('Either both or neither min or max value must be set');
+        }
+
+        if ($this->minValue > $this->maxValue) {
+            throw new \UnexpectedValueException('Min value must not be higher than max value');
+        }
+    }
 
 
     /**
@@ -57,6 +91,38 @@ class Descriptor
     public function hasRange(): bool
     {
         return $this->hasValue() && $this->minValue !== $this->maxValue;
+    }
+
+
+    /**
+     * Retrieve the left-side value of this descriptor.
+     *
+     * @return float|null
+     * @throws \UnexpectedValueException if `assertValidity` fails
+     */
+    public function retrieveLeftValue(): ?float
+    {
+        $this->assertValidity();
+        if (!$this->hasValue()) {
+            return null;
+        }
+        return $this->direction === self::DIRECTION_ASC ? $this->minValue : $this->maxValue;
+    }
+
+
+    /**
+     * Retrieve the right-side value of this descriptor.
+     *
+     * @return float|null
+     * @throws \UnexpectedValueException if `assertValidity` fails
+     */
+    public function retrieveRightValue(): ?float
+    {
+        $this->assertValidity();
+        if (!$this->hasValue()) {
+            return null;
+        }
+        return $this->direction === self::DIRECTION_ASC ? $this->maxValue : $this->minValue;
     }
 
 
@@ -116,6 +182,44 @@ class Descriptor
     public function setMaxValue(?float $maxValue): self
     {
         $this->maxValue = $maxValue;
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isDirectionAscending(): bool
+    {
+        return $this->direction === self::DIRECTION_ASC;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isDirectionDescending(): bool
+    {
+        return $this->direction === self::DIRECTION_DESC;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function setDirectionAscending(): self
+    {
+        $this->direction = self::DIRECTION_ASC;
+        return $this;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function setDirectionDescending(): self
+    {
+        $this->direction = self::DIRECTION_DESC;
         return $this;
     }
 }
