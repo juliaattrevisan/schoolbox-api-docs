@@ -51,7 +51,11 @@ class Module extends BaseModule
             $db = $this->getInjector()->get('databaseInternal');
             return new Rule\All(
                 new Rule\IsLoggedIn(),
-                new Authorizer\Rule\HasAudiencesAvailable($this->getStrategyFactory()->makeAllSimpleStrategies(), $db)
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_WRITE),
+                    new Authorizer\Rule\HasAudiencesAvailable($this->getStrategyFactory()->makeAllSimpleStrategies(), $db)
+                )
             );
         });
 
