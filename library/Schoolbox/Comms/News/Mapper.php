@@ -250,7 +250,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     /**
      * Get a list of years that have article(s) that were audienced to a user
      *
-     * @param array $articleIdsForUser
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
@@ -296,13 +295,19 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     }
 
 
+    /**
+     * Given a list of articles, returns those that are published and not expired
+     *
+     * @param array $availableArticleIds
+     * @return array
+     */
     public function findArticlesIdsPublished(array $availableArticleIds) {
         if (!\count($availableArticleIds)) {
             return [];
         }
 
+        $articleIds = [];
         $pb = $this->getPredicatePublished();
-
         $where = implode("\nAND ", $pb->getWhere());
 
         $query = "

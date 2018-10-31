@@ -23,9 +23,7 @@ use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
-use Schoolbox\Comms\News\Validation\ValidUserCanAudienceTo;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -34,7 +32,6 @@ use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
@@ -591,10 +588,7 @@ class Controller extends Base
      * @api GET /news/lists/feed
      *
      * @throws InvalidArgumentException
-     * @throws MapperException
-     * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \DomainException
      * @throws \OutOfRangeException
      * @throws \PDOException
@@ -928,7 +922,6 @@ class Controller extends Base
         $params = new Querystring($this->getRequest()->query);
         $pageNum = $params->getPageNum();
         $status = $params->getStatus();
-        $lists = new Moderation\Lists($this->newsMapper);
 
         if (!$pageNum) {
             $pageNum = 1;
