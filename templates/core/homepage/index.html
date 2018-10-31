@@ -102,7 +102,7 @@
         });
 
         $('#editMode').click(  function (event) {
-            $('[data-target="settings"]').parent().toggle(this.checked);
+            $('nav[data-component-settings]').toggle(this.checked);
             $('[data-component-handle]').toggle(this.checked);
             $('[data-component-titlebar-container]').each(function() {
                 $(this).toggleClass('actions-small-' + $(this).data('action-count'));
