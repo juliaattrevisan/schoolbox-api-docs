@@ -316,9 +316,6 @@ if ($virtualPermission >= WRITE_ACCESS) {
         $this->setVar("CURRENT_TEMPLATE_$x", $template == $x ? 'current' : '');
     }
 
-
-    $this->setVar('HIDE_CONTROLS_ON_WRITE', 'style="display:none"');
-
 } else {
     $this->setVar(array(
         'edit_page_block' => '',
@@ -327,8 +324,6 @@ if ($virtualPermission >= WRITE_ACCESS) {
         'colour_list_block' => '',
         'course_actions_block' => '',
     ));
-    $this->setVar('HIDE_CONTROLS_ON_WRITE', '');
-
 }
 
 //Setup control buttons
