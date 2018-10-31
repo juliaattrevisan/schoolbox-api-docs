@@ -12,9 +12,6 @@
      */
     .component {
         margin-bottom: rem-calc(($base-font-size));
-        &:hover{
-            cursor: move;
-        }
 
         /* Absorb from Skin Builder colour set
          *
