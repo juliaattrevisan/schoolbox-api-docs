@@ -614,11 +614,6 @@ class Controller extends Base
             'topics' => [
                 'name',
                 'slug',
-            ],
-            'status',
-            'statusDate' => [
-                'long',
-                'relativeTime'
             ]
         ];
 
