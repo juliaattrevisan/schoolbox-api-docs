@@ -106,7 +106,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => $limit,
             'referrer' => News\Statistics\Mapper::REFERRER_DASHBOARD,
-            'queryStringPage' => News\Querystring::PAGE_NUMBER
+            'queryStringPage' => News\Querystring::PAGE_NUMBER,
         ]);
     }
 }
