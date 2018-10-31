@@ -779,80 +779,33 @@ class External_Pcschools_User implements External_UserInterface
             return [];
         }
 
-        $studentExternalId = '';
-        $teacherExternalId = '';
-        $timePeriods       = [];
-        $classes           = [];
-        $spec              = new External_Pcschools_ValidCampusSpec();
-        foreach ($user->getCampusCollection() as $campus) {
-            if ($spec->isSatisfiedBy($campus)) {
-                $timePeriods[$campus->getExtTimetableCode()] = $campus->getExtTimetableCode();
-            }
+        if (!$user->getRole()->isStaff() && !$user->getRole()->isStudent()) {
+            return [];
         }
-        foreach ($timePeriods as $timePeriod) {
-            if ($user->getRole()->isStudent()) {
-                $studentExternalId = $externalId;
-            } elseif ($user->getRole()->isStaff()) {
-                $teacherExternalId = $externalId;
-            } else {
-                return [];
-            }
 
-            // Ordering of result sets from spSelTimeTableSchoolBox:
-            // Day periods
-            // Day classes
-            // Home classes
-            // Week days
-            // Terms
-            $statement = $this->getDatabase()->prepareProcedure($this->timetableStoredProc);
-            $statement->bindInputs([
-                'DATE' => date('Ymd'),
-                'TIMEPERIOD' => $timePeriod,
-                'STUDKEY' => $studentExternalId,
-                'TEACHERCODE' => $teacherExternalId,
-            ]);
+        $classes = [];
 
-            $statement->execute();
+        $classArray = $statement = $this->getDatabase()->getAll("
+            SELECT DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
+            FROM TIMEFILE tf
+                        INNER JOIN SUB su ON tf.[YEAR] = su.[YEAR] AND tf.SUBJECT = su.SUBJECT_NO AND tf.CLASS = su.CLASS AND tf.TIME_PERIOD = su.PERIOD_ID
+                        INNER JOIN SUBJECT s ON tf.SUBJECT = s.NO
+                        INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
+            WHERE st.CURRENT_YEAR <> '99'
+              AND (st.STUDKEY = '" . $this->getDatabase()->quote($externalId) . "' AND tf.TIME_PERIOD = '" . $this->getDatabase()->quote($timePeriod) . "');
+        ");
 
-            // Need only day classes
-            $statement->nextRowset();
-
-            // Add classes for each day into it
-            /** @noinspection PhpAssignmentInConditionInspection */
-            while ($dayClass = $statement->fetch()) {
-                if ($dayClass['SUPERDATE'] == null || $dayClass['SUPERDATE'] == date("Y-m-d") . " 00:00:00") {
-                    $code = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
-                    $classes[$code] = [
-                        'code'       => $code,
-                        'name'       => $dayClass['DESC'],
-                        'classType'  => '',
-                        'campusCode' => $timePeriod,
-                    ];
-                }
-            }
-            $statement->close();
-
-            $classArray = $statement = $this->getDatabase()->getAll("
-                SELECT DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
-                FROM TIMEFILE tf
-                            INNER JOIN SUB su ON tf.[YEAR] = su.[YEAR] AND tf.SUBJECT = su.SUBJECT_NO AND tf.CLASS = su.CLASS AND tf.TIME_PERIOD = su.PERIOD_ID
-                            INNER JOIN SUBJECT s ON tf.SUBJECT = s.NO
-                            INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
-                WHERE st.CURRENT_YEAR <> '99'
-                  AND (st.STUDKEY = '" . $this->getDatabase()->quote($studentExternalId) . "' AND tf.TIME_PERIOD = '" . $this->getDatabase()->quote($timePeriod) . "');
-            ");
-
-            foreach ($classArray as $class)
-            {
-                $code = $timePeriod . '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
-                $classes[$code] = [
-                    'code'       => $code,
-                    'name'       => $class['DESC'],
-                    'classType'  => '',
-                    'campusCode' => $timePeriod,
-                ];
-            }
+        foreach ($classArray as $class)
+        {
+            $code = $timePeriod . '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
+            $classes[$code] = [
+                'code'       => $code,
+                'name'       => $class['DESC'],
+                'classType'  => '',
+                'campusCode' => $timePeriod,
+            ];
         }
+
         return array_values($classes);
     }
 
