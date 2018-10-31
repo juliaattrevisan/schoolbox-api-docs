@@ -301,7 +301,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @param array $availableArticleIds
      * @return array
      */
-    public function findArticlesIdsPublished(array $availableArticleIds) {
+    public function findArticlesIdsPublished(array $availableArticleIds): array
+    {
         if (!\count($availableArticleIds)) {
             return [];
         }
