@@ -607,6 +607,9 @@ class Controller extends Base
             'title',
             'blurb',
             'featureImage',
+            'author' => [
+                'fullname'
+            ],
             'publishAt' => [
                 'long',
                 'relativeTime'
