@@ -49,7 +49,7 @@
                  #}
                 {% set capabilityMark = rubricMarkedGrid ? rubricMarkedGrid.retrieveCapabilityMark(groupUsage) : null %}
 
-                {% set rowspan = groupUsage.indicatorUsages|length + (showGroupTotal and rubricGrid.isCapabilityMarkShown(groupUsage.capability) and markType.mode != "none" ? 1 : 0) %}
+                {% set rowspan = groupUsage.indicatorUsages|length + (showGroupTotal and rubricGrid.isCapabilityMarkShown(groupUsage.capability) ? 1 : 0) %}
 
                 {% for critIndex, critUsage in groupUsage.indicatorUsages %}
                 <tr data-group="{{ rubricId }}-{{ groupUsage.capability.id }}">
@@ -134,7 +134,7 @@
 <script type="text/javascript">
     $(function () {
         var $rb       = $('#{{ rubricId }}'),
-            markType  = $rb.find("[data-final-summary]").attr("data-mark-type"),
+            markType  = $rb.find("[data-mark-type]").attr("data-mark-type"),
             dynagrade = {{ markType | json_encode | raw }};
 
         $("[data-feedback-form]").validate(
@@ -146,12 +146,12 @@
             }
         );
 
+
         // Add validation rules for per-capability marks
         $("[data-group-mark]").each(function() {
 
             // Can't validate letter grade dropdown as its values are preset on the frontend
             if (markType !== 'letter') {
-
                 // Percentage and total mark types must be numeric
                 $(this).rules('add', {
                     number: true
@@ -162,7 +162,7 @@
                     $(this).rules('add', {
                         range: [0, 100]
                     });
-                } else if (markType === "raw") {
+                } else if (markType === "raw" || markType === 'none') {
                     // Otherwise, range is between 0 and capability max
                     var capMax = $(this).closest("[data-group-summary]").attr("data-max");
 
@@ -185,18 +185,19 @@
         function disableEnableAssignFromDescs() {
             var $groups = $rb.find("[data-group-summary]");
             $groups.each(function() {
-                var displayedMark = $(this).find("[data-group-descriptor-sum]").text().replace(/%/, '').trim();
-                var customMark = $(this).find("[data-group-mark]").val();
+                var $this         = $(this),
+                    displayedMark = $this.find("[data-group-descriptor-sum]").text().replace(/%/, '').trim(),
+                    customMark    = $this.find("[data-group-mark]").val();
 
                 if (markType === 'letter') {
-                    var grades = getLetterGrades($(this));
-                    customMark = getLetterGradeFromNumeric($(this).find("[data-group-mark]").val(), grades);
+                    var grades = getLetterGrades($this);
+                    customMark = getLetterGradeFromNumeric($this.find("[data-group-mark]").val(), grades);
                 }
 
                 if (displayedMark === customMark) {
-                    $(this).find("[data-use-descriptor-values]").hide();
+                    $this.find("[data-use-descriptor-values]").hide();
                 } else {
-                    $(this).find("[data-use-descriptor-values]").show();
+                    $this.find("[data-use-descriptor-values]").show();
                 }
             })
         }
@@ -208,15 +209,12 @@
 
         // Update the per-capability and overall marks when descriptor selection is changed
         $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
-            var $changed = $(this);
-
-            var groupId  = $changed.attr('data-rubric-group');
-            var rubricId = $changed.attr('data-rubric');
-
-            var rowSelector = '[data-group="rb-' + rubricId + '-' + groupId + '"]';
-            var $groupRows = $(rowSelector);
-
-            var rubricTotalMark = 0;
+            var $changed        = $(this),
+                groupId         = $changed.attr('data-rubric-group'),
+                rubricId        = $changed.attr('data-rubric'),
+                rowSelector     = '[data-group="rb-' + rubricId + '-' + groupId + '"]',
+                $groupRows      = $(rowSelector),
+                rubricTotalMark = 0;
 
             if ($groupRows.length) {
                 var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
@@ -233,11 +231,7 @@
                 $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
 
                 // Update button text with mark calculated from descriptors
-                switch(markType) {
-                    case 'raw':
-                        $groupSummary.find("[data-group-descriptor-sum]").text(scaledGroupMark);
-                        break;
-
+                switch (markType) {
                     case 'letter':
                         var grades = getLetterGrades($groupSummary.find("[data-group-mark]"));
                         $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, $groupSummary.attr('data-mark')), grades));
@@ -247,19 +241,17 @@
                         $groupSummary.find("[data-group-descriptor-sum]").text(getPercentage($groupSummary, $groupSummary.attr('data-mark')) + "%");
                         break;
 
+                    case 'raw':
+                    case 'none':
                     default:
-                        // TODO
-                        // We have a "none" mark type
+                        $groupSummary.find("[data-group-descriptor-sum]").text(scaledGroupMark);
+                        break;
                 }
 
                 if ($groupSummary.length) {
                     if (! $groupSummary.attr('data-customised')) {
                         // Only update dropdown/input field if the mark has not been customised
-                        switch(markType) {
-                            case 'raw':
-                                $groupSummary.find("[data-group-mark]").val(scaledGroupMark);
-                                break;
-
+                        switch (markType) {
                             case 'letter':
                                 assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $groupSummary.find("[data-group-mark]").val(scaledGroupMark));
                                 break;
@@ -268,9 +260,11 @@
                                 $groupSummary.find("[data-group-mark]").val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
                                 break;
 
+                            case 'raw':
+                            case 'none':
                             default:
-                                // TODO
-                                // We have a "none" mark type
+                                $groupSummary.find("[data-group-mark]").val(scaledGroupMark);
+                                break;
                         }
 
                     }
@@ -335,21 +329,19 @@
             var normalised = 0;
 
             if ($groupRows.length) {
-                var rowCount = $groupRows.length;
+                // var rowCount = $groupRows.length;
                 switch (markType) {
-                    case 'raw':
-                        normalised = customMark;
-                        break;
-
                     case 'letter':
                     case 'percent':
                         // What is x percent of the total possible (unscaled) marks?
                         normalised = customMark * (capMax / 100);
                         break;
 
+                    case 'raw':
+                    case 'none':
                     default:
-                        // TODO
-                        // We have a "none" mark type
+                        normalised = customMark;
+                        break;
                 }
             }
 
@@ -376,10 +368,6 @@
             $groupSummary.find('[data-db-mark]').val(scaledGroupMark);
 
             switch(markType) {
-                case 'raw':
-                    $gradeInput.val(scaledGroupMark);
-                    break;
-
                 case 'letter':
                     assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $gradeInput.val(scaledGroupMark));
                     break;
@@ -388,9 +376,11 @@
                     $gradeInput.val(getPercentage($groupSummary, $groupSummary.attr('data-mark')));
                     break;
 
+                case 'raw':
+                case 'none':
                 default:
-                    // TODO
-                    // We have a "none" mark type
+                    $gradeInput.val(scaledGroupMark);
+                    break;
             }
 
             // The grade input has changed: trigger save draft
