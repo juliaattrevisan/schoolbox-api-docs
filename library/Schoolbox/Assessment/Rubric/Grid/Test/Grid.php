@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
@@ -560,10 +561,107 @@ class Grid extends TestCase
 
 
         // different ordering of descriptors: true (regardless of whether they're in the same level)
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid2CapUsages   = Generator::TEST_CAPABILITY_USAGES;
+        $grid2Descriptors = &$grid2CapUsages[1]['indicators'][12]['descriptors'];
+        $grid2Descriptors = array_combine(
+            array_keys($grid2Descriptors),
+            array_reverse(array_values($grid2Descriptors))
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            $grid2CapUsages
+        );
+
+        yield "different descriptor ordering" => [$grid1, $grid2, true];
+
+
         // different max points per capability: true?
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid2CapUsages = Generator::TEST_CAPABILITY_USAGES;
+        $grid2CapUsages[1]['maxValue'] = 100;
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            $grid2CapUsages
+        );
+
+        yield "different max points per capability" => [$grid1, $grid2, true];
+
+
+
         // different mark-per-cap on/off: true
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid1->getAssessment()->setMarkPerCapability(true);
+        $grid2->getAssessment()->setMarkPerCapability(false);
+        yield "different mark per capability setting" => [$grid1, $grid2, true];
+
+
         // different mark range on/off: true
-        // different mark type: true
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid1->getAssessment()->setUseMarkRange(true);
+        $grid2->getAssessment()->setUseMarkRange(false);
+        yield "different mark range" => [$grid1, $grid2, true];
+
+
+        // different mark type: true (whether same or different base type)
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid1->getAssessment()->setMarkScheme(new MarkScheme\TotalMarkFractional(100));
+        $grid2->getAssessment()->setMarkScheme(new MarkScheme\TotalMarkFractional(200));
+        yield "different mark type, same base type" => [$grid1, $grid2, true];
+
+
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid1->getAssessment()->setMarkScheme(new MarkScheme\None());
+        $grid2->getAssessment()->setMarkScheme(new MarkScheme\Percentage());
+        yield "different mark type, different base type" => [$grid1, $grid2, true];
     }
 
 
