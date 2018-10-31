@@ -256,27 +256,22 @@ class Controller extends Base
                 continue;
             }
 
-            if ($detailView) {
-                $segmentName = $translator->getSegmentName($segment);
-                $audienceSegments[$segmentName] = $segmentName;
+            // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
+            // Labels are used in brick rendering
+            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
+
+            // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
+            if ($segment->isSimple()) {
+                $encodedValue = $codec->encodeValue($segment->getEntityValue());
+                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
             } else {
-                // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
-                // Labels are used in brick rendering
-                $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
-
-                // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
-                if ($segment->isSimple()) {
-                    $encodedValue = $codec->encodeValue($segment->getEntityValue());
-                    $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
-                } else {
-                    foreach ($segment->getChildren() as $child) {
-                        $encodedValue = $codec->encodeValue($child->getEntityValue());
-                        $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
-                    }
+                foreach ($segment->getChildren() as $child) {
+                    $encodedValue = $codec->encodeValue($child->getEntityValue());
+                    $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
                 }
-
-                $audienceSegments[] = $option;
             }
+
+            $audienceSegments[] = $option;
         }
 
         return $audienceSegments;
@@ -589,6 +584,7 @@ class Controller extends Base
                 'isSavedForLater'   => $isSavedForLater,
                 'returnUrl'         => $this->getReturnUrl(),
                 'audienceSegments'   => $this->getAudienceSegments($article),
+                'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
             ];
         }
 
