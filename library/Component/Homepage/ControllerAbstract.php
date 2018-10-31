@@ -77,6 +77,27 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
 
         $this->setupConfigRendering($targetHandle);
 
+        // Write users will have 3 actions, and also will have their actions hidden by default due to the homepage lock feature
+        // Read users will have 1 action and no lock feature
+        $this->getSitePage()->setBlock('configTpl', 'titlebar_write', 'titlebar_write_block');
+        $this->getSitePage()->setBlock('configTpl', 'titlebar_read', 'titlebar_read_block');
+
+        if ($this->hasWriteAccess()) {
+            $this->setVar([
+                'COMPONENT_ACTION_COUNT' => 3,
+                'titlebar_read_block' => ''
+            ]);
+            $this->getSitePage()->parse('titlebar_write_block', 'titlebar_write');
+        } else {
+            $this->setVar([
+                'COMPONENT_ACTION_COUNT' => 1,
+                'titlebar_write_block' => ''
+            ]);
+            $this->getSitePage()->parse('titlebar_read_block', 'titlebar_read');
+        }
+
+        $this->getSitePage()->setBlock('configTpl', 'drag_handle', 'drag_handle_block');
+
         /* If you don't have write access, just render the collapse and go away
          */
         if (!$hasWriteAccess) {
@@ -85,10 +106,9 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
             /* Detroit
              */
             $this->applyCollapsedState();
-
             $this->getSitePage()->parse('settings_collapse_block', 'settings_collapse');
-        }
-        else {
+            $this->getSitePage()->setVar('drag_handle_block', '');
+        } else {
             /* If you want to process the config, then do so and display it
              * Also provide a triangle so you can alter them through the ui
              *
@@ -101,12 +121,13 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
                  */
                 $this->applyCollapsedState();
 
-                if(!$is_for_template) {
+                if (!$is_for_template) {
                     // We don't show the collapse option when building templates
                     $this->getSitePage()->parse('settings_collapse_block', 'settings_collapse');
                 }
                 $this->getSitePage()->parse('settings_link_block', 'settings_link');
                 $this->getSitePage()->parse('settings_close_block', 'settings_close');
+                $this->getSitePage()->parse('drag_handle_block', 'drag_handle');
             }
         }
 
@@ -164,7 +185,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
 
         $this->setVar(
             array(
-                'CONFIG_COLLAPSED_ICON' => $state['icon'],
+                'CONFIG_COLLAPSED_ICON'  => $state['icon'],
                 'CONFIG_COLLAPSED_CLASS' => $state['class'],
                 'CONFIG_COLLAPSED_STATE' => $state['data'],
             )

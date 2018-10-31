@@ -234,6 +234,17 @@ th, td{
 		@include switch-label;
 	}
 
+	&.medium {
+		@include wide-switch(6rem);
+		@include switch-label;
+	}
+
+
+	&.inline {
+		display: inline-block;
+		margin-bottom: 0;
+	}
+
 	@include switch-label(0.5rem);
 	vertical-align: middle;
 
@@ -243,7 +254,7 @@ th, td{
 	
 	span {
 		position: absolute;
-		top: 0.25rem;
+		top: 0.2rem;
 		line-height: 1.625rem;
 		font-weight: 100;
 		text-transform: uppercase;

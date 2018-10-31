@@ -100,6 +100,14 @@
                 location.reload();
             });
         });
+
+        // Lock homepage toggle
+        $('#component-lock-toggle').click(function (event) {
+            $('nav[data-component-settings], [data-component-handle]').toggle(this.checked);
+            $('div[data-component-titlebar-container]').each(function() {
+                $(this).toggleClass('actions-small-' + $(this).data('action-count'));
+            });
+        });
     });
 </script>
 
@@ -184,6 +192,8 @@
             }
         });
 
+
+
         /* Tab toggler
          * Deal with special components placeholder
          */
@@ -208,6 +218,7 @@
             }
         });
 
+
     });
 </script>
 <!-- END modify_layout -->
@@ -225,6 +236,13 @@
     <nav>
         <!-- BEGIN edit_page -->
         <span data-tab>
+            <span class="switch inline round ">
+                <input id="component-lock-toggle" type="checkbox" />
+                <label for="component-lock-toggle">
+                    <span class="icon-unlocked">&nbsp;</span>
+                    <span class="icon-locked">&nbsp;</span>
+                </label>
+            </span>
             <span class="tab-title" data-show-empty>
                 <a class="icon-add" href="#tabs-1" title="Add components" data-tab-activator></a>
             </span>
@@ -232,11 +250,11 @@
                 <a class="icon-components" href="#tabs-2" title="Edit columns" data-tab-activator></a>
             </span>
         </span>
+
         <!-- END edit_page -->
         <a href="#" class="icon-more" data-dropdown="tab-control" title="Actions"></a>
     </nav>
     <ul id="tab-control" class="f-dropdown" data-dropdown-content>
-
         <!-- BEGIN readonly_switch_on -->
         <li class="separator">You are in Teacher View</li>
         <li><a href="?readonly=1" class="icon-staff-students">Switch to Student View</a></li>
