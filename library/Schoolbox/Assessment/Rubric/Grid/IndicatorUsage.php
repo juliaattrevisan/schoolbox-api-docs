@@ -241,6 +241,15 @@ class IndicatorUsage
      */
     public function isCompatibleWith(IndicatorUsage $other): bool
     {
+        // Check it's the same indicator
+        if ($this->getIndicator()->getId() !== $other->getIndicator()->getId()) {
+            return false;
+        }
+
+        // Examine descriptors
+        // * Ensure same descriptors are in use (ordering doesn't matter)
+        // * Ensure each descriptor's values match
+
         return true;
     }
 
