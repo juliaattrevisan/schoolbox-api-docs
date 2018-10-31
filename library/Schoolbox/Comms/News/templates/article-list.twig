@@ -39,24 +39,17 @@
                 <li class="actions-small-1" v-for="article in currentArticles">
                     <div class="list-item">
                         <div class="small-12 card">
-                            {# TODO: need feature image href sent from backend, and article link
                             <a :href="article._links.self.href" v-if="article.featureImage">
                                 <img :src="article.featureImage._links.image.href + '&size=square64'">
                             </a>
-                            #}
 
-                            {# TODO: need article link sent from backend
                             <h3><a :href="article._links.self.href">${ article.title }</a></h3>
-                            #}
-                            <h3><a href="#">${ article.title }</a></h3>
 
-                            {# TODO: need author fullname, publish date with long and relative time sent from the backend
                             <p class="meta">
                                 Published by 
-                                ${ article.author.fullname }
+                                <a :href="article.author._links.profile.href">${ article.author.fullname }</a>
                                 <time :title="article.publishAt.long">${ article.publishAt.relativeTime }</time>
                             </p>
-                            #}
 
                             {# TODO: add topics #}
                         </div>
@@ -129,7 +122,7 @@
             tabSelected: topicAll,
 
             // Route for retrieving all the articles
-            getArticlesRoute: '{{ routeLookup('commsNews.getListByTopic') }}',
+            getArticlesRoute: '{{ routeLookup('commsNews.getListForUser') }}',
 
              // Route for news feed page
             getIndexRoute: '{{ routeLookup('commsNews.getIndex') }}',
@@ -151,7 +144,8 @@
 
             // Find some articles
             axios.get(self.getArticlesRoute).then(function(response) {
-                var articles = response.data.articles;
+                console.log(response);
+                var articles = response.data;
 
                 self.articlesLoading = false;
                 self.allArticles = articles;
