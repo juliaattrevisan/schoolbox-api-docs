@@ -11,7 +11,6 @@ namespace Schoolbox\Assessment\Rubric\Grid\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -433,5 +432,37 @@ class Grid extends TestCase
     ): void
     {
         $this->assertSame($expected, $grid->isCapabilityMarkShown($capability));
+    }
+
+
+    /**
+     * Data provider for `getTestIsCompatibleWithData`.
+     * @return iterable
+     */
+    public function getTestIsCompatibleWithData(): iterable
+    {
+        $grid1 = new RubricGrid\Grid(
+            new DueWork(),
+            new Rowset\RowSet(new Folder())
+        );
+        $grid2 = new RubricGrid\Grid(
+            new DueWork(),
+            new Rowset\RowSet(new Folder())
+        );
+        yield "empty with empty" => [$grid1, $grid2, true];
+    }
+
+
+    /**
+     * @dataProvider getTestIsCompatibleWithData
+     * @covers \Schoolbox\Assessment\Rubric\Grid\Grid::isCompatibleWith
+     *
+     * @param RubricGrid\Grid $grid1
+     * @param RubricGrid\Grid $grid2
+     * @param bool            $expected
+     */
+    public function testIsCompatibleWith(RubricGrid\Grid $grid1, RubricGrid\Grid $grid2, bool $expected): void
+    {
+        $this->assertSame($expected, $grid1->isCompatibleWith($grid2));
     }
 }

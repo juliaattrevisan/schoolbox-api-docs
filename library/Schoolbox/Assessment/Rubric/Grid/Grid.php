@@ -237,6 +237,19 @@ class Grid
 
 
     /**
+     * Are marked grids given to rubric `$other` mutually compatible with ones
+     * given to this grid?
+     *
+     * @param Grid $other
+     * @return bool
+     */
+    public function isCompatibleWith(Grid $other): bool
+    {
+        return true;
+    }
+
+
+    /**
      * @return IAssessable
      */
     public function getAssessment(): IAssessable
