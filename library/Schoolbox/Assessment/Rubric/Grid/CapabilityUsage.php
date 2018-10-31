@@ -185,14 +185,14 @@ class CapabilityUsage
 
 
     /**
-     * Retrieves the indicator IDs that this grid uses.
+     * Retrieves the indicator IDs that this capability uses.
      *
      * @return array|int[]
      */
     private function retrieveUsedIndicatorIds(): array
     {
         $indicatorIds = [];
-        foreach ($this->getIndicatorUsages() as $indicatorUsage) {
+        foreach ($this->indicatorUsages as $indicatorUsage) {
             $indicatorIds[] = $indicatorUsage->getIndicator()->getId();
         }
         sort($indicatorIds);

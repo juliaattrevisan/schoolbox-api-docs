@@ -274,7 +274,7 @@ class Grid
     private function retrieveUsedCapabilityIds(): array
     {
         $capabilityIds = [];
-        foreach ($this->getCapabilityUsages() as $capabilityUsage) {
+        foreach ($this->capabilityUsages as $capabilityUsage) {
             $capabilityIds[] = $capabilityUsage->getCapability()->getId();
         }
         sort($capabilityIds);
