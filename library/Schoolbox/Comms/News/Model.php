@@ -23,9 +23,6 @@ use Schoolbox\News\Topic;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Alaress_Date_Format;
-use TextFormatter;
-use Scrub;
-
 
 class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 {
@@ -671,12 +668,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
      */
     public function getBlurb(): ?string
     {
-        if ($this->blurb ) {
-            return $this->blurb;
-        }
-        else {
-            return TextFormatter::cutSentence(Scrub::html2text($this->body), 300);
-        }
+        return $this->blurb;
     }
 
 
