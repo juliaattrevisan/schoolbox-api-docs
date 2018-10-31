@@ -176,7 +176,7 @@
             window.onpopstate = function(event) {
                 if (!event.state) {
                     // Return to defaults
-                    self.page = 1;
+                    self.page = this.initialPage;
                     self.onPaginate(self.page, true);
                     self.tabSelected = this.allTab;
                     self.onTabChange(self.tabSelected, true, true);
