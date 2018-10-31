@@ -3,7 +3,7 @@
  # Sets up a container for async article loading
  #
  # @param Collection|Topic[] topics
- # @param int topicAll
+ # @param string topicAll
  # @param string slug
  # @param int compactMode
  # @param int limit
@@ -31,7 +31,8 @@
 {% block newsContent %}
     {% include '@commsNews/article-list.twig' with {
         initialPage: initialPage,
-        queryStringPage: queryStringPage
+        queryStringPage: queryStringPage,
+        topicAll: topicAll
     } %}
 {% endblock %}
 

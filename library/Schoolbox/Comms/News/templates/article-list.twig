@@ -4,6 +4,7 @@
  #
  # @param int|null initialPage - The page number to load by default
  # @param string queryStringPage - The string to use for page number in the URL
+ # @param string topicAll - The slug for the 'all' tab
  #}
 
 {% if not initialPage %}
@@ -14,7 +15,7 @@
     <section>
         {# tabs #}
         <dl class="tabs" v-if="allArticles.length || articlesLoading">
-            <dd v-for="topic in topics" :class="{active: tabSelected === topic}">
+            <dd v-for="topic in topics" :class="{active: tabSelected.toLowerCase() === topic.toLowerCase()}">
                 <a @click="onTabChange(topic)">${ topic }</a>
             </dd>
             <dd class="skeleton" v-if="articlesLoading" v-for="n in 3">
@@ -97,7 +98,7 @@
 <script>
     'use strict';
 
-    var allTab = 'All';
+    var topicAll = '{{ topicAll }}';
 
     var app = new Vue({
         el: '#news-component',
@@ -125,7 +126,7 @@
             filteredArticles: [],
 
             // The selected tab, just used for active styling
-            tabSelected: allTab,
+            tabSelected: topicAll,
 
             // Route for retrieving all the articles
             getArticlesRoute: '{{ routeLookup('commsNews.getListByTopic') }}',
@@ -142,7 +143,8 @@
             // The string to use for page in the URL
             queryStringPage: '{{ queryStringPage }}',
 
-            allTab: allTab
+            // Slug for the 'all' tab
+            topicAll: topicAll
         },
         mounted: function () {
             var self = this;
@@ -156,12 +158,12 @@
                 self.filteredArticles = articles;
 
                 self.topics = [
-                    this.allTab
+                    self.topicAll.charAt(0).toUpperCase() + self.topicAll.slice(1)
                 ];
                 // TODO: populate topic list with unique topics in articles returned
 
                 // In the case that this page has loaded with a page and/or tab in the URL params - update the page to reflect those params
-                if (self.tabSelected !== this.allTab) {
+                if (self.tabSelected !== self.topicAll) {
                     self.onTabChange(self.tabSelected, true, true);
                 }
                 if (self.page > 1) {
@@ -176,9 +178,9 @@
             window.onpopstate = function(event) {
                 if (!event.state) {
                     // Return to defaults
-                    self.page = this.initialPage;
+                    self.page = self.initialPage;
                     self.onPaginate(self.page, true);
-                    self.tabSelected = this.allTab;
+                    self.tabSelected = self.topicAll;
                     self.onTabChange(self.tabSelected, true, true);
                 } else {
                     if (event.state.page) {
@@ -204,7 +206,7 @@
                 // Update the window history
                 if (!holdState) {
                     var params;
-                    if (this.tabSelected === this.allTab) {
+                    if (this.tabSelected === this.topicAll) {
                         params = '?' + queryStringPage + '=' + page;
                     } else {
                         params = '?' + queryStringPage + '=' + page + '&topic=' + this.tabSelected;
@@ -222,14 +224,14 @@
              */
             onTabChange: function (tab, persistPage, holdState) {
                 var self = this;
-                var limit = this.configSearchTypeLimit;
+                var limit = self.configSearchTypeLimit;
 
                 self.tabSelected = tab;
                 if (!persistPage) {
                     vue.page = 1;
                 }
 
-                if (tab === this.allTab) {
+                if (tab === this.topicAll) {
                     // Reset back to original set
                     self.filteredArticles = self.allArticles;
                 } else {
