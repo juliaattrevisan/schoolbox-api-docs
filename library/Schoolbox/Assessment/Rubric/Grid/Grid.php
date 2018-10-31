@@ -245,13 +245,15 @@ class Grid
      */
     public function isCompatibleWith(Grid $other): bool
     {
-        // Check that each has the same capabilities and indicators in use
-        if ($this->retrieveUsedIndicatorIds() !== $other->retrieveUsedIndicatorIds()) {
+        // Check the assessment is the same?
+
+        // Check that each has the same capabilities in use
+        if ($this->retrieveUsedCapabilityIds() !== $other->retrieveUsedCapabilityIds()) {
             return false;
         }
 
-        // If we've got to this point, we know the same indicators are in use.
-        // Check each one uses the same descriptors.
+        // Now we know the capabilities in use are the same.
+        // Check each usage is compatible with the usage in the other.
         foreach ($this->getCapabilityUsages() as $thisCapabilityUsage) {
             if (!$thisCapabilityUsage->isCompatibleWith(
                 $other->retrieveCapabilityUsage($thisCapabilityUsage->getCapability())
@@ -265,20 +267,18 @@ class Grid
 
 
     /**
-     * Retrieves the indicator IDs that this grid uses.
+     * Retrieves the capability IDs that this grid uses.
      *
      * @return array|int[]
      */
-    private function retrieveUsedIndicatorIds(): array
+    private function retrieveUsedCapabilityIds(): array
     {
-        $indicatorIds = [];
+        $capabilityIds = [];
         foreach ($this->getCapabilityUsages() as $capabilityUsage) {
-            foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
-                $indicatorIds[] = $indicatorUsage->getIndicator()->getId();
-            }
+            $capabilityIds[] = $capabilityUsage->getCapability()->getId();
         }
-        sort($indicatorIds);
-        return $indicatorIds;
+        sort($capabilityIds);
+        return $capabilityIds;
     }
 
 

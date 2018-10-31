@@ -233,6 +233,19 @@ class IndicatorUsage
 
 
     /**
+     * Are marks given to indicator usage `$other` mutually compatible with
+     * ones given to this usage?
+     *
+     * @param IndicatorUsage $other
+     * @return bool
+     */
+    public function isCompatibleWith(IndicatorUsage $other): bool
+    {
+        return true;
+    }
+
+
+    /**
      * @return Indicator
      */
     public function getIndicator(): Indicator

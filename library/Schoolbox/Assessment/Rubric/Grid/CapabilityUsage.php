@@ -160,10 +160,43 @@ class CapabilityUsage
      */
     public function isCompatibleWith(CapabilityUsage $other): bool
     {
+        // Check it's the same capability
         if ($this->getCapability()->getId() !== $other->getCapability()->getId()) {
             return false;
         }
+
+        // Check the same indicators are in use
+        if ($this->retrieveUsedIndicatorIds() !== $other->retrieveUsedIndicatorIds()) {
+            return false;
+        }
+
+        // Now we know the indicators in use are the same.
+        // Check each usage is compatible with the usage in the other.
+        foreach ($this->getIndicatorUsages() as $thisIndicatorUsage) {
+            if (!$thisIndicatorUsage->isCompatibleWith(
+                $other->retrieveIndicatorUsage($thisIndicatorUsage->getIndicator())
+            )) {
+                return false;
+            }
+        }
+
         return true;
+    }
+
+
+    /**
+     * Retrieves the indicator IDs that this grid uses.
+     *
+     * @return array|int[]
+     */
+    private function retrieveUsedIndicatorIds(): array
+    {
+        $indicatorIds = [];
+        foreach ($this->getIndicatorUsages() as $indicatorUsage) {
+            $indicatorIds[] = $indicatorUsage->getIndicator()->getId();
+        }
+        sort($indicatorIds);
+        return $indicatorIds;
     }
 
 
