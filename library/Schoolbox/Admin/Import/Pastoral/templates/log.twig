@@ -40,18 +40,15 @@
         <section>
             <ul class="information-list">
                 {% for log in logs %}
-                    <li class="actions-small-1">
+                    <li>
                         <div class="list-item">
                             <div class="card small-12">
                                 <img src="/portrait.php?userId={{ log.creator.externalId }}&amp;size=square64" alt="View Profile">
-                                <h3>{{ log.creator.fullName }} - {{ log.createdAt.short }}</h3>
+                                <h3><a href="{{ routeLookup('adminImportPastoral.getLogDetail', {logId: log.importId}) }}" title="View Log">{{ log.creator.fullName }} - {{ log.createdAt.short }}</a></h3>
                                 <p class="meta">Last Message - {{ log.result }}</p>
                                 <p></p>
                             </div>
                         </div>
-                        <nav>
-                            <a class="icon-eye no-text" href="{{ routeLookup('adminImportPastoral.getLogDetail', {logId: log.importId}) }}" title="View Log"></a>
-                        </nav>
                     </li>
                 {% endfor %}
             </ul>
