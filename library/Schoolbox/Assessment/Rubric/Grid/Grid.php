@@ -245,7 +245,30 @@ class Grid
      */
     public function isCompatibleWith(Grid $other): bool
     {
+        // Check that each has the same capabilities and indicators in use
+        if ($this->retrieveUsedIndicatorIds() !== $other->retrieveUsedIndicatorIds()) {
+            return false;
+        }
+
         return true;
+    }
+
+
+    /**
+     * Retrieves the indicator IDs that this grid uses.
+     *
+     * @return array|int[]
+     */
+    private function retrieveUsedIndicatorIds(): array
+    {
+        $indicatorIds = [];
+        foreach ($this->getCapabilityUsages() as $capabilityUsage) {
+            foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+                $indicatorIds[] = $indicatorUsage->getIndicator()->getId();
+            }
+        }
+        sort($indicatorIds);
+        return $indicatorIds;
     }
 
 
