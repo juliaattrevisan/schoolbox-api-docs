@@ -13,7 +13,7 @@
 <div id="news-component">
     <section>
         {# tabs #}
-        <dl class="tabs" id="{{ topicContainerId }}" v-if="allArticles.length || articlesLoading">
+        <dl class="tabs" v-if="allArticles.length || articlesLoading">
             <dd v-for="topic in topics" :class="{active: tabSelected === topic}">
                 <a @click="onTabChange(topic)">${ topic }</a>
             </dd>
