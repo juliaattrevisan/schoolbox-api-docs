@@ -660,11 +660,9 @@ class IndicatorUsage extends TestCase
         );
 
         $grid2CapUsages   = Generator::TEST_CAPABILITY_USAGES;
-        $grid2Descriptors = &$grid2CapUsages[1]['indicators'][12]['descriptors'];
-        $grid2Descriptors = array_combine(
-            array_keys($grid2Descriptors),
-            array_reverse(array_values($grid2Descriptors))
-        );
+        $grid2Descriptors = &$grid2CapUsages[1]['indicators'][11]['descriptors'];
+        $grid2Descriptors[111]['levelId'] = 5;
+        $grid2Descriptors[115]['levelId'] = 1;
         $grid2 = $generator->generateGrid(
             RowSet\Test\Generator::TEST_CAPABILITIES,
             Generator::TEST_LEVELS,
