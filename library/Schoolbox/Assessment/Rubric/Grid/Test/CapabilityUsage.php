@@ -479,8 +479,64 @@ class CapabilityUsage extends TestCase
 
 
         // both with the same indicators, descs: true
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        yield "unchanged" => [
+            $grid1->getCapabilityUsages()[1],
+            $grid2->getCapabilityUsages()[1],
+            true
+        ];
+
+
         // different points value for a descriptor: false
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $indicator  = $grid2->getRowSet()->retrieveIndicator(11);
+        $descriptor = $grid2->retrieveIndicatorUsage($indicator)->retrieveDescriptor(1);
+        $descriptor->setMaxValue($descriptor->getMaxValue() + 1);
+        yield "different descriptor value" => [
+            $grid1->getCapabilityUsages()[1],
+            $grid2->getCapabilityUsages()[1],
+            false
+        ];
+
+
         // missing descriptor: false
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $indicator = $grid2->getRowSet()->retrieveIndicator(11);
+        unset($grid2->retrieveIndicatorUsage($indicator)->getDescriptors()[1]);
+        yield "missing descriptor" => [
+            $grid1->getCapabilityUsages()[1],
+            $grid2->getCapabilityUsages()[1],
+            false
+        ];
 
 
         // different capability: false
@@ -508,12 +564,82 @@ class CapabilityUsage extends TestCase
             Generator::TEST_LEVELS,
             $grid2CapUsages
         );
-        yield "different indicators" => [$grid1->getCapabilityUsages()[1], $grid2->getCapabilityUsages()[1], false];
+
+        yield "different indicators" => [
+            $grid1->getCapabilityUsages()[1],
+            $grid2->getCapabilityUsages()[1],
+            false
+        ];
 
 
         // different description for a descriptor: true
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $indicator  = $grid2->getRowSet()->retrieveIndicator(11);
+        $descriptor = $grid2->retrieveIndicatorUsage($indicator)->retrieveDescriptor(1);
+        $descriptor->setDescription($descriptor->getDescription() . ' CHANGED');
+        yield "different descriptor description" => [
+            $grid1->getCapabilityUsages()[1],
+            $grid2->getCapabilityUsages()[1],
+            false
+        ];
+
+
         // different ordering of descriptors: true (regardless of whether they're in the same level)
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid2CapUsages   = Generator::TEST_CAPABILITY_USAGES;
+        $grid2Descriptors = &$grid2CapUsages[1]['indicators'][12]['descriptors'];
+        $grid2Descriptors = array_combine(
+            array_keys($grid2Descriptors),
+            array_reverse(array_values($grid2Descriptors))
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            $grid2CapUsages
+        );
+
+        yield "different descriptor ordering" => [
+            $grid1->getCapabilityUsages()[1],
+            $grid2->getCapabilityUsages()[1],
+            true
+        ];
+
+
         // different max points per capability: true?
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid2CapUsages = Generator::TEST_CAPABILITY_USAGES;
+        $grid2CapUsages[1]['maxValue'] = 100;
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            $grid2CapUsages
+        );
+
+        yield "different max points per capability" => [
+            $grid1->getCapabilityUsages()[1],
+            $grid2->getCapabilityUsages()[1],
+            true
+        ];
     }
 
 
