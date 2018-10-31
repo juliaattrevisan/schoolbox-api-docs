@@ -447,14 +447,26 @@ class Grid extends TestCase
 
         // both empty: true
         $grid1 = new RubricGrid\Grid(
-            new DueWork(),
+            (new DueWork())->setId(1),
             new Rowset\RowSet(new Folder())
         );
         $grid2 = new RubricGrid\Grid(
-            new DueWork(),
+            (new DueWork())->setId(1),
             new Rowset\RowSet(new Folder())
         );
         yield "empty with empty" => [$grid1, $grid2, true];
+
+
+        // different assessment: false
+        $grid1 = new RubricGrid\Grid(
+            (new DueWork())->setId(1),
+            new Rowset\RowSet(new Folder())
+        );
+        $grid2 = new RubricGrid\Grid(
+            (new DueWork())->setId(2),
+            new Rowset\RowSet(new Folder())
+        );
+        yield "different assessment" => [$grid1, $grid2, false];
 
 
         // both with the same caps, inds, descs: true
