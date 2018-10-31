@@ -101,7 +101,7 @@
             });
         });
 
-        $('#editMode').click(  function (event) {
+        $('#component-edit-toggle').click(  function (event) {
             $('nav[data-component-settings], [data-component-handle]').toggle(this.checked);
             $('div[data-component-titlebar-container]').each(function() {
                 $(this).toggleClass('actions-small-' + $(this).data('action-count'));
@@ -236,8 +236,8 @@
         <!-- BEGIN edit_page -->
         <span data-tab>
             <span class="switch inline round ">
-                <input id="editMode" type="checkbox" />
-                <label for="editMode">
+                <input id="component-edit-toggle" type="checkbox" />
+                <label for="component-edit-toggle">
                     <span class="icon-unlocked">&nbsp;</span>
                     <span class="icon-locked">&nbsp;</span>
                 </label>
