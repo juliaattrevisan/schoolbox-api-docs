@@ -590,7 +590,7 @@ class CapabilityUsage extends TestCase
         yield "different descriptor description" => [
             $grid1->getCapabilityUsages()[1],
             $grid2->getCapabilityUsages()[1],
-            false
+            true
         ];
 
 

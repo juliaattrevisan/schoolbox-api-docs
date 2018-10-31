@@ -648,7 +648,7 @@ class IndicatorUsage extends TestCase
         yield "different descriptor description" => [
             $grid1->retrieveIndicatorUsageByDescriptorId(111),
             $grid2->retrieveIndicatorUsageByDescriptorId(111),
-            false
+            true
         ];
 
 
