@@ -450,6 +450,19 @@ class Grid extends TestCase
             new Rowset\RowSet(new Folder())
         );
         yield "empty with empty" => [$grid1, $grid2, true];
+
+
+        // Cases:
+        // different points value for a descriptor: false
+        // missing descriptor: false
+        // different capabilities: false
+        // different indicators: false
+        // different description for a descriptor: true
+        // different ordering of descriptors: true (regardless of whether they're in the same level)
+        // different max points per capability: true?
+        // different mark-per-cap on/off: true
+        // different mark range on/off: true
+        // different mark type: true
     }
 
 
