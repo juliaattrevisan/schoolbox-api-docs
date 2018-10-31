@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 class RoleType extends SimpleStrategy
@@ -50,17 +50,23 @@ class RoleType extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(): array
-    {
-        return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getSearchSql(User $user): string
     {
         return '';
+    }
+
+
+    /**
+     * @inheritdoc
+     * @param GenericCollection|User[] $users
+     */
+    public function getValues(GenericCollection $users): array
+    {
+        $values = [];
+        foreach ($users as $user) {
+            $values[$user->getRole()->getType()] = $user->getRole()->getType();
+        }
+        return $values;
     }
 }
 

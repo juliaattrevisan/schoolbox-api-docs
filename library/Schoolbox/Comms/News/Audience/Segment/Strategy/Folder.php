@@ -8,6 +8,7 @@
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -16,6 +17,8 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
+use External_UserInterface;
+use UnderflowException;
 
 class Folder extends SimpleStrategy
 {
@@ -31,6 +34,9 @@ class Folder extends SimpleStrategy
 
     /** @var Access */
     private $access;
+
+    /** @var External_UserInterface */
+    private $externalUser;
 
 
     /**
@@ -48,19 +54,20 @@ class Folder extends SimpleStrategy
     public static function isValidNullEntityValue(): bool
     {
         // A user may have no involved folders
-        return true;
+        return false;
+//        return true; // TODO Turned off as not-yet implemented in front-end so no need to include in query
     }
 
 
     /**
-     * @param UserAccessMapper $userAccessMapper
-     * @param bool             $staffCanPost
-     * @param bool             $moderationRequired
-     * @param bool             $canTargetTeachersOfUsersInFolder
-     * @param FolderMapper     $folderMapper
-     * @param RoleAccessMapper $roleAccessMapper
-     * @param Access           $access
-
+     * @param UserAccessMapper       $userAccessMapper
+     * @param bool                   $staffCanPost
+     * @param bool                   $moderationRequired
+     * @param bool                   $canTargetTeachersOfUsersInFolder
+     * @param FolderMapper           $folderMapper
+     * @param RoleAccessMapper       $roleAccessMapper
+     * @param Access                 $access
+     * @param External_UserInterface $externalUser
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
@@ -69,13 +76,15 @@ class Folder extends SimpleStrategy
         bool $canTargetTeachersOfUsersInFolder,
         FolderMapper $folderMapper,
         RoleAccessMapper $roleAccessMapper,
-        Access $access
+        Access $access,
+        External_UserInterface $externalUser
     ) {
         parent::__construct($userAccessMapper, $staffCanPost, $moderationRequired);
         $this->canTargetTeachersOfUsersInFolder = $canTargetTeachersOfUsersInFolder;
         $this->folderMapper                     = $folderMapper;
         $this->roleAccessMapper                 = $roleAccessMapper;
         $this->access                           = $access;
+        $this->externalUser                     = $externalUser;
     }
 
 
@@ -258,6 +267,36 @@ class Folder extends SimpleStrategy
             $this->hasCmsServicePerm($user, UserAccess::ACCESS_FULL) ||
             $this->hasNewsServicePerm($user, UserAccess::ACCESS_FULL) ||
             (null !== $entityValue && $this->access->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE);
+    }
+
+
+    /**
+     * @inheritdoc
+     * @param GenericCollection|User[] $users
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     */
+    public function getValues(GenericCollection $users): array
+    {
+        $userIds = $users->getPropertyValues('id');
+
+        // Get groups where learner or instructor (but not admin) TODO that's not what this code is doing??
+        $pb             = $this->getUserAccessMapper()->getPredicateBuilder()
+                               ->in('uid', $userIds)
+                               ->equals('service', UserAccess::SERVICE_HOMEPAGE)
+                               ->notEquals('type', UserAccess::ACCESS_DENY);
+        $groupFolderIds = $this->getUserAccessMapper()->findScalarByPredicates('sid', $pb);
+
+        // Get subjects
+        $subjectList = [];
+        foreach ($users as $user) {
+            /** @noinspection SlowArrayOperationsInLoopInspection */
+            $subjectList = \array_merge($subjectList, $this->externalUser->getSubjectList($user));
+        }
+
+        $classFolderIds = $this->folderMapper->findAllBySubjectList($subjectList)->getPropertyValues('id');
+
+        return \array_unique(\array_merge($groupFolderIds, $classFolderIds));
     }
 
 

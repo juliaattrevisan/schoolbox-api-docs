@@ -8,6 +8,7 @@
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 class SchoolHouse extends SimpleStrategy
@@ -23,7 +24,8 @@ class SchoolHouse extends SimpleStrategy
     public static function isValidNullEntityValue(): bool
     {
         // A user may have no School House
-        return true;
+        return false;
+//        return true; // TODO Turned off as not-yet implemented in front-end so no need to include in query
     }
 
 
@@ -83,5 +85,21 @@ class SchoolHouse extends SimpleStrategy
     public function getSearchSql(User $user): string
     {
         return '';
+    }
+
+
+    /**
+     * @inheritdoc
+     * @param GenericCollection|User[] $users
+     */
+    public function getValues(GenericCollection $users): array
+    {
+        $values = [];
+        foreach ($users as $user) {
+            if($user->getSchoolHouse() !== null) {
+                $values[$user->getSchoolHouse()->getId()] = $user->getSchoolHouse()->getId();
+            }
+        }
+        return $values;
     }
 }

@@ -9,11 +9,8 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use Alaress\Database;
-use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
@@ -43,44 +40,38 @@ class ArticleResolver implements IArticleResolver
     /** @var Database\Connector\IConnector */
     private $db;
 
-    /** @var UserAccessMapper */
-    private $userAccessMapper;
-
     /** @var Folder\Mapper */
     private $folderMapper;
 
     /** @var RelationshipFilterer */
     private $relationshipFilter;
 
-    /** @var External_UserInterface */
-    private $externalUser;
+    /** @var GenericCollection|News\Audience\Segment\ISimpleStrategy[] */
+    private $simpleStrategies;
 
 
     /**
      * @param bool[]                        $validNullEntities
      * @param array                         $modifierEntityMap
      * @param Database\Connector\IConnector $db
-     * @param UserAccessMapper              $userAccessMapper
      * @param Folder\Mapper                 $folderMapper
-     * @param External_UserInterface        $externalUser
      * @param RelationshipFilterer          $relationshipFilter
+     * @param GenericCollection             $simpleStrategies
      */
     public function __construct(
         array $validNullEntities,
         array $modifierEntityMap,
         Database\Connector\IConnector $db,
-        UserAccessMapper $userAccessMapper,
         Folder\Mapper $folderMapper,
-        External_UserInterface $externalUser,
-        RelationshipFilterer $relationshipFilter
+        RelationshipFilterer $relationshipFilter,
+        GenericCollection $simpleStrategies
     ) {
         $this->validNullEntities  = $validNullEntities;
         $this->modifierEntityMap  = $modifierEntityMap;
         $this->db                 = $db;
-        $this->userAccessMapper   = $userAccessMapper;
         $this->folderMapper       = $folderMapper;
-        $this->externalUser       = $externalUser;
         $this->relationshipFilter = $relationshipFilter;
+        $this->simpleStrategies   = $simpleStrategies;
     }
 
 
@@ -100,7 +91,7 @@ class ArticleResolver implements IArticleResolver
          * * An articles is targeted to 0:N audience segments.
          * * An audience segment may be simple or composite.
          * * Simple segments are targeted to a entity type and value.
-         * * Composite segments are composed of 1:N simple segments.
+         * * Composite segments are composed of 2 simple segments.
          * * Audience segments may be root segments or child segments.
          * * There is a maximum of one level of nesting (ie no children of child segments).
          * * Hence, child segments are always simple.
@@ -110,8 +101,7 @@ class ArticleResolver implements IArticleResolver
          * * * self        => user must match segment
          * * * parents_of  => user's child must match segment
          * * * teachers_of => user's students must match segment
-         * * If a composite segment targets 'parents_of'/'teachers_of', all child segments must target 'self'.
-         *   (this avoid having to find eg, children of children, which is nonsensical)
+         * * Composite segments do not have modifiers on either the parent or children
          * * For users with role type 'student' or 'guest', they can only match:
          * * 1. segments targeted to 'self'
          * * For users with role type 'parent', they can match:
@@ -120,321 +110,158 @@ class ArticleResolver implements IArticleResolver
          * * For users with role type 'teacher', they can match:
          * * 1. segments targeted to 'self' if the segment matches themselves, or
          * * 2. segments targeted to 'teachers_of' if the segment matches one of their taught students
-         * * Hence there are 3 independent methods for matching an article to a user:
+         * * Hence there are 2 independent methods for matching an article to a user:
          * * 1. Simple root segment targeted to user, or children/students of user
-         * * 2. Composite root segment targeted to user, composed of child segments that target user or children/students of user
-         * * 3. Composite root segment targeted to parents_of/teachers_of, composed of segments that target children/students of user
-         * * The last method does not apply if the user does not have role type of 'parent' or 'teacher'
+         * * 2. Composite root segment targeted to user, composed of child segments that target user
          *
-         * Hence we can build 3 queries, the first two using the same predicates, the latter with a
-         * related set of predicates, then UNION ALL them together.
+         * Hence we can build 2 queries, both using the 'self' predicates, the simple segments also
+         * checking 'related' user attributes, then UNION ALL them together.
          */
 
         /**
-         * @var Collection|string[]     $whereClauses
-         * @var Collection|mixed[]      $whereParams
-         * @var Collection[]|string[][] $relatedWhereClauses
+         * @var Collection|string[]|null[] $selfAttributes     Indexed by [entityType]
+         * @var Collection|string[]|null[] $relatedAttributes  Indexed by [entityType]
+         * @var Collection|mixed[]         $whereParams
          */
-        $whereClauses        = new Collection();
-        $whereParams         = new Collection();
-        $relatedWhereClauses = new GenericCollection(Collection::class);
+        $selfAttributes    = new Collection();                  // ['folder' => [1,2,3], 'role' => [1,2,3], ...]
+        $relatedAttributes = new Collection();                  // ['folder' => [1,2,3], 'role' => [1,2,3], ...]
+        $whereParams       = new Collection();
 
-        // Insert predicates for each segment relationship modifier.
-        $this->addSelfClauses($user, $whereClauses, $whereParams);
-        $this->addParentsOfClauses($user, $whereClauses, $whereParams, $relatedWhereClauses);
-        $this->addTeachersOfClauses($user, $whereClauses, $whereParams, $relatedWhereClauses);
+        // Fetch all the data we need for our query from
+        // * the user, and
+        // * any relevant related users (eg students/children) if relevant (ie staff/parent)
+
+        // Build query for user themself.
+        $validSelfEntities = $this->modifierEntityMap[Model::RELATIONSHIP_SELF];
+        if (\count($validSelfEntities)) {
+            foreach ($this->simpleStrategies as $strategy) {
+                if (\in_array($strategy::getEntityType(), $validSelfEntities, true)) {
+                    $selfAttributes[$strategy::getEntityType()] = $strategy->getValues(new GenericCollection(User::class, [$user]));
+                }
+            }
+        }
+        $selfWhereClauses = $this->buildWhereClauses($selfAttributes, Model::RELATIONSHIP_SELF, $whereParams);
+
+        // Build query for related users?
+        $role       = $user->getRole();
+        $hasRelated = $role->isParent() || $role->isStaff();
+        if ($hasRelated) {
+            $relationship         = $role->isParent() ? Model::RELATIONSHIP_PARENTS_OF : Model::RELATIONSHIP_TEACHERS_OF;
+            $validRelatedEntities = $this->modifierEntityMap[$relationship];
+
+            if (\count($validRelatedEntities)) {
+                // Don't bother fetching these if there's no valid relationships currently configured
+                $relatedUsers = $this->getRelatedUsers($user);
+
+                if (\count($relatedUsers)) {
+                    foreach ($this->simpleStrategies as $strategy) {
+                        if (\in_array($strategy::getEntityType(), $validRelatedEntities, true)) {
+                            $relatedAttributes[$strategy::getEntityType()] = $strategy->getValues($relatedUsers);
+                        }
+                    }
+                }
+            }
+            $relatedWhereClauses = $this->buildWhereClauses($relatedAttributes, $relationship, $whereParams);
+        } else {
+            $relatedWhereClauses = [];
+        }
 
         // Check for the unlikely case where the system is configured to not permit targeting to any segment types
-        if (!$whereClauses->count()) {
+        if (!$selfAttributes->count() && !$relatedAttributes->count()) {
             return [];
         }
 
-        $whereClause = \implode(" OR \n", $whereClauses->getAll());
-        $parameters  = $whereParams->getAll();
-        $queries     = [];
+        // Simple segments permit related modifiers, composites do not
+        $simpleClause  = "\n" . \implode(" OR \n", \array_merge($selfWhereClauses, $relatedWhereClauses));
+        $complexClause = "\n" . \implode(" OR \n", $selfWhereClauses);
 
-        // Case 1. User matches a simple root segment
-        $queries[] = "
+        $parameters = $whereParams->getAll();
+
+        $query = "
             SELECT comms_news_article_id
             FROM comms_news_audience
-            WHERE parent_id IS NULL AND (
-              $whereClause
-            )
+            WHERE parent_id IS NULL AND ({$simpleClause})
+
+            UNION 
+
+            SELECT parent.comms_news_article_id
+            FROM comms_news_audience comms_news_audience
+            JOIN comms_news_audience parent ON comms_news_audience.parent_id = parent.id
+            WHERE ({$complexClause})
+            GROUP BY comms_news_audience.parent_id
+            HAVING COUNT(comms_news_audience.parent_id) = 2;
         ";
-
-        // Case 2. User matches a composite root segment, where segment is targeted to 'self'
-        $queries[] = $this->buildCompositeSubquery(Model::RELATIONSHIP_SELF, $whereClause);
-
-
-        // Case 3. User is parent or staff, and matches a composite root segment targeted at *one* their children or students
-        //         Note that we have to UNION per child/student as `[A && B]^parent/teacher !== [A]^parent/teacher && [B]^parent/teacher`
-        if ($relatedWhereClauses->count()) {
-            foreach ($relatedWhereClauses as $whereClauses) {
-                $compositeRelationship = $user->getRole()->isStaff()
-                    ? Model::RELATIONSHIP_TEACHERS_OF
-                    : Model::RELATIONSHIP_PARENTS_OF;
-                $whereClause           = \implode(" OR \n", $whereClauses->getAll());
-                $queries[]             = $this->buildCompositeSubquery($compositeRelationship, $whereClause);
-            }
-        }
-
-        // We are not guaranteed to have independent subsets, but better to remove duplicates in DB to leverage caching.
-        $query = \implode("\nUNION\n", $queries);
 
         return $this->db->executeQuery($query, $parameters)->fetchAll(PDO::FETCH_COLUMN);
     }
 
 
     /**
-     * Returns a sub-query that will match composite audience segments
+     * Accepts a set of user attributes and a relationship modifier, and converts to a set of WHERE clauses.
      *
-     * @param string $compositeRelationship
-     * @param string $whereClause
-     * @return string
+     * Inserts any bound parameters values into $whereParams
+     *
+     * @param Collection $attributes
+     * @param string     $relationship
+     * @param Collection $whereParams
+     * @return string[]
      */
-    private function buildCompositeSubquery(string $compositeRelationship, string $whereClause): string
+    private function buildWhereClauses(Collection $attributes, string $relationship, Collection $whereParams): array
     {
-        $compositeType = Strategy\Composite::getEntityType();
+        $table           = Mapper::TABLE_NAME;
+        $colEntityType   = Mapper::FIELD_ENTITY_TYPE;
+        $colRelationship = Mapper::FIELD_RELATIONSHIP;
+        $colEntityValue  = Mapper::FIELD_ENTITY_VALUE;
 
-        return "
-        SELECT t1.comms_news_article_id
-                FROM (
-                    -- Find all matching audience sub-segments that are a child of a composite^self segment. Group by parent segment
-                    SELECT parent.comms_news_article_id, comms_news_audience.parent_id, COUNT(*) as child_count
-                    FROM comms_news_audience comms_news_audience
-                    JOIN comms_news_audience parent ON comms_news_audience.parent_id = parent.id
-                    WHERE parent.relationship = '{$compositeRelationship}' AND parent.entity_type = '{$compositeType}' AND (
-                      {$whereClause}
-                    )
-                    GROUP BY parent.id
-                ) t1
-                JOIN (
-                    -- Group all child segments by parent to get count of parents' children.
-                    -- If count-matching children == count-available children, then composite segment is a match
-                    SELECT parent_id, COUNT(*) as child_count FROM comms_news_audience WHERE parent_id IS NOT NULL GROUP BY parent_id
-                ) t2 ON t1.parent_id = t2.parent_id AND t1.child_count = t2.child_count
-        ";
-    }
-
-
-    /**
-     * Adds set of clauses that will match audiences segments targeted directly to the specified user
-     *
-     * @param User                $user
-     * @param Collection|string[] $whereClauses
-     * @param Collection|mixed[]  $whereParams
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     */
-    private function addSelfClauses(User $user, Collection $whereClauses, Collection $whereParams): void
-    {
-        $validEntities = $this->modifierEntityMap[Model::RELATIONSHIP_SELF];
-
-        if (!\count($validEntities)) {
-            // In the unlikely event you cannot target audience segments that lack a relationship modifier
-            return;
-        }
-
-        $this->addClauses($user, Model::RELATIONSHIP_SELF, $validEntities, $whereClauses, $whereParams, 0);
-    }
-
-
-    /**
-     * Adds WHERE clauses that match a parent's children.
-     *
-     * @param User                $user
-     * @param Collection|string[] $whereClauses
-     * @param Collection|mixed[]  $whereParams
-     * @param Collection|string[] $relatedWhereClauses
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
-     */
-    private function addParentsOfClauses(
-        User $user,
-        Collection $whereClauses,
-        Collection $whereParams,
-        Collection $relatedWhereClauses
-    ): void {
-        if (Role::PARENT !== $user->getRole()->getType()) {
-            return;
-        }
-
-        $validEntities = $this->modifierEntityMap[Model::RELATIONSHIP_PARENTS_OF];
-        if (!\count($validEntities)) {
-            // If the system is configured to not allow targeting of parents of users in some audience segment
-            return;
-        }
-
-        $childUsers = $this->relationshipFilter->getChildren($user);
-        if (!\count($childUsers)) {
-            // No children in schoolbox? Then this user should never see audience segments targeted to parents of a segment
-            return;
-        }
-
-        foreach ($childUsers as $idx => $childUser) {
-            $paramSuffix = 1 + $idx;
-
-            // For simple and composite^self segments
-            $this->addClauses($childUser, Model::RELATIONSHIP_PARENTS_OF, $validEntities, $whereClauses, $whereParams, $paramSuffix);
-
-            // For composite^parent_of segments
-            $childUserId                       = $childUser->getId();
-            $relatedWhereClauses[$childUserId] = new Collection();
-            $relatedWhereParams[$childUserId]  = new Collection();
-            $this->addClauses($childUser, Model::RELATIONSHIP_SELF, $validEntities, $relatedWhereClauses[$childUserId], $whereParams, $paramSuffix);
-        }
-    }
-
-
-    /**
-     * Adds a set of WHERE clauses that will match segments targeted at this user's students.
-     *
-     * Note that this includes users in a teacher's classes and groups.
-     *
-     * @param User                $user
-     * @param Collection|string[] $whereClauses
-     * @param Collection|mixed[]  $whereParams
-     * @param Collection|string[] $relatedWhereClauses
-     * @throws Predicate\InvalidColumnException
-     * @throws \UnderflowException
-     */
-    private function addTeachersOfClauses(
-        User $user,
-        Collection $whereClauses,
-        Collection $whereParams,
-        Collection $relatedWhereClauses
-    ): void {
-        if (Role::STAFF !== $user->getRole()->getType()) {
-            return;
-        }
-
-        $validEntities = $this->modifierEntityMap[Model::RELATIONSHIP_TEACHERS_OF];
-        if (!\count($validEntities)) {
-            // In the system is configured to not allow targeting of teachers of users in some audience segment
-            return;
-        }
-
-        $taughtUsers = $this->relationshipFilter->getTaughtStudentsAndLearners($user);
-        if (!\count($taughtUsers)) {
-            // No users found in Schoolbox?
-            return;
-        }
-
-        foreach ($taughtUsers as $idx => $taughtUser) {
-
-            $paramSuffix = 1 + $idx;
-
-            // For simple and composite^self segments
-            $this->addClauses($taughtUser, Model::RELATIONSHIP_TEACHERS_OF, $validEntities, $whereClauses, $whereParams, $paramSuffix);
-
-            // For composite^teacher_of segments
-            $childUserId                       = $taughtUser->getId();
-            $relatedWhereClauses[$childUserId] = new Collection();
-            $relatedWhereParams[$childUserId]  = new Collection();
-            $this->addClauses($taughtUser, Model::RELATIONSHIP_SELF, $validEntities, $relatedWhereClauses[$childUserId], $relatedWhereParams[$childUserId], $paramSuffix);
-        }
-    }
-
-
-    /**
-     * @param User                $user
-     * @param string              $relationship
-     * @param string[]            $validEntities
-     * @param Collection|string[] $whereClauses
-     * @param Collection|mixed[]  $whereParams
-     * @param int                 $paramSuffix
-     * @todo consider snapping each segment entity type into helper method, see 'service' example
-     * @todo consider snapping common structure into helper method
-     * @throws Predicate\InvalidColumnException
-     */
-    private function addClauses(
-        User $user,
-        string $relationship,
-        array $validEntities,
-        Collection $whereClauses,
-        Collection $whereParams,
-        int $paramSuffix
-    ): void {
-        $validEntities = \array_combine($validEntities, $validEntities);
-        $userId        = $user->getId();
-
-        // Targeted to a user
-        if (\array_key_exists(Strategy\User::getEntityType(), $validEntities)) {
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\User::getEntityType(), $userId, $relationship);
-        }
-
-        // Targeted to superusers
-        if (\array_key_exists(Strategy\Super::getEntityType(), $validEntities) && $user->isSuperuser()) {
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Super::getEntityType(), Strategy\Super::ENTITY_VALUE, $relationship);
-        }
-
-        // Targeted to a campus
-        if (\array_key_exists(Strategy\Campus::getEntityType(), $validEntities) && Strategy\Campus::isValidNullEntityValue()) {
-            $this->buildClause(
-                $whereClauses,
-                $whereParams,
-                $paramSuffix,
-                Strategy\Campus::getEntityType(),
-                $user->getCampusCollection()->getPropertyValues('id'),
-                $relationship
-            );
-        }
-
-        // Targeted to a Role
-        if (\array_key_exists(Strategy\Role::getEntityType(), $validEntities)) {
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Role::getEntityType(), $user->getRole()->getId(), $relationship);
-        }
-
-        // Targeted to a RoleType
-        if (\array_key_exists(Strategy\RoleType::getEntityType(), $validEntities)) {
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\RoleType::getEntityType(), $user->getRole()->getType(), $relationship);
-        }
-
-        // Targeted to a School House
-        if (\array_key_exists(Strategy\SchoolHouse::getEntityType(), $validEntities)) {
-            $schoolHouseId = $user->getSchoolHouse() ? $user->getSchoolHouse()->getId() : null;
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\SchoolHouse::getEntityType(), $schoolHouseId, $relationship);
-        }
-
-        // Targeted to a Residential House
-        if (\array_key_exists(Strategy\ResHouse::getEntityType(), $validEntities)) {
-            $residentialHouseId = $user->getResidentialHouse() ? $user->getResidentialHouse()->getId() : null;
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\ResHouse::getEntityType(), $residentialHouseId, $relationship);
-        }
-
-        // Targeted to a Year
-        if (\array_key_exists(Strategy\Year::getEntityType(), $validEntities)) {
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Year::getEntityType(), $user->getYear(), $relationship);
-        }
-
-        // Targeted to a service permission (including homepage learners + instructors)
-        if (\array_key_exists(Strategy\Service::getEntityType(), $validEntities)) {
-            // TODO - For now, assume that we cannot target to audiences such as 'all service moderators' ('*.*.3') etc
-            $services = [];
-            foreach ($this->userAccessMapper->findByColumn('uid', $userId) as $access) {
-                $services[] = "{$access->getService()}.{$access->getServiceIdentifier()}.{$access->getAccessLevel()}";
+        $whereClauses = [];
+        foreach ($attributes as $entityType => $values) {
+            $matchNull = $this->simpleStrategies[$entityType]::isValidNullEntityValue() && \in_array(null, $values, true);
+            $filtered  = \array_filter($values, function ($value) {
+                return null !== $value;
+            });
+            $parts     = [];
+            if (\count($filtered)) {
+                $prefix   = "{$entityType}_{$relationship[0]}";
+                $bindings = Predicate\Builder::getBindings($filtered, $prefix);
+                $parts[]  = "$table.$colEntityValue IN ({$bindings->getPlaceholder()})";
+                foreach ($bindings->getParams() as $placeholder => $val) {
+                    $whereParams[$placeholder] = $val;
+                }
             }
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Service::getEntityType(), \array_unique($services), $relationship);
+            if ($matchNull) {
+                $parts[] = "$table.$colEntityValue IS NULL";
+            }
+            if (\count($parts)) {
+                $whereClauses[] = "($table.$colRelationship = '$relationship' AND $table.$colEntityType = '$entityType' AND (" . \implode(' OR ', $parts) . "))";
+            }
         }
+        return $whereClauses;
+    }
 
-        // Targeted to a pastoral group
-        if (\array_key_exists(Strategy\PastoralGroup::getEntityType(), $validEntities)) {
-            $sql      = "SELECT group_id FROM pastoral_group_member WHERE user_id = {$userId} AND deleted_at IS NULL";
-            $groupIds = $this->db->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN);
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\PastoralGroup::getEntityType(), $groupIds, $relationship);
-        }
 
-        // Targeted to a folder (includes class && group association)
-        if (\array_key_exists(Strategy\Folder::getEntityType(), $validEntities)) {
-            // Get groups where learner or instructor (but not admin)
-            $pb             = $this->userAccessMapper->getPredicateBuilder()
-                                                     ->equals('uid', $userId)
-                                                     ->equals('service', UserAccess::SERVICE_HOMEPAGE)
-                                                     ->notEquals('type', UserAccess::ACCESS_DENY);
-            $groupFolderIds = $this->userAccessMapper->findScalarByPredicates('sid', $pb);
-            $classFolderIds = $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($user))->getPropertyValues('id');
-            $foldersIds     = \array_unique(\array_merge($groupFolderIds, $classFolderIds));
-            $this->buildClause($whereClauses, $whereParams, $paramSuffix, Strategy\Folder::getEntityType(), $foldersIds, $relationship);
+
+    /**
+     * @param User $user
+     * @return GenericCollection|User[]
+     * @throws Predicate\InvalidColumnException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     */
+    private function getRelatedUsers(User $user): GenericCollection
+    {
+        $relatedUsers = new GenericCollection(User::class);
+        $role         = $user->getRole();
+
+        if (Role::PARENT === $role->getType()) {
+            foreach ($this->relationshipFilter->getChildren($user) as $child) {
+                $relatedUsers[$child->getId()] = $child;
+            }
+        } elseif (Role::STAFF === $role->getType()) {
+            foreach ($this->relationshipFilter->getTaughtStudentsAndLearners($user) as $student) {
+                $relatedUsers[$student->getId()] = $student;
+            }
         }
+        return $relatedUsers;
     }
 
 

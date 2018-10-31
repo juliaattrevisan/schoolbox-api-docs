@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment;
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Composite;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
@@ -16,6 +17,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use UnexpectedValueException;
+use External_UserInterface;
 
 /**
  * Responsible for enumeration of the IStrategy interface
@@ -46,6 +48,12 @@ class StrategyFactory
     /** @var bool */
     private $canTargetTeachersOfUsersInFolder;
 
+    /** @var External_UserInterface */
+    private $externalUser;
+
+    /** @var IConnector */
+    private $db;
+
     /**
      * Cache the strategies so repeated calls to make() for the same strat will return the same instance
      *
@@ -55,13 +63,15 @@ class StrategyFactory
 
 
     /**
-     * @param UserAccessMapper $userAccessMapper
-     * @param bool             $staffCanPost
-     * @param bool             $moderationRequired
-     * @param bool             $canTargetTeachersOfUsersInFolder
-     * @param Folder\Mapper    $folderMapper
-     * @param RoleAccessMapper $roleAccessMapper
-     * @param Access           $access
+     * @param UserAccessMapper       $userAccessMapper
+     * @param bool                   $staffCanPost
+     * @param bool                   $moderationRequired
+     * @param bool                   $canTargetTeachersOfUsersInFolder
+     * @param Folder\Mapper          $folderMapper
+     * @param RoleAccessMapper       $roleAccessMapper
+     * @param Access                 $access
+     * @param External_UserInterface $externalUser
+     * @param IConnector             $db
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
@@ -70,7 +80,9 @@ class StrategyFactory
         bool $canTargetTeachersOfUsersInFolder,
         Folder\Mapper $folderMapper,
         RoleAccessMapper $roleAccessMapper,
-        Access $access
+        Access $access,
+        External_UserInterface $externalUser,
+        IConnector $db
     ) {
         $this->userAccessMapper                 = $userAccessMapper;
         $this->staffCanPost                     = $staffCanPost;
@@ -79,6 +91,8 @@ class StrategyFactory
         $this->folderMapper                     = $folderMapper;
         $this->roleAccessMapper                 = $roleAccessMapper;
         $this->access                           = $access;
+        $this->externalUser                     = $externalUser;
+        $this->db                               = $db;
     }
 
 
@@ -222,7 +236,7 @@ class StrategyFactory
             case Strategy\Service::getEntityType():
                 return new Strategy\Service($this->userAccessMapper, $this->staffCanPost, $this->moderationRequired);
             case Strategy\PastoralGroup::getEntityType():
-                return new Strategy\PastoralGroup($this->userAccessMapper, $this->staffCanPost, $this->moderationRequired);
+                return new Strategy\PastoralGroup($this->userAccessMapper, $this->staffCanPost, $this->moderationRequired, $this->db);
             case Strategy\Folder::getEntityType():
                 return new Strategy\Folder(
                     $this->userAccessMapper,
@@ -231,7 +245,8 @@ class StrategyFactory
                     $this->canTargetTeachersOfUsersInFolder,
                     $this->folderMapper,
                     $this->roleAccessMapper,
-                    $this->access
+                    $this->access,
+                    $this->externalUser
                 );
         }
         throw new UnknownEntityTypeException("Unrecognised entity type: '{$entityType}'");

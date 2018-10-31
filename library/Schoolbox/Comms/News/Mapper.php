@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
@@ -446,6 +447,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @param string          $sortProperty
      * @param string          $sortDirection
      * @return Search\Result
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC'): Search\Result
     {
@@ -453,7 +455,10 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             $limit = self::DEFAULT_LIMIT;
         }
 
-        $searcher = new Search\Result();
+        // TODO snap this outside the mapper
+        /** @var IConnector $database */
+        $database = self::getDi()->get('databaseInternal');
+        $searcher = new Search\Result($database);
         $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
         return $searcher;

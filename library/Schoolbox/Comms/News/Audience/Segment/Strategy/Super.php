@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 class Super extends SimpleStrategy
@@ -50,5 +51,20 @@ class Super extends SimpleStrategy
     public function getSearchSql(User $user): string
     {
         return '';
+    }
+
+
+    /**
+     * @inheritdoc
+     * @param GenericCollection|User[] $users
+     */
+    public function getValues(GenericCollection $users): array
+    {
+        foreach ($users as $user) {
+            if ($user->isSuperuser()) {
+                return [self::ENTITY_VALUE];
+            }
+        }
+        return [];
     }
 }

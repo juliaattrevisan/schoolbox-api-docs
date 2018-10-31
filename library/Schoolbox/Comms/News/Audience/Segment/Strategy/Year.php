@@ -8,6 +8,7 @@
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 class Year extends SimpleStrategy
@@ -23,7 +24,8 @@ class Year extends SimpleStrategy
     public static function isValidNullEntityValue(): bool
     {
         // A user may have no year
-        return true;
+        return false;
+//        return true; // TODO Turned off as not-yet implemented in front-end so no need to include in query
     }
 
 
@@ -89,5 +91,15 @@ class Year extends SimpleStrategy
     public function getSearchSql(User $user): string
     {
         return '';
+    }
+
+
+    /**
+     * @inheritdoc
+     * @param GenericCollection|User[] $users
+     */
+    public function getValues(GenericCollection $users): array
+    {
+        return \array_unique($users->getPropertyValues('year'));
     }
 }
