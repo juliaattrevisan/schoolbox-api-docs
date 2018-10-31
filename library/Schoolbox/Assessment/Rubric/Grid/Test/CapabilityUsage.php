@@ -460,4 +460,76 @@ class CapabilityUsage extends TestCase
     {
         $this->assertSame($expected, $capabilityUsage->isCapabilityMarkShown());
     }
+
+
+    /**
+     * Data provider for `testIsCompatibleWith`.
+     *
+     * @return iterable
+     */
+    public function getTestIsCompatibleWithData(): iterable
+    {
+        $generator = new Generator();
+
+
+        // both empty: true
+        $usage1 = new RubricGrid\CapabilityUsage(new RowSet\Capability());
+        $usage2 = new RubricGrid\CapabilityUsage(new RowSet\Capability());
+        yield "empty with empty" => [$usage1, $usage2, true];
+
+
+        // both with the same indicators, descs: true
+        // different points value for a descriptor: false
+        // missing descriptor: false
+
+
+        // different capability: false
+        $grid = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $usage1 = $grid->getCapabilityUsages()[1];
+        $usage2 = $grid->getCapabilityUsages()[2];
+        yield "different capability" => [$usage1, $usage2, false];
+
+
+        // different indicators: false
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid2CapUsages = Generator::TEST_CAPABILITY_USAGES;
+        unset($grid2CapUsages[1]['indicators'][11]);
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            $grid2CapUsages
+        );
+        yield "different indicators" => [$grid1->getCapabilityUsages()[1], $grid2->getCapabilityUsages()[1], false];
+
+
+        // different description for a descriptor: true
+        // different ordering of descriptors: true (regardless of whether they're in the same level)
+        // different max points per capability: true?
+    }
+
+
+    /**
+     * @dataProvider getTestIsCompatibleWithData
+     *
+     * @covers \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage::isCompatibleWith
+     * @param RubricGrid\CapabilityUsage $usage1
+     * @param RubricGrid\CapabilityUsage $usage2
+     * @param bool                       $expected
+     */
+    public function testIsCompatibleWith(
+        RubricGrid\CapabilityUsage $usage1,
+        RubricGrid\CapabilityUsage $usage2,
+        bool $expected
+    ): void {
+        $this->assertSame($expected, $usage1->isCompatibleWith($usage2));
+    }
 }
