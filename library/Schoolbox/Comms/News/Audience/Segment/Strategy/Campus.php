@@ -104,10 +104,10 @@ class Campus extends SimpleStrategy
                 $values[] = null;
             } else {
                 foreach ($campuses as $campus) {
-                    $values[] = $campus->getId();
+                    $values[$campus->getId()] = $campus->getId();
                 }
             }
         }
-        return \array_unique($values);
+        return $values;
     }
 }

@@ -96,8 +96,8 @@ class Role extends SimpleStrategy
     {
         $values = [];
         foreach ($users as $user) {
-            $values[] = $user->getRole()->getId();
+            $values[$user->getRole()->getId()] = $user->getRole()->getId();
         }
-        return \array_unique($values);
+        return $values;
     }
 }

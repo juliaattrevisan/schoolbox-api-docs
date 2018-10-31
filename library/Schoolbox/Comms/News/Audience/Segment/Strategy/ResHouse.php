@@ -65,9 +65,10 @@ class ResHouse extends SimpleStrategy
     {
         $values = [];
         foreach ($users as $user) {
-            $house    = $user->getResidentialHouse();
-            $values[] = $house ? $house->getId() : null;
+            if($user->getResidentialHouse() !== null) {
+                $values[$user->getResidentialHouse()->getId()] = $user->getResidentialHouse()->getId();
+            }
         }
-        return \array_unique($values);
+        return $values;
     }
 }

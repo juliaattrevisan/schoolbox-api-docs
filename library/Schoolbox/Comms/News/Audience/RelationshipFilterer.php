@@ -275,14 +275,14 @@ class RelationshipFilterer
         $folderCodes = [];
         foreach ($taughtFolders as $taughtFolder) {
             foreach ($taughtFolder->getCodes() as $code) {
-                $folderCodes[] = $code->getCode();
+                $folderCodes[$code->getCode()] = $code->getCode();
             }
         }
 
         // Find students for these folders codes
         $classStudentExternalIds = [];
-        foreach ($this->externalClass->getStudents(\implode(',', \array_unique($folderCodes))) as $classStudent) {
-            $classStudentExternalIds[] = $classStudent['synergy_id'];
+        foreach ($this->externalClass->getStudents(\implode(',', $folderCodes)) as $classStudent) {
+            $classStudentExternalIds[$classStudent['synergy_id']] = $classStudent['synergy_id'];
         }
 
         if (!\count($groupMemberIds) && !\count($classStudentExternalIds)) {
@@ -299,7 +299,7 @@ class RelationshipFilterer
         }
 
         if (\count($classStudentExternalIds)) {
-            $innerPredicate->in('synergy_id', \array_unique($classStudentExternalIds));
+            $innerPredicate->in('synergy_id', $classStudentExternalIds);
         }
 
         $outerPb = $this->userMapper->getPredicateBuilder()

@@ -64,9 +64,9 @@ class RoleType extends SimpleStrategy
     {
         $values = [];
         foreach ($users as $user) {
-            $values[] = $user->getRole()->getType();
+            $values[$user->getRole()->getType()] = $user->getRole()->getType();
         }
-        return \array_unique($values);
+        return $values;
     }
 }
 

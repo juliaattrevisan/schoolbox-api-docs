@@ -68,6 +68,6 @@ class Service extends SimpleStrategy
         foreach ($this->getUserAccessMapper()->findByColumn('uid', $users->getPropertyValues('id')) as $access) {
             $values[] = "{$access->getService()}.{$access->getServiceIdentifier()}.{$access->getAccessLevel()}";
         }
-        return \array_unique($values);
+        return $values;
     }
 }

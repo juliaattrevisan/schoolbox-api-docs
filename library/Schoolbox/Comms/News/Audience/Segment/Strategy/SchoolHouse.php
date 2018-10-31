@@ -96,9 +96,10 @@ class SchoolHouse extends SimpleStrategy
     {
         $values = [];
         foreach ($users as $user) {
-            $house    = $user->getSchoolHouse();
-            $values[] = $house ? $house->getId() : null;
+            if($user->getSchoolHouse() !== null) {
+                $values[$user->getSchoolHouse()->getId()] = $user->getSchoolHouse()->getId();
+            }
         }
-        return \array_unique($values);
+        return $values;
     }
 }
