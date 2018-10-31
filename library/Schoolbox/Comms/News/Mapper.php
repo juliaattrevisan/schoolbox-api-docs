@@ -250,7 +250,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     /**
      * Get a list of years that have article(s) that were audienced to a user
      *
-     * @param array $articleIdsForUser
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
@@ -295,6 +294,38 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         return $years;
     }
 
+
+    /**
+     * Given a list of articles, returns those that are published and not expired
+     *
+     * @param array $availableArticleIds
+     * @return array
+     */
+    public function findArticlesIdsPublished(array $availableArticleIds): array
+    {
+        if (!\count($availableArticleIds)) {
+            return [];
+        }
+
+        $articleIds = [];
+        $pb = $this->getPredicatePublished();
+        $where = implode("\nAND ", $pb->getWhere());
+
+        $query = "
+            SELECT id
+            FROM {$this->table}
+            WHERE {$where}
+            ORDER BY publish_at DESC, created_at DESC
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($pb->getParams());
+
+        while($id = $statement->fetchColumn(0)) {
+            $articleIds[] = $id;
+        }
+        return $articleIds;
+    }
 
     /**
      * Find just the ids for the articles in a topic

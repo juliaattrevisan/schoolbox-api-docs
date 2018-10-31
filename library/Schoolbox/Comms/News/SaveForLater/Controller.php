@@ -54,10 +54,14 @@ class Controller extends Base
     public function getList(): void
     {
         $articles = (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
-        $lists = new News\Moderation\Lists($this->newsMapper);
 
         $params = new News\Querystring($this->getRequest()->query);
         $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
+
+        if ( $this->isXhrRequest() ) {
+            $this->getResponse()->content->set($this->buildJsonOutput($articles->getPropertyValues('id')));
+            return;
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', [
             'articles' => $articles,

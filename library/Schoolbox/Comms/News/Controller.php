@@ -23,9 +23,7 @@ use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
-use Schoolbox\Comms\News\Validation\ValidUserCanAudienceTo;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -34,7 +32,6 @@ use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
@@ -585,6 +582,52 @@ class Controller extends Base
     }
 
     /**
+     * Get a list of articles that are audienced to me from anywhere and are published and not expired
+     * This is only returns data as JSON
+     *
+     * @api GET /news/lists/feed
+     *
+     * @throws InvalidArgumentException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \OutOfRangeException
+     * @throws \PDOException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     */
+    public function getListForUser() :void
+    {
+        $articleIds = $this->articleResolver->findArticlesForUser($this->getUser());
+        $articleIds = $this->newsMapper->findArticlesIdsPublished($articleIds);
+
+        $articles = $this->newsMapper->findByColumn('id', $articleIds);
+
+        $map = [
+            'id',
+            'title',
+            'blurb',
+            'featureImage',
+            'publishAt' => [
+                'long',
+                'relativeTime'
+            ],
+            'topics' => [
+                'name',
+                'slug',
+            ]
+        ];
+
+        $articles->reindex();
+        $articles = $articles->jsonSerialize(
+            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()), new BlurbDecorator())
+        );
+
+        $this->getResponse()->content->set($this->buildJsonOutput($articles));
+
+
+    }
+
+    /**
      * Delete an article
      *
      * @api POST /news/{articleId}/delete
@@ -876,7 +919,6 @@ class Controller extends Base
         $params = new Querystring($this->getRequest()->query);
         $pageNum = $params->getPageNum();
         $status = $params->getStatus();
-        $lists = new Moderation\Lists($this->newsMapper);
 
         if (!$pageNum) {
             $pageNum = 1;
@@ -941,6 +983,7 @@ class Controller extends Base
         $map = [
             'id',
             'title',
+            'blurb',
             'featureImage',
             'publishAt' => [
                 'long',
@@ -959,7 +1002,7 @@ class Controller extends Base
 
         $articles->reindex();
         $articles = $articles->jsonSerialize(
-            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()))
+            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser(), new BlurbDecorator()))
         );
 
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
