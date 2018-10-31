@@ -609,7 +609,7 @@ class IndicatorUsage extends TestCase
         );
 
         $indicator = $grid2->getRowSet()->retrieveIndicator(11);
-        unset($grid2->retrieveIndicatorUsage($indicator)->getDescriptors()[1]);
+        unset($grid2->retrieveIndicatorUsage($indicator)->getDescriptors()[5]);
         yield "missing descriptor" => [
             $grid1->retrieveIndicatorUsageByDescriptorId(111),
             $grid2->retrieveIndicatorUsageByDescriptorId(111),
