@@ -8,6 +8,7 @@
  # @param int compactMode
  # @param int limit
  # @param string referrer
+ # @param string queryStringPage
  #}
 {% extends '@commsNews/page-layout.twig' %}
 
@@ -29,7 +30,8 @@
 
 {% block newsContent %}
     {% include '@commsNews/article-list.twig' with {
-        initialPage: initialPage
+        initialPage: initialPage,
+        queryStringPage: queryStringPage
     } %}
 {% endblock %}
 

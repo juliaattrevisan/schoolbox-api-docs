@@ -1,6 +1,10 @@
 {#
  # News dashboard component
+ # @param string queryStringPage
  #}
+
 <div id="news-container-{{ componentInstanceId }}">
-    {% include '@commsNews/article-list.twig' %}
+    {% include '@commsNews/article-list.twig' with {
+        queryStringPage: queryStringPage
+    } %}
 </div>

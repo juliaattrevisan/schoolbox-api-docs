@@ -3,6 +3,7 @@
  # This can become a single file Vue component once we have a bundler
  #
  # @param int|null initialPage - The page number to load by default
+ # @param string queryStringPage - The string to use for page number in the URL
  #}
 
 {% if not initialPage %}
@@ -134,7 +135,10 @@
             configSearchTypeLimit: '{{ config.search_type_limit }}',
 
             // Localisation of news
-            localeNewsPlural: '{{ locale.news.plural }}'
+            localeNewsPlural: '{{ locale.news.plural }}',
+
+            // The string to use for page in the URL
+            queryStringPage: '{{ queryStringPage }}'
         },
         mounted: function () {
             var self = this;
@@ -197,9 +201,9 @@
                 if (!holdState) {
                     var params;
                     if (this.tabSelected === 'All') {
-                        params = '?p=' + page;
+                        params = '?' + queryStringPage + '=' + page;
                     } else {
-                        params = '?p=' + page + '&topic=' + this.tabSelected;
+                        params = '?' + queryStringPage + '=' + page + '&topic=' + this.tabSelected;
                     }
                     window.history.pushState({page: page, tab: this.tabSelected}, '', params);
                 }
