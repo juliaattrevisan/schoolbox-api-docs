@@ -152,6 +152,19 @@ class CapabilityUsage
 
 
     /**
+     * Are marks given to capability usage `$other` mutually compatible with
+     * ones given to this usage?
+     *
+     * @param CapabilityUsage $other
+     * @return bool
+     */
+    public function isCompatibleWith(CapabilityUsage $other): bool
+    {
+        return true;
+    }
+
+
+    /**
      * @return Capability
      */
     public function getCapability(): Capability

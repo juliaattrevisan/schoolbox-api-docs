@@ -250,6 +250,16 @@ class Grid
             return false;
         }
 
+        // If we've got to this point, we know the same indicators are in use.
+        // Check each one uses the same descriptors.
+        foreach ($this->getCapabilityUsages() as $thisCapabilityUsage) {
+            if (!$thisCapabilityUsage->isCompatibleWith(
+                $other->retrieveCapabilityUsage($thisCapabilityUsage->getCapability())
+            )) {
+                return false;
+            }
+        }
+
         return true;
     }
 
