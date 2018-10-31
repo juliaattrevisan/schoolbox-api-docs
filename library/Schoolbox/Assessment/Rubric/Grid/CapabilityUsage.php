@@ -160,6 +160,9 @@ class CapabilityUsage
      */
     public function isCompatibleWith(CapabilityUsage $other): bool
     {
+        if ($this->getCapability()->getId() !== $other->getCapability()->getId()) {
+            return false;
+        }
         return true;
     }
 
