@@ -246,10 +246,36 @@ class IndicatorUsage
             return false;
         }
 
-        // Examine descriptors
-        // * Ensure same descriptors are in use (ordering doesn't matter)
-        // * Ensure each descriptor's values match
+        // Ensure same descriptors are in use (ordering doesn't matter)
+        $thisDescriptorIds  = $this->descriptors->getPropertyValues('id');
+        $otherDescriptorIds = $other->descriptors->getPropertyValues('id');
+        sort($thisDescriptorIds);
+        sort($otherDescriptorIds);
+        if ($thisDescriptorIds !== $otherDescriptorIds) {
+            return false;
+        }
 
+        // Were any new descriptors (which don't have IDs yet) added?
+        // That automatically means they're not mutually compatible.
+        if (\in_array(null, $thisDescriptorIds, true)) {
+            return false;
+        }
+        if (\in_array(null, $otherDescriptorIds, true)) {
+            return false;
+        }
+
+        // Ensure each descriptor's values match
+        foreach ($thisDescriptorIds as $descriptorId) {
+            /** @var Descriptor $thisDescriptor */
+            /** @var Descriptor $otherDescriptor */
+            $thisDescriptor  = $this->descriptors->getBy('id', $descriptorId);
+            $otherDescriptor = $other->descriptors->getBy('id', $descriptorId);
+            if ($thisDescriptor->getMaxValue() !== $otherDescriptor->getMaxValue()) {
+                return false;
+            }
+        }
+
+        // If it passes that gauntlet:
         return true;
     }
 
