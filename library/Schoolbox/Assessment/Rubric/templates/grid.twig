@@ -17,7 +17,7 @@
 
 {% set markType = rubricGrid.assessment.markScheme.generateContext %}
 {% set showSummaryTotal = showRubricTotal and rubricMarkedGrid and markType.mode != "none" %}
-{% set showSummaryCapability = showGroupTotal and rubricMarkedGrid and rubricGrid.assessment.markPerCapability and markType.mode != "none"  %}
+{% set showSummaryCapability = showGroupTotal and rubricMarkedGrid and rubricGrid.assessment.markPerCapability %}
 <div class="scrollable">
 <table class="rb stack-for-medium-down">
     {% set hasLevels = '' %}
