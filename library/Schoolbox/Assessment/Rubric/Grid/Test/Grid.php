@@ -441,6 +441,10 @@ class Grid extends TestCase
      */
     public function getTestIsCompatibleWithData(): iterable
     {
+        $generator = new Generator();
+
+
+        // both empty: true
         $grid1 = new RubricGrid\Grid(
             new DueWork(),
             new Rowset\RowSet(new Folder())
@@ -452,8 +456,38 @@ class Grid extends TestCase
         yield "empty with empty" => [$grid1, $grid2, true];
 
 
-        // Cases:
+        // both with the same caps, inds, descs: true
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        yield "unchanged" => [$grid1, $grid2, true];
+
+
         // different points value for a descriptor: false
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $indicator  = $grid2->getRowSet()->retrieveIndicator(11);
+        $descriptor = $grid2->retrieveIndicatorUsage($indicator)->retrieveDescriptor(1);
+        $descriptor->setMaxValue($descriptor->getMaxValue() + 1);
+        yield "different descriptor value" => [$grid1, $grid2, false];
+
+
         // missing descriptor: false
         // different capabilities: false
         // different indicators: false
