@@ -296,6 +296,31 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     }
 
 
+    public function findArticlesIdsPublished(array $availableArticleIds) {
+        if (!\count($availableArticleIds)) {
+            return [];
+        }
+
+        $pb = $this->getPredicatePublished();
+
+        $where = implode("\nAND ", $pb->getWhere());
+
+        $query = "
+            SELECT id
+            FROM {$this->table}
+            WHERE {$where}
+            ORDER BY publish_at DESC, created_at DESC
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($pb->getParams());
+
+        while($id = $statement->fetchColumn(0)) {
+            $articleIds[] = $id;
+        }
+        return $articleIds;
+    }
+
     /**
      * Find just the ids for the articles in a topic
      * We generally use this for pagination counts where we need a count instead of hydrated things

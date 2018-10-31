@@ -585,6 +585,60 @@ class Controller extends Base
     }
 
     /**
+     * Get a list of articles that are audienced to me from anywhere and are published and not expired
+     * This is only returns data as JSON
+     *
+     * @api GET /news/lists/feed
+     *
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
+     * @throws \OutOfRangeException
+     * @throws \PDOException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     */
+    public function getListForUser() :void
+    {
+        $articleIds = $this->articleResolver->findArticlesForUser($this->getUser());
+        $articleIds = $this->newsMapper->findArticlesIdsPublished($articleIds);
+
+        $articles = $this->newsMapper->findByColumn('id', $articleIds);
+
+        $map = [
+            'id',
+            'title',
+            'blurb',
+            'featureImage',
+            'publishAt' => [
+                'long',
+                'relativeTime'
+            ],
+            'topics' => [
+                'name',
+                'slug',
+            ],
+            'status',
+            'statusDate' => [
+                'long',
+                'relativeTime'
+            ]
+        ];
+
+        $articles->reindex();
+        $articles = $articles->jsonSerialize(
+            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()))
+        );
+
+        $this->getResponse()->content->set($this->buildJsonOutput($articles));
+
+
+    }
+
+    /**
      * Delete an article
      *
      * @api POST /news/{articleId}/delete
@@ -939,6 +993,7 @@ class Controller extends Base
         $map = [
             'id',
             'title',
+            'blurb',
             'featureImage',
             'publishAt' => [
                 'long',

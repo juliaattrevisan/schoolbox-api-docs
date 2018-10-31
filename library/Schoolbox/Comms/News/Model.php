@@ -668,7 +668,12 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
      */
     public function getBlurb(): ?string
     {
-        return $this->blurb;
+        if ($this->blurb ) {
+            return $this->blurb;
+        }
+        else {
+            return \TextFormatter::cutSentence(\Scrub::html2text($this->body), 300);
+        }
     }
 
 
