@@ -103,7 +103,7 @@
 
         $('#editMode').click(  function (event) {
             $('nav[data-component-settings], [data-component-handle]').toggle(this.checked);
-            $('[data-component-titlebar-container]').each(function() {
+            $('div[data-component-titlebar-container]').each(function() {
                 $(this).toggleClass('actions-small-' + $(this).data('action-count'));
             });
         });
