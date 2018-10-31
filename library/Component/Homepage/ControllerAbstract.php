@@ -77,8 +77,24 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
 
         $this->setupConfigRendering($targetHandle);
 
-        //Show this many actions in nav bar if user has write access
-        $this->setVar('COMPONENT_ACTION_COUNT', $this->hasWriteAccess() ? 3 : 1);
+        // Write users will have 3 actions, and also will have their actions hidden by default due to the homepage lock feature
+        // Read users will have 1 action and no lock feature
+        $this->getSitePage()->setBlock('configTpl', 'titlebar_write', 'titlebar_write_block');
+        $this->getSitePage()->setBlock('configTpl', 'titlebar_read', 'titlebar_read_block');
+
+        if ($this->hasWriteAccess()) {
+            $this->setVar([
+                'COMPONENT_ACTION_COUNT' => 3,
+                'titlebar_read_block' => ''
+            ]);
+            $this->getSitePage()->parse('titlebar_write_block', 'titlebar_write');
+        } else {
+            $this->setVar([
+                'COMPONENT_ACTION_COUNT' => 1,
+                'titlebar_write_block' => ''
+            ]);
+            $this->getSitePage()->parse('titlebar_read_block', 'titlebar_read');
+        }
 
         $this->getSitePage()->setBlock('configTpl', 'drag_handle', 'drag_handle_block');
 
