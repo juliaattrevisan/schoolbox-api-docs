@@ -820,6 +820,8 @@ class Controller extends Base
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'slug' => $params->getSlug() ?: 'all',
             'referrer' => $params->getReferrer(),
+            'initialPage' => $params->getPageNum(),
+            'queryStringPage' => Querystring::PAGE_NUMBER,
 
             /* For configuring the rss button which changes per topic chosen
              */
