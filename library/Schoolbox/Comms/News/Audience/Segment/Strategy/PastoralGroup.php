@@ -32,7 +32,7 @@ class PastoralGroup extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getAudiencingSql(User $user, string $searchPlaceholder = null): string
+    public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "AND `name` LIKE :{$searchPlaceholder}";
 

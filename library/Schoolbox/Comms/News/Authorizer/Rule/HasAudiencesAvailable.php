@@ -50,7 +50,10 @@ class HasAudiencesAvailable implements IAuthorizationRule
         $pieces = [];
         foreach ($this->simpleStrategies as $strategy) {
             if ($strategy->canAudienceToEntityType($user)) {
-                $pieces[] = "({$strategy->getAudiencingSql($user)})";
+                $sql = $strategy->getAudiencingSql($user);
+                if ($sql) {
+                    $pieces[] = "({$sql})";
+                }
             }
         }
         if (!\count($pieces)) {
