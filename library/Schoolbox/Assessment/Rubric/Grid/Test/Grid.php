@@ -533,7 +533,8 @@ class Grid extends TestCase
             $grid2CapUsages
         );
 
-        yield "different capabilities" => [$grid1, $grid2, false];
+        yield "removed capability" => [$grid1, $grid2, false];
+        yield "added capability"   => [$grid2, $grid1, false];
 
 
         // different indicators: false
@@ -551,7 +552,8 @@ class Grid extends TestCase
             $grid2CapUsages
         );
 
-        yield "different indicators" => [$grid1, $grid2, false];
+        yield "removed indicator" => [$grid1, $grid2, false];
+        yield "added indicator"   => [$grid2, $grid1, false];
 
 
         // different description for a descriptor: true

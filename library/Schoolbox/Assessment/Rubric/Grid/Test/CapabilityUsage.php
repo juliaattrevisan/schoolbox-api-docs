@@ -565,9 +565,14 @@ class CapabilityUsage extends TestCase
             $grid2CapUsages
         );
 
-        yield "different indicators" => [
+        yield "removed indicator" => [
             $grid1->getCapabilityUsages()[1],
             $grid2->getCapabilityUsages()[1],
+            false
+        ];
+        yield "added indicator" => [
+            $grid2->getCapabilityUsages()[1],
+            $grid1->getCapabilityUsages()[1],
             false
         ];
 
