@@ -7,6 +7,7 @@
  # @param string queryStringReferrer - The string to use for referrer in the URL
  # @param string topicAll - The slug for the 'all' tab
  # @param string referrer - Referrer for stats logging
+ # @param bool changeTabOnMeta - On click of a topic in a news card meta- whether to change tab on the current page or not 
  #}
 
 {% if not initialPage %}
@@ -17,7 +18,7 @@
     <section>
         {# tabs #}
         <dl class="tabs" v-if="allArticles.length || articlesLoading">
-            <dd v-for="topic in topics" :class="{active: tabSelected === topic}">
+            <dd v-for="topic in topics" :class="{active: tabSelected.slug === topic.slug}">
                 <a @click="onTabChange(topic)">${ topic.name }</a>
             </dd>
             <dd class="skeleton" v-if="articlesLoading" v-for="n in 3">
@@ -58,9 +59,8 @@
                                 Related topics:
                                 <template v-for="(topic, index) in article.topics">
                                     <template v-if="index">, </template>
-                                    <a :href="getIndexRoute + '?topic=' + topic.slug">${ topic.name }</a>
-                                    {# TODO: recieve link via topic link decorator instead? #}
-                                    {# TODO: on the news feed- this link should just change the tab #}
+                                    <a v-if="changeTabOnMeta" @click="onTabChange(topic)">${ topic.name }</a>
+                                    <a v-else :href="getIndexRoute + '?topic=' + topic.slug">${ topic.name }</a>
                                 </template>
                             </p>
                         </div>
@@ -153,7 +153,11 @@
             topicAll: topicAllObject,
 
             // Referrer for stats logging
-            referrer: '{{ referrer }}'
+            referrer: '{{ referrer }}',
+
+            // Controls whether clicking on a topic in a news card meta will just change tab on the current screen,
+            // or link off to the news feed page
+            changeTabOnMeta: '{{ changeTabOnMeta }}'
         },
         mounted: function () {
             var self = this;
