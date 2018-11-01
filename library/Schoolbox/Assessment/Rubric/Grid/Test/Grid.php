@@ -495,9 +495,12 @@ class Grid extends TestCase
             Generator::TEST_CAPABILITY_USAGES
         );
 
-        $indicator  = $grid2->getRowSet()->retrieveIndicator(11);
-        $descriptor = $grid2->retrieveIndicatorUsage($indicator)->retrieveDescriptor(1);
-        $descriptor->setMaxValue($descriptor->getMaxValue() + 1);
+        $grid1->retrieveIndicatorUsage($grid1->getRowSet()->retrieveIndicator(11))
+              ->retrieveDescriptor(1)
+              ->setMaxValue(100);
+        $grid2->retrieveIndicatorUsage($grid2->getRowSet()->retrieveIndicator(11))
+              ->retrieveDescriptor(1)
+              ->setMaxValue(101);
         yield "different descriptor value" => [$grid1, $grid2, false];
 
 
@@ -568,9 +571,12 @@ class Grid extends TestCase
             Generator::TEST_CAPABILITY_USAGES
         );
 
-        $indicator  = $grid2->getRowSet()->retrieveIndicator(11);
-        $descriptor = $grid2->retrieveIndicatorUsage($indicator)->retrieveDescriptor(1);
-        $descriptor->setDescription($descriptor->getDescription() . ' CHANGED');
+        $grid1->retrieveIndicatorUsage($grid1->getRowSet()->retrieveIndicator(11))
+              ->retrieveDescriptor(1)
+              ->setDescription('y');
+        $grid2->retrieveIndicatorUsage($grid2->getRowSet()->retrieveIndicator(11))
+              ->retrieveDescriptor(1)
+              ->setDescription('z');
         yield "different descriptor description" => [$grid1, $grid2, true];
 
 
