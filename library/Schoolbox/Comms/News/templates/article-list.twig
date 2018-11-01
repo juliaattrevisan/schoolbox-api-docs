@@ -3,6 +3,7 @@
  # This can become a single file Vue component once we have a bundler
  #
  # @param int|null initialPage - The page number to load by default
+ # @param string|null topic - The topic to load by default
  # @param string queryStringPage - The string to use for page number in the URL
  # @param string queryStringReferrer - The string to use for referrer in the URL
  # @param string topicAll - The slug for the 'all' tab
@@ -18,8 +19,8 @@
     <section>
         {# tabs #}
         <dl class="tabs" v-if="allArticles.length || articlesLoading">
-            <dd v-for="topic in topics" :class="{active: tabSelected.slug === topic.slug}">
-                <a @click="onTabChange(topic)">${ topic.name }</a>
+            <dd v-for="topic in topics" :class="{active: tabSelected === topic.slug}">
+                <a @click="onTabChange(topic.slug)">${ topic.name }</a>
             </dd>
             <dd class="skeleton" v-if="articlesLoading" v-for="n in 3">
                 <a></a>
@@ -59,7 +60,7 @@
                                 Related topics:
                                 <template v-for="(topic, index) in article.topics">
                                     <template v-if="index">, </template>
-                                    <a v-if="changeTabOnMeta" @click="onTabChange(topic)">${ topic.name }</a>
+                                    <a v-if="changeTabOnMeta" @click="onTabChange(topic.slug)">${ topic.name }</a>
                                     <a v-else :href="getIndexRoute + '?topic=' + topic.slug">${ topic.name }</a>
                                 </template>
                             </p>
@@ -129,8 +130,8 @@
             // Will be populated as all articles on load
             filteredArticles: [],
 
-            // The selected tab, just used for active styling
-            tabSelected: topicAllObject,
+            // The selected tab's slug
+            tabSelected: '{{ topic }}' || topicAllObject.slug,
 
             // Route for retrieving all the articles
             getArticlesRoute: '{{ routeLookup('commsNews.getListForUser') }}',
@@ -147,6 +148,7 @@
             // The string to use for page in the URL
             queryStringPage: '{{ queryStringPage }}',
 
+            // The string to use for referrer in the URL
             queryStringReferrer: '{{ queryStringReferrer }}',
 
             // Slug for the 'all' tab
@@ -196,7 +198,7 @@
                 self.topics = topics;
 
                 // In the case that this page has loaded with a page and/or tab in the URL params - update the page to reflect those params
-                if (self.tabSelected !== self.topicAll) {
+                if (self.tabSelected !== self.topicAll.slug) {
                     self.onTabChange(self.tabSelected, true, true);
                 }
                 if (self.page > 1) {
@@ -213,7 +215,7 @@
                     // Return to defaults
                     self.page = self.initialPage;
                     self.onPaginate(self.page, true);
-                    self.tabSelected = self.topicAll;
+                    self.tabSelected = self.topicAll.slug;
                     self.onTabChange(self.tabSelected, true, true);
                 } else {
                     if (event.state.page) {
@@ -239,7 +241,7 @@
                 // Update the window history
                 if (!holdState) {
                     var params;
-                    if (this.tabSelected === this.topicAll) {
+                    if (this.tabSelected === this.topicAll.slug) {
                         params = '?' + this.queryStringPage + '=' + page;
                     } else {
                         params = '?' + this.queryStringPage + '=' + page + '&topic=' + this.tabSelected;
@@ -251,7 +253,7 @@
             /*
              * Changing topic tab
              *
-             * @param {object} tab - The tab to change to
+             * @param {string} tab - The tab to change to (slug)
              * @param {boolean} persistPage
              * @param {boolean} holdState - Whether to change the window's history or not
              */
@@ -263,14 +265,14 @@
                     self.page = 1;
                 }
 
-                if (tab === this.topicAll) {
+                if (tab === this.topicAll.slug) {
                     // Reset back to original set
                     self.filteredArticles = self.allArticles;
                 } else {
                     // Filter articles by tab selected
                     var filteredArticles = self.allArticles.filter(function (article) {
                         return article.topics.some(function(topic) { // Return true if the selected topic appears once
-                            return topic.slug === tab.slug;
+                            return topic.slug === tab;
                         });
                     });
 
@@ -279,7 +281,7 @@
 
                 // Update the window history
                 if (!holdState) {
-                    window.history.pushState({tab: tab, page: self.page}, '', '?topic=' + tab.slug);
+                    window.history.pushState({tab: tab, page: self.page}, '', '?topic=' + tab);
                 }
             }
         },

@@ -2,6 +2,8 @@
  # A list of all the available Topics to chooze
  # Sets up a container for async article loading
  #
+ # @param initialPage
+ # @param topic
  # @param Collection|Topic[] topics
  # @param string topicAll
  # @param string slug
@@ -36,7 +38,8 @@
         queryStringReferrer: queryStringReferrer,
         topicAll: topicAll,
         referrer: referrer,
-        changeTabOnMeta: true
+        changeTabOnMeta: true,
+        topic: topic
     } %}
 {% endblock %}
 

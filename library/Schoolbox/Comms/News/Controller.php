@@ -867,6 +867,7 @@ class Controller extends Base
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'slug' => $params->getSlug() ?: 'all',
             'referrer' => $params->getReferrer(),
+            'topic' => $params->getSlug(),
             'initialPage' => $params->getPageNum(),
             'queryStringPage' => Querystring::PAGE_NUMBER,
             'queryStringReferrer' => Querystring::REFERRER,
