@@ -14,6 +14,7 @@ use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
+use Alaress\Session\Session;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Request\IsJson;
@@ -425,6 +426,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                      * @var IConfigLoader          $config
                      * @var External_UserInterface $externalUser
                      * @var IConnector             $db
+                     * @var Session $session
                      */
                     $mapperFactory    = $di->get('mapperFactory');
                     $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
@@ -434,6 +436,23 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $config           = $di->get('config');
                     $externalUser     = $di->get('externalUser');
                     $db               = $di->get('databaseInternal');
+                    $session          = $di->get('session');
+
+                    // Get know user-to-class mapping from the session and inject into factory
+                    $knownUserClasses = [];
+
+                    // Self case
+                    $userId = $session->get('id');
+                    if ($userId) {
+                        $subjects = $session->get('subjects');
+                        if ($subjects) {
+                            $knownUserClasses[$userId] = $subjects;
+                        }
+                    }
+                    // Parent case
+                    foreach ($session->get('children', []) as $childData) {
+                        $knownUserClasses[$childData['id']] = $childData['subjects'];
+                    }
                     return new News\Audience\Segment\StrategyFactory(
                         $userAccessMapper,
                         $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS),
@@ -443,7 +462,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         $roleAccessMapper,
                         $access,
                         $externalUser,
-                        $db
+                        $db,
+                        $knownUserClasses
                     );
                 }
             )

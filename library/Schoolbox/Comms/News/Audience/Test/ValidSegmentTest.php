@@ -54,7 +54,8 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
             RoleAccessMapper::getInstance(),
             Access::getInstance(),
             new External_Offline_User(),
-            $mockConnector
+            $mockConnector,
+            []
         ))->getValidRelationshipModifiers();
 
         // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity

@@ -54,6 +54,9 @@ class StrategyFactory
     /** @var IConnector */
     private $db;
 
+    /** @var array|\mixed[][][] */
+    private $knownUserSubjects;
+
     /**
      * Cache the strategies so repeated calls to make() for the same strat will return the same instance
      *
@@ -72,6 +75,7 @@ class StrategyFactory
      * @param Access                 $access
      * @param External_UserInterface $externalUser
      * @param IConnector             $db
+     * @param mixed[][][]            $knownUserSubjects
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
@@ -82,7 +86,8 @@ class StrategyFactory
         RoleAccessMapper $roleAccessMapper,
         Access $access,
         External_UserInterface $externalUser,
-        IConnector $db
+        IConnector $db,
+        array $knownUserSubjects
     ) {
         $this->userAccessMapper                 = $userAccessMapper;
         $this->staffCanPost                     = $staffCanPost;
@@ -93,6 +98,7 @@ class StrategyFactory
         $this->access                           = $access;
         $this->externalUser                     = $externalUser;
         $this->db                               = $db;
+        $this->knownUserSubjects                = $knownUserSubjects;
     }
 
 
@@ -246,7 +252,8 @@ class StrategyFactory
                     $this->folderMapper,
                     $this->roleAccessMapper,
                     $this->access,
-                    $this->externalUser
+                    $this->externalUser,
+                    $this->knownUserSubjects
                 );
         }
         throw new UnknownEntityTypeException("Unrecognised entity type: '{$entityType}'");

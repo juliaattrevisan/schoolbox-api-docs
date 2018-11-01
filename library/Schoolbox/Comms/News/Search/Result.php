@@ -173,7 +173,8 @@ class Result extends Base
             Access\RoleAccessMapper::getInstance(),
             Access\Access::getInstance(),
             new External_User(),
-            $this->database
+            $this->database,
+            []
         );
 
         /* Is $user in the audience of the article?

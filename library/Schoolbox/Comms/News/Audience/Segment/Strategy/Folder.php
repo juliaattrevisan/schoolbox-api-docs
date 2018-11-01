@@ -38,6 +38,16 @@ class Folder extends SimpleStrategy
     /** @var External_UserInterface */
     private $externalUser;
 
+    /**
+     * Set of subject data arrays, grouped by user.id
+     *
+     * Same format as used in session
+     *
+     * @see \Session.php
+     * @var mixed[][][]
+     */
+    private $knownUserSubjects;
+
 
     /**
      * @return string
@@ -68,6 +78,7 @@ class Folder extends SimpleStrategy
      * @param RoleAccessMapper       $roleAccessMapper
      * @param Access                 $access
      * @param External_UserInterface $externalUser
+     * @param mixed[][][]            $knownUserSubjects
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
@@ -77,7 +88,8 @@ class Folder extends SimpleStrategy
         FolderMapper $folderMapper,
         RoleAccessMapper $roleAccessMapper,
         Access $access,
-        External_UserInterface $externalUser
+        External_UserInterface $externalUser,
+        array $knownUserSubjects
     ) {
         parent::__construct($userAccessMapper, $staffCanPost, $moderationRequired);
         $this->canTargetTeachersOfUsersInFolder = $canTargetTeachersOfUsersInFolder;
@@ -85,6 +97,7 @@ class Folder extends SimpleStrategy
         $this->roleAccessMapper                 = $roleAccessMapper;
         $this->access                           = $access;
         $this->externalUser                     = $externalUser;
+        $this->knownUserSubjects                = $knownUserSubjects;
     }
 
 
@@ -288,13 +301,19 @@ class Folder extends SimpleStrategy
         $groupFolderIds = $this->getUserAccessMapper()->findScalarByPredicates('sid', $pb);
 
         // Get subjects
-        $subjectList = [];
+        $subjectLists = [];
         foreach ($users as $user) {
+            // Attempt to use cached value if already known for this user
+            if(\array_key_exists($user->getId(), $this->knownUserSubjects)){
+                $subjectList = $this->knownUserSubjects[$user->getId()];
+            } else {
+                $subjectList = $this->externalUser->getSubjectList($user);
+            }
             /** @noinspection SlowArrayOperationsInLoopInspection */
-            $subjectList = \array_merge($subjectList, $this->externalUser->getSubjectList($user));
+            $subjectLists = \array_merge($subjectLists, $subjectList);
         }
 
-        $classFolderIds = $this->folderMapper->findAllBySubjectList($subjectList)->getPropertyValues('id');
+        $classFolderIds = $this->folderMapper->findAllBySubjectList($subjectLists)->getPropertyValues('id');
 
         return \array_unique(\array_merge($groupFolderIds, $classFolderIds));
     }
