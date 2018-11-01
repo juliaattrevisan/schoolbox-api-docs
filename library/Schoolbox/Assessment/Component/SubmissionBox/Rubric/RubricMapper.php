@@ -1593,11 +1593,15 @@ class RubricMapper
     }
 
     /**
+     * @deprecated use `persistGrid` instead
+     *
      * @param Rubric        $rubric
      * @param SubmissionBox $submissionBox
      */
     public function save(Rubric $rubric, SubmissionBox $submissionBox)
     {
+        trigger_error('This method is deprecated; use "persistGrid" instead', E_USER_DEPRECATED);
+
         // juuust in case
         $rubric->setSubmissionBox($submissionBox);
 
