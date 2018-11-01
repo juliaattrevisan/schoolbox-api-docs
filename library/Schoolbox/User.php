@@ -1372,9 +1372,14 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      */
     public function getJsonApiLinks(): array
     {
-        return [
-            'profile' => new SitePageLink("/search/user/{$this->getId()}"),
-        ];
+        if (!$this->isDeleted()) {
+            return [
+                'profile' => new SitePageLink("/search/user/{$this->getId()}"),
+            ];
+        }
+        else {
+            return [];
+        }
     }
 
 }
