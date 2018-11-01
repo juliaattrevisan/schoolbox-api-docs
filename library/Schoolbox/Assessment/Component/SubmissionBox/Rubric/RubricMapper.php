@@ -485,10 +485,12 @@ class RubricMapper
     /**
      * Saves this grid to the database.
      *
-     * @param Grid $grid
+     * @param Grid      $grid
+     * @param null|Grid $originalGrid If set, this is the state of the
+     *                                assessment's grid pre-save
      * @throws MapperException if something happens in the mapper
      */
-    public function persistGrid(Grid $grid): void
+    public function persistGrid(Grid $grid, ?Grid $originalGrid): void
     {
         // The mappers still deal in submission boxes, but we deal in levels
         // If this exceptioned out, it was never meant to be
