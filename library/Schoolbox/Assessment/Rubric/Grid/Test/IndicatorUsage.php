@@ -674,28 +674,6 @@ class IndicatorUsage extends TestCase
             $grid2->retrieveIndicatorUsageByDescriptorId(111),
             true
         ];
-
-
-        // different max points per capability: true?
-        $grid1 = $generator->generateGrid(
-            RowSet\Test\Generator::TEST_CAPABILITIES,
-            Generator::TEST_LEVELS,
-            Generator::TEST_CAPABILITY_USAGES
-        );
-
-        $grid2CapUsages = Generator::TEST_CAPABILITY_USAGES;
-        $grid2CapUsages[1]['maxValue'] = 100;
-        $grid2 = $generator->generateGrid(
-            RowSet\Test\Generator::TEST_CAPABILITIES,
-            Generator::TEST_LEVELS,
-            $grid2CapUsages
-        );
-
-        yield "different max points per capability" => [
-            $grid1->retrieveIndicatorUsageByDescriptorId(111),
-            $grid2->retrieveIndicatorUsageByDescriptorId(111),
-            true
-        ];
     }
 
 
