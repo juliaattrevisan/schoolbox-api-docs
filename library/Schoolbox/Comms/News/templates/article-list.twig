@@ -183,7 +183,10 @@
                     });
                 });
 
-                // TODO: sort the topics based on the sequence of the topics set in the DB
+                // Sort topics based on sequence
+                topics.sort(function(a, b) {
+                    return a.sequence - b.sequence;
+                });
 
                 // Send the array to Vue
                 self.topics = topics;

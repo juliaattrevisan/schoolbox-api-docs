@@ -617,6 +617,7 @@ class Controller extends Base
             'topics' => [
                 'name',
                 'slug',
+                'sequence'
             ]
         ];
 
