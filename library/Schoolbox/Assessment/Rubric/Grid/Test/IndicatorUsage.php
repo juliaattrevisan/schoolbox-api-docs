@@ -623,7 +623,7 @@ class IndicatorUsage extends TestCase
             Generator::TEST_LEVELS,
             Generator::TEST_CAPABILITY_USAGES
         );
-        yield "different capability" => [
+        yield "different indicator" => [
             $grid->retrieveIndicatorUsageByDescriptorId(111),
             $grid->retrieveIndicatorUsageByDescriptorId(121),
             false

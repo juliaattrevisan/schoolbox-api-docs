@@ -643,7 +643,7 @@ class Grid extends TestCase
         yield "different mark range" => [$grid1, $grid2, true];
 
 
-        // different mark type: true (whether same or different base type)
+        // different total mark: true
         $grid1 = $generator->generateGrid(
             RowSet\Test\Generator::TEST_CAPABILITIES,
             Generator::TEST_LEVELS,
@@ -656,9 +656,10 @@ class Grid extends TestCase
         );
         $grid1->getAssessment()->setMarkScheme(new MarkScheme\TotalMarkFractional(100));
         $grid2->getAssessment()->setMarkScheme(new MarkScheme\TotalMarkFractional(200));
-        yield "different mark type, same base type" => [$grid1, $grid2, true];
+        yield "different total mark" => [$grid1, $grid2, true];
 
 
+        // different mark type: true
         $grid1 = $generator->generateGrid(
             RowSet\Test\Generator::TEST_CAPABILITIES,
             Generator::TEST_LEVELS,
@@ -671,7 +672,7 @@ class Grid extends TestCase
         );
         $grid1->getAssessment()->setMarkScheme(new MarkScheme\None());
         $grid2->getAssessment()->setMarkScheme(new MarkScheme\Percentage());
-        yield "different mark type, different base type" => [$grid1, $grid2, true];
+        yield "different mark type" => [$grid1, $grid2, true];
     }
 
 
