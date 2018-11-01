@@ -998,12 +998,13 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
         // if a map is specified, we want to explicitly pass it through to sub-objects where possible
 
         $json = [];
-
-        foreach ($this as $key => $value) {
+        $i = 0;
+        foreach ($this as $value) {
             foreach ($decorators as $decorator) {
-                $json[$key] = $decorator->decorate($json[$key] ?: [], $value);
-            }
+                $json[$i] = $decorator->decorate($json[$i] ?: [], $value);
 
+            }
+            $i++;
         }
 
         return $json;
