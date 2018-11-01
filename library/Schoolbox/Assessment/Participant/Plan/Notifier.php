@@ -774,6 +774,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $bob = $this->targetBuilderToStudent($bob, $assessment, $participant)
                         ->setTitle(self::PATTERN_OVERDUE_STUDENT_TITLE)
                         ->setParam('overdue', new SimpleParam($overdue))
+                        ->unsetParam('submit')
                         ->setBody($participant->getDescription());
             $envelope->targetToUser($participant->getUser(), $bob->build());
 
@@ -783,7 +784,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
             $bob = $this->targetBuilderToParents($bob, $assessment, $participant)
                         ->setTitle(self::PATTERN_OVERDUE_PARENT_TITLE)
-                        ->setParam('submit', new SimpleParam($submit));
+                        ->setParam('submit', new SimpleParam($submit))
+                        ->unsetParam('overdue');
             $envelope->targetToParent($participant->getUser(), $bob->build());
         }
 
