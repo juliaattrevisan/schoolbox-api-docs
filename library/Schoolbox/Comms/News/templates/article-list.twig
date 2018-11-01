@@ -94,7 +94,6 @@
         v-if="currentArticles.length && pageCount > 1"
     ></Paginate>
 </div>
-
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 <script>
     'use strict';
@@ -178,7 +177,8 @@
                     article.topics.map(function(topic) {
                         if (topicsAdded.indexOf(topic.slug) === -1) {
                             topicsAdded.push(topic.slug);
-                            topics.push(Object.assign({}, topic));
+                            // WARNING: do not remove the space inside the braces below, phplib will eat it
+                            topics.push(Object.assign({ }, topic));
                         }
                     });
                 });
