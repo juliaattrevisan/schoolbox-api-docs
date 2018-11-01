@@ -607,8 +607,10 @@ class RubricMapper
         // wash up before dinner, kids
 
 
-        // invalidate changed descriptors
-        $this->checkDescriptorValueChanges($existingDescriptors, $descriptorModels);
+        // Invalidate all marks, if the grid and original grid are incompatible
+        if ($originalGrid && !$grid->isCompatibleWith($originalGrid)) {
+            $this->invalidateMarks($grid->getAssessment()->getId());
+        }
 
 
         // remove all levels that have zero descriptors attached - extract from the descriptors
@@ -1773,6 +1775,32 @@ class RubricMapper
 
         return false;
     }
+
+
+    /**
+     * Invalidate ALL the rubric marks given for this assessment.
+     *
+     * This includes:
+     * * capability marks
+     * * descriptor marks
+     *
+     * @param int $assessmentId
+     */
+    private function invalidateMarks(int $assessmentId): void
+    {
+        $query = "
+            UPDATE     rubric_descriptor_mark rdm
+            INNER JOIN rubric_group_mark      rgm ON rdm.rubric_group_mark_id = rgm.id
+            INNER JOIN submission_return       sr ON rgm.return_id            = sr.id
+            INNER JOIN submission_box          sb ON sr.box_id                = sb.id
+            SET        rdm.valid = FALSE,
+                       rgm.valid = FALSE
+            WHERE      sb.assessment_id = :assessmentId
+        ";
+
+        $this->database->prepare($query)->execute(['assessmentId' => $assessmentId]);
+    }
+
 
     /**
      * Invalidates all marks given for the specified descriptors
