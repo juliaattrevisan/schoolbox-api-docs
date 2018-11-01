@@ -5,6 +5,7 @@
  # @param int|null initialPage - The page number to load by default
  # @param string queryStringPage - The string to use for page number in the URL
  # @param string topicAll - The slug for the 'all' tab
+ # @param string referrer - Referrer for stats logging
  #}
 
 {% if not initialPage %}
@@ -39,11 +40,11 @@
                 <li class="actions-small-1" v-for="article in currentArticles">
                     <div class="list-item">
                         <div class="small-12 card">
-                            <a :href="article._links.self.href" v-if="article.featureImage">
+                            <a :href="article._links.self.href + '?ref=' + referrer" v-if="article.featureImage">
                                 <img :src="article.featureImage._links.image.href + '&size=square64'">
                             </a>
 
-                            <h3><a :href="article._links.self.href">${ article.title }</a></h3>
+                            <h3><a :href="article._links.self.href + '?ref=' + referrer">${ article.title }</a></h3>
 
                             <p class="meta">
                                 Published by 
@@ -142,7 +143,10 @@
             queryStringPage: '{{ queryStringPage }}',
 
             // Slug for the 'all' tab
-            topicAll: topicAll
+            topicAll: topicAll,
+
+            // Referrer for stats logging
+            referrer: '{{ referrer }}'
         },
         mounted: function () {
             var self = this;
