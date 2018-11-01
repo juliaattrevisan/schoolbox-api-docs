@@ -4,7 +4,9 @@
  #
  # @param int|null initialPage - The page number to load by default
  # @param string queryStringPage - The string to use for page number in the URL
+ # @param string queryStringReferrer - The string to use for referrer in the URL
  # @param string topicAll - The slug for the 'all' tab
+ # @param string referrer - Referrer for stats logging
  #}
 
 {% if not initialPage %}
@@ -39,38 +41,37 @@
                 <li class="actions-small-1" v-for="article in currentArticles">
                     <div class="list-item">
                         <div class="small-12 card">
-                            {# TODO: need feature image href sent from backend, and article link
-                            <a :href="article._links.self.href" v-if="article.featureImage">
+                            <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-if="article.featureImage">
                                 <img :src="article.featureImage._links.image.href + '&size=square64'">
                             </a>
-                            #}
 
-                            {# TODO: need article link sent from backend
-                            <h3><a :href="article._links.self.href">${ article.title }</a></h3>
-                            #}
-                            <h3><a href="#">${ article.title }</a></h3>
+                            <h3><a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">${ article.title }</a></h3>
 
-                            {# TODO: need author fullname, publish date with long and relative time sent from the backend
                             <p class="meta">
                                 Published by 
-                                ${ article.author.fullname }
+                                <a v-if="article.author._links && article.author._links.profile" :href="article.author._links.profile.href">${ article.author.fullname }</a>
+                                <template v-else>${ article.author.fullname }</template>
                                 <time :title="article.publishAt.long">${ article.publishAt.relativeTime }</time>
                             </p>
-                            #}
 
-                            {# TODO: add topics #}
+                            <p class="meta" v-if="Object.keys(article.topics).length">
+                                Related topics:
+                                <template v-for="(topic, key, index) in article.topics">
+                                    <template v-if="index">, </template>
+                                    <a :href="getIndexRoute + '?topic=' + topic.slug">${ topic.name }</a>
+                                    {# TODO: recieve link via topic link decorator instead? #}
+                                    {# TODO: on the news feed- this link should just change the tab #}
+                                </template>
+                            </p>
                         </div>
                     </div>
 
-                    {# TODO: need the modify route (with auth) sent from the backend
-                     # TODO: add save for later
                     <nav>
                         <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
+                        {# TODO: add save for later #}
                     </nav>
-                    #}
 
-                    {# TODO: add blurb, defaulting back to body when there's no blurb, plus 'read only' functionality #}
-
+                    <article v-html="article.blurb"></article>
                 </li>
             </ul>
 
@@ -129,13 +130,13 @@
             tabSelected: topicAll,
 
             // Route for retrieving all the articles
-            getArticlesRoute: '{{ routeLookup('commsNews.getListByTopic') }}',
+            getArticlesRoute: '{{ routeLookup('commsNews.getListForUser') }}',
 
              // Route for news feed page
             getIndexRoute: '{{ routeLookup('commsNews.getIndex') }}',
 
             // Config that's used for number of items per page
-            configSearchTypeLimit: '{{ config.search_type_limit }}',
+            configSearchTypeLimit: {{ config.search_type_limit }},
 
             // Localisation of news
             localeNewsPlural: '{{ locale.news.plural }}',
@@ -143,15 +144,20 @@
             // The string to use for page in the URL
             queryStringPage: '{{ queryStringPage }}',
 
+            queryStringReferrer: '{{ queryStringReferrer }}',
+
             // Slug for the 'all' tab
-            topicAll: topicAll
+            topicAll: topicAll,
+
+            // Referrer for stats logging
+            referrer: '{{ referrer }}'
         },
         mounted: function () {
             var self = this;
 
             // Find some articles
             axios.get(self.getArticlesRoute).then(function(response) {
-                var articles = response.data.articles;
+                var articles = response.data;
 
                 self.articlesLoading = false;
                 self.allArticles = articles;
@@ -207,9 +213,9 @@
                 if (!holdState) {
                     var params;
                     if (this.tabSelected === this.topicAll) {
-                        params = '?' + queryStringPage + '=' + page;
+                        params = '?' + this.queryStringPage + '=' + page;
                     } else {
-                        params = '?' + queryStringPage + '=' + page + '&topic=' + this.tabSelected;
+                        params = '?' + this.queryStringPage + '=' + page + '&topic=' + this.tabSelected;
                     }
                     window.history.pushState({page: page, tab: this.tabSelected}, '', params);
                 }

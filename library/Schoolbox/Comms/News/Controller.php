@@ -600,13 +600,16 @@ class Controller extends Base
         $articleIds = $this->articleResolver->findArticlesForUser($this->getUser());
         $articleIds = $this->newsMapper->findArticlesIdsPublished($articleIds);
 
-        $articles = $this->newsMapper->findByColumn('id', $articleIds);
+        $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
 
         $map = [
             'id',
             'title',
             'blurb',
             'featureImage',
+            'author' => [
+                'fullname'
+            ],
             'publishAt' => [
                 'long',
                 'relativeTime'
@@ -865,6 +868,7 @@ class Controller extends Base
             'referrer' => $params->getReferrer(),
             'initialPage' => $params->getPageNum(),
             'queryStringPage' => Querystring::PAGE_NUMBER,
+            'queryStringReferrer' => Querystring::REFERRER,
 
             /* For configuring the rss button which changes per topic chosen
              */
