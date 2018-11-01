@@ -260,9 +260,11 @@
                     // Reset back to original set
                     self.filteredArticles = self.allArticles;
                 } else {
-                    // Filter by tab selected
+                    // Filter articles by tab selected
                     var filteredArticles = self.allArticles.filter(function (article) {
-                        return false; // TODO: check if selected topic is in the array of topics for the article
+                        return article.topics.some(function(topic) { // Return true if the selected topic appears once
+                            return topic.slug === tab.slug;
+                        });
                     });
 
                     self.filteredArticles = filteredArticles;
