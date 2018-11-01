@@ -133,7 +133,7 @@
             getIndexRoute: '{{ routeLookup('commsNews.getIndex') }}',
 
             // Config that's used for number of items per page
-            configSearchTypeLimit: '{{ config.search_type_limit }}',
+            configSearchTypeLimit: {{ config.search_type_limit }},
 
             // Localisation of news
             localeNewsPlural: '{{ locale.news.plural }}',
@@ -205,9 +205,9 @@
                 if (!holdState) {
                     var params;
                     if (this.tabSelected === this.topicAll) {
-                        params = '?' + queryStringPage + '=' + page;
+                        params = '?' + this.queryStringPage + '=' + page;
                     } else {
-                        params = '?' + queryStringPage + '=' + page + '&topic=' + this.tabSelected;
+                        params = '?' + this.queryStringPage + '=' + page + '&topic=' + this.tabSelected;
                     }
                     window.history.pushState({page: page, tab: this.tabSelected}, '', params);
                 }
