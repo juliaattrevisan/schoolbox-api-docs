@@ -242,13 +242,13 @@ class IndicatorUsage
     public function isCompatibleWith(IndicatorUsage $other): bool
     {
         // Check it's the same indicator
-        if ($this->indicator->getId() !== $other->indicator->getId()) {
+        if ((int)$this->indicator->getId() !== (int)$other->indicator->getId()) {
             return false;
         }
 
         // Ensure same descriptors are in use (ordering doesn't matter)
-        $thisDescriptorIds  = $this->descriptors->getPropertyValues('id');
-        $otherDescriptorIds = $other->descriptors->getPropertyValues('id');
+        $thisDescriptorIds  = filter_var_array($this->descriptors->getPropertyValues('id'), FILTER_VALIDATE_INT);
+        $otherDescriptorIds = filter_var_array($other->descriptors->getPropertyValues('id'), FILTER_VALIDATE_INT);
         sort($thisDescriptorIds);
         sort($otherDescriptorIds);
         if ($thisDescriptorIds !== $otherDescriptorIds) {
@@ -258,7 +258,7 @@ class IndicatorUsage
         // Were any new descriptors (which don't have IDs yet) added or removed?
         // That automatically means they're not mutually compatible, even if
         // they would otherwise match.
-        if (\in_array(null, array_merge($thisDescriptorIds, $otherDescriptorIds), true)) {
+        if (\in_array(false, array_merge($thisDescriptorIds, $otherDescriptorIds), true)) {
             return false;
         }
 

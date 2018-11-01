@@ -246,7 +246,7 @@ class Grid
     public function isCompatibleWith(Grid $other): bool
     {
         // Check the assessment is the same
-        if ($this->assessment->getId() !== $other->assessment->getId()) {
+        if ((int)$this->assessment->getId() !== (int)$other->assessment->getId()) {
             return false;
         }
 
@@ -278,7 +278,7 @@ class Grid
     {
         $capabilityIds = [];
         foreach ($this->capabilityUsages as $capabilityUsage) {
-            $capabilityIds[] = $capabilityUsage->getCapability()->getId();
+            $capabilityIds[] = (int)$capabilityUsage->getCapability()->getId();
         }
         sort($capabilityIds);
         return $capabilityIds;
