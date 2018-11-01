@@ -54,9 +54,9 @@
                                 <time :title="article.publishAt.long">${ article.publishAt.relativeTime }</time>
                             </p>
 
-                            <p class="meta" v-if="Object.keys(article.topics).length">
+                            <p class="meta" v-if="article.topics.length">
                                 Related topics:
-                                <template v-for="(topic, key, index) in article.topics">
+                                <template v-for="(topic, index) in article.topics">
                                     <template v-if="index">, </template>
                                     <a :href="getIndexRoute + '?topic=' + topic.slug">${ topic.name }</a>
                                     {# TODO: recieve link via topic link decorator instead? #}
