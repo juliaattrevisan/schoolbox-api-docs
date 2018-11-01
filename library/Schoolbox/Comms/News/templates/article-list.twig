@@ -172,15 +172,18 @@
                     self.topicAll
                 ];
 
-                // Create an array of topics built from the articles returned
-                var topics = [];
+                // Add topics from the articles returned
+                var topicsAdded = [];
                 articles.map(function(article) {
                     article.topics.map(function(topic) {
-                        topics.push(Object.assign({}, topic));
+                        if (topicsAdded.indexOf(topic.slug) === -1) {
+                            topicsAdded.push(topic.slug);
+                            topics.push(Object.assign({}, topic));
+                        }
                     });
                 });
 
-                // TODO: make the above array unique
+                // TODO: sort the topics based on the sequence of the topics set in the DB
 
                 // Send the array to Vue
                 self.topics = topics;
