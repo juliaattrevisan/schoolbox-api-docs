@@ -51,7 +51,15 @@
                                 <time :title="article.publishAt.long">${ article.publishAt.relativeTime }</time>
                             </p>
 
-                            {# TODO: add topics #}
+                            <p class="meta" v-if="Object.keys(article.topics).length">
+                                Related topics:
+                                <template v-for="(topic, key, index) in article.topics">
+                                    <template v-if="index">, </template>
+                                    <a :href="getIndexRoute + '?topic=' + topic.slug">${ topic.name }</a>
+                                    {# TODO: recieve link via topic link decorator instead? #}
+                                    {# TODO: on the news feed- this link should just change the tab #}
+                                </template>
+                            </p>
                         </div>
                     </div>
 
