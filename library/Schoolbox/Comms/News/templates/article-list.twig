@@ -65,11 +65,10 @@
 
                     <nav>
                         <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
+                        {# TODO: add save for later #}
                     </nav>
-                    {# TODO: add save for later #}
 
-                    {# TODO: add blurb, defaulting back to body when there's no blurb, plus 'read only' functionality #}
-
+                    <article>${ article.blurb }</article>
                 </li>
             </ul>
 
@@ -150,7 +149,6 @@
 
             // Find some articles
             axios.get(self.getArticlesRoute).then(function(response) {
-                console.log(response);
                 var articles = response.data;
 
                 self.articlesLoading = false;
