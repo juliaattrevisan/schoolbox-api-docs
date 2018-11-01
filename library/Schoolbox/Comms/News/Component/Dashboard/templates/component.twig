@@ -1,6 +1,7 @@
 {#
  # News dashboard component
  # @param string queryStringPage
+ # @param string queryStringReferrer
  # @param string topicAll
  # @param string referrer
  #}
@@ -8,6 +9,7 @@
 <div id="news-container-{{ componentInstanceId }}">
     {% include '@commsNews/article-list.twig' with {
         queryStringPage: queryStringPage,
+        queryStringReferrer: queryStringReferrer,
         topicAll: topicAll,
         referrer: referrer
     } %}

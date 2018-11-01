@@ -9,6 +9,7 @@
  # @param int limit
  # @param string referrer
  # @param string queryStringPage
+ # @param string queryStringReferrer
  #}
 {% extends '@commsNews/page-layout.twig' %}
 
@@ -32,6 +33,7 @@
     {% include '@commsNews/article-list.twig' with {
         initialPage: initialPage,
         queryStringPage: queryStringPage,
+        queryStringReferrer: queryStringReferrer,
         topicAll: topicAll,
         referrer: referrer
     } %}
