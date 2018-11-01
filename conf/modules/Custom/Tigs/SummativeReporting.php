@@ -34,8 +34,8 @@ class SummativeReporting extends ModuleLoader
 
         $basePath = '/modules/custom/tigs/summative';
 
-        $this->loadModule($kernel, Summative\Admin\Module::class, "{$basePath}/admin", Summative\Admin\Module::BASE_NAME);
-        $this->loadModule($kernel, Summative\Comment\Module::class, "{$basePath}/comments", Summative\Comment\Module::BASE_NAME);
-        $this->loadModule($kernel, Summative\Report\Module::class, $basePath, Summative\Report\Module::BASE_NAME);
+        $this->loadModule($kernel, Summative\Admin\Module::class, "{$basePath}/admin");
+        $this->loadModule($kernel, Summative\Comment\Module::class, "{$basePath}/comments");
+        $this->loadModule($kernel, Summative\Report\Module::class, $basePath);
     }
 }

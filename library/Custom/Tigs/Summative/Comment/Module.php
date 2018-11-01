@@ -21,6 +21,15 @@ class Module extends Alaress\Module\Module
     /**
      * @inheritdoc
      */
+    public function __construct(ContainerInterface $injector, string $basename = '')
+    {
+        parent::__construct($injector, $basename ?: self::BASE_NAME);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     protected function registerRoutes(): void
     {
         $isStaff = new Alaress\Authorizer\Rule\HasRole(Role::STAFF);
@@ -29,6 +38,7 @@ class Module extends Alaress\Module\Module
         $this->register('GET', '/folder/{folderId}/term/{termSlug}', 'getTeacherComments', $isStaff);
     }
 
+
     /**
      * @inheritdoc
      */
@@ -36,6 +46,7 @@ class Module extends Alaress\Module\Module
     {
         $injector->set('controller:' . self::BASE_NAME, $injector->lazyNew(Controller::class));
     }
+
 
     /**
      * @inheritdoc
