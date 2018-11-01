@@ -63,12 +63,10 @@
                         </div>
                     </div>
 
-                    {# TODO: need the modify route (with auth) sent from the backend
-                     # TODO: add save for later
                     <nav>
                         <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
                     </nav>
-                    #}
+                    {# TODO: add save for later #}
 
                     {# TODO: add blurb, defaulting back to body when there's no blurb, plus 'read only' functionality #}
 
