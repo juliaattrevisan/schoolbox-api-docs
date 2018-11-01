@@ -600,7 +600,7 @@ class Controller extends Base
         $articleIds = $this->articleResolver->findArticlesForUser($this->getUser());
         $articleIds = $this->newsMapper->findArticlesIdsPublished($articleIds);
 
-        $articles = $this->newsMapper->findByColumn('id', $articleIds);
+        $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
 
         $map = [
             'id',

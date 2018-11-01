@@ -309,6 +309,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
         $articleIds = [];
         $pb = $this->getPredicatePublished();
+        $pb->in('id',$availableArticleIds);
         $where = implode("\nAND ", $pb->getWhere());
 
         $query = "
