@@ -246,7 +246,7 @@ class Grid
     public function isCompatibleWith(Grid $other): bool
     {
         // Check the assessment is the same
-        if ($this->getAssessment()->getId() !== $other->getAssessment()->getId()) {
+        if ($this->assessment->getId() !== $other->assessment->getId()) {
             return false;
         }
 
@@ -257,7 +257,7 @@ class Grid
 
         // Now we know the capabilities in use are the same.
         // Check each usage is compatible with the usage in the other.
-        foreach ($this->getCapabilityUsages() as $thisCapabilityUsage) {
+        foreach ($this->capabilityUsages as $thisCapabilityUsage) {
             if (!$thisCapabilityUsage->isCompatibleWith(
                 $other->retrieveCapabilityUsage($thisCapabilityUsage->getCapability())
             )) {

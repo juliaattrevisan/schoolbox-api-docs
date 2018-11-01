@@ -242,7 +242,7 @@ class IndicatorUsage
     public function isCompatibleWith(IndicatorUsage $other): bool
     {
         // Check it's the same indicator
-        if ($this->getIndicator()->getId() !== $other->getIndicator()->getId()) {
+        if ($this->indicator->getId() !== $other->indicator->getId()) {
             return false;
         }
 

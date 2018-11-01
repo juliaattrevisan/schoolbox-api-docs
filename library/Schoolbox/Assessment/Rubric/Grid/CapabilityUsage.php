@@ -161,7 +161,7 @@ class CapabilityUsage
     public function isCompatibleWith(CapabilityUsage $other): bool
     {
         // Check it's the same capability
-        if ($this->getCapability()->getId() !== $other->getCapability()->getId()) {
+        if ($this->capability->getId() !== $other->capability->getId()) {
             return false;
         }
 
@@ -172,7 +172,7 @@ class CapabilityUsage
 
         // Now we know the indicators in use are the same.
         // Check each usage is compatible with the usage in the other.
-        foreach ($this->getIndicatorUsages() as $thisIndicatorUsage) {
+        foreach ($this->indicatorUsages as $thisIndicatorUsage) {
             if (!$thisIndicatorUsage->isCompatibleWith(
                 $other->retrieveIndicatorUsage($thisIndicatorUsage->getIndicator())
             )) {
