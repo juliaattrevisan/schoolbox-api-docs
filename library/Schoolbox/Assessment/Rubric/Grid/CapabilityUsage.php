@@ -165,6 +165,11 @@ class CapabilityUsage
             return false;
         }
 
+        // Check that the mark-per-cap value hasn't changed
+        if ($this->maxValue !== $other->maxValue) {
+            return false;
+        }
+
         // Check the same indicators are in use
         if ($this->retrieveUsedIndicatorIds() !== $other->retrieveUsedIndicatorIds()) {
             return false;

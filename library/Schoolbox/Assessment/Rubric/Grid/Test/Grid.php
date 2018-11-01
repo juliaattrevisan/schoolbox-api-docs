@@ -615,7 +615,7 @@ class Grid extends TestCase
             $grid2CapUsages
         );
 
-        yield "different max points per capability" => [$grid1, $grid2, true];
+        yield "different max points per capability" => [$grid1, $grid2, false];
 
 
 
