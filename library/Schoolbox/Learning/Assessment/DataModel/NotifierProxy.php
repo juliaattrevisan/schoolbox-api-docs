@@ -11,6 +11,8 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 use Alaress\Diff\Differ;
 use Schoolbox\Assessment\Participant\Mapper as ParticipantMapper;
 use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Dehydrator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
@@ -106,6 +108,10 @@ class NotifierProxy
      */
     public function notify(IAssessable $assessment, User $effector, array $before): void
     {
+        if (!($assessment instanceof DueWork) && !($assessment instanceof Quiz)) {
+            return;
+        }
+
         $diff = $this->differ->diff($this->dehydrate($assessment), $before);
         if ($assessment->isDeleted()) {
             $action = PlanMapper::METHOD_DELETE;
