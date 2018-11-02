@@ -82,7 +82,7 @@
 
                     <nav>
                         <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
-                        <a :class="[ savedArticleIds.indexOf(article.id) >= 0 ? 'icon-favourite': 'icon-favourite-hollow' ]" title="Save for later"></a>
+                        <a @click="onSaveForLater(article.id)" :class="[ savedArticleIds.indexOf(article.id) >= 0 ? 'icon-favourite': 'icon-favourite-hollow' ]" title="Save for later"></a>
                     </nav>
 
                     <article v-if="!compactMode">
@@ -352,6 +352,23 @@
 
                 // Update the RSS link (which lives in a different Vue component)
                 rssLink.topic = tab;
+            },
+
+            /**
+             * Save an article for later
+             *
+             * @param {int} articleId - ID of the article to save
+             */
+            onSaveForLater: function(articleId) {
+                var self = this;
+
+                if (self.savedArticleIds.indexOf(articleId) >= 0) {
+                    // Article is already saved; this is an "unsave" action
+                    console.log("Unsaving article");
+                } else {
+                    // Save the article for later
+                    console.log("Saving article for later");
+                }
             }
         },
         computed: {
