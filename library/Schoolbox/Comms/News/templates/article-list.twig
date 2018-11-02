@@ -9,6 +9,7 @@
  # @param string topicAll - The slug for the 'all' tab
  # @param string referrer - Referrer for stats logging
  # @param bool changeTabOnMeta - On click of a topic in a news card meta- whether to change tab on the current page or not 
+ # @param bool modifyWindowState - If true- push changes to the window state
  #}
 
 {% if not initialPage %}
@@ -165,7 +166,10 @@
             initialPage: {{ initialPage }},
 
             // The initial topic the user started on, used for history API
-            initialTopic: '{{ topic }}' || topicAllObject.slug
+            initialTopic: '{{ topic }}' || topicAllObject.slug,
+
+            // Controls whether this will modify the window state at all (going to disable this on dashboard component)
+            modifyWindowState: {{ modifyWindowState ? 'true' : 'false' }}
         },
         mounted: function () {
             var self = this;
@@ -216,25 +220,27 @@
             });
 
             // Listen for window state change
-            window.onpopstate = function(event) {
-                if (!event.state) {
-                    // Return to defaults
-                    self.page = self.initialPage;
-                    self.onPaginate(self.page, true);
-                    self.tabSelected = self.initialTopic;
-                    self.onTabChange(self.tabSelected, true, true);
-                } else {
-                    if (event.state.page) {
-                        self.page = event.state.page;
-                        self.onPaginate(event.state.page, true);
-                    }
+            if (self.modifyWindowState) {
+                window.onpopstate = function(event) {
+                    if (!event.state) {
+                        // Return to defaults
+                        self.page = self.initialPage;
+                        self.onPaginate(self.page, true);
+                        self.tabSelected = self.initialTopic;
+                        self.onTabChange(self.tabSelected, true, true);
+                    } else {
+                        if (event.state.page) {
+                            self.page = event.state.page;
+                            self.onPaginate(event.state.page, true);
+                        }
 
-                    if (event.state.tab) {
-                        self.tabSelected = event.state.tab;
-                        self.onTabChange(event.state.tab, true, true);
+                        if (event.state.tab) {
+                            self.tabSelected = event.state.tab;
+                            self.onTabChange(event.state.tab, true, true);
+                        }
                     }
-                }
-            };
+                };
+            }
         },
         methods: {
             /*
@@ -245,7 +251,7 @@
              */
             onPaginate: function (page, holdState) {
                 // Update the window history
-                if (!holdState) {
+                if (!holdState && this.modifyWindowState) {
                     var params;
                     if (this.tabSelected === this.topicAll.slug) {
                         params = '?' + this.queryStringPage + '=' + page;
@@ -286,7 +292,7 @@
                 }
 
                 // Update the window history
-                if (!holdState) {
+                if (!holdState && this.modifyWindowState) {
                     window.history.pushState({tab: tab, page: self.page}, '', '?topic=' + tab);
                 }
             }
