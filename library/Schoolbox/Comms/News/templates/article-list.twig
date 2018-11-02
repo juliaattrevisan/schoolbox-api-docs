@@ -226,9 +226,10 @@
         mounted: function () {
             var self = this;
 
-            axios.get(self.getSavedArticlesRoute).then(function(response) {
-                self.savedArticleIds = response.data;
-            }).catch(function (error) {
+            $.get(self.getSavedArticlesRoute).then(function(data) {
+                console.log(data);
+                self.savedArticleIds = data;
+            }).fail(function (error) {
                 console.log(error);
             });
 
@@ -371,28 +372,26 @@
             /**
              * Save an article for later
              *
-             * @param {int} articleId - ID of the article to save
+             * @param articleId - ID of the article to save
              */
             saveForLater: function(articleId) {
                 var self = this;
-                console.log("Article ID: " + articleId);
 
                 if (self.savedArticleIds.indexOf(articleId) >= 0) {
                     // Article is already saved; this is an "unsave" action
-                    console.log("Unsaving article");
-
-                    axios.post(self.postUnsaveArticleForLaterRoute, {'articleId': articleId}).then(function() {
-                        // TODO toggle icon state if successful
-                    }).catch(function (error) {
+                    $.post(self.postUnsaveArticleForLaterRoute, {'articleId': articleId}, function(data) {
+                        console.log(data);
+                        self.savedArticleIds = data;
+                    }).fail(function (error) {
                         console.log(error);
                     });
                 } else {
                     // Save the article for later
-                    console.log("Saving article for later");
+                    $.post(self.postSaveArticleForLaterRoute, {'articleId': articleId}, function(data) {
+                        console.log(data);
 
-                    axios.post(self.postSaveArticleForLaterRoute, {'articleId': articleId}).then(function() {
-                        // TODO toggle icon state if successful
-                    }).catch(function (error) {
+                        self.savedArticleIds = data;
+                    }).fail(function (error) {
                         console.log(error);
                     });
                 }

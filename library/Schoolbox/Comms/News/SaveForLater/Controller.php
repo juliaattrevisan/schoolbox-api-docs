@@ -53,13 +53,12 @@ class Controller extends Base
      */
     public function getList(): void
     {
-        $articles = (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
+        $articles = $this->getSavedArticles();
 
         $params = new News\Querystring($this->getRequest()->query);
         $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
 
-        // TODO for some reason this thinks our requests is not XHR, so I've temporarily negated it
-        if ( !$this->isXhrRequest() ) {
+        if ( $this->isXhrRequest() ) {
             $data = $this->buildJsonOutput($articles->getPropertyValues('id'));
             $this->getResponse()->content->set($data);
             return;
@@ -102,6 +101,9 @@ class Controller extends Base
         ])->setTitle('Saved For Later'));
     }
 
+    private function getSavedArticles() {
+        return (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
+    }
 
     /**
      * Add an article to a user's 'saved-for-later' list.
@@ -122,8 +124,9 @@ class Controller extends Base
             $this->getResponse()->status->set(500);
         }
 
+        $savedArticles = $this->getSavedArticles()->getPropertyValues('id');
         if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->content->set($this->buildJsonOutput([]));
+            $this->getResponse()->content->set($this->buildJsonOutput($savedArticles));
             return;
         }
     }
@@ -149,8 +152,9 @@ class Controller extends Base
             $this->getResponse()->status->set(500);
         }
 
+        $savedArticles = $this->getSavedArticles()->getPropertyValues('id');
         if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->content->set($this->buildJsonOutput($response));
+            $this->getResponse()->content->set($this->buildJsonOutput($savedArticles));
             return;
         }
     }
