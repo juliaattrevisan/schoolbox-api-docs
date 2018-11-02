@@ -53,8 +53,7 @@ class Controller extends Base
      */
     public function getList(): void
     {
-        $articles = $this->getSavedArticles();
-
+        $articles = (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
         $params = new News\Querystring($this->getRequest()->query);
         $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
 
@@ -101,8 +100,14 @@ class Controller extends Base
         ])->setTitle('Saved For Later'));
     }
 
-    private function getSavedArticles() {
-        return (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
+    /**
+     * Get a list of IDs of articles that have been saved for later
+     *
+     * @return array|int[]
+     */
+    private function getSavedArticleIds() : array
+    {
+        return (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId())->getPropertyValues('id');
     }
 
     /**
@@ -110,11 +115,11 @@ class Controller extends Base
      *
      * No error if item is already added to list when this is called.
      *
-     * @api POST /news/saved/add
+     * @param News\Model $article
+     * @api POST /news/saved/{articleId}/add
      */
     public function postAdd(News\Model $article): void
     {
-//        $articleId = $this->request->post->get('articleId');
         try {
             $this->addArticleToUserSavedList($article, $this->getUser());
         } catch (BaseMapper\Exception|PDOException|UnexpectedValueException $e) {
@@ -123,7 +128,7 @@ class Controller extends Base
             $this->getResponse()->status->set(500);
         }
 
-        $savedArticles = $this->getSavedArticles()->getPropertyValues('id');
+        $savedArticles = $this->getSavedArticleIds();
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->content->set($this->buildJsonOutput($savedArticles));
             return;
@@ -136,14 +141,12 @@ class Controller extends Base
      *
      * No error if item was not in list when route was called.
      *
-     * @api POST /news/saved/remove
+     * @param News\Model $article
+     * @api POST /news/saved/{articleId}/remove
      */
     public function postRemove(News\Model $article): void
     {
-//        $articleId = $this->request->post->get('articleId');
-
         try {
-//            $article = $this->newsMapper->findById($articleId);
             $this->removeArticleFromUserSavedList($article, $this->getUser());
         } catch (BaseMapper\Exception $e) {
             // Server-side error, not the client's fault. Developers to be alerted.
@@ -151,7 +154,7 @@ class Controller extends Base
             $this->getResponse()->status->set(500);
         }
 
-        $savedArticles = $this->getSavedArticles()->getPropertyValues('id');
+        $savedArticles = $this->getSavedArticleIds();
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->content->set($this->buildJsonOutput($savedArticles));
             return;
