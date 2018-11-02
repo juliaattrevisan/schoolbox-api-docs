@@ -1,31 +1,25 @@
 {##
- # A list of all the available Topics to chooze
- # Sets up a container for async article loading
+ # News feed page
  #
- # @param Collection|Topic[] topics
+ # Shows the news component, with no limits and pagination, plus an RSS link
+ #
+ # @param int initialPage
  # @param string topicAll
- # @param string slug
- # @param int compactMode
- # @param int limit
+ # @param string topic
  # @param string referrer
  # @param string queryStringPage
  # @param string queryStringReferrer
+ # @param string queryStringTopic
+ # @param string key
  #}
 {% extends '@commsNews/page-layout.twig' %}
 
 {% block newsTitle %}{{ locale.news.proper }} Feed{% endblock %}
 
-{% block archiveLink %}
-    {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') %}
-    {% if archiveRoute %}
-        <a href="{{ archiveRoute }}" class='icon-archive' title="View archived {{ locale.news }}"></a>
-    {% endif %}
-{% endblock %}
-
 {% block rssLink %}
     {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key}) %}
-    {% if rssRoute and slug %}
-        <li><a href="{{ rssRoute }}?topic={{ slug }}" class='icon-rss' title="Download RSS feed for this topic" id="rss">RSS Link</a></li>
+    {% if rssRoute and topic %}
+        <li><a href="{{ rssRoute }}?{{ queryStringTopic }}={{ topic }}" class='icon-rss' title="Download RSS feed for this topic" id="rss">RSS Link</a></li>
     {% endif %}
 {% endblock %}
 
@@ -34,28 +28,10 @@
         initialPage: initialPage,
         queryStringPage: queryStringPage,
         queryStringReferrer: queryStringReferrer,
+        topic: topic,
         topicAll: topicAll,
-        referrer: referrer
+        referrer: referrer,
+        changeTabOnMeta: true,
+        modifyWindowState: true
     } %}
 {% endblock %}
-
-{% block newsScripts %}
-    <script src="/javascript/shared/comms/articletabs.js"></script>
-    <script src="/javascript/shared/comms/saveforlater.js"></script>
-    <script>
-        $(function() {
-            var $newContainer = $('#news-container');
-
-            $newContainer.articleTabs({
-                'topicTabs': $('#news-topics'),
-                'updateUrl': true,
-                onChangeSuccess: function(response) {
-                    $('#rss').attr('href', '{{ rssRoute }}?topic=' + response.slug);
-                }
-            });
-
-            $newContainer.saveForLater();
-        });
-    </script>
-{% endblock %}
-

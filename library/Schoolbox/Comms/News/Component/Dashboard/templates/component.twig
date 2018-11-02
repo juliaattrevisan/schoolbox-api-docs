@@ -2,6 +2,7 @@
  # News dashboard component
  # @param string queryStringPage
  # @param string queryStringReferrer
+ # @param string queryStringTopic
  # @param string topicAll
  # @param string referrer
  #}
@@ -10,7 +11,10 @@
     {% include '@commsNews/article-list.twig' with {
         queryStringPage: queryStringPage,
         queryStringReferrer: queryStringReferrer,
+        queryStringTopic: queryStringTopic,
         topicAll: topicAll,
-        referrer: referrer
+        referrer: referrer,
+        changeTabOnMeta: false,
+        modifyWindowState: false
     } %}
 </div>
