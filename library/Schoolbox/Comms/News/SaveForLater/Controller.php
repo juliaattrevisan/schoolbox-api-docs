@@ -58,7 +58,8 @@ class Controller extends Base
         $params = new News\Querystring($this->getRequest()->query);
         $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
 
-        if ( $this->isXhrRequest() ) {
+        // TODO for some reason this thinks our requests is not XHR, so I've temporarily negated it
+        if ( !$this->isXhrRequest() ) {
             $this->getResponse()->content->set($this->buildJsonOutput($articles->getPropertyValues('id')));
             return;
         }

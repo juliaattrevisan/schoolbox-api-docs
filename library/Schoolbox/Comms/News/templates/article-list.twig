@@ -152,6 +152,9 @@
             // Route for retrieving all the articles
             getArticlesRoute: '{{ routeLookup('commsNews.getListForUser') }}',
 
+            // Route for retrieving all the articles
+            getSavedArticlesRoute: '{{ routeLookup('commsNewsSaveForLater.getList') }}',
+
              // Route for news feed page
             getIndexRoute: '{{ routeLookup('commsNews.getIndex') }}',
 
@@ -208,6 +211,10 @@
         },
         mounted: function () {
             var self = this;
+
+            axios.get(self.getSavedArticlesRoute).then(function(response) {
+               console.log(response);
+            });
 
             // Find some articles
             axios.get(self.getArticlesRoute).then(function(response) {
