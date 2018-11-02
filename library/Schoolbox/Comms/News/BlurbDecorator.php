@@ -13,6 +13,21 @@ use Scrub;
 
 class BlurbDecorator implements IDecorator
 {
+
+    /**
+     * @var string
+     */
+    private $readmore;
+
+    /**
+     * @param string     $readmore
+     */
+    public function __construct($readmore)
+    {
+        $this->readmore = $readmore;
+    }
+
+
     /**
      * @param array  $json
      * @param object $model
@@ -27,6 +42,15 @@ class BlurbDecorator implements IDecorator
 
         if (!$model->getBlurb()) {
             $json['blurb'] = TextFormatter::cutSentence(Scrub::html2text($model->getBody()), 300);
+        }
+
+        if($model->getBody() && $json['blurb'] != $model->getBody() ) {
+            $json['readmore']['string'] = $this->readmore;
+            $json['readmore']['available'] = true;
+        }
+        else {
+            $json['readmore']['string'] = '';
+            $json['readmore']['available'] = false;
         }
 
         return $json;

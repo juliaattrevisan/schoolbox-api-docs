@@ -624,7 +624,7 @@ class Controller extends Base
 
         $articles->reindex();
         $articles = $articles->jsonSerialize(
-            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()), new BlurbDecorator())
+            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()), new BlurbDecorator($this->getConfigLoader()->get('read_more')))
         );
 
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
@@ -994,7 +994,7 @@ class Controller extends Base
 
         $articles->reindex();
         $articles = $articles->jsonSerialize(
-            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser(), new BlurbDecorator()))
+            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser(), new BlurbDecorator($this->getConfigLoader()->get('read_more'))))
         );
 
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
