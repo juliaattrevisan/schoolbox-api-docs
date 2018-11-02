@@ -224,8 +224,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         // Trigger different notifs depending on what assessment type was saved
         $assessment = $plan->getAssessment();
 
-        // Projects cause too many problems to not shortcut out immediately
-        if ($assessment->getProject()) {
+        // Quiz and due work will trigger notification.
+        if (!$assessment->getQuiz() && !$assessment->getDueWork()) {
             return;
         }
 
@@ -351,6 +351,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $upcomingDate = (clone $dueDate)->addHours(-self::QUIZ_UPCOMING_WINDOW);
         } elseif ($assessment->getDueWork()) {
             $upcomingDate = (clone $dueDate)->addHours(-self::DUEWORK_UPCOMING_WINDOW);
+        } else {
+            // this shouldn't happen
+            return;
         }
         if ($upcomingDate->lt($openDate)) {
             $upcomingDate = (clone $openDate)->addMinutes(1);
