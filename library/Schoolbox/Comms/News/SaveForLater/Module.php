@@ -48,8 +48,8 @@ class Module extends BaseModule
         };
 
         $this->register('GET', '', 'getList', $canViewList);
-        $this->register('POST', '/{articleId}/add', 'postAdd', $canAdd, $preloadNews);
-        $this->register('POST', '/{articleId}/remove', 'postRemove', $canRemove, $preloadNews);
+        $this->register('POST', '/add', 'postAdd', $canAdd);
+        $this->register('POST', '/remove', 'postRemove', $canRemove);
     }
 
     /**

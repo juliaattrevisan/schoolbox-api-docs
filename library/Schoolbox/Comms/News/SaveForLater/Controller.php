@@ -108,13 +108,13 @@ class Controller extends Base
      *
      * No error if item is already added to list when this is called.
      *
-     * @api POST /news/saved/{articleId}
-     *
-     * @param News\Model $article
+     * @api POST /news/saved/add
      */
-    public function postAdd(News\Model $article): void
+    public function postAdd(): void
     {
+        $articleId = $this->request->post->get('articleId');
         try {
+            $article = $this->newsMapper->findById($articleId);
             $this->addArticleToUserSavedList($article, $this->getUser());
         } catch (BaseMapper\Exception|PDOException|UnexpectedValueException $e) {
             // Server-side error, not the client's fault. Developers to be alerted.
@@ -134,12 +134,14 @@ class Controller extends Base
      *
      * No error if item was not in list when route was called.
      *
-     * @param News\Model $article
+     * @api POST /news/saved/remove
      */
-    public function postRemove(News\Model $article): void
+    public function postRemove(): void
     {
-        $response = [];
+        $articleId = $this->request->post->get('articleId');
+
         try {
+            $article = $this->newsMapper->findById($articleId);
             $this->removeArticleFromUserSavedList($article, $this->getUser());
         } catch (BaseMapper\Exception $e) {
             // Server-side error, not the client's fault. Developers to be alerted.

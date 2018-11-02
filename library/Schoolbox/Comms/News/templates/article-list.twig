@@ -82,7 +82,7 @@
 
                     <nav>
                         <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
-                        <a @click="onSaveForLater(article.id)" :class="[ savedArticleIds.indexOf(article.id) >= 0 ? 'icon-favourite': 'icon-favourite-hollow' ]" title="Save for later"></a>
+                        <a @click="saveForLater(article.id)" :class="[ savedArticleIds.indexOf(article.id) >= 0 ? 'icon-favourite': 'icon-favourite-hollow' ]" title="Save for later"></a>
                     </nav>
 
                     <article v-if="!compactMode">
@@ -159,6 +159,12 @@
 
              // Route for news feed page
             getIndexRoute: '{{ routeLookup('commsNews.getIndex') }}',
+
+            // Route to add an article to Saved For Later
+            postSaveArticleForLaterRoute: '{{ routeLookup('commsNewsSaveForLater.postAdd') }}',
+
+            // Route to remove an article from Saved For Later
+            postUnsaveArticleForLaterRoute: '{{ routeLookup('commsNewsSaveForLater.postRemove') }}',
 
             // Config that's used for number of items per page
             configSearchTypeLimit: {{ config.search_type_limit }},
@@ -361,15 +367,28 @@
              *
              * @param {int} articleId - ID of the article to save
              */
-            onSaveForLater: function(articleId) {
+            saveForLater: function(articleId) {
                 var self = this;
+                console.log("Article ID: " + articleId);
 
                 if (self.savedArticleIds.indexOf(articleId) >= 0) {
                     // Article is already saved; this is an "unsave" action
                     console.log("Unsaving article");
+
+                    axios.post(self.postUnsaveArticleForLaterRoute, {'articleId': articleId}).then(function() {
+                        // TODO toggle icon state if successful
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
                 } else {
                     // Save the article for later
                     console.log("Saving article for later");
+
+                    axios.post(self.postSaveArticleForLaterRoute, {'articleId': articleId}).then(function() {
+                        // TODO toggle icon state if successful
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
                 }
             }
         },
