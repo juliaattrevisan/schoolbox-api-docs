@@ -101,10 +101,6 @@
     'use strict';
 
     var topicAll = '{{ topicAll }}';
-    var topicAllObject = {
-        name: topicAll.charAt(0).toUpperCase() + topicAll.slice(1), // Capitalise for human consumption
-        slug: topicAll
-    };
 
     var app = new Vue({
         el: '#news-component',
@@ -132,7 +128,7 @@
             filteredArticles: [],
 
             // The selected tab's slug
-            tabSelected: '{{ topic }}' || topicAllObject.slug,
+            tabSelected: '{{ topic }}',
 
             // Route for retrieving all the articles
             getArticlesRoute: '{{ routeLookup('commsNews.getListForUser') }}',
@@ -152,8 +148,11 @@
             // The string to use for referrer in the URL
             queryStringReferrer: '{{ queryStringReferrer }}',
 
-            // Slug for the 'all' tab
-            topicAll: topicAllObject,
+            // Object for the 'all' tab
+            topicAll: {
+                name: topicAll.charAt(0).toUpperCase() + topicAll.slice(1), // Capitalise for human consumption
+                slug: topicAll
+            },
 
             // Referrer for stats logging
             referrer: '{{ referrer }}',

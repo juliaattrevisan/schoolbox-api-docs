@@ -6,7 +6,7 @@
  # @param topic
  # @param Collection|Topic[] topics
  # @param string topicAll
- # @param string slug
+ # @param string topic
  # @param int compactMode
  # @param int limit
  # @param string referrer
@@ -26,8 +26,8 @@
 
 {% block rssLink %}
     {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key}) %}
-    {% if rssRoute and slug %}
-        <li><a href="{{ rssRoute }}?topic={{ slug }}" class='icon-rss' title="Download RSS feed for this topic" id="rss">RSS Link</a></li>
+    {% if rssRoute and topic %}
+        <li><a href="{{ rssRoute }}?topic={{ topic }}" class='icon-rss' title="Download RSS feed for this topic" id="rss">RSS Link</a></li>
     {% endif %}
 {% endblock %}
 
