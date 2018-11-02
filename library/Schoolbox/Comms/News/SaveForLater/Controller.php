@@ -112,11 +112,10 @@ class Controller extends Base
      *
      * @api POST /news/saved/add
      */
-    public function postAdd(): void
+    public function postAdd(News\Model $article): void
     {
-        $articleId = $this->request->post->get('articleId');
+//        $articleId = $this->request->post->get('articleId');
         try {
-            $article = $this->newsMapper->findById($articleId);
             $this->addArticleToUserSavedList($article, $this->getUser());
         } catch (BaseMapper\Exception|PDOException|UnexpectedValueException $e) {
             // Server-side error, not the client's fault. Developers to be alerted.
@@ -139,12 +138,12 @@ class Controller extends Base
      *
      * @api POST /news/saved/remove
      */
-    public function postRemove(): void
+    public function postRemove(News\Model $article): void
     {
-        $articleId = $this->request->post->get('articleId');
+//        $articleId = $this->request->post->get('articleId');
 
         try {
-            $article = $this->newsMapper->findById($articleId);
+//            $article = $this->newsMapper->findById($articleId);
             $this->removeArticleFromUserSavedList($article, $this->getUser());
         } catch (BaseMapper\Exception $e) {
             // Server-side error, not the client's fault. Developers to be alerted.
