@@ -959,11 +959,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         $this->htmlConverter->setHtml($pastoral->getBodyPublic());
         $bodyPublicText = $this->htmlConverter->getText();
-        $bodyPublicText = html_entity_decode($bodyPublicText, ENT_QUOTES);
+        $bodyPublicText = utf8_decode(html_entity_decode($bodyPublicText, ENT_QUOTES));
 
         $this->htmlConverter->setHtml($pastoral->getBodyPrivate());
         $bodyPrivateText = $this->htmlConverter->getText();
-        $bodyPrivateText = html_entity_decode($bodyPrivateText, ENT_QUOTES);
+        $bodyPrivateText = utf8_decode(html_entity_decode($bodyPrivateText, ENT_QUOTES));
 
 
         // Return an array containing the parameters for the insert/update query
