@@ -74,7 +74,12 @@
                         {# TODO: add save for later #}
                     </nav>
 
-                    <article v-html="article.blurb"></article>
+                    <article>
+                        <div v-html="article.blurb"></div>
+                        <div style="margin-top:.5rem;">
+                            <a v-if="article.readmore.available" :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>
+                        </div>
+                    </article>
                 </li>
             </ul>
 
