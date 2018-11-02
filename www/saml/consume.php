@@ -90,6 +90,7 @@ else if(isset($_POST['SAMLResponse'])) {
         $msg = 'Invalid SAML user.';
         $errorTracker[] = $msg;
         SAMLDebugLog($msg);
+        error(ErrorMapper::ERROR_USER_NOT_FOUND);
     }
 }
 else {
