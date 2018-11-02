@@ -60,7 +60,8 @@ class Controller extends Base
 
         // TODO for some reason this thinks our requests is not XHR, so I've temporarily negated it
         if ( !$this->isXhrRequest() ) {
-            $this->getResponse()->content->set($this->buildJsonOutput($articles->getPropertyValues('id')));
+            $data = $this->buildJsonOutput($articles->getPropertyValues('id'));
+            $this->getResponse()->content->set($data);
             return;
         }
 

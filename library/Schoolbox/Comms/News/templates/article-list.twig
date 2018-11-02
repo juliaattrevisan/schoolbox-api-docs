@@ -82,7 +82,7 @@
 
                     <nav>
                         <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
-                        {# TODO: add save for later #}
+                        <a :class="[ savedArticleIds.indexOf(article.id) >= 0 ? 'icon-favourite': 'icon-favourite-hollow' ]" title="Save for later"></a>
                     </nav>
 
                     <article v-if="!compactMode">
@@ -144,6 +144,8 @@
 
             // *All* the author's articles
             allArticles: [],
+
+            savedArticleIds: [],
 
             // A container for a filtered list of authored articles
             // Will be populated as all articles on load
@@ -213,7 +215,7 @@
             var self = this;
 
             axios.get(self.getSavedArticlesRoute).then(function(response) {
-               console.log(response);
+                self.savedArticleIds = response.data;
             });
 
             // Find some articles
