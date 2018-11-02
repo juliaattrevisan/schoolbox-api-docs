@@ -54,7 +54,8 @@
                 <div class="empty-state no-margin" v-if="!filteredArticles.length && !articlesLoading">
                     <i class="icon-news"></i>
                     <p>You haven't authored any {{ locale.news.plural }}.</p>
-                    <p><a href="{{ routeLookupIfAuthorized('commsNews.getCreate') }}">Create {{ locale.news }}</a>.</p>
+                    {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+                    {% if createRoute %}<p><a href="{{ createRoute }}">Create {{ locale.news }}</a>.</p>{% endif %}
                 </div>
 
             </div>

@@ -189,7 +189,7 @@ class Folder extends SimpleStrategy
      * @throws InvalidColumnException
      * @throws Mapper\DefinitionException
      */
-    public function getAudiencingSql(User $user, string $searchPlaceholder = null): string
+    public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
     {
         $folderMembershipSql = '';
         $entityType          = self::getEntityType();
@@ -208,7 +208,7 @@ class Folder extends SimpleStrategy
              * I'm restricted from seeing any folders
              */
             if (!\count($folderMembership)) {
-                return '';
+                return null;
             }
 
             /* Otherwise, restrict my search results to these folders only

@@ -195,7 +195,8 @@ class Controller extends Base
             // Ensure the user is permitted to target this entity type
             if ($folderStrategy->canAudienceToEntityType($this->getUser())) {
                 // Ensure the user is permitted to target this entity value
-                $availableFolders   = $this->databaseInternal->executeQuery($folderStrategy->getAudiencingSql($this->getUser()))->fetchAll();
+                $sql = $folderStrategy->getAudiencingSql($this->getUser());
+                $availableFolders   = $sql ? $this->databaseInternal->executeQuery($sql)->fetchAll() : [];
                 $availableFolderIds = \array_column($availableFolders, 'id');
                 if (\in_array($groupId, $availableFolderIds, false)) {
                     $codec = new Audience\Segment\Codec($this->audienceMapper);

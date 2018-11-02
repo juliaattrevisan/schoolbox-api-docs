@@ -44,7 +44,7 @@ class User extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getAudiencingSql(\Schoolbox\User $user, string $searchPlaceholder = null): string
+    public function getAudiencingSql(\Schoolbox\User $user, string $searchPlaceholder = null): ?string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "AND (firstname LIKE :{$searchPlaceholder} OR lastname LIKE :{$searchPlaceholder})";
 

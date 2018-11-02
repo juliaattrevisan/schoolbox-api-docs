@@ -34,11 +34,13 @@ interface ISimpleStrategy extends IStrategy
      * This data is ultimately used to generate a list of (id, name) tuples originally
      * used in selectize's search suggestions list for a given keyword.
      *
+     * Returns NULL if no query is available. Callers need to check for this.
+     *
      * @param User   $user              Only return results that should be visible to this user
      * @param string $searchPlaceholder If specified, include a WHERE clause to filter by keyword
-     * @return string
+     * @return string|null
      */
-    public function getAudiencingSql(User $user, string $searchPlaceholder = null): string;
+    public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string;
 
 
     /**
