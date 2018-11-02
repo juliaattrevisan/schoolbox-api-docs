@@ -42,24 +42,3 @@
         topic: topic
     } %}
 {% endblock %}
-
-{% block newsScripts %}
-    <script src="/javascript/shared/comms/articletabs.js"></script>
-    <script src="/javascript/shared/comms/saveforlater.js"></script>
-    <script>
-        $(function() {
-            var $newContainer = $('#news-container');
-
-            $newContainer.articleTabs({
-                'topicTabs': $('#news-topics'),
-                'updateUrl': true,
-                onChangeSuccess: function(response) {
-                    $('#rss').attr('href', '{{ rssRoute }}?topic=' + response.slug);
-                }
-            });
-
-            $newContainer.saveForLater();
-        });
-    </script>
-{% endblock %}
-
