@@ -125,24 +125,23 @@ class Controller extends Base
             return;
         }
 
-        $codec         = new Audience\Segment\Codec($this->audienceMapper);
-        $valueLabels   = [];
+        $codec = new Audience\Segment\Codec($this->audienceMapper);
 
         // Special case for folder, only show involved folders in the list
         if (Audience\Segment\Strategy\Folder::getEntityType() === $entityType) {
             $involvedFolders = $this->folderMapper->findForUser($this->getUser(), true, UserAccess::ACCESS_WRITE);
-            foreach ($involvedFolders as $folder) {
-                $valueLabels[$codec->encodeValue((string)$folder->getId())] = $folder->getNameWithCodes();
+            if ($involvedFolders->count()) {
+                $valueLabels = [];
+                foreach ($involvedFolders as $folder) {
+                    $valueLabels[$codec->encodeValue((string)$folder->getId())] = $folder->getNameWithCodes();
+                }
+            } else {
+                // No involved folders? Fall back to folders with WRITE+ access
+                $valueLabels = $this->buildValueLabels($strategy, $codec);
             }
         } else {
-            $sql = $strategy->getAudiencingSql($this->getUser());
-            if ($sql) {
-                $stmt = $this->db->executeQuery($sql);
-                /** @noinspection PhpAssignmentInConditionInspection */
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $valueLabels[$codec->encodeValue($row['id'])] = $row['name'];
-                }
-            }
+            // Normal case
+            $valueLabels = $this->buildValueLabels($strategy, $codec);
         }
 
         \uasort($valueLabels, function (string $left, string $right) {
@@ -151,9 +150,31 @@ class Controller extends Base
 
         $data = [
             'availableModifiers' => $strategy->getValidRelationshipModifiers(),
-            'canTargetNull'      => $strategy->canAudienceToEntityValue($this->getUser(), NULL),
+            'canTargetNull'      => $strategy->canAudienceToEntityValue($this->getUser(), null),
             'valueLabels'        => $valueLabels,
         ];
         $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+
+    /**
+     * Builds value labels for a segment strategy
+     *
+     * @param Audience\Segment\ISimpleStrategy $strategy
+     * @param Audience\Segment\Codec           $codec
+     * @return array
+     */
+    private function buildValueLabels(Audience\Segment\ISimpleStrategy $strategy, Audience\Segment\Codec $codec): array
+    {
+        $valueLabels = [];
+        $sql         = $strategy->getAudiencingSql($this->getUser());
+        if ($sql) {
+            $stmt = $this->db->executeQuery($sql);
+            /** @noinspection PhpAssignmentInConditionInspection */
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $valueLabels[$codec->encodeValue($row['id'])] = $row['name'];
+            }
+        }
+        return $valueLabels;
     }
 }
