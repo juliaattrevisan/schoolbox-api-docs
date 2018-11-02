@@ -840,30 +840,15 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-
         /* These referrers should be used, even when they're not explicitly provided in the url
          */
         $params = new Querystring($this->getRequest()->query);
         $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
 
-        $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
-        $lists = new Moderation\Lists($this->newsMapper);
-
-        /* The initial data set to load, given the params provided
-         * Compact Mode is hardcoded to be disabled from this context
-         * HidePaginator is always false in this context
-         */
-        $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
-
-        $partialData = $this->generatePartial($urlPrefix, $params, $topics, false, null, null);
-        $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
-
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
          */
         $data = [
-            'initialContent' => $content,
-            'topics' => $topics,
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'topic' => $params->getSlug() ?: 'all',
             'referrer' => $params->getReferrer(),

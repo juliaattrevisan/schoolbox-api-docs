@@ -28,21 +28,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     private $newsMapper;
 
-    /**
-     * @var TopicMapper
-     */
-    private $topicMapper;
-
-    /**
-     * @var Collection|Topic[]
-     */
-    private $topics;
-
-    /**
-     * @var string
-     */
-    private $slug;
-
 
     /**
      * Controller constructor.
@@ -57,7 +42,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
         parent::__construct($instance, $user, $sitepage);
 
         $this->newsMapper  = $this->getMapperFactory()->get(News\Mapper::class);
-        $this->topicMapper = $this->getMapperFactory()->get(TopicMapper::class);
     }
 
 
@@ -68,13 +52,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute(): bool
     {
-        $this->topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
-
-        /* Figure out the first topic to select by default
-         * This initiates an async to load actual articles
-         */
-        $this->slug = (bool)$this->getConfig('default') ? News\Mapper::TOPIC_ALL_SLUG : $this->topics->first()->getSlug();
-
         /* Only render component if there's potentially content somewhere
          * If there's any non-deleted articles for any of the topics
          * maybe the user can see it with their async request
@@ -100,9 +77,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
         return $this->renderTwigTemplate($templateHandle, '@commsNewsDashboard/component.twig', [
             'componentInstanceId' => $this->getInstance()->getId(),
-            'topics' => $this->topics,
+            'topic' => News\Mapper::TOPIC_ALL_SLUG,
             'topicAll' => News\Mapper::TOPIC_ALL_SLUG,
-            'slug' => $this->slug,
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => $limit,
             'referrer' => News\Statistics\Mapper::REFERRER_DASHBOARD,
