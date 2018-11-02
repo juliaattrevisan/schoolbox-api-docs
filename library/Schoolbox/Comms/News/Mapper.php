@@ -129,6 +129,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
      */
     protected function hydrateSelect(\PDOStatement $statement): \Schoolbox\GenericCollection
     {
@@ -177,6 +178,12 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             }
 
             $collection->setOffset($article->getId(), $article);
+        }
+
+        /* Reorder topics sequentially
+         */
+        foreach ($collection as $article) {
+            $article->getTopics()->sortBy('sequence', 'asc');
         }
 
         return $collection;
@@ -300,6 +307,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * @param array $availableArticleIds
      * @return array
+     * @throws InvalidColumnException
+     * @throws \UnderflowException
      */
     public function findArticlesIdsPublished(array $availableArticleIds): array
     {
