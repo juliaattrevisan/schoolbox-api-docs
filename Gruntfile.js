@@ -158,7 +158,7 @@ var jsSrc = {
     vue: [ // Death to jQuery!
         'node_modules/promise-polyfill/dist/polyfill.js',
         'node_modules/es6-object-assign/dist/object-assign-auto.js',
-        'node_modules/vue/dist/vue.js',
+        'node_modules/vue/dist/vue.min.js',
         'node_modules/vuejs-paginate/dist/index.js',
         'node_modules/axios/dist/axios.js'
     ]
