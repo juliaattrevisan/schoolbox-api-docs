@@ -855,6 +855,7 @@ class Controller extends Base
             'initialPage' => $params->getPageNum(),
             'queryStringPage' => Querystring::PAGE_NUMBER,
             'queryStringReferrer' => Querystring::REFERRER,
+            'queryStringTopic' => Querystring::TOPIC_SLUG,
 
             /* For configuring the rss button which changes per topic chosen
              */

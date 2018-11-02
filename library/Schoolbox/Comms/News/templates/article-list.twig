@@ -6,6 +6,7 @@
  # @param string|null topic - The topic to load by default
  # @param string queryStringPage - The string to use for page number in the URL
  # @param string queryStringReferrer - The string to use for referrer in the URL
+ # @param string queryStringTopic - The string to use for topic in the URL
  # @param string topicAll - The slug for the 'all' tab
  # @param string referrer - Referrer for stats logging
  # @param bool changeTabOnMeta - On click of a topic in a news card meta- whether to change tab on the current page or not 
@@ -62,7 +63,7 @@
                                 <template v-for="(topic, index) in article.topics">
                                     <template v-if="index">, </template>
                                     <a v-if="changeTabOnMeta" @click="onTabChange(topic.slug)">${ topic.name }</a>
-                                    <a v-else :href="getIndexRoute + '?topic=' + topic.slug">${ topic.name }</a>
+                                    <a v-else :href="getIndexRoute + '?' + queryStringTopic + '=' + topic.slug">${ topic.name }</a>
                                 </template>
                             </p>
                         </div>
@@ -142,11 +143,10 @@
             // Localisation of news
             localeNewsPlural: '{{ locale.news.plural }}',
 
-            // The string to use for page in the URL
+            // Strings to use for params in the URL
             queryStringPage: '{{ queryStringPage }}',
-
-            // The string to use for referrer in the URL
             queryStringReferrer: '{{ queryStringReferrer }}',
+            queryStringTopic: '{{ queryStringTopic }}',
 
             // Object for the 'all' tab
             topicAll: {
@@ -292,7 +292,7 @@
 
                 // Update the window history
                 if (!holdState && this.modifyWindowState) {
-                    window.history.pushState({tab: tab, page: self.page}, '', '?topic=' + tab);
+                    window.history.pushState({tab: tab, page: self.page}, '', '?' + self.queryStringTopic + '=' + tab);
                 }
             }
         },

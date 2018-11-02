@@ -84,6 +84,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             'referrer' => News\Statistics\Mapper::REFERRER_DASHBOARD,
             'queryStringPage' => News\Querystring::PAGE_NUMBER,
             'queryStringReferrer' => News\Querystring::REFERRER,
+            'queryStringTopic' => News\Querystring::TOPIC_SLUG,
         ]);
     }
 }
