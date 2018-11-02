@@ -159,7 +159,13 @@
 
             // Controls whether clicking on a topic in a news card meta will just change tab on the current screen,
             // or link off to the news feed page
-            changeTabOnMeta: '{{ changeTabOnMeta }}'
+            changeTabOnMeta: '{{ changeTabOnMeta }}',
+
+            // The initial page the user started on, used for history API
+            initialPage: {{ initialPage }},
+
+            // The initial topic the user started on, used for history API
+            initialTopic: '{{ topic }}' || topicAllObject.slug
         },
         mounted: function () {
             var self = this;
@@ -215,7 +221,7 @@
                     // Return to defaults
                     self.page = self.initialPage;
                     self.onPaginate(self.page, true);
-                    self.tabSelected = self.topicAll.slug;
+                    self.tabSelected = self.initialTopic;
                     self.onTabChange(self.tabSelected, true, true);
                 } else {
                     if (event.state.page) {
