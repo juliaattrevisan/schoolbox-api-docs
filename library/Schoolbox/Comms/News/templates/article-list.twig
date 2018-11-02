@@ -83,7 +83,7 @@
                     <nav>
                         <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
                         <template v-if="configSaveForLater">
-                            <a @click="saveForLater(article.id, article._links.saveForLater.auth, article._links.saveForLater.href, article._links.unsaveForLater.href)"
+                            <a @click="saveForLater(article)"
                                :class="[ savedArticleIds.indexOf(article.id) >= 0 ? 'icon-favourite': 'icon-favourite-hollow' ]"
                                title="Save for later"></a>
                         </template>
@@ -221,7 +221,6 @@
             var self = this;
 
             $.get(self.getSavedArticlesRoute).then(function(data) {
-                console.log(data);
                 self.savedArticleIds = data;
             }).fail(function (error) {
                 console.log(error);
@@ -366,28 +365,24 @@
             /**
              * Save an article for later
              *
-             * @param articleId              ID of the article to save for later
-             * @param {bool} authorised      Whether I'm authorised to access this route or not
-             * @param {string} routeSave     Route for saving this article for later
-             * @param {string} routeRemove   Route for removing this article from saved for later
+             * @param article
              */
-            saveForLater: function(articleId, authorised, routeSave, routeRemove) {
+            saveForLater: function(article) {
                 var self = this;
 
-                if (authorised) {
-                    if (self.savedArticleIds.indexOf(articleId) >= 0) {
+                if (self.savedArticleIds.indexOf(article.id) >= 0) {
+                    if(article._links.unsaveForLater.auth) {
                         // Article is already saved; this is an "unsave" action
-                        $.post(routeRemove, function(data) {
-                            console.log(data);
+                        $.post(article._links.unsaveForLater.href, function(data) {
                             self.savedArticleIds = data;
                         }).fail(function (error) {
                             console.log(error);
                         });
-                    } else {
+                    }
+                } else {
+                    if(article._links.saveForLater.auth) {
                         // Save the article for later
-                        $.post(routeSave, function(data) {
-                            console.log(data);
-
+                        $.post(article._links.saveForLater.href, function (data) {
                             self.savedArticleIds = data;
                         }).fail(function (error) {
                             console.log(error);
