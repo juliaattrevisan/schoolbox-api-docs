@@ -185,7 +185,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         /* Reorder topics sequentially
          */
         foreach ($collection as $article) {
-            $article->getTopics()->sortBy('sequence', 'asc');
+            $article->getTopics()->sortBy('sequence', 'asc', null, true);
         }
 
         return $collection;
