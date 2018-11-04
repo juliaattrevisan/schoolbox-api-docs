@@ -133,7 +133,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    protected function hydrateSelect(\PDOStatement $statement): \Schoolbox\GenericCollection
+    protected function hydrateSelect(\PDOStatement $statement): GenericCollection
     {
         $collection = $this->createCollection();
 
