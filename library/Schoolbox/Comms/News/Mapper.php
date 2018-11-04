@@ -14,6 +14,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Storage;
@@ -28,6 +29,7 @@ use Alaress_Date_Format;
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model[]|GenericCollection createCollection($contents = [])
  */
 class Mapper extends \Schoolbox\Mapper implements Searchable
 {
@@ -129,8 +131,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
      */
-    protected function hydrateSelect(\PDOStatement $statement): \Schoolbox\GenericCollection
+    protected function hydrateSelect(\PDOStatement $statement): GenericCollection
     {
         $collection = $this->createCollection();
 
@@ -177,6 +180,12 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             }
 
             $collection->setOffset($article->getId(), $article);
+        }
+
+        /* Reorder topics sequentially
+         */
+        foreach ($collection as $article) {
+            $article->getTopics()->sortBy('sequence', 'asc', null, true);
         }
 
         return $collection;
@@ -300,6 +309,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * @param array $availableArticleIds
      * @return array
+     * @throws InvalidColumnException
+     * @throws \UnderflowException
      */
     public function findArticlesIdsPublished(array $availableArticleIds): array
     {
