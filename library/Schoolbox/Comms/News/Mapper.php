@@ -14,6 +14,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Resource\Storage;
@@ -28,6 +29,7 @@ use Alaress_Date_Format;
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model[]|GenericCollection createCollection($contents = [])
  */
 class Mapper extends \Schoolbox\Mapper implements Searchable
 {
