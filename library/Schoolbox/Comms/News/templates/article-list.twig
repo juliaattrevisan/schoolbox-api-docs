@@ -390,32 +390,28 @@
             saveForLater: function(article) {
                 var self = this;
 
-                if (self.savedArticleIds.indexOf(article.id) >= 0) {
-                    if(article._links.unsaveForLater.auth) {
-                        // Article is already saved; this is an "unsave" action
-                        axios({
-                            method: 'post',
-                            url: article._links.unsaveForLater.href,
-                            headers: postHeaders
-                        }).then(function(response) {
-                            self.savedArticleIds = response.data;
-                        }).catch(function (error) {
-                            console.log(error);
-                        });
-                    }
-                } else {
-                    if(article._links.saveForLater.auth) {
-                        // Save the article for later
-                        axios({
-                            method: 'post',
-                            url: article._links.saveForLater.href,
-                            headers: postHeaders
-                        }).then(function (response) {
-                            self.savedArticleIds = response.data;
-                        }).catch(function (error) {
-                            console.log(error);
-                        });
-                    }
+                if (self.savedArticleIds.indexOf(article.id) >= 0 && article._links.unsaveForLater.auth) {
+                    // Article is already saved; this is an "unsave" action
+                    axios({
+                        method: 'post',
+                        url: article._links.unsaveForLater.href,
+                        headers: postHeaders
+                    }).then(function(response) {
+                        self.savedArticleIds = response.data;
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                } else if (article._links.saveForLater.auth) {
+                    // Save the article for later
+                    axios({
+                        method: 'post',
+                        url: article._links.saveForLater.href,
+                        headers: postHeaders
+                    }).then(function (response) {
+                        self.savedArticleIds = response.data;
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
                 }
 
             }
