@@ -391,40 +391,51 @@
              */
             saveForLater: function(article) {
                 var self = this;
-                var articleIdIndex = self.savedArticleIds.indexOf(article.id)
-                var $toast = $('[data-toast]');
 
-                if (articleIdIndex >= 0 && article._links.unsaveForLater.auth) {
+                var requestURL,
+                    toastActivateMessage,
+                    toastSuccessMessage,
+                    toastFailMessage,
+                    updateArticleIds;
+
+                function removeArticleId(articleId) {
+                    var articleIdIndex = self.savedArticleIds.indexOf(articleId)
+                    self.savedArticleIds.splice(articleIdIndex, 1);
+                }
+
+                function addArticleId(articleId) {
+                    self.savedArticleIds.splice(0, 0, articleId);
+                }
+
+                if (self.savedArticleIds.indexOf(article.id) >= 0 && article._links.unsaveForLater.auth) {
                     // Article is already saved; this is an "unsave" action
-                    $toast.toastActivate({text: 'Removing article from your saved ' + self.localeNewsPlural + '...'});
-
-                    axios({
-                        method: 'post',
-                        url: article._links.unsaveForLater.href,
-                        headers: postHeaders
-                    }).then(function() {
-                        self.savedArticleIds.splice(articleIdIndex, 1);
-                        $toast.toastTimeout({text:'Article removed from your saved ' + self.localeNewsPlural, duration: 2000});
-                    }).catch(function (error) {
-                        console.log(error);
-                        $toast.toastTimeout({text:'Unable to remove article from your saved articles', duration: 2000, css: 'alert'});
-                    });
+                    requestURL = article._links.unsaveForLater.href;
+                    toastActivateMessage = 'Removing article from your saved ' + self.localeNewsPlural;
+                    toastSuccessMessage = 'Article removed from your saved ' + self.localeNewsPlural;
+                    toastFailMessage = 'Unable to remove article from your saved articles';
+                    updateArticleIds = removeArticleId;
                 } else if (article._links.saveForLater.auth) {
                     // Save the article for later
-                    $toast.toastActivate({text: 'Saving article for later...'});
-
-                    axios({
-                        method: 'post',
-                        url: article._links.saveForLater.href,
-                        headers: postHeaders
-                    }).then(function () {
-                        self.savedArticleIds.splice(0, 0, article.id);
-                        $toast.toastTimeout({text:'Article saved for later', duration: 2000});
-                    }).catch(function (error) {
-                        console.log(error);
-                        $toast.toastTimeout({text:'Unable to save article for later', duration: 2000, css: 'alert'});
-                    });
+                    requestURL = article._links.saveForLater.href;
+                    toastActivateMessage = 'Saving article for later...';
+                    toastSuccessMessage = 'Article saved for later';
+                    toastFailMessage = 'Unable to save article for later';
+                    updateArticleIds = addArticleId;
                 }
+
+                var $toast = $('[data-toast]');
+                $toast.toastActivate({text: toastActivateMessage});
+                axios({
+                    method: 'post',
+                    url: requestURL,
+                    headers: postHeaders
+                }).then(function () {
+                    $toast.toastTimeout({text: toastSuccessMessage, duration: 2000});
+                    updateArticleIds(article.id);
+                }).catch(function (error) {
+                    console.log(error);
+                    $toast.toastTimeout({text: toastFailMessage, duration: 2000, css: 'alert'});
+                });
 
             }
         },
