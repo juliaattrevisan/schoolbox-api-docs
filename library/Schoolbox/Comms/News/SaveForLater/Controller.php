@@ -58,8 +58,7 @@ class Controller extends Base
         $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
 
         if ( $this->isXhrRequest() ) {
-            $data = $this->buildJsonOutput($articles->getPropertyValues('id'));
-            $this->getResponse()->content->set($data);
+            $this->getResponse()->content->set($this->buildJsonOutput($articles->getPropertyValues('id')));
             return;
         }
 
