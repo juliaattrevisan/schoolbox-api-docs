@@ -238,7 +238,6 @@ class Controller extends Base
     private function getAudienceSegments(Model $article, $filterAudiences) :array
     {
         $audienceSegments = [];
-        $accessLists = [];
 
         $codec = new Audience\Segment\Codec($this->audienceMapper);
 
@@ -248,12 +247,11 @@ class Controller extends Base
         );
         $translator->buildCache($article);
 
-        if ($filterAudiences) {
-            $accessLists = $this->getUserAccessLists();
-        }
-
         foreach ($article->getAudience() as $segment) {
-            if ($filterAudiences && (\count($accessLists) > 0 && !\in_array($segment->getEntityValue(), $accessLists, false))) {
+
+            if ($filterAudiences &&
+                $segment->getEntityType() === Audience\Segment\Strategy\Folder::getEntityType() &&
+                Access::getInstance()->getFolderAccess($this->getUser(), $segment->getEntityValue()) < UserAccess::ACCESS_READ) {
                 continue;
             }
 
@@ -269,28 +267,22 @@ class Controller extends Base
                 foreach ($segment->getChildren() as $child) {
                     $encodedValue = $codec->encodeValue($child->getEntityValue());
                     $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
+
+                    // If the user doesn't have at least a read access to a folder, set the segment as hidden.
+                    if ($filterAudiences &&
+                        $child->getEntityType() === Audience\Segment\Strategy\Folder::getEntityType() &&
+                        Access::getInstance()->getFolderAccess($this->getUser(), $child->getEntityValue()) < UserAccess::ACCESS_READ) {
+                        $option->setAsHidden();
+                    }
                 }
             }
 
-            $audienceSegments[] = $option;
+            if ($option->isVisible()) {
+                $audienceSegments[] = $option;
+            }
         }
 
         return $audienceSegments;
-    }
-
-    /**
-     * Return user access lists by ids
-     * @return array
-     */
-    private function getUserAccessLists() :array
-    {
-        $userAccessIds = [];
-
-        foreach ($this->getUser()->getAccessList() as $access) {
-            $userAccessIds[] = $access->getServiceIdentifier();
-        }
-
-        return $userAccessIds;
     }
 
     /**
@@ -377,8 +369,8 @@ class Controller extends Base
             'featureImageZone'       => $zone->getTwigContext(),
             'encodedSegments'       => $this->getAudienceSegments($article, $filterAudiences),
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
-            'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
             'returnUrl'              => $this->getReturnUrl(),
+            'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(true),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -587,7 +579,7 @@ class Controller extends Base
                 'isSavedForLater'   => $isSavedForLater,
                 'returnUrl'         => $this->getReturnUrl(),
                 'encodedSegments'   => $this->getAudienceSegments($article, $filterAudiences),
-                'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
+                'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(true),
             ];
         }
 
@@ -1185,15 +1177,16 @@ class Controller extends Base
     /**
      * Returns the set of audience type strategies which the session user is permitted to audience to
      *
-     * @return string[]
+     * @param bool $bypassAudienceTypeFiltering
+     * @return array
      * @throws UnknownEntityTypeException
      * @throws UnexpectedValueException
      */
-    private function getAvailableAudienceTypeStrategies(): array
+    private function getAvailableAudienceTypeStrategies($bypassAudienceTypeFiltering = false): array
     {
         $availableStrategies = [];
         foreach ($this->strategyFactory->makeAllSimpleStrategies() as $strategy) {
-            if ($strategy->canAudienceToEntityType($this->getUser())) {
+            if ($bypassAudienceTypeFiltering || $strategy->canAudienceToEntityType($this->getUser())) {
                 $availableStrategies[] = $strategy::getEntityType();
             }
         }
