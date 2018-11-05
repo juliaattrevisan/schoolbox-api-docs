@@ -14,16 +14,20 @@
  #}
 {% extends '@commsNews/page-layout.twig' %}
 
+{% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key}) %}
+
 {% block newsTitle %}{{ locale.news.proper }} Feed{% endblock %}
 
 {% block rssLink %}
-    {% set rssRoute = routeLookupIfAuthorized('commsNewsFeed.getFeed', {key: key}) %}
     {% if rssRoute and topic %}
-        <li><a href="{{ rssRoute }}?{{ queryStringTopic }}={{ topic }}" class='icon-rss' title="Download RSS feed for this topic" id="rss">RSS Link</a></li>
+        <li id="news-rss-link"><a :href="link" class='icon-rss' title="Download RSS feed for this topic" id="rss">RSS Link</a></li>
     {% endif %}
 {% endblock %}
 
 {% block newsContent %}
+    {# has to live here instead of the scripts block below :( #}
+    <script src="/javascript/components/schoolbox-vue.min.js"></script>
+
     {% include '@commsNews/article-list.twig' with {
         initialPage: initialPage,
         queryStringPage: queryStringPage,
@@ -37,5 +41,20 @@
 {% endblock %}
 
 {% block newsScripts %}
-    <script src="/javascript/components/schoolbox-vue.min.js"></script>
+    <script>
+        var rssLink = new Vue({
+            el: '#news-rss-link',
+            delimiters: ['${', '}'],
+            data: {
+                route: '{{ rssRoute }}',
+                queryStringTopic: '{{ queryStringTopic }}',
+                topic: '{{ topic }}'
+            },
+            computed: {
+                link: function() {
+                    return this.route + '?' + this.queryStringTopic + '=' + this.topic
+                }
+            }
+        });
+    </script>
 {% endblock %}
