@@ -99,15 +99,6 @@ class Controller extends Base
         ])->setTitle('Saved For Later'));
     }
 
-    /**
-     * Get a list of IDs of articles that have been saved for later
-     *
-     * @return array|int[]
-     */
-    private function getSavedArticleIds() : array
-    {
-        return (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId())->getPropertyValues('id');
-    }
 
     /**
      * Add an article to a user's 'saved-for-later' list.
@@ -127,9 +118,8 @@ class Controller extends Base
             $this->getResponse()->status->set(500);
         }
 
-        $savedArticles = $this->getSavedArticleIds();
         if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->content->set($this->buildJsonOutput($savedArticles));
+            $this->getResponse()->content->set($this->buildJsonOutput([]));
             return;
         }
     }
@@ -153,9 +143,8 @@ class Controller extends Base
             $this->getResponse()->status->set(500);
         }
 
-        $savedArticles = $this->getSavedArticleIds();
         if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->content->set($this->buildJsonOutput($savedArticles));
+            $this->getResponse()->content->set($this->buildJsonOutput([]));
             return;
         }
     }

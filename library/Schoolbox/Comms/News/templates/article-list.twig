@@ -389,15 +389,15 @@
              */
             saveForLater: function(article) {
                 var self = this;
-
-                if (self.savedArticleIds.indexOf(article.id) >= 0 && article._links.unsaveForLater.auth) {
+                var articleIdIndex = self.savedArticleIds.indexOf(article.id)
+                if (articleIdIndex >= 0 && article._links.unsaveForLater.auth) {
                     // Article is already saved; this is an "unsave" action
                     axios({
                         method: 'post',
                         url: article._links.unsaveForLater.href,
                         headers: postHeaders
-                    }).then(function(response) {
-                        self.savedArticleIds = response.data;
+                    }).then(function() {
+                        self.savedArticleIds.splice(articleIdIndex, 1);
                     }).catch(function (error) {
                         console.log(error);
                     });
@@ -407,8 +407,8 @@
                         method: 'post',
                         url: article._links.saveForLater.href,
                         headers: postHeaders
-                    }).then(function (response) {
-                        self.savedArticleIds = response.data;
+                    }).then(function () {
+                        self.savedArticleIds.splice(0, 0, article.id);
                     }).catch(function (error) {
                         console.log(error);
                     });
