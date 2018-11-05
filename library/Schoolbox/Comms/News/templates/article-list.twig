@@ -407,6 +407,7 @@
                         $toast.toastTimeout({text:'Article removed from your saved ' + self.localeNewsPlural, duration: 2000});
                     }).catch(function (error) {
                         console.log(error);
+                        $toast.toastTimeout({text:'Unable to remove article from your saved articles', duration: 2000, css: 'alert'});
                     });
                 } else if (article._links.saveForLater.auth) {
                     // Save the article for later
@@ -421,6 +422,7 @@
                         $toast.toastTimeout({text:'Article saved for later', duration: 2000});
                     }).catch(function (error) {
                         console.log(error);
+                        $toast.toastTimeout({text:'Unable to save article for later', duration: 2000, css: 'alert'});
                     });
                 }
 
