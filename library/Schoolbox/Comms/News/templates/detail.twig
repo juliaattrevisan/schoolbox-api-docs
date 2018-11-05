@@ -21,10 +21,11 @@ Data:
 {% else %}
     {% set rejectVerb = 'Reject' %}
 {% endif %}
+{% set returnUrlQueryString = returnUrl ? '?' ~ RETURN_URL.name ~ '=' ~ returnUrl : '' %}
 
 <script type="text/javascript">
     $(function() {
-        history.replaceState({}, '', '{{ article.id }}');
+        history.replaceState({}, '', '{{ article.id }}{{ returnUrlQueryString }}');
     });
 </script>
 
@@ -159,11 +160,11 @@ Data:
         <ul id="header-options" class="f-dropdown" data-dropdown-content>
 
             {% if modifyRoute %}
-                <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
+                <li><a class="icon-modify" href="{{ modifyRoute }}{{ returnUrlQueryString }}">Modify</a></li>
             {% endif %}
 
             {% if deleteRoute %}
-                <li><a class="icon-delete" href="{{ deleteRoute }}" data-delete="{{ article.title }}">Delete</a></li>
+                <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString }}" data-delete="{{ article.title }}">Delete</a></li>
             {% endif %}
 
             {% if rejectRoute %}

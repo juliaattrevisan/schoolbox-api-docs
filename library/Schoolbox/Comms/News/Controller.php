@@ -186,11 +186,12 @@ class Controller extends Base
 
         // Prefill audience
         $audienceSegments = [];
-        $groupId = $this->getRequest()->query->get('groupId');
-        $entityType = $this->getRequest()->query->get('type');
+        $params = new Querystring($this->getRequest()->query);
+        $folderId = $params->getFolderId();
+        $entityType = $params->getEntityType();
 
         // Hard-coded to folder (for now)
-        if ($groupId && $entityType && $entityType === Audience\Segment\Strategy\Folder::getEntityType()) {
+        if ($folderId && $entityType && $entityType === Audience\Segment\Strategy\Folder::getEntityType()) {
             $folderStrategy = $this->strategyFactory->makeSimpleStrategy($entityType);
             // Ensure the user is permitted to target this entity type
             if ($folderStrategy->canAudienceToEntityType($this->getUser())) {
@@ -198,16 +199,16 @@ class Controller extends Base
                 $sql = $folderStrategy->getAudiencingSql($this->getUser());
                 $availableFolders   = $sql ? $this->databaseInternal->executeQuery($sql)->fetchAll() : [];
                 $availableFolderIds = \array_column($availableFolders, 'id');
-                if (\in_array($groupId, $availableFolderIds, false)) {
+                if (\in_array($folderId, $availableFolderIds, false)) {
                     $codec = new Audience\Segment\Codec($this->audienceMapper);
-                    $label = $this->folderMapper->findCheaplyById($groupId)->getNameWithCodes();
+                    $label = $this->folderMapper->findCheaplyById($folderId)->getNameWithCodes();
 
                     $audienceSegment = new Audience\SegmentSelectizeOption(
-                        $codec->encodeSimpleAttributes($entityType, $groupId, Audience\Model::RELATIONSHIP_SELF),
+                        $codec->encodeSimpleAttributes($entityType, $folderId, Audience\Model::RELATIONSHIP_SELF),
                         $label
                     );
 
-                    $audienceSegment->addLabel($entityType, $codec->encodeValue($groupId), $label);
+                    $audienceSegment->addLabel($entityType, $codec->encodeValue($folderId), $label);
                     $audienceSegments[] = $audienceSegment;
                 }
             }
@@ -220,6 +221,7 @@ class Controller extends Base
             'isAutoSavable'        => true,
             'audienceSegments'     => $audienceSegments,
             'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
+            'returnUrl'            => $params->getReturnUrl(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -238,13 +240,12 @@ class Controller extends Base
      */
     public function getCreateInFolder(int $folderId): void
     {
-        // Redirect somewhere
-        $params = [
-            'groupId' => $folderId,
-            'type'    => 'folder',
-        ];
+        $params = new Querystring($this->getRequest()->query);
+        $params->setFolderId($folderId);
+        $params->setEntityType(Audience\Segment\Strategy\Folder::getEntityType());
+
         $this->response->redirect->to(
-            $this->router->generate('commsNews.getCreate') . '?' . http_build_query($params)
+            $this->router->generate('commsNews.getCreate') . '?' . $params
         );
     }
 
@@ -336,6 +337,7 @@ class Controller extends Base
             'audienceSegments'       => $audienceSegments,
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
+            'returnUrl'              => $this->getRequest()->query->get(Querystring::RETURN_URL),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -410,6 +412,9 @@ class Controller extends Base
 
             // Send the update page route, JS will update the window state to this
             $url = $this->getRouter()->generate('commsNews.getUpdate', $routeParams);
+            if (isset($data[Querystring::RETURN_URL])) {
+                $url .= '?' . http_build_query([Querystring::RETURN_URL => $data[Querystring::RETURN_URL]]);
+            }
 
             // Send all the possible routes, JS will determine which ones to show where
             $updateRoute = $this->getRouter()->generate('commsNews.postUpdate', $routeParams);
@@ -420,11 +425,12 @@ class Controller extends Base
             }
 
             $this->getResponse()->content->set($this->buildJsonOutput([
-                'success' => true,
-                'articleId' => $article->getId(),
-                'url' => $url,
-                'updateRoute' => $updateRoute,
-                'submitRoute' => $submitRoute,
+                'success'      => true,
+                'articleId'    => $article->getId(),
+                'url'          => $url,
+                'returnUrl'    => $data[Querystring::RETURN_URL],
+                'updateRoute'  => $updateRoute,
+                'submitRoute'  => $submitRoute,
                 'approveRoute' => $approveRoute
             ]));
         } else {
@@ -433,7 +439,11 @@ class Controller extends Base
              * Go to the detail screen to see the outcome of your changes
              * and also use that screen to advance to the next step
              */
-            $nextStep = $this->getRouter()->generate('commsNews.getDetail', $routeParams);
+            if ($data[Querystring::RETURN_URL]) {
+                $nextStep = Querystring::decode($data[Querystring::RETURN_URL]);
+            } else {
+                $nextStep = $this->getRouter()->generate('commsNews.getDetail', $routeParams);
+            }
             $this->getResponse()->redirect->afterPost($nextStep);
             return;
         }
@@ -529,6 +539,7 @@ class Controller extends Base
                 'flashMessage'       => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
                 'moderationEnabled'  => $moderationEnabled,
                 'isSavedForLater'    => $isSavedForLater,
+                'returnUrl'          => $this->getRequest()->query->get(Querystring::RETURN_URL)
             ];
         }
 
@@ -562,6 +573,9 @@ class Controller extends Base
     public function getListForHomepage() :void
     {
         $params = new Querystring($this->getRequest()->query);
+        if ($params->getFolderId()) {
+            $params->setReturnUrl(Querystring::encode('/homepage/' . $params->getFolderId()));
+        }
 
         $partialData = $this->generatePartialForHomepage($params);
 
@@ -660,10 +674,13 @@ class Controller extends Base
             $this->newsMapper->delete($article);
 
             /* If you're a moderator, go back to the Moderation list
-             *
-             * TODO: Otherwise go...somewhere else? I don't have a component or dashboard yet
              */
-            $nextStep = $this->getRouteIfAuthorized('commsNewsModeration.getList') ?: '/';
+
+            if ($this->getRequest()->query->get(Querystring::RETURN_URL)) {
+                $nextStep = Querystring::decode($this->getRequest()->query->get(Querystring::RETURN_URL));
+            } else {
+                $nextStep = $this->getRouteIfAuthorized('commsNewsModeration.getList');
+            }
 
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->content->set($this->buildJsonOutput([
@@ -691,7 +708,7 @@ class Controller extends Base
 
 
     /**
-     * Get a list of articles that were audienced to me
+     * This is now used only in News Archive with a topic
      * This is the central piece of the puzzle
      *
      * @api GET /news/list
@@ -724,6 +741,7 @@ class Controller extends Base
         } else {
             $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
         }
+        $params->setReturnUrl(Querystring::encode($urlPrefix));
 
         $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
 
@@ -784,6 +802,7 @@ class Controller extends Base
          * HidePaginator is always false in this context
          */
         $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
+        $params->setReturnUrl(Querystring::encode($urlPrefix));
 
         // Find the years and months that have any articles (some may not contain any visible articles; thats ok)
         $availableYearsAndMonths = $this->newsMapper->findYearsAndMonthsWithArticles();
@@ -848,6 +867,8 @@ class Controller extends Base
         $params = new Querystring($this->getRequest()->query);
         $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
 
+        $urlPrefix = $this->getRouter()->generate('commsNews.getAIndex');
+
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
          */
@@ -855,6 +876,7 @@ class Controller extends Base
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'topic' => $params->getSlug() ?: 'all',
             'referrer' => $params->getReferrer(),
+            'returnUrl' => Querystring::encode($urlPrefix),
             'initialPage' => $params->getPageNum(),
             'queryStringPage' => Querystring::PAGE_NUMBER,
             'queryStringReferrer' => Querystring::REFERRER,
@@ -1053,7 +1075,8 @@ class Controller extends Base
             'hidePaginator' => $hidePaginator,
             'compactMode' => $params->getCompactMode(),
             'pageNum' => $params->getPageNum(),
-            'referrer' => $params->getReferrer()
+            'referrer' => $params->getReferrer(),
+            'returnUrl' => $params->getReturnUrl(),
         ]);
 
         return $partialData;
@@ -1091,7 +1114,7 @@ class Controller extends Base
             'compactMode' => $params->getCompactMode(),
             'referrer' => $params->getReferrer(),
             'folderId' => $params->getFolderId(),
-            'readonly' => $params->getReadOnlyFlag()
+            'returnUrl' => $params->getReturnUrl(),
         ]);
     }
 

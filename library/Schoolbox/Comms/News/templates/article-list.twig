@@ -188,6 +188,7 @@
             queryStringPage: '{{ queryStringPage }}',
             queryStringReferrer: '{{ queryStringReferrer }}',
             queryStringTopic: '{{ queryStringTopic }}',
+            queryStringReturnUrl: '{{ RETURN_URL.name }}',
 
             // Object for the 'all' tab
             topicAll: {
@@ -196,10 +197,13 @@
             },
 
             // If topic has come from the controller- use that to set default tab selected
-            tabSelected: '{{ topic }}', 
+            tabSelected: '{{ topic }}',
 
             // Referrer for stats logging
             referrer: '{{ referrer }}',
+
+            // Return URL
+            returnUrl: '{{ returnUrl }}',
 
             // Controls whether clicking on a topic in a news card meta will just change tab on the current screen,
             // or link off to the news feed page
@@ -208,7 +212,7 @@
             // The initial page the user started on, used for history API
             initialPage: {{ initialPage }},
 
-            // The initial topic a user started on, has to be set dynamically below after component has mounted 
+            // The initial topic a user started on, has to be set dynamically below after component has mounted
             initialTopic: '',
 
             // Controls whether this will modify the window state at all (going to disable this on dashboard component)
@@ -226,7 +230,7 @@
             // Skips over the 'all' tab and shows the first topic by default (used for the dashboard component)
             showTopicByDefault: {{ showTopicByDefault ?: 'false' }},
 
-            // Controls whether the 'show more' component link is enabled or not 
+            // Controls whether the 'show more' component link is enabled or not
             showMore: {{ showMore ?: 'false' }}
         },
         mounted: function () {
@@ -433,7 +437,7 @@
 
             // The current set of articles showing for the page
             currentArticles: function() {
-                // Short circuit if there's nothing in filteredArticles 
+                // Short circuit if there's nothing in filteredArticles
                 if (!this.filteredArticles.length) {
                     return [];
                 }
