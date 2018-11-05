@@ -293,6 +293,9 @@
                 if (!holdState && this.modifyWindowState) {
                     window.history.pushState({tab: tab, page: self.page}, '', '?' + self.queryStringTopic + '=' + tab);
                 }
+
+                // Update the RSS link (which lives in a different Vue component)
+                rssLink.topic = tab;
             }
         },
         computed: {
