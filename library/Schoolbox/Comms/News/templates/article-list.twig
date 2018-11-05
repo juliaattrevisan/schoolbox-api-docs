@@ -129,11 +129,18 @@
     var topicAll = '{{ topicAll }}';
 
     // Axios does not set the XHR header by default, so we have to do it manually.
-    var axiosConfig = {
+    var getHeaders = {
         headers: {
             'X-Requested-With' : 'XMLHttpRequest'
         }
     };
+
+    var postHeaders = {
+        headers: {
+            'X-Requested-With' : 'XMLHttpRequest',
+            'content-type': 'application/x-www-form-urlencoded'
+        }
+    }
 
     var app = new Vue({
         el: '#news-component',
@@ -228,14 +235,14 @@
         mounted: function () {
             var self = this;
 
-            axios.get(self.getSavedArticlesRoute, axiosConfig).then(function(data) {
-                self.savedArticleIds = data;
+            axios.get(self.getSavedArticlesRoute, getHeaders).then(function(response) {
+                self.savedArticleIds = response.data;
             }).catch(function (error) {
                 console.log(error);
             });
 
             // Find some articles
-            axios.get(self.getArticlesRoute, axiosConfig).then(function(response) {
+            axios.get(self.getArticlesRoute, getHeaders).then(function(response) {
                 var articles = response.data;
 
                 self.articlesLoading = false;
@@ -381,7 +388,7 @@
                 if (self.savedArticleIds.indexOf(article.id) >= 0) {
                     if(article._links.unsaveForLater.auth) {
                         // Article is already saved; this is an "unsave" action
-                        axios.post(article._links.unsaveForLater.href, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).then(function(data) {
+                        axios.post(article._links.unsaveForLater.href, null, postHeaders).then(function(data) {
                             self.savedArticleIds = data;
                         }).catch(function (error) {
                             console.log(error);
@@ -390,7 +397,7 @@
                 } else {
                     if(article._links.saveForLater.auth) {
                         // Save the article for later
-                        axios.post(article._links.saveForLater.href, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).then(function (data) {
+                        axios.post(article._links.saveForLater.href, null, postHeaders).then(function (data) {
                             self.savedArticleIds = data;
                         }).catch(function (error) {
                             console.log(error);
