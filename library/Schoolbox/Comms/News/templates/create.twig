@@ -812,8 +812,8 @@
                         $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
                     }
                 },
-                {% if audienceSegments|length %}
-                value: {{ audienceSegments|json_encode|raw }},
+                {% if encodedSegments|length %}
+                value: {{ encodedSegments|json_encode|raw }},
                 {% endif %}
                 multiple: true
             }).data('selectize');

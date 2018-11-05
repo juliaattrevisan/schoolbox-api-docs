@@ -406,7 +406,7 @@ Data:
             var vue          = this;
             brickManager = new BrickManager(vue, codec, entityTypeLabelMap);
 
-            var audienceSegments = {{ audienceSegments|json_encode|raw }};
+            var audienceSegments = {{ encodedSegments|json_encode|raw }};
 
             for(key in audienceSegments) {
                 var segment = audienceSegments[key];

@@ -29,6 +29,8 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
@@ -226,18 +228,17 @@ class Controller extends Base
     }
 
     /**
-     * Generate article's audience segments with an option to filter the audiences that can be seen by the user on article view
-     * based on the account access permission. If the logged in user is a member of a staff, filtering will be skipped.
-     * 
-     * @param $article
-     * @param bool $detailView
+     * Generate article's audience segments with audience filtering based on the account access permission.
+     * If the logged in user is a member of a staff, filtering will be skipped.
+     *
+     * @param Model $article
+     * @param $filterAudiences
      * @return array
      */
-    private function getAudienceSegments($article, $detailView = true) :array
+    private function getAudienceSegments(Model $article, $filterAudiences) :array
     {
         $audienceSegments = [];
         $accessLists = [];
-        $filterAudiences = $detailView && !$this->getUser()->getRole()->isStaff();
 
         $codec = new Audience\Segment\Codec($this->audienceMapper);
 
@@ -369,11 +370,12 @@ class Controller extends Base
             $zone->attachFiles([$article->getFeatureImage()->getHash()]);
         }
 
+        $filterAudiences = !$this->getUser()->getRole()->isStaff();
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action'                 => 'Update',
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
-            'audienceSegments'       => $this->getAudienceSegments($article, false),
+            'encodedSegments'       => $this->getAudienceSegments($article, $filterAudiences),
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
             'returnUrl'              => $this->getReturnUrl(),
@@ -576,6 +578,7 @@ class Controller extends Base
             unset($data['article']['featureImage']['_links']['fetch']);
 
         } else {
+            $filterAudiences = !$this->getUser()->getRole()->isStaff();
             $segment = $this->getSession()->getSegment('Schoolbox\Comms\News\Controller');
             $data = [
                 'article'           => $article,
@@ -583,7 +586,7 @@ class Controller extends Base
                 'moderationEnabled' => $moderationEnabled,
                 'isSavedForLater'   => $isSavedForLater,
                 'returnUrl'         => $this->getReturnUrl(),
-                'audienceSegments'   => $this->getAudienceSegments($article),
+                'encodedSegments'   => $this->getAudienceSegments($article, $filterAudiences),
                 'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
             ];
         }
