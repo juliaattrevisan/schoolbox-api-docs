@@ -123,6 +123,8 @@
         :click-handler="onPaginate"
     ></Paginate>
 </div>
+<div id='toaster' class="toast" data-toast></div>
+
 <script>
     'use strict';
 
@@ -390,25 +392,35 @@
             saveForLater: function(article) {
                 var self = this;
                 var articleIdIndex = self.savedArticleIds.indexOf(article.id)
+                var $toast = $('[data-toast]');
+
                 if (articleIdIndex >= 0 && article._links.unsaveForLater.auth) {
                     // Article is already saved; this is an "unsave" action
+                    // TODO localise 'news'
+                    $toast.toastActivate({text: 'Removing article from your Saved News...'});
+
                     axios({
                         method: 'post',
                         url: article._links.unsaveForLater.href,
                         headers: postHeaders
                     }).then(function() {
                         self.savedArticleIds.splice(articleIdIndex, 1);
+                        // TODO localise 'news'
+                        $toast.toastTimeout({text:'Article removed from your Saved News'});
                     }).catch(function (error) {
                         console.log(error);
                     });
                 } else if (article._links.saveForLater.auth) {
                     // Save the article for later
+                    $toast.toastActivate({text: 'Saving article from later...'});
+
                     axios({
                         method: 'post',
                         url: article._links.saveForLater.href,
                         headers: postHeaders
                     }).then(function () {
                         self.savedArticleIds.splice(0, 0, article.id);
+                        $toast.toastTimeout({text:'Article saved for later'});
                     }).catch(function (error) {
                         console.log(error);
                     });
