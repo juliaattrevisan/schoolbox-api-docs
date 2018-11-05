@@ -396,8 +396,7 @@
 
                 if (articleIdIndex >= 0 && article._links.unsaveForLater.auth) {
                     // Article is already saved; this is an "unsave" action
-                    // TODO localise 'news'
-                    $toast.toastActivate({text: 'Removing article from your Saved News...'});
+                    $toast.toastActivate({text: 'Removing article from your saved ' + self.localeNewsPlural + '...'});
 
                     axios({
                         method: 'post',
@@ -405,14 +404,13 @@
                         headers: postHeaders
                     }).then(function() {
                         self.savedArticleIds.splice(articleIdIndex, 1);
-                        // TODO localise 'news'
-                        $toast.toastTimeout({text:'Article removed from your Saved News', duration: 2000});
+                        $toast.toastTimeout({text:'Article removed from your saved ' + self.localeNewsPlural, duration: 2000});
                     }).catch(function (error) {
                         console.log(error);
                     });
                 } else if (article._links.saveForLater.auth) {
                     // Save the article for later
-                    $toast.toastActivate({text: 'Saving article from later...'});
+                    $toast.toastActivate({text: 'Saving article for later...'});
 
                     axios({
                         method: 'post',
