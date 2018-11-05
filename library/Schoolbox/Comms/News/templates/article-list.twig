@@ -406,7 +406,7 @@
                     }).then(function() {
                         self.savedArticleIds.splice(articleIdIndex, 1);
                         // TODO localise 'news'
-                        $toast.toastTimeout({text:'Article removed from your Saved News'});
+                        $toast.toastTimeout({text:'Article removed from your Saved News', duration: 2000});
                     }).catch(function (error) {
                         console.log(error);
                     });
@@ -420,7 +420,7 @@
                         headers: postHeaders
                     }).then(function () {
                         self.savedArticleIds.splice(0, 0, article.id);
-                        $toast.toastTimeout({text:'Article saved for later'});
+                        $toast.toastTimeout({text:'Article saved for later', duration: 2000});
                     }).catch(function (error) {
                         console.log(error);
                     });
