@@ -11,6 +11,7 @@
  # @param string referrer - Referrer for stats logging
  # @param bool changeTabOnMeta - On click of a topic in a news card meta- whether to change tab on the current page or not 
  # @param bool modifyWindowState - If true- push changes to the window state
+ # @param bool compactMode - Removes the blurb from the news card
  #}
 
 {% if not initialPage %}
@@ -84,7 +85,7 @@
                         {# TODO: add save for later #}
                     </nav>
 
-                    <article>
+                    <article v-if="!compactMode">
                         <div v-html="article.blurb"></div>
                         <div class="article-read-more">
                             <a v-if="article.readmore.available" :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>
@@ -182,7 +183,10 @@
             initialTopic: '{{ topic }}',
 
             // Controls whether this will modify the window state at all (going to disable this on dashboard component)
-            modifyWindowState: {{ modifyWindowState ? 'true' : 'false' }}
+            modifyWindowState: {{ modifyWindowState ? 'true' : 'false' }},
+
+            // Removes the blurb
+            compactMode: {{ compactMode ? 'true' : 'false' }}
         },
         mounted: function () {
             var self = this;
