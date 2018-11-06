@@ -255,12 +255,10 @@ class IndicatorUsage
             return false;
         }
 
-        // Were any new descriptors (which don't have IDs yet) added?
-        // That automatically means they're not mutually compatible.
-        if (\in_array(null, $thisDescriptorIds, true)) {
-            return false;
-        }
-        if (\in_array(null, $otherDescriptorIds, true)) {
+        // Were any new descriptors (which don't have IDs yet) added or removed?
+        // That automatically means they're not mutually compatible, even if
+        // they would otherwise match.
+        if (\in_array(null, array_merge($thisDescriptorIds, $otherDescriptorIds), true)) {
             return false;
         }
 
