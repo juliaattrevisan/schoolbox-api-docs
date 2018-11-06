@@ -625,6 +625,38 @@ class IndicatorUsage extends TestCase
         ];
 
 
+        // new descriptors: false, even if they're exactly the same
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $indicator1 = $grid1->getRowSet()->retrieveIndicator(11);
+        $grid1->retrieveIndicatorUsage($indicator1)->getDescriptors()[5]->setId(null);
+        unset($grid2->retrieveIndicatorUsage($indicator)->getDescriptors()[5]);
+        yield "added new descriptor" => [
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            $grid2->retrieveIndicatorUsageByDescriptorId(111),
+            false
+        ];
+        yield "removed new descriptor" => [
+            $grid2->retrieveIndicatorUsageByDescriptorId(111),
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            false
+        ];
+        yield "same indicator, both with new descriptors" => [
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            false
+        ];
+
+
         // different indicator: false
         $grid = $generator->generateGrid(
             RowSet\Test\Generator::TEST_CAPABILITIES,
