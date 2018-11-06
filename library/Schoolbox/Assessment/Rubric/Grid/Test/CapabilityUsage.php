@@ -554,13 +554,18 @@ class CapabilityUsage extends TestCase
 
 
         // different indicators: false
+        // ensure that cap max is the same for both regardless, so that only
+        // the indicators in use are checked
+        $grid1CapUsages = Generator::TEST_CAPABILITY_USAGES;
+        $grid1CapUsages[1]['maxValue'] = 100;
         $grid1 = $generator->generateGrid(
             RowSet\Test\Generator::TEST_CAPABILITIES,
             Generator::TEST_LEVELS,
-            Generator::TEST_CAPABILITY_USAGES
+            $grid1CapUsages
         );
 
         $grid2CapUsages = Generator::TEST_CAPABILITY_USAGES;
+        $grid2CapUsages[1]['maxValue'] = 100;
         unset($grid2CapUsages[1]['indicators'][11]);
         $grid2 = $generator->generateGrid(
             RowSet\Test\Generator::TEST_CAPABILITIES,
