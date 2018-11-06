@@ -415,7 +415,7 @@
                     updateArticleIds = addArticleId;
                 }
 
-                var $toast = $('[data-toast]');
+                var $toast = $('#toaster');
                 $toast.toastActivate({text: toastActivateMessage});
                 axios.post(requestURL, {}, { headers: postHeaders }).then(function () {
                     $toast.toastTimeout({text: toastSuccessMessage, duration: 2000});
