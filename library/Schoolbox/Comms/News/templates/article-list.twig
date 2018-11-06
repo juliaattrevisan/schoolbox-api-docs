@@ -99,6 +99,12 @@
                 <p>No ${ localeNewsPlural } to view at this time.</p>
             </div>
         </div>
+
+        <div class="component-action" v-if="showMoreLink">
+            <section>
+                <a :href="getIndexRoute + '?' + queryStringTopic + '=' + tabSelected" class="button">View More</a>
+            </section>
+        </div>
     </section>
     <Paginate
         v-if="!disablePagination && currentArticles.length && pageCount > 1"
@@ -195,7 +201,10 @@
             limit: {{ limit ?: 0 }},
 
             // Skips over the 'all' tab and shows the first topic by default (used for the dashboard component)
-            showTopicByDefault: {{ showTopicByDefault ?: 'false' }}
+            showTopicByDefault: {{ showTopicByDefault ?: 'false' }},
+
+            // Controls whether the 'show more' component link is enabled or not 
+            showMore: {{ showMore ?: 'false' }}
         },
         mounted: function () {
             var self = this;
@@ -367,6 +376,11 @@
                 var total = offset + limit;
 
                 return this.filteredArticles.slice(offset, total);
+            },
+
+            // When to show the 'show more' component action
+            showMoreLink: function() {
+                return !this.articlesLoading && this.showMore && this.currentArticles.length;
             }
         }
     });
