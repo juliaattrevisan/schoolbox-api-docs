@@ -42,6 +42,7 @@ class Module extends BaseModule
     {
         $suOrCommsOfficer = new Rule\All(
             new Rule\IsLoggedIn(),
+            new IsModerationEnabled($this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
