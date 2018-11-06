@@ -1,40 +1,15 @@
 {#
 Data:
-    article            News\Model
-    moderationEnabled  bool
-    isSavedForLater    bool
+    article                 News\Model
+    moderationEnabled       bool
+    isSavedForLater         bool
+    availableEntityTypes    string[]         The set of entity types that can be audienced by the current user
+    entityTypesData         array
 #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@commsNews/macro/layout.twig' as layout %}
 {% import '@commsNews/macro/indicator.twig' as indicator %}
-
-{% set entityTypesData = {
-    campus: {
-        name:         'Campus',
-        namePlural:    'Campuses',
-    },
-    role: {
-        name:         'Role',
-        namePlural:    'Roles',
-    },
-    school_house: {
-        name:         'House',
-        namePlural:    'Houses',
-    },
-    year: {
-        name:         'Year Level',
-        namePlural:    'Year Levels',
-    },
-    folder: {
-        name:         'Class/Group',
-        namePlural:    'Classes & Groups',
-    },
-    user: {
-        name:         'User',
-        namePlural:    'Users',
-    }
-} %}
 
 {# Modify article #}
 {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {article: article, articleId: article.id}) %}
