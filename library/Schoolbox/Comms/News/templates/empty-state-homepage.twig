@@ -1,0 +1,16 @@
+{% set createRoute = routeLookupIfAuthorized('commsNews.getCreateInFolder', {folderId: folderId}) %}
+<div class="empty-state no-margin">
+    <i class="icon-news"></i>
+    <p>
+        {% if not createRoute %}
+            There is no {{ locale.news }} to view at this time.
+        {% else %}
+            {% set createNewsQuerystringParams = [
+                'groupId=' ~ folderId,
+                'type=folder'
+            ]|join('&') %}
+
+            <a href="{{ createRoute }}?{{ createNewsQuerystringParams }}">Post a {{ locale.news }} article</a> to share new information on this homepage.
+        {% endif %}
+    </p>
+</div>

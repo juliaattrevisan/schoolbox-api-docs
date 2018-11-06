@@ -36,7 +36,7 @@
                                     <img :src="article.featureImage._links.image.href + '&size=square64'">
                                 </a>
 
-                                <h3><a :href="article._links.self.href + '?' + queryStringReturnUrl + '=' + returnUrl">${ article.title }</a></h3>
+                                <h3><a :href="article._links.self.href">${ article.title }</a></h3>
 
                                 <p class="meta">
                                     <b>${ article.status }</b>
@@ -46,7 +46,7 @@
                             </div>
                         </div>
                         <nav>
-                            <a v-if="article._links.update.auth" :href="article._links.update.href + '?' + queryStringReturnUrl + '=' + returnUrl" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
+                            <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
                         </nav>
                     </li>
                 </ul>
@@ -55,7 +55,7 @@
                     <i class="icon-news"></i>
                     <p>You haven't authored any {{ locale.news.plural }}.</p>
                     {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-                    {% if createRoute %}<p><a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous }}">Create {{ locale.news }}</a>.</p>{% endif %}
+                    {% if createRoute %}<p><a href="{{ createRoute }}">Create {{ locale.news }}</a>.</p>{% endif %}
                 </div>
 
             </div>
@@ -108,12 +108,7 @@
                 filteredArticles: [],
 
                 // The selected tab, just used for active styling
-                tabSelected: '{{ status }}',
-
-                // Return URL
-                returnUrl: '{{ RETURN_URL.previous }}',
-                queryStringReturnUrl: '{{ RETURN_URL.name }}'
-
+                tabSelected: '{{ status }}'
             },
             mounted: function () {
                 var vue = this;

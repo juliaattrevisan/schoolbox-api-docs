@@ -191,21 +191,21 @@ class Querystring
     /**
      * Get the entity type
      *
-     * @return string
+     * @return null|string
      */
     public function getEntityType(): ?string
     {
-        return isset($this->querystring[self::ENTITY_TYPE]) ? $this->querystring[self::ENTITY_TYPE] : null;
+        return $this->querystring[self::ENTITY_TYPE];
     }
 
     /**
      * Get the return url
      *
-     * @return string
+     * @return null|string
      */
-    public function getReturnUrl(): string
+    public function getReturnUrl(): ?string
     {
-        return (string)$this->querystring[self::RETURN_URL];
+        return $this->querystring[self::RETURN_URL];
     }
 
     /**
@@ -309,10 +309,13 @@ class Querystring
      * TODO: merging library/Schoolbox/Learning/Assessment/Redirect.php ?
      *
      * @param $url
-     * @return string
+     * @return null|string
      */
-    public static function encode($url)
+    public static function encode(?string $url): ?string
     {
+        if ($url === null) {
+            return null;
+        }
         return urlencode(base64_encode($url));
     }
 
@@ -320,10 +323,13 @@ class Querystring
      * Decode an encoded redirect url
      *
      * @param $encoded
-     * @return string
+     * @return null|string
      */
-    public static function decode($encoded)
+    public static function decode(?string $encoded): ?string
     {
+        if ($encoded === null) {
+            return null;
+        }
         return base64_decode(urldecode($encoded));
     }
 

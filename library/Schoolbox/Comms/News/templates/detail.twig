@@ -25,7 +25,7 @@ Data:
 
 <script type="text/javascript">
     $(function() {
-        history.replaceState({}, '', '{{ article.id }}{{ returnUrlQueryString }}');
+        history.replaceState({}, '', '{{ article.id }}');
     });
 </script>
 
@@ -160,7 +160,7 @@ Data:
         <ul id="header-options" class="f-dropdown" data-dropdown-content>
 
             {% if modifyRoute %}
-                <li><a class="icon-modify" href="{{ modifyRoute }}{{ returnUrlQueryString }}">Modify</a></li>
+                <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
             {% endif %}
 
             {% if deleteRoute %}

@@ -243,6 +243,7 @@ class Controller extends Base
         $params = new Querystring($this->getRequest()->query);
         $params->setFolderId($folderId);
         $params->setEntityType(Audience\Segment\Strategy\Folder::getEntityType());
+        $params->setReturnUrl(Querystring::encode('/homepage/' . $folderId));
 
         $this->response->redirect->to(
             $this->router->generate('commsNews.getCreate') . '?' . $params
@@ -534,12 +535,30 @@ class Controller extends Base
 
         } else {
             $segment = $this->getSession()->getSegment('Schoolbox\Comms\News\Controller');
+            $cameFrom = $this->getSession()->getHistory();
+
+            // if the previous url is for ajax call, get one before.
+            $ajaxUrl = $this->getRouter()->generate('commsNews.getListForUser');
+            if ($cameFrom === $ajaxUrl) {
+                $cameFrom = $this->getSession()->getHistory(2);
+            }
+
+            $returnUrl = '';
+            $authoredUrl = $this->getRouter()->generate('commsNews.getAuthored');
+
+            // navigate back to dashboard, homepage or /me, if came from one of them.
+            if ($cameFrom === '/'
+                || ($authoredUrl && $cameFrom === $authoredUrl)
+                || \strpos($cameFrom, '/homepage') !== false) {
+                $returnUrl = Querystring::encode($cameFrom);
+            }
+
             $data = [
-                'article'            => $article,
-                'flashMessage'       => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
-                'moderationEnabled'  => $moderationEnabled,
-                'isSavedForLater'    => $isSavedForLater,
-                'returnUrl'          => $this->getRequest()->query->get(Querystring::RETURN_URL)
+                'article'           => $article,
+                'flashMessage'      => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
+                'moderationEnabled' => $moderationEnabled,
+                'isSavedForLater'   => $isSavedForLater,
+                'returnUrl'         => $returnUrl,
             ];
         }
 
@@ -573,9 +592,6 @@ class Controller extends Base
     public function getListForHomepage() :void
     {
         $params = new Querystring($this->getRequest()->query);
-        if ($params->getFolderId()) {
-            $params->setReturnUrl(Querystring::encode('/homepage/' . $params->getFolderId()));
-        }
 
         $partialData = $this->generatePartialForHomepage($params);
 
@@ -673,13 +689,13 @@ class Controller extends Base
 
             $this->newsMapper->delete($article);
 
-            /* If you're a moderator, go back to the Moderation list
+            /* Redirect to returnUrl if provided, otherwise to news feed.
              */
 
             if ($this->getRequest()->query->get(Querystring::RETURN_URL)) {
                 $nextStep = Querystring::decode($this->getRequest()->query->get(Querystring::RETURN_URL));
             } else {
-                $nextStep = $this->getRouteIfAuthorized('commsNewsModeration.getList');
+                $nextStep = $this->getRouter()->generate('commsNews.getIndex');
             }
 
             if ($this->getRequest()->isXhr()) {
@@ -741,7 +757,6 @@ class Controller extends Base
         } else {
             $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
         }
-        $params->setReturnUrl(Querystring::encode($urlPrefix));
 
         $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
 
@@ -802,7 +817,6 @@ class Controller extends Base
          * HidePaginator is always false in this context
          */
         $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', ['year' => $year, 'month' => $month]);
-        $params->setReturnUrl(Querystring::encode($urlPrefix));
 
         // Find the years and months that have any articles (some may not contain any visible articles; thats ok)
         $availableYearsAndMonths = $this->newsMapper->findYearsAndMonthsWithArticles();
@@ -867,8 +881,6 @@ class Controller extends Base
         $params = new Querystring($this->getRequest()->query);
         $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
 
-        $urlPrefix = $this->getRouter()->generate('commsNews.getAIndex');
-
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
          */
@@ -876,7 +888,6 @@ class Controller extends Base
             'topicAll' => Mapper::TOPIC_ALL_SLUG,
             'topic' => $params->getSlug() ?: 'all',
             'referrer' => $params->getReferrer(),
-            'returnUrl' => Querystring::encode($urlPrefix),
             'initialPage' => $params->getPageNum(),
             'queryStringPage' => Querystring::PAGE_NUMBER,
             'queryStringReferrer' => Querystring::REFERRER,
@@ -1075,8 +1086,7 @@ class Controller extends Base
             'hidePaginator' => $hidePaginator,
             'compactMode' => $params->getCompactMode(),
             'pageNum' => $params->getPageNum(),
-            'referrer' => $params->getReferrer(),
-            'returnUrl' => $params->getReturnUrl(),
+            'referrer' => $params->getReferrer()
         ]);
 
         return $partialData;
@@ -1114,7 +1124,6 @@ class Controller extends Base
             'compactMode' => $params->getCompactMode(),
             'referrer' => $params->getReferrer(),
             'folderId' => $params->getFolderId(),
-            'returnUrl' => $params->getReturnUrl(),
         ]);
     }
 

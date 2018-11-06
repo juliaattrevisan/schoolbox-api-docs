@@ -35,7 +35,6 @@ class Controller extends Component_Homepage_ControllerAbstract
             'folderId' => $this->getSource()->getId(),
             'key' => $this->getUser()->getKey(),
             'referrer' => News\Statistics\Mapper::REFERRER_HOMEPAGE,
-            'returnUrl' => News\Querystring::encode('/homepage/' . $this->getSource()->getId()),
             'readonly' => $this->getContextPermission() < UserAccess::ACCESS_WRITE
         ]);
     }
