@@ -1413,7 +1413,7 @@ class RubricMapper
             // (The group values persist from previous rows)
             $groups[$workingGroupName]['id']                         = null;
             $groups[$workingGroupName]['name']                       = $workingGroupName;
-            $groups[$workingGroupName]['maxValue']                   = $groupMaxValue ?: null;
+            $groups[$workingGroupName]['maxValue']                   = $groupMaxValue !== '' ? $groupMaxValue : null;
             $groups[$workingGroupName]['criteria'][$workingCritName] = [
                 'id'   => null,
                 'name' => $workingCritName,

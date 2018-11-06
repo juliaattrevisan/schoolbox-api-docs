@@ -90,7 +90,7 @@ class Factory
                 $capabilityMaxSpec = new ValidCapabilityMax($markPerCap);
                 if (!$capabilityMaxSpec->isSatisfiedBy($capabilityMaxValue)) {
                     throw new \InvalidArgumentException(
-                        'provide capability maximum points that are numeric and greater than 0'
+                        'provide capability maximum points that are numeric and equal to or greater than 0'
                     );
                 }
             }
