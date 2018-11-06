@@ -400,16 +400,16 @@
                 if (self.savedArticleIds.indexOf(article.id) >= 0 && article._links.unsaveForLater.auth) {
                     // Article is already saved; this is an "unsave" action
                     requestURL = article._links.unsaveForLater.href;
-                    toastActivateMessage = 'Removing article from your saved ' + self.localeNewsPlural;
-                    toastSuccessMessage = 'Article removed from your saved ' + self.localeNewsPlural;
-                    toastFailMessage = 'Unable to remove article from your saved articles';
+                    toastActivateMessage = 'Removing...';
+                    toastSuccessMessage = 'Removed';
+                    toastFailMessage = 'Unable to remove';
                     updateArticleIds = removeArticleId;
                 } else if (article._links.saveForLater.auth) {
                     // Save the article for later
                     requestURL = article._links.saveForLater.href;
-                    toastActivateMessage = 'Saving article for later...';
-                    toastSuccessMessage = 'Article saved for later';
-                    toastFailMessage = 'Unable to save article for later';
+                    toastActivateMessage = 'Saving...';
+                    toastSuccessMessage = 'Saved';
+                    toastFailMessage = 'Unable to save';
                     updateArticleIds = addArticleId;
                 }
 
