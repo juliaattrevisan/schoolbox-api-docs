@@ -31,7 +31,7 @@ Documentation: https://github.com/axios/axios
 * Unlike jQuery's ajax library, axios does not set the XHR header - you need to do this manually: `{headers: {'X-Requested-With' : 'XMLHttpRequest'}}`
 * By default Axios sends JSON payloads in POST requests. This is not compatible with our backend architecture, which expects `application/x-www-form-urlencoded`. There are a number of solutions to this problem ([see the documentation](https://github.com/axios/axios#using-applicationx-www-form-urlencoded-format)) but the only approach that will currently work for us, without requiring polyfills for IE 11, is manually setting `{headers: { 'content-type': 'application/x-www-form-urlencoded'}}`
 
-Axios comes with built in convenience methods for making POST and GET requests: `axios.get()` and `axios.post()`. It is not possible to pass options to these convenience methods in order to set the headers we require, so the following approach is suggested instead:
+Axios comes with built in convenience methods for making POST and GET requests: `axios.get()` and `axios.post()`. It is not possible to pass options to `axios.post()` in order to set the headers we require, so the following approach is suggested instead:
 
     // Options
     var getHeaders = {
@@ -61,4 +61,7 @@ Axios comes with built in convenience methods for making POST and GET requests: 
 
 The complete set of options accepted by axios can be found [here](https://github.com/axios/axios#request-config).
 
-In the future, we will likely have a single place in which global axios options (such as the XHR header) can be defined. This will remove the need for manually setting XHR headers on every occasion, but the POST `content-type` header will still need to be set manually: we usually expect our GETs to return `application/json`, and axios does not let us define different global defaults for POST requests vs. GET requests.
+In the future, we will likely have a single place in which global axios defaults can be set (see [axios documentation on defaults](https://github.com/axios/axios#global-axios-defaults)). We will need to at least set the following:
+
+    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
