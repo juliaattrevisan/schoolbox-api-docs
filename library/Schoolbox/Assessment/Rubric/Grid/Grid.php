@@ -237,6 +237,55 @@ class Grid
 
 
     /**
+     * Are marked grids given to rubric `$other` mutually compatible with ones
+     * given to this grid?
+     *
+     * @param Grid $other
+     * @return bool
+     */
+    public function isCompatibleWith(Grid $other): bool
+    {
+        // Check the assessment is the same
+        if ($this->assessment->getId() !== $other->assessment->getId()) {
+            return false;
+        }
+
+        // Check that each has the same capabilities in use
+        if ($this->retrieveUsedCapabilityIds() !== $other->retrieveUsedCapabilityIds()) {
+            return false;
+        }
+
+        // Now we know the capabilities in use are the same.
+        // Check each usage is compatible with the usage in the other.
+        foreach ($this->capabilityUsages as $thisCapabilityUsage) {
+            if (!$thisCapabilityUsage->isCompatibleWith(
+                $other->retrieveCapabilityUsage($thisCapabilityUsage->getCapability())
+            )) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Retrieves the capability IDs that this grid uses.
+     *
+     * @return array|int[]
+     */
+    private function retrieveUsedCapabilityIds(): array
+    {
+        $capabilityIds = [];
+        foreach ($this->capabilityUsages as $capabilityUsage) {
+            $capabilityIds[] = $capabilityUsage->getCapability()->getId();
+        }
+        sort($capabilityIds);
+        return $capabilityIds;
+    }
+
+
+    /**
      * @return IAssessable
      */
     public function getAssessment(): IAssessable

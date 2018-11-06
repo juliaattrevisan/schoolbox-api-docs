@@ -152,6 +152,60 @@ class CapabilityUsage
 
 
     /**
+     * Are marks given to capability usage `$other` mutually compatible with
+     * ones given to this usage?
+     *
+     * @param CapabilityUsage $other
+     * @return bool
+     */
+    public function isCompatibleWith(CapabilityUsage $other): bool
+    {
+        // Check it's the same capability
+        if ($this->capability->getId() !== $other->capability->getId()) {
+            return false;
+        }
+
+        // Check that the mark-per-cap value hasn't changed
+        if ($this->maxValue !== $other->maxValue) {
+            return false;
+        }
+
+        // Check the same indicators are in use
+        if ($this->retrieveUsedIndicatorIds() !== $other->retrieveUsedIndicatorIds()) {
+            return false;
+        }
+
+        // Now we know the indicators in use are the same.
+        // Check each usage is compatible with the usage in the other.
+        foreach ($this->indicatorUsages as $thisIndicatorUsage) {
+            if (!$thisIndicatorUsage->isCompatibleWith(
+                $other->retrieveIndicatorUsage($thisIndicatorUsage->getIndicator())
+            )) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Retrieves the indicator IDs that this capability uses.
+     *
+     * @return array|int[]
+     */
+    private function retrieveUsedIndicatorIds(): array
+    {
+        $indicatorIds = [];
+        foreach ($this->indicatorUsages as $indicatorUsage) {
+            $indicatorIds[] = $indicatorUsage->getIndicator()->getId();
+        }
+        sort($indicatorIds);
+        return $indicatorIds;
+    }
+
+
+    /**
      * @return Capability
      */
     public function getCapability(): Capability

@@ -233,6 +233,52 @@ class IndicatorUsage
 
 
     /**
+     * Are marks given to indicator usage `$other` mutually compatible with
+     * ones given to this usage?
+     *
+     * @param IndicatorUsage $other
+     * @return bool
+     */
+    public function isCompatibleWith(IndicatorUsage $other): bool
+    {
+        // Check it's the same indicator
+        if ($this->indicator->getId() !== $other->indicator->getId()) {
+            return false;
+        }
+
+        // Ensure same descriptors are in use (ordering doesn't matter)
+        $thisDescriptorIds  = $this->descriptors->getPropertyValues('id');
+        $otherDescriptorIds = $other->descriptors->getPropertyValues('id');
+        sort($thisDescriptorIds);
+        sort($otherDescriptorIds);
+        if ($thisDescriptorIds !== $otherDescriptorIds) {
+            return false;
+        }
+
+        // Were any new descriptors (which don't have IDs yet) added or removed?
+        // That automatically means they're not mutually compatible, even if
+        // they would otherwise match.
+        if (\in_array(null, array_merge($thisDescriptorIds, $otherDescriptorIds), true)) {
+            return false;
+        }
+
+        // Ensure each descriptor's values match
+        foreach ($thisDescriptorIds as $descriptorId) {
+            /** @var Descriptor $thisDescriptor */
+            /** @var Descriptor $otherDescriptor */
+            $thisDescriptor  = $this->descriptors->getBy('id', $descriptorId);
+            $otherDescriptor = $other->descriptors->getBy('id', $descriptorId);
+            if ($thisDescriptor->getMaxValue() !== $otherDescriptor->getMaxValue()) {
+                return false;
+            }
+        }
+
+        // If it passes that gauntlet:
+        return true;
+    }
+
+
+    /**
      * @return Indicator
      */
     public function getIndicator(): Indicator

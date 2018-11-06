@@ -11,9 +11,9 @@ namespace Schoolbox\Assessment\Rubric\Grid\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
@@ -433,5 +433,267 @@ class Grid extends TestCase
     ): void
     {
         $this->assertSame($expected, $grid->isCapabilityMarkShown($capability));
+    }
+
+
+    /**
+     * Data provider for `getTestIsCompatibleWithData`.
+     * @return iterable
+     */
+    public function getTestIsCompatibleWithData(): iterable
+    {
+        $generator = new Generator();
+
+
+        // both empty: true
+        $grid1 = new RubricGrid\Grid(
+            (new DueWork())->setId(1),
+            new Rowset\RowSet(new Folder())
+        );
+        $grid2 = new RubricGrid\Grid(
+            (new DueWork())->setId(1),
+            new Rowset\RowSet(new Folder())
+        );
+        yield "empty with empty" => [$grid1, $grid2, true];
+
+
+        // different assessment: false
+        $grid1 = new RubricGrid\Grid(
+            (new DueWork())->setId(1),
+            new Rowset\RowSet(new Folder())
+        );
+        $grid2 = new RubricGrid\Grid(
+            (new DueWork())->setId(2),
+            new Rowset\RowSet(new Folder())
+        );
+        yield "different assessment" => [$grid1, $grid2, false];
+
+
+        // both with the same caps, inds, descs: true
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        yield "unchanged" => [$grid1, $grid2, true];
+
+
+        // different points value for a descriptor: false
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid1->retrieveIndicatorUsage($grid1->getRowSet()->retrieveIndicator(11))
+              ->retrieveDescriptor(1)
+              ->setMaxValue(100);
+        $grid2->retrieveIndicatorUsage($grid2->getRowSet()->retrieveIndicator(11))
+              ->retrieveDescriptor(1)
+              ->setMaxValue(101);
+        yield "different descriptor value" => [$grid1, $grid2, false];
+
+
+        // missing descriptor: false
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $indicator = $grid2->getRowSet()->retrieveIndicator(11);
+        unset($grid2->retrieveIndicatorUsage($indicator)->getDescriptors()[1]);
+        yield "missing descriptor" => [$grid1, $grid2, false];
+
+
+        // different capabilities: false
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid2CapUsages = Generator::TEST_CAPABILITY_USAGES;
+        unset($grid2CapUsages[1]);
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            $grid2CapUsages
+        );
+
+        yield "removed capability" => [$grid1, $grid2, false];
+        yield "added capability"   => [$grid2, $grid1, false];
+
+
+        // different indicators: false
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid2CapUsages = Generator::TEST_CAPABILITY_USAGES;
+        unset($grid2CapUsages[1]['indicators'][11]);
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            $grid2CapUsages
+        );
+
+        yield "removed indicator" => [$grid1, $grid2, false];
+        yield "added indicator"   => [$grid2, $grid1, false];
+
+
+        // different description for a descriptor: true
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid1->retrieveIndicatorUsage($grid1->getRowSet()->retrieveIndicator(11))
+              ->retrieveDescriptor(1)
+              ->setDescription('y');
+        $grid2->retrieveIndicatorUsage($grid2->getRowSet()->retrieveIndicator(11))
+              ->retrieveDescriptor(1)
+              ->setDescription('z');
+        yield "different descriptor description" => [$grid1, $grid2, true];
+
+
+        // different ordering of descriptors: true (regardless of whether they're in the same level)
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid2CapUsages   = Generator::TEST_CAPABILITY_USAGES;
+        $grid2Descriptors = &$grid2CapUsages[1]['indicators'][11]['descriptors'];
+        $grid2Descriptors[111]['levelId'] = 5;
+        $grid2Descriptors[115]['levelId'] = 1;
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            $grid2CapUsages
+        );
+
+        yield "different descriptor ordering" => [$grid1, $grid2, true];
+
+
+        // different max points per capability: true?
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid2CapUsages = Generator::TEST_CAPABILITY_USAGES;
+        $grid2CapUsages[1]['maxValue'] = 100;
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            $grid2CapUsages
+        );
+
+        yield "different max points per capability" => [$grid1, $grid2, false];
+
+
+
+        // different mark-per-cap on/off: true
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid1->getAssessment()->setMarkPerCapability(true);
+        $grid2->getAssessment()->setMarkPerCapability(false);
+        yield "different mark per capability setting" => [$grid1, $grid2, true];
+
+
+        // different mark range on/off: true
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid1->getAssessment()->setUseMarkRange(true);
+        $grid2->getAssessment()->setUseMarkRange(false);
+        yield "different mark range" => [$grid1, $grid2, true];
+
+
+        // different total mark: true
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid1->getAssessment()->setMarkScheme(new MarkScheme\TotalMarkFractional(100));
+        $grid2->getAssessment()->setMarkScheme(new MarkScheme\TotalMarkFractional(200));
+        yield "different total mark" => [$grid1, $grid2, true];
+
+
+        // different mark type: true
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid1->getAssessment()->setMarkScheme(new MarkScheme\None());
+        $grid2->getAssessment()->setMarkScheme(new MarkScheme\Percentage());
+        yield "different mark type" => [$grid1, $grid2, true];
+    }
+
+
+    /**
+     * @dataProvider getTestIsCompatibleWithData
+     * @covers \Schoolbox\Assessment\Rubric\Grid\Grid::isCompatibleWith
+     *
+     * @param RubricGrid\Grid $grid1
+     * @param RubricGrid\Grid $grid2
+     * @param bool            $expected
+     */
+    public function testIsCompatibleWith(RubricGrid\Grid $grid1, RubricGrid\Grid $grid2, bool $expected): void
+    {
+        $this->assertSame($expected, $grid1->isCompatibleWith($grid2));
     }
 }

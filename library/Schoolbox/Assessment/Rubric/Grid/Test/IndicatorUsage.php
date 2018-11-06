@@ -538,4 +538,201 @@ class IndicatorUsage extends TestCase
         $this->assertNotNull($descriptor);
         $this->assertSame($expected, $descriptor->getMinValue());
     }
+
+
+    /**
+     * Data provider for `testIsCompatibleWith`.
+     *
+     * @return iterable
+     */
+    public function getTestIsCompatibleWithData(): iterable
+    {
+        $generator = new Generator();
+
+
+        // both empty: true
+        $usage1 = new RubricGrid\IndicatorUsage(new RowSet\Indicator());
+        $usage2 = new RubricGrid\IndicatorUsage(new RowSet\Indicator());
+        yield "empty with empty" => [$usage1, $usage2, true];
+
+
+        // both with the same indicators, descs: true
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        yield "unchanged" => [
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            $grid2->retrieveIndicatorUsageByDescriptorId(111),
+            true
+        ];
+
+
+        // different points value for a descriptor: false
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid1->retrieveIndicatorUsage($grid1->getRowSet()->retrieveIndicator(11))
+              ->retrieveDescriptor(1)
+              ->setMaxValue(100);
+        $grid2->retrieveIndicatorUsage($grid2->getRowSet()->retrieveIndicator(11))
+              ->retrieveDescriptor(1)
+              ->setMaxValue(101);
+        yield "different descriptor value" => [
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            $grid2->retrieveIndicatorUsageByDescriptorId(111),
+            false
+        ];
+
+
+        // missing descriptor: false
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $indicator = $grid2->getRowSet()->retrieveIndicator(11);
+        unset($grid2->retrieveIndicatorUsage($indicator)->getDescriptors()[5]);
+        yield "removed descriptor" => [
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            $grid2->retrieveIndicatorUsageByDescriptorId(111),
+            false
+        ];
+        yield "added descriptor" => [
+            $grid2->retrieveIndicatorUsageByDescriptorId(111),
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            false
+        ];
+
+
+        // new descriptors: false, even if they're exactly the same
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $indicator1 = $grid1->getRowSet()->retrieveIndicator(11);
+        $grid1->retrieveIndicatorUsage($indicator1)->getDescriptors()[5]->setId(null);
+        unset($grid2->retrieveIndicatorUsage($indicator)->getDescriptors()[5]);
+        yield "added new descriptor" => [
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            $grid2->retrieveIndicatorUsageByDescriptorId(111),
+            false
+        ];
+        yield "removed new descriptor" => [
+            $grid2->retrieveIndicatorUsageByDescriptorId(111),
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            false
+        ];
+        yield "same indicator, both with new descriptors" => [
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            false
+        ];
+
+
+        // different indicator: false
+        $grid = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        yield "different indicator" => [
+            $grid->retrieveIndicatorUsageByDescriptorId(111),
+            $grid->retrieveIndicatorUsageByDescriptorId(121),
+            false
+        ];
+
+
+        // different description for a descriptor: true
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid1->retrieveIndicatorUsage($grid1->getRowSet()->retrieveIndicator(11))
+              ->retrieveDescriptor(1)
+              ->setDescription('y');
+        $grid2->retrieveIndicatorUsage($grid2->getRowSet()->retrieveIndicator(11))
+              ->retrieveDescriptor(1)
+              ->setDescription('z');
+        yield "different descriptor description" => [
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            $grid2->retrieveIndicatorUsageByDescriptorId(111),
+            true
+        ];
+
+
+        // different ordering of descriptors: true (regardless of whether they're in the same level)
+        $grid1 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            Generator::TEST_CAPABILITY_USAGES
+        );
+
+        $grid2CapUsages   = Generator::TEST_CAPABILITY_USAGES;
+        $grid2Descriptors = &$grid2CapUsages[1]['indicators'][11]['descriptors'];
+        $grid2Descriptors[111]['levelId'] = 5;
+        $grid2Descriptors[115]['levelId'] = 1;
+        $grid2 = $generator->generateGrid(
+            RowSet\Test\Generator::TEST_CAPABILITIES,
+            Generator::TEST_LEVELS,
+            $grid2CapUsages
+        );
+
+        yield "different descriptor ordering" => [
+            $grid1->retrieveIndicatorUsageByDescriptorId(111),
+            $grid2->retrieveIndicatorUsageByDescriptorId(111),
+            true
+        ];
+    }
+
+
+    /**
+     * @dataProvider getTestIsCompatibleWithData
+     *
+     * @covers \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::isCompatibleWith
+     * @param RubricGrid\IndicatorUsage $usage1
+     * @param RubricGrid\IndicatorUsage $usage2
+     * @param bool                      $expected
+     */
+    public function testIsCompatibleWith(
+        RubricGrid\IndicatorUsage $usage1,
+        RubricGrid\IndicatorUsage $usage2,
+        bool $expected
+    ): void {
+        $this->assertSame($expected, $usage1->isCompatibleWith($usage2));
+    }
 }
