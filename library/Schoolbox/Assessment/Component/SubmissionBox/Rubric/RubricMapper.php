@@ -1486,14 +1486,14 @@ class RubricMapper
                 $dText = trim($square[$i][$j]);
                 $dVal  = trim($square[$i + 1][$j]);
 
+
+                // Set the group's max value
+                $postdata['group'][$groupId]['maxValue'] = $groups[$gLookup]['maxValue'];
+
+                // turn this criterion on
+                $postdata['criterion'][$critId]['on'] = true;
+
                 if (strlen($dText) || strlen($dVal)) {
-
-                    // Set the group's max value
-                    $postdata['group'][$groupId]['maxValue'] = $groups[$gLookup]['maxValue'];
-
-                    // turn this criterion on
-                    $postdata['criterion'][$critId]['on'] = true;
-
                     // assign the descriptor data to the appropriate cell
                     $postdata['descriptor'][$critId][$levelSequence] = [
                         'id'     => null,
