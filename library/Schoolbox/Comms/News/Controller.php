@@ -37,6 +37,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
+use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -221,7 +222,7 @@ class Controller extends Base
             'article'              => $article,
             'featureImageZone'     => $zone->getTwigContext(),
             'isAutoSavable'        => true,
-            'audienceSegments'     => $audienceSegments,
+            'encodedSegments'      => $audienceSegments,
             'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
             'returnUrl'            => $this->getReturnUrl(),
             'entityTypesData'      => $this->getEntityTypesData(),
@@ -250,9 +251,7 @@ class Controller extends Base
 
         foreach ($article->getAudience() as $segment) {
 
-            if ($filterAudiences &&
-                $segment->getEntityType() === Audience\Segment\Strategy\Folder::getEntityType() &&
-                Access::getInstance()->getFolderAccess($this->getUser(), $segment->getEntityValue()) < UserAccess::ACCESS_READ) {
+            if($filterAudiences && !$this->isAudienceVisibleToUser($segment, $this->getUser())){
                 continue;
             }
 
@@ -284,6 +283,30 @@ class Controller extends Base
         }
 
         return $audienceSegments;
+    }
+
+    /**
+     * @param Audience\Model $segment
+     * @param User $user
+     * @return bool
+     */
+    private function isAudienceVisibleToUser(Audience\Model $segment, User $user): bool
+    {
+        // Base Case:
+        if ($segment->isSimple()) {
+            return
+                $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
+                Access::getInstance()->getFolderAccess($user, $segment->getEntityValue()) >= UserAccess::ACCESS_READ;
+        }
+
+        // Recursive Case:
+        foreach ($segment->getChildren() as $childSegment) {
+            // If any child is not visible, this composite is not visible
+            if (!$this->isAudienceVisibleToUser($childSegment, $user)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -368,7 +391,7 @@ class Controller extends Base
             'action'                 => 'Update',
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
-            'encodedSegments'       => $this->getAudienceSegments($article, $filterAudiences),
+            'encodedSegments'        => $this->getAudienceSegments($article, $filterAudiences),
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'returnUrl'              => $this->getReturnUrl(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(true),
