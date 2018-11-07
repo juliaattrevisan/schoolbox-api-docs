@@ -9,6 +9,7 @@
             {# If read_more policy has a value, append a "Read More" style link
              # Otherwise, don't do anything except the appended  ellipsis
              #}
+            {# TODO when everywhere gets refactored into Vue, make sure that margin-top: .5rem is always applied to .article-read-more #}
             {% if readMore|length %}
                 {% set pacified = pacified ~ '<div class="article-read-more"><a href="' ~ detailUrl ~ '" title="Read more">' ~ readMore ~ '</a></div>' %}
             {% endif %}
