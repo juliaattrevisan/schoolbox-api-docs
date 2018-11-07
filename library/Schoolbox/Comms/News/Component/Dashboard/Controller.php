@@ -77,7 +77,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
         return $this->renderTwigTemplate($templateHandle, '@commsNewsDashboard/component.twig', [
             'componentInstanceId' => $this->getInstance()->getId(),
-            'topic' => News\Mapper::TOPIC_ALL_SLUG,
             'topicAll' => News\Mapper::TOPIC_ALL_SLUG,
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => $limit,
@@ -85,6 +84,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             'queryStringPage' => News\Querystring::PAGE_NUMBER,
             'queryStringReferrer' => News\Querystring::REFERRER,
             'queryStringTopic' => News\Querystring::TOPIC_SLUG,
+            'showTopicByDefault' => !$this->getConfig('default'),
         ]);
     }
 }

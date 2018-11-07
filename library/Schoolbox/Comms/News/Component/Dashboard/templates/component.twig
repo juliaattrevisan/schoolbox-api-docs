@@ -5,6 +5,9 @@
  # @param string queryStringTopic
  # @param string topicAll
  # @param string referrer
+ # @param string compactMode
+ # @param int limit
+ # @param bool showTopicByDefault
  #}
 
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
@@ -17,6 +20,11 @@
         topicAll: topicAll,
         referrer: referrer,
         changeTabOnMeta: false,
-        modifyWindowState: false
+        modifyWindowState: false,
+        compactMode: compactMode,
+        limit: limit,
+        disablePagination: true,
+        showTopicByDefault: showTopicByDefault,
+        showMore: true
     } %}
 </div>
