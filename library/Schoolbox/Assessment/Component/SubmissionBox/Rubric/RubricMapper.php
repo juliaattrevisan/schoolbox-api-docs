@@ -485,10 +485,12 @@ class RubricMapper
     /**
      * Saves this grid to the database.
      *
-     * @param Grid $grid
+     * @param Grid      $grid
+     * @param null|Grid $originalGrid If set, this is the state of the
+     *                                assessment's grid pre-save
      * @throws MapperException if something happens in the mapper
      */
-    public function persistGrid(Grid $grid): void
+    public function persistGrid(Grid $grid, ?Grid $originalGrid): void
     {
         // The mappers still deal in submission boxes, but we deal in levels
         // If this exceptioned out, it was never meant to be
@@ -499,12 +501,10 @@ class RubricMapper
 
         // TODO some way to wrap all this in a transaction would be nice... -_-;
         // (The answer exists: merge SA-6405)
-        $levelMapper         = LevelMapper::getInstance();
-        $descriptorMapper    = DescriptorMapper::getInstance();
-        $indicatorMapper     = CriterionMapper::getInstance();
-        $capabilityMapper    = GroupMapper::getInstance();
-        $existingLevelIds    = $levelMapper->findIdsByColumn('box_id', $submissionBox->getId());
-        $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
+        $levelMapper      = LevelMapper::getInstance();
+        $descriptorMapper = DescriptorMapper::getInstance();
+        $indicatorMapper  = CriterionMapper::getInstance();
+        $capabilityMapper = GroupMapper::getInstance();
 
 
         // First, persist the levels
@@ -605,8 +605,10 @@ class RubricMapper
         // wash up before dinner, kids
 
 
-        // invalidate changed descriptors
-        $this->checkDescriptorValueChanges($existingDescriptors, $descriptorModels);
+        // Invalidate all marks, if the grid and original grid are incompatible
+        if ($originalGrid && !$grid->isCompatibleWith($originalGrid)) {
+            $this->invalidateMarks($grid->getAssessment()->getId());
+        }
 
 
         // remove all levels that have zero descriptors attached - extract from the descriptors
@@ -1593,11 +1595,17 @@ class RubricMapper
     }
 
     /**
+     * @deprecated use `persistGrid` instead
+     *
      * @param Rubric        $rubric
      * @param SubmissionBox $submissionBox
      */
     public function save(Rubric $rubric, SubmissionBox $submissionBox)
     {
+        // Commented out for now so that Atlas import doesn't break
+        // TODO make Atlas import not use this (SA-7796)
+//        trigger_error('This method is deprecated; use "persistGrid" instead', E_USER_DEPRECATED);
+
         // juuust in case
         $rubric->setSubmissionBox($submissionBox);
 
@@ -1767,6 +1775,32 @@ class RubricMapper
 
         return false;
     }
+
+
+    /**
+     * Invalidate ALL the rubric marks given for this assessment.
+     *
+     * This includes:
+     * * capability marks
+     * * descriptor marks
+     *
+     * @param int $assessmentId
+     */
+    private function invalidateMarks(int $assessmentId): void
+    {
+        $query = "
+            UPDATE     rubric_descriptor_mark rdm
+            INNER JOIN rubric_group_mark      rgm ON rdm.rubric_group_mark_id = rgm.id
+            INNER JOIN submission_return       sr ON rgm.return_id            = sr.id
+            INNER JOIN submission_box          sb ON sr.box_id                = sb.id
+            SET        rdm.valid = FALSE,
+                       rgm.valid = FALSE
+            WHERE      sb.assessment_id = :assessmentId
+        ";
+
+        $this->database->prepare($query)->execute(['assessmentId' => $assessmentId]);
+    }
+
 
     /**
      * Invalidates all marks given for the specified descriptors

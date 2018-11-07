@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
-use Schoolbox\Mapper\Traits\Model\Id;
-
 /**
  * A single descriptor within a rubric grid.
  *
@@ -17,11 +15,14 @@ use Schoolbox\Mapper\Traits\Model\Id;
  */
 class Descriptor
 {
-    use Id;
-
-
     private const DIRECTION_ASC = 'asc';
     private const DIRECTION_DESC = 'desc';
+
+
+    /**
+     * @var int|null
+     */
+    private $id;
 
 
     /**
@@ -123,6 +124,26 @@ class Descriptor
             return null;
         }
         return $this->direction === self::DIRECTION_ASC ? $this->maxValue : $this->minValue;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * @param int|null $id
+     * @return static
+     */
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+        return $this;
     }
 
 

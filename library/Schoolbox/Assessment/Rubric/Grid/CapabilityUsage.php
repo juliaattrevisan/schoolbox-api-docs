@@ -161,7 +161,7 @@ class CapabilityUsage
     public function isCompatibleWith(CapabilityUsage $other): bool
     {
         // Check it's the same capability
-        if ($this->capability->getId() !== $other->capability->getId()) {
+        if ((int)$this->capability->getId() !== (int)$other->capability->getId()) {
             return false;
         }
 
@@ -198,7 +198,7 @@ class CapabilityUsage
     {
         $indicatorIds = [];
         foreach ($this->indicatorUsages as $indicatorUsage) {
-            $indicatorIds[] = $indicatorUsage->getIndicator()->getId();
+            $indicatorIds[] = (int)$indicatorUsage->getIndicator()->getId();
         }
         sort($indicatorIds);
         return $indicatorIds;

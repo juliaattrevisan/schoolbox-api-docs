@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
-use Schoolbox\Mapper\Traits\Model\Id;
-
 /**
  * A level within a rubric grid.
  *
@@ -17,13 +15,36 @@ use Schoolbox\Mapper\Traits\Model\Id;
  */
 class Level
 {
-    use Id;
+    /**
+     * @var int|null
+     */
+    private $id;
 
 
     /**
      * @var string|null
      */
     private $name;
+
+
+    /**
+     * @return int|null
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * @param int|null $id
+     * @return static
+     */
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+        return $this;
+    }
 
 
     /**

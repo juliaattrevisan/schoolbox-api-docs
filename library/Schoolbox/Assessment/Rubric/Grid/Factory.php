@@ -22,7 +22,10 @@ class Factory
      *
      * @param Grid  $grid A grid (which already contains an assessment and rowset)
      * @param array $postData
-     * @param bool $validate Whether to run the backend validation on this data - should be FALSE for CSV import
+     * @param bool $validate Whether to run the backend validation on this data
+     *                       - should be FALSE for CSV import and export, as
+     *                       attempting to import/export an invalid grid should
+     *                       still succeed even if saving it will not.
      * @return Grid
      * @throws \InvalidArgumentException
      */
@@ -48,7 +51,7 @@ class Factory
         // cache levels and ensure all exist in the rubric
         foreach ($levels as $levelSequence => $level) {
             $levelName = $level['name'];
-            $levelId   = (int)$level['id'] ?? null;
+            $levelId   = filter_var($level['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
 
             if(!$levelId || $grid->getLevels()->filterBy('id',$levelId)->count() == 0) {
                 $grid->getLevels()->add((new Level())->setName($levelName)->setId($levelId));
@@ -145,7 +148,7 @@ class Factory
                 }
 
                 $descriptor      = $descriptors[$indicatorId][$levelSequence];
-                $descriptorId    = $descriptor['id'] ?? null;
+                $descriptorId    = filter_var($descriptor['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
                 $descriptorText  = $descriptor['text'];
                 $descriptorValue = $descriptor['points'];
 

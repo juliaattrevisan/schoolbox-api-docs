@@ -814,20 +814,32 @@ class MapperProxy
         } elseif ($subObject instanceof SubmissionBox) {
             // Legacy DueWork SitePage Controllers require that we preserve this field
             $subObject->setCategory($assessable->getBaseContext()->getFolder());
+            $boxMapper = SubmissionBoxMapper::getInstance();
 
-            SubmissionBoxMapper::getInstance()->save($subObject);
-
-            // Save the Rubric
             /** @var DueWorkObject $dueWork */
             $dueWork = $assessable;
             if ($dueWork->getUseRubric()) {
+                // Rubric involved? Save the due work, and then persist rubric
                 $rubricMapper = SubmissionBox\Rubric\RubricMapper::getInstance();
+
+                // Need to compare the previously existing grid with the newly
+                // saved one, for invalidation purposes
+                $originalGrid = null;
+                if ($dueWork->getId()) {
+                    $originalGrid = $rubricMapper->retrieveGrid($assessable, false);
+                }
+
+                $boxMapper->save($subObject);
+
                 if ($dueWork->getRubricGrid()) {
-                    $rubricMapper->persistGrid($dueWork->getRubricGrid());
+                    $rubricMapper->persistGrid($dueWork->getRubricGrid(), $originalGrid);
                 } elseif ($dueWork->getRubric()) {
                     $dueWork->getRubric()->setSubmissionBox($subObject);
                     $rubricMapper->save($dueWork->getRubric(), $subObject);
                 }
+            } else {
+                // No rubric? Just save the due work
+                $boxMapper->save($subObject);
             }
 
         } elseif ($subObject instanceof Quiz) {
