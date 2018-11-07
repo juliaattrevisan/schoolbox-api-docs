@@ -221,7 +221,7 @@ class Controller extends Base
             'isAutoSavable'        => true,
             'audienceSegments'     => $audienceSegments,
             'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
-            'returnUrl'            => $params->getReturnUrl(),
+            'returnUrl'            => $this->getReturnUrl(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -338,7 +338,7 @@ class Controller extends Base
             'audienceSegments'       => $audienceSegments,
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
-            'returnUrl'              => $this->getRequest()->query->get(Querystring::RETURN_URL),
+            'returnUrl'              => $this->getReturnUrl(),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -440,10 +440,13 @@ class Controller extends Base
              * Go to the detail screen to see the outcome of your changes
              * and also use that screen to advance to the next step
              */
-            if ($data[Querystring::RETURN_URL]) {
+            if ($article->isPublished() && $data[Querystring::RETURN_URL]) {
                 $nextStep = Querystring::decode($data[Querystring::RETURN_URL]);
             } else {
                 $nextStep = $this->getRouter()->generate('commsNews.getDetail', $routeParams);
+                if (isset($data[Querystring::RETURN_URL])) {
+                    $nextStep .= '?' . http_build_query([Querystring::RETURN_URL => $data[Querystring::RETURN_URL]]);
+                }
             }
             $this->getResponse()->redirect->afterPost($nextStep);
             return;
@@ -475,6 +478,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      * @throws \PDOException
+     * @throws RouteNotFound
      */
     public function getDetail(Model $article): void
     {
@@ -535,30 +539,12 @@ class Controller extends Base
 
         } else {
             $segment = $this->getSession()->getSegment('Schoolbox\Comms\News\Controller');
-            $cameFrom = $this->getSession()->getHistory();
-
-            // if the previous url is for ajax call, get one before.
-            $ajaxUrl = $this->getRouter()->generate('commsNews.getListForUser');
-            if ($cameFrom === $ajaxUrl) {
-                $cameFrom = $this->getSession()->getHistory(2);
-            }
-
-            $returnUrl = '';
-            $authoredUrl = $this->getRouter()->generate('commsNews.getAuthored');
-
-            // navigate back to dashboard, homepage or /me, if came from one of them.
-            if ($cameFrom === '/'
-                || ($authoredUrl && $cameFrom === $authoredUrl)
-                || \strpos($cameFrom, '/homepage') !== false) {
-                $returnUrl = Querystring::encode($cameFrom);
-            }
-
             $data = [
                 'article'           => $article,
                 'flashMessage'      => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
                 'moderationEnabled' => $moderationEnabled,
                 'isSavedForLater'   => $isSavedForLater,
-                'returnUrl'         => $returnUrl,
+                'returnUrl'         => $this->getReturnUrl(),
             ];
         }
 
@@ -1263,4 +1249,51 @@ class Controller extends Base
             }
         }
     }
+
+    /**
+     * Gets return url from query string and history.
+     * @return null|string
+     */
+    private function getReturnUrl(): ?string
+    {
+        $returnUrl = $this->getRequest()->query->get(Querystring::RETURN_URL);
+        if (!$returnUrl) {
+            $cameFrom = $this->getSession()->getHistory();
+            $validUrls = ['/'];
+            $asyncUrls = [];
+            try {
+                // if the previous url is for ajax call, get one before.
+                $listForUserUrl = $this->getRouter()->generate('commsNews.getListForUser');
+                if ($listForUserUrl) {
+                    $asyncUrls[] = $listForUserUrl;
+                }
+                $authoredArticlesUrl = $this->getRouter()->generate('commsNews.getAuthoredArticles');
+                if ($authoredArticlesUrl) {
+                    $asyncUrls[] = $authoredArticlesUrl;
+                }
+                if (\in_array($cameFrom, $asyncUrls)) {
+                    $cameFrom = $this->getSession()->getHistory(2);
+                }
+
+                $authoredUrl = $this->getRouter()->generate('commsNews.getAuthored');
+                if ($authoredUrl) {
+                    $validUrls[] = $authoredUrl;
+                }
+                $indexUrl = $this->getRouter()->generate('commsNews.getIndex');
+                if ($indexUrl) {
+                    $validUrls[] = $indexUrl;
+                }
+            } catch (RouteNotFound $e) {
+                return null;
+            }
+
+            // navigate back to dashboard, homepage or /me, if came from one of them.
+            if (\in_array($cameFrom, $validUrls)
+                || \strpos($cameFrom, '/homepage') !== false) {
+                $returnUrl = Querystring::encode($cameFrom);
+            }
+        }
+        return $returnUrl;
+    }
+
 }

@@ -20,7 +20,7 @@ Data:
         'hp=1',
         'ref=' ~ referrer
     ] |join('&') %}
-    {% set returnUrlQueryString = returnUrl ? '?' ~ RETURN_URL.name ~ '=' ~ returnUrl : '' %}
+
     {% set getListHomePagePath = routeLookup('commsNews.getListForHomepage', {folderId: folderId}) %}
 
     $(function () {
@@ -59,7 +59,7 @@ Data:
         {% endif %}
 
         {% if createRoute %}
-            <a href="{{ createRoute }}{{ returnUrlQueryString }}" class="button">Create {{ locale.news }}</a>
+            <a href="{{ createRoute }}" class="button">Create {{ locale.news }}</a>
         {% endif %}
     </section>
 </div>

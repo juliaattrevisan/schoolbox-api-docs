@@ -2,7 +2,7 @@
 <div class="empty-state no-margin">
     <i class="icon-news"></i>
     <p>
-        {% if not createRoute %}
+        {% if createRoute and readonly %}
             There is no {{ locale.news }} to view at this time.
         {% else %}
             {% set createNewsQuerystringParams = [
