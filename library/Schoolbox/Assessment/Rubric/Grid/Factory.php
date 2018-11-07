@@ -22,7 +22,10 @@ class Factory
      *
      * @param Grid  $grid A grid (which already contains an assessment and rowset)
      * @param array $postData
-     * @param bool $validate Whether to run the backend validation on this data - should be FALSE for CSV export
+     * @param bool $validate Whether to run the backend validation on this data
+     *                       - should be FALSE for CSV import and export, as
+     *                       attempting to import/export an invalid grid should
+     *                       still succeed even if saving it will not.
      * @return Grid
      * @throws \InvalidArgumentException
      */
