@@ -51,7 +51,7 @@ class Factory
         // cache levels and ensure all exist in the rubric
         foreach ($levels as $levelSequence => $level) {
             $levelName = $level['name'];
-            $levelId   = (int)$level['id'] ?? null;
+            $levelId   = filter_var($level['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
 
             if(!$levelId || $grid->getLevels()->filterBy('id',$levelId)->count() == 0) {
                 $grid->getLevels()->add((new Level())->setName($levelName)->setId($levelId));
@@ -148,7 +148,7 @@ class Factory
                 }
 
                 $descriptor      = $descriptors[$indicatorId][$levelSequence];
-                $descriptorId    = $descriptor['id'] ?? null;
+                $descriptorId    = filter_var($descriptor['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
                 $descriptorText  = $descriptor['text'];
                 $descriptorValue = $descriptor['points'];
 

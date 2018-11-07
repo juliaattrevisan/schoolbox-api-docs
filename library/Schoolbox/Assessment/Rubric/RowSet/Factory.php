@@ -50,7 +50,7 @@ class Factory
         // Add capabilities
         foreach ($postData as $tempCapabilityId => $postedCapability) {
             $capability = (new Capability())
-                ->setId($postedCapability['id'])
+                ->setId(filter_var($postedCapability['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE))
                 ->setName($postedCapability['name'] ?? '')
                 ->setCurriculumNodes(
                     $this->nodeMapper->findByColumn('id', $postedCapability['curriculumCode'])
@@ -59,7 +59,7 @@ class Factory
             // Add indicators
             foreach ($postedCapability['items'] ?? [] as $tempIndicatorId => $postedIndicator) {
                 $indicator = (new Indicator())
-                    ->setId($postedIndicator['id'])
+                    ->setId(filter_var($postedIndicator['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE))
                     ->setName($postedIndicator['name'] ?? '')
                     ->setCurriculumNodes(
                         $this->nodeMapper->findByColumn('id', $postedIndicator['curriculumCode'])
