@@ -697,6 +697,8 @@ class Controller extends Base
      * @api GET /news/list
      * @level 18.1
      *
+     * @deprecated Article lists should now be done on the front-end, with an XHR calls
+     * 
      * @param int|null $year
      * @param int|null $month
      * @throws InvalidArgumentException
