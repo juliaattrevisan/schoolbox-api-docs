@@ -1602,7 +1602,9 @@ class RubricMapper
      */
     public function save(Rubric $rubric, SubmissionBox $submissionBox)
     {
-        trigger_error('This method is deprecated; use "persistGrid" instead', E_USER_DEPRECATED);
+        // Commented out for now so that Atlas import doesn't break
+        // TODO make Atlas import not use this (SA-7796)
+//        trigger_error('This method is deprecated; use "persistGrid" instead', E_USER_DEPRECATED);
 
         // juuust in case
         $rubric->setSubmissionBox($submissionBox);
