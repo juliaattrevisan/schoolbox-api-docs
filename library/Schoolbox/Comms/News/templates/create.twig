@@ -12,63 +12,6 @@
 
 {% set audienceIsReadOnly = article.isApproved%}
 
-{% set entityTypesData = {
-    campus: {
-        name:         'Campus',
-        namePlural:    'Campuses',
-        icon:          'location',
-        selfModifier:  'Users in campus',
-        ajaxRoute:     routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'campus'}),
-        hideFromModal: false,
-        isMulti:       true
-    },
-    role: {
-        name:         'Role',
-        namePlural:    'Roles',
-        icon:          'staff-students',
-        selfModifier:  'Users in role',
-        ajaxRoute:     routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'role'}),
-        hideFromModal: false,
-        isMulti:       false
-    },
-    school_house: {
-        name:         'House',
-        namePlural:    'Houses',
-        icon:          'home',
-        selfModifier:  'House members',
-        ajaxRoute:     routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'school_house'}),
-        hideFromModal: false,
-        isMulti:       false
-    },
-    year: {
-        name:         'Year Level',
-        namePlural:    'Year Levels',
-        icon:          'teacher',
-        selfModifier:  'Users in year level/s',
-        ajaxRoute:     routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'year'}),
-        hideFromModal: false,
-        isMulti:       false
-    },
-    folder: {
-        name:         'Class/Group',
-        namePlural:    'Classes & Groups',
-        icon:          'group',
-        selfModifier:  'Class/group members',
-        ajaxRoute:     routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'folder'}),
-        hideFromModal: false,
-        isMulti:       true
-    },
-    user: {
-        name:         'User',
-        namePlural:    'Users',
-        icon:          'user',
-        selfModifier:  'Users',
-        ajaxRoute:     routeLookup('commsNewsAudienceBrowser.getList', {entityType: 'user'}),
-        hideFromModal: true,
-        isMulti:       false
-    }
-} %}
-
 {% if not audienceIsReadOnly %}
 {# Build Placeholder text #}
 {% set availableNames = [] %}

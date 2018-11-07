@@ -393,6 +393,7 @@ class Controller extends Base
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'returnUrl'              => $this->getReturnUrl(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(true),
+            'entityTypesData'        => $this->getEntityTypesData(),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -602,6 +603,7 @@ class Controller extends Base
                 'returnUrl'             => $this->getReturnUrl(),
                 'encodedSegments'       => $this->getAudienceSegments($article, $filterAudiences),
                 'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(true),
+                'entityTypesData'       => $this->getEntityTypesData(false),
             ];
         }
 
@@ -1214,6 +1216,73 @@ class Controller extends Base
         }
         return $availableStrategies;
     }
+
+    /**
+     *
+     * @param bool $generateAjaxRoutes
+     * @return array
+     * @throws RouteNotFound
+     */
+    private function getEntityTypesData(bool $generateAjaxRoutes = true): array
+    {
+        $entityTypes = [
+            'campus' => [
+                'name'          =>  'Campus',
+                'namePlural'    =>  'Campuses',
+                'icon'          =>  'location',
+                'selfModifier'  =>  'Users in campus',
+                'hideFromModal' =>  false,
+                'isMulti'       =>  true,
+            ],
+            'role' => [
+                'name'          =>  'Role',
+                'namePlural'    =>  'Roles',
+                'icon'          =>  'staff-students',
+                'selfModifier'  =>  'Users in role',
+                'hideFromModal' =>  false,
+                'isMulti'       =>  false,
+            ],
+            'school_house' => [
+                'name'          =>  'House',
+                'namePlural'    =>  'Houses',
+                'icon'          =>  'House members',
+                'selfModifier'  =>  'Users in role',
+                'hideFromModal' =>  false,
+                'isMulti'       =>  false,
+            ],
+            'year' => [
+                'name'          =>  'Year Level',
+                'namePlural'    =>  'Year Levels',
+                'icon'          =>  'teacher',
+                'selfModifier'  =>  'Users in year level/s',
+                'hideFromModal' =>  false,
+                'isMulti'       =>  false,
+            ],
+            'folder' => [
+                'name'          =>  'Class/Group',
+                'namePlural'    =>  'Classes & Groups',
+                'icon'          =>  'group',
+                'selfModifier'  =>  'Class/group members',
+                'hideFromModal' =>  false,
+                'isMulti'       =>  true,
+            ],
+            'user' => [
+                'name'          =>  'User',
+                'namePlural'    =>  'Users',
+                'icon'          =>  'user',
+                'selfModifier'  =>  'Users',
+                'hideFromModal' =>  true,
+                'isMulti'       =>  false,
+            ],
+        ];
+        if ($generateAjaxRoutes) {
+            foreach ($entityTypes as $type => $entityType) {
+                $entityTypes[$type]['ajaxRoute'] = $this->router->generate('commsNewsAudienceBrowser.getList', ['entityType' => $type]);
+            }
+        }
+        return $entityTypes;
+    }
+
     /**
      * Updates an article's attributes with post data payload
      *

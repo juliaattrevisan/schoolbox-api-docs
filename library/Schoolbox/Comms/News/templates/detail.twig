@@ -11,33 +11,6 @@ Data:
 {% import '@commsNews/macro/layout.twig' as layout %}
 {% import '@commsNews/macro/indicator.twig' as indicator %}
 
-{% set entityTypesData = {
-    campus: {
-        name:         'Campus',
-        namePlural:    'Campuses',
-    },
-    role: {
-        name:         'Role',
-        namePlural:    'Roles',
-    },
-    school_house: {
-        name:         'House',
-        namePlural:    'Houses',
-    },
-    year: {
-        name:         'Year Level',
-        namePlural:    'Year Levels',
-    },
-    folder: {
-        name:         'Class/Group',
-        namePlural:    'Classes & Groups',
-    },
-    user: {
-        name:         'User',
-        namePlural:    'Users',
-    }
-} %}
-
 {# Modify article #}
 {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {article: article, articleId: article.id}) %}
 
