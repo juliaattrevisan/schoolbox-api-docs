@@ -10,7 +10,7 @@
              # Otherwise, don't do anything except the appended  ellipsis
              #}
             {% if readMore|length %}
-                {% set pacified = pacified ~ '<a href="' ~ detailUrl ~ '" title="Read more">' ~ readMore ~ '</a>' %}
+                {% set pacified = pacified ~ '<div class="article-read-more"><a href="' ~ detailUrl ~ '" title="Read more">' ~ readMore ~ '</a></div>' %}
             {% endif %}
             {{ pacified|trim|purify }}
         {% endif %}
