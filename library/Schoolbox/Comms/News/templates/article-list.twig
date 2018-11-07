@@ -415,7 +415,7 @@
 
                 var $toast = $('#toaster');
                 $toast.toastActivate({text: toastActivateMessage});
-                axios.post(requestURL, {}, { headers: postHeaders }).then(function () {
+                axios.post(requestURL, [], { headers: postHeaders }).then(function () {
                     $toast.toastTimeout({text: toastSuccessMessage, duration: 2000});
                     updateArticleIds(article.id);
                 }).catch(function (error) {

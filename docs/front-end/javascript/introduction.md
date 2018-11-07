@@ -52,7 +52,7 @@ For now, you can supply custom headers per request:
         ...
     });
     
-    // yourData is an object containing the post params to send; if there are none, provide an empty object {} instead
+    // yourData is an object containing the post params to send; if there are none, provide an empty array [] instead
     axios.post(yourUrl, yourData, {headers: postHeaders}).then(function(response) {
         ...
     });
