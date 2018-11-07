@@ -277,9 +277,7 @@ class Controller extends Base
                 }
             }
 
-            if ($option->isVisible()) {
-                $audienceSegments[] = $option;
-            }
+            $audienceSegments[] = $option;
         }
 
         return $audienceSegments;

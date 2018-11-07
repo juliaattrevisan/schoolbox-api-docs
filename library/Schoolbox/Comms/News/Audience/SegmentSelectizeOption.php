@@ -44,14 +44,6 @@ class SegmentSelectizeOption implements JsonSerializable
     private $labels = [];
 
     /**
-     * Segment visibilty
-     *
-     * @var bool
-     */
-    private $isHidden = false;
-
-
-    /**
      * @param string $key
      * @param string $name
      */
@@ -86,22 +78,5 @@ class SegmentSelectizeOption implements JsonSerializable
             'name'   => $this->name,
             'labels' => $this->labels,
         ];
-    }
-
-    /**
-     * Set segment visibility to hidden
-     */
-    public function setAsHidden()
-    {
-        $this->isHidden = true;
-    }
-
-    /**
-     *
-     * @return bool
-     */
-    public function isVisible(): bool
-    {
-        return !$this->isHidden;
     }
 }
