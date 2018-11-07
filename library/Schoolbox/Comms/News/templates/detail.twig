@@ -6,8 +6,8 @@ Data:
 #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
-{% import '@commsNews/layout.twig' as layout %}
-{% import '@commsNews/indicator.twig' as indicator %}
+{% import '@commsNews/macro/layout.twig' as layout %}
+{% import '@commsNews/macro/indicator.twig' as indicator %}
 
 {# Modify article #}
 {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {article: article, articleId: article.id}) %}
