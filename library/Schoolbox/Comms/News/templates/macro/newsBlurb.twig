@@ -4,7 +4,7 @@
         {% if article.blurb %}
             {% set blurb = article.blurb %}
         {% else %}
-            {% set blurb = article.body|cutSentence(300, true) %}
+            {% set blurb = article.body|striptags|cutSentence(300, true) %}
         {% endif %}
 
         {# If there's more of the article to read:
