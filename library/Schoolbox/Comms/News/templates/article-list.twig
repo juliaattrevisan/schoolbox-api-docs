@@ -273,7 +273,7 @@
 
                 // Set default selected tab (if not already set via twig above)
                 if (!self.tabSelected) {
-                    if (self.showTopicByDefault) {
+                    if (self.showTopicByDefault && self.topics[1]) {
                         self.tabSelected = self.topics[1].slug;
                     } else {
                         self.tabSelected = self.topicAll.slug;
