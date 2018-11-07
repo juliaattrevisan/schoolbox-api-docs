@@ -11,30 +11,25 @@ namespace Schoolbox\Assessment\Rubric\RowSet;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
  * An indicator within a rubric rowset.
  */
 class Indicator
 {
-    use Id;
     use HasCurriculumNodes;
+
+
+    /**
+     * @var int|null
+     */
+    private $id;
 
 
     /**
      * @var string
      */
     private $name;
-
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
 
 
     /**
@@ -87,6 +82,35 @@ class Indicator
             return true;
         }
         return false;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * @param int|null $id
+     * @return static
+     */
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 
 
