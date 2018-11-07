@@ -2,7 +2,7 @@
     action                string ['Create','Update']
     article               News\Article\Model
     featureImageZone      array
-    audienceSegments      null|array,
+    encodedSegments      null|array,
     isAutoSavable         bool
     availableEntityTypes  string[]         The set of entity types that can be audienced by the current user
     entityTypesData       array
@@ -756,8 +756,8 @@
                         $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
                     }
                 },
-                {% if audienceSegments|length %}
-                value: {{ audienceSegments|json_encode|raw }},
+                {% if encodedSegments|length %}
+                value: {{ encodedSegments|json_encode|raw }},
                 {% endif %}
                 multiple: true
             }).data('selectize');
