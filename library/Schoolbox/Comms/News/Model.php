@@ -954,7 +954,9 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     {
         return [
             'self'   => new AuraLink('commsNews.getDetail', [ 'article' => $this, 'articleId' => $this->getId() ]),
-            'update' => new AuraLink('commsNews.getUpdate', [ 'article' => $this, 'articleId' => $this->getId() ])
+            'update' => new AuraLink('commsNews.getUpdate', [ 'article' => $this, 'articleId' => $this->getId() ]),
+            'saveForLater' => new AuraLink('commsNewsSaveForLater.postAdd', [ 'article' => $this, 'articleId' => $this->getId() ]),
+            'unsaveForLater' => new AuraLink('commsNewsSaveForLater.postRemove', [ 'article' => $this, 'articleId' => $this->getId() ])
         ];
     }
 }

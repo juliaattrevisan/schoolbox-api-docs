@@ -26,3 +26,35 @@ Current usage is to just create a new Vue instance at the bottom of your twig fi
 Axios will be replacing jQuery's ajax functionality to make http requests.
 
 Documentation: https://github.com/axios/axios
+
+### Gotchas
+* Unlike jQuery's ajax library, axios does not set the XHR header - you need to do this manually.
+* By default Axios sends JSON payloads in POST requests. This is not compatible with our backend architecture, which expects `application/x-www-form-urlencoded`, so you need to manually set the `content-type` header.
+
+In the future, we will likely have a single place in which global axios defaults can be set (see [axios documentation on defaults](https://github.com/axios/axios#global-axios-defaults)). We will need to at least set the following:
+
+    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+
+For now, you can supply custom headers per request:
+
+    // Options
+    var getHeaders = {
+        'X-Requested-With' : 'XMLHttpRequest'
+    };
+
+    var postHeaders = {
+        'X-Requested-With' : 'XMLHttpRequest',
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+    
+    axios.get(yourUrl, {headers: getHeaders}).then(function(response) {
+        ...
+    });
+    
+    // yourData is an object containing the post params to send; if there are none, provide an empty array [] instead
+    axios.post(yourUrl, yourData, {headers: postHeaders}).then(function(response) {
+        ...
+    });
+
+The complete set of options accepted by axios can be found [here](https://github.com/axios/axios#request-config).

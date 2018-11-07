@@ -54,7 +54,6 @@ class Controller extends Base
     public function getList(): void
     {
         $articles = (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
-
         $params = new News\Querystring($this->getRequest()->query);
         $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
 
@@ -106,9 +105,8 @@ class Controller extends Base
      *
      * No error if item is already added to list when this is called.
      *
-     * @api POST /news/saved/{articleId}
-     *
      * @param News\Model $article
+     * @api POST /news/saved/{articleId}/add
      */
     public function postAdd(News\Model $article): void
     {
@@ -133,10 +131,10 @@ class Controller extends Base
      * No error if item was not in list when route was called.
      *
      * @param News\Model $article
+     * @api POST /news/saved/{articleId}/remove
      */
     public function postRemove(News\Model $article): void
     {
-        $response = [];
         try {
             $this->removeArticleFromUserSavedList($article, $this->getUser());
         } catch (BaseMapper\Exception $e) {
@@ -146,7 +144,7 @@ class Controller extends Base
         }
 
         if ($this->getRequest()->isXhr()) {
-            $this->getResponse()->content->set($this->buildJsonOutput($response));
+            $this->getResponse()->content->set($this->buildJsonOutput([]));
             return;
         }
     }
