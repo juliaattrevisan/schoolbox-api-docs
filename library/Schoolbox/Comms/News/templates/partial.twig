@@ -25,7 +25,7 @@
                             </a>
                         {% endif %}
 
-                        <h3><a href="{{ articleURL }}">{{ article.title }}</a></h3>
+                        <h3>{% if article.body %}<a href="{{ articleURL }}">{{ article.title }}</a>{% else %}{{ article.title }}{% endif %}</h3>
 
                         <p class="meta">Published by
                             {% if article.author.deletedAt.isNull %}
