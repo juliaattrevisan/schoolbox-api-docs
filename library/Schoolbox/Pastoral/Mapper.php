@@ -125,6 +125,22 @@ class Mapper extends BaseMapper
         $pastoralRevisionMapper->save($pastoralRevision);
     }
 
+
+    /**
+     * Find and reset the updated timestamp of the newly created revision of
+     * this record.
+     *
+     * @param Model                    $model
+     * @param Alaress_Date_Format|null $updatedAt
+     */
+    public function resetRevisionUpdatedTimestamp(Model $model, ?Alaress_Date_Format $updatedAt): void
+    {
+        /** @var PastoralRevisionMapper $revisionMapper */
+        $revisionMapper = $this->getJoinMapper('revisions');
+        $revisionMapper->resetRevisionUpdatedTimestamp($model, $updatedAt);
+    }
+
+
     /**
      * @inheritdoc
      */

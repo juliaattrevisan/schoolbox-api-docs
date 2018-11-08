@@ -351,6 +351,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             // Because updated_at is clobbered:
                             $this->pastoralMapper->resetUpdatedTimestamp($pastoralRecord, $modifiedDate);
 
+                            // Need to do the same for the revision too
+                            $this->pastoralMapper->resetRevisionUpdatedTimestamp($pastoralRecord, $modifiedDate);
+
                             $logRecord->setResult("OK");
                             $logRecord->setPastoralId($pastoralRecord->getId());
 

@@ -13,6 +13,7 @@
 
 namespace Schoolbox\Pastoral\Revision;
 
+use Alaress_Date_Format;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\DefinitionException;
@@ -229,5 +230,30 @@ class Mapper extends BaseMapper
         }
 
         return $revision;
+    }
+
+
+    /**
+     * Find and reset the updated timestamp of the newly created revision of
+     * this record.
+     *
+     * @param Pastoral                 $pastoral
+     * @param Alaress_Date_Format|null $updatedAt
+     */
+    public function resetRevisionUpdatedTimestamp(Pastoral $pastoral, ?Alaress_Date_Format $updatedAt): void
+    {
+        $this->database->query(
+            "
+                UPDATE {$this->table}
+                SET    updated_at = :updatedAt
+                WHERE  root_id    = :id
+                ORDER BY id DESC
+                LIMIT 1
+            ",
+            [
+                'id'        => $pastoral->getId(),
+                'updatedAt' => ($updatedAt && !$updatedAt->isNull()) ? $updatedAt->getDatabase() : null,
+            ]
+        );
     }
 }
