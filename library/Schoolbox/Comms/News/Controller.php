@@ -29,12 +29,15 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
+use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -219,12 +222,83 @@ class Controller extends Base
             'article'              => $article,
             'featureImageZone'     => $zone->getTwigContext(),
             'isAutoSavable'        => true,
-            'audienceSegments'     => $audienceSegments,
+            'encodedSegments'      => $audienceSegments,
             'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
             'returnUrl'            => $this->getReturnUrl(),
+            'entityTypesData'      => $this->getEntityTypesData(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
+    /**
+     * Generate article's audience segments with audience filtering based on the account access permission.
+     * If the logged in user is a member of a staff, filtering will be skipped.
+     *
+     * @param Model $article
+     * @param $filterAudiences
+     * @return array
+     */
+    private function getAudienceSegments(Model $article) :array
+    {
+        $audienceSegments = [];
+
+        $codec = new Audience\Segment\Codec($this->audienceMapper);
+
+        $translator = new Audience\Segment\Translator(
+            $this->databaseInternal,
+            $this->strategyFactory
+        );
+        $translator->buildCache($article);
+
+        foreach ($article->getAudience() as $segment) {
+
+            if(!$this->isAudienceVisibleToUser($segment, $this->getUser())){
+                continue;
+            }
+
+            // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
+            // Labels are used in brick rendering
+            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
+
+            // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
+            if ($segment->isSimple()) {
+                $encodedValue = $codec->encodeValue($segment->getEntityValue());
+                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
+            } else {
+                foreach ($segment->getChildren() as $child) {
+                    $encodedValue = $codec->encodeValue($child->getEntityValue());
+                    $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
+                }
+            }
+
+            $audienceSegments[] = $option;
+        }
+
+        return $audienceSegments;
+    }
+
+    /**
+     * @param Audience\Model $segment
+     * @param User $user
+     * @return bool
+     */
+    private function isAudienceVisibleToUser(Audience\Model $segment, User $user): bool
+    {
+        // Base Case:
+        if ($segment->isSimple()) {
+            return
+                $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
+                Access::getInstance()->getFolderAccess($user, $segment->getEntityValue()) >= UserAccess::ACCESS_READ;
+        }
+
+        // Recursive Case:
+        foreach ($segment->getChildren() as $childSegment) {
+            // If any child is not visible, this composite is not visible
+            if (!$this->isAudienceVisibleToUser($childSegment, $user)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * Redirects to `getCreate`, with a predefined audience brick for the given
@@ -303,42 +377,15 @@ class Controller extends Base
             $zone->attachFiles([$article->getFeatureImage()->getHash()]);
         }
 
-        $codec = new Audience\Segment\Codec($this->audienceMapper);
-
-        $translator = new Audience\Segment\Translator(
-            $this->databaseInternal,
-            $this->strategyFactory
-        );
-        $translator->buildCache($article);
-
-        // Audiencing selectize data
-        $audienceSegments = [];
-        foreach ($article->getAudience() as $segment) {
-            // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
-            // Labels are used in brick rendering
-            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
-
-            // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
-            if ($segment->isSimple()) {
-                $encodedValue = $codec->encodeValue($segment->getEntityValue());
-                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
-            } else {
-                foreach ($segment->getChildren() as $child) {
-                    $encodedValue = $codec->encodeValue($child->getEntityValue());
-                    $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
-                }
-            }
-            $audienceSegments[] = $option;
-        }
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action'                 => 'Update',
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
-            'audienceSegments'       => $audienceSegments,
+            'encodedSegments'        => $this->getAudienceSegments($article),
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
-            'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
             'returnUrl'              => $this->getReturnUrl(),
+            'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(true),
+            'entityTypesData'        => $this->getEntityTypesData(),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -540,11 +587,14 @@ class Controller extends Base
         } else {
             $segment = $this->getSession()->getSegment('Schoolbox\Comms\News\Controller');
             $data = [
-                'article'           => $article,
-                'flashMessage'      => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
-                'moderationEnabled' => $moderationEnabled,
-                'isSavedForLater'   => $isSavedForLater,
-                'returnUrl'         => $this->getReturnUrl(),
+                'article'               => $article,
+                'flashMessage'          => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
+                'moderationEnabled'     => $moderationEnabled,
+                'isSavedForLater'       => $isSavedForLater,
+                'returnUrl'             => $this->getReturnUrl(),
+                'encodedSegments'       => $this->getAudienceSegments($article),
+                'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(true),
+                'entityTypesData'       => $this->getEntityTypesData(false),
             ];
         }
 
@@ -717,7 +767,7 @@ class Controller extends Base
      * @level 18.1
      *
      * @deprecated Article lists should now be done on the front-end, with an XHR calls
-     * 
+     *
      * @param int|null $year
      * @param int|null $month
      * @throws InvalidArgumentException
@@ -1142,21 +1192,87 @@ class Controller extends Base
     /**
      * Returns the set of audience type strategies which the session user is permitted to audience to
      *
-     * @return string[]
+     * @param bool $bypassAudienceTypeFiltering
+     * @return array
      * @throws UnknownEntityTypeException
      * @throws UnexpectedValueException
      */
-    private function getAvailableAudienceTypeStrategies(): array
+    private function getAvailableAudienceTypeStrategies(bool $bypassAudienceTypeFiltering = false): array
     {
         $availableStrategies = [];
         foreach ($this->strategyFactory->makeAllSimpleStrategies() as $strategy) {
-            if ($strategy->canAudienceToEntityType($this->getUser())) {
+            if ($bypassAudienceTypeFiltering || $strategy->canAudienceToEntityType($this->getUser())) {
                 $availableStrategies[] = $strategy::getEntityType();
             }
         }
         return $availableStrategies;
     }
 
+    /**
+     *
+     * @param bool $generateAjaxRoutes
+     * @return array
+     * @throws RouteNotFound
+     */
+    private function getEntityTypesData(bool $generateAjaxRoutes = true): array
+    {
+        $entityTypes = [
+            'campus' => [
+                'name'          =>  'Campus',
+                'namePlural'    =>  'Campuses',
+                'icon'          =>  'location',
+                'selfModifier'  =>  'Users in campus',
+                'hideFromModal' =>  false,
+                'isMulti'       =>  true,
+            ],
+            'role' => [
+                'name'          =>  'Role',
+                'namePlural'    =>  'Roles',
+                'icon'          =>  'staff-students',
+                'selfModifier'  =>  'Users in role',
+                'hideFromModal' =>  false,
+                'isMulti'       =>  false,
+            ],
+            'school_house' => [
+                'name'          =>  'House',
+                'namePlural'    =>  'Houses',
+                'icon'          =>  'House members',
+                'selfModifier'  =>  'Users in role',
+                'hideFromModal' =>  false,
+                'isMulti'       =>  false,
+            ],
+            'year' => [
+                'name'          =>  'Year Level',
+                'namePlural'    =>  'Year Levels',
+                'icon'          =>  'teacher',
+                'selfModifier'  =>  'Users in year level/s',
+                'hideFromModal' =>  false,
+                'isMulti'       =>  false,
+            ],
+            'folder' => [
+                'name'          =>  'Class/Group',
+                'namePlural'    =>  'Classes & Groups',
+                'icon'          =>  'group',
+                'selfModifier'  =>  'Class/group members',
+                'hideFromModal' =>  false,
+                'isMulti'       =>  true,
+            ],
+            'user' => [
+                'name'          =>  'User',
+                'namePlural'    =>  'Users',
+                'icon'          =>  'user',
+                'selfModifier'  =>  'Users',
+                'hideFromModal' =>  true,
+                'isMulti'       =>  false,
+            ],
+        ];
+        if ($generateAjaxRoutes) {
+            foreach ($entityTypes as $type => $entityType) {
+                $entityTypes[$type]['ajaxRoute'] = $this->router->generate('commsNewsAudienceBrowser.getList', ['entityType' => $type]);
+            }
+        }
+        return $entityTypes;
+    }
 
     /**
      * Updates an article's attributes with post data payload

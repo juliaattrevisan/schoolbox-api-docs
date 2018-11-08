@@ -43,7 +43,6 @@ class SegmentSelectizeOption implements JsonSerializable
      */
     private $labels = [];
 
-
     /**
      * @param string $key
      * @param string $name

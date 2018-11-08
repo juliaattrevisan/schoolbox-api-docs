@@ -1,8 +1,10 @@
 {#
 Data:
-    article            News\Model
-    moderationEnabled  bool
-    isSavedForLater    bool
+    article                 News\Model
+    moderationEnabled       bool
+    isSavedForLater         bool
+    availableEntityTypes    string[]         The set of entity types that can be audienced by the current user
+    entityTypesData         array
 #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -183,7 +185,7 @@ Data:
     <div class="small-12 island">
         <section>
             <div class="card small-12">
-
+                
                 {% if article.author.deletedAt.isNull %}
                     <a href="/search/user/{{ article.author.id }}" title="View Profile">
                         <img src="/portrait.php?userId={{ article.author.externalId }}&size=square64" alt="View Profile" />
@@ -195,6 +197,42 @@ Data:
                 {% endif %}
 
                 <p class="meta">{{ article.publishAt.long }}</p>
+
+                <div id="audience-container" v-if="countModalSegmentTypes">
+                    <p class="meta">
+                        <span v-if="audienceBricks.length > 1">Audiences: </span>
+                        <span v-else>Audience: </span>
+                        <template v-show="audienceBricks.length" v-for="(audienceBrick, index) in audienceBricks">
+                            <span v-if="audienceBrick.isComposite()">
+                                <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel }</a>
+                            </span>
+                            <span v-else>
+                                ${ audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel }
+                            </span>
+                            <template v-if="index+1 < audienceBricks.length">, </template>
+                        </template>
+
+                        {# modal #}
+                        <div data-reveal id="audience-composite" class="reveal-modal">
+                            <h2>Complex Audience</h2>
+                            <a class="close-reveal-modal" aria-label="Close">×</a>
+                            <p class="meta" v-if="selectedCompositeBrick.modalData">
+                                This audience segment includes users who are in both one or more of the selected
+                                ${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() } and one or more of the selected
+                                ${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }.
+                            </p>
+                            <div class="audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
+                                <div><b>${ dimensionData.typeLabel.plural }:</b></div>
+                                <div>
+                                    <template v-for="(label, index) in dimensionData.valueLabels">
+                                        ${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </p>
+                </div>
+
             </div>
         </section>
     </div>
@@ -294,6 +332,97 @@ Data:
 <div id="recipientsModal" class="reveal-modal" data-reveal>
     <a class="close-reveal-modal">&#215;</a>
 </div>
+
+<script src="/javascript/shared/comms/audience-bricks.js"></script>
+<script src="/javascript/components/schoolbox-vue.min.js"></script>
+{% autoescape 'js' %}
+<script>
+    /**
+     * Encapsulates information about a type of audience, eg 'folder' or 'campus'
+     *
+     * @param {string}  entityType
+     * @param {string}  name
+     * @param {string}  namePlural
+     * @constructor
+     */
+    var AudienceOption = function(entityType, name, namePlural){
+        this.entityType     = entityType;
+        this.name           = name;
+        this.namePlural     = namePlural;
+    };
+
+    /** @var {AudienceOption[]|Object} audienceOptions */
+    var audienceOptions = {};
+    {% for entityType in availableEntityTypes %}
+    {% set data = entityTypesData[entityType] %}
+    {% if data %}
+    audienceOptions['{{ entityType }}'] = new AudienceOption(
+        '{{ entityType }}',
+        '{{ data.name }}',
+        '{{ data.namePlural | raw }}'
+    );
+    {% endif %}
+    {% endfor %}
+
+    // Bricks need to render various human-friendly labels, so inject the entityType labels
+    // into the BrickManager so it can supply it to Bricks that it creates.
+    var entityTypeLabelMap = {
+        composite: { // -_-
+            singular: 'Complex Audience',
+            plural: 'Complex Audience'
+        }
+    };
+    for (var entityType in audienceOptions) {
+        entityTypeLabelMap[entityType] = {
+            singular: audienceOptions[entityType].name,
+            plural: audienceOptions[entityType].namePlural
+        };
+    }
+
+    var brickManager;
+    var codec = new Codec();
+
+    var app = new Vue({
+        el: '#audience-container',
+        delimiters: ['${', '}'],
+        mounted: function() {
+            var vue          = this;
+            brickManager = new BrickManager(vue, codec, entityTypeLabelMap);
+
+            var audienceSegments = {{ encodedSegments|json_encode|raw }};
+
+            for(key in audienceSegments) {
+                var segment = audienceSegments[key];
+                brickManager.onAddSegment(null, vue.audienceBricks, segment.key, segment.name, segment, segment.labels);
+            }
+        },
+        data: {
+            audienceBricks: [],
+            selectedCompositeBrick: {}
+        },
+        methods: {
+            showCompositeInfo: function(audienceBrick) {
+                this.selectedCompositeBrick = audienceBrick;
+                // Show modal
+                $('#audience-composite').foundation('reveal', 'open');
+            }
+        },
+        computed: {
+            // Returns the number of different audience segment entity-types
+            countModalSegmentTypes: function(){
+                var count = 0;
+                for(var i in audienceOptions){
+                    if(audienceOptions.hasOwnProperty(i)){
+                        count++;
+                    }
+                }
+
+                return count;
+            }
+        }
+    });
+</script>
+{% endautoescape %}
 
 {% if article.canBeRejected and rejectRoute %}
 <script>
