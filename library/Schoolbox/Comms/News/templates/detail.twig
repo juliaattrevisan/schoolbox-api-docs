@@ -216,10 +216,18 @@ Data:
                         <div data-reveal id="audience-composite" class="reveal-modal">
                             <h2>Complex Audience</h2>
                             <a class="close-reveal-modal" aria-label="Close">×</a>
-                            <p class="meta" v-if="selectedCompositeBrick.modalData">This audience segment includes users who are in both one or more of the selected ${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() } and one or more of the selected ${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }.</p>
+                            <p class="meta" v-if="selectedCompositeBrick.modalData">
+                                This audience segment includes users who are in both one or more of the selected
+                                ${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() } and one or more of the selected
+                                ${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }.
+                            </p>
                             <div class="audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
                                 <div><b>${ dimensionData.typeLabel.plural }:</b></div>
-                                <div><template v-for="(label, index) in dimensionData.valueLabels">${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template></template></div>
+                                <div>
+                                    <template v-for="(label, index) in dimensionData.valueLabels">
+                                        ${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template>
+                                    </template>
+                                </div>
                             </div>
                         </div>
                     </p>
