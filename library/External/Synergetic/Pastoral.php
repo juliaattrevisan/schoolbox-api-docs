@@ -336,11 +336,21 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                                 $pastoralRecord->setModifiedBy($modifier);
                             }
 
+                            $modifiedDate = null;
+                            if ($record['ModifiedDate']) {
+                                $modifiedDate = new Alaress_Date_Format($record['ModifiedDate'], Alaress_Date_Format::DATABASE_FORMAT);
+                                $pastoralRecord->setUpdatedAt($modifiedDate);
+                            }
+
                             if ($this->config->get('pastoral_severity')) {
                                 $pastoralRecord->setSeverity($severity);
                             }
 
                             $this->getPastoralMapper()->save($pastoralRecord);
+
+                            // Because updated_at is clobbered:
+                            $this->pastoralMapper->resetUpdatedAt($pastoralRecord, $modifiedDate);
+
                             $logRecord->setResult("OK");
                             $logRecord->setPastoralId($pastoralRecord->getId());
 
