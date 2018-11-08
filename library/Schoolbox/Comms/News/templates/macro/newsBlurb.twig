@@ -4,7 +4,7 @@
         {% if article.blurb %}
             {% set blurb = article.blurb %}
         {% else %}
-            {% set blurb = article.body|striptags|cutSentence(300, true) %}
+            {% set blurb = article.body|striptags|cutSentence(300, true)  %}
         {% endif %}
 
         {# If there's more of the article to read:
@@ -16,8 +16,6 @@
             {% if readMore|length %}
                 {% set detailUrl = routeLookup('commsNews.getDetail', {articleId: article.id}) %}
                 {% set readMoreLink = '<div class="article-read-more"><a href="' ~ detailUrl ~ '" title="Read more">' ~ readMore ~ '</a></div>' %}
-            {% else %}
-                {% set blurb = blurb|trim ~ '...' %}
             {% endif %}
         {% endif %}
 
