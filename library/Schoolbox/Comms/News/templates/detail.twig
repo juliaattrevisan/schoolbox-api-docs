@@ -408,11 +408,11 @@ Data:
             }
         },
         computed: {
-            // Returns the number of different audience segment entity-types available in the modal
+            // Returns the number of different audience segment entity-types
             countModalSegmentTypes: function(){
                 var count = 0;
                 for(var i in audienceOptions){
-                    if(audienceOptions.hasOwnProperty(i) && !audienceOptions[i].hideFromModal){
+                    if(audienceOptions.hasOwnProperty(i)){
                         count++;
                     }
                 }
