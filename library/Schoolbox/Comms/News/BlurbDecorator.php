@@ -40,10 +40,9 @@ class BlurbDecorator implements IDecorator
             return $json;
         }
 
-        if (!$model->getBlurb()) {
+        if (strlen(strip_tags($model->getBlurb())) == 0) {
             $json['blurb'] = TextFormatter::cutSentence(Scrub::html2text($model->getBody()), 300);
         }
-
        
         $json['readmore'] = [
             'string' => '',
@@ -52,13 +51,15 @@ class BlurbDecorator implements IDecorator
 
         // Show 'read more' link if a body exists, and 'read more' text exists,
         // Or just set readmore to available if body exists (for links from title and feature image)
-        if ($model->getBody() && \strlen($this->readmore)) {
-            $json['readmore'] = [
-                'string' => $this->readmore,
-                'available' => true
-            ];
-        } elseif ($model->getBody()) {
-            $json['readmore']['available'] = true;
+        if ($model->getBody()) {
+            if (\strlen($this->readmore)) {
+                $json['readmore'] = [
+                    'string' => $this->readmore,
+                    'available' => true
+                ];
+            } else {
+                $json['readmore']['available'] = true;
+            }
         }
 
         return $json;

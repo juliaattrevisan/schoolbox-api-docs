@@ -42,9 +42,15 @@
                                     <b>${ article.status }</b>
                                     <time :title="article.statusDate.long">${ article.statusDate.relativeTime }</time>
                                 </p>
-
                             </div>
                         </div>
+
+                        <article>
+                            <div v-html="article.blurb"></div>
+                            <div class="article-read-more">
+                                <a v-if="article.readmore.available" :href="article._links.self.href" v-html="article.readmore.string"></a>
+                            </div>
+                        </article>
                         <nav>
                             <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
                         </nav>
@@ -115,7 +121,6 @@
 
                 // Find some articles
                 axios.get('{{ routeLookup('commsNews.getAuthoredArticles') }}').then(function(response) {
-
                     // Convert response into an array
                     var articles = Object.keys(response.data).map(function(key) {
                         return response.data[key];
