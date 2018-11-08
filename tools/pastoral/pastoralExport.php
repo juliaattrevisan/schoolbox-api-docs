@@ -1,0 +1,135 @@
+<?php
+
+/**
+ * Synergetic Pastoral Exporter
+ *
+ * @author      Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ */
+
+use Aura\Di\Container as Injector;
+use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Model as PastoralModel;
+use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
+use Schoolbox\Pastoral\UploadQueue\Model as PastoralUploadQueueModel;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('\\Schoolbox\\Application\\Daemon');
+
+$kernel = new Schoolbox\Application\Daemon\Kernel('Pastoral Export', array(
+    'verbose' => array(false, false, false),
+));
+
+$kernel->run(function ($di, $loop, $log, $opts) {
+
+    /**
+     * @var Injector $di
+     * @var LoopInterface $loop
+     * @var LoggerInterface $log
+     * @var array $opts
+     */
+
+    // Only process if pastoral docman writeback is actually enabled in config
+
+    if (!$di->get('config')->get("external_pastoral")) {
+        $log->warning('Pastoral external is disabled, exiting...');
+        exit;
+    }
+
+    pcntl_signal(SIGCHLD, SIG_DFL);
+
+    $pastoralMapper            = PastoralMapper::getInstance();
+    $pastoralUploadQueueMapper = PastoralUploadQueueMapper::getInstance();
+    $externalPastoral = new External_Pastoral();
+
+    $lock = new Alaress_Lock('pastoral_export.' . INSTANCE_ID . '.lock');
+
+    if (!$lock->acquire()) {
+        $log->warn("A pastoral export is currently in progress, exiting...");
+        exit;
+    }
+
+    $log->info("Beginning export of pastoral records...");
+
+    // Retrieve all pastoral records and re-save
+
+    $pastoralRecords = $pastoralMapper->findAll();
+
+    /** @var PastoralModel $pastoralRecord */
+    foreach ($pastoralRecords as $pastoralRecord) {
+        $log->info("Removing existing external ID (Pastoral ID #{$pastoralRecord->getId()})...");
+        $pastoralRecord->setExternalId(null);
+        $pastoralMapper->save($pastoralRecord);
+
+        $log->info("Saving pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
+        $externalPastoral->syncPastoral($pastoralRecord);
+
+        $log->info("New external ID (Pastoral ID #{$pastoralRecord->getId()})...");
+    }
+
+    // Revert all docman uploads to pending
+
+    $pastoralUploads = $pastoralUploadQueueMapper->findAll();
+    foreach ($pastoralUploads as $pastoralUpload) {
+        $pastoralUpload->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
+        $pastoralUploadQueueMapper->save($pastoralUpload);
+    }
+
+    // Re-upload all documents
+
+    $pendingQueue = $pastoralUploadQueueMapper->getPending();
+
+    $failed  = 0;
+    $success = 0;
+
+    /** @var PastoralUploadQueueModel $file */
+    foreach ($pendingQueue as $file) {
+
+        if (!empty($file->getStorage())) {
+            $hash = $file->getStorage()->getHash();
+
+            $log->info("Starting process of file '{$hash}'");
+
+            // Mark file as processing so another daemon get started and try to duplicate processing
+
+            $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PROCESSING);
+
+            try {
+                $pastoralUploadQueueMapper->save($file);
+            } catch (PDOException $e) {
+                $log->alert("File '{$hash}' failed:" . $e->getMessage());
+                $failed++;
+                continue;
+            }
+
+            // Upload file to DocMan
+
+            try {
+                $file->uploadPastoralDocument();
+                $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_COMPLETED);
+            } catch (Exception $e) {
+                $log->error("$e", array($e));
+                $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_FAILED);
+            }
+
+            if ($file->getStatus() === PastoralUploadQueueMapper::UPLOAD_STATUS_FAILED) {
+                $log->error("Uploading of file '{$hash}' failed");
+                $failed++;
+            } else {
+                $log->info("Uploading of file '{$hash}' completed\n");
+                $success++;
+            }
+        } else {
+            $log->error("Uploading of upload queue item '{$file->getId()}' failed. No storage object found");
+            $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_FAILED);
+        }
+
+        $pastoralUploadQueueMapper->save($file);
+    }
+
+    $lock->release();
+    $log->info("Processing of pastoral upload completed: $success succeeded, $failed failed");
+});

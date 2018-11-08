@@ -33,9 +33,9 @@ class External_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function importPastoral(User $user, User $defaultOwner, $importParentAccess)
+    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments)
     {
-        return $this->getDatabase()->importPastoral($user, $defaultOwner, $importParentAccess);
+        return $this->getDatabase()->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments);
     }
 
     /**
