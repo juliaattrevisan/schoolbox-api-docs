@@ -186,11 +186,12 @@ class Controller extends Base
 
         // Prefill audience
         $audienceSegments = [];
-        $groupId = $this->getRequest()->query->get('groupId');
-        $entityType = $this->getRequest()->query->get('type');
+        $params = new Querystring($this->getRequest()->query);
+        $folderId = $params->getFolderId();
+        $entityType = $params->getEntityType();
 
         // Hard-coded to folder (for now)
-        if ($groupId && $entityType && $entityType === Audience\Segment\Strategy\Folder::getEntityType()) {
+        if ($folderId && $entityType && $entityType === Audience\Segment\Strategy\Folder::getEntityType()) {
             $folderStrategy = $this->strategyFactory->makeSimpleStrategy($entityType);
             // Ensure the user is permitted to target this entity type
             if ($folderStrategy->canAudienceToEntityType($this->getUser())) {
@@ -198,16 +199,16 @@ class Controller extends Base
                 $sql = $folderStrategy->getAudiencingSql($this->getUser());
                 $availableFolders   = $sql ? $this->databaseInternal->executeQuery($sql)->fetchAll() : [];
                 $availableFolderIds = \array_column($availableFolders, 'id');
-                if (\in_array($groupId, $availableFolderIds, false)) {
+                if (\in_array($folderId, $availableFolderIds, false)) {
                     $codec = new Audience\Segment\Codec($this->audienceMapper);
-                    $label = $this->folderMapper->findCheaplyById($groupId)->getNameWithCodes();
+                    $label = $this->folderMapper->findCheaplyById($folderId)->getNameWithCodes();
 
                     $audienceSegment = new Audience\SegmentSelectizeOption(
-                        $codec->encodeSimpleAttributes($entityType, $groupId, Audience\Model::RELATIONSHIP_SELF),
+                        $codec->encodeSimpleAttributes($entityType, $folderId, Audience\Model::RELATIONSHIP_SELF),
                         $label
                     );
 
-                    $audienceSegment->addLabel($entityType, $codec->encodeValue($groupId), $label);
+                    $audienceSegment->addLabel($entityType, $codec->encodeValue($folderId), $label);
                     $audienceSegments[] = $audienceSegment;
                 }
             }
@@ -220,6 +221,7 @@ class Controller extends Base
             'isAutoSavable'        => true,
             'audienceSegments'     => $audienceSegments,
             'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
+            'returnUrl'            => $this->getReturnUrl(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -238,13 +240,13 @@ class Controller extends Base
      */
     public function getCreateInFolder(int $folderId): void
     {
-        // Redirect somewhere
-        $params = [
-            'groupId' => $folderId,
-            'type'    => 'folder',
-        ];
+        $params = new Querystring($this->getRequest()->query);
+        $params->setFolderId($folderId);
+        $params->setEntityType(Audience\Segment\Strategy\Folder::getEntityType());
+        $params->setReturnUrl(Querystring::encode('/homepage/' . $folderId));
+
         $this->response->redirect->to(
-            $this->router->generate('commsNews.getCreate') . '?' . http_build_query($params)
+            $this->router->generate('commsNews.getCreate') . '?' . $params
         );
     }
 
@@ -336,6 +338,7 @@ class Controller extends Base
             'audienceSegments'       => $audienceSegments,
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
+            'returnUrl'              => $this->getReturnUrl(),
         ])->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -410,6 +413,9 @@ class Controller extends Base
 
             // Send the update page route, JS will update the window state to this
             $url = $this->getRouter()->generate('commsNews.getUpdate', $routeParams);
+            if (isset($data[Querystring::RETURN_URL])) {
+                $url .= '?' . http_build_query([Querystring::RETURN_URL => $data[Querystring::RETURN_URL]]);
+            }
 
             // Send all the possible routes, JS will determine which ones to show where
             $updateRoute = $this->getRouter()->generate('commsNews.postUpdate', $routeParams);
@@ -420,11 +426,12 @@ class Controller extends Base
             }
 
             $this->getResponse()->content->set($this->buildJsonOutput([
-                'success' => true,
-                'articleId' => $article->getId(),
-                'url' => $url,
-                'updateRoute' => $updateRoute,
-                'submitRoute' => $submitRoute,
+                'success'      => true,
+                'articleId'    => $article->getId(),
+                'url'          => $url,
+                'returnUrl'    => $data[Querystring::RETURN_URL],
+                'updateRoute'  => $updateRoute,
+                'submitRoute'  => $submitRoute,
                 'approveRoute' => $approveRoute
             ]));
         } else {
@@ -433,7 +440,14 @@ class Controller extends Base
              * Go to the detail screen to see the outcome of your changes
              * and also use that screen to advance to the next step
              */
-            $nextStep = $this->getRouter()->generate('commsNews.getDetail', $routeParams);
+            if ($article->isPublished() && $data[Querystring::RETURN_URL]) {
+                $nextStep = Querystring::decode($data[Querystring::RETURN_URL]);
+            } else {
+                $nextStep = $this->getRouter()->generate('commsNews.getDetail', $routeParams);
+                if (isset($data[Querystring::RETURN_URL])) {
+                    $nextStep .= '?' . http_build_query([Querystring::RETURN_URL => $data[Querystring::RETURN_URL]]);
+                }
+            }
             $this->getResponse()->redirect->afterPost($nextStep);
             return;
         }
@@ -464,6 +478,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      * @throws \PDOException
+     * @throws RouteNotFound
      */
     public function getDetail(Model $article): void
     {
@@ -525,10 +540,11 @@ class Controller extends Base
         } else {
             $segment = $this->getSession()->getSegment('Schoolbox\Comms\News\Controller');
             $data = [
-                'article'            => $article,
-                'flashMessage'       => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
-                'moderationEnabled'  => $moderationEnabled,
-                'isSavedForLater'    => $isSavedForLater,
+                'article'           => $article,
+                'flashMessage'      => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
+                'moderationEnabled' => $moderationEnabled,
+                'isSavedForLater'   => $isSavedForLater,
+                'returnUrl'         => $this->getReturnUrl(),
             ];
         }
 
@@ -659,11 +675,14 @@ class Controller extends Base
 
             $this->newsMapper->delete($article);
 
-            /* If you're a moderator, go back to the Moderation list
-             *
-             * TODO: Otherwise go...somewhere else? I don't have a component or dashboard yet
+            /* Redirect to returnUrl if provided, otherwise to news feed.
              */
-            $nextStep = $this->getRouteIfAuthorized('commsNewsModeration.getList') ?: '/';
+
+            if ($this->getRequest()->query->get(Querystring::RETURN_URL)) {
+                $nextStep = Querystring::decode($this->getRequest()->query->get(Querystring::RETURN_URL));
+            } else {
+                $nextStep = $this->getRouter()->generate('commsNews.getIndex');
+            }
 
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->content->set($this->buildJsonOutput([
@@ -691,7 +710,7 @@ class Controller extends Base
 
 
     /**
-     * Get a list of articles that were audienced to me
+     * This is now used only in News Archive with a topic
      * This is the central piece of the puzzle
      *
      * @api GET /news/list
@@ -1091,7 +1110,6 @@ class Controller extends Base
             'compactMode' => $params->getCompactMode(),
             'referrer' => $params->getReferrer(),
             'folderId' => $params->getFolderId(),
-            'readonly' => $params->getReadOnlyFlag()
         ]);
     }
 
@@ -1231,4 +1249,51 @@ class Controller extends Base
             }
         }
     }
+
+    /**
+     * Gets return url from query string and history.
+     * @return null|string
+     */
+    private function getReturnUrl(): ?string
+    {
+        $returnUrl = $this->getRequest()->query->get(Querystring::RETURN_URL);
+        if (!$returnUrl) {
+            $cameFrom = $this->getSession()->getHistory();
+            $validUrls = ['/'];
+            $asyncUrls = [];
+            try {
+                // if the previous url is for ajax call, get one before.
+                $listForUserUrl = $this->getRouter()->generate('commsNews.getListForUser');
+                if ($listForUserUrl) {
+                    $asyncUrls[] = $listForUserUrl;
+                }
+                $authoredArticlesUrl = $this->getRouter()->generate('commsNews.getAuthoredArticles');
+                if ($authoredArticlesUrl) {
+                    $asyncUrls[] = $authoredArticlesUrl;
+                }
+                if (\in_array($cameFrom, $asyncUrls)) {
+                    $cameFrom = $this->getSession()->getHistory(2);
+                }
+
+                $authoredUrl = $this->getRouter()->generate('commsNews.getAuthored');
+                if ($authoredUrl) {
+                    $validUrls[] = $authoredUrl;
+                }
+                $indexUrl = $this->getRouter()->generate('commsNews.getIndex');
+                if ($indexUrl) {
+                    $validUrls[] = $indexUrl;
+                }
+            } catch (RouteNotFound $e) {
+                return null;
+            }
+
+            // navigate back to dashboard, homepage or /me, if came from one of them.
+            if (\in_array($cameFrom, $validUrls)
+                || \strpos($cameFrom, '/homepage') !== false) {
+                $returnUrl = Querystring::encode($cameFrom);
+            }
+        }
+        return $returnUrl;
+    }
+
 }

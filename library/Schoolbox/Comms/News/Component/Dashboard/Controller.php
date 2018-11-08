@@ -81,6 +81,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             'compactMode' => $this->getConfig('compactMode'),
             'limit' => $limit,
             'referrer' => News\Statistics\Mapper::REFERRER_DASHBOARD,
+            'returnUrl' => News\Querystring::encode('/'),
             'queryStringPage' => News\Querystring::PAGE_NUMBER,
             'queryStringReferrer' => News\Querystring::REFERRER,
             'queryStringTopic' => News\Querystring::TOPIC_SLUG,

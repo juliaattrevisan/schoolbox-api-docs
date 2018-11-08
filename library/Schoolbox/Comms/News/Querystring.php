@@ -65,17 +65,21 @@ class Querystring
     public const REFERRER = 'ref';
 
     /**
+     * Querystring param for return url
+     */
+    public const RETURN_URL = 'returnUrl';
+
+    /**
+     * Querystring param for entity type
+     */
+    public const ENTITY_TYPE = 'type';
+
+    /**
      * An array of key/value pairs corresponding to GET params
      *
      * @var array
      */
     private $querystring;
-
-    /**
-     * Querystring param for Read-Only
-     */
-    public const READONLY = 'ro';
-
 
     /**
      * Querystring constructor.
@@ -93,7 +97,8 @@ class Querystring
             self::FOLDER => $data[self::FOLDER],
             self::REFERRER => $data[self::REFERRER],
             self::STATUS => $data[self::STATUS],
-            self::READONLY => $data[self::READONLY]
+            self::ENTITY_TYPE => $data[self::ENTITY_TYPE],
+            self::RETURN_URL => $data[self::RETURN_URL],
         ];
     }
 
@@ -184,15 +189,24 @@ class Querystring
     }
 
     /**
-     * The option to determine whether the request is read-only
+     * Get the entity type
      *
-     * @return bool
+     * @return null|string
      */
-    public function getReadOnlyFlag(): bool
+    public function getEntityType(): ?string
     {
-        return (bool)$this->querystring[self::READONLY];
+        return $this->querystring[self::ENTITY_TYPE];
     }
 
+    /**
+     * Get the return url
+     *
+     * @return null|string
+     */
+    public function getReturnUrl(): ?string
+    {
+        return $this->querystring[self::RETURN_URL];
+    }
 
     /**
      * @param null|string $referrer
@@ -204,6 +218,35 @@ class Querystring
         return $this;
     }
 
+    /**
+     * Set entity type
+     *
+     * @param string $entityType
+     */
+    public function setEntityType(?string $entityType)
+    {
+        $this->querystring[self::ENTITY_TYPE] = $entityType;
+    }
+
+    /**
+     * Set the folder id if one was specified
+     *
+     * @param int $folderId
+     *
+     */
+    public function setFolderId(int $folderId)
+    {
+        $this->querystring[self::FOLDER] = (string)$folderId;
+    }
+
+    /**
+     * Set the return url
+     * @param null|string $returnUrl
+     */
+    public function setReturnUrl(?string $returnUrl)
+    {
+        $this->querystring[self::RETURN_URL] = $returnUrl;
+    }
 
     /**
      * Array representation of the params
@@ -260,4 +303,34 @@ class Querystring
     {
         return (int)$param ?: 1;
     }
+
+    /**
+     * Encode a url
+     * TODO: merging library/Schoolbox/Learning/Assessment/Redirect.php ?
+     *
+     * @param $url
+     * @return null|string
+     */
+    public static function encode(?string $url): ?string
+    {
+        if ($url === null) {
+            return null;
+        }
+        return urlencode(base64_encode($url));
+    }
+
+    /**
+     * Decode an encoded redirect url
+     *
+     * @param $encoded
+     * @return null|string
+     */
+    public static function decode(?string $encoded): ?string
+    {
+        if ($encoded === null) {
+            return null;
+        }
+        return base64_decode(urldecode($encoded));
+    }
+
 }

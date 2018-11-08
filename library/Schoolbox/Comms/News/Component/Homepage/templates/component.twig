@@ -8,7 +8,6 @@ Data:
     folderId            int
     key                 string
     referrer            string
-    readonly            bool
  #}
 <div id="toast" class="toast"></div>
 <script src="/javascript/shared/comms/articletabs.js"></script>
@@ -19,8 +18,7 @@ Data:
         'l=' ~ limit,
         'f=' ~ folderId,
         'hp=1',
-        'ref=' ~ referrer,
-        'ro=' ~ (readonly ? '1' : '0')
+        'ref=' ~ referrer
     ] |join('&') %}
 
     {% set getListHomePagePath = routeLookup('commsNews.getListForHomepage', {folderId: folderId}) %}

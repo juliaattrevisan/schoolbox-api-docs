@@ -21,6 +21,7 @@ Data:
 {% else %}
     {% set rejectVerb = 'Reject' %}
 {% endif %}
+{% set returnUrlQueryString = returnUrl ? '?' ~ RETURN_URL.name ~ '=' ~ returnUrl : '' %}
 
 <script type="text/javascript">
     $(function() {
@@ -163,7 +164,7 @@ Data:
             {% endif %}
 
             {% if deleteRoute %}
-                <li><a class="icon-delete" href="{{ deleteRoute }}" data-delete="{{ article.title }}">Delete</a></li>
+                <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString }}" data-delete="{{ article.title }}">Delete</a></li>
             {% endif %}
 
             {% if rejectRoute %}
@@ -277,6 +278,9 @@ Data:
                 {% endif %}
                 <li>
                     <form action="{{ approveRoute ?: submitRoute }}" method="post">
+                        {% if returnUrl|length %}
+                            <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}" />
+                        {% endif %}
                         <input type="submit" value="{{ buttonText }}" />
                     </form>
                 </li>

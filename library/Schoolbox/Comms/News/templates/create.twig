@@ -128,6 +128,9 @@
         <form id="createForm" action="{{ formAction }}" data-action-draft="{{ formAction }}" data-action-submit="{{ formActionSubmit }}" method="post">
             <section>
                 <fieldset class="content">
+                    {% if returnUrl|length %}
+                        <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}" />
+                    {% endif %}
                     <div class="small-12 columns">
                         <label for="news-title" class="required">Title</label>
                         <input id="news-title" name="title" type="text" maxlength="255" value="{{ article.title }}" required />

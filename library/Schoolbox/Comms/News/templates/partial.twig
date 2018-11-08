@@ -83,7 +83,7 @@
         <div class="empty-state no-margin">
             <i class="icon-news"></i>
             <p>
-                {% if createRoute and readonly %}
+                {% if not createRoute %}
                     There is no {{ locale.news }} to view at this time.
                 {% else %}
                     {% set createNewsQuerystringParams = [
@@ -96,7 +96,6 @@
             </p>
         </div>
     {% else %}
-        {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
         <div class="empty-state no-margin">
             <i class="icon-news"></i>
             <p>
