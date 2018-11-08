@@ -237,7 +237,7 @@ class Controller extends Base
      * @param $filterAudiences
      * @return array
      */
-    private function getAudienceSegments(Model $article, bool $filterAudiences) :array
+    private function getAudienceSegments(Model $article) :array
     {
         $audienceSegments = [];
 
@@ -251,7 +251,7 @@ class Controller extends Base
 
         foreach ($article->getAudience() as $segment) {
 
-            if($filterAudiences && !$this->isAudienceVisibleToUser($segment, $this->getUser())){
+            if(!$this->isAudienceVisibleToUser($segment, $this->getUser())){
                 continue;
             }
 
@@ -377,12 +377,11 @@ class Controller extends Base
             $zone->attachFiles([$article->getFeatureImage()->getHash()]);
         }
 
-        $filterAudiences = !$this->getUser()->getRole()->isStaff();
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action'                 => 'Update',
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
-            'encodedSegments'        => $this->getAudienceSegments($article, $filterAudiences),
+            'encodedSegments'        => $this->getAudienceSegments($article),
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'returnUrl'              => $this->getReturnUrl(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(true),
@@ -586,7 +585,6 @@ class Controller extends Base
             unset($data['article']['featureImage']['_links']['fetch']);
 
         } else {
-            $filterAudiences = !$this->getUser()->getRole()->isStaff();
             $segment = $this->getSession()->getSegment('Schoolbox\Comms\News\Controller');
             $data = [
                 'article'               => $article,
@@ -594,7 +592,7 @@ class Controller extends Base
                 'moderationEnabled'     => $moderationEnabled,
                 'isSavedForLater'       => $isSavedForLater,
                 'returnUrl'             => $this->getReturnUrl(),
-                'encodedSegments'       => $this->getAudienceSegments($article, $filterAudiences),
+                'encodedSegments'       => $this->getAudienceSegments($article),
                 'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(true),
                 'entityTypesData'       => $this->getEntityTypesData(false),
             ];
