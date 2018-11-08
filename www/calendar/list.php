@@ -64,6 +64,7 @@ if (count($this->arg) >= 2) {
 $this->setFile(TEMPLATE_content, 'calendar/list.html');
 $this->setBlock(TEMPLATE_content, 'has_no_events', 'has_no_events_block');
 $this->setBlock(TEMPLATE_content, 'date', 'date_block');
+$this->setBlock(TEMPLATE_content, 'has_series', 'has_series_block');
 $this->setBlock('date', 'event', 'event_block');
 
 $this->setVar(
@@ -71,6 +72,7 @@ $this->setVar(
         'has_no_events_block' => '',
         'date_block' => '',
         'event_block' => '',
+        'has_series_block' => '',
     )
 );
 
@@ -103,6 +105,7 @@ $calendar = new Lister(
 $lastDate = false;
 
 if ($calendar->getAllEvents()->count()) {
+    $hasSeries = false;
     foreach ($calendar->getAllEvents() as $currentEvent) {
         $currentDate = $currentEvent->getStartTime()->getDatabaseDate();
 
@@ -119,11 +122,20 @@ if ($calendar->getAllEvents()->count()) {
             $this->parse('event_block', 'event', true);
         }
         $lastDate = $currentDate;
+
+        if ($currentEvent->getSeriesId()
+            || ($currentEvent instanceof \Calendar\Event\Type\ResourceBooking\Event
+                && $currentEvent->getBooking()->getEvent()->getSeriesId())) {
+            $hasSeries = true;
+        }
     }
 
     // Parze out blox after last event
 
     $this->parse('date_block', 'date', true);
+    if ($hasSeries) {
+        $this->parse('has_series_block', 'has_series', true);
+    }
 } else {
     $this->parse('has_no_events_block', 'has_no_events');
 }
