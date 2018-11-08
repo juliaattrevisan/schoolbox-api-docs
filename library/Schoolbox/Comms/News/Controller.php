@@ -237,7 +237,7 @@ class Controller extends Base
      * @param $filterAudiences
      * @return array
      */
-    private function getAudienceSegments(Model $article, $filterAudiences) :array
+    private function getAudienceSegments(Model $article, bool $filterAudiences) :array
     {
         $audienceSegments = [];
 
