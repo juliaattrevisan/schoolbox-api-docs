@@ -3916,7 +3916,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param object                   $object
      * @param Alaress_Date_Format|null $updatedAt
      */
-    public function resetUpdatedAt($object, ?Alaress_Date_Format $updatedAt): void
+    public function resetUpdatedTimestamp($object, ?Alaress_Date_Format $updatedAt): void
     {
         if ($this->updatedMap) {
             $this->updateAll(

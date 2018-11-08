@@ -349,7 +349,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             $this->getPastoralMapper()->save($pastoralRecord);
 
                             // Because updated_at is clobbered:
-                            $this->pastoralMapper->resetUpdatedAt($pastoralRecord, $modifiedDate);
+                            $this->pastoralMapper->resetUpdatedTimestamp($pastoralRecord, $modifiedDate);
 
                             $logRecord->setResult("OK");
                             $logRecord->setPastoralId($pastoralRecord->getId());
