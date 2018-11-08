@@ -825,7 +825,7 @@ class MapperProxy
                 // Need to compare the previously existing grid with the newly
                 // saved one, for invalidation purposes
                 $originalGrid = null;
-                if ($dueWork->getId()) {
+                if (!$isCreate) {
                     $originalGrid = $rubricMapper->retrieveGrid($assessable, false);
                 }
 
