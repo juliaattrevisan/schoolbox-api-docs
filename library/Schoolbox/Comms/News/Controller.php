@@ -267,13 +267,6 @@ class Controller extends Base
                 foreach ($segment->getChildren() as $child) {
                     $encodedValue = $codec->encodeValue($child->getEntityValue());
                     $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
-
-                    // If the user doesn't have at least a read access to a folder, set the segment as hidden.
-                    if ($filterAudiences &&
-                        $child->getEntityType() === Audience\Segment\Strategy\Folder::getEntityType() &&
-                        Access::getInstance()->getFolderAccess($this->getUser(), $child->getEntityValue()) < UserAccess::ACCESS_READ) {
-                        $option->setAsHidden();
-                    }
                 }
             }
 
