@@ -17,7 +17,7 @@
                 {% set detailUrl = routeLookup('commsNews.getDetail', {articleId: article.id}) %}
                 {% set readMoreLink = '<div class="article-read-more"><a href="' ~ detailUrl ~ '" title="Read more">' ~ readMore ~ '</a></div>' %}
             {% else %}
-                {% set blurb = blurb|purify|trim ~ '...' %}
+                {% set blurb = blurb|trim ~ '...' %}
             {% endif %}
         {% endif %}
 
