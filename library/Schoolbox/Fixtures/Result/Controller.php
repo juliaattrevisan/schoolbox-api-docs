@@ -265,9 +265,14 @@ class Controller extends AbstractController
          */
         if (!$match->getHomeTeam()) {
 
-            $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getHomeSchool()->getName());
+            if($match->getHomeSchool()) {
+                $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getHomeSchool()->getName());
 
-            $match->setHomeTeam($facelessTeam);
+                $match->setHomeTeam($facelessTeam);
+            }
+            else {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+            }
         }
 
         /* Find faceless away team, ram it into a Team instance
@@ -275,9 +280,14 @@ class Controller extends AbstractController
          */
         if (!$match->getAwayTeam()) {
 
-            $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getAwaySchool()->getName());
+            if($match->getAwaySchool()) {
+                $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getAwaySchool()->getName());
 
-            $match->setAwayTeam($facelessTeam);
+                $match->setAwayTeam($facelessTeam);
+            }
+            else {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+            }
         }
 
         /* Tell me the weather
