@@ -322,13 +322,15 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 		$existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
 		$currentAnswer = $this->getByQuestionID($question_id);
+        $decodedAnswer = html_entity_decode($currentAnswer['answer'], ENT_IGNORE | ENT_QUOTES);
+
 
 		/* Pattern match spans to find answers
 		   */
 		$matches = array();
 		$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
 
-		preg_match_all($pattern, $currentAnswer['answer'], $matches);
+        preg_match_all($pattern, $decodedAnswer, $matches);
 
 		$actualAnswers = $matches[1];
 
@@ -336,7 +338,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 		   * student's reponse and the actual answer
 		   */
 		$replace = " <span class='fillgap correct'>$1</span> ";
-		$correctResponse = preg_replace($pattern, $replace, $currentAnswer['answer']);
+        $correctResponse = preg_replace($pattern, $replace, $decodedAnswer);
 
 		if ($existing['response']) {
 			$existingAnswer = unserialize($existing['response']);
@@ -344,7 +346,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 			/* Prepare a special way to show Fillgap answers. This replaces
 				* %%token%% tokens with inputs and the already-submitted values
 				*/
-			$ans = $currentAnswer['answer'];
+            $ans = $decodedAnswer;
 
 			$i = 0;
 
@@ -381,7 +383,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 
 			$page->setVar(array(
 				'ANSWER_ID' => $currentAnswer['answer_id'],
-				'ANSWER' => preg_replace($pattern, $replace, Scrub::html($currentAnswer['answer'])),
+				'ANSWER' => preg_replace($pattern, $replace, Scrub::html($decodedAnswer)),
 				'RESPONSE_ID' => $existing['response_id'],
 				'REVIEWED_COMMENT' => '',
 				'REVIEWED_MARKS' => 0,

@@ -21,7 +21,7 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap
     public function mark($currentResponse)
     {
         $response = unserialize($currentResponse['response']);
-        $answer = $currentResponse['answer'];
+        $answer = html_entity_decode($currentResponse['answer'], ENT_IGNORE | ENT_QUOTES);
 
         /* Pattern match spans to find answers
            */
