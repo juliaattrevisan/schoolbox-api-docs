@@ -3,6 +3,9 @@
 /**
  * Synergetic Pastoral Exporter
  *
+ * This script manually syncs all pastoral care records within Schoolbox to
+ * the external pastoral care system, if one is configured.
+ *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au
@@ -64,19 +67,25 @@ $kernel->run(function ($di, $loop, $log, $opts) {
         $pastoralRecord->setExternalId(null);
         $pastoralMapper->save($pastoralRecord);
 
-        $log->info("Saving pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
+        $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
         $externalPastoral->syncPastoral($pastoralRecord);
 
-        $log->info("New external ID (Pastoral ID #{$pastoralRecord->getId()})...");
+        $log->debug("Pastoral record synced (External ID #{$pastoralRecord->getExternalId()})...");
     }
+
+    $log->info(sprintf("%s pastoral records exported", count($pastoralRecords)));
+
 
     // Revert all docman uploads to pending
 
+    $log->info("Beginning reversion of all Docman records to pending...");
     $pastoralUploads = $pastoralUploadQueueMapper->findAll();
     foreach ($pastoralUploads as $pastoralUpload) {
         $pastoralUpload->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
         $pastoralUploadQueueMapper->save($pastoralUpload);
     }
+    $log->info(sprintf("%s Docman records reverted", count($pastoralUploads)));
+
 
     // Re-upload all documents
 
@@ -85,13 +94,15 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     $failed  = 0;
     $success = 0;
 
+    $log->info("Beginning re-upload of all documents...");
+
     /** @var PastoralUploadQueueModel $file */
     foreach ($pendingQueue as $file) {
 
         if (!empty($file->getStorage())) {
             $hash = $file->getStorage()->getHash();
 
-            $log->info("Starting process of file '{$hash}'");
+            $log->debug("Starting process of file '{$hash}'");
 
             // Mark file as processing so another daemon get started and try to duplicate processing
 
@@ -119,7 +130,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                 $log->error("Uploading of file '{$hash}' failed");
                 $failed++;
             } else {
-                $log->info("Uploading of file '{$hash}' completed\n");
+                $log->debug("Uploading of file '{$hash}' completed\n");
                 $success++;
             }
         } else {
