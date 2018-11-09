@@ -85,7 +85,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         if ($this->hasWriteAccess()) {
             $this->setVar([
                 'COMPONENT_ACTION_COUNT' => 3,
-                'HIDE_CONTROLS_ON_WRITE' => 'style="display:none"',
+                'HIDE_CONTROLS_ON_WRITE' => '',
                 'titlebar_read_block' => ''
             ]);
             $this->getSitePage()->parse('titlebar_write_block', 'titlebar_write');

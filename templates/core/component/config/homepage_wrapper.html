@@ -2,7 +2,7 @@
     <div class="small-12 columns">
         <div class="component-titlebar">
             <!-- BEGIN titlebar_write -->
-            <div data-component-titlebar-container data-action-count="{COMPONENT_ACTION_COUNT}">
+            <div data-component-titlebar-container data-action-count="{COMPONENT_ACTION_COUNT}" class="actions-small-{COMPONENT_ACTION_COUNT}">
             <!-- END titlebar_write -->
 
             <!-- BEGIN titlebar_read -->
@@ -12,7 +12,7 @@
                 <div class="list-item">
                     <h2 title="{COMPONENT_NAME}">
                         <!-- BEGIN drag_handle -->
-                        <a href="#" class="icon-grip" id="drag{COMPONENT_INSTANCE_ID}" data-component-handle style="display:none"></a>
+                        <a href="#" class="icon-grip" id="drag{COMPONENT_INSTANCE_ID}" data-component-handle></a>
                         <!-- END drag_handle -->
                         {COMPONENT_NAME}
                     </h2>
