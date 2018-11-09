@@ -272,6 +272,9 @@ if ($virtualPermission >= WRITE_ACCESS) {
         ));
     }
 
+    // Hide all controls by default now (locked mode)
+    $this->setVar('HIDE_CONTROLS_ON_WRITE', '');
+
     if (isset($tabList) && count($tabList)) {
         $tabNumber = 0;
         foreach ($tabList as $id => $tab) {
