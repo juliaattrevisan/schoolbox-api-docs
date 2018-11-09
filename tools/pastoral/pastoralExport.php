@@ -22,9 +22,13 @@ use Schoolbox\Pastoral\UploadQueue\Model as PastoralUploadQueueModel;
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Pastoral Export', array(
-    'verbose' => array(false, false, false),
-));
+$opts   = getopt('v');
+$kernel = new Schoolbox\Application\Daemon\Kernel(
+    'Pastoral Export',
+    [
+        'verbose' => $opts['v'] ?? [],
+    ]
+);
 
 $kernel->run(function ($di, $loop, $log, $opts) {
 
