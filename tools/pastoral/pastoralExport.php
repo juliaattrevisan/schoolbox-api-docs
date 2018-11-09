@@ -48,7 +48,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     $lock = new Alaress_Lock('pastoral_export.' . INSTANCE_ID . '.lock');
 
     if (!$lock->acquire()) {
-        $log->warn("A pastoral export is currently in progress, exiting...");
+        $log->warning("A pastoral export is currently in progress, exiting...");
         exit;
     }
 
