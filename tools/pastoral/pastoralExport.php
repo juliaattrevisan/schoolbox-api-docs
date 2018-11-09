@@ -67,13 +67,8 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
     /** @var PastoralModel $pastoralRecord */
     foreach ($pastoralRecords as $pastoralRecord) {
-        $log->info("Removing existing external ID (Pastoral ID #{$pastoralRecord->getId()})...");
-        $pastoralRecord->setExternalId(null);
-        $pastoralMapper->save($pastoralRecord);
-
         $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
         $externalPastoral->syncPastoral($pastoralRecord);
-
         $log->debug("Pastoral record synced (External ID #{$pastoralRecord->getExternalId()})...");
     }
 
