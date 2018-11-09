@@ -21,7 +21,7 @@ use Traversable;
 class EventRecurrenceMapper
 {
 
-    const EFFICACY_SELF   = 'self';
+    const EFFICACY_SELF = 'self';
     const EFFICACY_SERIES = 'series';
 
     /**
@@ -49,8 +49,7 @@ class EventRecurrenceMapper
     {
         $this->setEventMapper($eventMapper);
     }
-
-
+    
     /**
      * Get the series recurrence settings
      *
@@ -73,18 +72,18 @@ class EventRecurrenceMapper
         $dateFirst = $series->first()->getStartDateTime();
         $dateFirst->startOfDay();
         /** @var Alaress_Date_Format $dateNext */
-        $dateNext  = $series->next()->current()->getStartDateTime();
+        $dateNext = $series->next()->current()->getStartDateTime();
         $dateNext->startOfDay();
         /** @var Alaress_Date_Format $dateLast */
-        $dateLast  = $series->last()->getStartDateTime();
+        $dateLast = $series->last()->getStartDateTime();
         $dateLast->startOfDay();
 
         //$diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
         $diff = $dateFirst->diffInDays($dateNext);
 
         $recurMap = array(
-            1  => 'daily',
-            7  => 'weekly',
+            1 => 'daily',
+            7 => 'weekly',
             14 => 'fortnightly',
             28 => 'monthly',
             29 => 'monthly',
@@ -94,41 +93,55 @@ class EventRecurrenceMapper
 
         if (isset($recurMap[$diff])) {
             return array(
-                'num'   => count($series),
-                'freq'  => $recurMap[$diff],
+                'num' => count($series),
+                'freq' => $recurMap[$diff],
                 'start' => $dateFirst,
-                'end'   => $dateLast
+                'end' => $dateLast
             );
         }
 
         return array(
-            'num'   => count($series),
-            'freq'  => 'periodically',
+            'num' => count($series),
+            'freq' => 'periodically',
             'start' => $dateFirst,
-            'end'   => $dateLast
+            'end' => $dateLast
         );
     }
-
 
     /**
      * Totally custom save method
      *
-     * @param Event               $event
-     * @param string              $efficacy
-     * @param string              $repeatSetting
+     * @param Event $event
+     * @param string $efficacy
+     * @param string $repeatSetting
      * @param Alaress_Date_Format $until
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
-     * @param int                 $access
-     * @param EventRelations      $eventRelations
+     * @param int $access
+     * @param EventRelations $eventRelations
      */
-    public function save(Event $event, $efficacy, $repeatSetting, $until, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate, $access, EventRelations $eventRelations)
-    {
+    public function save(
+        Event $event,
+        $efficacy,
+        $repeatSetting,
+        $until,
+        Alaress_Date_Format $startDate,
+        Alaress_Date_Format $endDate,
+        $access,
+        EventRelations $eventRelations
+    ) {
 
         /* Set up recurrences, if appropriate
          * This is mandatory as events are saved via EventRecurrence
          */
-        $eventRecurrence = new EventRecurrence($this->getEventMapper(), $efficacy, $repeatSetting, $until, $startDate, $endDate);
+        $eventRecurrence = new EventRecurrence(
+            $this->getEventMapper(),
+            $efficacy,
+            $repeatSetting,
+            $until,
+            $startDate,
+            $endDate
+        );
 
         // silence!! but srsly, in this context, the event mapper needs to not raise notifications
         $eventPropagator = $this->eventMapper->getEventPropagator();
@@ -141,7 +154,11 @@ class EventRecurrenceMapper
              */
             $this->setFirstEventIdInSeries($event->getId());
 
-            $previous = $this->getEventMapper()->findOneByColumn($this->getEventMapper()->getIdentifierColumn(), $event->getId(), ['cache'=>false]);
+            $previous = $this->getEventMapper()->findOneByColumn(
+                $this->getEventMapper()->getIdentifierColumn(),
+                $event->getId(),
+                ['cache' => false]
+            );
 
             if ($efficacy == self::EFFICACY_SERIES) {
                 $this->persistSeries($event, $eventRelations, $access, $startDate, $endDate);
@@ -156,7 +173,13 @@ class EventRecurrenceMapper
             /* Create N recurring events which are wholly new. When you save a model through a mapper, it gives that model's instance the affectedId (that is,
              * the id it will have in the db). To save clones of event with different dates, need to set the primary key to null explicitly
              */
-            $this->persist($event, $eventRecurrence->getDateCollection(), $eventRecurrence->getSeriesId(), $eventRelations, $access);
+            $this->persist(
+                $event,
+                $eventRecurrence->getDateCollection(),
+                $eventRecurrence->getSeriesId(),
+                $eventRelations,
+                $access
+            );
         }
 
         $action = $previous ? Schoolbox\Mapper::METHOD_UPDATE : Schoolbox\Mapper::METHOD_CREATE;
@@ -166,19 +189,23 @@ class EventRecurrenceMapper
         $this->raiseNotification($event, $action, $previous);
     }
 
-
     /**
      * Persist an entire series
      *
-     * @param Event               $event
-     * @param EventRelations      $eventRelations
+     * @param Event $event
+     * @param EventRelations $eventRelations
      * @param                     $access
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
      * @throws Schoolbox\Mapper\Exception
      */
-    protected function persistSeries(Event $event, EventRelations $eventRelations, $access, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate)
-    {
+    protected function persistSeries(
+        Event $event,
+        EventRelations $eventRelations,
+        $access,
+        Alaress_Date_Format $startDate,
+        Alaress_Date_Format $endDate
+    ) {
         // Clone metadata IMMEDIATELY otherwise it will be clobbered by refetch
         // of $event in getAllInSeries below. (╯°□°）╯︵ ┻━┻
         $seriesEventMetadata = $event->getMetadata();
@@ -202,12 +229,19 @@ class EventRecurrenceMapper
         $event->setAccess($access);
 
         // Use start and end deltas to set time of each series event
-        $originalEvent = $this->getEventMapper()->findOneByColumn('id', $event->getId(), [], ['cache' => false]);
-        $startDelta    = Interval::createFromDateTimeDifference(
+        $originalEvent = $this->getEventMapper()->findOneByColumn(
+            'id',
+            $event->getId(),
+            [],
+            ['cache' => false]
+        );
+
+        $startDelta = Interval::createFromDateTimeDifference(
             $originalEvent->getStartDateTime()->getDateTimeObject(),
             $startDate->getDateTimeObject()
         )->getAsDateInterval();
-        $endDelta      = Interval::createFromDateTimeDifference(
+
+        $endDelta = Interval::createFromDateTimeDifference(
             $originalEvent->getEndDateTime()->getDateTimeObject(),
             $endDate->getDateTimeObject()
         )->getAsDateInterval();
@@ -222,9 +256,17 @@ class EventRecurrenceMapper
                 $seriesMetadata = $metadata;
             }
 
-            // Adjust each event's start and end individually
+            // Adjust each event's start, end and publish date individually
             $seriesEvent->getStartDateTime()->getDateTimeObject()->add($startDelta);
             $seriesEvent->getEndDateTime()->getDateTimeObject()->add($endDelta);
+
+            // Assign publishDateTime within the condition (On purpose)
+            if ($publishDateTime = $event->getPublishDateTime()) {
+                $seriesEvent->setPublishDateTime($publishDateTime);
+            } else {
+                $seriesEvent->setPublishDateTime(null);
+            }
+
             $this->getEventMapper()->save($seriesEvent);
             $this->getEventMapper()->updateMetadata($seriesMetadata, $seriesEvent);
 
@@ -234,17 +276,20 @@ class EventRecurrenceMapper
         }
     }
 
-
     /**
      * Persist a single event
      *
-     * @param Event           $event
-     * @param EventRelations  $eventRelations
+     * @param Event $event
+     * @param EventRelations $eventRelations
      * @param                 $access
      * @param EventRecurrence $eventRecurrence
      */
-    protected function persistSingle(Event $event, EventRelations $eventRelations, $access, EventRecurrence $eventRecurrence)
-    {
+    protected function persistSingle(
+        Event $event,
+        EventRelations $eventRelations,
+        $access,
+        EventRecurrence $eventRecurrence
+    ) {
         // Modify an existing event and add recurring incidents
         // If there's any recurrence: update first only, and create the
         // rest from scratch.
@@ -297,7 +342,6 @@ class EventRecurrenceMapper
             $eventRelations,
             $access
         );
-
     }
 
     /**
@@ -322,9 +366,9 @@ class EventRecurrenceMapper
     /**
      * Match signature of Schoolbox\Mapper and emulate an Event notification
      *
-     * @param Event  $object
+     * @param Event $object
      * @param string $verb
-     * @param Event  $previous
+     * @param Event $previous
      * @throws Schoolbox\Mapper\Exception
      * @return bool
      */
@@ -342,8 +386,7 @@ class EventRecurrenceMapper
 
         try {
             $em->getEventPropagator()->propagate($sess['user'], $verb, $object, $em, $diff);
-        }
-        catch( \ErrorException $e) {
+        } catch (\ErrorException $e) {
             //Unable to connect to notification system
             return false;
         }
@@ -352,20 +395,18 @@ class EventRecurrenceMapper
     }
 
     /**
-     * @param Event          $event
-     * @param Traversable    $dates
+     * @param Event $event
+     * @param Traversable $dates
      * @param EventRelations $eventRelations
-     * @param int            $sid
-     * @param int            $access
+     * @param int $sid
+     * @param int $access
      */
     protected function persist(Event $event, Traversable $dates, $sid, EventRelations $eventRelations, $access)
     {
-        $event->setSeriesId($sid)
-              ->setAccess($access);
+        $event->setSeriesId($sid)->setAccess($access);
 
         foreach ($dates as $currentDate) {
-            $event->setStartDate($currentDate['start'])
-                  ->setEndDate($currentDate['end']);
+            $event->setStartDate($currentDate['start'])->setEndDate($currentDate['end']);
 
             $this->getEventMapper()->create($event);
             $this->getEventMapper()->updateMetadata($event->getMetadata(), $event);
@@ -385,9 +426,9 @@ class EventRecurrenceMapper
      * Another totally custom recurrence save method - this one uses an iterable
      * date source to create dates.
      *
-     * @param Event                   $event
-     * @param DateTime[]|Traversable  $dateSource
-     * @param EventRelations          $eventRelations
+     * @param Event $event
+     * @param DateTime[]|Traversable $dateSource
+     * @param EventRelations $eventRelations
      * @return Collection|Event[]
      */
     public function createSequenceFromIterator(
@@ -411,7 +452,7 @@ class EventRecurrenceMapper
     /**
      * Gets an event sequence from a base event and an iterable date source.
      *
-     * @param Event                  $event
+     * @param Event $event
      * @param DateTime[]|Traversable $dateSource
      *
      * @return Collection|Event[]
@@ -420,26 +461,26 @@ class EventRecurrenceMapper
     {
         if (empty($dateSource)) {
             // just get the single event
-            return new Collection([ $event ]);
+            return new Collection([$event]);
         }
 
         // dateSource could be a datePeriod
         // How many days are there between $start and $end?
         $startDate = clone $event->getStartDateTime();
-        $endDate   = clone $event->getEndDateTime();
+        $endDate = clone $event->getEndDateTime();
 
         $startDate->startOfDay();
         $endDate->startOfDay();
 
-        $dayDiff  = $startDate->diffInDays($endDate);
+        $dayDiff = $startDate->diffInDays($endDate);
         $seriesId = $this->getEventMapper()->getUpperSeriesIndex();
 
         $collection = new Collection();
 
         foreach ($dateSource as $currentDate) {
-            $year  = $currentDate->format('Y');
+            $year = $currentDate->format('Y');
             $month = $currentDate->format('m');
-            $day   = $currentDate->format('d');
+            $day = $currentDate->format('d');
 
             $newEvent = clone $event;
 
