@@ -234,13 +234,13 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Find and reset the updated timestamp of the newly created revision of
-     * this record.
+     * Overridden because this mapper doesn't actually have an updated
+     * timestamp field (presumably so the timestamp can be set manually?).
      *
-     * @param Pastoral                 $pastoral
+     * @param Model                    $object
      * @param Alaress_Date_Format|null $updatedAt
      */
-    public function resetRevisionUpdatedTimestamp(Pastoral $pastoral, ?Alaress_Date_Format $updatedAt): void
+    public function resetUpdatedTimestamp($object, ?Alaress_Date_Format $updatedAt): void
     {
         $this->database->query(
             "
@@ -251,7 +251,7 @@ class Mapper extends BaseMapper
                 LIMIT 1
             ",
             [
-                'id'        => $pastoral->getId(),
+                'id'        => $object->getId(),
                 'updatedAt' => ($updatedAt && !$updatedAt->isNull()) ? $updatedAt->getDatabase() : null,
             ]
         );
