@@ -263,17 +263,22 @@ if ($virtualPermission >= WRITE_ACCESS) {
             $tabList[$component->getComponentCategory()]['name'] = $component->getComponentCategoryName();
             $tabList[$component->getComponentCategory()]['count']++;
 
+            $this->setVar([
+                'HIDE_CONTROLS_ON_WRITE' => 'style="display:block;"',
+                'COMPONENT_SETTINGS_DATA' => 'data-component-settings'
+            ]);
         }
     } else {
-        $this->setVar(array(
+        $this->setVar([
             'homepage_component_block' => '',
             'homepage_component_page_block' => 'No components are available for you to add.',
             'homepage_component_tab_block' => '',
-        ));
-    }
 
-    // Hide all controls by default now (locked mode)
-    $this->setVar('HIDE_CONTROLS_ON_WRITE', '');
+            // Show controls for read users, because they don't get locked mode
+            'HIDE_CONTROLS_ON_WRITE' => '',
+            'COMPONENT_SETTINGS_DATA' => ''
+        ]);
+    }
 
     if (isset($tabList) && count($tabList)) {
         $tabNumber = 0;
