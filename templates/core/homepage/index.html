@@ -100,16 +100,16 @@
                 location.reload();
             });
         });
-        
+
         // Lock all components on page load
         // This is done with JS, otherwise components that are added after page load will be locked,
         // and who can be bothered wrangling with phplib
         $('nav[data-component-settings], [data-component-handle]').hide();
-        
+
         // Toggle for homepage lock
         $('#component-lock-toggle').click(function (event) {
             var locked = this.checked;
-            
+
             $('nav[data-component-settings], [data-component-handle]').toggle(locked);
 
             $('div[data-component-titlebar-container]').each(function() {
@@ -244,7 +244,7 @@
     <nav>
         <!-- BEGIN edit_page -->
         <span data-tab>
-            <span class="switch inline round">
+            <span class="switch inline round" id="component-lock-switch">
                 <input id="component-lock-toggle" type="checkbox" />
                 <label for="component-lock-toggle">
                     <span class="icon-unlocked">&nbsp;</span>
@@ -252,15 +252,15 @@
                 </label>
             </span>
             <span class="tab-title" data-show-empty>
-                <a class="icon-add" href="#tabs-1" title="Add components" data-tab-activator></a>
+                <a class="icon-add" href="#tabs-1" title="Add components" data-tab-activator id="add-component"></a>
             </span>
             <span class="tab-title" data-hide-empty>
-                <a class="icon-components" href="#tabs-2" title="Edit columns" data-tab-activator></a>
+                <a class="icon-components" href="#tabs-2" title="Edit columns" data-tab-activator id="edit-column"></a>
             </span>
         </span>
 
         <!-- END edit_page -->
-        <a href="#" class="icon-more" data-dropdown="tab-control" title="Actions"></a>
+        <a href="#" class="icon-more" data-dropdown="tab-control" title="Actions" id="all-actions"></a>
     </nav>
     <ul id="tab-control" class="f-dropdown" data-dropdown-content>
         <!-- BEGIN readonly_switch_on -->

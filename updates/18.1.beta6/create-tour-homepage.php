@@ -1,0 +1,316 @@
+<?php
+/**
+ * Create dashboard feature tour
+ *
+ * @author    Doug MacKenzie <doug.mackenzie@alaress.com.au>
+ * @copyright Copyright 2018, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+use Psr\Log\LoggerInterface;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('\\Schoolbox\\Application\\Daemon');
+
+$kernel = new Schoolbox\Application\Daemon\Kernel('Create Feature Tour', [
+    'verbose' => [false, false, false],
+    'errors'  => E_ALL,
+]);
+
+$kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
+
+    $database = Database::getInstance();
+
+    // Put all the variable details of the tour in... variables
+    $tour_uuid        = 'f4bb1eb3-c5c2-46f0-853d-a8873f2d34ca';
+    $tour_title       = 'Staff Homepage Tour';
+    $tour_description = 'This tour will walk staff through the common tools for building a homepage';
+
+    $steps = [
+        // Introduction
+        [
+            'uuid'         => '89742c3d-0c88-407b-a005-a8873f2d34ca',
+            'tooltip_uuid' => '52dfefce-5e6e-4c68-b2c3-a8873f2d34ca',
+            'type'         => 'modal',
+            'title'        => 'Creating homepages',
+            'content'      => "
+                <p>This homepage can be configured by you, you just need to know a few simple things before you get started.</p>
+            ",
+            'css_class'    => 'introjs-intromodal',
+        ],
+
+        // Unlock page
+        [
+            'uuid'         => '359bc5c5-ffc8-46be-a20c-a8873f2d34ca',
+            'tooltip_uuid' => 'f1040b20-6014-44ab-8e88-a8873f2d34ca',
+            'type'         => 'tooltip',
+            'selector'     => '#component-lock-switch',
+            'content'      => "
+                <p>This switch will unlock all the components on the page. Once unlocked you can drag and drop components using the <span class='icon-grip'></span> handle. You can configure component settings using the <span class='icon-settings'></span> button.</p>
+            ",
+        ],
+
+        // Add components
+        [
+            'uuid'         => '1a47bac6-c9e3-4c6f-979b-a8873f2d34ca',
+            'tooltip_uuid' => '888a36a5-5c22-4e29-b959-a8873f2d34ca',
+            'type'         => 'tooltip',
+            'selector'     => '#add-component',
+            'content'      => "<p>Here you will find a wide range of components to add additional functionality to your page.</p>",
+        ],
+
+        // Edit colours and layout
+        [
+            'uuid'         => '5d2ebff9-8a70-4d12-a46a-a8873f2d34ca',
+            'tooltip_uuid' => '7da9259f-4e4b-4b35-8b4c-a8873f2d34ca',
+            'type'         => 'tooltip',
+            'selector'     => '#edit-column',
+            'content'      => "<p>You can also change the width of columns or the colours of your components here.</p>",
+        ],
+        // Actions
+        [
+            'uuid'         => '388c55bd-4dd4-4011-bc92-a8873f2d34ca',
+            'tooltip_uuid' => 'ca753320-c576-416d-a32f-a8873f2d34ca',
+            'type'         => 'tooltip',
+            'selector'     => '#all-actions',
+            'content'      => "<p>Everything else that might be useful is found here in the actions menu</p>",
+        ],
+
+    ];
+
+
+    // Insert the container into the tour table
+    $statement = $database->prepare("
+        INSERT INTO tour (
+          `uuid`,
+          `author_user_id`,
+          `title`,
+          `description`,
+          `active`,
+          `created_at`,
+          `updated_at`,
+          `deleted_at`
+        ) VALUES (
+          :uuid,
+          (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
+          :title,
+          :description,
+          1,
+          NOW(),
+          NOW(),
+          NULL
+        );
+    ");
+    $statement->execute([
+        'uuid'        => $tour_uuid,
+        'title'       => $tour_title,
+        'description' => $tour_description,
+    ]);
+
+
+    // Insert the audience (all roles under the 'staff' role type)
+    $statement = $database->prepare("
+        INSERT INTO   `tour_audience_role`
+        (
+                      `moderator_user_id`,
+                      `tour_uuid`,
+                      `role_id`
+        )
+        SELECT        (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
+                      :tour_uuid,
+                      `id`
+        FROM          `groups`
+        WHERE         `group_type` = 'staff';
+    ");
+    $statement->execute([
+        'tour_uuid' => $tour_uuid,
+    ]);
+
+
+    // Insert the trigger (on load of /)
+    $statement = $database->prepare("
+        INSERT INTO     `tour_trigger`
+        (
+                        `uuid`,
+                        `author_user_id`,
+                        `tour_uuid`,
+                        `selector`,
+                        `event`,
+                        `url_regex`,
+                        `created_at`,
+                        `updated_at`,
+                        `deleted_at`
+        )
+        SELECT          '9b7e1ebd-c51b-4e42-a323-a8873f2d34ca',
+                        (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
+                        :tour_uuid,
+                        'body',
+                        'tourReady',
+                        '^/homepage/.*',
+                        NOW(),
+                        NOW(),
+                        NULL
+    ");
+    $statement->execute([
+        'tour_uuid' => $tour_uuid,
+    ]);
+
+
+    // Reverse the array so that we can insert the 'next_step_uuid' without getting an FK error
+    $stepsReversed = array_reverse($steps);
+
+    // Insert the content
+    $i = 0;
+    foreach ($stepsReversed as $step) {
+
+        $statement = $database->prepare("
+          INSERT INTO   `tour_step`
+          (
+                        `uuid`,
+                        `tour_uuid`,
+                        `next_step_uuid`,
+                        `author_user_id`,
+                        `type`,
+                        `created_at`,
+                        `updated_at`,
+                        `deleted_at`
+          )
+          SELECT        :uuid,
+                        :tour_uuid,
+                        :next_step_uuid,
+                        (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
+                        :step_type,
+                        NOW(),
+                        NOW(),
+                        NULL
+        ");
+
+        $next_step_uuid = null;
+
+        if ($i !== 0) {
+            $next_step_uuid = $stepsReversed[$i - 1]['uuid'];
+        }
+
+        $statement->execute([
+            'uuid'           => $step['uuid'],
+            'tour_uuid'      => $tour_uuid,
+            'next_step_uuid' => $next_step_uuid,
+            'step_type'      => $step['type'],
+        ]);
+
+
+        if ($step['type'] === 'tooltip') {
+
+            $statement = $database->prepare("
+              INSERT INTO   `tour_step_tooltip`
+              (
+                            `uuid`,
+                            `tour_step_uuid`,
+                            `body`,
+                            `selector`,
+                            `css_class`,
+                            `created_at`,
+                            `updated_at`,
+                            `deleted_at`
+              )
+              SELECT        :uuid,
+                            :tour_step_uuid,
+                            :content,
+                            :selector,
+                            NULL,
+                            NOW(),
+                            NOW(),
+                            NULL
+            ");
+            $statement->execute([
+                'uuid'           => $step['tooltip_uuid'],
+                'tour_step_uuid' => $step['uuid'],
+                'content'        => trim($step['content']),
+                'selector'       => $step['selector'],
+            ]);
+
+        } elseif ($step['type'] === 'modal') {
+
+            $statement = $database->prepare("
+              INSERT INTO   `tour_step_modal`
+              (
+                            `uuid`,
+                            `tour_step_uuid`,
+                            `title`,
+                            `body`,
+                            `css_class`,
+                            `created_at`,
+                            `updated_at`,
+                            `deleted_at`
+              )
+              SELECT        :uuid,
+                            :tour_step_uuid,
+                            :title,
+                            :content,
+                            :css_class,
+                            NOW(),
+                            NOW(),
+                            NULL
+            ");
+            $statement->execute([
+                'uuid'           => $step['tooltip_uuid'],
+                'tour_step_uuid' => $step['uuid'],
+                'title'          => trim($step['title']),
+                'content'        => trim($step['content']),
+                'css_class'      => $step['css_class'],
+            ]);
+
+        }
+
+        // Insert any step events
+        if (isset($step['events'])) {
+            foreach ($step['events'] as $event) {
+                $statement = $database->prepare("
+                  INSERT INTO   `tour_step_event`
+                  (
+                                `uuid`,
+                                `tour_step_uuid`,
+                                `selector`,
+                                `event`,
+                                `insertion_point`,
+                                `order`,
+                                `created_at`,
+                                `updated_at`,
+                                `deleted_at`
+                  )
+                  SELECT        :uuid,
+                                :tour_step_uuid,
+                                :selector,
+                                :event,
+                                :insertion_point,
+                                :eventOrder,
+                                NOW(),
+                                NOW(),
+                                NULL
+                ");
+                $statement->execute([
+                    'uuid'            => $event['uuid'],
+                    'tour_step_uuid'  => $step['uuid'],
+                    'selector'        => $event['selector'],
+                    'event'           => $event['event'],
+                    'insertion_point' => $event['insertion_point'],
+                    'eventOrder'      => $event['order'],
+                ]);
+            }
+        }
+
+        $i++;
+    }
+
+
+    // Update the tour table with the first step uuid
+    $statement = $database->prepare("
+        UPDATE          `tour`
+        SET             `first_step_uuid` = :first_step_uuid
+        WHERE           `uuid` = :uuid
+    ");
+    $statement->execute([
+        'uuid'           => $tour_uuid,
+        'first_step_uuid' => $steps[0]['uuid'],
+    ]);
+});
