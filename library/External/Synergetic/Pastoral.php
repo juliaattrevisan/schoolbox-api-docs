@@ -429,9 +429,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             JOIN        {$this->schemaMedia}.tDocumentReferences ref on ref.tDocumentsSeq = doc.tDocumentsSeq
             WHERE       RelatedSeqModuleCode = 'SPC' 
         ");
-            $documents = $queryDocuments->fetchAll();
 
-            foreach ($documents as $document) {
+            foreach ($queryDocuments as $document) {
                 try {
                     $record = $this->getPastoralMapper()->findOneByColumn('external_id', $document['external_id']);
 
