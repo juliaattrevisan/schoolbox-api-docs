@@ -1325,27 +1325,37 @@ class Controller extends Base
             $asyncUrls = [];
             try {
                 // if the previous url is for ajax call, get one before.
-                $listForUserUrl = $this->getRouter()->generate('commsNews.getListForUser');
-                if ($listForUserUrl) {
-                    $asyncUrls[] = $listForUserUrl;
-                }
-                $authoredArticlesUrl = $this->getRouter()->generate('commsNews.getAuthoredArticles');
-                if ($authoredArticlesUrl) {
-                    $asyncUrls[] = $authoredArticlesUrl;
+                $ajaxRoutes = [
+                    'commsNews.getListForUser',
+                    'commsNews.getAuthoredArticles'
+                ];
+                foreach ($ajaxRoutes as $ajaxRoute) {
+                    $route = $this->getRouter()->generate($ajaxRoute);
+                    if ($route) {
+                        $asyncUrls[] = $route;
+                    }
                 }
                 if (\in_array($cameFrom, $asyncUrls)) {
                     $cameFrom = $this->getSession()->getHistory(2);
                 }
 
-                $authoredUrl = $this->getRouter()->generate('commsNews.getAuthored');
-                if ($authoredUrl) {
-                    $validUrls[] = $authoredUrl;
-                }
-                $indexUrl = $this->getRouter()->generate('commsNews.getIndex');
-                if ($indexUrl) {
-                    $validUrls[] = $indexUrl;
+                // get proper urls to return to.
+                $commsRoutes = [
+                    'commsNews.getListForUser',
+                    'commsNews.getAuthoredArticles',
+                    'commsNews.getAuthored',
+                    'commsNewsModeration.getList',
+                    'commsNewsSaveForLater.getList',
+                    'commsNews.getIndex',
+                ];
+                foreach ($commsRoutes as $commsRoute) {
+                    $route = $this->getRouter()->generate($commsRoute);
+                    if ($route) {
+                        $validUrls[] = $route;
+                    }
                 }
             } catch (RouteNotFound $e) {
+                // should not happen
                 return null;
             }
 
