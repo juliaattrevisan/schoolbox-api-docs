@@ -95,83 +95,23 @@ $kernel->run(function ($di, $loop, $log, $opts) {
         if (count($attachments)) {
             $log->debug(sprintf("Syncing %d pastoral record attachments", count($attachments)));
             foreach ($attachments as $attachment) {
-                // Only re-sync if it's not already in the Q?
+                // Only re-sync if it's not already in the Q
                 $log->debug(
                     sprintf('Syncing pastoral record attachment "%s"', $attachment->getStorage()->getBasename())
                 );
-                $pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment, null);
+                $queueCount = $pastoralUploadQueueMapper->countByColumnList([
+                    'pastoral_id' => $pastoralRecord->getId(),
+                    'hash'        => $attachment->getStorage()->getHash(),
+                ]);
+                if ($queueCount === 0) {
+                    $pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment, null);
+                }
             }
         }
     }
+
+
+    // And done
     $log->info(sprintf("%s pastoral records exported", count($pastoralRecords)));
-
-
-//    // Revert all docman uploads to pending (only if attachment upload is on)
-//    if (!$di->get('config')->get("external_pastoral_upload")) {
-//        $log->info('Pastoral external attachment upload is disabled: not uploading attachments');
-//
-//    } else {
-//        $log->info("Beginning reversion of all Docman records to pending...");
-//        $pastoralUploads = $pastoralUploadQueueMapper->findAll();
-//        foreach ($pastoralUploads as $pastoralUpload) {
-//            $pastoralUpload->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
-//            $pastoralUploadQueueMapper->save($pastoralUpload);
-//        }
-//        $log->info(sprintf("%s Docman records reverted", count($pastoralUploads)));
-//
-//
-//        // Re-upload all documents
-//        $pendingQueue = $pastoralUploadQueueMapper->getPending();
-//        $failed  = 0;
-//        $success = 0;
-//
-//        $log->info("Beginning re-upload of all documents...");
-//
-//        /** @var PastoralUploadQueueModel $file */
-//        foreach ($pendingQueue as $file) {
-//
-//            if (!empty($file->getStorage())) {
-//                $hash = $file->getStorage()->getHash();
-//
-//                $log->debug("Starting process of file '{$hash}'");
-//
-//                // Mark file as processing so another daemon get started and try to duplicate processing
-//                $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PROCESSING);
-//                try {
-//                    $pastoralUploadQueueMapper->save($file);
-//                } catch (PDOException $e) {
-//                    $log->alert("File '{$hash}' failed:" . $e->getMessage());
-//                    $failed++;
-//                    continue;
-//                }
-//
-//
-//                // Upload file to DocMan
-//                try {
-//                    $externalPastoral->uploadPastoralDocument($file);
-//                    $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_COMPLETED);
-//                } catch (Exception $e) {
-//                    $log->error("$e", array($e));
-//                    $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_FAILED);
-//                }
-//
-//                if ($file->getStatus() === PastoralUploadQueueMapper::UPLOAD_STATUS_FAILED) {
-//                    $log->error("Uploading of file '{$hash}' failed");
-//                    $failed++;
-//                } else {
-//                    $log->debug("Uploading of file '{$hash}' completed\n");
-//                    $success++;
-//                }
-//            } else {
-//                $log->error("Uploading of upload queue item '{$file->getId()}' failed. No storage object found");
-//                $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_FAILED);
-//            }
-//
-//            $pastoralUploadQueueMapper->save($file);
-//        }
-//
-//        $log->info("Processing of pastoral upload completed: $success succeeded, $failed failed");
-//    }
-
     $lock->release();
 });
