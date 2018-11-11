@@ -420,15 +420,15 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         if ($importAttachments) {
             // Import attachments from Synergetic DocMan
 
-            $queryDocuments = $this->connector->executeQuery("
-            SELECT      ref.RelatedSeq as external_id,
-                        doc.Description as [filename],
-                        DocumentType as extension,
-                        [Document] as [blob]
-            FROM        {$this->schemaMedia}.tDocuments doc
-            JOIN        {$this->schemaMedia}.tDocumentReferences ref on ref.tDocumentsSeq = doc.tDocumentsSeq
-            WHERE       RelatedSeqModuleCode = 'SPC' 
-        ");
+            $queryDocuments = $this->connector->getQueryIterator("
+                SELECT ref.RelatedSeq as external_id,
+                       doc.Description as [filename],
+                       DocumentType as extension,
+                       [Document] as [blob]
+                FROM   {$this->schemaMedia}.tDocuments doc
+                JOIN   {$this->schemaMedia}.tDocumentReferences ref on ref.tDocumentsSeq = doc.tDocumentsSeq
+                WHERE  RelatedSeqModuleCode = 'SPC'
+            ");
 
             foreach ($queryDocuments as $document) {
                 try {
