@@ -59,10 +59,9 @@ $kernel->run(function ($di, $loop, $log, $opts) {
         exit;
     }
 
-    $log->info("Beginning export of pastoral records...");
 
     // Retrieve all pastoral records and re-save
-
+    $log->info("Beginning export of pastoral records...");
     $pastoralRecords = $pastoralMapper->findAll();
 
     /** @var PastoralModel $pastoralRecord */
@@ -71,7 +70,6 @@ $kernel->run(function ($di, $loop, $log, $opts) {
         $externalPastoral->syncPastoral($pastoralRecord);
         $log->debug("Pastoral record synced (External ID #{$pastoralRecord->getExternalId()})...");
     }
-
     $log->info(sprintf("%s pastoral records exported", count($pastoralRecords)));
 
 
@@ -90,9 +88,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
 
         // Re-upload all documents
-
         $pendingQueue = $pastoralUploadQueueMapper->getPending();
-
         $failed  = 0;
         $success = 0;
 
@@ -107,9 +103,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                 $log->debug("Starting process of file '{$hash}'");
 
                 // Mark file as processing so another daemon get started and try to duplicate processing
-
                 $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PROCESSING);
-
                 try {
                     $pastoralUploadQueueMapper->save($file);
                 } catch (PDOException $e) {
@@ -118,8 +112,8 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                     continue;
                 }
 
-                // Upload file to DocMan
 
+                // Upload file to DocMan
                 try {
                     $file->uploadPastoralDocument();
                     $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_COMPLETED);
