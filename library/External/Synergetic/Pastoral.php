@@ -461,6 +461,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                     unlink($filename);
                 } catch (MapperException $e) {
+                    // Pastoral record for this attachment wasn't found?
                 }
             }
         }
