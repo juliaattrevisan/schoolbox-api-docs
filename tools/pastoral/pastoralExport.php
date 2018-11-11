@@ -14,6 +14,8 @@
 use Aura\Di\Container as Injector;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
+use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
@@ -49,8 +51,9 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     pcntl_signal(SIGCHLD, SIG_DFL);
 
     $pastoralMapper            = PastoralMapper::getInstance();
+    $pastoralAttachmentMapper  = PastoralAttachmentMapper::getInstance();
     $pastoralUploadQueueMapper = PastoralUploadQueueMapper::getInstance();
-    $externalPastoral = new External_Pastoral();
+    $externalPastoral          = new External_Pastoral();
 
     $lock = new Alaress_Lock('pastoral_export.' . INSTANCE_ID . '.lock');
 
@@ -69,6 +72,13 @@ $kernel->run(function ($di, $loop, $log, $opts) {
         $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
         $externalPastoral->syncPastoral($pastoralRecord);
         $log->debug("Pastoral record synced (External ID #{$pastoralRecord->getExternalId()})...");
+
+
+        // Re-process all of their attachments
+        $attachments = $pastoralAttachmentMapper->findByColumn('pastoral_id', $pastoralRecord->getId());
+        foreach ($attachments as $attachment) {
+            $pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment, null);
+        }
     }
     $log->info(sprintf("%s pastoral records exported", count($pastoralRecords)));
 
