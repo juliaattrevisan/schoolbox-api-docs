@@ -115,7 +115,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
                 // Upload file to DocMan
                 try {
-                    $file->uploadPastoralDocument();
+                    $externalPastoral->uploadPastoralDocument($file);
                     $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_COMPLETED);
                 } catch (Exception $e) {
                     $log->error("$e", array($e));
