@@ -95,10 +95,11 @@ $kernel->run(function ($di, $loop, $log, $opts) {
         if (count($attachments)) {
             $log->debug(sprintf("Syncing %d pastoral record attachments", count($attachments)));
             foreach ($attachments as $attachment) {
-                // Only re-sync if it's not already in the Q
                 $log->debug(
                     sprintf('Syncing pastoral record attachment "%s"', $attachment->getStorage()->getBasename())
                 );
+
+                // Only re-sync if it's not already in the Q
                 $queueCount = $pastoralUploadQueueMapper->countByColumnList([
                     'pastoral_id' => $pastoralRecord->getId(),
                     'hash'        => $attachment->getStorage()->getHash(),
