@@ -42,7 +42,6 @@ $kernel->run(function ($di, $loop, $log, $opts) {
      */
 
     // Only process if pastoral docman writeback is actually enabled in config
-
     if (!$di->get('config')->get("external_pastoral")) {
         $log->warning('Pastoral external is disabled, exiting...');
         exit;
@@ -54,9 +53,15 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     $pastoralAttachmentMapper  = PastoralAttachmentMapper::getInstance();
     $pastoralUploadQueueMapper = PastoralUploadQueueMapper::getInstance();
     $externalPastoral          = new External_Pastoral();
+    $externalPastoralUpload    = $di->get('config')->get("external_pastoral_upload");
+    if ($externalPastoralUpload) {
+        $log->info('Pastoral external attachment upload is enabled');
+    } else {
+        $log->info('Pastoral external attachment upload is disabled: not uploading attachments');
+    }
+
 
     $lock = new Alaress_Lock('pastoral_export.' . INSTANCE_ID . '.lock');
-
     if (!$lock->acquire()) {
         $log->warning("A pastoral export is currently in progress, exiting...");
         exit;
@@ -74,10 +79,27 @@ $kernel->run(function ($di, $loop, $log, $opts) {
         $log->debug("Pastoral record synced (External ID #{$pastoralRecord->getExternalId()})...");
 
 
-        // Re-process all of their attachments
-        $attachments = $pastoralAttachmentMapper->findByColumn('pastoral_id', $pastoralRecord->getId());
-        foreach ($attachments as $attachment) {
-            $pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment, null);
+        // Re-process all attachments (only if attachment upload is on)
+        if (!$externalPastoralUpload) {
+            continue;
+        }
+
+
+        // Note that only public attachments get synced
+        /** @var PastoralAttachmentModel[] $attachments */
+        $attachments = $pastoralAttachmentMapper->findByColumnList([
+            'pastoral_id' => $pastoralRecord->getId(),
+            'private'     => false,
+        ]);
+        if (count($attachments)) {
+            $log->debug(sprintf("Syncing %d pastoral record attachments", count($attachments)));
+            foreach ($attachments as $attachment) {
+                // Only re-sync if it's not already in the Q?
+                $log->debug(
+                    sprintf('Syncing pastoral record attachment "%s"', $attachment->getStorage()->getBasename())
+                );
+                $pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment, null);
+            }
         }
     }
     $log->info(sprintf("%s pastoral records exported", count($pastoralRecords)));
