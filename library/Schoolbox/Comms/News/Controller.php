@@ -1236,7 +1236,7 @@ class Controller extends Base
             'school_house' => [
                 'name'          =>  'House',
                 'namePlural'    =>  'Houses',
-                'icon'          =>  'House members',
+                'icon'          =>  'home',
                 'selfModifier'  =>  'Users in role',
                 'hideFromModal' =>  false,
                 'isMulti'       =>  false,
