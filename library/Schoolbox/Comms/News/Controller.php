@@ -1341,8 +1341,6 @@ class Controller extends Base
 
                 // get proper urls to return to.
                 $commsRoutes = [
-                    'commsNews.getListForUser',
-                    'commsNews.getAuthoredArticles',
                     'commsNews.getAuthored',
                     'commsNewsModeration.getList',
                     'commsNewsSaveForLater.getList',
