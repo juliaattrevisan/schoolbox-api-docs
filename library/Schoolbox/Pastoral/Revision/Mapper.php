@@ -13,6 +13,7 @@
 
 namespace Schoolbox\Pastoral\Revision;
 
+use Alaress_Date_Format;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\DefinitionException;
@@ -229,5 +230,30 @@ class Mapper extends BaseMapper
         }
 
         return $revision;
+    }
+
+
+    /**
+     * Overridden because this mapper doesn't actually have an updated
+     * timestamp field (presumably so the timestamp can be set manually?).
+     *
+     * @param Model                    $object
+     * @param Alaress_Date_Format|null $updatedAt
+     */
+    public function resetUpdatedTimestamp($object, ?Alaress_Date_Format $updatedAt): void
+    {
+        $this->database->query(
+            "
+                UPDATE {$this->table}
+                SET    updated_at = :updatedAt
+                WHERE  root_id    = :id
+                ORDER BY id DESC
+                LIMIT 1
+            ",
+            [
+                'id'        => $object->getId(),
+                'updatedAt' => ($updatedAt && !$updatedAt->isNull()) ? $updatedAt->getDatabase() : null,
+            ]
+        );
     }
 }

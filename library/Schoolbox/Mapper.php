@@ -3908,6 +3908,27 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
+     * Reset the updated timestamp of `$object` in the database.
+     *
+     * Required as a workaround for manually set updated timestamp model values
+     * being clobbered on save in `\Schoolbox\Mapper::populateSaveTimestamps`.
+     *
+     * @param object                   $object
+     * @param Alaress_Date_Format|null $updatedAt
+     */
+    public function resetUpdatedTimestamp($object, ?Alaress_Date_Format $updatedAt): void
+    {
+        if ($this->updatedMap) {
+            $this->updateAll(
+                $object,
+                $this->updatedMap['column'],
+                ($updatedAt && !$updatedAt->isNull()) ? $updatedAt->getDatabase() : null
+            );
+        }
+    }
+
+
+    /**
      * Set model UUIDs (if this mapper has a UUID) prior to saving to DB
      *
      * @param Collection $collection

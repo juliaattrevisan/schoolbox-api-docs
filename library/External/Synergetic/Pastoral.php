@@ -21,6 +21,7 @@ use Schoolbox\Pastoral\Log\Mapper as PastoralLogMapper;
 use Schoolbox\Pastoral\Log\Model as PastoralLog;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
+use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
@@ -69,6 +70,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
     /** @var PastoralSeverityMapper $pastoralSeverityMapper */
     protected $pastoralSeverityMapper;
+
+    /** @var PastoralRevisionMapper $pastoralRevisionMapper */
+    protected $pastoralRevisionMapper;
 
     // The media database schema varies between v67/68 of Synergetic, this will hold the schema name we should use
 
@@ -176,6 +180,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $this->setPastoralSubTypeMapper(PastoralSubTypeMapper::getInstance());
         $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
         $this->setPastoralSeverityMapper(PastoralSeverityMapper::getInstance());
+        $this->pastoralRevisionMapper = PastoralRevisionMapper::getInstance();
     }
 
     /**
@@ -336,11 +341,26 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                                 $pastoralRecord->setModifiedBy($modifier);
                             }
 
+                            $modifiedDate = null;
+                            if ($record['ModifiedDate']) {
+                                $modifiedDate = new Alaress_Date_Format($record['ModifiedDate'], Alaress_Date_Format::DATABASE_FORMAT);
+                                $pastoralRecord->setUpdatedAt($modifiedDate);
+                            }
+
                             if ($this->config->get('pastoral_severity')) {
                                 $pastoralRecord->setSeverity($severity);
                             }
 
                             $this->getPastoralMapper()->save($pastoralRecord);
+
+                            // Because updated_at is clobbered:
+                            $this->pastoralMapper->resetUpdatedTimestamp($pastoralRecord, $modifiedDate);
+
+                            // Need to do the same for the revision too
+                            foreach ($this->pastoralRevisionMapper->findForRecord($pastoralRecord) as $revision) {
+                                $this->pastoralRevisionMapper->resetUpdatedTimestamp($revision, $modifiedDate);
+                            }
+
                             $logRecord->setResult("OK");
                             $logRecord->setPastoralId($pastoralRecord->getId());
 
