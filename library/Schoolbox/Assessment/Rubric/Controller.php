@@ -365,11 +365,11 @@ class Controller extends BaseController
 
                 // Instructor-given feedback
                 if ($this->mapper->hasInstructorMarkedGrid($participant)) {
-                    $response['affectedUsers']['response'][$user->getId()]
+                    $response['affectedUsers']['instructor'][$user->getId()]
                         = $user->jsonSerialize($jsonDecorator, $linkDecorator);
                 }
 
-                // Self-assessments
+                // Self-assessment feedback
                 if ($assessment->isSelfAssessable() && $this->mapper->hasSelfAssessedMarkedGrid($participant)) {
                     $response['affectedUsers']['selfAssess'][$user->getId()]
                         = $user->jsonSerialize($jsonDecorator, $linkDecorator);
