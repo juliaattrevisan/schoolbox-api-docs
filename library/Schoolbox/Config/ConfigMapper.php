@@ -96,7 +96,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
 
     // All config for this module will share this common prefix
     public const PREFIX_TIGS_CRP = 'tigs_crp_';
-    public const _PARTICIPATION_REPORT_ENABLED = self::PREFIX_TIGS_CRP . 'participation_report_enabled';
+    public const _TIGS_PARTICIPATION_REPORT_ENABLED = self::PREFIX_TIGS_CRP . 'participation_report_enabled';
 
     /** @var array */
     protected $cache = array();
