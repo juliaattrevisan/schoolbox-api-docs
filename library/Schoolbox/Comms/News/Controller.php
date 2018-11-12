@@ -8,6 +8,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News;
 
+use Alaress\Authorizer\Rule\All;
+use Alaress\Authorizer\Rule\HasServicePermission;
+use Alaress\Authorizer\Rule\LazyCallback;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Specification\Exception\UnsatisfiedException;
@@ -31,6 +34,7 @@ use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
@@ -285,7 +289,9 @@ class Controller extends Base
     {
         // Base Case:
         if ($segment->isSimple()) {
+            $userAccessMapper = new UserAccessMapper();
             return
+                $userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE ||
                 $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
                 Access::getInstance()->getFolderAccess($user, $segment->getEntityValue()) >= UserAccess::ACCESS_READ;
         }
@@ -1236,7 +1242,7 @@ class Controller extends Base
             'school_house' => [
                 'name'          =>  'House',
                 'namePlural'    =>  'Houses',
-                'icon'          =>  'House members',
+                'icon'          =>  'home',
                 'selfModifier'  =>  'Users in role',
                 'hideFromModal' =>  false,
                 'isMulti'       =>  false,
