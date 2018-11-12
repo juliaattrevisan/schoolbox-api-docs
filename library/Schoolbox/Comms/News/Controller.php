@@ -228,7 +228,7 @@ class Controller extends Base
             'isAutoSavable'        => true,
             'encodedSegments'      => $audienceSegments,
             'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
-            'returnUrl'            => $this->getReturnUrl(),
+            'returnUrl'            => $this->getExplicitReturnUrl(),
             'entityTypesData'      => $this->getEntityTypesData(),
         ])->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
@@ -389,7 +389,7 @@ class Controller extends Base
             'featureImageZone'       => $zone->getTwigContext(),
             'encodedSegments'        => $this->getAudienceSegments($article),
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
-            'returnUrl'              => $this->getReturnUrl(),
+            'returnUrl'              => $this->getExplicitReturnUrl(),
             'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(true),
             'entityTypesData'        => $this->getEntityTypesData(),
         ])->setTitle("Update {$article->getTitle()}"));
@@ -597,7 +597,7 @@ class Controller extends Base
                 'flashMessage'          => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
                 'moderationEnabled'     => $moderationEnabled,
                 'isSavedForLater'       => $isSavedForLater,
-                'returnUrl'             => $this->getReturnUrl(),
+                'returnUrl'             => $this->getExplicitReturnUrl(),
                 'encodedSegments'       => $this->getAudienceSegments($article),
                 'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(true),
                 'entityTypesData'       => $this->getEntityTypesData(false),
@@ -1314,63 +1314,76 @@ class Controller extends Base
 
     /**
      * Gets return url from query string and history.
+     * Returns value of returnUrl query string, if set.
+     * If not and if it is visited from the following:
+     *    - homepage
+     *    - dashboard
+     *    - moderation page
+     *    - saved page
+     * returns the encoded url of the page.
+     * Returns null otherwise.
      * @return null|string
      */
-    private function getReturnUrl(): ?string
+    private function getExplicitReturnUrl(): ?string
     {
         $returnUrl = $this->getRequest()->query->get(Querystring::RETURN_URL);
-        if (!$returnUrl) {
-            $cameFrom = $this->getSession()->getHistory();
-            // include dashboard as the default valid url.
-            $validUrls = ['/'];
-            $asyncUrls = [];
-            try {
-                // if the previous url is for ajax call, get one before.
-                $ajaxRoutes = [
-                    'commsNews.getListForUser',
-                    'commsNews.getAuthoredArticles'
-                ];
-                foreach ($ajaxRoutes as $ajaxRoute) {
-                    $route = $this->getRouter()->generate($ajaxRoute);
-                    if ($route) {
-                        $asyncUrls[] = $route;
-                    }
-                }
-                if (\in_array($cameFrom, $asyncUrls)) {
-                    $cameFrom = $this->getSession()->getHistory(2);
-                }
-
-                // get proper urls to return to.
-                $commsRoutes = [
-                    'commsNews.getAuthored',
-                    'commsNewsModeration.getList',
-                    'commsNewsSaveForLater.getList',
-                    'commsNews.getIndex',
-                ];
-                foreach ($commsRoutes as $commsRoute) {
-                    $route = $this->getRouter()->generate($commsRoute);
-                    if ($route) {
-                        $validUrls[] = $route;
-                    }
-                }
-            } catch (RouteNotFound $e) {
-                // should not happen
-                return null;
-            }
-
-            // navigate back, if came from one of the valid urls above.
-            if (\in_array($cameFrom, $validUrls)
-                || \strpos($cameFrom, '/homepage') !== false) {
-                $returnUrl = Querystring::encode($cameFrom);
-            }
+        if ($returnUrl) {
+            return $returnUrl;
         }
-        return $returnUrl;
+        // visible url of the previous page.
+        $previousUrl = $this->getSession()->getHistory();
+        // urls of comms article list that current action can be redirected to - dashboard as the default.
+        $commsListUrls = ['/'];
+        // urls which are for ajax call and need to be excluded
+        // (we might want to improve getHistory() at some point...)
+        $asyncUrls = [];
+        try {
+            // if the previous url is for ajax call, get one before.
+            $ajaxRoutes = [
+                'commsNews.getListForUser',
+                'commsNews.getAuthoredArticles'
+            ];
+            foreach ($ajaxRoutes as $ajaxRoute) {
+                $route = $this->getRouter()->generate($ajaxRoute);
+                if ($route) {
+                    $asyncUrls[] = $route;
+                }
+            }
+            if (\in_array($previousUrl, $asyncUrls)) {
+                $previousUrl = $this->getSession()->getHistory(2);
+            }
+
+            // populate urls of comms article list that current action can be redirected to.
+            $commsRoutes = [
+                'commsNews.getAuthored',
+                'commsNewsModeration.getList',
+                'commsNewsSaveForLater.getList',
+                'commsNews.getIndex',
+            ];
+            foreach ($commsRoutes as $commsRoute) {
+                $route = $this->getRouter()->generate($commsRoute);
+                if ($route) {
+                    $commsListUrls[] = $route;
+                }
+            }
+        } catch (RouteNotFound $e) {
+            // should not happen
+            return null;
+        }
+
+        // If the url of the previous pages matches any of the comms list pages above or homepage, return the url
+        // null otherwise.
+        if (\in_array($previousUrl, $commsListUrls)
+            || \strpos($previousUrl, '/homepage') !== false) {
+            return Querystring::encode($previousUrl);
+        }
+        return null;
     }
 
-    
+
     /**
      * Get the variables needed for the news sidebar
-     * 
+     *
      * @return array
      */
     private function getSidebarVars(): array

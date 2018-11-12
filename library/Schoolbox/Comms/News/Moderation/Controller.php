@@ -336,14 +336,16 @@ class Controller extends Base
         }
 
         if (200 === $httpCode) {
-            // TODO. The client should be responsible for determining what to do after approval.
-            // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
-            // TODO. THis should just return the outcome of the request, not a redirect.
-            $listRoute = $this->getRouteIfAuthorized('commsNewsModeration.getList');
-            if ($listRoute) {
-                $route = $listRoute;
+            $returnUrl = News\Querystring::decode($this->getRequest()->query->get(News\Querystring::RETURN_URL));
+            if ($returnUrl) {
+                $route = $returnUrl;
             } else {
-                $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
+                $listRoute = $this->getRouteIfAuthorized('commsNewsModeration.getList');
+                if ($listRoute) {
+                    $route = $listRoute;
+                } else {
+                    $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
+                }
             }
             $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);
         } else {
