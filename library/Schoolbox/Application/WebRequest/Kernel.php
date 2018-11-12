@@ -278,7 +278,6 @@ class Kernel extends \Alaress\Application\Kernel
                     $output = $this->di->get("webOutput:base");
                 }
             }
-            $output->output($response);
 
             // Post-processing: if this is a HTML request and not a redirect,
             // store this request in history.
@@ -289,6 +288,10 @@ class Kernel extends \Alaress\Application\Kernel
             if (!($isXhr || $redirect || !$allowBackToTheFuture)) {
                 $session->pushHistory($_SERVER['REQUEST_URI']);
             }
+
+            $output->output($response);
+
+
             exit;
         }
 

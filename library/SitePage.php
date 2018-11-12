@@ -376,7 +376,7 @@ class SitePage extends Page
         $this->setVar($templateVar);
 
         // Apply the custom java scripts all the pages other than admin pages
-        if (!isset($_REQUEST['page']) || strpos($_REQUEST['page'], '/adminv2/') !== 0) {
+        if (!isset($_SERVER['REQUEST_URI']) || strpos($_SERVER['REQUEST_URI'], '/adminv2/') !== 0) {
             $this->setVar('SITE_HEADER_SCRIPTS', $this->config->get('site_header_scripts'));
         } else {
             $this->setVar('SITE_HEADER_SCRIPTS', '');
