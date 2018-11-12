@@ -13,6 +13,7 @@ use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
@@ -363,13 +364,13 @@ class Controller extends BaseController
                 $user = $participant->getUser();
 
                 // Instructor-given feedback
-                if ($participant->hasPublishedFeedback()) {
+                if ($this->mapper->hasInstructorMarkedGrid($participant)) {
                     $response['affectedUsers']['response'][$user->getId()]
                         = $user->jsonSerialize($jsonDecorator, $linkDecorator);
                 }
 
                 // Self-assessments
-                if ($assessment->isSelfAssessable() && $participant->hasSubmittedResponse()) {
+                if ($assessment->isSelfAssessable() && $this->mapper->hasSelfAssessedMarkedGrid($participant)) {
                     $response['affectedUsers']['selfAssess'][$user->getId()]
                         = $user->jsonSerialize($jsonDecorator, $linkDecorator);
                 }

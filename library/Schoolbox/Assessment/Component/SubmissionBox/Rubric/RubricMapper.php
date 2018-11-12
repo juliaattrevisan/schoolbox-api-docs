@@ -29,6 +29,7 @@ use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -798,6 +799,71 @@ class RubricMapper
         // And save cap/ind marks
         $capabilityMarkMapper->save($capabilityMarksToSave);
         $indicatorMarkMapper->save($indicatorMarksToSave);
+    }
+
+
+    /**
+     * Does this participant have a valid instructor marked grid?
+     *
+     * @param Participant $participant
+     * @return bool
+     */
+    public function hasInstructorMarkedGrid(Participant $participant): bool
+    {
+        return $this->hasMarkedGrid($participant, [SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR]);
+    }
+
+
+    /**
+     * Does this participant have a valid self-assessed marked grid?
+     *
+     * @param Participant $participant
+     * @return bool
+     */
+    public function hasSelfAssessedMarkedGrid(Participant $participant): bool
+    {
+        return $this->hasMarkedGrid(
+            $participant,
+            [
+                SubmissionBox\ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION,
+                SubmissionBox\ReturnedWork::REVIEW_ROUTE_SELF_GRADING
+            ]
+        );
+    }
+
+
+    /**
+     * Does this participant have a valid marked grid of the given types?
+     *
+     * @param Participant $participant
+     * @param array       $feedbackTypes The types of feedback to check.
+     *                                   One or more of the
+     *                                   `\Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork::REVIEW_ROUTE_*`
+     *                                   constants.
+     * @return bool
+     */
+    public function hasMarkedGrid(Participant $participant, array $feedbackTypes): bool
+    {
+        // Which feedbacks are getting checked?
+        $feedbackIds = [];
+        foreach ($participant->getAllFeedbacks() as $feedback) {
+            if ($feedback instanceof DueWork\Feedback\Model
+                && \in_array($feedback->getReviewRoute(), $feedbackTypes, true)
+            ) {
+                $feedbackIds[] = $feedback->getId();
+            }
+        }
+
+        if (empty($feedbackIds)) {
+            return false;
+        }
+
+        // Query for determining if there's valid marks for this participant
+        $indicatorMarkMapper = DescriptorMarkMapper::getInstance();
+        return $indicatorMarkMapper->countByColumnList([
+            'r.id'  => $feedbackIds,
+            'valid' => true,
+        ]) > 0;
     }
 
 
