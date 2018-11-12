@@ -162,36 +162,21 @@ class Notifier extends AbstractModuleNotifier
             ->setNamespace($this->getSlug())
         ;
 
-        // Target home team parents
+        //Target parents of all teams
+        foreach($match->getAllTeams() as $team) {
+            $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
 
-        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
-
-        /** @var TeamPlayer $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer) {
-            $href = "/fixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
-            $bob->setHref($href)
-                ->setParams([
-                    'child' => new UserParam($teamPlayer->getUser()),
-                    'sport' => new Param($sport->getName()),
-                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
-                ]);
-            $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
-        }
-
-        // Target away team parents
-
-        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
-
-        /** @var TeamPlayer $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer) {
-            $href = "/fixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
-            $bob->setHref($href)
-                ->setParams([
-                    'child' => new UserParam($teamPlayer->getUser()),
-                    'sport' => new Param($sport->getName()),
-                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
-                ]);
-            $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
+            /** @var TeamPlayer $teamPlayer */
+            foreach ($teamPlayers as $teamPlayer) {
+                $href = "/fixtures/matches/{$match->getId()}/results/{$team->getId()}";
+                $bob->setHref($href)
+                    ->setParams([
+                                    'child' => new UserParam($teamPlayer->getUser()),
+                                    'sport' => new Param($sport->getName()),
+                                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
+                                ]);
+                $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
+            }
         }
 
         return $envelope;
@@ -224,35 +209,22 @@ class Notifier extends AbstractModuleNotifier
             ->setNamespace($this->getSlug())
         ;
 
-        // Target home team
+        // Target players of all teams
+        foreach($match->getAllTeams() as $team) {
 
-        $this->log->info("ID: " . $match->getHomeTeam()->getId());
-        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
+            $this->log->info("ID: " . $team->getId());
+            $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
 
-        /** @var TeamPlayer $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer) {
-            $href = "/fixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
-            $bob->setHref($href)
-                ->setParams([
-                    'sport' => new Param($sport->getName()),
-                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
-                ]);
-            $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
-        }
-
-        // Target away team
-
-        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
-
-        /** @var TeamPlayer $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer) {
-            $href = "/fixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
-            $bob->setHref($href)
-                ->setParams([
-                    'sport' => new Param($sport->getName()),
-                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
-                ]);
-            $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
+            /** @var TeamPlayer $teamPlayer */
+            foreach ($teamPlayers as $teamPlayer) {
+                $href = "/fixtures/matches/{$match->getId()}/results/{$team->getId()}";
+                $bob->setHref($href)
+                    ->setParams([
+                                    'sport' => new Param($sport->getName()),
+                                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
+                                ]);
+                $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
+            }
         }
 
         return $envelope;
