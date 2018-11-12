@@ -1035,18 +1035,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             }
         }
 
-        // UNICODE SAFETY
-        // Multibyte encoding doesn't work properly with HTML unless 'HTML-ENTITIES' is given as the character encoding
-        // However we don't want HTML entities in Synergetic, so get rid of them afterwards
-        // (attempting to do these operations in a different order results in corrupted text)
         $this->htmlConverter->setHtml($pastoral->getBodyPublic());
         $bodyPublicText = $this->htmlConverter->getText();
-        $bodyPublicText = html_entity_decode(mb_convert_encoding($bodyPublicText, 'HTML-ENTITIES', 'UTF-8'));
 
         $this->htmlConverter->setHtml($pastoral->getBodyPrivate());
         $bodyPrivateText = $this->htmlConverter->getText();
-        $bodyPrivateText = html_entity_decode(mb_convert_encoding($bodyPrivateText, 'HTML-ENTITIES', 'UTF-8'));
-
 
         // Return an array containing the parameters for the insert/update query
 
