@@ -16,4 +16,5 @@ class Config
     // All config for this module will share this common prefix
     public const PREFIX_TIGS_CRP = 'tigs_crp_';
     public const _TIGS_PARTICIPATION_REPORT_ENABLED = self::PREFIX_TIGS_CRP . 'participation_report_enabled';
+    public const _TIGS_SUBJECT_REPORT_ENABLED = self::PREFIX_TIGS_CRP . 'subject_report_enabled';
 }

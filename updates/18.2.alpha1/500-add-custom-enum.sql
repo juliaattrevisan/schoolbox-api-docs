@@ -12,3 +12,15 @@ INSERT INTO config(name, value, title, description, field_id, editable, hidden, 
   'true',
   'custom'
 );
+
+INSERT INTO config(name, value, title, description, field_id, editable, hidden, required, module) VALUES (
+  'tigs_crp_subject_report_enabled',
+  '1',
+  'Subject Report enabled',
+  'If enabled, students and parents can access the Subject Report. Staff can always access.',
+  (SELECT id FROM lu_config_field WHERE field = 'boolean'),
+  'true',
+  'false',
+  'true',
+  'custom'
+);
