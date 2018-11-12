@@ -957,6 +957,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             }
         }
 
+        // UNICODE SAFETY
         // Multibyte encoding doesn't work properly with HTML unless 'HTML-ENTITIES' is given as the character encoding
         // However we don't want HTML entities in Synergetic, so get rid of them afterwards
         // (attempting to do these operations in a different order results in corrupted text)
