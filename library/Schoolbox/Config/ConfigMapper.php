@@ -94,6 +94,10 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const _BOARDER_LEAVE_ENABLED = 'boarder_leave_enabled';
     public const _AUDIENCE_TO_FOLDER_TEACHERS = 'audience_to_folder_users_teachers';
 
+    // All config for this module will share this common prefix
+    public const PREFIX_TIGS_CRP = 'tigs_crp_';
+    public const _PARTICIPATION_REPORT_ENABLED = self::PREFIX_TIGS_CRP . 'participation_report_enabled';
+
     /** @var array */
     protected $cache = array();
 
