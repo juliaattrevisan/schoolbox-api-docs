@@ -12,7 +12,6 @@ namespace Alaress\Mail;
 
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
-use phpDocumentor\Reflection\Types\Boolean;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
