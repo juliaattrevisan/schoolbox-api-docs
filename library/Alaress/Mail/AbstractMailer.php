@@ -422,7 +422,8 @@ abstract class AbstractMailer implements IMailer
         ];
         $validEmailAddresses = [];
 
-        $emailLists = array_map('trim',explode(",", $emailAddresses));
+        // Separate $emailAddresses by comma that's outside parentheses
+        $emailLists = array_map('trim', preg_split('/(?!<(?:\(|\[)[^)\]]+),(?![^(\[]+(?:\)|\]))/', $emailAddresses));
 
         foreach ($emailLists as $email) {
             // Check if string is a valid email OR
