@@ -353,16 +353,25 @@ class Controller extends BaseController
             'valid'         => true,
             'affectedUsers' => [],
         ];
-        $jsonDecorator = new PropertyDecorator();
-        $linkDecorator = new LinkDecorator($this->router, $this->authorizer);
         if (!$proposedGrid->isCompatibleWith($currentGrid)) {
             $response['valid'] = false;
+            $jsonDecorator = new PropertyDecorator();
+            $linkDecorator = new LinkDecorator($this->router, $this->authorizer);
+
             // Determine who's actually affected?
-            // Note: this doesn't include self-assessed yet
             foreach ($box->getAllParticipants() as $participant) {
+                $user = $participant->getUser();
+
+                // Instructor-given feedback
                 if ($participant->hasPublishedFeedback()) {
-                    $user = $participant->getUser();
-                    $response['affectedUsers'][$user->getId()] = $user->jsonSerialize($jsonDecorator, $linkDecorator);
+                    $response['affectedUsers']['response'][$user->getId()]
+                        = $user->jsonSerialize($jsonDecorator, $linkDecorator);
+                }
+
+                // Self-assessments
+                if ($box->isSelfAssessable() && $participant->hasSubmittedResponse()) {
+                    $response['affectedUsers']['selfAssess'][$user->getId()]
+                        = $user->jsonSerialize($jsonDecorator, $linkDecorator);
                 }
             }
         }
