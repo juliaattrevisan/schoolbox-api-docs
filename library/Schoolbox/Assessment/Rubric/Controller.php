@@ -327,21 +327,21 @@ class Controller extends BaseController
     public function determineMarkInvalidation(): void
     {
         $post  = $this->request->post->get('rb');
-        $boxId = key($post);
-        $box   = $this->assessmentDataSource->findByIdForReview($boxId);
-        if (!$box instanceof DueWork) {
+        $assessmentId = key($post);
+        $assessment   = $this->assessmentDataSource->findByIdForReview($assessmentId);
+        if (!$assessment instanceof DueWork) {
             $this->sendError('Can only determine mark invalidation for due work');
             return;
         }
-        $box->setMarkPerCapability($this->request->post->getBool('markPerCapability', false))
+        $assessment->setMarkPerCapability($this->request->post->getBool('markPerCapability', false))
             ->setUseMarkRange($this->request->post->getBool('useMarkRange', false));
 
 
         // Need to fetch current grid and proposed grid's base separately,
         // because of object references
-        $currentGrid  = $this->mapper->retrieveGrid($box, false);
+        $currentGrid  = $this->mapper->retrieveGrid($assessment, false);
         $proposedGrid = (new GridFactory())->buildFromPostData(
-            $this->mapper->retrieveGrid($box, false),
+            $this->mapper->retrieveGrid($assessment, false),
             $post,
             false
         );
@@ -350,16 +350,16 @@ class Controller extends BaseController
         // Is the proposed grid itself not valid?
         // Doesn't matter for the purpose of this exercise
         $response = [
-            'valid'         => true,
+            'compatible'    => true,
             'affectedUsers' => [],
         ];
         if (!$proposedGrid->isCompatibleWith($currentGrid)) {
-            $response['valid'] = false;
+            $response['compatible'] = false;
             $jsonDecorator = new PropertyDecorator();
             $linkDecorator = new LinkDecorator($this->router, $this->authorizer);
 
             // Determine who's actually affected?
-            foreach ($box->getAllParticipants() as $participant) {
+            foreach ($assessment->getAllParticipants() as $participant) {
                 $user = $participant->getUser();
 
                 // Instructor-given feedback
@@ -369,7 +369,7 @@ class Controller extends BaseController
                 }
 
                 // Self-assessments
-                if ($box->isSelfAssessable() && $participant->hasSubmittedResponse()) {
+                if ($assessment->isSelfAssessable() && $participant->hasSubmittedResponse()) {
                     $response['affectedUsers']['selfAssess'][$user->getId()]
                         = $user->jsonSerialize($jsonDecorator, $linkDecorator);
                 }
