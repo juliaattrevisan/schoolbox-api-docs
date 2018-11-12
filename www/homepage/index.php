@@ -314,6 +314,11 @@ if ($virtualPermission >= WRITE_ACCESS) {
     for ($x = 1; $x <= 4; $x++) {
         $this->setVar("CURRENT_TEMPLATE_$x", $template == $x ? 'current' : '');
     }
+
+    // Hide controls on page load (lock mode)
+    $this->setVar([
+        'HIDE_CONTROLS_ON_WRITE' => 'style="display:none;"'
+    ]);
 } else {
     $this->setVar([
         'edit_page_block' => '',
@@ -321,6 +326,9 @@ if ($virtualPermission >= WRITE_ACCESS) {
         'customise_page_block' => '',
         'colour_list_block' => '',
         'course_actions_block' => '',
+
+        // Read access users still see their collapse button 
+        'HIDE_CONTROLS_ON_WRITE' => ''
     ]);
 }
 

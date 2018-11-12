@@ -86,7 +86,12 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
             $this->setVar([
                 'COMPONENT_ACTION_COUNT' => 3,
                 'titlebar_read_block' => '',
+
+                // Add data attribute for write users
                 'COMPONENT_SETTINGS_DATA' => 'data-component-settings',
+
+                // Note: purposefully not defining the HIDE_CONTROLS_ON_WRITE var in this file,
+                //       if we set to nothing here, then component actions will be shown on page load.
             ]);
             $this->getSitePage()->parse('titlebar_write_block', 'titlebar_write');
         } else {
