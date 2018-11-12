@@ -330,7 +330,7 @@ class Controller extends BaseController
         $boxId = key($post);
         $box   = $this->assessmentDataSource->findByIdForReview($boxId);
         if (!$box instanceof DueWork) {
-            $this->sendError('Can only download rubrics for due work');
+            $this->sendError('Can only determine mark invalidation for due work');
             return;
         }
         $box->setMarkPerCapability($this->request->post->getBool('markPerCapability', false))
