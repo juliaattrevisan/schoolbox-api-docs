@@ -41,6 +41,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
     // Module column enum
     public const MODULE_SETTINGS = 'settings';
     public const MODULE_COMMS    = 'comms';
+    public const MODULE_CUSTOM   = 'custom';
 
     // Field enum (kinda)
     public const FIELD_INPUT         =  1;
@@ -151,7 +152,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
         $this->uses(self::COL_EDITABLE, self::TYPE_BOOL_ENUM);
         $this->uses(self::COL_HIDDEN, self::TYPE_BOOL_ENUM);
         $this->uses(self::COL_REQUIRED, self::TYPE_BOOL_ENUM);
-        $this->uses(self::COL_MODULE, self::TYPE_STRING, self::COLUMN_ENUM, null, [self::MODULE_SETTINGS, self::MODULE_COMMS]);
+        $this->uses(self::COL_MODULE, self::TYPE_STRING, self::COLUMN_ENUM, null, [self::MODULE_SETTINGS, self::MODULE_COMMS, self::MODULE_CUSTOM]);
     }
 
 
