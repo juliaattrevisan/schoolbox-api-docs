@@ -795,7 +795,11 @@ class Leave_Controller extends Controller
             $travelTypes = $this->getTravelTypes();
 
             /** @var Leave_Request_TravelType $travelType */
-            $travelType  = $travelTypes[$request->getTravelType()->getId()] ?: $travelTypes[0];
+            if ($request->getTravelType() instanceof Leave_Request_TravelType) {
+                $travelType = $travelTypes[$request->getTravelType()->getId()] ?: $travelTypes[0];
+            } else {
+                $travelType = $travelTypes[0];
+            }
 
             $this->getPage()->setVar(
                 array(
