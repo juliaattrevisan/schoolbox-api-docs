@@ -40,23 +40,23 @@ class Factory
         $indicators   = $rubricData['criterion']  ?: [];
         $descriptors  = $rubricData['descriptor'] ?: [];
 
-        // Level ordering is important
-        ksort($levels);
+        // Ensure levels and descriptors are reindexed back into sequence
+        $levels      = array_values($levels);
+        $descriptors = array_map('array_values', $descriptors);
 
         if ($assessment instanceof DueWork) {
             $usesMarkRange = $assessment->getUseMarkRange();
             $markPerCap = $assessment->getMarkPerCapability();
         }
 
-        // cache levels and ensure all exist in the rubric
+        // Rebuild the set of levels from scratch each time
+        $newLevels = $grid->getLevels()->emptyClone();
         foreach ($levels as $levelSequence => $level) {
             $levelName = $level['name'];
             $levelId   = filter_var($level['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-
-            if(!$levelId || $grid->getLevels()->filterBy('id',$levelId)->count() == 0) {
-                $grid->getLevels()->add((new Level())->setName($levelName)->setId($levelId));
-            }
+            $newLevels->add((new Level())->setName($levelName)->setId($levelId));
         }
+        $grid->setLevels($newLevels);
 
         // Must assume that all capabilities in formdata exist:
         // they will, because it was created when the capability was added
