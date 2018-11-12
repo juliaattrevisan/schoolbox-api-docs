@@ -14,6 +14,11 @@ WHERE `user`.id is null;
 
 UPDATE leave_request
 LEFT JOIN `user` ON leave_request.`authorisation_user_id` = `user`.id
+SET authorisation_user_id = (SELECT `id` FROM `user` WHERE username LIKE 'alaress')
+WHERE `user`.id is null AND leave_request.authorisation_datetime IS NOT NULL;
+
+UPDATE leave_request
+LEFT JOIN `user` ON leave_request.`authorisation_user_id` = `user`.id
 SET authorisation_user_id = NULL
 WHERE `user`.id is null;
 
