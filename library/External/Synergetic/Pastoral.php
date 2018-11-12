@@ -420,18 +420,17 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         if ($importAttachments) {
             // Import attachments from Synergetic DocMan
 
-            $queryDocuments = $this->connector->executeQuery("
-            SELECT      ref.RelatedSeq as external_id,
-                        doc.Description as [filename],
-                        DocumentType as extension,
-                        [Document] as [blob]
-            FROM        {$this->schemaMedia}.tDocuments doc
-            JOIN        {$this->schemaMedia}.tDocumentReferences ref on ref.tDocumentsSeq = doc.tDocumentsSeq
-            WHERE       RelatedSeqModuleCode = 'SPC' 
-        ");
-            $documents = $queryDocuments->fetchAll();
+            $queryDocuments = $this->connector->getQueryIterator("
+                SELECT ref.RelatedSeq as external_id,
+                       doc.Description as [filename],
+                       DocumentType as extension,
+                       [Document] as [blob]
+                FROM   {$this->schemaMedia}.tDocuments doc
+                JOIN   {$this->schemaMedia}.tDocumentReferences ref on ref.tDocumentsSeq = doc.tDocumentsSeq
+                WHERE  RelatedSeqModuleCode = 'SPC'
+            ");
 
-            foreach ($documents as $document) {
+            foreach ($queryDocuments as $document) {
                 try {
                     $record = $this->getPastoralMapper()->findOneByColumn('external_id', $document['external_id']);
 
@@ -462,6 +461,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                     unlink($filename);
                 } catch (MapperException $e) {
+                    // Pastoral record for this attachment wasn't found?
                 }
             }
         }
