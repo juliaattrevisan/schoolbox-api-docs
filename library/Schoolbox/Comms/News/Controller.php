@@ -1321,6 +1321,7 @@ class Controller extends Base
         $returnUrl = $this->getRequest()->query->get(Querystring::RETURN_URL);
         if (!$returnUrl) {
             $cameFrom = $this->getSession()->getHistory();
+            // include dashboard as the default valid url.
             $validUrls = ['/'];
             $asyncUrls = [];
             try {
@@ -1357,7 +1358,7 @@ class Controller extends Base
                 return null;
             }
 
-            // navigate back to dashboard, homepage or /me, if came from one of them.
+            // navigate back, if came from one of the valid urls above.
             if (\in_array($cameFrom, $validUrls)
                 || \strpos($cameFrom, '/homepage') !== false) {
                 $returnUrl = Querystring::encode($cameFrom);
