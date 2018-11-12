@@ -68,7 +68,7 @@ class Controller extends Base
     {
         $configContext = (new ModuleConfig($this->fieldStrategyFactory))->getContext(
             $this->getConfigLoader()->get('site_version'),
-            $this->configMapper->findByColumn(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_COMMS, ['order'=>['configID'=>'ASC']]),
+            $this->configMapper->findByColumn(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_COMMS, ['order' => [ConfigMapper::COL_ID => 'ASC']]),
             $this->router->generate('commsNewsPolicy.postPolicies')
         );
 
