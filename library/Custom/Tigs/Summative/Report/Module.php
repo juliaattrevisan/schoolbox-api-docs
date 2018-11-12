@@ -87,7 +87,7 @@ class Module extends Alaress\Module\Module
             return $params;
         }
 
-        if (!array_key_exists('userId', $params)) {
+        if (!\array_key_exists('userId', $params)) {
             throw new UnexpectedValueException("No 'userId' found in route params");
         }
 
