@@ -20,6 +20,7 @@ use InvalidArgumentException;
 use UnexpectedValueException;
 use Schoolbox\Mapper;
 use Schoolbox\User;
+use Schoolbox\Resource\Folder;
 
 class Module extends Alaress\Module\Module
 {
@@ -45,11 +46,15 @@ class Module extends Alaress\Module\Module
             return $this->preloadUser($params);
         };
 
+        $preloadUserAndFolder = function ($params) {
+            return $this->preloadUserAndFolder($params);
+        };
+
         $canSeeParticipation = $this->buildRuleCanViewReport(Config::_TIGS_PARTICIPATION_REPORT_ENABLED, 'Participation');
         $canSeeSubjectReport = $this->buildRuleCanViewReport(Config::_TIGS_SUBJECT_REPORT_ENABLED, 'Subject');
 
         $this->register('GET', '/user/{userId}', 'getParticipationReport', $canSeeParticipation, $preloadUser);
-        $this->register('GET', '/{userId}/folder/{folderId}', 'getSubjectReport', $canSeeSubjectReport);
+        $this->register('GET', '/{userId}/folder/{folderId}', 'getSubjectReport', $canSeeSubjectReport, $preloadUserAndFolder);
     }
 
 
@@ -95,6 +100,34 @@ class Module extends Alaress\Module\Module
         } catch (Mapper\Exception $e) {
             throw new NotFound('User Not Found', 0, $e);
         }
+    }
+
+
+    /**
+     * Loads a User and Folder Model instance from route params
+     *
+     * @param array $params
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws NotFound
+     * @throws UnexpectedValueException
+     */
+    private function preloadUserAndFolder(array $params): array
+    {
+        $preload = $this->preloadUser($params);
+
+        if (($params['folder'] ?? null) instanceof Folder\Model) {
+            $preload['folder'] = $params['folder'];
+        } elseif (!\array_key_exists('folderId', $params)) {
+            throw new UnexpectedValueException("No 'folderId' found in route params");
+        } else {
+            try {
+                $preload['folder'] = $this->getFolderMapper()->findById($params['folderId']);
+            } catch (Mapper\Exception $e) {
+                throw new NotFound('Folder Not Found', 0, $e);
+            }
+        }
+        return $preload;
     }
 
 
@@ -147,5 +180,15 @@ class Module extends Alaress\Module\Module
     private function getUserMapper(): UserMapper
     {
         return $this->getMapperFactory()->get(UserMapper::class);
+    }
+
+
+    /**
+     * @return Folder\Mapper|Mapper
+     * @throws InvalidArgumentException
+     */
+    private function getFolderMapper(): Folder\Mapper
+    {
+        return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
 }
