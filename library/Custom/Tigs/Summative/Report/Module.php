@@ -41,16 +41,15 @@ class Module extends Alaress\Module\Module
      */
     protected function registerRoutes(): void
     {
-        $isLoggedIn = new Rule\IsLoggedIn();
-
         $preloadUser = function ($params) {
             return $this->preloadUser($params);
         };
 
-        $canSeeParticipation = $this->buildRuleCanViewParticipationReport();
+        $canSeeParticipation = $this->buildRuleCanViewReport(Config::_TIGS_PARTICIPATION_REPORT_ENABLED, 'Participation');
+        $canSeeSubjectReport = $this->buildRuleCanViewReport(Config::_TIGS_SUBJECT_REPORT_ENABLED, 'Subject');
 
         $this->register('GET', '/user/{userId}', 'getParticipationReport', $canSeeParticipation, $preloadUser);
-        $this->register('GET', '/{userId}/folder/{folderId}', 'getSubjectReport', $isLoggedIn);
+        $this->register('GET', '/{userId}/folder/{folderId}', 'getSubjectReport', $canSeeSubjectReport);
     }
 
 
@@ -100,16 +99,18 @@ class Module extends Alaress\Module\Module
 
 
     /**
-     * Returns an auth rule for viewing the Participation Report
+     * Returns an auth rule for viewing the one of the Reports
      *
      * * Viewee must be in years 7-12
      * * Viewer must be SU or Staff, or student/parent and config enabled
      *
+     * @param string $configName
+     * @param string $reportName
      * @return Rule\IAuthorizationRule
      */
-    private function buildRuleCanViewParticipationReport(): Rule\IAuthorizationRule
+    private function buildRuleCanViewReport(string $configName, string $reportName): Rule\IAuthorizationRule
     {
-        return new Rule\LazyCallback(function () {
+        return new Rule\LazyCallback(function () use ($configName, $reportName) {
             return new Rule\All(
                 new Rule\Callback(function (array $params) {
                     // Because preload exceptions are not handled immediately, we can't fatal if the preload failed.
@@ -126,9 +127,9 @@ class Module extends Alaress\Module\Module
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
                     new Rule\All(
-                        new Rule\Callback(function () {
-                            if (!$this->getConfig()->get(Config::_TIGS_PARTICIPATION_REPORT_ENABLED)) {
-                                throw new Alaress\Authorizer\Failure\Unauthorized('Participation report is disabled');
+                        new Rule\Callback(function () use ($configName, $reportName) {
+                            if (!$this->getConfig()->get($configName)) {
+                                throw new Alaress\Authorizer\Failure\Unauthorized("{$reportName} report is disabled");
                             }
                         }),
                         new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
