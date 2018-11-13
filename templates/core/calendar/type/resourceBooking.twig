@@ -31,7 +31,8 @@
     <a class="button icon-modify" href="{{ renderer.getEditURL() }}">Modify</a>
     {% endif %}
     {% if renderer.getCancelURL() != '' %}
-    <a class="button icon-delete" href="{{ renderer.getCancelURL() }}">Delete</a>
+        <a class="button icon-delete" {{ event.booking.event.seriesId() ? 'data-delete-series' : 'data-delete-single' }} id="delete-event-{{ event.eventId }}"
+           data-event-id="{{ event.eventId }}" data-event-type="booking">Delete</a>
     {% endif %}
     {% if renderer.getApproveURL() != '' %}
     <a class="button icon-approve" href="{{ renderer.getApproveURL() }}">Approve</a>
@@ -41,3 +42,10 @@
     {% endif %}
 </div>
 {% endblock eventBubbleButtons %}
+    {% block deleteUrls %}
+        <input type="hidden" id="delete-single-{{ event.eventId }}" value="{{ renderer.getCancelURL() }}">
+        {% if event.booking.event.seriesId() %}
+            <input type="hidden" id="delete-series-self-{{ event.eventId }}" value="{{ renderer.getCancelURL() }}">
+            <input type="hidden" id="delete-series-all-{{ event.eventId }}" value="{{ renderer.getCancelURL() }}?efficacy=series&seriesId={{ event.booking.event.seriesId() }}#">
+        {% endif %}
+    {% endblock deleteUrls %}

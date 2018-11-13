@@ -77,7 +77,8 @@
                     <a class="button icon-modify" href="/calendar/modify.php?eventID={{ event.eventId }}{{ returnStr }}">Modify</a>
                     {% endblock %}
                     {% block deleteButton %}
-                    <a class="button icon-delete" id="delete-event-{{ event.eventId }}">Delete</a>
+                    <a class="button icon-delete" {{ event.seriesId() ? 'data-delete-series' : 'data-delete-single' }} id="delete-event-{{ event.eventId }}"
+                        data-event-id="{{ event.eventId }}" data-event-type="event">Delete</a>
                     {% endblock %}
                 {% endif %}
             </div>
@@ -86,18 +87,11 @@
 
         <a class="close-reveal-modal">&#215;</a>
     </div>
+    {% block deleteUrls %}
+        <input type="hidden" id="delete-single-{{ event.eventId }}" value="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr }}">
+        {% if event.seriesId() %}
+            <input type="hidden" id="delete-series-self-{{ event.eventId }}" value="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr }}&efficacy=self">
+            <input type="hidden" id="delete-series-all-{{ event.eventId }}" value="/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr }}&efficacy=series">
+        {% endif %}
+    {% endblock deleteUrls %}
 </li>
-
-<script type="text/javascript">
-    $(function() {
-        $('#delete-event-{{ event.eventId }}').on('click', function () {
-            $('[data-reveal]').hide();
-            $(this).confirmDialog({
-                text: 'Are you sure you wish to delete this event?',
-                confirmEvent: function() {
-                    window.location.href = "/calendar/modifyForm.php?action=Delete&id={{ event.eventId }}{{ returnStr | raw }}";
-                }
-            });
-        });
-    });
-</script>

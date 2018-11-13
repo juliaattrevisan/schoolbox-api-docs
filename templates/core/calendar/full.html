@@ -401,6 +401,7 @@
         updateSeriesDialog.on('click', '[data-interaction="close"]', function(e) {
             e.preventDefault();
             updateSeriesDialog.foundation('reveal', 'close');
+            updateSeriesDialog.html(updateSeriesDialog.html().replace(/booking/g, 'event'));
         });
 
         $('#download-calendar-export').click(function(event) {
@@ -453,6 +454,7 @@
                     // Remove all previous change status events, and reapply to this
                     // dialog box.
                     updateSeriesDialog.find('[data-booking-action-text]').text($(this).text().toLowerCase());
+                    updateSeriesDialog.html(updateSeriesDialog.html().replace(/event/g, 'booking'));
                     updateSeriesDialog.foundation('reveal', 'open');
                     updateSeriesDialog.off('click', '[data-efficacy="self"]');
                     updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
@@ -464,6 +466,7 @@
                     updateSeriesDialog.on('click', '[data-efficacy="series"]', function(e) {
                         e.preventDefault();
                         updateSeriesDialog.foundation('reveal', 'close');
+                        updateSeriesDialog.html(updateSeriesDialog.html().replace(/booking/g, 'event'));
                         callback({efficacy: 'series', seriesId: seriesId});
                     });
                 }
@@ -831,7 +834,7 @@
 
 <div class="reveal-modal" data-reveal aria-labelledby="dialog-booking-bulk-update-title" aria-hidden="true" role="dialog" id="dialog-booking-bulk-update">
     <h2 id="dialog-booking-bulk-update-title">This event is part of a series</h2>
-    <p>Would you like to <span data-booking-action-text></span> only this booking, or all in the series?</p>
+    <p>Would you like to <span data-booking-action-text></span> only this event, or all in the series?</p>
     <ul class="flex-list buttons">
         <li><a href="#" class="button" data-efficacy="self">Only this event</a></li>
         <li><a href="#" class="button" data-efficacy="series">All events in the series</a></li>
