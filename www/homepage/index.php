@@ -262,14 +262,13 @@ if ($virtualPermission >= WRITE_ACCESS) {
             // This was set to $component->componentCategoryName - a non-existent value
             $tabList[$component->getComponentCategory()]['name'] = $component->getComponentCategoryName();
             $tabList[$component->getComponentCategory()]['count']++;
-
         }
     } else {
-        $this->setVar(array(
+        $this->setVar([
             'homepage_component_block' => '',
             'homepage_component_page_block' => 'No components are available for you to add.',
             'homepage_component_tab_block' => '',
-        ));
+        ]);
     }
 
     if (isset($tabList) && count($tabList)) {
@@ -316,14 +315,21 @@ if ($virtualPermission >= WRITE_ACCESS) {
         $this->setVar("CURRENT_TEMPLATE_$x", $template == $x ? 'current' : '');
     }
 
+    // Hide controls on page load (lock mode)
+    $this->setVar([
+        'HIDE_CONTROLS_ON_WRITE' => 'style="display:none;"'
+    ]);
 } else {
-    $this->setVar(array(
+    $this->setVar([
         'edit_page_block' => '',
         'modify_layout_block' => '',
         'customise_page_block' => '',
         'colour_list_block' => '',
         'course_actions_block' => '',
-    ));
+
+        // Read access users still see their collapse button 
+        'HIDE_CONTROLS_ON_WRITE' => ''
+    ]);
 }
 
 //Setup control buttons

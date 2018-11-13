@@ -100,12 +100,20 @@
                 location.reload();
             });
         });
-
-        // Lock homepage toggle
+        
+        // Lock all components on page load
+        // This is done with JS, otherwise components that are added after page load will be locked,
+        // and who can be bothered wrangling with phplib
+        $('nav[data-component-settings], [data-component-handle]').hide();
+        
+        // Toggle for homepage lock
         $('#component-lock-toggle').click(function (event) {
-            $('nav[data-component-settings], [data-component-handle]').toggle(this.checked);
+            var locked = this.checked;
+            
+            $('nav[data-component-settings], [data-component-handle]').toggle(locked);
+
             $('div[data-component-titlebar-container]').each(function() {
-                $(this).toggleClass('actions-small-' + $(this).data('action-count'));
+                $(this).toggleClass('actions-small-' + $(this).data('action-count'), locked);
             });
         });
     });

@@ -85,15 +85,22 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         if ($this->hasWriteAccess()) {
             $this->setVar([
                 'COMPONENT_ACTION_COUNT' => 3,
-                'HIDE_CONTROLS_ON_WRITE' => 'style="display:none"',
-                'titlebar_read_block' => ''
+                'titlebar_read_block' => '',
+
+                // Add data attribute for write users
+                'COMPONENT_SETTINGS_DATA' => 'data-component-settings',
+
+                // Note: purposefully not defining the HIDE_CONTROLS_ON_WRITE var in this file,
+                //       if we set to nothing here, then component actions will be shown on page load.
             ]);
             $this->getSitePage()->parse('titlebar_write_block', 'titlebar_write');
         } else {
             $this->setVar([
                 'COMPONENT_ACTION_COUNT' => 1,
-                'HIDE_CONTROLS_ON_WRITE' => '',
-                'titlebar_write_block' => ''
+                'titlebar_write_block' => '',
+
+                // Don't apply data attribute for read users, so that their collapse button doesn't get hidden by JS
+                'COMPONENT_SETTINGS_DATA' => '',
             ]);
             $this->getSitePage()->parse('titlebar_read_block', 'titlebar_read');
         }
