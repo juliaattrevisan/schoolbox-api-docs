@@ -76,6 +76,7 @@ class ThemedHtml extends Html
                         'unread'     => $_SESSION['msg-count'],
                         'stackLimit' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
                     ],
+                    'previousUser' => $_SESSION['previous']['user'] ?? null,
                 ]
             );
 

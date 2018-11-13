@@ -338,35 +338,37 @@
                                 <li><a class="icon-logout" href="/logout.php">Logout</a></li>
                             </ul>
                             <ul id="avatar2">
-                                <!-- BEGIN can_switch -->
+
+                                {% if USER.linkedUser is not empty %}
                                 <li>
                                     <ul id="switch-user">
                                         <li class="separator">Switch User</li>
-                                        <!-- BEGIN switch_user -->
+                                        {% for linkedUser in USER.linkedUser %}
                                         <li class="switch-user">
                                             <div class="card small-12">
-                                                <a class="no-pad" href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to {MENU_SWITCH_USER_FULLNAME}">
-                                                    <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
-                                                    <p>{MENU_SWITCH_USER_FULLNAME}</p>
-                                                    <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
+                                                <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
+                                                    <img src="/portrait.php?userId={{ linkedUser.externalId }}&amp;size=square64" />
+                                                    <p>{{ linkedUser.formatName }}</p>
+                                                    <p class="meta">{{ linkedUser.role.name }}</p>
                                                 </a>
                                             </div>
                                         </li>
-                                        <!-- END switch_user -->
+                                        {% endfor %}
                                     </ul>
                                 </li>
-                                <!-- END can_switch -->
-                                <!-- BEGIN recover_user -->
+                                {% endif %}
+
+                                {% if previousUser %}
                                 <li class="switch-user">
                                     <div class="card small-12">
-                                        <a class="no-pad" href="/user/recoverSession" title="Return to {MENU_SWITCH_USER_FULLNAME}">
-                                            <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
-                                            <p>{MENU_SWITCH_USER_FULLNAME}</p>
-                                            <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
+                                        <a class="no-pad" href="/user/recoverSession" title="Return to {{ previousUser.formatName }}">
+                                            <img src="/portrait.php?userId={{ previousUser.externalId }}&amp;size=square64" />
+                                            <p>{{ previousUser.formatName }}</p>
+                                            <p class="meta">{{ previousUser.role.name }}</p>
                                         </a>
                                     </div>
                                 </li>
-                                <!-- END recover_user -->
+                                {% endif %}
                             </ul>
                         </div>
                     </li>
