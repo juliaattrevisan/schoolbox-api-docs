@@ -97,8 +97,10 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
                 ]);
 
                 foreach ($criterions as $crit) {
-                    $this->setVar('CRITERION_NAME', Scrub::text($crit->getName()));
-                    $this->parse('rubric_descriptor_block', 'rubric_descriptor', true);
+                    if (trim($crit->getName()) !== '') {
+                        $this->setVar('CRITERION_NAME', Scrub::text($crit->getName()));
+                        $this->parse('rubric_descriptor_block', 'rubric_descriptor', true);
+                    }
                 }
 
                 $this->parse('rubric_criterion_block', 'rubric_criterion', true);
