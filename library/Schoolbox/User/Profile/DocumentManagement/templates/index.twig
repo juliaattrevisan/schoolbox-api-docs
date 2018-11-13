@@ -1,11 +1,10 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 
-{{ bread.crumbs(
-    [ student.formatName, "/search/user/" ~ student.id ],
-    [ 'Academic Reports' ]
-) }}
-
 <div class="row">
+    {{ bread.crumbs(
+        [ student.formatName, "/search/user/" ~ student.id ],
+        [ 'Academic Reports' ]
+    ) }}
     <div class="small-12 island">
         <h1>{{ locale.reports.properPlural }}</h1>
     </div>
