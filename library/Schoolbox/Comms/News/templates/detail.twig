@@ -53,30 +53,57 @@ Data:
     <div class="actions-small-2 row">
         <div class="list-item">
             <h1>{{ article.title }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
-
             <ul class="meta">
-
+                <li class="icon-user">
+                    Published by
+                    {% if article.author.deletedAt.isNull %}
+                    <a href="/search/user/{{ article.author.id }}" title="View Profile">
+                        {{  article.author.fullname }}
+                    </a>
+                {% else %}
+                    {{ article.author.fullname }}
+                    {% endif %} on <span title="{{ article.publishAt.long }}" >{{ article.publishAt.short }}</span>
+                </li>
                 {# Topics #}
                 {% if article.topics|length %}
-                    <li class="icon-news">Related Topics:
+                    <li class="icon-breadcrumbs">Topics:
                         {% for topic in article.topics %}
                             <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     </li>
                 {% endif %}
 
-                {# This info only really matters to the author, I suppose
-                 # Submitted at; accepted at; accepted by
-                 #}
-                {% if isAuthor %}
-                    {% if article.isSubmitted %}
-                        <li class="icon-calendar">Submitted on {{ article.submittedAt.local }}</li>
-                    {% endif %}
+                <li class="icon-eye" id="audience-container" v-if="audienceBricks.length > 0">
+                        <span v-if="audienceBricks.length > 1">Audiences: </span>
+                        <span v-else>Audience: </span>
+                        <template v-show="audienceBricks.length" v-for="(audienceBrick, index) in audienceBricks">
+                            <span v-if="audienceBrick.isComposite()">
+                                <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel }</a>
+                            </span>
+                            <span v-else>
+                                ${ audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel }
+                            </span>
+                            <template v-if="index+1 < audienceBricks.length">, </template>
+                        </template>
 
-                    {% if article.isAccepted %}
-                        <li class="icon-calendar">Last moderated on {{ article.acceptedAt.local }} by {{ article.acceptedBy.fullname }}</li>
-                    {% endif %}
-                {% endif %}
+                        {# modal #}
+                        <div data-reveal id="audience-composite" class="reveal-modal">
+                            <h2>Complex Audience</h2>
+                            <a class="close-reveal-modal" aria-label="Close">×</a>
+                    <p class="meta" v-if="selectedCompositeBrick.modalData">
+                        This audience segment includes users who are in both one or more of the selected
+                        ${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() } and one or more of the selected
+                        ${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }.
+                    </p>
+                    <div class="audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
+                        <div><b>${ dimensionData.typeLabel.plural }:</b></div>
+                        <div>
+                            <template v-for="(label, index) in dimensionData.valueLabels">
+                                ${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template>
+                            </template>
+                        </div>
+                    </div>
+                </li>
             </ul>
         </div>
 
@@ -178,63 +205,6 @@ Data:
             {#{% endif %}#}
         </ul>
         {% endif %}
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <section>
-            <div class="card small-12">
-                
-                {% if article.author.deletedAt.isNull %}
-                    <a href="/search/user/{{ article.author.id }}" title="View Profile">
-                        <img src="/portrait.php?userId={{ article.author.externalId }}&size=square64" alt="View Profile" />
-                        <p>{{ article.author.fullname }}</p>
-                    </a>
-                {% else %}
-                    <img src="/portrait.php?userId={{ article.author.externalId }}&size=square64" alt="View Profile" />
-                    <p>{{ article.author.fullname }}</p>
-                {% endif %}
-
-                <p class="meta">{{ article.publishAt.long }}</p>
-
-                <div id="audience-container" v-if="countModalSegmentTypes">
-                    <p class="meta">
-                        <span v-if="audienceBricks.length > 1">Audiences: </span>
-                        <span v-else>Audience: </span>
-                        <template v-show="audienceBricks.length" v-for="(audienceBrick, index) in audienceBricks">
-                            <span v-if="audienceBrick.isComposite()">
-                                <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel }</a>
-                            </span>
-                            <span v-else>
-                                ${ audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel }
-                            </span>
-                            <template v-if="index+1 < audienceBricks.length">, </template>
-                        </template>
-
-                        {# modal #}
-                        <div data-reveal id="audience-composite" class="reveal-modal">
-                            <h2>Complex Audience</h2>
-                            <a class="close-reveal-modal" aria-label="Close">×</a>
-                            <p class="meta" v-if="selectedCompositeBrick.modalData">
-                                This audience segment includes users who are in both one or more of the selected
-                                ${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() } and one or more of the selected
-                                ${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }.
-                            </p>
-                            <div class="audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
-                                <div><b>${ dimensionData.typeLabel.plural }:</b></div>
-                                <div>
-                                    <template v-for="(label, index) in dimensionData.valueLabels">
-                                        ${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
-                    </p>
-                </div>
-
-            </div>
-        </section>
     </div>
 </div>
 
@@ -405,19 +375,6 @@ Data:
                 this.selectedCompositeBrick = audienceBrick;
                 // Show modal
                 $('#audience-composite').foundation('reveal', 'open');
-            }
-        },
-        computed: {
-            // Returns the number of different audience segment entity-types
-            countModalSegmentTypes: function(){
-                var count = 0;
-                for(var i in audienceOptions){
-                    if(audienceOptions.hasOwnProperty(i)){
-                        count++;
-                    }
-                }
-
-                return count;
             }
         }
     });
