@@ -223,10 +223,18 @@
         {% endautoescape %}
 
         {% endif %}
-        {SITE_HEADER_SCRIPTS}
+
+        {# TODO hide if on admin page #}
+        {{ CONFIG.site_header_scripts | raw }}
+
     {% endblock mainHeader %}
 
-    {CUSTOM_HEADER_REGION}
+    {##
+     # Twig doesn't/can't use custom headers, AFAICT.
+     # Only way I can see this happening is if I could override a block in
+     # a base template included by another one?
+     #}
+    {#{CUSTOM_HEADER_REGION}#}
 
 </head>
 <body class="{{ CONFIG.messaging_enabled ? '' : 'disableNotifications' }}">
