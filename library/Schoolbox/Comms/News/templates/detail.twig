@@ -54,8 +54,7 @@ Data:
         <div class="list-item">
             <h1>{{ article.title }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
             <ul class="meta">
-                <li class="icon-user">
-                    Published by
+                <li class="icon-user">Published by
                     {% if article.author.deletedAt.isNull %}
                     <a href="/search/user/{{ article.author.id }}" title="View Profile">
                         {{  article.author.fullname }}
