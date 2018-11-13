@@ -6,6 +6,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use PDO;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\GenericCollection;
