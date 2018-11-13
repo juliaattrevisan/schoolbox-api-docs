@@ -46,7 +46,7 @@
     <!-- BEGIN has_series -->
     <script>
         $(function() {
-            $('a[data-delete-series]').on('click', function () {
+            $('a[data-delete-series]').on('click', function (event) {
                 event.preventDefault();
                 var dialog = $('[data-dialog="bulk-delete"]');
                 var eventId = $(this).attr('data-event-id');
