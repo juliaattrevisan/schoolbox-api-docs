@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.php?logo=skin_logo_square&size=apple180">
 
     {% block mainHeader %}
-        <link rel="stylesheet" type="text/css" href="/css/{{ CONFIG.site_location }}/chrome-foundation.css?v={{ CONFIG.site_version }}" />
+        <link rel="stylesheet" type="text/css" href="/css/{{ config.site_location }}/chrome-foundation.css?v={{ config.site_version }}" />
         <link rel="Shortcut Icon" href="/images/logo.php?logo=skin_logo_square&size=favicon" type="image/x-icon" />
 
         {# header custom CSS: never used AFAICT #}
@@ -39,7 +39,7 @@
         <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 
         {# Should also check if user is impersonated #}
-        {% if USER and CONFIG.tours_enabled %}
+        {% if USER and config.tours_enabled %}
             {% autoescape 'js' %}
             <script type="text/javascript">
                 window.tourUrl = '{TOUR_ROUTE}';
@@ -47,8 +47,8 @@
             {% endautoescape %}
         {% endif %}
 
-        <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={{ CONFIG.site_version }}"></script>
-        <script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={{ CONFIG.site_version }}"></script>
+        <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
         <script src="/javascript/shared/browser-redirect.js"></script>
         <script type="text/javascript" src="/javascript/math/jscurry-0.3.0.js"></script>
         <script type="text/javascript" src="/javascript/math/jqmath-0.4.0.js"></script>
@@ -148,15 +148,15 @@
             });
 
             // Date formats (global variable)
-            var siteLocation = "{{ CONFIG.site_location }}";
+            var siteLocation = "{{ config.site_location }}";
 
             var dateDisplayFormats = {
                 datepicker:        {DATEPICKER_FORMAT},
                 momentJs:          {MOMENTJS_FORMAT},
                 momentJsDatetime:  {MOMENTJS_FORMAT_DATETIME},
                 momentJsDateLong:  {MOMENTJS_FORMAT_LOCAL_LONG},
-                localDate:         "{{ CONFIG.date_local }}",
-                localDateTime:     "{{ CONFIG.date_local }} {{ CONFIG.date_time }}",
+                localDate:         "{{ config.date_local }}",
+                localDateTime:     "{{ config.date_local }} {{ config.date_time }}",
                 calendarStartTime: "{CALENDAR_START_TIME}"
             };
 
@@ -179,7 +179,7 @@
         {# Header JS: AFAICT used nowhere #}
         {#<script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>#}
 
-        {% if CONFIG.site_usage_tracking %}
+        {% if config.site_usage_tracking %}
         <!-- Global Site Tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-97642429-1"></script>
 
@@ -203,9 +203,9 @@
             });
 
             // Send custom dimension events
-            gtag('event', 'site_school_code_dimension', {'site_school_code': '{{ CONFIG. site_school_code }}'});
-            gtag('event', 'site_type_dimension', {'site_type': '{{ CONFIG.site_type }}'});
-            gtag('event', 'site_version_dimension', {'site_version': '{{ CONFIG.site_version }}'});
+            gtag('event', 'site_school_code_dimension', {'site_school_code': '{{ config. site_school_code }}'});
+            gtag('event', 'site_type_dimension', {'site_type': '{{ config.site_type }}'});
+            gtag('event', 'site_version_dimension', {'site_version': '{{ config.site_version }}'});
 
             if (schoolboxUser.id) {
                 gtag('event', 'role_name_dimension', {'role_name': schoolboxUser.role.name });
@@ -225,7 +225,7 @@
         {% endif %}
 
         {# TODO hide if on admin page #}
-        {{ CONFIG.site_header_scripts | raw }}
+        {{ config.site_header_scripts | raw }}
 
     {% endblock mainHeader %}
 
@@ -237,7 +237,7 @@
     {#{CUSTOM_HEADER_REGION}#}
 
 </head>
-<body class="{{ CONFIG.messaging_enabled ? '' : 'disableNotifications' }}">
+<body class="{{ config.messaging_enabled ? '' : 'disableNotifications' }}">
 <div class="off-canvas-wrap docs-wrap" data-offcanvas>
     <div class="inner-wrap {HIDE_NOTIFICATIONS_TRAY}">
 
@@ -246,7 +246,7 @@
         <aside class="left-off-canvas-menu hide-for-print" data-side-nav>
             <div class="logo-wrapper">
                 <a href="/" class="logo">
-                    <img src="/images/logo.php?logo=skin_logo_large&size=normal" srcset="/images/logo.php?logo=skin_logo_large&size=normal 1x,/images/logo.php?logo=skin_logo_large&size=hidpi 2x" alt="{{ CONFIG.site_name }}"/>
+                    <img src="/images/logo.php?logo=skin_logo_large&size=normal" srcset="/images/logo.php?logo=skin_logo_large&size=normal 1x,/images/logo.php?logo=skin_logo_large&size=hidpi 2x" alt="{{ config.site_name }}"/>
                 </a>
             </div>
 

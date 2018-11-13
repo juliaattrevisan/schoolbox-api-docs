@@ -595,6 +595,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     );
 
                     // Global access to config object and localisation
+                    // TODO capitalize globals
                     $twig->addGlobal('config', $config);
                     $twig->addGlobal('locale',  $di->get('l10n'));
                     $dateFormats = new Alaress_Date_Locale_Config();
