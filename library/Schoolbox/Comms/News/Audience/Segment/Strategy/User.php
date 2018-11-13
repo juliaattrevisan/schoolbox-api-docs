@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
+use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\GenericCollection;
 
 class User extends SimpleStrategy
@@ -40,6 +41,16 @@ class User extends SimpleStrategy
         }
         return $this->getStaffCanPost() && $user->getRole()->isStaff();
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getValidRelationshipModifiers(): array
+    {
+        return [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF];
+    }
+
 
     /**
      * @inheritdoc
