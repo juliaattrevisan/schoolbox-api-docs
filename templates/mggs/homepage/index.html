@@ -100,6 +100,22 @@
                 location.reload();
             });
         });
+
+        // Lock all components on page load
+        // This is done with JS, otherwise components that are added after page load will be locked,
+        // and who can be bothered wrangling with phplib
+        $('nav[data-component-settings], [data-component-handle]').hide();
+        
+        // Toggle for homepage lock
+        $('#component-lock-toggle').click(function (event) {
+            var locked = this.checked;
+            
+            $('nav[data-component-settings], [data-component-handle]').toggle(locked);
+
+            $('div[data-component-titlebar-container]').each(function() {
+                $(this).toggleClass('actions-small-' + $(this).data('action-count'), locked);
+            });
+        });
     });
 </script>
 
@@ -225,6 +241,13 @@
     <nav>
         <!-- BEGIN edit_page -->
         <span data-tab>
+            <span class="switch inline round">
+                <input id="component-lock-toggle" type="checkbox" />
+                <label for="component-lock-toggle">
+                    <span class="icon-unlocked">&nbsp;</span>
+                    <span class="icon-locked">&nbsp;</span>
+                </label>
+            </span>
             <span class="tab-title" data-show-empty>
                 <a class="icon-add" href="#tabs-1" title="Add components" data-tab-activator></a>
             </span>
