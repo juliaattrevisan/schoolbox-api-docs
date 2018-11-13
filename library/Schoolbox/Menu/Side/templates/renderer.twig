@@ -1,3 +1,12 @@
+{% set tokens = {
+    '[id]':         user.id,
+    '[externalId]': user.externalId,
+    '[username]':   user.username,
+    '[firstName]':  user.firstName,
+    '[lastName]':   user.lastName,
+    '[email]':      user.email,
+} %}
+
 <nav id="nav">
     <ul class="off-canvas-list">
         {% spaceless %}
@@ -10,11 +19,13 @@
                         <ul class="off-canvas-list">
                             {% for node in nodes %}
                                 <li {% if node.children | length %}class="has-submenu"{% endif %}>
-                                    <a href="{{ node.url }}" {%  if node.target is not empty %}target="{{ node.target }}"{% endif %}>
-                                        <span>{{ node.title }}</span>
+                                    <a href="{{ node.url | replace(tokens) }}"
+                                       {% if node.target is not empty %}target="{{ node.target }}"{% endif %}
+                                    >
+                                        <span>{{ node.title | replace(tokens) }}</span>
                                     </a>
                                     {% if node.children | length %}
-                                        {% include "@menuSide/includes/treeLevel.twig" with {'node': node } %}
+                                        {% include "@menuSide/includes/treeLevel.twig" with {node: node, tokens: tokens} %}
                                     {% endif %}
                                 </li>
                             {% endfor %}

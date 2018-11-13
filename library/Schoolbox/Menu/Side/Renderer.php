@@ -104,32 +104,32 @@ class Renderer
         try {
             $nodes = $this->menuSideMapper->findNodesForUser($user);
 
-            // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
-
-            /** @var MenuSide $node */
-            foreach ($nodes as $node) {
-
-                $array_find = [
-                    '[id]',
-                    '[externalId]',
-                    '[username]',
-                    '[firstName]',
-                    '[lastName]',
-                    '[email]',
-                ];
-
-                $array_replace = [
-                    urlencode($user->getId()),
-                    urlencode($user->getExternalId()),
-                    urlencode($user->getUsername()),
-                    urlencode($user->getFirstname()),
-                    urlencode($user->getLastname()),
-                    urlencode($user->getEmail())
-                ];
-
-                $node->setUrl(str_ireplace($array_find, $array_replace, $node->getUrl()));
-                $node->setTitle(str_ireplace($array_find, $array_replace, $node->getTitle()));
-            }
+//            // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
+//
+//            /** @var MenuSide $node */
+//            foreach ($nodes as $node) {
+//
+//                $array_find = [
+//                    '[id]',
+//                    '[externalId]',
+//                    '[username]',
+//                    '[firstName]',
+//                    '[lastName]',
+//                    '[email]',
+//                ];
+//
+//                $array_replace = [
+//                    urlencode($user->getId()),
+//                    urlencode($user->getExternalId()),
+//                    urlencode($user->getUsername()),
+//                    urlencode($user->getFirstname()),
+//                    urlencode($user->getLastname()),
+//                    urlencode($user->getEmail())
+//                ];
+//
+//                $node->setUrl(str_ireplace($array_find, $array_replace, $node->getUrl()));
+//                $node->setTitle(str_ireplace($array_find, $array_replace, $node->getTitle()));
+//            }
         } catch (MapperException $e) {
             $nodes = [];
         }
@@ -139,7 +139,8 @@ class Renderer
 
         // Render this thing out
 
-        return $twig->render('@menuSide/renderer.twig', array(
+        return $twig->render('@menuSide/renderer.twig', [
+            'user' => $user,
             'isStaff' => $user->getRole()->isStaff(),
             'nodes' => $nodes,
             'subjects' => $subjectGroups,
@@ -150,7 +151,7 @@ class Renderer
             'siteTitle' => $this->configLoader->get('title'),
             // TODO eradicate this session dependency
             'children' => is_array($_SESSION['children']) ? $_SESSION['children'] : []
-        ));
+        ]);
     }
 
     /**
