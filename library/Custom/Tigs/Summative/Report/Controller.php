@@ -46,14 +46,13 @@ class Controller extends Web\Controller\Base
      */
     public function getParticipationReport(User $user): void
     {
-        $data = [
+        $data   = [
             'user'      => $user,
             'isEnabled' => $this->getConfigLoader()->get(Config::_TIGS_PARTICIPATION_REPORT_ENABLED),
         ];
-        $this
-            ->getResponse()->content
-            ->set($this->buildHtmlOutput('@tigsSummativeReport/participation.twig', $data)
-            ->setTitle("Participation Report"));
+        $output = $this->buildHtmlOutput('@tigsSummativeReport/participation.twig', $data, "Participation Report");
+
+        $this->getResponse()->content->set($output);
     }
 
 
@@ -137,18 +136,18 @@ class Controller extends Web\Controller\Base
             $curriculumSemester  = $sbSem;
         }
 
-        $this
-            ->getResponse()->content
-            ->set($this->buildHtmlOutput('@tigsSummativeReport/subject.twig', [
-                'user'                => $user,
-                'folder'              => $folder,
-                'isHsc'               => $isHsc,
-                'isIb'                => $isIb,
-                'sbSem'               => $sbSem,
-                'term'                => $term,
-                'curriculumYearLevel' => $curriculumYearLevel,
-                'curriculumSemester'  => $curriculumSemester,
-            ])
-            ->setTitle("Subject Report"));
+        $data   = [
+            'user'                => $user,
+            'folder'              => $folder,
+            'isHsc'               => $isHsc,
+            'isIb'                => $isIb,
+            'sbSem'               => $sbSem,
+            'term'                => $term,
+            'curriculumYearLevel' => $curriculumYearLevel,
+            'curriculumSemester'  => $curriculumSemester,
+        ];
+        $output = $this->buildHtmlOutput('@tigsSummativeReport/subject.twig', $data, "Subject Report");
+
+        $this->getResponse()->content->set($output);
     }
 }
