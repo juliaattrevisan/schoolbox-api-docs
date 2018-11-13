@@ -32,9 +32,9 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'uuid'         => '89742c3d-0c88-407b-a005-a8873f2d34ca',
             'tooltip_uuid' => '52dfefce-5e6e-4c68-b2c3-a8873f2d34ca',
             'type'         => 'modal',
-            'title'        => 'Creating homepages',
+            'title'        => 'Setting up homepages',
             'content'      => "
-                <p>This homepage can be configured by you, you just need to know a few simple things before you get started.</p>
+                <p>You can arrange components on this homepage, you just need to know a few simple things before you get started.</p>
             ",
             'css_class'    => 'introjs-intromodal',
         ],
@@ -46,7 +46,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'type'         => 'tooltip',
             'selector'     => '#component-lock-switch',
             'content'      => "
-                <p>This switch will unlock all the components on the page. Once unlocked you can drag and drop components using the <span class='icon-grip'></span> handle. You can configure component settings using the <span class='icon-settings'></span> button.</p>
+                <p>This switch will unlock all the components on the page. Once unlocked you can drag and drop components using the <span class='icon-grip'></span> handle. You can also adjust component settings using the <span class='icon-settings'></span> button.</p>
             ",
         ],
 
@@ -56,7 +56,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'tooltip_uuid' => '888a36a5-5c22-4e29-b959-a8873f2d34ca',
             'type'         => 'tooltip',
             'selector'     => '#add-component',
-            'content'      => "<p>Here you will find a wide range of components to add additional functionality to your page.</p>",
+            'content'      => "<p>Here you will find a wide range of components to add extra features to your page.</p>",
         ],
 
         // Edit colours and layout
@@ -65,7 +65,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'tooltip_uuid' => '7da9259f-4e4b-4b35-8b4c-a8873f2d34ca',
             'type'         => 'tooltip',
             'selector'     => '#edit-column',
-            'content'      => "<p>You can also change the width of columns or the colours of your components here.</p>",
+            'content'      => "<p>You can customise the layout and colours of your page via this button.</p>",
         ],
         // Actions
         [
@@ -73,7 +73,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'tooltip_uuid' => 'ca753320-c576-416d-a32f-a8873f2d34ca',
             'type'         => 'tooltip',
             'selector'     => '#all-actions',
-            'content'      => "<p>Everything else that might be useful is found here in the actions menu</p>",
+            'content'      => "<p>Looking for something else? Make sure you check the three dot menu for extra tools you can use from this page.</p>",
         ],
 
     ];
@@ -144,8 +144,8 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         SELECT          '9b7e1ebd-c51b-4e42-a323-a8873f2d34ca',
                         (SELECT `id` FROM `user` WHERE `username` = 'alaress' LIMIT 1),
                         :tour_uuid,
-                        'body',
-                        'tourReady',
+                        '#component-lock-switch',
+                        'editTourStart',
                         '^/homepage/.*',
                         NOW(),
                         NOW(),

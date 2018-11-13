@@ -106,6 +106,7 @@
         // and who can be bothered wrangling with phplib
         $('nav[data-component-settings], [data-component-handle]').hide();
 
+
         // Toggle for homepage lock
         $('#component-lock-toggle').click(function (event) {
             var locked = this.checked;
@@ -116,6 +117,11 @@
                 $(this).toggleClass('actions-small-' + $(this).data('action-count'), locked);
             });
         });
+
+        $('body').on('tourReady', function () {
+         $('#component-lock-switch').trigger('editTourStart');
+        });
+
     });
 </script>
 
