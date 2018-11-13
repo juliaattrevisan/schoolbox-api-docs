@@ -858,19 +858,15 @@ class RubricMapper
             return false;
         }
 
-        // Query for determining if there's valid capability marks for this participant
+        // Determine if there's valid capability marks for this participant.
+        // Don't need to check descriptor marks separately, because they cannot
+        // exist without capability marks.
         $validCapMarkCount = GroupMarkMapper::getInstance()->countByColumnList([
             'r.id'  => $feedbackIds,
             'valid' => true,
         ]);
 
-        // Query for determining if there's valid descriptor marks for this participant
-        $validDescriptorMarkCount = DescriptorMarkMapper::getInstance()->countByColumnList([
-            'r.id'  => $feedbackIds,
-            'valid' => true,
-        ]);
-
-        return $validCapMarkCount > 0 || $validDescriptorMarkCount > 0;
+        return $validCapMarkCount > 0;
     }
 
 
