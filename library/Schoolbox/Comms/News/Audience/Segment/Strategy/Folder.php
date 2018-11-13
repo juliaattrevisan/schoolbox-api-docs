@@ -304,7 +304,7 @@ class Folder extends SimpleStrategy
         $subjectLists = [];
         foreach ($users as $user) {
             // Attempt to use cached value if already known for this user
-            if(\array_key_exists($user->getId(), $this->knownUserSubjects)){
+            if (\array_key_exists($user->getId(), $this->knownUserSubjects)) {
                 $subjectList = $this->knownUserSubjects[$user->getId()];
             } else {
                 $subjectList = $this->externalUser->getSubjectList($user);
