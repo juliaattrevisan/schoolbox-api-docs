@@ -239,9 +239,80 @@
 </head>
 <body class="{{ config.messaging_enabled ? '' : 'disableNotifications' }}">
 <div class="off-canvas-wrap docs-wrap" data-offcanvas>
-    <div class="inner-wrap {HIDE_NOTIFICATIONS_TRAY}">
+    <div class="inner-wrap {{ USER.hideNotificationsTray ? '' : 'docking' }}">
 
-        {INSTANTMESSAGE_BLOCK}
+        {% block instant %}
+            <aside class="right-off-canvas-menu island no-pad hide-for-print" id="msgs" data-unread="{{ ws.unread }}">
+                <ul class="off-canvas-list" id="message-list">
+                    <li>
+                        <label title="Click to hide or show Notifications">Notifications</label>
+                    </li>
+                    <li>
+                        <a id="msg-mar" class="mark-all-read button icon-approve" href="#">Mark all read</a>
+                    </li>
+                    <li>
+                        <section>
+                            <ul id="msg-content" class="action-list">
+                                <li data-msgitem class="actions-small-1">
+                                    <div class="list-item">
+                                        <div class="compact card wrap-down small-12">
+                                            <a data-msgitem-href class="no-pad">
+                                                <img data-msgitem-thumb />
+                                                <p data-msgitem-title></p>
+                                                <p class="meta spaced" data-msgitem-time></p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <nav>
+                                        <a data-msgitem-ack class="icon-approve no-pad" title="Mark as read"></a>
+                                    </nav>
+                                </li>
+                            </ul>
+                        </section>
+                    </li>
+                    <li>
+                        <a href="/messages" class="button" data-msgfooter-action>
+                            <span class="connecting"></span>&nbsp;Connecting&hellip;
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+            <div id="alert-dialog" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+                <h2 data-modal-title></h2>
+                <ul id="alert-content" class="information-list no-pad">
+                    <li data-msgitem>
+                        <div class="card wrap-down small-12">
+                            <a data-msgitem-href>
+                                <img data-msgitem-thumb />
+                                <p data-msgitem-title></p>
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            </div>
+
+            {% autoescape 'js' %}
+            <script type="text/javascript">
+                $(function () {
+                    // launch the notifier
+                    $('#msgs').notifier({
+                        host:     '{{ ws.host }}',
+                        port:     '{{ config.websocket_port_ssl ?? 8081 }}',
+                        path:     '{{ config.websocket_path ?? '/' }}',
+                        secure:   true,
+                        unread:   '{{ ws.unread }}',
+                        maxstack: '{{ ws.stackLimit }}'
+                    });
+
+                    $('#alert-dialog').on('click', 'a.action', function (e) {
+                        e.preventDefault();
+                    })
+                });
+            </script>
+            {% endautoescape %}
+        {% endblock %}
+
 
         <aside class="left-off-canvas-menu hide-for-print" data-side-nav>
             <div class="logo-wrapper">
