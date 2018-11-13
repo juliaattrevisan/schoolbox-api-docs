@@ -42,38 +42,12 @@ class Renderer
             $tabs = [];
         }
 
-        /** @var MenuTopModel $tab */
-        foreach ($tabs as $tab) {
-            // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
-
-            $array_find = [
-                '[id]',
-                '[externalId]',
-                '[username]',
-                '[firstName]',
-                '[lastName]',
-                '[email]',
-            ];
-
-            $array_replace = [
-                urlencode($user->getId()),
-                urlencode($user->getExternalId()),
-                urlencode($user->getUsername()),
-                urlencode($user->getFirstname()),
-                urlencode($user->getLastname()),
-                urlencode($user->getEmail())
-            ];
-
-            $tab->setUrl(str_ireplace($array_find, $array_replace, $tab->getUrl()));
-            $tab->setText(str_ireplace($array_find, $array_replace, $tab->getText()));
-            $tab->setTitle(str_ireplace($array_find, $array_replace, $tab->getTitle()));
-        }
-
         // Render whatever tabs passed muster
 
         return $twig->render('@menuTop/renderer.twig', array(
             'tabCurrent' => $tabCurrent,
-            'tabs' => $tabs
+            'tabs'       => $tabs,
+            'user'       => $user,
         ));
     }
 
