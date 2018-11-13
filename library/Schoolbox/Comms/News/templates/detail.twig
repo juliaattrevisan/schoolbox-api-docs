@@ -169,7 +169,9 @@ Data:
                 <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString }}" data-delete="{{ article.title }}">Delete</a></li>
             {% endif %}
 
-            {% if rejectRoute %}
+            {# Hide when the article status is awaiting for moderation #}
+            {# OR If the article is rejected or unpublished #}
+            {% if rejectRoute and article.isApproved %}
                 <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
             {% endif %}
 
