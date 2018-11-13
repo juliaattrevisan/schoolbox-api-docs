@@ -68,7 +68,7 @@
                     {% endif %}
 
                     {% set moderationRoute = routeLookupIfAuthorized('commsNewsModeration.getList') %}
-                    {% if moderationRoute %}
+                    {% if moderationRoute and ( config.global_moderation or moderationCount)  %}
                         <li {% if page == moderationRoute %}class="active"{% endif %} role="menuitem">
                             <a href="{{ moderationRoute }}">
                                 Requiring Moderation
