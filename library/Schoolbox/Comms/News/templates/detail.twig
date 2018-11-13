@@ -78,7 +78,7 @@ Data:
                         <span v-else>Audience: </span>
                         <template v-show="audienceBricks.length" v-for="(audienceBrick, index) in audienceBricks">
                             <span v-if="audienceBrick.isComposite()">
-                                <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel }</a>
+                                <a href="#" title="Click to view full audience" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel }</a>
                             </span>
                             <span v-else>
                                 ${ audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel }
