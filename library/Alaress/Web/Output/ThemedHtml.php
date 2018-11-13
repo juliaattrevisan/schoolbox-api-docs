@@ -13,6 +13,7 @@
 namespace Alaress\Web\Output;
 
 use Aura\Web\Response;
+use Schoolbox\Menu\Top\Mapper;
 
 class ThemedHtml extends Html
 {
@@ -77,6 +78,7 @@ class ThemedHtml extends Html
                         'stackLimit' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
                     ],
                     'previousUser' => $_SESSION['previous']['user'] ?? null,
+                    'tabs'         => Mapper::getInstance()->findTabsForUser($_SESSION['user']),
                 ]
             );
 

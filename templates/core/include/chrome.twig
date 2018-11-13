@@ -378,7 +378,30 @@
 
             <nav class="row">
                 <ul class="off-canvas-list second-nav">
-                    {MENU_TOP}
+                    {% block menuTop %}
+                        {# TODO either migrate or replace the renderer #}
+                        {% set tokens = {
+                            '[id]':         USER.id,
+                            '[externalId]': USER.externalId,
+                            '[username]':   USER.username,
+                            '[firstName]':  USER.firstName,
+                            '[lastName]':   USER.lastName,
+                            '[email]':      USER.email,
+                        } %}
+
+                        {% for tab in tabs %}
+                            <li>
+                                <a class="icon-{{ tab.icon }} {% if chrome.tab | lower == tab.token | lower and tab.token is not empty %}navthis{% endif %}"
+                                   href="{{ tab.url | replace(tokens) | escape('url') }}"
+                                   title="{{ tab.title | replace(tokens) }}"
+                                   {% if tab.target is not empty %}target="{{ tab.target }}"{% endif %}
+                                >
+                                    <span>{{ tab.text | replace(tokens) }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+
+                    {% endblock menuTop %}
                 </ul>
             </nav>
             {MENU_SIDE}
