@@ -1229,21 +1229,26 @@
             approveRoute: '{{ approveRoute }}',
             globalModeration: '{{ config.global_moderation }}',
             isSubmitted: '{{ (article.isSubmitted) }}',
-            isRejected: '{{ (article.isRejected) }}'
+            isRejected: '{{ (article.isRejected) }}',
+            staffPostStatus: '{{ config.news_staff_post_enabled }}',
+            isStaff: '{{ USER.getRole.isStaff }}'
         },
         computed: {
             submitText: function() {
                 if (this.isSubmitted && !this.isRejected) {
                     return 'Save';
-                } else if (this.requiresModeration && this.articleId) {
+                } else if ((this.staffIsAllowedToBypassModeration || this.requiresModeration) && this.articleId) {
                     return 'Submit for moderation';
                 }
-
                 return 'Publish {{ locale.news }}';
             },
 
             requiresModeration: function() {
                 return this.globalModeration && !this.approveRoute;
+            },
+
+            staffIsAllowedToBypassModeration: function() {
+                return (this.staffPostStatus && this.isStaff) && !this.approveRoute;
             }
         }
     });
