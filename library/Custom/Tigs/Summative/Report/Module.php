@@ -112,6 +112,10 @@ class Module extends Alaress\Module\Module
         return new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\Callback(function (array $params) {
+                    // Because preload exceptions are not handled immediately, we can't fatal if the preload failed.
+                    if (!($params['user'] ?? null) instanceof User) {
+                        throw new InvalidPath("No user found in route params");
+                    }
                     $student  = $params['user'];
                     $userYear = $student->getYear();
                     if (!\is_numeric($userYear) || $userYear < 7 || $userYear > 12) {
