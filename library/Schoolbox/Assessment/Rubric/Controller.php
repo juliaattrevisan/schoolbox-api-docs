@@ -361,18 +361,22 @@ class Controller extends BaseController
 
             // Determine who's actually affected?
             foreach ($assessment->getAllParticipants() as $participant) {
-                $user = $participant->getUser();
+                $user   = $participant->getUser();
+                $userId = $user->getId();
 
                 // Instructor-given feedback
                 if ($this->mapper->hasInstructorMarkedGrid($participant)) {
-                    $response['affectedUsers']['instructor'][$user->getId()]
-                        = $user->jsonSerialize($jsonDecorator, $linkDecorator);
+                    $response['affectedUsers'][$userId]['instructor'] = true;
                 }
 
                 // Self-assessment feedback
                 if ($assessment->isSelfAssessable() && $this->mapper->hasSelfAssessedMarkedGrid($participant)) {
-                    $response['affectedUsers']['selfAssess'][$user->getId()]
-                        = $user->jsonSerialize($jsonDecorator, $linkDecorator);
+                    $response['affectedUsers'][$userId]['selfAssess'] = true;
+                }
+
+                // If either type of feedback set: set the user instead
+                if (!empty($response['affectedUsers'][$userId])) {
+                    $response['affectedUsers'][$userId]['user'] = $user->jsonSerialize($jsonDecorator, $linkDecorator);
                 }
             }
         }
