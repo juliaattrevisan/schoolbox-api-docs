@@ -25,7 +25,7 @@ WHERE `user`.id is null;
 
 UPDATE leave_request
 LEFT JOIN `lu_leave_request_travel_type` ON leave_request.`travel_type_id` = `lu_leave_request_travel_type`.id
-SET travel_type_id = (SELECT `id` FROM `lu_leave_request_travel_type` LIMIT 1)
+SET travel_type_id = NULL
 WHERE `lu_leave_request_travel_type`.id IS NULL
 AND travel_type_id IS NOT NULL;
 
