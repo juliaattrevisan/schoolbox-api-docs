@@ -859,11 +859,21 @@ class RubricMapper
         }
 
         // Query for determining if there's valid marks for this participant
-        $indicatorMarkMapper = DescriptorMarkMapper::getInstance();
-        return $indicatorMarkMapper->countByColumnList([
+        if (DescriptorMarkMapper::getInstance()->countByColumnList([
             'r.id'  => $feedbackIds,
             'valid' => true,
-        ]) > 0;
+        ]) > 0) {
+            return false;
+        }
+
+        if (GroupMarkMapper::getInstance()->countByColumnList([
+            'r.id'  => $feedbackIds,
+            'valid' => true,
+        ]) > 0) {
+            return false;
+        }
+
+        return true;
     }
 
 
