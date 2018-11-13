@@ -378,13 +378,13 @@
 
             <nav class="row">
                 <ul class="off-canvas-list second-nav">
-                    {% block menuTop %}
+                    {% block menuTopOffCanvas %}
                         {% include '@menuTop/renderer.twig' with {
                             tabCurrent: chrome.tab,
                             tabs:       tabs,
                             user:       USER,
                         } only %}
-                    {% endblock menuTop %}
+                    {% endblock menuTopOffCanvas %}
                 </ul>
             </nav>
             {MENU_SIDE}
@@ -408,7 +408,15 @@
                             <img src="/images/logo.php?logo=skin_logo_square&size=normal" srcset="/images/logo.php?logo=skin_logo_square&size=normal 1x,/images/logo.php?logo=skin_logo_square&size=hidpi 2x" alt="{SITE_NAME}"/>
                         </a>
 
-                        <ul id="top-menu">{MENU_TOP}</ul>
+                        <ul id="top-menu">
+                            {% block menuTop %}
+                                {% include '@menuTop/renderer.twig' with {
+                                    tabCurrent: chrome.tab,
+                                    tabs:       tabs,
+                                    user:       USER,
+                                } only %}
+                            {% endblock menuTop %}
+                        </ul>
 
                         <form id="search" action="/search" method="get">
                             <input id="search-field" type="text" name="keyword" placeholder="Search"/>
