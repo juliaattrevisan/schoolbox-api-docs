@@ -7,8 +7,8 @@
  # @param bool       isSaved   Is this article currently saved to user's list?
  #}
 
-{% set routeAdd    = routeLookup('commsNewsSaveForLater.postAdd', {article: article, articleId: article.id}) %}
-{% set routeRemove = routeLookup('commsNewsSaveForLater.postRemove', {article: article, articleId: article.id}) %}
+{% set routeAdd    = routeLookupIfAuthorized('commsNewsSaveForLater.postAdd', {article: article, articleId: article.id}) %}
+{% set routeRemove = routeLookupIfAuthorized('commsNewsSaveForLater.postRemove', {article: article, articleId: article.id}) %}
 
 <span data-save-for-later="{{ article.id }}">
     {# Add to List #}
