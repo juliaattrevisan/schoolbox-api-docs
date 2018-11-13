@@ -870,7 +870,7 @@ class RubricMapper
             'valid' => true,
         ]);
 
-        return $capMarkCount >= 0 || $descriptorMarkCount >= 0;
+        return $capMarkCount > 0 || $descriptorMarkCount > 0;
     }
 
 
