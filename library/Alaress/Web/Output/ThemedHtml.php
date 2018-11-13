@@ -71,7 +71,7 @@ class ThemedHtml extends Html
                         'template' => $template,
                     ],
                     'ws'       => [
-                        'host'       => parse_url($_SERVER['HTTP_HOST'], PHP_URL_HOST),
+                        'host'       => $_SERVER['HTTP_HOST'],
                         // TODO don't shuck out of session
                         'unread'     => $_SESSION['msg-count'],
                         'stackLimit' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
