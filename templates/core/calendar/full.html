@@ -400,6 +400,7 @@
         var updateSeriesDialog = $('#dialog-booking-bulk-update');
         updateSeriesDialog.on('click', '[data-interaction="close"]', function(e) {
             e.preventDefault();
+            updateSeriesDialog.html(updateSeriesDialog.html().replace(/booking/g, 'event'));
             updateSeriesDialog.foundation('reveal', 'close');
         });
 
@@ -445,6 +446,7 @@
                 var href     = this.href
                 var callback = function(data) {
                     $.ajax(href, {data: data}).done(function() {
+                        updateSeriesDialog.html(updateSeriesDialog.html().replace(/booking/g, 'event'));
                         c.dom.fullCalendar('refetchEvents')
                     })
                 }
@@ -453,6 +455,7 @@
                     // Remove all previous change status events, and reapply to this
                     // dialog box.
                     updateSeriesDialog.find('[data-booking-action-text]').text($(this).text().toLowerCase());
+                    updateSeriesDialog.html(updateSeriesDialog.html().replace(/event/g, 'booking'));
                     updateSeriesDialog.foundation('reveal', 'open');
                     updateSeriesDialog.off('click', '[data-efficacy="self"]');
                     updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
