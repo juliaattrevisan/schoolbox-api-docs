@@ -194,9 +194,38 @@ class Module extends Alaress\Module\Module
                     if (null === $folder->getId()) {
                         throw new InvalidPath("Folder does not exist in SB");
                     }
+                    // Student must be enrolled in the folder
+                    if (!($params['user'] ?? null) instanceof User) {
+                        throw new InvalidPath("No user found in route params");
+                    }
+                    /** @var User $user */
+                    $user = $params['user'];
+                    if (!$this->isUserEnrolledInFolder($user, $folder)) {
+                        throw new InvalidPath("User {$user->getId()} is not enrolled in folder {$folder->getId()}");
+                    }
                 })
             );
         });
+    }
+
+
+    /**
+     * Returns whether a user is enrolled in a class folder by examining external SIS class membership
+     *
+     * @param User         $user
+     * @param Folder\Model $folder
+     * @return bool
+     */
+    private function isUserEnrolledInFolder(User $user, Folder\Model $folder): bool
+    {
+        foreach ($this->getExternalUser()->getSubjectList($user) as $subject) {
+            foreach ($folder->getCodes() as $code) {
+                if ($code->getCode() === $subject['code']) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
