@@ -139,6 +139,7 @@ class Controller extends Web\Controller\Base
         $data   = [
             'user'                => $user,
             'folder'              => $folder,
+            'isEnabled'           => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
             'isHsc'               => $isHsc,
             'isIb'                => $isIb,
             'sbSem'               => $sbSem,
