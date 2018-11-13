@@ -1333,7 +1333,7 @@ class Controller extends Base
         // visible url of the previous page.
         $previousUrl = $this->getSession()->getHistory();
         // urls of comms article list that current action can be redirected to - dashboard as the default.
-        $commsListUrls = ['/'];
+        $commsListUrls = ['/', '/dashboard'];
         // urls which are for ajax call and need to be excluded
         // (we might want to improve getHistory() at some point...)
         $asyncUrls = [];
