@@ -1,4 +1,29 @@
+{#
+Displays a report for the selected user and folder for the current term.
+
+Data:
+    user:                User           - a student in years 7-12
+    folder:              Folder\Model   - a class folder
+    isHsc:               bool           - is user reported on using HSC
+    isIb:                bool           - is user reported on using IB
+    sbSem:               int            - an integer from 1-2
+    term:                int            - an integer from 1-4
+    curriculumYearLevel: int            - an integer from 7-12
+    curriculumSemester:  int            - an integer from 1-2
+
+#}
 <h1>Subject Report</h1>
 
-<p>userId: {{ userId }}</p>
-<p>folderId: {{ folderId }}</p>
+<p>userId: {{ user.id }}</p>
+<p>folderId: {{ folder.id }}</p>
+<br>
+<p>isHsc: {% if isHsc %}true{% else %}false{% endif %}</p>
+<p>isIb: {% if isIb %}true{% else %}false{% endif %}</p>
+<br>
+<p>SB Term: {{ term }}</p>
+<br>
+<p>SB Year Level: {{ user.year }}</p>
+<p>SB Semester: {{ sbSem }}</p>
+<br>
+<p>Curriculum Year Level: {{ curriculumYearLevel }}</p>
+<p>Curriculum Semester: {{ curriculumSemester }}</p>
