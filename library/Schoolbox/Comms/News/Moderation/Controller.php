@@ -265,7 +265,7 @@ class Controller extends Base
             // TODO. The client should be responsible for determining what to do after approval.
             // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
             // TODO. THis should just return the outcome of the request, not a redirect.
-            if ($this->getRequest()->post->get(News\Querystring::RETURN_URL)) {
+            if ($article->isPublished() && $this->getRequest()->post->get(News\Querystring::RETURN_URL)) {
                 $route = News\Querystring::decode($this->getRequest()->post->get(News\Querystring::RETURN_URL));
             } else {
                 $listRoute = $this->getRouteIfAuthorized('commsNewsModeration.getList');
