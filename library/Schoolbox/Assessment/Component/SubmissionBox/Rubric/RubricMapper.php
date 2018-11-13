@@ -858,19 +858,19 @@ class RubricMapper
             return false;
         }
 
-        // If no capability marks, then this grid has not been marked
-        $capMarkCount = GroupMarkMapper::getInstance()->countByColumnList([
+        // Query for determining if there's valid capability marks for this participant
+        $validCapMarkCount = GroupMarkMapper::getInstance()->countByColumnList([
             'r.id'  => $feedbackIds,
             'valid' => true,
         ]);
 
-        // Query for determining if there's valid marks for this participant
-        $descriptorMarkCount = DescriptorMarkMapper::getInstance()->countByColumnList([
+        // Query for determining if there's valid descriptor marks for this participant
+        $validDescriptorMarkCount = DescriptorMarkMapper::getInstance()->countByColumnList([
             'r.id'  => $feedbackIds,
             'valid' => true,
         ]);
 
-        return $capMarkCount > 0 || $descriptorMarkCount > 0;
+        return $validCapMarkCount > 0 || $validDescriptorMarkCount > 0;
     }
 
 
