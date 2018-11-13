@@ -438,7 +438,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $db               = $di->get('databaseInternal');
                     $session          = $di->get('session');
 
-                    // Get know user-to-class mapping from the session and inject into factory
+                    // Get known user-to-class mapping from the session and inject into factory
                     $knownUserClasses = [];
 
                     // Self case
