@@ -51,7 +51,7 @@ class Module extends Alaress\Module\Module
         };
 
         $canSeeParticipation = $this->buildRuleCanViewReport(Config::_TIGS_PARTICIPATION_REPORT_ENABLED, 'Participation');
-        $canSeeSubjectReport = $this->buildRuleCanViewReport(Config::_TIGS_SUBJECT_REPORT_ENABLED, 'Subject');
+        $canSeeSubjectReport = $this->buildRuleCanViewSubjectReport();
 
         $this->register('GET', '/user/{userId}', 'getParticipationReport', $canSeeParticipation, $preloadUser);
         $this->register('GET', '/{userId}/folder/{folderId}', 'getSubjectReport', $canSeeSubjectReport, $preloadUserAndFolder);
@@ -168,6 +168,33 @@ class Module extends Alaress\Module\Module
                         new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
                     )
                 )
+            );
+        });
+    }
+
+
+    /**
+     * Returns an auth rule for the subject report route
+     *
+     * @return Rule\IAuthorizationRule
+     */
+    private function buildRuleCanViewSubjectReport(): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(function () {
+            return new Rule\All(
+                $this->buildRuleCanViewReport(Config::_TIGS_SUBJECT_REPORT_ENABLED, 'Subject'),
+                new Rule\Callback(function (array $params) {
+                    // Because preload exceptions are not handled immediately, we can't fatal if the preload failed.
+                    if (!($params['folder'] ?? null) instanceof Folder\Model) {
+                        throw new InvalidPath("No folder model found in route params");
+                    }
+                    /** @var Folder\Model $folder */
+                    $folder = $params['folder'];
+                    // Folder must exist in SB (empty folder models are created for subjects in the SIS but not in SB)
+                    if (null === $folder->getId()) {
+                        throw new InvalidPath("Folder does not exist in SB");
+                    }
+                })
             );
         });
     }

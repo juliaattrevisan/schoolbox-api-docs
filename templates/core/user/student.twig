@@ -600,7 +600,7 @@
                             <section>
                                 {% for subject in subjectGroup %}
                                 <ul class="subject-list group">
-                                    <li class="subject-group">
+                                    <li class="subject-group {% block folderListItemClasses %}{% endblock %}">
                                         <div class="content small-12">
                                             {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
                                             <a href="/homepage/code/{{ subject.code|e('url')|e('url')|e('url') }}">
@@ -610,6 +610,7 @@
                                             <h3 class="no-margin">{{ subject.name }} <span class="meta">({{ subject.code }})</span></h3>
                                             {% endif %}
                                         </div>
+                                        {% block folderListItemActions %}{% endblock %}
                                     </li>
                                     {% for teacher in subject.teachers %}
                                         {% set teacherEmails = teacherEmails ~ teacher.email ~ ',' %}
