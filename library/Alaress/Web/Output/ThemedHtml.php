@@ -49,27 +49,40 @@ class ThemedHtml extends Html
     {
         $page     = $this->getSitepage();
         $template = $this->getTemplate();
-        $data     = $this->getData();
+//        $data     = $this->getData();
         if (empty($template)) {
             // No template? I can't generate a standard response,
             // so return an error response.
             $code = $this->getResponse()->status->getCode();
-            if ($code == 404) {
+            if ($code === 404) {
                 $page->pageNotFound();
             } else {
                 $page->error(null, 'Template not found', $code ?: 500);
             }
         } else {
-            $tab = $this->getTab();
-            if ($tab) {
-                $page->setTab($tab);
-            }
-            $page->setFile(TEMPLATE_content, 'output.html');
-            $page->buildPage();
-            $page->setVar('OUTPUT', $this->getTemplateEngine()->render($template, $data));
+            echo $this->templateEngine->render(
+                'include/chrome.twig',
+                [
+                    'template' => $template,
+                    'data'     => $this->getData(),
+                    'chrome'   => [
+                        'tab'      => $this->getTab(),
+                        'title'    => $this->getTitle(),
+                        'template' => $template,
+                    ],
+                ]
+            );
 
-            $page->setTitle($this->getTitle());
-            $page->outputPage(true);
+//            $tab = $this->getTab();
+//            if ($tab) {
+//                $page->setTab($tab);
+//            }
+//            $page->setFile(TEMPLATE_content, 'output.html');
+//            $page->buildPage();
+//            $page->setVar('OUTPUT', $this->getTemplateEngine()->render($template, $data));
+//
+//            $page->setTitle($this->getTitle());
+//            $page->outputPage(true);
         }
     }
 
