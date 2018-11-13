@@ -1,3 +1,4 @@
+<!-- event/booking list - dashboard calendar component -->
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component>
     <script>
         $(function() {
@@ -70,8 +71,8 @@
                     .off('click')
                     .on('click', function(e) {
                         e.preventDefault();
-                        dialog.html(dialog.html().replace(/event/g, 'booking'));
                         dialog.foundation('reveal', 'close');
+                        dialog.html(dialog.html().replace(/event/g, 'booking'));
                     });
             });
         });
