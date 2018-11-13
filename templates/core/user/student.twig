@@ -324,7 +324,7 @@
                                     {% set routeAcademicReports = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
                                     {% if routeAcademicReports %}
                                         <li>
-                                            <a href="{{ routeAcademicReports }}" class="icon-document">Academic Reports</a>
+                                            <a href="{{ routeAcademicReports }}" class="icon-document">{{ locale.reports.properPlural }}</a>
                                         </li>
                                     {% endif %}
                                 {% endif %}
