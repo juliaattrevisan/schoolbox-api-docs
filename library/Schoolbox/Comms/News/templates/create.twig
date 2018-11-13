@@ -1228,27 +1228,26 @@
             articleId: '{{ article.id }}',
             approveRoute: '{{ approveRoute }}',
             globalModeration: '{{ config.global_moderation }}',
+            globalPosting: '{{ config.news_staff_post_enabled }}',
             isSubmitted: '{{ (article.isSubmitted) }}',
-            isRejected: '{{ (article.isRejected) }}',
-            staffPostStatus: '{{ config.news_staff_post_enabled }}',
-            isStaff: '{{ USER.getRole.isStaff }}'
+            isRejected: '{{ (article.isRejected) }}'
         },
         computed: {
             submitText: function() {
                 if (this.isSubmitted && !this.isRejected) {
                     return 'Save';
-                } else if ((this.staffIsAllowedToBypassModeration || this.requiresModeration) && this.articleId) {
+                } else if (this.requiresModeration && this.articleId) {
                     return 'Submit for moderation';
                 }
                 return 'Publish {{ locale.news }}';
             },
 
+            // Switch to 'requiring moderation' if:
+            // * Global moderation config is turned on
+            // * Global posting is turned on (no case where a user can post for moderation otherwise)
+            // * The draft save response has returned false for an approveRoute
             requiresModeration: function() {
-                return this.globalModeration && !this.approveRoute;
-            },
-
-            staffIsAllowedToBypassModeration: function() {
-                return (this.staffPostStatus && this.isStaff) && !this.approveRoute;
+                return this.globalModeration && this.globalPosting && !this.approveRoute;
             }
         }
     });
