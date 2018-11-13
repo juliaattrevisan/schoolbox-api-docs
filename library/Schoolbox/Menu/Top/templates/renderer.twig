@@ -10,7 +10,8 @@
 {% for tab in tabs %}
     <li>
         <a class="icon-{{ tab.icon }} {% if tabCurrent | lower == tab.token | lower and tab.token is not empty %}navthis{% endif %}"
-           href="{{ tab.url | replace(tokens) | escape('url') }}"
+           {# Should href tokens be url-encoded? #}
+           href="{{ tab.url | replace(tokens) }}"
            title="{{ tab.title | replace(tokens) }}"
            {% if tab.target is not empty %}target="{{ tab.target }}"{% endif %}
         >
