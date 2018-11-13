@@ -379,15 +379,18 @@
             <nav class="row">
                 <ul class="off-canvas-list second-nav">
                     {% block menuTopOffCanvas %}
-                        {% include '@menuTop/renderer.twig' with {
-                            tabCurrent: chrome.tab,
-                            tabs:       tabs,
-                            user:       USER,
-                        } only %}
+                        {% include '@menuTop/renderer.twig' with topMenuData only %}
                     {% endblock menuTopOffCanvas %}
                 </ul>
             </nav>
-            {MENU_SIDE}
+
+            {% block menuSideOffCanvas %}
+                {% include '@menuSide/renderer.twig' with {
+                    tabCurrent: chrome.tab,
+                    tabs:       tabs,
+                    user:       USER,
+                } only %}
+            {% endblock menuSideOffCanvas %}
         </aside>
 
         <!-- START CONTAINER -->
@@ -410,11 +413,7 @@
 
                         <ul id="top-menu">
                             {% block menuTop %}
-                                {% include '@menuTop/renderer.twig' with {
-                                    tabCurrent: chrome.tab,
-                                    tabs:       tabs,
-                                    user:       USER,
-                                } only %}
+                                {% include '@menuTop/renderer.twig' with topMenuData only %}
                             {% endblock menuTop %}
                         </ul>
 
