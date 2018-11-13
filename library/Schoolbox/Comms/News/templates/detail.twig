@@ -78,12 +78,10 @@ Data:
                         <span v-else>Audience: </span>
                         <template v-show="audienceBricks.length" v-for="(audienceBrick, index) in audienceBricks">
                             <span v-if="audienceBrick.isComposite()">
-                                <a href="#" title="Click to view full audience" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel }</a>
+                                <a href="#" title="Click to view full audience" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel }</a>
                             </span>
-                            <span v-else>
-                                ${ audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel }
-                            </span>
-                            <template v-if="index+1 < audienceBricks.length">, </template>
+                            {# has to be on one line or you get weird whitespace #}
+                            <span v-else>${ audienceBrick.modifierLabel.length > 0 ? audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel : audienceBrick.nameLabel }</span><template v-if="index+1 < audienceBricks.length">, </template>
                         </template>
 
                         {# modal #}
