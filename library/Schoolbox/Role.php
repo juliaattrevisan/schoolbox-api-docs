@@ -9,7 +9,7 @@
 namespace Schoolbox;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-class Role implements ValueLabelInterface, ISoftDeletable
+class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
 {
     use ModelTrait\DeletedAtDate;
 
@@ -207,5 +207,22 @@ class Role implements ValueLabelInterface, ISoftDeletable
     public function getDigestSchedule()
     {
         return $this->digestSchedule;
+    }
+
+
+    /**
+     * @return array|mixed
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'      => $this->id,
+            'type'    => $this->type,
+            'name'    => $this->name,
+            'student' => $this->isStudent(),
+            'staff'   => $this->isStaff(),
+            'parent'  => $this->isParent(),
+            'guest'   => $this->isGuest(),
+        ];
     }
 }
