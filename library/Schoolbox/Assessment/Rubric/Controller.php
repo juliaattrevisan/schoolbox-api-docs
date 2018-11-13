@@ -366,7 +366,7 @@ class Controller extends BaseController
 
                 // Instructor-given feedback
                 if ($this->mapper->hasInstructorMarkedGrid($participant)) {
-                    $response['affectedUsers'][$userId]['instructor'] = true;
+                    $response['affectedUsers'][$userId]['instructorGiven'] = true;
                 }
 
                 // Self-assessment feedback
@@ -374,7 +374,7 @@ class Controller extends BaseController
                     $response['affectedUsers'][$userId]['selfAssess'] = true;
                 }
 
-                // If either type of feedback set: set the user instead
+                // If either type of feedback set: set the user as affected
                 if (!empty($response['affectedUsers'][$userId])) {
                     $response['affectedUsers'][$userId]['user'] = $user->jsonSerialize($jsonDecorator, $linkDecorator);
                 }
