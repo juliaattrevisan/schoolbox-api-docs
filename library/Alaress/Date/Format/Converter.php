@@ -13,6 +13,8 @@ class Alaress_Date_Format_Converter
     /**
      * Convert a date() format string to a datepicker format string.
      *
+     * @deprecated because jQuery datepicker is deprecated
+     *
      * @see http://api.jqueryui.com/datepicker/#utility-formatDate
      *
      * @param string $format

@@ -151,13 +151,12 @@
             var siteLocation = "{{ config.site_location }}";
 
             var dateDisplayFormats = {
-                datepicker:        {DATEPICKER_FORMAT},
-                momentJs:          {MOMENTJS_FORMAT},
-                momentJsDatetime:  {MOMENTJS_FORMAT_DATETIME},
-                momentJsDateLong:  {MOMENTJS_FORMAT_LOCAL_LONG},
+                momentJs:          "{{ config.date_local | momentJsFormat }}",
+                momentJsDatetime:  "{{ (config.date_local ~ ' ' ~ config.date_time) | momentJsFormat }}",
+                momentJsDateLong:  "{{ config.date_long | momentJsFormat }}",
                 localDate:         "{{ config.date_local }}",
-                localDateTime:     "{{ config.date_local }} {{ config.date_time }}",
-                calendarStartTime: "{CALENDAR_START_TIME}"
+                localDateTime:     "{{ config.date_local ~ ' ' ~ config.date_time }}",
+                calendarStartTime: "{{ config.calendar_start_time }}"
             };
 
             // TODO consider expanding Schoolbox json-serialized user so these fields get output

@@ -594,6 +594,15 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         )
                     );
 
+                    // MomentJsFormat filter
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'momentJsFormat',
+                            [ \Alaress_Date_Format_Converter::class, 'toMomentJs' ]
+                        )
+                    );
+
+
                     // Global access to config object and localisation
                     // TODO capitalize globals
                     $twig->addGlobal('config', $config);
