@@ -1169,6 +1169,11 @@ $selector-width: 2.25rem;
     }
 }
 
+// For meta text that's inline with other text, remove bottom margin and add left margin
+.meta.inline {
+    margin: 0 0 0 0.375rem;
+}
+
 // Grades that sit along side of other elements
 .flex-grade {
     display: flex;
