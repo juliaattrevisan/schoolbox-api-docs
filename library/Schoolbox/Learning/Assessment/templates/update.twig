@@ -65,22 +65,25 @@
 
             $.post('/rubric/determineMarkInvalidation', $('form#assessmentForm').serializeArray())
                 .done(function(response) {
-                    // console.log("You clicked the submit button");
-                    console.log(response);
+                    console.log("You clicked the submit button");
 
                     if (response['compatible'] === false) {
                         console.log("Rubric is incompatible - asking for confirmation");
 
-                        var numberAffected = Object.keys(response['affectedUsers']).length;
+                        var dialogHtml = '<p>You have made changes to this rubric, but ' + numberAffected;
 
-                        var dialogHtml = '<p>You have made changes to this rubric, but '
-                            + numberAffected + ' student(s) have already been marked:</p>' +
-                        '<ul class="information-list scrollable-list">';
+                        var numberAffected = Object.keys(response['affectedUsers']).length;
+                        if (numberAffected > 1) {
+                            dialogHtml += ' students have already been marked:</p>';
+                        } else {
+                            dialogHtml += ' student has already been marked:</p>';
+                        }
+
+                        dialogHtml += '<ul class="information-list scrollable-list">';
 
                         var affectedUsers = response['affectedUsers'];
 
                         $(Object.keys(response['affectedUsers'])).each(function(index, userId) {
-
                             var isSelfReflection = affectedUsers[userId]['instructorGiven'] === false;
                             var userExternalId = affectedUsers[userId]['user']['externalId'];
                             var userName = affectedUsers[userId]['user']['firstname'] + ' ' + affectedUsers[userId]['user']['lastname'];
