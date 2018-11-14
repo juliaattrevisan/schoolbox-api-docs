@@ -52,7 +52,6 @@
          * Only exists on the update page because a new (not yet created) due work will never have existing rubric marks.
          */
         function formWillSubmit() {
-            // TODO we need to use jquery promises instead for compatibility, but I'm not sure how to translate this into it
             return new Promise(function(resolve, reject) {
 
                 // Test whether marks need to be invalidated
