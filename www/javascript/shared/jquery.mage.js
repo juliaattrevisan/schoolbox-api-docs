@@ -368,7 +368,8 @@
                 action = elem.attr('formaction') || (form.length ? form.attr('action') : window.location.pathname),
                 target = elem.closest(self.options.submittable);
 
-            // do the prep-work
+            // Disable the form and set "loading" text
+            // TODO this needs to happen BEFORE the promise is returned, but I can't make it work, help??
             xhrBefore.call(self);
 
             // send it off
