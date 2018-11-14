@@ -419,16 +419,20 @@
                             <label data-jsubmit for="search-field" class="icon-search no-text"></label>
                         </form>
                     </section>
-                    <!-- BEGIN instantmessage_toggle -->
+
+                    {% block messaging %}
+                    {% if config.messaging_enabled %}
                     <section class="right-small" id="notification-toggle">
-                        <a class="right-off-canvas-toggle icon-notifications hidden-for-xlarge-up" data-unread="{WEBSOCKET_UNREAD_COUNT}">
-                            <span data-unread-count>{WEBSOCKET_UNREAD_LABEL}</span>
+                        <a class="right-off-canvas-toggle icon-notifications hidden-for-xlarge-up" data-unread="{{ ws.unread }}">
+                            <span data-unread-count>{{ ws.unread ?? ''}}</span>
                         </a>
-                        <a class="icon-notifications show-for-xlarge-up" data-unread="{WEBSOCKET_UNREAD_COUNT}">
-                            <span data-unread-count>{WEBSOCKET_UNREAD_LABEL}</span>
+                        <a class="icon-notifications show-for-xlarge-up" data-unread="{{ ws.unread }}">
+                            <span data-unread-count>{{ ws.unread ?? '' }}</span>
                         </a>
                     </section>
-                    <!-- END instantmessage_toggle -->
+                    {% endif %}
+                    {% endblock messaging %}
+
                 </nav>
             </div>
 
@@ -437,7 +441,38 @@
                     {% include template with data only %}
                 </div>
             </div>
-            {MAIN_FOOTER_REGION}
+
+            {% block footer %}
+                <div id="footer" class="clearfix">
+                    <ul>
+                        <li>{{ NOW.year }} &copy; Copyright <a href="{{ config.school_address }}">{{ config.school_name }}</a></li>
+                        <li><a href="/policy.php">Guidelines of Use and Privacy Policy</a></li>
+                        <li><a href="http://www.schoolbox.com.au" title="Schoolbox, Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a>
+                            {{ config.site_version }} by <a href="http://www.alaress.com.au">Alaress</a></li>
+                        {% if config.feedback_url and config.feedback_text %}
+                        <li><a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <script type="text/javascript">
+                    Foundation.global.namespace = '';
+                    $(document).foundation();
+
+                    $(function () {
+                        var s = $('#search');
+
+                        s.on('focus blur', 'input', function (e) {
+                            if (e.type === 'focusin') {
+                                s.addClass('focus');
+                            } else {
+                                s.removeClass('focus');
+                            }
+                        });
+                    });
+                </script>
+                {{ config.site_analytics | raw }}
+            {% endblock %}
+
             {DEBUGBAR_HEAD}
             {DEBUGBAR}
         </section>
