@@ -14,6 +14,7 @@ use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
+use Alaress\Session\Session;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Request\IsJson;
@@ -59,6 +60,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SitePage;
 use Twig_Extension_Debug;
@@ -425,6 +427,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                      * @var IConfigLoader          $config
                      * @var External_UserInterface $externalUser
                      * @var IConnector             $db
+                     * @var Session                $session
+                     * @var User                   $user
                      */
                     $mapperFactory    = $di->get('mapperFactory');
                     $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
@@ -434,6 +438,21 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $config           = $di->get('config');
                     $externalUser     = $di->get('externalUser');
                     $db               = $di->get('databaseInternal');
+                    $session          = $di->get('session');
+                    $user             = $session->get('user');
+
+                    // Get known user-to-class mapping from the session and inject into factory
+                    $knownUserClasses = [];
+
+                    // Self case
+                    $subjects = $session->get('subjects');
+                    if ($subjects) {
+                        $knownUserClasses[$user->getId()] = $subjects;
+                    }
+                    // Parent case
+                    foreach ($session->get('children', []) as $childData) {
+                        $knownUserClasses[$childData['id']] = $childData['subjects'];
+                    }
                     return new News\Audience\Segment\StrategyFactory(
                         $userAccessMapper,
                         $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS),
@@ -443,7 +462,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         $roleAccessMapper,
                         $access,
                         $externalUser,
-                        $db
+                        $db,
+                        $knownUserClasses
                     );
                 }
             )
