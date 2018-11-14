@@ -890,7 +890,36 @@ class Controller extends Base
             'availableYearsAndMonths' => $availableYearsAndMonths,
             'year' => $year,
             'month' => $month,
-            'newsItems' => $partialData
+            'newsItems' => $partialData,
+
+           // Vars for the nav sidebar
+           'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
+           'authoredCounts' => [
+               'Drafted' => [
+                   'count'      => $this->newsMapper->countByPredicates(
+                       $this->newsMapper
+                           ->getPredicateDraft()
+                           ->equals('author_id', $this->getUser()->getId())
+                   ),
+                   'labelClass' => 'unsubmitted',
+               ],
+               'Awaiting Moderation' => [
+                   'count'      => $this->newsMapper->countByPredicates(
+                       $this->newsMapper
+                           ->getPredicateAwaitingModeration()
+                           ->equals('author_id', $this->getUser()->getId())
+                   ),
+                   'labelClass' => 'submitted',
+               ],
+               'Rejected' => [
+                   'count'      => $this->newsMapper->countByPredicates(
+                       $this->newsMapper
+                           ->getPredicateRejected()
+                           ->equals('author_id', $this->getUser()->getId())
+                   ),
+                   'labelClass' => 'submitted-late',
+               ],
+            ]
         ];
 
 
