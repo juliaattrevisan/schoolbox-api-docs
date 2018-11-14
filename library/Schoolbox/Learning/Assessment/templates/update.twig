@@ -60,7 +60,20 @@
         });
 
         $("[data-mage-submitrow] input[type='submit']").click(function(e) {
-           console.log("You clicked the submit button");
+            e.preventDefault();
+            console.log("You clicked the submit button");
+            $(this).confirmDialog({
+                header: 'Confirm mark deletion',
+                text: 'You have made changes to this rubric, but 14 students have already been marked:',
+                confirmLabel: 'Yes',
+                cancelLabel: 'No',
+                confirmEvent: function() {
+                    console.log("Confirming save");
+                },
+                cancelEvent: function() {
+                    console.log("Cancelling save");
+                }
+            });
         });
     });
 </script>
