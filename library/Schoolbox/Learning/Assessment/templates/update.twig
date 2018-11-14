@@ -6,6 +6,7 @@
 <script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script src="/javascript/shared/assessment/participation.js"></script>
+
 <script>
     $(function () {
 
@@ -62,11 +63,31 @@
         $("[data-mage-submitrow] input[type='submit']").click(function(e) {
             e.preventDefault();
             console.log("You clicked the submit button");
+
+            // TODO get these values from API response, and loop through all users
+            var userExternalId = '135';
+            var userName = 'David Rhodes';
+            var dialogHtml = '<p>You have made changes to this rubric, but 14 student(s) have already been marked:</p>' +
+                '<ul class="information-list scrollable-list">' +
+                '    <li>' +
+                '        <div class="row">' +
+                '            <div class="small-12 list-item compact card">' +
+                '                <img src="/portrait.php?userId=' + userExternalId + '&amp;size=square64">' +
+                '                <p>' + userName + '</p>' +
+                '            </div>' +
+                '        </div>' +
+                '    </li>' +
+                '</ul>' +
+                '<br/>' +
+                '<p>If you choose to save changes, these rubric marks will be deleted.</p>' +
+                '<p>Are you sure you want to continue?</p>'
+
             $(this).confirmDialog({
                 header: 'Confirm mark deletion',
-                text: 'You have made changes to this rubric, but 14 students have already been marked:',
+                text: dialogHtml,
                 confirmLabel: 'Yes',
                 cancelLabel: 'No',
+                format: 'html',
                 confirmEvent: function() {
                     console.log("Confirming save");
                 },
