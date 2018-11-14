@@ -60,6 +60,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SitePage;
 use Twig_Extension_Debug;
@@ -426,7 +427,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                      * @var IConfigLoader          $config
                      * @var External_UserInterface $externalUser
                      * @var IConnector             $db
-                     * @var Session $session
+                     * @var Session                $session
+                     * @var User                   $user
                      */
                     $mapperFactory    = $di->get('mapperFactory');
                     $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
@@ -437,17 +439,15 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $externalUser     = $di->get('externalUser');
                     $db               = $di->get('databaseInternal');
                     $session          = $di->get('session');
+                    $user             = $session->get('user');
 
                     // Get known user-to-class mapping from the session and inject into factory
                     $knownUserClasses = [];
 
                     // Self case
-                    $userId = $session->get('id');
-                    if ($userId) {
-                        $subjects = $session->get('subjects');
-                        if ($subjects) {
-                            $knownUserClasses[$userId] = $subjects;
-                        }
+                    $subjects = $session->get('subjects');
+                    if ($subjects) {
+                        $knownUserClasses[$user->getId()] = $subjects;
                     }
                     // Parent case
                     foreach ($session->get('children', []) as $childData) {
