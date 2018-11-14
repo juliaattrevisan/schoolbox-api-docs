@@ -1,10 +1,6 @@
 <?php
 /**
- * Create dashboard feature tour
- *
- * @author    Doug MacKenzie <doug.mackenzie@alaress.com.au>
- * @copyright Copyright 2018, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * Create homepage feature tour
  */
 
 use Psr\Log\LoggerInterface;
