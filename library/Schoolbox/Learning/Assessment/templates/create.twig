@@ -22,7 +22,7 @@
 
             $('input[data-mage-next="end"]').mage({
                 validateOptions: validateOptions,
-                beforeSubmit: beforeSubmit,
+                beforeAttemptingSubmit: beforeAttemptingSubmit,
                 onXhrDone: function (data) {
                     if('string' == typeof data.returnUrl){
                         window.location.href = data.returnUrl;

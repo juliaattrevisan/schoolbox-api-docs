@@ -38,7 +38,7 @@
         $('input[data-mage-next]').mage({
             initValidation: initDecimalDescsValidation,
             validateOptions: validateOptions,
-            beforeSubmit: beforeSubmit,
+            beforeAttemptingSubmit: beforeAttemptingSubmit,
             formWillSubmit: formWillSubmit,
             onXhrDone: function (data) {
                 if('string' == typeof data.returnUrl){

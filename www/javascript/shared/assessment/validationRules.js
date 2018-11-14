@@ -117,7 +117,7 @@ function initDecimalDescsValidation() {
  * These rules must be applied right before submit as to take into account things
  * that have been changed via JS.
  */
-var beforeSubmit = function() {
+var beforeAttemptingSubmit = function() {
     var publishDate = $('input[name="publishDate"]'),
         publishTime = $('input[name="publishTime"]'),
         openDate = $('input[name="openDate"]'),

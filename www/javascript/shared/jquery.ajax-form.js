@@ -4,7 +4,7 @@
  * Includes ability to retry.
  *
  * This triggers the following events on the form:
- * * beforeSubmit.ajaxForm: Before the AJAX submission is run
+ * * beforeAttemptingSubmit.ajaxForm: Before the AJAX submission is run
  * * done.ajaxForm:         When AJAX submission runs successfully
  * * fail.ajaxForm:         When AJAX submission fails
  * * always.ajaxForm:       After either done.ajaxForm or fail.ajaxForm
@@ -107,7 +107,7 @@
         if (!('method' in ajaxOptions || 'type' in ajaxOptions)) {
             ajaxOptions.method = form.attr('method');
         }
-        form.trigger('beforeSubmit.ajaxForm');
+        form.trigger('beforeAttemptingSubmit.ajaxForm');
         return $.ajax(ajaxOptions)
             .then(
                 function(data, status, xhr) {

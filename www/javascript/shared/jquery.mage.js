@@ -16,8 +16,9 @@
         submittable: 'fieldset',
         currentStopClass: 'current-stop',
         reenablePrevious: false,
-        beforeSubmit: $.noop,
+        beforeAttemptingSubmit: $.noop,
         formWillSubmit: function() {
+            // TODO refactor to use jquery promises for compatibility
             return new Promise(function(resolve, reject) {
                 // Plugin instances can override this if they want to prevent submission until something async has happened.
                 resolve();
@@ -329,8 +330,8 @@
             form.alaressValidate(self.options.validateOptions);
         }
 
-        // call beforeSubmit
-        self.options.beforeSubmit.call();
+        // call beforeAttemptingSubmit
+        self.options.beforeAttemptingSubmit.call();
 
         copyCkEditorValues.call(self, elem);
 
