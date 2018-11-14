@@ -111,6 +111,10 @@
                 $(this).toggleClass('actions-small-' + $(this).data('action-count'), locked);
             });
         });
+
+        $('body').on('tourReady', function () {
+            $('#component-lock-switch').trigger('editTourStart');
+        });
     });
 </script>
 
@@ -236,7 +240,7 @@
     <nav>
         <!-- BEGIN edit_page -->
         <span data-tab>
-            <span class="switch inline round">
+            <span class="switch inline round" id="component-lock-switch">
                 <input id="component-lock-toggle" type="checkbox" />
                 <label for="component-lock-toggle">
                     <span class="icon-unlocked">&nbsp;</span>
@@ -244,14 +248,14 @@
                 </label>
             </span>
             <span class="tab-title" data-show-empty>
-                <a class="icon-add" href="#tabs-1" title="Add components" data-tab-activator></a>
+                <a class="icon-add" href="#tabs-1" title="Add components" data-tab-activator id="add-component"></a>
             </span>
             <span class="tab-title" data-hide-empty>
-                <a class="icon-components" href="#tabs-2" title="Edit columns" data-tab-activator></a>
+                <a class="icon-components" href="#tabs-2" title="Edit columns" data-tab-activator id="edit-column"></a>
             </span>
         </span>
         <!-- END edit_page -->
-        <a href="#" class="icon-more" data-dropdown="tab-control" title="Actions"></a>
+        <a href="#" class="icon-more" data-dropdown="tab-control" title="Actions" id="all-actions"></a>
     </nav>
     <ul id="tab-control" class="f-dropdown" data-dropdown-content>
 

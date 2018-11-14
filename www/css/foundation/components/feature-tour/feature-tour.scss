@@ -65,6 +65,10 @@ $tooltip-padding: 1rem;
 .introjs-tooltiptext {
   font-size: $paragraph-font-size;
   padding-right: 2rem;
+
+  [class^="icon-"]:before {
+    padding-right: 0;
+  }
 }
 
 
