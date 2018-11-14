@@ -140,7 +140,10 @@ var jsSrc = {
         'www/javascript/shared/tour/tour.js',
 
         // Lodash
-        'node_modules/lodash/lodash.js'
+        'node_modules/lodash/lodash.js',
+
+        // Promise polyfill
+        'node_modules/promise-polyfill/dist/polyfill.js'
     ],
     masonry: [
         // Colour handling
@@ -156,7 +159,6 @@ var jsSrc = {
         'www/javascript/shared/calendar/jquery.fullcalendar.js'
     ],
     vue: [ // Death to jQuery!
-        'node_modules/promise-polyfill/dist/polyfill.js',
         'node_modules/es6-object-assign/dist/object-assign-auto.js',
         'node_modules/vue/dist/vue.min.js',
         'node_modules/vuejs-paginate/dist/index.js',
