@@ -1360,6 +1360,7 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     {
         return [
             'id',
+            'externalId',
             'title',
             'firstname',
             'lastname'

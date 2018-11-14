@@ -330,26 +330,6 @@ Usage:
 
 <div class="row">
     <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}" data-hide-watch="#useRubric">
-        {% if rubricHasMarks %}
-        <div class="small-12 columns no-pad">
-            <div class="alert-box warning">
-                <strong>Warning:</strong> you have already marked some students' work.<br>
-                Invalidating or altering the rubric will <em>not</em> update their mark for this activity unless you explicitly assign
-                the {{ locale.grades.proper }} from the rubric.
-                <ul>
-                    <li>Changing the value of existing descriptors will remove any existing marks given</li>
-                    <li>You can safely add {{ locale.translate('rubricCriterion',true,false) }}. This will not alter a student's rubric mark.</li>
-                    <li>Removing {{ locale.translate('rubricCriterion',true,false) }} will invalidate any marks given for that {{ locale.translate('rubricCriterion',false,false) }}'s row;</li>
-                    <li>You can safely change wordings and orders of descriptors.</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="small-12 columns no-pad">
-            <div class="alert-box alert" data-descriptors-changed>Warning! You have changed the value of existing descriptors! This will cause all existing graded student rubrics to be lost.</div>
-        </div>
-        {% endif %}
-
         <div class="small-12 columns no-pad">
             <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
         </div>

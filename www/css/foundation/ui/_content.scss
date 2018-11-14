@@ -458,6 +458,12 @@ table{
     }
 }
 
+// Make a list vertically scrollable if too much content
+.information-list.scrollable-list {
+    max-height: 10rem;
+    overflow-y: auto;
+}
+
 /* Don't use row hovers on Timetable Grid screens anymore
  * They don't do much now due to fully-expanding coloured blocks
  */
@@ -1161,6 +1167,11 @@ $selector-width: 2.25rem;
         text-transform: lowercase;
         font-variant: small-caps;
     }
+}
+
+// For meta text that's inline with other text, remove bottom margin and add left margin
+.meta.inline {
+    margin: 0 0 0 0.375rem;
 }
 
 // Grades that sit along side of other elements
