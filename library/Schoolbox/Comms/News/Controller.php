@@ -846,7 +846,6 @@ class Controller extends Base
      */
     public function getArchive(int $year = null, int $month = null): void
     {
-
         /* These referrers should be used, even when they're not explicitly provided in the url
          */
         $params = new Querystring($this->getRequest()->query);
@@ -892,8 +891,7 @@ class Controller extends Base
             'month' => $month,
             'newsItems' => $partialData
         ];
-
-
+        $data = array_merge($data, $this->getSidebarVars());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/archive.twig', $data));
     }
@@ -938,38 +936,8 @@ class Controller extends Base
             /* For configuring the rss button which changes per topic chosen
              */
             'key' => $this->getUser()->getKey(),
-
-            // Vars for the nav sidebar
-            'page' => $this->getRequest()->query['page'],
-            'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
-            'authoredCounts' => [
-                'Drafted' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateDraft()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'unsubmitted',
-                ],
-                'Awaiting Moderation' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateAwaitingModeration()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted',
-                ],
-                'Rejected' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateRejected()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted-late',
-                ],
-
-            ]
         ];
+        $data = array_merge($data, $this->getSidebarVars());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/index.twig', $data));
     }
@@ -997,40 +965,12 @@ class Controller extends Base
             $status = 'All';
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored.twig', [
+        $data = array_merge([
             'pageNum' => $pageNum,
             'status' => $status,
+        ], $this->getSidebarVars());
 
-            // Vars for the nav sidebar
-            'page' => $this->getRequest()->query['page'],
-            'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
-            'authoredCounts' => [
-                'Drafted' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateDraft()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'unsubmitted',
-                ],
-                'Awaiting Moderation' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateAwaitingModeration()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted',
-                ],
-                'Rejected' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateRejected()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted-late',
-                ]
-            ]
-        ]));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/authored.twig', $data));
     }
 
 
@@ -1416,6 +1356,46 @@ class Controller extends Base
             }
         }
         return $returnUrl;
+    }
+
+    
+    /**
+     * Get the variables needed for the news sidebar
+     * 
+     * @return array
+     */
+    private function getSidebarVars(): array
+    {
+        return [
+            'page' => $this->getRequest()->query['page'],
+            'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
+            'authoredCounts' => [
+                'Drafted' => [
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateDraft()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'unsubmitted',
+                ],
+                'Awaiting Moderation' => [
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateAwaitingModeration()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'submitted',
+                ],
+                'Rejected' => [
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateRejected()
+                            ->equals('author_id', $this->getUser()->getId())
+                    ),
+                    'labelClass' => 'submitted-late',
+                ],
+            ]
+        ];
     }
 
 }
