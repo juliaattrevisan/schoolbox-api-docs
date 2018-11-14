@@ -42,7 +42,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'type'         => 'tooltip',
             'selector'     => '#component-lock-switch',
             'content'      => "
-                <p>This switch will unlock all the components on the page, revealing extra buttons on the header. Once unlocked you can drag and drop components using the <span class='icon-grip'></span> handle. You can also adjust component settings using the <span class='icon-settings'></span> button.</p>
+                <p>This switch will unlock all the components on the page, revealing extra buttons on the header. Once unlocked you can drag and drop components using the <i class='icon-grip'></i> handle. You can also adjust component settings using the <i class='icon-settings'></i> button.</p>
             ",
         ],
 
