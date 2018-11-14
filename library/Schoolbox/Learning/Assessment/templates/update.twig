@@ -33,16 +33,16 @@
         });
 
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
-        $('input[data-mage-next]').mage({
-            initValidation: initDecimalDescsValidation,
-            validateOptions: validateOptions,
-            beforeSubmit: beforeSubmit,
-            onXhrDone: function (data) {
-                if('string' == typeof data.returnUrl){
-                    window.location.href = data.returnUrl;
-                }
-            }
-        });
+        // $('input[data-mage-next]').mage({
+        //     initValidation: initDecimalDescsValidation,
+        //     validateOptions: validateOptions,
+        //     beforeSubmit: beforeSubmit,
+        //     onXhrDone: function (data) {
+        //         if('string' == typeof data.returnUrl){
+        //             window.location.href = data.returnUrl;
+        //         }
+        //     }
+        // });
 
         $('[data-delete]').click(function(event) {
             event.preventDefault();
@@ -59,7 +59,9 @@
             });
         });
 
-
+        $("[data-mage-submitrow] input[type='submit']").click(function(e) {
+           console.log("You clicked the submit button");
+        });
     });
 </script>
 
