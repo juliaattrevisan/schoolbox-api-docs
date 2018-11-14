@@ -12,8 +12,8 @@
 
 namespace Alaress\Web\Output;
 
+use Alaress\DebugBar\Instance as DebugBar;
 use Schoolbox\Menu\Side\Renderer as MenuSideRenderer;
-use Schoolbox\Menu\Top\Mapper as TopMenuMapper;
 use Schoolbox\Menu\Top\Renderer as MenuTopRenderer;
 
 class ThemedHtml extends Html
@@ -62,6 +62,15 @@ class ThemedHtml extends Html
                 $page->error(null, 'Template not found', $code ?: 500);
             }
         } else {
+
+            $debugBar = [];
+            if (DebugBar::isEnabled()) {
+                $renderer = DebugBar::getInstance()->getJavascriptRenderer();
+                $renderer->setBaseUrl('/debugbar/');
+                $debugBar['head'] = $renderer->renderHead();
+                $debugBar['body'] = $renderer->render();
+            }
+
             echo $this->templateEngine->render(
                 'include/chrome.twig',
                 [
@@ -85,6 +94,9 @@ class ThemedHtml extends Html
 
                     // TODO DI and inject this object
                     'sideMenuData' => (new MenuSideRenderer())->generateTwigData($_SESSION['user']),
+
+                    // TODO DI and inject the debug bar
+                    'debugBar'     => $debugBar,
                 ]
             );
 

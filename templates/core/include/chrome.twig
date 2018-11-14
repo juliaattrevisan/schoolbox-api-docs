@@ -473,8 +473,8 @@
                 {{ config.site_analytics | raw }}
             {% endblock %}
 
-            {DEBUGBAR_HEAD}
-            {DEBUGBAR}
+            {{ debugBar.head | raw }}
+            {{ debugBar.body | raw }}
         </section>
         <!-- END CONTAINER -->
         <a href="#" class="exit-off-canvas"></a>
