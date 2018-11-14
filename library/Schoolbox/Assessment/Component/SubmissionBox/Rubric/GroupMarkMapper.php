@@ -6,6 +6,8 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use PDO;
+use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
@@ -52,6 +54,52 @@ class GroupMarkMapper extends Mapper
         // behavior as one, as when it's set (by the teacher altering a rubric
         // grid's structure) the marks given for that rubric no longer show.
         $this->uses('valid', self::TYPE_BOOLEAN);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('submission_return', 'r')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('submission_return', '', 'r')}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return GroupMark[]|GenericCollection
+     * @throws Mapper\Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        /** @var ReturnedWorkMapper $submissionReturnMapper */
+        $submissionReturnMapper = $this->getJoinMapper('submission_return');
+        $marks                  = $this->createCollection();
+
+        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $mark = $this->hydrate($r);
+            $mark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
+            $marks->add($mark);
+        }
+
+        return $marks;
     }
 
 

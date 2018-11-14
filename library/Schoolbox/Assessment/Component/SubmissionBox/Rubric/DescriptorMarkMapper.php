@@ -73,15 +73,26 @@ class DescriptorMarkMapper extends Mapper
 
 
     /**
-     * @return string
+     * @inheritdoc
      */
     protected function getSelectString()
     {
         return "
-            SELECT  {$this->getColumnString()},
-                    {$this->getJoinColumnString('group_mark', 'g')},
-                    {$this->getJoinColumnString('group_mark.submission_return', 'r')},
-                    {$this->getJoinColumnString('descriptor', 'd')}
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('group_mark', 'g')},
+                {$this->getJoinColumnString('group_mark.submission_return', 'r')},
+                {$this->getJoinColumnString('descriptor', 'd')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString()
+    {
+        return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('group_mark', '', 'g')}
             LEFT JOIN {$this->getJoinSql('group_mark.submission_return', 'g', 'r')}

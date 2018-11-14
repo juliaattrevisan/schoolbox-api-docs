@@ -9,8 +9,11 @@
 
 namespace Schoolbox\Assessment\Rubric;
 
+use Alaress\Json\Decorator\LinkDecorator;
+use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
@@ -313,6 +316,76 @@ class Controller extends BaseController
             'format' => 'file',
             'data'   => $content
         ]);
+    }
+
+
+    /**
+     * Determines whether a rubric submitted via POST will invalidate marks.
+     *
+     * @api POST /rubric/determineMarkInvalidation
+     * @level 181
+     */
+    public function determineMarkInvalidation(): void
+    {
+        $post  = $this->request->post->get('rb');
+        $assessmentId = key($post);
+        $assessment   = $this->assessmentDataSource->findByIdForReview($assessmentId);
+        if (!$assessment instanceof DueWork) {
+            $this->sendError('Can only determine mark invalidation for due work');
+            return;
+        }
+        $assessment->setMarkPerCapability($this->request->post->getBool('markPerCapability', false))
+            ->setUseMarkRange($this->request->post->getBool('useMarkRange', false));
+
+
+        // Need to fetch current grid and proposed grid's base separately,
+        // because of object references
+        $currentGrid  = $this->mapper->retrieveGrid($assessment, false);
+        $proposedGrid = (new GridFactory())->buildFromPostData(
+            $this->mapper->retrieveGrid($assessment, false),
+            $post,
+            false
+        );
+
+
+        // Is the proposed grid itself not valid?
+        // Doesn't matter for the purpose of this exercise
+        $response = [
+            'compatible'    => true,
+            'affectedUsers' => [],
+        ];
+        if (!$proposedGrid->isCompatibleWith($currentGrid)) {
+            $response['compatible'] = false;
+            $jsonDecorator = new PropertyDecorator();
+            $linkDecorator = new LinkDecorator($this->router, $this->authorizer);
+
+            // Determine who's actually affected?
+            foreach ($assessment->getAllParticipants() as $participant) {
+                $user   = $participant->getUser();
+                $userId = $user->getId();
+
+                // Instructor-given feedback
+                if ($this->mapper->hasInstructorMarkedGrid($participant)) {
+                    $response['affectedUsers'][$userId]['instructorGiven'] = true;
+                }
+
+                // Self-assessment feedback
+                if ($assessment->isSelfAssessable() && $this->mapper->hasSelfAssessedMarkedGrid($participant)) {
+                    $response['affectedUsers'][$userId]['selfAssess'] = true;
+                }
+
+                // If either type of feedback set: set the user as affected
+                if (!empty($response['affectedUsers'][$userId])) {
+                    $response['affectedUsers'][$userId]['user'] = $user->jsonSerialize($jsonDecorator, $linkDecorator);
+                }
+            }
+        }
+
+
+        // Response code is always 200:
+        // this is a valid request even if marks would've been invalidated.
+        $this->response->status->setCode(200);
+        $this->response->content->set($this->buildJsonOutput($response));
     }
 
 
