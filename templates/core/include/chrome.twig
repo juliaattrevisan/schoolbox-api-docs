@@ -385,11 +385,7 @@
             </nav>
 
             {% block menuSideOffCanvas %}
-                {% include '@menuSide/renderer.twig' with {
-                    tabCurrent: chrome.tab,
-                    tabs:       tabs,
-                    user:       USER,
-                } only %}
+                {% include '@menuSide/renderer.twig' with sideMenuData only %}
             {% endblock menuSideOffCanvas %}
         </aside>
 

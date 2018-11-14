@@ -12,8 +12,9 @@
 
 namespace Alaress\Web\Output;
 
-use Aura\Web\Response;
+use Schoolbox\Menu\Side\Renderer as MenuSideRenderer;
 use Schoolbox\Menu\Top\Mapper as TopMenuMapper;
+use Schoolbox\Menu\Top\Renderer as MenuTopRenderer;
 
 class ThemedHtml extends Html
 {
@@ -79,15 +80,15 @@ class ThemedHtml extends Html
                     ],
                     'previousUser' => $_SESSION['previous']['user'] ?? null,
 
-                    // Move this into a top and side menu data aggregator
+                    // TODO move this into a top menu data aggregator
                     'topMenuData'  => [
                         'tabCurrent' => $this->getTab(),
                         'user'       => $_SESSION['user'],
                         'tabs'       => TopMenuMapper::getInstance()->findTabsForUser($_SESSION['user']),
                     ],
-                    'sideMenuData' => [
-                        //
-                    ],
+
+                    // TODO move this into a side menu data aggregator
+                    'sideMenuData' => (new MenuSideRenderer())->generateTwigData($_SESSION['user']),
                 ]
             );
 
