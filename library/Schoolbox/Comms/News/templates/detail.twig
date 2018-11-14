@@ -193,7 +193,12 @@ Data:
                 <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString }}" data-delete="{{ article.title }}">Delete</a></li>
             {% endif %}
 
-            {% if rejectRoute %}
+            {# 'Unpublish' action
+             # Only show this after the article is approved because...
+             # 'Reject' appears as a button when the article is awaiting moderation, and..
+             # anything before awaiting moderation doesn't need a reject/unpublish button
+             #}
+            {% if rejectRoute and article.isApproved %}
                 <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
             {% endif %}
 
