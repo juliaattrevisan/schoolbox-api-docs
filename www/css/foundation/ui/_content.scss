@@ -458,6 +458,12 @@ table{
     }
 }
 
+// Make a list vertically scrollable if too much content
+.information-list.scrollable-list {
+    max-height: 10rem;
+    overflow-y: auto;
+}
+
 /* Don't use row hovers on Timetable Grid screens anymore
  * They don't do much now due to fully-expanding coloured blocks
  */
