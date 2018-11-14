@@ -4,13 +4,13 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+declare(strict_types=1);
 
 namespace SocialStream;
 
 use Alaress\Async\Notification\Instance\Builder;
-use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
@@ -50,7 +50,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
     /**
      * @return string
      */
-    protected function getSlug()
+    protected function getSlug(): string
     {
         return NSMapper::NS_SSTREAM;
     }
@@ -62,7 +62,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param mixed $dependencies
      * @return void
      */
-    public function loadDependencies($dependencies = null)
+    public function loadDependencies($dependencies = null): void
     {
         $this->catMapper = FolderMapper::getInstance();
         $this->userAccessMapper = UserAccessMapper::getInstance();
@@ -75,7 +75,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param TriggerBundle $bundle
      * @return void
      */
-    public function bundleTriggers($bundle)
+    public function bundleTriggers($bundle): void
     {
         switch ($bundle->getMethod()) {
             case Mapper::METHOD_CREATE:
@@ -99,7 +99,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param User $author
      * @return string
      */
-    protected function getPostIcon($post, $author)
+    protected function getPostIcon(SocialStream_Post_Abstract $post, User $author): string
     {
         if ($post instanceof \SocialStream_Post_Url) {
             /** @param \SocialStream_Post_Url $post **/
@@ -123,13 +123,18 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param array $diff
      * @return Envelope
      */
-    protected function notifyPosted($roleType, $post, $author, $diff = null)
+    protected function notifyPosted(string $roleType, SocialStream_Post_Abstract $post, User $author, ?array $diff = null): Envelope
     {
         $envelope = new Envelope();
         $bob = new Builder();
 
         /** @var Folder $cat */
-        $cat = $this->catMapper->findById($post->getHomepageId());
+        try {
+            $cat = $this->catMapper->findById($post->getHomepageId());
+        } catch (Mapper\Exception $e) {
+            $this->log->warning('Failed to find folder with id:' . $post->getHomepageId() . $e->getMessage());
+            return $envelope;
+        }
 
         if ($post instanceof \SocialStream_Post_Url) {
             $posted = 'posted a link';
@@ -146,10 +151,10 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 
         $bob->setTitle(":author $posted in the social stream in :cat")
             ->setParams(
-                array(
+                [
                     'author' => new UserParam($author),
                     'cat'    => new CategoryParam($cat)
-                )
+                ]
             )
             ->setIcon($this->getPostIcon($post, $author))
             ->setHref($href)
@@ -157,7 +162,62 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
             ->setSeverity(Logger::NOTICE)
             ->setBody(Scrub::html2text($post->getBody()))
             ->setNamespace($this->getSlug())
-            ->addFilter('roletype', $roleType);
+            ->addFilter('roletype', [$roleType]);
+
+        $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $bob->build());
+
+        return $envelope;
+    }
+
+
+    /**
+     * @param SocialStream_Post_Abstract $post
+     * @param string $roleType
+     * @param User $author
+     * @param array $diff
+     * @return Envelope
+     */
+    protected function notifyReplied(string $roleType, SocialStream_Post_Abstract $post, User $author, ?array $diff = null): Envelope
+    {
+
+        $envelope = new Envelope();
+        $bob = new Builder();
+
+        /** @var Folder $cat */
+        try {
+            $cat = $this->catMapper->findById($post->getHomepageId());
+        } catch (Mapper\Exception $e) {
+            $this->log->warning('Failed to find folder with id:' . $post->getHomepageId() . $e->getMessage());
+            return $envelope;
+        }
+
+        // list of user's to notify: parent ("user replied to your post") and siblings ("user ALSO replied to")
+        /** @var SocialStream_Post_Abstract $parent */
+        try {
+            $parent = $this->mapper->findById($post->getParentId());
+        } catch (Mapper\Exception $e) {
+            // this is a top-level post, so "replies" aren't relevant
+            return $envelope;
+        }
+
+        $href = '/homepage/' . $cat->getId();
+        $icon = $this->getPostIcon($post, $author);
+
+        // base config
+        $bob->setHref($href)
+            ->setIcon($icon)
+            ->addTopic("sstream.{$parent->getPostId()}.replied")
+            ->setTitle(':author replied to a post in :cat')
+            ->setSeverity(Logger::NOTICE)
+            ->setNamespace($this->getSlug())
+            ->setBody(Scrub::html2text($post->getBody()))
+            ->setParams(
+                [
+                    'author' => new UserParam($author),
+                    'cat'    => new CategoryParam($cat)
+                ]
+            )
+            ->addFilter('roletype', [$roleType]);
 
         $envelope->broadcastToCategory($cat, UserAccess::ACCESS_READ, $bob->build());
 
@@ -171,78 +231,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param array $diff
      * @return Envelope
      */
-    protected function notifyReplied($post, $author, $diff = null)
-    {
-
-        /** @var PostMapper $mapper */
-        $mapper = $this->mapper;
-        $envelope = new Envelope();
-        $bob = new Builder();
-
-        /** @var Folder $cat */
-        $cat = $this->catMapper->findById($post->getHomepageId());
-
-        // list of user's to notify: parent ("user replied to your post") and siblings ("user ALSO replied to")
-        /** @var SocialStream_Post_Abstract $parent */
-        try {
-            $parent = $this->mapper->findById($post->getParentId());
-        } catch (Mapper\Exception $e) {
-            // this is a top-level post, so "replies" aren't relevant
-            return $envelope;
-        }
-
-        $parentAuthorId = $parent->getOwner()->getId();
-
-        // compensate for inconsistent return types -_-
-        if ($parentAuthorId instanceof User) {
-            $parentAuthorId = $parentAuthorId->getId();
-        }
-
-        /** @var Collection|SocialStream_Post_Abstract[] $siblings */
-        $siblings = $mapper->findChildren($parent);
-
-        // so, this MIGHT return objects, or MIGHT return ids.
-        $siblingAuthorsOrIds = $siblings->getColumnValues('ownerId') ? : array();
-
-        $href = '/homepage/' . $cat->getId();
-        $icon = $this->getPostIcon($post, $author);
-
-        // base config
-        $bob->setHref($href)
-            ->setIcon($icon)
-            ->addTopic("sstream.{$post->getPostId()}.replied")
-            ->setSeverity(Logger::NOTICE)
-            ->setNamespace($this->getSlug())
-            ->setBody(Scrub::html2text($post->getBody()))
-            ->setParams(
-                array(
-                    'author' => new UserParam($author),
-                    'cat'    => new CategoryParam($cat)
-                )
-            );
-
-        // parent post config
-        $envelope->targetToUser($parentAuthorId, $bob->setTitle(':author replied to your post in :cat')->build());
-
-        // sibling post config
-        $bob->setTitle(':author also replied to a post in :cat');
-
-        foreach ($siblingAuthorsOrIds as $siblingOrId) {
-            $siblingId = $siblingOrId instanceof User ? $siblingOrId->getId() : $siblingOrId;
-            $envelope->targetToUser($siblingId, $bob->build());
-        }
-
-        return $envelope;
-    }
-
-
-    /**
-     * @param SocialStream_Post_Abstract $post
-     * @param User $author
-     * @param array $diff
-     * @return Envelope
-     */
-    public function notifyStudentPosted($post, $author, $diff = null)
+    public function notifyStudentPosted(SocialStream_Post_Abstract $post, User $author, ?array $diff = null): Envelope
     {
         return $this->notifyPosted(Role::STUDENT, $post, $author, $diff);
     }
@@ -254,9 +243,9 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param array $diff
      * @return Envelope
      */
-    public function notifyStudentReplied($post, $author, $diff = null)
+    public function notifyStudentReplied(SocialStream_Post_Abstract $post, User $author, ?array $diff = null): Envelope
     {
-        return $this->notifyReplied($post, $author, $diff);
+        return $this->notifyReplied(Role::STUDENT, $post, $author, $diff);
     }
 
 
@@ -266,7 +255,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param array $diff
      * @return Envelope
      */
-    public function notifyStaffPosted($post, $author, $diff = null)
+    public function notifyStaffPosted(SocialStream_Post_Abstract $post, User $author, ?array $diff = null): Envelope
     {
         return $this->notifyPosted(Role::STAFF, $post, $author, $diff);
     }
@@ -278,9 +267,9 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param array $diff
      * @return Envelope
      */
-    public function notifyStaffReplied($post, $author, $diff = null)
+    public function notifyStaffReplied(SocialStream_Post_Abstract $post, User $author, ?array $diff = null): Envelope
     {
-        return $this->notifyReplied($post, $author, $diff);
+        return $this->notifyReplied(Role::STAFF, $post, $author, $diff);
     }
 
 
@@ -290,7 +279,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param array $diff
      * @return Envelope
      */
-    public function notifyParentPosted($post, $author, $diff = null)
+    public function notifyParentPosted(SocialStream_Post_Abstract $post, User $author, ?array $diff = null): Envelope
     {
         return $this->notifyPosted(Role::PARENT, $post, $author, $diff);
     }
@@ -302,9 +291,9 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param array $diff
      * @return Envelope
      */
-    public function notifyParentReplied($post, $author, $diff = null)
+    public function notifyParentReplied(SocialStream_Post_Abstract $post, User $author, ?array $diff = null): Envelope
     {
-        return $this->notifyReplied($post, $author, $diff);
+        return $this->notifyReplied(Role::PARENT, $post, $author, $diff);
     }
 
 
