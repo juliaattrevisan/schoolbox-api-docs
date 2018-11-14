@@ -28,8 +28,10 @@ use Swift_Transport;
 abstract class AbstractMailer implements IMailer
 {
 
-    const MAX_RETRIES = 4;
-    const RETRY_TIMEOUT = 1;
+    private const KEY_INVALID = 'invalid';
+    private const KEY_VALID = 'valid';
+    private const MAX_RETRIES = 4;
+    private const RETRY_TIMEOUT = 1;
 
     /**
      * Instance of mail transporter.
@@ -66,7 +68,7 @@ abstract class AbstractMailer implements IMailer
      * @param string $to
      * @param string $host
      */
-    public function __construct($template, $subject = "", $to = "", $host = "")
+    public function __construct($template, $subject = '', $to = '', $host = '')
     {
         $this->email = new Swift_Message();
         $this->setFrom(self::getConfig()->get('mail_from_address'), self::getConfig()->get('mail_from_name'));
@@ -89,20 +91,17 @@ abstract class AbstractMailer implements IMailer
     public function setLogger(LoggerInterface $logger)
     {
         $this->log = $logger;
+
         return $this;
     }
 
 
     public function setTo($to)
     {
-        if (is_array($to)) {
+        if (\is_array($to)) {
             if ($to['email']) {
                 //Assume one dimensional array
-                if ($to['name']) {
-                    $this->email->addTo($to['email'], $to['name']);
-                } else {
-                    $this->email->addTo($to['email']);
-                }
+                $this->email->addTo($to['email'], $to['name'] ?? null);
             } else if ($to['name']) {
                 //Name only, can't send email
                 throw new Swift_RfcComplianceException("No email address supplied.");
@@ -111,11 +110,7 @@ abstract class AbstractMailer implements IMailer
                 //Assume two dimensional array
                 $this->to = '';
                 foreach ($to as $email) {
-                    if ($email['name']) {
-                        $this->email->addTo($email['email'], $email['name']);
-                    } else {
-                        $this->email->addTo($email['email']);
-                    }
+                    $this->email->addTo($email['email'], $email['name'] ?? null);
                 }
             }
         } else {
@@ -134,13 +129,9 @@ abstract class AbstractMailer implements IMailer
      * @param string $email
      * @param string $name
      */
-    public function setFrom($email, $name = "")
+    public function setFrom($email, $name = '')
     {
-        if ($name) {
-            $this->email->setFrom($email, $name);
-        } else {
-            $this->email->setFrom($email);
-        }
+        $this->email->setFrom($email, $name ?? null);
         $this->email->setReturnPath($email);
     }
 
@@ -153,11 +144,7 @@ abstract class AbstractMailer implements IMailer
      */
     public function setReplyTo($email, $name = '')
     {
-        if ($name) {
-            $this->email->setReplyTo($email, $name);
-        } else {
-            $this->email->setReplyTo($email);
-        }
+        $this->email->setReplyTo($email, $name ?? null);
     }
 
 
@@ -174,6 +161,7 @@ abstract class AbstractMailer implements IMailer
         /** @var User $user */
         $user = $sessionData['user'];
         $this->setFrom($user->getEmail(), $user->formatName());
+
         return $this;
     }
 
@@ -224,7 +212,6 @@ abstract class AbstractMailer implements IMailer
     {
         $encoder = new \Swift_Mime_ContentEncoder_Base64ContentEncoder();
         $this->email->setEncoder($encoder);
-
     }
 
     /**
@@ -234,7 +221,7 @@ abstract class AbstractMailer implements IMailer
      * @throws Swift_SwiftException
      * @return bool
      */
-    public function send($to = "")
+    public function send($to = '')
     {
 
         if (!empty($to)) {
@@ -292,10 +279,10 @@ abstract class AbstractMailer implements IMailer
 
             $mailer->send($this->email);
         } catch (\Exception $e) {
+
+            $retriesMsg = $retries == 1 ? 'retry remains' : 'retries remain';
             // this means "mail server went away"
-            $errMsg = sprintf("Internal Mailing %s occurred (%d %s): %s",
-                get_class($e), $retries, $retries == 1 ? 'retry remains' : 'retries remain', $e->getMessage()
-            );
+            $errMsg = sprintf('Internal Mailing %s occurred (%d %s): %s', \get_class($e), $retries, $retriesMsg, $e->getMessage());
 
             $this->log->error($errMsg, ['exception'=>$e]);
 
@@ -369,22 +356,19 @@ abstract class AbstractMailer implements IMailer
     public static function parseAddressString($string, $returnValidEmailsOnly = true): array
     {
         $address_list = self::parseAddressList($string);
-        $return_list  = [
-            'valid' => [],
-            'invalid' => []
-        ];
+        $return_list  = [];
 
-        foreach ($address_list['valid'] as $address) {
+        foreach ($address_list[self::KEY_VALID] as $address) {
             $to = $address->mailbox . '@' . $address->host;
             $alias = property_exists($address, 'personal') ? $address->personal : null;
-            $return_list['valid'][$to] = $alias;
+            $return_list[self::KEY_VALID][$to] = $alias;
         }
 
-        if (!$returnValidEmailsOnly && !empty($address_list['invalid'])) {
-            $return_list['invalid'] = $address_list['invalid'];
+        if (!$returnValidEmailsOnly && \count($address_list[self::KEY_INVALID]) > 0) {
+            $return_list[self::KEY_INVALID] = $address_list[self::KEY_INVALID];
         }
 
-        return $returnValidEmailsOnly ? $return_list['valid'] : $return_list;
+        return $returnValidEmailsOnly ? $return_list[self::KEY_VALID] : $return_list;
     }
 
     /**
@@ -416,34 +400,39 @@ abstract class AbstractMailer implements IMailer
      */
     private static function parseAddressList(string $emailAddresses): array
     {
-        $emails = [
-            'valid' => [],
-            'invalid' => []
-        ];
-        $validEmailAddresses = [];
-
-        // Separate $emailAddresses by comma that's outside parentheses
+        $emails = [];
+        // Separate $emailAddresses by comma that's outside parentheses E.g: English Unit 1 (ENC17,ENC18)
         $emailLists = array_map('trim', preg_split('/(?!<(?:\(|\[)[^)\]]+),(?![^(\[]+(?:\)|\]))/', $emailAddresses));
 
         foreach ($emailLists as $email) {
             // Check if string is a valid email OR
             // Check if the email within a string is valid e.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
             if (filter_var($email, FILTER_VALIDATE_EMAIL) || self::emailFromStringIsValid($email) !== false) {
-                $emails['valid'][] = $email;
-            } else {
-                $emails['invalid'][] = $email;
+                $emails[self::KEY_VALID][] = $email;
+                continue;
             }
-        }
 
-        if (\count($emails['valid']) > 0) {
-            $validEmailAddresses = imap_rfc822_parse_adrlist(implode(",", $emails['valid']),
-                self::getConfig()->get('site_hostname') . '.' . self::getConfig()->get('site_domain'));
+            $emails[self::KEY_INVALID][] = $email;
         }
 
         return [
-            'valid' => $validEmailAddresses,
-            'invalid' => $emails['invalid'],
+            self::KEY_VALID => isset($emails[self::KEY_VALID]) ? self::parseValidEmailAddresses($emails[self::KEY_VALID]) : [],
+            self::KEY_INVALID => $emails[self::KEY_INVALID] ?? [],
         ];
+    }
+
+    /**
+     * Parse valid email addresses from a string
+     *
+     * @param $emails
+     * @return array
+     */
+    private static function parseValidEmailAddresses($emails): array
+    {
+        $emailAddresses = implode(',', $emails);
+        $defaultHost = self::getConfig()->get('site_hostname') . '.' . self::getConfig()->get('site_domain');
+
+        return imap_rfc822_parse_adrlist($emailAddresses, $defaultHost);
     }
 
     /**
