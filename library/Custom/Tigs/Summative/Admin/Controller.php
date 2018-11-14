@@ -7,35 +7,12 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\Admin;
 
-use Alaress\Web;
-use Config;
-use Schoolbox\Admin\Settings\FieldStrategyFactory;
-use Schoolbox\Admin\Settings\ModuleConfig;
+use Alaress\Web\Controller\ConfigController;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate;
 
-class Controller extends Web\Controller\Base
+class Controller extends ConfigController
 {
-
-    /** @var ConfigMapper */
-    private $configMapper;
-
-    /** @var FieldStrategyFactory */
-    private $fieldStrategyFactory;
-
-
-    /**
-     * @param ConfigMapper         $configMapper
-     * @param FieldStrategyFactory $fieldStrategyFactory
-     */
-    public function __construct(ConfigMapper $configMapper, FieldStrategyFactory $fieldStrategyFactory)
-    {
-        $this->configMapper         = $configMapper;
-        $this->fieldStrategyFactory = $fieldStrategyFactory;
-    }
-
-
     /**
      * Renders the module admin page
      *
@@ -47,20 +24,14 @@ class Controller extends Web\Controller\Base
      */
     public function getAdmin(): void
     {
-        $pb = $this->buildModuleConfigPredicate();
-
-        $configContext = (new ModuleConfig($this->fieldStrategyFactory))->getContext(
-            $this->getConfigLoader()->get('site_version'),
-            $this->configMapper->findByPredicates($pb, ['order' => [ConfigMapper::COL_ID => 'ASC']]),
-            $this->router->generate('tigsSummativeAdmin.postAdmin')
+        $configContext = $this->buildConfigContext(
+            $this->buildConfigPredicate(),
+            $this->getRouter()->generate('tigsSummativeAdmin.postAdmin')
         );
 
-        $this
-            ->getResponse()->content
-            ->set($this->buildHtmlOutput('@tigsSummativeAdmin/admin.twig', [
-                'configContext' => $configContext,
-            ])
-                       ->setTitle("TIGS Summative Reporting Admin"));
+        $data = ['configContext' => $configContext,];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@tigsSummativeAdmin/admin.twig', $data, "TIGS Summative Reporting Admin"));
     }
 
 
@@ -77,20 +48,7 @@ class Controller extends Web\Controller\Base
      */
     public function postAdmin(): void
     {
-        /** @var GenericCollection|Config[] $existingConfigs */
-        $existingConfigs = $this->configMapper->findByPredicates($this->buildModuleConfigPredicate())->indexBy(ConfigMapper::COL_NAME);
-
-        foreach ($this->request->post->get() as $name => $value) {
-            $existingConfig  = $existingConfigs[$name];
-            $valueSerializer = $this->fieldStrategyFactory->makeValueSerializer($existingConfig->getFieldId());
-            $newValue        = $valueSerializer->serializeValue($value);
-
-            if ($newValue !== $existingConfig->getValue()) {
-                $existingConfig->setValue($newValue);
-                $this->configMapper->save($existingConfig);
-            }
-        }
-
+        $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('tigsSummativeAdmin.getAdmin'));
     }
 
@@ -101,10 +59,11 @@ class Controller extends Web\Controller\Base
      * @return \Alaress\Database\Predicate\Builder
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    private function buildModuleConfigPredicate(): Predicate\Builder
+    private function buildConfigPredicate(): Predicate\Builder
     {
-        return $this->configMapper->getPredicateBuilder()
-                                  ->like(ConfigMapper::COL_NAME, ConfigMapper::PREFIX_TIGS_CRP . "%")
-                                  ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_CUSTOM);
+        return $this->getConfigMapper()
+                    ->getPredicateBuilder()
+                    ->like(ConfigMapper::COL_NAME, ConfigMapper::PREFIX_TIGS_CRP . "%")
+                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_CUSTOM);
     }
 }

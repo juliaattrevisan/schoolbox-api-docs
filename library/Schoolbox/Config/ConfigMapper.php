@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Config;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
@@ -214,30 +215,6 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public function dropCache()
     {
         $this->cache = array();
-    }
-
-
-    /**
-     * Returns all config items for a specific lu_config_type.type, and optional module
-     *
-     * @param string      $typeLabel
-     * @param string|null $module
-     * @return GenericCollection|Config[]
-     */
-    public function findByTypeLabel(string $typeLabel, string $module = null): GenericCollection
-    {
-        $pb = $this->getPredicateBuilder()
-                   ->equals('lct.type', $typeLabel);
-
-        if ($module) {
-            $pb->equals(self::COL_MODULE, $module);
-        }
-
-        if (!$this->get(self::_BOARDER_LEAVE_ENABLED)) {
-            $pb->notEquals(self::COL_TYPE, self::TYPE_BOARD);
-        }
-
-        return $this->findByPredicates($pb, ['order'=>['configID'=>'ASC']]);
     }
 
 
