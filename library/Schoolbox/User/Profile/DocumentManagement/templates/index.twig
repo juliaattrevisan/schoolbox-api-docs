@@ -1,13 +1,12 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 
-{{ bread.crumbs(
-    [ student.formatName, "/search/user/" ~ student.id ],
-    [ 'Academic Reports' ]
-) }}
-
 <div class="row">
+    {{ bread.crumbs(
+        [ student.formatName, "/search/user/" ~ student.id ],
+        [ 'Academic Reports' ]
+    ) }}
     <div class="small-12 island">
-        <h1>Academic Reports</h1>
+        <h1>{{ locale.reports.properPlural }}</h1>
     </div>
 
     {% if wysiwyg_content | length > 0 %}
@@ -37,7 +36,7 @@
             {% endif %}
             <li class="actions-small-1">
                 <div class="list-item">
-                    <div class="compact card small-12">
+                    <div class="card small-12">
                         <a href="{{ routeLookupIfAuthorized('profileDocumentManagement.getDownload', {studentId: student.id, documentId: report.ID, source: report.Source}) }}">
                             <img src="/images/mime/application-pdf.svg" class="mime">
                             <h3>{{ report.Description }}</h3>
@@ -57,7 +56,7 @@
         <div class="small-12 island">
             <div class="empty-state">
                 <i class="icon-document"></i>
-                <p>No academic reports found for this student</p>
+                <p>No {{ locale.reports.plural }} found for this student</p>
             </div>
         </div>
     {% endif %}

@@ -9,6 +9,7 @@ namespace Schoolbox\User\Profile\DocumentManagement;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\External\Connector\IDocument;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -36,6 +37,9 @@ class Controller extends Base
         // And render this thing out
         $reports = $this->externalDocument->getAcademicReportsForStudent($student);
         $wysiwyg_value = $this->getConfigLoader()->get('academic_reports_wysiwyg');
+        /* @var RosettaStone $l10n */
+        $l10n = $this->getDi()->get('l10n');
+
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -45,7 +49,7 @@ class Controller extends Base
                     'reports' => $reports,
                     'wysiwyg_content' => $wysiwyg_value
                 ],
-                'Academic Reports for '.$student->formatName()
+                $l10n->translate('reports',true, true).' for '.$student->formatName()
             )
         );
     }
