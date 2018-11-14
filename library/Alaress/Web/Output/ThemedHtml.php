@@ -80,14 +80,10 @@ class ThemedHtml extends Html
                     ],
                     'previousUser' => $_SESSION['previous']['user'] ?? null,
 
-                    // TODO move this into a top menu data aggregator
-                    'topMenuData'  => [
-                        'tabCurrent' => $this->getTab(),
-                        'user'       => $_SESSION['user'],
-                        'tabs'       => TopMenuMapper::getInstance()->findTabsForUser($_SESSION['user']),
-                    ],
+                    // TODO DI and inject this object
+                    'topMenuData'  => (new MenuTopRenderer())->generateTwigData($_SESSION['user'], $this->getTab()),
 
-                    // TODO move this into a side menu data aggregator
+                    // TODO DI and inject this object
                     'sideMenuData' => (new MenuSideRenderer())->generateTwigData($_SESSION['user']),
                 ]
             );
