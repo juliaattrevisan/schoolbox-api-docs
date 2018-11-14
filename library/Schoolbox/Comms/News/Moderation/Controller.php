@@ -269,7 +269,8 @@ class Controller extends Base
                 $route = News\Querystring::decode($this->getRequest()->post->get(News\Querystring::RETURN_URL));
             } else {
                 $listRoute = $this->getRouteIfAuthorized('commsNewsModeration.getList');
-                if ($listRoute) {
+                if ($listRoute
+                    && (!$article->getAuthor() || ($article->getAuthor()->getId() !== $this->getUser()->getId()))) {
                     $route = $listRoute;
                 } else {
                     $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
