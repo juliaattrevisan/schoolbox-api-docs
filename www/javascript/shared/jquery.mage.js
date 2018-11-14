@@ -17,6 +17,12 @@
         currentStopClass: 'current-stop',
         reenablePrevious: false,
         beforeSubmit: $.noop,
+        formWillSubmit: function() {
+            return new Promise(function(resolve, reject) {
+                // Plugin instances can override this if they want to prevent submission until something async has happened.
+                resolve();
+            });
+        },
         onXhrDone: $.noop,
         onXhrFail: $.noop,
         onXhrAlways: $.noop,
@@ -340,7 +346,6 @@
          * If the form has neither - it will pass through without any validation
          */
         if (form.valid() == false) {
-
             // focus user to first invalid field
             $(form).find(':input.error').first().focus();
 
@@ -353,16 +358,22 @@
             return;
         }
 
-        // HTML5 FTW
-        var method = elem.attr('formmethod') || (form.length ? form.attr('method') : 'post'),
-            action = elem.attr('formaction') || (form.length ? form.attr('action') : window.location.pathname),
-            target = elem.closest(self.options.submittable);
+        // This will only run if the form is valid: we shouldn't be trying to submit at all otherwise.
+        var promise = self.options.formWillSubmit.call();
+        promise.then(function() {
+            // Submit the form
 
-        // do the prep-work
-        xhrBefore.call(self);
+            // HTML5 FTW
+            var method = elem.attr('formmethod') || (form.length ? form.attr('method') : 'post'),
+                action = elem.attr('formaction') || (form.length ? form.attr('action') : window.location.pathname),
+                target = elem.closest(self.options.submittable);
 
-        // send it off
-        xhrSend.call(self, method, action, target);
+            // do the prep-work
+            xhrBefore.call(self);
+
+            // send it off
+            xhrSend.call(self, method, action, target);
+        });
     }
 
     /**
