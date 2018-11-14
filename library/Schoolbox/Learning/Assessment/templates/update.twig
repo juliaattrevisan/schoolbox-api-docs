@@ -62,7 +62,8 @@
 
         $("[data-mage-submitrow] input[type='submit']").click(function(e) {
             e.preventDefault();
-
+            // TODO add "loading" state to button, since XHR request may take some time
+            
             $.post('/rubric/determineMarkInvalidation', $('form#assessmentForm').serializeArray())
                 .done(function(response) {
                     console.log("You clicked the submit button");
