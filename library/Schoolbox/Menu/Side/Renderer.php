@@ -43,13 +43,15 @@ class Renderer
         $this->configLoader = new ConfigLoader();
     }
 
+
     /**
-     * @param \Twig_Environment $twig
-     * @param User $user
-     * @param string $pageCurrent
-     * @return null|string
+     * Generate Twig data for the side menu.
+     *
+     * @param null|User   $user
+     * @param null|string $pageCurrent
+     * @return array
      */
-    public function menuSideRenderer(\Twig_Environment $twig, $user, $pageCurrent = null)
+    public function generateTwigData(?User $user, ?string $pageCurrent = null): array
     {
         // Return null if no user logged in
 
@@ -81,7 +83,7 @@ class Renderer
             usort($subjects, function ($a, $b) {
                 return strnatcmp($a['name'].$a['code'], $b['name'].$b['code']);
             });
-            
+
             //Need to assign back, as $subjects is localised variable
             $subjectGroups[$subjectGroup] = $subjects;
         }
@@ -139,7 +141,7 @@ class Renderer
 
         // Render this thing out
 
-        return $twig->render('@menuSide/renderer.twig', [
+        return [
             'user' => $user,
             'nodes' => $nodes,
             'subjects' => $subjectGroups,
@@ -150,7 +152,25 @@ class Renderer
             'siteTitle' => $this->configLoader->get('title'),
             // TODO eradicate this session dependency
             'children' => is_array($_SESSION['children']) ? $_SESSION['children'] : []
-        ]);
+        ];
+    }
+
+
+    /**
+     * @param \Twig_Environment $twig
+     * @param User $user
+     * @param string $pageCurrent
+     * @return null|string
+     */
+    public function menuSideRenderer(\Twig_Environment $twig, $user, $pageCurrent = null)
+    {
+        $data = $this->generateTwigData($user, $pageCurrent);
+        if (!$data) {
+            return null;
+        }
+
+        // Render this thing out
+        return $twig->render('@menuSide/renderer.twig', $data);
     }
 
     /**
