@@ -13,6 +13,7 @@ use Alaress\Database\Predicate;
 
 class Controller extends ConfigController
 {
+
     /**
      * Renders the module admin page
      *
