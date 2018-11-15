@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Config;
 
-use Alaress\Database\Predicate\Builder;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
@@ -94,10 +93,6 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const _NEWS_EDIT_OTHERS      = 'news_edit_other';
     public const _BOARDER_LEAVE_ENABLED = 'boarder_leave_enabled';
     public const _AUDIENCE_TO_FOLDER_TEACHERS = 'audience_to_folder_users_teachers';
-
-    // All config for this module will share this common prefix
-    public const PREFIX_TIGS_CRP = 'tigs_crp_';
-    public const _TIGS_PARTICIPATION_REPORT_ENABLED = self::PREFIX_TIGS_CRP . 'participation_report_enabled';
 
     /** @var array */
     protected $cache = array();

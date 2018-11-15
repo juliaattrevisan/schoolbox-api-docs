@@ -9,6 +9,7 @@ namespace Custom\Tigs\Summative\Admin;
 
 use Alaress\Database\Quoter\Mysql\Quoter;
 use Alaress\Web\Controller\ConfigController;
+use Custom\Tigs\Summative\Config;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Alaress\Database\Predicate;
@@ -83,7 +84,7 @@ class Controller extends ConfigController
     {
         return $this->getConfigMapper()
                     ->getPredicateBuilder()
-                    ->like(ConfigMapper::COL_NAME, $this->quoter->escapeForLike(ConfigMapper::PREFIX_TIGS_CRP) . "%")
+                    ->like(ConfigMapper::COL_NAME, $this->quoter->escapeForLike(Config::PREFIX_TIGS_CRP) . "%")
                     ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_CUSTOM);
     }
 }
