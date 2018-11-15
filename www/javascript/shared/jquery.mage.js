@@ -155,7 +155,7 @@
         var $e = $(this.element);
         var $t = $e.closest(this.options.submittable);
         
-        $t.attr('readonly', 'readonly');
+        $t.attr('disabled', 'disabled');
         $t.find('[data-mage-error]').slideUp(slideFast);
 
         if ($e.data('mage-reset') === undefined) {
@@ -175,7 +175,7 @@
         var $e = $(this.element);
         var $t = $e.closest(this.options.submittable);
 
-        $t.removeAttr('readonly');
+        $t.removeAttr('disabled');
 
         if ($e.data('mage-reset')) {
             // reset the submit button text and re-enable it
@@ -208,7 +208,7 @@
         // also slide away this section's helptext
         $e.closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideSlow, function() {
             // disable all inputs in the closed section
-            $t.find(':input').attr('readonly', 'readonly');
+            $t.find(':input').attr('disabled', 'disabled');
         });
 
 
@@ -226,7 +226,7 @@
         var $t = $e.closest(this.options.submittable);
 
         // enable all inputs in the section (that we have not explicitly declared to be excluded)
-        $t.find(':input:not([data-mage-disabled])').removeAttr('readonly');
+        $t.find(':input:not([data-mage-disabled])').removeAttr('disabled');
 
         // slide out the main content wrapper
         var $content = $e.closest('[data-mage-collapsed]');
@@ -492,7 +492,7 @@
      */
     function cloneTarget(target)
     {
-        var hauser = target.clone().removeAttr('readonly');
+        var hauser = target.clone().removeAttr('disabled');
 
         hauser.find('select').each(function () {
 
@@ -564,7 +564,7 @@
          * locked/unlocked state - but previously, instantiation was into a disabled
          * fieldset, so you have to manually re-enable them which is terrible
          */
-        $('[data-mage="' + this.nextPart +  '"]').removeAttr('readonly');
+        $('[data-mage="' + this.nextPart +  '"]').removeAttr('disabled');
 
         // call the callback (this would include any specific manipulation for the section being targeted)
         onXhrDone.call(this.element, data);
