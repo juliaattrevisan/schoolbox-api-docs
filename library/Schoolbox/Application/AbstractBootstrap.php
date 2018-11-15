@@ -474,7 +474,16 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $di->setters[Output\Stream::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
         $di->setters[Output\ThemedHtml::class]['setSitepage'] = $di->lazyGet('layoutEngine');
         $di->set('webOutput:base', $di->lazyNew(Output\Base::class));
-        $di->set('webOutput:html', $di->lazyNew(Output\ThemedHtml::class));
+        $di->set('webOutput:html', $di->lazy(function() use ($di) {
+            $output = new Output\ThemedHtml();
+            $output->setTemplateEngine($di->get('templateEngine'));
+            $output->setSitepage($di->get('layoutEngine'));
+            $output->addDataGenerator(
+                'ws',
+                new Output\DataGenerator\Websocket($di->get('config'), $di->get('session'), $_SERVER)
+            );
+            return $output;
+        }));
         $di->set('webOutput:nochrome', $di->lazyNew(Output\Html::class));
         $di->set('webOutput:json', $di->lazyNew(Output\Json::class));
         $di->set('webOutput:file', $di->lazyNew(Output\File::class));

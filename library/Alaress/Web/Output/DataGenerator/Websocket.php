@@ -55,6 +55,7 @@ class Websocket implements IDataGenerator
     public function generate(): array
     {
         return [
+            'enabled'    => $this->config->get('messaging_enabled'),
             'host'       => $this->serverVars['HTTP_HOST'] ?? '',
             'port'       => $this->config->get('websocket_port_ssl') ?: 8081,
             'path'       => $this->config->get('websocket_path') ?: '/',

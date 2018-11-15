@@ -236,7 +236,7 @@
     {#{CUSTOM_HEADER_REGION}#}
 
 </head>
-<body class="{{ config.messaging_enabled ? '' : 'disableNotifications' }}">
+<body class="{{ ws.enabled ? '' : 'disableNotifications' }}">
 <div class="off-canvas-wrap docs-wrap" data-offcanvas>
     <div class="inner-wrap {{ USER.hideNotificationsTray ? '' : 'docking' }}">
 
@@ -297,8 +297,8 @@
                     // launch the notifier
                     $('#msgs').notifier({
                         host:     '{{ ws.host }}',
-                        port:     '{{ config.websocket_port_ssl ?? 8081 }}',
-                        path:     '{{ config.websocket_path ?? '/' }}',
+                        port:     '{{ ws.port }}',
+                        path:     '{{ ws.path }}',
                         secure:   true,
                         unread:   '{{ ws.unread }}',
                         maxstack: '{{ ws.stackLimit }}'
@@ -421,7 +421,7 @@
                     </section>
 
                     {% block messaging %}
-                    {% if config.messaging_enabled %}
+                    {% if ws.enabled %}
                     <section class="right-small" id="notification-toggle">
                         <a class="right-off-canvas-toggle icon-notifications hidden-for-xlarge-up" data-unread="{{ ws.unread }}">
                             <span data-unread-count>{{ ws.unread ?? ''}}</span>

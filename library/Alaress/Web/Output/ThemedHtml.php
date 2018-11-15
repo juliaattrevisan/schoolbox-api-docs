@@ -125,12 +125,6 @@ class ThemedHtml extends Html
                     'tab'   => $this->getTab(),
                     'title' => $this->getTitle(),
                 ],
-                'ws'           => [
-                    'host'       => $_SERVER['HTTP_HOST'],
-                    // TODO don't shuck out of session
-                    'unread'     => $_SESSION['msg-count'],
-                    'stackLimit' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
-                ],
                 'previousUser' => $previousUser,
 
                 // TODO DI and inject this object
