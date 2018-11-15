@@ -10,6 +10,7 @@
 namespace Alaress\Web\Output;
 
 use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\Web\Output\DataGenerator\IDataGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Menu\Side\Renderer as MenuSideRenderer;
@@ -40,6 +41,30 @@ class ThemedHtml extends Html
      * @var \SitePage
      */
     protected $sitepage;
+
+
+    /**
+     * @var array
+     */
+    private $dataGenerators = [];
+
+
+    /**
+     * Adds a data generator to this object.
+     *
+     * The result of `$generator->generate()` will be available in the template
+     * in key `$key`
+     *
+     * @param string         $key
+     * @param IDataGenerator $generator
+     * @return ThemedHtml
+     */
+    public function addDataGenerator(string $key, IDataGenerator $generator): self
+    {
+        $this->dataGenerators[$key] = $generator;
+        return $this;
+    }
+
 
     /**
      * Outputs the response body from the response object.
