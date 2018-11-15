@@ -174,11 +174,11 @@ interface EventInterface
     /**
      * Get renderer class
      *
-     * @param string $type
-     * @throws \Exception If unable to find a rendering class for the specified type
+     * @param string $format
+     * @throws \Exception If unable to find a rendering class for the specified format
      * @return string
      */
-    public function getRendererClass($type): string;
+    public function getRendererClass($format): string;
 
     /**
      * Set isEditable

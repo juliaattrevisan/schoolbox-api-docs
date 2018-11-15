@@ -52,7 +52,7 @@ class VCalExporter extends Renderer {
     /**
      * This will stream the vcal output as it parses over the event collection
      */
-    public function renderAll($type = null) {
+    public function renderAll($format = null) {
 		// Output base calendar, and output its start and end separately
 		echo trim(str_replace('END:VCALENDAR', '', $this->vCalendar->serialize()))."\r\n";
 
@@ -67,13 +67,13 @@ class VCalExporter extends Renderer {
      * This overrides the default in order to inject the vCalendar object into the renderer, which is obviously
      *
      * @param $event
-     * @param $type
+     * @param $format
      * @return string
      * @throws \Exception
      */
-    public function renderEvent($event, $type)
+    public function renderEvent($event, $format)
     {
-        $rendererClass = $event->getRendererClass($type);
+        $rendererClass = $event->getRendererClass($format);
         /** @var VObjectTrait $renderObj */
         $renderObj = new $rendererClass(
             $this->getPage(),
