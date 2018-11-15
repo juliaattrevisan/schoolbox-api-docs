@@ -130,25 +130,6 @@ abstract class EventBase implements EventInterface
      */
     protected $seriesId = null;
 
-    /**
-     * Constructor
-     *
-     * Set up default settings
-     */
-    public function __construct()
-    {
-        $this->setup();
-    }
-
-
-    /**
-     * Hook method for your own customisations
-     *
-     * Empty by default
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Find out if the currently logged in user is the owner (creator)

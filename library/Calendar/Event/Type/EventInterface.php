@@ -14,8 +14,6 @@ use \Alaress_Date_Format;
 interface EventInterface
 {
 
-    public function __construct();
-
     /**
      * Set author
      *
