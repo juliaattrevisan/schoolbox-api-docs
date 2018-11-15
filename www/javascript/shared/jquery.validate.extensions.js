@@ -352,5 +352,4 @@
         return valid;
     }, "Descriptor values must be an ascending or descending sequence");
 
-
 }(jQuery));

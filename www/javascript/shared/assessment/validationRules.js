@@ -33,10 +33,13 @@ function initDecimalDescsValidation() {
     function attachValidationRules() {
         // Validate decimal places on each descriptor
         // Only validate digits (i.e. string contains only numbers, no decimal places) if mark range is on
-        // Always validate it's numeric
+        // Always validate it's numeric and positive
+        // (although `digits` will disallow negative numbers, we are using it to validate there are no decimal places
+        // only if mark range is on and giving it a fairly specific error message, so it can't be used for both)
         $("[data-descriptor-value]").each(function() {
             $(this).rules("add", {
                 number: true,
+                min: 0,
                 digits: {
                     depends: function() {
                         return $("#useMarkRange").is(":checked");
