@@ -18,18 +18,4 @@ interface RendererInterface {
      * @return string
      */
     public function render();
-
-    /**
-     * Set the event that you want to render
-     *
-     * @param EventBase
-     */
-    public function setEvent($event);
-
-    /**
-     * Get the event that you want to render
-     *
-     * @return EventBase
-     */
-    public function getEvent();
 }

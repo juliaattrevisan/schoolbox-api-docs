@@ -26,12 +26,12 @@ class Javascript extends Base
             $classes[] = 'source' . $connectorId;
         }
 
-        $classes[] = 'type' . $this->event->getType();
+        $classes[] = 'type' . $this->getEvent()->getType();
 
         $event = array(
-            'title'     => $this->event->getTitle(),
-            'start'     => $this->event->getStartTime()->getDatabase(),
-            'end'       => $this->event->getEndTime()->getDatabase(),
+            'title'     => $this->getEvent()->getTitle(),
+            'start'     => $this->getEvent()->getStartTime()->getDatabase(),
+            'end'       => $this->getEvent()->getEndTime()->getDatabase(),
 
             /* Whether you can edit this event or not
              */
@@ -44,7 +44,7 @@ class Javascript extends Base
 
             /* Colour of the event
              */
-            'color'     => $this->event->getColour(),
+            'color'     => $this->getEvent()->getColour(),
 
             /* Campus slug so you can filter events
              */
@@ -54,16 +54,16 @@ class Javascript extends Base
              */
             'data'      => array(
                 'meta'       => array(
-                    'eventId'     => $this->event->getEventId(),
-                    'time'        => $this->event->getTime(),
-                    'detail'      => \Scrub::html($this->event->getDetail()),
-                    'location'    => $this->event->getLocation(),
-                    'eventTypeId' => $this->event->getType(),
-                    'eventType'   => 'type' . $this->event->getType(),
-                    'type'        => $this->event->getEventType(),
-                    'author'      => $this->event->getAuthorName(),
-                    'authorId'    => $this->event->getAuthorId(),
-                    'level'       => $this->event->getEventClasses(),
+                    'eventId'     => $this->getEvent()->getEventId(),
+                    'time'        => $this->getEvent()->getTime(),
+                    'detail'      => \Scrub::html($this->getEvent()->getDetail()),
+                    'location'    => $this->getEvent()->getLocation(),
+                    'eventTypeId' => $this->getEvent()->getType(),
+                    'eventType'   => 'type' . $this->getEvent()->getType(),
+                    'type'        => $this->getEvent()->getEventType(),
+                    'author'      => $this->getEvent()->getAuthorName(),
+                    'authorId'    => $this->getEvent()->getAuthorId(),
+                    'level'       => $this->getEvent()->getEventClasses(),
                 ),
                 // Do I need this? TODO
 

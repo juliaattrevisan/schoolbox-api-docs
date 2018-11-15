@@ -31,12 +31,12 @@ class Javascript extends Base
         $hasAttendanceRequestButton = false;
         $hasListButton = false;
 
-        if ($this->event->canAttend()) {
+        if ($this->getEvent()->canAttend()) {
             $hasIcon = true;
 
             /* Anyone with write access can approve attendance
              */
-            if ($this->event->isEditable()) {
+            if ($this->getEvent()->isEditable()) {
                 $hasListButton = true;
             }
 
@@ -51,17 +51,17 @@ class Javascript extends Base
 
         /* Congeal all that stuff
          */
-        $start = $this->event->getStartTime()->getDatabaseDate();
-        $end = $this->event->getEndTime()->getDatabaseDate();
-        $all_day = $this->event->getAllDay();
+        $start = $this->getEvent()->getStartTime()->getDatabaseDate();
+        $end = $this->getEvent()->getEndTime()->getDatabaseDate();
+        $all_day = $this->getEvent()->getAllday();
         if (!$all_day) {
-            $start .= ' ' . $this->event->getStartTime()->getDatabaseTime();
-            $end .= ' ' . $this->event->getEndTime()->getDatabaseTime();
+            $start .= ' ' . $this->getEvent()->getStartTime()->getDatabaseTime();
+            $end .= ' ' . $this->getEvent()->getEndTime()->getDatabaseTime();
         } else {
             // FullCalendar (and vCal) 2.0 treats event ends as exclusive.
             // Doesn't really matter for timed events, but all day events
             // get truncated by one day.
-            $end = $this->event->getEndTime()->addDays(1)->getDatabaseDate();
+            $end = $this->getEvent()->getEndTime()->addDays(1)->getDatabaseDate();
         }
 
         //
@@ -69,14 +69,14 @@ class Javascript extends Base
         $classes = $this->getEvent()->getEventClasses();
 
         $event = array(
-            'resourceId' => $this->event->getResourceId(),
-            'title'      => $this->event->getTitle(),
+            'resourceId' => $this->getEvent()->getResourceId(),
+            'title'      => $this->getEvent()->getTitle(),
             'start'      => $start,
             'end'        => $end,
 
             /* Whether you can edit this event or not
              */
-            'editable'   => $this->event->isEditable(),
+            'editable'   => $this->getEvent()->isEditable(),
 
             /* Whether it's an all-day event or not
              * If allDay is true, then you can't resize it
@@ -85,7 +85,7 @@ class Javascript extends Base
 
             /* Colour of the event
              */
-            'color'      => $this->event->getColour(),
+            'color'      => $this->getEvent()->getColour(),
 
             /* Campus slug so you can filter events
              */
@@ -95,23 +95,23 @@ class Javascript extends Base
              */
             'data'       => array(
                 'meta'       => array(
-                    'eventId'     => $this->event->getEventId(),
-                    'time'        => $this->event->getTime(),
-                    'detail'      => \Scrub::html($this->event->getDetail()),
-                    'location'    => $this->event->getLocation(),
-                    'eventTypeId' => $this->event->getType(),
-                    'eventType'   => 'type' . $this->event->getType(),
-                    'type'        => $this->event->getEventType(),
-                    'author'      => $this->event->getAuthorName(),
-                    'authorId'    => $this->event->getAuthorId(),
-                    'level'       => $this->event->getEventClasses(),
-                    'completed'   => $this->event->getCompleted(),
-                    'seriesId'    => $this->event->getSeriesId(),
+                    'eventId'     => $this->getEvent()->getEventId(),
+                    'time'        => $this->getEvent()->getTime(),
+                    'detail'      => \Scrub::html($this->getEvent()->getDetail()),
+                    'location'    => $this->getEvent()->getLocation(),
+                    'eventTypeId' => $this->getEvent()->getType(),
+                    'eventType'   => 'type' . $this->getEvent()->getType(),
+                    'type'        => $this->getEvent()->getEventType(),
+                    'author'      => $this->getEvent()->getAuthorName(),
+                    'authorId'    => $this->getEvent()->getAuthorId(),
+                    'level'       => $this->getEvent()->getEventClasses(),
+                    'completed'   => $this->getEvent()->getCompleted(),
+                    'seriesId'    => $this->getEvent()->getSeriesId(),
                 ),
                 'links'      => array(
                     'category' => array(
-                        'id'   => $this->event->getCategoryId(),
-                        'name' => $this->event->getCategoryName(),
+                        'id'   => $this->getEvent()->getCategoryId(),
+                        'name' => $this->getEvent()->getCategoryName(),
                     ),
                 ),
                 'styles'     => array(

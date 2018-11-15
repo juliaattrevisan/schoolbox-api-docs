@@ -9,16 +9,31 @@
 
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
-use Calendar\Event\Type\EventInterface;
 use \Calendar\Event\Type\RendererBase;
+use Calendar\Event\Type\ResourceBooking;
+use Schoolbox\User;
+use SitePage;
 
-/**
- * Class Base
- *
- * @method \Calendar\Event\Type\ResourceBooking\Event getEvent()
- */
 abstract class Base extends RendererBase
 {
+
+    /** @var ResourceBooking\Event */
+    private $event;
+
+
+    /**
+     * @param SitePage              $page
+     * @param ResourceBooking\Event $event
+     * @param User                  $user
+     * @param \Group                $groupHandler
+     * @param \Calendar             $calHandler
+     * @param User                  $viewer
+     */
+    public function __construct(SitePage $page, ResourceBooking\Event $event, User $user, \Group $groupHandler, \Calendar $calHandler, User $viewer)
+    {
+        parent::__construct($page, $user, $groupHandler, $calHandler, $viewer);
+        $this->event = $event;
+    }
 
     public function getEditURL() {
         return $this->getRouteIfAuthorized(
@@ -56,5 +71,13 @@ abstract class Base extends RendererBase
         else {
             return '';
         }
+    }
+
+    /**
+     * @return ResourceBooking\Event
+     */
+    protected function getEvent(): ResourceBooking\Event
+    {
+        return $this->event;
     }
 }

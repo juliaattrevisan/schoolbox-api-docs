@@ -21,10 +21,10 @@ class Javascript extends Base
 
         /* Output list button */
         if ($this->showAttendanceLink()) {
-            $encodedClass = urlencode(urlencode(urlencode($this->event->getCode())));
-            $classLink = $this->event->getCampus() ? $this->event->getCampus() . '/' . $encodedClass : '0/' . $encodedClass;
+            $encodedClass = urlencode(urlencode(urlencode($this->getEvent()->getCode())));
+            $classLink = $this->getEvent()->getCampus() ? $this->getEvent()->getCampus() . '/' . $encodedClass : '0/' . $encodedClass;
 
-            $hasListButton = "<a class='button icon-class-list' href='/modules/attendance/modify/{$classLink}/{$this->event->getStartTime()->getDatabaseDate()}/{$this->event->getPeriod()}/{$this->event->getTimetableCode()}' title='Mark Attendance'>Attendance</a>";
+            $hasListButton = "<a class='button icon-class-list' href='/modules/attendance/modify/{$classLink}/{$this->getEvent()->getStartTime()->getDatabaseDate()}/{$this->getEvent()->getPeriod()}/{$this->getEvent()->getTimetableCode()}' title='Mark Attendance'>Attendance</a>";
         } else {
             $hasListButton = false;
         }
@@ -32,17 +32,17 @@ class Javascript extends Base
 
         /* Congeal all that stuff
          */
-        $start = $this->event->getStartTime()->getDatabaseDate();
-        $end = $this->event->getEndTime()->getDatabaseDate();
-        $all_day = $this->event->getAllDay();
+        $start = $this->getEvent()->getStartTime()->getDatabaseDate();
+        $end = $this->getEvent()->getEndTime()->getDatabaseDate();
+        $all_day = $this->getEvent()->getAllday();
         if (!$all_day) {
-            $start .= ' ' . $this->event->getStartTime()->getDatabaseTime();
-            $end .= ' ' . $this->event->getEndTime()->getDatabaseTime();
+            $start .= ' ' . $this->getEvent()->getStartTime()->getDatabaseTime();
+            $end .= ' ' . $this->getEvent()->getEndTime()->getDatabaseTime();
         } else {
             // FullCalendar (and vCal) 2.0 treats event ends as exclusive.
             // Doesn't really matter for timed events, but all day events
             // get truncated by one day.
-            $end = $this->event->getEndTime()->addDays(1)->getDatabaseDate();
+            $end = $this->getEvent()->getEndTime()->addDays(1)->getDatabaseDate();
         }
 
         //
@@ -50,7 +50,7 @@ class Javascript extends Base
         $classes = $this->getEvent()->getEventClasses();
 
         $event = array(
-            'title'     => $this->event->getTitle(),
+            'title'     => $this->getEvent()->getTitle(),
             'start'     => $start,
             'end'       => $end,
 
@@ -65,7 +65,7 @@ class Javascript extends Base
 
             /* Colour of the event
              */
-            'color'     => $this->event->getColour(),
+            'color'     => $this->getEvent()->getColour(),
 
             /* Campus slug so you can filter events
              */
@@ -75,22 +75,22 @@ class Javascript extends Base
              */
             'data'      => array(
                 'meta'       => array(
-                    'eventId'     => $this->event->getEventId(),
-                    'time'        => $this->event->getTime(),
-                    'detail'      => \Scrub::html($this->event->getDetail()),
-                    'location'    => $this->event->getLocation(),
-                    'eventTypeId' => $this->event->getType(),
-                    'eventType'   => 'type' . $this->event->getType(),
-                    'type'        => $this->event->getEventType(),
-                    'author'      => $this->event->getAuthorName(),
-                    'authorId'    => $this->event->getAuthorId(),
-                    'level'       => $this->event->getEventClasses(),
-                    'completed'   => $this->event->getCompleted(),
+                    'eventId'     => $this->getEvent()->getEventId(),
+                    'time'        => $this->getEvent()->getTime(),
+                    'detail'      => \Scrub::html($this->getEvent()->getDetail()),
+                    'location'    => $this->getEvent()->getLocation(),
+                    'eventTypeId' => $this->getEvent()->getType(),
+                    'eventType'   => 'type' . $this->getEvent()->getType(),
+                    'type'        => $this->getEvent()->getEventType(),
+                    'author'      => $this->getEvent()->getAuthorName(),
+                    'authorId'    => $this->getEvent()->getAuthorId(),
+                    'level'       => $this->getEvent()->getEventClasses(),
+                    'completed'   => $this->getEvent()->getCompleted(),
                 ),
                 'links'      => array(
                     'category' => array(
-                        'id'   => $this->event->getCategoryId(),
-                        'name' => $this->event->getCategoryName(),
+                        'id'   => $this->getEvent()->getCategoryId(),
+                        'name' => $this->getEvent()->getCategoryName(),
                     ),
                 ),
                 'styles'     => array(
