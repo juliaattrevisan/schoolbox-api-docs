@@ -348,35 +348,14 @@ class Controller extends BaseController
         );
 
 
-        // Determine compatibility
-        $currentRubricUse = $assessment->getUseRubric();
-        if ($currentRubricUse) {
-            $proposedRubricUse = $this->request->post->getBool('useRubric', false);
-            if ($proposedRubricUse) {
-                // Does the current and proposed due work both use rubrics?
-                // Need to ask whether compatible
-                $isCompatible = $proposedGrid->isCompatibleWith($currentGrid);
-
-            } else {
-                // Did rubric marks get switched off in the form?
-                // That's always incompatible
-                $isCompatible = false;
-            }
-
-        } else {
-            // Does the due work currently not use rubrics?
-            // That's always compatible
-            $isCompatible = true;
-        }
-
-
         // Is the proposed grid itself not valid?
         // Doesn't matter for the purpose of this exercise
         $response = [
-            'compatible'    => $isCompatible,
+            'compatible'    => true,
             'affectedUsers' => [],
         ];
-        if (!$isCompatible) {
+        if (!$proposedGrid->isCompatibleWith($currentGrid)) {
+            $response['compatible'] = false;
             $jsonDecorator = new PropertyDecorator();
             $linkDecorator = new LinkDecorator($this->router, $this->authorizer);
 
