@@ -1,0 +1,57 @@
+<?php
+/**
+ * @copyright Copyright 2018, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Alaress\Web\Output\DataGenerator;
+
+use DebugBar\DebugBar as DebugBarInstance;
+
+/**
+ * Generate data for rendering the debug bar.
+ *
+ * This should only be added if the debug bar is actually enabled.
+ */
+class DebugBar implements IDataGenerator
+{
+    /**
+     * @var DebugBarInstance
+     */
+    private $debugBar;
+
+
+    /**
+     * @var string
+     */
+    private $baseUrl;
+
+
+    /**
+     * Constructor
+     *
+     * @param DebugBarInstance $debugBar
+     * @param string           $baseUrl
+     */
+    public function __construct(DebugBarInstance $debugBar, string $baseUrl)
+    {
+        $this->debugBar = $debugBar;
+        $this->baseUrl  = $baseUrl;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function generate(): array
+    {
+        $renderer = $this->debugBar->getJavascriptRenderer();
+        $renderer->setBaseUrl($this->baseUrl);
+        return [
+            'head' => $renderer->renderHead(),
+            'body' => $renderer->render(),
+        ];
+    }
+}

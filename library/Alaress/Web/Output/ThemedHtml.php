@@ -89,14 +89,6 @@ class ThemedHtml extends Html
                 $page->error(null, 'Template not found', $code ?: 500);
             }
         } else {
-            // Debug bar
-            $debugBar = [];
-            if (DebugBar::isEnabled()) {
-                $renderer = DebugBar::getInstance()->getJavascriptRenderer();
-                $renderer->setBaseUrl('/debugbar/');
-                $debugBar['head'] = $renderer->renderHead();
-                $debugBar['body'] = $renderer->render();
-            }
 
             $data = [
                 'template'     => $template,
@@ -111,9 +103,6 @@ class ThemedHtml extends Html
 
                 // TODO DI and inject this object
                 'sideMenuData' => (new MenuSideRenderer())->generateTwigData($user),
-
-                // TODO DI and inject the debug bar
-                'debugBar'     => $debugBar,
             ];
             foreach ($this->dataGenerators as $key => $generator) {
                 $data[$key] = $generator->generate();
