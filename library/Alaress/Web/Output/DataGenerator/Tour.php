@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Alaress\Web\Output\DataGenerator;
 
+use Alaress\Web\Output\ThemedHtml;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Schoolbox\IConfigLoader;
@@ -61,9 +62,9 @@ class Tour implements IDataGenerator
 
 
     /**
-     * @return array
+     * @inheritdoc
      */
-    public function generate(): array
+    public function generate(ThemedHtml $output): array
     {
         $tour = [];
         // TODO figure out how to figure out if user's impersonated?

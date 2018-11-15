@@ -98,14 +98,14 @@ class ThemedHtml extends Html
                     'title' => $this->getTitle(),
                 ],
 
-                // TODO DI and inject this object
-                'topMenuData'  => (new MenuTopRenderer())->generateTwigData($user, $this->getTab()),
+//                // TODO DI and inject this object
+//                'topMenuData'  => (new MenuTopRenderer())->generateTwigData($user, $this->getTab()),
 
                 // TODO DI and inject this object
                 'sideMenuData' => (new MenuSideRenderer())->generateTwigData($user),
             ];
             foreach ($this->dataGenerators as $key => $generator) {
-                $data[$key] = $generator->generate();
+                $data[$key] = $generator->generate($this);
             }
 
             // Render it all out
