@@ -39,10 +39,10 @@
         <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 
         {# Should also check if user is impersonated #}
-        {% if USER and config.tours_enabled %}
+        {% if tour.url %}
             {% autoescape 'js' %}
             <script type="text/javascript">
-                window.tourUrl = '{TOUR_ROUTE}';
+                window.tourUrl = '{{ tour.url }}';
             </script>
             {% endautoescape %}
         {% endif %}

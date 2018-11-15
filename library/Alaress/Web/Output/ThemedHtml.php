@@ -13,8 +13,11 @@
 namespace Alaress\Web\Output;
 
 use Alaress\DebugBar\Instance as DebugBar;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Menu\Side\Renderer as MenuSideRenderer;
 use Schoolbox\Menu\Top\Renderer as MenuTopRenderer;
+use Schoolbox\User;
 
 class ThemedHtml extends Html
 {
@@ -51,6 +54,10 @@ class ThemedHtml extends Html
     {
         $page     = $this->getSitepage();
         $template = $this->getTemplate();
+
+        /** @var User|null $user */
+        $user     = $_SESSION['user'];
+
 //        $data     = $this->getData();
         if (empty($template)) {
             // No template? I can't generate a standard response,
@@ -62,7 +69,7 @@ class ThemedHtml extends Html
                 $page->error(null, 'Template not found', $code ?: 500);
             }
         } else {
-
+            // Debug bar
             $debugBar = [];
             if (DebugBar::isEnabled()) {
                 $renderer = DebugBar::getInstance()->getJavascriptRenderer();
@@ -71,6 +78,27 @@ class ThemedHtml extends Html
                 $debugBar['body'] = $renderer->render();
             }
 
+            // Feature tour
+            $impersonated = false;
+            $previousUser = null;
+            if ($user) {
+                if (isset($_SESSION['previous']['user'])) {
+                    /** @var User $previousUser */
+                    $previousUser = $_SESSION['previous']['user'];
+                    if ($previousUser->isSuperuser()) {
+                        $impersonated = true;
+                    }
+                }
+            }
+
+            $tour = [];
+            if ($user && !$impersonated && ConfigMapper::getInstance()->get('tours_enabled')) {
+                $request     = parse_url($_SERVER['REQUEST_URI']);
+                $encodedUrl  = Redirect::encode($request['path']);
+                $tour['url'] = '/tour/url/'.$encodedUrl;
+            }
+
+            // Render it all out
             echo $this->templateEngine->render(
                 'include/chrome.twig',
                 [
@@ -87,16 +115,19 @@ class ThemedHtml extends Html
                         'unread'     => $_SESSION['msg-count'],
                         'stackLimit' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
                     ],
-                    'previousUser' => $_SESSION['previous']['user'] ?? null,
+                    'previousUser' => $previousUser,
 
                     // TODO DI and inject this object
-                    'topMenuData'  => (new MenuTopRenderer())->generateTwigData($_SESSION['user'], $this->getTab()),
+                    'topMenuData'  => (new MenuTopRenderer())->generateTwigData($user, $this->getTab()),
 
                     // TODO DI and inject this object
-                    'sideMenuData' => (new MenuSideRenderer())->generateTwigData($_SESSION['user']),
+                    'sideMenuData' => (new MenuSideRenderer())->generateTwigData($user),
 
                     // TODO DI and inject the debug bar
                     'debugBar'     => $debugBar,
+
+                    // TODO DI and inject all the tour requires
+                    'tour'         => $tour,
                 ]
             );
 
