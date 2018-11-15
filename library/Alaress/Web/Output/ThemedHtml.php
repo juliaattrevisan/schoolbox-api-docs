@@ -103,9 +103,8 @@ class ThemedHtml extends Html
                     'template' => $template,
                     'data'     => $this->getData(),
                     'chrome'   => [
-                        'tab'      => $this->getTab(),
-                        'title'    => $this->getTitle(),
-                        'template' => $template,
+                        'tab'   => $this->getTab(),
+                        'title' => $this->getTitle(),
                     ],
                     'ws'       => [
                         'host'       => $_SERVER['HTTP_HOST'],
