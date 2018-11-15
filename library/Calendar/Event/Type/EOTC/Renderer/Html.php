@@ -17,12 +17,8 @@ class Html extends Base {
      */
     public function render()
     {
-        if ($this->isVisible()) {
-            return $this->getTemplate()->render('calendar/type/EOTC.twig',
-                array('event' => $this->getEvent())
-            );
-        } else {
-            return '';
-        }
+        return $this->getTemplate()->render('calendar/type/EOTC.twig',
+            array('event' => $this->getEvent())
+        );
     }
 }

@@ -9,8 +9,6 @@
  */
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
-use Calendar\Event\Type\ResourceBooking\Renderer\Base;
-
 class Html extends Base {
     /**
      * Render this event
@@ -18,14 +16,9 @@ class Html extends Base {
      */
     public function render()
     {
-        if ($this->isVisible()) {
-            return $this->getTemplate()->render('calendar/type/resourceBooking.twig',
-                array(  'event' => $this->getEvent(),
-                        'renderer' => $this)
-            );
-        } else {
-            return '';
-        }
-
+        return $this->getTemplate()->render('calendar/type/resourceBooking.twig',
+            array(  'event' => $this->getEvent(),
+                    'renderer' => $this)
+        );
     }
 }

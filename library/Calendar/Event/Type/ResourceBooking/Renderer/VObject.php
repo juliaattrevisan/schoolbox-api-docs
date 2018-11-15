@@ -35,39 +35,37 @@ class VObject extends Base
         $utcTimezone = new DateTimeZone('UTC');
         /* Show visible events only, in export
          */
-        if ($this->isVisible()) {
-            /** @var VEvent $vEvent */
-            $vEvent = $this->vCalendar->create('VEVENT');
-            // Generate a UID based on $this->getEvent()->getEventId()
-            $vEvent->add('UID', $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId());
-            $vEvent->add('CATEGORIES', $this->getEvent()->getCategory());
-            $vEvent->add('LOCATION', $this->getEvent()->getLocation());
+        /** @var VEvent $vEvent */
+        $vEvent = $this->vCalendar->create('VEVENT');
+        // Generate a UID based on $this->getEvent()->getEventId()
+        $vEvent->add('UID', $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId());
+        $vEvent->add('CATEGORIES', $this->getEvent()->getCategory());
+        $vEvent->add('LOCATION', $this->getEvent()->getLocation());
 
-            $this->getTextConverter()->setHtml($this->getEvent()->getDetail());
-            $vEvent->add('DESCRIPTION', $this->getTextConverter()->getText());
+        $this->getTextConverter()->setHtml($this->getEvent()->getDetail());
+        $vEvent->add('DESCRIPTION', $this->getTextConverter()->getText());
 
-            $start_time = $this->getEvent()->getStartTime()->getDateTimeObject();
-            if (!($start_time instanceof DateTime)) {
-                $start_time = new DateTime($this->getEvent()->getStartTime()->getDatabase());
-            }
-            $end_time = $this->getEvent()->getEndTime()->getDateTimeObject();
-            if (!($end_time instanceof DateTime)) {
-                $end_time = new DateTime($this->getEvent()->getEndTime()->getDatabase());
-            }
-            if (!$this->getEvent()->getAllday()) {
-                $start_time->setTimezone($utcTimezone);
-                $end_time->setTimezone($utcTimezone);
-                $vEvent->add('DTSTART', $start_time);
-                $vEvent->add('DTEND', $end_time);
-            } else {
-                $end_time->add(new DateInterval('P1D'));
-                $vEvent->add('DTSTART', $start_time->format('Ymd'), array('VALUE' => 'DATE'));
-                $vEvent->add('DTEND', $end_time->format('Ymd'), array('VALUE' => 'DATE'));
-            }
-
-            $vEvent->add('SUMMARY', $this->getEvent()->getTitle());
-
-            return $vEvent->serialize();
+        $start_time = $this->getEvent()->getStartTime()->getDateTimeObject();
+        if (!($start_time instanceof DateTime)) {
+            $start_time = new DateTime($this->getEvent()->getStartTime()->getDatabase());
         }
+        $end_time = $this->getEvent()->getEndTime()->getDateTimeObject();
+        if (!($end_time instanceof DateTime)) {
+            $end_time = new DateTime($this->getEvent()->getEndTime()->getDatabase());
+        }
+        if (!$this->getEvent()->getAllday()) {
+            $start_time->setTimezone($utcTimezone);
+            $end_time->setTimezone($utcTimezone);
+            $vEvent->add('DTSTART', $start_time);
+            $vEvent->add('DTEND', $end_time);
+        } else {
+            $end_time->add(new DateInterval('P1D'));
+            $vEvent->add('DTSTART', $start_time->format('Ymd'), array('VALUE' => 'DATE'));
+            $vEvent->add('DTEND', $end_time->format('Ymd'), array('VALUE' => 'DATE'));
+        }
+
+        $vEvent->add('SUMMARY', $this->getEvent()->getTitle());
+
+        return $vEvent->serialize();
     }
 }

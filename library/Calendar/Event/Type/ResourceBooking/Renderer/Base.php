@@ -9,6 +9,7 @@
 
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
+use Calendar\Event\Type\EventInterface;
 use \Calendar\Event\Type\RendererBase;
 
 /**
@@ -18,14 +19,6 @@ use \Calendar\Event\Type\RendererBase;
  */
 abstract class Base extends RendererBase
 {
-
-    /**
-     * @return bool
-     */
-    public function isVisible()
-    {
-        return true;
-    }
 
     public function getEditURL() {
         return $this->getRouteIfAuthorized(

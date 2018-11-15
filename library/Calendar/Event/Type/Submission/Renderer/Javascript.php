@@ -29,10 +29,6 @@ class Javascript extends Base
      */
     public function render()
     {
-        if (!$this->isVisible()) {
-            return '';
-        }
-
         $event = $this->deriveCore();
         $event['data'] = [
             'meta'       => $this->deriveMeta(),

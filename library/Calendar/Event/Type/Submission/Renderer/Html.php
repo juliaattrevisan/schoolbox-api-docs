@@ -14,10 +14,6 @@ class Html extends Base {
 
     public function render()
     {
-        if(!$this->isVisible()){
-            return '';
-        }
-
         return $this->getTemplate()->render('calendar/type/submission.twig',
             array(  'event' => $this->getEvent(),
                     'renderer' => $this)

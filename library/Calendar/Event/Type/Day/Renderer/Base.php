@@ -9,29 +9,12 @@
 
 namespace Calendar\Event\Type\Day\Renderer;
 
+use Calendar\Event\Type\EventInterface;
 use \Calendar\Event\Type\RendererBase;
 use Schoolbox\Calendar\Event;
 
 abstract class Base extends RendererBase
 {
-
-    /**
-     * If the Publish Date hasn't been reached yet, only show the events to Superusers
-     * in a different way so they can still edit/click them. Otherwise, they don't appear
-     * at all for everyone else
-     *
-     * @return bool
-     */
-    public function isVisible()
-    {
-        $isFutureEvent   = ($this->getEvent()->getPublishDate()->getUnixTimestamp() >= time());
-        $isAlwaysVisible = ($this->getViewer()->isSuperuser() || $this->getEvent()->isOwner() || $this->getEvent()->isEditable());
-        if ($isFutureEvent && !($isAlwaysVisible)) {
-            return false;
-        }
-        return true;
-    }
-
 
     /**
      * If an event has not been published yet, but is still visible (see isVisible) then it should be translucent

@@ -18,15 +18,9 @@ class Html extends Base {
      */
     public function render()
     {
-
-        if ($this->isVisible()) {
-            return $this->getTemplate()->render('calendar/type/timetable.twig',
-                array(  'event' => $this->getEvent(),
-                        'renderer' => $this)
-            );
-        } else {
-            return '';
-        }
-
+        return $this->getTemplate()->render('calendar/type/timetable.twig',
+            array(  'event' => $this->getEvent(),
+                    'renderer' => $this)
+        );
     }
 }

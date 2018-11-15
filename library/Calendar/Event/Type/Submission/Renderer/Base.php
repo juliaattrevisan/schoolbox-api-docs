@@ -10,27 +10,9 @@
 namespace Calendar\Event\Type\Submission\Renderer;
 
 use \Calendar\Event\Type\RendererBase;
-use Calendar\Event\Type\Submission\Event;
 
 abstract class Base extends RendererBase
 {
-
-    /**
-     * Hide submissions from Students and Parents if not yet published
-     *
-     * @return bool
-     */
-    public function isVisible() {
-        $alwaysVisible = $this->getViewer()->isSuperuser() || $this->getViewer()->getRole()->isStaff();
-        if(!$alwaysVisible){
-            /**
-             * @var Event $submissionEvent
-             */
-            $submissionEvent = $this->getEvent();
-            return $submissionEvent->getPublishDate()->lte(new \Alaress_Date_Format());
-        }
-        return true;
-    }
 
     /**
      * Helper function to determine if person viewing assessment event can edit it, this should probably be on the
