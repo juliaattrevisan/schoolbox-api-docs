@@ -15,7 +15,7 @@ use Schoolbox\User;
 use SitePage;
 use Config;
 
-class Exporter extends Renderer {
+class VCalExporter extends Renderer {
 
     /**
      * @var VCalendar
