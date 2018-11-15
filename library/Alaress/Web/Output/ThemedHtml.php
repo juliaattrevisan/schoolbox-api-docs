@@ -98,19 +98,6 @@ class ThemedHtml extends Html
                 $debugBar['body'] = $renderer->render();
             }
 
-            // Feature tour
-            $impersonated = false;
-            $previousUser = null;
-            if ($user) {
-                if (isset($_SESSION['previous']['user'])) {
-                    /** @var User $previousUser */
-                    $previousUser = $_SESSION['previous']['user'];
-                    if ($previousUser->isSuperuser()) {
-                        $impersonated = true;
-                    }
-                }
-            }
-
             $data = [
                 'template'     => $template,
                 'data'         => $this->getData(),
@@ -118,7 +105,6 @@ class ThemedHtml extends Html
                     'tab'   => $this->getTab(),
                     'title' => $this->getTitle(),
                 ],
-                'previousUser' => $previousUser,
 
                 // TODO DI and inject this object
                 'topMenuData'  => (new MenuTopRenderer())->generateTwigData($user, $this->getTab()),

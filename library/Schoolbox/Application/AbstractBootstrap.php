@@ -490,7 +490,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 ->addDataGenerator(
                     'tour',
                     new Output\DataGenerator\Tour($config, $session->getAuthUser(), $router, $_SERVER)
-                );
+                )
+                ->addDataGenerator('user', new Output\DataGenerator\User($session->getAuthUser(), $session));
             return $output;
         }));
         $di->set('webOutput:nochrome', $di->lazyNew(Output\Html::class));

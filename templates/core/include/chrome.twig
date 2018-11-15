@@ -38,8 +38,7 @@
         <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.css" />
         <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 
-        {# Should also check if user is impersonated #}
-        {% if tour.url %}
+        {% if tour.url and not user.impersonated %}
             {% autoescape 'js' %}
             <script type="text/javascript">
                 window.tourUrl = '{{ tour.url }}';
@@ -160,14 +159,14 @@
             };
 
             // TODO consider expanding Schoolbox json-serialized user so these fields get output
-            var schoolboxUser   = {{ USER | json_encode | raw }};
-            schoolboxUser.name  = "{{ USER.formatName }}";
-            schoolboxUser.email = "{{ USER.email }}";
-            schoolboxUser.year  = "{{ USER.year }}";
-            schoolboxUser.role  = {{ USER.role | json_encode | raw }};
+            var schoolboxUser   = {{ user.current | json_encode | raw }};
+            schoolboxUser.name  = "{{ user.current.formatName }}";
+            schoolboxUser.email = "{{ user.current.email }}";
+            schoolboxUser.year  = "{{ user.current.year }}";
+            schoolboxUser.role  = {{ user.current.role | json_encode | raw }};
 
             // TODO set if they're impersonated
-            schoolboxUser.impersonated = false;
+            schoolboxUser.impersonated = Boolean('{{ user.impersonated}}');
 
             $.datepicker.setDefaults({
                 dateFormat: dateDisplayFormats.datepicker
@@ -238,7 +237,7 @@
 </head>
 <body class="{{ ws.enabled ? '' : 'disableNotifications' }}">
 <div class="off-canvas-wrap docs-wrap" data-offcanvas>
-    <div class="inner-wrap {{ USER.hideNotificationsTray ? '' : 'docking' }}">
+    <div class="inner-wrap {{ user.current.hideNotificationsTray ? '' : 'docking' }}">
 
         {% block instant %}
             <aside class="right-off-canvas-menu island no-pad hide-for-print" id="msgs" data-unread="{{ ws.unread }}">
@@ -320,30 +319,30 @@
                 </a>
             </div>
 
-            {% if USER %}
+            {% if user.current %}
             <div class="row">
                 <ul class="account-menu accordion" id="account-menu" data-accordion>
                     <li class="accordion-navigation">
                         <a href="#accountContent" class="profile-drop" id="profile-accordion">
-                            <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ USER.externalId }}&size=square80"/>
-                            <span>{{ USER.formatName }}</span>
+                            <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square80"/>
+                            <span>{{ user.current.formatName }}</span>
                         </a>
                         <div id="accountContent" class="content">
                             <ul id="profile-options">
-                                <li><a class="icon-staff-students" href="/search/user/{{ USER.id }}">Profile</a></li>
+                                <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
                                 <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
-                                {% if USER.superuser %}
+                                {% if user.current.superuser %}
                                 <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
                                 {% endif %}
                                 <li><a class="icon-logout" href="/logout.php">Logout</a></li>
                             </ul>
                             <ul id="avatar2">
 
-                                {% if USER.linkedUser is not empty %}
+                                {% if user.current.linkedUser is not empty %}
                                 <li>
                                     <ul id="switch-user">
                                         <li class="separator">Switch User</li>
-                                        {% for linkedUser in USER.linkedUser %}
+                                        {% for linkedUser in user.current.linkedUser %}
                                         <li class="switch-user">
                                             <div class="card small-12">
                                                 <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
@@ -358,13 +357,13 @@
                                 </li>
                                 {% endif %}
 
-                                {% if previousUser %}
+                                {% if user.previous %}
                                 <li class="switch-user">
                                     <div class="card small-12">
-                                        <a class="no-pad" href="/user/recoverSession" title="Return to {{ previousUser.formatName }}">
-                                            <img src="/portrait.php?userId={{ previousUser.externalId }}&amp;size=square64" />
-                                            <p>{{ previousUser.formatName }}</p>
-                                            <p class="meta">{{ previousUser.role.name }}</p>
+                                        <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
+                                            <img src="/portrait.php?userId={{ user.previous.externalId }}&amp;size=square64" />
+                                            <p>{{ user.previous.formatName }}</p>
+                                            <p class="meta">{{ user.previous.role.name }}</p>
                                         </a>
                                     </div>
                                 </li>
