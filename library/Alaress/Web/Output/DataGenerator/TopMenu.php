@@ -55,7 +55,9 @@ class TopMenu implements IDataGenerator
         }
 
         return [
-            'tabs' => $tabs,
+            'tabCurrent' => $output->getTab(),
+            'tabs'       => $tabs,
+            'user'       => $this->currentUser,
         ];
     }
 }

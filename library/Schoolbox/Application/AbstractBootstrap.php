@@ -49,6 +49,8 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Error;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
+use Schoolbox\Menu\Side\Mapper as SideMenuMapper;
+use Schoolbox\Menu\Top\Mapper as TopMenuMapper;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
@@ -475,7 +477,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $di->setters[Output\Stream::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
         $di->setters[Output\ThemedHtml::class]['setSitepage'] = $di->lazyGet('layoutEngine');
         $di->set('webOutput:base', $di->lazyNew(Output\Base::class));
-        $di->set('webOutput:html', $di->lazy(function() use ($di) {
+        $di->set('webOutput:html', $di->lazy(function() use ($di, $mapperFactory) {
             /** @var IConfigLoader $config */
             /** @var Session $session */
             /** @var Router $router */
@@ -491,7 +493,14 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     'tour',
                     new Output\DataGenerator\Tour($config, $session->getAuthUser(), $router, $_SERVER)
                 )
-                ->addDataGenerator('user', new Output\DataGenerator\User($session->getAuthUser(), $session));
+                ->addDataGenerator('user', new Output\DataGenerator\User($session->getAuthUser(), $session))
+                ->addDataGenerator(
+                    'topMenu',
+                    new Output\DataGenerator\TopMenu(
+                        $session->getAuthUser(),
+                        $mapperFactory->get(TopMenuMapper::class)
+                    )
+                );
 
             if ($config->get('debug_mode')) {
                 $output->addDataGenerator(

@@ -134,7 +134,7 @@ class ThemedHtml extends Html
     /**
      * @return string
      */
-    protected function getTab()
+    public function getTab()
     {
         return $this->tab ?? $this->retrieveFieldFromResponse('tab');
     }
