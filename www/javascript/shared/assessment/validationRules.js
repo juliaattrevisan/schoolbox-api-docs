@@ -28,52 +28,24 @@ var validateOptions = {
     }
 };
 
-function initDecimalDescsValidation() {
+$(document).ready(function() {
+    // Initialise validator - have to do this here, as the only other place it happens is in the mage on submit
+    $("#assessmentForm").alaressValidate();
 
-    function attachValidationRules() {
-        // Validate decimal places on each descriptor
-        // Only validate digits (i.e. string contains only numbers, no decimal places) if mark range is on
-        // Always validate it's numeric and positive
-        // (although `digits` will disallow negative numbers, we are using it to validate there are no decimal places
-        // only if mark range is on and giving it a fairly specific error message, so it can't be used for both)
-        $("[data-descriptor-value]").each(function() {
-            $(this).rules("add", {
-                number: true,
-                min: 0,
-                digits: {
-                    depends: function() {
-                        return $("#useMarkRange").is(":checked");
-                    }
-                },
-                messages: {
-                    digits: "You cannot have descriptors with decimal places if using mark range"
-                }
-            });
-        });
-
-        // Validate all rows of descriptors
-        $("[data-criterion-name]").each(function() {
-            $(this).rules("add", { descriptorsAreMonotonic: true });
-        });
-    }
-
-    function reValidate() {
-        $("[data-descriptor-value]").each(function() {
-            $(this).valid();
-        });
-        $("[data-criterion-name]").each(function() {
-            $(this).valid();
-        });
-    }
-
-    // on load
+    // attach on-load rules
+    // the stuff in validateOptions is rules we only want run on submit, so don't pass them as options here.
     attachValidationRules();
 
+    // Attach MutationObservers and on-change listeners
+    initDynamicValidationTriggers();
+});
+
+
+function initDynamicValidationTriggers() {
     // on change of mark range setting
     $("#useMarkRange").change(function() {
         reValidate();
     });
-
 
     // Attach listener to run monotonicity validation on a descriptor row every time one of the contained descriptor values change
     $("[data-descriptor-value]").change(function() {
@@ -81,7 +53,6 @@ function initDecimalDescsValidation() {
         var $closestDescRow = $changedDescriptor.closest("[data-descriptor]").prevAll("th").find("[data-criterion-name]");
         $closestDescRow.valid();
     });
-
 
     var moConfig = { attributes: false, childList: true, characterData: false };
 
@@ -112,6 +83,41 @@ function initDecimalDescsValidation() {
     });
 }
 
+function attachValidationRules() {
+    // Validate decimal places on each descriptor
+    // Only validate digits (i.e. string contains only numbers, no decimal places) if mark range is on
+    // Always validate it's numeric and positive
+    // (although `digits` will disallow negative numbers, we are using it to validate there are no decimal places
+    // only if mark range is on and giving it a fairly specific error message, so it can't be used for both)
+    $("[data-descriptor-value]").each(function() {
+        $(this).rules("add", {
+            number: true,
+            min: 0,
+            digits: {
+                depends: function() {
+                    return $("#useMarkRange").is(":checked");
+                }
+            },
+            messages: {
+                digits: "You cannot have descriptors with decimal places if using mark range"
+            }
+        });
+    });
+
+    // Validate all rows of descriptors
+    $("[data-criterion-name]").each(function() {
+        $(this).rules("add", { descriptorsAreMonotonic: true });
+    });
+}
+
+function reValidate() {
+    $("[data-descriptor-value]").each(function() {
+        $(this).valid();
+    });
+    $("[data-criterion-name]").each(function() {
+        $(this).valid();
+    });
+}
 
 /**
  * These rules must be applied right before submit as to take into account things
@@ -132,7 +138,7 @@ var beforeAttemptingSubmit = function() {
         closeVisible = closeDate.is(':visible');
 
     // have to do this again since its not in validateOptions and the plugin clears+reapplys rules on submit
-    initDecimalDescsValidation();
+    initDynamicValidationTriggers();
 
     if (openVisible && closeVisible) {
 
