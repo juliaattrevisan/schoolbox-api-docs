@@ -44,7 +44,7 @@ class ThemedHtml extends Html
 
 
     /**
-     * @var array
+     * @var IDataGenerator[]
      */
     private $dataGenerators = [];
 
@@ -118,37 +118,39 @@ class ThemedHtml extends Html
                 $tour['url'] = '/tour/url/' . $encodedUrl;
             }
 
+            $data = [
+                'template'     => $template,
+                'data'         => $this->getData(),
+                'chrome'       => [
+                    'tab'   => $this->getTab(),
+                    'title' => $this->getTitle(),
+                ],
+                'ws'           => [
+                    'host'       => $_SERVER['HTTP_HOST'],
+                    // TODO don't shuck out of session
+                    'unread'     => $_SESSION['msg-count'],
+                    'stackLimit' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
+                ],
+                'previousUser' => $previousUser,
+
+                // TODO DI and inject this object
+                'topMenuData'  => (new MenuTopRenderer())->generateTwigData($user, $this->getTab()),
+
+                // TODO DI and inject this object
+                'sideMenuData' => (new MenuSideRenderer())->generateTwigData($user),
+
+                // TODO DI and inject the debug bar
+                'debugBar'     => $debugBar,
+
+                // TODO DI and inject all the tour requires
+                'tour'         => $tour,
+            ];
+            foreach ($this->dataGenerators as $key => $generator) {
+                $data[$key] = $generator->generate();
+            }
+
             // Render it all out
-            echo $this->templateEngine->render(
-                'include/chrome.twig',
-                [
-                    'template'     => $template,
-                    'data'         => $this->getData(),
-                    'chrome'       => [
-                        'tab'   => $this->getTab(),
-                        'title' => $this->getTitle(),
-                    ],
-                    'ws'           => [
-                        'host'       => $_SERVER['HTTP_HOST'],
-                        // TODO don't shuck out of session
-                        'unread'     => $_SESSION['msg-count'],
-                        'stackLimit' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
-                    ],
-                    'previousUser' => $previousUser,
-
-                    // TODO DI and inject this object
-                    'topMenuData'  => (new MenuTopRenderer())->generateTwigData($user, $this->getTab()),
-
-                    // TODO DI and inject this object
-                    'sideMenuData' => (new MenuSideRenderer())->generateTwigData($user),
-
-                    // TODO DI and inject the debug bar
-                    'debugBar'     => $debugBar,
-
-                    // TODO DI and inject all the tour requires
-                    'tour'         => $tour,
-                ]
-            );
+            echo $this->templateEngine->render('include/chrome.twig', $data);
         }
     }
 
