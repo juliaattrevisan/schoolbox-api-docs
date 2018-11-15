@@ -155,13 +155,13 @@
         var $e = $(this.element);
         var $t = $e.closest(this.options.submittable);
         
-        $t.attr('disabled', 'disabled');
+        $t.attr('readonly', 'readonly');
         $t.find('[data-mage-error]').slideUp(slideFast);
 
         if ($e.data('mage-reset') === undefined) {
             $e.data('mage-reset', $e.val());
         }
-        $e.val($e.data('mage-working')).attr('readonly', 'readonly');
+        $e.val($e.data('mage-working')).attr('disabled', 'disabled');
     };
 
     /**
@@ -175,11 +175,11 @@
         var $e = $(this.element);
         var $t = $e.closest(this.options.submittable);
 
-        $t.removeAttr('disabled');
+        $t.removeAttr('readonly');
 
         if ($e.data('mage-reset')) {
             // reset the submit button text and re-enable it
-            $e.val($e.data('mage-reset')).removeAttr('readonly');
+            $e.val($e.data('mage-reset')).removeAttr('disabled');
         }
 
         // unset the 'submitted' flag
@@ -208,7 +208,7 @@
         // also slide away this section's helptext
         $e.closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideSlow, function() {
             // disable all inputs in the closed section
-            $t.find(':input').attr('disabled', 'disabled');
+            $t.find(':input').attr('readonly', 'readonly');
         });
 
 
@@ -226,7 +226,7 @@
         var $t = $e.closest(this.options.submittable);
 
         // enable all inputs in the section (that we have not explicitly declared to be excluded)
-        $t.find(':input:not([data-mage-disabled])').removeAttr('disabled');
+        $t.find(':input:not([data-mage-disabled])').removeAttr('readonly');
 
         // slide out the main content wrapper
         var $content = $e.closest('[data-mage-collapsed]');
@@ -354,28 +354,35 @@
             return;
         }
 
+        // Everything after this point will only run if the form is valid: we shouldn't be trying to submit at all otherwise.
+
         if (typeof elem.data('mageSubmitted') != 'undefined') {
             // do not resubmit this section
             return;
         }
 
-        // This will only run if the form is valid: we shouldn't be trying to submit at all otherwise.
+        // Disable the form and set "loading" text
+        xhrBefore.call(self);
+
+        // Wait for async requests to approve submit (e.g. with a confirm dialog); goes straight through by default
         var promise = self.options.formWillSubmit.call();
-        promise.then(function() {
-            // Submit the form
+        promise.then(
+            function() {
+                // Submit the form if Promise is resolved
 
-            // HTML5 FTW
-            var method = elem.attr('formmethod') || (form.length ? form.attr('method') : 'post'),
-                action = elem.attr('formaction') || (form.length ? form.attr('action') : window.location.pathname),
-                target = elem.closest(self.options.submittable);
+                // HTML5 FTW
+                var method = elem.attr('formmethod') || (form.length ? form.attr('method') : 'post'),
+                    action = elem.attr('formaction') || (form.length ? form.attr('action') : window.location.pathname),
+                    target = elem.closest(self.options.submittable);
 
-            // Disable the form and set "loading" text
-            // TODO this needs to happen BEFORE the promise is returned, but I can't make it work, help??
-            xhrBefore.call(self);
-
-            // send it off
-            xhrSend.call(self, method, action, target);
-        });
+                // send it off
+                xhrSend.call(self, method, action, target);
+            },
+            function() {
+                // Re-enable form and remove "loading" text if Promise is rejected
+                xhrAfter.call(self);
+            }
+        );
     }
 
     /**
@@ -485,7 +492,7 @@
      */
     function cloneTarget(target)
     {
-        var hauser = target.clone().removeAttr('disabled');
+        var hauser = target.clone().removeAttr('readonly');
 
         hauser.find('select').each(function () {
 
@@ -528,6 +535,10 @@
         this.disableSection();
     }
 
+    function xhrAfter() {
+        this.enableSection();
+    }
+
 
     /**
      * Expects to be applied to the Mage object (but is not a prototype method so as to keep it private).
@@ -553,7 +564,7 @@
          * locked/unlocked state - but previously, instantiation was into a disabled
          * fieldset, so you have to manually re-enable them which is terrible
          */
-        $('[data-mage="' + this.nextPart +  '"]').removeAttr('disabled');
+        $('[data-mage="' + this.nextPart +  '"]').removeAttr('readonly');
 
         // call the callback (this would include any specific manipulation for the section being targeted)
         onXhrDone.call(this.element, data);
