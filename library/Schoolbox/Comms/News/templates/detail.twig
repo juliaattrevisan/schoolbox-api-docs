@@ -199,7 +199,7 @@ Data:
              # anything before awaiting moderation doesn't need a reject/unpublish button
              #}
             {% if rejectRoute and article.isApproved %}
-                <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
+                <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}{{ returnUrlQueryString }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
             {% endif %}
 
             {#{% if statisticsRoute %}#}
