@@ -40,16 +40,16 @@ abstract class ConfigController extends Base
     /**
      * Returns data suitable for injecting into standard config twig template
      *
-     * @param Predicate\Builder $pb
-     * @param string            $route
+     * @param Predicate\Builder $pb        A PB for finding the config for this module
+     * @param string            $postRoute Where should the config be posted to
      * @return array
      */
-    protected function buildConfigContext(Predicate\Builder $pb, string $route): array
+    protected function buildConfigContext(Predicate\Builder $pb, string $postRoute): array
     {
         return (new ModuleConfig($this->fieldStrategyFactory))->getContext(
             $this->getConfigLoader()->get('site_version'),
             $this->configMapper->findByPredicates($pb, ['order' => [ConfigMapper::COL_ID => 'ASC']]),
-            $route
+            $postRoute
         );
     }
 
@@ -69,7 +69,7 @@ abstract class ConfigController extends Base
         $existingConfigs = $this->configMapper->findByPredicates($pb)->indexBy(ConfigMapper::COL_NAME);
 
         foreach ($post as $name => $value) {
-            if(!\array_key_exists($name, $existingConfigs)){
+            if(!$existingConfigs->keyExists($name)){
                 // Ignore posted config not for this module
                 continue;
             }
