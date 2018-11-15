@@ -12,7 +12,7 @@ use Alaress\Session\Session;
 use Schoolbox\IConfigLoader;
 
 /**
- * Class Websocket
+ * Generate data for rendering the websocket (instant messaging) system.
  */
 class Websocket implements IDataGenerator
 {

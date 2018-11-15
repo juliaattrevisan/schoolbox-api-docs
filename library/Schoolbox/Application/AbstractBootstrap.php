@@ -19,6 +19,7 @@ use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
+use Aura\Router\Router;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
 use Alaress\Session\Factory;
@@ -475,13 +476,21 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $di->setters[Output\ThemedHtml::class]['setSitepage'] = $di->lazyGet('layoutEngine');
         $di->set('webOutput:base', $di->lazyNew(Output\Base::class));
         $di->set('webOutput:html', $di->lazy(function() use ($di) {
-            $output = new Output\ThemedHtml();
-            $output->setTemplateEngine($di->get('templateEngine'));
-            $output->setSitepage($di->get('layoutEngine'));
-            $output->addDataGenerator(
-                'ws',
-                new Output\DataGenerator\Websocket($di->get('config'), $di->get('session'), $_SERVER)
-            );
+            /** @var IConfigLoader $config */
+            /** @var Session $session */
+            /** @var Router $router */
+            $config  = $di->get('config');
+            $session = $di->get('session');
+            $router  = $di->get('router');
+            $output  = new Output\ThemedHtml();
+            $output
+                ->setTemplateEngine($di->get('templateEngine'))
+                ->setSitepage($di->get('layoutEngine'))
+                ->addDataGenerator('ws', new Output\DataGenerator\Websocket($config, $session, $_SERVER))
+                ->addDataGenerator(
+                    'tour',
+                    new Output\DataGenerator\Tour($config, $session->getAuthUser(), $router, $_SERVER)
+                );
             return $output;
         }));
         $di->set('webOutput:nochrome', $di->lazyNew(Output\Html::class));

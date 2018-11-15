@@ -111,13 +111,6 @@ class ThemedHtml extends Html
                 }
             }
 
-            $tour = [];
-            if ($user && !$impersonated && ConfigMapper::getInstance()->get('tours_enabled')) {
-                $request     = parse_url($_SERVER['REQUEST_URI']);
-                $encodedUrl  = Redirect::encode($request['path']);
-                $tour['url'] = '/tour/url/' . $encodedUrl;
-            }
-
             $data = [
                 'template'     => $template,
                 'data'         => $this->getData(),
@@ -135,9 +128,6 @@ class ThemedHtml extends Html
 
                 // TODO DI and inject the debug bar
                 'debugBar'     => $debugBar,
-
-                // TODO DI and inject all the tour requires
-                'tour'         => $tour,
             ];
             foreach ($this->dataGenerators as $key => $generator) {
                 $data[$key] = $generator->generate();
