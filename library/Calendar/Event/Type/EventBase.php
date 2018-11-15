@@ -629,6 +629,9 @@ abstract class EventBase implements EventInterface
     /**
      * Returns the available Render Classes for this event
      *
+     * These are PHP class names, each representing a different output format, eg VCal, HTML, etc that are able
+     * to process events of this type.
+     *
      * @return string[]
      */
     abstract protected function getRenderClasses(): array;
