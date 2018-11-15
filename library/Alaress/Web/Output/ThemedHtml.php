@@ -2,9 +2,6 @@
 /**
  * Output handling class that renders a Twig template and data into a theme.
  *
- * Currently, theming is handled by the good old Sitepage object, but this could
- * change.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -93,20 +90,20 @@ class ThemedHtml extends Html
             if ($user && !$impersonated && ConfigMapper::getInstance()->get('tours_enabled')) {
                 $request     = parse_url($_SERVER['REQUEST_URI']);
                 $encodedUrl  = Redirect::encode($request['path']);
-                $tour['url'] = '/tour/url/'.$encodedUrl;
+                $tour['url'] = '/tour/url/' . $encodedUrl;
             }
 
             // Render it all out
             echo $this->templateEngine->render(
                 'include/chrome.twig',
                 [
-                    'template' => $template,
-                    'data'     => $this->getData(),
-                    'chrome'   => [
+                    'template'     => $template,
+                    'data'         => $this->getData(),
+                    'chrome'       => [
                         'tab'   => $this->getTab(),
                         'title' => $this->getTitle(),
                     ],
-                    'ws'       => [
+                    'ws'           => [
                         'host'       => $_SERVER['HTTP_HOST'],
                         // TODO don't shuck out of session
                         'unread'     => $_SESSION['msg-count'],
@@ -127,17 +124,6 @@ class ThemedHtml extends Html
                     'tour'         => $tour,
                 ]
             );
-
-//            $tab = $this->getTab();
-//            if ($tab) {
-//                $page->setTab($tab);
-//            }
-//            $page->setFile(TEMPLATE_content, 'output.html');
-//            $page->buildPage();
-//            $page->setVar('OUTPUT', $this->getTemplateEngine()->render($template, $data));
-//
-//            $page->setTitle($this->getTitle());
-//            $page->outputPage(true);
         }
     }
 
@@ -145,7 +131,8 @@ class ThemedHtml extends Html
      * @param  \SitePage $sitepage
      * @return $this
      */
-    public function setSitepage($sitepage) {
+    public function setSitepage($sitepage)
+    {
         $this->sitepage = $sitepage;
         return $this;
     }
@@ -153,7 +140,8 @@ class ThemedHtml extends Html
     /**
      * @return \SitePage
      */
-    public function getSitepage() {
+    public function getSitepage()
+    {
         return $this->sitepage;
     }
 
@@ -162,9 +150,7 @@ class ThemedHtml extends Html
      */
     protected function getTab()
     {
-        return isset($this->tab)
-            ? $this->tab
-            : $this->retrieveFieldFromResponse('tab');
+        return $this->tab ?? $this->retrieveFieldFromResponse('tab');
     }
 
     /**
@@ -182,9 +168,7 @@ class ThemedHtml extends Html
      */
     protected function getTitle()
     {
-        return isset($this->title)
-            ? $this->title
-            : $this->retrieveFieldFromResponse('title');
+        return $this->title ?? $this->retrieveFieldFromResponse('title');
     }
 
     /**
