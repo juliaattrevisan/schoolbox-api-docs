@@ -12,7 +12,6 @@ namespace Calendar\Event\Collection;
 use Sabre\VObject\Component\VCalendar;
 use Alaress\Html\ToText as Html2Text;
 use Schoolbox\User;
-use SitePage;
 use Config;
 
 class VCalExporter extends Renderer {
