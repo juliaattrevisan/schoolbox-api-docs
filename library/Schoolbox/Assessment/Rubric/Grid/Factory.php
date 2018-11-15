@@ -74,7 +74,8 @@ class Factory
 
         // cache capabilities
         /** @var Capability[] $capabilityCache */
-        $capabilityCache = [];
+        $capabilityCache     = [];
+        $newCapabilityUsages = $grid->getCapabilityUsages()->emptyClone();
         foreach ($capabilities as $capability) {
             // This capability must exist and be in use in order for it to be saved
             $capabilityId   = (int)$capability['id'];
@@ -110,9 +111,10 @@ class Factory
             }
 
             $capabilityUsage = (new CapabilityUsage($capability))->setMaxValue($capabilityMaxValue);
-            $capabilityCache[$capabilityId]             = $capability;
-            $grid->getCapabilityUsages()[$capabilityId] = $capabilityUsage;
+            $capabilityCache[$capabilityId]     = $capability;
+            $newCapabilityUsages[$capabilityId] = $capabilityUsage;
         }
+        $grid->setCapabilityUsages($newCapabilityUsages);
 
 
         // Cache indicators
