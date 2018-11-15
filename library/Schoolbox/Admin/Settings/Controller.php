@@ -32,8 +32,8 @@ class Controller extends ConfigController
      */
     public function getSettings(string $typeLabel = null): void
     {
-        $typeLabel  = $typeLabel ? \urldecode($typeLabel) : 'Site';
-        $typeLabels = \array_column(Cfg::getTypeList() ?: [], 'type');
+        $typeLabel  = $typeLabel ? urldecode($typeLabel) : 'Site';
+        $typeLabels = array_column(Cfg::getTypeList() ?: [], 'type');
 
         if (!\in_array($typeLabel, $typeLabels, true)) {
             throw Mapper::getInstance()->generateException(Mapper::ERROR_PAGE_NOT_FOUND);
@@ -48,7 +48,7 @@ class Controller extends ConfigController
         foreach ($typeLabels as $label) {
             $settingsTabs[] = [
                 'label'    => $label,
-                'route'    => \urldecode($this->getRouter()->generate('settings.getSettings', ['typeLabel' => \str_replace(' ', '+', $label)])),
+                'route'    => urldecode($this->getRouter()->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $label)])),
                 'isActive' => $typeLabel === $label,
             ];
         }
@@ -80,7 +80,7 @@ class Controller extends ConfigController
     {
         $postedValues = $this->request->post->get();
 
-        /** @var GenericCollection|config[] $existingConfigs */
+        /** @var GenericCollection|Config[] $existingConfigs */
         $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate($typeLabel))->indexBy(ConfigMapper::COL_NAME);
 
         // Messaging behavior may be affected by changing configuration.
