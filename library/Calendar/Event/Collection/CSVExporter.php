@@ -9,9 +9,6 @@
 
 namespace Calendar\Event\Collection;
 
-use Html2Text\Html2Text;
-use Sabre\VObject\Component\VCalendar;
-
 class CSVExporter extends Renderer {
 
     var $csvFormat = array( 'start_date',
@@ -28,16 +25,6 @@ class CSVExporter extends Renderer {
                            );
 
     /**
-     * @var VCalendar $vCalendar
-     */
-    protected $vCalendar;
-
-    /**
-     * @var Html2Text
-     */
-    protected $textConverter;
-
-    /**
      * This will stream the vcal output as it parses over the event collection
      */
     public function renderAll($type = null) {
@@ -48,39 +35,4 @@ class CSVExporter extends Renderer {
             echo $this->renderEvent($currentEvent, 'csv');
 		}
 	}
-
-    /**
-     * @param VCalendar $vCalendar
-     */
-    public function setVCalendar($vCalendar)
-    {
-        $this->vCalendar = $vCalendar;
-    }
-
-    /**
-     * @return VCalendar
-     */
-    public function getVCalendar()
-    {
-        return $this->vCalendar;
-    }
-
-    /**
-     * @param Html2Text $textConverter
-     */
-    public function setTextConverter($textConverter)
-    {
-        $this->textConverter = $textConverter;
-    }
-
-    /**
-     * @return Html2Text
-     */
-    public function getTextConverter()
-    {
-        return $this->textConverter;
-    }
-
-
-
 }
