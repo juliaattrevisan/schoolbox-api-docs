@@ -297,11 +297,11 @@
                     // launch the notifier
                     $('#msgs').notifier({
                         host:     '{{ ws.host }}',
-                        port:     '{{ ws.port }}',
+                        port:     Number('{{ ws.port }}'),
                         path:     '{{ ws.path }}',
-                        secure:   true,
-                        unread:   '{{ ws.unread }}',
-                        maxstack: '{{ ws.stackLimit }}'
+                        secure:   Boolean('{{ ws.secure }}'),
+                        unread:   Number('{{ ws.unread }}'),
+                        maxstack: Number('{{ ws.stackLimit }}')
                     });
 
                     $('#alert-dialog').on('click', 'a.action', function (e) {

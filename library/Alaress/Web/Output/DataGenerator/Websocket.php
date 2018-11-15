@@ -59,6 +59,7 @@ class Websocket implements IDataGenerator
             'host'       => $this->serverVars['HTTP_HOST'] ?? '',
             'port'       => $this->config->get('websocket_port_ssl') ?: 8081,
             'path'       => $this->config->get('websocket_path') ?: '/',
+            'secure'     => true,
             'unread'     => $this->session->get('msg-count'),
             'stackLimit' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
         ];
