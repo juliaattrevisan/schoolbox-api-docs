@@ -49,6 +49,7 @@ class Result extends Base
                   `heading` LIKE ?
                 )
             ORDER BY {$sanitiser->getSortByWithAlias('t')} {$sanitiser->getSortDir()}
+            LIMIT 0,{$sanitiser->getMaxLimit()}
         ";
 
         $quotedLike = $mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword());
@@ -95,6 +96,7 @@ class Result extends Base
                   MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) OR
                   `heading` LIKE ?
                 )
+            LIMIT 0,{$sanitiser->getMaxLimit()}
         ";
 
         $quotedLike = $mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword());

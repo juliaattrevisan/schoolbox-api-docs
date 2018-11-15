@@ -53,6 +53,7 @@ class Result extends Base
                 AND f.hidden IS FALSE
                 AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
             ORDER BY {$sanitiser->getSortByWithAlias('f')} {$sanitiser->getSortDir()}
+            LIMIT 0,{$sanitiser->getMaxLimit()}
         ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
@@ -104,6 +105,7 @@ class Result extends Base
                 f.deleted_at IS NULL
                 AND f.hidden IS FALSE
                 AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
+            LIMIT 0, {$sanitiser->getMaxLimit()}
         ";
 
         $stmt = $mapper->getDatabase()->prepare($query);

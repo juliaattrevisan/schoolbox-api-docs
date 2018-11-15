@@ -61,6 +61,7 @@ class Result extends Base
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
             AND   `c`.`deleted_at` IS NULL
             ORDER BY {$sanitiser->getSortByWithAlias('c')} {$sanitiser->getSortDir()}
+            LIMIT 0,{$sanitiser->getMaxLimit()}
         ";
 
         $statement = $mapper->getDatabase()->prepare($query);
@@ -132,6 +133,7 @@ class Result extends Base
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
             AND   `c`.`deleted_at` IS NULL
+            LIMIT 0,{$sanitiser->getMaxLimit()}
         ";
 
         $stmt = $mapper->getDatabase()->prepare($query);

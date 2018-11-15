@@ -52,11 +52,17 @@ class Sanitiser
     private $offset = 0;
 
     /**
-     * Limit
+     * Page Limit
      *
      * @var int
      */
     private $limit = 0;
+
+    /**
+     * Max results limit
+     * @var int
+     */
+    private $maxLimit = 1000;
 
     /**
      * Keyword
@@ -146,6 +152,24 @@ class Sanitiser
     {
         return $this->limit;
     }
+
+    /**
+     * @return int
+     */
+    public function getMaxLimit(): int
+    {
+        return $this->maxLimit;
+    }
+
+    /**
+     * @param int $maxLimit
+     */
+    public function setMaxLimit($maxLimit): void
+    {
+        $this->maxLimit = $maxLimit;
+    }
+
+
 
     /**
      * Set offset

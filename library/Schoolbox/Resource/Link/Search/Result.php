@@ -49,6 +49,7 @@ class Result extends Base
                 l.deleted_at IS NULL
                 AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
             ORDER BY {$sanitiser->getSortByWithAlias('l')} {$sanitiser->getSortDir()}
+            LIMIT 0,{$sanitiser->getMaxLimit()}
         ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
@@ -92,6 +93,7 @@ class Result extends Base
             WHERE
                 l.deleted_at IS NULL
                 AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
+            LIMIT 0,{$sanitiser->getMaxLimit()}
         ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
