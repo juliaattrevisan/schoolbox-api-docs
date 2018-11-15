@@ -19,12 +19,12 @@ class VCalExporter extends Renderer {
     /**
      * @var VCalendar
      */
-    var $vCalendar;
+    private $vCalendar;
 
     /**
      * @var Html2Text
      */
-    protected $textConverter;
+    private $textConverter;
 
     /**
      * Constructor
@@ -40,12 +40,12 @@ class VCalExporter extends Renderer {
     {
         parent::__construct($api, $startTimestamp, $endTimestamp, $user, $page, $viewer);
 
-		$this->setVCalendar(new VCalendar());
-		$this->getVCalendar()->add('method', 'PUBLISH');
-        $this->getVCalendar()->add('X-WR-CALNAME', Config::get('title').' Calendar');
-        $this->getVCalendar()->add('X-WR-CALDESC', 'Calendar for '.Config::get('school_name'));
+		$this->vCalendar = new VCalendar();
+		$this->vCalendar->add('method', 'PUBLISH');
+        $this->vCalendar->add('X-WR-CALNAME', Config::get('title').' Calendar');
+        $this->vCalendar->add('X-WR-CALDESC', 'Calendar for '.Config::get('school_name'));
 
-        $this->setTextConverter(new Html2Text());
+        $this->textConverter = new Html2Text();
 	}
 
     /**
@@ -53,7 +53,7 @@ class VCalExporter extends Renderer {
      */
     public function renderAll($type = null) {
 		// Output base calendar, and output its start and end separately
-		echo trim(str_replace('END:VCALENDAR', '', $this->getVCalendar()->serialize()))."\r\n";
+		echo trim(str_replace('END:VCALENDAR', '', $this->vCalendar->serialize()))."\r\n";
 
 		foreach ($this->getAllEvents() as $currentEvent) {
             echo $this->renderEvent($currentEvent, 'vcal');
@@ -80,43 +80,8 @@ class VCalExporter extends Renderer {
             $this->getCalendarHandler(),
             $this->getViewer()
         );
-        $renderObj->setVCalendar($this->getVCalendar());
-        $renderObj->setTextConverter($this->getTextConverter());
+        $renderObj->setVCalendar($this->vCalendar);
+        $renderObj->setTextConverter($this->textConverter);
         return $renderObj->render();
     }
-
-    /**
-     * @param \Sabre\VObject\Component\VCalendar $vCalendar
-     */
-    public function setVCalendar($vCalendar)
-    {
-        $this->vCalendar = $vCalendar;
-    }
-
-    /**
-     * @return \Sabre\VObject\Component\VCalendar
-     */
-    public function getVCalendar()
-    {
-        return $this->vCalendar;
-    }
-
-    /**
-     * @param \Html2Text\Html2Text $textConverter
-     */
-    public function setTextConverter($textConverter)
-    {
-        $this->textConverter = $textConverter;
-    }
-
-    /**
-     * @return \Html2Text\Html2Text
-     */
-    public function getTextConverter()
-    {
-        return $this->textConverter;
-    }
-
-
-
 }
