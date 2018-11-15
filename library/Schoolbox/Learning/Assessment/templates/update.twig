@@ -63,7 +63,7 @@
                     if (response['compatible'] === false && numberAffected > 0) {
                         var dialogHtml = '<p>You have made changes to this rubric, but ' + numberAffected;
 
-                        if (numberAffected == 1) {
+                        if (numberAffected !== 1) {
                             dialogHtml += ' students have already been marked:</p>';
                         } else {
                             dialogHtml += ' student has already been marked:</p>';
