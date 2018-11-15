@@ -11,7 +11,7 @@ namespace Calendar\Event\Type\External\Renderer;
 
 class Javascript extends Base
 {
-    public function render()
+    public function render(): string
     {
         /* Event attendance
          */

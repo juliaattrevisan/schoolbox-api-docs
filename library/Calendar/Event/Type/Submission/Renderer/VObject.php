@@ -29,7 +29,7 @@ class VObject extends Base
      *
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         // Output event times as UTC,
         // no client should be able to mess that up.

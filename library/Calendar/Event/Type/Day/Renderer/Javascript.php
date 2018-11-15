@@ -14,7 +14,7 @@ class Javascript extends Base
     /**
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         /* Future events are visible to superusers, event owners, group members with write access
          */

@@ -70,13 +70,6 @@ abstract class RendererBase implements RendererInterface
         $this->setCalendarHandler($calHandler);
     }
 
-    /**
-     * Returns the output from the render action for this event
-     *
-     * @return string
-     */
-    abstract public function render();
-
 
     /**
      * Return templating engine

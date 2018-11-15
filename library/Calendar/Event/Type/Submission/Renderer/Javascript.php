@@ -27,7 +27,7 @@ class Javascript extends Base
      *
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         $event = $this->deriveCore();
         $event['data'] = [

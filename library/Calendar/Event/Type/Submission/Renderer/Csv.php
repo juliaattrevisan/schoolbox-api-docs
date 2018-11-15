@@ -14,7 +14,7 @@ class Csv extends Base{
     /**
      * Render this event out as CSV data
      */
-    public function render()
+    public function render(): string
     {
         $fd = fopen('php://temp/maxmemory:10000', 'rw');
 

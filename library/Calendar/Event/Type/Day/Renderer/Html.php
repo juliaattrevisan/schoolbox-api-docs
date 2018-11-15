@@ -16,7 +16,7 @@ class Html extends Base {
      * Render this event as html using twig
      * @return string
      */
-    public function render()
+    public function render(): string
     {
 
         $returnUrl = $_SERVER["REQUEST_URI"];

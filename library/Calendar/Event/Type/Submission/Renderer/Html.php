@@ -12,7 +12,7 @@ namespace Calendar\Event\Type\Submission\Renderer;
 class Html extends Base {
 
 
-    public function render()
+    public function render(): string
     {
         return $this->getTemplate()->render('calendar/type/submission.twig',
             array(  'event' => $this->getEvent(),

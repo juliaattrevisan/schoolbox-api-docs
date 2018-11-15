@@ -22,7 +22,7 @@ class Javascript extends Base
      * Renders an event
      *
      */
-    public function render()
+    public function render(): string
     {
         // Resource bookings are never all day events.
         $start = $this->getEvent()->getStartTime()->getDatabase();

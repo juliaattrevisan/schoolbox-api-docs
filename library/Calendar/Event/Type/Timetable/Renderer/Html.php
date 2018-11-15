@@ -16,7 +16,7 @@ class Html extends Base {
      * Render this event as html using twig
      *
      */
-    public function render()
+    public function render(): string
     {
         return $this->getTemplate()->render('calendar/type/timetable.twig',
             array(  'event' => $this->getEvent(),

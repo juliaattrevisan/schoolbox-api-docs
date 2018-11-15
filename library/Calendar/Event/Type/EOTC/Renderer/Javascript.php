@@ -20,7 +20,7 @@ class Javascript extends Base
      *
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         /* Events not in Approved state appear translucent
          */
