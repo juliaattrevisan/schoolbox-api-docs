@@ -35,16 +35,90 @@
         });
 
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
-        // $('input[data-mage-next]').mage({
-        //     initValidation: initDecimalDescsValidation,
-        //     validateOptions: validateOptions,
-        //     beforeSubmit: beforeSubmit,
-        //     onXhrDone: function (data) {
-        //         if('string' == typeof data.returnUrl){
-        //             window.location.href = data.returnUrl;
-        //         }
-        //     }
-        // });
+        $('input[data-mage-next]').mage({
+            initValidation: initDecimalDescsValidation,
+            validateOptions: validateOptions,
+            beforeAttemptingSubmit: beforeAttemptingSubmit,
+            formWillSubmit: formWillSubmit,
+            onXhrDone: function (data) {
+                if('string' == typeof data.returnUrl){
+                    window.location.href = data.returnUrl;
+                }
+            }
+        });
+
+        /**
+         * Promise to submit the form (or not), based on user's response to the mark invalidation confirmation dialog.
+         * Only exists on the update page because a new (not yet created) due work will never have existing rubric marks.
+         */
+        function formWillSubmit() {
+            var formData = this;
+            return new Promise(function(resolve, reject) {
+
+                // Test whether marks need to be invalidated
+                $.post('/rubric/determineMarkInvalidation', formData).done(function(response) {
+                    // Show dialog only if invalidation is required
+                    var numberAffected = Object.keys(response['affectedUsers']).length;
+
+                    if (response['compatible'] === false && numberAffected > 0) {
+                        var dialogHtml = '<p>You have made changes to this rubric, but ' + numberAffected;
+
+                        if (numberAffected !== 1) {
+                            dialogHtml += ' students have already been marked:</p>';
+                        } else {
+                            dialogHtml += ' student has already been marked:</p>';
+                        }
+
+                        dialogHtml += '<ul class="information-list scrollable-list">';
+
+                        var affectedUsers = response['affectedUsers'];
+
+                        $(Object.keys(response['affectedUsers'])).each(function(index, userId) {
+                            var noInstructorFeedback = affectedUsers[userId]['selfAssess'] && !affectedUsers[userId]['instructorGiven'];
+
+                            var userExternalId = affectedUsers[userId]['user']['externalId'];
+                            var userName = affectedUsers[userId]['user']['firstname'] + ' ' + affectedUsers[userId]['user']['lastname'];
+                            dialogHtml += '<li>' +
+                                '      <div class="row">' +
+                                '          <div class="small-12 list-item compact card">' +
+                                '              <img src="/portrait.php?userId=' + userExternalId + '&amp;size=square64">' +
+                                '              <p>' + userName;
+
+                            if (noInstructorFeedback) {
+                                dialogHtml += '<span class="meta inline"> (self-reflection)<span>';
+                            }
+
+                            dialogHtml += '</p></div></div></li>';
+                        });
+
+                        dialogHtml += '</ul>' +
+                            '<br/>' +
+                            '<p>If you choose to save changes, these rubric marks will be deleted.</p>' +
+                            '<p>Are you sure you want to continue?</p>';
+
+                        $(this).confirmDialog({
+                            header: 'Confirm mark deletion',
+                            text: dialogHtml,
+                            confirmLabel: 'Yes',
+                            cancelLabel: 'No',
+                            format: 'html',
+                            confirmEvent: function() {
+                                // Yes, invalidate rubric marks - I promise to submit the form!
+                                resolve();
+                            },
+                            cancelEvent: function() {
+                                // No, cancel - prevent form submit
+                                reject();
+                            }
+                        });
+                    } else {
+                        // No confirmation dialog required - I promise to submit the form!
+                        resolve();
+                    }
+                });
+
+            });
+        }
 
         $('[data-delete]').click(function(event) {
             event.preventDefault();
@@ -61,74 +135,7 @@
             });
         });
 
-        $("[data-mage-submitrow] input[type='submit']").click(function(e) {
-            e.preventDefault();
-            // TODO add "loading" state to button, since XHR request may take some time
-            
-            $.post("{{ routeLookup('rubric.determineMarkInvalidation') }}", $("form#assessmentForm").serializeArray())
-                .done(function(response) {
-                    console.log("You clicked the submit button");
 
-                    if (response['compatible'] === false) {
-                        console.log("Rubric is incompatible - asking for confirmation");
-
-                        var numberAffected = Object.keys(response['affectedUsers']).length;
-                        var dialogHtml = '<p>You have made changes to this rubric, but ' + numberAffected;
-
-                        if (numberAffected > 1) {
-                            dialogHtml += ' students have already been marked:</p>';
-                        } else {
-                            dialogHtml += ' student has already been marked:</p>';
-                        }
-
-                        dialogHtml += '<ul class="information-list scrollable-list">';
-
-                        var affectedUsers = response['affectedUsers'];
-
-                        $(Object.keys(response['affectedUsers'])).each(function(index, userId) {
-                            var noInstructorFeedback = affectedUsers[userId]['selfAssess'] && !affectedUsers[userId]['instructorGiven'];
-
-                            var userExternalId = affectedUsers[userId]['user']['externalId'];
-                            var userName = affectedUsers[userId]['user']['firstname'] + ' ' + affectedUsers[userId]['user']['lastname'];
-                            dialogHtml += '<li>' +
-                                        '      <div class="row">' +
-                                        '          <div class="small-12 list-item compact card">' +
-                                        '              <img src="/portrait.php?userId=' + userExternalId + '&amp;size=square64">' +
-                                        '              <p>' + userName;
-
-                            if (noInstructorFeedback) {
-                                dialogHtml += '<span class="meta inline"> (self-reflection)<span>';
-                            }
-
-                            dialogHtml += '</p></div></div></li>';
-                        });
-
-                        dialogHtml += '</ul>' +
-                        '<br/>' +
-                        '<p>If you choose to save changes, these rubric marks will be deleted.</p>' +
-                        '<p>Are you sure you want to continue?</p>';
-
-                        $(this).confirmDialog({
-                            header: 'Confirm mark deletion',
-                            text: dialogHtml,
-                            confirmLabel: 'Yes',
-                            cancelLabel: 'No',
-                            format: 'html',
-                            confirmEvent: function() {
-                                console.log("Confirming save");
-                            },
-                            cancelEvent: function() {
-                                console.log("Cancelling save");
-                            }
-                        });
-                    } else {
-                        console.log("Rubric is compatible, doing nothing");
-                    }
-
-                });
-
-
-        });
     });
 </script>
 {% endautoescape %}

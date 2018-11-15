@@ -16,7 +16,14 @@
         submittable: 'fieldset',
         currentStopClass: 'current-stop',
         reenablePrevious: false,
-        beforeSubmit: $.noop,
+        beforeAttemptingSubmit: $.noop,
+        formWillSubmit: function(formData) {
+            // Accepts serialized form data as an arg, accessible as 'this' inside the function
+            return new Promise(function(resolve, reject) {
+                // Plugin instances can override this if they want to prevent submission until something async has happened.
+                resolve();
+            });
+        },
         onXhrDone: $.noop,
         onXhrFail: $.noop,
         onXhrAlways: $.noop,
@@ -154,7 +161,7 @@
         if ($e.data('mage-reset') === undefined) {
             $e.data('mage-reset', $e.val());
         }
-        $e.val($e.data('mage-working')).attr('readonly', 'readonly');
+        $e.val($e.data('mage-working')).attr('disabled', 'disabled');
     };
 
     /**
@@ -172,7 +179,7 @@
 
         if ($e.data('mage-reset')) {
             // reset the submit button text and re-enable it
-            $e.val($e.data('mage-reset')).removeAttr('readonly');
+            $e.val($e.data('mage-reset')).removeAttr('disabled');
         }
 
         // unset the 'submitted' flag
@@ -323,8 +330,8 @@
             form.alaressValidate(self.options.validateOptions);
         }
 
-        // call beforeSubmit
-        self.options.beforeSubmit.call();
+        // call beforeAttemptingSubmit
+        self.options.beforeAttemptingSubmit.call();
 
         copyCkEditorValues.call(self, elem);
 
@@ -340,7 +347,6 @@
          * If the form has neither - it will pass through without any validation
          */
         if (form.valid() == false) {
-
             // focus user to first invalid field
             $(form).find(':input.error').first().focus();
 
@@ -348,21 +354,38 @@
             return;
         }
 
+        // Everything after this point will only run if the form is valid: we shouldn't be trying to submit at all otherwise.
+
         if (typeof elem.data('mageSubmitted') != 'undefined') {
             // do not resubmit this section
             return;
         }
 
-        // HTML5 FTW
-        var method = elem.attr('formmethod') || (form.length ? form.attr('method') : 'post'),
-            action = elem.attr('formaction') || (form.length ? form.attr('action') : window.location.pathname),
-            target = elem.closest(self.options.submittable);
+        // Get the form data to POST before disabling the form, as it won't be POSTed otherwise
+        var formData = $(form).serializeArray();
 
-        // do the prep-work
+        // Disable the form and set "loading" text
         xhrBefore.call(self);
 
-        // send it off
-        xhrSend.call(self, method, action, target);
+        // Wait for async requests to approve submit (e.g. with a confirm dialog); goes straight through by default
+        var promise = self.options.formWillSubmit.call(formData);
+        promise.then(
+            function() {
+                // Submit the form if Promise is resolved
+
+                // HTML5 FTW
+                var method = elem.attr('formmethod') || (form.length ? form.attr('method') : 'post'),
+                    action = elem.attr('formaction') || (form.length ? form.attr('action') : window.location.pathname),
+                    target = elem.closest(self.options.submittable);
+
+                // send it off
+                xhrSend.call(self, method, action, target);
+            },
+            function() {
+                // Re-enable form and remove "loading" text if Promise is rejected
+                xhrAfter.call(self);
+            }
+        );
     }
 
     /**
@@ -513,6 +536,10 @@
      */
     function xhrBefore() {
         this.disableSection();
+    }
+
+    function xhrAfter() {
+        this.enableSection();
     }
 
 

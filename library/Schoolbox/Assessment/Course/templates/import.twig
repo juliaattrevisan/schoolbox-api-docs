@@ -92,7 +92,7 @@ Usages:
                 validateOptions: {
                     ignore: ':disabled'
                 },
-                beforeSubmit: function() {
+                beforeAttemptingSubmit: function() {
                     // make sure at least one unit is selected
                     $('input[data-checkbox-group="unit"]').rules('add', {
                         oneCheckbox: 'unit'
@@ -138,7 +138,7 @@ Usages:
             var $magePart3 = $('input[data-mage-next="none"]');
             $magePart3.mage({
                 validateOptions: {},
-                beforeSubmit: function() {
+                beforeAttemptingSubmit: function() {
                     // check every visible publish date field
                     $('input[data-role="publish_date"]:visible:enabled').each(function() {
                         $(this).rules('add', {
