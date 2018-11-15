@@ -11,8 +11,6 @@ namespace Calendar\Event\Collection;
 
 use Html2Text\Html2Text;
 use Sabre\VObject\Component\VCalendar;
-use Schoolbox\User;
-
 
 class CSVExporter extends Renderer {
 
