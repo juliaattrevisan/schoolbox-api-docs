@@ -227,7 +227,9 @@ var beforeAttemptingSubmit = function() {
 
     }
 
-    // Max mark validation: only when the field is visible
+    // Validate Total Available Marks on form submit if field is visible (only visible if using Total Mark type)
+    // NOTE: not to be confused with capability max!
+    // This is the total marks for the ENTIRE due work, which gets summed from cap maxes
     if (maxMark.is(':visible')) {
 
         // The message is a little different when rubrics are in use,
