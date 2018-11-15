@@ -9,12 +9,11 @@
 
 namespace Calendar\Event\Type\ResourceBooking;
 
-use Calendar\Event\Type\EventInterface;
 use Schoolbox\ResourceBooking\Booking\Model;
 use Calendar\Event\Type\Day\Event as DayEvent;
 
-class Event extends DayEvent implements EventInterface {
-
+class Event extends DayEvent
+{
     /**
      * Renderer classes
      */

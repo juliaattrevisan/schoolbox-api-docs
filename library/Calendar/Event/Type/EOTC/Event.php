@@ -17,7 +17,8 @@ use Schoolbox\Collection;
 use Schoolbox\User;
 
 
-class Event extends Day\Event implements EventInterface {
+class Event extends Day\Event
+{
 
     /**
      * Renderer classes

@@ -14,10 +14,9 @@
 namespace Calendar\Event\Type\Timetable;
 
 use Calendar\Event\Type\Day\Event as DayEvent;
-use Calendar\Event\Type\EventInterface;
 
-
-class Event extends DayEvent implements EventInterface {
+class Event extends DayEvent
+{
 
     /**
      * Renderer classes
