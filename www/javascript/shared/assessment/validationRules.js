@@ -138,6 +138,7 @@ var beforeAttemptingSubmit = function() {
         closeVisible = closeDate.is(':visible');
 
     // have to do this again since its not in validateOptions and the plugin clears+reapplys rules on submit
+    attachValidationRules();
     initDynamicValidationTriggers();
 
     if (openVisible && closeVisible) {
