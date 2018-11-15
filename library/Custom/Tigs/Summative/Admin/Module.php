@@ -16,6 +16,7 @@ use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use InvalidArgumentException;
+use Alaress\Database\Quoter\Mysql\Quoter;
 
 class Module extends Alaress\Module\Module
 {
@@ -73,6 +74,9 @@ class Module extends Alaress\Module\Module
             'configMapper'         => $this->getMapperFactory()->getLazy(ConfigMapper::class),
             'fieldStrategyFactory' => $injector->lazy(function () {
                 return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
+            }),
+            'quoter'               => $injector->lazy(function () {
+                return new Quoter();
             }),
         ];
     }
