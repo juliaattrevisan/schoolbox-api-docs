@@ -9,6 +9,7 @@
 
 namespace Calendar\Event\Collection;
 
+use Calendar\Event\Render\VObjectTrait;
 use Sabre\VObject\Component\VCalendar;
 use Alaress\Html\ToText as Html2Text;
 use Schoolbox\User;
@@ -67,11 +68,13 @@ class VCalExporter extends Renderer {
      *
      * @param $event
      * @param $type
-     * @return mixed
+     * @return string
+     * @throws \Exception
      */
     public function renderEvent($event, $type)
     {
         $rendererClass = $event->getRendererClass($type);
+        /** @var VObjectTrait $renderObj */
         $renderObj = new $rendererClass(
             $this->getPage(),
             $event,
