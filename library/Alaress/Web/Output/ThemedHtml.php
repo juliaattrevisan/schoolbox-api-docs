@@ -52,14 +52,12 @@ class ThemedHtml extends Html
      */
     protected function outputResponseBody()
     {
-        $page     = $this->getSitepage();
-        $template = $this->getTemplate();
-
         /** @var User|null $user */
         $user     = $_SESSION['user'];
+        $template = $this->getTemplate();
 
-//        $data     = $this->getData();
         if (empty($template)) {
+            $page = $this->getSitepage();
             // No template? I can't generate a standard response,
             // so return an error response.
             $code = $this->getResponse()->status->getCode();
