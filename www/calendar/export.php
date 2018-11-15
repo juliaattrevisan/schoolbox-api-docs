@@ -145,9 +145,16 @@ try {
     $forward           = $forward ? abs($forward) : 12;
     $timetable_forward = $timetable_forward ? abs($timetable_forward) : 3;
 
+    // Enable override of start/end dates
+    if (isset($_GET['start'])) {
+        $start = \strtotime($_GET['start']);
+    }
+    if (isset($_GET['end'])) {
+        $end = \strtotime($_GET['end']);
+    }
     // Default start and end times
-    $start = strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
-    $end   = strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
+    $start = $start ?: \strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
+    $end   = $end ?: \strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
 
     // Report errors in this thing
     /** @var Raven_Client|null $sentry */
