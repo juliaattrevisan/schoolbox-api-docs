@@ -32,8 +32,8 @@ $(document).ready(function() {
     // Initialise validator - have to do this here, as the only other place it happens is in the mage on submit
     $("#assessmentForm").alaressValidate();
 
-    // attach on-load rules
-    // the stuff in validateOptions is rules we only want run on submit, so don't pass them as options here.
+    // Attach on-load rules -
+    // we can't pass these as options to alaressValidate because we need to loop through elements applying rules
     attachValidationRules();
 
     // Attach MutationObservers and on-change listeners
