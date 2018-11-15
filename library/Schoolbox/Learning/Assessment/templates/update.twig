@@ -52,10 +52,11 @@
          * Only exists on the update page because a new (not yet created) due work will never have existing rubric marks.
          */
         function formWillSubmit() {
+            var formData = this;
             return new Promise(function(resolve, reject) {
 
                 // Test whether marks need to be invalidated
-                $.post('/rubric/determineMarkInvalidation', $('form#assessmentForm').serializeArray()).done(function(response) {
+                $.post('/rubric/determineMarkInvalidation', formData).done(function(response) {
                     // Show dialog only if invalidation is required
                     var numberAffected = Object.keys(response['affectedUsers']).length;
 

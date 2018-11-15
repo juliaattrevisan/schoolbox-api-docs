@@ -17,8 +17,8 @@
         currentStopClass: 'current-stop',
         reenablePrevious: false,
         beforeAttemptingSubmit: $.noop,
-        formWillSubmit: function() {
-            // TODO refactor to use jquery promises for compatibility
+        formWillSubmit: function(formData) {
+            // Accepts serialized form data as an arg, accessible as 'this' inside the function
             return new Promise(function(resolve, reject) {
                 // Plugin instances can override this if they want to prevent submission until something async has happened.
                 resolve();
@@ -361,11 +361,14 @@
             return;
         }
 
+        // Get the form data to POST before disabling the form, as it won't be POSTed otherwise
+        var formData = $(form).serializeArray();
+
         // Disable the form and set "loading" text
         xhrBefore.call(self);
 
         // Wait for async requests to approve submit (e.g. with a confirm dialog); goes straight through by default
-        var promise = self.options.formWillSubmit.call();
+        var promise = self.options.formWillSubmit.call(formData);
         promise.then(
             function() {
                 // Submit the form if Promise is resolved
