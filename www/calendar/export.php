@@ -16,6 +16,7 @@ $kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 use Alaress\Application\Kernel;
 use Alaress\Database\Connector\IConnector;
 use Calendar\Event\Collection\CSVExporter;
+use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Collection\VCalExporter;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
@@ -387,33 +388,20 @@ try {
     exit;
 }
 
+$renderer = new Renderer(
+    $api,
+    $start,
+    $end,
+    $user,
+    new SitePage(false),
+    $viewer
+);
+
 // Always output here
 if ($_GET['format'] === 'csv') {
-    header('Cache-Control: private');
-    header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: filename=' . $filename . '.csv');
-
-    $exporter = new CSVExporter(
-        $api,
-        $start,
-        $end,
-        $user,
-        new SitePage(false),
-        $viewer
-    );
+    $exporter = new CSVExporter();
 } else {
-    header('Cache-Control: private');
-    header('Content-Type: text/calendar; charset=utf-8');
-    header('Content-Disposition: filename=' . $filename . '.ics');
-
-    $exporter = new VCalExporter(
-        $api,
-        $start,
-        $end,
-        $user,
-        new SitePage(false),
-        $viewer
-    );
+    $exporter = new VCalExporter();
 }
 
-$exporter->renderAll();
+$exporter->renderAll($renderer, $filename);

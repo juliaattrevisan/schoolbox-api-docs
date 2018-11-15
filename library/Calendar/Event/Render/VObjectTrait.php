@@ -7,13 +7,13 @@
 
 namespace Calendar\Event\Render;
 
-use Html2Text\Html2Text;
+use Calendar\Event\Type\EventInterface;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
 use \DateTime;
 use \DateInterval;
 use \DateTimeZone;
-
+use Alaress\Html;
 
 /**
  * Default VObject rendering for all types of Calendar events.
@@ -24,102 +24,96 @@ use \DateTimeZone;
  */
 trait VObjectTrait
 {
+
     /**
      * @var VCalendar
      */
-    protected $vCalendar;
+    private $vCalendar;
 
     /**
-     * @var Html2Text
+     * @var Html\ToText
      */
-    protected $textConverter;
+    private $textConverter;
 
 
     /**
-     * @return VEvent
-     */
-    public abstract function getEvent();
-
-
-        /**
      * Render this event
      *
      * @return string
+     * @throws \InvalidArgumentException
      */
-    public function render()
+    public function render(): string
     {
+        /** @var EventInterface $event */
+        $event = $this->getEvent();
+
         // Output event times as UTC,
         // no client should be able to mess that up.
         $utcTimezone = new DateTimeZone('UTC');
 
         /** @var VEvent $vEvent */
-        $vEvent = $this->vCalendar->create('VEVENT');
+        $vEvent = $this->getVCalendar()->create('VEVENT');
         // Generate a UID based on $this->getEvent()->getEventId()
-        $vEvent->add('UID', $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId());
-        $vEvent->add('CATEGORIES', $this->getEvent()->getEventType());
-        $vEvent->add('LOCATION', $this->getEvent()->getLocation());
+        $vEvent->add('UID', $event->getEventId() . '/' . $event->getConnectorId());
+        $vEvent->add('CATEGORIES', $this->getCategories());
+        $vEvent->add('LOCATION', $event->getLocation());
 
-        $this->getTextConverter()->setHtml($this->getEvent()->getDetail());
+        $this->getTextConverter()->setHtml($event->getDetail());
         $vEvent->add('DESCRIPTION', $this->getTextConverter()->getText());
 
-        $start_time = $this->getEvent()->getStartTime()->getDateTimeObject();
+        $start_time = $event->getStartTime()->getDateTimeObject();
         if (!($start_time instanceof DateTime)) {
-            $start_time = new DateTime($this->getEvent()->getStartTime()->getDatabase());
+            $start_time = new DateTime($event->getStartTime()->getDatabase());
         }
-        $end_time = $this->getEvent()->getEndTime()->getDateTimeObject();
+        $end_time = $event->getEndTime()->getDateTimeObject();
         if (!($end_time instanceof DateTime)) {
-            $end_time = new DateTime($this->getEvent()->getEndTime()->getDatabase());
+            $end_time = new DateTime($event->getEndTime()->getDatabase());
         }
-        if (!$this->getEvent()->getAllday()) {
+        if (!$event->getAllday()) {
             $start_time->setTimezone($utcTimezone);
             $end_time->setTimezone($utcTimezone);
             $vEvent->add('DTSTART', $start_time);
             $vEvent->add('DTEND', $end_time);
         } else {
             $end_time->add(new DateInterval('P1D'));
-            $vEvent->add('DTSTART', $start_time->format('Ymd'), array('VALUE' => 'DATE'));
-            $vEvent->add('DTEND', $end_time->format('Ymd'), array('VALUE' => 'DATE'));
+            $vEvent->add('DTSTART', $start_time->format('Ymd'), ['VALUE' => 'DATE']);
+            $vEvent->add('DTEND', $end_time->format('Ymd'), ['VALUE' => 'DATE']);
         }
 
-        $vEvent->add('SUMMARY', $this->getEvent()->getTitle());
+        $vEvent->add('SUMMARY', $event->getTitle());
 
         return $vEvent->serialize();
     }
 
-    /**
-     * @param  \Sabre\VObject\Component\VCalendar $vCalendar
-     * @return $this
-     */
-    public function setVCalendar($vCalendar)
+
+    protected function getCategories(): string
     {
-        $this->vCalendar = $vCalendar;
-        return $this;
+        /** @var EventInterface $event */
+        $event = $this->getEvent();
+        return $event->getEventType();
     }
 
+
     /**
-     * @return \Sabre\VObject\Component\VCalendar
+     * @return VCalendar
      */
-    public function getVCalendar()
+    protected function getVCalendar(): VCalendar
     {
+        if (!$this->vCalendar) {
+            $this->vCalendar = new VCalendar();
+        }
         return $this->vCalendar;
     }
 
-    /**
-     * @return Html2Text
-     */
-    public function getTextConverter()
-    {
-        return $this->textConverter;
-    }
 
     /**
-     * @param  Html2Text $textConverter
-     *
-     * @return $this
+     * @return Html\ToText
      */
-    public function setTextConverter($textConverter)
+    protected function getTextConverter(): Html\ToText
     {
-        $this->textConverter = $textConverter;
-        return $this;
+        if (!$this->textConverter) {
+            $this->textConverter = new Html\ToText();
+        }
+        return $this->textConverter;
     }
 }
