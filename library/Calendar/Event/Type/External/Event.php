@@ -13,14 +13,6 @@ use Calendar\Event\Type\EventBase;
 class Event extends EventBase
 {
 
-    /**
-     * Renderer classes
-     */
-    protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
-                                        'html'          => Renderer\Html::class,
-                                        'vcal'          => Renderer\VObject::class,
-                                        'csv'           => Renderer\Csv::class,
-    );
 
     /**
      * Event location
@@ -56,5 +48,19 @@ class Event extends EventBase
      */
     public function canAttend() {
         return false;
+    }
+
+
+    /**
+     * @return string[]
+     */
+    protected function getRenderClasses(): array
+    {
+        return [
+            'javascript' => Renderer\Javascript::class,
+            'html'       => Renderer\Html::class,
+            'vcal'       => Renderer\VObject::class,
+            'csv'        => Renderer\Csv::class,
+        ];
     }
 }

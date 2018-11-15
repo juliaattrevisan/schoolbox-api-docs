@@ -20,16 +20,6 @@ use Schoolbox\User;
 class Event extends Day\Event
 {
 
-    /**
-     * Renderer classes
-     * @var array
-     */
-    protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
-                                        'html'          => Renderer\Html::class,
-                                        'vcal'          => Renderer\VObject::class,
-                                        'csv'           => Renderer\Csv::class,
-    );
-
     /* Attendance flag
      */
     private $attendance = 0;
@@ -146,6 +136,20 @@ class Event extends Day\Event
     {
         $this->custom = $custom;
         return $this;
+    }
+
+
+    /**
+     * @return string[]
+     */
+    protected function getRenderClasses(): array
+    {
+        return [
+            'javascript' => Renderer\Javascript::class,
+            'html'       => Renderer\Html::class,
+            'vcal'       => Renderer\VObject::class,
+            'csv'        => Renderer\Csv::class,
+        ];
     }
 }
 

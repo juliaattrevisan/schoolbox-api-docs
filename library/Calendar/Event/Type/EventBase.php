@@ -476,15 +476,6 @@ abstract class EventBase implements EventInterface
         return $this->startTime;
     }
 
-    /**
-     * Set renderer class
-     *
-     * @param string $renderClasses
-     */
-    public function setRendererClass($renderClasses)
-    {
-        $this->renderClasses = $renderClasses;
-    }
 
     /**
      * Get renderer class
@@ -493,15 +484,14 @@ abstract class EventBase implements EventInterface
      * @throws \Exception If unable to find a rendering class for the specified type
      * @return string
      */
-    public function getRendererClass($type)
+    public function getRendererClass($type): string
     {
-        if($this->renderClasses[$type]) {
-            return $this->renderClasses[$type];
-        }
-        else {
-            throw new \Exception("Unable to find rendering class for $type");
+        $renderClasses = $this->getRenderClasses();
+        if (\array_key_exists($type, $renderClasses)) {
+            return $renderClasses[$type];
         }
 
+        throw new \Exception("Unable to find rendering class for $type");
     }
 
     /**
@@ -634,4 +624,12 @@ abstract class EventBase implements EventInterface
         $this->resourceId = $resourceId;
         return $this;
     }
+
+
+    /**
+     * Returns the available Render Classes for this event
+     *
+     * @return string[]
+     */
+    abstract protected function getRenderClasses(): array;
 }

@@ -90,15 +90,6 @@ class Event extends EventBase
     private $attendance = false;
 
     /**
-     * Renderer classes
-     */
-    protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
-                                        'html'          => Renderer\Html::class,
-                                        'vcal'          => Renderer\VObject::class,
-                                        'csv'           => Renderer\Csv::class,
-                                    );
-
-    /**
      * Can someone attend this event
      *
      * @return bool
@@ -349,4 +340,16 @@ class Event extends EventBase
     }
 
 
+    /**
+     * @return string[]
+     */
+    protected function getRenderClasses(): array
+    {
+        return [
+            'javascript' => Renderer\Javascript::class,
+            'html'       => Renderer\Html::class,
+            'vcal'       => Renderer\VObject::class,
+            'csv'        => Renderer\Csv::class,
+        ];
+    }
 }
