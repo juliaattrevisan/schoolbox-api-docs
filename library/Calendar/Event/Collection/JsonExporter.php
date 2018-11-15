@@ -1,0 +1,33 @@
+<?php
+/**
+ * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+declare(strict_types=1);
+
+namespace Calendar\Event\Collection;
+
+class JsonExporter implements IExporter
+{
+
+    /**
+     * @param Renderer $renderer
+     * @param string   $filename
+     * @throws \Exception
+     */
+    public function renderAll(Renderer $renderer, string $filename): void
+    {
+        header("Cache-Control: private");
+        header("Content-Type: application/json; charset=utf-8");
+        header("Content-Disposition: attachment; filename={$filename}.json");
+
+        $eventStrings = [];
+        foreach ($renderer->getAllEvents() as $event) {
+            $eventStrings[] = $renderer->renderEvent($event, 'javascript');
+        }
+
+        $content = \implode(',', $eventStrings);
+
+        echo "[{$content}]";
+    }
+}

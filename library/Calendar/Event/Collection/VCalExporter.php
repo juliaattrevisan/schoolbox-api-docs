@@ -10,7 +10,7 @@ namespace Calendar\Event\Collection;
 use Sabre\VObject\Component\VCalendar;
 use Config;
 
-class VCalExporter
+class VCalExporter implements IExporter
 {
 
     /**

@@ -16,6 +16,7 @@ $kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 use Alaress\Application\Kernel;
 use Alaress\Database\Connector\IConnector;
 use Calendar\Event\Collection\CSVExporter;
+use Calendar\Event\Collection\JsonExporter;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Collection\VCalExporter;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -390,20 +391,25 @@ try {
     exit;
 }
 
+// Always output here
+switch($_GET['format'] ?? ''){
+    case 'csv':
+        $exporter = new CSVExporter();
+        break;
+    case 'json':
+        $exporter = new JsonExporter();
+        break;
+    default:
+        $exporter = new VCalExporter();
+}
+
 $renderer = new Renderer(
     $api,
     $start,
     $end,
     $user,
-    new SitePage(false),
+    (new SitePage(false))->setDi($kernel->getDependencyInjector()),
     $viewer
 );
-
-// Always output here
-if ($_GET['format'] === 'csv') {
-    $exporter = new CSVExporter();
-} else {
-    $exporter = new VCalExporter();
-}
 
 $exporter->renderAll($renderer, $filename);

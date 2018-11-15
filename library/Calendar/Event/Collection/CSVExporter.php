@@ -9,7 +9,7 @@
 
 namespace Calendar\Event\Collection;
 
-class CSVExporter
+class CSVExporter implements IExporter
 {
 
     /**
