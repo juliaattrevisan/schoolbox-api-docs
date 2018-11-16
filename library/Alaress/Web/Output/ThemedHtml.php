@@ -69,33 +69,31 @@ class ThemedHtml extends Html
     protected function outputResponseBody()
     {
         $template = $this->getTemplate();
-
         if (empty($template)) {
-            $page = $this->getSitepage();
-            // No template? I can't generate a standard response,
-            // so return an error response.
             $code = $this->getResponse()->status->getCode();
             if ($code === 404) {
-                $page->pageNotFound();
+                $template = 'common/error/404.twig';
             } else {
-                $page->error(null, 'Template not found', $code ?: 500);
+                // TODO Figure out how to render all the extraneous error stuff
+                // $page->error(null, 'Template not found', $code ?: 500);
+                $template = 'common/error/general.twig';
             }
-        } else {
-            $data = [
-                'template' => $template,
-                'data'     => $this->getData(),
-                'chrome'   => [
-                    'tab'   => $this->getTab(),
-                    'title' => $this->getTitle(),
-                ],
-            ];
-            foreach ($this->dataGenerators as $key => $generator) {
-                $data[$key] = $generator->generate($this);
-            }
-
-            // Render it all out
-            echo $this->templateEngine->render('include/chrome.twig', $data);
         }
+
+        $data = [
+            'template' => $template,
+            'data'     => $this->getData(),
+            'chrome'   => [
+                'tab'   => $this->getTab(),
+                'title' => $this->getTitle(),
+            ],
+        ];
+        foreach ($this->dataGenerators as $key => $generator) {
+            $data[$key] = $generator->generate($this);
+        }
+
+        // Render it all out
+        echo $this->templateEngine->render('include/chrome.twig', $data);
     }
 
     /**
