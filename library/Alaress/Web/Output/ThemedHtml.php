@@ -69,20 +69,27 @@ class ThemedHtml extends Html
     protected function outputResponseBody()
     {
         $template = $this->getTemplate();
+        $data     = [];
         if (empty($template)) {
             $code = $this->getResponse()->status->getCode();
             if ($code === 404) {
                 $template = 'common/error/404.twig';
             } else {
                 // TODO Figure out how to render all the extraneous error stuff
-                // $page->error(null, 'Template not found', $code ?: 500);
                 $template = 'common/error/general.twig';
+                $data     = [
+                    'summary' => [
+                        'message' => 'Template not found',
+                    ],
+                ];
             }
+        } else {
+            $data = $this->getData();
         }
 
         $data = [
             'template' => $template,
-            'data'     => $this->getData(),
+            'data'     => $data,
             'chrome'   => [
                 'tab'   => $this->getTab(),
                 'title' => $this->getTitle(),
