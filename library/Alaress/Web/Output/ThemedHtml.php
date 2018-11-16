@@ -98,9 +98,6 @@ class ThemedHtml extends Html
                     'title' => $this->getTitle(),
                 ],
 
-//                // TODO DI and inject this object
-//                'topMenuData'  => (new MenuTopRenderer())->generateTwigData($user, $this->getTab()),
-
                 // TODO DI and inject this object
                 'sideMenuData' => (new MenuSideRenderer())->generateTwigData($user),
             ];
