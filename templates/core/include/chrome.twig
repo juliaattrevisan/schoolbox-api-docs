@@ -237,7 +237,7 @@
 </head>
 <body class="{{ ws.enabled ? '' : 'disableNotifications' }}">
 <div class="off-canvas-wrap docs-wrap" data-offcanvas>
-    <div class="inner-wrap {{ user.current.hideNotificationsTray ? '' : 'docking' }}">
+    <div class="inner-wrap {{ user.current.getHideNotificationsTray ? '' : 'docking' }}">
 
         {% block instant %}
             <aside class="right-off-canvas-menu island no-pad hide-for-print" id="msgs" data-unread="{{ ws.unread }}">
