@@ -106,24 +106,6 @@ class ThemedHtml extends Html
     }
 
     /**
-     * @param  \SitePage $sitepage
-     * @return $this
-     */
-    public function setSitepage($sitepage)
-    {
-        $this->sitepage = $sitepage;
-        return $this;
-    }
-
-    /**
-     * @return \SitePage
-     */
-    public function getSitepage()
-    {
-        return $this->sitepage;
-    }
-
-    /**
      * @return string
      */
     public function getTab()

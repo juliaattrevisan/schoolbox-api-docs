@@ -477,7 +477,6 @@ abstract class AbstractBootstrap implements BootstrapInterface
         // Web output class - currently uses Sitepage
         $di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
         $di->setters[Output\Stream::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
-        $di->setters[Output\ThemedHtml::class]['setSitepage'] = $di->lazyGet('layoutEngine');
         $di->set('webOutput:base', $di->lazyNew(Output\Base::class));
         $di->set('webOutput:html', $di->lazy(function() use ($di, $mapperFactory) {
             /** @var IConfigLoader $config */
@@ -489,7 +488,6 @@ abstract class AbstractBootstrap implements BootstrapInterface
             $output  = new Output\ThemedHtml();
             $output
                 ->setTemplateEngine($di->get('templateEngine'))
-                ->setSitepage($di->get('layoutEngine'))
                 ->addDataGenerator('ws', new Output\DataGenerator\Websocket($config, $session, $_SERVER))
                 ->addDataGenerator(
                     'tour',
