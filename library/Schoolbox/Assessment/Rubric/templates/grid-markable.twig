@@ -194,7 +194,9 @@
                     customMark = getLetterGradeFromNumeric($this.find("[data-group-mark]").val(), grades);
                 }
 
-                if (displayedMark === customMark) {
+                var diff = Math.abs(parseFloat(displayedMark) - parseFloat(customMark));
+                // Allow for precision errors when diffing
+                if (diff < 0.01) {
                     $this.find("[data-use-descriptor-values]").hide();
                 } else {
                     $this.find("[data-use-descriptor-values]").show();
