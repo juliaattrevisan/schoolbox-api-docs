@@ -156,15 +156,14 @@ class SideMenu implements IDataGenerator
         // Shouldn't it be in $currentUser?
 
         return [
-            'user' => $this->currentUser,
-            'nodes' => $nodes,
-            'subjects' => $subjectGroups,
-            'sections' => $sections,
-            'pageCurrent' => $pageCurrent,
-            'groups' => $this->menuItemMapper->findGroupsForUser($this->currentUser),
+            'user'      => $this->currentUser,
+            'nodes'     => $nodes,
+            'subjects'  => $subjectGroups,
+            'sections'  => $sections,
+            'groups'    => $this->menuItemMapper->findGroupsForUser($this->currentUser),
             'bookmarks' => $this->bookmarkMapper->findByColumn('owner', $this->currentUser->getId()),
             'siteTitle' => $this->config->get('title'),
-            'children' => $this->session->get('children', []),
+            'children'  => $this->session->get('children', []),
         ];
     }
 }
