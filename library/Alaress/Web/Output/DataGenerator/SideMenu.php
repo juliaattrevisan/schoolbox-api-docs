@@ -14,7 +14,7 @@ use Schoolbox\Bookmark\Mapper as BookmarkMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Menu\Side\Mapper as MenuItemMapper;
-use Schoolbox\Menu\Side\Section\Mapper as MenuSideSectionMapper;
+use Schoolbox\Menu\Side\Section\Mapper as MenuSectionMapper;
 use Schoolbox\Menu\Side\Section\Model as MenuSideSection;
 use Schoolbox\User;
 
@@ -42,7 +42,7 @@ class SideMenu implements IDataGenerator
 
 
     /**
-     * @var MenuSideSectionMapper
+     * @var MenuSectionMapper
      */
     private $menuSectionMapper;
 
@@ -62,18 +62,18 @@ class SideMenu implements IDataGenerator
     /**
      * Constructor
      *
-     * @param IConfigLoader         $config
-     * @param null|User             $currentUser
-     * @param Session               $session
-     * @param MenuSideSectionMapper $menuSectionMapper
-     * @param MenuItemMapper        $menuItemMapper
-     * @param BookmarkMapper        $bookmarkMapper
+     * @param IConfigLoader     $config
+     * @param null|User         $currentUser
+     * @param Session           $session
+     * @param MenuSectionMapper $menuSectionMapper
+     * @param MenuItemMapper    $menuItemMapper
+     * @param BookmarkMapper    $bookmarkMapper
      */
     public function __construct(
         IConfigLoader $config,
         ?User $currentUser,
         Session $session,
-        MenuSideSectionMapper $menuSectionMapper,
+        MenuSectionMapper $menuSectionMapper,
         MenuItemMapper $menuItemMapper,
         BookmarkMapper $bookmarkMapper
     ) {
