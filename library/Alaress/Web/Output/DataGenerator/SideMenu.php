@@ -62,13 +62,27 @@ class SideMenu implements IDataGenerator
     /**
      * Constructor
      *
-     * @param User|null     $currentUser
-     * @param TopMenuMapper $mapper
+     * @param IConfigLoader         $config
+     * @param null|User             $currentUser
+     * @param Session               $session
+     * @param MenuSideSectionMapper $menuSectionMapper
+     * @param MenuItemMapper        $menuItemMapper
+     * @param BookmarkMapper        $bookmarkMapper
      */
-    public function __construct(?User $currentUser, TopMenuMapper $mapper)
-    {
-        $this->currentUser = $currentUser;
-        $this->mapper      = $mapper;
+    public function __construct(
+        IConfigLoader $config,
+        ?User $currentUser,
+        Session $session,
+        MenuSideSectionMapper $menuSectionMapper,
+        MenuItemMapper $menuItemMapper,
+        BookmarkMapper $bookmarkMapper
+    ) {
+        $this->config            = $config;
+        $this->currentUser       = $currentUser;
+        $this->session           = $session;
+        $this->menuSectionMapper = $menuSectionMapper;
+        $this->menuItemMapper    = $menuItemMapper;
+        $this->bookmarkMapper    = $bookmarkMapper;
     }
 
 
