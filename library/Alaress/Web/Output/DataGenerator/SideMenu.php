@@ -101,6 +101,7 @@ class SideMenu implements IDataGenerator
         $subjectGroups = [];
 
         // TODO eradicate this session dependency
+        // Shouldn't it be in $currentUser?
         $subjects = $this->session->get('subjects');
         if (\is_iterable($subjects)) {
             foreach ($subjects as $subject) {
@@ -152,6 +153,7 @@ class SideMenu implements IDataGenerator
 
         // Render this thing out
         // TODO eradicate this session dependency for children
+        // Shouldn't it be in $currentUser?
 
         return [
             'user' => $this->currentUser,
