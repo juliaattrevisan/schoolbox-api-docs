@@ -4,7 +4,7 @@
 <!--  Visit us at www.schoolbox.com.au -->
 <head>
     {# TODO consider if there's a better way to set title? #}
-    <title>{{ chrome.title }}</title>
+    <title>{{ config.title }}{{ chrome.title ? (' - ' ~ chrome.title) : '' }}</title>
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-au" />
