@@ -9,6 +9,7 @@
 
 namespace Alaress\Web\Output;
 
+use Alaress_Date_Format;
 use Alaress\Web\Output\DataGenerator\IDataGenerator;
 
 class ThemedHtml extends Html
@@ -78,6 +79,7 @@ class ThemedHtml extends Html
                 // TODO Figure out how to render all the extraneous error stuff
                 $template = 'common/error/general.twig';
                 $data     = [
+                    'date'    => Alaress_Date_Format::now(),
                     'summary' => [
                         'message' => 'Template not found',
                     ],
