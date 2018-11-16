@@ -10,8 +10,8 @@ namespace Alaress\Web\Output\DataGenerator;
 
 use Alaress\Session\Session;
 use Alaress\Web\Output\ThemedHtml;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Menu\Side\Mapper as MenuItemMapper;
 use Schoolbox\Menu\Side\Section\Mapper as MenuSideSectionMapper;
@@ -115,15 +115,15 @@ class SideMenu implements IDataGenerator
             });
         }
 
-        //Sort the subjects within each subjectGroup
-        foreach ($subjectGroups as $subjectGroup => $subjects ) {
+        // Sort the subjects within each subjectGroup
+        foreach ($subjectGroups as $subjectGroup => $subjects) {
 
-            //Each value is an array, so sort each array
+            // Each value is an array, so sort each array
             usort($subjects, function ($a, $b) {
-                return strnatcmp($a['name'].$a['code'], $b['name'].$b['code']);
+                return strnatcmp($a['name'] . $a['code'], $b['name'] . $b['code']);
             });
 
-            //Need to assign back, as $subjects is localised variable
+            // Need to assign back, as $subjects is localised variable
             $subjectGroups[$subjectGroup] = $subjects;
         }
 
