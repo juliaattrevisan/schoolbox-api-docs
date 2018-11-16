@@ -1,0 +1,1 @@
+CREATE INDEX plagscan_document_status ON plagscan_document (status);
