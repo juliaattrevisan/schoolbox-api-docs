@@ -31,6 +31,7 @@ use External_ClassInterface;
 use External_UserInterface;
 use GuzzleHttp;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\Bookmark\Mapper as BookmarkMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
@@ -50,6 +51,7 @@ use Schoolbox\Error;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Menu\Side\Mapper as SideMenuMapper;
+use Schoolbox\Menu\Side\Section\Mapper as SideMenuSectionMapper;
 use Schoolbox\Menu\Top\Mapper as TopMenuMapper;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
@@ -499,6 +501,17 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     new Output\DataGenerator\TopMenu(
                         $session->getAuthUser(),
                         $mapperFactory->get(TopMenuMapper::class)
+                    )
+                )
+                ->addDataGenerator(
+                    'sideMenu',
+                    new Output\DataGenerator\SideMenu(
+                        $config,
+                        $session->getAuthUser(),
+                        $session,
+                        $mapperFactory->get(SideMenuSectionMapper::class),
+                        $mapperFactory->get(SideMenuMapper::class),
+                        $mapperFactory->get(BookmarkMapper::class)
                     )
                 );
 
