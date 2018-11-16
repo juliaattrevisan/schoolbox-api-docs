@@ -9,13 +9,7 @@
 
 namespace Alaress\Web\Output;
 
-use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\DataGenerator\IDataGenerator;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Menu\Side\Renderer as MenuSideRenderer;
-use Schoolbox\Menu\Top\Renderer as MenuTopRenderer;
-use Schoolbox\User;
 
 class ThemedHtml extends Html
 {
@@ -74,8 +68,6 @@ class ThemedHtml extends Html
      */
     protected function outputResponseBody()
     {
-        /** @var User|null $user */
-        $user     = $_SESSION['user'];
         $template = $this->getTemplate();
 
         if (empty($template)) {
@@ -89,17 +81,13 @@ class ThemedHtml extends Html
                 $page->error(null, 'Template not found', $code ?: 500);
             }
         } else {
-
             $data = [
-                'template'     => $template,
-                'data'         => $this->getData(),
-                'chrome'       => [
+                'template' => $template,
+                'data'     => $this->getData(),
+                'chrome'   => [
                     'tab'   => $this->getTab(),
                     'title' => $this->getTitle(),
                 ],
-
-                // TODO DI and inject this object
-                'sideMenuData' => (new MenuSideRenderer())->generateTwigData($user),
             ];
             foreach ($this->dataGenerators as $key => $generator) {
                 $data[$key] = $generator->generate($this);
