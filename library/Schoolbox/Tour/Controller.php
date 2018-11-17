@@ -60,7 +60,7 @@ class Controller extends Base
      */
     public function getTours($url)
     {
-        $list = new Lists($this->tourMapper);
+        $list = new Lists($this->tourMapper, $this->tourStepMapper);
         $data = $list->getTours($this->getUser(), $url);
 
         // Return results in JSON

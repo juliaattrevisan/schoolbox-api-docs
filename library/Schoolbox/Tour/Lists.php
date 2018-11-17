@@ -21,11 +21,17 @@ class Lists
     private $tourMapper;
 
     /**
+     * @var Step\Mapper;
+     */
+    private $stepMapper;
+
+    /**
      * Lists constructor.
      * @param Mapper $tourMapper
      */
-    public function __construct(Mapper $tourMapper) {
+    public function __construct(Mapper $tourMapper, Step\Mapper $stepMapper) {
         $this->tourMapper = $tourMapper;
+        $this->stepMapper = $stepMapper;
     }
 
     /**
@@ -49,14 +55,12 @@ class Lists
 
         /** @var Model $tour */
         foreach ($tours as $tour) {
-            // Grab all of the triggers for this tour
-            $tourTriggers = $this->tourTriggerMapper->findForUrl($tour, $url);
 
             // Create an array to store the selectors/events
             $triggerArray = [];
 
             /** @var TourTrigger $tourTrigger */
-            foreach ($tourTriggers as $tourTrigger) {
+            foreach ($tour->getTriggerList() as $tourTrigger) {
 
                 // Add the selector/event to the return data
 
@@ -73,7 +77,7 @@ class Lists
                     'title'       => $tour->getTitle(),
                     'description' => $tour->getDescription(),
                     'triggers'    => $triggerArray,
-                    'steps'       => $this->tourStepMapper->getStepArray($tour->getUuid()),
+                    'steps'       => $this->stepMapper->getStepArray($tour->getUuid()),
                 ];
             }
         }
