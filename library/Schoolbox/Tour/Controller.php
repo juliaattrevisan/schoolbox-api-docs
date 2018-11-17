@@ -60,50 +60,8 @@ class Controller extends Base
      */
     public function getTours($url)
     {
-        // Store the tours we are going to serve in an array
-
-        $data = [];
-
-        // Retrieve the URL we are loading tours for
-
-
-        // Grab all tours for the logged in user/url
-
-        $tours = $this->tourMapper->findByUserForUrl($this->getUser(), $url);
-
-
-        // Iterate through them and add the required information into the array
-
-        /** @var Model $tour */
-        foreach ($tours as $tour) {
-            // Grab all of the triggers for this tour
-            $tourTriggers = $this->tourTriggerMapper->findForUrl($tour, $url);
-
-            // Create an array to store the selectors/events
-            $triggerArray = [];
-
-            /** @var TourTrigger $tourTrigger */
-            foreach ($tourTriggers as $tourTrigger) {
-
-                // Add the selector/event to the return data
-
-                $triggerArray[] = [
-                    'selector' => $tourTrigger->getJavascriptSelector(),
-                    'event'    => $tourTrigger->getJavascriptEvent(),
-                ];
-            }
-
-            // Only add if one or more triggers was found
-            if (\count($triggerArray) > 0) {
-                $data[] = [
-                    'uuid'        => $tour->getUuid(),
-                    'title'       => $tour->getTitle(),
-                    'description' => $tour->getDescription(),
-                    'triggers'    => $triggerArray,
-                    'steps'       => $this->tourStepMapper->getStepArray($tour->getUuid()),
-                ];
-            }
-        }
+        $list = new Lists($this->tourMapper);
+        $data = $list->getTours($this->getUser(), $url);
 
         // Return results in JSON
         $this->getResponse()->status->set(200);
