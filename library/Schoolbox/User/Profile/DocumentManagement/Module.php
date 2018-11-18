@@ -55,16 +55,20 @@ class Module extends BaseModule
         /* Also check the config option academic_reports_available_to_students to see if students can access
          * anything; parents-of-student and all staff can always access these docs
          */
-        $permission = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\HasRole(Role::STAFF),
-            new Rule\Any(
-                new Rule\All(
-                    new Rule\IsTrue($this->getConfig()->get('academic_reports_available_to_students')),
-                    new Rule\IsUser('studentId')
-                ),
-                new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
-            )
+        $permission =
+            new Rule\LazyCallback(function () {
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\Any(
+                        new Rule\All(
+                            new Rule\IsTrue($this->getConfig()->get('academic_reports_available_to_students')),
+                            new Rule\IsUser('studentId')
+                        ),
+                        new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
+                    )
+                );
+            }
         );
 
         $this->register(

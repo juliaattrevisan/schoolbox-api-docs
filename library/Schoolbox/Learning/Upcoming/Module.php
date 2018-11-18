@@ -45,7 +45,9 @@ class Module extends BaseModule
         );
         // parents may view their child's work only if config.restrict_parent_duework_access is off
         if (!$this->getConfigMapper()->get('restrict_parent_duework_access')) {
-            $access->addRule(new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId'));
+            $access->addRule( new Rule\LazyCallback(function () {
+                new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId');
+            }));
         }
 
         $this->register('GET', '', 'getUpcoming', new Rule\IsLoggedIn());

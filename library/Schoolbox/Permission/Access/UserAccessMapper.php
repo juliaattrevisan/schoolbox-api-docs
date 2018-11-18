@@ -35,25 +35,6 @@ use Schoolbox\UserMapper;
  */
 class UserAccessMapper extends Mapper
 {
-    /** @var WritableCache */
-    private $cache;
-
-    /**
-     * Secondary hook method which occurs after successful construction
-     *
-     * This was made because a subclass of Mapper needed to make a
-     * db call, but that needs to occur after mapping() since it
-     * defines models and tables (unavailable in setup() atm)
-     */
-    protected function postSetup()
-    {
-        try {
-            $this->cache = self::getDi()->get('subscriptionCache');
-        } catch (ServiceNotFound $e) {
-            // noop
-        }
-    }
-
 
     /**
      * Cached permissions
@@ -107,8 +88,10 @@ class UserAccessMapper extends Mapper
             return;
         }
 
-        if ($this->cache) {
-            $this->cache->cacheUsers(INSTANCE_ID, [ $model->getUser()->getId() ]);
+        $cache = self::getDi()->get('subscriptionCache');
+
+        if ($cache) {
+            $cache->cacheUsers(INSTANCE_ID, [ $model->getUser()->getId() ]);
         }
     }
 

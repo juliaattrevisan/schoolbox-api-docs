@@ -62,16 +62,18 @@ class Module extends BaseModule
             );
 
         $permissionParentOfStudent =
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new IsParentAccessAllowed(),
-                new Rule\HasRole(Role::PARENT),
-                new Rule\IsParentOfUser(
-                    $this->getExternalUser(),
-                    UserMapper::getInstance(),
-                    'studentId'
-                )
-            );
+            new Rule\LazyCallback(function () {
+                new Rule\All(
+                    new Rule\IsLoggedIn(),
+                    new IsParentAccessAllowed(),
+                    new Rule\HasRole(Role::PARENT),
+                    new Rule\IsParentOfUser(
+                        $this->getExternalUser(),
+                        UserMapper::getInstance(),
+                        'studentId'
+                    )
+                );
+            });
 
         // User is in the audience of the pastoral record
 
