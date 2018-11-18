@@ -463,11 +463,8 @@ class SitePage extends Page
 
         if ($this->user instanceof User && !$impersonated && $config->get('tours_enabled')) {
             $request = parse_url($_SERVER['REQUEST_URI']);
-            $encodedUrl = Redirect::encode($request['path']);
             $tourList = new \Schoolbox\Tour\Lists(new \Schoolbox\Tour\Mapper(), new Schoolbox\Tour\Step\Mapper());
             $this->setVar('TOUR_JSON', json_encode($tourList->getTours($this->user, $request['path'])));
-
-            $this->setVar('TOUR_ROUTE', $this->routeLookup('tour.getTours', ['url' => $encodedUrl]));
             $this->parse('tour_script_block', 'tour_script', true);
         } else {
             $this->setVar('tour_script_block', '');
