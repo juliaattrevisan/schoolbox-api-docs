@@ -132,7 +132,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         try {
             $cat = $this->catMapper->findById($post->getHomepageId());
         } catch (Mapper\Exception $e) {
-            $this->log->warning('Failed to find folder with id:' . $post->getHomepageId() . $e->getMessage());
+            $this->log->warning("Failed to find folder with id: {$post->getHomepageId()} {$e->getMessage()}");
             return $envelope;
         }
 
@@ -187,7 +187,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         try {
             $cat = $this->catMapper->findById($post->getHomepageId());
         } catch (Mapper\Exception $e) {
-            $this->log->warning('Failed to find folder with id:' . $post->getHomepageId() . $e->getMessage());
+            $this->log->warning("Failed to find folder with id: {$post->getHomepageId()} {$e->getMessage()}");
             return $envelope;
         }
 
