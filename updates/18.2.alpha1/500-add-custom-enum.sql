@@ -4,7 +4,7 @@ ALTER TABLE config
 INSERT INTO config(name, value, title, description, field_id, editable, hidden, required, module) VALUES (
   'tigs_crp_participation_report_enabled',
   '0',
-  'Participation Report enabled',
+  'Participation Report enabled for non-staff',
   'If enabled, students and parents can access the Participation Report. Staff can always access.',
   (SELECT id FROM lu_config_field WHERE field = 'boolean'),
   'true',
