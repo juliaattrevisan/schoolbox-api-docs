@@ -4,7 +4,6 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Realtime\Message;
@@ -15,7 +14,9 @@ use OutOfBoundsException;
 use PDO;
 use PDOStatement;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
+use Schoolbox\Resource\Folder;
 
 class RoutePermissionMapper extends Mapper {
 
@@ -179,9 +180,11 @@ class RoutePermissionMapper extends Mapper {
      * @param string $topic
      * @param int    $roleId
      * @param int    $userId
+     * @throws Mapper\Exception
      * @return array
      */
-	public function findRouteLevels($topic, $roleId, $userId = 0) {
+    public function findRouteLevels(string $topic, int $roleId, int $userId = 0): array
+    {
 		// find the routing levels that match this role, user and topic regex
 		$stmt = $this->prepare("
 			SELECT
@@ -232,8 +235,24 @@ class RoutePermissionMapper extends Mapper {
 			'user_id' => $userId
 		));
 
-		$precedence = array();
+        $folderMapper = Folder\Mapper::getInstance();
 
+        // Is this for a homepage? If so, get any direct inheriting descendants.
+        // Route overrides inherit from their closest non-inheriting ancestor node.
+        if (preg_match('/service\\.' . UserAccess::SERVICE_HOMEPAGE . '\\.(\d+)\\./', $topic, $matches)) {
+                $folder = $folderMapper->findCheaplyById($matches[1]);
+            if ($folder->getInherit()) {
+                $nearestParent = $folderMapper->findNearestNonInheritingAncestralNode($folder);
+                if ($nearestParent) {
+                    // topic to search in the overrides should be for non-inheriting ancestor
+                    $topic = str_replace("service." . UserAccess::SERVICE_HOMEPAGE . ".{$folder->getId()}.",
+                        "service." . UserAccess::SERVICE_HOMEPAGE . ".{$nearestParent->getId()}.", $topic);
+                }
+            }
+        }
+
+        // if current topic matches route
+        $precedence = [];
 		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			// no multiword (ie '.#.') support
 			$regex = '`' . str_replace('*','([^\.]+)', $r['msg_route_key']) . '\.`';
