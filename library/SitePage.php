@@ -1,5 +1,6 @@
 <?php
 
+use Alaress\Web\Output;
 use Aura\Router\Router;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Menu\Side\Renderer as MenuSideRender;
@@ -316,7 +317,19 @@ class SitePage extends Page
         if (!$lite && !$this->lite) {
             $this->buildPage();
             $this->saveHistory();
+            /** @var Output\ThemedHtml $renderer */
+            $renderer = $this->getDi()->get('webOutput:html');
+            $renderer
+                ->setTab($this->currentTab)
+                ->setTitle($this->getVar('TITLE'));
+        } else {
+            /** @var Output\Html $renderer */
+            $renderer = $this->getDi()->get('webOutput:nochrome');
         }
+
+
+        // Output the PHPLib using the renderer
+
 
         $debug_bar_head = '';
         $debug_bar_body = '';
