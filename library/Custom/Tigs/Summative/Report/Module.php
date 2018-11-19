@@ -194,10 +194,11 @@ class Module extends Alaress\Module\Module
                     if (null === $folder->getId()) {
                         throw new InvalidPath("Folder does not exist in SB");
                     }
-                    // Student must be enrolled in the folder
+                    // Student must be provided
                     if (!($params['user'] ?? null) instanceof User) {
                         throw new InvalidPath("No user found in route params");
                     }
+                    // .. and enrolled in the specified folder
                     /** @var User $user */
                     $user = $params['user'];
                     if (!$this->isUserEnrolledInFolder($user, $folder)) {
