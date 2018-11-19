@@ -32,11 +32,6 @@ class ThemedHtml extends Html
      */
     protected $title = null;
 
-    /**
-     * @var \SitePage
-     */
-    protected $sitepage;
-
 
     /**
      * @var IDataGenerator[]
