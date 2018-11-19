@@ -1,3 +1,18 @@
-<h1>Participation Report</h1>
+{#
+Displays a report for the selected user and current term.
 
-<p>userId: {{ userId }}</p>
+Data:
+    user:     User - a student in years 7-12
+    isEnabled bool - is the report enabled for the student and their parents to visit?
+#}
+
+<div class="row">
+    <div class="island small-12">
+        <h1>Participation Report: {{ user.fullName }}</h1>
+        {% if not isEnabled %}
+            <div data-alert class="alert-box highlight">
+                This report is currently not visible to the student or their parents.
+            </div>
+        {% endif %}
+    </div>
+</div>

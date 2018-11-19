@@ -9,6 +9,7 @@ namespace Custom\Tigs\Summative\Report;
 
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
+use Custom\Tigs\Summative\Config;
 use Schoolbox\User;
 
 class Controller extends Web\Controller\Base
@@ -23,11 +24,13 @@ class Controller extends Web\Controller\Base
      */
     public function getParticipationReport(User $user): void
     {
+        $data = [
+            'user'      => $user,
+            'isEnabled' => $this->getConfigLoader()->get(Config::_TIGS_PARTICIPATION_REPORT_ENABLED),
+        ];
         $this
             ->getResponse()->content
-            ->set($this->buildHtmlOutput('@tigsSummativeReport/participation.twig', [
-                'userId' => $user->getId(),
-            ])
+            ->set($this->buildHtmlOutput('@tigsSummativeReport/participation.twig', $data)
             ->setTitle("Participation Report"));
     }
 
