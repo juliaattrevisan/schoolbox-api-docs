@@ -33,7 +33,7 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
 
     // fields that we will permit sorting on
     private $sortable = array('time', 'action', 'user');
-    private $filterable = array('keyword', 'user', 'action');
+    private $filterable = array('keyword', 'user', 'action', 'after', 'before');
     private $defaultOrderBy = 'time';
 
     /**
@@ -123,6 +123,8 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
                 $resultFilter[$thisFilter[0]] = $thisFilter[1];
         }
 
+        $resultFilter['after'] = $resultFilter['after'] ?: date('Y-m-d', strtotime('-30 days'));
+
         $this->filter = $resultFilter;
 
         $sqlFilter = array();
@@ -132,17 +134,15 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
             if(in_array($key, $this->filterable)) {
                 // custom filter by user
                 if ($key == 'user') {
-                    $sqlFilter[]    = "(username LIKE :user OR firstname LIKE :user OR lastname LIKE :user)";
+                    $sqlFilter[] = "(username LIKE :user OR firstname LIKE :user OR lastname LIKE :user)";
                     $params['user'] = $value;
-                }
-                else if($key == 'action') {
+                } else if ($key == 'action') {
                     $sqlFilter[] = "cl.action = :action";
                     $params['action'] = $value;
-                }
-                // custom filter by keyword
+                } // custom filter by keyword
                 else if ($key == 'keyword') {
                     $sqlFilter[] =
-"(
+                        "(
    c.name         LIKE :keyword
 OR f.description  LIKE :keyword
 OR f.realname     LIKE :keyword
@@ -154,12 +154,23 @@ OR mf.description LIKE :keyword
 OR mf.realname    LIKE :keyword
 OR ml.name        LIKE :keyword
 )";
-                    $params['keyword'] = '%'.$this->db->escapeForLike($value).'%';
-                }
-                // default filter key
+                    $params['keyword'] = '%' . $this->db->escapeForLike($value) . '%';
+                } else if ($key == 'after') {
+                    if ($date = strtotime($value)) {
+                        $date = date('Y-m-d H:i:s', $date);
+                        $sqlFilter[] = "`time` >= :after";
+                        $params['after'] = $date;
+                    }
+                } else if ($key == 'before') {
+                    if ($date = strtotime($value)) {
+                        $date = date('Y-m-d H:i:s', $date);
+                        $sqlFilter[] = "`time` <= :before";
+                        $params['before'] = $date;
+                    }
+                } // default filter key
                 else {
-                    $sqlFilter[]  = $this->db->quoteIdentifier($key)." LIKE :$key";
-                    $params[$key] = '%'.$this->db->escapeForLike($value).'%';
+                    $sqlFilter[] = $this->db->quoteIdentifier($key) . " LIKE :$key";
+                    $params[$key] = '%' . $this->db->escapeForLike($value) . '%';
                 }
             }
         }

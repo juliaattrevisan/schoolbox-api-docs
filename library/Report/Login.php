@@ -155,10 +155,14 @@ class Report_Login extends Report_Abstract implements Report_IReport
             }
         }
 
+        $resultFilter['after'] = $resultFilter['after'] ?: date('Y-m-d', strtotime('-30 days'));
+
+
         $this->filter = $resultFilter;
 
         $sqlFilter = array();
         $params    = array();
+
         foreach ($resultFilter as $key => $value) {
             if (in_array($key, $this->getFilterFields())) {
 
