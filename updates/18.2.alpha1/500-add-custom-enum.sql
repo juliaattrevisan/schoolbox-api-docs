@@ -16,7 +16,7 @@ INSERT INTO config(name, value, title, description, field_id, editable, hidden, 
 INSERT INTO config(name, value, title, description, field_id, editable, hidden, required, module) VALUES (
   'tigs_crp_subject_report_enabled',
   '0',
-  'Subject Report enabled',
+  'Subject Report enabled for non-staff',
   'If enabled, students and parents can access the Subject Report. Staff can always access.',
   (SELECT id FROM lu_config_field WHERE field = 'boolean'),
   'true',
