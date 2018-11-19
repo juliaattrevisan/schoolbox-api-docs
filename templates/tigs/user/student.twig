@@ -14,4 +14,10 @@
     <li>
         <a href="/homepage/2814" class="icon-forms">Permission Notes</a>
     </li>
+    {% set routeParticipationReport = routeLookupIfAuthorized('tigsSummativeReport.getParticipationReport', { userId: user.id, user: user }) %}
+    {% if routeParticipationReport %}
+        <li>
+            <a href="{{ routeParticipationReport }}" class="icon-report">Participation Report</a>
+        </li>
+    {% endif %}
 {% endblock buttons %}
