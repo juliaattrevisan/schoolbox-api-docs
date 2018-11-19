@@ -315,8 +315,6 @@ class SitePage extends Page
         }
 
         if (!$lite && !$this->lite) {
-            $this->buildPage();
-//            $this->setFile(TEMPLATE_body, 'output.html');
             $this->saveHistory();
             /** @var Output\ThemedHtml $renderer */
             $renderer = $this->getDi()->get('webOutput:html');
@@ -332,7 +330,7 @@ class SitePage extends Page
 
         // Output the PHPLib using the renderer
         $renderer->setData([
-            $content = $this->template->parse('finaloutput', TEMPLATE_content)
+            'content' => $this->template->parse('finaloutput', TEMPLATE_content)
         ]);
 
 
@@ -340,79 +338,8 @@ class SitePage extends Page
         $renderer->output($this->getDi()->get('webFactory')->newResponse());
 
 
-//        $debug_bar_head = '';
-//        $debug_bar_body = '';
-//
-//        if (Alaress\DebugBar\Instance::isEnabled()) {
-//            $renderer = Alaress\DebugBar\Instance::getInstance()->getJavascriptRenderer();
-//            $renderer->setBaseUrl('/debugbar/');
-//            $debug_bar_head = $renderer->renderHead();
-//            $debug_bar_body = $renderer->render();
-//        }
-//
-//        if (!$this->user instanceof User) {
-//            $this->user = new User();
-//        }
-//
-//        $dateFormat = $this->config->get('date_local');
-//        $dateTimeFormat = $this->config->get('date_local').' '.$this->config->get('date_time');
-//        $dateTimeFormatLong = $this->config->get('date_long');
-//        $startTimeADF = new Alaress_Date_Format(ConfigMapper::getInstance()->get('calendar_start_time'), 'H:i');
-//        $templateVar = array(
-//            'TEMPLATE_YEAR' => date('Y'),
-//            'SITE_NAME' => $this->config->get('school_name'),
-//            'SITE_TITLE' => $this->config->get('title'),
-//            'SITE_GREETING' => TextFormatter::greeting(), // TODO: This should be an object
-//            'SITE_LOGINNAME' => $this->user->formatName(),
-//            'SITE_USERNAME' => $this->user->getUsername(),
-//            'SITE_USER_EMAIL' => json_encode($this->user->getEmail()),
-//            'SITE_USER_FULLNAME' => json_encode($this->user->formatName()),
-//            'SITE_LOCATION' => $this->site,
-//            'SITE_ANALYTICS' => $this->config->get('site_analytics'),
-//            'USER_ID' => $this->user->getId(),
-//            'EXTERNAL_ID' => $this->user->getExternalId(),
-//            'USER_ROLE' => $this->user->getRole()->getName(),
-//            'SITE_VERSION' => $this->config->get('site_version'),
-//            'SCHOOL_ADDRESS' => $this->config->get('school_address'),
-//            'DEBUGBAR' => $debug_bar_body,
-//            'DEBUGBAR_HEAD' => $debug_bar_head,
-//            'WEBSOCKET_HOST' => self::parseRequestUrl(PHP_URL_HOST),
-//            'WEBSOCKET_PATH' => $this->config->get('websocket_path') ? $this->config->get('websocket_path') : '/',
-//            'WEBSOCKET_PORT' => $this->getWebsocketPort(),
-//            'WEBSOCKET_UNREAD_COUNT' => $_SESSION['msg-count'] ?? 0,
-//            'WEBSOCKET_UNREAD_LABEL' => $_SESSION['msg-count'] ?? '',
-//            'WEBSOCKET_STACK_LIMIT' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
-//            'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true',
-//            'DATEPICKER_FORMAT' => json_encode(Alaress_Date_Format_Converter::toDatepicker($dateFormat)),
-//            'MOMENTJS_FORMAT' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateFormat)),
-//            'MOMENTJS_FORMAT_DATETIME' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateTimeFormat)),
-//            'MOMENTJS_FORMAT_LOCAL_LONG' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateTimeFormatLong)),
-//            'LOCAL_DATE_FORMAT' => $dateFormat,
-//            'LOCAL_DATETIME_FORMAT' => $dateTimeFormat,
-//            'SYNERGETIC_SSO' => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
-//            'FEEDBACK_TEXT' => Scrub::text($this->config->get('feedback_text')),
-//            'FEEDBACK_URL' => Scrub::text($this->config->get('feedback_url')),
-//            'CALENDAR_START_TIME' => $startTimeADF->getDatabaseTime()
-//        );
-//
-//        $this->setVar($templateVar);
-//
-//        // Apply the custom java scripts all the pages other than admin pages
-//        if (!isset($_SERVER['REQUEST_URI']) || strpos($_SERVER['REQUEST_URI'], '/adminv2/') !== 0) {
-//            $this->setVar('SITE_HEADER_SCRIPTS', $this->config->get('site_header_scripts'));
-//        } else {
-//            $this->setVar('SITE_HEADER_SCRIPTS', '');
-//        }
-//
-//        $title = $this->getVar('TITLE');
-//
-//        if (empty($title)) {
-//            $this->setTitle();
-//        }
-//        $this->disableXssProtectionAfterForm();
-//
-//        $this->template->pParse('finaloutput', TEMPLATE_body);
-
+        // Do this leftover thing
+        self::disableXssProtectionAfterForm();
         return true;
     }
 
