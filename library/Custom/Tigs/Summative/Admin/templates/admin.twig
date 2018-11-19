@@ -1,1 +1,10 @@
-<h1>TIGS Summative Report Admin</h1>
+{#
+    configContext:  array     - Data required to render a config settings form
+#}
+<div class="row">
+    <div class="island small-12">
+        <h1>TIGS Summative Report Admin</h1>
+    </div>
+</div>
+
+{% include '@settings/moduleConfig.twig' with configContext only %}

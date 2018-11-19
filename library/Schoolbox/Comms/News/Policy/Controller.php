@@ -7,18 +7,16 @@
 
 namespace Schoolbox\Comms\News\Policy;
 
-use Alaress\Web\Controller\Base;
-use Config;
+use Alaress\Database\Predicate;
+use Alaress\Web\Controller\ConfigController;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
-use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
-class Controller extends Base
+class Controller extends ConfigController
 {
 
     /** @var UserAccessMapper */
@@ -26,12 +24,6 @@ class Controller extends Base
 
     /** @var TopicMapper */
     private $topicMapper;
-
-    /** @var ConfigMapper */
-    private $configMapper;
-
-    /** @var FieldStrategyFactory */
-    private $fieldStrategyFactory;
 
 
     /**
@@ -46,10 +38,10 @@ class Controller extends Base
         UserAccessMapper $userAccessMapper,
         TopicMapper $topicMapper
     ) {
-        $this->configMapper         = $configMapper;
-        $this->fieldStrategyFactory = $fieldStrategyFactory;
-        $this->userAccessMapper     = $userAccessMapper;
-        $this->topicMapper          = $topicMapper;
+        parent::__construct($configMapper, $fieldStrategyFactory);
+
+        $this->userAccessMapper = $userAccessMapper;
+        $this->topicMapper      = $topicMapper;
     }
 
 
@@ -66,9 +58,8 @@ class Controller extends Base
      */
     public function getPolicies(): void
     {
-        $configContext = (new ModuleConfig($this->fieldStrategyFactory))->getContext(
-            $this->getConfigLoader()->get('site_version'),
-            $this->configMapper->findByColumn(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_COMMS, ['order'=>['configID'=>'ASC']]),
+        $configContext = $this->buildConfigContext(
+            $this->buildConfigPredicate(),
             $this->router->generate('commsNewsPolicy.postPolicies')
         );
 
@@ -90,23 +81,23 @@ class Controller extends Base
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
      * @throws \UnexpectedValueException
+     * @throws Predicate\InvalidColumnException
      */
     public function postPolicies(): void
     {
-        /** @var GenericCollection|Config[] $existingConfigs */
-        $existingConfigs = $this->configMapper->findByColumn(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_COMMS)->indexBy(ConfigMapper::COL_NAME);
-
-        foreach ($this->request->post->get() as $name => $value) {
-            $existingConfig  = $existingConfigs[$name];
-            $valueSerializer = $this->fieldStrategyFactory->makeValueSerializer($existingConfig->getFieldId());
-            $newValue        = $valueSerializer->serializeValue($value);
-
-            if ($newValue !== $existingConfig->getValue()) {
-                $existingConfig->setValue($newValue);
-                $this->configMapper->save($existingConfig);
-            }
-        }
-
+        $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('commsNewsPolicy.getPolicies'));
+    }
+
+
+    /**
+     * Returns a predicate builder for finding all custom config for this module
+     *
+     * @return \Alaress\Database\Predicate\Builder
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    private function buildConfigPredicate(): Predicate\Builder
+    {
+        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_COMMS);
     }
 }

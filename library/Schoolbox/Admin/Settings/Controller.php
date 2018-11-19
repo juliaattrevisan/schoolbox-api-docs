@@ -7,34 +7,17 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings;
 
-use Alaress\Web\Controller\Base;
+use Alaress\Web\Controller\ConfigController;
 use Cfg;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\GenericCollection;
 use Alaress;
+use Alaress\Database\Predicate;
 
-class Controller extends Base
+class Controller extends ConfigController
 {
-
-    /** @var ConfigMapper */
-    private $configMapper;
-
-    /** @var FieldStrategyFactory */
-    private $fieldRendererFactory;
-
-
-    /**
-     * @param ConfigMapper         $configMapper
-     * @param FieldStrategyFactory $fieldRendererFactory
-     */
-    public function __construct(ConfigMapper $configMapper, FieldStrategyFactory $fieldRendererFactory)
-    {
-        $this->configMapper         = $configMapper;
-        $this->fieldRendererFactory = $fieldRendererFactory;
-    }
-
 
     /**
      * Renders an admin settings page for settings with the specified type
@@ -43,8 +26,9 @@ class Controller extends Base
      * @api   GET /adminv2/setting/{typeLabel}
      *
      * @param string $typeLabel The human-friendly type label stored in lu_config_type
-     * @throws \UnexpectedValueException
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws Predicate\InvalidColumnException
      */
     public function getSettings(string $typeLabel = null): void
     {
@@ -55,9 +39,8 @@ class Controller extends Base
             throw Mapper::getInstance()->generateException(Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        $configContext = (new ModuleConfig($this->fieldRendererFactory))->getContext(
-            $this->getConfigLoader()->get('site_version'),
-            $this->configMapper->findByTypeLabel($typeLabel, ConfigMapper::MODULE_SETTINGS),
+        $configContext = $this->buildConfigContext(
+            $this->buildConfigPredicate($typeLabel),
             $this->router->generate('settings.postSettings', ['typeLabel' => $typeLabel])
         );
 
@@ -88,14 +71,17 @@ class Controller extends Base
      *
      * @param string $typeLabel
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     * @throws Predicate\InvalidColumnException
      */
     public function postSettings(string $typeLabel): void
     {
         $postedValues = $this->request->post->get();
 
         /** @var GenericCollection|Config[] $existingConfigs */
-        $existingConfigs = $this->configMapper->findByColumn(ConfigMapper::COL_NAME, \array_keys($postedValues))->indexBy(ConfigMapper::COL_NAME);
+        $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate($typeLabel))->indexBy(ConfigMapper::COL_NAME);
 
         // Messaging behavior may be affected by changing configuration.
         $reRouterSettings = ['messaging_enabled', 'mail_replyto_enabled', 'feedback_url', 'feedback_text'];
@@ -103,7 +89,7 @@ class Controller extends Base
 
         foreach ($postedValues as $name => $value) {
             $existingConfig  = $existingConfigs[$name];
-            $valueSerializer = $this->fieldRendererFactory->makeValueSerializer($existingConfig->getFieldId());
+            $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
             $newValue        = $valueSerializer->serializeValue($value);
 
             if ($newValue !== $existingConfig->getValue()) {
@@ -111,7 +97,7 @@ class Controller extends Base
                     $reloadReRouter = true;
                 }
                 $existingConfig->setValue($newValue);
-                $this->configMapper->save($existingConfig);
+                $this->getConfigMapper()->save($existingConfig);
             }
         }
 
@@ -125,5 +111,26 @@ class Controller extends Base
 
         $route = urldecode($this->getRouter()->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));
         $this->getResponse()->redirect->afterPost($route);
+    }
+
+
+    /**
+     * Returns a predicate suitable for finding config for this module
+     *
+     * @param string $typeLabel
+     * @return Predicate\Builder
+     * @throws Predicate\InvalidColumnException
+     */
+    private function buildConfigPredicate(string $typeLabel): Predicate\Builder
+    {
+        $pb = $this->getConfigMapper()
+                   ->getPredicateBuilder()
+                   ->equals('lct.type', $typeLabel)
+                   ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SETTINGS);
+
+        if (!$this->getConfigLoader()->get(ConfigMapper::_BOARDER_LEAVE_ENABLED)) {
+            $pb->notEquals(ConfigMapper::COL_TYPE, ConfigMapper::TYPE_BOARD);
+        }
+        return $pb;
     }
 }
