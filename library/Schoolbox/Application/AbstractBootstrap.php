@@ -511,7 +511,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         $mapperFactory->get(SideMenuMapper::class),
                         $mapperFactory->get(BookmarkMapper::class)
                     )
-                );
+                )
+                ->addDataGenerator('scripts', new Output\DataGenerator\Scripts($config, $_SERVER));
 
             if ($config->get('debug_mode')) {
                 $output->addDataGenerator(

@@ -222,8 +222,7 @@
 
         {% endif %}
 
-        {# TODO hide if on admin page #}
-        {{ config.site_header_scripts | raw }}
+        {{ scripts.header | raw }}
 
     {% endblock mainHeader %}
 
