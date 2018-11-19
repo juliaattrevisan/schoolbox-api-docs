@@ -413,29 +413,35 @@
                             <img src="/images/logo.php?logo=skin_logo_square&size=normal" srcset="/images/logo.php?logo=skin_logo_square&size=normal 1x,/images/logo.php?logo=skin_logo_square&size=hidpi 2x" alt="{{ config.school_name }}"/>
                         </a>
 
-                        <ul id="top-menu">
-                            {% block menuTop %}
-                                {% include '@menuTop/renderer.twig' with topMenu only %}
-                            {% endblock menuTop %}
-                        </ul>
+                        {% block menuTop %}
+                            {% if user.current.id %}
+                                <ul id="top-menu">
+                                    {% include '@menuTop/renderer.twig' with topMenu only %}
+                                </ul>
+                            {% endif %}
+                        {% endblock menuTop %}
 
-                        <form id="search" action="/search" method="get">
-                            <input id="search-field" type="text" name="keyword" placeholder="Search"/>
-                            <label data-jsubmit for="search-field" class="icon-search no-text"></label>
-                        </form>
+                        {% block search %}
+                            {% if user.current.id %}
+                                <form id="search" action="/search" method="get">
+                                    <input id="search-field" type="text" name="keyword" placeholder="Search"/>
+                                    <label data-jsubmit for="search-field" class="icon-search no-text"></label>
+                                </form>
+                            {% endif %}
+                        {% endblock search %}
                     </section>
 
                     {% block messaging %}
-                    {% if ws.enabled %}
-                    <section class="right-small" id="notification-toggle">
-                        <a class="right-off-canvas-toggle icon-notifications hidden-for-xlarge-up" data-unread="{{ ws.unread }}">
-                            <span data-unread-count>{{ ws.unread ?? ''}}</span>
-                        </a>
-                        <a class="icon-notifications show-for-xlarge-up" data-unread="{{ ws.unread }}">
-                            <span data-unread-count>{{ ws.unread ?? '' }}</span>
-                        </a>
-                    </section>
-                    {% endif %}
+                        {% if ws.enabled and user.current.id %}
+                            <section class="right-small" id="notification-toggle">
+                                <a class="right-off-canvas-toggle icon-notifications hidden-for-xlarge-up" data-unread="{{ ws.unread }}">
+                                    <span data-unread-count>{{ ws.unread ?? ''}}</span>
+                                </a>
+                                <a class="icon-notifications show-for-xlarge-up" data-unread="{{ ws.unread }}">
+                                    <span data-unread-count>{{ ws.unread ?? '' }}</span>
+                                </a>
+                            </section>
+                        {% endif %}
                     {% endblock messaging %}
 
                 </nav>
