@@ -185,21 +185,37 @@
         function disableEnableAssignFromDescs() {
             var $groups = $rb.find("[data-group-summary]");
             $groups.each(function() {
+                var markIsDifferent = false;
+
                 var $this         = $(this),
                     displayedMark = $this.find("[data-group-descriptor-sum]").text().replace(/%/, '').trim(),
                     customMark    = $this.find("[data-group-mark]").val();
 
                 if (markType === 'letter') {
+                    // Compare letter grades by their string value (easier since we're dealing with brackets)
+
                     var grades = getLetterGrades($this);
                     customMark = getLetterGradeFromNumeric($this.find("[data-group-mark]").val(), grades);
+
+                    if (displayedMark !== customMark) {
+                        markIsDifferent = true;
+                    }
+                } else {
+                    // Compare percentage and total marks by their numeric value
+
+                    var diff = Math.abs(parseFloat(displayedMark) - parseFloat(customMark));
+                    // Allow for precision errors when diffing
+                    if (diff >= 0.01) {
+                        markIsDifferent = true;
+                    }
                 }
 
-                if (displayedMark === customMark) {
-                    $this.find("[data-use-descriptor-values]").hide();
-                } else {
+                if (markIsDifferent) {
                     $this.find("[data-use-descriptor-values]").show();
+                } else {
+                    $this.find("[data-use-descriptor-values]").hide();
                 }
-            })
+            });
         }
 
         disableEnableAssignFromDescs();
