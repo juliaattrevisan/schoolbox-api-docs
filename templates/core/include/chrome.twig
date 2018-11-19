@@ -319,72 +319,78 @@
                 </a>
             </div>
 
-            {% if user.current %}
-            <div class="row">
-                <ul class="account-menu accordion" id="account-menu" data-accordion>
-                    <li class="accordion-navigation">
-                        <a href="#accountContent" class="profile-drop" id="profile-accordion">
-                            <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square80"/>
-                            <span>{{ user.current.formatName }}</span>
-                        </a>
-                        <div id="accountContent" class="content">
-                            <ul id="profile-options">
-                                <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
-                                <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
-                                {% if user.current.superuser %}
-                                <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
-                                {% endif %}
-                                <li><a class="icon-logout" href="/logout.php">Logout</a></li>
-                            </ul>
-                            <ul id="avatar2">
-
-                                {% if user.current.linkedUser is not empty %}
-                                <li>
-                                    <ul id="switch-user">
-                                        <li class="separator">Switch User</li>
-                                        {% for linkedUser in user.current.linkedUser %}
-                                        <li class="switch-user">
-                                            <div class="card small-12">
-                                                <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
-                                                    <img src="/portrait.php?userId={{ linkedUser.externalId }}&amp;size=square64" />
-                                                    <p>{{ linkedUser.formatName }}</p>
-                                                    <p class="meta">{{ linkedUser.role.name }}</p>
-                                                </a>
-                                            </div>
-                                        </li>
-                                        {% endfor %}
+            {% block accountMenu %}
+                {% if user.current.id %}
+                    <div class="row">
+                        <ul class="account-menu accordion" id="account-menu" data-accordion>
+                            <li class="accordion-navigation">
+                                <a href="#accountContent" class="profile-drop" id="profile-accordion">
+                                    <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square80"/>
+                                    <span>{{ user.current.formatName }}</span>
+                                </a>
+                                <div id="accountContent" class="content">
+                                    <ul id="profile-options">
+                                        <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
+                                        <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
+                                        {% if user.current.superuser %}
+                                            <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
+                                        {% endif %}
+                                        <li><a class="icon-logout" href="/logout.php">Logout</a></li>
                                     </ul>
-                                </li>
-                                {% endif %}
+                                    <ul id="avatar2">
 
-                                {% if user.previous %}
-                                <li class="switch-user">
-                                    <div class="card small-12">
-                                        <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
-                                            <img src="/portrait.php?userId={{ user.previous.externalId }}&amp;size=square64" />
-                                            <p>{{ user.previous.formatName }}</p>
-                                            <p class="meta">{{ user.previous.role.name }}</p>
-                                        </a>
-                                    </div>
-                                </li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            {% endif %}
+                                        {% if user.current.linkedUser is not empty %}
+                                            <li>
+                                                <ul id="switch-user">
+                                                    <li class="separator">Switch User</li>
+                                                    {% for linkedUser in user.current.linkedUser %}
+                                                        <li class="switch-user">
+                                                            <div class="card small-12">
+                                                                <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
+                                                                    <img src="/portrait.php?userId={{ linkedUser.externalId }}&amp;size=square64" />
+                                                                    <p>{{ linkedUser.formatName }}</p>
+                                                                    <p class="meta">{{ linkedUser.role.name }}</p>
+                                                                </a>
+                                                            </div>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </li>
+                                        {% endif %}
 
-            <nav class="row">
-                <ul class="off-canvas-list second-nav">
-                    {% block menuTopOffCanvas %}
-                        {% include '@menuTop/renderer.twig' with topMenu only %}
-                    {% endblock menuTopOffCanvas %}
-                </ul>
-            </nav>
+                                        {% if user.previous %}
+                                            <li class="switch-user">
+                                                <div class="card small-12">
+                                                    <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
+                                                        <img src="/portrait.php?userId={{ user.previous.externalId }}&amp;size=square64" />
+                                                        <p>{{ user.previous.formatName }}</p>
+                                                        <p class="meta">{{ user.previous.role.name }}</p>
+                                                    </a>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                {% endif %}
+            {% endblock accountMenu %}
+
+            {% block menuTopOffCanvas %}
+                {% if user.current.id %}
+                    <nav class="row">
+                        <ul class="off-canvas-list second-nav">
+                            {% include '@menuTop/renderer.twig' with topMenu only %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% endblock menuTopOffCanvas %}
 
             {% block menuSideOffCanvas %}
-                {% include '@menuSide/renderer.twig' with sideMenu only %}
+                {% if user.current.id %}
+                    {% include '@menuSide/renderer.twig' with sideMenu only %}
+                {% endif %}
             {% endblock menuSideOffCanvas %}
         </aside>
 
