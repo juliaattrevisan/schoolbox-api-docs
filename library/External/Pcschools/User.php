@@ -718,21 +718,6 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Gets the current semester for the user.
-     *
-     * @importance low - used everywhere, but if you can't get it from the DB,
-     *             Jan-Jun: 1, Jul-Dec: 2
-     *
-     * @param string $externalUserId
-     *
-     * @return string The current semester
-     */
-    public function getCurrentSemester($externalUserId = null)
-    {
-        return date('m') < 6 ? 1 : 2;
-    }
-
-    /**
      * Gets the current year for the user.
      * Needs a method because a user could be set on file as being on a
      * previous year.
@@ -747,6 +732,18 @@ class External_Pcschools_User implements External_UserInterface
     public function getCurrentYear($externalUserId = null)
     {
         return date('Y');
+    }
+
+    public function findPeriod() {
+        $query = "SELECT TIME_PERIOD, SUB_PERIOD FROM dbo.CALENDAR WHERE DATE = :now";
+        $period = $this->getDatabase()->getRow($query, [':now'=>date('ymd')]);
+        if ($period['TIME_PERIOD'] == 0 || $period['SUBJECT_PERIOD'] == 0) {
+            $query = "SELECT TIME_PERIOD, SUBJECT_PD FROM dbo.SYSFILE";
+            $altPeriod = $this->getDatabase()->getRow($query);
+            $period['TIME_PERIOD'] = $period['TIME_PERIOD'] ?: $altPeriod['TIME_PERIOD'];
+            $period['SUB_PERIOD'] = $period['TIME_PERIOD'] ?: $altPeriod['SUBJECT_PD'];
+        }
+        return $period;
     }
 
     /**
@@ -784,25 +781,27 @@ class External_Pcschools_User implements External_UserInterface
         }
 
         $classes = [];
+        $period = $this->findPeriod();
 
         $classArray = $statement = $this->getDatabase()->getAll("
             SELECT DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
             FROM TIMEFILE tf
-                        INNER JOIN SUB su ON tf.[YEAR] = su.[YEAR] AND tf.SUBJECT = su.SUBJECT_NO AND tf.CLASS = su.CLASS AND tf.TIME_PERIOD = su.PERIOD_ID
+                        INNER JOIN SUB su ON tf.[YEAR] = su.[YEAR] AND tf.SUBJECT = su.SUBJECT_NO AND tf.CLASS = su.CLASS
                         INNER JOIN SUBJECT s ON tf.SUBJECT = s.NO
-                        INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
-            WHERE st.CURRENT_YEAR <> '99'
-              AND (st.STUDKEY = '" . $this->getDatabase()->quote($externalId) . "' AND tf.TIME_PERIOD = '" . $this->getDatabase()->quote($timePeriod) . "');
+            WHERE su.STUDKEY = '" . $this->getDatabase()->quote($externalId) . "' 
+              AND tf.TIME_PERIOD = '" . $this->getDatabase()->quote($period['TIME_PERIOD']) . "'
+              AND su.PERIOD_ID =  '" . $this->getDatabase()->quote($period['SUB_PERIOD']) . "'
+              AND (tf.[STATUS] = '' OR tf.[STATUS] = 'S' OR (tf.[STATUS] = 'C' AND tf.TEACHER_REP = '" . $this->getDatabase()->quote($externalId) . "' )))
         ");
 
         foreach ($classArray as $class)
         {
-            $code = $timePeriod . '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
+            $code = $period['TIME_PERIOD']. '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
             $classes[$code] = [
                 'code'       => $code,
                 'name'       => $class['DESC'],
                 'classType'  => '',
-                'campusCode' => $timePeriod,
+                'campusCode' => $period['TIME_PERIOD'],
             ];
         }
 
