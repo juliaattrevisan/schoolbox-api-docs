@@ -21,3 +21,17 @@
         </li>
     {% endif %}
 {% endblock buttons %}
+
+{% block folderListItemClasses -%}
+    {%- set routeSubjectReport = routeLookupIfAuthorized('tigsSummativeReport.getSubjectReport', { userId: user.id, user: user, folderId: subject.folder.id, folder: subject.folder }) -%}
+    {%- if routeSubjectReport %}actions-small-1{% endif -%}
+{%- endblock %}
+
+{% block folderListItemActions %}
+    {% set routeSubjectReport = routeLookupIfAuthorized('tigsSummativeReport.getSubjectReport', { userId: user.id, user: user, folderId: subject.folder.id, folder: subject.folder }) %}
+    {% if routeSubjectReport %}
+        <nav>
+            <a class="icon-report" href="{{ routeSubjectReport }}" title="Subject Report"></a>
+        </nav>
+    {% endif %}
+{% endblock %}

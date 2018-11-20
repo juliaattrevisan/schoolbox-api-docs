@@ -10,6 +10,7 @@ namespace Custom\Tigs\Summative\Report;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
 class Controller extends Web\Controller\Base
@@ -40,17 +41,17 @@ class Controller extends Web\Controller\Base
      *
      * @api   GET /modules/custom/tigs/summative/user/{userId}/folder/{folderId}
      * @level 18.1.0
-     * @param int $userId
-     * @param int $folderId
+     * @param User         $user
+     * @param Folder\Model $folder
      * @throws ServiceNotFound
      */
-    public function getSubjectReport(int $userId, int $folderId): void
+    public function getSubjectReport(User $user, Folder\Model $folder): void
     {
         $this
             ->getResponse()->content
             ->set($this->buildHtmlOutput('@tigsSummativeReport/subject.twig', [
-                'userId'   => $userId,
-                'folderId' => $folderId,
+                'userId'   => $user->getId(),
+                'folderId' => $folder->getId(),
             ])
             ->setTitle("Subject Report"));
     }
