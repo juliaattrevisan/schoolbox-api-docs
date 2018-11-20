@@ -10,6 +10,7 @@ namespace Custom\Tigs\Summative\Report;
 use Alaress;
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Twig\Loader\IChainLoader;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
@@ -21,6 +22,7 @@ use UnexpectedValueException;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Assessment\Term;
 
 class Module extends Alaress\Module\Module
 {
@@ -73,6 +75,20 @@ class Module extends Alaress\Module\Module
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+
+    /**
+     * @inheritdoc
+     * @param Container|ContainerInterface $injector The dependency injection container.
+     * @throws InvalidArgumentException
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector): void
+    {
+        $injector->params[Controller::class] = [
+            'externalUser' => $injector->lazyGet('externalUser'),
+            'termMapper'   => $this->getMapperFactory()->getLazy(Term\Mapper::class),
+        ];
     }
 
 
