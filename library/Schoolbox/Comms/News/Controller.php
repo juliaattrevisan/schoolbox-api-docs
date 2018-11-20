@@ -200,9 +200,11 @@ class Controller extends Base
         // Hard-coded to folder (for now)
         if ($folderId && $entityType && $entityType === Audience\Segment\Strategy\Folder::getEntityType()) {
             $folderStrategy = $this->strategyFactory->makeSimpleStrategy($entityType);
-            // Ensure the user is permitted to target this entity type and ensure that the user is permitted to target this entity value
+
+            // Ensure the user is permitted to target this entity type and has the permissions to audience into the folder
             if ($folderStrategy->canAudienceToEntityType($this->getUser()) &&
-                ($this->getUser()->isSuperuser() || Access::getInstance()->getFolderAccess($this->getUser(),$folderId) >= WRITE_ACCESS)
+                (Access::getInstance()->getFolderAccess($this->getUser(),$folderId) >= UserAccess::ACCESS_WRITE &&
+                    $folderStrategy->canAudienceToAnyClassOrGroup($this->getUser()))
             ) {
                 $codec = new Audience\Segment\Codec($this->audienceMapper);
                 $label = $this->folderMapper->findCheaplyById($folderId)->getNameWithCodes();
