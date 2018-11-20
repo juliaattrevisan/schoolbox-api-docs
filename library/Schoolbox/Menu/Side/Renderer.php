@@ -53,10 +53,10 @@ class Renderer
      */
     public function generateTwigData(?User $user, ?string $pageCurrent = null): array
     {
-        // Return null if no user logged in
+        // Return empty array if no user logged in
 
         if (!$user instanceof User) {
-            return null;
+            return [];
         }
 
         // Mangle subjects into usable format
