@@ -79,11 +79,7 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract {
 
 		/* Render all registered events
 		 */
-		echo "[";
-		echo $renderer->renderAll('javascript');
-		/* Final null element to help keep IE happy
-		 */
-		echo "{}]";
+		echo "[" . \implode(',', $renderer->renderAll('javascript')) . "]";
 
 		// Save page that is being viewed into history.
 		// Problem with storing start of sequence:

@@ -45,6 +45,5 @@ $strategy = ConfigMapper::getInstance()->get('site_location') === 'mggs'
     ? 'pbl-javascript'
     : 'javascript';
 
-// final null element to help keep IE happy
-printf('[%s{}]', $renderer->renderAll($strategy));
+printf('[%s]', \implode(',', $renderer->renderAll($strategy)));
 exit;

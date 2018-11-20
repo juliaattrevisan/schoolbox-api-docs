@@ -105,14 +105,14 @@ class Renderer
      * Render all events
      *
      * @param string $format
-     * @return string
+     * @return string[]
      * @throws \Exception If unable to find a rendering class for the specified type
      */
-    public function renderAll($format)
+    public function renderAll(string $format): array
     {
-        $output = '';
+        $output = [];
         foreach ($this->allEvents as $currentEvent) {
-            $output .= $this->renderEvent($currentEvent, $format);
+            $output[] = $this->renderEvent($currentEvent, $format);
         }
         return $output;
     }

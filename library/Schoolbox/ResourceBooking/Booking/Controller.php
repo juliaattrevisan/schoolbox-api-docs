@@ -657,11 +657,11 @@ class Controller extends Base
                     new \Calendar(),
                     $this->getUser()
                 );
-                $output   .= $renderer->render();
+                $output[] = $renderer->render();
             }
         }
 
-        $output = json_decode('[' . $output . '{}]');
+        $output = json_decode('[' . \implode(',', $output) . ']');
 
         $this->getResponse()->content->set(
             [

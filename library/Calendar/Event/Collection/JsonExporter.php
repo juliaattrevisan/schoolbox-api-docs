@@ -21,13 +21,6 @@ class JsonExporter implements IExporter
         header("Content-Type: application/json; charset=utf-8");
         header("Content-Disposition: attachment; filename={$filename}.json");
 
-        $eventStrings = [];
-        foreach ($renderer->getAllEvents() as $event) {
-            $eventStrings[] = $renderer->renderEvent($event, 'javascript');
-        }
-
-        $content = \implode(',', $eventStrings);
-
-        echo "[{$content}]";
+        printf("[%s]", \implode(',', $renderer->renderAll('javascript')));
     }
 }
