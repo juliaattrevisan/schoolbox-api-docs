@@ -67,12 +67,14 @@ class Mapper extends BaseMapper
      * @inheritdoc
      * @throws BaseMapper\Exception
      * @throws BaseMapper\DefinitionException
+     * @return bool
      */
-    public function softDeleteKami(Model $file): void
+    public function softDeleteKami(Model $file): bool
     {
         $kamiMapper = $this->getJoinMapper('kami');
         $kamiFiles = $kamiMapper->findByColumn('student_submission_file_id', $file->getId());
         $kamiMapper->delete($kamiFiles);
+        return true;
     }
 
 
