@@ -16,8 +16,8 @@ use GuzzleHttp;
 class Controller extends Component_Dashboard_ControllerAbstract
 {
 
-    private const API_KEY = 'b972a53b7573b1320ef3ef0145d8e1f1';
-    private $location = 'Melbourne,AU';
+    private const API_KEY = '93cc4486b7ba4afdafe44837182011';
+    private $location = 'Melbourne';
 
     /**
      * Controller constructor.
@@ -66,11 +66,11 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     private function getForecast() : array
     {
-        $requestUrl = "/data/2.5/forecast?q={$this->location}&units=metric&appid=" . self::API_KEY;
+        $requestUrl = "http://api.apixu.com/v1/forecast.json?q={$this->location}&days=5&key=" . self::API_KEY;
 
         try {
             $response = $this->makeRequest($requestUrl);
-            $twigData = $this->parseWeatherData($response, false);
+            $twigData = $this->parseWeatherData($response);
         } catch (\Exception $e) {
             $twigData = $this->parseWeatherData(['error' => $e->getMessage()], true);
         }
@@ -109,12 +109,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
      * @param array $responseData
      * @return array
      */
-    private function parseWeatherData($responseData, $weatherUnavailable) : array
+    private function parseWeatherData($responseData) : array
     {
-        if ($weatherUnavailable) {
-            return ['weatherUnavailable' => true];
-        }
-
         $twigData = ['weatherLocation' => $responseData['city']['name']];
 
         // Group by day, as we get a flat list of 3-hourly measurements otherwise
@@ -182,6 +178,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
             $twigData['forecastDays'][] = $dayForecast;
         }
+
+        // If we've reached this code path, we successfully retrieved the weather data.
+        $twigData[] = ['weatherUnavailable' => false];
 
         return $twigData;
     }
