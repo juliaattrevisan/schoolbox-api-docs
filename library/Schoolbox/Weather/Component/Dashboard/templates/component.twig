@@ -25,18 +25,16 @@
                         {% for forecastDay in forecastDays %}
                             <li data-equalizer>
                                 <div class="list-item">
-                                    <div class="card small-3" data-equalizer-watch>
-                                        <img src="{{ forecastImage }}" class='mime' title="{{ forecastSummary }}" alt="{{ forecastSummary }}" />
-                                    </div>
+                                    <i class="icon-weather-{{forecastDay.weatherSummary}}" title="{{ forecastDay.weatherSummary }}" alt="{{ forecastDay.weatherSummary }}"></i>
                                     <div class="card small-3 content temperature">
-                                        {{ forecastDay }}
+                                        {{ forecastDay.day }}
                                     </div>
                                     <div class="card small-5 content temperature">
-                                        {% if forecastDayIsNow %}
+                                        {% if forecastDay.forecastDayIsNow %}
                                             <span class="meta">{{ forecastDay.currentTemp }}&deg;</span>
                                         {% else %}
                                             <span class="hot">{{ forecastDay.highTemp }}&deg;</span>
-                                            <span class="cold">{{ forecasDay.lowTemp }}&deg;</span>
+                                            <span class="cold">{{ forecastDay.lowTemp }}&deg;</span>
                                         {% endif %}
                                     </div>
                                 </div>
