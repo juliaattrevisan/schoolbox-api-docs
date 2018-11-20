@@ -330,7 +330,7 @@ class SitePage extends Page
 
         // Output the PHPLib using the renderer
         $renderer->setData([
-            'content' => $this->template->parse('finaloutput', TEMPLATE_content)
+            'content' => $this->template->parse('finaloutput', TEMPLATE_body)
         ]);
 
 
