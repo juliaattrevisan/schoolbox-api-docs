@@ -328,6 +328,16 @@ class SitePage extends Page
         $renderer->setTemplate('include/sitepageContent.twig');
 
 
+        // Put the PHPLib together
+        $this->setFile(TEMPLATE_body, 'include/chromeContent.html');
+        $this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
+        if ($this->getVar('custom_head')) {
+            $this->parse('CUSTOM_HEADER_REGION', 'custom_head');
+        } else {
+            $this->setVar('CUSTOM_HEADER_REGION', '');
+        }
+
+
         // Output the PHPLib using the renderer
         $renderer->setData([
             'content' => $this->template->parse('finaloutput', TEMPLATE_body)
