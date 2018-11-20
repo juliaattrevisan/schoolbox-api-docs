@@ -277,8 +277,8 @@ class Folder extends SimpleStrategy
         // Special case for folders
         return
             $user->isSuperuser() ||
-            $this->hasCmsServicePerm($user, UserAccess::ACCESS_FULL) ||
-            $this->hasNewsServicePerm($user, UserAccess::ACCESS_FULL) ||
+            $this->hasCmsServicePerm($user, UserAccess::ACCESS_WRITE) ||
+            $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE) ||
             (null !== $entityValue && $this->access->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE);
     }
 
