@@ -75,16 +75,20 @@ class SitePage extends Page
     private $db;
 
     /**
-     * SitePage constructor.
-     * @param bool $login
+     * Constructor
      *
+     * @param bool                             $login
+     * @param \Aura\Di\ContainerInterface|null $di
      */
-    public function __construct($login = true)
+    public function __construct($login = true, ?Aura\Di\ContainerInterface $di = null)
     {
         parent::__construct();
 
         $this->config = \Config::getInstance();
         $this->db = \DeprecatedDatabase::getInstance();
+        if ($di) {
+            $this->di = $di;
+        }
 
         if(isset($_SESSION['user'])) {
             $this->user = $_SESSION['user'];

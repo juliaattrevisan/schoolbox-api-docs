@@ -332,15 +332,11 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
         // inject web params (yep, even Sitepage!)
         $di->set('layoutEngine', $di->lazy(function() use ($di) {
-            $sitepage = new SitePage(false);
-            $sitepage->setDi($di);
-            return $sitepage;
+            return new SitePage(false, $di);
         }));
 
         $di->set('sitePage',     $di->lazy(function() use ($di) {
-            $sitepage = new SitePage();
-            $sitepage->setDi($di);
-            return $sitepage;
+            return new SitePage(true, $di);
         }));
 
 
