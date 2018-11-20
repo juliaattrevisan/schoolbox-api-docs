@@ -19,6 +19,7 @@ use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
+use Aura\Router\Router;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
 use Alaress\Session\Factory;
@@ -30,6 +31,7 @@ use External_ClassInterface;
 use External_UserInterface;
 use GuzzleHttp;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\Bookmark\Mapper as BookmarkMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
@@ -48,6 +50,9 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Error;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
+use Schoolbox\Menu\Side\Mapper as SideMenuMapper;
+use Schoolbox\Menu\Side\Section\Mapper as SideMenuSectionMapper;
+use Schoolbox\Menu\Top\Mapper as TopMenuMapper;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
@@ -472,9 +477,51 @@ abstract class AbstractBootstrap implements BootstrapInterface
         // Web output class - currently uses Sitepage
         $di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
         $di->setters[Output\Stream::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
-        $di->setters[Output\ThemedHtml::class]['setSitepage'] = $di->lazyGet('layoutEngine');
         $di->set('webOutput:base', $di->lazyNew(Output\Base::class));
-        $di->set('webOutput:html', $di->lazyNew(Output\ThemedHtml::class));
+        $di->set('webOutput:html', $di->lazy(function() use ($di, $mapperFactory) {
+            /** @var IConfigLoader $config */
+            /** @var Session $session */
+            /** @var Router $router */
+            $config  = $di->get('config');
+            $session = $di->get('session');
+            $router  = $di->get('router');
+            $output  = new Output\ThemedHtml();
+            $output
+                ->setTemplateEngine($di->get('templateEngine'))
+                ->addDataGenerator('ws', new Output\DataGenerator\Websocket($config, $session, $_SERVER))
+                ->addDataGenerator(
+                    'tour',
+                    new Output\DataGenerator\Tour($config, $session->getAuthUser(), $router, $_SERVER)
+                )
+                ->addDataGenerator('user', new Output\DataGenerator\User($session->getAuthUser(), $session))
+                ->addDataGenerator(
+                    'topMenu',
+                    new Output\DataGenerator\TopMenu(
+                        $session->getAuthUser(),
+                        $mapperFactory->get(TopMenuMapper::class)
+                    )
+                )
+                ->addDataGenerator(
+                    'sideMenu',
+                    new Output\DataGenerator\SideMenu(
+                        $config,
+                        $session->getAuthUser(),
+                        $session,
+                        $mapperFactory->get(SideMenuSectionMapper::class),
+                        $mapperFactory->get(SideMenuMapper::class),
+                        $mapperFactory->get(BookmarkMapper::class)
+                    )
+                );
+
+            if ($config->get('debug_mode')) {
+                $output->addDataGenerator(
+                    'debugBar',
+                    new Output\DataGenerator\DebugBar(\Alaress\DebugBar\Instance::getInstance(), '/debugbar/')
+                );
+            }
+
+            return $output;
+        }));
         $di->set('webOutput:nochrome', $di->lazyNew(Output\Html::class));
         $di->set('webOutput:json', $di->lazyNew(Output\Json::class));
         $di->set('webOutput:file', $di->lazyNew(Output\File::class));
@@ -594,7 +641,17 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         )
                     );
 
+                    // MomentJsFormat filter
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'momentJsFormat',
+                            [ \Alaress_Date_Format_Converter::class, 'toMomentJs' ]
+                        )
+                    );
+
+
                     // Global access to config object and localisation
+                    // TODO capitalize globals
                     $twig->addGlobal('config', $config);
                     $twig->addGlobal('locale',  $di->get('l10n'));
                     $dateFormats = new Alaress_Date_Locale_Config();

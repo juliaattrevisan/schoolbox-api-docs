@@ -1,3 +1,21 @@
-        {% for tab in tabs %}
-            <li><a class="icon-{{ tab.icon }} {% if tabCurrent | lower == tab.token | lower and tab.token is not empty %}navthis{% endif %}" href="{{ tab.url }}" title="{{ tab.title }}" {% if tab.target is not empty %}target="{{ tab.target }}"{% endif %}><span>{{ tab.text }}</span></a></li>
-        {% endfor %}
+{% set tokens = {
+    '[id]':         user.id,
+    '[externalId]': user.externalId,
+    '[username]':   user.username,
+    '[firstName]':  user.firstName,
+    '[lastName]':   user.lastName,
+    '[email]':      user.email,
+} %}
+
+{% for tab in tabs %}
+    <li>
+        <a class="icon-{{ tab.icon }} {% if tabCurrent | lower == tab.token | lower and tab.token is not empty %}navthis{% endif %}"
+           {# Should href tokens be url-encoded? #}
+           href="{{ tab.url | replace(tokens) }}"
+           title="{{ tab.title | replace(tokens) }}"
+           {% if tab.target is not empty %}target="{{ tab.target }}"{% endif %}
+        >
+            <span>{{ tab.text | replace(tokens) }}</span>
+        </a>
+    </li>
+{% endfor %}

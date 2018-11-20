@@ -2,9 +2,6 @@
 /**
  * Output handling class that renders a Twig template and data into a theme.
  *
- * Currently, theming is handled by the good old Sitepage object, but this could
- * change.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -12,7 +9,8 @@
 
 namespace Alaress\Web\Output;
 
-use Aura\Web\Response;
+use Alaress_Date_Format;
+use Alaress\Web\Output\DataGenerator\IDataGenerator;
 
 class ThemedHtml extends Html
 {
@@ -34,10 +32,29 @@ class ThemedHtml extends Html
      */
     protected $title = null;
 
+
     /**
-     * @var \SitePage
+     * @var IDataGenerator[]
      */
-    protected $sitepage;
+    private $dataGenerators = [];
+
+
+    /**
+     * Adds a data generator to this object.
+     *
+     * The result of `$generator->generate()` will be available in the template
+     * in key `$key`
+     *
+     * @param string         $key
+     * @param IDataGenerator $generator
+     * @return ThemedHtml
+     */
+    public function addDataGenerator(string $key, IDataGenerator $generator): self
+    {
+        $this->dataGenerators[$key] = $generator;
+        return $this;
+    }
+
 
     /**
      * Outputs the response body from the response object.
@@ -47,56 +64,49 @@ class ThemedHtml extends Html
      */
     protected function outputResponseBody()
     {
-        $page     = $this->getSitepage();
         $template = $this->getTemplate();
-        $data     = $this->getData();
+        $data     = [];
         if (empty($template)) {
-            // No template? I can't generate a standard response,
-            // so return an error response.
             $code = $this->getResponse()->status->getCode();
-            if ($code == 404) {
-                $page->pageNotFound();
+            if ($code === 404) {
+                $template = 'common/error/404.twig';
             } else {
-                $page->error(null, 'Template not found', $code ?: 500);
+                // TODO Figure out how to render all the extraneous error stuff
+                $template = 'common/error/general.twig';
+                $data     = [
+                    'date'    => Alaress_Date_Format::now(),
+                    'summary' => [
+                        'message' => 'Template not found',
+                    ],
+                ];
             }
         } else {
-            $tab = $this->getTab();
-            if ($tab) {
-                $page->setTab($tab);
-            }
-            $page->setFile(TEMPLATE_content, 'output.html');
-            $page->buildPage();
-            $page->setVar('OUTPUT', $this->getTemplateEngine()->render($template, $data));
-
-            $page->setTitle($this->getTitle());
-            $page->outputPage(true);
+            $data = $this->getData();
         }
-    }
 
-    /**
-     * @param  \SitePage $sitepage
-     * @return $this
-     */
-    public function setSitepage($sitepage) {
-        $this->sitepage = $sitepage;
-        return $this;
-    }
+        $chromeData = [
+            'tab'   => $this->getTab(),
+            'title' => $this->getTitle(),
+        ];
+        $data       = [
+            'template' => $template,
+            'data'     => $data,
+            'chrome'   => $chromeData,
+        ];
+        foreach ($this->dataGenerators as $key => $generator) {
+            $data[$key] = $generator->generate($chromeData);
+        }
 
-    /**
-     * @return \SitePage
-     */
-    public function getSitepage() {
-        return $this->sitepage;
+        // Render it all out
+        echo $this->templateEngine->render('include/chrome.twig', $data);
     }
 
     /**
      * @return string
      */
-    protected function getTab()
+    public function getTab()
     {
-        return isset($this->tab)
-            ? $this->tab
-            : $this->retrieveFieldFromResponse('tab');
+        return $this->tab ?? $this->retrieveFieldFromResponse('tab');
     }
 
     /**
@@ -114,9 +124,7 @@ class ThemedHtml extends Html
      */
     protected function getTitle()
     {
-        return isset($this->title)
-            ? $this->title
-            : $this->retrieveFieldFromResponse('title');
+        return $this->title ?? $this->retrieveFieldFromResponse('title');
     }
 
     /**

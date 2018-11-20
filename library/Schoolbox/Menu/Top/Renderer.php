@@ -27,6 +27,29 @@ class Renderer
         $this->setMenuTopMapper(MenuTopMapper::getInstance());
     }
 
+
+    /**
+     * Generate Twig data for the top menu.
+     *
+     * @param null|User   $user
+     * @param null|string $tabCurrent
+     * @return array
+     */
+    public function generateTwigData(?User $user, ?string $tabCurrent = null): array
+    {
+        try {
+            $tabs = $this->getMenuTopMapper()->findTabsForUser($user);
+        } catch (MapperException $e) {
+            $tabs = [];
+        }
+
+        return [
+            'tabCurrent' => $tabCurrent,
+            'tabs'       => $tabs,
+            'user'       => $user,
+        ];
+    }
+
     /**
      * @param \Twig_Environment $twig
      * @param string $tabCurrent Used to highlight active tab
@@ -36,45 +59,7 @@ class Renderer
     public function menuTopRenderer(\Twig_Environment $twig, $tabCurrent = null, $user = null)
     {
         // Render this thing out
-        try {
-            $tabs = $this->getMenuTopMapper()->findTabsForUser($user);
-        } catch (MapperException $e) {
-            $tabs = [];
-        }
-
-        /** @var MenuTopModel $tab */
-        foreach ($tabs as $tab) {
-            // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
-
-            $array_find = [
-                '[id]',
-                '[externalId]',
-                '[username]',
-                '[firstName]',
-                '[lastName]',
-                '[email]',
-            ];
-
-            $array_replace = [
-                urlencode($user->getId()),
-                urlencode($user->getExternalId()),
-                urlencode($user->getUsername()),
-                urlencode($user->getFirstname()),
-                urlencode($user->getLastname()),
-                urlencode($user->getEmail())
-            ];
-
-            $tab->setUrl(str_ireplace($array_find, $array_replace, $tab->getUrl()));
-            $tab->setText(str_ireplace($array_find, $array_replace, $tab->getText()));
-            $tab->setTitle(str_ireplace($array_find, $array_replace, $tab->getTitle()));
-        }
-
-        // Render whatever tabs passed muster
-
-        return $twig->render('@menuTop/renderer.twig', array(
-            'tabCurrent' => $tabCurrent,
-            'tabs' => $tabs
-        ));
+        return $twig->render('@menuTop/renderer.twig', $this->generateTwigData($user, $tabCurrent));
     }
 
     /**

@@ -43,18 +43,20 @@ class Renderer
         $this->configLoader = new ConfigLoader();
     }
 
+
     /**
-     * @param \Twig_Environment $twig
-     * @param User $user
-     * @param string $pageCurrent
-     * @return null|string
+     * Generate Twig data for the side menu.
+     *
+     * @param null|User   $user
+     * @param null|string $pageCurrent
+     * @return array
      */
-    public function menuSideRenderer(\Twig_Environment $twig, $user, $pageCurrent = null)
+    public function generateTwigData(?User $user, ?string $pageCurrent = null): array
     {
-        // Return null if no user logged in
+        // Return empty array if no user logged in
 
         if (!$user instanceof User) {
-            return null;
+            return [];
         }
 
         // Mangle subjects into usable format
@@ -81,7 +83,7 @@ class Renderer
             usort($subjects, function ($a, $b) {
                 return strnatcmp($a['name'].$a['code'], $b['name'].$b['code']);
             });
-            
+
             //Need to assign back, as $subjects is localised variable
             $subjectGroups[$subjectGroup] = $subjects;
         }
@@ -104,32 +106,32 @@ class Renderer
         try {
             $nodes = $this->menuSideMapper->findNodesForUser($user);
 
-            // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
-
-            /** @var MenuSide $node */
-            foreach ($nodes as $node) {
-
-                $array_find = [
-                    '[id]',
-                    '[externalId]',
-                    '[username]',
-                    '[firstName]',
-                    '[lastName]',
-                    '[email]',
-                ];
-
-                $array_replace = [
-                    urlencode($user->getId()),
-                    urlencode($user->getExternalId()),
-                    urlencode($user->getUsername()),
-                    urlencode($user->getFirstname()),
-                    urlencode($user->getLastname()),
-                    urlencode($user->getEmail())
-                ];
-
-                $node->setUrl(str_ireplace($array_find, $array_replace, $node->getUrl()));
-                $node->setTitle(str_ireplace($array_find, $array_replace, $node->getTitle()));
-            }
+//            // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
+//
+//            /** @var MenuSide $node */
+//            foreach ($nodes as $node) {
+//
+//                $array_find = [
+//                    '[id]',
+//                    '[externalId]',
+//                    '[username]',
+//                    '[firstName]',
+//                    '[lastName]',
+//                    '[email]',
+//                ];
+//
+//                $array_replace = [
+//                    urlencode($user->getId()),
+//                    urlencode($user->getExternalId()),
+//                    urlencode($user->getUsername()),
+//                    urlencode($user->getFirstname()),
+//                    urlencode($user->getLastname()),
+//                    urlencode($user->getEmail())
+//                ];
+//
+//                $node->setUrl(str_ireplace($array_find, $array_replace, $node->getUrl()));
+//                $node->setTitle(str_ireplace($array_find, $array_replace, $node->getTitle()));
+//            }
         } catch (MapperException $e) {
             $nodes = [];
         }
@@ -139,8 +141,8 @@ class Renderer
 
         // Render this thing out
 
-        return $twig->render('@menuSide/renderer.twig', array(
-            'isStaff' => $user->getRole()->isStaff(),
+        return [
+            'user' => $user,
             'nodes' => $nodes,
             'subjects' => $subjectGroups,
             'sections' => $sections,
@@ -150,7 +152,25 @@ class Renderer
             'siteTitle' => $this->configLoader->get('title'),
             // TODO eradicate this session dependency
             'children' => is_array($_SESSION['children']) ? $_SESSION['children'] : []
-        ));
+        ];
+    }
+
+
+    /**
+     * @param \Twig_Environment $twig
+     * @param User $user
+     * @param string $pageCurrent
+     * @return null|string
+     */
+    public function menuSideRenderer(\Twig_Environment $twig, $user, $pageCurrent = null)
+    {
+        $data = $this->generateTwigData($user, $pageCurrent);
+        if (!$data) {
+            return null;
+        }
+
+        // Render this thing out
+        return $twig->render('@menuSide/renderer.twig', $data);
     }
 
     /**
