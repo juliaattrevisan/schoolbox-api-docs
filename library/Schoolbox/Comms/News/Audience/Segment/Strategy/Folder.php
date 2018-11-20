@@ -325,7 +325,7 @@ class Folder extends SimpleStrategy
      * @param User $user
      * @return bool
      */
-    private function canAudienceToAnyClassOrGroup(User $user): bool
+    public function canAudienceToAnyClassOrGroup(User $user): bool
     {
         return
             $user->isSuperuser() ||
