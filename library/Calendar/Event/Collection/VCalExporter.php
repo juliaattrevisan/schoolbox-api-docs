@@ -21,7 +21,7 @@ class VCalExporter implements IExporter
      * @throws \InvalidArgumentException
      * @throws \Exception
      */
-    public function renderAll(Renderer $renderer, string $filename): void
+    public function export(Renderer $renderer, string $filename): void
     {
         header('Cache-Control: private');
         header('Content-Type: text/calendar; charset=utf-8');

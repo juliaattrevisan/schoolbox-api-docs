@@ -440,4 +440,4 @@ $renderer = new Renderer(
     $viewer
 );
 
-$exporter->renderAll($renderer, $filename);
+$exporter->export($renderer, $filename);

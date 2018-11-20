@@ -15,7 +15,7 @@ class JsonExporter implements IExporter
      * @param string   $filename
      * @throws \Exception
      */
-    public function renderAll(Renderer $renderer, string $filename): void
+    public function export(Renderer $renderer, string $filename): void
     {
         header("Cache-Control: private");
         header("Content-Type: application/json; charset=utf-8");
