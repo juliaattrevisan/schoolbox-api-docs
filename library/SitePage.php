@@ -350,6 +350,7 @@ class SitePage extends Page
         $templateVar = [
             'USER_ID'      => $this->user->getId(),
             'USER_ROLE'    => $this->user->getRole()->getName(),
+            'SITE_NAME'    => $this->config::get('school_name'),
             'SITE_VERSION' => $this->config::get('site_version'),
         ];
         $this->setVar($templateVar);
