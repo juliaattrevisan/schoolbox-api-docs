@@ -72,7 +72,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
             $response = $this->makeRequest($requestUrl);
             $twigData = $this->parseWeatherData($response);
         } catch (\Exception $e) {
-            $twigData = $this->parseWeatherData(['error' => $e->getMessage()], true);
+            return ['error' => $e->getMessage(), 'weatherUnavailable' => true];
+        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+            return ['error' => $e->getMessage(), 'weatherUnavailable' => true];
         }
 
         return $twigData;
@@ -111,31 +113,46 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     private function parseWeatherData($responseData) : array
     {
-        $twigData = ['weatherLocation' => $responseData['city']['name']];
+        $twigData = ['weatherLocation' => $responseData['location']['name']];
 
-        // Group by day, as we get a flat list of 3-hourly measurements otherwise
-        $forecastDays = [];
-        foreach($responseData['list'] as $measurement) {
-            $day = \Alaress_Date_Format::newFromTimestamp($measurement['dt'])->getWeekDayNumber();
-            $forecastDays[$day][] = $measurement;
+        $today = \Alaress_Date_Format::newFromTimestamp($responseData['current']['last_updated_epoch'])->getWeekDayNumber();
+        switch($today) {
+            case \Alaress_Date_Format::MONDAY:
+                $todayOfWeek = 'Mon';
+                break;
+            case \Alaress_Date_Format::TUESDAY:
+                $todayOfWeek = 'Tue';
+                break;
+            case \Alaress_Date_Format::WEDNESDAY:
+                $todayOfWeek = 'Wed';
+                break;
+            case \Alaress_Date_Format::THURSDAY:
+                $todayOfWeek = 'Thu';
+                break;
+            case \Alaress_Date_Format::FRIDAY:
+                $todayOfWeek = 'Fri';
+                break;
+            case \Alaress_Date_Format::SATURDAY:
+                $todayOfWeek = 'Sat';
+                break;
+            default:
+                $todayOfWeek = 'Sun';
         }
 
-        foreach($forecastDays as $forecastDay) {
-            $weatherSummary = $forecastDay[0]['weather'][0]['main'];
-            $tempCurrent = $forecastDay[0]['main']['temp'] ?? null; // TODO what IS this value actually? IS it current temp?
+        $twigData['today'] = [
+            'day' => $todayOfWeek,
+            'weatherSummary' => $responseData['current']['condition']['text'],
+            'weatherIcon' => $responseData['current']['condition']['icon'],
+            'currentTemp' => $responseData['current']['temp_c'],
+            'humidity' => $responseData['current']['humidity'],
+            'windSpeed' => $responseData['current']['wind_kph'],
+            'windDirection' => $responseData['current']['wind_dir'],
+            'lastUpdated' => $responseData['current']['last_updated_epoch'] // TODO format this
+        ];
 
-            // Work out the highest and lowest recorded temperature for this day over all the measurements we received
-            $tempMin = $this->getMinTempForDay($forecastDay);
-            $tempMax = $this->getMaxTempForDay($forecastDay);
+        foreach($responseData['forecast']['forecastday'] as $forecastDay) {
 
-            $humidity = $this->averageMeasurement($forecastDay, 'main', 'humidity');
-            $windSpeed = $this->averageMeasurement($forecastDay, 'wind', 'speed');
-            $windDegrees = $this->averageMeasurement($forecastDay, 'wind', 'deg'); // TODO are we ok with this? Or should we parse it into direction format?
-
-            // TODO parse into something. This is UTC
-            $lastUpdatedDateString = $forecastDay[0]['dt_txt'];
-
-            $day = \Alaress_Date_Format::newFromTimestamp($forecastDay[0]['dt'])->getWeekDayNumber();
+            $day = \Alaress_Date_Format::newFromTimestamp($forecastDay['date_epoch'])->getWeekDayNumber();
             switch($day) {
                 case \Alaress_Date_Format::MONDAY:
                     $dayOfWeek = 'Mon';
@@ -159,28 +176,23 @@ class Controller extends Component_Dashboard_ControllerAbstract
                     $dayOfWeek = 'Sun';
             }
 
-            // TODO this comparison is too precise; need to compare on day of week
-            $forecastDayIsNow = \Alaress_Date_Format::now()->getUnixTimeStamp() === \Alaress_Date_Format::newFromTimestamp($forecastDay[0]['dt'])->getUnixTimeStamp();
-
             $dayForecast = [
                 'day' => $dayOfWeek,
-                'weatherSummary' => $weatherSummary,
-                'currentTemp' => $tempCurrent,
-                'lowTemp' => $tempMin,
-                'highTemp' => $tempMax,
-                'humidity' => $humidity,
-                'windSpeed' => $windSpeed,
-                'windDegrees' => $windDegrees,
-                'lastUpdated' => $lastUpdatedDateString,
-                'weatherUnavailable' => false,
-                'forecastDayIsNow' => $forecastDayIsNow,
+                'weatherSummary' => $forecastDay['condition']['text'],
+                'weatherIcon' => $forecastDay['condition']['icon'],
+                'lowTemp' => $forecastDay['min_temp_c'],
+                'highTemp' => $forecastDay['max_temp_c'],
+                'humidity' => $forecastDay['humidity'],
+                'windSpeed' => $forecastDay['wind_kph'],
+                'windDirection' => $forecastDay['wind_dir'],
+                'lastUpdated' => $forecastDay['last_updated_epoch'] // TODO format this
             ];
 
             $twigData['forecastDays'][] = $dayForecast;
         }
 
         // If we've reached this code path, we successfully retrieved the weather data.
-        $twigData[] = ['weatherUnavailable' => false];
+        $twigData['weatherUnavailable'] = false;
 
         return $twigData;
     }

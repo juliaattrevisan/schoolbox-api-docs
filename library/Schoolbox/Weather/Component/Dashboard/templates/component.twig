@@ -12,6 +12,7 @@
 
                 <div class="content">
                     <p class="meta">Weather service is temporarily unavailable.</p>
+                    <p>{{ error }}</p>
                 </div>
 
             {% else %}
@@ -22,20 +23,27 @@
 
                 <section>
                     <ul class="weather-list-summary">
+                        <li data-equalizer>
+                            <div class="list-item">
+                                <img src="{{ today.weatherIcon }}" title="{{ today.weatherSummary }}" alt="{{ today.weatherSummary }}"/>
+                                <div class="card small-3 content temperature">
+                                    {{ today.day }}
+                                </div>
+                                <div class="card small-5 content temperature">
+                                    <span class="hot">{{ today.currentTemp }}&deg;</span>
+                                </div>
+                            </div>
+                        </li>
                         {% for forecastDay in forecastDays %}
                             <li data-equalizer>
                                 <div class="list-item">
-                                    <i class="icon-weather-{{forecastDay.weatherSummary}}" title="{{ forecastDay.weatherSummary }}" alt="{{ forecastDay.weatherSummary }}"></i>
+                                    <img src="{{ forecastDay.weatherIcon }}" title="{{ forecastDay.weatherSummary }}" alt="{{ forecastDay.weatherSummary }}"/>
                                     <div class="card small-3 content temperature">
                                         {{ forecastDay.day }}
                                     </div>
                                     <div class="card small-5 content temperature">
-                                        {% if forecastDay.forecastDayIsNow %}
-                                            <span class="meta">{{ forecastDay.currentTemp }}&deg;</span>
-                                        {% else %}
-                                            <span class="hot">{{ forecastDay.highTemp }}&deg;</span>
-                                            <span class="cold">{{ forecastDay.lowTemp }}&deg;</span>
-                                        {% endif %}
+                                        <span class="hot">{{ forecastDay.highTemp }}&deg;</span>
+                                        <span class="cold">{{ forecastDay.lowTemp }}&deg;</span>
                                     </div>
                                 </div>
                             </li>
