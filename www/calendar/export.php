@@ -156,6 +156,27 @@ try {
     $start = $start ?: \strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
     $end   = $end ?: \strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
 
+    // Ensure the requested period is not greater than what is configured in the admin so students don't bring down server
+    if (isset($_GET['start']) || isset($_GET['end'])) {
+        $permittedPeriodMonths = $back + $forward;
+        $requestedPeriodMonths = (int)(($end - $start) / (3600 * 24 * 31));
+        if ($requestedPeriodMonths > $permittedPeriodMonths) {
+            $message = "Requested period '{$requestedPeriodMonths}' is greater than permitted period '{$permittedPeriodMonths}'";
+
+            $format = $_GET['format'] ?? '';
+            \http_response_code(401);
+            switch (\strtolower($format)) {
+                case 'json':
+                    echo json_encode(['errors' => [$message]]);
+                    break;
+                case 'csv':
+                default:
+                    echo $message;
+            }
+            exit;
+        }
+    }
+
     // Report errors in this thing
     /** @var Raven_Client|null $sentry */
     $sentry = $kernel->getDependencyInjector()->has('sentry')
