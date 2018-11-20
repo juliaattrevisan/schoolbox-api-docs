@@ -344,11 +344,9 @@ class SitePage extends Page
             $this->user = new User();
         }
         $templateVar = [
-            'USER_ID'        => $this->user->getId(),
-            'USER_ROLE'      => $this->user->getRole()->getName(),
-            'SITE_VERSION'   => $this->config::get('site_version'),
-            // TODO fix the only place this is used
-            'SYNERGETIC_SSO' => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
+            'USER_ID'      => $this->user->getId(),
+            'USER_ROLE'    => $this->user->getRole()->getName(),
+            'SITE_VERSION' => $this->config::get('site_version'),
         ];
         $this->setVar($templateVar);
 

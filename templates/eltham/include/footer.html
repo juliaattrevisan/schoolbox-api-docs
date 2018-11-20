@@ -40,8 +40,7 @@
 			var deeplink = "/" + $(this).attr('data-portal');
 
 			// Check if we have already gone through the SSO popup process
-
-			if ({SYNERGETIC_SSO}) {
+			if (schoolboxUser.communityLogin) {
 				// Already done, just go to the page
 
 				window.location.href='/synergetic' + deeplink;

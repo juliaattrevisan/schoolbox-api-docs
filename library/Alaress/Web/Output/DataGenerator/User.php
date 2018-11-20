@@ -61,9 +61,10 @@ class User implements IDataGenerator
             }
         }
         return [
-            'current'      => $this->currentUser,
-            'previous'     => $previousUser,
-            'impersonated' => $impersonated,
+            'current'        => $this->currentUser,
+            'previous'       => $previousUser,
+            'impersonated'   => $impersonated,
+            'communityLogin' => $this->session->get('communityLogin'),
         ];
     }
 }
