@@ -115,32 +115,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
     {
         $twigData = ['weatherLocation' => $responseData['location']['name']];
 
-        $today = \Alaress_Date_Format::newFromTimestamp($responseData['current']['last_updated_epoch'])->getWeekDayNumber();
-        switch($today) {
-            case \Alaress_Date_Format::MONDAY:
-                $todayOfWeek = 'Mon';
-                break;
-            case \Alaress_Date_Format::TUESDAY:
-                $todayOfWeek = 'Tue';
-                break;
-            case \Alaress_Date_Format::WEDNESDAY:
-                $todayOfWeek = 'Wed';
-                break;
-            case \Alaress_Date_Format::THURSDAY:
-                $todayOfWeek = 'Thu';
-                break;
-            case \Alaress_Date_Format::FRIDAY:
-                $todayOfWeek = 'Fri';
-                break;
-            case \Alaress_Date_Format::SATURDAY:
-                $todayOfWeek = 'Sat';
-                break;
-            default:
-                $todayOfWeek = 'Sun';
-        }
-
         $twigData['today'] = [
-            'day' => $todayOfWeek,
+            'day' => $this->getDayOfWeek($responseData['current']['last_updated_epoch']),
             'weatherSummary' => $responseData['current']['condition']['text'],
             'weatherIcon' => $responseData['current']['condition']['icon'],
             'currentTemp' => $responseData['current']['temp_c'],
@@ -151,33 +127,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
         ];
 
         foreach($responseData['forecast']['forecastday'] as $forecastDay) {
-
-            $day = \Alaress_Date_Format::newFromTimestamp($forecastDay['date_epoch'])->getWeekDayNumber();
-            switch($day) {
-                case \Alaress_Date_Format::MONDAY:
-                    $dayOfWeek = 'Mon';
-                    break;
-                case \Alaress_Date_Format::TUESDAY:
-                    $dayOfWeek = 'Tue';
-                    break;
-                case \Alaress_Date_Format::WEDNESDAY:
-                    $dayOfWeek = 'Wed';
-                    break;
-                case \Alaress_Date_Format::THURSDAY:
-                    $dayOfWeek = 'Thu';
-                    break;
-                case \Alaress_Date_Format::FRIDAY:
-                    $dayOfWeek = 'Fri';
-                    break;
-                case \Alaress_Date_Format::SATURDAY:
-                    $dayOfWeek = 'Sat';
-                    break;
-                default:
-                    $dayOfWeek = 'Sun';
-            }
-
             $dayForecast = [
-                'day' => $dayOfWeek,
+                'day' => $this->getDayOfWeek($forecastDay['date_epoch']),
                 'weatherSummary' => $forecastDay['condition']['text'],
                 'weatherIcon' => $forecastDay['condition']['icon'],
                 'lowTemp' => $forecastDay['min_temp_c'],
@@ -195,5 +146,38 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $twigData['weatherUnavailable'] = false;
 
         return $twigData;
+    }
+
+    private function getDayOfWeek($timestamp) {
+        $day = \Alaress_Date_Format::newFromTimestamp($timestamp)->getWeekDayNumber();
+
+        if ($day === \Alaress_Date_Format::now()->getWeekDayNumber()) {
+            return 'Now';
+        }
+
+        switch($day) {
+            case \Alaress_Date_Format::MONDAY:
+                $dayOfWeek = 'Mon';
+                break;
+            case \Alaress_Date_Format::TUESDAY:
+                $dayOfWeek = 'Tue';
+                break;
+            case \Alaress_Date_Format::WEDNESDAY:
+                $dayOfWeek = 'Wed';
+                break;
+            case \Alaress_Date_Format::THURSDAY:
+                $dayOfWeek = 'Thu';
+                break;
+            case \Alaress_Date_Format::FRIDAY:
+                $dayOfWeek = 'Fri';
+                break;
+            case \Alaress_Date_Format::SATURDAY:
+                $dayOfWeek = 'Sat';
+                break;
+            default:
+                $dayOfWeek = 'Sun';
+        }
+
+        return $dayOfWeek;
     }
 }
