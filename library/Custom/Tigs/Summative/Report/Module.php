@@ -161,6 +161,7 @@ class Module extends Alaress\Module\Module
     {
         return new Rule\LazyCallback(function () use ($configName, $reportName) {
             return new Rule\All(
+                new Rule\IsLoggedIn(),
                 new Rule\Callback(function (array $params) {
                     // Because preload exceptions are not handled immediately, we can't fatal if the preload failed.
                     if (!($params['user'] ?? null) instanceof User) {
