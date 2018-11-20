@@ -75,48 +75,12 @@ class Controller extends Base
      */
     public function getClassSnapshotList(Folder $folder)
     {
-        $students = [];
-        $userIds = [];
-
-        // Get the class codes on the folder we are viewing
-
-        $codes = $folder->getCodes()->getColumnValues('code');
-
-        // Retrieve the students in each of these classes
-
-        foreach ($codes as $code) {
-            $students = array_merge($students, $this->externalClass->getStudents($code));
-        }
-
-        // If we didn't find any students, no point going on
-
-        if (count($students) == 0) {
-            return false;
-        }
-
-        // Now convert those external user arrays into Schoolbox users
-
-        $users = $this->userMapper->findByColumn(
-            'synergy_id',
-            array_column($students, 'synergy_id')
-        );
-
-        /** @var User $user */
-        foreach ($users as $user) {
-            $userIds[] = $user->getId();
-        }
-
-        // If we didn't find any schoolbox users, no point going on
-
-        if (count($userIds) == 0) {
-            return false;
-        }
-
+        $userIds = $this->getStudents($folder);
         // And work out what surveys they have completed
-
         $surveys = null;
-
-        $surveys = $this->surveyMapper->findAttemptedSurveysForUsers($userIds);
+        if(count($userIds) > 0) {
+            $surveys = $this->surveyMapper->findAttemptedSurveysForUsers($userIds, 'backpack');
+        }
 
         $this->getResponse()->content->set([
             'template' => '@surveySnapshot/classSnapshot.twig',
@@ -134,14 +98,14 @@ class Controller extends Base
      *
      * @param Survey $survey
      */
-    public function getClassSnapshot($survey)
+    public function getClassSnapshot($survey, $folder)
     {
         $this->excel = new PHPExcel();
 
         if ($survey instanceof Survey) {
             $answersRenderArray = [];
-
-            $responses = SurveyMapper::getInstance()->findClassSnapshot($survey->getId());
+            $userIds = $this->getStudents($folder);
+            $responses = SurveyMapper::getInstance()->findClassSnapshot($survey->getId(), $userIds);
 
             foreach ($responses as $response) {
                 // Strip the section title of tags and create an array entry for it if none already exists
@@ -252,10 +216,8 @@ class Controller extends Base
                         }
 
                         // Move down to next row
-
                         $this->currentRow++;
                     }
-
                     $currentQuestionColumn++;
                 }
             }
@@ -367,5 +329,36 @@ class Controller extends Base
             array_values($replacements),
             $string
         );
+    }
+
+
+    /**
+     * @param Folder $folder
+     * @return array
+     */
+    private function getStudents(Folder $folder) : array
+    {
+        $students = [];
+
+        // Get the class codes on the folder we are viewing
+        $codes = $folder->getCodes()->getColumnValues('code');
+
+        // Retrieve the students in each of these classes
+        foreach ($codes as $code) {
+            $students = array_merge($students, $this->externalClass->getStudents($code));
+        }
+
+        // If we didn't find any students, no point going on
+        if (count($students) == 0) {
+            return [];
+        }
+
+        // Now convert those external user arrays into Schoolbox users
+        $users = $this->userMapper->findByColumn(
+            'synergy_id',
+            array_column($students, 'synergy_id')
+        );
+
+        return $users->getPropertyValues('id');
     }
 }

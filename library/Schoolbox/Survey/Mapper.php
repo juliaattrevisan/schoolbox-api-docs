@@ -110,18 +110,19 @@ class Mapper extends BaseMapper
      * @param array $userIds Array containing Schoolbox user IDs of people that have attempted quizzes
      * @return Collection
      */
-    public function findAttemptedSurveysForUsers($userIds)
+    public function findAttemptedSurveysForUsers($userIds, $name)
     {
         $data = PredicateBuilder::getArrayBindings($userIds, 'userId');
 
-        $sql = $this->getSelectString() . " 
-                
-            WHERE           `aa`.user_id IN ({$data['placeholders']}) AND
-                            `{$this->getTable()}`.deleted_at IS NULL AND
-                            `aa`.deleted_at IS NULL AND
-                            `f`.deleted_at IS NULL AND
-                            `ass`.deleted_at IS NULL
-        ";
+        $pb = new PredicateBuilder();
+        $pb->in('aa.user_id', $userIds);
+        $pb->like('title', $name);
+        $pb->isNull("`{$this->getTable()}`.deleted_at" );
+        $pb->isNull("`aa`.deleted_at" );
+        $pb->isNull("`f`.deleted_at" );
+        $pb->isNull("`ass`.deleted_at");
+
+        $sql = $this->getSelectString() . " WHERE ".$pb->getWhere();
 
         $statement = $this->getDatabase()->prepare($sql);
         $statement->execute($data['bindings']);
@@ -197,7 +198,7 @@ class Mapper extends BaseMapper
      * @param int $surveyId
      * @return array
      */
-    public function findClassSnapshot($surveyId)
+    public function findClassSnapshot($surveyId, $userIds)
     {
         $sql = "
             SELECT      attempt.user_id,
@@ -230,6 +231,7 @@ class Mapper extends BaseMapper
             WHERE       survey.deleted_at IS NULL AND
                         survey.assess_id = :survey_id AND
                         survey.availability = 'survey'
+                        attempt.user_id = IN (".explode(',' $userIds).")
             ORDER BY    attempt.user_id,
                         section.sequence,
                         question.sequence            
