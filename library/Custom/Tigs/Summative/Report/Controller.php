@@ -100,7 +100,8 @@ class Controller extends Web\Controller\Base
             }
             $semTitle = $this->termMapper->findForDate($now)->getTitle();
 
-            if (!preg_match('/Semester (\d)/', $semTitle, $matches)) {
+            // Vagrant + TIGS current share the same term title scheme, eg 'Semester 2, 2018'
+            if (!\preg_match('/Semester (\d)/', $semTitle, $matches)) {
                 throw new \UnexpectedValueException("Unable to recognise a semester");
             }
             $sbSem = (int)$matches[1];
