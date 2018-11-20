@@ -199,25 +199,25 @@ class Controller extends Base
 
         // Hard-coded to folder (for now)
         if ($folderId && $entityType && $entityType === Audience\Segment\Strategy\Folder::getEntityType()) {
+
+            /** @var Audience\Segment\Strategy\Folder $folderStrategy */
             $folderStrategy = $this->strategyFactory->makeSimpleStrategy($entityType);
-            // Ensure the user is permitted to target this entity type
-            if ($folderStrategy->canAudienceToEntityType($this->getUser())) {
-                // Ensure the user is permitted to target this entity value
-                $sql = $folderStrategy->getAudiencingSql($this->getUser());
-                $availableFolders   = $sql ? $this->databaseInternal->executeQuery($sql)->fetchAll() : [];
-                $availableFolderIds = \array_column($availableFolders, 'id');
-                if (\in_array($folderId, $availableFolderIds, false)) {
-                    $codec = new Audience\Segment\Codec($this->audienceMapper);
-                    $label = $this->folderMapper->findCheaplyById($folderId)->getNameWithCodes();
 
-                    $audienceSegment = new Audience\SegmentSelectizeOption(
-                        $codec->encodeSimpleAttributes($entityType, $folderId, Audience\Model::RELATIONSHIP_SELF),
-                        $label
-                    );
+            // Ensure the user is permitted to target this entity type and has the permissions to audience into the folder
+            if ($folderStrategy->canAudienceToEntityType($this->getUser()) &&
+                (Access::getInstance()->getFolderAccess($this->getUser(),$folderId) >= UserAccess::ACCESS_WRITE ||
+                    $folderStrategy->canAudienceToAnyClassOrGroup($this->getUser()))
+            ) {
+                $codec = new Audience\Segment\Codec($this->audienceMapper);
+                $label = $this->folderMapper->findCheaplyById($folderId)->getNameWithCodes();
 
-                    $audienceSegment->addLabel($entityType, $codec->encodeValue($folderId), $label);
-                    $audienceSegments[] = $audienceSegment;
-                }
+                $audienceSegment = new Audience\SegmentSelectizeOption(
+                    $codec->encodeSimpleAttributes($entityType, $folderId, Audience\Model::RELATIONSHIP_SELF),
+                    $label
+                );
+
+                $audienceSegment->addLabel($entityType, $codec->encodeValue($folderId), $label);
+                $audienceSegments[] = $audienceSegment;
             }
         }
 
