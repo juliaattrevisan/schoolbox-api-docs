@@ -84,16 +84,17 @@ class ThemedHtml extends Html
             $data = $this->getData();
         }
 
-        $data = [
+        $chromeData = [
+            'tab'   => $this->getTab(),
+            'title' => $this->getTitle(),
+        ];
+        $data       = [
             'template' => $template,
             'data'     => $data,
-            'chrome'   => [
-                'tab'   => $this->getTab(),
-                'title' => $this->getTitle(),
-            ],
+            'chrome'   => $chromeData,
         ];
         foreach ($this->dataGenerators as $key => $generator) {
-            $data[$key] = $generator->generate($this);
+            $data[$key] = $generator->generate($chromeData);
         }
 
         // Render it all out

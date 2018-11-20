@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Alaress\Web\Output\DataGenerator;
 
-use Alaress\Web\Output\ThemedHtml;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Schoolbox\IConfigLoader;
@@ -64,14 +63,14 @@ class Tour implements IDataGenerator
     /**
      * @inheritdoc
      */
-    public function generate(ThemedHtml $output): array
+    public function generate(?array $chromeData = []): array
     {
         $tour = [];
         // TODO figure out how to figure out if user's impersonated?
         // Alternately just don't show tours to impersonated users
         if ($this->currentUser && $this->config->get('tours_enabled')) {
-            $request     = parse_url($this->serverVars['REQUEST_URI']);
-            $encodedUrl  = Redirect::encode($request['path']);
+            $request    = parse_url($this->serverVars['REQUEST_URI']);
+            $encodedUrl = Redirect::encode($request['path']);
 
             // Add the route generator here
             try {

@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Alaress\Web\Output\DataGenerator;
 
 use Alaress\Session\Session;
-use Alaress\Web\Output\ThemedHtml;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -89,7 +88,7 @@ class SideMenu implements IDataGenerator
     /**
      * @inheritdoc
      */
-    public function generate(ThemedHtml $output): array
+    public function generate(?array $chromeData = []): array
     {
         // Return nothing if no user logged in
         if (!$this->currentUser) {

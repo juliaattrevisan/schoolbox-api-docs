@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Alaress\Web\Output\DataGenerator;
 
 use Alaress\Session\Session;
-use Alaress\Web\Output\ThemedHtml;
 use Schoolbox\User as UserModel;
 
 /**
@@ -46,7 +45,7 @@ class User implements IDataGenerator
     /**
      * @inheritdoc
      */
-    public function generate(ThemedHtml $output): array
+    public function generate(?array $chromeData = []): array
     {
         $previousUser = null;
         $impersonated = false;

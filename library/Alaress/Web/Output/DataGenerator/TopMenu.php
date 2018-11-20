@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Alaress\Web\Output\DataGenerator;
 
-use Alaress\Web\Output\ThemedHtml;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Menu\Top\Mapper as TopMenuMapper;
 use Schoolbox\User;
@@ -46,7 +45,7 @@ class TopMenu implements IDataGenerator
     /**
      * @inheritdoc
      */
-    public function generate(ThemedHtml $output): array
+    public function generate(?array $chromeData = []): array
     {
         try {
             $tabs = $this->mapper->findTabsForUser($this->currentUser);
@@ -55,7 +54,7 @@ class TopMenu implements IDataGenerator
         }
 
         return [
-            'tabCurrent' => $output->getTab(),
+            'tabCurrent' => $chromeData['tab'] ?? '',
             'tabs'       => $tabs,
             'user'       => $this->currentUser,
         ];

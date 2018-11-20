@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Alaress\Web\Output\DataGenerator;
 
-use Alaress\Web\Output\ThemedHtml;
 use DebugBar\DebugBar as DebugBarInstance;
 
 /**
@@ -46,7 +45,7 @@ class DebugBar implements IDataGenerator
     /**
      * @inheritdoc
      */
-    public function generate(ThemedHtml $output): array
+    public function generate(?array $chromeData = []): array
     {
         $renderer = $this->debugBar->getJavascriptRenderer();
         $renderer->setBaseUrl($this->baseUrl);

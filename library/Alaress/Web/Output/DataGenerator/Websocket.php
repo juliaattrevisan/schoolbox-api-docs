@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Alaress\Web\Output\DataGenerator;
 
 use Alaress\Session\Session;
-use Alaress\Web\Output\ThemedHtml;
 use Schoolbox\IConfigLoader;
 
 /**
@@ -53,7 +52,7 @@ class Websocket implements IDataGenerator
     /**
      * @inheritdoc
      */
-    public function generate(ThemedHtml $output): array
+    public function generate(?array $chromeData = []): array
     {
         return [
             'enabled'    => $this->config->get('messaging_enabled'),
