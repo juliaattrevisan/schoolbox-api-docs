@@ -24,7 +24,7 @@ use ReflectionClass;
 use ReflectionProperty;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\News\Mapper;
+use Schoolbox\Comms\News\Topic;
 use Schoolbox\WebDav\Mapper as WebDavMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
@@ -475,7 +475,7 @@ class Controller extends Base
             ],
             'news-topic'             => [
                 'title'             => 'News Topics',
-                'mapper'            => Mapper::class,
+                'mapper'            => Topic\Mapper::class,
                 'sortable'          => 'sequence',
                 'fields'            => [
                     'name'          => [
