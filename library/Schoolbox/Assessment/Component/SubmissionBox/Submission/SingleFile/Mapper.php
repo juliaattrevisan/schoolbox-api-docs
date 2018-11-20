@@ -64,7 +64,9 @@ class Mapper extends BaseMapper
 
 
     /**
-     * @inheritdoc
+     * Soft-deletes any kami docs for this file
+     *
+     * @param Model $file
      * @throws BaseMapper\Exception
      * @throws BaseMapper\DefinitionException
      * @return bool
