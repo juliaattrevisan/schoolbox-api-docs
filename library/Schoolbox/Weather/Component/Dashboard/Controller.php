@@ -17,7 +17,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
 {
 
     private const API_KEY = 'b972a53b7573b1320ef3ef0145d8e1f1';
-    private $location = 'Melbourne';
+    private $location = 'Melbourne,AU';
 
     /**
      * Controller constructor.
@@ -106,30 +106,40 @@ class Controller extends Component_Dashboard_ControllerAbstract
     }
 
     /**
-     * @param array $data
+     * @param array $responseData
      * @return array
      */
-    private function parseWeatherData($data, $weatherUnavailable) : array
+    private function parseWeatherData($responseData, $weatherUnavailable) : array
     {
         if ($weatherUnavailable) {
             return ['weatherUnavailable' => true];
         }
 
-        $forecastData = ['weatherLocation' => $data['city']['name']];
+        $twigData = ['weatherLocation' => $responseData['city']['name']];
 
-        foreach($data['list'] as $forecastDay) {
-            $weatherSummary = $forecastDay['weather'][0]['main'];
-            $tempCurrent = $forecastDay['main']['temp'] ?? null;
-            $tempMin = $forecastDay['main']['temp_min'];
-            $tempMax = $forecastDay['main']['temp_max'];
-            $humidity = $forecastDay['main']['humidity'];
-            $windSpeed = $forecastDay['wind']['speed'];
-            $windDegrees = $forecastDay['wind']['deg']; // TODO are we ok with this? Or should we parse it into direction format?
+        // Group by day, as we get a flat list of 3-hourly measurements otherwise
+        $forecastDays = [];
+        foreach($responseData['list'] as $measurement) {
+            $day = \Alaress_Date_Format::newFromTimestamp($measurement['dt'])->getWeekDayNumber();
+            $forecastDays[$day][] = $measurement;
+        }
 
-            // TODO parse into a unix timestamp or something. This is UTC
-            $lastUpdatedDateString = $forecastDay['dt_txt'];
+        foreach($forecastDays as $forecastDay) {
+            $weatherSummary = $forecastDay[0]['weather'][0]['main'];
+            $tempCurrent = $forecastDay[0]['main']['temp'] ?? null; // TODO what IS this value actually? IS it current temp?
 
-            $day = \Alaress_Date_Format::newFromTimestamp($forecastDay['dt'])->getWeekDayNumber();
+            // Work out the highest and lowest recorded temperature for this day over all the measurements we received
+            $tempMin = $this->getMinTempForDay($forecastDay);
+            $tempMax = $this->getMaxTempForDay($forecastDay);
+
+            $humidity = $this->averageMeasurement($forecastDay, 'main', 'humidity');
+            $windSpeed = $this->averageMeasurement($forecastDay, 'wind', 'speed');
+            $windDegrees = $this->averageMeasurement($forecastDay, 'wind', 'deg'); // TODO are we ok with this? Or should we parse it into direction format?
+
+            // TODO parse into something. This is UTC
+            $lastUpdatedDateString = $forecastDay[0]['dt_txt'];
+
+            $day = \Alaress_Date_Format::newFromTimestamp($forecastDay[0]['dt'])->getWeekDayNumber();
             switch($day) {
                 case \Alaress_Date_Format::MONDAY:
                     $dayOfWeek = 'Mon';
@@ -152,7 +162,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
                 default:
                     $dayOfWeek = 'Sun';
             }
-            $forecastDayIsNow = \Alaress_Date_Format::now()->getUnixTimeStamp() === \Alaress_Date_Format::newFromTimestamp($forecastDay['dt'])->getUnixTimeStamp();
+
+            // TODO this comparison is too precise; need to compare on day of week
+            $forecastDayIsNow = \Alaress_Date_Format::now()->getUnixTimeStamp() === \Alaress_Date_Format::newFromTimestamp($forecastDay[0]['dt'])->getUnixTimeStamp();
 
             $dayForecast = [
                 'day' => $dayOfWeek,
@@ -168,10 +180,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
                 'forecastDayIsNow' => $forecastDayIsNow,
             ];
 
-            $forecastData['forecastDays'][] = $dayForecast;
+            $twigData['forecastDays'][] = $dayForecast;
         }
 
-        return $forecastData;
+        return $twigData;
     }
 
     /**
@@ -183,8 +195,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
     {
         $max = 0;
         foreach($measurements as $measurement) {
-            if ($measurement > $max) {
-                $max = $measurement;
+            if ($measurement['main']['temp_max'] > $max) {
+                $max = $measurement['main']['temp_max'];
             }
         }
         return $max;
@@ -197,12 +209,33 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     private function getMinTempForDay(array $measurements) : float
     {
-        $min = 0;
+        $min = null;
         foreach($measurements as $measurement) {
-            if ($measurement < $min) {
-                $min = $measurement;
+            if ($min === null) {
+                $min = $measurement['main']['temp_min'];
+            } else {
+                if ($measurement['main']['temp_min'] < $min) {
+                    $min = $measurement['main']['temp_min'];
+                }
             }
         }
         return $min;
+    }
+
+    /**
+     * @param array $measurements
+     * @param string $parentKey
+     * @param string $childKey
+     * @return float
+     */
+    private function averageMeasurement(array $measurements, string $parentKey, string $childKey) : float
+    {
+        $measurementsCount = (float)\count($measurements);
+        $sum = 0;
+        foreach($measurements as $measurement) {
+            $sum += $measurement[$parentKey][$childKey];
+        }
+
+        return $sum / $measurementsCount;
     }
 }
