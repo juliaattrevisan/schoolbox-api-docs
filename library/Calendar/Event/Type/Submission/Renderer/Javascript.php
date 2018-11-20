@@ -94,7 +94,7 @@ class Javascript extends Base
      */
     protected function deriveMeta()
     {
-        $event = $this->getEvent();
+        $event      = $this->getEvent();
         $assessable = $event->getAssessment();
         $workType   = $assessable->getWorkType();
 
