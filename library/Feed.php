@@ -40,7 +40,6 @@ class Feed {
         $files = $this->getFiles($folderId, $limit);
         $links = $this->getLinks($folderId, $limit);
         $folders = $this->getFolders($folderId, $limit);
-        $news = $this->getNews($folderId, $limit);
         $wiki = $this->getWiki($folderId, $limit);
         $forum = $this->getForum($folderId, $limit);
         $blog = $this->getBlog($folderId, $limit);
@@ -308,49 +307,6 @@ class Feed {
         }
 
         return $surveys;
-    }
-
-
-	/**
-	 * @deprecated use \Schoolbox\Resource\Category\NewsNotifier::getFeed()
-	 * @param $folderId
-	 * @param $limit
-	 * @return array
-	 */
-	function getNews($folderId, $limit) {
-
-        $where = $this->getFilterFromCategoryId($folderId);
-
-        $query = "SELECT sn.id, heading, UNIX_TIMESTAMP(datetime_posted) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', c.name as cat_name, c.id as cat_id
-					FROM subject_news sn
-					JOIN user u ON owner = u.id
-					LEFT JOIN folder c ON c.id = sn.code
-					WHERE sn.code $where AND sn.datetime_published < NOW() AND deleted = 0
-					ORDER BY datetime_posted DESC LIMIT 0, $limit";
-
-        $this->db->query($query);
-
-        $userHandler = new User();
-
-        while ($row = $this->db->getNextArray()) {
-
-            $news[] = array(
-                'date' => $row['submitted'],
-                'type' => 'icon-news',
-                'message' => $userHandler->formatName($row) . ' posted the news ' . Scrub::text($row['heading']),
-                'messageHTML' => "{$this->buildUsernameHTML($row, $row['uid'], $userHandler)} posted the news ". Scrub::text( $row['heading'] ),
-                'external_id' => $row['external_id'],
-                'user_name' => $userHandler->formatName($row),
-                'cat_name' => $row['cat_name'],
-                'cat_id' => $row['cat_id'],
-                'user_id' => $row['uid'],
-                'link'    => null,
-                'name'    => $row['heading'],
-                'action'  => 'posted the news',
-            );
-        }
-
-        return $news;
     }
 
     function getFolders($folderId, $limit) {

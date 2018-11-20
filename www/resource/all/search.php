@@ -104,10 +104,6 @@ if (!$count['all']) {
     /* Dump them
      */
     $oldHandlerRenderers = new \Schoolbox\Collection();
-//    $oldHandlerRenderers->add(new \Schoolbox\User\Search\Renderer($page, $result, $count, 0));
-//    $oldHandlerRenderers->add(new \Schoolbox\File\Search\Renderer($page, $result, $count, 0));
-    $oldHandlerRenderers->add(new \Schoolbox\News\Search\Renderer($page, $result, $count, 0));
-    $oldHandlerRenderers->add(new \Schoolbox\Folder\News\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\Blog\Homepage\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\Wiki\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\Forum\Search\Renderer($page, $result, $count, 0));

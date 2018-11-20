@@ -7,8 +7,7 @@
  */
 
 use Schoolbox\CampusMapper;
-use Schoolbox\News\Article;
-use Schoolbox\News\ArticleMapper;
+use Schoolbox\Comms\News;
 use Schoolbox\Realtime\Test\AbstractNotificationTest;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -202,9 +201,9 @@ class CampusReassignment extends AbstractNotificationTest
     private function broadcast(array $roleFilter = [])
     {
         // create a news article targeted at campus:1
-        $am = ArticleMapper::getInstance();
+        $am = News\Mapper::getInstance();
 
-        /** @var Article $article */
+        /** @var News\Model $article */
         $article = clone $am->findById(1);
 
         // forcibly remove guests in all cases
@@ -212,10 +211,10 @@ class CampusReassignment extends AbstractNotificationTest
 
         $this->log->info("{$roles->count()} roles to notify");
 
+
         $article->setId(null)
-                ->setExpiryDate(Alaress_Date_Format::now()->addYears(100))
-                ->setCampuses(CampusMapper::getInstance()->findByColumn('id', self::CAMPUS_ONE))
-                ->setRoles($roles);
+                ->setExpiresAt(Alaress_Date_Format::now()->addYears(100));
+
 
         $am->setSessionData([ 'user' => $article->getOwner() ]);
         $am->create($article);
