@@ -17,7 +17,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
 {
 
     private const API_KEY = 'b972a53b7573b1320ef3ef0145d8e1f1';
-    private $location = 'London,uk';
+    private $location = 'Melbourne';
 
     /**
      * Controller constructor.
@@ -129,11 +129,33 @@ class Controller extends Component_Dashboard_ControllerAbstract
             // TODO parse into a unix timestamp or something. This is UTC
             $lastUpdatedDateString = $forecastDay['dt_txt'];
 
-            $day = 'Wed'; // TODO infer this from the timestamp
-            $forecastDayIsNow = false; // TODO infer from $day
+            $day = \Alaress_Date_Format::newFromTimestamp($forecastDay['dt'])->getWeekDayNumber();
+            switch($day) {
+                case \Alaress_Date_Format::MONDAY:
+                    $dayOfWeek = 'Mon';
+                    break;
+                case \Alaress_Date_Format::TUESDAY:
+                    $dayOfWeek = 'Tue';
+                    break;
+                case \Alaress_Date_Format::WEDNESDAY:
+                    $dayOfWeek = 'Wed';
+                    break;
+                case \Alaress_Date_Format::THURSDAY:
+                    $dayOfWeek = 'Thu';
+                    break;
+                case \Alaress_Date_Format::FRIDAY:
+                    $dayOfWeek = 'Fri';
+                    break;
+                case \Alaress_Date_Format::SATURDAY:
+                    $dayOfWeek = 'Sat';
+                    break;
+                default:
+                    $dayOfWeek = 'Sun';
+            }
+            $forecastDayIsNow = \Alaress_Date_Format::now()->getUnixTimeStamp() === \Alaress_Date_Format::newFromTimestamp($forecastDay['dt'])->getUnixTimeStamp();
 
             $dayForecast = [
-                'day' => $day,
+                'day' => $dayOfWeek,
                 'weatherSummary' => $weatherSummary,
                 'currentTemp' => $tempCurrent,
                 'lowTemp' => $tempMin,
@@ -150,5 +172,37 @@ class Controller extends Component_Dashboard_ControllerAbstract
         }
 
         return $forecastData;
+    }
+
+    /**
+     * Given a list of 3-hourly measurements taken over a day, what is the highest recorded temperature?
+     * @param array $measurements
+     * @return float
+     */
+    private function getMaxTempForDay(array $measurements) : float
+    {
+        $max = 0;
+        foreach($measurements as $measurement) {
+            if ($measurement > $max) {
+                $max = $measurement;
+            }
+        }
+        return $max;
+    }
+
+    /**
+     * Given a list of 3-hourly measurements taken over a day, what is the lowest recorded temperature?
+     * @param array $measurements
+     * @return float
+     */
+    private function getMinTempForDay(array $measurements) : float
+    {
+        $min = 0;
+        foreach($measurements as $measurement) {
+            if ($measurement < $min) {
+                $min = $measurement;
+            }
+        }
+        return $min;
     }
 }
