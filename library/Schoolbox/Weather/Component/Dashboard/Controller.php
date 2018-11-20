@@ -55,8 +55,22 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle): bool
     {
-        return $this->renderTwigTemplate($templateHandle, '@weatherDashboard/component.twig', [
-            'testData' => true
-        ]);
+        $data = $this->getForecast();
+        return $this->renderTwigTemplate($templateHandle, '@weatherDashboard/component.twig', $data);
+    }
+
+
+    /**
+     * Get a JSON representation of the data from the API
+     *
+     * @return array
+     */
+    private function getForecast() : array
+    {
+        $data = [
+            'weatherUnavailable' => true
+        ];
+
+        return $data;
     }
 }

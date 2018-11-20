@@ -4,8 +4,55 @@
  # @param bool testData
  #}
 
-<script src="/javascript/components/schoolbox-vue.min.js"></script>
-
 <div id="weather-container-{{ componentInstanceId }}">
-    <p>{{ testData }}</p>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 island">
+
+            {% if weatherUnavailable %}
+
+                <div class="content">
+                    <p class="meta">Weather service is temporarily unavailable.</p>
+                </div>
+
+            {% else %}
+
+                <h2 class="subheader">
+                    <a href="/weather/">Weather in {{ weatherLocation }}</a>
+                </h2>
+
+                <section>
+                    <ul class="weather-list-summary">
+                        {% for forecastDay in forecastDays %}
+                            <li data-equalizer>
+                                <div class="list-item">
+                                    <div class="card small-3" data-equalizer-watch>
+                                        <img src="{{ forecastImage }}" class='mime' title="{{ forecastSummary }}" alt="{{ forecastSummary }}" />
+                                    </div>
+                                    <div class="card small-3 content temperature">
+                                        {{ forecastDay }}
+                                    </div>
+                                    <div class="card small-5 content temperature">
+                                        {% if forecastDayIsNow %}
+                                            <span class="meta">{{ forecastDay.currentTemp }}&deg;</span>
+                                        {% else %}
+                                            <span class="hot">{{ forecastDay.highTemp }}&deg;</span>
+                                            <span class="cold">{{ forecasDay.lowTemp }}&deg;</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    <div class="component-action">
+                        <section>
+                            <a href="/weather/" title="View Weekly Forecast" class="button">View Weekly Forecast</a>
+                        </section>
+                    </div>
+                </section>
+
+            {% endif %}
+
+        </div>
+    </div>
 </div>
