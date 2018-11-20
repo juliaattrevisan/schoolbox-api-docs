@@ -150,7 +150,12 @@ class Module extends Alaress\Module\Module
                     if (!($params['user'] ?? null) instanceof User) {
                         throw new InvalidPath("No user found in route params");
                     }
+                    /** @var User $student */
                     $student  = $params['user'];
+                    // User must be a student
+                    if (!$student->getRole()->isStudent()) {
+                        throw new InvalidPath("User must be a student. Found '{$student->getRole()->getType()}'");
+                    }
                     $userYear = $student->getYear();
                     if (!\is_numeric($userYear) || $userYear < 7 || $userYear > 12) {
                         throw new InvalidPath("User is not in years 7-12, found '$userYear'");
