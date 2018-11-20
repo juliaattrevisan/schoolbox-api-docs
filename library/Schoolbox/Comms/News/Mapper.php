@@ -19,7 +19,7 @@ use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Searchable;
-use Schoolbox\News\TopicMapper;
+use Schoolbox\Comms\News\Topic;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -81,7 +81,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
         $this->joinsVia(
             'comms_news_article_topic',
-            TopicMapper::class,
+            Topic\Mapper::class,
             'newsTopicID',
             'topic_id',
             'article_id',

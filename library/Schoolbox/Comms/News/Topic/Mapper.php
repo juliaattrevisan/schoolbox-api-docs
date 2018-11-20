@@ -6,16 +6,13 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\News;
+namespace Schoolbox\Comms\News\Topic;
 
-
-use Schoolbox\Mapper;
-
-class TopicMapper extends Mapper {
+class Mapper extends \Schoolbox\Mapper {
 
 	protected function mapping() {
 		$this->hasTable('newsTopic');
-		$this->hasModel('\\Schoolbox\\News\\Topic');
+		$this->hasModel(Model::class);
 
 		$this->hasMap(array(
 			'column' => 'newsTopicID',
@@ -36,5 +33,4 @@ class TopicMapper extends Mapper {
                 'type' => Mapper::TYPE_STRING,
             ));
 	}
-
 }

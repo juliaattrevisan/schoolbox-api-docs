@@ -11,10 +11,7 @@ namespace Schoolbox\Comms\News\Component\Dashboard;
 use Component_Config_Size;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\Collection;
 use Schoolbox\Comms\News;
-use Schoolbox\News\Topic;
-use Schoolbox\News\TopicMapper;
 use Schoolbox\User;
 use SitePage;
 

@@ -4,7 +4,6 @@
  *
  * Rebuild a querystring or find out the particular pieces
  *  - compact mode
- *  - topic slug
  *  - page number
  *  - limit
  *  - hide paginator
@@ -19,7 +18,6 @@
 namespace Schoolbox\Comms\News;
 
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\News\TopicMapper;
 
 class Querystring
 {

@@ -25,8 +25,8 @@ use Schoolbox\Comms\News\Statistics;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\GenericCollection;
-use Schoolbox\News\Topic;
-use Schoolbox\News\TopicMapper;
+use Schoolbox\Comms\News\Topic\Model as Topic;
+use Schoolbox\Comms\News\Topic\Mapper as TopicMapper;
 use Schoolbox\User;
 
 abstract class Base
