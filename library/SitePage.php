@@ -338,6 +338,21 @@ class SitePage extends Page
         }
 
 
+        // Put the PHPLib vars back together
+        // Some of these may be needed, some of them nay not
+        if (!$this->user instanceof User) {
+            $this->user = new User();
+        }
+        $templateVar = [
+            'USER_ID'        => $this->user->getId(),
+            'USER_ROLE'      => $this->user->getRole()->getName(),
+            'SITE_VERSION'   => $this->config::get('site_version'),
+            // TODO fix the only place this is used
+            'SYNERGETIC_SSO' => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
+        ];
+        $this->setVar($templateVar);
+
+
         // Output the PHPLib using the renderer
         $renderer->setData([
             'content' => $this->template->parse('finaloutput', TEMPLATE_body)
