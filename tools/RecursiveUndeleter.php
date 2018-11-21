@@ -55,7 +55,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as Retu
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-
+use Schoolbox\Learning\InlineGrader\Kami;
 
 require_once __DIR__ . '/../library/Bootstrap.php';
 
@@ -190,6 +190,7 @@ class RecursiveUndeleter
             SubmissionMapper::class   => 'box_id',
             ReturnedWorkMapper::class => 'box_id',
             Rubric\LevelMapper::class => 'box_id',
+            Eportfolio\ShowcaseMapper::class,
         ],
         TaskMapper::class               => [
             Task\CompletionMapper::class,
@@ -213,6 +214,7 @@ class RecursiveUndeleter
         Rubric\LevelMapper::class       => [
             Rubric\DescriptorMapper::class => 'rubric_descriptor.level_id',
         ],
+        Eportfolio\ShowcaseMapper::class => [],
         QuizQuestion\Mapper::class      => [
             QuizSolution\Mapper::class => 'question_id',
         ],
@@ -220,10 +222,12 @@ class RecursiveUndeleter
         QuizSolution\Mapper::class      => [],
         StudentSubmissionFile\Mapper::class => [
             Plagscan\Mapper::class,
+            Kami\Mapper::class,
         ],
         ReturnedWorkFile\Mapper::class  => [],
         Rubric\DescriptorMapper::class  => [],
         Plagscan\Mapper::class          => [],
+        Kami\Mapper::class              => [],
         Rubric\CriterionMapper::class   => [
             Rubric\DescriptorMapper::class => 'rubric_descriptor.criterion_id',
         ]

@@ -45,6 +45,7 @@ class Mapper extends BaseMapper
         $this->joinsReverseSingle('student_submission_file_id', Kami\Mapper::class, 'kami', 'kami');
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeletePlagScan' ]);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteKami' ]);
     }
 
 
@@ -59,6 +60,23 @@ class Mapper extends BaseMapper
         $plagScanMapper = $this->getJoinMapper('plagscan');
         $plagScans = $plagScanMapper->findByColumn('student_submission_file_id', $file->getId(), ['deleted' => true]);
         $plagScanMapper->delete($plagScans);
+    }
+
+
+    /**
+     * Soft-deletes any kami docs for this file
+     *
+     * @param Model $file
+     * @throws BaseMapper\Exception
+     * @throws BaseMapper\DefinitionException
+     * @return bool
+     */
+    public function softDeleteKami(Model $file): bool
+    {
+        $kamiMapper = $this->getJoinMapper('kami');
+        $kamiFiles = $kamiMapper->findByColumn('student_submission_file_id', $file->getId());
+        $kamiMapper->delete($kamiFiles);
+        return true;
     }
 
 
