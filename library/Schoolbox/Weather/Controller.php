@@ -38,11 +38,14 @@ class Controller extends Base
         // Lol ew
         // Attempt to get dashboard component's location config by looking for the first weather component
         // (there can only ever be one)
-        $dashboardComponentInstance = Component_InstanceMapper::getInstance()->findOneByColumn('component_definition_id', 5);
-        $configuredLocation = Component_ConfigMapper::getInstance()->findValue('url', $dashboardComponentInstance->getId());
+        // TODO this is not working at allll I don't even know where these configs come from
+//        $dashboardComponentInstance = Component_InstanceMapper::getInstance()->findOneByColumn('component_definition_id', 5);
+//        $configuredLocation = Component_ConfigMapper::getInstance()->findValue('url', $dashboardComponentInstance->getId());
 
+//        $location = $_GET['location'] ?: ($configuredLocation ?: self::DEFAULT_LOCATION));
+        $location = $_GET['location'] ?: self::DEFAULT_LOCATION;
         $apixuClient = new ApixuClient();
-        $twigData = $apixuClient->getForecast(self::DEFAULT_FORECAST_LIMIT, $_GET['location'] ?: ($configuredLocation ?: self::DEFAULT_LOCATION));
+        $twigData = $apixuClient->getForecast(self::DEFAULT_FORECAST_LIMIT, $location);
         $twigData['regions'] = self::AUS_CITIES;
         $this->getResponse()->content->set($this->buildHtmlOutput('@weather/weather.twig', $twigData));
     }
