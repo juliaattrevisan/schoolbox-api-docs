@@ -12,6 +12,7 @@ namespace Schoolbox\Weather;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use Alaress\Authorizer\Rule;
 
 class Module extends BaseModule
 {
@@ -27,7 +28,8 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $this->register('GET', '', 'getWeatherDetails'); // Weather details page
+        $perms = new Rule\IsLoggedIn();
+        $this->register('GET', '', 'getWeatherDetails', $perms); // Weather details page
     }
 
     /**

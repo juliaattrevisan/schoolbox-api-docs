@@ -42,6 +42,9 @@
 
   .weather-summary {
     margin-bottom: 1rem;
+
+  }
+  .weather-summary, .temperature {
     p {
       font-size: unset;
     }
