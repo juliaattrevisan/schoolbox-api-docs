@@ -17,7 +17,11 @@ class Controller extends Component_Dashboard_ControllerAbstract
 {
 
     private const API_KEY = '93cc4486b7ba4afdafe44837182011';
-    private $location = 'Melbourne, Australia';
+
+    // TODO these defaults are actually stored in the DB; should we be looking at the instead?
+    // select * from schoolbox.component_config_definition where component_definition_id=5
+    // see default_value field (only forecast limit is set but could easily update the other one)
+    private const DEFAULT_LOCATION = 'Melbourne, Australia';
     private const DEFAULT_FORECAST_LIMIT = 3;
 
     /**
@@ -31,7 +35,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
         parent::__construct($instance, $user, $sitepage);
-        $this->setComponentName('Weather in ' . $this->location);
+        $location = (null === $this->getConfig('url') || '' === $this->getConfig('url')) ? self::DEFAULT_LOCATION : $this->getConfig('url');
+        $this->setComponentName('Weather in ' . $location);
     }
 
 
@@ -74,12 +79,14 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
         // 'days' param includes today, so we have to increment this by 1 to mimic previous API behavior
         $forecastLimit+=1;
-        $requestUrl = "http://api.apixu.com/v1/forecast.json?q={$this->location}&days={$forecastLimit}&key=" . self::API_KEY;
+        $location = (null === $this->getConfig('url') || '' === $this->getConfig('url')) ? self::DEFAULT_LOCATION : $this->getConfig('url');
+        $requestUrl = "http://api.apixu.com/v1/forecast.json?q={$location}&days={$forecastLimit}&key=" . self::API_KEY;
 
         try {
             $response = $this->makeRequest($requestUrl);
             $twigData = $this->parseWeatherData($response);
         } catch (\Exception $e) {
+            // TODO errors are for debugging only. Remove in production as they may contain the API key!
             return ['error' => $e->getMessage(), 'weatherUnavailable' => true];
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
             return ['error' => $e->getMessage(), 'weatherUnavailable' => true];
