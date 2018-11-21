@@ -30,6 +30,7 @@ class Module extends BaseModule
     {
         $perms = new Rule\IsLoggedIn();
         $this->register('GET', '', 'getWeatherDetails', $perms); // Weather details page
+
     }
 
     /**

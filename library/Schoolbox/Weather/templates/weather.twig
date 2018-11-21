@@ -71,10 +71,9 @@ Weather details page (linked from dashboard component)
             <h2 class="subheader">Weather around Australia</h2>
             <section>
                 <ul class="information-list">
-                    {# TODO build this list #}
                     {% for region in regions %}
                         <li class="row content">
-                            <a href="/weather/{{ region }}">{{ region }}</a>
+                            <a href="{{routeLookup('weather.getWeatherDetails')}}?location={{region}}">{{ region }}</a>
                         </li>
                     {% endfor %}
                 </ul>
