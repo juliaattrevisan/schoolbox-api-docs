@@ -29,3 +29,18 @@
     width: 3rem;
   }
 }
+
+.weather-list {
+  display: flex;
+  justify-content: space-around;
+  background: #fafafa;
+
+  li, li:last-child {
+    border: none;
+    background: none;
+  }
+
+  .weather-summary {
+    font-size: unset;
+  }
+}

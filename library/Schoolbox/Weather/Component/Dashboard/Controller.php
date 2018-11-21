@@ -76,8 +76,4 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $data = $apixuClient->getForecast($forecastLimit, $location);
         return $this->renderTwigTemplate($templateHandle, '@weatherDashboard/component.twig', $data);
     }
-
-
-
-
 }

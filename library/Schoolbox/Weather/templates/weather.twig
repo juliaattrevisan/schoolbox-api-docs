@@ -20,25 +20,23 @@ Weather details page (linked from dashboard component)
 
             <section>
                 <div class="row collapse">
-                    {% for forecastDay in forecastDays %}
-                        <div class="small-12 large-2 columns">
-                            <ul class="weather-list">
-                                <li>
+                    <ul class="weather-list">
+                        {% for forecastDay in forecastDays %}
+                            <li class="weather-forecast">
+                                <div class="weather-card">
                                     <h3>{{ forecastDay.day }}</h3>
-                                </li>
-                                <li>
-                                    <img src="{{ forecastDay.weatherIcon }}" alt="{{ forecastDay.weatherSummary }}" />
-                                </li>
-                                <li>
-                                    <span class="meta">{{ forecastDay.weatherSummary }}</span>
-                                </li>
-                                <li class="content temperature">
-                                    <span class="hot">{{ forecastDay.highTemp }}&deg;</span>
-                                    <span class="cold">{{ forecastDay.lowTemp }}&deg;</span>
-                                </li>
-                            </ul>
-                        </div>
-                    {% endfor %}
+                                    <div class="weather-summary">
+                                        <img src="{{ forecastDay.weatherIcon }}" alt="{{ forecastDay.weatherSummary }}" />
+                                        <p class="meta">{{ forecastDay.weatherSummary }}</p>
+                                    </div>
+                                    <p class="temperature">
+                                        <span class="hot">{{ forecastDay.highTemp }}&deg;</span>
+                                        <span class="cold">{{ forecastDay.lowTemp }}&deg;</span>
+                                    </p>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </section>
         </div>
@@ -53,7 +51,7 @@ Weather details page (linked from dashboard component)
                     <dd class="small-12 large-6">{{ today.currentTemp }}&deg;</dd>
 
                     <dt class="small-12 large-6">Wind</dt>
-                    <dd class="small-12 large-6">{{ today.windSpeed }} {{ today.windDirection }}</dd>
+                    <dd class="small-12 large-6">{{ today.windSpeed }} kph {{ today.windDirection }}</dd>
 
                     <dt class="small-12 large-6">Humidity</dt>
                     <dd class="small-12 large-6">{{ today.humidity }}%</dd>
