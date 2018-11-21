@@ -261,10 +261,12 @@
 <script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('table').selectAll({
-            selector: '#check-all',
-            checkboxes: '[data-cleanup-event-id]'
-        });
+        if ($('table').length) {
+            $('table').selectAll({
+                selector: '#check-all',
+                checkboxes: '[data-cleanup-event-id]'
+            });
+        }
 
         /* Special modifiers
          * Automatically activate these two checkboxes whenever
