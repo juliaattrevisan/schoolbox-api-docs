@@ -127,6 +127,12 @@ class Controller extends Component_Dashboard_ControllerAbstract
         ];
 
         foreach($responseData['forecast']['forecastday'] as $forecastDay) {
+
+            // Skip today's forecast; we don't use it
+            if ($this->getDayOfWeek($forecastDay['date_epoch']) === 'Now') {
+                continue;
+            }
+
             $dayForecast = [
                 'day' => $this->getDayOfWeek($forecastDay['date_epoch']),
                 'weatherSummary' => $forecastDay['condition']['text'],
@@ -151,6 +157,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
     private function getDayOfWeek($timestamp) {
         $day = \Alaress_Date_Format::newFromTimestamp($timestamp)->getWeekDayNumber();
 
+        // TODO compare on something more robust than the week day
         if ($day === \Alaress_Date_Format::now()->getWeekDayNumber()) {
             return 'Now';
         }
