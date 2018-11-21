@@ -20,7 +20,7 @@ ALTER TABLE `comms_news_article_statistics`
   CHANGE COLUMN `referrer` `referrer` ENUM('dashboard', 'homepage', 'index', 'archive', 'email', 'saved', 'search') CHARACTER SET 'ascii' NULL DEFAULT NULL ,
   CHANGE COLUMN `role_type` `role_type` ENUM('staff', 'parent', 'student', 'guest') CHARACTER SET 'ascii' NULL DEFAULT NULL ;
 
-ALTER TABLE `schoolbox`.`comms_news_article_statistics_cumulative`
+ALTER TABLE `comms_news_article_statistics_cumulative`
   CHANGE COLUMN `type` `type` ENUM('impression', 'conversion', 'open') CHARACTER SET 'ascii' NULL DEFAULT NULL ,
   CHANGE COLUMN `referrer` `referrer` ENUM('dashboard', 'homepage', 'index', 'archive', 'email', 'saved', 'search') CHARACTER SET 'ascii' NULL DEFAULT NULL ,
   CHANGE COLUMN `role_type` `role_type` ENUM('staff', 'parent', 'student', 'guest') CHARACTER SET 'ascii' NULL DEFAULT NULL ;
