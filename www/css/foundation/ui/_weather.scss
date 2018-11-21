@@ -41,6 +41,9 @@
   }
 
   .weather-summary {
-    font-size: unset;
+    margin-bottom: 1rem;
+    p {
+      font-size: unset;
+    }
   }
 }
