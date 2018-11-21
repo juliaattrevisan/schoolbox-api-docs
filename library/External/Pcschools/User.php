@@ -791,7 +791,7 @@ class External_Pcschools_User implements External_UserInterface
             WHERE su.STUDKEY = '" . $this->getDatabase()->quote($externalId) . "' 
               AND tf.TIME_PERIOD = '" . $this->getDatabase()->quote($period['TIME_PERIOD']) . "'
               AND su.PERIOD_ID =  '" . $this->getDatabase()->quote($period['SUB_PERIOD']) . "'
-              AND (tf.[STATUS] = '' OR tf.[STATUS] = 'S' OR (tf.[STATUS] = 'C' AND tf.TEACHER_REP = '" . $this->getDatabase()->quote($externalId) . "' )))
+              AND (tf.[STATUS] = '' OR tf.[STATUS] = 'S' OR (tf.[STATUS] = 'C' AND tf.TEACHER_REP = '" . $this->getDatabase()->quote($externalId) . "' ))
         ");
 
         foreach ($classArray as $class)
