@@ -155,12 +155,11 @@ class Controller extends Component_Dashboard_ControllerAbstract
     }
 
     private function getDayOfWeek($timestamp) {
-        $day = \Alaress_Date_Format::newFromTimestamp($timestamp)->getWeekDayNumber();
-
-        // TODO compare on something more robust than the week day
-        if ($day === \Alaress_Date_Format::now()->getWeekDayNumber()) {
+        if (\Alaress_Date_Format::newFromTimestamp($timestamp)->getDateOnly() === \Alaress_Date_Format::now()->getDateOnly()) {
             return 'Now';
         }
+
+        $day = \Alaress_Date_Format::newFromTimestamp($timestamp)->getWeekDayNumber();
 
         switch($day) {
             case \Alaress_Date_Format::MONDAY:
