@@ -17,7 +17,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
 {
 
     private const API_KEY = '93cc4486b7ba4afdafe44837182011';
-    private $location = 'Melbourne';
+    private $location = 'Melbourne, Australia';
     private const DEFAULT_FORECAST_LIMIT = 3;
 
     /**
