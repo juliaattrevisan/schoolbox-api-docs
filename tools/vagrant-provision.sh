@@ -170,7 +170,7 @@ mkdir -p /vagrant/tools/browscap;
 /vagrant/vendor/browscap/browscap-php/bin/browscap-php browscap:update --cache=/vagrant/tools/browscap/ --remote-file=Lite_PHP_BrowscapINI
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading Schoolbox MySQL Demo data";
-mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';";
+mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox < /vagrant/data/schoolbox.sql;
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db' WHERE name='external_type'";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db_host' WHERE name='external_db_host'";
