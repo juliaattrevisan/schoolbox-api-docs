@@ -742,15 +742,15 @@ class SitePage extends Page
     /**
      * Outputs an error message.
      *
-     * @param mixed $ec   int:  retrieves error text from code from database
-     *                    null: outputs whatever's in $message as error
-     * @param array $args Replaces '%MESSAGE%' in $ec
-     * @param int   $code HTTP response code, defaults to 400 (Bad Request)
+     * @param mixed  $ec      int:  retrieves error text from code from database
+     *                        null: outputs whatever's in $message as error
+     * @param string $message Replaces '%MESSAGE%' in $ec
+     * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
      * @throws Exception
      */
-    public function error($ec, $args = [], $code = 400)
+    public function error($ec, $message = '', $code = 400)
     {
-        throw ErrorMapper::getInstance()->generateException($ec, null, $args, $code);
+        throw ErrorMapper::getInstance()->generateException($ec, null, $message, $code);
 
 //        // Backward-compatibility with $args being a message
 //        if (is_string($args)) {

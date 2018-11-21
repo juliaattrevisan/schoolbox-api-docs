@@ -371,9 +371,11 @@ class Bootstrap extends AbstractBootstrap {
                 /* Pass $data straight in for twig rendering
                  */
                 if ($di instanceof Di\Container) {
+                    // TODO render stack traces appropriately
+                    // This will use Twig rather than SitePage
                     /** @var \SitePage $page */
                     $page = $di->get('layoutEngine');
-                    $page->error(null, $args, $code);
+                    $page->error(null, '', $code);
                 }
                 /* Just dump it out in raw form
                  * TODO: Make synonymous with twig output
