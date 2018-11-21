@@ -19,8 +19,11 @@ class ApixuClient
 {
     // TODO store this in the DB and get it from there?
     private const API_KEY = '93cc4486b7ba4afdafe44837182011';
-    private const API_BASE_URL = 'http://api.openweathermap.org';
+    private const API_BASE_URL = 'http://api.apixu.com/v1/';
 
+    private const PROVIDER_NAME = 'Apixu';
+    private const PROVIDER_URL = 'https://apixu.com';
+    private const PROVIDER_LOGO = 'https://cdn.apixu.com/v2/images/logo.png';
 
     /**
      * Get the data from the API in a JSON format usable by Twig
@@ -51,7 +54,7 @@ class ApixuClient
      * @throws \DomainException
      */
     private function makeRequest(int $forecastLimit, string $location) {
-        $requestUrl = "http://api.apixu.com/v1/forecast.json?q={$location}&days={$forecastLimit}&key=" . self::API_KEY;
+        $requestUrl = "forecast.json?q={$location}&days={$forecastLimit}&key=" . self::API_KEY;
         $client = new GuzzleHttp\Client(['base_uri' => self::API_BASE_URL]);
         $response = $client->request('GET', $requestUrl);
 
@@ -81,7 +84,14 @@ class ApixuClient
      */
     private function parseWeatherData($responseData) : array
     {
-        $twigData = ['weatherLocation' => $responseData['location']['name']];
+        $twigData = [
+            'weatherLocation' => $responseData['location']['name'],
+            'apiProvider' => [
+                'url' => self::PROVIDER_URL,
+                'name' => self::PROVIDER_NAME,
+                'logo' => self::PROVIDER_LOGO
+            ]
+        ];
 
         $twigData['today'] = [
             'day' => $this->getDayOfWeek($responseData['current']['last_updated_epoch']),
