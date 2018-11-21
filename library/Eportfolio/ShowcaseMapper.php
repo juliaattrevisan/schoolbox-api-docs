@@ -66,7 +66,7 @@ class ShowcaseMapper extends Schoolbox\Mapper
         return "
             FROM {$this->getTable()}
             JOIN {$this->getJoinSql('submissionBox', '', 'sb')}
-            JOIN {$submissionBoxMapper->getJoinSql('assessmentModel', 'sb', 'am')}
+            JOIN {$submissionBoxMapper->getJoinSql('assessmentModel', 'sb', 'am', true)}
         ";
     }
 
@@ -94,7 +94,7 @@ class ShowcaseMapper extends Schoolbox\Mapper
 
         $assessmentMapper = $submissionBoxMapper->getJoinMapper('assessmentModel');
         $assessmentModels = $assessmentMapper
-            ->findByColumn($assessmentMapper->getIdentifierColumn(), $assessmentIds)
+            ->findByColumn($assessmentMapper->getIdentifierColumn(), $assessmentIds, ['deleted' => true])
             ->indexBy($assessmentMapper->getIdentifierColumn());
 
         foreach ($showcaseItems as $showcaseItem) {
