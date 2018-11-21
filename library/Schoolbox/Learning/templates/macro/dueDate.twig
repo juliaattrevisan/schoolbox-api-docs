@@ -1,12 +1,6 @@
 {##
  # Displays an assessment's due date.
  #
- # If we are interested in a specific student's interaction with the assessment,
- # we should call dueDate.participant, otherwise if interested in the assessment itself,
- # we should call dueDate.assessment.
- #
- # If you are calling from a fragment where you don't know, you can fallback to dueDate().
- #
  # TODO: attach some JS to the relative time to countdown to the due date
  #}
 
@@ -42,7 +36,7 @@
 
 
 {##
- # Display a participant's due date (ie the participant's plan's due date)
+ # Helper macro to render due date for a participant's plan. Please don't call this directly! use dueDate instead
  #}
 {% macro participant(participant, acceptOnline) %}
     {% spaceless %}
@@ -60,7 +54,7 @@
 
 
 {##
- # Display an assessment's real due date
+ # Helper macro to render an assessment's default (not participant-specific) due date. Please don't call this directly! use dueDate instead
  #}
 {% macro assessment(assessment) %}
     {% spaceless %}
