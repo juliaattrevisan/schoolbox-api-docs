@@ -27,7 +27,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $this->register('GET', '/weather', 'getWeatherDetails'); // Weather details page
+        $this->register('GET', '', 'getWeatherDetails'); // Weather details page
     }
 
     /**
