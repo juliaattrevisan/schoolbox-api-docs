@@ -59,6 +59,22 @@ class Mapper extends BaseMapper
         $submissionBoxes           = $submissionBoxMapper->createCollection();
         $otherAssessmentTypeModels = $assessmentMapper->createCollection();
 
+        /* We need to perform some acrobatics here due to the different ways the system treats the
+         * DueWork/Assessment relationship. In some parts it's treated as inheritance, in others composition.
+         *
+         * The distinction is inheritance uses `submission_box.assessment.id` as the entity identifier,
+         * whereas composition uses `submission_box.id`.
+         *
+         * The inheritance-based (eg assessment context) codebase cascades the delete to the assessment model.
+         *
+         * The composition-based codebase considers the SubmissionBox deleted if it's constituent Assessment is deleted.
+         * This means attempting to cascade the delete from [Assessment >> SubmissionBox >> SubmissionBox child relationships] will fail
+         * because when the system checks the SubmissionBox, it will already be considered deleted, and the code with short-circuit,
+         * failing to cascade to the SubmissionBox child relationships.
+         *
+         * For now, we'll just compensate for this here.
+         */
+
         foreach ($assessments as $assessment) {
             $submissionBox = $assessment->getDueWork();
             if ($submissionBox) {
