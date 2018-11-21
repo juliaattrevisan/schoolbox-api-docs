@@ -774,7 +774,8 @@ class External_Pcschools_User implements External_UserInterface
      * @param User $user
      *
      * @return array
-     */    public function getSubjectList(User $user)
+     */    
+    public function getSubjectList(User $user)
     {
         $externalId = $user->getExternalId();
 
@@ -793,7 +794,7 @@ class External_Pcschools_User implements External_UserInterface
         // Retrieve timetabled classes
 
         $period = $this->findPeriod();
-
+        
         $classArray = $statement = $this->getDatabase()->getAll("
             SELECT DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
             FROM TIMEFILE tf
@@ -803,21 +804,9 @@ class External_Pcschools_User implements External_UserInterface
               AND tf.TIME_PERIOD = '" . $this->getDatabase()->quote($period['TIME_PERIOD']) . "'
               AND su.PERIOD_ID =  '" . $this->getDatabase()->quote($period['SUB_PERIOD']) . "'
               AND (tf.[STATUS] = '' OR tf.[STATUS] = 'S' OR (tf.[STATUS] = 'C' AND tf.TEACHER_REP = '" . $this->getDatabase()->quote($externalId) . "' ))
-        ");
-        foreach ($classArray as $class)
-        {
-            $code = $period['TIME_PERIOD']. '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
-            $classes[$code] = [
-                'code'       => $code,
-                'name'       => $class['DESC'],
-                'classType'  => '',
-                'campusCode' => $period['TIME_PERIOD'],
-            ];
-        }
 
-        // Combine this with classes that are not timetabled but the student is involved in. This is required to make classes appear for Junior school
+            UNION
 
-        $classArray = $statement = $this->getDatabase()->getAll("
                 SELECT DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
                 FROM TIMEFILE tf
                             INNER JOIN SUB su ON tf.[YEAR] = su.[YEAR] AND tf.SUBJECT = su.SUBJECT_NO AND tf.CLASS = su.CLASS AND tf.TIME_PERIOD = su.PERIOD_ID
@@ -825,19 +814,19 @@ class External_Pcschools_User implements External_UserInterface
                             INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
                 WHERE st.CURRENT_YEAR <> '99'
                   AND (st.STUDKEY = '" . $this->getDatabase()->quote($externalId). "' AND tf.TIME_PERIOD = '" . $this->getDatabase()->quote($period['TIME_PERIOD']) . "');
-            ");
 
+        ");
         foreach ($classArray as $class)
-        {
-            $code = $period['TIME_PERIOD'] . '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
-            $classes[$code] = [
+        {   
+            $code = $period['TIME_PERIOD']. '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
+            $classes[$code] = [ 
                 'code'       => $code,
                 'name'       => $class['DESC'],
                 'classType'  => '',
                 'campusCode' => $period['TIME_PERIOD'],
             ];
-        }
-
+        }   
+        
         return array_values($classes);
     }
 
