@@ -135,14 +135,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
             $dayForecast = [
                 'day' => $this->getDayOfWeek($forecastDay['date_epoch']),
-                'weatherSummary' => $forecastDay['condition']['text'],
-                'weatherIcon' => $forecastDay['condition']['icon'],
-                'lowTemp' => $forecastDay['min_temp_c'],
-                'highTemp' => $forecastDay['max_temp_c'],
-                'humidity' => $forecastDay['humidity'],
-                'windSpeed' => $forecastDay['wind_kph'],
-                'windDirection' => $forecastDay['wind_dir'],
-                'lastUpdated' => $forecastDay['last_updated_epoch'] // TODO format this
+                'weatherSummary' => $forecastDay['day']['condition']['text'],
+                'weatherIcon' => $forecastDay['day']['condition']['icon'],
+                'lowTemp' => $forecastDay['day']['mintemp_c'],
+                'highTemp' => $forecastDay['day']['maxtemp_c']
             ];
 
             $twigData['forecastDays'][] = $dayForecast;
