@@ -9,11 +9,14 @@
  #}
 {% macro dueDate(assessable, user) %}
 {% spaceless %}
+    {# Only due works have an acceptOnline option; all other assessment types are accept online by default #}
+    {% set acceptOnline = assessable.acceptOnline|default(true) %}
+
     {% import _self as dueDate %}
     {# Is the nominated user a participant ? #}
     {% set participant = assessable.participantIfExtant(user) %}
     {% if participant and not participant.isExcluded %}
-        {{ dueDate.participant(participant, assessable.acceptOnline) }}
+        {{ dueDate.participant(participant, acceptOnline) }}
     {% else %}
         {# Is the user a parent? Check if any of their children are participants #}
         {% set childParticipant = null %}
@@ -25,7 +28,7 @@
 
         {% if childParticipant %}
             {# We found a child of the parent who is participating, render their due date  #}
-            {{ dueDate.participant(childParticipant, assessable.acceptOnline) }}
+            {{ dueDate.participant(childParticipant, acceptOnline) }}
         {% else %}
             {# Not a participant, and not a parent of a participant  #}
             {{ dueDate.assessment(assessable) }}
