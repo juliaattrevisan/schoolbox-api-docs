@@ -19,7 +19,7 @@ class Controller extends Base
     // select * from schoolbox.component_config_definition where component_definition_id=5
     // see default_value field (only forecast limit is set but could easily update the other one)
     private const DEFAULT_LOCATION = 'Melbourne, Australia';
-    private const DEFAULT_FORECAST_LIMIT = 3;
+    private const DEFAULT_FORECAST_LIMIT = 5;
 
     private const AUS_CITIES = [
         'Melbourne',
