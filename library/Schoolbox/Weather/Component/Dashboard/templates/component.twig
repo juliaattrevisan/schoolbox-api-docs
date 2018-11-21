@@ -18,29 +18,29 @@
                 <section>
                     <ul class="weather-list-summary">
                         <li data-equalizer>
-                            <div class="list-item">
-                                <div class="card small-3">
+                            <div class="list-item weather-forecast">
+                                <div class="card">
                                     <img class="mime" src="{{ today.weatherIcon }}" title="{{ today.weatherSummary }}" alt="{{ today.weatherSummary }}"/>
                                 </div>
-                                <div class="card small-3 content temperature">
+                                <div class="card content">
                                     {{ today.day }}
                                 </div>
-                                <div class="card small-5 content temperature">
+                                <div class="card content temperature">
                                     <span class="meta">{{ today.currentTemp }}&deg;</span>
                                 </div>
                             </div>
                         </li>
                         {% for forecastDay in forecastDays %}
                             <li data-equalizer>
-                                <div class="list-item">
-                                    <div class="card small-3">
+                                <div class="list-item weather-forecast">
+                                    <div class="card">
                                         <img class="mime" src="{{ forecastDay.weatherIcon }}" title="{{ forecastDay.weatherSummary }}" alt="{{ forecastDay.weatherSummary }}"/>
                                     </div>
-                                    <div class="card small-3 content temperature">
+                                    <div class="card content">
                                         {{ forecastDay.day }}
                                     </div>
                                     {# TODO refactor to use flexbox!! #}
-                                    <div class="card small-5 content temperature">
+                                    <div class="card content temperature">
                                         <span class="hot">{{ forecastDay.highTemp }}&deg;</span>
                                         <span class="cold">{{ forecastDay.lowTemp }}&deg;</span>
                                     </div>
@@ -61,3 +61,10 @@
         </div>
     </div>
 </div>
+
+<style>
+    .weather-forecast, .temperature {
+        display: flex;
+        align-items: center;
+    }
+</style>
