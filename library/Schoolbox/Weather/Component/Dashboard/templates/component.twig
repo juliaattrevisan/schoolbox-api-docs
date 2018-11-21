@@ -18,32 +18,23 @@
                 <section>
                     <ul class="weather-list-summary">
                         <li data-equalizer>
-                            <div class="list-item weather-forecast">
-                                <div class="card">
-                                    <img class="mime" src="{{ today.weatherIcon }}" title="{{ today.weatherSummary }}" alt="{{ today.weatherSummary }}"/>
-                                </div>
-                                <div class="card content">
-                                    {{ today.day }}
-                                </div>
-                                <div class="card content temperature">
-                                    <span class="meta">{{ today.currentTemp }}&deg;</span>
-                                </div>
+                            <div class="list-item weather-forecast current">
+                                <p class="day-heading">{{ today.day }}</p>
+
+                                <img src="{{ today.weatherIcon }}" title="{{ today.weatherSummary }}" alt="{{ today.weatherSummary }}"/>
+
+                                <p>{{ today.currentTemp }}&deg;</p>
                             </div>
                         </li>
                         {% for forecastDay in forecastDays %}
                             <li data-equalizer>
                                 <div class="list-item weather-forecast">
-                                    <div class="card">
-                                        <img class="mime" src="{{ forecastDay.weatherIcon }}" title="{{ forecastDay.weatherSummary }}" alt="{{ forecastDay.weatherSummary }}"/>
-                                    </div>
-                                    <div class="card content">
-                                        {{ forecastDay.day }}
-                                    </div>
-                                    {# TODO refactor to use flexbox!! #}
-                                    <div class="card content temperature">
-                                        <span class="hot">{{ forecastDay.highTemp }}&deg;</span>
-                                        <span class="cold">{{ forecastDay.lowTemp }}&deg;</span>
-                                    </div>
+                                    <p class="day-heading">{{ forecastDay.day }}</p>
+
+                                    <img src="{{ forecastDay.weatherIcon }}" title="{{ forecastDay.weatherSummary }}" alt="{{ forecastDay.weatherSummary }}"/>
+
+                                    <p class="hot">{{ forecastDay.highTemp }}&deg;</p>
+                                    <p class="cold">{{ forecastDay.lowTemp }}&deg;</p>
                                 </div>
                             </li>
                         {% endfor %}
@@ -63,8 +54,38 @@
 </div>
 
 <style>
-    .weather-forecast, .temperature {
+    .weather-forecast {
         display: flex;
         align-items: center;
+        justify-content: space-evenly;
+        background: #fafafa;
+        color: #555;
+        padding: 0.75rem 0 0.75rem 0;
+    }
+
+    .weather-forecast p {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .weather-forecast p.hot {
+        color: red;
+    }
+
+    .weather-forecast p.cold {
+        color: blue;
+    }
+
+    .weather-forecast img {
+        width: 3rem;
+    }
+
+    .weather-forecast.current {
+        background: white;
+        color: black;
+    }
+
+    .day-heading {
+        font-weight: bold;
     }
 </style>
