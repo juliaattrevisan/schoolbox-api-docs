@@ -154,6 +154,12 @@ class Controller extends Component_Dashboard_ControllerAbstract
         return $twigData;
     }
 
+    /**
+     * Given a unix timestamp, get a string representing the day of the week.
+     *
+     * @param int $timestamp
+     * @return string
+     */
     private function getDayOfWeek($timestamp) {
         if (\Alaress_Date_Format::newFromTimestamp($timestamp)->getDateOnly() === \Alaress_Date_Format::now()->getDateOnly()) {
             return 'Now';
