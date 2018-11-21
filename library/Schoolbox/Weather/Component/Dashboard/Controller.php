@@ -18,6 +18,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
     private const API_KEY = '93cc4486b7ba4afdafe44837182011';
     private $location = 'Melbourne';
+    private const DEFAULT_FORECAST_LIMIT = 3;
 
     /**
      * Controller constructor.
@@ -66,7 +67,13 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     private function getForecast() : array
     {
-        $requestUrl = "http://api.apixu.com/v1/forecast.json?q={$this->location}&days=5&key=" . self::API_KEY;
+        $configuredForecastLimit = $this->getConfig('size');
+        // Special case 0 - this is the 'all' case -_- but our API has no such thing as an 'all' option, so we have to fall back to default
+        $forecastLimit = (null === $configuredForecastLimit || 0 === (int)$configuredForecastLimit) ? self::DEFAULT_FORECAST_LIMIT : (int)$configuredForecastLimit;
+
+        // 'days' param includes today, so we have to increment this by 1 to mimic previous API behavior
+        $forecastLimit+=1;
+        $requestUrl = "http://api.apixu.com/v1/forecast.json?q={$this->location}&days={$forecastLimit}&key=" . self::API_KEY;
 
         try {
             $response = $this->makeRequest($requestUrl);
@@ -127,7 +134,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
         ];
 
         foreach($responseData['forecast']['forecastday'] as $forecastDay) {
-
             // Skip today's forecast; we don't use it
             if ($this->getDayOfWeek($forecastDay['date_epoch']) === 'Now') {
                 continue;
@@ -142,6 +148,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             ];
 
             $twigData['forecastDays'][] = $dayForecast;
+
         }
 
         // If we've reached this code path, we successfully retrieved the weather data.
