@@ -11,7 +11,8 @@ CREATE TABLE `comms_news_article_statistics` (
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL,
-  PRIMARY KEY (`id`));
+  PRIMARY KEY (`id`)
+) CHARACTER SET utf8mb4;
 
 ALTER TABLE `comms_news_article_statistics`
 ADD CONSTRAINT `fk_comms_news_statistics_article_id`
@@ -45,7 +46,8 @@ CREATE TABLE `comms_news_article_statistics_cumulative` (
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL,
-  PRIMARY KEY (`id`));
+  PRIMARY KEY (`id`)
+) CHARACTER SET utf8mb4;
 
 -- The (date, article_id) tuple must be unique for this period of reporting
 -- We don't want people spamming this uncontrollably and skewing data

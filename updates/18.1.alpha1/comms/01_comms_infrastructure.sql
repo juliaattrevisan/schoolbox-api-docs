@@ -27,7 +27,7 @@ CREATE TABLE `comms_news_article` (
   INDEX idx_comms_news_article_created_at (created_at),
   INDEX idx_comms_news_article_updated_at (updated_at),
   INDEX idx_comms_news_article_deleted_at (deleted_at)
-);
+) CHARACTER SET utf8mb4;
 
 ALTER TABLE `comms_news_article`
 ADD CONSTRAINT `fk_comms_news_article_author_id`
@@ -58,13 +58,13 @@ CREATE TABLE comms_news_audience(
   INDEX idx_comms_news_audience_value (entity_value),
   INDEX idx_comms_news_audience_relationship (relationship),
   UNIQUE INDEX idx_comms_news_audience_parent_type_value_relationship(parent_id, entity_type, entity_value, relationship)
-);
+) CHARACTER SET utf8mb4;
 
 -- News Article Tag relations
 CREATE TABLE `comms_news_article_topic` (
   `article_id` int(11) NOT NULL,
   `topic_id`   int(11) UNSIGNED NOT NULL
-);
+) CHARACTER SET utf8mb4;
 
 ALTER TABLE `comms_news_article_topic`
 ADD CONSTRAINT `fk_comms_news_article_article_id`
@@ -84,7 +84,7 @@ CREATE TABLE `comms_news_saveforlater` (
   `created_at`         DATETIME      NOT NULL,
   `updated_at`         DATETIME      NOT NULL,
   `deleted_at`         DATETIME
-);
+) CHARACTER SET utf8mb4;
 
 ALTER TABLE `comms_news_saveforlater`
   ADD CONSTRAINT `fk_comms_news_saveforlater_user_id`
