@@ -1,7 +1,5 @@
 {#
  # Weather dashboard component version 2
- #
- # @param bool testData
  #}
 
 <div id="weather-container-{{ componentInstanceId }}">
@@ -11,15 +9,11 @@
             {% if weatherUnavailable %}
 
                 <div class="content">
-                    <p class="meta">Weather service is temporarily unavailable.</p>
+                    <p class="meta">Weather forecast is temporarily unavailable.</p>
                     <p>{{ error }}</p>
                 </div>
 
             {% else %}
-
-                <h2 class="subheader">
-                    <a href="/weather/">Weather in {{ weatherLocation }}</a>
-                </h2>
 
                 <section>
                     <ul class="weather-list-summary">

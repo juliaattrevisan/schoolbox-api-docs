@@ -31,6 +31,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
         parent::__construct($instance, $user, $sitepage);
+        $this->setComponentName('Weather in ' . $this->location);
     }
 
 
