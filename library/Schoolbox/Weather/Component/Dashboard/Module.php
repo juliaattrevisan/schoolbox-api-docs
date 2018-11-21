@@ -4,7 +4,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Weather;
+namespace Schoolbox\Weather\Component\Dashboard;
 
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
@@ -15,18 +15,7 @@ class Module extends BaseModule
     /**
      * @var string
      */
-    protected $basename = 'weather';
-
-    /**
-     * Hook method for setting up routes via self::register()
-     *
-     * @return void
-     */
-    protected function registerRoutes(): void
-    {
-        $this->register('GET', '/weather', 'getWeatherDetails'); // Weather details page
-    }
-
+    protected $basename = 'weatherDashboard';
 
     /**
      * {@inheritdoc}

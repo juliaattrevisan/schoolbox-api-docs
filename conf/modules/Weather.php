@@ -10,8 +10,6 @@ namespace Config\Modules;
 
 use Alaress\Application\Kernel;
 use Config\ModuleLoader;
-use Schoolbox\Weather\Component as WeatherComponent;
-
 
 class Weather extends ModuleLoader
 {
@@ -23,6 +21,8 @@ class Weather extends ModuleLoader
      */
     public function configure($kernel): void
     {
-        $this->loadModule($kernel, WeatherComponent\Dashboard\Module::class, "/weather/component/dashboard");
+        $this->loadModule($kernel, \Schoolbox\Weather\Component\Dashboard\Module::class, "/weather/component/dashboard");
+        $this->loadModule($kernel, \Schoolbox\Weather\Module::class, "/weather");
+
     }
 }

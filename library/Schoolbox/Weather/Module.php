@@ -6,7 +6,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Comms\News\SaveForLater;
+namespace Schoolbox\Weather;
 
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
@@ -29,27 +29,16 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'commsNewsSaveForLater';
-
+    protected $basename = 'weather';
 
     /**
      * Hook method for setting up routes via self::register()
      *
-     * @throws InvalidArgumentException
+     * @return void
      */
     protected function registerRoutes(): void
     {
-        $canViewList = $this->getAuthRuleCanViewList();
-        $canAdd      = $this->getAuthRuleCanAddSavedForLater();
-        $canRemove   = $this->getAuthRuleCanRemoveSavedForLater();
-
-        $preloadNews = function ($params) {
-            return $this->preloadNews($params);
-        };
-
-        $this->register('GET', '', 'getList', $canViewList);
-        $this->register('POST', '/{articleId}/add', 'postAdd', $canAdd, $preloadNews);
-        $this->register('POST', '/{articleId}/remove', 'postRemove', $canRemove, $preloadNews);
+        $this->register('GET', '/weather', 'getWeatherDetails'); // Weather details page
     }
 
     /**
