@@ -509,7 +509,7 @@ fi
 # Restore the DB
 echo -e "\nStarting restore of the database";
 ## Backup the current DB config separately
-mysqldump --allow-keywords -i -e -q -a --skip-extended-insert -c -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb config > /tmp/$sqldb-config-`date -I`.sql;
+mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a --skip-extended-insert -c -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb config > /tmp/$sqldb-config-`date -I`.sql;
 ## Drop existing DB and reload just config table
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "DROP DATABASE $sqldb;";
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';";

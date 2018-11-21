@@ -128,7 +128,7 @@ echo "Reverting vagrant specific changes";
 mysql --defaults-extra-file=~/.my.cnf schoolbox < $cachedir/vagrant-cleanup.sql;
 
 echo "Exporting database";
-mysqldump --defaults-extra-file=~/.my.cnf -f --allow-keywords -i -e -q -a -c schoolbox > /vagrant/data/schoolbox.sql;
+mysqldump --defaults-extra-file=~/.my.cnf -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c schoolbox > /vagrant/data/schoolbox.sql;
 if [ $? -ne 0 ];
 then
     echo "Error: exporting database failed";

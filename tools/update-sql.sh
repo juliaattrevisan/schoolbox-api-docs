@@ -116,7 +116,7 @@ then
 else
     echo "Backing up database before changes";
     mkdir -p $backupdir;
-    mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
+    mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
 fi
 
 echo "Updating database to new version";
