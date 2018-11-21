@@ -85,7 +85,7 @@ class ApixuClient
     private function parseWeatherData($responseData) : array
     {
         $twigData = [
-            'weatherLocation' => $responseData['location']['name'],
+            'weatherLocation' => $responseData['location']['name'] . ', ' . $responseData['location']['country'],
             'apiProvider' => [
                 'url' => self::PROVIDER_URL,
                 'name' => self::PROVIDER_NAME,
