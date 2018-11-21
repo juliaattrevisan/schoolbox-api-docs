@@ -93,6 +93,8 @@ class ApixuClient
             ]
         ];
 
+        $todayLastUpdated = \Alaress_Date_Format::newFromTimestamp($responseData['current']['last_updated_epoch'])->getRelativeTime();
+
         $twigData['today'] = [
             'day' => $this->getDayOfWeek($responseData['current']['last_updated_epoch']),
             'weatherSummary' => $responseData['current']['condition']['text'],
@@ -101,7 +103,7 @@ class ApixuClient
             'humidity' => $responseData['current']['humidity'],
             'windSpeed' => $responseData['current']['wind_kph'],
             'windDirection' => $responseData['current']['wind_dir'],
-            'lastUpdated' => $responseData['current']['last_updated_epoch'] // TODO format this
+            'lastUpdated' => $todayLastUpdated
         ];
 
         foreach($responseData['forecast']['forecastday'] as $forecastDay) {
