@@ -1,0 +1,86 @@
+{#
+Weather details page (linked from dashboard component)
+#}
+
+{% if weatherUnavailable %}
+    <div class="content">
+        <p class="meta">Weather forecast is temporarily unavailable.</p>
+        <p>{{ error }}</p>
+    </div>
+{% else %}
+    <div class="row">
+        <div class="small-12 columns">
+            <h1>Weather for {{ weatherLocation }}</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Forecast</h2>
+
+            <section>
+                <div class="row collapse">
+                    {% for forecastDay in forecastDays %}
+                        <div class="small-12 large-2 columns">
+                            <ul class="weather-list">
+                                <li>
+                                    <h3>{{ forecastDay.day }}</h3>
+                                </li>
+                                <li>
+                                    <img src="{{ forecastDay.weatherIcon }}" alt="{{ forecastDay.weatherSummary }}" />
+                                </li>
+                                <li>
+                                    <span class="meta">{{ forecastDay.weatherSummary }}</span>
+                                </li>
+                                <li class="content temperature">
+                                    <span class="hot">{{ forecastDay.highTemp }}&deg;</span>
+                                    <span class="cold">{{ forecastDay.lowTemp }}&deg;</span>
+                                </li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 medium-6 island">
+            <h2 class="subheader">Currently</h2>
+            <section class="content">
+                <dl class="inline-dl no-margin">
+                    <dt class="small-12 large-6">Temperature</dt>
+                    <dd class="small-12 large-6">{{ today.currentTemp }}&deg;</dd>
+
+                    <dt class="small-12 large-6">Wind</dt>
+                    <dd class="small-12 large-6">{{ today.windSpeed }} {{ today.windDirection }}</dd>
+
+                    <dt class="small-12 large-6">Humidity</dt>
+                    <dd class="small-12 large-6">{{ today.humidity }}%</dd>
+
+                    <dt class="small-12 large-6">Last updated</dt>
+                    <dd class="small-12 large-6">{{ today.lastUpdated }}</dd>
+                </dl>
+
+                <div class="content">
+                    <p class="meta">Weather supplied by</p>
+                    <a href="{{ apiProvider.url }}" target="_blank"><img width="180" alt="{{ apiProvider.name }}" src="{{ apiProvider.logo }}" /></a>
+                </div>
+            </section>
+        </div>
+
+        <div class="small-12 medium-6 island">
+            <h2 class="subheader">Weather around Australia</h2>
+            <section>
+                <ul class="information-list">
+                    {# TODO build this list #}
+                    {% for region in regions %}
+                        <li class="row content">
+                            <a href="/weather/{{ region }}">{{ region }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+    </div>
+{% endif %}
