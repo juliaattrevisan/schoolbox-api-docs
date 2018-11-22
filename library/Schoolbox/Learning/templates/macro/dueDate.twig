@@ -63,7 +63,6 @@
     {% spaceless %}
         {% set dueAt = assessment.dueAt %}
         {% if dueAt is not null and not dueAt.isNull %}
-            {% import '@learning/macro/urgency.twig' as urgency %}
             <span title="{{ dueAt.long }}">Due
                 <time datetime="{{ dueAt }}">{{ dueAt.relativeDay|replace({' at 11:59pm': ''}) }}</time>
                 {% if dueAt.isFuture and dueAt.diffInDays(NOW) < 7 %}
