@@ -77,7 +77,7 @@ class QueueSorter implements FilterInterface
 			$this->validate($instance, $user);
 
 			// just take the first topic
-			$outputLevels = $this->getReroutedLevel($user, $instance->getTopics()[0]);
+            $outputLevels = $this->getReroutedLevel($user, $instance->getTopics()[0], $instance->getFolderId());
 
             if ($this->permMapper->isMuted($outputLevels)) {
                 throw new FilterException('Reroute level is zero');
@@ -151,11 +151,12 @@ class QueueSorter implements FilterInterface
      *
 	 * @param User   $user
 	 * @param string $topic
+     * @param int $folderId
 	 * @return string[]
 	 */
-	private function getReroutedLevel(User $user, $topic)
+	private function getReroutedLevel(User $user, string $topic, int $folderId)
     {
-		$intent = $this->permMapper->findRouteLevels($topic, $user->getRole()->getId(), $user->getId());
+		$intent = $this->permMapper->findRouteLevels($topic, $user->getRole()->getId(), $user->getId(), $folderId);
 
 		if (count($intent) === 0) {
 			// if we got nothing back, this user isn't meant to see this message

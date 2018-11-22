@@ -4,7 +4,6 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Blog\Homepage\Post;
@@ -53,9 +52,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         // we only care about notifying blog post creation
         if ($bundle->getMethod() == BaseMapper::METHOD_CREATE) {
-            /** @var BlogModel $blog */
-            $blog = $bundle->getEvent()->getObject();
-            $bundle->attach(self::TRIGGER_POSTED, $blog->getCreatedAt()->getUnixTimeStamp());
+            $bundle->attach(self::TRIGGER_POSTED, self::IMMEDIATELY);
         }
     }
 

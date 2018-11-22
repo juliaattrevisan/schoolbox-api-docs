@@ -82,6 +82,7 @@ class Notifier extends AbstractModuleNotifier
             'externalClass'        => $di->lazyGet('externalClass'),
             'relationshipFilterer' => $relationshipFilterer,
             'audienceMapper'       => $mf->getLazy(Audience\Mapper::class),
+            'folderMapper'         => $mf->getLazy(\Schoolbox\Resource\Folder\Mapper::class),
         ]);
 
         $moderatorResolver = $di->lazyNew(ModeratorResolver::class, [
