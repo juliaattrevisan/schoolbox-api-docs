@@ -547,19 +547,18 @@ class Bootstrap extends AbstractBootstrap {
                 /* Use structured information for rendering
                  */
                 $args = [
-                    'message' => $message,
-                    'info' => $info,
-                    'url' => $url,
-                    'error' => $error,
-                    'date' => date('Y-m-d H:i:s'),
+                    'message'          => $message,
+                    'info'             => $info,
+                    'url'              => $url,
+                    'error'            => $error,
+                    'date'             => \Alaress_Date_Format::now(),
                     'outputStackTrace' => $outputStackTrace,
-                    'stackTrace' => $e
+                    'stackTrace'       => $e,
                 ];
 
                 /* Pass $data straight in for twig rendering
                  */
                 if ($di instanceof Di\Container) {
-
                     // Is it JSON or not?
                     /** @var ThemedHtml $output */
                     $output = $di->get('webOutput:html');
@@ -570,11 +569,6 @@ class Bootstrap extends AbstractBootstrap {
 
                     // Finagle a response?
                     $output->output($di->get('webFactory')->newResponse());
-
-
-//                    /** @var \SitePage $page */
-//                    $page = $di->get('layoutEngine');
-//                    $page->error(null, $args, $code);
                 }
                 /* Just dump it out in raw form
                  * TODO: Make synonymous with twig output
@@ -583,7 +577,7 @@ class Bootstrap extends AbstractBootstrap {
                     $output =
                         "<p><b>{$args['message']} {$args['info']}</b></p>" .
                         '<ul>' .
-                        "<li>Datetime: {$args['date']}</li>" .
+                        "<li>Datetime: {$args['date']->getLong()}</li>" .
                         "<li>URL: {$args['url']}" .
                         '</li>';
 

@@ -71,7 +71,6 @@ class ThemedHtml extends Html
             if ($code === 404) {
                 $template = 'common/error/404.twig';
             } else {
-                // TODO Figure out how to render all the extraneous error stuff
                 $template = 'common/error/general.twig';
                 $data     = [
                     'date'    => Alaress_Date_Format::now(),
