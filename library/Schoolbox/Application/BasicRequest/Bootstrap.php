@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Application\BasicRequest;
 
+use Alaress\Web\Output\ThemedHtml;
 use Aura\Di;
 use Autoloader;
 use Config;
@@ -558,9 +559,22 @@ class Bootstrap extends AbstractBootstrap {
                 /* Pass $data straight in for twig rendering
                  */
                 if ($di instanceof Di\Container) {
-                    /** @var \SitePage $page */
-                    $page = $di->get('layoutEngine');
-                    $page->error(null, $args, $code);
+
+                    // Is it JSON or not?
+                    /** @var ThemedHtml $output */
+                    $output = $di->get('webOutput:html');
+                    $output
+                        ->setTitle('Error Encountered')
+                        ->setData($args)
+                        ->setTemplate('common/error/general.twig');
+
+                    // Finagle a response?
+                    $output->output($di->get('webFactory')->newResponse());
+
+
+//                    /** @var \SitePage $page */
+//                    $page = $di->get('layoutEngine');
+//                    $page->error(null, $args, $code);
                 }
                 /* Just dump it out in raw form
                  * TODO: Make synonymous with twig output
