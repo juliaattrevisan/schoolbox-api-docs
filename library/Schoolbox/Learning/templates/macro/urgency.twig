@@ -14,11 +14,10 @@
             {% if acceptOnline %}
                 gradient-{{ max(0, min(10, urgency))|round(0, 'floor') }}
             {% else %}
-                {% if participant.lateDate.unixTimestamp < currentTimestamp %}
+                {% if participant.lateDate.unixTimestamp > currentTimestamp %}
                     gradient-{{ max(0, min(10, urgency))|round(0, 'floor') }}
                 {% endif %}
             {% endif %}
-
         {% endif %}
     {% endspaceless %}
 {% endmacro %}
