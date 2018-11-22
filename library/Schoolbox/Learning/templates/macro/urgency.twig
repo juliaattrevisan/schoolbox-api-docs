@@ -11,12 +11,13 @@
         {% if participant.user.id == USER.id and participant.allResponses|length == 0 %}
             {% set currentTimestamp = NOW.unixTimestamp %}
             {% set urgency = (participant.dueDate.unixTimestamp - currentTimestamp) / 86400 %}
-            {% if acceptOnline %}
+
+            {# Only show the color coding if the assessment accepts online submission OR it is not yet overdue #}
+            {# Have to look at due date, not late date, because an assessment without online submission doesn't have a late date #}
+            {% set overdue = participant.dueDate.unixTimestamp < currentTimestamp %}
+
+            {% if acceptOnline or not overdue %}
                 gradient-{{ max(0, min(10, urgency))|round(0, 'floor') }}
-            {% else %}
-                {% if participant.lateDate.unixTimestamp > currentTimestamp %}
-                    gradient-{{ max(0, min(10, urgency))|round(0, 'floor') }}
-                {% endif %}
             {% endif %}
         {% endif %}
     {% endspaceless %}
