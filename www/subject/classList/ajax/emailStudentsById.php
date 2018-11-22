@@ -6,7 +6,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 require_once('../../../../library/Bootstrap.php');
 
@@ -14,7 +13,6 @@ require_once('../../../../library/Bootstrap.php');
  */
 $page = new SitePage();
 $externalClass = new External_Class();
-$userHandler = new User();
 
 $ids = array();
 $emailString = array();
@@ -22,21 +20,21 @@ $emailString = array();
 /* Find all the students whose parents we'll need to contact
  */
 $allStudents = $externalClass->getStudents($_POST['classCode']);
-
 if ($allStudents && count($allStudents) && is_array($_POST['allIds']) && count($_POST['allIds'])) {
-	foreach ($allStudents as $currentStudent) {
-		if (in_array($currentStudent['synergy_id'], $_POST['allIds'])) {
-			$user = $userHandler->getBySynergy($currentStudent['synergy_id']);
-
-			$emailObj = new Email();
-			$emailString[] = $emailObj->formatEmailFromArray($user);
-		}
-	}
+    $userMapper = new \Schoolbox\UserMapper();
+    foreach ($allStudents as $currentStudent) {
+        if (in_array($currentStudent['synergy_id'], $_POST['allIds'])) {
+            $user = $userMapper->findByExternalId($currentStudent['synergy_id']);
+            if($user->getEmail()) {
+                $emailString[] = '"'.$user->formatName().'" <'.$user->getEmail().'>';
+            }
+        }
+    }
 }
 
 /* Uniqueify emails
  */
-$emailString = array_values(array_filter(array_unique($emailString)));
+$emailString = array_filter(array_unique($emailString));
 
 header('Content-Type: application/json');
 echo json_encode($emailString);

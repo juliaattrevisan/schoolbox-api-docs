@@ -49,14 +49,8 @@ if (Cfg::get('mail_enable') == 1) {
     if (\count($invalidEmails) > 0) {
         $page->setBlock('alert_box', 'invalid_address', 'invalid_address_block');
         foreach ($invalidEmails as $email) {
-            // Check if the email is just in between the <> symbol and assign it to variable on purpose
-            if ($emailFromString = Mailer::getEmailFromString($email)) {
-                $email = $emailFromString;
-            }
-            $username = explode('@', $email);
             $page->setVar([
-                'INVALID_NAME' => $username[0],
-                'INVALID_EMAIL' => $email
+                'INVALID_EMAIL' => Scrub::text($email)
             ]);
             $page->parse('invalid_address_block', 'invalid_address', true);
         }
