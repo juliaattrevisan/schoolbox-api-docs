@@ -41,7 +41,7 @@ class NotificationTest extends TestCase
         $context = []
     ) {
         return new \Alaress\Async\Notification\Instance\Instance($title, $ns, $icon, $href, $params, $level, $topics,
-            $time, $meta, $context);
+            0, $time, $meta, $context);
     }
 
     public function testConstructSingleInstance()

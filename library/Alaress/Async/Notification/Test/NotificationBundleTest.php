@@ -19,7 +19,7 @@ class NotificationBundleTest extends TestCase
         $bundle = new \Alaress\Async\Notification\NotificationBundle();
 
         $bundle->appendInstance(new \Alaress\Async\Notification\Instance\Instance(
-            'foobar', 'mock', '#', '#', [], 0, [], 0, [], []
+            'foobar', 'mock', '#', '#', [], 0, [], 0, 0, [], []
         ));
 
         $this->assertEquals(1, $bundle->count());
@@ -31,10 +31,10 @@ class NotificationBundleTest extends TestCase
 
         $bundle->appendInstances([
             new \Alaress\Async\Notification\Instance\Instance(
-                'foobar', 'mock', '#', '#', [], 0, [], 0, [], []
+                'foobar', 'mock', '#', '#', [], 0, [], 0, 0, [], []
             ),
             new \Alaress\Async\Notification\Instance\Instance(
-                'globber', 'mock', '#', '#', [], 0, [], 0, [], []
+                'globber', 'mock', '#', '#', [], 0, [], 0, 0, [], []
             ),
         ]);
 
@@ -46,7 +46,7 @@ class NotificationBundleTest extends TestCase
         $bundle = new \Alaress\Async\Notification\NotificationBundle();
 
         $inst = new \Alaress\Async\Notification\Instance\Instance(
-            'foobar', 'mock', '#', '#', [], 0, [], 0, [], []
+            'foobar', 'mock', '#', '#', [], 0, [], 0, 0, [], []
         );
 
         $bundle->appendInstance($inst);
@@ -56,7 +56,7 @@ class NotificationBundleTest extends TestCase
 
         // and add a fresh-but-identical instance
         $bundle->appendInstance(new \Alaress\Async\Notification\Instance\Instance(
-            'foobar', 'mock', '#', '#', [], 0, [], 0, [], []
+            'foobar', 'mock', '#', '#', [], 0, [], 0, 0, [], []
         ));
 
         // should still be 1 notification
@@ -69,7 +69,7 @@ class NotificationBundleTest extends TestCase
 
         $n = new \Alaress\Async\Notification\Notification([
             new \Alaress\Async\Notification\Instance\Instance(
-                'foobar', 'mock', '#', '#', [], 0, [], 0, [], []
+                'foobar', 'mock', '#', '#', [], 0, [], 0, 0, [], []
             ),
         ]);
 
@@ -84,13 +84,13 @@ class NotificationBundleTest extends TestCase
 
         $n[] = new \Alaress\Async\Notification\Notification([
             new \Alaress\Async\Notification\Instance\Instance(
-                'foobar', 'mock', '#', '#', [], 0, [], 0, [], []
+                'foobar', 'mock', '#', '#', [], 0, [], 0, 0, [], []
             ),
         ]);
 
         $n[] = new \Alaress\Async\Notification\Notification([
             new \Alaress\Async\Notification\Instance\Instance(
-                'globber', 'mock', '#', '#', [], 0, [], 0, [], []
+                'globber', 'mock', '#', '#', [], 0, [], 0, 0, [], []
             ),
         ]);
 
@@ -108,7 +108,7 @@ class NotificationBundleTest extends TestCase
         for ($i = 0; $i < 3; ++$i) {
             $n[] = new \Alaress\Async\Notification\Notification([
                 new \Alaress\Async\Notification\Instance\Instance(
-                    'foobar', 'mock', '#', '#', [], 0, [], 0, [], []
+                    'foobar', 'mock', '#', '#', [], 0, [], 0, 0, [], []
                 ),
             ]);
         }
