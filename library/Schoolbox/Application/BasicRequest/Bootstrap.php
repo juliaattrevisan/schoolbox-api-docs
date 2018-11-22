@@ -554,6 +554,7 @@ class Bootstrap extends AbstractBootstrap {
                     'date'             => \Alaress_Date_Format::now(),
                     'outputStackTrace' => $outputStackTrace,
                     'stackTrace'       => $e,
+                    'exceptionClass'   => \is_object($e) ? \get_class($e) : 'Error',
                 ];
 
                 /* Pass $data straight in for twig rendering
