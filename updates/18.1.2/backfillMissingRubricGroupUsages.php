@@ -98,8 +98,9 @@ $backfiller = new class extends App
                 sprintf("Testing box #%d, group #%d...", $groupUsage['boxId'], $groupUsage['groupId'])
             );
             $countGroupUsageQuery->execute($groupUsage);
-            if ($countGroupUsageQuery->rowCount() > 0) {
+            if ($countGroupUsageQuery->rowCount() === 0) {
                 $this->log->debug("No rubric_group_usage record found: creating one");
+                $count++;
                 $insertGroupUsageQuery->execute($groupUsage);
             }
         }
