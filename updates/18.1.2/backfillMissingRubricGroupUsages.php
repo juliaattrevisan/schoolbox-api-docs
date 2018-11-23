@@ -86,7 +86,7 @@ $backfiller = new class extends App
         ");
 
         $insertGroupUsageQuery = $this->database->prepareQuery("
-            INSERT INTO rubric_group_usage
+            INSERT IGNORE INTO rubric_group_usage
                 (rubric_group_id, submission_box_id, max_value, sequence)
             VALUES
                 (:groupId, :boxId, NULL, 0)
