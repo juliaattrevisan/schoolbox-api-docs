@@ -89,7 +89,7 @@ $backfiller = new class extends App
             INSERT IGNORE INTO rubric_group_usage
                 (rubric_group_id, submission_box_id, max_value, sequence)
             VALUES
-                (:groupId, :boxId, NULL, 0)
+                (:groupId, :boxId, 0, 0)
         ");
 
         $count = 0;
