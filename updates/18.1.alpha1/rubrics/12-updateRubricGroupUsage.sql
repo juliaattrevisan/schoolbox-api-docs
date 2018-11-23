@@ -10,7 +10,7 @@ INSERT INTO rubric_group_usage
 SELECT
     temp.rubric_group_id,
     temp.submission_box_id,
-    SUM(temp.max_value_for_criterion_and_box) AS max_value,
+    COALESCE(SUM(temp.max_value_for_criterion_and_box), 0) AS max_value,
     0 AS sequence
 FROM (
     -- Inner query: fetch all criteria+groups in use on each due work,
