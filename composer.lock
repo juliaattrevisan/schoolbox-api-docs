@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "2ed0353350ffde6df217ef6695585137",
+    "content-hash": "0a58499417dfabf0441d437ed577ab42",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -657,6 +657,66 @@
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
             "time": "2017-02-14T19:40:03+00:00"
+        },
+        {
+            "name": "crell/api-problem",
+            "version": "3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Crell/ApiProblem.git",
+                "reference": "9f0547232f8cb4ef1ebb59d0e43c4b2be3a4daf2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Crell/ApiProblem/zipball/9f0547232f8cb4ef1ebb59d0e43c4b2be3a4daf2",
+                "reference": "9f0547232f8cb4ef1ebb59d0e43c4b2be3a4daf2",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "7.*",
+                "psr/http-factory": "^1.0",
+                "psr/http-message": "1.*",
+                "zendframework/zend-diactoros": "~1.0"
+            },
+            "suggest": {
+                "psr/http-factory": "Common interfaces for PSR-7 HTTP message factories",
+                "psr/http-message": "Common interface for HTTP messages"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Crell\\ApiProblem\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Larry Garfield",
+                    "email": "larry@garfieldtech.com",
+                    "homepage": "http://www.garfieldtech.com/"
+                }
+            ],
+            "description": "PHP wrapper for the api-problem IETF specification",
+            "homepage": "https://github.com/Crell/ApiProblem",
+            "keywords": [
+                "api-problem",
+                "http",
+                "json",
+                "rest",
+                "xml"
+            ],
+            "time": "2018-11-24T21:24:57+00:00"
         },
         {
             "name": "doctrine/lexer",
@@ -2352,6 +2412,7 @@
                 "xls",
                 "xlsx"
             ],
+            "abandoned": "phpoffice/phpspreadsheet",
             "time": "2015-05-05T00:10:25+00:00"
         },
         {
