@@ -152,6 +152,10 @@ class Instance implements JsonSerializable
      */
     protected $action = self::ACTION_SEND;
 
+    /**
+     * Folder id of this message, if this needs to be muted by the homepage based message settings
+     */
+    protected $folderId;
 
     /**
      * @param string               $text
@@ -161,6 +165,7 @@ class Instance implements JsonSerializable
      * @param ParameterInterface[] $params
      * @param int                  $severity
      * @param array                $topics
+     * @param int                  $folderId
      * @param int                  $time
      * @param array                $meta
      * @param array                $context
@@ -176,6 +181,7 @@ class Instance implements JsonSerializable
         $params,
         $severity,
         $topics,
+        $folderId,
         $time = null,
         $meta = null,
         $context = null,
@@ -221,6 +227,7 @@ class Instance implements JsonSerializable
 
         $this->time     = (int)$time ?: time();
         $this->severity = (int)$severity;
+        $this->folderId = (int)$folderId;
 
         $this->params  = (array)$params;
         $this->topics  = (array)$topics;
@@ -284,6 +291,7 @@ class Instance implements JsonSerializable
         $action        = $array['action'] ?? self::ACTION_SEND;
         $severity      = isset($array['level']) ? $array['level'] : 0;
         $context       = isset($array['context']) ? $array['context'] : [];
+        $folderId      = $array['folderId'];
 
         // override topic if relevant to do so (happens in QueueSorter::process())
         if ($topic) {
@@ -300,7 +308,7 @@ class Instance implements JsonSerializable
             }
         }
 
-        $instance = new self($messageString, $namespace, $icon, $href, $params, $severity, $topics, $time, $meta, $context);
+        $instance = new self($messageString, $namespace, $icon, $href, $params, $severity, $topics, $folderId, $time, $meta, $context);
         $instance->setAction($action);
         return $instance;
     }
@@ -350,6 +358,7 @@ class Instance implements JsonSerializable
             'topics'    => $this->topics,
             'context'   => $this->context,
             'action'    => $this->action,
+            'folderId'  => $this->folderId,
         );
     }
 
@@ -521,5 +530,14 @@ class Instance implements JsonSerializable
     public function isActionRetractAll(): bool
     {
         return $this->action === self::ACTION_RETRACT_ALL;
+    }
+
+    /**
+     * Gets folder id
+     * @return int
+     */
+    public function getFolderId(): int
+    {
+        return $this->folderId;
     }
 }

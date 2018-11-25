@@ -180,10 +180,11 @@ class RoutePermissionMapper extends Mapper {
      * @param string $topic
      * @param int    $roleId
      * @param int    $userId
+     * @param int    $folderId
      * @throws Mapper\Exception
      * @return array
      */
-    public function findRouteLevels(string $topic, int $roleId, int $userId = 0): array
+ 	public function findRouteLevels(string $topic, int $roleId, int $userId = 0, int $folderId = 0) : array
     {
 		// find the routing levels that match this role, user and topic regex
 		$stmt = $this->prepare("
@@ -235,21 +236,31 @@ class RoutePermissionMapper extends Mapper {
 			'user_id' => $userId
 		));
 
-        $folderMapper = Folder\Mapper::getInstance();
+        // No override found. Returning current mask.
+        if ($stmt->rowCount() === 0) {
+            return $masked;
+        }
 
         // Is this for a homepage? If so, get any direct inheriting descendants.
         // Route overrides inherit from their closest non-inheriting ancestor node.
-        if (preg_match('/service\\.' . UserAccess::SERVICE_HOMEPAGE . '\\.(\d+)\\./', $topic, $matches)) {
-                $folder = $folderMapper->findCheaplyById($matches[1]);
-            if ($folder->getInherit()) {
-                $nearestParent = $folderMapper->findNearestNonInheritingAncestralNode($folder);
-                if ($nearestParent) {
-                    // topic to search in the overrides should be for non-inheriting ancestor
-                    $topic = str_replace("service." . UserAccess::SERVICE_HOMEPAGE . ".{$folder->getId()}.",
-                        "service." . UserAccess::SERVICE_HOMEPAGE . ".{$nearestParent->getId()}.", $topic);
-                }
+        if ($folderId === 0 && preg_match('/service\\.' . UserAccess::SERVICE_HOMEPAGE . '\\.(\d+)\\./', $topic, $matches)) {
+            $folderId = (int)$matches[1];
+        }
+        if ($folderId === 0) {
+            return $masked;
+        }
+
+        $folderMapper = Folder\Mapper::getInstance();
+        $folder = $folderMapper->findCheaplyById($folderId);
+        if ($folder->getInherit()) {
+            $nearestParent = $folderMapper->findNearestNonInheritingAncestralNode($folder);
+            if ($nearestParent) {
+                $folderId = $nearestParent->getId();
             }
         }
+
+        // topic to search in the overrides should be for non-inheriting ancestor
+        $searchTopic = "service." . UserAccess::SERVICE_HOMEPAGE . ".{$folderId}.";
 
         // if current topic matches route
         $precedence = [];
@@ -257,7 +268,7 @@ class RoutePermissionMapper extends Mapper {
 			// no multiword (ie '.#.') support
 			$regex = '`' . str_replace('*','([^\.]+)', $r['msg_route_key']) . '\.`';
 
-			if(preg_match($regex, $topic, $matches, PREG_OFFSET_CAPTURE)) {
+			if(preg_match($regex, $searchTopic, $matches, PREG_OFFSET_CAPTURE)) {
 				// literal leftness, wildcard rightness, applied level
 
 				$leftness = $matches[0][1];

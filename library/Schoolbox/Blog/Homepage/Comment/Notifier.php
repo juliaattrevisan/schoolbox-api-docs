@@ -4,7 +4,6 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Blog\Homepage\Comment;
@@ -70,13 +69,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         // we only care about create
         if ($bundle->getMethod() == BaseMapper::METHOD_CREATE) {
-
-            /** @var Comment $comment */
-            $comment = $bundle->getEvent()->getObject();
-
             $bundle->attachEach([
-                self::TRIGGER_COMMENTED => $comment->getCreatedAt()->getUnixTimeStamp(),
-                self::TRIGGER_FOLLOWED  => $comment->getCreatedAt()->getUnixTimeStamp(),
+                self::TRIGGER_COMMENTED => self::IMMEDIATELY,
+                self::TRIGGER_FOLLOWED  => self::IMMEDIATELY,
             ]);
         }
     }
@@ -130,7 +125,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         /** @var BlogModel $blog */
         $blog        = $this->blogMapper->findById($comment->getBlog()->getId());
         $blogName    = $blog->getHeading();
-        $folderId    = $blog->getFolder()->getId();
+        $folderId    = (int)$blog->getFolder()->getId();
         $authorExtId = $author->getExternalId();
 
         /** @var FolderModel $folder */
@@ -150,6 +145,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             ->setTimestamp($comment->getCreatedAt()->getUnixTimeStamp())
             ->setNamespace($this->getSlug())
             ->setBody($comment->getBody())
+            ->setFolderId($folderId)
             ->setByline($author->formatName("{firstname} wrote"));
 
         return $bob;

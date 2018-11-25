@@ -58,6 +58,8 @@ class Builder implements BuilderInterface
 	/** @var string */
 	protected $namespace;
 
+	/** @var int */
+	protected $folderId;
 
 	/**
 	 * Basic construction
@@ -87,6 +89,7 @@ class Builder implements BuilderInterface
 
 		$this->severity  = 0;
 		$this->time      = 0;
+		$this->folderId  = 0;
 
 		return $this;
 	}
@@ -283,6 +286,17 @@ class Builder implements BuilderInterface
         return $this;
     }
 
+    /**
+     * Explicitly specify the folder id which this message involves
+     * @param int $folderId
+     * @return Builder
+     */
+    public function setFolderId(int $folderId): self
+    {
+        $this->folderId = $folderId;
+        return $this;
+    }
+
 	/**
 	 * Builds an instance from the construction given
 	 *
@@ -320,7 +334,7 @@ class Builder implements BuilderInterface
 		return new Instance(
 			// mandatory args
 			$this->title, $this->namespace, $this->icon, $this->href,
-			$this->params, $this->severity, $this->topics,
+			$this->params, $this->severity, $this->topics, $this->folderId,
 			// optional args
 			$this->time, $this->meta, $this->context, $this->validate
 		);

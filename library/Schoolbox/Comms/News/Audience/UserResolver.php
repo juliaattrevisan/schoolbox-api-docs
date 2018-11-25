@@ -9,11 +9,13 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience;
 
 use Alaress\Database;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use External_ClassInterface;
 use PDO;
 use Schoolbox\Realtime\Message\RoutePermission;
 use UnexpectedValueException;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Responsible for:
@@ -40,6 +42,8 @@ class UserResolver implements IUserResolver
     /** @var Mapper */
     private $audienceMapper;
 
+    /** @var FolderMapper */
+    private $folderMapper;
 
     /**
      * @param bool[]                        $validNullEntities
@@ -47,19 +51,22 @@ class UserResolver implements IUserResolver
      * @param External_ClassInterface       $externalClass
      * @param RelationshipFilterer          $relationshipFilterer
      * @param Mapper                        $audienceMapper
+     * @param FolderMapper $folderMapper
      */
     public function __construct(
         array $validNullEntities,
         Database\Connector\IConnector $db,
         External_ClassInterface $externalClass,
         RelationshipFilterer $relationshipFilterer,
-        Mapper $audienceMapper
+        Mapper $audienceMapper,
+        FolderMapper $folderMapper
     ) {
         $this->validNullEntities    = $validNullEntities;
         $this->db                   = $db;
         $this->externalClass        = $externalClass;
         $this->relationshipFilterer = $relationshipFilterer;
         $this->audienceMapper       = $audienceMapper;
+        $this->folderMapper         = $folderMapper;
     }
 
 
@@ -104,12 +111,24 @@ class UserResolver implements IUserResolver
 
         // Simple base case:
         if (Segment\Strategy\Composite::getEntityType() !== $entityType) {
-            $userIds = $this->getUserIds($audienceSegment->getEntityType(), $audienceSegment->getEntityValue());
+            $entityValue = $audienceSegment->getEntityValue();
+            if ($excludeMuted && $audienceSegment->getEntityType() === Segment\Strategy\Folder::getEntityType()) {
+                try {
+                    $folder = $this->folderMapper->findCheaplyById($entityValue);
+                    if ($folder->getInherit()) {
+                        $folder = $this->folderMapper->findNearestNonInheritingAncestralNode($folder);
+                        $entityValue = $folder->getId();
+                    }
+                } catch (Exception $e) {
+                    return [];
+                }
+            }
+            $userIds = $this->getUserIds($audienceSegment->getEntityType(), $entityValue);
             $userIds = $this->applyRelationshipFilter($userIds, $audienceSegment->getRelationship());
             // Exclude the users who has muted the current folder.
             if ($excludeMuted && $audienceSegment->getEntityType() === Segment\Strategy\Folder::getEntityType()) {
                 $parameters = [
-                    'routeKey' => sprintf('service.%s.%s', UserAccess::SERVICE_HOMEPAGE, $audienceSegment->getEntityValue()),
+                    'routeKey' => sprintf('service.%s.%s', UserAccess::SERVICE_HOMEPAGE, $entityValue),
                     'delivery' => RoutePermission::MUTE,
                 ];
                 $mutedUserIds = $this->db->executeQuery(

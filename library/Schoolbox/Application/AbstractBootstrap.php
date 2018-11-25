@@ -399,6 +399,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $db              = $di->get('databaseInternal');
                     $externalUser    = $di->get('externalUser');
                     $externalClass   = $di->get('externalClass');
+                    $mapperFactory   = $di->get('mapperFactory');
+                    $folderMapper    = $mapperFactory->get(Folder\Mapper::class);
                     $userResolver = new News\Audience\UserResolver(
                         StrategyFactory::getValidNullEntities(),
                         $db,
@@ -411,7 +413,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                             $externalClass,
                             $di->get('mapperFactory')->get(UserAccessMapper::class)
                         ),
-                        $di->get('mapperFactory')->get(News\Audience\Mapper::class)
+                        $di->get('mapperFactory')->get(News\Audience\Mapper::class),
+                        $folderMapper
                     );
 
                     return $userResolver;
