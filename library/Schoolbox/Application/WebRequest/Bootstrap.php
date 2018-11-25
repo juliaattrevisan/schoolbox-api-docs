@@ -13,10 +13,13 @@ use Alaress\Csrf\HeaderCheck;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
 use Alaress\DebugBar\DataCollector\XhprofCollector;
 use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\Web\Output\Json;
 use Alaress\Web\Output\ThemedHtml;
+use Alaress\Web\Request\IsJson;
 use Aura\Di;
 use Autoloader;
 use Config;
+use Crell\ApiProblem\ApiProblem;
 use Database;
 use Psr\Log\NullLogger;
 use Schoolbox\Application\AbstractBootstrap;
@@ -276,7 +279,10 @@ class Bootstrap extends AbstractBootstrap {
         $outputStackTrace = Config::get('debug_show_stack_trace');
 
 
-        if ($e instanceof \Exception || $e instanceof \Throwable) {
+        $isException = false;
+        if ($e instanceof \Throwable) {
+            $isException = true;
+
             $error = array(
                 'file'    => $e->getFile(),
                 'message' => $e->getMessage(),
@@ -300,8 +306,8 @@ class Bootstrap extends AbstractBootstrap {
 
             // if it was a fatal error or exception that triggered our sudden but inevitable demise...
             if (
-                (intval($error['type']) & (E_ERROR | E_CORE_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR))
-                || $e instanceof \Exception || $e instanceof \Throwable
+                $isException
+                || (intval($error['type']) & (E_ERROR | E_CORE_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR))
             ) {
                 // RedisException extends RuntimeException: occurs when Redis
                 // session management isn't working for whatever reason.
@@ -343,7 +349,7 @@ class Bootstrap extends AbstractBootstrap {
                 // If there's no SitePage in DI yet: just output a styleless error.
                 $di = $this->getKernel()->getDependencyInjector();
 
-                if (!$e instanceof \Exception && !$e instanceof \Throwable) {
+                if (!$isException) {
                     $e = $error;
                     $e['code'] = $code;
 
@@ -370,15 +376,33 @@ class Bootstrap extends AbstractBootstrap {
                  */
                 if ($di instanceof Di\Container) {
                     // Is it JSON or not?
-                    /** @var ThemedHtml $output */
-                    $output = $di->get('webOutput:html');
-                    $output
-                        ->setTitle('Error Encountered')
-                        ->setData($args)
-                        ->setTemplate('common/error/general.twig');
+                    $response = $di->get('webFactory')->newResponse();
+                    if ((new IsJson())->isSatisfiedBy($response)) {
+                        $problem = (new ApiProblem($message))
+                            ->setStatus($code)
+                            ->setDetail($info)
+                            ->setInstance($url);
+
+                        if ($outputStackTrace) {
+                            $problem['trace'] = $isException ? $e->getTrace() : $e['trace'];
+                        }
+
+                        /** @var Json $output */
+                        $output = $di->get('webOutput:json');
+                        $output
+                            ->setData($problem->asArray());
+
+                    } else {
+                        /** @var ThemedHtml $output */
+                        $output = $di->get('webOutput:html');
+                        $output
+                            ->setTitle('Error Encountered')
+                            ->setData($args)
+                            ->setTemplate('common/error/general.twig');
+                    }
 
                     // Finagle a response?
-                    $output->output($di->get('webFactory')->newResponse());
+                    $output->output($response);
                 }
                 /* Just dump it out in raw form
                  * TODO: Make synonymous with twig output
