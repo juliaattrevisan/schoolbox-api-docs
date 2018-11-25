@@ -26,7 +26,7 @@ class Freedom implements IQueryHelper
     {
         $sql = "
             SELECT
-            ''                                  AS student_contact_network_login,
+            I.LOGIN                             AS student_contact_network_login,
             CONVERT(varchar(10), I.MEMBER#)     AS student_contact_id,
             ''                                  AS student_contact_title,
             CONVERT(varchar(20), I.GIVENNAME)   AS student_contact_given_name,
