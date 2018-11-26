@@ -357,8 +357,13 @@ abstract class AbstractMailer implements IMailer
      */
     public static function parseAddressString($string, $returnValidEmailsOnly = true): array
     {
-        $address_list = self::parseAddressList($string);
         $return_list  = [];
+
+        if (\trim($string) === '') {
+            return $return_list;
+        }
+
+        $address_list = self::parseAddressList($string);
 
         foreach ($address_list[self::KEY_VALID] as $address) {
             $to = $address->mailbox . '@' . $address->host;
