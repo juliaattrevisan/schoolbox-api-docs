@@ -223,10 +223,10 @@
                     {name: 'insert', groups: ['insert']},
                     '/',
                     {name: 'styles', groups: ['styles']},
-                    {name: 'colors', groups: ['colors']},
                     {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi', 'paragraph']},
                     {name: 'others', groups: ['others']},
                     '/',
+                    {name: 'colors', groups: ['colors']},
                     {name: 'clipboard', groups: ['clipboard', 'undo']},
                     {name: 'document', groups: ['mode', 'document', 'doctools']},
                     {name: 'editing', groups: ['find', 'selection', 'spellchecker', 'editing']},
@@ -265,7 +265,7 @@
 
                 /* Remove default plugins; add Schoolbox Custom Plugins
                  */
-                removePlugins: 'image,image2,uploadimage,link',
+                removePlugins: 'image,image2,uploadimage',
                 extraPlugins: 'schoolboxresource,schoolboxiframe,schoolboxlink,schoolboxanchor,dragresize',
 
                 /* Other settings
