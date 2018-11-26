@@ -44,6 +44,12 @@ class Controller extends BaseController
 
 
     /**
+     * @var SubmissionBoxMapper
+     */
+    private $boxMapper;
+
+
+    /**
      * @var FolderMapper
      */
     private $folderMapper;
@@ -66,6 +72,7 @@ class Controller extends BaseController
      *
      * @param RubricMapper         $mapper
      * @param AssessmentDataSource $assessmentDataSource
+     * @param SubmissionBoxMapper  $boxMapper
      * @param FolderMapper         $folderMapper
      * @param GroupMapper          $groupMapper
      * @param CriterionMapper      $criterionMapper
@@ -73,12 +80,14 @@ class Controller extends BaseController
     public function __construct(
         RubricMapper $mapper,
         AssessmentDataSource $assessmentDataSource,
+        SubmissionBoxMapper $boxMapper,
         FolderMapper $folderMapper,
         GroupMapper $groupMapper,
         CriterionMapper $criterionMapper
     ) {
         $this->mapper               = $mapper;
         $this->assessmentDataSource = $assessmentDataSource;
+        $this->boxMapper            = $boxMapper;
         $this->folderMapper         = $folderMapper;
         $this->groupMapper          = $groupMapper;
         $this->criterionMapper      = $criterionMapper;
@@ -249,12 +258,13 @@ class Controller extends BaseController
             }
 
             if ($boxId = $post->get('boxId')) {
-                $box    = SubmissionBoxMapper::getInstance()->findById($boxId);
-                $folder = $box->getCategory();
+                $box    = $this->boxMapper->findById($boxId);
+                $folder = $this->folderMapper->findById($box->getCategory()->getId());
 
             } elseif ($folderId = $post->get('folderId')) {
-                $box    = SubmissionBoxMapper::getInstance()->createModel()->setId(0);
-                $folder = $box->getCategory()->setId($folderId);
+                $box    = $this->boxMapper->createModel()->setId(0);
+                $folder = $this->folderMapper->findById($folderId);
+                $box->setCategory($folder);
 
             } else {
                 // can't work with that
