@@ -254,8 +254,7 @@
                                             {{ upcoming.typeName }}
                                         </p>
                                     {% endif %}
-
-                                    <p class="meta">{{ dueDate.dueDate(upcoming, student) }}</p>
+                                    <p class="meta">{{ dueDate.forParticipant(upcoming.participant(student)) }}</p>
                                 </div>
                             </li>
                         {% endfor %}
