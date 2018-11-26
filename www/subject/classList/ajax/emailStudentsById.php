@@ -34,7 +34,7 @@ if ($allStudents && count($allStudents) && is_array($_POST['allIds']) && count($
 
 /* Uniqueify emails
  */
-$emailString = array_filter(array_unique($emailString));
+$emailString = array_unique($emailString);
 
 header('Content-Type: application/json');
 echo json_encode($emailString);
