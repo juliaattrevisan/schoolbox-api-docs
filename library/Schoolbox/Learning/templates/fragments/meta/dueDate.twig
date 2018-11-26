@@ -5,7 +5,7 @@
         {% if student %}
             {{ dueDate.dueDate(assessment, student) }}
         {% else %}
-            {{ dueDate.assessment(assessment) }}
+            {{ dueDate.forAssessment(assessment) }}
         {% endif %}
     </li>
     {% endspaceless %}

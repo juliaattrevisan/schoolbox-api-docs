@@ -13,22 +13,22 @@
     {# Is the nominated user a participant ? #}
     {% set participant = assessable.participantIfExtant(user) %}
     {% if participant and not participant.isExcluded %}
-        {{ dueDate.participant(participant) }}
+        {{ dueDate.forParticipant(participant) }}
     {% else %}
         {# Is the user a parent? Check if any of their children are participants #}
         {% set childParticipant = null %}
         {% for child in user.children if not childParticipant %}
             {% if assessable.isParticipant(child) %}
-                {% set childParticipant = assessable.participant(child) %}
+                {% set childParticipant = assessable.forParticipant(child) %}
             {% endif %}
         {% endfor %}
 
         {% if childParticipant %}
             {# We found a child of the parent who is participating, render their due date  #}
-            {{ dueDate.participant(childParticipant) }}
+            {{ dueDate.forParticipant(childParticipant) }}
         {% else %}
             {# Not a participant, and not a parent of a participant  #}
-            {{ dueDate.assessment(assessable) }}
+            {{ dueDate.forAssessment(assessable) }}
         {% endif %}
     {% endif %}
 {% endspaceless %}
@@ -38,7 +38,7 @@
 {##
  # Helper macro to render due date for a participant's plan.
  #}
-{% macro participant(participant) %}
+{% macro forParticipant(participant) %}
     {% spaceless %}
         {# cache this for performance #}
         {% set participantDueDate = participant.dueDate %}
@@ -56,7 +56,7 @@
 {##
  # Helper macro to render an assessment's default (not participant-specific) due date.
  #}
-{% macro assessment(assessment) %}
+{% macro forAssessment(assessment) %}
     {% spaceless %}
         {% set dueAt = assessment.dueAt %}
         {% if dueAt is not null and not dueAt.isNull %}
