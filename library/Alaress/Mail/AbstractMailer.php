@@ -401,8 +401,8 @@ abstract class AbstractMailer implements IMailer
     private static function parseAddressList(string $emailAddresses): array
     {
         $emails = [];
-        // Separate $emailAddresses by comma that's outside parentheses E.g: English Unit 1 (ENC17,ENC18)
-        $emailLists = array_map('trim', preg_split('/(?!<(?:\(|\[)[^)\]]+),(?![^(\[]+(?:\)|\]))/', $emailAddresses));
+        //Explode emails by the ascii's Record Separator
+        $emailLists = explode(\chr(0x1E), $emailAddresses);
 
         foreach ($emailLists as $email) {
             // Check if string is a valid email OR
