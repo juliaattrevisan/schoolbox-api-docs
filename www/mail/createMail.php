@@ -26,8 +26,10 @@ if (Cfg::get('mail_enable') == 1) {
     foreach ($addressLists as $type => $request) {
         if (null !== $_REQUEST[$type]) {
             $emailAddresses = Mailer::parseAddressString($_REQUEST[$type], false);
-            foreach ($emailAddresses['valid'] as $email => $name) {
-                $addressLists[$type][] = Mailer::buildAddress($email, $name);
+            if(!empty($emailAddresses['valid'])) {
+                foreach ($emailAddresses['valid'] as $email => $name) {
+                    $addressLists[$type][] = Mailer::buildAddress($email, $name);
+                }
             }
         } elseif (null === $_REQUEST[$type] && $type === 'bcc') {
             $addressLists[$type][] = Mailer::buildAddress(
