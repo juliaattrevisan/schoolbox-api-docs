@@ -8,7 +8,7 @@
 {% macro datetime(participant) %}
     {% spaceless %}
         {# Only due works have an acceptOnline option; all other assessment types are accept online by default #}
-        {% set acceptOnline = assessable.acceptOnline|default(true) %}
+        {% set acceptOnline = participant.plan.assessable.acceptOnline|default(true) %}
 
         {# Datetime urgency only has meaning to the logged-in user #}
         {% if participant.user.id == USER.id and participant.allResponses|length == 0 %}
