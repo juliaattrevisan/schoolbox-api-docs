@@ -52,7 +52,7 @@ Data:
 <div class="small-12 columns">
     <div class="actions-small-2 row">
         <div class="list-item">
-            <h1>{{ article.title }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
+            <h1>{{ article.title |default("(untitled)") }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
             <ul class="meta">
                 <li class="icon-user">Published by
                     {% if article.author.deletedAt.isNull %}

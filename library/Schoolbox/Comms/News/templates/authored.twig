@@ -36,7 +36,9 @@
                                     <img :src="article.featureImage._links.image.href + '&size=square64'">
                                 </a>
 
-                                <h3><a :href="article._links.self.href">${ article.title }</a></h3>
+                                <h3><a v-if="article.title" :href="article._links.self.href">${ article.title }</a>
+                                    <a v-else :href="article._links.self.href">(untitled)</a>
+                                </h3>
 
                                 <p class="meta">
                                     <b>${ article.status }</b>
