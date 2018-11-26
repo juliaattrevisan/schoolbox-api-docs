@@ -411,18 +411,17 @@ abstract class AbstractMailer implements IMailer
         //Explode emails by the ascii's Record Separator
         $emailList = explode(\chr(self::EMAIL_SEPARATOR_CODE), $emailAddresses);
 
-        if (\count($emailList) > 0) {
-            foreach ($emailList as $email) {
-                // Check if string is a valid email OR
-                // Check if the email within a string is valid e.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
-                if (filter_var($email, FILTER_VALIDATE_EMAIL) || self::emailFromStringIsValid($email)) {
-                    $emails[self::KEY_VALID][] = $email;
-                    continue;
-                }
-
-                $emails[self::KEY_INVALID][] = $email;
+        foreach ($emailList as $email) {
+            // Check if string is a valid email OR
+            // Check if the email within a string is valid e.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
+            if (filter_var($email, FILTER_VALIDATE_EMAIL) || self::emailFromStringIsValid($email)) {
+                $emails[self::KEY_VALID][] = $email;
+                continue;
             }
+
+            $emails[self::KEY_INVALID][] = $email;
         }
+
         return [
             self::KEY_VALID => isset($emails[self::KEY_VALID]) ? self::parseValidEmailAddresses($emails[self::KEY_VALID]) : [],
             self::KEY_INVALID => $emails[self::KEY_INVALID] ?? [],
