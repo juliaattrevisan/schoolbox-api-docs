@@ -94,7 +94,7 @@ class GroupUsage
      * @param float|null $maxValue
      * @return static
      */
-    public function setMaxValue(float $maxValue): self
+    public function setMaxValue(?float $maxValue): self
     {
         $this->maxValue = $maxValue;
         return $this;
