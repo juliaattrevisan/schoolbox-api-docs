@@ -24,6 +24,7 @@ use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Model as File;
 use Url;
@@ -43,17 +44,44 @@ class Controller extends BaseController
 
 
     /**
+     * @var FolderMapper
+     */
+    private $folderMapper;
+
+
+    /**
+     * @var GroupMapper
+     */
+    private $groupMapper;
+
+
+    /**
+     * @var CriterionMapper
+     */
+    private $criterionMapper;
+
+
+    /**
      * Constructor
      *
      * @param RubricMapper         $mapper
      * @param AssessmentDataSource $assessmentDataSource
+     * @param FolderMapper         $folderMapper
+     * @param GroupMapper          $groupMapper
+     * @param CriterionMapper      $criterionMapper
      */
     public function __construct(
         RubricMapper $mapper,
-        AssessmentDataSource $assessmentDataSource
+        AssessmentDataSource $assessmentDataSource,
+        FolderMapper $folderMapper,
+        GroupMapper $groupMapper,
+        CriterionMapper $criterionMapper
     ) {
         $this->mapper               = $mapper;
         $this->assessmentDataSource = $assessmentDataSource;
+        $this->folderMapper         = $folderMapper;
+        $this->groupMapper          = $groupMapper;
+        $this->criterionMapper      = $criterionMapper;
     }
 
 
@@ -112,8 +140,7 @@ class Controller extends BaseController
                 return;
             }
 
-            $criterionMapper = CriterionMapper::getInstance();
-            $criteria        = $criterionMapper->findForFolder($folderId);
+            $criteria        = $this->criterionMapper->findForFolder($folderId);
             $proposedGroup   = $this->mapper->normaliseForComparison($groupName);
             $proposedName    = $this->mapper->normaliseForComparison($critName);
             foreach ($criteria as $criterion){
@@ -126,7 +153,7 @@ class Controller extends BaseController
                 }
             }
 
-            $criterionModel = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $critName, $groupName);
+            $criterionModel = $this->criterionMapper->findOrCreateOneForFolderByKey($folderId, $critName, $groupName);
 
             $group = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
                 ->setId($criterionModel->getGroup()->getId())
@@ -158,7 +185,7 @@ class Controller extends BaseController
                 ->setName($groupName);
 
             // Ensure the proposed Group name is not already in use.
-            $groupModels = GroupMapper::getInstance()->findForFolder($folderId);
+            $groupModels = $this->groupMapper->findForFolder($folderId);
             $proposed    = $this->mapper->normaliseForComparison($groupName);
             foreach ($groupModels as $groupModel) {
                 $grouping = $this->mapper->normaliseForComparison($groupModel->getName());

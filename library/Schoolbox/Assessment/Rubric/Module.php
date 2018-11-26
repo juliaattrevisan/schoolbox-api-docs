@@ -13,8 +13,11 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Twig_Error_Loader;
 
@@ -70,8 +73,11 @@ class Module extends BaseModule
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class),
             [
-                'mapper' => $this->getMapperFactory()->getLazy(RubricMapper::class),
+                'mapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
                 'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
+                'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'groupMapper'          => $this->getMapperFactory()->getLazy(GroupMapper::class),
+                'criterionMapper'      => $this->getMapperFactory()->getLazy(CriterionMapper::class),
             ]
         );
     }
