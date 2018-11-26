@@ -33,6 +33,8 @@ abstract class AbstractMailer implements IMailer
     private const MAX_RETRIES = 4;
     private const RETRY_TIMEOUT = 1;
 
+    public const EMAIL_SEPARATOR_CODE = 0x1E;
+
     /**
      * Instance of mail transporter.
      *
@@ -402,7 +404,7 @@ abstract class AbstractMailer implements IMailer
     {
         $emails = [];
         //Explode emails by the ascii's Record Separator
-        $emailLists = explode(\chr(0x1E), $emailAddresses);
+        $emailLists = explode(\chr(self::EMAIL_SEPARATOR_CODE), $emailAddresses);
 
         foreach ($emailLists as $email) {
             // Check if string is a valid email OR
@@ -414,7 +416,6 @@ abstract class AbstractMailer implements IMailer
 
             $emails[self::KEY_INVALID][] = $email;
         }
-
         return [
             self::KEY_VALID => isset($emails[self::KEY_VALID]) ? self::parseValidEmailAddresses($emails[self::KEY_VALID]) : [],
             self::KEY_INVALID => $emails[self::KEY_INVALID] ?? [],

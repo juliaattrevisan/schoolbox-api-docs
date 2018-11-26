@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  */
 
+use Alaress\Mail\AbstractMailer;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -171,7 +172,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 if ($this->getUser()->getRole()->isStaff() && isset($emailall) && $this->getConfigMapper()->get('mail_enable')) {
                     $this->setVar([
                         "REPLYTO" => $this->getUser()->getEmail(),
-                        "EMAILALL" => implode(chr(0x1E), $emailall),
+                        "EMAILALL" => implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), $emailall),
                     ]);
                     $this->parse("member_email_block", "member_email");
                 } else {

@@ -6,6 +6,7 @@
  * @version     SVN: $Id$
  */
 
+use Alaress\Mail\AbstractMailer;
 use \Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Mapper\Exception as MapperException;
 
@@ -212,7 +213,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                 }
 
 
-                $emailAllStudents = implode(',', $allStudentEmails);
+                $emailAllStudents = implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), $allStudentEmails);
 
                 /* Student bulk email
                   */
