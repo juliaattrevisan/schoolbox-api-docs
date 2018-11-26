@@ -258,13 +258,13 @@ class Controller extends BaseController
             }
 
             if ($boxId = $post->get('boxId')) {
-                $box    = $this->boxMapper->findById($boxId);
-                $folder = $this->folderMapper->findById($box->getCategory()->getId());
+                $assessment   = $this->assessmentDataSource->findByDueWorkId($boxId);
+                $assessmentId = $assessment->getId();
+                $folder       = $assessment->getBaseContext()->getFolder();
 
             } elseif ($folderId = $post->get('folderId')) {
-                $box    = $this->boxMapper->createModel()->setId(0);
-                $folder = $this->folderMapper->findById($folderId);
-                $box->setCategory($folder);
+                $assessmentId = 0;
+                $folder       = $this->folderMapper->findById($folderId);
 
             } else {
                 // can't work with that
@@ -281,12 +281,12 @@ class Controller extends BaseController
 
             $rubricRowSet = $this->mapper->retrieveRowSet($folder, true);
             $dummyDueWork = (new DueWork())
-                ->setId($box->getAssessmentModel()->getId())
+                ->setId($assessmentId)
                 ->setMarkPerCapability($usingMarkPerCapability)
                 ->setUseMarkRange($usingMarkRange);
             $rubricGrid   = new Grid($dummyDueWork, $rubricRowSet);
             $rubricGrid   = (new GridFactory())
-                ->buildFromPostData($rubricGrid, [$box->getAssessmentModel()->getId() => $postData], false);
+                ->buildFromPostData($rubricGrid, [$assessmentId => $postData], false);
 
         } catch (\Exception $e) {
 
