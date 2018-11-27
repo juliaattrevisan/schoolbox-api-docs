@@ -6,11 +6,9 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Menu\Side\Renderer as MenuSideRender;
 use Schoolbox\Menu\Top\Renderer as MenuTopRenderer;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Tour\Renderer as TourRenderer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Config\ConfigMapper;
 
 class SitePage extends Page
 {
@@ -361,13 +359,14 @@ class SitePage extends Page
             'content' => $this->template->parse('finaloutput', TEMPLATE_body)
         ]);
 
+        // Do this leftover thing
+        self::disableXssProtectionAfterForm();
 
         // Finagle a response
         $renderer->output($this->getDi()->get('webFactory')->newResponse());
 
 
-        // Do this leftover thing
-        self::disableXssProtectionAfterForm();
+
         return true;
     }
 
