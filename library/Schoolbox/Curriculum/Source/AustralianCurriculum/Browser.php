@@ -182,15 +182,16 @@ class Browser extends Source\BrowserAbstract
         // Get everything out of the manifest instead of out of RDF queries.
         $curl = new Alaress_Curl_Url($area->getReference().'-manifest.json');
         $curl->exec();
-        if (!count($curl->getErrors())) {
-            $manifest = json_decode($curl->getResult());
+        if ( !\count($curl->getErrors()) && $manifest = json_decode($curl->getResult()) ) {
             foreach ($manifest as $part) {
                 if(($nodes = $this->buildOutputTree($part, $level)) != false) {
                     $collection->add($nodes);
                 }
             }
+            return $collection;
         }
-        return $collection;
+
+        throw new \UnexpectedValueException("No learning areas found");
     }
 
     /**
