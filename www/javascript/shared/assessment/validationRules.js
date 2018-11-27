@@ -38,7 +38,7 @@ var validateOptions = {
     messages: {
         weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should be zero or greater',
         useRubric: {
-            require_from_group: 'You must select at least one indicator if using a rubric'
+            require_from_group: 'You must have at least one selected indicator if using a rubric'
         }
     }
 };

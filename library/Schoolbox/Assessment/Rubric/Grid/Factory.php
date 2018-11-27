@@ -192,7 +192,7 @@ class Factory
         if ($validate) {
             $gridSpec = new ValidRubricGrid();
             if (!$gridSpec->isSatisfiedBy($grid)) {
-                throw new \InvalidArgumentException('select at least one indicator');
+                throw new \InvalidArgumentException('have at least one selected indicator if using a rubric');
             }
         }
 
