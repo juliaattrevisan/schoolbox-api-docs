@@ -13,11 +13,9 @@ use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\Grid\Exporter\ArrayExporter;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
@@ -44,12 +42,6 @@ class Controller extends BaseController
 
 
     /**
-     * @var SubmissionBoxMapper
-     */
-    private $boxMapper;
-
-
-    /**
      * @var FolderMapper
      */
     private $folderMapper;
@@ -72,7 +64,6 @@ class Controller extends BaseController
      *
      * @param RubricMapper         $mapper
      * @param AssessmentDataSource $assessmentDataSource
-     * @param SubmissionBoxMapper  $boxMapper
      * @param FolderMapper         $folderMapper
      * @param GroupMapper          $groupMapper
      * @param CriterionMapper      $criterionMapper
@@ -80,14 +71,12 @@ class Controller extends BaseController
     public function __construct(
         RubricMapper $mapper,
         AssessmentDataSource $assessmentDataSource,
-        SubmissionBoxMapper $boxMapper,
         FolderMapper $folderMapper,
         GroupMapper $groupMapper,
         CriterionMapper $criterionMapper
     ) {
         $this->mapper               = $mapper;
         $this->assessmentDataSource = $assessmentDataSource;
-        $this->boxMapper            = $boxMapper;
         $this->folderMapper         = $folderMapper;
         $this->groupMapper          = $groupMapper;
         $this->criterionMapper      = $criterionMapper;

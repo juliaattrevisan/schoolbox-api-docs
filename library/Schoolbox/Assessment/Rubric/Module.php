@@ -16,7 +16,6 @@ use Aura\Di\ContainerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
@@ -76,7 +75,6 @@ class Module extends BaseModule
             [
                 'mapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
                 'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
-                'boxMapper'            => $this->getMapperFactory()->getLazy(SubmissionBoxMapper::class),
                 'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 'groupMapper'          => $this->getMapperFactory()->getLazy(GroupMapper::class),
                 'criterionMapper'      => $this->getMapperFactory()->getLazy(CriterionMapper::class),
