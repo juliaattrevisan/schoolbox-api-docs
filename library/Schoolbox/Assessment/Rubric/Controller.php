@@ -13,17 +13,16 @@ use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\Grid\Exporter\ArrayExporter;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Model as File;
 use Url;
@@ -43,17 +42,44 @@ class Controller extends BaseController
 
 
     /**
+     * @var FolderMapper
+     */
+    private $folderMapper;
+
+
+    /**
+     * @var GroupMapper
+     */
+    private $groupMapper;
+
+
+    /**
+     * @var CriterionMapper
+     */
+    private $criterionMapper;
+
+
+    /**
      * Constructor
      *
      * @param RubricMapper         $mapper
      * @param AssessmentDataSource $assessmentDataSource
+     * @param FolderMapper         $folderMapper
+     * @param GroupMapper          $groupMapper
+     * @param CriterionMapper      $criterionMapper
      */
     public function __construct(
         RubricMapper $mapper,
-        AssessmentDataSource $assessmentDataSource
+        AssessmentDataSource $assessmentDataSource,
+        FolderMapper $folderMapper,
+        GroupMapper $groupMapper,
+        CriterionMapper $criterionMapper
     ) {
         $this->mapper               = $mapper;
         $this->assessmentDataSource = $assessmentDataSource;
+        $this->folderMapper         = $folderMapper;
+        $this->groupMapper          = $groupMapper;
+        $this->criterionMapper      = $criterionMapper;
     }
 
 
@@ -112,8 +138,7 @@ class Controller extends BaseController
                 return;
             }
 
-            $criterionMapper = CriterionMapper::getInstance();
-            $criteria        = $criterionMapper->findForFolder($folderId);
+            $criteria        = $this->criterionMapper->findForFolder($folderId);
             $proposedGroup   = $this->mapper->normaliseForComparison($groupName);
             $proposedName    = $this->mapper->normaliseForComparison($critName);
             foreach ($criteria as $criterion){
@@ -126,7 +151,7 @@ class Controller extends BaseController
                 }
             }
 
-            $criterionModel = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $critName, $groupName);
+            $criterionModel = $this->criterionMapper->findOrCreateOneForFolderByKey($folderId, $critName, $groupName);
 
             $group = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
                 ->setId($criterionModel->getGroup()->getId())
@@ -158,7 +183,7 @@ class Controller extends BaseController
                 ->setName($groupName);
 
             // Ensure the proposed Group name is not already in use.
-            $groupModels = GroupMapper::getInstance()->findForFolder($folderId);
+            $groupModels = $this->groupMapper->findForFolder($folderId);
             $proposed    = $this->mapper->normaliseForComparison($groupName);
             foreach ($groupModels as $groupModel) {
                 $grouping = $this->mapper->normaliseForComparison($groupModel->getName());
@@ -222,12 +247,13 @@ class Controller extends BaseController
             }
 
             if ($boxId = $post->get('boxId')) {
-                $box    = SubmissionBoxMapper::getInstance()->findById($boxId);
-                $folder = $box->getCategory();
+                $assessment   = $this->assessmentDataSource->findByDueWorkId($boxId);
+                $assessmentId = $assessment->getId();
+                $folder       = $assessment->getBaseContext()->getFolder();
 
             } elseif ($folderId = $post->get('folderId')) {
-                $box    = SubmissionBoxMapper::getInstance()->createModel()->setId(0);
-                $folder = $box->getCategory()->setId($folderId);
+                $assessmentId = 0;
+                $folder       = $this->folderMapper->findById($folderId);
 
             } else {
                 // can't work with that
@@ -244,12 +270,12 @@ class Controller extends BaseController
 
             $rubricRowSet = $this->mapper->retrieveRowSet($folder, true);
             $dummyDueWork = (new DueWork())
-                ->setId($box->getAssessmentModel()->getId())
+                ->setId($assessmentId)
                 ->setMarkPerCapability($usingMarkPerCapability)
                 ->setUseMarkRange($usingMarkRange);
             $rubricGrid   = new Grid($dummyDueWork, $rubricRowSet);
             $rubricGrid   = (new GridFactory())
-                ->buildFromPostData($rubricGrid, [$box->getAssessmentModel()->getId() => $postData], false);
+                ->buildFromPostData($rubricGrid, [$assessmentId => $postData], false);
 
         } catch (\Exception $e) {
 
