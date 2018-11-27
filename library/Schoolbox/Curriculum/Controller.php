@@ -10,6 +10,7 @@
 namespace Schoolbox\Curriculum;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
@@ -19,17 +20,29 @@ class Controller extends Base
     /**
      * @var Node\Mapper
      */
-    protected $nodeMapper;
+    private $nodeMapper;
+
 
     /**
-     * @var LearningArea\Mapper
+     * @var ArticleResolver
      */
-    protected $areaMapper;
+    private $articleResolver;
+
 
     /**
-     * @var LearningLevel\Mapper
+     * Constructor
+     *
+     * @param Node\Mapper          $nodeMapper
+     * @param ArticleResolver      $articleResolver
      */
-    protected $levelMapper;
+    public function __construct(
+        Node\Mapper $nodeMapper,
+        ArticleResolver $articleResolver
+    ) {
+        $this->nodeMapper      = $nodeMapper;
+        $this->articleResolver = $articleResolver;
+    }
+
 
     /**
      * Controller action for browsing the list of curricula.
@@ -38,7 +51,7 @@ class Controller extends Base
     {
         // Fetch all the nodes at once, and parse into a jstree like status
         $tree = array();
-        foreach ($this->getNodeMapper()->findAll() as $node) {
+        foreach ($this->nodeMapper->findAll() as $node) {
             /** @var Node\Model $node */
             $tree[] = $this->getAsJsTree($node);
         }
@@ -70,7 +83,8 @@ class Controller extends Base
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
-                'data'   => $this->getNodeMapper()->search(
+                'data'   => $this->nodeMapper->search(
+                    $this->articleResolver,
                     $this->getSession()->getAuthUser(),
                     $search
                 ),
@@ -168,7 +182,7 @@ class Controller extends Base
     public function create()
     {
         /** @var $item Node\Model */
-        $item = $this->getNodeMapper()->createModel();
+        $item = $this->nodeMapper->createModel();
 
         // Default learning area and level, or a preselected one?
 
@@ -186,16 +200,16 @@ class Controller extends Base
         // if it has parent.
         // (Do this in preSave?)
         if ($post['parent']) {
-            $parent = $this->getNodeMapper()->findById($post['parent']);
+            $parent = $this->nodeMapper->findById($post['parent']);
             $item
                 ->setParent($parent);
         } else {
             $item
-                ->setParent($this->getNodeMapper()->createModel());
+                ->setParent($this->nodeMapper->createModel());
         }
 
         // Save the item
-        if (!$this->getNodeMapper()->save($item)) {
+        if (!$this->nodeMapper->save($item)) {
             // Something went wrong, but I know not what
             $code = 500;
         }
@@ -248,7 +262,7 @@ class Controller extends Base
         // Parent: check this node isn't its own ancestor
 
         // Save the item
-        if (!$this->getNodeMapper()->save($item)) {
+        if (!$this->nodeMapper->save($item)) {
             // Something went wrong, but I know not what
             $code = 500;
         }
@@ -282,7 +296,7 @@ class Controller extends Base
     public function delete(Node\Model $item)
     {
         $code = 200;
-        if (!$this->getNodeMapper()->delete($item)) {
+        if (!$this->nodeMapper->delete($item)) {
             // Something went wrong, but I know not what
             $code = 500;
         }
@@ -306,23 +320,5 @@ class Controller extends Base
                 $this->getSession()->getHistory()
             );
         }
-    }
-
-    /**
-     * @return Node\Mapper
-     */
-    public function getNodeMapper()
-    {
-        return $this->nodeMapper;
-    }
-
-    /**
-     * @param  Node\Mapper $nodeMapper
-     * @return $this
-     */
-    public function setNodeMapper($nodeMapper)
-    {
-        $this->nodeMapper = $nodeMapper;
-        return $this;
     }
 }

@@ -101,10 +101,14 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'nodeMapper'      => $this->getMapperFactory()->getLazy(NodeMapper::class),
+                    'articleResolver' => $injector->lazyGet('commsNewsArticleResolver'),
+                ]
+            )
         );
-        $injector->setters[Controller::class]['setNodeMapper']
-            = $this->getMapperFactory()->getLazy(NodeMapper::class);
     }
 
     /* Getters / Setters
