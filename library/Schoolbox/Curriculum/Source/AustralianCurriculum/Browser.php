@@ -40,7 +40,7 @@ class Browser extends Source\BrowserAbstract
     public function setup()
     {
         $this->setClient(
-            new EasyRdf_Sparql_Client('http://rdf.australiancurriculum.edu.au/sparql')
+            new EasyRdf_Sparql_Client('http://rdf.australiancurriculum.edu.au/api/sparql')
         );
         $this->setHtmlConverter(new Html2Text());
     }
@@ -53,21 +53,18 @@ class Browser extends Source\BrowserAbstract
 
         // Fetch a list of all standard documents.
         // Then, group by available education levels?
-        $sparql = <<<SPARQL
-prefix asn: <http://purl.org/ASN/schema/core/>
-prefix dct: <http://purl.org/dc/terms/>
-SELECT *
-       WHERE {
-    ?doc a asn:StandardDocument .
-    ?doc dct:source ?source .
-    ?doc dct:modified ?modified .
-    ?doc dct:subject ?subject .
-    OPTIONAL { ?doc dct:abstract ?abstract } .
-    OPTIONAL { ?doc dct:description ?description } .
-    OPTIONAL { ?doc dct:title ?title . } .
-}
-SPARQL
-        ;
+        $sparql = 'prefix asn: <http://purl.org/ASN/schema/core/>
+                prefix dct: <http://purl.org/dc/terms/>
+                SELECT *
+                   WHERE {
+                ?doc a asn:StandardDocument .
+                ?doc dct:source ?source .
+                ?doc dct:modified ?modified .
+                ?doc dct:subject ?subject .
+                OPTIONAL { ?doc dct:abstract ?abstract } .
+                OPTIONAL { ?doc dct:description ?description } .
+                OPTIONAL { ?doc dct:title ?title . } .
+            }';
         $models = array();
         foreach ($this->getClient()->query($sparql) as $row) {
             if(is_object($row->title)) {
@@ -108,19 +105,16 @@ SPARQL
         // Fetch all unique learning levels from the curriculum here.
         // I'd like to fetch the label from the level document too, but I don't
         // know how.
-        $sparql = <<<SPARQL
-prefix asn: <http://purl.org/ASN/schema/core/>
-prefix dct: <http://purl.org/dc/terms/>
-prefix sko: <http://www.w3.org/2004/02/skos/core#>
-SELECT DISTINCT ?level ?label WHERE {
-    ?subject a asn:StandardDocument .
-    {
-        ?subject dct:educationLevel ?level .
-        OPTIONAL { ?level sko:prefLabel ?label }
-    }
-}
-SPARQL
-        ;
+        $sparql = 'prefix asn: <http://purl.org/ASN/schema/core/>
+        prefix dct: <http://purl.org/dc/terms/>
+        prefix sko: <http://www.w3.org/2004/02/skos/core#>
+        SELECT DISTINCT ?level ?label WHERE {
+            ?subject a asn:StandardDocument .
+            {
+                ?subject dct:educationLevel ?level .
+                OPTIONAL { ?level sko:prefLabel ?label }
+            }
+        }';
         $collection = new Collection();
         foreach ($this->getClient()->query($sparql) as $row) {
 
