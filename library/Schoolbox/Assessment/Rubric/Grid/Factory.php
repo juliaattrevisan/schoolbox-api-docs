@@ -187,6 +187,16 @@ class Factory
             $capabilityUsage->getIndicatorUsages()[$indicatorId] = $indicatorUsage;
         }
 
+
+        // Validate if an indicator is used
+        if ($validate) {
+            $gridSpec = new ValidRubricGrid();
+            if (!$gridSpec->isSatisfiedBy($grid)) {
+                throw new \InvalidArgumentException('select at least one indicator');
+            }
+        }
+
+
         // Calculate max values for each capability usage.
         // If no value was passed: use calculated value
         foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
