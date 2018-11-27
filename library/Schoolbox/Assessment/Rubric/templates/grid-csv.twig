@@ -11,18 +11,18 @@
             var wrap   = $(this),
                 target = wrap.find('[data-replaceable]'),
                 body   = $('body'),
-                boxIdInput, folderIdInput, isTaskInput, postdata;
+                assessmentIdInput, folderIdInput, isTaskInput, postdata;
 
 
             // perform an ajax-replace of the target via the hash we've been given
             var url = '{{ routeLookup('rubric.import', { storageTuple: '' }) }}' + data.hash;
 
             // detect our lookup reference
-            boxIdInput = body.find('input[name="id"]');
+            assessmentIdInput = body.find('input[name="id"]');
 
-            if (boxIdInput.length == 1 && boxIdInput.val() > 0) {
+            if (assessmentIdInput.length == 1 && assessmentIdInput.val() > 0) {
                 postdata = {
-                    boxId: boxIdInput.val()
+                    assessmentId: assessmentIdInput.val()
                 };
 
             } else {

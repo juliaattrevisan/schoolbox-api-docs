@@ -246,10 +246,9 @@ class Controller extends BaseController
                 throw new \Schoolbox\Resource\Exception("Not a plaintext CSV file, cannot parse");
             }
 
-            if ($boxId = $post->get('boxId')) {
-                $assessment   = $this->assessmentDataSource->findByDueWorkId($boxId);
-                $assessmentId = $assessment->getId();
-                $folder       = $assessment->getBaseContext()->getFolder();
+            if ($assessmentId = $post->get('assessmentId')) {
+                $assessment = $this->assessmentDataSource->findById($assessmentId);
+                $folder     = $assessment->getBaseContext()->getFolder();
 
             } elseif ($folderId = $post->get('folderId')) {
                 $assessmentId = 0;
