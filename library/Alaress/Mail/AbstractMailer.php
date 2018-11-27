@@ -418,7 +418,11 @@ abstract class AbstractMailer implements IMailer
                 continue;
             }
 
-            $emails[self::KEY_INVALID][] = $email;
+            // If email address from username in the profile page is unchecked, and alternate email address is empty,
+            // just skip those rather than showing "9AH French (FREA1)" <> as an error.
+            if (self::getEmailFromString($email) !== '') {
+                $emails[self::KEY_INVALID][] = $email;
+            }
         }
 
         return [
