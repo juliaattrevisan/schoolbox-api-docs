@@ -403,7 +403,10 @@
         });
 
         // Init datepickers with staller
-        $dateInputs.alaressDateTimePicker({
+        $('#publishAt').alaressDateTimePicker({
+            staller: $submitButton
+        });
+        $('#expiresAt').alaressDateTimePicker({
             staller: $submitButton
         });
        
