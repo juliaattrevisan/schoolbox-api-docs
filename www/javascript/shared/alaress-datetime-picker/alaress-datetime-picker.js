@@ -611,13 +611,12 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
       // Hide any validation error while this is processing
       $fieldError.hide();
 
-      // Disable the field
+      // Make the field readonly
       $(t).prop("readonly", true);
-      $(t).prop("disabled", true);
 
       xhr
         .done(function(data) {
-          $(t).prop("disabled", false);
+          $(t).prop("readonly", false);
 
           // If it couldn't parse a date - show a validation error on the form
           if (data.error) {
@@ -694,7 +693,6 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
         })
         .always(function() {
           $(t).prop("readonly", false);
-          $(t).prop("disabled", false);
         });
 
       // Fire a custom event for change of this
