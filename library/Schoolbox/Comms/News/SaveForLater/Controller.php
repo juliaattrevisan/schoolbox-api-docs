@@ -96,7 +96,7 @@ class Controller extends Base
                 ],
             ],
             'readMore' => $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
-        ])->setTitle('Saved For Later'));
+        ])->setTitle('Saved For Later')->setTab('news'));
     }
 
 

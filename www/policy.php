@@ -1,28 +1,16 @@
 <?php
-require_once('../library/Bootstrap.php');
 
-$page = new SitePage(false);
+use Alaress\Application\Kernel;
+
+/** @var Kernel $kernel */
+$kernel = require_once '../library/Bootstrap.php';
+
+/** @var SitePage $page */
+$page = $kernel->getDependencyInjector()->get('layoutEngine');
 $page->setSite();
-$page->setFile(TEMPLATE_body, 'policy/view.html');
+$page->setFile(TEMPLATE_content, 'policy/view.html');
 $page->setTitle('Guidelines of Use and Privacy Policy');
 
-$page->setVar(array(
-	'POLICY' => Cfg::get('policy')
-));
+$page->setVar('POLICY', Cfg::get('policy'));
 
-/**
- * Support and Feedback custom link
- */
-$config = new \Schoolbox\Config\Loader();
-$page->setBlock(TEMPLATE_body, 'feedback_link', 'feedback_link_block');
-
-$feedbackText = $config->get('feedback_text');
-$feedbackURL = $config->get('feedback_url');
-
-if (strlen(trim($feedbackText)) && strlen(trim($feedbackURL))) {
-    $page->parse('feedback_link_block', 'feedback_link');
-} else {
-    $page->setVar('feedback_link_block', '');
-}
-
-$page->outputPage(true);
+$page->outputPage();

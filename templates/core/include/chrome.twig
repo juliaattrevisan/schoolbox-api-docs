@@ -159,14 +159,13 @@
             };
 
             // TODO consider expanding Schoolbox json-serialized user so these fields get output
-            var schoolboxUser   = {{ user.current | json_encode | raw }};
-            schoolboxUser.name  = "{{ user.current.formatName }}";
-            schoolboxUser.email = "{{ user.current.email }}";
-            schoolboxUser.year  = "{{ user.current.year }}";
-            schoolboxUser.role  = {{ user.current.role | json_encode | raw }};
-
-            // TODO set if they're impersonated
-            schoolboxUser.impersonated = Boolean('{{ user.impersonated}}');
+            var schoolboxUser            = {{ user.current | json_encode | raw }};
+            schoolboxUser.name           = "{{ user.current.formatName }}";
+            schoolboxUser.email          = "{{ user.current.email }}";
+            schoolboxUser.year           = "{{ user.current.year }}";
+            schoolboxUser.role           = {{ user.current.role | json_encode | raw }};
+            schoolboxUser.impersonated   = Boolean('{{ user.impersonated }}');
+            schoolboxUser.communityLogin = Boolean('{{ user.communityLogin }}');
 
             $.datepicker.setDefaults({
                 dateFormat: dateDisplayFormats.datepicker
@@ -222,8 +221,7 @@
 
         {% endif %}
 
-        {# TODO hide if on admin page #}
-        {{ config.site_header_scripts | raw }}
+        {{ scripts.header | raw }}
 
     {% endblock mainHeader %}
 

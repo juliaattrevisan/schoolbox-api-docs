@@ -1,15 +1,14 @@
 <?php
 
+use Alaress\Web\Output;
 use Aura\Router\Router;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Menu\Side\Renderer as MenuSideRender;
 use Schoolbox\Menu\Top\Renderer as MenuTopRenderer;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Tour\Renderer as TourRenderer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Config\ConfigMapper;
 
 class SitePage extends Page
 {
@@ -74,16 +73,20 @@ class SitePage extends Page
     private $db;
 
     /**
-     * SitePage constructor.
-     * @param bool $login
+     * Constructor
      *
+     * @param bool                             $login
+     * @param \Aura\Di\ContainerInterface|null $di
      */
-    public function __construct($login = true)
+    public function __construct($login = true, ?Aura\Di\ContainerInterface $di = null)
     {
         parent::__construct();
 
         $this->config = \Config::getInstance();
         $this->db = \DeprecatedDatabase::getInstance();
+        if ($di) {
+            $this->di = $di;
+        }
 
         if(isset($_SESSION['user'])) {
             $this->user = $_SESSION['user'];
@@ -314,82 +317,55 @@ class SitePage extends Page
         }
 
         if (!$lite && !$this->lite) {
-            $this->buildPage();
             $this->saveHistory();
+            /** @var Output\ThemedHtml $renderer */
+            $renderer = $this->getDi()->get('webOutput:html');
+            $renderer
+                ->setTab($this->currentTab)
+                ->setTitle($this->getVar('TITLE'));
+        } else {
+            /** @var Output\Html $renderer */
+            $renderer = $this->getDi()->get('webOutput:nochrome');
+        }
+        $renderer->setTemplate('include/sitepageContent.twig');
+
+
+        // Put the PHPLib together
+        $this->setFile(TEMPLATE_body, 'include/chromeContent.html');
+        $this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
+        if ($this->getVar('custom_head')) {
+            $this->parse('CUSTOM_HEADER_REGION', 'custom_head');
+        } else {
+            $this->setVar('CUSTOM_HEADER_REGION', '');
         }
 
-        $debug_bar_head = '';
-        $debug_bar_body = '';
 
-        if (Alaress\DebugBar\Instance::isEnabled()) {
-            $renderer = Alaress\DebugBar\Instance::getInstance()->getJavascriptRenderer();
-            $renderer->setBaseUrl('/debugbar/');
-            $debug_bar_head = $renderer->renderHead();
-            $debug_bar_body = $renderer->render();
-        }
-
+        // Put the PHPLib vars back together
+        // Some of these may be needed, some of them nay not
         if (!$this->user instanceof User) {
             $this->user = new User();
         }
-
-        $dateFormat = $this->config->get('date_local');
-        $dateTimeFormat = $this->config->get('date_local').' '.$this->config->get('date_time');
-        $dateTimeFormatLong = $this->config->get('date_long');
-        $startTimeADF = new Alaress_Date_Format(ConfigMapper::getInstance()->get('calendar_start_time'), 'H:i');
-        $templateVar = array(
-            'TEMPLATE_YEAR' => date('Y'),
-            'SITE_NAME' => $this->config->get('school_name'),
-            'SITE_TITLE' => $this->config->get('title'),
-            'SITE_GREETING' => TextFormatter::greeting(), // TODO: This should be an object
-            'SITE_LOGINNAME' => $this->user->formatName(),
-            'SITE_USERNAME' => $this->user->getUsername(),
-            'SITE_USER_EMAIL' => json_encode($this->user->getEmail()),
-            'SITE_USER_FULLNAME' => json_encode($this->user->formatName()),
-            'SITE_LOCATION' => $this->site,
-            'SITE_ANALYTICS' => $this->config->get('site_analytics'),
-            'USER_ID' => $this->user->getId(),
-            'EXTERNAL_ID' => $this->user->getExternalId(),
-            'USER_ROLE' => $this->user->getRole()->getName(),
-            'SITE_VERSION' => $this->config->get('site_version'),
-            'SCHOOL_ADDRESS' => $this->config->get('school_address'),
-            'DEBUGBAR' => $debug_bar_body,
-            'DEBUGBAR_HEAD' => $debug_bar_head,
-            'WEBSOCKET_HOST' => self::parseRequestUrl(PHP_URL_HOST),
-            'WEBSOCKET_PATH' => $this->config->get('websocket_path') ? $this->config->get('websocket_path') : '/',
-            'WEBSOCKET_PORT' => $this->getWebsocketPort(),
-            'WEBSOCKET_UNREAD_COUNT' => $_SESSION['msg-count'] ?? 0,
-            'WEBSOCKET_UNREAD_LABEL' => $_SESSION['msg-count'] ?? '',
-            'WEBSOCKET_STACK_LIMIT' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
-            'PAGE_SECURE' => empty($_SERVER['HTTPS']) ? 'false' : 'true',
-            'DATEPICKER_FORMAT' => json_encode(Alaress_Date_Format_Converter::toDatepicker($dateFormat)),
-            'MOMENTJS_FORMAT' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateFormat)),
-            'MOMENTJS_FORMAT_DATETIME' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateTimeFormat)),
-            'MOMENTJS_FORMAT_LOCAL_LONG' => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateTimeFormatLong)),
-            'LOCAL_DATE_FORMAT' => $dateFormat,
-            'LOCAL_DATETIME_FORMAT' => $dateTimeFormat,
-            'SYNERGETIC_SSO' => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
-            'FEEDBACK_TEXT' => Scrub::text($this->config->get('feedback_text')),
-            'FEEDBACK_URL' => Scrub::text($this->config->get('feedback_url')),
-            'CALENDAR_START_TIME' => $startTimeADF->getDatabaseTime()
-        );
-
+        $templateVar = [
+            'USER_ID'      => $this->user->getId(),
+            'USER_ROLE'    => $this->user->getRole()->getName(),
+            'SITE_NAME'    => $this->config::get('school_name'),
+            'SITE_VERSION' => $this->config::get('site_version'),
+        ];
         $this->setVar($templateVar);
 
-        // Apply the custom java scripts all the pages other than admin pages
-        if (!isset($_SERVER['REQUEST_URI']) || strpos($_SERVER['REQUEST_URI'], '/adminv2/') !== 0) {
-            $this->setVar('SITE_HEADER_SCRIPTS', $this->config->get('site_header_scripts'));
-        } else {
-            $this->setVar('SITE_HEADER_SCRIPTS', '');
-        }
 
-        $title = $this->getVar('TITLE');
+        // Output the PHPLib using the renderer
+        $renderer->setData([
+            'content' => $this->template->parse('finaloutput', TEMPLATE_body)
+        ]);
 
-        if (empty($title)) {
-            $this->setTitle();
-        }
-        $this->disableXssProtectionAfterForm();
+        // Do this leftover thing
+        self::disableXssProtectionAfterForm();
 
-        $this->template->pParse('finaloutput', TEMPLATE_body);
+        // Finagle a response
+        $renderer->output($this->getDi()->get('webFactory')->newResponse());
+
+
 
         return true;
     }

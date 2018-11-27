@@ -118,7 +118,7 @@ class Controller extends Base
                     'labelClass' => 'submitted-late',
                 ],
             ]
-        ])->setTitle('Requiring Moderation'));
+        ])->setTitle('Requiring Moderation')->setTab('news'));
     }
 
 
