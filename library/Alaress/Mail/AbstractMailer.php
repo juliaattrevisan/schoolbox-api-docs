@@ -362,7 +362,6 @@ abstract class AbstractMailer implements IMailer
         if (\trim($string) === '') {
             return $return_list;
         }
-
         $address_list = self::parseAddressList($string);
 
         foreach ($address_list[self::KEY_VALID] as $address) {
@@ -469,5 +468,15 @@ abstract class AbstractMailer implements IMailer
         }
 
         return false;
+    }
+
+    /**
+     * Update email separator from comma with EMAIL_SEPARATOR_CODE
+     * @param $string
+     * @return mixed
+     */
+    public static function standardiseEmailSeparator($string)
+    {
+        return str_replace(',', \chr(self::EMAIL_SEPARATOR_CODE), $string);
     }
 } 

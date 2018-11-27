@@ -50,7 +50,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
         }
     }
     else {
-        foreach (Mailer::parseAddressString($to) as $address => $name) {
+        foreach (Mailer::parseAddressString(Mailer::standardiseEmailSeparator($to)) as $address => $name) {
             try {
                 $mail->addTo($address, $name);
             }
@@ -82,7 +82,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
     $mail->setSubject($subject);
 
     if (strrchr($cc, '@')) {
-        foreach (Mailer::parseAddressString($cc) as $address => $name) {
+        foreach (Mailer::parseAddressString(Mailer::standardiseEmailSeparator($cc)) as $address => $name) {
             try {
                 $mail->addCc($address, $name);
             }
@@ -93,7 +93,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
     }
 
     if (strrchr($bcc, '@')) {
-        foreach (Mailer::parseAddressString($bcc) as $address => $name) {
+        foreach (Mailer::parseAddressString(Mailer::standardiseEmailSeparator($bcc)) as $address => $name) {
             try {
                 $mail->addBcc($address, $name);
             }
