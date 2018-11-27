@@ -5,22 +5,32 @@ var scriptValidationRules = $('script[src*=validationRules]');
  */
 var validateOptions = {
     rules: {
+        useRubric: {
+            require_from_group: [1, '[data-criterion-name]'],
+            depends: function() {
+                return $("#useRubric").is(":checked");
+            }
+        },
         title: {required: true},
         weight: {
             required: true,
             number: true,
             min: 0
-        },
+        }
     },
     errorPlacement: function(error, element) {
-        if ($(element).is("[data-criterion-name]")) {
+        var $element = $(element);
+        if ($element.is("[data-criterion-name]")) {
             // For validating descriptor rows - make sure error message is inserted AFTER the indicator checkbox
-            error.insertAfter($(element).next("label.checkbox-label"));
-        } else if ($(element).is("[data-group-max-value]")) {
+            error.insertAfter($element.next("label.checkbox-label"));
+        } else if ($element.is("[data-group-max-value]")) {
             // For validating max cap marks - mark sure error message is UNDERNEATH input+button pairing
-            error.insertAfter($(element).next("button"));
+            error.insertAfter($element.next("button"));
+        } else if ($element.is("#useRubric")) {
+            // For validating if at least one indicator is selected
+            error.insertAfter($element.closest('div.switch'));
         } else {
-            error.insertAfter(element);
+            $.alaressValidate.defaultErrorPlacement(error, element);
         }
     },
     messages: {
