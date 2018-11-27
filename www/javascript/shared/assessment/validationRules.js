@@ -6,9 +6,12 @@ var scriptValidationRules = $('script[src*=validationRules]');
 var validateOptions = {
     rules: {
         useRubric: {
-            require_from_group: [1, '[data-criterion-name]'],
-            depends: function() {
-                return $("#useRubric").is(":checked");
+            require_from_group: {
+                param: [1, '[data-criterion-name]'],
+                depends: function(element) {
+                    return element.checked;
+                },
+                message: 'You must select at least one indicator if using a rubric'
             }
         },
         title: {required: true},
