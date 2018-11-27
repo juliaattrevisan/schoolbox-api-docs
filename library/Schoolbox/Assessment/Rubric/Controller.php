@@ -309,25 +309,24 @@ class Controller extends BaseController
      */
     public function download()
     {
-        $post     = $this->request->post->get('rb');
-        $boxId    = key($post);
-
-        // Note: I can't download rubrics for due works that don't exist yet
-        $box      = $this->assessmentDataSource->findById($boxId);
-        if (!$box instanceof DueWork) {
+        $post         = $this->request->post->get('rb');
+        $assessmentId = key($post);
+        $assessment   = $this->assessmentDataSource->findById($assessmentId);
+        if (!$assessment instanceof DueWork) {
             // This is an error. How do I generate one?
+            // Note: I can't download rubrics for due works that don't exist yet
             $this->sendError('Can only download rubrics for due work');
             return;
         }
-        $box->setMarkPerCapability($this->request->post->getBool('markPerCapability') ?? false)
-            ->setUseMarkRange($this->request->post->getBool('useMarkRange') ?? false);
+        $assessment->setMarkPerCapability($this->request->post->getBool('markPerCapability') ?? false)
+                   ->setUseMarkRange($this->request->post->getBool('useMarkRange') ?? false);
 
         $grid     = (new GridFactory())->buildFromPostData(
-            $this->mapper->retrieveGrid($box, false),
+            $this->mapper->retrieveGrid($assessment, false),
             $post,
             false
         );
-        $basename = (new Url($box->getTitle()))->getSlug();
+        $basename = (new Url($assessment->getTitle()))->getSlug();
         $content  = $this->array2csv((new ArrayExporter())->export($grid));
 
         $headers  = $this->getResponse()->headers;
@@ -353,7 +352,7 @@ class Controller extends BaseController
      */
     public function determineMarkInvalidation(): void
     {
-        $post  = $this->request->post->get('rb');
+        $post         = $this->request->post->get('rb');
         $assessmentId = key($post);
         $assessment   = $this->assessmentDataSource->findByIdForReview($assessmentId);
         if (!$assessment instanceof DueWork) {
