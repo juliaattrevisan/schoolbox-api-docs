@@ -10,8 +10,7 @@ var validateOptions = {
                 param: [1, '[data-criterion-name]'],
                 depends: function(element) {
                     return element.checked;
-                },
-                message: 'You must select at least one indicator if using a rubric'
+                }
             }
         },
         title: {required: true},
@@ -38,6 +37,9 @@ var validateOptions = {
     },
     messages: {
         weight: 'The ' + scriptValidationRules.attr('data-locale-grading-proper') + ' weight should be zero or greater',
+        useRubric: {
+            require_from_group: 'You must select at least one indicator if using a rubric'
+        }
     }
 };
 
