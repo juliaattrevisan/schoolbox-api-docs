@@ -123,8 +123,6 @@
     });
 </script>
 <div id="rubric-attachable{{ idSuffix }}">
-    <input type="hidden" name="folderId" value="{{ folderId }}" />
-    {% if test %}<input type="hidden" name="id" value="{{ test }}" />{% endif %}
     <div data-hideable>
         <div data-replaceable>
             {% include '@rubric/grid-editable.twig' %}
