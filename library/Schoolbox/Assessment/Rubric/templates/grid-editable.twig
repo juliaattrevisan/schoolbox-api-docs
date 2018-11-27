@@ -69,6 +69,24 @@
             });
 */
 
+            // Swap names of input elements within first and second
+            var commonInputs = [
+                '[data-id]',
+                '[data-level]',
+                '[data-descriptor-text]',
+                '[data-descriptor-value]'
+            ];
+            commonInputs.forEach(function(input) {
+                var firstInput  = first.find(input),
+                    secondInput = second.find(input);
+                if (firstInput.length && secondInput.length) {
+                    var firstName  = firstInput.attr('name'),
+                        secondName = secondInput.attr('name');
+                    firstInput.attr('name', secondName);
+                    secondInput.attr('name', firstName);
+                }
+            });
+
             // apply the DOM manipulation
             first[move](second);
 
