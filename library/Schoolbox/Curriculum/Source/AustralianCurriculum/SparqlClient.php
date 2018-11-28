@@ -57,24 +57,25 @@ class SparqlClient extends EasyRdf_Sparql_Client
         );
         $client->setHeaders('Accept', $accept);
 
+        $queryUri = $this->getQueryUri();
         if ($type == 'update') {
             $client->setMethod('POST');
-            $client->setUri($this->updateUri);
+            $client->setUri($this->getUpdateUri());
             $client->setRawData($prefixes . $query);
             $client->setHeaders('Content-Type', 'application/sparql-update');
         } elseif ($type == 'query') {
             // Use GET if the query is less than 2kB
             // 2046 = 2kB minus 1 for '?' and 1 for NULL-terminated string on server
             $encodedQuery = 'q=' . urlencode($prefixes . $query);
-            if (strlen($encodedQuery) + strlen($this->queryUri) <= 2046) {
-                $delimiter = $this->queryUri_has_params ? '&' : '?';
+            if (strlen($encodedQuery) + strlen($queryUri) <= 2046) {
+                $delimiter = parse_url($queryUri, PHP_URL_QUERY) === '' ? '?' : '&';
 
                 $client->setMethod('GET');
-                $client->setUri($this->queryUri . $delimiter . $encodedQuery);
+                $client->setUri($queryUri . $delimiter . $encodedQuery);
             } else {
                 // Fall back to POST instead (which is un-cacheable)
                 $client->setMethod('POST');
-                $client->setUri($this->queryUri);
+                $client->setUri($queryUri);
                 $client->setRawData($encodedQuery);
                 $client->setHeaders('Content-Type', 'application/x-www-form-urlencoded');
             }
@@ -91,7 +92,7 @@ class SparqlClient extends EasyRdf_Sparql_Client
             if (strpos($type, 'application/sparql-results') === 0) {
                 return new EasyRdf_Sparql_Result($response->getBody(), $type);
             } else {
-                return new EasyRdf_Graph($this->queryUri, $response->getBody(), $type);
+                return new EasyRdf_Graph($queryUri, $response->getBody(), $type);
             }
         } else {
             throw new EasyRdf_Exception(
