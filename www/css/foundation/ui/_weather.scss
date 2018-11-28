@@ -44,9 +44,7 @@
     margin-bottom: 1rem;
 
   }
-  .weather-summary, .temperature {
-    p {
+  .weather-summary p, p.temperature {
       font-size: unset;
-    }
   }
 }

@@ -24,21 +24,22 @@ Weather details page (linked from dashboard component)
 
                         <li class="weather-forecast">
                             <div class="weather-card">
-                                <h3>Temperature</h3>
-                                <p class="temperature">
-                                    <span class="hot">{{ today.highTemp }}&deg;</span>
-                                    <span class="cold">{{ today.lowTemp }}&deg;</span>
-                                </p>
-                                <p class="meta">Current: {{ today.currentTemp }}&deg;</p>
+                                <div class="weather-summary">
+                                    <img src="{{ today.weatherIcon }}" alt="{{ today.weatherSummary }}" />
+                                    <p class="meta">{{ today.weatherSummary }}</p>
+                                </div>
                             </div>
                         </li>
 
                         <li class="weather-forecast">
                             <div class="weather-card">
-                                <h3>Conditions</h3>
-                                <div class="weather-summary">
-                                    <img src="{{ today.weatherIcon }}" alt="{{ today.weatherSummary }}" />
-                                    <p class="meta">{{ today.weatherSummary }}</p>
+                                <div class="temperature">
+                                    <p class="meta">Current: {{ today.currentTemp }}&deg;</p>
+
+                                    <p>
+                                        <span class="hot">{{ today.highTemp }}&deg;</span>
+                                        <span class="cold">{{ today.lowTemp }}&deg;</span>
+                                    </p>
                                 </div>
                             </div>
                         </li>
@@ -91,7 +92,7 @@ Weather details page (linked from dashboard component)
     </div>
 
     <div class="row">
-        <div class="small-12 medium-6 island">
+        <div class="small-12 medium-6 columns">
             <h2 class="subheader">Weather supplied by</h2>
             <section class="content">
                 <div class="content">
@@ -113,4 +114,5 @@ Weather details page (linked from dashboard component)
             </section>
         </div>
     </div>
+
 {% endif %}
