@@ -201,7 +201,6 @@ class Homepage
             new Chat(),
             new Forum(),
             new Poll(),
-            new Submission(),
             new Survey_Main(),
             new TextBox(),
             new Wiki(),
