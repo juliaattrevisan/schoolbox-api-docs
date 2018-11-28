@@ -352,6 +352,7 @@ class SitePage extends Page
             'SITE_VERSION' => $this->config::get('site_version'),
         ];
         $this->setVar($templateVar);
+        $this->localise();
 
 
         // Output the PHPLib using the renderer
