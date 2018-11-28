@@ -211,6 +211,7 @@ class Homepage
             Resource\File\Mapper::getInstance(),
             Schoolbox\Dropbox\Mapper::getInstance(),
             \SocialStream\PostMapper::getInstance(),
+            Schoolbox\Comms\News\Audience\Mapper::getInstance(),
         );
 
         foreach ($homepageCleanables as $homepageCleanable){
