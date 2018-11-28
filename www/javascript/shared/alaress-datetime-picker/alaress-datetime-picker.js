@@ -264,8 +264,12 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
       '" data-adtp></div></div>'
   );
 
-  // Create click event to open the modal for the element
+  // On focus of the element- store the original value in a data var, so that we can compare before 'massaging' (strtotime)
+  element.on("focus", function() {
+    element.data("originalValue", this.value);
+  });
 
+  // Listen for blur or enter press- apply strtotime
   element
     .on("blur", function(e) {
       massageDateValue(e, options.staller);
@@ -277,6 +281,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
       }
     });
 
+  // Create click event to open the modal for the element
   $datepickerButton.click(function() {
     var originalValue;
 
@@ -599,7 +604,7 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
   function massageDateValue(e, staller) {
     var t = e.target;
 
-    if ($.trim($(t).val()) != "") {
+    if ($.trim($(t).val()) != "" && $.trim($(t).val()) !== $(t).data('originalValue')) {
       // set up params to guide server-side parsing
       var opts = adtp.getOptions($(t));
       var params = {
