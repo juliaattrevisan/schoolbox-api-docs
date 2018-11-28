@@ -64,6 +64,8 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
+use Schoolbox\Tour\Mapper as TourMapper;
+use Schoolbox\Tour\Step\Mapper as StepMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -483,14 +485,14 @@ abstract class AbstractBootstrap implements BootstrapInterface
             /** @var Router $router */
             $config  = $di->get('config');
             $session = $di->get('session');
-            $router  = $di->get('router');
+            $tourList = new \Schoolbox\Tour\Lists( $mapperFactory->get(TourMapper::class), $mapperFactory->get(StepMapper::class));
             $output  = new Output\ThemedHtml();
             $output
                 ->setTemplateEngine($di->get('templateEngine'))
                 ->addDataGenerator('ws', new Output\DataGenerator\Websocket($config, $session, $_SERVER))
                 ->addDataGenerator(
                     'tour',
-                    new Output\DataGenerator\Tour($config, $session->getAuthUser(), $router, $_SERVER)
+                    new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER)
                 )
                 ->addDataGenerator('user', new Output\DataGenerator\User($session->getAuthUser(), $session))
                 ->addDataGenerator(
