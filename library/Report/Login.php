@@ -1,10 +1,10 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 class Report_Login extends Report_Abstract implements Report_IReport
 {
@@ -155,10 +155,12 @@ class Report_Login extends Report_Abstract implements Report_IReport
             }
         }
 
+        $resultFilter['after'] = $resultFilter['after'] ?: date('Y-m-d', strtotime('-30 days'));
+
         $this->filter = $resultFilter;
 
         $sqlFilter = array();
-        $params    = array();
+        $params = array();
         foreach ($resultFilter as $key => $value) {
             if (in_array($key, $this->getFilterFields())) {
 
@@ -168,14 +170,14 @@ class Report_Login extends Report_Abstract implements Report_IReport
 
                 // custom filter by user
                 if ($key == 'user') {
-                    $sqlFilter[]     = "user.username LIKE :value
+                    $sqlFilter[] = "user.username LIKE :value
                                         OR user.firstname LIKE :value
                                         OR user.lastname LIKE :value";
-                    $params['value'] = '%'.$this->db->escapeForLike($value).'%';
+                    $params['value'] = '%' . $this->db->escapeForLike($value) . '%';
                 } elseif ($key == 'after') {
                     if ($date = strtotime($value)) {
-                        $date            = date('Y-m-d H:i:s', $date);
-                        $sqlFilter[]     = "`date` >= :after";
+                        $date = date('Y-m-d H:i:s', $date);
+                        $sqlFilter[] = "`date` >= :after";
                         $params['after'] = $date;
                     }
                 } elseif ($key == 'before') {
@@ -185,8 +187,8 @@ class Report_Login extends Report_Abstract implements Report_IReport
                         $params['before'] = $date;
                     }
                 } else {
-                    $sqlFilter[]  = $this->db->quoteIdentifier($key)." LIKE :$key";
-                    $params[$key] = '%'.$this->db->escapeForLike($value).'%';
+                    $sqlFilter[] = $this->db->quoteIdentifier($key) . " LIKE :$key";
+                    $params[$key] = '%' . $this->db->escapeForLike($value) . '%';
                 }
             }
         }
@@ -249,20 +251,22 @@ class Report_Login extends Report_Abstract implements Report_IReport
 
         // render users
         if (!empty($this->dataSet)) {
-            $page->setVar(array(
-                'COUNTABLE_COUNT' => $this->dataCount,
-                'REPORT_TITLE'    => Scrub::text($this->getReportTitle()),
-                'SORT_BASE'       => "login/{$this->getIndexID()}",
-                'COUNTABLE'       => 'events'
-            ));
-
-            $j = 0;
+            $page->setVar(
+                array(
+                    'COUNTABLE_COUNT' => $this->dataCount,
+                    'REPORT_TITLE'    => Scrub::text($this->getReportTitle()),
+                    'SORT_BASE'       => "login/{$this->getIndexID()}",
+                    'COUNTABLE'       => 'events'
+                )
+            );
 
             foreach ($this->dataSet as $log) {
-                $page->setVar([
-                    'log_user_block'    => '',
-                    'log_no_user_block' => '',
-                ]);
+                $page->setVar(
+                    [
+                        'log_user_block'    => '',
+                        'log_no_user_block' => '',
+                    ]
+                );
                 $action = $log['login'] == 0 ? "Failed login" : "Logged in";
 
                 $userHandler = new User();
@@ -270,17 +274,20 @@ class Report_Login extends Report_Abstract implements Report_IReport
                 $nameShards = array(
                     'title'     => $log['title'],
                     'firstname' => $log['firstname'],
-                    'lastname'  => $log['lastname']);
+                    'lastname'  => $log['lastname']
+                );
 
-                $page->setVar(array(
-                    'UID'         => Scrub::text($log['user']),
-                    'DATE'        => Scrub::text($log['date']),
-                    'USERNAME'    => Scrub::text($log['username']),
-                    'DISPLAYNAME' => Scrub::text($userHandler->formatName($nameShards)),
-                    'ACTION'      => Scrub::text($action),
-                    'IP'          => Scrub::text($log['ip']),
-                    'ROLE'        => Scrub::text($log['role']),
-                ));
+                $page->setVar(
+                    array(
+                        'UID'         => Scrub::text($log['user']),
+                        'DATE'        => Scrub::text($log['date']),
+                        'USERNAME'    => Scrub::text($log['username']),
+                        'DISPLAYNAME' => Scrub::text($userHandler->formatName($nameShards)),
+                        'ACTION'      => Scrub::text($action),
+                        'IP'          => Scrub::text($log['ip']),
+                        'ROLE'        => Scrub::text($log['role']),
+                    )
+                );
 
                 $page->parse('activity_block', 'activity', true);
             }
@@ -292,14 +299,16 @@ class Report_Login extends Report_Abstract implements Report_IReport
 
         } // else empty data set
         else {
-            $page->setVar(array(
-                'RESULT'                => 'No results.',
-                'COUNTABLE_COUNT'       => $this->dataCount,
-                'REPORT_TITLE'          => Scrub::text($this->getReportTitle()),
-                'previous_button_block' => '',
-                'next_button_block'     => '',
-                'page_number_block'     => ''
-            ));
+            $page->setVar(
+                array(
+                    'RESULT'                => 'No results.',
+                    'COUNTABLE_COUNT'       => $this->dataCount,
+                    'REPORT_TITLE'          => Scrub::text($this->getReportTitle()),
+                    'previous_button_block' => '',
+                    'next_button_block'     => '',
+                    'page_number_block'     => ''
+                )
+            );
         }
     }
 
