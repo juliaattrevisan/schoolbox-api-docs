@@ -4,7 +4,7 @@
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 <script type="text/javascript" src="/javascript/jquery.chained.min.js"></script>
-
+{% autoescape('js') %}
 <script type="text/javascript">
     $(function () {
 
@@ -31,9 +31,7 @@
             },
             value: [
                 {% for tag in record.tags %}
-
-                {% set tagName = tag.name | escape('js') %}
-                {'id': '{{ tagName }}', 'name': '{{ tagName }}'}{% if not loop.last %},{% endif %}
+                {'id': '{{ tag.name }}', 'name': '{{ tag.name }}'}{% if not loop.last %},{% endif %}
                 {% endfor %}
             ]
         });
@@ -165,4 +163,5 @@
 
 });
 </script>
+{% endautoescape %}
 

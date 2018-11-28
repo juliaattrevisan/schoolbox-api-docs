@@ -9,7 +9,6 @@ namespace Schoolbox\Pastoral\Management;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Pastoral\Audience\Mapper as PastoralAudienceMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
@@ -50,11 +49,12 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param UserMapper                $userMapper
-     * @param PastoralAccessMapper      $pastoralAccessMapper
-     * @param PastoralGroupMapper       $pastoralGroupMapper
+     * @param UserMapper $userMapper
+     * @param PastoralAccessMapper $pastoralAccessMapper
+     * @param PastoralGroupMapper $pastoralGroupMapper
      * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
-     * @param PastoralAudienceMapper    $pastoralAudienceMapper
+     * @param PastoralAudienceMapper $pastoralAudienceMapper
+     * @param RoleMapper $roleMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -105,8 +105,9 @@ class Controller extends Base
     /**
      *  Edit the defaults for a particular type and subtype
      *
-     * @param $type
-     * @param $subType
+     * @param PastoralType $type
+     * @param PastoralSubType|null $subType
+     * @throws MapperException
      */
     public function getAudiencesModify(PastoralType $type, ?PastoralSubType $subType)
     {
@@ -151,41 +152,53 @@ class Controller extends Base
         ]);
     }
 
+    /**
+     * @param PastoralType $type
+     */
     public function getAudiencesModifyNoSub(PastoralType $type)
     {
         $this->getAudiencesModify($type, null);
     }
 
+    /**
+     * @param int $typeId
+     * @throws MapperException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
     public function postAudienceUpdateNoSub($typeId)
     {
         $this->postAudienceUpdate($typeId, null);
     }
 
+    /**
+     * @param int $typeId
+     * @param int $subtypeId
+     * @throws MapperException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
     public function postAudienceUpdate($typeId, $subtypeId)
     {
+        $post = $this->getRequest()->post;
+
         //Delete the old ones
         $this->pastoralAudienceMapper->hardDeleteByType($typeId, $subtypeId);
 
         // Save system role permissions, de-duplicating as we go\
         $foundRoles = [];
 
-        if (is_array($_POST["role"])) {
-            foreach ($_POST["role"] as $role_id => $accessLevel) {
+        if (is_array($post["role"])) {
+            foreach ($post["role"] as $role_id => $accessLevel) {
                 if (!in_array($role_id, $foundRoles)) {
                     $foundRoles[] = $role_id;
 
-                    try {
-                        /** @var Role $role */
-                        $role = $this->roleMapper->findById($role_id);
-                        $audience = $this->pastoralAudienceMapper->createModel();
-                        $audience->setTypeId($typeId);
-                        $audience->setSubtypeId($subtypeId);
-                        $audience->setRole($role);
-                        $audience->setAccess($accessLevel);
-                        $this->pastoralAudienceMapper->save($audience);
-                    } catch (MapperException $e) {
-                        // Noop
-                    }
+                    /** @var Role $role */
+                    $role = $this->roleMapper->findById($role_id);
+                    $audience = $this->pastoralAudienceMapper->createModel();
+                    $audience->setTypeId($typeId);
+                    $audience->setSubtypeId($subtypeId);
+                    $audience->setRole($role);
+                    $audience->setAccess($accessLevel);
+                    $this->pastoralAudienceMapper->save($audience);
                 }
             }
         }
@@ -193,24 +206,20 @@ class Controller extends Base
         // Save pastoral group permissions, de-duplicating as we go
         $foundGroups = [];
 
-        if (is_array($_POST["group"])) {
-            foreach ($_POST["group"] as $group_id => $accessLevel) {
+        if (is_array($post["group"])) {
+            foreach ($post["group"] as $group_id => $accessLevel) {
                 if (!in_array($group_id, $foundGroups)) {
                     $foundGroups[] = $group_id;
 
-                    try {
-                        /** @var PastoralGroup $group */
-                        $group = $this->pastoralGroupMapper->findById($group_id);
-                        $audience = $this->pastoralAudienceMapper->createModel();
-                        $audience->setTypeId($typeId);
-                        $audience->setSubtypeId($subtypeId);
-                        $audience->setGroup($group);
-                        $audience->setAccess($accessLevel);
+                    /** @var PastoralGroup $group */
+                    $group = $this->pastoralGroupMapper->findById($group_id);
+                    $audience = $this->pastoralAudienceMapper->createModel();
+                    $audience->setTypeId($typeId);
+                    $audience->setSubtypeId($subtypeId);
+                    $audience->setGroup($group);
+                    $audience->setAccess($accessLevel);
 
-                        $this->pastoralAudienceMapper->save($audience);
-                    } catch (MapperException $e) {
-                        // Noop
-                    }
+                    $this->pastoralAudienceMapper->save($audience);
                 }
             }
         }
@@ -218,23 +227,19 @@ class Controller extends Base
         // Save individual user permissions, de-duplicating as we go
         $foundUsers = [];
 
-        if (is_array($_POST["user"])) {
-            foreach ($_POST["user"] as $user_id => $accessLevel) {
+        if (is_array($post["user"])) {
+            foreach ($post["user"] as $user_id => $accessLevel) {
                 if (!in_array($user_id, $foundUsers)) {
                     $foundUsers[] = $user_id;
 
-                    try {
-                        /** @var UserMapper $user */
-                        $user = $this->userMapper->findById($user_id);
-                        $audience = $this->pastoralAudienceMapper->createModel();
-                        $audience->setTypeId($typeId);
-                        $audience->setSubtypeId($subtypeId);
-                        $audience->setAccess($accessLevel);
-                        $audience->setUser($user);
-                        $this->pastoralAudienceMapper->save($audience);
-                    } catch (MapperException $e) {
-                        // Noop
-                    }
+                    /** @var UserMapper $user */
+                    $user = $this->userMapper->findById($user_id);
+                    $audience = $this->pastoralAudienceMapper->createModel();
+                    $audience->setTypeId($typeId);
+                    $audience->setSubtypeId($subtypeId);
+                    $audience->setAccess($accessLevel);
+                    $audience->setUser($user);
+                    $this->pastoralAudienceMapper->save($audience);
                 }
             }
         }
@@ -242,6 +247,12 @@ class Controller extends Base
         $this->response->redirect->to($this->getRouteIfAuthorized('pastoralManagement.getAudiences'));
     }
 
+    /**
+     * @param $typeId
+     * @param $subtypeId
+     * @return \Schoolbox\GenericCollection
+     * @throws MapperException
+     */
     public function getAudienceForType($typeId, $subtypeId)
     {
         $rolePerms = $this->pastoralAudienceMapper->findByColumnList(['type_id' => $typeId, 'subtype_id' => $subtypeId]);
@@ -270,10 +281,10 @@ class Controller extends Base
      */
     public function postGroupsDelete()
     {
-        $_POST = $this->getRequest()->post;
+        $groupId = $this->getRequest()->post['id'];
 
-        $this->pastoralGroupMapper->deleteByColumn('id', $_POST['id']);
-        $this->pastoralAccessMapper->deleteByColumn('group_id', $_POST['id']);
+        $this->pastoralGroupMapper->deleteByColumn('id', $groupId);
+        $this->pastoralAccessMapper->deleteByColumn('group_id', $groupId);
 
         $this->getResponse()->redirect->afterPost(
             $this->router->generate('pastoralManagement.getGroups')
@@ -285,13 +296,13 @@ class Controller extends Base
      */
     public function postGroupsModify()
     {
-        $_POST = $this->getRequest()->post;
+        $post = $this->getRequest()->post;
 
-        $memberIds = explode(",", $_POST['members']);
+        $memberIds = explode(",", $post['members']);
 
         /** @var PastoralGroup $group */
 
-        if (empty($_POST['id'])) {
+        if (empty($post['id'])) {
             // Creating new group
 
             $group = $this->pastoralGroupMapper->createModel();
@@ -299,14 +310,14 @@ class Controller extends Base
         } else {
             // Updating existing group (or create a new one if its been deleted from under us)
 
-            $group = $this->pastoralGroupMapper->findByIdWithFallback($_POST['id']);
+            $group = $this->pastoralGroupMapper->findByIdWithFallback($post['id']);
         }
 
-        if (empty(trim($_POST['name']))) {
-            $_POST['name'] = 'Untitled Group';
+        if (empty(trim($post['name']))) {
+            $post['name'] = 'Untitled Group';
         }
 
-        $group->setName($_POST['name']);
+        $group->setName($post['name']);
         $this->pastoralGroupMapper->save($group);
 
         // If we are updating an existing group, we need to delete unwanted existing group members
@@ -315,7 +326,7 @@ class Controller extends Base
 
         $membersToSkip = [];
 
-        if (!empty($_POST['id'])) {
+        if (!empty($post['id'])) {
             $membersExisting = $this->pastoralGroupMemberMapper->findByColumn('group_id', $group->getId());
 
             // Go through every member in the database

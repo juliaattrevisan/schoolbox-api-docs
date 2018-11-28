@@ -99,28 +99,20 @@ class Module extends BaseModule
                 // Load group record
 
                 if (array_key_exists('groupId', $params)) {
-                    try {
-                        /** @var GroupMapper $groupMapper */
-                        $groupMapper          = $this->getMapperFactory()->get(GroupMapper::class);
-                        $returnArray['group'] = $groupMapper->findById($params['groupId']);
-                    } catch (MapperException $e) {
-                    }
+                    /** @var GroupMapper $groupMapper */
+                    $groupMapper          = $this->getMapperFactory()->get(GroupMapper::class);
+                    $returnArray['group'] = $groupMapper->findById($params['groupId']);
                 }
                 if (array_key_exists('typeId', $params)) {
-                    try {
-                        /** @var GroupMapper $groupMapper */
-                        $typeMapper          = $this->getMapperFactory()->get(PastoralTypeMapper::class);
-                        $returnArray['type'] = $typeMapper->findById($params['typeId']);
-                    } catch (MapperException $e) {
-                    }
+                    /** @var GroupMapper $groupMapper */
+                    $typeMapper          = $this->getMapperFactory()->get(PastoralTypeMapper::class);
+                    $returnArray['type'] = $typeMapper->findById($params['typeId']);
+
                 }
                 if (array_key_exists('subtypeId', $params)) {
-                    try {
-                        /** @var GroupMapper $groupMapper */
-                        $subTypeMapper          = $this->getMapperFactory()->get(SubTypeMapper::class);
-                        $returnArray['subType'] = $subTypeMapper->findById($params['subtypeId']);
-                    } catch (MapperException $e) {
-                    }
+                    /** @var GroupMapper $groupMapper */
+                    $subTypeMapper          = $this->getMapperFactory()->get(SubTypeMapper::class);
+                    $returnArray['subType'] = $subTypeMapper->findById($params['subtypeId']);
                 }
 
                 return $returnArray;
