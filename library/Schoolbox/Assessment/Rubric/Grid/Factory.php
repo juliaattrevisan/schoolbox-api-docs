@@ -44,9 +44,10 @@ class Factory
         $levels      = array_values($levels);
         $descriptors = array_map('array_values', $descriptors);
 
+        $markPerCap = false;
         if ($assessment instanceof DueWork) {
             $usesMarkRange = $assessment->getUseMarkRange();
-            $markPerCap = $assessment->getMarkPerCapability();
+            $markPerCap    = $assessment->getMarkPerCapability();
         }
 
         // Rebuild the set of levels from scratch each time
@@ -76,10 +77,10 @@ class Factory
         /** @var Capability[] $capabilityCache */
         $capabilityCache     = [];
         $newCapabilityUsages = $grid->getCapabilityUsages()->emptyClone();
-        foreach ($capabilities as $capability) {
+        foreach ($capabilities as $capabilityData) {
             // This capability must exist and be in use in order for it to be saved
-            $capabilityId   = (int)$capability['id'];
-            $capabilityName = $capability['name'];
+            $capabilityId   = (int)$capabilityData['id'];
+            $capabilityName = $capabilityData['name'];
             if (!$capabilityId) {
                 continue;
             }
@@ -88,7 +89,7 @@ class Factory
             }
 
             // Validate capability max value
-            $capabilityMaxValue = isset($capability['maxValue']) ? (float)$capability['maxValue'] : null;
+            $capabilityMaxValue = isset($capabilityData['maxValue']) ? (float)$capabilityData['maxValue'] : null;
 
             if ($validate) {
                 $capabilityMaxSpec = new ValidCapabilityMax($markPerCap);
@@ -185,6 +186,16 @@ class Factory
             $capabilityUsage                                     = $grid->retrieveCapabilityUsage($capability);
             $capabilityUsage->getIndicatorUsages()[$indicatorId] = $indicatorUsage;
         }
+
+
+        // Validate if an indicator is used
+        if ($validate) {
+            $gridSpec = new ValidRubricGrid();
+            if (!$gridSpec->isSatisfiedBy($grid)) {
+                throw new \InvalidArgumentException('have at least one selected indicator if using a rubric');
+            }
+        }
+
 
         // Calculate max values for each capability usage.
         // If no value was passed: use calculated value
