@@ -486,10 +486,11 @@ abstract class AbstractBootstrap implements BootstrapInterface
             $config  = $di->get('config');
             $session = $di->get('session');
             $tourList = new \Schoolbox\Tour\Lists( $mapperFactory->get(TourMapper::class), $mapperFactory->get(StepMapper::class));
+            $redis   = $di->get('redis');
             $output  = new Output\ThemedHtml();
             $output
                 ->setTemplateEngine($di->get('templateEngine'))
-                ->addDataGenerator('ws', new Output\DataGenerator\Websocket($config, $session, $_SERVER))
+                ->addDataGenerator('ws', new Output\DataGenerator\Websocket($config, $session, $redis, $_SERVER))
                 ->addDataGenerator(
                     'tour',
                     new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER)

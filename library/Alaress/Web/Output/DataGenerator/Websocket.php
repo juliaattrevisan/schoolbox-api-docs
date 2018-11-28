@@ -9,7 +9,10 @@ declare(strict_types=1);
 namespace Alaress\Web\Output\DataGenerator;
 
 use Alaress\Session\Session;
+use Predis\ClientInterface;
 use Schoolbox\IConfigLoader;
+use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter\Param;
 
 /**
  * Generate data for rendering the websocket (instant messaging) system.
@@ -27,6 +30,10 @@ class Websocket implements IDataGenerator
      */
     private $session;
 
+    /**
+     * @var ClientInterface
+     */
+    private $redis;
 
     /**
      * @var array
@@ -37,14 +44,16 @@ class Websocket implements IDataGenerator
     /**
      * Constructor
      *
-     * @param IConfigLoader $config
-     * @param Session       $session
-     * @param array         $serverVars
+     * @param IConfigLoader   $config
+     * @param Session         $session
+     * @param ClientInterface $redis
+     * @param array           $serverVars
      */
-    public function __construct(IConfigLoader $config, Session $session, array $serverVars)
+    public function __construct(IConfigLoader $config, Session $session, ClientInterface $redis, array $serverVars)
     {
         $this->config     = $config;
         $this->session    = $session;
+        $this->redis      = $redis;
         $this->serverVars = $serverVars;
     }
 
@@ -60,8 +69,38 @@ class Websocket implements IDataGenerator
             'port'       => $this->config->get('websocket_port_ssl') ?: 8081,
             'path'       => $this->config->get('websocket_path') ?: '/',
             'secure'     => true,
-            'unread'     => $this->session->get('msg-count'),
+            'unread'     => $this->getUnreadMessages(),
             'stackLimit' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
         ];
     }
+
+    public function getUnreadMessages() {
+        $unreadCount = count(
+            array_filter(
+                array_map(
+                    function ($messageKey) {
+                        try {
+                            $data = $this->redis->get($messageKey);
+                            if (!$data) {
+                                return false;
+                            }
+                            return unserialize(
+                                gzuncompress($data),
+                                ['allowed_classes' => [Instance::class, Param::class,],]
+                            );
+
+                        } catch (\ErrorException $e) {
+                            return false;
+                        }
+                    },
+                $this->redis->sMembers(sprintf('msg:%s:q:%d:unread', INSTANCE_ID,  $this->session->getAuthUser()->getId()))
+                ),
+                function ($item) {
+                    return $item instanceof Instance;
+                }
+            )
+        );
+        return $unreadCount;
+    }
+
 }
