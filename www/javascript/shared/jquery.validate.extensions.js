@@ -108,11 +108,16 @@
     $.validator.addMethod('datepickerDateNotBefore', function(value, element, other_element_selector) {
         var date       = getDateFromString(dateDisplayFormats.momentJs, value, 0, 0, 0);
         var other_date = getDateFromString(dateDisplayFormats.momentJs, other_element_selector.val(), 0, 0, 0);
-        return date.isValid()
-            && other_date.isValid()
-            && date.valueOf() >= other_date.valueOf()
-        ;
-    }, 'Please enter a valid date');
+        
+        // If the other date is empty or not valid, return valid for this and leave the error for that field for now
+        // Otherwise we end up with an error message on this field when the user is still working on the other one
+        if (!other_date.isValid()) {
+            return true;
+        }
+        
+        return date.isValid() && date.valueOf() >= other_date.valueOf();
+
+    }, 'Please enter a date that is <i>after</i> the previous date');
 
 
     /**

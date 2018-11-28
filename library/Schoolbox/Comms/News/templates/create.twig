@@ -390,7 +390,16 @@
                 },
                 expiresAt: {
                     required: true,
-                    datepickerDate: true
+                    datepickerDate: true,
+
+                    // This shouldn't be needed, because the date sync shouldn't allow the user to get here,
+                    // but we did somehow get there once, and this is a good safety measure
+                    datepickerDateNotBefore: $('#publishAt')
+                }
+            },
+            messages: {
+                expiresAt: {
+                    datepickerDateNotBefore: "Please enter a date that is <i>after</i> the publish date",
                 }
             }
         });
