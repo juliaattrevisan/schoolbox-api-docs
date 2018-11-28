@@ -14,7 +14,6 @@ use Schoolbox\GenericCollection;
 use InvalidArgumentException;
 use PDOStatement;
 use PDO;
-use Schoolbox\Resource\Browser\NodeInterface;
 
 /**
  * @method Model createModel($idValue = null)
