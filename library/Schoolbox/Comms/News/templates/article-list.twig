@@ -371,7 +371,9 @@
                 }
 
                 // Update the RSS link (which lives in a different Vue component)
-                rssLink.topic = tab;
+                if (typeof rssLink !== 'undefined') {
+                    rssLink.topic = tab;
+                }
             },
 
             /**
