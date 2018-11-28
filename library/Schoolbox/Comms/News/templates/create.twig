@@ -391,6 +391,9 @@
                 expiresAt: {
                     required: true,
                     datepickerDate: true,
+
+                    // This shouldn't be needed, because the date sync shouldn't allow the user to get here,
+                    // but we did somehow get there once, and this is a good safety measure
                     datepickerDateNotBefore: $('#publishAt')
                 }
             },
