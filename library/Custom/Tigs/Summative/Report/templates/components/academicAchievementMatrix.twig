@@ -30,7 +30,7 @@ Data:
                 <tr>
                     <th>{{ indicatorUsage.indicator.name }}</th>
 
-                    {% set indicatorMark = markedGrid|default(false) ? markedGrid.retrieveIndicatorMark(indicatorUsage) : null %}
+                    {% set indicatorMark = markedGrid is defined ? markedGrid.retrieveIndicatorMark(indicatorUsage) : null %}
                     {% set indicatorMarkDescriptor = indicatorMark ? indicatorMark.descriptor : null %}
 
                     {% for descriptor in indicatorUsage.descriptors %}
