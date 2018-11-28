@@ -1278,7 +1278,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
                             ->setInstance($url);
 
                         if ($outputStackTrace) {
-                            $problem['trace'] = $isException ? $e->getTrace() : $e['trace'];
+                            $problem['trace'] = array_merge(
+                                [$error],
+                                $isException ? $e->getTrace() : $e['trace']
+                            );
                         }
 
                         /** @var Output\Json $output */
