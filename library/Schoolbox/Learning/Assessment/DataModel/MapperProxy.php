@@ -147,7 +147,7 @@ class MapperProxy
     /**
      * Find by ID for review, either of a single student or all in the class.
      *
-     * This method loads participants, responses, feedback and rubric grid.
+     * This method loads participants, responses and feedback. It does not load the rubric grid.
      *
      * @param int       $id
      * @param null|User $student         If provided, load only this student's participation
