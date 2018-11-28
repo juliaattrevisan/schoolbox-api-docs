@@ -64,6 +64,9 @@ abstract class AbstractCourseMapper extends BaseMapper
         foreach ($courses as $course) {
             if (isset($units[$course->getId()])) {
                 $course->setUnits($units[$course->getId()]);
+                $course->getUnits()->indexByCallback(function (AbstractUnit $unit) {
+                    return $unit->getId();
+                });
             }
         }
         return $courses;
