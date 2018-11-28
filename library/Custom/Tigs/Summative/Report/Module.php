@@ -15,6 +15,8 @@ use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
@@ -82,12 +84,16 @@ class Module extends Alaress\Module\Module
      * @inheritdoc
      * @param Container|ContainerInterface $injector The dependency injection container.
      * @throws InvalidArgumentException
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         $injector->params[Controller::class] = [
-            'externalUser' => $injector->lazyGet('externalUser'),
-            'termMapper'   => $this->getMapperFactory()->getLazy(Term\Mapper::class),
+            'externalUser'          => $injector->lazyGet('externalUser'),
+            'termMapper'            => $this->getMapperFactory()->getLazy(Term\Mapper::class),
+            'assessmentMapperProxy' => $injector->get('assessmentDataSource'),
+            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
+            'access'                => $this->getMapperFactory()->getLazy(Access::class),
         ];
     }
 
