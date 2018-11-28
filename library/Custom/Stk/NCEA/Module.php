@@ -51,52 +51,54 @@ class Module extends BaseModule
     {
         /* Anyone can see the form
          */
-        $getPerms = new Rule\All(
-            new Rule\IsLoggedIn(),
-
+        $getPerms = new Rule\LazyCallback(function () {
             new Rule\All(
+                new Rule\IsLoggedIn(),
                 new Rule\All(
-                    new Rule\Callback(function ($params, User $user) {
-                        try {
-                            /** @var \Schoolbox\User $user */
-                            $student = $this->getUserMapper()->findById($params['userId']);
-                            $externalUser = $this->getExternalUser()->getStudent($student->getExternalId());
-                        }
-                        catch (MapperException $e) {
-                            throw new Unauthorized('User Not Found');
-                        }
+                    new Rule\All(
+                        new Rule\Callback(
+                            function ($params, User $user) {
+                                try {
+                                    /** @var \Schoolbox\User $user */
+                                    $student = $this->getUserMapper()->findById($params['userId']);
+                                    $externalUser = $this->getExternalUser()->getStudent($student->getExternalId());
+                                } catch (MapperException $e) {
+                                    throw new Unauthorized('User Not Found');
+                                }
 
-                        /** @var IConnector $externalDb */
-                        $externalDb = $this->getInjector()->get('databaseExternal');
+                                /** @var IConnector $externalDb */
+                                $externalDb = $this->getInjector()->get('databaseExternal');
 
-                        /* Permission to NCEA Report and its button, controlled by STK
+                                /* Permission to NCEA Report and its button, controlled by STK
+                                 */
+                                $availability = (new Availability($externalDb))->hasAccess((int)$student->getYear());
+
+                                if (!$availability) {
+                                    throw new Unauthorized('Unavailable for this student\'s year level due to OLE flag');
+                                }
+
+                                /* Explicit IB Check: IB students not allowed
+                                 */
+                                if ($externalUser['StudentIBFlag']) {
+                                    throw new Unauthorized('NCEA Reports not available to IB Students');
+                                }
+                            }
+                        ),
+
+                        /* This student must be in Year 11-13 inclusive
                          */
-                        $availability = (new Availability($externalDb))->hasAccess((int)$student->getYear());
-
-                        if (!$availability) {
-                            throw new Unauthorized('Unavailable for this student\'s year level due to OLE flag');
-                        }
-
-                        /* Explicit IB Check: IB students not allowed
-                         */
-                        if ($externalUser['StudentIBFlag']) {
-                            throw new Unauthorized('NCEA Reports not available to IB Students');
-                        }
-                    }),
-
-                    /* This student must be in Year 11-13 inclusive
+                        new Rule\IsYearLevel($this->availableForYears)
+                    ),
+                    /* The Students themselves, their parents, any staff/superuser can get button and report
                      */
-                    new Rule\IsYearLevel($this->availableForYears)
-                ),
-                /* The Students themselves, their parents, any staff/superuser can get button and report
-                 */
-                new Rule\Any(
-                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId'),
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\IsSuperuser()
+                    new Rule\Any(
+                        new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId'),
+                        new Rule\HasRole(Role::STAFF),
+                        new Rule\IsSuperuser()
+                    )
                 )
-            )
-        );
+            );
+        });
 
         $preloadUser = function ($params) { return $this->preloadUser($params); };
 

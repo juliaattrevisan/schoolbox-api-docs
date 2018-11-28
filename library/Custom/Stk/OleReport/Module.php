@@ -16,9 +16,7 @@ use Aura\Router\Router;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
-use \External_UserInterface;
 use \MSSQL;
 
 /**
@@ -119,11 +117,13 @@ class Module extends BaseModule
             ->addRoutePermission(
                 $authorizer,
                 $ruleRegexp,
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
-                )
+                new Rule\LazyCallback(function () {
+                    new Rule\Any(
+                        new Rule\IsSuperuser(),
+                        new Rule\HasRole(Role::STAFF),
+                        new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
+                    );
+                })
             );
     }
 
