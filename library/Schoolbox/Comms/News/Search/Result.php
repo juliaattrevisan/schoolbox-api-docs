@@ -288,6 +288,7 @@ class Result extends Base
                 AND n.rejected_at IS NULL
                 AND MATCH(n.title, n.blurb, n.body) AGAINST ({$sanitiser->getKeyword()})
             ORDER BY {$sanitiser->getSortByWithAlias('n')} {$sanitiser->getSortDir()}
+            LIMIT 0,{$sanitiser->getMaxLimit()}
         ";
 
         $stmt = $mapper->getDatabase()->prepare($query);

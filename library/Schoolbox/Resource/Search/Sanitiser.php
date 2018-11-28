@@ -62,7 +62,7 @@ class Sanitiser
      * Max results limit
      * @var int
      */
-    private $maxLimit = 1000;
+    private $maxLimit = 500;
 
     /**
      * Keyword
