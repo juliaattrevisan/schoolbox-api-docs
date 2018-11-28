@@ -132,7 +132,6 @@ class Browser extends Source\BrowserAbstract
                 $label = $row->label->getValue();
             } else {
                 // fetch the label in a separate request.
-                // TODO get the query working properly
                 $curl = new Alaress_Curl_Url($row->level->getUri().'.rdf');
                 $curl->addOptions([CURLOPT_FOLLOWLOCATION => true]);
                 $curl->exec();
