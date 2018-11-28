@@ -10,8 +10,6 @@ namespace Config\Modules\Custom\Stk;
 use Alaress\Application\Kernel;
 use Custom\Stk\OleReport\Module as OleReportModule;
 use Config\Modules\ModuleConfigInterface;
-use External_User;
-
 
 /**
  * Configuration for the SaintKentigern-specific OLE report.

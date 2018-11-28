@@ -52,11 +52,13 @@ class Module extends \Schoolbox\Learning\Grades\Module
         $this->addRoutePermission(
                 $authorizer,
                 '(?:getCustomGradesYear)',
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
-                )
+                new Rule\LazyCallback(function () {
+                    new Rule\Any(
+                        new Rule\IsSuperuser(),
+                        new Rule\HasRole(Role::STAFF),
+                        new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
+                    );
+                })
             );
     }
 

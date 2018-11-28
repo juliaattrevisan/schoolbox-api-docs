@@ -79,7 +79,15 @@ class Module extends BaseModule
             'GET',
             '/resources/{studentId}{/date}',
             'getResourcesForStudent',
-            new Rule\Any($access, new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')),
+            new Rule\LazyCallback(function ($access) {
+                new Rule\All(
+                    new Rule\IsLoggedIn(),
+                    new Rule\Any(
+                        $access,
+                        new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
+                    )
+                );
+            }),
             $preload
         );
         $this->register(
