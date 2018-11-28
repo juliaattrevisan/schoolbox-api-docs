@@ -136,6 +136,7 @@ class Browser extends Source\BrowserAbstract
                 // fetch the label in a separate request.
                 // TODO get the query working properly
                 $curl = new Alaress_Curl_Url($row->level->getUri().'.rdf');
+                $curl->addOptions([CURLOPT_FOLLOWLOCATION => true]);
                 $curl->exec();
                 if (!count($curl->getErrors())) {
                     $document = simplexml_load_string($curl->getResult());
@@ -181,6 +182,7 @@ class Browser extends Source\BrowserAbstract
         $collection = new Collection();
         // Get everything out of the manifest instead of out of RDF queries.
         $curl = new Alaress_Curl_Url($area->getReference().'-manifest.json');
+        $curl->addOptions([CURLOPT_FOLLOWLOCATION => true]);
         $curl->exec();
         if ( !\count($curl->getErrors()) && $manifest = json_decode($curl->getResult()) ) {
             foreach ($manifest as $part) {
