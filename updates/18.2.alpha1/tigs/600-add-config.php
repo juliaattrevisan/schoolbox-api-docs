@@ -43,6 +43,7 @@ $app = new class extends App
      * @param LoopInterface   $loop
      * @param LoggerInterface $log
      * @param array           $opts
+     * @throws PDOException
      */
     public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
     {
@@ -54,8 +55,7 @@ $app = new class extends App
         try {
             $this->execute();
             $this->database->commit();
-        } /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (\Alaress\Database\Exception|PDOException $e) {
+        } catch (\Alaress\Database\Exception $e) {
             $this->log->error($e->getMessage(), ['exception' => $e]);
             $this->database->rollBack();
         }
