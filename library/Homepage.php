@@ -2,6 +2,7 @@
 
 /* This script controls homepage layout functions.  It is used for setting up templates and customising homepage */
 
+use Schoolbox\Comms\News\Audience\Mapper;
 use Schoolbox\Resource;
 
 class Homepage
@@ -198,8 +199,6 @@ class Homepage
         $homepageCleanables = array(
             new Assess_Main(),
             new Blog(),
-//            new Calendar(),
-            new CategoryNews(),
             new Chat(),
             new Forum(),
             new Poll(),
