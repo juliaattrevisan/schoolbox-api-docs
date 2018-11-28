@@ -26,8 +26,8 @@
 
     The strategy used to accomodate all cases is to convert both value and keys to strings, then perform a strict comparison.
 #}
-{% set valueString = value ~ '' %}
-{% set renderEmptyOption = not required or value is null or value is same as('') %}
+{% set valueString         = value ~ '' %}
+{% set renderEmptyOption   = not required or value is null or value is same as('') %}
 {% set emptyOptionSelected = value is same as('') or value is null %}
 {% if not renderEmptyOption %}
     {% set valueIsValid = false %}
@@ -42,7 +42,7 @@
 
 <select name="{{ name }}">
     {% if renderEmptyOption %}
-        <option {% if required %} style="display: none;"{% endif %}{% if emptyOptionSelected %} selected="selected"{% endif %}></option>
+        <option {% if required %} style="display: none;"{% endif %}{% if emptyOptionSelected %} selected="selected"{% endif %}>-- select an option --</option>
     {% endif %}
     {% for key, option in options %}
         {% set keyString = key ~ '' %}
