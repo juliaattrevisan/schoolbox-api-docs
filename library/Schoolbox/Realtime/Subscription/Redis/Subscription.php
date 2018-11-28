@@ -146,6 +146,7 @@ class Subscription implements ISubscription
                     try {
                         $data = $this->syncClient->get($messageKey);
                         if (!$data) {
+                            $this->syncClient->srem($messageKey,$this->getSetIdentifier());
                             return false;
                         }
                         return unserialize(
