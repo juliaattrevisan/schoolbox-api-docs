@@ -117,7 +117,7 @@
         
         return date.isValid() && date.valueOf() >= other_date.valueOf();
 
-    }, 'Please enter a date that occurs <i>after</i> the previous date');
+    }, 'Please enter a date that is <i>after</i> the previous date');
 
 
     /**
