@@ -16,6 +16,50 @@ Weather details page (linked from dashboard component)
 
     <div class="row">
         <div class="small-12 island">
+            <h2 class="subheader">Currently</h2>
+            <p class="meta">Last updated: {{ today.lastUpdated }}</p>
+            <section>
+                <div class="row collapse">
+                    <ul class="weather-list">
+
+                        <li class="weather-forecast">
+                            <div class="weather-card">
+                                <h3>Temperature</h3>
+                                <p class="temperature">{{ today.currentTemp }}&deg;</p>
+                            </div>
+                        </li>
+
+                        <li class="weather-forecast">
+                            <div class="weather-card">
+                                <h3>Conditions</h3>
+                                <div class="weather-summary">
+                                    <img src="{{ today.weatherIcon }}" alt="{{ today.weatherSummary }}" />
+                                    <p class="meta">{{ today.weatherSummary }}</p>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="weather-forecast">
+                            <div class="weather-card">
+                                <h3>Wind</h3>
+                                <p class="meta">{{ today.windSpeed }} km/h {{ today.windDirection }}</p>
+                            </div>
+                        </li>
+
+                        <li class="weather-forecast">
+                            <div class="weather-card">
+                                <h3>Humidity</h3>
+                                <p class="meta">{{ today.humidity }}%</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 island">
             <h2 class="subheader">Forecast</h2>
 
             <section>
@@ -44,24 +88,9 @@ Weather details page (linked from dashboard component)
 
     <div class="row">
         <div class="small-12 medium-6 island">
-            <h2 class="subheader">Currently</h2>
+            <h2 class="subheader">Weather supplied by</h2>
             <section class="content">
-                <dl class="inline-dl no-margin">
-                    <dt class="small-12 large-6">Temperature</dt>
-                    <dd class="small-12 large-6">{{ today.currentTemp }}&deg;</dd>
-
-                    <dt class="small-12 large-6">Wind</dt>
-                    <dd class="small-12 large-6">{{ today.windSpeed }} km/h {{ today.windDirection }}</dd>
-
-                    <dt class="small-12 large-6">Humidity</dt>
-                    <dd class="small-12 large-6">{{ today.humidity }}%</dd>
-
-                    <dt class="small-12 large-6">Last updated</dt>
-                    <dd class="small-12 large-6">{{ today.lastUpdated }}</dd>
-                </dl>
-
                 <div class="content">
-                    <p class="meta">Weather supplied by</p>
                     <a href="{{ apiProvider.url }}" target="_blank"><img alt="{{ apiProvider.name }}" src="{{ apiProvider.logo }}" />{{ apiProvider.name }}</a>
                 </div>
             </section>
