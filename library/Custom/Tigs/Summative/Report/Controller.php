@@ -69,6 +69,35 @@ class Controller extends Web\Controller\Base
      */
     public function getSubjectReport(User $user, Folder\Model $folder): void
     {
+        [$isHsc, $isIb, $sbSem, $term, $curriculumYearLevel, $curriculumSemester] = $this->deriveStudentAttributes($user);
+
+        $data   = [
+            'user'                => $user,
+            'folder'              => $folder,
+            'isEnabled'           => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
+            'isHsc'               => $isHsc,
+            'isIb'                => $isIb,
+            'sbSem'               => $sbSem,
+            'term'                => $term,
+            'curriculumYearLevel' => $curriculumYearLevel,
+            'curriculumSemester'  => $curriculumSemester,
+        ];
+        $output = $this->buildHtmlOutput('@tigsSummativeReport/subject.twig', $data, "Subject Report");
+
+        $this->getResponse()->content->set($output);
+    }
+
+
+    /**
+     * Helper to derive relevant student attributes
+     *
+     * @param User $user
+     * @return array
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
+     */
+    private function deriveStudentAttributes(User $user): array
+    {
         $ibFlagOn = (bool)$this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'];
 
         $isHsc = !$ibFlagOn || $user->getYear() <= 10;
@@ -136,19 +165,6 @@ class Controller extends Web\Controller\Base
             $curriculumSemester  = $sbSem;
         }
 
-        $data   = [
-            'user'                => $user,
-            'folder'              => $folder,
-            'isEnabled'           => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
-            'isHsc'               => $isHsc,
-            'isIb'                => $isIb,
-            'sbSem'               => $sbSem,
-            'term'                => $term,
-            'curriculumYearLevel' => $curriculumYearLevel,
-            'curriculumSemester'  => $curriculumSemester,
-        ];
-        $output = $this->buildHtmlOutput('@tigsSummativeReport/subject.twig', $data, "Subject Report");
-
-        $this->getResponse()->content->set($output);
+        return [$isHsc, $isIb, $sbSem, $term, $curriculumYearLevel, $curriculumSemester];
     }
 }
