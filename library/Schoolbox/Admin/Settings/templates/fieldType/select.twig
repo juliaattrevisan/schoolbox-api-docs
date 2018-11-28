@@ -6,6 +6,9 @@
 #}
 
 <select name="{{ name }}">
+    {% if not required or not value %}
+        <option value="" {% if required %}style="display: none;"{% endif %}></option>
+    {% endif %}
     {% for key, option in options %}
     <option value="{{ key }}" {% if key == value %}selected="selected"{% endif %}>{{ option }}</option>
     {% endfor %}
