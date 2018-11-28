@@ -88,19 +88,9 @@ class Kernel extends \Alaress\Application\Kernel
 
         if ($route instanceof Route) {
             $this->outputAuraContent($route, $path);
-        }
-
-        // we shall assume that if a specific page is requested, the user just be sent to that page regardless of device
-        if ((isset($_GET['page']) && $_GET['page']) && $_GET['page'] != '/') {
-            $pageName = $_GET['page'];
         } else {
-            $pageName = 'dashboard';
+            $this->outputSitepageContent($_GET['page'] ?? null);
         }
-
-        /** @var \SitePage $page */
-        $page = $this->di->get('sitePage');
-        $page->loadContent($pageName);
-        $page->outputPage();
     }
 
 
@@ -314,5 +304,28 @@ class Kernel extends \Alaress\Application\Kernel
         }
 
         $output->output($response);
+    }
+
+
+    /**
+     * Renders Sitepage-based content.
+     *
+     * @param string|null $path the base path that was requested
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    private function outputSitepageContent(?string $path): void
+    {
+        // we shall assume that if a specific page is requested,
+        // the user just be sent to that page regardless of device
+        if ($path !== null && $path && $path !== '/') {
+            $pageName = $path;
+        } else {
+            $pageName = 'dashboard';
+        }
+
+        /** @var \SitePage $sitePage */
+        $sitePage = $this->di->get('sitePage');
+        $sitePage->loadContent($pageName);
+        $sitePage->outputPage();
     }
 }
