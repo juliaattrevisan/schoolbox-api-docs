@@ -371,6 +371,7 @@
                 }
 
                 // Update the RSS link (which lives in a different Vue component)
+                // The rssLink component only exists on the news feed page, not on the dashboard
                 if (typeof rssLink !== 'undefined') {
                     rssLink.topic = tab;
                 }
