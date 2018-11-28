@@ -67,8 +67,8 @@ class SparqlClient extends EasyRdf_Sparql_Client
             // Use GET if the query is less than 2kB
             // 2046 = 2kB minus 1 for '?' and 1 for NULL-terminated string on server
             $encodedQuery = 'q=' . urlencode($prefixes . $query);
-            if (strlen($encodedQuery) + strlen($queryUri) <= 2046) {
-                $delimiter = parse_url($queryUri, PHP_URL_QUERY) === '' ? '?' : '&';
+            if (\strlen($encodedQuery) + \strlen($queryUri) <= 2046) {
+                $delimiter = (parse_url($queryUri, PHP_URL_QUERY) ?? '') === '' ? '?' : '&';
 
                 $client->setMethod('GET');
                 $client->setUri($queryUri . $delimiter . $encodedQuery);
