@@ -25,7 +25,11 @@ Weather details page (linked from dashboard component)
                         <li class="weather-forecast">
                             <div class="weather-card">
                                 <h3>Temperature</h3>
-                                <p class="temperature">{{ today.currentTemp }}&deg;</p>
+                                <p class="temperature">
+                                    <span class="hot">{{ today.highTemp }}&deg;</span>
+                                    <span class="cold">{{ today.lowTemp }}&deg;</span>
+                                </p>
+                                <p class="meta">Current: {{ today.currentTemp }}&deg;</p>
                             </div>
                         </li>
 

@@ -107,8 +107,10 @@ class ApixuClient
         ];
 
         foreach($responseData['forecast']['forecastday'] as $forecastDay) {
-            // Skip today's forecast; we don't use it
+            // Get the min and max temp from today's forecast, then move on to tomorrow's forecast
             if ($this->getDayOfWeek($forecastDay['date_epoch']) === 'Now') {
+                $twigData['today']['lowTemp'] = $forecastDay['day']['mintemp_c'];
+                $twigData['today']['highTemp'] = $forecastDay['day']['maxtemp_c'];
                 continue;
             }
 
