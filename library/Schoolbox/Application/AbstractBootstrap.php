@@ -27,6 +27,7 @@ use Alaress\Web\Output;
 use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Locale_Config;
 use Aura\Di;
+use Crell\ApiProblem\ApiProblem;
 use External_ClassInterface;
 use External_UserInterface;
 use GuzzleHttp;
@@ -1157,6 +1158,171 @@ abstract class AbstractBootstrap implements BootstrapInterface
         // load dependencies into the kernel itself
         $this->kernel->setDependencyInjector($di);
     }
+
+
+    /**
+     * Shutdown handler for either exceptions or fatal errors
+     *
+     * @param \Exception|array $e
+     * @param array $stack
+     */
+    public function shutdownSafely($e = null, $stack = null)
+    {
+        $di = $this->getKernel()->getDependencyInjector();
+        /** @var IConfigLoader $config */
+        $config = $di->get('config');
+        $outputStackTrace = $config->get('debug_show_stack_trace');
+
+
+        $isException = false;
+        if ($e instanceof \Throwable) {
+            $isException = true;
+
+            $error = array(
+                'file'    => $e->getFile(),
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+                'type'    => $e->getCode(),
+            );
+
+            $this->getKernel()->callExceptionCallbacks($e);
+
+        } elseif (is_array($e)) {
+            $error = $e;
+        } else {
+            $error = error_get_last();
+        }
+
+        // it's almost a guarantee that some kind of minor error will have occurred at some point
+        if ($error !== null) {
+
+            // use the document_root to get a Schoolbox-relative file in which the error occurred
+            $cause = substr($error['file'], strlen($_SERVER['DOCUMENT_ROOT']) - 4);
+
+            // if it was a fatal error or exception that triggered our sudden but inevitable demise...
+            if (
+                $isException
+                || (intval($error['type']) & (E_ERROR | E_CORE_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR))
+            ) {
+                // RedisException extends RuntimeException: occurs when Redis
+                // session management isn't working for whatever reason.
+                $code    = 400;
+                $info    = 'If the problem persists, please contact your System Administrator including the following information:';
+
+                if ($e instanceof \PDOException){
+                    $code = 500;
+                    $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
+                } else if ($e instanceof \RuntimeException) {
+                    $code    = 500;
+                    $message = 'Schoolbox is currently down due to an internal service being inactive.';
+                } else {
+                    $message = 'Schoolbox has encountered a fatal error.';
+
+                    // decide what to tell the user based on where this error came from
+                    switch ($cause) {
+                        // certain queries in the reports can return too much data to fit under the memory limit
+                        case '/library/Report/Login.php':
+                        case '/library/Report/Activity.php':
+                            $info = "The report you tried to run has returned too much data. Please press 'Back' and refine your report filter parameters.";
+                            break;
+                        // if it's not somewhere we expect to find an error, just be generic about it
+                        default:
+                            break;
+                    }
+                }
+
+                if(isset($_SERVER['HTTP_HOST'])) {
+                    $url = 'http'.(getenv("SERVER_PORT") == 443 ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+                }
+                else {
+                    $url = '';
+                }
+
+                // explain that something went cataclysmically wrong.
+
+                // Use Sitepage to output an error message in the school's design.
+                // If there's no SitePage in DI yet: just output a styleless error.
+
+                if (!$isException) {
+                    $e = $error;
+                    $e['code'] = $code;
+
+                    if (is_array($stack)) {
+                        array_shift($stack);
+                        $e['trace'] = $stack;
+                    }
+                }
+
+                /* Use structured information for rendering
+                 */
+                $args = [
+                    'message'          => $message,
+                    'info'             => $info,
+                    'url'              => $url,
+                    'error'            => $error,
+                    'date'             => \Alaress_Date_Format::now(),
+                    'outputStackTrace' => $outputStackTrace,
+                    'stackTrace'       => $e,
+                    'exceptionClass'   => \is_object($e) ? \get_class($e) : 'Error',
+                ];
+
+                /* Pass $data straight in for twig rendering
+                 */
+                if ($di instanceof Di\Container) {
+                    // Is it JSON or not?
+                    $response = $di->get('webFactory')->newResponse();
+                    if ((new IsJson())->isSatisfiedBy($response)) {
+                        $problem = (new ApiProblem($message))
+                            ->setStatus($code)
+                            ->setDetail($info)
+                            ->setInstance($url);
+
+                        if ($outputStackTrace) {
+                            $problem['trace'] = $isException ? $e->getTrace() : $e['trace'];
+                        }
+
+                        /** @var Output\Json $output */
+                        $output = $di->get('webOutput:json');
+                        $output
+                            ->setData($problem->asArray());
+
+                    } else {
+                        /** @var Output\ThemedHtml $output */
+                        $output = $di->get('webOutput:html');
+                        $output
+                            ->setTitle('Error Encountered')
+                            ->setData($args)
+                            ->setTemplate('common/error/general.twig');
+                    }
+
+                    // Finagle a response?
+                    $output->output($response);
+                }
+                /* Just dump it out in raw form
+                 * TODO: Make synonymous with twig output
+                 */
+                else {
+                    $output =
+                        "<p><b>{$args['message']} {$args['info']}</b></p>" .
+                        '<ul>' .
+                        "<li>Datetime: {$args['date']->getLong()}</li>" .
+                        "<li>URL: {$args['url']}" .
+                        '</li>';
+
+                    if ($outputStackTrace) {
+                        $output .= "<li>Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}.</li>";
+                    } else {
+                        $output .= "<li>Error: {$args['error']['message']}. (Further details have been logged.)</li>";
+                    }
+
+                    $output .= '</ul>';
+
+                    echo $output;
+                }
+            }
+        }
+    }
+
 
     /**
      * @return bool
