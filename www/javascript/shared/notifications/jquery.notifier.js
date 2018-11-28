@@ -171,14 +171,6 @@
                 }
                 $(settings.counter).html(unreadTotalLabel);
 
-                $.ajax({
-                    accepts  : 'application/json',
-                    async    : true,
-                    type     : 'POST',
-                    url      : '/ajax/msgcounter.php',
-                    data     : {c : unreadTotal}
-                });
-
                 clearInterval(ii);
                 ii = setInterval(updateRelativeTimes, 9000);
             }
