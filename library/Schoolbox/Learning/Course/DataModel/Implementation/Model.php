@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Learning\Course\DataModel\Implementation;
 
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\AbstractCourse;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
@@ -39,8 +38,11 @@ class Model extends AbstractCourse
      */
     private $unitImplementations;
 
+
     /**
      * Constructor
+     *
+     * @throws \UnexpectedValueException
      */
     public function __construct()
     {
@@ -65,19 +67,22 @@ class Model extends AbstractCourse
         return $this;
     }
 
+
     /**
-     * @return Unit\Model[]|Collection
+     * @return Unit\Model[]|GenericCollection
      */
-    public function getUnits()
+    public function getUnits(): GenericCollection
     {
         return $this->unitImplementations;
     }
 
+
     /**
      * @param Unit\Model[]|GenericCollection $unitImplementations
      * @return static
+     * @throws \DomainException
      */
-    public function setUnits(GenericCollection $unitImplementations)
+    public function setUnits(GenericCollection $unitImplementations): AbstractCourse
     {
         $this->unitImplementations->replaceWith($unitImplementations);
         return $this;
