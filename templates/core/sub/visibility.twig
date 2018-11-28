@@ -13,7 +13,7 @@
             <option value="{{ currentOption }}"
                     {% if currentOption == selected %}selected="selected"{% endif %}
                     {% if currentOption not in availableVisibilities %}disabled="disabled"{% endif %}
-            >&#xe66b;&nbsp;&nbsp;&nbsp;{{ label }}</option>
+            >{{ label }}</option>
         {% endfor %}
     </select>
 </label>
