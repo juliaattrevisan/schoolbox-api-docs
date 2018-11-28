@@ -39,9 +39,7 @@ class Browser extends Source\BrowserAbstract
      */
     public function setup()
     {
-        $this->setClient(
-            new EasyRdf_Sparql_Client('http://rdf.australiancurriculum.edu.au/api/sparql')
-        );
+        $this->setClient(new SparqlClient(SparqlClient::API_URI));
         $this->setHtmlConverter(new Html2Text());
     }
 
