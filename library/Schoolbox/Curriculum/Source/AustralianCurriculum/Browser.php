@@ -242,7 +242,7 @@ class Browser extends Source\BrowserAbstract
     protected function buildSingleNode($json)
     {
         $node = new Node\Model();
-        $node->setReference($json->id);
+        $node->setReference($json->id ?? $json->Id);
 
         // Figure out what the name and description should be.
         $statementLabel = '';
