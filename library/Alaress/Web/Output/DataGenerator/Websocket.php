@@ -101,9 +101,9 @@ class Websocket implements IDataGenerator
                 }
             );
 
-        $notfication = new NotificationBundle();
-        $notfication->appendInstances($intances);
-        return $notfication->count();
+        $notificationList = new NotificationBundle();
+        $notificationList->appendInstances($intances);
+        return $notificationList->count();
     }
 
 }
