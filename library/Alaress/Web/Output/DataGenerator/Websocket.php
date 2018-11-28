@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Alaress\Web\Output\DataGenerator;
 
+use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Session\Session;
 use Predis\ClientInterface;
 use Schoolbox\IConfigLoader;
@@ -75,7 +76,7 @@ class Websocket implements IDataGenerator
     }
 
     public function getUnreadMessages() {
-        $unreadCount = count(
+        $intances =
             array_filter(
                 array_map(
                     function ($messageKey) {
@@ -98,9 +99,11 @@ class Websocket implements IDataGenerator
                 function ($item) {
                     return $item instanceof Instance;
                 }
-            )
-        );
-        return $unreadCount;
+            );
+
+        $notfication = new NotificationBundle();
+        $notfication->appendInstances($intances);
+        return $notfication->count();
     }
 
 }
