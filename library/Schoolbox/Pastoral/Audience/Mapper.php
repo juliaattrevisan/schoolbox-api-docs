@@ -17,6 +17,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
+use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -44,12 +45,12 @@ class Mapper extends BaseMapper
         $this->hasTable('pastoral_audience');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('type_id', self::TYPE_INTEGER);
-        $this->uses('subtype_id', self::TYPE_INTEGER);
         $this->uses('access', self::TYPE_INTEGER);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role');
         $this->joins('group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
+        $this->joins('type_id', TypeMapper::class, 'id', null, null, 'type', 'type');
+        $this->joins('subtype_id', TypeMapper::class, 'id', null, null, 'subtype', 'subtype');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
@@ -67,10 +68,14 @@ class Mapper extends BaseMapper
 
         return "
 			SELECT      {$this->getColumnString()},
+			            {$this->getJoinColumnString('type', 't')},
+                        {$this->getJoinColumnString('subtype', 'st')},
                         {$this->getJoinColumnString('role', 'r')},
                         {$this->getJoinColumnString('user', 'u')},
                         {$this->getJoinColumnString('group', 'g')}
 			FROM        {$this->getTable()}
+            JOIN        {$this->getJoinSql('type', '', 't')}
+            LEFT JOIN   {$this->getJoinSql('subtype', '', 'st')}
             LEFT JOIN   {$this->getJoinSql('role', '', 'r')}
             LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
             LEFT JOIN   {$this->getJoinSql('group', '', 'g')}
@@ -95,6 +100,11 @@ class Mapper extends BaseMapper
             }
 
             $access = $this->hydrate($row);
+
+            $access->setType($this->hydrateJoin($row, 'type', 't'));
+            if (!empty($row['st.id'])) {
+                $access->setSubtype($this->hydrateJoin($row, 'subtype', 'st'));
+            }
 
             // Hydrate user
 

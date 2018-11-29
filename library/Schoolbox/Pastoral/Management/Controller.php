@@ -107,7 +107,6 @@ class Controller extends Base
      *
      * @param PastoralType $type
      * @param PastoralSubType|null $subType
-     * @throws MapperException
      */
     public function getAudiencesModify(PastoralType $type, ?PastoralSubType $subType)
     {

@@ -14,6 +14,8 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
+use Schoolbox\Pastoral\Type\Model as Type;
+
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -32,11 +34,11 @@ class Model
     /** @var null|Role  */
     private $role;
 
-    /** @var integer */
-    private $typeId;
+    /** @var null|Type */
+    private $type;
 
-    /** @var null|integer */
-    private $subtypeId;
+    /** @var null|Type */
+    private $subtype;
 
     /** @var integer */
     private $access;
@@ -102,13 +104,45 @@ class Model
         return $this;
     }
 
+    /**
+     * @return Type|null
+     */
+    public function getType(): ?Type
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param Type|null $type
+     */
+    public function setType(?Type $type): void
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return Type|null
+     */
+    public function getSubtype(): ?Type
+    {
+        return $this->subtype;
+    }
+
+    /**
+     * @param Type|null $subtype
+     */
+    public function setSubtype(?Type $subtype): void
+    {
+        $this->subtype = $subtype;
+    }
+
 
     /**
      * @return int
      */
     public function getTypeId(): int
     {
-        return $this->typeId;
+        return $this->type->getId();
     }
 
 
@@ -118,7 +152,13 @@ class Model
      */
     public function setTypeId($typeId): self
     {
-        $this->typeId = $typeId;
+        if($this->type instanceof Type) {
+            $this->type->setId($typeId);
+        }
+        else {
+            $this->type = new Type();
+            $this->type->setId($typeId);
+        }
 
         return $this;
     }
@@ -129,7 +169,12 @@ class Model
      */
     public function getSubtypeId()
     {
-        return $this->subtypeId;
+        if($this->subtype instanceof Type) {
+            return $this->subtype->getId();
+        } else {
+            return null;
+        }
+
     }
 
 
@@ -139,7 +184,13 @@ class Model
      */
     public function setSubtypeId($subtypeId): self
     {
-        $this->subtypeId = $subtypeId;
+        if($this->subtype instanceof Type) {
+            $this->subtype->setId($subtypeId);
+        }
+        else {
+            $this->subtype = new Type();
+            $this->subtype->setId($subtypeId);
+        }
 
         return $this;
     }
