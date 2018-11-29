@@ -72,7 +72,7 @@ class Sync extends Base implements ISync
                         ParentFirstname                 AS student_contact_preferred,
                         ParentFirstname                 AS student_contact_given_name,
                         ParentSurname                   AS student_contact_surname,
-                        ''                              AS student_contact_home_email,
+                        PersonalEmail                   AS student_contact_home_email,
                         CISEmail                        AS student_contact_default_email,
                         ''                              AS student_contact_work_email,
                         V_Student.campus                AS student_campus,                        

@@ -74,7 +74,7 @@ class External_Isams_User implements External_UserInterface
                         V_Parent.Title                AS Title,
                         V_Parent.ParentFirstname      AS Preferred,
                         V_Parent.ParentSurname        AS Surname,
-                        V_Parent.CISEmail             AS Email,
+                        V_Parent.PersonalEmail             AS Email,
                         ''                            AS OccupEmail,
                         ''                            AS DefaultEmailCode,
                         ''                            AS HomePhone,
@@ -120,12 +120,12 @@ class External_Isams_User implements External_UserInterface
     {
         $emailList = [];
         $pb = $this->getConnector()->buildPredicateBuilder("V_Parent")->in("StudentID", $synergyIds);
-        $pb->notEquals("CISEmail", "");
+        $pb->notEquals("PersonalEmail", "");
         $whereString = implode(" AND " , $pb->getWhere());
 
         $query =
         "
-            SELECT V_Parent.ParentID, V_Parent.CISEmail 
+            SELECT V_Parent.ParentID, V_Parent.PersonalEmail 
             FROM V_Parent
             WHERE $whereString
         ";
@@ -134,7 +134,7 @@ class External_Isams_User implements External_UserInterface
 
         foreach ($iterator as $currentRow) {
             if (!isset($emailList[$currentRow['ParentID']])) {
-                $emailList[$currentRow['ParentID']] = $currentRow['CISEmail'];
+                $emailList[$currentRow['ParentID']] = $currentRow['PersonalEmail'];
             }
         }
 
@@ -237,7 +237,7 @@ class External_Isams_User implements External_UserInterface
                         V_Parent.ParentFirstname      AS StudentContactPreferred,
                         V_Parent.ParentFirstname      AS StudentContactLegalFullName,
                         V_Parent.ParentSurname        AS StudentContactSurname,
-                        V_Parent.CISEmail             AS StudentContactDefaultEmail,
+                        V_Parent.PersonalEmail        AS StudentContactDefaultEmail,
                         1                             AS ValidAddressFlag,
                         V_Parent.Address1             AS StudentContactAddress1,
                         V_Parent.Address2             AS StudentContactAddress2,
@@ -300,7 +300,7 @@ class External_Isams_User implements External_UserInterface
                         V_Parent.Title                AS StudentContactTitle,
                         V_Parent.ParentFirstname      AS StudentContactPreferred,
                         V_Parent.ParentSurname        AS StudentContactSurname,
-                        V_Parent.CISEmail             AS StudentContactDefaultEmail,
+                        V_Parent.PersonalEmail             AS StudentContactDefaultEmail,
                         V_Parent.Mobile               AS StudentContactMobilePhone,
                         ''                            AS StudentContactOccupPhone,
                         ''                            AS StudentContactPhoneActual,
@@ -401,7 +401,7 @@ class External_Isams_User implements External_UserInterface
     {
         $query =
             "
-          SELECT  V_Parent.CISEmail 
+          SELECT  V_Parent.PersonalEmail 
           FROM    V_Parent 
           WHERE   V_Parent.ParentID = :id
         ";
@@ -450,7 +450,7 @@ class External_Isams_User implements External_UserInterface
                         V_Parent.Title                AS StudentContactTitle,
                         V_Parent.ParentFirstname      AS StudentContactPreferred,
                         V_Parent.ParentSurname        AS StudentContactSurname,
-                        V_Parent.CISEmail             AS StudentContactDefaultEmail,
+                        V_Parent.PersonalEmail        AS StudentContactDefaultEmail,
                         ''                            AS StudentContactSpouseNetworkLogin,
                         ''                            AS StudentContactSpouseID,
                         ''                            AS StudentContactSpouseTitle,
