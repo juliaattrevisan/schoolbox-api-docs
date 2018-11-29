@@ -8,12 +8,9 @@ declare(strict_types=1);
 
 namespace Alaress\Web\Output\DataGenerator;
 
-use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Session\Session;
-use Predis\ClientInterface;
 use Schoolbox\IConfigLoader;
-use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Notification\Parameter\Param;
+use Schoolbox\Realtime\Subscription\Redis\UnreadCounter;
 
 /**
  * Generate data for rendering the websocket (instant messaging) system.
@@ -31,10 +28,12 @@ class Websocket implements IDataGenerator
      */
     private $session;
 
+
     /**
-     * @var ClientInterface
+     * @var UnreadCounter
      */
-    private $redis;
+    private $unreadCounter;
+
 
     /**
      * @var array
@@ -45,17 +44,21 @@ class Websocket implements IDataGenerator
     /**
      * Constructor
      *
-     * @param IConfigLoader   $config
-     * @param Session         $session
-     * @param ClientInterface $redis
-     * @param array           $serverVars
+     * @param IConfigLoader $config
+     * @param Session       $session
+     * @param UnreadCounter $unreadCounter
+     * @param array         $serverVars
      */
-    public function __construct(IConfigLoader $config, Session $session, ClientInterface $redis, array $serverVars)
-    {
-        $this->config     = $config;
-        $this->session    = $session;
-        $this->redis      = $redis;
-        $this->serverVars = $serverVars;
+    public function __construct(
+        IConfigLoader $config,
+        Session $session,
+        UnreadCounter $unreadCounter,
+        array $serverVars
+    ) {
+        $this->config        = $config;
+        $this->session       = $session;
+        $this->unreadCounter = $unreadCounter;
+        $this->serverVars    = $serverVars;
     }
 
 
@@ -70,40 +73,8 @@ class Websocket implements IDataGenerator
             'port'       => $this->config->get('websocket_port_ssl') ?: 8081,
             'path'       => $this->config->get('websocket_path') ?: '/',
             'secure'     => true,
-            'unread'     => $this->getUnreadMessages(),
+            'unread'     => $this->unreadCounter->getUnread(INSTANCE_ID, $this->session->getAuthUser()->getId()),
             'stackLimit' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
         ];
     }
-
-    public function getUnreadMessages() {
-        $intances =
-            array_filter(
-                array_map(
-                    function ($messageKey) {
-                        try {
-                            $data = $this->redis->get($messageKey);
-                            if (!$data) {
-                                return false;
-                            }
-                            return unserialize(
-                                gzuncompress($data),
-                                ['allowed_classes' => [Instance::class, Param::class,],]
-                            );
-
-                        } catch (\ErrorException $e) {
-                            return false;
-                        }
-                    },
-                $this->redis->sMembers(sprintf('msg:%s:q:%d:unread', INSTANCE_ID,  $this->session->getAuthUser()->getId()))
-                ),
-                function ($item) {
-                    return $item instanceof Instance;
-                }
-            );
-
-        $notificationList = new NotificationBundle();
-        $notificationList->appendInstances($intances);
-        return $notificationList->count();
-    }
-
 }

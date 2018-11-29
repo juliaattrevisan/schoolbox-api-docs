@@ -30,6 +30,7 @@ use Aura\Di;
 use External_ClassInterface;
 use External_UserInterface;
 use GuzzleHttp;
+use Predis\ClientInterface as RedisInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
 use Schoolbox\Collection;
@@ -64,6 +65,7 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
+use Schoolbox\Realtime\Subscription\Redis\UnreadCounter;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Step\Mapper as StepMapper;
 use Schoolbox\Role;
@@ -483,6 +485,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
             /** @var IConfigLoader $config */
             /** @var Session $session */
             /** @var Router $router */
+            /** @var RedisInterface $redis */
             $config  = $di->get('config');
             $session = $di->get('session');
             $tourList = new \Schoolbox\Tour\Lists( $mapperFactory->get(TourMapper::class), $mapperFactory->get(StepMapper::class));
@@ -490,7 +493,15 @@ abstract class AbstractBootstrap implements BootstrapInterface
             $output  = new Output\ThemedHtml();
             $output
                 ->setTemplateEngine($di->get('templateEngine'))
-                ->addDataGenerator('ws', new Output\DataGenerator\Websocket($config, $session, $redis, $_SERVER))
+                ->addDataGenerator(
+                    'ws',
+                    new Output\DataGenerator\Websocket(
+                        $config,
+                        $session,
+                        new UnreadCounter($redis),
+                        $_SERVER
+                    )
+                )
                 ->addDataGenerator(
                     'tour',
                     new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER)
