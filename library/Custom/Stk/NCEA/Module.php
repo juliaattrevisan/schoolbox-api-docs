@@ -52,7 +52,7 @@ class Module extends BaseModule
         /* Anyone can see the form
          */
         $getPerms = new Rule\LazyCallback(function () {
-            new Rule\All(
+            return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\All(
                     new Rule\All(

@@ -57,7 +57,7 @@ class Module extends BaseModule
          */
         $permission =
             new Rule\LazyCallback(function () {
-                new Rule\Any(
+                return new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
                     new Rule\Any(
