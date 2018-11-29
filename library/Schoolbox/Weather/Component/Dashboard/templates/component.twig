@@ -23,7 +23,7 @@
 
                                 <img src="{{ today.weatherIcon }}" title="{{ today.weatherSummary }}" alt="{{ today.weatherSummary }}"/>
 
-                                <p>{{ today.currentTemp }}&deg;</p>
+                                <p>{{ today.currentTemp }}&deg;C</p>
                             </div>
                         </li>
                         {% for forecastDay in forecastDays %}
@@ -33,8 +33,8 @@
 
                                     <img src="{{ forecastDay.weatherIcon }}" title="{{ forecastDay.weatherSummary }}" alt="{{ forecastDay.weatherSummary }}"/>
 
-                                    <p class="hot">{{ forecastDay.highTemp }}&deg;</p>
-                                    <p class="cold">{{ forecastDay.lowTemp }}&deg;</p>
+                                    <p class="hot">{{ forecastDay.highTemp }}&deg;C</p>
+                                    <p class="cold">{{ forecastDay.lowTemp }}&deg;C</p>
                                 </div>
                             </li>
                         {% endfor %}
