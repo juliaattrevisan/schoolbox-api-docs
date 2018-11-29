@@ -87,10 +87,10 @@ class Config
 
 
     /**
-     * @param mixed $value
+     * @param null|string $value
      * @return $this
      */
-    public function setValue($value): self
+    public function setValue(?string $value): self
     {
         $this->value = $value;
         return $this;
