@@ -52,11 +52,17 @@ class Sanitiser
     private $offset = 0;
 
     /**
-     * Limit
+     * Page Limit
      *
      * @var int
      */
-    private $limit = 0;
+    private $pageLimit = 0;
+
+    /**
+     * Max results limit
+     * @var int
+     */
+    private $resultLimit = 500;
 
     /**
      * Keyword
@@ -116,7 +122,7 @@ class Sanitiser
         /* Limits and offsets
          */
         $this->setOffset((int)$offset);
-        $this->setLimit((int)$limit);
+        $this->setPageLimit((int)$limit);
 
         /* PDO
          */
@@ -128,23 +134,41 @@ class Sanitiser
      */
 
     /**
-     * Set limit
+     * Set page limit
      *
      * @param int $limit
      */
-    private function setLimit($limit)
+    private function setPageLimit($limit)
     {
-        $this->limit = $limit;
+        $this->pageLimit = $limit;
     }
 
     /**
-     * Get limit
+     * Get page limit
      *
      * @return int
      */
-    public function getLimit()
+    public function getPageLimit()
     {
-        return $this->limit;
+        return $this->pageLimit;
+    }
+
+    /**
+     * Get result limit
+     * @return int
+     */
+    public function getResultLimit(): int
+    {
+        return $this->resultLimit;
+    }
+
+    /**
+     * Set result limit
+     * @param int $resultLimit
+     */
+    public function setResultLimit($resultLimit): void
+    {
+        $this->resultLimit = $resultLimit;
     }
 
     /**

@@ -83,7 +83,7 @@ class Result extends Base
                 /* Only obtain $limit items
                  * Once you've got the limit of items, break out
                  */
-                if ($collection->count() < $sanitiser->getLimit()) {
+                if ($collection->count() < $sanitiser->getPageLimit()) {
                     $article = $mapper->hydrate($row, 'n');
 
                     if ($article) {
@@ -288,6 +288,7 @@ class Result extends Base
                 AND n.rejected_at IS NULL
                 AND MATCH(n.title, n.blurb, n.body) AGAINST ({$sanitiser->getKeyword()})
             ORDER BY {$sanitiser->getSortByWithAlias('n')} {$sanitiser->getSortDir()}
+            LIMIT 0,{$sanitiser->getResultLimit()}
         ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
