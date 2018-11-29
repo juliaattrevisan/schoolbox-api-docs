@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Tour;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -46,6 +47,11 @@ class Model implements ISoftDeletable
      * @var TourStep|null
      */
     protected $firstStep;
+
+    /**
+     * @var GenericCollection|Trigger[]
+     */
+    protected $triggerList;
 
     /**
      * @return User|null
@@ -152,6 +158,25 @@ class Model implements ISoftDeletable
     {
         $this->firstStep = $firstStep;
         return $this;
+    }
+
+    /**
+     * @return GenericCollection|Trigger[]
+     */
+    public function getTriggerList()
+    {
+        return $this->triggerList;
+    }
+
+    /**
+     * @param GenericCollection $triggerList
+     * @return $this
+     */
+    public function setTriggerList(GenericCollection $triggerList)
+    {
+        $this->triggerList = $triggerList;
+        return $this;
+
     }
 
 }

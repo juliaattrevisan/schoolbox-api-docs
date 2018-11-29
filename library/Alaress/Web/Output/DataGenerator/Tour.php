@@ -8,10 +8,8 @@ declare(strict_types=1);
 
 namespace Alaress\Web\Output\DataGenerator;
 
-use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Router;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Tour\Lists as TourLists;
 use Schoolbox\User;
 
 /**
@@ -32,9 +30,9 @@ class Tour implements IDataGenerator
 
 
     /**
-     * @var Router
+     * @var TourLists
      */
-    private $router;
+    private $tourList;
 
 
     /**
@@ -48,14 +46,14 @@ class Tour implements IDataGenerator
      *
      * @param IConfigLoader $config
      * @param null|User     $currentUser
-     * @param Router        $router
+     * @param TourLists        $tourList
      * @param array         $serverVars
      */
-    public function __construct(IConfigLoader $config, ?User $currentUser, Router $router, array $serverVars)
+    public function __construct(IConfigLoader $config, ?User $currentUser, TourLists $tourList, array $serverVars)
     {
         $this->config      = $config;
         $this->currentUser = $currentUser;
-        $this->router      = $router;
+        $this->tourList    = $tourList;
         $this->serverVars  = $serverVars;
     }
 
@@ -66,18 +64,9 @@ class Tour implements IDataGenerator
     public function generate(?array $chromeData = []): array
     {
         $tour = [];
-        // TODO figure out how to figure out if user's impersonated?
-        // Alternately just don't show tours to impersonated users
         if ($this->currentUser && $this->config->get('tours_enabled')) {
             $request    = parse_url($this->serverVars['REQUEST_URI']);
-            $encodedUrl = Redirect::encode($request['path']);
-
-            // Add the route generator here
-            try {
-                $tour['url'] = $this->router->generate('tour.getTours', ['url' => $encodedUrl]);
-            } catch (RouteNotFound $e) {
-                // noop
-            }
+            $tour['data'] = $this->tourList->getTours($this->currentUser, $request['path']);
         }
         return $tour;
     }

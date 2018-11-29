@@ -89,10 +89,12 @@ class Mapper extends BaseMapper
         return "
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('author', 'a')},
-                        {$this->getJoinColumnString('firstStep', 's')}
+                        {$this->getJoinColumnString('firstStep', 's')},
+                        {$this->getJoinColumnString('trigger', 't')}
             FROM        {$this->getTable()}
-            LEFT JOIN   {$this->getJoinSql('author', '', 'a', true)}
-            LEFT JOIN   {$this->getJoinSql('firstStep', '', 's')}
+            INNER JOIN  {$this->getJoinSql('author', '', 'a', true)}
+            INNER JOIN  {$this->getJoinSql('trigger', '', 't')}
+            INNER JOIN  {$this->getJoinSql('firstStep', '', 's')}
         ";
     }
 
@@ -113,12 +115,22 @@ class Mapper extends BaseMapper
         /** @var TourStepMapper $tourStepMapper */
         $tourStepMapper = $this->getJoinMapper('firstStep');
 
+        /** @var TriggerMapper $triggerMapper */
+        $triggerMapper = $this->getJoinMapper('trigger');
+
         foreach ($statement as $row) {
             $model = $this->hydrate($row);
+            $model->setTriggerList(new GenericCollection(Trigger\Model::class));
 
             if ($model instanceof Model) {
                 $model->setAuthor($authorUserMapper->hydrate($row, 'a'));
                 $model->setFirstStep($tourStepMapper->hydrate($row, 's'));
+
+                $trigger = $triggerMapper->hydrate($row, 't');
+                if ($trigger) {
+                    $model->getTriggerList()->setOffset($trigger->getUuid(), $trigger);
+                }
+
                 $collection->add($model);
             }
         }
@@ -162,7 +174,6 @@ class Mapper extends BaseMapper
 
         $sql = " 
             {$this->getSelectString()} 
-            INNER JOIN  {$this->getJoinSql('trigger', '', 't')}
             WHERE       {$userQuery['query']} AND 
                         :url REGEXP `t`.`url_regex` AND
                         `{$this->getTable()}`.`active` = 1
