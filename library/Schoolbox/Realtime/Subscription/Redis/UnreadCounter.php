@@ -38,11 +38,11 @@ class UnreadCounter
     /**
      * Returns the messages contained within this subscription.
      *
-     * @param int $instanceId
-     * @param int $userId
+     * @param string $instanceId
+     * @param int    $userId
      * @return array
      */
-    public function getUnread(int $instanceId, int $userId): array
+    public function getUnread(string $instanceId, int $userId): array
     {
         $setIdentifier = sprintf(Subscription::PATTERN_SET, $instanceId, $userId);
         return array_filter(
