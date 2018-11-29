@@ -1355,6 +1355,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
             }
 
             // Finagle a response?
+            $response->status->setCode($code);
             $output->output($response);
         } else {
             /* Just dump it out in raw form
@@ -1375,6 +1376,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
             $output .= '</ul>';
 
+            http_response_code($code);
             echo $output;
         }
     }
