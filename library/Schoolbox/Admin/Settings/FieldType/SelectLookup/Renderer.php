@@ -29,13 +29,16 @@ class Renderer extends Select\Renderer
 
 
     /**
-     * @param Config $config
+     * Converts a string representation of options into an array form
+     *
+     * @param string $optionsString
      * @return array
+     * @throws \InvalidArgumentException If mapper class not found
      */
-    protected function getData(Config $config): array
+    protected function buildOptions(string $optionsString): array
     {
         // options: expected to contain mapper class
-        $lookupOptions  = \unserialize($config->getOptions() ?? '', [false]);
+        $lookupOptions  = \unserialize($optionsString ?? '', [false]);
         $mapper         = $this->mapperFactory->get($lookupOptions['mapper']);
         $getKeyMethod   = $lookupOptions['getKeyMethod'] ?? 'getId';
         $getValueMethod = $lookupOptions['getValueMethod'] ?? 'getName';
@@ -45,10 +48,7 @@ class Renderer extends Select\Renderer
         foreach ($mapper->$findMethod() as $opt) {
             $options[$opt->$getKeyMethod()] = $opt->$getValueMethod();
         }
-
-        return \array_merge(parent::getData($config), [
-            'options' => $options,
-        ]);
+        return $options;
     }
 
 

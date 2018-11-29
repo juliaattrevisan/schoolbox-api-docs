@@ -28,13 +28,25 @@ class Renderer extends AbstractRenderer
      */
     protected function getData(Config $config): array
     {
-        $select  = [];
-        $options = \explode(':', $config->getOptions());
+        $options = $this->buildOptions($config->getOptions());
 
-        foreach ($options as $value) {
-            $select[$value] = $value;
+        return \array_merge(parent::getData($config), ['options' => $options]);
+    }
+
+
+    /**
+     * Converts a string representation of options into an array form
+     *
+     * @param string $optionsString
+     * @return array
+     */
+    protected function buildOptions(string $optionsString): array
+    {
+        $options = [];
+        foreach (\explode(':', $optionsString) as $value) {
+            $options[$value] = $value;
         }
-        return \array_merge(parent::getData($config), ['options' => $select]);
+        return $options;
     }
 
 

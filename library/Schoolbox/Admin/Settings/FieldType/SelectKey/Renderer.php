@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\FieldType\SelectKey;
 
-use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Admin\Settings\FieldType\Select;
 
@@ -15,19 +14,19 @@ class Renderer extends Select\Renderer
 {
 
     /**
-     * @inheritdoc
+     * Converts a string representation of options into an array form
+     *
+     * @param string $optionsString
+     * @return array
      */
-    protected function getData(Config $config): array
+    protected function buildOptions(string $optionsString): array
     {
         $options = [];
-        foreach (\explode(':', $config->getOptions()) as $keyAndValue) {
+        foreach (\explode(':', $optionsString) as $keyAndValue) {
             [$key, $val] = \explode(';', $keyAndValue);
             $options[$key] = $val;
         }
-
-        return \array_merge(parent::getData($config), [
-            'options' => $options,
-        ]);
+        return $options;
     }
 
 
