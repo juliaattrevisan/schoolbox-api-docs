@@ -18,7 +18,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('profile_icons');
+        $this->hasTable('menu_icons');
         $this->hasModel(Model::class);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('title', self::TYPE_STRING);
