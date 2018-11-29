@@ -44,7 +44,13 @@
     margin-bottom: 1rem;
 
   }
-  .weather-summary p, p.temperature {
+  .weather-forecast p {
       font-size: unset;
+  }
+
+  .temperature-forecast {
+    .meta {
+      margin-right: 1rem;
+    }
   }
 }

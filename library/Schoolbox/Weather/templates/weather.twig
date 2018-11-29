@@ -33,12 +33,13 @@ Weather details page (linked from dashboard component)
 
                         <li class="weather-forecast">
                             <div class="weather-card">
-                                <div class="temperature">
-                                    <p class="meta">Current: {{ today.currentTemp }}&deg;</p>
+                                <h3>Temperature</h3>
 
-                                    <p>
-                                        <span class="hot">{{ today.highTemp }}&deg;</span>
-                                        <span class="cold">{{ today.lowTemp }}&deg;</span>
+                                <div class="temperature">
+                                    <p class="temperature-forecast">
+                                        <span class="meta">Currently {{ today.currentTemp }}&deg;C</span>
+                                        <span class="hot">Hi {{ today.highTemp }}&deg;C</span>
+                                        <span class="cold">Lo {{ today.lowTemp }}&deg;C</span>
                                     </p>
                                 </div>
                             </div>
@@ -79,8 +80,8 @@ Weather details page (linked from dashboard component)
                                         <p class="meta">{{ forecastDay.weatherSummary }}</p>
                                     </div>
                                     <p class="temperature">
-                                        <span class="hot">{{ forecastDay.highTemp }}&deg;</span>
-                                        <span class="cold">{{ forecastDay.lowTemp }}&deg;</span>
+                                        <span class="hot">Hi {{ forecastDay.highTemp }}&deg;C</span>
+                                        <span class="cold">Lo {{ forecastDay.lowTemp }}&deg;C</span>
                                     </p>
                                 </div>
                             </li>
