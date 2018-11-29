@@ -33,6 +33,8 @@ $(function() {
             onItemAdd(key, $item) {
                 if (validateEmail(key) === false) {
                     $item.addClass('error');
+                    var closeTab = '<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a>';
+                    $item.html(key + ' - Invalid email format' + closeTab);
                 }
             }
         }
@@ -50,9 +52,8 @@ $(function() {
         if (validEmailFilter.test(email)) {
             return true;
         }
-        else {
-            return false;
-        }
+
+        return false;
     }
 
     $('#to').selectizeSelector($.extend({}, options, {value: {REPLYTO}}))

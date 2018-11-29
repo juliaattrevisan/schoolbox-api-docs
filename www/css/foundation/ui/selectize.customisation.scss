@@ -96,6 +96,10 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 
 			> a.remove {
 				color: $selectize-error-text !important;
+				&:hover {
+					color: #000;
+					background: none !important;
+				}
 			}
 		}
 
