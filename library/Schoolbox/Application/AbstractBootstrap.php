@@ -1190,9 +1190,6 @@ abstract class AbstractBootstrap implements BootstrapInterface
         // it's almost a guarantee that some kind of minor error will have occurred at some point
         if ($error !== null) {
 
-            // use the document_root to get a Schoolbox-relative file in which the error occurred
-            $cause = substr($error['file'], strlen($_SERVER['DOCUMENT_ROOT']) - 4);
-
             // if it was a fatal error or exception that triggered our sudden but inevitable demise...
             if (
                 $isException
@@ -1213,6 +1210,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $message = 'Schoolbox has encountered a fatal error.';
 
                     // decide what to tell the user based on where this error came from
+                    // use the document_root to get a Schoolbox-relative file in which the error occurred
+                    $cause = substr($error['file'], strlen($_SERVER['DOCUMENT_ROOT']) - 4);
                     switch ($cause) {
                         // certain queries in the reports can return too much data to fit under the memory limit
                         case '/library/Report/Login.php':
@@ -1246,84 +1245,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         $e['trace'] = $stack;
                     }
                 }
-
-
-                // Start rendering
-                $di = $this->getKernel()->getDependencyInjector();
-                /** @var IConfigLoader $config */
-                $config = $di->get('config');
-                $outputStackTrace = $config->get('debug_show_stack_trace');
-
-
-                /* Use structured information for rendering
-                 */
-                $args = [
-                    'message'          => $message,
-                    'info'             => $info,
-                    'url'              => $url,
-                    'error'            => $error,
-                    'date'             => \Alaress_Date_Format::now(),
-                    'outputStackTrace' => $outputStackTrace,
-                    'stackTrace'       => $e,
-                    'exceptionClass'   => \is_object($e) ? \get_class($e) : 'Error',
-                ];
-
-                /* Pass $data straight in for twig rendering
-                 */
-                if ($di instanceof Di\Container) {
-                    // Is it JSON or not?
-                    $response = $di->get('webFactory')->newResponse();
-                    if ((new IsJson())->isSatisfiedBy($response)) {
-                        $problem = (new ApiProblem($message))
-                            ->setStatus($code)
-                            ->setDetail($info)
-                            ->setInstance($url);
-
-                        if ($outputStackTrace) {
-                            $problem['trace'] = array_merge(
-                                [$error],
-                                $isException ? $e->getTrace() : $e['trace']
-                            );
-                        }
-
-                        /** @var Output\Json $output */
-                        $output = $di->get('webOutput:json');
-                        $output
-                            ->setData($problem->asArray());
-
-                    } else {
-                        /** @var Output\ThemedHtml $output */
-                        $output = $di->get('webOutput:html');
-                        $output
-                            ->setTitle('Error Encountered')
-                            ->setData($args)
-                            ->setTemplate('common/error/general.twig');
-                    }
-
-                    // Finagle a response?
-                    $output->output($response);
-                }
-                /* Just dump it out in raw form
-                 * TODO: Make synonymous with twig output
-                 */
-                else {
-                    $output =
-                        "<p><b>{$args['message']} {$args['info']}</b></p>" .
-                        '<ul>' .
-                        "<li>Datetime: {$args['date']->getLong()}</li>" .
-                        "<li>URL: {$args['url']}" .
-                        '</li>';
-
-                    if ($outputStackTrace) {
-                        $output .= "<li>Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}.</li>";
-                    } else {
-                        $output .= "<li>Error: {$args['error']['message']}. (Further details have been logged.)</li>";
-                    }
-
-                    $output .= '</ul>';
-
-                    echo $output;
-                }
+                $this->outputError($e, $message, $info, $url, $error, $code);
             }
         }
     }
@@ -1351,5 +1273,100 @@ abstract class AbstractBootstrap implements BootstrapInterface
     protected function getKernel()
     {
         return $this->kernel;
+    }
+
+
+    /**
+     * @param        $e
+     * @param string $message
+     * @param string $info
+     * @param string $url
+     * @param        $error
+     * @param int    $code
+     * @throws Di\Exception\ServiceNotFound
+     */
+    private function outputError(
+        $e,
+        string $message,
+        string $info,
+        string $url,
+        $error,
+        int $code
+    ): void {
+        // Start rendering
+        $di = $this->getKernel()->getDependencyInjector();
+        /** @var IConfigLoader $config */
+        $config           = $di->get('config');
+        $outputStackTrace = $config->get('debug_show_stack_trace');
+
+
+        /* Use structured information for rendering
+         */
+        $args = [
+            'message'          => $message,
+            'info'             => $info,
+            'url'              => $url,
+            'error'            => $error,
+            'date'             => \Alaress_Date_Format::now(),
+            'outputStackTrace' => $outputStackTrace,
+            'stackTrace'       => $e,
+            'exceptionClass'   => \is_object($e) ? \get_class($e) : 'Error',
+        ];
+
+        /* Pass $data straight in for twig rendering
+         */
+        if ($di instanceof Di\Container) {
+            // Is it JSON or not?
+            $response = $di->get('webFactory')->newResponse();
+            if ((new IsJson())->isSatisfiedBy($response)) {
+                $problem = (new ApiProblem($message))
+                    ->setStatus($code)
+                    ->setDetail($info)
+                    ->setInstance($url);
+
+                if ($outputStackTrace) {
+                    $problem['trace'] = array_merge(
+                        [$error],
+                        $e instanceof \Throwable ? $e->getTrace() : $e['trace']
+                    );
+                }
+
+                /** @var Output\Json $output */
+                $output = $di->get('webOutput:json');
+                $output
+                    ->setData($problem->asArray());
+
+            } else {
+                /** @var Output\ThemedHtml $output */
+                $output = $di->get('webOutput:html');
+                $output
+                    ->setTitle('Error Encountered')
+                    ->setData($args)
+                    ->setTemplate('common/error/general.twig');
+            }
+
+            // Finagle a response?
+            $output->output($response);
+        } else {
+            /* Just dump it out in raw form
+             * TODO: Make synonymous with twig output
+             */
+            $output =
+                "<p><b>{$args['message']} {$args['info']}</b></p>" .
+                '<ul>' .
+                "<li>Datetime: {$args['date']->getLong()}</li>" .
+                "<li>URL: {$args['url']}" .
+                '</li>';
+
+            if ($outputStackTrace) {
+                $output .= "<li>Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}.</li>";
+            } else {
+                $output .= "<li>Error: {$args['error']['message']}. (Further details have been logged.)</li>";
+            }
+
+            $output .= '</ul>';
+
+            echo $output;
+        }
     }
 }
