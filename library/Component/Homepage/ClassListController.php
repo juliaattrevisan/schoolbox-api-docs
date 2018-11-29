@@ -149,16 +149,14 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                     try {
                         $user = $userMapper->findByExternalId($currentStudent['synergy_id']);
 
-                        $email = $user->getEmail();
-
                         /* Accumulate this for a giant parent-based bcc
                             */
                         $synergyIds[] = $currentStudent['synergy_id'];
 
                         /* Agglutinate a giant bcc
                             */
-                        if ($email) {
-                            $allStudentEmails[] = $email;
+                        if ($user->getEmail()) {
+                            $allStudentEmails[] =  htmlentities('"' . $user->formatName() . '" <' . $user->getEmail() . '>');
                         }
 
                         $this->setVar([
