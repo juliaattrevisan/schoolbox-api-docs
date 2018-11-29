@@ -161,6 +161,4 @@ class Model
         $this->access = $access;
         return $this;
     }
-
-
 }

@@ -20,9 +20,7 @@ use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Pastoral\Group\Model as PastoralGroup;
-use Schoolbox\Role;
-use Schoolbox\Mapper\Exception as MapperException;
+
 
 /**
  * Class Mapper
@@ -141,6 +139,4 @@ class Mapper extends BaseMapper
         }
 
     }
-
-
 }
