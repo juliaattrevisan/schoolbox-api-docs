@@ -13,6 +13,7 @@ use Schoolbox\Config\ConfigMapper;
 
 class Renderer extends AbstractRenderer
 {
+    public const EMPTY_OPTION_LABEL = '-- select an option --';
 
     /**
      * @inheritdoc
@@ -30,7 +31,10 @@ class Renderer extends AbstractRenderer
     {
         $options = $this->buildOptions($config->getOptions());
 
-        return \array_merge(parent::getData($config), ['options' => $options]);
+        return \array_merge(parent::getData($config), [
+            'options'          => $options,
+            'emptyOptionLabel' => self::EMPTY_OPTION_LABEL,
+        ]);
     }
 
 
