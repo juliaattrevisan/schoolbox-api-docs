@@ -246,6 +246,15 @@
             {% block buttons_island %}
                 <ul class='flex-list flex-wrap buttons'>
                     {% block buttons %}
+                        {% if eportfolioAuth %}
+                            {% block buttons_eportfolio %}
+                                <li>
+                                    <a href="/eportfolio/{{ user.id }}/profile"
+                                       class="icon-eportfolio">ePortfolio</a>
+                                </li>
+                            {% endblock buttons_eportfolio %}
+                        {% endif %}
+
                         {% if showButtons %}
                             {% block buttons_dueWork %}
                                 {% if (not session.user.role.parent) or (not config.restrict_parent_duework_access) %}
@@ -266,14 +275,6 @@
                             {% endblock buttons_grades %}
 
 
-                            {% if eportfolioAuth %}
-                                {% block buttons_eportfolio %}
-                                    <li>
-                                        <a href="/eportfolio/{{ user.id }}/profile"
-                                           class="icon-eportfolio">ePortfolio</a>
-                                    </li>
-                                {% endblock buttons_eportfolio %}
-                            {% endif %}
 
                             {% if showPastoral %}
                                 {% if isStaff or isParentOfStudent %}
