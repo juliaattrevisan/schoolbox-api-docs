@@ -1,7 +1,8 @@
 {#
     name:              string
-    value:             null|string     This has been sanitised before injecting into this template and may not match DB value.
-                                       Eg, invalid values are coerced to NULL.
+    value:             null|string     The selected value. NULL means 'non selected'.
+                                       This has been validated prior to injection into this template and may not match DB value.
+                                       Eg, invalid values will have been coerced to NULL.
     options:           string[]
     required:          bool
     renderEmptyOption: bool            Should we insert an empty option in the dropdown select?
