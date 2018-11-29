@@ -2,6 +2,7 @@
 
 use Alaress\Web\Output;
 use Aura\Router\Router;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Menu\Side\Renderer as MenuSideRender;
@@ -1291,11 +1292,7 @@ class SitePage extends Page
      */
     public function pageNotFound()
     {
-        http_response_code(404);
-
-        $errorContents = $this->getTwig()->render('common/error/404.twig', []);
-
-        $this->renderError('Page Not Found', $errorContents);
+        throw new NotFound();
     }
 
     /**

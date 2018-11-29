@@ -1348,7 +1348,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 $output
                     ->setTitle('Error Encountered')
                     ->setData($args)
-                    ->setTemplate('common/error/general.twig');
+                    ->setTemplate($code === 404
+                        ? 'common/error/404.twig'
+                        : 'common/error/general.twig'
+                    );
             }
 
             // Finagle a response?
