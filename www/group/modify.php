@@ -1,5 +1,6 @@
 <?php
 
+use Alaress\Mail\AbstractMailer;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
@@ -265,7 +266,7 @@ if (is_numeric($this->arg[0])) {
 
         if (!empty($all_emails)) {
             $this->setVar([
-                'EMAILALL' => implode(',', $all_emails),
+                'EMAILALL' => implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), $all_emails),
             ]);
             $this->parse('mail_all_block', 'mail_all');
             $this->parse('mail_all_form_block', 'mail_all_form');
