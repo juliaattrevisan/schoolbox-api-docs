@@ -49,7 +49,7 @@ class Result extends Base
                 l.deleted_at IS NULL
                 AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
             ORDER BY {$sanitiser->getSortByWithAlias('l')} {$sanitiser->getSortDir()}
-            LIMIT 0,{$sanitiser->getMaxLimit()}
+            LIMIT 0,{$sanitiser->getResultLimit()}
         ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
@@ -57,7 +57,7 @@ class Result extends Base
 
         $collection = $mapper->createCollection();
 
-        foreach ($this->buildSearchResult($stmt, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
+        foreach ($this->buildSearchResult($stmt, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getPageLimit()) as $row) {
             $link = $mapper->hydrate($row, 'l');
             $owner = $mapper->hydrateJoin($row, 'user', 'u');
             $folder = $mapper->hydrateJoin($row, 'folder', 'c');
@@ -93,7 +93,7 @@ class Result extends Base
             WHERE
                 l.deleted_at IS NULL
                 AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
-            LIMIT 0,{$sanitiser->getMaxLimit()}
+            LIMIT 0,{$sanitiser->getResultLimit()}
         ";
 
         $stmt = $mapper->getDatabase()->prepare($query);

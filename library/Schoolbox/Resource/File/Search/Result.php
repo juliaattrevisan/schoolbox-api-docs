@@ -53,7 +53,7 @@ class Result extends Base
                 AND f.hidden IS FALSE
                 AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
             ORDER BY {$sanitiser->getSortByWithAlias('f')} {$sanitiser->getSortDir()}
-            LIMIT 0,{$sanitiser->getMaxLimit()}
+            LIMIT 0,{$sanitiser->getResultLimit()}
         ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
@@ -61,7 +61,7 @@ class Result extends Base
 
         $collection = $mapper->createCollection();
 
-        foreach ($this->buildSearchResult($stmt, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
+        foreach ($this->buildSearchResult($stmt, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getPageLimit()) as $row) {
             $file = $mapper->hydrate($row, 'f');
             $storage = $mapper->hydrateJoin($row, 'hash', 's');
             $mime = $mapper->getJoinMapper('hash')->hydrateJoin($row, 'allowedFileExtension', 'e');
@@ -105,7 +105,7 @@ class Result extends Base
                 f.deleted_at IS NULL
                 AND f.hidden IS FALSE
                 AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
-            LIMIT 0, {$sanitiser->getMaxLimit()}
+            LIMIT 0, {$sanitiser->getResultLimit()}
         ";
 
         $stmt = $mapper->getDatabase()->prepare($query);

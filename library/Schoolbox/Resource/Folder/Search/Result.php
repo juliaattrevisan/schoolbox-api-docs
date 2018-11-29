@@ -61,7 +61,7 @@ class Result extends Base
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
             AND   `c`.`deleted_at` IS NULL
             ORDER BY {$sanitiser->getSortByWithAlias('c')} {$sanitiser->getSortDir()}
-            LIMIT 0,{$sanitiser->getMaxLimit()}
+            LIMIT 0,{$sanitiser->getResultLimit()}
         ";
 
         $statement = $mapper->getDatabase()->prepare($query);
@@ -77,7 +77,7 @@ class Result extends Base
         foreach ($this->buildSearchResult($statement, $user, 'c.id', 0, self::NO_LIMIT) as $row) {
 
             // Not at offset + limit results yet? Skip
-            if (count($results) > ($sanitiser->getOffset() + $sanitiser->getLimit())) {
+            if (count($results) > ($sanitiser->getOffset() + $sanitiser->getPageLimit())) {
                 break;
             }
 
@@ -108,7 +108,7 @@ class Result extends Base
         /* What, it times out doing new Collection(array_values($results))
          */
         $results->reindex();
-        $results = $results->slice($sanitiser->getOffset(), $sanitiser->getLimit());
+        $results = $results->slice($sanitiser->getOffset(), $sanitiser->getPageLimit());
 
         return $results;
     }
@@ -133,7 +133,7 @@ class Result extends Base
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
             AND   `c`.`deleted_at` IS NULL
-            LIMIT 0,{$sanitiser->getMaxLimit()}
+            LIMIT 0,{$sanitiser->getResultLimit()}
         ";
 
         $stmt = $mapper->getDatabase()->prepare($query);

@@ -49,7 +49,7 @@ class Result extends Base
                   `heading` LIKE ?
                 )
             ORDER BY {$sanitiser->getSortByWithAlias('t')} {$sanitiser->getSortDir()}
-            LIMIT 0,{$sanitiser->getMaxLimit()}
+            LIMIT 0,{$sanitiser->getResultLimit()}
         ";
 
         $quotedLike = $mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword());
@@ -59,7 +59,7 @@ class Result extends Base
 
         $collection = $mapper->createCollection();
 
-        foreach ($this->buildSearchResult($stmt, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
+        foreach ($this->buildSearchResult($stmt, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getPageLimit()) as $row) {
             $textbox = $mapper->hydrate($row, 't');
             $category = $mapper->hydrateJoin($row, 'category', 'c');
 
@@ -96,7 +96,7 @@ class Result extends Base
                   MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) OR
                   `heading` LIKE ?
                 )
-            LIMIT 0,{$sanitiser->getMaxLimit()}
+            LIMIT 0,{$sanitiser->getResultLimit()}
         ";
 
         $quotedLike = $mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword());
