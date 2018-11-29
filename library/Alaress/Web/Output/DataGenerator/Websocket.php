@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Alaress\Web\Output\DataGenerator;
 
+use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Session\Session;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
@@ -67,13 +68,16 @@ class Websocket implements IDataGenerator
      */
     public function generate(?array $chromeData = []): array
     {
+        $unread = $this->unreadCounter->getUnread(INSTANCE_ID, $this->session->getAuthUser()->getId());
+        $bundle = new NotificationBundle();
+        $bundle->appendInstances($unread);
         return [
             'enabled'    => $this->config->get('messaging_enabled'),
             'host'       => $this->serverVars['HTTP_HOST'] ?? '',
             'port'       => $this->config->get('websocket_port_ssl') ?: 8081,
             'path'       => $this->config->get('websocket_path') ?: '/',
             'secure'     => true,
-            'unread'     => \count($this->unreadCounter->getUnread(INSTANCE_ID, $this->session->getAuthUser()->getId())),
+            'unread'     => $bundle->count(),
             'stackLimit' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
         ];
     }
