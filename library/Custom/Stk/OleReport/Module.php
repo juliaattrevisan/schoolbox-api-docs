@@ -118,7 +118,7 @@ class Module extends BaseModule
                 $authorizer,
                 $ruleRegexp,
                 new Rule\LazyCallback(function () {
-                    new Rule\Any(
+                    return new Rule\Any(
                         new Rule\IsSuperuser(),
                         new Rule\HasRole(Role::STAFF),
                         new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')

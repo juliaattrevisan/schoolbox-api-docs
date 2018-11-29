@@ -80,7 +80,7 @@ class Module extends BaseModule
             '/resources/{studentId}{/date}',
             'getResourcesForStudent',
             new Rule\LazyCallback(function ($access) {
-                new Rule\All(
+                return new Rule\All(
                     new Rule\IsLoggedIn(),
                     new Rule\Any(
                         $access,
