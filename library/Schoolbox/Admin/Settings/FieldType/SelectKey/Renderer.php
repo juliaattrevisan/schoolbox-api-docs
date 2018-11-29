@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\FieldType\SelectKey;
 
+use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Admin\Settings\FieldType\Select;
 
@@ -27,6 +28,16 @@ class Renderer extends Select\Renderer
             $options[$key] = $val;
         }
         return $options;
+    }
+
+    protected function isValueValid(?string $value, array $options): bool
+    {
+        foreach ($options as $key => $option) {
+            if ((string)$key === $value) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

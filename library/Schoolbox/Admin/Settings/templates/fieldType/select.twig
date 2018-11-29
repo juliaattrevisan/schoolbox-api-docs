@@ -1,51 +1,19 @@
 {#
-    name:          string
-    value:         string
-    options:       array
-    required:      bool
+    name:              string
+    value:             null|string     This has been sanitised before injecting into this template and may not match DB value.
+                                       Eg, invalid values are coerced to NULL.
+    options:           string[]
+    required:          bool
+    renderEmptyOption: bool            Should we insert an empty option in the dropdown select?
 #}
-
-{#
-    We need to render an empty option if:
-    * config is not required
-    * config does not have a value set, or
-    * config value does not match an available option (ie config value is invalid)
-
-    The empty option is selected if:
-    * value is null or empty string, or
-    * config value does not match an available option (ie config value is invalid)
-
-    PHP automatically coerces numeric array keys to integers. The config value is generally a string.
-    We therefore rely on twig's loose equality comparison to determine if an option is selected.
-    But this means that no value (either NULL or empty string) will be considered equal to a key with integer value 0.
-    To detect this case, we must explicitly check for no value being set, and if so, ensure we don't falsely match a 0-key.
-
-    We also need to cater for the case where the persisted value is invalid. eg both the following are considered true in twig:
-        'invalidValue' == 'anOption'
-        0              == 'anOption'
-
-    The strategy used to accomodate all cases is to convert both value and keys to strings, then perform a strict comparison.
-#}
-{% set valueString         = value ~ '' %}
-{% set renderEmptyOption   = not required or value is null or value is same as('') %}
-{% set emptyOptionSelected = value is same as('') or value is null %}
-{% if not renderEmptyOption %}
-    {% set valueIsValid = false %}
-    {% for key, option in options if not valueIsValid %}
-        {% set valueIsValid = valueString is same as(key ~ '') %}
-    {% endfor %}
-    {% if not valueIsValid %}
-        {% set renderEmptyOption = true %}
-        {% set emptyOptionSelected = true %}
-    {% endif %}
-{% endif %}
 
 <select name="{{ name }}">
     {% if renderEmptyOption %}
-        <option {% if required %} style="display: none;"{% endif %}{% if emptyOptionSelected %} selected="selected"{% endif %}>-- select an option --</option>
+        <option {% if required %} style="display: none;"{% endif %}{% if value is null %} selected="selected"{% endif %}>-- select an option --</option>
     {% endif %}
     {% for key, option in options %}
+        {# We still need to convert numeric keys to strings, eg 0 => '0' so that a falsy value (eg NULL, '') does not erroneously match a key of 0 #}
         {% set keyString = key ~ '' %}
-        <option value="{{ key }}" {% if keyString is same as(valueString) %}selected="selected"{% endif %}>{{ option }}</option>
+        <option value="{{ key }}" {% if keyString is same as(value) %}selected="selected"{% endif %}>{{ option }}</option>
     {% endfor %}
 </select>

@@ -13,8 +13,6 @@ use Schoolbox\Config\ConfigMapper;
 
 class Renderer extends AbstractRenderer
 {
-    public const EMPTY_OPTION_LABEL = '-- select an option --';
-
     /**
      * @inheritdoc
      */
@@ -29,12 +27,20 @@ class Renderer extends AbstractRenderer
      */
     protected function getData(Config $config): array
     {
-        $options = $this->buildOptions($config->getOptions());
+        $data = \array_merge(parent::getData($config), ['options' => $this->buildOptions($config->getOptions())]);
 
-        return \array_merge(parent::getData($config), [
-            'options'          => $options,
-            'emptyOptionLabel' => self::EMPTY_OPTION_LABEL,
-        ]);
+        $isValidValue = $this->isValueValid($data['value'], $data['options']);
+
+        if(!$isValidValue){
+            $data['value'] = null;
+        }
+
+        // We need to render an empty option if:
+        // * config is optional, or
+        // * config value is invalid
+        $data['renderEmptyOption'] = !$config->getRequired() || !$isValidValue;
+
+        return $data;
     }
 
 
@@ -54,31 +60,14 @@ class Renderer extends AbstractRenderer
     }
 
 
-    /**
-     * Returns the config's value, applying any relevant transformations
-     *
-     * @param Config $config
-     * @return null|string
-     */
-    protected function getTransformedValue(Config $config): ?string
+    protected function isValueValid(?string $value, array $options): bool
     {
-        // Check that the current configured value is valid
-        $configuredValue = $config->getValue();
-
-        // Not set?
-        if (null === $configuredValue) {
-            // That's fine, return unchanged.
-            return null;
-        }
-
-        foreach (\explode(':', $config->getOptions()) as $value) {
-            if ($value === $configuredValue) {
-                // Value is valid, return it unchanged.
-                return $configuredValue;
+        foreach ($options as $key => $option) {
+            if ($option === $value) {
+                return true;
             }
         }
-        // Current value is not valid. Return null.
-        return null;
+        return false;
     }
 
 

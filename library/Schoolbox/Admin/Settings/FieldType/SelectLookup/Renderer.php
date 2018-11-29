@@ -51,6 +51,16 @@ class Renderer extends Select\Renderer
         return $options;
     }
 
+    protected function isValueValid(?string $value, array $options): bool
+    {
+        foreach ($options as $key => $option) {
+            if ((string)$key === $value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * @inheritdoc
