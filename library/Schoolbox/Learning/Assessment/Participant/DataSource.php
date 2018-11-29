@@ -279,16 +279,8 @@ class DataSource
                 //Ensure response user is fully hydrated
                 $responseUser    = $this->userMapper->findByIdWithFallback($response->getSubmittedOnBehalfOf()->getId());
                 $participantUser = $assessable->getParticipantIfExtant($responseUser);
-                if (!$participantUser) {
-                    $msg = sprintf(
-                        'User (id: %s) has a response (id: %s) for assessment (id: %s) but no participant record',
-                        $responseUser->getId(),
-                        $response->getId(),
-                        $assessable->getId()
-                    );
-                    throw new DomainException($msg);
-                }
-                if (!$participantUser->isExcluded()) {
+                if ($participantUser) {
+                    // either the user has been deleted or excluded, since participated.
                     // Don't load interactions for excluded participants.
                     $participantUser->getAllResponses()[$response->getId()] = $response;
                 }
@@ -316,16 +308,7 @@ class DataSource
                 $participant = $assessment->getParticipantIfExtant($feedbackUser);
 
                 if (!$participant) {
-                    $msg = sprintf(
-                        'User (id: %s) has a feedback (id: %s) for assessment (id: %s) but no participant record',
-                        $feedbackUser->getId(),
-                        $feedback->getId(),
-                        $assessment->getId()
-                    );
-                    throw new DomainException($msg);
-                }
-                if ($participant->isExcluded()) {
-                    // Don't load interactions for excluded participants.
+                    // either the user has been deleted or excluded, since participated.
                     continue;
                 }
                 $participant->getAllFeedbacks()->add($feedback);

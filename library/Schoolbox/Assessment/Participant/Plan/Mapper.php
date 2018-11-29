@@ -63,7 +63,7 @@ class Mapper extends BaseMapper
      *
      * @param Builder $pb
      * @return Model[]|GenericCollection
-     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
      */
     public function findPlansAndParticipants(Builder $pb = null): GenericCollection
     {
@@ -73,7 +73,7 @@ class Mapper extends BaseMapper
                    {$this->getJoinColumnString('participants.user', 'u')}
             FROM   {$this->getTable()}
             LEFT JOIN  {$this->getJoinSql('participants', '', 'p')}
-            LEFT JOIN  {$this->getJoinSql('participants.user', 'p', 'u', true)}";
+            LEFT JOIN  {$this->getJoinSql('participants.user', 'p', 'u')}";
 
         $args = [];
         if ($pb && $pb->count()) {
@@ -90,7 +90,7 @@ class Mapper extends BaseMapper
      *
      * @param array $assessmentIds
      * @return Model[]|GenericCollection
-     * @throws BaseMapper\DefinitionException If unable to locate a specified mapper join
+     * @throws BaseMapper\Exception If unable to locate a specified mapper join
      */
     public function findPlansAndParticipantsForAssessments(array $assessmentIds): GenericCollection
     {
@@ -105,7 +105,7 @@ class Mapper extends BaseMapper
     /**
      * @param PDOStatement $statement
      * @return GenericCollection
-     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
@@ -123,17 +123,20 @@ class Mapper extends BaseMapper
             if (!$plan) {
                 continue;
             }
-
-            // Did the query join onto participants?
-            if (array_key_exists('p.id', $row)) {
+            // Did the query join onto participants and users?
+            $participant = null;
+            $user = null;
+            if (\array_key_exists('p.id', $row) && !\is_null($row['p.id'])) {
                 $participant = $participantMapper->hydrate($row, 'p');
-                if ($participant) {
-                    // Indexed by user.id to optimise participant traversals
-                    $plan->getParticipants()[$participant->getUser()->getId()] = $participant;
-                    if (array_key_exists('u.id', $row)) {
-                        $participant->setUser($userMapper->hydrate($row, 'u'));
-                    }
-                }
+            }
+            // Try hydrating user, only if participant data is set and not excluded
+            if ($participant && \array_key_exists('u.id', $row) && !\is_null($row['u.id'])) {
+                $user = $userMapper->hydrate($row, 'u');
+            }
+            if ($participant && $user) {
+                // Indexed by user.id to optimise participant traversals
+                $participant->setUser($user);
+                $plan->getParticipants()[$participant->getUser()->getId()] = $participant;
             }
             $plans[$plan->getId()] = $plan;
         }

@@ -88,14 +88,10 @@ class ActionValidator
         }
 
         $isInstructor = $this->access->isInstructor($user, $quiz->getContext()->getFolder());
-        $participant  = $quiz->getParticipantIfExtant($user);
+        $participant  = $quiz->getParticipantIfExtant($user, false);
 
         // Does user have a participation for this assessment?
         if ($participant) {
-            // Users who have been explicitly excluded can never attempt
-            if ($participant->isExcluded()) {
-                return false;
-            }
 
             // Instructors are not bound by the normal rules
             if ($isInstructor) {
@@ -147,7 +143,7 @@ class ActionValidator
         // Is student even participating?
         $folder      = $quiz->getBaseContext()->getFolder();
         $participant = $quiz->getParticipantIfExtant($student);
-        if (!$participant || $participant->isExcluded()) {
+        if (!$participant) {
             return false;
         }
 

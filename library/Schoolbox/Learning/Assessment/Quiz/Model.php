@@ -276,9 +276,9 @@ class Model extends AbstractAssessment
 
         // Is instructor wishing to create response for themself?
         if ($instructor->getId() == $submittedOnBehalfOf->getId()) {
-            // Cannot be excluded, and if no participation, must be a dynamic plan available
+            // If no participation, must be a dynamic plan available
             if ($participant) {
-                return !$participant->isExcluded();
+                return true;
             }
             return $this->hasDynamicPlan();
         }

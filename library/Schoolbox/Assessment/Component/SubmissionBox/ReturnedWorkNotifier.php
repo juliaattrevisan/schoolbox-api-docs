@@ -165,7 +165,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $participant = $assessment->getParticipantIfExtant($student);
 
         //Don't send a notification for an item that the user cannot see
-        if ($participant->getPublishDate()->isFuture()) {
+        if (!$participant || $participant->getPublishDate()->isFuture()) {
             return $envelope;
         }
 

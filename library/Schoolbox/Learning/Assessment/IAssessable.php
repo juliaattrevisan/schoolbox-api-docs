@@ -270,10 +270,12 @@ interface IAssessable extends ISoftDeletable
      * Includes excluded participation objects
      *
      * @param User $user
+     * @param bool $strict
      * @return Participant|null
      */
-    public function getParticipantIfExtant(User $user);
+    public function getParticipantIfExtant(User $user, bool $strict = true);
 
+//    public function getParticipantIfExtantR(User $user);
 
     /**
      * Removes the specified user's participation from this IAssessment.

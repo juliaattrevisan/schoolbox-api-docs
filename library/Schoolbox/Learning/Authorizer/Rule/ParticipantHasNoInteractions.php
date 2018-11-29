@@ -30,9 +30,9 @@ class ParticipantHasNoInteractions extends AbstractParticipationRule
         $student     = $this->findStudent($params);
         $participant = $assessable->getParticipantIfExtant($student);
 
-        if ($participant && ($participant->hasSubmittedResponse() || $participant->hasPublishedFeedback())) {
-            throw new Unauthorized();
+        if ($participant && (!$participant->hasSubmittedResponse() && !$participant->hasPublishedFeedback())) {
+            return true;
         }
-        return true;
+        throw new Unauthorized();
     }
 }
