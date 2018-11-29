@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings;
 
+use Schoolbox\Admin\Settings\Exceptions\FieldTypeMismatchException;
 use Schoolbox\Config\Config;
 
 /**
@@ -21,6 +22,7 @@ interface IConfigRenderer
      *
      * @param Config $config
      * @return mixed
+     * @throws FieldTypeMismatchException If config and this renderer are for different field types
      */
     public function getTemplateAndData(Config $config);
 }
