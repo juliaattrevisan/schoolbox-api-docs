@@ -9,18 +9,16 @@
 namespace Schoolbox\Realtime\Subscription\Redis;
 
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Notification\Parameter\Param;
 use InvalidArgumentException;
-use Redis;
 use Schoolbox\Realtime\Subscription\ISubscription;
 use Alaress\Redis\Async;
 use Predis;
 
 class Subscription implements ISubscription
 {
-    const PATTERN_SUBSCRIPTION = 'msg:%s:%d:*';
-    const PATTERN_SET          = 'msg:%s:q:%d:unread';
-    const PATTERN_MESSAGE      = 'msg:%s:m:%s:*';
+    public const PATTERN_SUBSCRIPTION = 'msg:%s:%d:*';
+    public const PATTERN_SET          = 'msg:%s:q:%d:unread';
+    public const PATTERN_MESSAGE      = 'msg:%s:m:%s:*';
 
 
     /** @var string */
@@ -32,11 +30,11 @@ class Subscription implements ISubscription
     /** @var Async\Client */
     private $asyncClient;
 
-    /** @var Redis|Predis\ClientInterface */
+    /** @var Predis\ClientInterface */
     private $syncClient;
 
     /** @var UnreadRetriever */
-    private $unreadCounter;
+    private $unreadRetriever;
 
     /**
      * Constructor
@@ -46,7 +44,7 @@ class Subscription implements ISubscription
      * @param Predis\ClientInterface $syncClient
      * @param Async\Client           $asyncClient
      * @param Async\EventListener    $listener
-     * @param UnreadRetriever        $unreadCounter
+     * @param UnreadRetriever        $unreadRetriever
      * @throws Predis\ClientException
      */
     public function __construct(
@@ -55,13 +53,13 @@ class Subscription implements ISubscription
         Predis\ClientInterface $syncClient,
         Async\Client $asyncClient,
         Async\EventListener $listener,
-        UnreadRetriever $unreadCounter
+        UnreadRetriever $unreadRetriever
     ) {
-        $this->instanceId    = $instanceId;
-        $this->userId        = $userId;
-        $this->asyncClient   = $asyncClient;
-        $this->syncClient    = $syncClient;
-        $this->unreadCounter = $unreadCounter;
+        $this->instanceId      = $instanceId;
+        $this->userId          = $userId;
+        $this->asyncClient     = $asyncClient;
+        $this->syncClient      = $syncClient;
+        $this->unreadRetriever = $unreadRetriever;
 
         $this->asyncClient->psubscribe($this->getRouteKey(), $listener);
     }
@@ -152,7 +150,7 @@ class Subscription implements ISubscription
      */
     public function getUnread()
     {
-        return $this->unreadCounter->getUnread($this->instanceId, $this->userId);
+        return $this->unreadRetriever->getUnread($this->instanceId, $this->userId);
     }
 
 }
