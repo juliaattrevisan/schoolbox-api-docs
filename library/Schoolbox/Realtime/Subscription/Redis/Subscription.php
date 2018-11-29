@@ -35,21 +35,33 @@ class Subscription implements ISubscription
     /** @var Redis|Predis\ClientInterface */
     private $syncClient;
 
+    /** @var UnreadCounter */
+    private $unreadCounter;
 
     /**
-     * @param string                 $instanceId
-     * @param int                    $userId
-     * @param Async\Client           $asyncClient
+     * Constructor
+     *
+     * @param                        $instanceId
+     * @param                        $userId
      * @param Predis\ClientInterface $syncClient
+     * @param Async\Client           $asyncClient
      * @param Async\EventListener    $listener
+     * @param UnreadCounter          $unreadCounter
      * @throws Predis\ClientException
      */
-    public function __construct($instanceId, $userId, Predis\ClientInterface $syncClient, Async\Client $asyncClient, Async\EventListener $listener)
-    {
-        $this->instanceId  = $instanceId;
-        $this->userId      = $userId;
-        $this->asyncClient = $asyncClient;
-        $this->syncClient  = $syncClient;
+    public function __construct(
+        $instanceId,
+        $userId,
+        Predis\ClientInterface $syncClient,
+        Async\Client $asyncClient,
+        Async\EventListener $listener,
+        UnreadCounter $unreadCounter
+    ) {
+        $this->instanceId    = $instanceId;
+        $this->userId        = $userId;
+        $this->asyncClient   = $asyncClient;
+        $this->syncClient    = $syncClient;
+        $this->unreadCounter = $unreadCounter;
 
         $this->asyncClient->psubscribe($this->getRouteKey(), $listener);
     }
@@ -140,29 +152,7 @@ class Subscription implements ISubscription
      */
     public function getUnread()
     {
-        return array_filter(
-            array_map(
-                function ($messageKey) {
-                    try {
-                        $data = $this->syncClient->get($messageKey);
-                        if (!$data) {
-                            $this->syncClient->srem($messageKey,$this->getSetIdentifier());
-                            return false;
-                        }
-                        return unserialize(
-                            gzuncompress($data),
-                            ['allowed_classes' => [Instance::class, Param::class,],]
-                        );
-                    } catch (\ErrorException $e) {
-                        return false;
-                    }
-                },
-                $this->syncClient->sMembers($this->getSetIdentifier())
-            ),
-            function ($item) {
-                return $item instanceof Instance;
-            }
-        );
+        return $this->unreadCounter->getUnread($this->instanceId, $this->userId);
     }
 
 }

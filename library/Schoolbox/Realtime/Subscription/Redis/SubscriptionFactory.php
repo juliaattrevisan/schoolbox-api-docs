@@ -57,7 +57,14 @@ class SubscriptionFactory implements ISubscriptionFactory
      */
     public function build($instanceId, $userId)
     {
-        return new Subscription($instanceId, $userId, $this->syncClient, $this->asyncClient, $this->listener);
+        return new Subscription(
+            $instanceId,
+            $userId,
+            $this->syncClient,
+            $this->asyncClient,
+            $this->listener,
+            new UnreadCounter($this->syncClient)
+        );
     }
 
 }
