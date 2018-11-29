@@ -1201,9 +1201,18 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 $code    = 400;
                 $info    = 'If the problem persists, please contact your System Administrator including the following information:';
 
+
+                if (isset($_SERVER['HTTP_HOST'])) {
+                    $url = 'http'.(getenv("SERVER_PORT") == 443 ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+                } else {
+                    $url = '';
+                }
+
                 if ($e instanceof SchoolboxException) {
                     $code    = $e->getHttpStatusCode();
                     $message = $e->getMessage();
+                    $info    = '';
+                    $url     = '';
                 } elseif ($e instanceof \PDOException){
                     $code    = 500;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
@@ -1226,13 +1235,6 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         default:
                             break;
                     }
-                }
-
-                if(isset($_SERVER['HTTP_HOST'])) {
-                    $url = 'http'.(getenv("SERVER_PORT") == 443 ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-                }
-                else {
-                    $url = '';
                 }
 
                 // explain that something went cataclysmically wrong.
