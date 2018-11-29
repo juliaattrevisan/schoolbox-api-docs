@@ -24,8 +24,6 @@ $(function () {
         window.tourStart = function (uuid) {
             // TODO: This will eventually need to handle the situation where 2 are triggered simultaneously
             var tour = window.tours[uuid];
-            console.log(uuid);
-            console.log(tour);
 
             if (typeof(tour) !== 'undefined') {
                 // Grab an instance of IntroJS
