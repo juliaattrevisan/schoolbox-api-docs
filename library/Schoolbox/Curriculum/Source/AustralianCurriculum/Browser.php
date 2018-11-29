@@ -39,9 +39,7 @@ class Browser extends Source\BrowserAbstract
      */
     public function setup()
     {
-        $this->setClient(
-            new EasyRdf_Sparql_Client('http://rdf.australiancurriculum.edu.au/sparql')
-        );
+        $this->setClient(new SparqlClient(SparqlClient::API_URI));
         $this->setHtmlConverter(new Html2Text());
     }
 
@@ -53,21 +51,18 @@ class Browser extends Source\BrowserAbstract
 
         // Fetch a list of all standard documents.
         // Then, group by available education levels?
-        $sparql = <<<SPARQL
-prefix asn: <http://purl.org/ASN/schema/core/>
-prefix dct: <http://purl.org/dc/terms/>
-SELECT *
-       WHERE {
-    ?doc a asn:StandardDocument .
-    ?doc dct:source ?source .
-    ?doc dct:modified ?modified .
-    ?doc dct:subject ?subject .
-    OPTIONAL { ?doc dct:abstract ?abstract } .
-    OPTIONAL { ?doc dct:description ?description } .
-    OPTIONAL { ?doc dct:title ?title . } .
-}
-SPARQL
-        ;
+        $sparql = 'prefix asn: <http://purl.org/ASN/schema/core/>
+                prefix dct: <http://purl.org/dc/terms/>
+                SELECT *
+                   WHERE {
+                ?doc a asn:StandardDocument .
+                ?doc dct:source ?source .
+                ?doc dct:modified ?modified .
+                ?doc dct:subject ?subject .
+                OPTIONAL { ?doc dct:abstract ?abstract } .
+                OPTIONAL { ?doc dct:description ?description } .
+                OPTIONAL { ?doc dct:title ?title . } .
+            }';
         $models = array();
         foreach ($this->getClient()->query($sparql) as $row) {
             if(is_object($row->title)) {
@@ -108,19 +103,16 @@ SPARQL
         // Fetch all unique learning levels from the curriculum here.
         // I'd like to fetch the label from the level document too, but I don't
         // know how.
-        $sparql = <<<SPARQL
-prefix asn: <http://purl.org/ASN/schema/core/>
-prefix dct: <http://purl.org/dc/terms/>
-prefix sko: <http://www.w3.org/2004/02/skos/core#>
-SELECT DISTINCT ?level ?label WHERE {
-    ?subject a asn:StandardDocument .
-    {
-        ?subject dct:educationLevel ?level .
-        OPTIONAL { ?level sko:prefLabel ?label }
-    }
-}
-SPARQL
-        ;
+        $sparql = 'prefix asn: <http://purl.org/ASN/schema/core/>
+        prefix dct: <http://purl.org/dc/terms/>
+        prefix sko: <http://www.w3.org/2004/02/skos/core#>
+        SELECT DISTINCT ?level ?label WHERE {
+            ?subject a asn:StandardDocument .
+            {
+                ?subject dct:educationLevel ?level .
+                OPTIONAL { ?level sko:prefLabel ?label }
+            }
+        }';
         $collection = new Collection();
         foreach ($this->getClient()->query($sparql) as $row) {
 
@@ -140,8 +132,8 @@ SPARQL
                 $label = $row->label->getValue();
             } else {
                 // fetch the label in a separate request.
-                // TODO get the query working properly
                 $curl = new Alaress_Curl_Url($row->level->getUri().'.rdf');
+                $curl->addOptions([CURLOPT_FOLLOWLOCATION => true]);
                 $curl->exec();
                 if (!count($curl->getErrors())) {
                     $document = simplexml_load_string($curl->getResult());
@@ -187,16 +179,18 @@ SPARQL
         $collection = new Collection();
         // Get everything out of the manifest instead of out of RDF queries.
         $curl = new Alaress_Curl_Url($area->getReference().'-manifest.json');
+        $curl->addOptions([CURLOPT_FOLLOWLOCATION => true]);
         $curl->exec();
-        if (!count($curl->getErrors())) {
-            $manifest = json_decode($curl->getResult());
+        if ( !\count($curl->getErrors()) && $manifest = json_decode($curl->getResult()) ) {
             foreach ($manifest as $part) {
                 if(($nodes = $this->buildOutputTree($part, $level)) != false) {
                     $collection->add($nodes);
                 }
             }
+            return $collection;
         }
-        return $collection;
+
+        throw new \UnexpectedValueException("No learning areas found");
     }
 
     /**
@@ -247,7 +241,7 @@ SPARQL
     protected function buildSingleNode($json)
     {
         $node = new Node\Model();
-        $node->setReference($json->id);
+        $node->setReference($json->id ?? $json->Id);
 
         // Figure out what the name and description should be.
         $statementLabel = '';
