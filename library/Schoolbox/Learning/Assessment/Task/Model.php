@@ -231,7 +231,7 @@ class Model extends AbstractAssessment
         }
 
         // Instructor can mark the task as long as the learner is a participant
-        return $participant && !$participant->isExcluded();
+        return $participant instanceof Participant;
     }
 
     /**

@@ -284,9 +284,9 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function getParticipantIfExtant(User $user, bool $strict = true)
+    public function getParticipantIfExtant(User $user, bool $getExcluded = false)
     {
-        return $this->findParticipantIfExtant($user, $strict);
+        return $this->findParticipantIfExtant($user, $getExcluded);
     }
 
 
@@ -316,10 +316,10 @@ abstract class AbstractAssessment implements IAssessable
      * a value is null than to throw and immediately catch an exception.
      *
      * @param User $user
-     * @param bool $strict .. true to return null for excluded participant
+     * @param bool $getExcluded .. false to return null for excluded participant
      * @return Participant|null
      */
-    protected function findParticipantIfExtant(User $user, bool $strict = false): ?Participant
+    protected function findParticipantIfExtant(User $user, bool $getExcluded = true): ?Participant
     {
         if (!$user || $user->isDeleted()) {
             return null;
@@ -328,7 +328,7 @@ abstract class AbstractAssessment implements IAssessable
         foreach ($this->plans as $plan) {
             if ($plan->getParticipants()->offsetExists($userId)) {
                 $participant = $plan->getParticipants()[$userId];
-                if (!$participant->isExcluded() || !$strict) {
+                if (!$participant->isExcluded() || $getExcluded) {
                     return $participant;
                 }
             }

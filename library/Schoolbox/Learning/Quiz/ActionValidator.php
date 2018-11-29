@@ -88,7 +88,7 @@ class ActionValidator
         }
 
         $isInstructor = $this->access->isInstructor($user, $quiz->getContext()->getFolder());
-        $participant  = $quiz->getParticipantIfExtant($user, false);
+        $participant  = $quiz->getParticipantIfExtant($user, true);
 
         // Does user have a participation for this assessment?
         if ($participant) {
