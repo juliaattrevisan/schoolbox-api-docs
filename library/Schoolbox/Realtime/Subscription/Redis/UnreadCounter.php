@@ -51,6 +51,7 @@ class UnreadCounter
                     try {
                         $data = $this->syncClient->get($messageKey);
                         if (!$data) {
+                            // TODO determine whether we really should clear unreadable here
                             $this->syncClient->srem($messageKey, $setIdentifier);
                             return false;
                         }
