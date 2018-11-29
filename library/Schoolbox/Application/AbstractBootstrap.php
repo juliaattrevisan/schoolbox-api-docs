@@ -1168,12 +1168,6 @@ abstract class AbstractBootstrap implements BootstrapInterface
      */
     public function shutdownSafely($e = null, $stack = null)
     {
-        $di = $this->getKernel()->getDependencyInjector();
-        /** @var IConfigLoader $config */
-        $config = $di->get('config');
-        $outputStackTrace = $config->get('debug_show_stack_trace');
-
-
         $isException = false;
         if ($e instanceof \Throwable) {
             $isException = true;
@@ -1252,6 +1246,14 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         $e['trace'] = $stack;
                     }
                 }
+
+
+                // Start rendering
+                $di = $this->getKernel()->getDependencyInjector();
+                /** @var IConfigLoader $config */
+                $config = $di->get('config');
+                $outputStackTrace = $config->get('debug_show_stack_trace');
+
 
                 /* Use structured information for rendering
                  */
