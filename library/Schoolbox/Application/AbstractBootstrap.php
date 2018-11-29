@@ -1283,13 +1283,16 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
 
     /**
-     * @param        $e
-     * @param string $message
-     * @param string $info
-     * @param string $url
-     * @param        $error
-     * @param int    $code
-     * @throws Di\Exception\ServiceNotFound
+     * Output an error. The format depends on the request type (JSON or HTML).
+     *
+     * @param array|\Throwable $e       The throwable that led us here, or the
+     *                                  stack trace in array form.
+     * @param string           $message A human-friendly message to output.
+     * @param string           $info    More descriptive description of what
+     *                                  happened.
+     * @param string           $url     The URL from which this error occurred
+     * @param array            $error   An array-format stack trace
+     * @param int              $code    A HTTP status code
      */
     private function outputError(
         $e,
@@ -1299,85 +1302,104 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $error,
         int $code
     ): void {
-        // Start rendering
-        $di = $this->getKernel()->getDependencyInjector();
-        /** @var IConfigLoader $config */
-        $config           = $di->get('config');
-        $outputStackTrace = $config->get('debug_show_stack_trace');
-
-
         /* Use structured information for rendering
          */
         $args = [
-            'message'          => $message,
-            'info'             => $info,
-            'url'              => $url,
-            'error'            => $error,
-            'date'             => \Alaress_Date_Format::now(),
-            'outputStackTrace' => $outputStackTrace,
-            'stackTrace'       => $e,
-            'exceptionClass'   => \is_object($e) ? \get_class($e) : 'Error',
+            'message'        => $message,
+            'info'           => $info,
+            'url'            => $url,
+            'error'          => $error,
+            'date'           => \Alaress_Date_Format::now(),
+            'stackTrace'     => $e,
+            'exceptionClass' => \is_object($e) ? \get_class($e) : 'Error',
         ];
 
         /* Pass $data straight in for twig rendering
          */
+        $di = $this->getKernel()->getDependencyInjector();
         if ($di instanceof Di\Container) {
             // Is it JSON or not?
-            $response = $di->get('webFactory')->newResponse();
-            if ((new IsJson())->isSatisfiedBy($response)) {
-                $problem = (new ApiProblem($message))
-                    ->setStatus($code)
-                    ->setDetail($info)
-                    ->setInstance($url);
+            try {
+                /** @var IConfigLoader $config */
+                $config                   = $di->get('config');
+                $args['outputStackTrace'] = $config->get('debug_show_stack_trace');
 
-                if ($outputStackTrace) {
-                    $problem['trace'] = array_merge(
-                        [$error],
-                        $e instanceof \Throwable ? $e->getTrace() : $e['trace']
-                    );
+                $response = $di->get('webFactory')->newResponse();
+                if ((new IsJson())->isSatisfiedBy($response)) {
+                    $problem = (new ApiProblem($message))
+                        ->setStatus($code)
+                        ->setDetail($info)
+                        ->setInstance($url);
+
+                    if ($args['outputStackTrace']) {
+                        $problem['trace'] = array_merge(
+                            [$error],
+                            $e instanceof \Throwable ? $e->getTrace() : $e['trace']
+                        );
+                    }
+
+                    /** @var Output\Json $output */
+                    $output = $di->get('webOutput:json');
+                    $output
+                        ->setData($problem->asArray());
+
+                } else {
+                    /** @var Output\ThemedHtml $output */
+                    $output = $di->get('webOutput:html');
+                    $output
+                        ->setTitle('Error Encountered')
+                        ->setData($args)
+                        ->setTemplate($code === 404
+                            ? 'common/error/404.twig'
+                            : 'common/error/general.twig'
+                        );
                 }
 
-                /** @var Output\Json $output */
-                $output = $di->get('webOutput:json');
-                $output
-                    ->setData($problem->asArray());
+                // Finagle a response?
+                $response->status->setCode($code);
+                $output->output($response);
+                return;
 
-            } else {
-                /** @var Output\ThemedHtml $output */
-                $output = $di->get('webOutput:html');
-                $output
-                    ->setTitle('Error Encountered')
-                    ->setData($args)
-                    ->setTemplate($code === 404
-                        ? 'common/error/404.twig'
-                        : 'common/error/general.twig'
-                    );
+            } catch (Di\Exception\ServiceNotFound $e) {
+                // noop: fall thru to outputRawHtmlError
             }
-
-            // Finagle a response?
-            $response->status->setCode($code);
-            $output->output($response);
-        } else {
-            /* Just dump it out in raw form
-             * TODO: Make synonymous with twig output
-             */
-            $output =
-                "<p><b>{$args['message']} {$args['info']}</b></p>" .
-                '<ul>' .
-                "<li>Datetime: {$args['date']->getLong()}</li>" .
-                "<li>URL: {$args['url']}" .
-                '</li>';
-
-            if ($outputStackTrace) {
-                $output .= "<li>Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}.</li>";
-            } else {
-                $output .= "<li>Error: {$args['error']['message']}. (Further details have been logged.)</li>";
-            }
-
-            $output .= '</ul>';
-
-            http_response_code($code);
-            echo $output;
         }
+
+        // There was no DI, or I couldn't find a renderer.
+        // Just output raw HTML
+        $this->outputRawHtmlError($code, $args);
+    }
+
+
+    /**
+     * Outputs an error without using a Twig or JSON renderer.
+     *
+     * This is a fallback that is used when none of those renderers are found.
+     *
+     * @param int   $code
+     * @param array $args
+     */
+    private function outputRawHtmlError(int $code, array $args): void
+    {
+        /* Just dump it out in raw form
+         * TODO: Make synonymous with twig output
+         */
+        $output =
+            "<p><b>{$args['message']} {$args['info']}</b></p>" .
+            '<ul>' .
+            "<li>Datetime: {$args['date']->getLong()}</li>" .
+            "<li>URL: {$args['url']}" .
+            '</li>';
+
+        if ($args['outputStackTrace']) {
+            $output .= "<li>Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}.</li>";
+        } else {
+            $output .= "<li>Error: {$args['error']['message']}. (Further details have been logged.)</li>";
+        }
+
+        $output .= '</ul>';
+
+        http_response_code($code);
+        echo $output;
     }
 }
