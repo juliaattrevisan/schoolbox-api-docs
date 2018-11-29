@@ -54,6 +54,8 @@ class Controller extends Base
     /**
      * Retrieve all tours for the requested URL
      *
+     * @deprecated as of 18.2, tours for a URL are loaded directly into the page
+     *
      * @api   GET /tours/url/{url}
      * @param string $url
      * @throws \Schoolbox\Mapper\DefinitionException
