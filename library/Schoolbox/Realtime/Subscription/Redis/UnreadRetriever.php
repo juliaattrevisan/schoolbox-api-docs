@@ -51,7 +51,8 @@ class UnreadRetriever
                     try {
                         $data = $this->syncClient->get($messageKey);
                         if (!$data) {
-                            // TODO determine whether we really should clear unreadable here
+                            // the message doesn't exist? remove the reference
+                            // (precedent: `\Alaress\Async\Queue\RedisQueue::fetch`)
                             $this->syncClient->srem($messageKey, $setIdentifier);
                             return false;
                         }
