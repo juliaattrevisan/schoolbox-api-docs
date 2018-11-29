@@ -212,7 +212,7 @@ class Notifier extends AbstractModuleNotifier
      * Notify parents that someone posted on their child's eportfolio blog
      *
      * @param Model $post
-     * @param User  $effector
+     * @param User $effector
      * @return Envelope
      * @throws OutOfBoundsException     If severity is not set
      * @throws InvalidArgumentException If a required property was not set
@@ -222,33 +222,33 @@ class Notifier extends AbstractModuleNotifier
         try {
             $page = $this->pageMapper->findById($post->getPage()->getPageId());
             $owner = $this->userMapper->findById($page->getOwner()->getId());
-
-            // Care only about student's blog. The others are handled in the other methods.
-            if (!$owner->getRole()->isStudent()) {
-                return new Envelope();
-            }
-
-            // Send it to all their parents
-            $parents = $owner->loadParents()->getParents();
-            $audience = $this->userMapper->createCollection();
-            // Need to explicitely set page owner
-            $post->getPage()->setOwner($owner);
-
-            foreach ($parents as $parent) {
-                if ($this->access->userCanView($post, $parent)) {
-                    try {
-                        $audience[$parent->getId()] = $parent;
-                    } catch (Exception $e) {
-                        // noop
-                    }
-                }
-            }
-
-            return $this->notifyPosted($post, $owner, $effector, $audience, RoleMapper::ROLE_PARENT);
         } catch (Exception $e) {
             // page or owner was invalid.
             return new Envelope();
         }
+
+        // Care only about student's blog. The others are handled in the other methods.
+        if (!$owner->getRole()->isStudent()) {
+            return new Envelope();
+        }
+
+        // Send it to all their parents
+        $parents = $owner->loadParents()->getParents();
+        $audience = $this->userMapper->createCollection();
+        // Need to explicitly set page owner
+        $post->getPage()->setOwner($owner);
+
+        foreach ($parents as $parent) {
+            try {
+                if ($this->access->userCanView($post, $parent)) {
+                    $audience[$parent->getId()] = $parent;
+                }
+            } catch (Exception $e) {
+                // noop
+            }
+        }
+
+        return $this->notifyPosted($post, $owner, $effector, $audience, RoleMapper::ROLE_PARENT);
     }
 
     /**
