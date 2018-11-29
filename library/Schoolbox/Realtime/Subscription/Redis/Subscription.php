@@ -35,7 +35,7 @@ class Subscription implements ISubscription
     /** @var Redis|Predis\ClientInterface */
     private $syncClient;
 
-    /** @var UnreadCounter */
+    /** @var UnreadRetriever */
     private $unreadCounter;
 
     /**
@@ -46,7 +46,7 @@ class Subscription implements ISubscription
      * @param Predis\ClientInterface $syncClient
      * @param Async\Client           $asyncClient
      * @param Async\EventListener    $listener
-     * @param UnreadCounter          $unreadCounter
+     * @param UnreadRetriever        $unreadCounter
      * @throws Predis\ClientException
      */
     public function __construct(
@@ -55,7 +55,7 @@ class Subscription implements ISubscription
         Predis\ClientInterface $syncClient,
         Async\Client $asyncClient,
         Async\EventListener $listener,
-        UnreadCounter $unreadCounter
+        UnreadRetriever $unreadCounter
     ) {
         $this->instanceId    = $instanceId;
         $this->userId        = $userId;

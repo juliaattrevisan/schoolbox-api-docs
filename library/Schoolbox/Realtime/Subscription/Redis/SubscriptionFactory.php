@@ -63,7 +63,7 @@ class SubscriptionFactory implements ISubscriptionFactory
             $this->syncClient,
             $this->asyncClient,
             $this->listener,
-            new UnreadCounter($this->syncClient)
+            new UnreadRetriever($this->syncClient)
         );
     }
 

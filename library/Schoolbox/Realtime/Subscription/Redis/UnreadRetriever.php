@@ -13,10 +13,10 @@ use Alaress\Async\Notification\Parameter\Param;
 use Predis;
 
 /**
- * Unread counter class, moved into a separate object so that systems outside
- * of the socket daemon can count the unread messages for a user.
+ * Unread retriever class, moved into a separate object so that systems outside
+ * of the socket daemon can fetch and count the unread messages for a user.
  */
-class UnreadCounter
+class UnreadRetriever
 {
     /**
      * @var Predis\ClientInterface

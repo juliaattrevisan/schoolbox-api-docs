@@ -65,7 +65,7 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
-use Schoolbox\Realtime\Subscription\Redis\UnreadCounter;
+use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Step\Mapper as StepMapper;
 use Schoolbox\Role;
@@ -498,7 +498,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     new Output\DataGenerator\Websocket(
                         $config,
                         $session,
-                        new UnreadCounter($redis),
+                        new UnreadRetriever($redis),
                         $_SERVER
                     )
                 )

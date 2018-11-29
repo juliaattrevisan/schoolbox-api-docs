@@ -10,7 +10,7 @@ namespace Alaress\Web\Output\DataGenerator;
 
 use Alaress\Session\Session;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Realtime\Subscription\Redis\UnreadCounter;
+use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
 
 /**
  * Generate data for rendering the websocket (instant messaging) system.
@@ -30,7 +30,7 @@ class Websocket implements IDataGenerator
 
 
     /**
-     * @var UnreadCounter
+     * @var UnreadRetriever
      */
     private $unreadCounter;
 
@@ -44,15 +44,15 @@ class Websocket implements IDataGenerator
     /**
      * Constructor
      *
-     * @param IConfigLoader $config
-     * @param Session       $session
-     * @param UnreadCounter $unreadCounter
-     * @param array         $serverVars
+     * @param IConfigLoader   $config
+     * @param Session         $session
+     * @param UnreadRetriever $unreadCounter
+     * @param array           $serverVars
      */
     public function __construct(
         IConfigLoader $config,
         Session $session,
-        UnreadCounter $unreadCounter,
+        UnreadRetriever $unreadCounter,
         array $serverVars
     ) {
         $this->config        = $config;
