@@ -39,6 +39,34 @@ class Renderer extends AbstractRenderer
 
 
     /**
+     * Returns the config's value, applying any relevant transformations
+     *
+     * @param Config $config
+     * @return null|string
+     */
+    protected function getTransformedValue(Config $config): ?string
+    {
+        // Check that the current configured value is valid
+        $configuredValue = $config->getValue();
+
+        // Not set?
+        if (null === $configuredValue) {
+            // That's fine, return unchanged.
+            return null;
+        }
+
+        foreach (\explode(':', $config->getOptions()) as $value) {
+            if ($value === $configuredValue) {
+                // Value is valid, return it unchanged.
+                return $configuredValue;
+            }
+        }
+        // Current value is not valid. Return null.
+        return null;
+    }
+
+
+    /**
      * @inheritdoc
      */
     protected function getFieldId(): int
