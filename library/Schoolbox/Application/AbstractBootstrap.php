@@ -31,6 +31,7 @@ use Crell\ApiProblem\ApiProblem;
 use External_ClassInterface;
 use External_UserInterface;
 use GuzzleHttp;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Predis\ClientInterface as RedisInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
@@ -1200,10 +1201,13 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 $code    = 400;
                 $info    = 'If the problem persists, please contact your System Administrator including the following information:';
 
-                if ($e instanceof \PDOException){
-                    $code = 500;
+                if ($e instanceof SchoolboxException) {
+                    $code    = $e->getHttpStatusCode();
+                    $message = $e->getMessage();
+                } elseif ($e instanceof \PDOException){
+                    $code    = 500;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
-                } else if ($e instanceof \RuntimeException) {
+                } elseif ($e instanceof \RuntimeException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently down due to an internal service being inactive.';
                 } else {
