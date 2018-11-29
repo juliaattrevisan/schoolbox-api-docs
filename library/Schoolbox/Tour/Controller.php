@@ -20,9 +20,6 @@ class Controller extends Base
     /** @var Mapper $tourMapper */
     private $tourMapper;
 
-    /** @var TourTriggerMapper $tourTriggerMapper */
-    private $tourTriggerMapper;
-
     /** @var Step\Mapper $tourStepMapper */
     private $tourStepMapper;
 
@@ -33,19 +30,16 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param TourMapper        $tourMapper
-     * @param TourTriggerMapper $tourTriggerMapper
-     * @param Step\Mapper       $tourStepMapper
-     * @param Status\Mapper     $tourStatusMapper
+     * @param TourMapper    $tourMapper
+     * @param Step\Mapper   $tourStepMapper
+     * @param Status\Mapper $tourStatusMapper
      */
     public function __construct(
         TourMapper $tourMapper,
-        TourTriggerMapper $tourTriggerMapper,
         Step\Mapper $tourStepMapper,
         Status\Mapper $tourStatusMapper
     ) {
         $this->tourMapper        = $tourMapper;
-        $this->tourTriggerMapper = $tourTriggerMapper;
         $this->tourStepMapper    = $tourStepMapper;
         $this->tourStatusMapper  = $tourStatusMapper;
     }
