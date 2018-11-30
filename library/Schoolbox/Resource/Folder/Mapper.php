@@ -1112,18 +1112,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     private function findForUserQuery(User $user, bool $get_subjects, int $access_level, bool $exactAccess): PDOStatement
     {
         $query = "
-			SELECT
-				{$this->getColumnString('c')},
-				{$this->getJoinColumnString('homepages', 'h')},
-				{$this->getJoinColumnString('codes', 'cc')},
-				{$this->getJoinColumnString('groups', 'g')}
-			FROM {$this->getTable()} c
-			LEFT JOIN userAccess a ON c.id=a.sid AND a.service=:service
-			LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
-			LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
-			LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
-			WHERE c.deleted_at IS NULL AND a.uid = :user
-		";
+            SELECT
+                {$this->getColumnString('c')},
+                {$this->getJoinColumnString('homepages', 'h')},
+                {$this->getJoinColumnString('codes', 'cc')},
+                {$this->getJoinColumnString('groups', 'g')}
+            FROM {$this->getTable()} c
+            INNER JOIN userAccess a ON c.id = a.sid AND a.service = :service AND a.uid = :user
+            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+            LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
+            LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
+            WHERE c.deleted_at IS NULL
+        ";
         if ($exactAccess) {
             $query .= ' AND a.type = :access';
         } else {
@@ -1146,10 +1146,29 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                             return trim($row['code']);
                         }, $subject_list
                     );
+
+
+                    // Fetch these folders with a UNION of two optimized queries
+                    // instead of one query. (see SA-7958)
+                    // (Lesson: when LEFT JOINing onto a table I optionally
+                    //  filter on, consider a UNION instead)
+                    $subjectQuery = "
+                        SELECT
+                            {$this->getColumnString('c')},
+                            {$this->getJoinColumnString('homepages', 'h')},
+                            {$this->getJoinColumnString('codes', 'cc')},
+                            {$this->getJoinColumnString('groups', 'g')}
+                        FROM {$this->getTable()} c
+                        INNER JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+                        LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
+                        LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
+                        WHERE c.deleted_at IS NULL
+                    ";
+                    $subjectQueryParts = [];
                     if (!empty($category_codes)) {
-                        $query .= ' OR cc.code IN ' . $this->getArrayPlaceholders($category_codes, 'code');
+                        $subjectQueryParts[] = 'cc.code IN ' . $this->getArrayPlaceholders($category_codes, 'code');
                         $params = array_merge($params, $this->getArrayParameters($category_codes, 'code'));
-                        //
+
                         // Allow search of codes with a campus prefix.
                         $category_like_codes = array_map(
                             function ($code) {
@@ -1158,14 +1177,20 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                             $category_codes
                         );
                         foreach ($category_like_codes as $i => $like_code) {
-                            $query .= ' OR cc.code LIKE :like_code_' . $i;
+                            $subjectQueryParts[] = 'cc.code LIKE :like_code_' . $i;
                             $params['like_code_' . $i] = $like_code;
                         }
+                    }
+
+                    if (!empty($subjectQueryParts)) {
+                        $subjectQuery .= ' AND (' . implode(' OR ', $subjectQueryParts) . ')';
+                        $query .= ' UNION ' . $subjectQuery;
                     }
                 }
             }
         }
 
+        $query .= ' ORDER BY `c.id` ASC';
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
