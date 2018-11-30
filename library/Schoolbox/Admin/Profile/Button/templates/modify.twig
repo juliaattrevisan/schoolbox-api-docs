@@ -15,11 +15,6 @@
             });
         });
 
-        $('[data-cancel]').click(function () {
-            window.location.href = '{{ routeLookup('adminProfileButton.getIndex') }}';
-            return false;
-        });
-
         $('[data-submit]').click(function () {
             form.alaressValidate({
                 ignore: ':disabled',
@@ -138,10 +133,8 @@
     <div class="row">
         <div class="small-12 column">
             <ul class="flex-list buttons">
+                <li><a href="{{ routeLookup('adminProfileButton.getIndex') }}" class="button">Cancel</button></a>
                 <li><input data-submit type="submit" class="submit expand" value="Save"></li>
-                <li>
-                    <button data-cancel class="button expand icon-cancel">Cancel Changes</button>
-                </li>
             </ul>
         </div>
     </div>
