@@ -801,6 +801,9 @@ class Controller extends BaseController
         $homepage = new Homepage($folder->getId());
         $homepage->emptyHomepage();
 
+        // Soft Delete Assessments
+        $folderMapper->softDeleteAssessments($folder);
+
         // Delete all files
 
         $fileList = $fileMapper->findForFolders([ $folder->getId() ]);

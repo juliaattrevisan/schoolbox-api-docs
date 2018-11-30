@@ -176,4 +176,18 @@ class Mapper extends \Schoolbox\Mapper
         }
         return $affectedIds;
     }
+
+    /**
+     * Deletes related news article audience by folder id
+     *
+     * @param int $cid
+     * @return void
+     */
+    public function homepageClean(int $cid) :void
+    {
+        $this->deleteByColumnList([
+            self::FIELD_ENTITY_VALUE  => $cid,
+            self::FIELD_ENTITY_TYPE   => 'folder'
+        ]);
+    }
 }

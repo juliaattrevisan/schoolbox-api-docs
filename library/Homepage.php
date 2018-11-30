@@ -198,12 +198,9 @@ class Homepage
         $homepageCleanables = array(
             new Assess_Main(),
             new Blog(),
-//            new Calendar(),
-            new CategoryNews(),
             new Chat(),
             new Forum(),
             new Poll(),
-            new Submission(),
             new Survey_Main(),
             new TextBox(),
             new Wiki(),
@@ -212,6 +209,7 @@ class Homepage
             Resource\File\Mapper::getInstance(),
             Schoolbox\Dropbox\Mapper::getInstance(),
             \SocialStream\PostMapper::getInstance(),
+            Schoolbox\Comms\News\Audience\Mapper::getInstance(),
         );
 
         foreach ($homepageCleanables as $homepageCleanable){
