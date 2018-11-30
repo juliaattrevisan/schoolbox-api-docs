@@ -1147,6 +1147,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                         }, $subject_list
                     );
 
+
+                    // Fetch these folders with a UNION of two optimized queries
+                    // instead of one query. (see SA-7958)
+                    // (Lesson: when LEFT JOINing onto a table I optionally
+                    //  filter on, consider a UNION instead)
                     $subjectQuery = "
                         SELECT
                             {$this->getColumnString('c')},
@@ -1162,7 +1167,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                     $subjectQueryParts = [];
                     if (!empty($category_codes)) {
                         $subjectQueryParts[] = 'cc.code IN ' . $this->getArrayPlaceholders($category_codes, 'code');
-//                        $subjectQuery .= ' OR cc.code IN ' . $this->getArrayPlaceholders($category_codes, 'code');
                         $params = array_merge($params, $this->getArrayParameters($category_codes, 'code'));
 
                         // Allow search of codes with a campus prefix.
@@ -1174,7 +1178,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                         );
                         foreach ($category_like_codes as $i => $like_code) {
                             $subjectQueryParts[] = 'cc.code LIKE :like_code_' . $i;
-//                            $subjectQuery .= ' OR cc.code LIKE :like_code_' . $i;
                             $params['like_code_' . $i] = $like_code;
                         }
                     }
