@@ -1,7 +1,17 @@
 <script type="text/javascript" src="/javascript/shared/attacher.checkbox-group.js"></script>
 <script>
     $(function () {
-        var form = $('form#itemForm');
+        $('#itemForm').alaressValidate({
+            ignore: ':disabled',
+            rules: {
+                'text': {required: true},
+                'url': {required: true, isURL: true}
+            },
+            messages: {
+                'text': {required: 'You must enter a name before you can proceed.'},
+                'url': {required: 'You must enter a valid URL for this profile item before you can proceed.'}
+            }
+        });
 
         $('[data-role="openResourceBrowser"]').click(function(e) {
             e.preventDefault();
@@ -14,21 +24,6 @@
                 }
             });
         });
-
-        $('[data-submit]').click(function () {
-            form.alaressValidate({
-                ignore: ':disabled',
-                rules: {
-                    'text': {required: true},
-                    'url': {required: true, isURL: true}
-                },
-                messages: {
-                    'text': {required: 'You must enter a name before you can proceed.'},
-                    'url': {required: 'You must enter a valid URL for this profile item before you can proceed.'}
-                }
-            });
-        });
-
     });
 </script>
 
@@ -134,7 +129,7 @@
         <div class="small-12 column">
             <ul class="flex-list buttons">
                 <li><a href="{{ routeLookup('adminProfileButton.getIndex') }}" class="button">Cancel</button></a>
-                <li><input data-submit type="submit" class="submit expand" value="Save"></li>
+                <li><button type="submit" class="submit expand">Save</button></li>
             </ul>
         </div>
     </div>
