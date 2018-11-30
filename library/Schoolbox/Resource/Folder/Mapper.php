@@ -1187,6 +1187,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
         }
 
+        $query .= ' ORDER BY `c.id` ASC';
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
