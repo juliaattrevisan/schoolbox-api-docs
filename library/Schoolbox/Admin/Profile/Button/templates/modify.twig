@@ -1,32 +1,3 @@
-<script type="text/javascript" src="/javascript/shared/attacher.checkbox-group.js"></script>
-<script>
-    $(function () {
-        $('#itemForm').alaressValidate({
-            ignore: ':disabled',
-            rules: {
-                'text': {required: true},
-                'url': {required: true, isURL: true}
-            },
-            messages: {
-                'text': {required: 'You must enter a name before you can proceed.'},
-                'url': {required: 'You must enter a valid URL for this profile item before you can proceed.'}
-            }
-        });
-
-        $('[data-role="openResourceBrowser"]').click(function(e) {
-            e.preventDefault();
-            $('[data-role="resourceBrowser"]').socialstreamBrowser({
-                title: 'Choose a folder',
-                categoryId: 0,
-                mimeFilter: false,
-                submitCallback: function(url, filename) {
-                    $('input[name="url"]').val(url);
-                }
-            });
-        });
-    });
-</script>
-
 {# Shared navigation profile #}
 {{ renderAdminNavigation(pageCurrent) }}
 
@@ -134,8 +105,36 @@
         </div>
     </div>
 </form>
+
+<script src="/javascript/shared/attacher.checkbox-group.js"></script>
 <script>
     $(function() {
+        // Init validation
+        $('#itemForm').alaressValidate({
+            ignore: ':disabled',
+            rules: {
+                'text': {required: true},
+                'url': {required: true, isURL: true}
+            },
+            messages: {
+                'text': {required: 'You must enter a name before you can proceed.'},
+                'url': {required: 'You must enter a valid URL for this profile item before you can proceed.'}
+            }
+        });
+
+        // Resource browser
+        $('[data-role="openResourceBrowser"]').click(function(e) {
+            e.preventDefault();
+            $('[data-role="resourceBrowser"]').socialstreamBrowser({
+                title: 'Choose a folder',
+                categoryId: 0,
+                mimeFilter: false,
+                submitCallback: function(url, filename) {
+                    $('input[name="url"]').val(url);
+                }
+            });
+        });
+
         // Icon preview
         $('[data-icon]').change(function() {
             $('#icon').attr('class', 'size-32 icon-' + $('#icon-select').val())
@@ -189,6 +188,5 @@
                 $(this).prop('checked', status);
             });
         });
-
     });
 </script>
