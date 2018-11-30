@@ -1112,18 +1112,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     private function findForUserQuery(User $user, bool $get_subjects, int $access_level, bool $exactAccess): PDOStatement
     {
         $query = "
-			SELECT
-				{$this->getColumnString('c')},
-				{$this->getJoinColumnString('homepages', 'h')},
-				{$this->getJoinColumnString('codes', 'cc')},
-				{$this->getJoinColumnString('groups', 'g')}
-			FROM {$this->getTable()} c
-			LEFT JOIN userAccess a ON c.id=a.sid AND a.service=:service
-			LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
-			LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
-			LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
-			WHERE c.deleted_at IS NULL AND a.uid = :user
-		";
+            SELECT
+                {$this->getColumnString('c')},
+                {$this->getJoinColumnString('homepages', 'h')},
+                {$this->getJoinColumnString('codes', 'cc')},
+                {$this->getJoinColumnString('groups', 'g')}
+            FROM {$this->getTable()} c
+            INNER JOIN userAccess a ON c.id = a.sid AND a.service = :service AND a.uid = :user
+            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+            LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
+            LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
+            WHERE c.deleted_at IS NULL
+        ";
         if ($exactAccess) {
             $query .= ' AND a.type = :access';
         } else {
@@ -1137,6 +1137,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         // TODO Currently incorrectly shows all classes for Staff, regardless of requested access. See SA-7364
         if ($this->fetchClassesFromExternalSis($get_subjects, $user, $access_level, $exactAccess)) {
+            $subjectQuery = "
+                SELECT
+                    {$this->getColumnString('c')},
+                    {$this->getJoinColumnString('homepages', 'h')},
+                    {$this->getJoinColumnString('codes', 'cc')},
+                    {$this->getJoinColumnString('groups', 'g')}
+                FROM {$this->getTable()} c
+                INNER JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+                LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
+                LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
+                WHERE c.deleted_at IS NULL
+            ";
             $external_user = $this->getExternalUser();
             if ($external_user instanceof External_UserInterface) {
                 $subject_list = $external_user->getSubjectList($user);
@@ -1147,7 +1159,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                         }, $subject_list
                     );
                     if (!empty($category_codes)) {
-                        $query .= ' OR cc.code IN ' . $this->getArrayPlaceholders($category_codes, 'code');
+                        $subjectQuery .= ' OR cc.code IN ' . $this->getArrayPlaceholders($category_codes, 'code');
                         $params = array_merge($params, $this->getArrayParameters($category_codes, 'code'));
                         //
                         // Allow search of codes with a campus prefix.
@@ -1158,10 +1170,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                             $category_codes
                         );
                         foreach ($category_like_codes as $i => $like_code) {
-                            $query .= ' OR cc.code LIKE :like_code_' . $i;
+                            $subjectQuery .= ' OR cc.code LIKE :like_code_' . $i;
                             $params['like_code_' . $i] = $like_code;
                         }
                     }
+
+                    $query .= ' UNION ' . $subjectQuery;
                 }
             }
         }
