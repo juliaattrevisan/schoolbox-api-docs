@@ -98,7 +98,7 @@ class Admin implements ModuleConfigInterface
         $menuSide = new \Schoolbox\Admin\Menu\Side\Module($di);
         $menuSide->init('/adminv2/menu-side');
 
-        // Side menu manager
+        // Profile button manager
         $menuSide = new \Schoolbox\Admin\Profile\Button\Module($di);
         $menuSide->init('/adminv2/profile-button');
 

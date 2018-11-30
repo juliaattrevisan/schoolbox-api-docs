@@ -135,23 +135,18 @@
     </div>
 </form>
 <script>
-
     $(function() {
-
-        {# Icon preview#}
-
+        // Icon preview
         $('[data-icon]').change(function() {
             $('#icon').attr('class', 'size-32 icon-' + $('#icon-select').val())
         });
 
         $('#icon').attr('class', 'size-32 icon-' + $('#icon-select').val())
 
-        {# Check all checkboxes if everything was selected #}
-
+        // Check all checkboxes if everything was selected
         var allChecked = true;
 
-        {# Roles #}
-
+        // Roles
         $('[data-role]').each(function() {
             if (!$(this).prop('checked')) {
                 allChecked = false;
@@ -162,8 +157,7 @@
             $('#role-all').prop('checked', true);
         }
 
-        {# Campuses #}
-
+        // Campuses
         $('[data-campus]').each(function() {
             if (!$(this).prop('checked')) {
                 allChecked = false;
