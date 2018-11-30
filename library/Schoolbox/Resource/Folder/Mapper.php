@@ -1137,18 +1137,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         // TODO Currently incorrectly shows all classes for Staff, regardless of requested access. See SA-7364
         if ($this->fetchClassesFromExternalSis($get_subjects, $user, $access_level, $exactAccess)) {
-            $subjectQuery = "
-                SELECT
-                    {$this->getColumnString('c')},
-                    {$this->getJoinColumnString('homepages', 'h')},
-                    {$this->getJoinColumnString('codes', 'cc')},
-                    {$this->getJoinColumnString('groups', 'g')}
-                FROM {$this->getTable()} c
-                INNER JOIN {$this->getJoinSql('codes', 'c', 'cc')}
-                LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
-                LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
-                WHERE c.deleted_at IS NULL
-            ";
             $external_user = $this->getExternalUser();
             if ($external_user instanceof External_UserInterface) {
                 $subject_list = $external_user->getSubjectList($user);
@@ -1158,10 +1146,25 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                             return trim($row['code']);
                         }, $subject_list
                     );
+
+                    $subjectQuery = "
+                        SELECT
+                            {$this->getColumnString('c')},
+                            {$this->getJoinColumnString('homepages', 'h')},
+                            {$this->getJoinColumnString('codes', 'cc')},
+                            {$this->getJoinColumnString('groups', 'g')}
+                        FROM {$this->getTable()} c
+                        INNER JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+                        LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
+                        LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
+                        WHERE c.deleted_at IS NULL
+                    ";
+                    $subjectQueryParts = [];
                     if (!empty($category_codes)) {
-                        $subjectQuery .= ' OR cc.code IN ' . $this->getArrayPlaceholders($category_codes, 'code');
+                        $subjectQueryParts[] = 'cc.code IN ' . $this->getArrayPlaceholders($category_codes, 'code');
+//                        $subjectQuery .= ' OR cc.code IN ' . $this->getArrayPlaceholders($category_codes, 'code');
                         $params = array_merge($params, $this->getArrayParameters($category_codes, 'code'));
-                        //
+
                         // Allow search of codes with a campus prefix.
                         $category_like_codes = array_map(
                             function ($code) {
@@ -1170,12 +1173,16 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                             $category_codes
                         );
                         foreach ($category_like_codes as $i => $like_code) {
-                            $subjectQuery .= ' OR cc.code LIKE :like_code_' . $i;
+                            $subjectQueryParts[] = 'cc.code LIKE :like_code_' . $i;
+//                            $subjectQuery .= ' OR cc.code LIKE :like_code_' . $i;
                             $params['like_code_' . $i] = $like_code;
                         }
                     }
 
-                    $query .= ' UNION ' . $subjectQuery;
+                    if (!empty($subjectQueryParts)) {
+                        $subjectQuery .= ' AND (' . implode(' OR ', $subjectQueryParts) . ')';
+                        $query .= ' UNION ' . $subjectQuery;
+                    }
                 }
             }
         }
