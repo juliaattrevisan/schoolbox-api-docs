@@ -14,6 +14,9 @@
 
 <script type="text/javascript">
     $(function() {
+
+        var settingsForm = $('#settings');
+
         {% if hasColourPicker %}
         $("[data-colour-picker]").spectrum({
             allowEmpty: false,
@@ -36,8 +39,7 @@
 
         {% if hasResourcePicker %}
         // Homepage selector
-        var settings = $('form[data-action="saveSettings"]');
-        settings.on('click', 'a[data-interaction="homepage_selector"]', function(e) {
+        settingsForm.on('click', 'a[data-interaction="homepage_selector"]', function(e) {
             e.preventDefault();
             var inputName = $(this).data('input_name');
             $('#resource-browser').socialstreamBrowser({
@@ -45,12 +47,15 @@
                 mimeFilter: false,
                 categoryId: 0,
                 submitCallback: function(url) {
-                    settings.find('input[name="'+inputName+'"]').val(url);
+                    settingsForm.find('input[name="'+inputName+'"]').val(url);
                 }
             });
         });
-        settings.alaressValidate();
         {% endif %}
+
+
+        settingsForm.alaressValidate();
+
     });
 </script>
 
@@ -78,23 +83,20 @@
         <form data-action="saveSettings" id="settings" method="post" action="{{ postRoute }}">
             <section>
                 <fieldset class="content">
-                    <div class="small-12 columns">
                         {% for setting in settings %}
                             {% set data = setting.data %}
                             {% if not data.hidden %}
-                                <label for="{{ data.name }}" {{ data.required ? 'class="required"' }}>
-                                    {{ data.title }}
-                                </label>
+                                <div class="small-12 columns">
+                                <label for="{{ data.name }}" {{ data.required ? 'class="required"' }}>{{ data.title }}</label>
                                 <span data-tooltip class="has-tip tip-top hint" title="{{ data.description }}">?</span>
-
                                 {% if not data.editable %}
                                     <p>{{ data.value }}</p>
                                 {% else %}
                                     {% include '@settings/fieldType/' ~ setting.template with data only %}
                                 {% endif %}
+                                </div>
                             {% endif %}
                         {% endfor %}
-                    </div>
                 </fieldset>
             </section>
 

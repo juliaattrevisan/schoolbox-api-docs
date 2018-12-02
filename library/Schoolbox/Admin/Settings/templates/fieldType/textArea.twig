@@ -3,4 +3,4 @@
     value:         string
     required:      bool
 #}
-<textarea id="{{ name }}" {% if required %}class="required" required{% endif %} name="{{ name }}" rows="5" {% block extraAttributes %}{% endblock %}>{{ value }}</textarea>
+<textarea id="{{ name }}" {{ required ? 'required ' }} name="{{ name }}" rows="5" {% block extraAttributes %}{% endblock %}>{{ value }}</textarea>
