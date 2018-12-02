@@ -52,14 +52,9 @@
             });
         });
         {% endif %}
-
-
         settingsForm.alaressValidate();
-
     });
 </script>
-
-
 {% if hasTimePicker %}
     <script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
     <script type="text/javascript">
@@ -76,8 +71,6 @@
         });
     </script>
 {% endif %}
-
-
 <div class="row">
     <div class="small-12 island">
         <form data-action="saveSettings" id="settings" method="post" action="{{ postRoute }}">
@@ -99,12 +92,10 @@
                         {% endfor %}
                 </fieldset>
             </section>
-
             {% if isEditable %}
                 <input type="submit" value="Save"/>
             {% endif %}
         </form>
     </div>
 </div>
-
 <div id="resource-browser" class="hide"></div>
