@@ -1,26 +1,16 @@
 {# Shared navigation profile #}
 {{ renderAdminNavigation(pageCurrent) }}
 
-{% if profile | length == 0 %}
-    <div class="row">
-        <div class="small-12 island">
-            <div class="empty-state">
-                <i class="icon-month-view"></i>
-                <p>You do not have any custom profile buttons configured.</p>
-                <p><a href="{{ routeLookup('adminProfileButton.getCreate') }}" title="Create profile page button">Create your first profile page button.</a></p>
-            </div>
+<div class="row {% if profile | length > 0 %}hide{% endif %}" data-tabs-empty>
+    <div class="small-12 island">
+        <div class="empty-state">
+            <i class="icon-staff-students"></i>
+            <p><a href="{{ routeLookup('adminProfileButton.getCreate') }}">Add a custom button</a> to the profile page for specific roles and campuses.</p>
         </div>
     </div>
-{% else %}
-    <div class="row hide" data-tabs-empty>
-        <div class="small-12 island">
-            <div class="empty-state">
-                <i class="icon-month-view"></i>
-                <p>Your button profile is empty.</p>
-                <p><a href="{{ routeLookup('adminProfileButton.getCreate') }}" title="Create profile page button">Create your first profile page button.</a></p>
-            </div>
-        </div>
-    </div>
+</div>
+
+{% if profile | length > 0 %}
     <div class="row" data-tabs>
 
         <div class="small-12 island">
@@ -63,7 +53,6 @@
 
         </div>
     </div>
-
 {% endif %}
 
 <!-- BEGIN custom_head -->
@@ -84,9 +73,7 @@
 
                 $.post('{{ routeLookup('adminProfileButton.postOrder') }}', {
                     order: order
-                })
-                        .success(function () {
-                        });
+                });
             }
         });
 
