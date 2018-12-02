@@ -121,7 +121,7 @@ if (!$count['all']) {
     }
 }
 
-$page->parse(TEMPLATE_body, 'RESULT', true);
+$page->parse(TEMPLATE_content, 'RESULT', true);
 $page->outputPage(true);
 
 exit();
