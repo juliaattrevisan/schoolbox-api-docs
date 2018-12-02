@@ -1,5 +1,6 @@
 <?php
 
+use Alaress\Mail\AbstractMailer;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as Access;
@@ -393,7 +394,7 @@ function renderStudent(
         $emails[] = $studentCoach->getEmail();
     }
 
-    $allTeacherEmails = implode(',', array_filter($emails));
+    $allTeacherEmails = implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), array_filter($emails));
 
     $pd = null;
     if (\Config::get('site_location') === 'help') {
