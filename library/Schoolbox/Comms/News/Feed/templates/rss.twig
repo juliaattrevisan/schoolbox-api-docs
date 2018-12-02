@@ -11,7 +11,7 @@
         {% for article in articles %}
             {% set image = '' %}
             {% if article.featureImage %}
-                {% set image = '<img src="'~ baseUrl ~'/image.php?hash=' ~ article.featureImage.hash ~ '&size=constrain200">' %}
+                {% set image = '<img src="'~ baseUrl ~'/storage/image.php?hash=' ~ article.featureImage.hash ~ '&size=constrain200">' %}
             {% endif %}
         <item>
             <title>{{ article.title }}</title>
