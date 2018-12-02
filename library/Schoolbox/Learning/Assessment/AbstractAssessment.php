@@ -254,9 +254,9 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isParticipant(User $user): bool
     {
-        $candidate = $this->findParticipantIfExtant($user);
+        $candidate = $this->findParticipantIfExtant($user, false);
 
-        return $candidate instanceof Participant && !$candidate->isExcluded();
+        return $candidate instanceof Participant;
     }
 
 
@@ -328,7 +328,7 @@ abstract class AbstractAssessment implements IAssessable
         foreach ($this->plans as $plan) {
             if ($plan->getParticipants()->offsetExists($userId)) {
                 $participant = $plan->getParticipants()[$userId];
-                if (!$participant->isExcluded() || $getExcluded) {
+                if ($getExcluded || !$participant->isExcluded()) {
                     return $participant;
                 }
             }
