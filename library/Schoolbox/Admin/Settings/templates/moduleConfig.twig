@@ -87,7 +87,7 @@
                             {% set data = setting.data %}
                             {% if not data.hidden %}
                                 <div class="small-12 columns">
-                                <label for="{{ data.name }}" {{ data.required ? 'class="required"' }}>{{ data.title }}</label>
+                                <label for="{{ data.name }}" {{ data.required and data.editable ? 'class="required"' }}>{{ data.title }}</label>
                                 <span data-tooltip class="has-tip tip-top hint" title="{{ data.description }}">?</span>
                                 {% if not data.editable %}
                                     <p>{{ data.value }}</p>
