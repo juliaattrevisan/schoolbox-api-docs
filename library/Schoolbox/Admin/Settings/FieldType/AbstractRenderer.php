@@ -7,9 +7,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\FieldType;
 
+use Schoolbox\Admin\Settings\Exceptions\FieldTypeMismatchException;
 use Schoolbox\Config\Config;
 use Schoolbox\Admin\Settings\IConfigRenderer;
-use InvalidArgumentException;
 
 /**
  * Provides common functionality for config field-type rendering classes
@@ -19,12 +19,13 @@ abstract class AbstractRenderer implements IConfigRenderer
 
     /**
      * @inheritdoc
+     * @throws FieldTypeMismatchException
      */
     public function getTemplateAndData(Config $config): array
     {
         // Ensure we received a config of the correct field type
         if ($config->getFieldId() !== $this->getFieldId()) {
-            throw new InvalidArgumentException("Invalid config field. Renderer: '{$this->getFieldId()}', Config: '{$config->getFieldId()}'");
+            throw new FieldTypeMismatchException("Invalid config field. Renderer: '{$this->getFieldId()}', Config: '{$config->getFieldId()}'");
         }
 
         return [

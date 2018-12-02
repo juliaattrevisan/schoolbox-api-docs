@@ -13,7 +13,6 @@ use Schoolbox\Config\ConfigMapper;
 
 class Renderer extends AbstractRenderer
 {
-
     /**
      * @inheritdoc
      */
@@ -28,13 +27,47 @@ class Renderer extends AbstractRenderer
      */
     protected function getData(Config $config): array
     {
-        $select  = [];
-        $options = \explode(':', $config->getOptions());
+        $data = \array_merge(parent::getData($config), ['options' => $this->buildOptions($config->getOptions())]);
 
-        foreach ($options as $value) {
-            $select[$value] = $value;
+        $isValidValue = $this->isValueValid($data['value'], $data['options']);
+
+        if(!$isValidValue){
+            $data['value'] = null;
         }
-        return \array_merge(parent::getData($config), ['options' => $select]);
+
+        // We need to render an empty option if:
+        // * config is optional, or
+        // * config value is invalid
+        $data['renderEmptyOption'] = !$config->getRequired() || !$isValidValue;
+
+        return $data;
+    }
+
+
+    /**
+     * Converts a string representation of options into an array form
+     *
+     * @param string $optionsString
+     * @return array
+     */
+    protected function buildOptions(string $optionsString): array
+    {
+        $options = [];
+        foreach (\explode(':', $optionsString) as $value) {
+            $options[$value] = $value;
+        }
+        return $options;
+    }
+
+
+    protected function isValueValid(?string $value, array $options): bool
+    {
+        foreach ($options as $key => $option) {
+            if ($option === $value) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

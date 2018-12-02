@@ -1,12 +1,20 @@
 {#
-    name:          string
-    value:         string
-    options:       array
-    required:      bool
+    name:              string
+    value:             null|string     The selected value. NULL means 'non selected'.
+                                       This has been validated prior to injection into this template and may not match DB value.
+                                       Eg, invalid values will have been coerced to NULL.
+    options:           string[]
+    required:          bool
+    renderEmptyOption: bool            Should we insert an empty option in the dropdown select?
 #}
 
 <select name="{{ name }}">
+    {% if renderEmptyOption %}
+        <option {% if required %} style="display: none;"{% endif %}{% if value is null %} selected="selected"{% endif %}>-- select an option --</option>
+    {% endif %}
     {% for key, option in options %}
-    <option value="{{ key }}" {% if key == value %}selected="selected"{% endif %}>{{ option }}</option>
+        {# We still need to convert numeric keys to strings, eg 0 => '0' so that a falsy value (eg NULL, '') does not erroneously match a key of 0 #}
+        {% set keyString = key ~ '' %}
+        <option value="{{ key }}" {% if keyString is same as(value) %}selected="selected"{% endif %}>{{ option }}</option>
     {% endfor %}
 </select>

@@ -15,19 +15,29 @@ class Renderer extends Select\Renderer
 {
 
     /**
-     * @inheritdoc
+     * Converts a string representation of options into an array form
+     *
+     * @param string $optionsString
+     * @return array
      */
-    protected function getData(Config $config): array
+    protected function buildOptions(string $optionsString): array
     {
         $options = [];
-        foreach (\explode(':', $config->getOptions()) as $keyAndValue) {
+        foreach (\explode(':', $optionsString) as $keyAndValue) {
             [$key, $val] = \explode(';', $keyAndValue);
             $options[$key] = $val;
         }
+        return $options;
+    }
 
-        return \array_merge(parent::getData($config), [
-            'options' => $options,
-        ]);
+    protected function isValueValid(?string $value, array $options): bool
+    {
+        foreach ($options as $key => $option) {
+            if ((string)$key === $value) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
