@@ -221,10 +221,10 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
     }
 
     function homepageClean($cid) {
-        $query = "DELETE {$this->_table}, {$this->_postTable}
-			FROM {$this->_table}, {$this->_postTable}
-			WHERE {$this->_table}.{$this->_index} = {$this->_postTable}.{$this->_index}
-				AND {$this->_table}.categoryID = $cid";
+        $query = "UPDATE {$this->_table}, {$this->_postTable} 
+            SET {$this->_table}.deleted=true, {$this->_postTable}.deleted=true
+            WHERE {$this->_table}.{$this->_index} = {$this->_postTable}.{$this->_index}
+            AND {$this->_table}.categoryID = $cid";
 
         return $this->db->query($query);
     }
