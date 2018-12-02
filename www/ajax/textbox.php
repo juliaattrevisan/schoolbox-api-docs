@@ -4,8 +4,10 @@ require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 $page          = new SitePage;
 $textboxMapper = new \Schoolbox\Resource\Textbox\Mapper();
 $return        = array();
+$articleResolver = $kernel->getDependencyInjector()->get('commsNewsArticleResolver');
 
-$allTextboxes = $textboxMapper->search($_SESSION['user'], $_GET['query']);
+
+$allTextboxes = $textboxMapper->search($articleResolver, $_SESSION['user'], $_GET['query']);
 
 foreach ($allTextboxes->getResult() as $currentTextbox) {
     $return[] = array(
