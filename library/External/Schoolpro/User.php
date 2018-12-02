@@ -209,7 +209,7 @@ class External_Schoolpro_User implements External_UserInterface
      * Get a list of student contacts (parents) and their contact information
      *
      * @param string $externalUserId
-     * @return mixed
+     * @return array
      */
     public function getStudentContactList($externalUserId)
     {
@@ -254,7 +254,7 @@ class External_Schoolpro_User implements External_UserInterface
             return array($studentContact);
         }
 
-        return false;
+        return [];
     }
     
     /**
