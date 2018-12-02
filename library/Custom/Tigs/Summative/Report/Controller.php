@@ -22,6 +22,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use UnexpectedValueException;
 
 class Controller extends Web\Controller\Base
 {
@@ -270,12 +271,11 @@ class Controller extends Web\Controller\Base
      *
      * @param GenericCollection|CourseImpl\Model[] $courseImports
      * @return GenericCollection|UnitImpl\Model[]
+     * @throws UnexpectedValueException
      */
     private function getUnitImpls(GenericCollection $courseImports): GenericCollection
     {
-        /** @var CourseImpl\Model $firstCourseImport */
-        $firstCourseImport = $courseImports->first();
-        $unitImpls         = $firstCourseImport->getUnits()->emptyClone();
+        $unitImpls = new GenericCollection(UnitImpl\Model::class);
 
         foreach ($courseImports as $courseImport) {
             foreach ($courseImport->getUnits() as $unitImpl) {
