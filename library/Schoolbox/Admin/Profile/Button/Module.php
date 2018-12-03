@@ -1,9 +1,5 @@
 <?php
-/**
- * @author    Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright Copyright 2016, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
- */
+declare(strict_types=1);
 
 namespace Schoolbox\Admin\Profile\Button;
 
@@ -26,7 +22,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Router $router, $basePath): void
     {
         $routes = [
             'GET' => [
@@ -51,7 +47,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initRoutePermissions(Authorizer $authorizer)
+    public function initRoutePermissions(Authorizer $authorizer): void
     {
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
@@ -61,7 +57,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector): void
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
@@ -69,7 +65,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
