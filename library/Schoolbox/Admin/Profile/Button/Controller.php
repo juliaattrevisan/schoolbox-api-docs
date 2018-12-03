@@ -60,7 +60,7 @@ class Controller extends Base
      * Display re-order screen
      *
      * @api   GET /adminv2/profile-button
-     * @level 165
+     * @level 182
      */
     public function getIndex()
     {
@@ -78,7 +78,7 @@ class Controller extends Base
      * Display modification screen
      *
      * @api   GET /adminv2/profile-button/modify/{id}
-     * @level 165
+     * @level 182
      *
      * @param $id
      */
@@ -124,7 +124,7 @@ class Controller extends Base
      * Display create screen
      *W
      * @api   GET /adminv2/insert
-     * @level 165
+     * @level 182
      *
      */
     public function getCreate()
@@ -145,7 +145,7 @@ class Controller extends Base
      * Update profile item order
      *
      * @api   POST /adminv2/profile-button/order
-     * @level 165
+     * @level 182
      */
     public function postOrder()
     {
@@ -169,7 +169,7 @@ class Controller extends Base
      * Delete profile item
      *
      * @api   POST /adminv2/profile-button/delete
-     * @level 165
+     * @level 182
      */
     public function postDelete()
     {
@@ -181,7 +181,7 @@ class Controller extends Base
      * Save profile item
      *
      * @api   POST /adminv2/profile-button/modify
-     * @level 165
+     * @level 182
      */
     public function postModify()
     {
