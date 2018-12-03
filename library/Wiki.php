@@ -125,8 +125,8 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
 	function homepageClean($cid)
 	{
-		$query = "DELETE w, r FROM  `" . $this->_table . "` w, " . $this->_revisionTable . " r  WHERE w.wikiID=r.wikiID AND categoryID='{$this->db->quote($cid)}'";
-		$this->db->query($query);
+        $query = "UPDATE {$this->_table} SET deleted = true WHERE categoryID='{$this->db->quote($cid)}'";
+        $this->db->query($query);
 	}
 
 	/**
