@@ -35,6 +35,7 @@ Data:
             {% if aamData.data is defined and aamData.data[unitId] is defined %}
                 {% include '@tigsSummativeReport/components/academicAchievementMatrix.twig' with aamData.data[unitId] only %}
             {% endif %}
+            {% if not loop.last %}<br>{% endif %}
         {% endfor %}
     </div>
 </div>
