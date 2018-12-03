@@ -185,9 +185,26 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function homepageClean(int $cid) :void
     {
+        $entityType = 'folder';
+
+        // Query for composite folders
+        $query = $this->getSelectString() . 'WHERE `child`.'. self::FIELD_ENTITY_VALUE .' = :folderId 
+        AND `child`.'. self::FIELD_ENTITY_TYPE .' = :entityType';
+
+        $statement = $this->database->prepare($query);
+        $statement->bindParam(':folderId', $cid);
+        $statement->bindParam(':entityType', $entityType);
+        $statement->execute();
+
+        // Delete composite folder audiences if any
+        foreach ($statement->fetchAll() as $key => $segment) {
+            $this->deleteSegment($this->findById($segment['id']));
+        }
+
+        // Delete non-composite folder audiences as well if any
         $this->deleteByColumnList([
-            self::FIELD_ENTITY_VALUE  => $cid,
-            self::FIELD_ENTITY_TYPE   => 'folder'
+            self::FIELD_ENTITY_VALUE   => $cid,
+            self::FIELD_ENTITY_TYPE    => $entityType
         ]);
     }
 }
