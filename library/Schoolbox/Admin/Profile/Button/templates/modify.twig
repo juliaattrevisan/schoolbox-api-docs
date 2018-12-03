@@ -110,7 +110,7 @@
             <ul class="flex-list buttons">
                 <li><a href="{{ routeLookup('adminProfileButton.getIndex') }}" class="button">Cancel</button></a>
                 <li>
-                    <button type="submit" class="submit expand">
+                    <button type="submit" class="submit expand" id="profile-button-submit">
                         {% if createForm %}
                             Create profile button
                         {% else %}
@@ -135,6 +135,13 @@
             messages: {
                 'text': {required: 'You must enter a name before you can proceed.'},
                 'url': {required: 'You must enter a valid URL for this profile item before you can proceed.'}
+            },
+            submitHandler: function(form) {
+                // Disable submit button
+                $('#profile-button-submit').prop('disabled', true).text('Working...');
+
+                // Submit the form
+                form.submit();
             }
         });
 
