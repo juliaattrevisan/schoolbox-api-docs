@@ -312,7 +312,8 @@ class Controller extends Web\Controller\Base
             // If user is superuser, prompt them to fix this.
             if ($this->getUser()->isSuperuser()) {
                 $routeConfig = $this->getRouter()->generate('tigsSummativeAdmin.getAdmin');
-                $errorMsg    .= " <a href =\"{$routeConfig}\">Set Academic Achievement Matrix Work Type</a>";
+                $hash        = Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX;
+                $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">Set Academic Achievement Matrix Work Type</a>";
             }
             return ['error' => $errorMsg];
         }
