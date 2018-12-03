@@ -165,7 +165,7 @@ abstract class Base
         }
 
         // render final output
-        $this->getPage()->parse(TEMPLATE_body, 'RESULT', true);
+        $this->getPage()->parse(TEMPLATE_content, 'RESULT', true);
     }
 
     /**
