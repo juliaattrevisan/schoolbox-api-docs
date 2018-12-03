@@ -45,12 +45,12 @@
                 </fieldset>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label for="url" class="required">
+                        <label for="profile-button-url" class="required">
                             Destination URL
                             <span data-tooltip class="hint has-tip tip-button" data-width="200" title="You can use [id], [firstName], [lastName], [externalId], [username], [email] in your URLs, these will be replaced for the user">?</span>
                         </label>
                         <div class="input-group">
-                            <input name="url" required type="text" value="{{ item.url }}">
+                            <input name="url" id="profile-button-url" required type="text" value="{{ item.url }}">
                             <a href="#" class="button icon-folder" data-role="openResourceBrowser">Browse {{ resource }}</a>
                         </div>
                     </div>
@@ -116,7 +116,8 @@
                         {% else %}
                             Save
                         {% endif %}
-                    </button></li>
+                    </button>
+                </li>
             </ul>
         </div>
     </div>
@@ -153,7 +154,7 @@
                 categoryId: 0,
                 mimeFilter: false,
                 submitCallback: function(url, filename) {
-                    $('input[name="url"]').val(url);
+                    $('#profile-button-url').val(url);
                 }
             });
         });
