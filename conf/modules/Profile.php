@@ -15,7 +15,7 @@ class Menu extends ModuleLoader
      * @param Kernel $kernel
      * @return void
      */
-    public function configure(Kernel $kernel): void
+    public function configure($kernel): void
     {
         $this->loadModule($kernel, ProfileButtonModule::class, null);
     }

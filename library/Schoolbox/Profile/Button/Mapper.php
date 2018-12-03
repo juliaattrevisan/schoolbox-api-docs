@@ -78,13 +78,15 @@ class Mapper extends BaseMapper
                 '[email]',
             ];
 
+            $userEmail = empty($user->getEmail()) ? '' : $user->getEmail();
+
             $array_replace = [
-                urlencode($user->getId()),
-                urlencode($user->getExternalId()),
-                urlencode($user->getUsername()),
-                urlencode($user->getFirstname()),
-                urlencode($user->getLastname()),
-                urlencode($user->getEmail())
+                \urlencode((string)$user->getId()),
+                \urlencode($user->getExternalId()),
+                \urlencode($user->getUsername()),
+                \urlencode($user->getFirstname()),
+                \urlencode($user->getLastname()),
+                \urlencode($userEmail)
             ];
 
             $button->setUrl(str_ireplace($array_find, $array_replace, $button->getUrl()));

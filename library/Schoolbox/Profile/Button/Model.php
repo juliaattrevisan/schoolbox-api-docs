@@ -46,9 +46,9 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return null|int
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -190,9 +190,9 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Alaress_Date_Format $deletedAt
+     * @return null|Alaress_Date_Format $deletedAt
      */
-    public function getDeletedAt(): Alaress_Date_Format
+    public function getDeletedAt(): ?Alaress_Date_Format
     {
         return $this->deletedAt;
     }

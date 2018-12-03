@@ -244,7 +244,7 @@ class Controller extends Base
             foreach ($post['campuses'] as $campusId) {
                 $profileButtonCampus = new ProfileButtonCampus();
                 $profileButtonCampus->setProfileButtonId($item->getId());
-                $profileButtonCampus->setCampusId($campusId);
+                $profileButtonCampus->setCampusId((int)$campusId);
                 $this->getProfileButtonCampusMapper()->save($profileButtonCampus);
             }
         }
@@ -255,7 +255,7 @@ class Controller extends Base
             foreach ($post['roles'] as $roleId) {
                 $profileButtonRole = new ProfileButtonRole();
                 $profileButtonRole->setProfileButtonId($item->getId());
-                $profileButtonRole->setRoleId($roleId);
+                $profileButtonRole->setRoleId((int)$roleId);
                 $this->getProfileButtonRoleMapper()->save($profileButtonRole);
             }
         }
@@ -312,10 +312,10 @@ class Controller extends Base
     }
 
     /**
-     * @param ProfileButtonRoleMapper $mapper
+     * @param ProfileButtonCampusMapper $mapper
      * @return $this
      */
-    public function setProfileButtonCampusMapper(ProfileButtonRoleMapper $mapper): self
+    public function setProfileButtonCampusMapper(ProfileButtonCampusMapper $mapper): self
     {
         $this->profileButtonCampusMapper = $mapper;
         return $this;
