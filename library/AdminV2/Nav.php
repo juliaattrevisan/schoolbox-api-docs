@@ -13,7 +13,7 @@ class AdminV2_Nav
         'user'               => 'Users',
         'menu-side'          => 'Side Menu',
         'menu-top'           => 'Top Menu',
-        'profile-button'     => 'Profile Page Buttons',
+        'profile-button'     => 'Profile Buttons',
         'dashboard'          => 'Dashboard',
         'homepage'           => 'Homepages',
         'eportfolio'         => 'ePortfolios',
