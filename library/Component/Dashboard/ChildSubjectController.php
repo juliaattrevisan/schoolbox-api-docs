@@ -8,6 +8,9 @@
  *
  */
 
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
+
 class Component_Dashboard_ChildSubjectController extends Component_Dashboard_ControllerAbstract
 {
 
@@ -44,6 +47,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         $this->setBlock('student_block', 'due_work', 'due_work_block');
         $this->setBlock('student_block', 'grades_button', 'grades_button_block');
         $this->setBlock('student_block', 'timetable', 'timetable_block');
+        $this->setBlock('student_block', 'custom_buttons', 'custom_buttons_block');
 
         $isParent = $this->getUser()->getRole()->isParent();
 
@@ -127,12 +131,35 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                     $this->setVar('reports_block');
                 }
 
+                // Custom buttons from admin
+                try {
+                    $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($userChild);
+                } catch (MapperException $e) {
+                    $customButtons = [];
+                }
+
+                foreach ($customButtons as $customButton) {
+                    $this->setVar([
+                        'BUTTON_TEXT' => $customButton->getText(),
+                        'BUTTON_TITLE' => $customButton->getTitle(),
+                        'BUTTON_HREF' => $customButton->getURL(),
+                        'BUTTON_ICON' => $customButton->getIcon(),
+                        'BUTTON_TARGET' => $customButton->getTarget(),
+                    ]);
+        
+                    $this->parse('custom_buttons_block', 'custom_buttons', true);
+                }
+
+                // Parse the parent block
                 $this->parse("student_subjects", "student_block", true);
-                $this->setVar('subject_item', '');
 
                 /* Clear children after parsing out the parent
                  */
-                $this->setVar('due_work_block', '');
+                $this->setVar([
+                    'subject_item' => '',
+                    'due_work_block' => '',
+                    'custom_buttons_block' => ''
+                ]);
             }
         }
 
