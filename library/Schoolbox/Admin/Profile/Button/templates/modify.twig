@@ -63,12 +63,14 @@
                     </div>
                 </fieldset>
                 <fieldset class="content">
+                    <legend>
+                        User Profiles To Show On
+                        <span data-tooltip class="has-tip hint" title="The button will appear on the profiles of the users in the selected roles and campuses.">?</span>
+                    </legend>
+
                     <div class="small-12 medium-6 columns">
                         <fieldset class="checklist">
-                            <legend>
-                                Visible Campus
-                                <span data-tooltip="" class="hint has-tip tip-button" data-width="200" title="Users in these campus will see the tab, remember users can be in multiple campus">?</span>
-                            </legend>
+                            <label>Campuses</label>
                             <input id="campus-all" type="checkbox">
                             <label for="campus-all">Select All</label>
                             {% for campus in campuses %}
@@ -79,10 +81,7 @@
                     </div>
                     <div class="small-12 medium-6 columns">
                         <fieldset class="checklist">
-                            <legend>
-                                Visible Roles
-                                <span data-tooltip="" class="hint has-tip tip-button" data-width="200" title="Users in these roles will see the tab">?</span>
-                            </legend>
+                            <label>Roles</label>
                             <input id="role-all" type="checkbox">
                             <label for="role-all">Select All</label>
                             {% for role in roles %}
