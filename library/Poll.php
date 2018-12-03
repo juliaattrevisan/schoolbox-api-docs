@@ -108,7 +108,10 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
     public function homepageClean($cid)
     {
-        $query = "DELETE p, l FROM  `" . $this->_table . "` p LEFT JOIN pollLog l ON l.poll_id = p.id WHERE p.folder_id='{$this->db->quote($cid)}'";
+        $query = "DELETE l FROM  `" . $this->_table . "` p LEFT JOIN pollLog l ON l.poll_id = p.id WHERE p.folder_id='{$this->db->quote($cid)}'";
+        $this->db->query($query);
+
+        $query = "DELETE FROM poll WHERE folder_id = '{$this->db->quote($cid)}'";
         $this->db->query($query);
     }
 
