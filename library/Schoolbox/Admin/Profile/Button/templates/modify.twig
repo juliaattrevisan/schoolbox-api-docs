@@ -13,26 +13,20 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
-                            Title
-                            <input required type="text" name='text' value="{{ item.text }}">
-                        </label>
+                        <label for="profile-button-title" class="required">Title</label>
+                        <input required type="text" id="profile-button-title" name='text' value="{{ item.text }}">
                     </div>
                     <div class="small-12 columns">
-                        <label>
-                            Hover Description
-                            <input name='title' type="text" value="{{ item.title }}">
-                        </label>
+                        <label for="profile-button-desc">Hover Description</label>
+                        <input name='title' id="profile-button-desc" type="text" value="{{ item.title }}">
                     </div>
                     <div class="small-10 columns">
-                        <label>
-                            Icon
-                            <select id="icon-select" name="icon">
-                                {% for icon in icons %}
-                                    <option {% if icon.name == item.icon %}selected{% endif %} value="{{ icon.name }}">{{ icon.title }}</option>
-                                {% endfor %}
-                            </select>
-                        </label>
+                        <label for="icon-select">Icon</label>
+                        <select id="icon-select" name="icon">
+                            {% for icon in icons %}
+                                <option {% if icon.name == item.icon %}selected{% endif %} value="{{ icon.name }}">{{ icon.title }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="small-2 columns">
                         <label>Preview</label>
@@ -41,7 +35,7 @@
                 </fieldset>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label for="url">
+                        <label for="url" class="required">
                             Destination URL
                             <span data-tooltip class="hint has-tip tip-button" data-width="200" title="You can use [id], [firstName], [lastName], [externalId], [username], [email] in your URLs, these will be replaced for the user">?</span>
                         </label>
@@ -51,13 +45,11 @@
                         </div>
                     </div>
                     <div class="small-12 columns">
-                        <label>
-                            Destination Target
-                            <select name="target">
-                                <option {% if item.target == '' %}selected{% endif %} value="">Same Window</option>
-                                <option {% if item.target == '_blank' %}selected{% endif %} value="_blank">New Window</option>
-                            </select>
-                        </label>
+                        <label for="profile-button-destination">Destination Target</label>
+                        <select name="target" id="profile-button-destination">
+                            <option {% if item.target == '' %}selected{% endif %} value="">Same Window</option>
+                            <option {% if item.target == '_blank' %}selected{% endif %} value="_blank">New Window</option>
+                        </select>
                     </div>
                 </fieldset>
                 <fieldset class="content" id="profile-user-selections">
