@@ -106,6 +106,7 @@ class Controller extends Web\Controller\Base
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getSubjectReport(User $user, Folder\Model $folder): void
     {
@@ -290,12 +291,15 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * Builds data for rendering the AAM components
+     * Builds data for rendering the AAM components.
+     *
+     * If
      *
      * @param GenericCollection|UnitImpl\Model[] $unitImpls
      * @param User                               $student
      * @return array
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function buildAcademicAchievementSummaryData(GenericCollection $unitImpls, User $student): array
     {
@@ -304,7 +308,13 @@ class Controller extends Web\Controller\Base
 
         // Not set? Then we can't identify AAM assessments.
         if (null === $aamWorkTypeId) {
-            return [];
+            $errorMsg = 'Cannot render Academic Achievement Matrix components. Work type not set.';
+            // If user is superuser, prompt them to fix this.
+            if ($this->getUser()->isSuperuser()) {
+                $routeConfig = $this->getRouter()->generate('tigsSummativeAdmin.getAdmin');
+                $errorMsg    .= " <a href =\"{$routeConfig}\">Set Academic Achievement Matrix Work Type</a>";
+            }
+            return ['error' => $errorMsg];
         }
 
         $aam = new AcademicAchievementMatrix(

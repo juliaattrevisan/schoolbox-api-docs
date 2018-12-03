@@ -76,9 +76,9 @@ class AcademicAchievementMatrix
      * * if invalid data found, returns an error message to aid resolution
      *
      * @return array
-     * @var string     $return['error']      Optional. If cannot build due to invalid data
-     * @var Grid       $return['grid']       Optional. If a valid AAM rubric is found for the unit
-     * @var MarkedGrid $return['markedGrid'] Optional. If student has visible marks for the rubric
+     * @var string     $data['data'][unitImplId]['error']      Optional. If cannot build due to invalid data
+     * @var Grid       $data['data'][unitImplId]['grid']       Optional. If a valid AAM rubric is found for the unit
+     * @var MarkedGrid $data['data'][unitImplId]['markedGrid'] Optional. If student has visible marks for the rubric
      * @throws \Schoolbox\Mapper\Exception
      */
     public function toContext(): array
@@ -91,7 +91,7 @@ class AcademicAchievementMatrix
             }
         }
 
-        return $data;
+        return ['data' => $data];
     }
 
 

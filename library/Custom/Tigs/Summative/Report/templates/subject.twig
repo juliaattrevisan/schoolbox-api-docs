@@ -22,13 +22,18 @@ Data:
                 This report is currently not visible to the student or their parents.
             </div>
         {% endif %}
+        {% if aamData.error is defined %}
+            <div data-alert class="alert-box alert">
+                {{ aamData.error|raw }}
+            </div>
+        {% endif %}
     </div>
     <div class="small-12">
         {% for unitId, unit in unitImpls %}
             <h2 class="subheader">{{ unit.title }}</h2>
             {# Were we given AAM data for this unit? #}
-            {% if aamData[unitId] is defined %}
-                {% include '@tigsSummativeReport/components/academicAchievementMatrix.twig' with aamData[unitId] only %}
+            {% if aamData.data is defined and aamData.data[unitId] is defined %}
+                {% include '@tigsSummativeReport/components/academicAchievementMatrix.twig' with aamData.data[unitId] only %}
             {% endif %}
         {% endfor %}
     </div>
