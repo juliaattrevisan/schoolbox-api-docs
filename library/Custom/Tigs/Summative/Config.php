@@ -17,4 +17,5 @@ class Config
     public const PREFIX_TIGS_CRP = 'tigs_crp_';
     public const _TIGS_PARTICIPATION_REPORT_ENABLED = self::PREFIX_TIGS_CRP . 'participation_report_enabled';
     public const _TIGS_SUBJECT_REPORT_ENABLED = self::PREFIX_TIGS_CRP . 'subject_report_enabled';
+    public const _TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX = self::PREFIX_TIGS_CRP . 'work_type_academic_achievement_matrix';
 }
