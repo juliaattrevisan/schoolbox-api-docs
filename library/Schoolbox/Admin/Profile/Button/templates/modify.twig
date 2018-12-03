@@ -69,25 +69,29 @@
                     </legend>
 
                     <div class="small-12 medium-6 columns">
-                        <fieldset class="checklist">
-                            <label>Campuses</label>
-                            <input id="campus-all" type="checkbox">
-                            <label for="campus-all">Select All</label>
-                            {% for campus in campuses %}
-                                <input name="campuses[]" data-campus id="campus-{{ campus.id }}" type="checkbox" {% if campusesSelected[campus.id] %}checked{% endif %} value="{{ campus.id }}">
-                                <label for="campus-{{ campus.id }}">{{ campus.name }}</label>
-                            {% endfor %}
+                        <fieldset>
+                            <label class="required">Campuses</label>
+                            <div class="checklist">
+                                <input id="campus-all" type="checkbox">
+                                <label for="campus-all">Select All</label>
+                                {% for campus in campuses %}
+                                    <input name="campuses[]" data-campus id="campus-{{ campus.id }}" type="checkbox" {% if campusesSelected[campus.id] %}checked{% endif %} value="{{ campus.id }}">
+                                    <label for="campus-{{ campus.id }}">{{ campus.name }}</label>
+                                {% endfor %}
+                            </div>
                         </fieldset>
                     </div>
                     <div class="small-12 medium-6 columns">
-                        <fieldset class="checklist">
-                            <label>Roles</label>
-                            <input id="role-all" type="checkbox">
-                            <label for="role-all">Select All</label>
-                            {% for role in roles %}
-                                <input name="roles[]" data-role id="role-{{ role.id }}" type="checkbox" {% if rolesSelected[role.id] %}checked{% endif %} value="{{ role.id }}">
-                                <label for="role-{{ role.id }}">{{ role.name }}</label>
-                            {% endfor %}
+                        <fieldset>
+                            <label class="required">Roles</label>
+                            <div class="checklist">
+                                <input id="role-all" type="checkbox">
+                                <label for="role-all">Select All</label>
+                                {% for role in roles %}
+                                    <input name="roles[]" data-role id="role-{{ role.id }}" type="checkbox" {% if rolesSelected[role.id] %}checked{% endif %} value="{{ role.id }}">
+                                    <label for="role-{{ role.id }}">{{ role.name }}</label>
+                                {% endfor %}
+                            </div>
                         </fieldset>
                     </div>
                 </fieldset>
@@ -130,15 +134,19 @@
         $('#itemForm').alaressValidate({
             ignore: ':disabled',
             rules: {
-                'text': {required: true},
-                'url': {required: true, isURL: true}
+                'text': 'required',
+                'url': {required: true, isURL: true},
+                'campuses[]': 'required',
+                'roles[]': 'required'
             },
             messages: {
                 'text': {required: 'Please enter a name for the profile button.'},
                 'url': {
                     required: 'Please enter a destination URL for the profile button.',
                     isURL: 'Please enter a valid URL for the profile button.'
-                }
+                },
+                'campuses[]': {required: 'Please select at least one campus.'},
+                'roles[]': {required: 'Please select at least one role.'},
             },
             submitHandler: function(form) {
                 // Disable submit button
