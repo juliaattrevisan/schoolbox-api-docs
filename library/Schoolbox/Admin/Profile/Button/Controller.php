@@ -1,9 +1,5 @@
 <?php
-/**
- * @author    Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright Copyright 2016, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
- */
+declare(strict_types=1);
 
 namespace Schoolbox\Admin\Profile\Button;
 
@@ -62,7 +58,7 @@ class Controller extends Base
      * @api   GET /adminv2/profile-button
      * @level 182
      */
-    public function getIndex()
+    public function getIndex(): void
     {
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/index.twig',
@@ -82,7 +78,7 @@ class Controller extends Base
      *
      * @param $id
      */
-    public function getModify($id)
+    public function getModify(int $id): void
     {
         // Get selected campuses and roles
 
@@ -127,7 +123,7 @@ class Controller extends Base
      * @level 182
      *
      */
-    public function getCreate()
+    public function getCreate(): void
     {
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/modify.twig',
@@ -147,7 +143,7 @@ class Controller extends Base
      * @api   POST /adminv2/profile-button/order
      * @level 182
      */
-    public function postOrder()
+    public function postOrder(): void
     {
         $post = $this->getRequest()->post;
         $orderArray = explode(",", $post['order']);
@@ -171,7 +167,7 @@ class Controller extends Base
      * @api   POST /adminv2/profile-button/delete
      * @level 182
      */
-    public function postDelete()
+    public function postDelete(): void
     {
         $post = $this->getRequest()->post;
         $this->getProfileButtonMapper()->deleteByColumn("id", $post["id"]);
@@ -183,7 +179,7 @@ class Controller extends Base
      * @api   POST /adminv2/profile-button/modify
      * @level 182
      */
-    public function postModify()
+    public function postModify(): void
     {
         $post = $this->getRequest()->post;
 
@@ -272,16 +268,16 @@ class Controller extends Base
     /**
      * @return ProfileIconMapper
      */
-    public function getProfileIconMapper()
+    public function getProfileIconMapper(): ProfileIconMapper
     {
         return $this->profileIconMapper;
     }
 
     /**
-     * @param $mapper
+     * @param ProfileIconMapper $mapper
      * @return $this
      */
-    public function setProfileIconMapper($mapper)
+    public function setProfileIconMapper(ProfileIconMapper $mapper): self
     {
         $this->profileIconMapper = $mapper;
         return $this;
@@ -292,16 +288,16 @@ class Controller extends Base
     /**
      * @return ProfileButtonMapper
      */
-    public function getProfileButtonMapper()
+    public function getProfileButtonMapper(): ProfileButtonMapper
     {
         return $this->profileButtonMapper;
     }
 
     /**
-     * @param $mapper
+     * @param ProfileButtonMapper $mapper
      * @return $this
      */
-    public function setProfileButtonMapper($mapper)
+    public function setProfileButtonMapper(ProfileButtonMapper $mapper): self
     {
         $this->profileButtonMapper = $mapper;
         return $this;
@@ -310,16 +306,16 @@ class Controller extends Base
     /**
      * @return ProfileButtonCampusMapper
      */
-    public function getProfileButtonCampusMapper()
+    public function getProfileButtonCampusMapper(): ProfileButtonCampusMapper
     {
         return $this->profileButtonCampusMapper;
     }
 
     /**
-     * @param $mapper
+     * @param ProfileButtonRoleMapper $mapper
      * @return $this
      */
-    public function setProfileButtonCampusMapper($mapper)
+    public function setProfileButtonCampusMapper(ProfileButtonRoleMapper $mapper): self
     {
         $this->profileButtonCampusMapper = $mapper;
         return $this;
@@ -328,16 +324,16 @@ class Controller extends Base
     /**
      * @return ProfileButtonRoleMapper
      */
-    public function getProfileButtonRoleMapper()
+    public function getProfileButtonRoleMapper(): ProfileButtonRoleMapper
     {
         return $this->profileButtonRoleMapper;
     }
 
     /**
-     * @param $mapper
+     * @param ProfileButtonRoleMapper $mapper
      * @return $this
      */
-    public function setProfileButtonRoleMapper($mapper)
+    public function setProfileButtonRoleMapper(ProfileButtonRoleMapper $mapper): self
     {
         $this->profileButtonRoleMapper = $mapper;
         return $this;
@@ -346,16 +342,16 @@ class Controller extends Base
     /**
      * @return RoleMapper
      */
-    public function getRoleMapper()
+    public function getRoleMapper(): RoleMapper
     {
         return $this->roleMapper;
     }
 
     /**
-     * @param $mapper
+     * @param RoleMapper $mapper
      * @return $this
      */
-    public function setRoleMapper($mapper)
+    public function setRoleMapper(RoleMapper $mapper): self
     {
         $this->roleMapper = $mapper;
         return $this;
@@ -364,16 +360,16 @@ class Controller extends Base
     /**
      * @return CampusMapper
      */
-    public function getCampusMapper()
+    public function getCampusMapper(): CampusMapper
     {
         return $this->campusMapper;
     }
 
     /**
-     * @param $mapper
+     * @param CampusMapper $mapper
      * @return $this
      */
-    public function setCampusMapper($mapper)
+    public function setCampusMapper(CampusMapper $mapper): self
     {
         $this->campusMapper = $mapper;
         return $this;
