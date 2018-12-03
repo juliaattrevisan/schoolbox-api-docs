@@ -66,7 +66,7 @@ class Controller extends Base
                 'pageCurrent' => self::PAGE_CURRENT,
                 'profile' => $this->getProfileButtonMapper()->findAll()->sortBy('sortOrder', 'asc')
             ],
-            'title' => 'Admin - Button Profile'
+            'title' => 'Admin - Profile Buttons'
         ]);
     }
 
@@ -112,7 +112,7 @@ class Controller extends Base
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc'),
                 'campusesSelected' => $campusesSelected                
             ],
-            'title' => 'Admin - Button Profile'
+            'title' => 'Admin - Profile Button Modify'
         ]);
     }
 
@@ -133,7 +133,7 @@ class Controller extends Base
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
             ],
-            'title' => 'Admin - Button Profile'
+            'title' => 'Admin - Profile Button Create'
         ]);
     }
 
