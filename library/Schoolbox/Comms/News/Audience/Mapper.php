@@ -196,7 +196,7 @@ class Mapper extends \Schoolbox\Mapper
         $statement->bindParam(':entityType', $entityType);
         $statement->execute();
 
-        // Delete composite folder audiences if any
+        // Delete respective composite folder audiences if any
         foreach ($statement->fetchAll() as $key => $segment) {
             $this->deleteSegment($this->findById($segment['id']));
         }
