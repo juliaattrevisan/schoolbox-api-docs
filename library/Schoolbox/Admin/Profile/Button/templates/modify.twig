@@ -134,8 +134,11 @@
                 'url': {required: true, isURL: true}
             },
             messages: {
-                'text': {required: 'You must enter a name before you can proceed.'},
-                'url': {required: 'You must enter a valid URL for this profile item before you can proceed.'}
+                'text': {required: 'Please enter a name for the profile button.'},
+                'url': {
+                    required: 'Please enter a destination URL for the profile button.',
+                    isURL: 'Please enter a valid URL for the profile button.'
+                }
             },
             submitHandler: function(form) {
                 // Disable submit button
