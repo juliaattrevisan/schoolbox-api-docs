@@ -1,15 +1,25 @@
 {# Shared navigation profile #}
 {{ renderAdminNavigation(pageCurrent) }}
 
+{% if item.id is empty %}
+    {% set createForm = true %}
+{% else %}
+    {% set createForm = false %}
+{% endif %}
+
 <form id="itemForm" action="{{ routeLookup('adminProfileButton.postModify') }}" method="post">
     <input type="hidden" name="id" value="{{ item.id }}">
     <div class="row">
         <div class="small-12 island">
-            {% if item.id is empty %}
-                <h2 class="subheader">Create Profile Item</h2>
-            {% else %}
-                <h2 class="subheader">Modify Profile Item</h2>
-            {% endif %}
+            
+            <h2 class="subheader">
+                {% if createForm %}
+                    Create Profile Button
+                {% else %}
+                    Modify Profile Button
+                {% endif %}
+            </h2>
+            
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -52,7 +62,7 @@
                         </select>
                     </div>
                 </fieldset>
-                <fieldset class="content" id="profile-user-selections">
+                <fieldset class="content" id="profile-button-user-selections">
                     <legend>
                         User Profiles To Show On
                         <span data-tooltip class="has-tip hint" title="The button will appear on the profiles of the users in the selected roles and campuses.">?</span>
@@ -99,7 +109,14 @@
         <div class="small-12 column">
             <ul class="flex-list buttons">
                 <li><a href="{{ routeLookup('adminProfileButton.getIndex') }}" class="button">Cancel</button></a>
-                <li><button type="submit" class="submit expand">Save</button></li>
+                <li>
+                    <button type="submit" class="submit expand">
+                        {% if createForm %}
+                            Create profile button
+                        {% else %}
+                            Save
+                        {% endif %}
+                    </button></li>
             </ul>
         </div>
     </div>
@@ -155,12 +172,12 @@
         });
 
         // Select all
-        $("#profile-user-selections").selectAll({    
+        $("#profile-button-user-selections").selectAll({    
             selector: "#campus-all",
             checkboxes: "[data-campus]"
         });
 
-         $("#profile-user-selections").selectAll({    
+         $("#profile-button-user-selections").selectAll({    
             selector: "#role-all",
             checkboxes: "[data-role]"
         });
