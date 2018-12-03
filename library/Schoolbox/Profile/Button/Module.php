@@ -1,11 +1,9 @@
 <?php
 /**
  * Share navigation element for admin pages
- *
- * @author    Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright Copyright 2016, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Profile\Button;
 
@@ -22,7 +20,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

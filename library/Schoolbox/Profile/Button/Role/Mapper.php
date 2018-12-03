@@ -1,11 +1,5 @@
 <?php
-/**
- *
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
- */
+declare(strict_types=1);
 
 namespace Schoolbox\Profile\Button\Role;
 
@@ -16,7 +10,7 @@ class Mapper extends BaseMapper
     /**
      * Setup mapper
      */
-    protected function mapping()
+    protected function mapping(): void
     {
         $this->hasTable('profile_button_role');
         $this->hasModel(Model::class);

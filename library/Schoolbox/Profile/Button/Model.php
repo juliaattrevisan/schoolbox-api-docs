@@ -1,13 +1,10 @@
 <?php
-/**
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- */
+declare(strict_types=1);
 
 namespace Schoolbox\Profile\Button;
 
 use Schoolbox\ISoftDeletable;
+use Alaress_Date_Format;
 
 class Model implements ISoftDeletable
 {
@@ -42,7 +39,7 @@ class Model implements ISoftDeletable
      * @param int $id
      * @return self
      */
-    public function setId($id)
+    public function setId(int $id): self
     {
         $this->id = $id;
         return $this;
@@ -51,7 +48,7 @@ class Model implements ISoftDeletable
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -60,7 +57,7 @@ class Model implements ISoftDeletable
      * @param string $title
      * @return self
      */
-    public function setTitle($title)
+    public function setTitle(string $title): self
     {
         $this->title = $title;
         return $this;
@@ -69,7 +66,7 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -78,7 +75,7 @@ class Model implements ISoftDeletable
      * @param string $text
      * @return self
      */
-    public function setText($text)
+    public function setText(string $text): self
     {
         $this->text = $text;
         return $this;
@@ -87,7 +84,7 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getText()
+    public function getText(): string
     {
         return $this->text;
     }
@@ -96,7 +93,7 @@ class Model implements ISoftDeletable
      * @param string $token
      * @return self
      */
-    public function setToken($token)
+    public function setToken(string $token): self
     {
         $this->token = $token;
         return $this;
@@ -105,7 +102,7 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getToken()
+    public function getToken(): string
     {
         return $this->token;
     }
@@ -114,7 +111,7 @@ class Model implements ISoftDeletable
      * @param string $icon
      * @return self
      */
-    public function setIcon($icon)
+    public function setIcon(string $icon): self
     {
         $this->icon = $icon;
         return $this;
@@ -123,7 +120,7 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getIcon()
+    public function getIcon(): string
     {
         return $this->icon;
     }
@@ -132,7 +129,7 @@ class Model implements ISoftDeletable
      * @param string $url
      * @return self
      */
-    public function setUrl($url)
+    public function setUrl(string $url): self
     {
         $this->url = $url;
         return $this;
@@ -141,7 +138,7 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }
@@ -150,7 +147,7 @@ class Model implements ISoftDeletable
      * @param string $target
      * @return self
      */
-    public function setTarget($target)
+    public function setTarget(string $target): self
     {
         $this->target = $target;
         return $this;
@@ -159,7 +156,7 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getTarget()
+    public function getTarget(): string
     {
         return $this->target;
     }
@@ -168,7 +165,7 @@ class Model implements ISoftDeletable
      * @param int $sortOrder
      * @return self
      */
-    public function setSortOrder($sortOrder)
+    public function setSortOrder(int $sortOrder): self
     {
         $this->sortOrder = $sortOrder;
         return $this;
@@ -177,25 +174,25 @@ class Model implements ISoftDeletable
     /**
      * @return int
      */
-    public function getSortOrder()
+    public function getSortOrder(): int
     {
         return $this->sortOrder;
     }
 
     /**
-     * @param \Alaress_Date_Format $deletedAt
+     * @param Alaress_Date_Format $deletedAt
      * @return self
      */
-    public function setDeletedAt($deletedAt)
+    public function setDeletedAt(Alaress_Date_Format $deletedAt): self
     {
         $this->deletedAt = $deletedAt;
         return $this;
     }
 
     /**
-     * @return \Alaress_Date_Format $deletedAt
+     * @return Alaress_Date_Format $deletedAt
      */
-    public function getDeletedAt()
+    public function getDeletedAt(): Alaress_Date_Format
     {
         return $this->deletedAt;
     }
@@ -205,7 +202,7 @@ class Model implements ISoftDeletable
      *
      * @return bool
      */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
         return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
     }

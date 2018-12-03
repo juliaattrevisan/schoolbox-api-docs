@@ -1,11 +1,5 @@
 <?php
-/**
- *
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
- */
+declare(strict_types=1);
 
 namespace Schoolbox\Profile\Button\Role;
 
@@ -26,7 +20,7 @@ class Model
      * @param int $id
      * @return self
      */
-    public function setId($id)
+    public function setId(int $id): self
     {
         $this->id = $id;
         return $this;
@@ -35,7 +29,7 @@ class Model
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -44,7 +38,7 @@ class Model
      * @param int $profileButtonId
      * @return self
      */
-    public function setProfileButtonId($profileButtonId)
+    public function setProfileButtonId(int $profileButtonId): self
     {
         $this->profileButtonId = $profileButtonId;
         return $this;
@@ -53,7 +47,7 @@ class Model
     /**
      * @return int
      */
-    public function getProfileButtonId()
+    public function getProfileButtonId(): int
     {
         return $this->profileButtonId;
     }
@@ -62,7 +56,7 @@ class Model
      * @param int $roleId
      * @return self
      */
-    public function setRoleId($roleId)
+    public function setRoleId(int $roleId): self
     {
         $this->roleId = $roleId;
         return $this;
@@ -71,7 +65,7 @@ class Model
     /**
      * @return int
      */
-    public function getRoleId()
+    public function getRoleId(): int
     {
         return $this->roleId;
     }

@@ -1,24 +1,20 @@
 <?php
-/**
- *
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
- */
+declare(strict_types=1);
 
 namespace Schoolbox\Profile\Button;
 
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Model;
+use Schoolbox\Collection;
+use Schoolbox\User;
 
 class Mapper extends BaseMapper
 {
     /**
      * Setup mapper
      */
-    protected function mapping()
+    protected function mapping(): void
     {
         $this->hasTable('profile_button');
         $this->hasModel(Model::class);
@@ -35,11 +31,11 @@ class Mapper extends BaseMapper
 
 
     /**
-     * @param \Schoolbox\User $user
-     * @return \Schoolbox\Collection
+     * @param User $user
+     * @return Collection
      * @throws MapperException
      */
-    public function findButtonsForUser($user)
+    public function findButtonsForUser(User $user): Collection
     {
         $campusList = array();
 
