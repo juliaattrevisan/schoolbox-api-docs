@@ -60,7 +60,7 @@
                         </label>
                     </div>
                 </fieldset>
-                <fieldset class="content">
+                <fieldset class="content" id="profile-user-selections">
                     <legend>
                         User Profiles To Show On
                         <span data-tooltip class="has-tip hint" title="The button will appear on the profiles of the users in the selected roles and campuses.">?</span>
@@ -113,6 +113,7 @@
     </div>
 </form>
 
+<script src="/javascript/shared/select-all/jquery.select-all.js"></script>
 <script>
     $(function() {
         // Init validation
@@ -161,51 +162,16 @@
             updateIconPreview($('#icon-select').val());
         });
 
-        // Check all checkboxes if everything was selected
-        var allChecked = true;
-
-        // Roles
-        $('[data-role]').each(function() {
-            if (!$(this).prop('checked')) {
-                allChecked = false;
-            }
+        // Select all
+        $("#profile-user-selections").selectAll({    
+            selector: "#campus-all",
+            checkboxes: "[data-campus]"
         });
 
-        if (allChecked) {
-            $('#role-all').prop('checked', true);
-        }
-
-        // Campuses
-        $('[data-campus]').each(function() {
-            if (!$(this).prop('checked')) {
-                allChecked = false;
-            }
+         $("#profile-user-selections").selectAll({    
+            selector: "#role-all",
+            checkboxes: "[data-role]"
         });
-
-        if (allChecked) {
-            $('#campus-all').prop('checked', true);
-        }
-
-        $('[data-campus]').change(function() {
-            $('#campus-all').prop('checked', false);
-        });
-
-        $('#campus-all').change(function() {
-            var status = $(this).prop('checked');
-            $('[data-campus]').each(function() {
-                $(this).prop('checked', status);
-            });
-        });
-
-        $('[data-role]').change(function() {
-            $('#role-all').prop('checked', false);
-        });
-
-        $('#role-all').change(function() {
-            var status = $(this).prop('checked');
-            $('[data-role]').each(function() {
-                $(this).prop('checked', status);
-            });
-        });
+       
     });
 </script>
