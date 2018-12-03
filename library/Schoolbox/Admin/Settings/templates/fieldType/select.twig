@@ -10,7 +10,7 @@
 
 <select name="{{ name }}">
     {% if renderEmptyOption %}
-        <option {% if required %} style="display: none;"{% endif %}{% if value is null %} selected="selected"{% endif %}>-- select an option --</option>
+        <option value="" {% if required %} style="display: none;"{% endif %}{% if value is null %} selected="selected"{% endif %}>-- select an option --</option>
     {% endif %}
     {% for key, option in options %}
         {# We still need to convert numeric keys to strings, eg 0 => '0' so that a falsy value (eg NULL, '') does not erroneously match a key of 0 #}
