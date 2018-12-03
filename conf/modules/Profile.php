@@ -1,9 +1,5 @@
 <?php
-/**
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- */
+declare(strict_types=1);
 
 namespace Config\Profile;
 
@@ -19,7 +15,7 @@ class Menu extends ModuleLoader
      * @param Kernel $kernel
      * @return void
      */
-    public function configure($kernel)
+    public function configure(Kernel $kernel): void
     {
         $this->loadModule($kernel, ProfileButtonModule::class, null);
     }
