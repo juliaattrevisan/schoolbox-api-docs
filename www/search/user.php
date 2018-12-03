@@ -41,9 +41,9 @@ function renderParent(SitePage $page, $user, External_User $synUserHandler, User
 
     try {
         $user    = $userMapper->findById($user['uid']);
-        $buttons = ProfileButtonMapper::getInstance()->findButtonsForUser($user);
+        $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user);
     } catch (MapperException $e) {
-        $buttons = [];
+        $customButtons = [];
     }
 
     $page->setFile(TEMPLATE_content, 'output.html');
@@ -56,7 +56,7 @@ function renderParent(SitePage $page, $user, External_User $synUserHandler, User
                 'user'           => $user,
                 'externalUser'   => $externalUser,
                 'spouse'         => $spouse,
-                'buttons'        => $buttons,
+                'customButtons'  => $customButtons,
                 'eportfolioAuth' => $authenticator->canView(),
                 'now'            => Alaress_Date_Format::now(),
             ]
@@ -82,9 +82,9 @@ function renderStaff(SitePage $page, $user, External_User $synUserHandler, UserM
 
     try {
         $user    = $userMapper->findById($user['uid']);
-        $buttons = ProfileButtonMapper::getInstance()->findButtonsForUser($user);
+        $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user);
     } catch (MapperException $e) {
-        $buttons = [];
+        $customButtons = [];
     }
 
     $page->setFile(TEMPLATE_content, 'output.html');
@@ -97,7 +97,7 @@ function renderStaff(SitePage $page, $user, External_User $synUserHandler, UserM
                 'user'           => $user,
                 'externalUser'   => $externalUser,
                 'eportfolioAuth' => $authenticator->canView(),
-                'buttons'        => $buttons,
+                'customButtons'  => $customButtons,
                 'now'            => Alaress_Date_Format::now(),
             ]
         )
@@ -395,7 +395,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
     }
 
     $user    = $userMapper->findById($user['uid']);
-    $buttons = ProfileButtonMapper::getInstance()->findButtonsForUser($user);
+    $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user);
 
     $page->setVar(
         'OUTPUT',
@@ -413,7 +413,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
                 'boarderType'        => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
                 'contacts'           => $contacts,
                 'subjects'           => $subjects,
-                'buttons'            => $buttons,
+                'customButtons'      => $customButtons,
                 'groups'             => $groups,
                 'formTeacher'        => $formTeacher,
                 'tutorTeacher'       => $tutorTeacher,
