@@ -138,7 +138,7 @@ class Controller extends Base
     }
 
     /**
-     * Update profile item order
+     * Update profile button order
      *
      * @api   POST /adminv2/profile-button/order
      * @level 182
@@ -162,7 +162,7 @@ class Controller extends Base
     }
 
     /**
-     * Delete profile item
+     * Delete profile button
      *
      * @api   POST /adminv2/profile-button/delete
      * @level 182
@@ -174,7 +174,7 @@ class Controller extends Base
     }
 
     /**
-     * Save profile item
+     * Save profile button
      *
      * @api   POST /adminv2/profile-button/modify
      * @level 182
