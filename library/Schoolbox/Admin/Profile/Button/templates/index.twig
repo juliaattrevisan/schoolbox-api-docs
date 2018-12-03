@@ -1,19 +1,16 @@
 {# Shared navigation profile #}
 {{ renderAdminNavigation(pageCurrent) }}
 
-<div class="row {% if profile | length > 0 %}hide{% endif %}" data-tabs-empty>
-    <div class="small-12 island">
+<div class="row">
+    <div class="small-12 island {% if profile|length > 0 %}hide{% endif %}" id="profile-button-empty-state">
         <div class="empty-state">
             <i class="icon-staff-students"></i>
             <p><a href="{{ routeLookup('adminProfileButton.getCreate') }}">Add a custom button</a> to the profile page for specific roles and campuses.</p>
         </div>
     </div>
-</div>
 
-{% if profile | length > 0 %}
-    <div class="row" data-tabs>
-
-        <div class="small-12 island">
+    {% if profile | length > 0 %}
+        <div class="small-12 island" id="profile-button-container">
 
             <div class="row actions-small-1">
                 <div class="list-item">
@@ -27,7 +24,7 @@
             </div>
 
             <section>
-                <ul class="information-list sortable-card ui-sortable" data-sortable="">
+                <ul class="information-list sortable-card ui-sortable" id="profile-button-list">
                     {% for item in profile %}
                         <li data-profile-button="{{ item.id }}">
                             <div class="actions-small-2">
@@ -52,19 +49,19 @@
             </section>
 
         </div>
-    </div>
-{% endif %}
+    {% endif %}
+</div>
 
 <!-- BEGIN custom_head -->
 <script>
     $(function () {
-        $('#content').find('ul[data-sortable]').sortable({
+        $('#profile-button-list').sortable({
             handle: '.grip',
             axis: 'y',
             update: function () {
                 var order = '';
                 // Update the sort order in the database
-                $('[data-profile-button]').each(function (e) {
+                $('#profile-button-list').find('[data-profile-button]').each(function (e) {
                     if (order != '') {
                         order += ',';
                     }
@@ -77,7 +74,7 @@
             }
         });
 
-        $('[data-delete]').click(function (event) {
+        $('a[data-delete]').click(function (event) {
             event.preventDefault();
             var id = $(this).data('delete');
             var listItem = $(this).closest('li');
@@ -90,9 +87,9 @@
                     }).success(function (e) {
                         $(listItem).remove();
 
-                        if ($('[data-profile-button]').length == 0) {
-                            $('[data-tabs-empty]').removeClass('hide');
-                            $('[data-tabs]').addClass('hide');
+                        if ($('#profile-button-list').find('[data-profile-button]').length == 0) {
+                            $('#profile-button-empty-state').removeClass('hide');
+                            $('#profile-button-container').addClass('hide');
                         }
                     });
                 }
