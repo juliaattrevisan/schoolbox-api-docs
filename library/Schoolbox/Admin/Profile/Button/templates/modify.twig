@@ -27,7 +27,7 @@
                     <div class="small-10 columns">
                         <label>
                             Icon
-                            <select id="icon-select" name="icon" data-icon>
+                            <select id="icon-select" name="icon">
                                 {% for icon in icons %}
                                     <option {% if icon.name == item.icon %}selected{% endif %} value="{{ icon.name }}">{{ icon.title }}</option>
                                 {% endfor %}
@@ -35,10 +35,8 @@
                         </label>
                     </div>
                     <div class="small-2 columns">
-                        <label>
-                            Preview
-                        </label>
-                        <div id="icon" style="margin-button:5px" class="size-32 icon-{{ item.icon }}"></div>
+                        <label>Preview</label>
+                        <div id="icon-preview" style="margin-button:5px" class="size-32 icon-{{ item.icon }}"></div>
                     </div>
                 </fieldset>
                 <fieldset class="content">
@@ -131,7 +129,7 @@
         });
 
         // Resource browser
-        $('[data-role="openResourceBrowser"]').click(function(e) {
+        $('a[data-role="openResourceBrowser"]').click(function(e) {
             e.preventDefault();
             $('[data-role="resourceBrowser"]').socialstreamBrowser({
                 title: 'Choose a folder',
@@ -143,12 +141,25 @@
             });
         });
 
-        // Icon preview
-        $('[data-icon]').change(function() {
-            $('#icon').attr('class', 'size-32 icon-' + $('#icon-select').val())
-        });
+        /*
+         * Update the icon preview with the selected icon
+         *
+         * @param string icon
+         */
+        function updateIconPreview(icon) {
+            // Remove existing icon-* class and add the new one
+            $('#icon-preview').removeClass(function(index, className) {
+               return (className.match (/(^|\s)icon-\S+/g) || []).join(' ');
+            }).addClass('icon-' + icon);
+        }
 
-        $('#icon').attr('class', 'size-32 icon-' + $('#icon-select').val())
+        // Update icon preview on page load
+        updateIconPreview($('#icon-select').val());
+
+        // Update icon preview on change of the dropdown
+        $('#icon-select').change(function() {
+            updateIconPreview($('#icon-select').val());
+        });
 
         // Check all checkboxes if everything was selected
         var allChecked = true;
