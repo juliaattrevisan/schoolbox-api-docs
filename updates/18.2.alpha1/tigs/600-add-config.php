@@ -133,9 +133,9 @@ $app = new class extends App
             'description' => $description,
             'field_id'    => $fieldId,
             'options'     => $options,
-            'editable'    => $editable,
-            'hidden'      => $hidden,
-            'required'    => $required,
+            'editable'    => $editable ? 'true' : 'false',
+            'hidden'      => $hidden ? 'true' : 'false',
+            'required'    => $required ? 'true' : 'false',
             'module'      => $module,
         ]);
     }
