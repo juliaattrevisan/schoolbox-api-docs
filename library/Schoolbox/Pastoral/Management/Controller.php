@@ -111,7 +111,8 @@ class Controller extends Base
     public function getAudiencesModify(PastoralType $type, ?PastoralSubType $subType)
     {
         $roles = new Collection();
-        $rolesAll = RoleMapper::getInstance()->findAll(['order' => ['name' => 'ASC']]);
+        $rolesAll = $this->roleMapper->findAll(['order' => ['name' => 'ASC']]);
+        $roleUsers = [];
         $allowParents = $this->getConfigLoader()->get('pastoral_parent_access');
 
         //Staff roles only for default audiences
@@ -127,6 +128,12 @@ class Controller extends Base
                 $roles->add($roleCurrent);
             }
         }
+
+        foreach ($roles as $role) {
+            $roleId = $role->getId();
+            $roleUsers[$roleId] = $this->userMapper->countByColumn('group_id', $roleId);
+        }
+
         if ($subType !== null) {
             $subTypeId = $subType->getId();
         }
@@ -143,6 +150,7 @@ class Controller extends Base
                 'allowIndividual'   => $this->getConfigLoader()->get('pastoral_individual_access'),
                 'allowParents'      => false,  //prevent user search from including student parents
                 'roles'             => $roles,
+                'roleUsers'         => $roleUsers,
                 'groups'            => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
                 'type'              => $type,
                 'subtype'           => $subType,
