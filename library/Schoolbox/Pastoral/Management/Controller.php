@@ -135,7 +135,6 @@ class Controller extends Base
         $allowParents = $this->getConfigLoader()->get('pastoral_parent_access');
 
         //Staff roles only for default audiences
-        /** @var Role $roleCurrent */
         foreach ($rolesAll as $roleCurrent) {
             // Staff role? Show all users
             if ($roleCurrent->isStaff()) {

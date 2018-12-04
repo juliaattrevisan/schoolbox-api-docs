@@ -15,6 +15,7 @@ use InvalidArgumentException;
  * @method Role createModel($idValue = null)
  * @method Role hydrate(array $row, $alias = '', $callback = null)
  * @method Role findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ * @method GenericCollection|Role[] findAll($options = [])
  */
 class RoleMapper extends Mapper
 {
