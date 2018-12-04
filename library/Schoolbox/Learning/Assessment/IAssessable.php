@@ -253,6 +253,7 @@ interface IAssessable extends ISoftDeletable
 
     /**
      * Find a reference to a particular Participant in this Assessable
+     * including excluded data and of deleted user
      * which saves you this traversal in Controllers etc
      *
      * @param User $user
@@ -266,14 +267,12 @@ interface IAssessable extends ISoftDeletable
      * which saves you this traversal in Controllers etc
      *
      * Returns null rather than throwing exception if $user is not a participant
-     *
-     * Includes excluded participation objects
+     * including the case where the participant is excluded or the user is deleted
      *
      * @param User $user
-     * @param bool $getExcluded .. false to return null for excluded participant
      * @return Participant|null
      */
-    public function getParticipantIfExtant(User $user, bool $getExcluded = false);
+    public function getParticipantIfExtant(User $user);
 
     /**
      * Removes the specified user's participation from this IAssessment.

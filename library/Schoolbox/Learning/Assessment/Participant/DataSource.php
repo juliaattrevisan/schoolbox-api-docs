@@ -277,10 +277,17 @@ class DataSource
             }
             foreach ($assessmentResponses as $response) {
                 //Ensure response user is fully hydrated
-                $responseUser    = $this->userMapper->findByIdWithFallback($response->getSubmittedOnBehalfOf()->getId());
-                $participantUser = $assessable->getParticipantIfExtant($responseUser);
-                if ($participantUser) {
-                    // either the user has been deleted or excluded, since participated.
+                $responseUser = $this->userMapper->findByIdWithFallback($response->getSubmittedOnBehalfOf()->getId());
+                // participants for assessment are no longer hydrated for deleted user.
+                if ($responseUser->isDeleted()) {
+                    continue;
+                }
+                try {
+                    $participantUser = $assessable->getParticipant($responseUser);
+                } catch (UnexpectedValueException $e) {
+                    throw new DomainException($e);
+                }
+                if (!$participantUser->isExcluded()) {
                     // Don't load interactions for excluded participants.
                     $participantUser->getAllResponses()[$response->getId()] = $response;
                 }
@@ -305,10 +312,17 @@ class DataSource
 
                 //Ensure response user is fully hydrated
                 $feedbackUser    = $this->userMapper->findByIdWithFallback($feedback->getReviewee()->getId());
-                $participant = $assessment->getParticipantIfExtant($feedbackUser);
-
-                if (!$participant) {
-                    // either the user has been deleted or excluded, since participated.
+                // participants for assessment are no longer hydrated for deleted user.
+                if ($feedbackUser->isDeleted()) {
+                    continue;
+                }
+                try {
+                    $participant = $assessment->getParticipant($feedbackUser);
+                } catch (UnexpectedValueException $e) {
+                    throw new DomainException($e);
+                }
+                if ($participant->isExcluded()) {
+                    // Don't load interactions for excluded participants.
                     continue;
                 }
                 $participant->getAllFeedbacks()->add($feedback);
