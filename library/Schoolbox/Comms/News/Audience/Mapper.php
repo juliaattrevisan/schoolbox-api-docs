@@ -185,7 +185,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function homepageClean(int $cid) :void
     {
-        $entityType = 'folder';
+        $entityType = Segment\Strategy\Folder::getEntityType();
 
         // Query for composite folders
         $query = $this->getSelectString() . 'WHERE `child`.'. self::FIELD_ENTITY_VALUE .' = :folderId 
