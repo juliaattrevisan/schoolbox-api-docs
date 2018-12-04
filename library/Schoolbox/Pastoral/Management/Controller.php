@@ -92,7 +92,7 @@ class Controller extends Base
      * @api   GET /pastoral/management/audience
      * @level 18.2
      */
-    public function getAudiences()
+    public function getAudiences(): void
     {
         $this->getResponse()->content->set([
             'template' => '@pastoralManagement/audiences.twig',
@@ -113,7 +113,7 @@ class Controller extends Base
      * @param PastoralType $type
      * @param PastoralSubType|null $subType
      */
-    public function getAudiencesModify(PastoralType $type, ?PastoralSubType $subType)
+    public function getAudiencesModify(PastoralType $type, ?PastoralSubType $subType): void
     {
         $roles = new Collection();
         $rolesAll = $this->roleMapper->findAll(['order' => ['name' => 'ASC']]);
@@ -165,7 +165,7 @@ class Controller extends Base
      * @level 18.2
      * @param PastoralType $type
      */
-    public function getAudiencesModifyNoSub(PastoralType $type)
+    public function getAudiencesModifyNoSub(PastoralType $type): void
     {
         $this->getAudiencesModify($type, null);
     }
@@ -177,7 +177,7 @@ class Controller extends Base
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function postAudienceUpdateNoSub(PastoralType $type)
+    public function postAudienceUpdateNoSub(PastoralType $type): void
     {
         $this->postAudienceUpdate($type, null);
     }
@@ -190,7 +190,7 @@ class Controller extends Base
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function postAudienceUpdate(PastoralType $type, ?PastoralSubType $subType)
+    public function postAudienceUpdate(PastoralType $type, ?PastoralSubType $subType): void
     {
         $post = $this->getRequest()->post;
 
