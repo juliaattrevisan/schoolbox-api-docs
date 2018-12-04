@@ -138,65 +138,6 @@ class Model implements ISoftDeletable
         $this->subtype = $subtype;
     }
 
-
-    /**
-     * @return int
-     */
-    public function getTypeId(): int
-    {
-        return $this->type->getId();
-    }
-
-
-    /**
-     * @param int $typeId
-     * @return Model
-     */
-    public function setTypeId($typeId): self
-    {
-        if($this->type instanceof Type) {
-            $this->type->setId($typeId);
-        }
-        else {
-            $this->type = new Type();
-            $this->type->setId($typeId);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @return int|null
-     */
-    public function getSubtypeId()
-    {
-        if($this->subtype instanceof Type) {
-            return $this->subtype->getId();
-        } else {
-            return null;
-        }
-
-    }
-
-
-    /**
-     * @param int|null $subtypeId
-     * @return Model
-     */
-    public function setSubtypeId($subtypeId): self
-    {
-        if($this->subtype instanceof Type) {
-            $this->subtype->setId($subtypeId);
-        }
-        else {
-            $this->subtype = new Type();
-            $this->subtype->setId($subtypeId);
-        }
-
-        return $this;
-    }
-
     /**
      * @return int
      */
