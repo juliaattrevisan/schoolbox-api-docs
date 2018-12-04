@@ -88,6 +88,9 @@ class Controller extends Base
 
     /**
      * Display default audiences for pastoral types and sub-types
+     *
+     * @api   GET /pastoral/management/audience
+     * @level 18.2
      */
     public function getAudiences()
     {
@@ -103,8 +106,10 @@ class Controller extends Base
 
 
     /**
-     *  Edit the defaults for a particular type and subtype
+     * Edit the defaults for a particular type and subtype
      *
+     * @api   GET /pastoral/management/audience/type/{typeId}/subtype/{subtypeId}/modify
+     * @level 18.2
      * @param PastoralType $type
      * @param PastoralSubType|null $subType
      */
@@ -156,6 +161,8 @@ class Controller extends Base
     }
 
     /**
+     * @api   GET /pastoral/management/audience/type/{typeId}/modify
+     * @level 18.2
      * @param PastoralType $type
      */
     public function getAudiencesModifyNoSub(PastoralType $type)
@@ -164,6 +171,8 @@ class Controller extends Base
     }
 
     /**
+     * @api   POST /pastoral/management/audience/type/{typeId}/modify
+     * @level 18.2
      * @param PastoralType $type
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
@@ -174,6 +183,8 @@ class Controller extends Base
     }
 
     /**
+     * @api   POST /pastoral/management/audience/type/{typeId}/subtype/{subtypeId}/modify
+     * @level 18.2
      * @param int $typeId
      * @param int $subtypeId
      * @throws MapperException
