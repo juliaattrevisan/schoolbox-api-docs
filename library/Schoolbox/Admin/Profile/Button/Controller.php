@@ -80,22 +80,22 @@ class Controller extends Base
     {
         // Get selected campuses and roles
 
-        $selections = $this->getProfileButtonRoleMapper()->findByColumn('profile_button_id', $id);
+        $roleSelections = $this->getProfileButtonRoleMapper()->findByColumn('profile_button_id', $id);
 
         $rolesSelected = [];
 
         /** @var ProfileButtonRole $selection */
-        foreach ($selections as $selection) {
-            $rolesSelected[$selection->getRoleId()] = true;
+        foreach ($roleSelections as $roleSelection) {
+            $rolesSelected[$roleSelection->getRoleId()] = true;
         }
 
-        $selections = $this->getProfileButtonCampusMapper()->findByColumn('profile_button_id', $id);
+        $campusSelections = $this->getProfileButtonCampusMapper()->findByColumn('profile_button_id', $id);
 
         $campusesSelected = [];
 
         /** @var ProfileButtonCampus $selection */
-        foreach ($selections as $selection) {
-            $campusesSelected[$selection->getCampusId()] = true;
+        foreach ($campusesSelected as $campusSelection) {
+            $campusesSelected[$campusSelection->getCampusId()] = true;
         }
 
         $this->getResponse()->content->set([
