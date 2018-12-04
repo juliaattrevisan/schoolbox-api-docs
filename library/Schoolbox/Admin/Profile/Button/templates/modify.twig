@@ -47,7 +47,7 @@
                     <div class="small-12 columns">
                         <label for="profile-button-url" class="required">
                             Destination URL
-                            <span data-tooltip class="hint has-tip tip-button" data-width="200" title="You can use [id], [firstName], [lastName], [externalId], [username], [email] in your URLs, these will be replaced for the user">?</span>
+                            <span data-tooltip class="hint has-tip tip-button" data-width="400" title="<p>You can use [profileId], [profileFirstName], [profileLastName], [profileExternalId], [profileUsername], [profileEmail] in your URLs, these will be replaced with details of the user being <b>viewed</b>.</p> <p>You can also use [id], [firstName], [lastName], [externalId], [username], [email], these will be replaced with details of the user <b>viewing</b> the page.</p>">?</span>
                         </label>
                         <div class="input-group">
                             <input name="url" id="profile-button-url" required type="text" value="{{ item.url }}">
