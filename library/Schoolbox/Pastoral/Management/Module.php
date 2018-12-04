@@ -39,17 +39,17 @@ class Module extends BaseModule
 
         $this->registerRoutesArray([
             'GET'  => [
-                '/audience'                                             => ['getAudiences' => $permissionPastoralModeratorWrite],
-                '/audience/type/{typeId}/modify'                        => ['getAudiencesModifyNoSub' => $permissionPastoralModeratorWrite],
-                '/audience/type/{typeId}/subtype/{subtypeId}/modify'    => ['getAudiencesModify' => $permissionPastoralModeratorWrite],
-                '/groups'                                               => ['getGroups' => $permissionPastoralModeratorWrite],
-                '/groups/modify{/groupId}'                              => ['getGroupsModify' => $permissionPastoralModeratorWrite],
+                '/audience'                            => ['getAudiences' => $permissionPastoralModeratorWrite],
+                '/audience/type/{typeId}/modify'       => ['getAudiencesModifyNoSub' => $permissionPastoralModeratorWrite],
+                '/audience/subtype/{subtypeId}/modify' => ['getAudiencesModify' => $permissionPastoralModeratorWrite],
+                '/groups'                              => ['getGroups' => $permissionPastoralModeratorWrite],
+                '/groups/modify{/groupId}'             => ['getGroupsModify' => $permissionPastoralModeratorWrite],
             ],
             'POST' => [
-                '/groups/delete'                                        => ['postGroupsDelete'      => $permissionPastoralModeratorWrite],
-                '/groups/modify'                                        => ['postGroupsModify'      => $permissionPastoralModeratorWrite],
-                '/audience/type/{typeId}/modify'                        => ['postAudienceUpdateNoSub' => $permissionPastoralModeratorWrite],
-                '/audience/type/{typeId}/subtype/{subtypeId}/modify'    => ['postAudienceUpdate' => $permissionPastoralModeratorWrite],
+                '/groups/delete'                       => ['postGroupsDelete'      => $permissionPastoralModeratorWrite],
+                '/groups/modify'                       => ['postGroupsModify'      => $permissionPastoralModeratorWrite],
+                '/audience/type/{typeId}/modify'       => ['postAudienceUpdateNoSub' => $permissionPastoralModeratorWrite],
+                '/audience/subtype/{subtypeId}/modify' => ['postAudienceUpdate' => $permissionPastoralModeratorWrite],
             ],
         ]);
     }
