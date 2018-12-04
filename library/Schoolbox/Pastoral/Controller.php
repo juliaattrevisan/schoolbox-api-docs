@@ -115,6 +115,9 @@ class Controller extends Base
     /** @var PastoralReportMapper $pastoralReportMapper */
     private $pastoralReportMapper;
 
+    /** @var Audience\Mapper */
+    private $audienceMapper;
+
     const ATTACHZONE_PRIVATE = 'private';
     const ATTACHZONE_PUBLIC  = 'public';
 
@@ -141,6 +144,7 @@ class Controller extends Base
      * @param PastoralAccessMapper       $pastoralAccessMapper
      * @param ErrorMapper                $errorMapper
      * @param PastoralReportMapper       $pastoralReportMapper
+     * @param Audience\Mapper            $audienceMapper;
      */
     public function __construct(
         IConfigLoader $config,
@@ -162,7 +166,8 @@ class Controller extends Base
         PastoralGroupMapper $pastoralGroupMapper,
         PastoralGroupMemberMapper $pastoralGroupMemberMapper,
         ErrorMapper $errorMapper,
-        PastoralReportMapper $pastoralReportMapper
+        PastoralReportMapper $pastoralReportMapper,
+        Audience\Mapper $audienceMapper
     ) {
         $this->config                    = $config;
         $this->errorMapper               = $errorMapper;
@@ -184,6 +189,7 @@ class Controller extends Base
         $this->userMapper                = $userMapper;
         $this->userAccessMapper          = $userAccessMapper;
         $this->pastoralReportMapper      = $pastoralReportMapper;
+        $this->audienceMapper            = $audienceMapper;
     }
 
 
@@ -511,7 +517,7 @@ class Controller extends Base
         }
 
         /** @var \Schoolbox\Pastoral\Audience\Model[] | Collection $audienceDefaults */
-        $audienceDefaults = Audience\Mapper::getInstance()->findAll();
+        $audienceDefaults = $this->audienceMapper->findAll();
 
         // Render this thing out
 
