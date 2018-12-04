@@ -112,20 +112,15 @@ class Mapper extends BaseMapper
      */
     public function findAttemptedSurveysForUsers($userIds, $name)
     {
-        $data = PredicateBuilder::getArrayBindings($userIds, 'userId');
-
-        $pb = new PredicateBuilder();
+        $pb = $this->getPredicateBuilder();
         $pb->in('aa.user_id', $userIds);
-        $pb->like('title', $name);
-        $pb->isNull("`{$this->getTable()}`.deleted_at" );
-        $pb->isNull("`aa`.deleted_at" );
-        $pb->isNull("`f`.deleted_at" );
-        $pb->isNull("`ass`.deleted_at");
+        $pb->like('title', '%'.$name.'%');
+        $pb->isNull("{$this->getTable()}.deleted_at" );
 
-        $sql = $this->getSelectString() . " WHERE ".$pb->getWhere();
+        $sql = $this->getSelectString() . " WHERE ".implode(' AND ',$pb->getWhere());
 
         $statement = $this->getDatabase()->prepare($sql);
-        $statement->execute($data['bindings']);
+        $statement->execute($pb->getParams());
 
         // Hydrate results and return unique surveys
 
@@ -196,10 +191,21 @@ class Mapper extends BaseMapper
      * Retrieve the data required for the ePortfolio matrix component
      *
      * @param int $surveyId
+     * @param array $userIds
      * @return array
      */
-    public function findClassSnapshot($surveyId, $userIds)
+    public function findClassSnapshot($surveyId, array $userIds = [])
     {
+        $pb = $this->getPredicateBuilder();
+        $pb->equals('survey.assess_id', $surveyId);
+        $pb->isNull('survey.deleted_at');
+        $pb->equals('survey.availability', 'survey');
+
+        if(count($userIds) > 0) {
+            $pb->in('attempt.user_id', $userIds);
+        }
+
+
         $sql = "
             SELECT      attempt.user_id,
                         survey.assess_id  AS survey_id,
@@ -228,17 +234,13 @@ class Mapper extends BaseMapper
                         response.section_id = section.section_id AND
                         response.question_id = question.question_id
             JOIN        assess_answer answer ON answer.question_id = question.question_id
-            WHERE       survey.deleted_at IS NULL AND
-                        survey.assess_id = :survey_id AND
-                        survey.availability = 'survey'
-                        attempt.user_id = IN (".explode(',' $userIds).")
+            WHERE       ".implode(' AND ', $pb->getWhere())."
             ORDER BY    attempt.user_id,
                         section.sequence,
                         question.sequence            
         ";
-
         $statement = $this->database->prepare($sql);
-        $statement->execute(['survey_id' => $surveyId]);
+        $statement->execute($pb->getParams());
 
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }

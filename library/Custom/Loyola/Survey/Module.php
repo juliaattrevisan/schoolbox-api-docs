@@ -33,6 +33,7 @@ class Module extends BaseModule
         $isStaff = new Rule\HasRole(Role::STAFF);
 
         $this->register('GET', '/class/{folderId}', 'getClassSnapshotList', $isStaff);
+        $this->register('GET', '/class/snapshot/{surveyId}', 'getSnapshot', $isStaff);
         $this->register('GET', '/class/{folderId}/snapshot/{surveyId}', 'getClassSnapshot', $isStaff);
     }
 

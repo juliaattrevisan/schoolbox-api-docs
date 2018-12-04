@@ -15,7 +15,6 @@ use PHPExcel_Style_Alignment;
 use PHPExcel_Worksheet;
 use PHPExcel_Writer_Excel2007;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Survey\Model as Survey;
 use Schoolbox\Survey\Mapper as SurveyMapper;
@@ -93,145 +92,161 @@ class Controller extends Base
         return true;
     }
 
+
+
+
     /**
      * Retrieve spreadsheet containing aggregated survey results
      *
      * @param Survey $survey
      */
-    public function getClassSnapshot($survey, $folder)
+    public function getSnapshot(Survey $survey) {
+        $responses = SurveyMapper::getInstance()->findClassSnapshot($survey->getId());
+        $this->renderSpreadsheet($survey, $responses);
+    }
+
+    /**
+     * Retrieve spreadsheet containing aggregated survey results filtered to a class list
+     *
+     * @param Survey $survey
+     * @param Folder $folder
+     */
+    public function getClassSnapshot(Survey $survey, Folder $folder)
     {
+        $userIds = $this->getStudents($folder);
+        $responses = SurveyMapper::getInstance()->findClassSnapshot($survey->getId(), $userIds);
+        $this->renderSpreadsheet($survey, $responses);
+    }
+
+    private function renderSpreadsheet(Survey $survey, $responses) {
+
         $this->excel = new PHPExcel();
+        $answersRenderArray = [];
 
-        if ($survey instanceof Survey) {
-            $answersRenderArray = [];
-            $userIds = $this->getStudents($folder);
-            $responses = SurveyMapper::getInstance()->findClassSnapshot($survey->getId(), $userIds);
 
-            foreach ($responses as $response) {
-                // Strip the section title of tags and create an array entry for it if none already exists
-                $sectionTitle = Scrub::html2text($response['section_title']);
+        foreach ($responses as $response) {
+            // Strip the section title of tags and create an array entry for it if none already exists
+            $sectionTitle = Scrub::html2text($response['section_title']);
 
-                if (!isset($answersRenderArray[$sectionTitle])) {
-                    $answersRenderArray[$sectionTitle] = [];
-                }
-
-                // Unserialize the available answers (into an array of objects) and then mash into an indexed array so
-                // we can easily lookup the persons selected answer
-
-                $answers = unserialize($response['answers']);
-
-                $answersArray = [];
-
-                if (is_array($answers)) {
-                    foreach ($answers as $answer) {
-                        $answersArray[$answer->value] = $answer->description;
-                    }
-
-                    $selectedAnswers = unserialize($response['selectedAnswers']);
-
-                    $answers = [];
-
-                    if (is_array($selectedAnswers)) {
-                        foreach ($selectedAnswers as $answer) {
-                            $answers[] = $answersArray[Scrub::html2text($answer)];
-                        }
-                    }
-
-                    if (!isset($answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])])) {
-                        $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])] = [];
-                    }
-
-                    $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])][$response['user_id']] = $answers;
-                }
+            if (!isset($answersRenderArray[$sectionTitle])) {
+                $answersRenderArray[$sectionTitle] = [];
             }
 
-            // Throw this data into the spreadsheet
+            // Unserialize the available answers (into an array of objects) and then mash into an indexed array so
+            // we can easily lookup the persons selected answer
 
-            foreach ($answersRenderArray as $tabText => $question) {
-                // Create a tab for each section
-                $this->spreadsheetTabSetup(
-                    $this->replaceInvalidCharacters($tabText),
-                    $this->replaceInvalidCharacters($survey->getFolder()->getNameWithCodes() . " - " . $survey->getTitle())
-                );
+            $answers = unserialize($response['answers']);
 
-                $this->activeSheet->getDefaultRowDimension()->setRowHeight(-1);
+            $answersArray = [];
 
-                // Start from the left
+            if (is_array($answers)) {
+                foreach ($answers as $answer) {
+                    $answersArray[$answer->value] = $answer->description;
+                }
 
-                $currentQuestionColumn = 1;
+                $selectedAnswers = unserialize($response['selectedAnswers']);
 
-                $startRow = $this->currentRow;
+                $answers = [];
 
-                // Iterate each question
+                if (is_array($selectedAnswers)) {
+                    foreach ($selectedAnswers as $answer) {
+                        $answers[] = $answersArray[Scrub::html2text($answer)];
+                    }
+                }
 
-                foreach ($question as $questionText => $users) {
-                    // Move back to the start row
-                    $this->currentRow = $startRow;
+                if (!isset($answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])])) {
+                    $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])] = [];
+                }
 
-                    $this->activeSheet->getColumnDimensionByColumn($currentQuestionColumn)->setAutoSize(true);
+                $answersRenderArray[$sectionTitle][Scrub::html2text($response['question'])][$response['user_id']] = $answers;
+            }
+        }
 
-                    $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getFont()->setBold(true);
+        // Throw this data into the spreadsheet
+
+        foreach ($answersRenderArray as $tabText => $question) {
+            // Create a tab for each section
+            $this->spreadsheetTabSetup(
+                $this->replaceInvalidCharacters($tabText),
+                $this->replaceInvalidCharacters($survey->getFolder()->getNameWithCodes() . " - " . $survey->getTitle())
+            );
+
+            $this->activeSheet->getDefaultRowDimension()->setRowHeight(-1);
+
+            // Start from the left
+
+            $currentQuestionColumn = 1;
+
+            $startRow = $this->currentRow;
+
+            // Iterate each question
+
+            foreach ($question as $questionText => $users) {
+                // Move back to the start row
+                $this->currentRow = $startRow;
+
+                $this->activeSheet->getColumnDimensionByColumn($currentQuestionColumn)->setAutoSize(true);
+
+                $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getFont()->setBold(true);
+                $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setIndent(1);
+                $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setWrapText(true);
+
+                $this->activeSheet->setCellValueByColumnAndRow($currentQuestionColumn, $this->currentRow, $questionText);
+
+                $this->currentRow++;
+
+                foreach ($users as $userId => $answers) {
+                    // Draw in the respondents names
+                    $user = $this->userMapper->findByIdWithFallback($userId);
+
+                    $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getFont()->setBold(true);
+                    $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                    $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setIndent(1);
+                    $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+                    $name = $survey->getAnonymousResult()
+                        ? ''
+                        : "{$user->getLastname()}, {$user->getFirstname()}";
+                    $this->activeSheet->setCellValueByColumnAndRow(0, $this->currentRow, $name);
+
+                    // Concatenate all the answers together into one cell
+
+                    $answerText = "";
+
+                    $rows = 0;
+                    foreach ($answers as $answerTextCurrent) {
+                        if ($answerText != "") {
+                            $answerText .= "\n";
+                        }
+                        $answerText .= "• {$answerTextCurrent}";
+                        $rows++;
+                    }
+
                     $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
                     $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setIndent(1);
+                    $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+                    $this->activeSheet->setCellValueByColumnAndRow($currentQuestionColumn, $this->currentRow, $answerText);
                     $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setWrapText(true);
 
-                    $this->activeSheet->setCellValueByColumnAndRow($currentQuestionColumn, $this->currentRow, $questionText);
-
-                    $this->currentRow++;
-
-                    foreach ($users as $userId => $answers) {
-                        // Draw in the respondents names
-                        $user = $this->userMapper->findByIdWithFallback($userId);
-
-                        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getFont()->setBold(true);
-                        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-                        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setIndent(1);
-                        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
-                        $name = $survey->getAnonymousResult()
-                            ? ''
-                            : "{$user->getLastname()}, {$user->getFirstname()}";
-                        $this->activeSheet->setCellValueByColumnAndRow(0, $this->currentRow, $name);
-
-                        // Concatenate all the answers together into one cell
-
-                        $answerText = "";
-
-                        $rows = 0;
-                        foreach ($answers as $answerTextCurrent) {
-                            if ($answerText != "") {
-                                $answerText .= "\n";
-                            }
-                            $answerText .= "• {$answerTextCurrent}";
-                            $rows++;
-                        }
-
-                        $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-                        $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setIndent(1);
-                        $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
-                        $this->activeSheet->setCellValueByColumnAndRow($currentQuestionColumn, $this->currentRow, $answerText);
-                        $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setWrapText(true);
-
-                        if ($this->activeSheet->getRowDimension($this->currentRow)->getRowHeight() < 16 * $rows) {
-                            $this->activeSheet->getRowDimension($this->currentRow)->setRowHeight(16 * $rows);
-                        }
-
-                        // Move down to next row
-                        $this->currentRow++;
+                    if ($this->activeSheet->getRowDimension($this->currentRow)->getRowHeight() < 16 * $rows) {
+                        $this->activeSheet->getRowDimension($this->currentRow)->setRowHeight(16 * $rows);
                     }
-                    $currentQuestionColumn++;
+
+                    // Move down to next row
+                    $this->currentRow++;
                 }
+                $currentQuestionColumn++;
             }
         }
 
         // Remove the default worksheet
-
         $this->excel->removeSheetByIndex(0);
 
         // Download the spreadsheet
-
         $this->spreadsheetDownload("cls-report-{$survey->getId()}-{$survey->getFolder()->getId()}.xlsx");
         exit;
     }
+
 
     /**
      * Setup the spreadsheet for the export
