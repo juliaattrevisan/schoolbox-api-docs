@@ -139,12 +139,13 @@ class Mapper extends BaseMapper
         return $results;
     }
 
+
     /**
-     * @param int $typeId
-     * @param int $subtypeId
+     * @param int      $typeId
+     * @param int|null $subtypeId
      * @throws Exception
      */
-    public function hardDeleteByType($typeId, $subtypeId): void
+    public function hardDeleteByType(int $typeId, ?int $subtypeId): void
     {
         $oldPerms = $this->findByColumnList(['type_id' => $typeId, 'subtype_id' => $subtypeId], ['deleted' => true]);
 
