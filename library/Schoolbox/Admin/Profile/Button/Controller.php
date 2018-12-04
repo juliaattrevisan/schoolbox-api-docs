@@ -110,7 +110,7 @@ class Controller extends Base
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc'),
                 'campusesSelected' => $campusesSelected                
             ],
-            'title' => 'Admin - Profile Button Modify'
+            'title' => 'Admin - Modify Profile Button'
         ]);
     }
 
@@ -131,7 +131,7 @@ class Controller extends Base
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
             ],
-            'title' => 'Admin - Profile Button Create'
+            'title' => 'Admin - Create Profile Button'
         ]);
     }
 
