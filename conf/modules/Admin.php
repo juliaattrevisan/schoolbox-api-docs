@@ -99,8 +99,8 @@ class Admin implements ModuleConfigInterface
         $menuSide->init('/adminv2/menu-side');
 
         // Profile button manager
-        $menuSide = new \Schoolbox\Admin\Profile\Button\Module($di);
-        $menuSide->init('/adminv2/profile-button');
+        $profileButtons = new \Schoolbox\Admin\Profile\Button\Module($di);
+        $profileButtons->init('/adminv2/profile-button');
 
         // Pastoral care import page
 
