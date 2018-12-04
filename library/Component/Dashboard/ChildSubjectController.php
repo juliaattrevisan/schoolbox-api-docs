@@ -133,7 +133,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
                 // Custom buttons from admin
                 try {
-                    $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($userChild);
+                    $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($userChild, $this->getUser());
                 } catch (MapperException $e) {
                     $customButtons = [];
                 }

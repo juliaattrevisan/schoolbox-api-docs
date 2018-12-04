@@ -31,15 +31,16 @@ class Mapper extends BaseMapper
 
 
     /**
-     * @param User $user
+     * @param User $viewee
+     * @param User $viewer
      * @return Collection
      * @throws MapperException
      */
-    public function findButtonsForUser(User $user): Collection
+    public function findButtonsForUser(User $viewee, User $viewer): Collection
     {
         $campusList = array();
 
-        foreach ($user->getCampusCollection() as $campus) {
+        foreach ($viewee->getCampusCollection() as $campus) {
             $campusList[] = $campus->getId();
         }
 
@@ -59,7 +60,7 @@ class Mapper extends BaseMapper
         ";
 
         $params = $this->getPredicateBuilder()->getArrayParameters($campusList, 'campus');
-        $params['roleId'] = $user->getRole()->getId();
+        $params['roleId'] = $viewee->getRole()->getId();
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
@@ -70,6 +71,12 @@ class Mapper extends BaseMapper
             // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
 
             $array_find = [
+                '[profileId]',
+                '[profileExternalId]',
+                '[profileUsername]',
+                '[profileFirstName]',
+                '[profileLastName]',
+                '[profileEmail]',
                 '[id]',
                 '[externalId]',
                 '[username]',
@@ -78,15 +85,22 @@ class Mapper extends BaseMapper
                 '[email]',
             ];
 
-            $userEmail = empty($user->getEmail()) ? '' : $user->getEmail();
+            $vieweeEmail = empty($viewee->getEmail()) ? '' : $viewee->getEmail();
+            $viewerEmail = empty($viewer->getEmail()) ? '' : $viewer->getEmail();
 
             $array_replace = [
-                \urlencode((string)$user->getId()),
-                \urlencode($user->getExternalId()),
-                \urlencode($user->getUsername()),
-                \urlencode($user->getFirstname()),
-                \urlencode($user->getLastname()),
-                \urlencode($userEmail)
+                \urlencode((string)$viewee->getId()),
+                \urlencode($viewee->getExternalId()),
+                \urlencode($viewee->getUsername()),
+                \urlencode($viewee->getFirstname()),
+                \urlencode($viewee->getLastname()),
+                \urlencode($vieweeEmail),
+                \urlencode((string)$viewer->getId()),
+                \urlencode($viewer->getExternalId()),
+                \urlencode($viewer->getUsername()),
+                \urlencode($viewer->getFirstname()),
+                \urlencode($viewer->getLastname()),
+                \urlencode($viewerEmail)
             ];
 
             $button->setUrl(str_ireplace($array_find, $array_replace, $button->getUrl()));

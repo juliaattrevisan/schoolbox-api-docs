@@ -29,6 +29,9 @@ function renderParent(SitePage $page, $user, External_User $synUserHandler, User
 {
     $externalUser = $synUserHandler->getParent($user['synergy_id']);
 
+    /** @var SchoolboxUser $sessionUser */
+    $sessionUser = $_SESSION["user"];
+
     if (isset($externalUser['SpouseID'])) {
         try {
             $spouse = $userMapper->findByExternalId($externalUser['SpouseID'], Role::PARENT);
@@ -41,7 +44,7 @@ function renderParent(SitePage $page, $user, External_User $synUserHandler, User
 
     try {
         $user    = $userMapper->findById($user['uid']);
-        $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user);
+        $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user, $sessionUser);
     } catch (MapperException $e) {
         $customButtons = [];
     }
@@ -79,10 +82,12 @@ function renderParent(SitePage $page, $user, External_User $synUserHandler, User
 function renderStaff(SitePage $page, $user, External_User $synUserHandler, UserMapper $userMapper, Eportfolio_Authenticator $authenticator, IConfigLoader $config)
 {
     $externalUser = $synUserHandler->getStaff($user['synergy_id']);
-
+    /** @var SchoolboxUser $sessionUser */
+    $sessionUser = $_SESSION["user"];
+    
     try {
         $user    = $userMapper->findById($user['uid']);
-        $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user);
+        $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user, $sessionUser);
     } catch (MapperException $e) {
         $customButtons = [];
     }
@@ -395,7 +400,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
     }
 
     $user    = $userMapper->findById($user['uid']);
-    $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user);
+    $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user, $sessionUser);
 
     $page->setVar(
         'OUTPUT',
