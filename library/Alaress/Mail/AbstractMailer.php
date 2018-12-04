@@ -28,8 +28,12 @@ use Swift_Transport;
 abstract class AbstractMailer implements IMailer
 {
 
-    const MAX_RETRIES = 4;
-    const RETRY_TIMEOUT = 1;
+    private const KEY_INVALID = 'invalid';
+    private const KEY_VALID = 'valid';
+    private const MAX_RETRIES = 4;
+    private const RETRY_TIMEOUT = 1;
+
+    public const EMAIL_SEPARATOR_CODE = 0x1E;
 
     /**
      * Instance of mail transporter.
@@ -66,7 +70,7 @@ abstract class AbstractMailer implements IMailer
      * @param string $to
      * @param string $host
      */
-    public function __construct($template, $subject = "", $to = "", $host = "")
+    public function __construct($template, $subject = '', $to = '', $host = '')
     {
         $this->email = new Swift_Message();
         $this->setFrom(self::getConfig()->get('mail_from_address'), self::getConfig()->get('mail_from_name'));
@@ -89,20 +93,17 @@ abstract class AbstractMailer implements IMailer
     public function setLogger(LoggerInterface $logger)
     {
         $this->log = $logger;
+
         return $this;
     }
 
 
     public function setTo($to)
     {
-        if (is_array($to)) {
+        if (\is_array($to)) {
             if ($to['email']) {
                 //Assume one dimensional array
-                if ($to['name']) {
-                    $this->email->addTo($to['email'], $to['name']);
-                } else {
-                    $this->email->addTo($to['email']);
-                }
+                $this->email->addTo($to['email'], $to['name'] ?? null);
             } else if ($to['name']) {
                 //Name only, can't send email
                 throw new Swift_RfcComplianceException("No email address supplied.");
@@ -111,11 +112,7 @@ abstract class AbstractMailer implements IMailer
                 //Assume two dimensional array
                 $this->to = '';
                 foreach ($to as $email) {
-                    if ($email['name']) {
-                        $this->email->addTo($email['email'], $email['name']);
-                    } else {
-                        $this->email->addTo($email['email']);
-                    }
+                    $this->email->addTo($email['email'], $email['name'] ?? null);
                 }
             }
         } else {
@@ -134,13 +131,9 @@ abstract class AbstractMailer implements IMailer
      * @param string $email
      * @param string $name
      */
-    public function setFrom($email, $name = "")
+    public function setFrom($email, $name = '')
     {
-        if ($name) {
-            $this->email->setFrom($email, $name);
-        } else {
-            $this->email->setFrom($email);
-        }
+        $this->email->setFrom($email, $name ?? null);
         $this->email->setReturnPath($email);
     }
 
@@ -153,11 +146,7 @@ abstract class AbstractMailer implements IMailer
      */
     public function setReplyTo($email, $name = '')
     {
-        if ($name) {
-            $this->email->setReplyTo($email, $name);
-        } else {
-            $this->email->setReplyTo($email);
-        }
+        $this->email->setReplyTo($email, $name ?? null);
     }
 
 
@@ -174,6 +163,7 @@ abstract class AbstractMailer implements IMailer
         /** @var User $user */
         $user = $sessionData['user'];
         $this->setFrom($user->getEmail(), $user->formatName());
+
         return $this;
     }
 
@@ -224,7 +214,6 @@ abstract class AbstractMailer implements IMailer
     {
         $encoder = new \Swift_Mime_ContentEncoder_Base64ContentEncoder();
         $this->email->setEncoder($encoder);
-
     }
 
     /**
@@ -234,7 +223,7 @@ abstract class AbstractMailer implements IMailer
      * @throws Swift_SwiftException
      * @return bool
      */
-    public function send($to = "")
+    public function send($to = '')
     {
 
         if (!empty($to)) {
@@ -292,10 +281,10 @@ abstract class AbstractMailer implements IMailer
 
             $mailer->send($this->email);
         } catch (\Exception $e) {
+
+            $retriesMsg = $retries == 1 ? 'retry remains' : 'retries remain';
             // this means "mail server went away"
-            $errMsg = sprintf("Internal Mailing %s occurred (%d %s): %s",
-                get_class($e), $retries, $retries == 1 ? 'retry remains' : 'retries remain', $e->getMessage()
-            );
+            $errMsg = sprintf('Internal Mailing %s occurred (%d %s): %s', \get_class($e), $retries, $retriesMsg, $e->getMessage());
 
             $this->log->error($errMsg, ['exception'=>$e]);
 
@@ -352,7 +341,6 @@ abstract class AbstractMailer implements IMailer
         return self::$transport;
     }
 
-
     /**
      * @param bool $reinitialise
      * @return Swift_Transport
@@ -362,25 +350,32 @@ abstract class AbstractMailer implements IMailer
         return static::getConfiguredSwiftTransport(self::getConfig(), $reinitialise);
     }
 
-
     /**
      * @param string $string
+     * @param bool $returnValidEmailsOnly
      * @return array
      */
-    public static function parseAddressString($string)
+    public static function parseAddressString($string, $returnValidEmailsOnly = true): array
     {
-        $address_list = imap_rfc822_parse_adrlist($string, self::getConfig()->get('site_hostname') . '.' . self::getConfig()->get('site_domain'));
         $return_list  = [];
-        foreach ($address_list as $address) {
-            if ($address->host !== '.SYNTAX-ERROR.') {
-                $to               = $address->mailbox . '@' . $address->host;
-                $alias            = property_exists($address, 'personal') ? $address->personal : null;
-                $return_list[$to] = $alias;
-            }
-        }
-        return $return_list;
-    }
 
+        if (\trim($string) === '') {
+            return $return_list;
+        }
+        $address_list = self::parseAddressList($string);
+
+        foreach ($address_list[self::KEY_VALID] as $address) {
+            $to = $address->mailbox . '@' . $address->host;
+            $alias = property_exists($address, 'personal') ? $address->personal : null;
+            $return_list[self::KEY_VALID][$to] = $alias;
+        }
+
+        if (!$returnValidEmailsOnly && \count($address_list[self::KEY_INVALID]) > 0) {
+            $return_list[self::KEY_INVALID] = $address_list[self::KEY_INVALID];
+        }
+
+        return $returnValidEmailsOnly ? $return_list[self::KEY_VALID] : $return_list;
+    }
 
     /**
      * @param string $address
@@ -390,9 +385,9 @@ abstract class AbstractMailer implements IMailer
     public static function buildAddress($address, $name = '')
     {
         list($mailbox, $host) = explode('@', $address, 2);
+
         return imap_rfc822_write_address($mailbox, $host, $name);
     }
-
 
     /**
      * @return IConfigLoader
@@ -403,5 +398,89 @@ abstract class AbstractMailer implements IMailer
             self::$conf = ConfigMapper::getInstance();
         }
         return self::$conf;
+    }
+
+    /**
+     * @param string $emailAddresses
+     * @return array
+     */
+    private static function parseAddressList(string $emailAddresses): array
+    {
+        $emails = [];
+        //Explode emails by the ascii's Record Separator
+        $emailList = explode(\chr(self::EMAIL_SEPARATOR_CODE), $emailAddresses);
+
+        foreach ($emailList as $email) {
+            // Check if string is a valid email OR
+            // Check if the email within a string is valid e.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
+            if (filter_var($email, FILTER_VALIDATE_EMAIL) || self::emailFromStringIsValid($email)) {
+                $emails[self::KEY_VALID][] = $email;
+                continue;
+            }
+
+            // If email address from username in the profile page is unchecked, and alternate email address is empty,
+            // just skip those rather than showing "9AH French (FREA1)" <> as an error.
+            if (self::getEmailFromString($email) !== '') {
+                $emails[self::KEY_INVALID][] = $email;
+            }
+        }
+
+        return [
+            self::KEY_VALID => isset($emails[self::KEY_VALID]) ? self::parseValidEmailAddresses($emails[self::KEY_VALID]) : [],
+            self::KEY_INVALID => $emails[self::KEY_INVALID] ?? [],
+        ];
+    }
+
+    /**
+     * Parse valid email addresses from a string
+     *
+     * @param $emails
+     * @return array
+     */
+    private static function parseValidEmailAddresses($emails): array
+    {
+        $emailAddresses = implode(',', $emails);
+        $defaultHost = self::getConfig()->get('site_hostname') . '.' . self::getConfig()->get('site_domain');
+
+        return imap_rfc822_parse_adrlist($emailAddresses, $defaultHost);
+    }
+
+    /**
+     * Get an email from a string. E.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
+     * @param string $string
+     * @return bool
+     */
+    private static function emailFromStringIsValid(string $string): bool
+    {
+        $email = self::getEmailFromString($string);
+
+        if ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $string
+     * @return bool|null
+     */
+    public static function getEmailFromString(string $string)
+    {
+        if (preg_match('~<(.*?)>~', $string, $output) !== 0) {
+            return $output[1];
+        }
+
+        return false;
+    }
+
+    /**
+     * Update email separator from comma with EMAIL_SEPARATOR_CODE
+     * @param $string
+     * @return mixed
+     */
+    public static function standardiseEmailSeparator($string)
+    {
+        return str_replace(',', \chr(self::EMAIL_SEPARATOR_CODE), $string);
     }
 } 

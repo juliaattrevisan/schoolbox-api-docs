@@ -6,6 +6,7 @@
  * @version     SVN: $Id$
  */
 
+use Alaress\Mail\AbstractMailer;
 use \Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Mapper\Exception as MapperException;
 
@@ -148,16 +149,14 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                     try {
                         $user = $userMapper->findByExternalId($currentStudent['synergy_id']);
 
-                        $email = $user->getEmail();
-
                         /* Accumulate this for a giant parent-based bcc
                             */
                         $synergyIds[] = $currentStudent['synergy_id'];
 
                         /* Agglutinate a giant bcc
                             */
-                        if ($email) {
-                            $allStudentEmails[] = $email;
+                        if ($user->getEmail()) {
+                            $allStudentEmails[] =  htmlentities('"' . $user->formatName() . '" <' . $user->getEmail() . '>');
                         }
 
                         $this->setVar([
@@ -211,15 +210,12 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                     }
                 }
 
-
-                $emailAllStudents = implode(',', $allStudentEmails);
-
                 /* Student bulk email
                   */
                 if ($this->getContentPermission() > UserAccess::ACCESS_READ &&  $this->getConfigMapper()->get('mail_enable')) {
                     $this->setVar([
                         'REPLY_TO'           => $this->getUser()->getEmail(),
-                        'EMAIL_ALL_STUDENTS' => $emailAllStudents,
+                        'EMAIL_ALL_STUDENTS' => implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), $allStudentEmails),
                     ]);
 
                     $this->parse('student_email_block', 'student_email');
@@ -231,18 +227,16 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                   */
                 if (count($synergyIds)
                     && $this->getContentPermission() > UserAccess::ACCESS_READ
-                    && ($this->getConfigMapper()->get('email_all_parents') == 1)
+                    && $this->getConfigMapper()->get('email_all_parents')
                     && $this->getConfigMapper()->get('mail_enable')
                 ) {
                     $externalHandler = new External_User();
                     $allParents      = $externalHandler->getParentEmails($synergyIds);
+                    $emailAllParents = '';
 
-                    if (is_array($allParents)) {
-                        /* Uniquify emails
-                        */
-                        $emailAllParents = implode(', ', array_filter(array_unique($allParents)));
-                    } else {
-                        $emailAllParents = '';
+                    if (\is_array($allParents) && \count($allParents) > 0) {
+                        // Uniquify emails and merge to string
+                        $emailAllParents = implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), array_unique($allParents));
                     }
 
                     $this->setVar([

@@ -44,6 +44,9 @@ $selectize-padding-y: 0;
 $selectize-padding-item-x: 0;
 $selectize-padding-item-y: 0;
 
+$selectize-error-text: $white;
+$selectize-error-background: #fa4a47;
+
 @import "../../core/selectize/src/selectize.scss";
 
 /* selectize.scss uses a whole bunch of !important vars
@@ -87,6 +90,19 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 	}
 
 	.selectize-input {
+		.error {
+			background-color: $selectize-error-background !important;
+			color: $selectize-error-text !important;
+
+			> a.remove {
+				color: $selectize-error-text !important;
+				&:hover {
+					color: #000;
+					background: none !important;
+				}
+			}
+		}
+
 		> div {
 			a.remove {
 				padding: 0 0 0 0.25rem !important;

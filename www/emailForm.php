@@ -10,6 +10,7 @@
 			confirmation - location to redirect user to after submission, ie a confirmation page
 */
 
+use Alaress\Mail\AbstractMailer;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\CoreContext;
@@ -42,7 +43,7 @@ if (validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.h
 
         $key = strtoupper($key);
         if (is_array($var)) {
-            $context[$key] = implode(', ', $var);
+            $context[$key] = implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), $var);
         } else {
             $context[$key] = $var;
         }
