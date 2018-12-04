@@ -277,7 +277,7 @@
 
                 if (parentEmails.length) {
                     // Join the email array into a comma separated string, then add to the form
-                    var emailCSV = parentEmails.join(',');
+                    var emailCSV = parentEmails.join(String.fromCharCode(30));
                     $('#emailAllParentsBcc').val(emailCSV);
 
                     // Submit the form
