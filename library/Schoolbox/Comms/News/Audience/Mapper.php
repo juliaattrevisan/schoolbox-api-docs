@@ -14,6 +14,7 @@ use Schoolbox\GenericCollection;
 use InvalidArgumentException;
 use PDOStatement;
 use PDO;
+use Schoolbox\IHomepageCleanable;
 
 /**
  * @method Model createModel($idValue = null)
@@ -21,7 +22,7 @@ use PDO;
  * @method GenericCollection|Model[] createCollection($contents = [])
  * @method GenericCollection|Model[] findByPredicates(Builder $pb, array $options = [])
  */
-class Mapper extends \Schoolbox\Mapper
+class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
 {
     // Table definition
     public const TABLE_NAME                  = 'comms_news_audience';
@@ -183,7 +184,7 @@ class Mapper extends \Schoolbox\Mapper
      * @param int $cid
      * @return void
      */
-    public function homepageClean(int $cid) :void
+    public function homepageClean($cid) :void
     {
         $entityType = Segment\Strategy\Folder::getEntityType();
 
