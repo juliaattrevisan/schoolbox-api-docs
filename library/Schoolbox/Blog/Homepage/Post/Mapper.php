@@ -15,6 +15,7 @@ use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\IHomepageCleanable;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\RoleAccessMapper;
@@ -28,7 +29,7 @@ use Schoolbox\UserMapper;
 /**
  * @method Model createModel($idValue = null)
  */
-class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
+class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, IHomepageCleanable
 {
     /**
      * Setup mapper
@@ -45,6 +46,9 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
+
+        $this->joinsReverseMulti('blog_id', \Schoolbox\Blog\Homepage\Comment\Mapper::class, 'comments', 'comments');
+        $this->joinsReverseMulti('blog_id', \Schoolbox\Blog\Homepage\Image\Mapper::class, 'images', 'images');
 
         $this->hasJoin(
             'perms',
@@ -63,6 +67,9 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
                 'other_key' => 'sid'
             )
         );
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteComments']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteImages']);
     }
 
 
@@ -251,4 +258,42 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         return $c;
     }
 
+    /**
+     * Soft-deletes blog for specified homepage
+     *
+     * @param int $cid
+     * @return void
+     */
+    public function homepageClean($cid)
+    {
+        $this->deleteByColumn('folder_id', $cid);
+    }
+
+    /**
+     * Soft deletes all comments that belongs to this blog model
+     *
+     * Called as a post soft-delete callback.
+     *
+     * @param Model $model
+     * @throws DefinitionException If specified join mapper not found
+     */
+    public function softDeleteComments(Model $model)
+    {
+        $mapper = $this->getJoinMapper('comments');
+        $mapper->softDelete($mapper->findByColumn('blog_id', $model->getId()));
+    }
+
+    /**
+     * Soft deletes all images that belongs to this blog model
+     *
+     * Called as a post soft-delete callback.
+     *
+     * @param Model $model
+     * @throws DefinitionException If specified join mapper not found
+     */
+    public function softDeleteImages(Model $model)
+    {
+        $mapper = $this->getJoinMapper('images');
+        $mapper->softDelete($mapper->findByColumn('blog_id', $model->getId()));
+    }
 }

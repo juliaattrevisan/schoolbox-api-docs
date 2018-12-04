@@ -40,6 +40,12 @@ class Model implements ISoftDeletable
 	/** @var string */
 	protected $body;
 
+    /** @var \Schoolbox\Blog\Homepage\Comment\Mapper */
+    protected $comments;
+
+    /** @var \Schoolbox\Blog\Homepage\Image\Mapper */
+    protected $images;
+
 	/**
 	 * @param int $id
 	 * @return self
@@ -153,4 +159,37 @@ class Model implements ISoftDeletable
 	public function getBody() {
 		return $this->body;
 	}
+
+    /**
+     * @return \Schoolbox\Blog\Homepage\Comment\Mapper
+     */
+    public function getComments() {
+        return $this->comments;
+    }
+
+    /**
+     * @param $comments
+     * @return $this
+     */
+    public function setComments($comments) {
+        $this->comments = $comments;
+        return $this;
+    }
+
+    /**
+     * @return \Schoolbox\Blog\Homepage\Image\Mapper
+     */
+    public function getImages() {
+        return $this->images;
+    }
+
+    /**
+     * @param $images
+     * @return $this
+     */
+    public function setImages($images) {
+        $this->images = $images;
+
+        return $this;
+    }
 }

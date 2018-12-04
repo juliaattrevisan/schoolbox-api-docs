@@ -197,7 +197,6 @@ class Homepage
         /** @var $homepageCleanables \Schoolbox\IHomepageCleanable[] */
         $homepageCleanables = array(
             new Assess_Main(),
-            new Blog(),
             new Chat(),
             new Forum(),
             new Poll(),
@@ -210,6 +209,7 @@ class Homepage
             Schoolbox\Dropbox\Mapper::getInstance(),
             \SocialStream\PostMapper::getInstance(),
             Schoolbox\Comms\News\Audience\Mapper::getInstance(),
+            Schoolbox\Blog\Homepage\Post\Mapper::getInstance(),
         );
 
         foreach ($homepageCleanables as $homepageCleanable){
