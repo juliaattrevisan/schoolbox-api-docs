@@ -39,10 +39,10 @@ class Controller extends Base
     /** @var UserMapper $userMapper */
     private $userMapper;
 
-    /**@var PastoralAudienceMapper $pastoralAudienceMapper */
+    /**@var PastoralAudienceMapper */
     private $pastoralAudienceMapper;
 
-    /** @var RoleMapper $roleMapper */
+    /** @var RoleMapper */
     private $roleMapper;
 
 
