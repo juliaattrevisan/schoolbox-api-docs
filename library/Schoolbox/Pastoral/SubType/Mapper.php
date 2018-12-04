@@ -12,6 +12,9 @@ use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use UnexpectedValueException;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**

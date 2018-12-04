@@ -91,8 +91,16 @@ class Mapper extends BaseMapper
     {
         $results = $this->createCollection();
 
-        /** @var RoleMapper $roleMapper */
-        $roleMapper = $this->getJoinMapper('role');
+        /**
+         * @var RoleMapper    $roleMapper
+         * @var TypeMapper    $typeMapper
+         * @var SubTypeMapper $subTypeMapper
+         * @var GroupMapper   $pGroupMapper
+         */
+        $roleMapper    = $this->getJoinMapper('role');
+        $typeMapper    = $this->getJoinMapper('type');
+        $subTypeMapper = $this->getJoinMapper('subtype');
+        $pGroupMapper  = $this->getJoinMapper('group');
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             // The record must have a user, role or group specified
@@ -102,9 +110,9 @@ class Mapper extends BaseMapper
 
             $access = $this->hydrate($row);
 
-            $access->setType($this->hydrateJoin($row, 'type', 't'));
+            $access->setType($typeMapper->hydrate($row, 't'));
             if (!empty($row['st.id'])) {
-                $access->setSubtype($this->hydrateJoin($row, 'subtype', 'st'));
+                $access->setSubtype($subTypeMapper->hydrate($row, 'st'));
             }
 
             // Hydrate user
@@ -117,12 +125,12 @@ class Mapper extends BaseMapper
 
             // Hydrate role
             if (!empty($row['r.id'])) {
-                $access->setRole($this->hydrateJoin($row, 'role', 'r'));
+                $access->setRole($roleMapper->hydrate($row, 'r'));
             }
 
             // Hydrate group
             if (!empty($row['g.id'])) {
-                $access->setGroup($this->hydrateJoin($row, 'group', 'g'));
+                $access->setGroup($pGroupMapper->hydrate($row, 'g'));
             }
 
             $results->add($access);
