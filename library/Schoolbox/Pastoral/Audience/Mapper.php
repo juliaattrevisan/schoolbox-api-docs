@@ -61,36 +61,41 @@ class Mapper extends BaseMapper
     {
         // Intentionally does not join onto soft-deleted strong entities
         // (e.g. An access is for a User, and user is soft-deleted)
-
         return "
 			SELECT      {$this->getColumnString()},
 			            {$this->getJoinColumnString('type', 't')},
                         {$this->getJoinColumnString('subtype', 'st')},
                         {$this->getJoinColumnString('role', 'r')},
                         {$this->getJoinColumnString('user', 'u')},
+			            {$this->getJoinColumnString('user.role', 'ur')},
                         {$this->getJoinColumnString('group', 'g')}
 			FROM        {$this->getTable()}
             JOIN        {$this->getJoinSql('type', '', 't')}
             LEFT JOIN   {$this->getJoinSql('subtype', '', 'st')}
             LEFT JOIN   {$this->getJoinSql('role', '', 'r')}
             LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN   {$this->getJoinSql('user.role', 'u', 'ur')}
             LEFT JOIN   {$this->getJoinSql('group', '', 'g')}
         ";
     }
+
 
     /**
      * @param PDOStatement $statement
      *
      * @throws Exception
+     * @throws BaseMapper\DefinitionException
      * @return GenericCollection
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
         $results = $this->createCollection();
 
+        /** @var RoleMapper $roleMapper */
+        $roleMapper = $this->getJoinMapper('role');
+
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             // The record must have a user, role or group specified
-
             if (empty($row['u.id']) && empty($row['r.id']) && empty($row['g.id'])) {
                 continue;
             }
@@ -103,22 +108,19 @@ class Mapper extends BaseMapper
             }
 
             // Hydrate user
-
             if (!empty($row['u.id'])) {
                 /** @var User $user */
                 $user = $this->hydrateJoin($row, 'user', 'u');
-                $user->setRole = $this->getJoinMapper('role')->findByIdWithFallback($user->getRole()->getId());
+                $user->setRole($roleMapper->hydrate($row, 'ur'));
                 $access->setUser($user);
             }
 
             // Hydrate role
-
             if (!empty($row['r.id'])) {
                 $access->setRole($this->hydrateJoin($row, 'role', 'r'));
             }
 
             // Hydrate group
-
             if (!empty($row['g.id'])) {
                 $access->setGroup($this->hydrateJoin($row, 'group', 'g'));
             }
