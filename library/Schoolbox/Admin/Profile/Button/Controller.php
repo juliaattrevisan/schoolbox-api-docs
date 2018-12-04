@@ -116,7 +116,7 @@ class Controller extends Base
 
     /**
      * Display create screen
-     *W
+     *
      * @api   GET /adminv2/insert
      * @level 182
      *
