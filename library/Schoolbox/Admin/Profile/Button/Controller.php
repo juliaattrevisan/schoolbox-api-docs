@@ -16,8 +16,6 @@ use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
 
 /**
- * Controller for managing school terms through the admin section.
- *
  * @package Schoolbox\Admin\Profile\Button
  */
 class Controller extends Base
