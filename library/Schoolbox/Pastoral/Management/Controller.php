@@ -134,14 +134,10 @@ class Controller extends Base
             $roleUsers[$roleId] = $this->userMapper->countByColumn('group_id', $roleId);
         }
 
-        if ($subType !== null) {
-            $subTypeId = $subType->getId();
-        }
-
         //This is fudged using the same audience screen from the record. So to get the saved records to display, it is easiest to attach them to $record
         $record = [];
         $record['id'] = "fakeId";
-        $record['access'] = $this->getAudienceForType($type->getId(), $subTypeId);
+        $record['access'] = $this->getAudienceForType($type, $subType);
 
         $this->getResponse()->content->set([
             'template' => '@pastoralManagement/audiences_modify.twig',
@@ -168,13 +164,13 @@ class Controller extends Base
     }
 
     /**
-     * @param int $typeId
+     * @param PastoralType $type
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function postAudienceUpdateNoSub($typeId)
+    public function postAudienceUpdateNoSub(PastoralType $type)
     {
-        $this->postAudienceUpdate($typeId, null);
+        $this->postAudienceUpdate($type->getId(), null);
     }
 
     /**
@@ -183,12 +179,12 @@ class Controller extends Base
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function postAudienceUpdate($typeId, $subtypeId)
+    public function postAudienceUpdate(PastoralType $type, ?PastoralSubType $subType)
     {
         $post = $this->getRequest()->post;
 
         //Delete the old ones
-        $this->pastoralAudienceMapper->hardDeleteByType($typeId, $subtypeId);
+        $this->pastoralAudienceMapper->hardDeleteByType($type->getId(), $subType ? $subType->getId() : null);
 
         // Save system role permissions, de-duplicating as we go\
         $foundRoles = [];
@@ -201,8 +197,8 @@ class Controller extends Base
                     /** @var Role $role */
                     $role = $this->roleMapper->findById($role_id);
                     $audience = $this->pastoralAudienceMapper->createModel();
-                    $audience->setTypeId($typeId);
-                    $audience->setSubtypeId($subtypeId);
+                    $audience->setType($type);
+                    $audience->setSubtype($subType);
                     $audience->setRole($role);
                     $audience->setAccess($accessLevel);
                     $this->pastoralAudienceMapper->save($audience);
@@ -221,8 +217,8 @@ class Controller extends Base
                     /** @var PastoralGroup $group */
                     $group = $this->pastoralGroupMapper->findById($group_id);
                     $audience = $this->pastoralAudienceMapper->createModel();
-                    $audience->setTypeId($typeId);
-                    $audience->setSubtypeId($subtypeId);
+                    $audience->setType($type);
+                    $audience->setSubtype($subType);
                     $audience->setGroup($group);
                     $audience->setAccess($accessLevel);
 
@@ -242,8 +238,8 @@ class Controller extends Base
                     /** @var UserMapper $user */
                     $user = $this->userMapper->findById($user_id);
                     $audience = $this->pastoralAudienceMapper->createModel();
-                    $audience->setTypeId($typeId);
-                    $audience->setSubtypeId($subtypeId);
+                    $audience->setType($type);
+                    $audience->setSubtype($subType);
                     $audience->setAccess($accessLevel);
                     $audience->setUser($user);
                     $this->pastoralAudienceMapper->save($audience);
@@ -255,14 +251,17 @@ class Controller extends Base
     }
 
     /**
-     * @param $typeId
-     * @param $subtypeId
+     * @param PastoralType         $type
+     * @param PastoralSubType|null $subtype
      * @return \Schoolbox\GenericCollection
      * @throws MapperException
      */
-    public function getAudienceForType($typeId, $subtypeId)
+    public function getAudienceForType(PastoralType $type, ?PastoralSubType $subtype)
     {
-        $rolePerms = $this->pastoralAudienceMapper->findByColumnList(['type_id' => $typeId, 'subtype_id' => $subtypeId]);
+        $rolePerms = $this->pastoralAudienceMapper->findByColumnList([
+            'type_id'    => $type->getId(),
+            'subtype_id' => $subtype ? $subtype->getId() : null
+        ]);
         return $rolePerms;
     }
 
