@@ -111,9 +111,9 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Type|null $type
+     * @param Type $type
      */
-    public function setType(?Type $type): void
+    public function setType(Type $type): void
     {
         $this->type = $type;
     }
