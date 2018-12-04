@@ -12,6 +12,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Audience\Mapper as PastoralAudienceMapper;
 use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
@@ -24,6 +25,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
+use InvalidArgumentException;
 
 // These mappers are injected into controllers where required
 
@@ -60,8 +62,10 @@ class Module extends BaseModule
         ]);
     }
 
+
     /**
      * {@inheritdoc}
+     * @throws InvalidArgumentException If invalid mapper class specified
      */
     public function initControllers(ContainerInterface $injector)
     {
@@ -69,11 +73,12 @@ class Module extends BaseModule
             'userMapper'             => UserMapper::getInstance(),
             'pastoralMapper'         => PastoralMapper::getInstance(),
             'pastoralSeverityMapper' => PastoralSeverityMapper::getInstance(),
-            'pastoralTypeMapper'     => PastoralTypeMapper::getInstance(),
             'pastoralAccessMapper'   => PastoralAccessMapper::getInstance(),
             'pastoralTagMapper'      => PastoralTagMapper::getInstance(),
             'audienceMapper'         => PastoralAudienceMapper::getInstance(),
             'roleMapper'             => RoleMapper::getInstance(),
+            'pastoralTypeMapper'     => $this->getMapperFactory()->getLazy(Pastoral\Type\Mapper::class),
+            'pastoralSubTypeMapper'  => $this->getMapperFactory()->getLazy(Pastoral\SubType\Mapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));

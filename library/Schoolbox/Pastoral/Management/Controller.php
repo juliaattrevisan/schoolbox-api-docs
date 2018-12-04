@@ -47,6 +47,12 @@ class Controller extends Base
     /** @var RoleMapper */
     private $roleMapper;
 
+    /** @var Pastoral\Type\Mapper */
+    private $pastoralTypeMapper;
+
+    /** @var Pastoral\SubType\Mapper */
+    private $pastoralSubTypeMapper;
+
 
     /**
      * Constructor
@@ -57,6 +63,8 @@ class Controller extends Base
      * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
      * @param PastoralAudienceMapper    $pastoralAudienceMapper
      * @param RoleMapper                $roleMapper
+     * @param Pastoral\Type\Mapper      $pastoralTypeMapper
+     * @param Pastoral\SubType\Mapper   $pastoralSubTypeMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -64,7 +72,9 @@ class Controller extends Base
         PastoralGroupMapper $pastoralGroupMapper,
         PastoralGroupMemberMapper $pastoralGroupMemberMapper,
         PastoralAudienceMapper $pastoralAudienceMapper,
-        RoleMapper $roleMapper
+        RoleMapper $roleMapper,
+        Pastoral\Type\Mapper $pastoralTypeMapper,
+        Pastoral\SubType\Mapper $pastoralSubTypeMapper
     ) {
         $this->userMapper                = $userMapper;
         $this->pastoralAccessMapper      = $pastoralAccessMapper;
@@ -72,6 +82,8 @@ class Controller extends Base
         $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
         $this->pastoralAudienceMapper    = $pastoralAudienceMapper;
         $this->roleMapper                = $roleMapper;
+        $this->pastoralTypeMapper        = $pastoralTypeMapper;
+        $this->pastoralSubTypeMapper     = $pastoralSubTypeMapper;
     }
 
     /**
@@ -99,8 +111,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@pastoralManagement/audiences.twig',
             'data'     => [
-                'types'     => PastoralTypeMapper::getInstance()->findAll(),
-                'subtypes'  => PastoralSubTypeMapper::getInstance()->findAll()
+                'types'     => $this->pastoralTypeMapper->findAll(),
+                'subtypes'  => $this->pastoralSubTypeMapper->findAll()
             ],
             'title' => 'Pastoral Group Management',
         ]);
