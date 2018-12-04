@@ -1,8 +1,8 @@
 {% if subtype.id is null %}
-    {% set action = routeLookupIfAuthorized('pastoralManagement.postAudienceUpdateNoSub', {typeId: type.id}) %}
+    {% set action = routeLookupIfAuthorized('pastoralManagement.postAudienceTypeModify', {type: type, typeId: type.id}) %}
     {% set title = type.name %}
 {% else %}
-    {% set action = routeLookupIfAuthorized('pastoralManagement.postAudienceUpdate', {subtypeId: subtype.id}) %}
+    {% set action = routeLookupIfAuthorized('pastoralManagement.postAudienceSubTypeModify', {subtype: subtype, subtypeId: subtype.id}) %}
     {% set title = type.name ~ ': ' ~ subtype.name %}
 {% endif %}
 

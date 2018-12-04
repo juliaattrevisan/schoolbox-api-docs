@@ -8,7 +8,6 @@
 namespace Schoolbox\Pastoral\Management;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Audience\Mapper as PastoralAudienceMapper;
@@ -17,8 +16,6 @@ use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
-use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
-use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
 use Schoolbox\Resource\Search\Results;
@@ -120,14 +117,41 @@ class Controller extends Base
 
 
     /**
+     * @api   GET /pastoral/management/audience/type/{typeId}/modify
+     * @level 18.2
+     * @param PastoralType $type
+     * @throws MapperException
+     */
+    public function getAudiencesTypeModify(PastoralType $type): void
+    {
+        $this->getAudiencesModify($type, null);
+    }
+
+
+    /**
+     * Edit the defaults for a particular type and subtype
+     *
+     * @api   GET /pastoral/management/audience/subtype/{subtypeId}/modify
+     * @level 18.2
+     * @param PastoralSubType $subType
+     * @throws MapperException
+     */
+    public function getAudiencesSubTypeModify(PastoralSubType $subType): void
+    {
+        $this->getAudiencesModify($subType->getPastoralType(), $subType);
+    }
+
+
+    /**
      * Edit the defaults for a particular type and subtype
      *
      * @api   GET /pastoral/management/audience/type/{typeId}/subtype/{subtypeId}/modify
      * @level 18.2
-     * @param PastoralType $type
+     * @param PastoralType         $type
      * @param PastoralSubType|null $subType
+     * @throws MapperException
      */
-    public function getAudiencesModify(PastoralType $type, ?PastoralSubType $subType): void
+    private function getAudiencesModify(PastoralType $type, ?PastoralSubType $subType): void
     {
         $roles = $this->roleMapper->createCollection();
         $rolesAll = $this->roleMapper->findAll(['order' => ['name' => 'ASC']]);
@@ -173,38 +197,49 @@ class Controller extends Base
         ]);
     }
 
-    /**
-     * @api   GET /pastoral/management/audience/type/{typeId}/modify
-     * @level 18.2
-     * @param PastoralType $type
-     */
-    public function getAudiencesModifyNoSub(PastoralType $type): void
-    {
-        $this->getAudiencesModify($type, null);
-    }
 
     /**
      * @api   POST /pastoral/management/audience/type/{typeId}/modify
      * @level 18.2
      * @param PastoralType $type
      * @throws MapperException
+     * @throws MapperException\Deleted
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
-    public function postAudienceUpdateNoSub(PastoralType $type): void
+    public function postAudienceTypeModify(PastoralType $type): void
     {
-        $this->postAudienceUpdate($type, null);
+        $this->postAudienceModify($type, null);
     }
 
 
     /**
      * @api   POST /pastoral/management/audience/type/{typeId}/subtype/{subtypeId}/modify
      * @level 18.2
+     * @param PastoralSubType $subType
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    public function postAudienceSubTypeModify(PastoralSubType $subType): void
+    {
+        $this->postAudienceModify($subType->getPastoralType(), $subType);
+    }
+
+
+    /**
      * @param PastoralType         $type
      * @param PastoralSubType|null $subType
      * @throws MapperException
+     * @throws MapperException\Deleted
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
-    public function postAudienceUpdate(PastoralType $type, ?PastoralSubType $subType): void
+    private function postAudienceModify(PastoralType $type, ?PastoralSubType $subType): void
     {
         $post = $this->getRequest()->post;
 
