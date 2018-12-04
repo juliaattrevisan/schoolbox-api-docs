@@ -23,10 +23,10 @@ class Model implements ISoftDeletable
     use UpdatedAtDate;
     use DeletedAtDate;
 
-    /** @var User $user Schoolbox user whose actions we are tracking */
+    /** @var User */
     private $user;
 
-    /** @var null|PastoralGroup $pastoralGroup */
+    /** @var null|PastoralGroup */
     private $group;
 
     /** @var null|Role  */
