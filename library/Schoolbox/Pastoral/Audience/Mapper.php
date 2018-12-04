@@ -1,14 +1,8 @@
 <?php
 /**
- * Pastoral care pastoral type audience defaults
- *
- * This allows the user to set a default audience for a pastoral type/subtype
- *
- * @author      Mattherw Schembri <matt.schembri@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Pastoral\Audience;
 
 use PDO;
@@ -23,12 +17,12 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-
 /**
- * Class Mapper
- * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * Pastoral care pastoral type audience defaults
  *
- * @package Schoolbox\Pastoral\Audience
+ * This allows the user to set a default audience for a pastoral type/subtype
+ *
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends BaseMapper
 {
