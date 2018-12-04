@@ -1,8 +1,4 @@
 <?php
-/**
- * Share navigation element for admin pages
- */
-
 declare(strict_types=1);
 
 namespace Schoolbox\Profile\Button;
