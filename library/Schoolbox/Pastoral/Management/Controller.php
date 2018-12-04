@@ -129,7 +129,7 @@ class Controller extends Base
      */
     public function getAudiencesModify(PastoralType $type, ?PastoralSubType $subType): void
     {
-        $roles = new Collection();
+        $roles = $this->roleMapper->createCollection();
         $rolesAll = $this->roleMapper->findAll(['order' => ['name' => 'ASC']]);
         $roleUsers = [];
         $allowParents = $this->getConfigLoader()->get('pastoral_parent_access');
