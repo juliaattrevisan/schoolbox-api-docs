@@ -82,7 +82,7 @@ class Model extends AbstractCourse
      * @return static
      * @throws \DomainException
      */
-    public function setUnits(GenericCollection $unitImplementations): AbstractCourse
+    public function setUnits(GenericCollection $unitImplementations): self
     {
         $this->unitImplementations->replaceWith($unitImplementations);
         return $this;

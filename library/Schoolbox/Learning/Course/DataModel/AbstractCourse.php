@@ -17,6 +17,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * Abstract for CourseSpec  + CourseImpl models
+ * @method self setUnits(GenericCollection $units)
  */
 abstract class AbstractCourse implements ISoftDeletable
 {
@@ -53,11 +54,4 @@ abstract class AbstractCourse implements ISoftDeletable
      * @return GenericCollection|AbstractUnit[]
      */
     abstract public function getUnits(): GenericCollection;
-
-
-    /**
-     * @param GenericCollection|AbstractUnit[] $units
-     * @return AbstractCourse
-     */
-    abstract public function setUnits(GenericCollection $units): self;
 }
