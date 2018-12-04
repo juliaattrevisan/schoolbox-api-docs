@@ -9,6 +9,8 @@ namespace Schoolbox\Pastoral\Management;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
+use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Audience\Mapper as PastoralAudienceMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
@@ -263,10 +265,10 @@ class Controller extends Base
     /**
      * @param PastoralType         $type
      * @param PastoralSubType|null $subtype
-     * @return \Schoolbox\GenericCollection
+     * @return GenericCollection|Pastoral\Audience\Model[]
      * @throws MapperException
      */
-    private function getAudienceForType(PastoralType $type, ?PastoralSubType $subtype)
+    private function getAudienceForType(PastoralType $type, ?PastoralSubType $subtype): GenericCollection
     {
         $rolePerms = $this->pastoralAudienceMapper->findByColumnList([
             'type_id'    => $type->getId(),
