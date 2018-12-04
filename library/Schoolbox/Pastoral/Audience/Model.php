@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Pastoral\Audience;
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -19,7 +20,7 @@ use Schoolbox\Pastoral\Type\Model as Type;
 use Schoolbox\Role;
 use Schoolbox\User;
 
-class Model
+class Model implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
