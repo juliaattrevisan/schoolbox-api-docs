@@ -44,7 +44,7 @@ if ($allStudents && count($allHousemasters)) {
 
 // Uniqueify emails
 
-$emailString = array_values(array_filter(array_unique($emailString)));
+$emailString = array_unique($emailString);
 
 header('Content-Type: application/json');
 echo json_encode($emailString);
