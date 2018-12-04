@@ -16,6 +16,7 @@ use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Pastoral;
 
 /**
  * Pastoral care pastoral type audience defaults
@@ -27,10 +28,9 @@ use Schoolbox\UserMapper;
 class Mapper extends BaseMapper
 {
     // Define record access levels
-
-    const ACCESS_DENY = 0;                      // Deny trumps all other access to allow exclusion of a user/group/role
-    const ACCESS_PUBLIC = 1;
-    const ACCESS_PRIVATE = 2;
+    private const ACCESS_DENY    = Pastoral\Access\Mapper::ACCESS_DENY;     // Deny trumps all other access to allow exclusion of a user/group/role
+    private const ACCESS_PUBLIC  = Pastoral\Access\Mapper::ACCESS_PUBLIC;
+    private const ACCESS_PRIVATE = Pastoral\Access\Mapper::ACCESS_PRIVATE;
 
     /**
      * Setup mapper
