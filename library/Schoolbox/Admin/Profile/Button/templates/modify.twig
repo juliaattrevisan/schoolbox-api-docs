@@ -23,11 +23,17 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label for="profile-button-title" class="required">Button Text</label>
+                        <label for="profile-button-title" class="required">
+                            Button Text
+                            <span data-tooltip class="hint has-tip tip-button" data-width="400" title="<p>You can use [profileId], [profileFirstName], [profileLastName], [profileExternalId], [profileUsername], [profileEmail] in the button text, these will be replaced with details of the user being <b>viewed</b>.</p> <p>You can also use [id], [firstName], [lastName], [externalId], [username], [email], these will be replaced with details of the user <b>viewing</b> the page.</p>">?</span>
+                        </label>
                         <input required type="text" id="profile-button-title" name='text' value="{{ item.text }}">
                     </div>
                     <div class="small-12 columns">
-                        <label for="profile-button-desc">Hover Description</label>
+                        <label for="profile-button-desc">
+                            Hover Description
+                            <span data-tooltip class="hint has-tip tip-button" data-width="400" title="<p>You can use [profileId], [profileFirstName], [profileLastName], [profileExternalId], [profileUsername], [profileEmail] in the hover description, these will be replaced with details of the user being <b>viewed</b>.</p> <p>You can also use [id], [firstName], [lastName], [externalId], [username], [email], these will be replaced with details of the user <b>viewing</b> the page.</p>">?</span>
+                        </label>
                         <input name='title' id="profile-button-desc" type="text" value="{{ item.title }}">
                     </div>
                     <div class="small-10 columns">
@@ -47,7 +53,7 @@
                     <div class="small-12 columns">
                         <label for="profile-button-url" class="required">
                             Destination URL
-                            <span data-tooltip class="hint has-tip tip-button" data-width="400" title="<p>You can use [profileId], [profileFirstName], [profileLastName], [profileExternalId], [profileUsername], [profileEmail] in your URLs, these will be replaced with details of the user being <b>viewed</b>.</p> <p>You can also use [id], [firstName], [lastName], [externalId], [username], [email], these will be replaced with details of the user <b>viewing</b> the page.</p>">?</span>
+                            <span data-tooltip class="hint has-tip tip-button" data-width="400" title="<p>You can use [profileId], [profileFirstName], [profileLastName], [profileExternalId], [profileUsername], [profileEmail] in the URL, these will be replaced with details of the user being <b>viewed</b>.</p> <p>You can also use [id], [firstName], [lastName], [externalId], [username], [email], these will be replaced with details of the user <b>viewing</b> the page.</p>">?</span>
                         </label>
                         <div class="input-group">
                             <input name="url" id="profile-button-url" required type="text" value="{{ item.url }}">
