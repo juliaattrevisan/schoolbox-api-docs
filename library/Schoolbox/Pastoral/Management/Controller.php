@@ -266,7 +266,7 @@ class Controller extends Base
      * @return \Schoolbox\GenericCollection
      * @throws MapperException
      */
-    public function getAudienceForType(PastoralType $type, ?PastoralSubType $subtype)
+    private function getAudienceForType(PastoralType $type, ?PastoralSubType $subtype)
     {
         $rolePerms = $this->pastoralAudienceMapper->findByColumnList([
             'type_id'    => $type->getId(),
