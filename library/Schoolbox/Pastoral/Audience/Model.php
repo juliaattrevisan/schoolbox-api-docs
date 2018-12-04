@@ -93,9 +93,9 @@ class Model implements ISoftDeletable
 
     /**
      * @param Role $role
-     * @return Model
+     * @return $this
      */
-    public function setRole($role): self
+    public function setRole(Role $role): self
     {
         $this->role = $role;
 
