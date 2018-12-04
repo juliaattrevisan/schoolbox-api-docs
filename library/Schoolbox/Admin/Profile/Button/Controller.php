@@ -146,8 +146,7 @@ class Controller extends Base
         $post = $this->getRequest()->post;
         $orderArray = explode(",", $post['order']);
 
-        $order = 1;
-
+        $order = 0;
         foreach ($orderArray as $id) {
             try {
                 /** @var ProfileButton $item */
