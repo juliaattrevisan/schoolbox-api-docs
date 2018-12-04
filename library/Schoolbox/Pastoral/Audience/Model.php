@@ -1,13 +1,8 @@
 <?php
 /**
- * This maintains an audit trail of every record a staff member views, and all the searches that they perform (and the
- * results that these searches returned)
- *
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Pastoral\Audience;
 
 use Schoolbox\ISoftDeletable;
@@ -18,7 +13,6 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 use Schoolbox\Pastoral\Type\Model as Type;
-
 use Schoolbox\Role;
 use Schoolbox\User;
 
