@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning;
 
+use Alaress\Mail\AbstractMailer;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
@@ -273,6 +274,7 @@ class Controller extends Base
             'assessmentsToMark'         => $assessmentsToMark,
             'assessmentsToChase'        => $assessmentsToChase,
             'assessmentStudentsToEmail' => $assessmentStudentsToEmail,
+            'emailSeparator'            => \chr(AbstractMailer::EMAIL_SEPARATOR_CODE),
         ])->getAsString();
     }
 
