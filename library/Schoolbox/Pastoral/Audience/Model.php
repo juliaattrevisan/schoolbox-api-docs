@@ -112,10 +112,12 @@ class Model implements ISoftDeletable
 
     /**
      * @param Type $type
+     * @return $this
      */
-    public function setType(Type $type): void
+    public function setType(Type $type): self
     {
         $this->type = $type;
+        return $this;
     }
 
     /**
@@ -128,10 +130,12 @@ class Model implements ISoftDeletable
 
     /**
      * @param SubType|null $subtype
+     * @return $this
      */
-    public function setSubtype(?SubType $subtype): void
+    public function setSubtype(?SubType $subtype): self
     {
         $this->subtype = $subtype;
+        return $this;
     }
 
     /**
