@@ -35,7 +35,7 @@ class Mapper extends BaseMapper
     /**
      * Setup mapper
      */
-    protected function mapping()
+    protected function mapping(): void
     {
         $this->hasTable('pastoral_audience');
         $this->hasModel(Model::class);
@@ -57,7 +57,7 @@ class Mapper extends BaseMapper
      * @throws BaseMapper\DefinitionException
      * @return string
      */
-    protected function getSelectString()
+    protected function getSelectString(): string
     {
         // Intentionally does not join onto soft-deleted strong entities
         // (e.g. An access is for a User, and user is soft-deleted)
@@ -87,7 +87,7 @@ class Mapper extends BaseMapper
      * @throws BaseMapper\DefinitionException
      * @return GenericCollection
      */
-    protected function hydrateSelect(PDOStatement $statement)
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         $results = $this->createCollection();
 
