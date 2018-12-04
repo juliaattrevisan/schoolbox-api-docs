@@ -101,7 +101,6 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/modify.twig',
             'data'     => [
-                'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => self::PAGE_CURRENT,
                 'item' => $this->getProfileButtonMapper()->findOneByColumn($this->getProfileButtonMapper()->getIdentifierColumn(), $id, [], ['cache'=>false]),
                 'icons' => $this->getProfileIconMapper()->findAll()->sortBy('title', 'asc'),
