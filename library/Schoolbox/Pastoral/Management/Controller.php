@@ -170,7 +170,7 @@ class Controller extends Base
      */
     public function postAudienceUpdateNoSub(PastoralType $type)
     {
-        $this->postAudienceUpdate($type->getId(), null);
+        $this->postAudienceUpdate($type, null);
     }
 
     /**
@@ -235,7 +235,6 @@ class Controller extends Base
                 if (!in_array($user_id, $foundUsers)) {
                     $foundUsers[] = $user_id;
 
-                    /** @var UserMapper $user */
                     $user = $this->userMapper->findById($user_id);
                     $audience = $this->pastoralAudienceMapper->createModel();
                     $audience->setType($type);
