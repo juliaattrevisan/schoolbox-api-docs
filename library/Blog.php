@@ -1,6 +1,6 @@
 <?php
 
-class Blog extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
+class Blog extends DeprecatedModel {
 
 	/**
 	 * @deprecated
@@ -65,28 +65,4 @@ class Blog extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
             return $this->db->getAll($query);
         }
-
-    /**
-     * Soft-deletes content
-     *
-     * TODO: Refactor
-     *
-     * @deprecated use \Schoolbox\Blog\BlogMapper::delete()
-     * @param  $folderId
-     * @return void
-     */
-    public function homepageClean($folderId) {
-        $deletedAt = 'NOW()';
-
-        $query = "UPDATE blog
-            LEFT JOIN blog_comment ON blog.id = blog_comment.blog_id
-            LEFT JOIN blog_image ON blog.id = blog_image.blog_id
-            SET 
-            blog.deleted_at = $deletedAt, 
-            blog_comment.deleted_at = $deletedAt, 
-            blog_image.deleted_at = $deletedAt 
-            WHERE blog.folder_id = $folderId";
-
-        $this->db->query($query);
-    }
 }
