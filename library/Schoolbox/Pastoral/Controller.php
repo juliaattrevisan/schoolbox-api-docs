@@ -516,7 +516,6 @@ class Controller extends Base
             }
         }
 
-        /** @var \Schoolbox\Pastoral\Audience\Model[] | Collection $audienceDefaults */
         $audienceDefaults = $this->audienceMapper->findAll();
 
         // Render this thing out

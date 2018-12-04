@@ -24,6 +24,7 @@ use Schoolbox\Pastoral;
  * This allows the user to set a default audience for a pastoral type/subtype
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method GenericCollection|Model[] findAll($options = [])
  */
 class Mapper extends BaseMapper
 {
