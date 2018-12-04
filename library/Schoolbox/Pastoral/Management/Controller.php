@@ -195,11 +195,12 @@ class Controller extends Base
         $this->postAudienceUpdate($type, null);
     }
 
+
     /**
      * @api   POST /pastoral/management/audience/type/{typeId}/subtype/{subtypeId}/modify
      * @level 18.2
-     * @param int $typeId
-     * @param int $subtypeId
+     * @param PastoralType         $type
+     * @param PastoralSubType|null $subType
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
      */
