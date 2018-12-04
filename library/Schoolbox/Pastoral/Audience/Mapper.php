@@ -148,11 +148,8 @@ class Mapper extends BaseMapper
     {
         $oldPerms = $this->findByColumnList(['type_id' => $typeId, 'subtype_id' => $subtypeId], ['deleted' => true]);
 
-        if (\count($oldPerms) > 0) {
-            foreach ($oldPerms as $oldie) {
-                $this->hardDelete($oldie);
-            }
+        foreach ($oldPerms as $oldie) {
+            $this->hardDelete($oldie);
         }
-
     }
 }
