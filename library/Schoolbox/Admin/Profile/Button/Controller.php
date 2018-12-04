@@ -94,7 +94,7 @@ class Controller extends Base
         $campusesSelected = [];
 
         /** @var ProfileButtonCampus $selection */
-        foreach ($campusesSelected as $campusSelection) {
+        foreach ($campusSelections as $campusSelection) {
             $campusesSelected[$campusSelection->getCampusId()] = true;
         }
 
@@ -166,8 +166,10 @@ class Controller extends Base
      */
     public function postDelete(): void
     {
-        $post = $this->getRequest()->post;
-        $this->getProfileButtonMapper()->deleteByColumn("id", $post["id"]);
+        if (!empty($post['id'])) {
+            $post = $this->getRequest()->post;
+            $this->getProfileButtonMapper()->deleteByColumn("id", $post["id"]);
+        }
     }
 
     /**
