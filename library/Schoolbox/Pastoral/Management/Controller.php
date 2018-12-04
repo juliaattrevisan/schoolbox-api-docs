@@ -49,12 +49,12 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param UserMapper $userMapper
-     * @param PastoralAccessMapper $pastoralAccessMapper
-     * @param PastoralGroupMapper $pastoralGroupMapper
+     * @param UserMapper                $userMapper
+     * @param PastoralAccessMapper      $pastoralAccessMapper
+     * @param PastoralGroupMapper       $pastoralGroupMapper
      * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
-     * @param PastoralAudienceMapper $pastoralAudienceMapper
-     * @param RoleMapper $roleMapper
+     * @param PastoralAudienceMapper    $pastoralAudienceMapper
+     * @param RoleMapper                $roleMapper
      */
     public function __construct(
         UserMapper $userMapper,
