@@ -15,6 +15,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
+use Schoolbox\Pastoral\SubType\Model as SubType;
 use Schoolbox\Pastoral\Type\Model as Type;
 
 use Schoolbox\Role;
@@ -38,7 +39,7 @@ class Model implements ISoftDeletable
     /** @var null|Type */
     private $type;
 
-    /** @var null|Type */
+    /** @var null|SubType */
     private $subtype;
 
     /** @var integer */
@@ -122,17 +123,17 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Type|null
+     * @return SubType|null
      */
-    public function getSubtype(): ?Type
+    public function getSubtype(): ?SubType
     {
         return $this->subtype;
     }
 
     /**
-     * @param Type|null $subtype
+     * @param SubType|null $subtype
      */
-    public function setSubtype(?Type $subtype): void
+    public function setSubtype(?SubType $subtype): void
     {
         $this->subtype = $subtype;
     }

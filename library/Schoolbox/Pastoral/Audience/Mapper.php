@@ -17,6 +17,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
+use Schoolbox\Pastoral\SubType\Mapper as SubTypeMapper;
 use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -50,7 +51,7 @@ class Mapper extends BaseMapper
         $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role');
         $this->joins('group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
         $this->joins('type_id', TypeMapper::class, 'id', null, null, 'type', 'type');
-        $this->joins('subtype_id', TypeMapper::class, 'id', null, null, 'subtype', 'subtype');
+        $this->joins('subtype_id', SubTypeMapper::class, 'id', null, null, 'subtype', 'subtype');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
