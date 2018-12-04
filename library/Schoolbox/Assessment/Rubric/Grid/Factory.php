@@ -40,10 +40,6 @@ class Factory
         $indicators   = $rubricData['criterion']  ?: [];
         $descriptors  = $rubricData['descriptor'] ?: [];
 
-        // Ensure levels and descriptors are reindexed back into sequence
-        $levels      = array_values($levels);
-        $descriptors = array_map('array_values', $descriptors);
-
         $markPerCap = false;
         if ($assessment instanceof DueWork) {
             $usesMarkRange = $assessment->getUseMarkRange();
