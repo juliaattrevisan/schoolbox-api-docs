@@ -47,6 +47,7 @@ class Mapper extends BaseMapper
         $this->joins('type_id', TypeMapper::class, 'id', null, null, 'type', 'type');
         $this->joins('subtype_id', SubTypeMapper::class, 'id', null, null, 'subtype', 'subtype');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 

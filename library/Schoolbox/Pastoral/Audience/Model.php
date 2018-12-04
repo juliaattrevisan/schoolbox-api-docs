@@ -14,6 +14,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 use Schoolbox\Pastoral\Type\Model as Type;
@@ -25,6 +26,7 @@ class Model implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
 
     /** @var User $user Schoolbox user whose actions we are tracking */
