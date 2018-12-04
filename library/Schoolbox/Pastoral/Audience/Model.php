@@ -141,7 +141,7 @@ class Model implements ISoftDeletable
     /**
      * @return int
      */
-    public function getAccess(): int
+    public function getAccess(): ?int
     {
         return $this->access;
     }
