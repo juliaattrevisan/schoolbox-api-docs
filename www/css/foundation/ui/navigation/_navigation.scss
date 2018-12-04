@@ -111,7 +111,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
 		transform: translate3d(0, 0, 0);
 
-		#drawer::after {
+		[data-drawer]::after {
 			content: '\e64b';
 		}
 	}
@@ -394,7 +394,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 /* Off Canvas Menu
  */
 .left-off-canvas-menu {
-	#drawer {
+	[data-drawer] {
 		display: block;
 		height: 2.5rem;
 		padding: .5rem;

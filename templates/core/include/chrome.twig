@@ -82,30 +82,28 @@
                     });
 
                 $('.right-small a, .right-off-canvas-menu label').on('click', function() {
-                    $('.inner-wrap').toggleClass('right-open');
+                    $('[data-inner-offcanvas]').toggleClass('right-open');
                     $(this).toggleClass('raquo');
 
-                    if ($('.inner-wrap').hasClass('right-open')){
+                    if ($('[data-inner-offcanvas]').hasClass('right-open')){
                         $.post('/ajax/notificationsTray', {state: 'show'}, function(responseText) {
                         });
-                    }
-                    else {
+                    } else {
                         $.post('/ajax/notificationsTray', {state: 'hide'}, function(responseText) {
                         });
                     }
                 });
 
-                $('#drawer').on('click', function(){
+                $('[data-drawer]').on('click', function(){
                     $('[data-offcanvas]').removeClass('move-right');
-                    $('.inner-wrap').toggleClass('left-open');
+                    $('[data-inner-offcanvas]').toggleClass('left-open');
                     $(this).toggleClass('open');
 
                     /* Sidenav toggle
                      */
-                    if ($('.inner-wrap').hasClass('left-open')){
+                    if ($('[data-inner-offcanvas]').hasClass('left-open')){
                         $.post('/ajax/sidenav', {state: 'show'});
-                    }
-                    else {
+                    } else {
                         $.post('/ajax/sidenav', {state: 'hide'});
                     }
                 });
@@ -258,10 +256,10 @@
 </head>
 <body class="{{ ws.enabled ? '' : 'disableNotifications' }}">
 <div class="off-canvas-wrap docs-wrap" data-offcanvas data-transition="overlap">
-    <div class="inner-wrap {{ user.current.getHideSidenav ? '' : 'left-open' }} {{ user.current.getHideNotificationsTray ? '' : 'right-open' }}">
+    <div class="inner-wrap {{ user.current.getHideSidenav ? '' : 'left-open' }} {{ user.current.getHideNotificationsTray ? '' : 'right-open' }}" data-inner-offcanvas>
 
         <aside id="left-menu" class="left-off-canvas-menu hide-for-print" data-side-nav>
-            <a href="#" id="drawer" title="Show or hide navigation"></a>
+            <a href="#" title="Show or hide navigation" data-drawer></a>
             <div class="logo-wrapper">
                 <a href="/" class="logo">
                     <img src="/images/logo.php?logo=skin_logo_large&size=normal" srcset="/images/logo.php?logo=skin_logo_large&size=normal 1x,/images/logo.php?logo=skin_logo_large&size=hidpi 2x" alt="{{ config.school_name }}"/>
