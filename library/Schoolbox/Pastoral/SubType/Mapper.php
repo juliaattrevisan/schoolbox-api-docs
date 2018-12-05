@@ -31,6 +31,7 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
     }
 
     /**
@@ -55,6 +56,19 @@ class Mapper extends BaseMapper
             throw new UnexpectedValueException(sprintf($message, $countRecords));
         }
 
+        return true;
+    }
+
+
+    /**
+     * Deletes any pastoral audiences for this type
+     *
+     * @param Model $type
+     * @return bool
+     */
+    protected function deletePastoralAudiences(Model $type): bool
+    {
+        Pastoral\Audience\Mapper::getInstance()->deleteByColumn('type_id', $type->getId());
         return true;
     }
 }

@@ -69,23 +69,21 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString(): string
     {
-        // Intentionally does not join onto soft-deleted strong entities
-        // (e.g. An access is for a User, and user is soft-deleted)
         return "
-			SELECT      {$this->getColumnString()},
-			            {$this->getJoinColumnString('type', 't')},
+            SELECT      {$this->getColumnString()},
+                        {$this->getJoinColumnString('type', 't')},
                         {$this->getJoinColumnString('subtype', 'st')},
                         {$this->getJoinColumnString('role', 'r')},
                         {$this->getJoinColumnString('user', 'u')},
-			            {$this->getJoinColumnString('user.role', 'ur')},
+                        {$this->getJoinColumnString('user.role', 'ur')},
                         {$this->getJoinColumnString('group', 'g')}
-			FROM        {$this->getTable()}
-            LEFT JOIN   {$this->getJoinSql('type', '', 't')}
-            LEFT JOIN   {$this->getJoinSql('subtype', '', 'st')}
-            LEFT JOIN   {$this->getJoinSql('role', '', 'r')}
-            LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
-            LEFT JOIN   {$this->getJoinSql('user.role', 'u', 'ur')}
-            LEFT JOIN   {$this->getJoinSql('group', '', 'g')}
+            FROM        {$this->getTable()}
+            LEFT JOIN   {$this->getJoinSql('type', '', 't', true)}
+            LEFT JOIN   {$this->getJoinSql('subtype', '', 'st', true)}
+            LEFT JOIN   {$this->getJoinSql('role', '', 'r', true)}
+            LEFT JOIN   {$this->getJoinSql('user', '', 'u', true)}
+            LEFT JOIN   {$this->getJoinSql('user.role', 'u', 'ur', true)}
+            LEFT JOIN   {$this->getJoinSql('group', '', 'g', true)}
         ";
     }
 

@@ -56,6 +56,9 @@ use Schoolbox\Resource\File;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Pastoral;
+use Schoolbox\RoleMapper;
+use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../library/Bootstrap.php';
 
@@ -230,7 +233,29 @@ class RecursiveUndeleter
         Kami\Mapper::class              => [],
         Rubric\CriterionMapper::class   => [
             Rubric\DescriptorMapper::class => 'rubric_descriptor.criterion_id',
-        ]
+        ],
+        UserMapper::class               => [
+            Pastoral\Access\Mapper::class,
+            Pastoral\Audience\Mapper::class,
+        ],
+        RoleMapper::class               => [
+            Pastoral\Access\Mapper::class,
+            Pastoral\Audience\Mapper::class,
+        ],
+        Pastoral\Group\Mapper::class    => [
+            Pastoral\Access\Mapper::class => 'group_id',
+            Pastoral\Audience\Mapper::class => 'group_id',
+            Pastoral\Group\Member\Mapper::class => 'group_id',
+        ],
+        Pastoral\Type\Mapper::class     => [
+            Pastoral\Audience\Mapper::class => [],
+        ],
+        Pastoral\SubType\Mapper::class  => [
+            Pastoral\Audience\Mapper::class => [],
+        ],
+        Pastoral\Access\Mapper::class   => [],
+        Pastoral\Audience\Mapper::class => [],
+        Pastoral\Group\Member\Mapper::class => [],
     ];
 
 

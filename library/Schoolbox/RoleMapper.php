@@ -49,6 +49,7 @@ class RoleMapper extends Mapper
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteUsersExists']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeletePastoralAccess']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
     }
 
 
@@ -77,6 +78,19 @@ class RoleMapper extends Mapper
     public function softDeletePastoralAccess(Role $role)
     {
         Pastoral\Access\Mapper::getInstance()->deleteByColumn('role_id', $role->getId());
+        return true;
+    }
+
+
+    /**
+     * Deletes any pastoral audiences for a Role
+     *
+     * @param Role $role
+     * @return bool
+     */
+    protected function deletePastoralAudiences(Role $role): bool
+    {
+        Pastoral\Audience\Mapper::getInstance()->deleteByColumn('role_id', $role->getId());
         return true;
     }
 

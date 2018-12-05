@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral\Type;
 
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\DocumentClassification\Mapper as DocumentClassificationMapper;
 use UnexpectedValueException;
@@ -33,6 +34,7 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
     }
 
     /**
@@ -58,6 +60,19 @@ class Mapper extends BaseMapper
             );
         }
 
+        return true;
+    }
+
+
+    /**
+     * Deletes any pastoral audiences for this subType
+     *
+     * @param Model $subType
+     * @return bool
+     */
+    protected function deletePastoralAudiences(Model $subType): bool
+    {
+        Pastoral\Audience\Mapper::getInstance()->deleteByColumn('subtype_id', $subType->getId());
         return true;
     }
 }

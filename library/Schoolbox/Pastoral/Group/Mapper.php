@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral\Group;
 
 use PDOStatement;
+use Schoolbox\Pastoral;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral\Group\Member as GroupMember;
 use Schoolbox\User;
@@ -36,6 +37,9 @@ class Mapper extends BaseMapper
         $this->joinsReverseMulti('group_id', GroupMember\Mapper::class, 'members', 'members');
 
         $this->registerCallback(Mapper::CALLBACK_PRESOFTDELETE, [$this, 'deleteGroupMembers']);
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAccess']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
     }
 
     /**
@@ -86,5 +90,31 @@ class Mapper extends BaseMapper
         }
 
         return $collection;
+    }
+
+
+    /**
+     * Deletes any pastoral access for a PastoralGroup
+     *
+     * @param Model $pastoralGroup
+     * @return bool
+     */
+    protected function deletePastoralAccess(Model $pastoralGroup): bool
+    {
+        Pastoral\Access\Mapper::getInstance()->deleteByColumn('group_id', $pastoralGroup->getId());
+        return true;
+    }
+
+
+    /**
+     * Deletes any pastoral audiences for a PastoralGroup
+     *
+     * @param Model $pastoralGroup
+     * @return bool
+     */
+    protected function deletePastoralAudiences(Model $pastoralGroup): bool
+    {
+        Pastoral\Audience\Mapper::getInstance()->deleteByColumn('group_id', $pastoralGroup->getId());
+        return true;
     }
 }
