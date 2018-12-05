@@ -333,11 +333,12 @@
 
                             {% block buttons_email_all_staff %}
                                 {% if isStaff and config.email_all_staff %}
+                                    {% set replyTo = '"' ~ session.user.formatName ~ '"' ~ " <" ~ session.user.email ~ ">" %}
                                     <li>
                                         <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">Email All Teachers</a>
                                         <form id="email-all-form" action="/mail/createMail.php" class="hide">
                                             <input name="cc" value="{{ allTeacherEmails }}" type="hidden">
-                                            <input name="replyto" value="{{ session.user.email }}" type="hidden">
+                                            <input name="replyto" value="{{ replyTo }}" type="hidden">
                                         </form>
                                     </li>
                                 {% endif %}
@@ -642,7 +643,8 @@
                                             </div>
                                             <nav>
                                                 {% if not teacher.email is empty %}
-                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ teacher.email }}" title="Email {{ teacher.email }}"></a>
+                                                    {% set replyTo = '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
+                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
                                                 {% endif %}
                                             </nav>
                                         </li>
@@ -715,7 +717,8 @@
                                             </div>
                                             <nav>
                                                 {% if not owner.email is empty %}
-                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ owner.email }}" title="Email {{ owner.email }}"></a>
+                                                    {% set replyTo = '"' ~ owner.formatName ~ '"' ~ " <" ~ owner.email ~ ">" %}
+                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
                                                 {% endif %}
                                             </nav>
                                         </li>

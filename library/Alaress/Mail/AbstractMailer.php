@@ -495,10 +495,17 @@ abstract class AbstractMailer implements IMailer
     /**
      * @param $formatName
      * @param $email
+     * @param bool $convertResultToHtml
      * @return string
      */
-    public static function emailDisplayFormatter($formatName, $email)
+    public static function emailDisplayFormatter($formatName, $email, $convertResultToHtml = true)
     {
-        return htmlentities('"' . $formatName . '" <' . $email . '>');
+        $result = '"' . $formatName . '" <' . $email . '>';
+
+        if ($convertResultToHtml) {
+            return htmlentities($result);
+        }
+
+        return $result;
     }
 } 

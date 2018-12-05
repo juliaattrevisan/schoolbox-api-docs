@@ -262,7 +262,7 @@ class Controller extends Base
                 foreach($assessment->getAllParticipants() as $participant){
                     if($participant->isResponseRequired()){
                         $student = $participant->getUser();
-                        $assessmentStudentsToEmail[$assessment->getId()][$student->getId()] = $student->getEmail();
+                        $assessmentStudentsToEmail[$assessment->getId()][$student->getId()] = AbstractMailer::emailDisplayFormatter($student->formatName(), $student->getEmail(), false);
                     }
                 }
             }

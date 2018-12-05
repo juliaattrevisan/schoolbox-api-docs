@@ -146,9 +146,9 @@ if (is_numeric($this->arg[0])) {
         $memberAccess = $userAccessMapper->getAccess($member, $folder->getId());
         $memberMayOwn = $roleAccessMapper->roleMayOwnFolders($member->getRole());
 
-        // Store member email for 'email group members' button
+        // Store member email for 'bers' button
         if ($member->getId() != $_SESSION['id']) { // Don't email yourself
-            $all_emails[] = $member->getEmail();
+            $all_emails[] = AbstractMailer::emailDisplayFormatter($member->formatName(), $member->getEmail());
         }
 
         if ($memberAccess->getAccessLevel() == UserAccess::ACCESS_FULL) {

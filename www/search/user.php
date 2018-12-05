@@ -84,7 +84,7 @@ function renderStaff(SitePage $page, $user, External_User $synUserHandler, UserM
     $externalUser = $synUserHandler->getStaff($user['synergy_id']);
     /** @var SchoolboxUser $sessionUser */
     $sessionUser = $_SESSION["user"];
-    
+
     try {
         $user    = $userMapper->findById($user['uid']);
         $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user, $sessionUser);
@@ -366,24 +366,24 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
         foreach ($subject as $class) {
             /** @var SchoolboxUser $teacher */
             foreach ($class["teachers"] as $teacher) {
-                $emails[] = $teacher->getEmail();
+                $emails[] = AbstractMailer::emailDisplayFormatter($teacher->formatName(), $teacher->getEmail(), false);
             }
         }
     }
-    if ($formTeacher instanceof SchoolboxUser) {
-        $emails[] = $formTeacher->getEmail();
+    if ($formTeacher instanceof Schoolbox\User) {
+        $emails[] = AbstractMailer::emailDisplayFormatter($formTeacher->formatName(), $formTeacher->getEmail(), false);
     }
-    if ($tutorTeacher instanceof SchoolboxUser) {
-        $emails[] = $tutorTeacher->getEmail();
+    if ($tutorTeacher instanceof Schoolbox\User) {
+        $emails[] = AbstractMailer::emailDisplayFormatter($tutorTeacher->formatName(), $tutorTeacher->getEmail(), false);
     }
-    if ($hohTeacher instanceof SchoolboxUser) {
-        $emails[] = $hohTeacher->getEmail();
+    if ($hohTeacher instanceof Schoolbox\User) {
+        $emails[] = AbstractMailer::emailDisplayFormatter($hohTeacher->formatName(), $hohTeacher->getEmail(), false);
     }
-    if ($coordTeacher instanceof SchoolboxUser) {
-        $emails[] = $coordTeacher->getEmail();
+    if ($coordTeacher instanceof Schoolbox\User) {
+        $emails[] = AbstractMailer::emailDisplayFormatter($coordTeacher->formatName(), $coordTeacher->getEmail(), false);
     }
-    if ($studentCoach instanceof SchoolboxUser) {
-        $emails[] = $studentCoach->getEmail();
+    if ($studentCoach instanceof Schoolbox\User) {
+        $emails[] = AbstractMailer::emailDisplayFormatter($studentCoach->formatName(), $studentCoach->getEmail(), false);
     }
 
     $allTeacherEmails = implode(AbstractMailer::emailSeparator(), array_filter(array_unique($emails)));
