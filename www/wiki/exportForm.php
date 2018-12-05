@@ -6,8 +6,8 @@ use Alaress\Application\Kernel;
 
 $kernel = require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 
-$page = $kernel->getDependencyInjector()->get('layoutEngine');
-$wikiHandler = new Wiki;
+$page         = $kernel->getDependencyInjector()->get('layoutEngine');
+$wikiHandler  = new Wiki;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
 if (isset($_GET['wikiID'])) {
@@ -28,8 +28,8 @@ if (isset($_GET['wikiID'])) {
      */
     $hostURL = SitePage::conType() . $_SERVER['HTTP_HOST'];
 
-    $matches = array();
-    $body = $wikiContents['body'];
+    $matches = [];
+    $body    = $wikiContents['body'];
 
     preg_match_all("/<a href=['\"](\/[^'\"]+)['\"][^>]*>/", $body, $matches);
 
@@ -45,12 +45,12 @@ if (isset($_GET['wikiID'])) {
      */
     $modifiedDate = new Alaress_Date_Format($wikiContents['modified'], 'U');
 
-    $output = array(
-        'AUTHOR' => $wikiContents['firstname'] . ' ' . $wikiContents['lastname'],
-        'HEADING' => Scrub::text($wikiContents['heading']),
-        'BODY' => $body,
+    $output = [
+        'AUTHOR'       => $wikiContents['firstname'] . ' ' . $wikiContents['lastname'],
+        'HEADING'      => Scrub::text($wikiContents['heading']),
+        'BODY'         => $body,
         'LASTMODIFIED' => $modifiedDate->getLong(),
-    );
+    ];
 
     /* Load Page templating, to keep consistent, rather than dumping raw output.
      * This also allows you to format the exported wiki page.
