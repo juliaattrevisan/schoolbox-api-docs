@@ -2277,7 +2277,8 @@ class RubricMapper
            ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
            ->isNull('a.deleted_at')
            ->notNull('sr.published_at')
-           ->isNull('sr.deleted_at');
+           ->isNull('sr.deleted_at')
+           ->isNull('u.deleted_at');
 
         $finish = $term->getActualFinish();
         if (null !== $finish && !$finish->isNull()) {
@@ -2291,6 +2292,7 @@ class RubricMapper
                 sr.id    AS feedbackId,
                 a.id     AS assessmentId
             FROM submission_return sr
+            INNER JOIN user                 u ON sr.owner = u.id
             INNER JOIN submission_box      sb ON sr.box_id = sb.id
             INNER JOIN rubric_group_usage rgu ON sb.id = rgu.submission_box_id
             INNER JOIN rubric_group        rg ON rgu.rubric_group_id = rg.id
