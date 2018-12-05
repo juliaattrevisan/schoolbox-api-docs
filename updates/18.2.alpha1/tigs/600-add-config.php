@@ -93,6 +93,19 @@ $app = new class extends App
             true,
             ConfigMapper::MODULE_CUSTOM
         );
+
+        $this->insertConfig(
+            Tigs\Summative\Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_SUMMARY,
+            '',
+            'Work Type - Academic Achievement Summary',
+            "Rubrics attached to assessments of this work-type will be used to derive the values displayed in the Academic Achievement Summary table on a student's Subject Report",
+            ConfigMapper::FIELD_SELECT_LOOKUP,
+            \serialize([SelectLookup\Renderer::OPTION_KEY_MAPPER => WorkType\Mapper::class,]),
+            true,
+            false,
+            true,
+            ConfigMapper::MODULE_CUSTOM
+        );
     }
 
 
