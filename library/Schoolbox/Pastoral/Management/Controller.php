@@ -279,9 +279,9 @@ class Controller extends Base
             $posted->add($audience);
         }
 
-        $rulesToDelete = $this->pastoralAudienceMapper->createCollection();  // removed type+audience
-        $rulesToAdd    = $this->pastoralAudienceMapper->createCollection();  // new type+audience
-        $rulesToUpdate = $this->pastoralAudienceMapper->createCollection();  // same type+audience, accessLevel has changed
+        $rulesToDelete = $this->pastoralAudienceMapper->createCollection();  // removed entityType+entityId
+        $rulesToAdd    = $this->pastoralAudienceMapper->createCollection();  // new     entityType+entityId
+        $rulesToUpdate = $this->pastoralAudienceMapper->createCollection();  // same    entityType+entityId, accessLevel has changed
 
         // New Rules
         foreach ($posted as $postedRule) {
