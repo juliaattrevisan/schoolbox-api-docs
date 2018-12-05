@@ -99,7 +99,7 @@ class Module extends BaseModule
                         $returnArray['group'] = $params['group'];
                     } else {
                         $groupMapper          = $this->getMapperFactory()->get(GroupMapper::class);
-                        $returnArray['group'] = $groupMapper->findById($params['groupId']);
+                        $returnArray['group'] = $params['groupId'] ? $groupMapper->findById($params['groupId']) : $groupMapper->createModel();
                     }
                 }
                 if (\array_key_exists('typeId', $params)) {

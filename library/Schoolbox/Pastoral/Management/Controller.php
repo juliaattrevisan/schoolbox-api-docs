@@ -345,9 +345,9 @@ class Controller extends Base
     /**
      * Display form to allow insert/update of a pastoral group
      *
-     * @param PastoralGroup $group
+     * @param Pastoral\Group\Model $group
      */
-    public function getGroupsModify($group)
+    public function getGroupsModify(Pastoral\Group\Model $group): void
     {
         $this->getResponse()->content->set([
             'template' => '@pastoralManagement/groups_modify.twig',
