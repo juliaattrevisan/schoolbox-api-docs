@@ -5,7 +5,6 @@
  */
 namespace Schoolbox\Pastoral\Audience;
 
-use Alaress\Database\Predicate\Builder;
 use PDO;
 use PDOStatement;
 use Schoolbox\GenericCollection;
@@ -18,6 +17,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Pastoral;
+use UnexpectedValueException;
 
 /**
  * Pastoral care pastoral type audience defaults
@@ -54,6 +54,8 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateRelationships']);
     }
 
     /**
@@ -143,5 +145,36 @@ class Mapper extends BaseMapper
         }
 
         return $results;
+    }
+
+
+    /**
+     * Ensures the model has correct relationships
+     *
+     * @param Model $model
+     * @return bool
+     * @throws UnexpectedValueException If invalid relationship combination detected
+     */
+    protected function validateRelationships(Model $model): bool
+    {
+        $errors = [];
+        if ($model->getType() && $model->getSubtype()) {
+            $errors[] = "Audience cannot be for both a Type and SubType";
+        } elseif (!$model->getType() && !$model->getSubtype()) {
+            $errors[] = "Audience must have either a Type and SubType";
+        }
+
+        $count = (int)$model->getUser() + (int)$model->getRole() + (int)$model->getGroup();
+        if (!$count) {
+            $errors[] = "Audience must have either a User, Role, or Group";
+        } elseif ($count > 1) {
+            $errors[] = "Audience must be for only one of User, Role, or Group";
+        }
+
+        if (\count($errors)) {
+            throw new UnexpectedValueException(\implode("\n", $errors));
+        }
+
+        return true;
     }
 }
