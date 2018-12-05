@@ -249,9 +249,9 @@ class Controller extends Base
         // Save system role permissions, de-duplicating as we go\
         $foundRoles = [];
 
-        if (is_array($post["role"])) {
+        if (\is_array($post["role"])) {
             foreach ($post["role"] as $role_id => $accessLevel) {
-                if (!in_array($role_id, $foundRoles)) {
+                if (!\in_array($role_id, $foundRoles)) {
                     $foundRoles[] = $role_id;
 
                     /** @var Role $role */
@@ -269,9 +269,9 @@ class Controller extends Base
         // Save pastoral group permissions, de-duplicating as we go
         $foundGroups = [];
 
-        if (is_array($post["group"])) {
+        if (\is_array($post["group"])) {
             foreach ($post["group"] as $group_id => $accessLevel) {
-                if (!in_array($group_id, $foundGroups)) {
+                if (!\in_array($group_id, $foundGroups)) {
                     $foundGroups[] = $group_id;
 
                     /** @var PastoralGroup $group */
@@ -290,9 +290,9 @@ class Controller extends Base
         // Save individual user permissions, de-duplicating as we go
         $foundUsers = [];
 
-        if (is_array($post["user"])) {
+        if (\is_array($post["user"])) {
             foreach ($post["user"] as $user_id => $accessLevel) {
-                if (!in_array($user_id, $foundUsers)) {
+                if (!\in_array($user_id, $foundUsers)) {
                     $foundUsers[] = $user_id;
 
                     $user = $this->userMapper->findById($user_id);
