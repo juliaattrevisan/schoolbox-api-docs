@@ -1,8 +1,12 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
+/** @var Kernel $kernel */
 
-$page = new SitePage;
+use Alaress\Application\Kernel;
+
+$kernel = require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
+
+$page = $kernel->getDependencyInjector()->get('layoutEngine');
 $wikiHandler = new Wiki;
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
@@ -51,7 +55,7 @@ if (isset($_GET['wikiID'])) {
     /* Load Page templating, to keep consistent, rather than dumping raw output.
      * This also allows you to format the exported wiki page.
      */
-    $page->setFile(TEMPLATE_body, '/wiki/exportedPage.html');
+    $page->setFile(TEMPLATE_content, '/wiki/exportedPage.html');
     $page->setVar($output);
 
     /* Construct headers so this pops up a Save-As dialog
