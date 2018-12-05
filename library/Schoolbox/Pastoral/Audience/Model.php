@@ -58,21 +58,17 @@ class Model implements ISoftDeletable
             return false;
         }
 
-
         if (($this->role xor $other->role) || ($this->role && (int)$this->role->getId() !== (int)$other->role->getId())) {
             return false;
         }
-
 
         if (($this->group xor $other->group) || ($this->group && (int)$this->group->getId() !== (int)$other->group->getId())) {
             return false;
         }
 
-
         if (($this->type xor $other->type) || ($this->type && (int)$this->type->getId() !== (int)$other->type->getId())) {
             return false;
         }
-
 
         if (($this->subtype xor $other->subtype) || ($this->subtype && (int)$this->subtype->getId() !== (int)$other->subtype->getId())) {
             return false;
