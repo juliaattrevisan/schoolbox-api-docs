@@ -104,8 +104,6 @@ class Mapper extends BaseMapper
             ];
 
             $button->setUrl(str_ireplace($array_find, $array_replace, $button->getUrl()));
-            $button->setText(str_ireplace($array_find, $array_replace, $button->getText()));
-            $button->setTitle(str_ireplace($array_find, $array_replace, $button->getTitle()));
         }
 
         return $buttons;
