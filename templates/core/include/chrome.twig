@@ -94,10 +94,16 @@
                     }
                 });
 
-                $('[data-drawer]').on('click', function(){
+                $('[data-drawer]').attr('title', 'Show navigation').on('click', function(){
                     $('[data-offcanvas]').removeClass('move-right');
                     $('[data-inner-offcanvas]').toggleClass('left-open');
                     $(this).toggleClass('open');
+
+                    var title = 'Show navigation';
+                    if ($(this).hasClass('open')){
+                        title = 'Hide navigation';
+                    }
+                    $(this).attr('title', title);
 
                     /* Sidenav toggle
                      */
@@ -259,7 +265,7 @@
     <div class="inner-wrap {{ user.current.getHideSidenav ? '' : 'left-open' }} {{ user.current.getHideNotificationsTray ? '' : 'right-open' }}" data-inner-offcanvas>
 
         <aside id="left-menu" class="left-off-canvas-menu hide-for-print" data-side-nav>
-            <a href="#" title="Show or hide navigation" data-drawer></a>
+            <a href="#" title="Show navigation" data-drawer></a>
             <div class="logo-wrapper">
                 <a href="/" class="logo">
                     <img src="/images/logo.php?logo=skin_logo_large&size=normal" srcset="/images/logo.php?logo=skin_logo_large&size=normal 1x,/images/logo.php?logo=skin_logo_large&size=hidpi 2x" alt="{{ config.school_name }}"/>
