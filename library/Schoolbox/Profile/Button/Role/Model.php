@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Profile\Button\Role;
 
-use Schoolbox\ISoftDeletable;
-
 class Model
 {
     /** @var int */

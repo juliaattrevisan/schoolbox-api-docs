@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Profile\Button\Campus;
 
-use Schoolbox\ISoftDeletable;
-
 class Model
 {
     /** @var int */
@@ -20,7 +18,7 @@ class Model
      * @param int $id
      * @return self
      */
-    public function setId($id)
+    public function setId($id): self
     {
         $this->id = $id;
         return $this;
