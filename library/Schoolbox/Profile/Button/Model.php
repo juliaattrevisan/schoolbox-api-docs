@@ -14,7 +14,7 @@ class Model implements ISoftDeletable
     /** @var int */
     protected $sortOrder;
 
-    /** @var string */
+    /** @var string|null */
     protected $title;
 
     /** @var string */
@@ -23,13 +23,13 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $token;
 
-    /** @var string */
+    /** @var string|null */
     protected $icon;
 
     /** @var string */
     protected $url;
 
-    /** @var string */
+    /** @var string|null */
     protected $target;
 
     /** @var \Alaress_Date_Format */
@@ -54,19 +54,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $title
+     * @param string|null $title
      * @return self
      */
-    public function setTitle(string $title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -108,19 +108,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $icon
+     * @param string|null $icon
      * @return self
      */
-    public function setIcon(string $icon): self
+    public function setIcon(?string $icon): self
     {
         $this->icon = $icon;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getIcon(): string
+    public function getIcon(): ?string
     {
         return $this->icon;
     }
@@ -144,19 +144,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $target
+     * @param string|null $target
      * @return self
      */
-    public function setTarget(string $target): self
+    public function setTarget(?string $target): self
     {
         $this->target = $target;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTarget(): string
+    public function getTarget(): ?string
     {
         return $this->target;
     }
