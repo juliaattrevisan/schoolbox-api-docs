@@ -11,6 +11,129 @@ $(function () {
     // (Fastclick stops mousedown from triggering?)
     $(document).on('touchstart', $.datepicker._checkExternalClick);
 
+    // Disable $ formula encoding
+    M.$mathQ = false;
+
+    $('#infoPanel').find('a[data-menu]').flyout();
+    $('#nav').touchMenu()
+        .scrollToTop({
+                cancel: function () {
+                    return !$(this).parent().hasClass('has-submenu');
+                }
+            }
+        );
+
+    var s = $('#search');
+    s.on('click', '[data-jsubmit]', function () {
+        if (s.find('input').val()) {
+            s.submit();
+        }
+    });
+
+    /* Replace all editor video/audio placeholders
+    */
+    $.fn.schoolboxResource_ProxyReplacment();
+
+    /* Notifications toggle
+     */
+    $('.right-small, .right-off-canvas-menu').hover(function(){
+            $('.right-off-canvas-menu').addClass('overlap');
+        },
+        function(){
+            $('.right-off-canvas-menu').removeClass('overlap');
+        });
+
+    $('.right-small a, .right-off-canvas-menu label').on('click', function() {
+        $('[data-inner-offcanvas]').toggleClass('right-open');
+        $(this).toggleClass('raquo');
+
+        if ($('[data-inner-offcanvas]').hasClass('right-open')){
+            $.post('/ajax/notificationsTray', {state: 'show'}, function(responseText) {
+            });
+        } else {
+            $.post('/ajax/notificationsTray', {state: 'hide'}, function(responseText) {
+            });
+        }
+    });
+
+    /* Left menu toggle
+     */
+    $('[data-drawer]').attr('title', 'Hide navigation').on('click', function(){
+        $('[data-offcanvas]').removeClass('move-right');
+        $('[data-inner-offcanvas]').toggleClass('left-open');
+        $(this).toggleClass('open');
+
+        var title = 'Hide navigation';
+        if ($(this).hasClass('open')){
+            title = 'Show navigation';
+        }
+        $(this).attr('title', title);
+
+        if ($('[data-inner-offcanvas]').hasClass('left-open')){
+            $.post('/ajax/sidenav', {state: 'show'});
+        } else {
+            $.post('/ajax/sidenav', {state: 'hide'});
+        }
+    });
+
+    /* Open / Close account menu
+     * + click outside div to close
+     */
+    var accountMenu = $('#account-content');
+
+    $('#profile-drop').on('click', function(e){
+        e.stopPropagation();
+        accountMenu.toggleClass('open');
+    });
+
+    $('[data-offcanvas]').on('click', function(){
+        accountMenu.removeClass('open');
+    });
+
+    /* Ensure modals always appear in a visible location
+     *
+     * The callback open.fndtn.reveal doesn't fire when the
+     * modal is built dynamically with js -_-
+     *
+     * Also, arbitrary 6.25rem padding at top (in the design)
+     */
+    var modalTop = 6.25*16;
+
+    $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
+        $(this).css({'top': $(window).scrollTop() + modalTop + 'px'});
+    });
+
+    $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
+        $(this).css({'top': $(window).scrollTop() + modalTop + 'px'});
+    });
+
+    var splash, d, x, y, splashTimeout;
+    $(document).on('click', ".button, button, .sub-nav a, .pagination a, .flex-list a, [data-component-palette]", function(e) {
+
+        splash = $(this).find(".splash");
+        splash.removeClass('animate');
+        clearTimeout(splashTimeout);
+
+        if (splash.length === 0) {
+            $(this).prepend("<span class='splash'></span>");
+        }
+
+        if (!splash.height() && !splash.width()) {
+            d = Math.max($(this).outerWidth(), $(this).outerHeight());
+            splash.css({height: d, width: d});
+        }
+
+        x = e.pageX - $(this).offset().left - splash.width()/2;
+        y = e.pageY - $(this).offset().top - splash.height()/2;
+
+        splash.css({top: y+'px', left: x+'px'}).addClass("animate");
+
+        // Remove the animation after a bit of time, otherwise this animation will happen every time the element hides and becomes visible again
+        splashTimeout = setTimeout(function() {
+            splash.removeClass('animate');
+        }, 300);
+    });
+
     /**
      * Autoclear the main site search field (works without polyfill in all but IE9)
      */
@@ -67,15 +190,4 @@ $(function () {
         });
     }
 
-//    /**
-//     * Remove the layerX and layerY console log reports from Webkit.
-//     */
-//    var all = $.event.props,
-//        len = all.length,
-//        res = [];
-//    while (len--) {
-//      var el = all[len];
-//      if (el != 'layerX' && el != 'layerY') res.push(el);
-//    }
-//    $.event.props = res
 });
