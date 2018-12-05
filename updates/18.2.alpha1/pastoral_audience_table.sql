@@ -9,5 +9,10 @@ CREATE TABLE pastoral_audience (
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `deleted_at` DATETIME,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    CONSTRAINT pastoral_audience_type_id    FOREIGN KEY (`type_id`)    REFERENCES lu_pastoral_type (`id`)    ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT pastoral_audience_subtype_id FOREIGN KEY (`subtype_id`) REFERENCES lu_pastoral_subtype (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT pastoral_audience_user_id    FOREIGN KEY (`user_id`)    REFERENCES user (`id`)                ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT pastoral_audience_role_id    FOREIGN KEY (`role_id`)    REFERENCES `groups` (`id`)            ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT pastoral_audience_group_id   FOREIGN KEY (`group_id`)   REFERENCES pastoral_group (`id`)      ON DELETE RESTRICT ON UPDATE RESTRICT
 );
