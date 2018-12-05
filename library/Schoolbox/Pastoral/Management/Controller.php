@@ -249,60 +249,54 @@ class Controller extends Base
         // Save system role permissions, de-duplicating as we go\
         $foundRoles = [];
 
-        if (\is_array($post["role"])) {
-            foreach ($post["role"] as $role_id => $accessLevel) {
-                if (!\in_array($role_id, $foundRoles, false)) {
-                    $foundRoles[] = $role_id;
+        foreach ($post["role"] ?? [] as $role_id => $accessLevel) {
+            if (!\in_array($role_id, $foundRoles, false)) {
+                $foundRoles[] = $role_id;
 
-                    /** @var Role $role */
-                    $role = $this->roleMapper->findById($role_id);
-                    $audience = $this->pastoralAudienceMapper->createModel();
-                    $audience->setType($type);
-                    $audience->setSubtype($subType);
-                    $audience->setRole($role);
-                    $audience->setAccess($accessLevel);
-                    $this->pastoralAudienceMapper->save($audience);
-                }
+                /** @var Role $role */
+                $role = $this->roleMapper->findById($role_id);
+                $audience = $this->pastoralAudienceMapper->createModel();
+                $audience->setType($type);
+                $audience->setSubtype($subType);
+                $audience->setRole($role);
+                $audience->setAccess($accessLevel);
+                $this->pastoralAudienceMapper->save($audience);
             }
         }
 
         // Save pastoral group permissions, de-duplicating as we go
         $foundGroups = [];
 
-        if (\is_array($post["group"])) {
-            foreach ($post["group"] as $group_id => $accessLevel) {
-                if (!\in_array($group_id, $foundGroups, false)) {
-                    $foundGroups[] = $group_id;
+        foreach ($post["group"] ?? [] as $group_id => $accessLevel) {
+            if (!\in_array($group_id, $foundGroups, false)) {
+                $foundGroups[] = $group_id;
 
-                    /** @var PastoralGroup $group */
-                    $group = $this->pastoralGroupMapper->findById($group_id);
-                    $audience = $this->pastoralAudienceMapper->createModel();
-                    $audience->setType($type);
-                    $audience->setSubtype($subType);
-                    $audience->setGroup($group);
-                    $audience->setAccess($accessLevel);
+                /** @var PastoralGroup $group */
+                $group = $this->pastoralGroupMapper->findById($group_id);
+                $audience = $this->pastoralAudienceMapper->createModel();
+                $audience->setType($type);
+                $audience->setSubtype($subType);
+                $audience->setGroup($group);
+                $audience->setAccess($accessLevel);
 
-                    $this->pastoralAudienceMapper->save($audience);
-                }
+                $this->pastoralAudienceMapper->save($audience);
             }
         }
 
         // Save individual user permissions, de-duplicating as we go
         $foundUsers = [];
 
-        if (\is_array($post["user"])) {
-            foreach ($post["user"] as $user_id => $accessLevel) {
-                if (!\in_array($user_id, $foundUsers, false)) {
-                    $foundUsers[] = $user_id;
+        foreach ($post["user"] ?? [] as $user_id => $accessLevel) {
+            if (!\in_array($user_id, $foundUsers, false)) {
+                $foundUsers[] = $user_id;
 
-                    $user = $this->userMapper->findById($user_id);
-                    $audience = $this->pastoralAudienceMapper->createModel();
-                    $audience->setType($type);
-                    $audience->setSubtype($subType);
-                    $audience->setAccess($accessLevel);
-                    $audience->setUser($user);
-                    $this->pastoralAudienceMapper->save($audience);
-                }
+                $user = $this->userMapper->findById($user_id);
+                $audience = $this->pastoralAudienceMapper->createModel();
+                $audience->setType($type);
+                $audience->setSubtype($subType);
+                $audience->setAccess($accessLevel);
+                $audience->setUser($user);
+                $this->pastoralAudienceMapper->save($audience);
             }
         }
 
