@@ -55,7 +55,7 @@
             submitHandler: function(form) {
                 // Find the submit button for this form and disable it,
                 // to avoid accidental multiple requests
-                var submitButton = $(form).find('input[type="submit"]');
+                var submitButton = $(form).find('input[type=submit], button[type=submit]');
                 $(submitButton).prop("disabled", true);
                 form.submit();
             }
