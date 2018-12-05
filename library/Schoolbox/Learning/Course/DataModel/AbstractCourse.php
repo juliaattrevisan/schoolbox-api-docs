@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Course\DataModel;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -16,6 +17,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * Abstract for CourseSpec  + CourseImpl models
+ * @method self setUnits(GenericCollection $units)
  */
 abstract class AbstractCourse implements ISoftDeletable
 {
@@ -46,4 +48,10 @@ abstract class AbstractCourse implements ISoftDeletable
         $this->folder = $folder;
         return $this;
     }
+
+
+    /**
+     * @return GenericCollection|AbstractUnit[]
+     */
+    abstract public function getUnits(): GenericCollection;
 }

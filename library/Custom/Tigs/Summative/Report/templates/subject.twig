@@ -11,7 +11,8 @@ Data:
     term:                int            - an integer from 1-4
     curriculumYearLevel: int            - an integer from 7-12
     curriculumSemester:  int            - an integer from 1-2
-
+    unitImpls            UnitImpl\Model - All units imported to this folder.
+    aamData              array          - Data to render the Academic Achievement Matrix components
 #}
 <div class="row">
     <div class="island small-12">
@@ -21,19 +22,41 @@ Data:
                 This report is currently not visible to the student or their parents.
             </div>
         {% endif %}
+        {% if aamData.error is defined %}
+            <div data-alert class="alert-box alert">
+                {{ aamData.error|raw }}
+            </div>
+        {% endif %}
+    </div>
+    <div class="small-12">
+        {% for unitId, unit in unitImpls %}
+            <h2 class="subheader">{{ unit.title }}</h2>
+            {# Were we given AAM data for this unit? #}
+            {% if aamData.data is defined and aamData.data[unitId] is defined %}
+                {% include '@tigsSummativeReport/components/academicAchievementMatrix.twig' with aamData.data[unitId] only %}
+            {% endif %}
+            {% if not loop.last %}<br>{% endif %}
+        {% endfor %}
     </div>
 </div>
 
-<p>userId: {{ user.id }}</p>
-<p>folderId: {{ folder.id }}</p>
-<br>
-<p>isHsc: {% if isHsc %}true{% else %}false{% endif %}</p>
-<p>isIb: {% if isIb %}true{% else %}false{% endif %}</p>
-<br>
-<p>SB Term: {{ term }}</p>
-<br>
-<p>SB Year Level: {{ user.year }}</p>
-<p>SB Semester: {{ sbSem }}</p>
-<br>
-<p>Curriculum Year Level: {{ curriculumYearLevel }}</p>
-<p>Curriculum Semester: {{ curriculumSemester }}</p>
+<div class="row">
+    <div class="island small-12">
+        <section class="meta" style="padding-left: 10px;">
+            <h2 class="subheader">Dev Debug data:</h2>
+            <p>userId: {{ user.id }}</p>
+            <p>folderId: {{ folder.id }}</p>
+            <br>
+            <p>isHsc: {% if isHsc %}true{% else %}false{% endif %}</p>
+            <p>isIb: {% if isIb %}true{% else %}false{% endif %}</p>
+            <br>
+            <p>SB Term: {{ term }}</p>
+            <br>
+            <p>SB Year Level: {{ user.year }}</p>
+            <p>SB Semester: {{ sbSem }}</p>
+            <br>
+            <p>Curriculum Year Level: {{ curriculumYearLevel }}</p>
+            <p>Curriculum Semester: {{ curriculumSemester }}</p>
+        </section>
+    </div>
+</div>

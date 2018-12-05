@@ -38,8 +38,11 @@ class Model extends AbstractCourse
      */
     private $courseImplementations;
 
+
     /**
      * Constructor
+     *
+     * @throws \UnexpectedValueException
      */
     public function __construct()
     {
@@ -56,9 +59,8 @@ class Model extends AbstractCourse
     {
         if($this->getFolder() != null) {
             return $this->getFolder()->getName();
-        } else {
-            return '';
         }
+        return '';
     }
 
     /* Getters / Setters
@@ -67,16 +69,18 @@ class Model extends AbstractCourse
     /**
      * @return Unit\Model[]|GenericCollection
      */
-    public function getUnits()
+    public function getUnits(): GenericCollection
     {
         return $this->unitSpecifications;
     }
 
+
     /**
      * @param Unit\Model[]|GenericCollection $unitSpecifications
      * @return static
+     * @throws \DomainException
      */
-    public function setUnits(GenericCollection $unitSpecifications)
+    public function setUnits(GenericCollection $unitSpecifications): self
     {
         $this->unitSpecifications->replaceWith($unitSpecifications);
         return $this;
@@ -90,9 +94,11 @@ class Model extends AbstractCourse
         return $this->courseImplementations;
     }
 
+
     /**
      * @param CourseImplementation[]|GenericCollection $courseImplementations
      * @return static
+     * @throws \DomainException
      */
     public function setCourseImplementations(GenericCollection $courseImplementations)
     {
