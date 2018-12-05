@@ -20,6 +20,7 @@ use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
 use Schoolbox\Resource\Search\Results;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -153,27 +154,17 @@ class Controller extends Base
      */
     private function getAudiencesModify(PastoralType $type, ?PastoralSubType $subType): void
     {
-        // TODO implement this in a PB, rather that post-hydration filter
-        $roles = $this->roleMapper->createCollection();
-        $rolesAll = $this->roleMapper->findAll(['order' => ['name' => 'ASC']]);
-        $roleUsers = [];
-        $allowParents = $this->getConfigLoader()->get('pastoral_parent_access');
-
-        //Staff roles only for default audiences
-        foreach ($rolesAll as $role) {
-            // Staff role? Show all users
-            if ($role->isStaff()) {
-                $roles->add($role);
-            }
-
-            // Parent role? Show only the # of this student's parents in this role
-            if ($allowParents && $role->isParent()) {
-                $roles->add($role);
-            }
+        $pb = $this->roleMapper->getPredicateBuilder()->equals('group_type', Role::STAFF);
+        if ($this->getConfigLoader()->get('pastoral_parent_access')) {
+            $pb->equals('group_type', Role::PARENT);
+            $pb = $this->roleMapper->getPredicateBuilder()->any($pb);
         }
 
+        $roles     = $this->roleMapper->findByPredicates($pb, ['order' => ['name' => 'ASC']]);
+        $roleUsers = [];
+
         foreach ($roles as $role) {
-            $roleId = $role->getId();
+            $roleId             = $role->getId();
             $roleUsers[$roleId] = $this->userMapper->countByColumn('group_id', $roleId);
         }
 
