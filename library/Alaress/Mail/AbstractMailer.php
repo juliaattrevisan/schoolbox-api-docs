@@ -485,6 +485,7 @@ abstract class AbstractMailer implements IMailer
     }
 
     /**
+     * Implode glue to join email addresses array
      * @return string
      */
     public static function emailSeparator() :string

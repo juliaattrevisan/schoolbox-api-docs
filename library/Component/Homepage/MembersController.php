@@ -171,7 +171,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     /* Member bulk email
                      */
                     if ($user->getEmail()) {
-                        $emailall[] = AbstractMailer::emailDisplayFormatter($user->formatName(), $user->getEmail());
+                        $emailall[] = Scrub::text($user->getFormattedEmailDisplay());
                     }
 
                     /* Member cards

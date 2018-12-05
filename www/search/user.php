@@ -2,6 +2,7 @@
 
 use Schoolbox\Config\ConfigMapper;
 use Alaress\Mail\AbstractMailer;
+use Embera\Providers\Screenr;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as Access;
@@ -366,24 +367,24 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
         foreach ($subject as $class) {
             /** @var SchoolboxUser $teacher */
             foreach ($class["teachers"] as $teacher) {
-                $emails[] = AbstractMailer::emailDisplayFormatter($teacher->formatName(), $teacher->getEmail(), false);
+                $emails[] = $teacher->getFormattedEmailDisplay();
             }
         }
     }
     if ($formTeacher instanceof Schoolbox\User) {
-        $emails[] = AbstractMailer::emailDisplayFormatter($formTeacher->formatName(), $formTeacher->getEmail(), false);
+        $emails[] = $formTeacher->getFormattedEmailDisplay();
     }
     if ($tutorTeacher instanceof Schoolbox\User) {
-        $emails[] = AbstractMailer::emailDisplayFormatter($tutorTeacher->formatName(), $tutorTeacher->getEmail(), false);
+        $emails[] = $tutorTeacher->getFormattedEmailDisplay();
     }
     if ($hohTeacher instanceof Schoolbox\User) {
-        $emails[] = AbstractMailer::emailDisplayFormatter($hohTeacher->formatName(), $hohTeacher->getEmail(), false);
+        $emails[] = $hohTeacher->getFormattedEmailDisplay();
     }
     if ($coordTeacher instanceof Schoolbox\User) {
-        $emails[] = AbstractMailer::emailDisplayFormatter($coordTeacher->formatName(), $coordTeacher->getEmail(), false);
+        $emails[] = $coordTeacher->getFormattedEmailDisplay();
     }
     if ($studentCoach instanceof Schoolbox\User) {
-        $emails[] = AbstractMailer::emailDisplayFormatter($studentCoach->formatName(), $studentCoach->getEmail(), false);
+        $emails[] = $studentCoach->getFormattedEmailDisplay();
     }
 
     $allTeacherEmails = implode(AbstractMailer::emailSeparator(), array_filter(array_unique($emails)));

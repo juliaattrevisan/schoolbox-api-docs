@@ -156,7 +156,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                         /* Agglutinate a giant bcc
                             */
                         if ($user->getEmail()) {
-                            $allStudentEmails[] = AbstractMailer::emailDisplayFormatter($user->formatName(), $user->getEmail());
+                            $allStudentEmails[] = Scrub::text($user->getFormattedEmailDisplay());
                         }
 
                         $this->setVar([
