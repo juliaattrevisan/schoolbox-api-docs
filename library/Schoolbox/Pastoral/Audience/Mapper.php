@@ -109,6 +109,7 @@ class Mapper extends BaseMapper
         $subTypeMapper = $this->getJoinMapper('subtype');
         $pGroupMapper  = $this->getJoinMapper('group');
 
+        /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             // The record must have a user, role or group specified
             if (empty($row['u.id']) && empty($row['r.id']) && empty($row['g.id'])) {
@@ -141,7 +142,7 @@ class Mapper extends BaseMapper
                 $access->setGroup($pGroupMapper->hydrate($row, 'g'));
             }
 
-            $results->add($access);
+            $results[$access->getId()] = $access;
         }
 
         return $results;
