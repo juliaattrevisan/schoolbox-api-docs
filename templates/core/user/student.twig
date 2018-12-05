@@ -600,7 +600,7 @@
             {% if showSubjects %}
                 {% for group, subjectGroup in subjects %}
                     {# Keep a running total of all teachers emails in this group #}
-                    {% set teacherEmails = '' %}
+                    {% set teacherEmails = [] %}
                     <div class="row">
                         <div class="small-12 island">
                             <h2 class="subheader">{{ group }}</h2>
@@ -620,7 +620,8 @@
                                         {% block folderListItemActions %}{% endblock %}
                                     </li>
                                     {% for teacher in subject.teachers %}
-                                        {% set teacherEmails = teacherEmails ~ teacher.email ~ ',' %}
+                                        {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
+                                        {% set teacherEmails = teacherEmails|merge([email]) %}
                                         <li class="actions-small-1">
                                             <div class="list-item">
                                                 <div class="compact card small-12">
@@ -650,12 +651,14 @@
                                 {% endfor %}
 
                                 {% if session.user.role.staff and config.email_all_staff and config.mail_enable %}
+                                    {% set teacherEmails = teacherEmails|join(emailSeparator)  %}
+                                    {% set replyTo = '"' ~ session.user.formatName ~ '"' ~ " <" ~ session.user.email ~ ">" %}
                                     <div class="component-action">
                                         <section>
                                             <form action="/mail/createMail.php" method="post">
                                                 <div class="row">
                                                     <div class="small-12 columns">
-                                                        <input type="hidden" name="replyto" value="{{ session.user.email }}"/>
+                                                        <input type="hidden" name="replyto" value="{{ replyTo }}"/>
                                                         <input type="hidden" name="bcc" value="{{ teacherEmails }}"/>
                                                         <button type="submit" class="button">Email All {{ group }} Teachers</button>
                                                     </div>

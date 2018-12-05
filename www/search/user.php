@@ -431,6 +431,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
                 'allTeacherEmails'   => $allTeacherEmails,
                 'pdStates'           => $pdMapper->getStates(),
                 'pd'                 => $pd,
+                'emailSeparator'     => AbstractMailer::emailSeparator(),
             ]
         )
     );
