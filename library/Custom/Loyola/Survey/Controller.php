@@ -47,17 +47,18 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param UserMapper $userMapper
-     * @param SurveyMapper $surveyMapper
-     * @param FolderMapper $folderMapper
+     * @param UserMapper               $userMapper
+     * @param SurveyMapper             $surveyMapper
+     * @param \External_ClassInterface $externalClass
      */
     public function __construct(
         UserMapper $userMapper,
-        SurveyMapper $surveyMapper
+        SurveyMapper $surveyMapper,
+        \External_ClassInterface $externalClass
     ) {
-        $this->externalClass = new External_Class();
-        $this->userMapper = $userMapper;
-        $this->surveyMapper = $surveyMapper;
+        $this->userMapper    = $userMapper;
+        $this->externalClass = $externalClass;
+        $this->surveyMapper  = $surveyMapper;
     }
 
     /**

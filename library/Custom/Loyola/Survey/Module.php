@@ -72,8 +72,9 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $mappers = [
-            'userMapper'   => UserMapper::getInstance(),
-            'surveyMapper' => SurveyMapper::getInstance(),
+            'userMapper'    => $this->getMapperFactory()->get(UserMapper::class),
+            'surveyMapper'  => $this->getMapperFactory()->get(SurveyMapper::class),
+            'externalClass' => $injector->lazyGet('externalClass')
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
