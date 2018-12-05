@@ -66,9 +66,8 @@ class Controller extends Base
      * classroom learning snapshot
      *
      * @param Folder $folder
-     * @return bool
      */
-    public function getClassSnapshotList(Folder $folder)
+    public function getClassSnapshotList(Folder $folder): void
     {
         $userIds = $this->getStudents($folder);
         // And work out what surveys they have completed
@@ -84,8 +83,6 @@ class Controller extends Base
                 'surveys' => $surveys
             ]
         ]);
-
-        return true;
     }
 
 
@@ -96,7 +93,8 @@ class Controller extends Base
      *
      * @param Survey $survey
      */
-    public function getSnapshot(Survey $survey) {
+    public function getSnapshot(Survey $survey): void
+    {
         $responses = SurveyMapper::getInstance()->findClassSnapshot($survey->getId());
         $this->renderSpreadsheet($survey, $responses);
     }
@@ -107,14 +105,22 @@ class Controller extends Base
      * @param Survey $survey
      * @param Folder $folder
      */
-    public function getClassSnapshot(Survey $survey, Folder $folder)
+    public function getClassSnapshot(Survey $survey, Folder $folder): void
     {
         $userIds = $this->getStudents($folder);
         $responses = SurveyMapper::getInstance()->findClassSnapshot($survey->getId(), $userIds);
         $this->renderSpreadsheet($survey, $responses);
     }
 
-    private function renderSpreadsheet(Survey $survey, $responses) {
+
+    /**
+     * Output a spreadsheet
+     *
+     * @param Survey $survey
+     * @param array  $responses
+     */
+    private function renderSpreadsheet(Survey $survey, $responses): void
+    {
 
         $this->excel = new PHPExcel();
         $answersRenderArray = [];
@@ -250,7 +256,7 @@ class Controller extends Base
      * @param string $tabText
      * @param string $title
      */
-    private function spreadsheetTabSetup($tabText, $title)
+    private function spreadsheetTabSetup($tabText, $title): void
     {
         $this->currentRow = 2;
 
@@ -300,9 +306,9 @@ class Controller extends Base
     /**
      * Download spreadsheet
      *
-     * @param $filename
+     * @param string $filename
      */
-    private function spreadsheetDownload($filename)
+    private function spreadsheetDownload($filename): void
     {
         $tempFilename = tempnam(sys_get_temp_dir(), 'cls_');
 
@@ -323,7 +329,7 @@ class Controller extends Base
      * @param string $string
      * @return string
      */
-    private function replaceInvalidCharacters($string)
+    private function replaceInvalidCharacters($string): string
     {
         $replacements = [
             '\\' => '|',
@@ -352,7 +358,7 @@ class Controller extends Base
         $students = [];
 
         // Get the class codes on the folder we are viewing
-        $codes = $folder->getCodes()->getColumnValues('code');
+        $codes = $folder->getCodes()->getPropertyValues('code');
 
         // Retrieve the students in each of these classes
         foreach ($codes as $code) {
@@ -360,7 +366,7 @@ class Controller extends Base
         }
 
         // If we didn't find any students, no point going on
-        if (count($students) == 0) {
+        if (count($students) === 0) {
             return [];
         }
 
