@@ -17,7 +17,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
 
 /**
- * The module for managing school terms through the admin section.
+ * The module for managing custom profile buttons through the admin section.
  *
  * @package Schoolbox\Admin\Profile\Button
  */
