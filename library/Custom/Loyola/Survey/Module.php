@@ -33,7 +33,8 @@ class Module extends BaseModule
         $isStaff = new Rule\HasRole(Role::STAFF);
 
         $this->register('GET', '/class/{folderId}', 'getClassSnapshotList', $isStaff);
-        $this->register('GET', '/class/snapshot/{surveyId}', 'getClassSnapshot', $isStaff);
+        $this->register('GET', '/class/snapshot/{surveyId}', 'getSnapshot', $isStaff);
+        $this->register('GET', '/class/{folderId}/snapshot/{surveyId}', 'getClassSnapshot', $isStaff);
     }
 
     /**
@@ -71,9 +72,9 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $mappers = [
-            'userMapper' => UserMapper::getInstance(),
-            'folderMapper' => FolderMapper::getInstance(),
-            'surveyMapper' => SurveyMapper::getInstance(),
+            'userMapper'    => $this->getMapperFactory()->get(UserMapper::class),
+            'surveyMapper'  => $this->getMapperFactory()->get(SurveyMapper::class),
+            'externalClass' => $injector->lazyGet('externalClass')
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
