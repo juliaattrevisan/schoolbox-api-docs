@@ -9,6 +9,12 @@ use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Menu\Icon\Mapper as IconMapper;
+use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
+use Schoolbox\Profile\Button\Campus\Mapper as ProfileButtonCampusMapper;
+use Schoolbox\Profile\Button\Role\Mapper as ProfileButtonRoleMapper;
+use Schoolbox\CampusMapper;
+use Schoolbox\RoleMapper;
 
 /**
  * The module for managing school terms through the admin section.
@@ -59,7 +65,14 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector): void
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class), [
+            'iconMapper'   => $this->getMapperFactory()->getLazy(IconMapper::class),
+            'profileButtonMapper' => $this->getMapperFactory()->getLazy(ProfileButtonMapper::class),
+            'profileButtonCampusMapper' => $this->getMapperFactory()->getLazy(ProfileButtonCampusMapper::class),
+            'profileButtonRoleMapper' => $this->getMapperFactory()->getLazy(ProfileButtonRoleMapper::class),
+            'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
+            'campusMapper' => $this->getMapperFactory()->getLazy(CampusMapper::class),
+        ]);
     }
 
     /**
