@@ -51,12 +51,12 @@
             ignore: false,
             ignoreTitle: true,
             errorPlacement: $.alaressValidate.defaultErrorPlacement,
-            // Add to  line 51 in jquery.alaressValidate.js
             submitHandler: function(form) {
                 // Find the submit button for this form and disable it,
                 // to avoid accidental multiple requests
-                var submitButton = $(form).find('input[type=submit], button[type=submit]');
-                $(submitButton).prop("disabled", true);
+                $(form).find('input[type=submit], button[type=submit]').prop("disabled", true);
+
+                // ..and submit the form
                 form.submit();
             }
         };
