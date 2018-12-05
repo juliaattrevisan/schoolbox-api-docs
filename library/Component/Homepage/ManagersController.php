@@ -164,7 +164,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 /* Manager bulk email
                  */
                 if ($manager->getEmail()) {
-                    $emailall[] =  htmlentities('"' . $manager->formatName() . '" <' . $manager->getEmail() . '>');
+                    $emailall[] = AbstractMailer::emailDisplayFormatter($manager->formatName(), $manager->getEmail());
                 }
 
                 if ($this->getUser()->getRole()->isStaff() && isset($emailall) && $this->getConfigMapper()->get('mail_enable')) {

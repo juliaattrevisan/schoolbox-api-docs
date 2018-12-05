@@ -491,4 +491,14 @@ abstract class AbstractMailer implements IMailer
     {
         return \chr(self::EMAIL_SEPARATOR_CODE);
     }
+
+    /**
+     * @param $formatName
+     * @param $email
+     * @return string
+     */
+    public static function emailDisplayFormatter($formatName, $email)
+    {
+        return htmlentities('"' . $formatName . '" <' . $email . '>');
+    }
 } 
