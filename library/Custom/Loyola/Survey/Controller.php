@@ -18,7 +18,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\UserMapper;
 use Schoolbox\Survey\Model as Survey;
 use Schoolbox\Survey\Mapper as SurveyMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Scrub;
 
 class Controller extends Base
@@ -95,7 +94,7 @@ class Controller extends Base
      */
     public function getSnapshot(Survey $survey): void
     {
-        $responses = SurveyMapper::getInstance()->findClassSnapshot($survey->getId());
+        $responses = $this->surveyMapper->findClassSnapshot($survey->getId());
         $this->renderSpreadsheet($survey, $responses);
     }
 
@@ -108,7 +107,7 @@ class Controller extends Base
     public function getClassSnapshot(Survey $survey, Folder $folder): void
     {
         $userIds = $this->getStudents($folder);
-        $responses = SurveyMapper::getInstance()->findClassSnapshot($survey->getId(), $userIds);
+        $responses = $this->surveyMapper->findClassSnapshot($survey->getId(), $userIds);
         $this->renderSpreadsheet($survey, $responses);
     }
 
