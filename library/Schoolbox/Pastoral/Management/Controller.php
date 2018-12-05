@@ -251,7 +251,7 @@ class Controller extends Base
 
         if (\is_array($post["role"])) {
             foreach ($post["role"] as $role_id => $accessLevel) {
-                if (!\in_array($role_id, $foundRoles)) {
+                if (!\in_array($role_id, $foundRoles, false)) {
                     $foundRoles[] = $role_id;
 
                     /** @var Role $role */
@@ -271,7 +271,7 @@ class Controller extends Base
 
         if (\is_array($post["group"])) {
             foreach ($post["group"] as $group_id => $accessLevel) {
-                if (!\in_array($group_id, $foundGroups)) {
+                if (!\in_array($group_id, $foundGroups, false)) {
                     $foundGroups[] = $group_id;
 
                     /** @var PastoralGroup $group */
@@ -292,7 +292,7 @@ class Controller extends Base
 
         if (\is_array($post["user"])) {
             foreach ($post["user"] as $user_id => $accessLevel) {
-                if (!\in_array($user_id, $foundUsers)) {
+                if (!\in_array($user_id, $foundUsers, false)) {
                     $foundUsers[] = $user_id;
 
                     $user = $this->userMapper->findById($user_id);
