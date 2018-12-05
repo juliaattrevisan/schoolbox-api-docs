@@ -5,6 +5,7 @@
  */
 namespace Schoolbox\Pastoral\Audience;
 
+use Alaress\Database\Predicate\Builder;
 use PDO;
 use PDOStatement;
 use Schoolbox\GenericCollection;
@@ -23,7 +24,10 @@ use Schoolbox\Pastoral;
  *
  * This allows the user to set a default audience for a pastoral type/subtype
  *
+ * @method Model createModel($idValue = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method GenericCollection|Model[] createCollection($contents = [])
+ * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  * @method GenericCollection|Model[] findAll($options = [])
  */
 class Mapper extends BaseMapper
@@ -71,7 +75,7 @@ class Mapper extends BaseMapper
 			            {$this->getJoinColumnString('user.role', 'ur')},
                         {$this->getJoinColumnString('group', 'g')}
 			FROM        {$this->getTable()}
-            JOIN        {$this->getJoinSql('type', '', 't')}
+            LEFT JOIN   {$this->getJoinSql('type', '', 't')}
             LEFT JOIN   {$this->getJoinSql('subtype', '', 'st')}
             LEFT JOIN   {$this->getJoinSql('role', '', 'r')}
             LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
@@ -111,9 +115,10 @@ class Mapper extends BaseMapper
 
             $access = $this->hydrate($row);
 
-            $access->setType($typeMapper->hydrate($row, 't'));
             if (!empty($row['st.id'])) {
                 $access->setSubtype($subTypeMapper->hydrate($row, 'st'));
+            } else {
+                $access->setType($typeMapper->hydrate($row, 't'));
             }
 
             // Hydrate user
@@ -138,20 +143,5 @@ class Mapper extends BaseMapper
         }
 
         return $results;
-    }
-
-
-    /**
-     * @param int      $typeId
-     * @param int|null $subtypeId
-     * @throws Exception
-     */
-    public function hardDeleteByType(int $typeId, ?int $subtypeId): void
-    {
-        $oldPerms = $this->findByColumnList(['type_id' => $typeId, 'subtype_id' => $subtypeId], ['deleted' => true]);
-
-        foreach ($oldPerms as $oldie) {
-            $this->hardDelete($oldie);
-        }
     }
 }

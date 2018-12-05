@@ -134,7 +134,10 @@
                     var subtypeId = $("#subtypeId").val();
 
                     {% for audience in audiences %}
-                        if ({{ audience.type.id }} == typeId && {{ audience.subtype.id | default("null") }} == subtypeId) {
+                        {% set subtype = audience.subtype %}
+                        {% set type    = subtype is null ? audience.type : subtype.pastoralType %}
+
+                        if ('{{ type.id }}' === typeId && '{{ subtype.id }}' === subtypeId) {
                             {% if audience.group.id %}
                             window.addGroup("{{ audience.group.id }}", "{{ audience.group.name }}", "{{ audience.access }}");
                             {% elseif audience.role.id %}

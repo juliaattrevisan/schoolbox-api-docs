@@ -1,6 +1,6 @@
 CREATE TABLE pastoral_audience (
     `id` int(11) NOT NULL AUTO_INCREMENT,
-    `type_id` int(11) NOT NULL,
+    `type_id` int(11) DEFAULT NULL,
     `subtype_id` int(11) DEFAULT NULL,
     `access`  int(11) NOT NULL,
     `user_id` int(11) DEFAULT NULL,

@@ -3,6 +3,8 @@
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
+
 namespace Schoolbox\Pastoral\Audience;
 
 use Schoolbox\ISoftDeletable;
@@ -40,6 +42,44 @@ class Model implements ISoftDeletable
 
     /** @var integer */
     private $access;
+
+
+    /**
+     * Returns whether this AudienceRule is equal to some other AudienceRule
+     *
+     * @param self $other
+     * @param bool $ignoreAccess If true, consider rules equal if they differ only by accessLevel
+     * @return bool
+     */
+    public function equals(Model $other, bool $ignoreAccess = false): bool
+    {
+        // TODO remove explicit type-coercion once model hydration is fixed SA-4539
+        if (($this->user xor $other->user) || ($this->user && (int)$this->user->getId() !== (int)$other->user->getId())) {
+            return false;
+        }
+
+
+        if (($this->role xor $other->role) || ($this->role && (int)$this->role->getId() !== (int)$other->role->getId())) {
+            return false;
+        }
+
+
+        if (($this->group xor $other->group) || ($this->group && (int)$this->group->getId() !== (int)$other->group->getId())) {
+            return false;
+        }
+
+
+        if (($this->type xor $other->type) || ($this->type && (int)$this->type->getId() !== (int)$other->type->getId())) {
+            return false;
+        }
+
+
+        if (($this->subtype xor $other->subtype) || ($this->subtype && (int)$this->subtype->getId() !== (int)$other->subtype->getId())) {
+            return false;
+        }
+
+        return $ignoreAccess || $this->access === $other->access;
+    }
 
 
     /**
