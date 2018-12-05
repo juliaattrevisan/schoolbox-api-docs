@@ -18,6 +18,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Pastoral;
 use UnexpectedValueException;
+use InvalidArgumentException;
 
 /**
  * Pastoral care pastoral type audience defaults
@@ -37,8 +38,11 @@ class Mapper extends BaseMapper
     private const ACCESS_PUBLIC  = Pastoral\Access\Mapper::ACCESS_PUBLIC;
     private const ACCESS_PRIVATE = Pastoral\Access\Mapper::ACCESS_PRIVATE;
 
+
     /**
      * Setup mapper
+     *
+     * @throws InvalidArgumentException
      */
     protected function mapping(): void
     {
