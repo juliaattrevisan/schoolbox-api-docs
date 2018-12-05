@@ -171,7 +171,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     /* Member bulk email
                      */
                     if ($user->getEmail()) {
-                        $allStudentEmails[] =  htmlentities('"' . $user->formatName() . '" <' . $user->getEmail() . '>');
+                        $emailall[] =  htmlentities('"' . $user->formatName() . '" <' . $user->getEmail() . '>');
                     }
 
                     /* Member cards
