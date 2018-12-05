@@ -71,7 +71,7 @@
 
             {# Callback when user added from modal #}
 
-            window.modalUserAdded = function (user) {
+            window.modalUserAdded = function (user, permission = 1) {
 
                 {# Only add if they don't already exist in the table #}
 
@@ -89,8 +89,14 @@
                         .replace(/{ID}/g, user.id)
                         .replace(/{ROLE}/g, user.role);
 
+
+
                     var permissionListUsers = $('#permission-users');
                     permissionListUsers.html(permissionListUsers.html() + html);
+
+                    //Check the correct box
+                    var selector = 'input[name = "user['+user.id+']"][value ="'+permission+'"]';
+                    $(permissionListUsers).find(selector).attr("checked", "checked");
                 }
 
                 {# Update visibility table and click events #}

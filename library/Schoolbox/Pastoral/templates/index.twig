@@ -12,14 +12,21 @@
     <nav>
         {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
         {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
+        {% set routeGetAudiences = routeLookupIfAuthorized('pastoralManagement.getAudiences') %}
 
+        <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
         {% if routeReportBuilder %}
-            <a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>
+            <li><a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder">Report Builder</a></li>
         {% endif %}
         {% if routeGetGroups %}
-            <a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>
+            <li><a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups">Manage Groups</a></li>
         {% endif %}
-    </nav>
+        {% if routeGetAudiences %}
+            <li><a href="{{ routeGetAudiences }}" class="icon-settings" title="Manage {{ locale.pastoral.proper }} Audience Defaults">Manage Visibility Defaults</a></li>
+        {% endif %}
+    </ul>
 </div>
 
 {# If the user has never viewed a pastoral record, show a welcome message #}

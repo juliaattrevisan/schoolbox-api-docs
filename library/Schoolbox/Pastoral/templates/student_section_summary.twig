@@ -22,13 +22,9 @@
 
     <div class="row actions-small-2">
         {% if user.role.isStaff %}
-            {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
-            {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
             {% set routeRecordInsert = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
             {% if not linkedStudent %}
                 <nav>
-                    {% if routeReportBuilder %}<a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>{% endif %}
-                    {% if routeGetGroups %}<a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>{% endif %}
                     {% if linkedStudents | length %}<a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>{% endif %}
                     {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Record"></a>{% endif %}
                 </nav>
@@ -52,12 +48,8 @@
 
     <div class="row actions-small-2">
         {% if user.role.isStaff %}
-            {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
-            {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
             {% set routeRecordInsert = routeLookupIfAuthorized('pastoral.getStudentRecordInsertForm', {'studentId': student.id}) %}
             <nav>
-                {% if routeReportBuilder %}<a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder"></a>{% endif %}
-                {% if routeGetGroups %}<a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups"></a>{% endif %}
                 {% if linkedStudents | length %}<a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>{% endif %}
                 {% if routeRecordInsert %}<a href="{{ routeRecordInsert }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Record"></a>{% endif %}
             </nav>

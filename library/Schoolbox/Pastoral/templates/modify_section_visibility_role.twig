@@ -23,7 +23,7 @@
 
                 <tr data-role-id="{{ userAccess.role.id }}">
                     <td class="small-2">
-                        Pastoral Role
+                        Role
                     </td>
                     <td class="small-3">
                         {{ userAccess.role.name }}
@@ -70,7 +70,10 @@
                                     System Role
                                     ({{ roleUsers[role.id] }} {% if roleUsers[role.id] == 1 %}User{% else %}Users{% endif %})
                                     {% if role.isParent %}
-                                        <br />(Only {{ record.student.firstName }}'s parents will be able to view this record.)
+                                        <br />
+                                        (Only
+                                        {{ record is defined and record.student is defined ? record.student.firstName : 'the student' }}'s
+                                        parents will be able to view this record.)
                                     {% endif %}
                                 </p>
                             </div>
@@ -158,12 +161,7 @@
 
             {# Add role to table #}
 
-            $('[data-role-add]').click(function (e) {
-                e.preventDefault();
-
-                var roleId = $(this).attr('data-role-add');
-                var roleName = $(this).attr('data-role-name');
-
+            window.addRole = function(roleId, roleName, permission = 1) {
                 if (window.rolesAdded[roleId] !== true) {
                     $('#empty-roles').remove();
 
@@ -175,6 +173,10 @@
 
                     var permissionListRoles = $('#permission-roles');
                     permissionListRoles.html(permissionListRoles.html() + html);
+
+                    //Check the correct box
+                    var selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';
+                    $(permissionListRoles).find(selector).attr("checked", "checked");
                 }
 
                 $(this).addClass('hide');
@@ -182,6 +184,15 @@
                 updateRolePermissionsClick();
                 updateRolesModal();
                 updateVisibility();
+            }
+
+            $('[data-role-add]').click(function (e) {
+                e.preventDefault();
+
+                var roleId = $(this).attr('data-role-add');
+                var roleName = $(this).attr('data-role-name');
+
+                addRole(roleId, roleName);
 
                 var remaining = 0;
 

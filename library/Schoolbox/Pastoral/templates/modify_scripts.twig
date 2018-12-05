@@ -4,7 +4,7 @@
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 <script type="text/javascript" src="/javascript/jquery.chained.min.js"></script>
-
+{% autoescape('js') %}
 <script type="text/javascript">
     $(function () {
 
@@ -31,9 +31,7 @@
             },
             value: [
                 {% for tag in record.tags %}
-
-                {% set tagName = tag.name | escape('js') %}
-                {'id': '{{ tagName }}', 'name': '{{ tagName }}'}{% if not loop.last %},{% endif %}
+                {'id': '{{ tag.name }}', 'name': '{{ tag.name }}'}{% if not loop.last %},{% endif %}
                 {% endfor %}
             ]
         });
@@ -111,5 +109,59 @@
         $('#formPastoralPreloader').addClass('hide');
         $('#formPastoral').removeClass('hide');
         $('#formPastoralDelete').removeClass('hide');
-    });
+
+        $("#typeId,#subtypeId").on('change', function() {
+            loadAudience();
+        });
+
+        window.hasChanged = false;
+
+        function loadAudience() {
+            //Only load the audience defaults if this is a new record
+            {% if record.access | length < 1 %}
+                //Only change between defaults if no other changes have been made
+                if(window.hasChanged == false) {
+                    //Remove all other rows
+                    $("#permission-roles tr").remove();
+                    $("#permission-users tr").remove();
+                    $("#permission-groups tr").remove();
+
+                    window.rolesAdded = [];
+                    window.usersAdded = [];
+                    window.groupsAdded = [];
+
+                    var typeId = $("#typeId").val();
+                    var subtypeId = $("#subtypeId").val();
+
+                    {% for audience in audiences %}
+                        if ({{ audience.type.id }} == typeId && {{ audience.subtype.id | default("null") }} == subtypeId) {
+                            {% if audience.group.id %}
+                            window.addGroup("{{ audience.group.id }}", "{{ audience.group.name }}", "{{ audience.access }}");
+                            {% elseif audience.role.id %}
+                            window.addRole("{{ audience.role.id }}", "{{ audience.role.name }}", "{{ audience.access}}");
+                            {% elseif audience.user.id %}
+                            window.modalUserAdded({
+                                'id' : {{ audience.user.id }},
+                                'first_name': "{{ audience.user.firstname }}",
+                                'last_name': "{{ audience.user.lastname }}",
+                                'role': "{{ audience.user.role.name }}",
+                            }, "{{ audience.access}}");
+                            {% endif %}
+                        }
+                    {% endfor %}
+
+                    updateVisibility();
+                }
+            {% endif %}
+        }
+
+        loadAudience();
+
+        $('[data-delete-visibility], input[name  *= "user"], input[name *= "groups"], input[name *= "role"], [data-button *= "add"]').on('click', function() {
+            window.hasChanged = true;
+        });
+
+});
 </script>
+{% endautoescape %}
+

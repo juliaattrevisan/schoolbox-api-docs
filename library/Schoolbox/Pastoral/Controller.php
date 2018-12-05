@@ -422,6 +422,8 @@ class Controller extends Base
         $access['public'] = $record->getAccessLevel($this->getUser()) > PastoralAccessMapper::ACCESS_DENY ;
         $access['private'] = $record->getAccessLevel($this->getUser()) > PastoralAccessMapper::ACCESS_PUBLIC ;
 
+
+
         // Lets render this thing
 
         $this->getResponse()->content->set([
@@ -436,6 +438,7 @@ class Controller extends Base
                 'user'               => $this->getUser(),
                 'showSeverity'       => $this->getConfigLoader()->get('pastoral_severity'),
                 'access'             => $access,
+
             ],
             'title' => $record->getHeading(),
         ]);
@@ -507,6 +510,9 @@ class Controller extends Base
             }
         }
 
+        /** @var \Schoolbox\Pastoral\Audience\Model[] | Collection $audienceDefaults */
+        $audienceDefaults = Audience\Mapper::getInstance()->findAll();
+
         // Render this thing out
 
         $this->getResponse()->content->set([
@@ -516,7 +522,7 @@ class Controller extends Base
                 'allowIndividual'   => $this->config->get('pastoral_individual_access'),
                 'allowParents'      => $allowParents,
                 'types'             => $this->pastoralTypeMapper->findAll(['order' => ['name' => 'ASC']]),
-                'subTypes'        => $this->pastoralSubTypeMapper->findAll(['order' => ['name' => 'ASC']]),
+                'subTypes'          => $this->pastoralSubTypeMapper->findAll(['order' => ['name' => 'ASC']]),
                 'severities'        => $severities,
                 'roles'             => $roles,
                 'roleUsers'         => $roleUsers,
@@ -524,6 +530,7 @@ class Controller extends Base
                 'moderator'         => $moderator,
                 'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
                 'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
+                'audiences'         => $audienceDefaults,
             ],
             'title' => 'Pastoral Record',
         ]);
