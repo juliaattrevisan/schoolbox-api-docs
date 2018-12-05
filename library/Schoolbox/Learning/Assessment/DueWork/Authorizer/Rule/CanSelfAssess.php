@@ -53,10 +53,6 @@ class CanSelfAssess extends AbstractParticipationRule
         }
 
         $assessment  = $this->findAssessable($params);
-        $student     = $this->findStudent($params);
-
-        // If a response has been submitted for self-assessment, we are guaranteed to find a participation record.
-        $participant = $assessment->getParticipant($student);
 
         // Only due works may be self-assessed.
         // Task self-assessment is a different, and probably misnamed concept.
@@ -66,8 +62,12 @@ class CanSelfAssess extends AbstractParticipationRule
             throw new InvalidArgumentException("Only due work may be self-assessed");
         }
 
+        $student     = $this->findStudent($params);
+        // If a response has been submitted for self-assessment, we are guaranteed to find a participation record.
+        $participant = $assessment->getParticipantIfExtant($student);
+
         // Check logged in user is the participant
-        if ($user->getId() != $participant->getUser()->getId()) {
+        if (!$participant || $user->getId() != $participant->getUser()->getId()) {
             throw new Unauthorized();
         }
 

@@ -41,20 +41,20 @@
                         <th>Marks</th>
                     {% endif %}
                     </tr>
-                    {% for participant in dueWork.allParticipants %}
+                    {% for participant in dueWork.participantUsers %}
                     <tr>
                         <td>
                             <div class="card wrap-down small-12 ">
-                                <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.user.id}) }}" title="View Profile">
-                                    <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullname }}">
-                                    <p>{{ participant.user.fullname}}</p>
+                                <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.id}) }}" title="View Profile">
+                                    <img src="/portrait.php?userId={{ participant.externalId }}&amp;size=square64" alt="{{ participant.fullname }}">
+                                    <p>{{ participant.fullname}}</p>
                                 </a>
                             </div>
                         </td>
                         {% if dueWork.useRubric %}
                             {% for criteria in headers %}
                                 {% for id, criterion in criteria %}
-                                    {% set mark = marks[participant.user.id][id] %}
+                                    {% set mark = marks[participant.id][id] %}
                                     <td>
                                         <p>{{ mark.descriptor.description }}</p>
                                         <p>{{ mark.value }}</p>

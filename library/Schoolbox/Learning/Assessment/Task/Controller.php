@@ -322,12 +322,7 @@ class Controller extends Assessment\Controller
         $submittedFor = $response->getSubmittedOnBehalfOf();
         $participant  = $response->getAssessable()->getParticipantIfExtant($submittedFor);
 
-        // 1. Cannot interact if explicitly excluded
-        if($participant && $participant->isExcluded()){
-            throw new InvalidTaskResponseException("Cannot create a response for an excluded participation.");
-        }
-
-        // Is the current session user an instructor
+        // 1. Is the current session user an instructor
         $classFolder  = $response->getAssessable()->getBaseContext()->getFolder();
         $isInstructor = $this->getAccess()->isInstructor($this->getUser(), $classFolder);
 

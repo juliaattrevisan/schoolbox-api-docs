@@ -225,13 +225,13 @@ class Model extends AbstractAssessment
         if ($instructor->getId() == $submittedOnBehalfOf->getId()) {
             // Cannot be excluded, and if no participation, must be a dynamic plan available
             if ($participant) {
-                return !$participant->isExcluded();
+                return true;
             }
             return $this->hasDynamicPlan();
         }
 
         // Instructor can mark the task as long as the learner is a participant
-        return $participant && !$participant->isExcluded();
+        return $participant instanceof Participant;
     }
 
     /**

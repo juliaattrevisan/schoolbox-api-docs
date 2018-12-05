@@ -254,14 +254,15 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isParticipant(User $user): bool
     {
-        $candidate = $this->findParticipantIfExtant($user);
+        $candidate = $this->getParticipantIfExtant($user);
 
-        return $candidate instanceof Participant && !$candidate->isExcluded();
+        return $candidate instanceof Participant;
     }
 
 
     /**
      * Find a reference to a particular Participant in this Assessable
+     * regardless of excluded or deleted
      * which saves you this traversal in Controllers etc
      *
      * @param User $user
@@ -270,10 +271,13 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getParticipant(User $user)
     {
-        $participant = $this->findParticipantIfExtant($user);
-        if ($participant instanceof Participant) {
-            return $participant;
+        $userId = $user->getId();
+        foreach ($this->plans as $plan) {
+            if ($plan->getParticipants()->offsetExists($userId)) {
+                return $plan->getParticipants()[$userId];
+            }
         }
+
         $fullName = "{$user->getFirstname()} {$user->getLastname()}";
         throw new \UnexpectedValueException(
             "{$fullName} (id: {$user->getId()}) is not a participant of {$this->getTitle()} (id: {$this->getId()})"
@@ -284,9 +288,22 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function getParticipantIfExtant(User $user)
+    public function getParticipantIfExtant(User $user): ?Participant
     {
-        return $this->findParticipantIfExtant($user);
+        if (!$user || $user->isDeleted()) {
+            return null;
+        }
+        $userId = $user->getId();
+        foreach ($this->plans as $plan) {
+            if ($plan->getParticipants()->offsetExists($userId)) {
+                $participant = $plan->getParticipants()[$userId];
+                if (!$participant->isExcluded()) {
+                    return $participant;
+                }
+            }
+        }
+
+        return null;
     }
 
 
@@ -307,29 +324,6 @@ abstract class AbstractAssessment implements IAssessable
         }
         return $userRemoved;
     }
-
-
-    /**
-     * Find a reference to a particular Participant in this Assessable, if they exist.
-     *
-     * This was added for optimization reasons - it's far more performant to check if
-     * a value is null than to throw and immediately catch an exception.
-     *
-     * @param User $user
-     * @return Participant|null
-     */
-    protected function findParticipantIfExtant(User $user): ?Participant
-    {
-        $userId = $user->getId();
-        foreach ($this->plans as $plan) {
-            if ($plan->getParticipants()->offsetExists($userId)) {
-                return $plan->getParticipants()[$userId];
-            }
-        }
-
-        return null;
-    }
-
 
     /**
      * @inheritdoc

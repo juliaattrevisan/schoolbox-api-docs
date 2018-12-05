@@ -277,16 +277,15 @@ class DataSource
             }
             foreach ($assessmentResponses as $response) {
                 //Ensure response user is fully hydrated
-                $responseUser    = $this->userMapper->findByIdWithFallback($response->getSubmittedOnBehalfOf()->getId());
-                $participantUser = $assessable->getParticipantIfExtant($responseUser);
-                if (!$participantUser) {
-                    $msg = sprintf(
-                        'User (id: %s) has a response (id: %s) for assessment (id: %s) but no participant record',
-                        $responseUser->getId(),
-                        $response->getId(),
-                        $assessable->getId()
-                    );
-                    throw new DomainException($msg);
+                $responseUser = $this->userMapper->findByIdWithFallback($response->getSubmittedOnBehalfOf()->getId());
+                // participants for assessment are no longer hydrated for deleted user.
+                if ($responseUser->isDeleted()) {
+                    continue;
+                }
+                try {
+                    $participantUser = $assessable->getParticipant($responseUser);
+                } catch (UnexpectedValueException $e) {
+                    throw new DomainException($e);
                 }
                 if (!$participantUser->isExcluded()) {
                     // Don't load interactions for excluded participants.
@@ -313,16 +312,14 @@ class DataSource
 
                 //Ensure response user is fully hydrated
                 $feedbackUser    = $this->userMapper->findByIdWithFallback($feedback->getReviewee()->getId());
-                $participant = $assessment->getParticipantIfExtant($feedbackUser);
-
-                if (!$participant) {
-                    $msg = sprintf(
-                        'User (id: %s) has a feedback (id: %s) for assessment (id: %s) but no participant record',
-                        $feedbackUser->getId(),
-                        $feedback->getId(),
-                        $assessment->getId()
-                    );
-                    throw new DomainException($msg);
+                // participants for assessment are no longer hydrated for deleted user.
+                if ($feedbackUser->isDeleted()) {
+                    continue;
+                }
+                try {
+                    $participant = $assessment->getParticipant($feedbackUser);
+                } catch (UnexpectedValueException $e) {
+                    throw new DomainException($e);
                 }
                 if ($participant->isExcluded()) {
                     // Don't load interactions for excluded participants.

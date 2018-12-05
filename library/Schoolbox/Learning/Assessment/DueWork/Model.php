@@ -472,19 +472,18 @@ class Model extends AbstractAssessment implements ISelfAssessable
     {
         // Specified student not a participant ?
         $participant = $this->getParticipantIfExtant($submittedOnBehalfOf);
+        if ($participant) {
+            return true;
+        }
 
         // Is instructor wishing to create response for themself?
         if ($instructor->getId() == $submittedOnBehalfOf->getId()) {
-            // Cannot be excluded, and if no participation, must be a dynamic plan available
-            if ($participant) {
-                return !$participant->isExcluded();
-            }
+            // If no participation, must be a dynamic plan available
             return $this->hasDynamicPlan();
         }
 
-        // Can instructor SOBO for the learner?
-        // Instructors are not constrained by the submission limit, or the open duration
-        return $participant && !$participant->isExcluded();
+        return false;
+
     }
 
     /* Getters/Setters

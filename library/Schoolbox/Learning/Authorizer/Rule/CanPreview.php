@@ -53,7 +53,6 @@ class CanPreview extends AbstractParticipationRule
 
         $student       = $this->findStudent($params);
         $assessable    = $this->findAssessable($params);
-        $participation = $assessable->getParticipantIfExtant($student);
 
         // Session user can only preview themselves
         if ($student->getId() != $user->getId()) {
@@ -66,8 +65,9 @@ class CanPreview extends AbstractParticipationRule
         }
 
         // Is the user explicitly excluded?
-        if ($participation && $participation->isExcluded()) {
-            throw new Unauthorized("User (id: {$student->getId()} has been explicitly excluded from assessment (id: {$assessable->getId()})");
+        $participation = $assessable->getParticipantIfExtant($student);
+        if (!$participation) {
+            throw new Unauthorized("User (id: {$student->getId()} is deleted or has been explicitly excluded from assessment (id: {$assessable->getId()})");
         }
 
         // No participation, and no dynamic plan to insert a participation into?

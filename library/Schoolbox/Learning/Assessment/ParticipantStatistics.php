@@ -102,7 +102,7 @@ class ParticipantStatistics
                     continue;
                 }
                 $subParticipant = $assessable->getParticipantIfExtant($user);
-                if ($subParticipant && !$subParticipant->isExcluded() && $subParticipant->isResponseRequired()) {
+                if ($subParticipant && $subParticipant->isResponseRequired()) {
                     $this->cacheCountResponseRequired++;
                 }
             }
@@ -124,7 +124,7 @@ class ParticipantStatistics
                     continue;
                 }
                 $subParticipant = $assessable->getParticipantIfExtant($user);
-                if ($subParticipant && !$subParticipant->isExcluded() && $subParticipant->isFeedbackRequired()) {
+                if ($subParticipant && $subParticipant->isFeedbackRequired()) {
                     $this->cacheCountFeedbackRequired++;
                 }
             }
@@ -146,7 +146,7 @@ class ParticipantStatistics
                     continue;
                 }
                 $subParticipant = $assessable->getParticipantIfExtant($user);
-                if ($subParticipant && !$subParticipant->isExcluded() && $subParticipant->isReviewComplete()) {
+                if ($subParticipant && $subParticipant->isReviewComplete()) {
                     $this->cacheCountReviewComplete++;
                 }
             }

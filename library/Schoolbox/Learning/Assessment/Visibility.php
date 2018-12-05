@@ -132,7 +132,7 @@ class Visibility
             return false;
         }
         $participant = $assessable->getParticipantIfExtant($nonInstructor);
-        if (!$participant || $participant->isExcluded()) {
+        if (!$participant) {
             return false;
         }
         $closeDate   = $participant->getCloseDate();

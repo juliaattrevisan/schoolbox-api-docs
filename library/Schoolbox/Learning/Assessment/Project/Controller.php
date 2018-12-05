@@ -148,7 +148,7 @@ class Controller extends Assessment\Controller
             ->filter(function(IAssessable $subAssessable) use ($student) {
                 // Don't show assessment if user is excluded
                 $participant = $subAssessable->getParticipantIfExtant($student);
-                if ($participant && $participant->isExcluded()) {
+                if (!$participant) {
                     return false;
                 }
                 // If a parent, only show sub-assessments if the current viewee is participating
