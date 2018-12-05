@@ -573,10 +573,8 @@ class Report_Parent extends Report_Abstract
                 );
             }
 
-            // Cleanup empty strings in array
-            $filteredEmails = array_filter(array_unique($allEmails), function ($element) {
-                return is_string($element) && '' !== trim($element);
-            });
+            // Uniqueify and cleanup empty string emails
+            $filteredEmails = array_filter(array_unique($allEmails));
 
             $this->getPage()->parse('student_block', 'student', true);
             $this->getPage()->setVar('EMAIL_ALL_PARENTS', implode(AbstractMailer::emailSeparator(), $filteredEmails));

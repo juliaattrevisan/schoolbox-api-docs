@@ -386,7 +386,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
         $emails[] = $studentCoach->getEmail();
     }
 
-    $allTeacherEmails = implode(AbstractMailer::emailSeparator(), array_filter($emails));
+    $allTeacherEmails = implode(AbstractMailer::emailSeparator(), array_filter(array_unique($emails)));
 
     $pd = null;
     if (ConfigMapper::getInstance()->get('site_location') === 'help') {
