@@ -36,7 +36,7 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
      * @return void
      */
     public function homepageClean($cid) {
-        $query = "UPDATE {$this->_table} SET deleted = 'true' WHERE categoryID = '{$cid}'";
+        $query = "UPDATE {$this->_table} SET deleted = NOW() WHERE categoryID = '{$cid}'";
 
         $this->db->query($query);
     }

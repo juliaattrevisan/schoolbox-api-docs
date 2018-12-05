@@ -14,6 +14,7 @@ use Schoolbox\GenericCollection;
 use InvalidArgumentException;
 use PDOStatement;
 use PDO;
+use Schoolbox\IHomepageCleanable;
 
 /**
  * @method Model createModel($idValue = null)
@@ -21,7 +22,7 @@ use PDO;
  * @method GenericCollection|Model[] createCollection($contents = [])
  * @method GenericCollection|Model[] findByPredicates(Builder $pb, array $options = [])
  */
-class Mapper extends \Schoolbox\Mapper
+class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
 {
     // Table definition
     public const TABLE_NAME                  = 'comms_news_audience';
@@ -183,11 +184,28 @@ class Mapper extends \Schoolbox\Mapper
      * @param int $cid
      * @return void
      */
-    public function homepageClean(int $cid) :void
+    public function homepageClean($cid) :void
     {
+        $entityType = Segment\Strategy\Folder::getEntityType();
+
+        // Query for composite folders
+        $query = $this->getSelectString() . 'WHERE `child`.'. self::FIELD_ENTITY_VALUE .' = :folderId 
+        AND `child`.'. self::FIELD_ENTITY_TYPE .' = :entityType';
+
+        $statement = $this->database->prepare($query);
+        $statement->bindParam(':folderId', $cid);
+        $statement->bindParam(':entityType', $entityType);
+        $statement->execute();
+
+        // Delete respective composite folder audiences if any
+        foreach ($statement->fetchAll() as $key => $segment) {
+            $this->deleteSegment($this->findById($segment['id']));
+        }
+
+        // Delete non-composite folder audiences as well if any
         $this->deleteByColumnList([
-            self::FIELD_ENTITY_VALUE  => $cid,
-            self::FIELD_ENTITY_TYPE   => 'folder'
+            self::FIELD_ENTITY_VALUE   => $cid,
+            self::FIELD_ENTITY_TYPE    => $entityType
         ]);
     }
 }
