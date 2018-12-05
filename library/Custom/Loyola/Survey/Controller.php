@@ -29,9 +29,6 @@ class Controller extends Base
     /** @var SurveyMapper */
     private $surveyMapper;
 
-    /** @var FolderMapper */
-    private $folderMapper;
-
     /** @var PHPExcel $excel */
     private $excel;
 
@@ -56,13 +53,11 @@ class Controller extends Base
      */
     public function __construct(
         UserMapper $userMapper,
-        FolderMapper $folderMapper,
         SurveyMapper $surveyMapper
     ) {
         $this->externalClass = new External_Class();
         $this->userMapper = $userMapper;
         $this->surveyMapper = $surveyMapper;
-        $this->folderMapper = $folderMapper;
     }
 
     /**

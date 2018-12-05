@@ -72,8 +72,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $mappers = [
-            'userMapper' => UserMapper::getInstance(),
-            'folderMapper' => FolderMapper::getInstance(),
+            'userMapper'   => UserMapper::getInstance(),
             'surveyMapper' => SurveyMapper::getInstance(),
         ];
 
