@@ -20,11 +20,11 @@ class Component_Renderer
      */
     public function renderAllAdminComponents(SitePage $page, $componentCollection)
     {
-        $page->setFile(TEMPLATE_body, 'adminv2/component/layout.html');
+        $page->setFile(TEMPLATE_content, 'adminv2/component/layout.html');
 
-        $page->setBlock(TEMPLATE_body, 'position_top', 'position_top_block');
-        $page->setBlock(TEMPLATE_body, 'position_left', 'position_left_block');
-        $page->setBlock(TEMPLATE_body, 'position_right', 'position_right_block');
+        $page->setBlock(TEMPLATE_content, 'position_top', 'position_top_block');
+        $page->setBlock(TEMPLATE_content, 'position_left', 'position_left_block');
+        $page->setBlock(TEMPLATE_content, 'position_right', 'position_right_block');
 
         $occupiedPositionList = array();
 
@@ -75,7 +75,7 @@ class Component_Renderer
      */
     public function renderAdminComponent(SitePage $page, Component_ControllerAbstract $component)
     {
-        $page->setFile(TEMPLATE_body, 'adminv2/component/placeholder.html');
+        $page->setFile(TEMPLATE_content, 'adminv2/component/placeholder.html');
 
         $component->setup();
 
