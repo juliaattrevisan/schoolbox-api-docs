@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Button;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Profile\Icon\Mapper as ProfileIconMapper;
+use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Campus\Mapper as ProfileButtonCampusMapper;
 use \Schoolbox\Profile\Button\Role\Mapper as ProfileButtonRoleMapper;
@@ -22,8 +22,8 @@ class Controller extends Base
 {
     const PAGE_CURRENT = 'profile-button';
 
-    /** @var ProfileIconMapper $profileIconMapper */
-    private $profileIconMapper;
+    /** @var IconMapper $iconMapper */
+    private $iconMapper;
 
     /** @var ProfileButtonMapper $profileButtonMapper */
     private $profileButtonMapper;
@@ -42,7 +42,7 @@ class Controller extends Base
 
     public function __construct()
     {
-        $this->setProfileIconMapper(ProfileIconMapper::getInstance());
+        $this->setIconMapper(IconMapper::getInstance());
         $this->setProfileButtonMapper(ProfileButtonMapper::getInstance());
         $this->setRoleMapper(RoleMapper::getInstance());
         $this->setCampusMapper(CampusMapper::getInstance());
@@ -103,7 +103,7 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent' => self::PAGE_CURRENT,
                 'item' => $this->getProfileButtonMapper()->findOneByColumn($this->getProfileButtonMapper()->getIdentifierColumn(), $id, [], ['cache'=>false]),
-                'icons' => $this->getProfileIconMapper()->findAll()->sortBy('title', 'asc'),
+                'icons' => $this->getIconMapper()->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'rolesSelected' => $rolesSelected,
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc'),
@@ -126,7 +126,7 @@ class Controller extends Base
             'template' => '@adminProfileButton/modify.twig',
             'data'     => [
                 'pageCurrent' => self::PAGE_CURRENT,
-                'icons' => $this->getProfileIconMapper()->findAll()->sortBy('title', 'asc'),
+                'icons' => $this->getIconMapper()->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
             ],
@@ -264,20 +264,20 @@ class Controller extends Base
     /** Here be mappers and stuff */
 
     /**
-     * @return ProfileIconMapper
+     * @return IconMapper
      */
-    public function getProfileIconMapper(): ProfileIconMapper
+    public function getIconMapper(): IconMapper
     {
-        return $this->profileIconMapper;
+        return $this->iconMapper;
     }
 
     /**
-     * @param ProfileIconMapper $mapper
+     * @param IconMapper $mapper
      * @return $this
      */
-    public function setProfileIconMapper(ProfileIconMapper $mapper): self
+    public function setIconMapper(IconMapper $mapper): self
     {
-        $this->profileIconMapper = $mapper;
+        $this->iconMapper = $mapper;
         return $this;
     }
 
