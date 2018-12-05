@@ -20,7 +20,6 @@ use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
 use Schoolbox\Resource\Search\Results;
-use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -209,7 +208,6 @@ class Controller extends Base
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
      * @throws \UnexpectedValueException
-     * @throws InvalidColumnException
      */
     public function postAudienceTypeModify(PastoralType $type): void
     {
@@ -226,7 +224,6 @@ class Controller extends Base
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
      * @throws \UnexpectedValueException
-     * @throws InvalidColumnException
      */
     public function postAudienceSubTypeModify(PastoralSubType $subType): void
     {
