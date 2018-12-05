@@ -20,9 +20,6 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $text;
 
-    /** @var string */
-    protected $token;
-
     /** @var string|null */
     protected $icon;
 
@@ -87,24 +84,6 @@ class Model implements ISoftDeletable
     public function getText(): string
     {
         return $this->text;
-    }
-
-    /**
-     * @param string $token
-     * @return self
-     */
-    public function setToken(string $token): self
-    {
-        $this->token = $token;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getToken(): string
-    {
-        return $this->token;
     }
 
     /**

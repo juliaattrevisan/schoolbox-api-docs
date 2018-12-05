@@ -212,34 +212,6 @@ class Controller extends Base
         $item->setIcon($post['icon']);
         $item->setUrl($post['url']);
         $item->setTarget($post['target']);
-
-        // Populate token
-
-        if (stripos($post['url'], '/learning/classes') === 0) {
-            $item->setToken('CLASSES');
-        } else if (stripos($post['url'], '/learning/due') === 0) {
-            $item->setToken('SUBMISSION');
-        } else if (stripos($post['url'], '/timetable') === 0) {
-            $item->setToken('TIMETABLE');
-        } else if (stripos($post['url'], '/calendar/week') === 0) {
-            $item->setToken('CALENDAR');
-        } else if (stripos($post['url'], '/news') === 0) {
-            $item->setToken('NEWS');
-        } else if (stripos($post['url'], '/learning/grades') === 0) {
-            $item->setToken('GRADE');
-        } else if (stripos($post['url'], '/course/list') === 0) {
-            $item->setToken('COURSE');
-        } else if (stripos($post['url'], '/resources') === 0) {
-            $item->setToken('RESOURCES');
-        } else if (stripos($post['url'], '/eportfolio') === 0) {
-            $item->setToken('EPORTFOLIO');
-        } else if (stripos($post['url'], '/my-files') === 0) {
-            $item->setToken('MYFILES');
-        } else if (stripos($post['url'], '/drives') === 0) {
-            $item->setToken('NETWORK');
-        } else {
-            $item->setToken('');
-        }
         
         $this->profileButtonMapper->save($item);
 
