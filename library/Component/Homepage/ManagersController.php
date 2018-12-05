@@ -170,7 +170,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 if ($this->getUser()->getRole()->isStaff() && isset($emailall) && $this->getConfigMapper()->get('mail_enable')) {
                     $this->setVar([
                         "REPLYTO" => $this->getUser()->getEmail(),
-                        "EMAILALL" => implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), $emailall),
+                        "EMAILALL" => implode(AbstractMailer::emailSeparator(), $emailall),
                     ]);
                     $this->parse("member_email_block", "member_email");
                 } else {

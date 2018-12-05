@@ -274,7 +274,7 @@ class Controller extends Base
             'assessmentsToMark'         => $assessmentsToMark,
             'assessmentsToChase'        => $assessmentsToChase,
             'assessmentStudentsToEmail' => $assessmentStudentsToEmail,
-            'emailSeparator'            => \chr(AbstractMailer::EMAIL_SEPARATOR_CODE),
+            'emailSeparator'            => AbstractMailer::emailSeparator(),
         ])->getAsString();
     }
 

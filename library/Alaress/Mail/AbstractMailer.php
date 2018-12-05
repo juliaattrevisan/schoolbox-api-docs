@@ -483,4 +483,12 @@ abstract class AbstractMailer implements IMailer
     {
         return str_replace(',', \chr(self::EMAIL_SEPARATOR_CODE), $string);
     }
+
+    /**
+     * @return string
+     */
+    public static function emailSeparator() :string
+    {
+        return \chr(self::EMAIL_SEPARATOR_CODE);
+    }
 } 

@@ -215,7 +215,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                 if ($this->getContentPermission() > UserAccess::ACCESS_READ &&  $this->getConfigMapper()->get('mail_enable')) {
                     $this->setVar([
                         'REPLY_TO'           => $this->getUser()->getEmail(),
-                        'EMAIL_ALL_STUDENTS' => implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), $allStudentEmails),
+                        'EMAIL_ALL_STUDENTS' => implode(AbstractMailer::emailSeparator(), $allStudentEmails),
                     ]);
 
                     $this->parse('student_email_block', 'student_email');
@@ -236,7 +236,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                     if (\is_array($allParents) && \count($allParents) > 0) {
                         // Uniquify emails and merge to string
-                        $emailAllParents = implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), array_unique($allParents));
+                        $emailAllParents = implode(AbstractMailer::emailSeparator(), array_unique($allParents));
                     }
 
                     $this->setVar([
