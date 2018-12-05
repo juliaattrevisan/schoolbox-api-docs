@@ -345,6 +345,12 @@
 
                             {% block buttons_miscellaneous %}
                             {% endblock buttons_miscellaneous %}
+
+                            {% for button in customButtons %}
+                                <li>
+                                    <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }}" target="{{ button.target }}">{{ button.text }}</a>
+                                </li>
+                            {% endfor %}
                         {% endif %}
                     {% endblock buttons %}
                 </ul>

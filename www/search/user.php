@@ -1,135 +1,134 @@
 <?php
 
+use Schoolbox\Config\ConfigMapper;
 use Alaress\Mail\AbstractMailer;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as Access;
 use Schoolbox\ProfessionalDevelopment\Mapper as ProfessionalDevelopmentMapper;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\UserMapper;
 use Schoolbox\Role;
-
-//require_once 'include/permission.php';
-
-//display user description page
+use Schoolbox\User as SchoolboxUser;
 
 /**
- * Parent rendering, extracted to a method.
- * @param SitePage                 $page
- * @param array                    $user
- * @param External_User            $synUserHandler
- * @param UserMapper               $userMapper
+ * @param SitePage $page
+ * @param array $user
+ * @param External_User $synUserHandler
+ * @param UserMapper $userMapper
  * @param Eportfolio_Authenticator $authenticator
+ *
+ * @throws Twig_Error_Loader
+ * @throws Twig_Error_Runtime
+ * @throws Twig_Error_Syntax
  */
-function renderParent(
-    SitePage $page,
-    $user,
-    External_User $synUserHandler,
-    UserMapper $userMapper,
-    Eportfolio_Authenticator $authenticator
-) {
-
+function renderParent(SitePage $page, $user, External_User $synUserHandler, UserMapper $userMapper, Eportfolio_Authenticator $authenticator)
+{
     $externalUser = $synUserHandler->getParent($user['synergy_id']);
-    if(isset($externalUser['SpouseID'])) {
+
+    /** @var SchoolboxUser $sessionUser */
+    $sessionUser = $_SESSION["user"];
+
+    if (isset($externalUser['SpouseID'])) {
         try {
             $spouse = $userMapper->findByExternalId($externalUser['SpouseID'], Role::PARENT);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (MapperException $e) {
             $spouse = null;
         }
-    }
-    else {
+    } else {
         $spouse = null;
     }
 
-    // TwigLib
+    try {
+        $user    = $userMapper->findById($user['uid']);
+        $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user, $sessionUser);
+    } catch (MapperException $e) {
+        $customButtons = [];
+    }
+
     $page->setFile(TEMPLATE_content, 'output.html');
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
             'user/parent.twig',
             [
-                'session'         => $_SESSION,
-                'user'            => $userMapper->findById($user['uid']),
-                'externalUser'    => $externalUser,
-                'spouse'          => $spouse,
-                'eportfolioAuth'  => $authenticator->canView(),
-                'now'             => Alaress_Date_Format::now(),
+                'session'        => $_SESSION,
+                'user'           => $user,
+                'externalUser'   => $externalUser,
+                'spouse'         => $spouse,
+                'customButtons'  => $customButtons,
+                'eportfolioAuth' => $authenticator->canView(),
+                'now'            => Alaress_Date_Format::now(),
             ]
         )
     );
 }
 
 /**
- * Staff rendering, extracted to a method.
+ * @param SitePage $page
+ * @param array $user
+ * @param External_User $synUserHandler
+ * @param UserMapper $userMapper
+ * @param Eportfolio_Authenticator $authenticator
+ * @param IConfigLoader $config
  *
- * @param SitePage                      $page
- * @param array                         $user
- * @param External_User                 $synUserHandler
- * @param UserMapper                    $userMapper
- * @param Eportfolio_Authenticator      $authenticator
- * @param IConfigLoader                 $config
- * @throws RuntimeException
  * @throws Twig_Error_Loader
  * @throws Twig_Error_Runtime
  * @throws Twig_Error_Syntax
  */
-function renderStaff(
-    SitePage $page,
-    $user,
-    External_User $synUserHandler,
-    UserMapper $userMapper,
-    Eportfolio_Authenticator $authenticator,
-    IConfigLoader $config
-) {
+function renderStaff(SitePage $page, $user, External_User $synUserHandler, UserMapper $userMapper, Eportfolio_Authenticator $authenticator, IConfigLoader $config)
+{
     $externalUser = $synUserHandler->getStaff($user['synergy_id']);
+    /** @var SchoolboxUser $sessionUser */
+    $sessionUser = $_SESSION["user"];
+    
+    try {
+        $user    = $userMapper->findById($user['uid']);
+        $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user, $sessionUser);
+    } catch (MapperException $e) {
+        $customButtons = [];
+    }
 
-    // TwigLib
     $page->setFile(TEMPLATE_content, 'output.html');
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
             'user/staff.twig',
             [
-                'session'         => $_SESSION,
-                'user'            => $userMapper->findById($user['uid']),
-                'externalUser'    => $externalUser,
-                'eportfolioAuth'  => $authenticator->canView(),
-                'now'             => Alaress_Date_Format::now(),
+                'session'        => $_SESSION,
+                'user'           => $user,
+                'externalUser'   => $externalUser,
+                'eportfolioAuth' => $authenticator->canView(),
+                'customButtons'  => $customButtons,
+                'now'            => Alaress_Date_Format::now(),
             ]
         )
     );
 }
 
 /**
- * Student rendering, extracted to a method.
- *
- * @param SitePage                      $page
- * @param array                         $user
- * @param Group                         $groupHandler
- * @param External_User                 $synUserHandler
- * @param External_Class                $classHandler
- * @param UserMapper                    $userMapper
- * @param Folder\Mapper                 $folderMapper
- * @param Eportfolio_Authenticator      $authenticator
+ * @param SitePage $page
+ * @param array $user
+ * @param Group $groupHandler
+ * @param External_User $synUserHandler
+ * @param External_Class $classHandler
+ * @param UserMapper $userMapper
+ * @param FolderMapper $folderMapper
+ * @param Eportfolio_Authenticator $authenticator
  * @param ProfessionalDevelopmentMapper $pdMapper
+ *
  * @throws MapperException
- * @throws RuntimeException
+ * @throws MapperException\Deleted
  * @throws Twig_Error_Loader
  * @throws Twig_Error_Runtime
  * @throws Twig_Error_Syntax
  */
-function renderStudent(
-    SitePage $page,
-    $user,
-    Group $groupHandler,
-    External_User $synUserHandler,
-    External_Class $classHandler,
-    UserMapper $userMapper,
-    Folder\Mapper $folderMapper,
-    Eportfolio_Authenticator $authenticator,
-    ProfessionalDevelopmentMapper $pdMapper
-) {
-    $externalUser = $synUserHandler->getStudent($user['synergy_id']);
+function renderStudent(SitePage $page, $user, Group $groupHandler, External_User $synUserHandler, External_Class $classHandler, UserMapper $userMapper, FolderMapper $folderMapper, Eportfolio_Authenticator $authenticator, ProfessionalDevelopmentMapper $pdMapper)
+{
+    $externalUser                  = $synUserHandler->getStudent($user['synergy_id']);
     $externalUser['AlertMessages'] = preg_split(
         '/[\\n\\r]+/',
         $externalUser['AlertMessage'],
@@ -137,7 +136,7 @@ function renderStudent(
         PREG_SPLIT_NO_EMPTY
     );
 
-    /** @var Schoolbox\User $sessionUser */
+    /** @var SchoolboxUser $sessionUser */
     $sessionUser = $_SESSION["user"];
 
     $student = $userMapper->findById($user['uid']);
@@ -145,7 +144,7 @@ function renderStudent(
     // Load the list of subjects, and their teacher.
     // Then group by subject type?
     $subjects      = [];
-    $splitSubjects = \Config::get('mysubjects_split');
+    $splitSubjects = ConfigMapper::getInstance()->get('mysubjects_split');
     $teacherRoles  = $groupHandler->getStaffGroupTypeIds();
     foreach ($synUserHandler->getSubjectList($student) as $subject) {
         $group = $splitSubjects && $subject['classType'] ? $subject['classType'] : 'Classes';
@@ -153,13 +152,13 @@ function renderStudent(
         // Load a bunch of category and teacher info too
         try {
             $subject['folder'] = $folderMapper->findByCode($subject['code']);
-            $subject['perms'] = $groupHandler->getPermission($subject['folder']->getId());
+            $subject['perms']  = $groupHandler->getPermission($subject['folder']->getId());
 
-        } catch (\Exception $e) {
-            if (\Config::get('show_all_subjects')) {
-                $code = new Folder\Code\Model();
+        } catch (Exception $e) {
+            if (ConfigMapper::getInstance()->get('show_all_subjects')) {
+                $code = new FolderCode();
                 $code->setCode($subject['code']);
-                $subject['folder'] = new Folder\Model();
+                $subject['folder'] = new Folder();
                 $subject['folder']->setName($subject['name'])->addCode($code);
             } else {
                 continue;
@@ -168,13 +167,12 @@ function renderStudent(
 
         $teacherCodes = $classHandler->getTeacherName($subject['folder']->getCodeString() ?: $subject['code']);
 
-        if(is_array($teacherCodes) && count($teacherCodes) > 0) {
+        if (is_array($teacherCodes) && count($teacherCodes) > 0) {
             $subject['teachers'] = $userMapper->findByColumnList([
-                    'synergy_id' => $teacherCodes,
-                    'group_id' => $teacherRoles,
+                'synergy_id' => $teacherCodes,
+                'group_id'   => $teacherRoles,
             ]);
-        }
-        else {
+        } else {
             $subject['teachers'] = [];
         }
 
@@ -205,12 +203,12 @@ function renderStudent(
         if ($externalUser['TeacherFormID']) {
             try {
                 $formTeacher = $userMapper->findByExternalId($externalUser['TeacherFormID'], Role::STAFF);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $formTeacher = new \Schoolbox\User();
+            } catch (Exception $e) {
+                $formTeacher = new SchoolboxUser();
                 $formTeacher->setLastname($externalUser['StudentFormStaffName']);
             }
         } else {
-            $formTeacher = new \Schoolbox\User();
+            $formTeacher = new SchoolboxUser();
             $formTeacher->setLastname($externalUser['StudentFormStaffName']);
         }
     }
@@ -223,13 +221,12 @@ function renderStudent(
         if ($externalUser['TeacherTutorID']) {
             try {
                 $tutorTeacher = $userMapper->findByExternalId($externalUser['TeacherTutorID'], Role::STAFF);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $tutorTeacher = new \Schoolbox\User();
+            } catch (Exception $e) {
+                $tutorTeacher = new SchoolboxUser();
                 $tutorTeacher->setLastname($externalUser['StudentTutorName']);
             }
-        }
-        else {
-            $tutorTeacher = new \Schoolbox\User();
+        } else {
+            $tutorTeacher = new SchoolboxUser();
             $tutorTeacher->setLastname($externalUser['StudentTutorName']);
         }
     }
@@ -239,13 +236,13 @@ function renderStudent(
         if ($externalUser['HeadOfHouseID']) {
             try {
                 $hohTeacher = $userMapper->findByExternalId($externalUser['HeadOfHouseID'], Role::STAFF);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $hohTeacher = new \Schoolbox\User();
+            } catch (Exception $e) {
+                $hohTeacher = new SchoolboxUser();
                 $hohTeacher->setLastname($externalUser['StudentHeadOfHouse']);
             }
         } else {
-            $hohTeacher = new \Schoolbox\User();
-                $hohTeacher->setLastname($externalUser['StudentHeadOfHouse']);
+            $hohTeacher = new SchoolboxUser();
+            $hohTeacher->setLastname($externalUser['StudentHeadOfHouse']);
         }
     }
 
@@ -257,12 +254,12 @@ function renderStudent(
         if ($externalUser['YearLevelCoordID']) {
             try {
                 $coordTeacher = $userMapper->findByExternalId($externalUser['YearLevelCoordID'], Role::STAFF);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $coordTeacher = new \Schoolbox\User();
+            } catch (Exception $e) {
+                $coordTeacher = new SchoolboxUser();
                 $coordTeacher->setLastname($externalUser['StudentYearLevelCoordinator']);
             }
         } else {
-            $coordTeacher = new \Schoolbox\User();
+            $coordTeacher = new SchoolboxUser();
             $coordTeacher->setLastname($externalUser['StudentYearLevelCoordinator']);
         }
     }
@@ -273,43 +270,43 @@ function renderStudent(
         if ($externalUser['CoachID']) {
             try {
                 $studentCoach = $userMapper->findByExternalId($externalUser['CoachID']);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $studentCoach = new \Schoolbox\User();
+            } catch (Exception $e) {
+                $studentCoach = new SchoolboxUser();
                 $studentCoach->setLastname($externalUser['StudentCoach']);
             }
         } else {
-            $studentCoach = new \Schoolbox\User();
+            $studentCoach = new SchoolboxUser();
             $studentCoach->setLastname($externalUser['StudentCoach']);
         }
     }
 
     // Load contact's user IDs
-    $contacts = [];
+    $contacts    = [];
     $contactList = $synUserHandler->getStudentContactList($user['synergy_id']);
-    if(is_array($contactList)) {
+    if (is_array($contactList)) {
         foreach ($contactList as $contact) {
             $main = null;
             try {
                 $main = $userMapper->findByExternalId($contact['StudentContactID'], Role::PARENT);
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (Exception $e) {
                 // noop
             }
             $spouse = null;
             try {
                 $spouse = $userMapper->findByExternalId($contact['StudentContactSpouseID'], Role::PARENT);
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (Exception $e) {
                 // noop
             }
 
             // Only show the parent contacts to the parent themselves, hide divorced parents from each other
-            if($sessionUser->getRole()->isStaff() || ( $sessionUser->getRole()->isParent() && (
-                    $contact['StudentContactID'] == $sessionUser->getExternalId() ||
-                    $contact['StudentContactSpouseID'] == $sessionUser->getExternalId())
+            if ($sessionUser->getRole()->isStaff() || ($sessionUser->getRole()->isParent() && (
+                        $contact['StudentContactID'] == $sessionUser->getExternalId() ||
+                        $contact['StudentContactSpouseID'] == $sessionUser->getExternalId())
                 )
             ) {
-                $contact['main'] = $main;
+                $contact['main']   = $main;
                 $contact['spouse'] = $spouse;
-                $contacts[] = $contact;
+                $contacts[]        = $contact;
             }
         }
     }
@@ -320,10 +317,10 @@ function renderStudent(
     $student->loadParents();
     $isParentOfStudent  = $sessionUser->isParentOf($student);
     $isRelatedToStudent = false;
-    $isPrimaryCarer = false;
+    $isPrimaryCarer     = false;
     if (!$isParentOfStudent) {
         $studentList = $synUserHandler->getEnrolledStudents($sessionUser->getExternalId());
-        if(is_array($studentList)) {
+        if (is_array($studentList)) {
             foreach ($studentList as $enrolledStudentId) {
                 if ($enrolledStudentId['RelatedID'] == $student->getExternalId()) {
                     $isRelatedToStudent = true;
@@ -334,24 +331,19 @@ function renderStudent(
     } else {
         $isRelatedToStudent = true;
         // Only the primary parent will see emergency contact information
-        if($contactList[0]['StudentContactID'] == $sessionUser->getExternalId() || $contactList[0]['StudentContactSpouseID'] == $sessionUser->getExternalId()) {
+        if ($contactList[0]['StudentContactID'] == $sessionUser->getExternalId() || $contactList[0]['StudentContactSpouseID'] == $sessionUser->getExternalId()) {
             $isPrimaryCarer = true;
         }
     }
 
-    // TwigLib
-    // TODO make preg_replace available to Twig
-    // TODO make session contents available to Twig by default, either through whole _SESSION or Aura
-    // TODO make $now available to Twig by default
-
     $page->setFile(TEMPLATE_content, 'output.html');
 
-    $showPastoral = Config::get('pastoral_enabled');
+    $showPastoral = ConfigMapper::getInstance()->get('pastoral_enabled');
 
-    if ($sessionUser->getRole()->isParent() && !Config::get('pastoral_parent_access'))
+    if ($sessionUser->getRole()->isParent() && !ConfigMapper::getInstance()->get('pastoral_parent_access'))
         $showPastoral = false;
 
-    $protectStudentContacts = \Config::get('protect_student_contacts');
+    $protectStudentContacts = ConfigMapper::getInstance()->get('protect_student_contacts');
 
     $hideContacts = $student->getHideContacts() ? 1 : 0;
 
@@ -372,32 +364,32 @@ function renderStudent(
 
     foreach ($subjects as $subject) {
         foreach ($subject as $class) {
-            /** @var \Schoolbox\User $teacher */
+            /** @var SchoolboxUser $teacher */
             foreach ($class["teachers"] as $teacher) {
                 $emails[] = $teacher->getEmail();
             }
         }
     }
-    if ($formTeacher instanceof Schoolbox\User) {
+    if ($formTeacher instanceof SchoolboxUser) {
         $emails[] = $formTeacher->getEmail();
     }
-    if ($tutorTeacher instanceof Schoolbox\User) {
+    if ($tutorTeacher instanceof SchoolboxUser) {
         $emails[] = $tutorTeacher->getEmail();
     }
-    if ($hohTeacher instanceof Schoolbox\User) {
+    if ($hohTeacher instanceof SchoolboxUser) {
         $emails[] = $hohTeacher->getEmail();
     }
-    if ($coordTeacher instanceof Schoolbox\User) {
+    if ($coordTeacher instanceof SchoolboxUser) {
         $emails[] = $coordTeacher->getEmail();
     }
-    if ($studentCoach instanceof Schoolbox\User) {
+    if ($studentCoach instanceof SchoolboxUser) {
         $emails[] = $studentCoach->getEmail();
     }
 
     $allTeacherEmails = implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), array_filter($emails));
 
     $pd = null;
-    if (\Config::get('site_location') === 'help') {
+    if (ConfigMapper::getInstance()->get('site_location') === 'help') {
         /* Load Professional Development details if they exist
          */
         try {
@@ -406,6 +398,9 @@ function renderStudent(
             // noop
         }
     }
+
+    $user    = $userMapper->findById($user['uid']);
+    $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user, $sessionUser);
 
     $page->setVar(
         'OUTPUT',
@@ -423,6 +418,7 @@ function renderStudent(
                 'boarderType'        => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
                 'contacts'           => $contacts,
                 'subjects'           => $subjects,
+                'customButtons'      => $customButtons,
                 'groups'             => $groups,
                 'formTeacher'        => $formTeacher,
                 'tutorTeacher'       => $tutorTeacher,
@@ -444,9 +440,9 @@ function renderStudent(
 if (is_numeric($this->arg[0])) {
     $this->setTitle('Address Book');
 
-    $userHandler  = new \User();
+    $userHandler  = new User();
     $groupHandler = new Group();
-    $config = new \Schoolbox\Config\Loader();
+    $config       = ConfigMapper::getInstance();
 
     $user = $userHandler->getByID($this->arg[0]);
 
@@ -471,7 +467,7 @@ if (is_numeric($this->arg[0])) {
             $synUserHandler,
             new External_Class(),
             new UserMapper(),
-            new Folder\Mapper(),
+            new FolderMapper(),
             new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile'),
             ProfessionalDevelopmentMapper::getInstance()
         );

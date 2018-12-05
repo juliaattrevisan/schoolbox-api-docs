@@ -24,12 +24,12 @@
     $(function() {
         $('#infoPanel').find('a[data-menu]').flyout();
         $('#nav').touchMenu()
-                 .scrollToTop({
+            .scrollToTop({
                     cancel: function () {
                         return !$(this).parent().hasClass('has-submenu');
                     }
-                 }
-        );
+                }
+            );
 
         var s = $('#search');
         s.on('click', '[data-jsubmit]', function () {
@@ -43,11 +43,11 @@
         $.fn.schoolboxResource_ProxyReplacment();
 
         $('.right-small, .right-off-canvas-menu').hover(function(){
-            $('.right-off-canvas-menu').addClass('overlap');
-        },
-        function(){
-            $('.right-off-canvas-menu').removeClass('overlap');
-        });
+                $('.right-off-canvas-menu').addClass('overlap');
+            },
+            function(){
+                $('.right-off-canvas-menu').removeClass('overlap');
+            });
 
         $('.right-small a, .right-off-canvas-menu label').click(function() {
             $('.inner-wrap').toggleClass('docking');
