@@ -365,6 +365,9 @@
 
             window.addClickEvent['{{ guid }}'] = function () {
 
+                {# Crudely register that the visibility rules have changed #}
+                window.hasChanged = true;
+
                 {# Grab the ID of the person we are adding to the group #}
 
                 var id = parseInt($(this).attr('data-user-id'));
