@@ -116,6 +116,10 @@
 
         window.hasChanged = false;
 
+        $('#table-permission').on('change', '[type=radio]', function () {
+            window.hasChanged = true;
+        });
+
         function loadAudience() {
             //Only load the audience defaults if this is a new record
             {% if record.access | length < 1 %}
