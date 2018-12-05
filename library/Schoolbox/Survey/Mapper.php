@@ -107,14 +107,15 @@ class Mapper extends BaseMapper
     /**
      * Retrieve a list of all surveys attempted by the users specified
      *
-     * @param array $userIds Array containing Schoolbox user IDs of people that have attempted quizzes
-     * @return Collection
+     * @param array  $userIds Array containing Schoolbox user IDs of people that have attempted quizzes
+     * @param string $name    Only search for surveys whose titles contain this
+     * @return Collection|Model[]
      */
-    public function findAttemptedSurveysForUsers($userIds, $name)
+    public function findAttemptedSurveysForUsers($userIds, $name): Collection
     {
         $pb = $this->getPredicateBuilder();
         $pb->in('aa.user_id', $userIds);
-        $pb->like('title', '%'.$name.'%');
+        $pb->like('title', '%'.$this->database->escapeForLike($name).'%');
         $pb->isNull("{$this->getTable()}.deleted_at" );
 
         $sql = $this->getSelectString() . " WHERE ".implode(' AND ',$pb->getWhere());
@@ -194,7 +195,7 @@ class Mapper extends BaseMapper
      * @param array $userIds
      * @return array
      */
-    public function findClassSnapshot($surveyId, array $userIds = [])
+    public function findClassSnapshot($surveyId, array $userIds = []): array
     {
         $pb = $this->getPredicateBuilder();
         $pb->equals('survey.assess_id', $surveyId);
