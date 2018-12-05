@@ -14,7 +14,6 @@ use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
 use Schoolbox\Pastoral\SubType\Mapper as SubTypeMapper;
 use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
 use Schoolbox\RoleMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Pastoral;
 use UnexpectedValueException;
@@ -103,11 +102,13 @@ class Mapper extends BaseMapper
         $results = $this->createCollection();
 
         /**
+         * @var UserMapper    $userMapper
          * @var RoleMapper    $roleMapper
          * @var TypeMapper    $typeMapper
          * @var SubTypeMapper $subTypeMapper
          * @var GroupMapper   $pGroupMapper
          */
+        $userMapper    = $this->getJoinMapper('user');
         $roleMapper    = $this->getJoinMapper('role');
         $typeMapper    = $this->getJoinMapper('type');
         $subTypeMapper = $this->getJoinMapper('subtype');
@@ -130,8 +131,7 @@ class Mapper extends BaseMapper
 
             // Hydrate user
             if (!empty($row['u.id'])) {
-                /** @var User $user */
-                $user = $this->hydrateJoin($row, 'user', 'u');
+                $user = $userMapper->hydrate($row, 'u');
                 $user->setRole($roleMapper->hydrate($row, 'ur'));
                 $access->setUser($user);
             }
