@@ -602,6 +602,6 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         // deleteByColumn doesn't work as expected when querying a join column,
         // because the delete string doesn't contain the joins the select does.
         // Fortunately delete(findByColumn()) works.
-        $this->delete($this->findByColumn('c.category_id', $cid));
+        $this->getJoinMapper('category')->deleteByColumn('category_id', $cid);
     }
 }
