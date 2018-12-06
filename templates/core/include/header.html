@@ -49,11 +49,11 @@
                 $('.right-off-canvas-menu').removeClass('overlap');
             });
 
-        $('.right-small a, .right-off-canvas-menu label').on('click', function() {
-            $('.inner-wrap').toggleClass('right-open');
+        $('.right-small a, .right-off-canvas-menu label').click(function() {
+            $('.inner-wrap').toggleClass('docking');
             $(this).toggleClass('raquo');
 
-            if ($('.inner-wrap').hasClass('right-open')){
+            if ($('.inner-wrap').hasClass('docking')){
                 $.post('/ajax/notificationsTray', {state: 'show'}, function(responseText) {
                 });
             }
@@ -61,35 +61,6 @@
                 $.post('/ajax/notificationsTray', {state: 'hide'}, function(responseText) {
                 });
             }
-        });
-
-        $('#drawer').on('click', function(){
-            $('.off-canvas-wrap').removeClass('move-right');
-            $('.inner-wrap').toggleClass('left-open');
-            $(this).toggleClass('open');
-
-            /* Sidenav toggle
-             */
-            if ($('.inner-wrap').hasClass('left-open')){
-                $.post('/ajax/sidenav', {state: 'show'});
-            }
-            else {
-                $.post('/ajax/sidenav', {state: 'hide'});
-            }
-        });
-
-        /* Open / Close account menu
-         * + click outside div to close
-         */
-        var accountMenu = $('#account-content');
-
-        $('#profile-drop').on('click', function(e){
-            e.stopPropagation();
-            accountMenu.toggleClass('open');
-        });
-
-        $('[data-offcanvas]').on('click', function(){
-            accountMenu.removeClass('open');
         });
 
         /* Ensure modals always appear in a visible location
