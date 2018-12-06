@@ -765,6 +765,7 @@ class External_Synergetic_User implements External_UserInterface
                             a.StudentContactMobilePhone,
                             a.StudentContactOccupPhone,
                             a.StudentContactRelation,
+                            a.StudentContactPrimaryOnlyFlag,
                             a.StudentContactSpouseID,
                             a.StudentContactSpouseTitle,
                             a.StudentContactSpousePreferred,
@@ -792,6 +793,9 @@ class External_Synergetic_User implements External_UserInterface
         $contactList = [];
 
         foreach ($iteratorContacts as $contact) {
+            if ((bool)$contact['StudentContactPrimaryOnlyFlag']) {
+                $contact['StudentContactSpouseID'] = '';
+            }
             $contactList[] = $contact;
         }
 
@@ -926,13 +930,26 @@ class External_Synergetic_User implements External_UserInterface
             ORDER BY    Community.BirthDate
         ";
 
-        return $this->getConnector()->executeQuery(
+        $students = $this->getConnector()->executeQuery(
             $query,
             array_merge(
                 $relationshipBindings['bindings'],
                 ['externalId' => $externalUserId]
             )
         )->fetchAll();
+
+        foreach ($students as $key => $student) {
+            $contacts = $this->getStudentContactList((int)$student['RelatedID']);
+            foreach ($contacts as $contact) {
+                if ((int)$contact['StudentContactID'] === (int)$externalId ||
+                    (int)$contact['StudentContactSpouseID'] === (int)$externalId) {
+                    continue 2;
+                }
+            }
+            // current parent is not a contact of current student
+            unset($students[$key]);
+        }
+        return $students;
     }
 
 
