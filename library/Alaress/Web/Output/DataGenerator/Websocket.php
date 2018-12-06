@@ -8,8 +8,11 @@ declare(strict_types=1);
 
 namespace Alaress\Web\Output\DataGenerator;
 
+use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Session\Session;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
+use Schoolbox\User as UserModel;
 
 /**
  * Generate data for rendering the websocket (instant messaging) system.
@@ -23,9 +26,15 @@ class Websocket implements IDataGenerator
 
 
     /**
-     * @var Session
+     * @var UserModel
      */
-    private $session;
+    private $currentUser;
+
+
+    /**
+     * @var UnreadRetriever
+     */
+    private $unreadRetriever;
 
 
     /**
@@ -35,17 +44,32 @@ class Websocket implements IDataGenerator
 
 
     /**
+     * @var string
+     */
+    private $instanceId;
+
+
+    /**
      * Constructor
      *
-     * @param IConfigLoader $config
-     * @param Session       $session
-     * @param array         $serverVars
+     * @param IConfigLoader   $config
+     * @param UserModel       $currentUser
+     * @param UnreadRetriever $unreadRetriever
+     * @param array           $serverVars
+     * @param string          $instanceId
      */
-    public function __construct(IConfigLoader $config, Session $session, array $serverVars)
-    {
-        $this->config     = $config;
-        $this->session    = $session;
-        $this->serverVars = $serverVars;
+    public function __construct(
+        IConfigLoader $config,
+        UserModel $currentUser,
+        UnreadRetriever $unreadRetriever,
+        array $serverVars,
+        string $instanceId
+    ) {
+        $this->config          = $config;
+        $this->currentUser     = $currentUser;
+        $this->unreadRetriever = $unreadRetriever;
+        $this->serverVars      = $serverVars;
+        $this->instanceId      = $instanceId;
     }
 
 
@@ -54,13 +78,16 @@ class Websocket implements IDataGenerator
      */
     public function generate(?array $chromeData = []): array
     {
+        $unread = $this->unreadRetriever->getUnread($this->instanceId, $this->currentUser->getId());
+        $bundle = new NotificationBundle();
+        $bundle->appendInstances($unread);
         return [
             'enabled'    => $this->config->get('messaging_enabled'),
             'host'       => $this->serverVars['HTTP_HOST'] ?? '',
             'port'       => $this->config->get('websocket_port_ssl') ?: 8081,
             'path'       => $this->config->get('websocket_path') ?: '/',
             'secure'     => true,
-            'unread'     => $this->session->get('msg-count'),
+            'unread'     => $bundle->count(),
             'stackLimit' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
         ];
     }
