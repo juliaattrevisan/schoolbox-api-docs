@@ -65,11 +65,42 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
+        $buttons = $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc');
+
+        $rolesSelected = [];
+        $campusesSelected = [];
+        foreach($buttons as $button) {
+            $roleSelections = $this->profileButtonRoleMapper->findByColumn('profile_button_id', $button->getId());
+
+            $rolesForButton = [];
+
+            /** @var ProfileButtonRole $selection */
+            foreach ($roleSelections as $roleSelection) {
+                $rolesForButton[$roleSelection->getRoleId()] = true;
+            }
+
+            $campusSelections = $this->profileButtonCampusMapper->findByColumn('profile_button_id', $button->getId());
+
+            $campusesForButton = [];
+
+            /** @var ProfileButtonCampus $selection */
+            foreach ($campusSelections as $campusSelection) {
+                $campusesForButton[$campusSelection->getCampusId()] = true;
+            }
+
+            $rolesSelected[$button->getId()] = $rolesForButton;
+            $campusesSelected[$button->getId()] = $campusesForButton;
+        }
+
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/index.twig',
             'data'     => [
                 'pageCurrent' => self::PAGE_CURRENT,
-                'profile' => $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc')
+                'profile' => $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc'),
+                'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
+                'rolesSelected' => $rolesSelected,
+                'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
+                'campusesSelected' => $campusesSelected
             ],
             'title' => 'Admin - Profile Buttons'
         ]);
