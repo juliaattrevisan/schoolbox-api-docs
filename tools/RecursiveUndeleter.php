@@ -239,8 +239,8 @@ class RecursiveUndeleter
             Pastoral\Audience\Mapper::class,
         ],
         RoleMapper::class               => [
-            Pastoral\Access\Mapper::class,
-            Pastoral\Audience\Mapper::class,
+            Pastoral\Access\Mapper::class => 'role_id',
+            Pastoral\Audience\Mapper::class => 'role_id',
         ],
         Pastoral\Group\Mapper::class    => [
             Pastoral\Access\Mapper::class => 'group_id',
