@@ -497,7 +497,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     'ws',
                     new Output\DataGenerator\Websocket(
                         $config,
-                        $session,
+                        $session->getAuthUser(),
                         new UnreadRetriever($redis),
                         $_SERVER
                     )

@@ -12,6 +12,7 @@ use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Session\Session;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
+use Schoolbox\User as UserModel;
 
 /**
  * Generate data for rendering the websocket (instant messaging) system.
@@ -25,9 +26,9 @@ class Websocket implements IDataGenerator
 
 
     /**
-     * @var Session
+     * @var UserModel
      */
-    private $session;
+    private $currentUser;
 
 
     /**
@@ -46,18 +47,18 @@ class Websocket implements IDataGenerator
      * Constructor
      *
      * @param IConfigLoader   $config
-     * @param Session         $session
+     * @param UserModel       $currentUser
      * @param UnreadRetriever $unreadRetriever
      * @param array           $serverVars
      */
     public function __construct(
         IConfigLoader $config,
-        Session $session,
+        UserModel $currentUser,
         UnreadRetriever $unreadRetriever,
         array $serverVars
     ) {
         $this->config          = $config;
-        $this->session         = $session;
+        $this->currentUser     = $currentUser;
         $this->unreadRetriever = $unreadRetriever;
         $this->serverVars      = $serverVars;
     }
@@ -68,7 +69,7 @@ class Websocket implements IDataGenerator
      */
     public function generate(?array $chromeData = []): array
     {
-        $unread = $this->unreadRetriever->getUnread(INSTANCE_ID, $this->session->getAuthUser()->getId());
+        $unread = $this->unreadRetriever->getUnread(INSTANCE_ID, $this->currentUser->getId());
         $bundle = new NotificationBundle();
         $bundle->appendInstances($unread);
         return [
