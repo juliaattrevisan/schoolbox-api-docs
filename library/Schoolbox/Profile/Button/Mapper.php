@@ -65,6 +65,8 @@ class Mapper extends BaseMapper
         $statement->execute($params);
         $buttons = $this->hydrateList($statement);
 
+        $processedButtons = new Collection();
+
         /** @var Model $button */
         foreach ($buttons as $button) {
             // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
@@ -102,9 +104,11 @@ class Mapper extends BaseMapper
                 \urlencode($viewerEmail)
             ];
 
-            $button->setUrl(str_ireplace($array_find, $array_replace, $button->getUrl()));
+            $processedButton = clone $button;
+            $processedButton->setUrl(str_ireplace($array_find, $array_replace, $button->getUrl()));
+            $processedButtons->add($processedButton);
         }
 
-        return $buttons;
+        return $processedButtons;
     }
 }
