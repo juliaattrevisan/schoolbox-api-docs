@@ -1,8 +1,8 @@
 {% if subtype.id is null %}
-    {% set action = routeLookupIfAuthorized('pastoralManagement.postAudienceTypeModify', {type: type, typeId: type.id}) %}
+    {% set action = routeLookupIfAuthorized('pastoralAudience.postAudienceTypeModify', {type: type, typeId: type.id}) %}
     {% set title = type.name %}
 {% else %}
-    {% set action = routeLookupIfAuthorized('pastoralManagement.postAudienceSubTypeModify', {subtype: subtype, subtypeId: subtype.id}) %}
+    {% set action = routeLookupIfAuthorized('pastoralAudience.postAudienceSubTypeModify', {subtype: subtype, subtypeId: subtype.id}) %}
     {% set title = type.name ~ ': ' ~ subtype.name %}
 {% endif %}
 
@@ -10,7 +10,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
     [ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
-    [ 'Visibility Defaults',      routeLookup('pastoralManagement.getAudiences') ],
+    [ 'Visibility Defaults',      routeLookup('pastoralAudience.getAudiences') ],
     [ title ]
 ) }}
 

@@ -12,11 +12,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Pastoral;
-use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
-use Schoolbox\Pastoral\SubType\Mapper as SubTypeMapper;
-use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
 use InvalidArgumentException;
@@ -39,17 +35,12 @@ class Module extends BaseModule
 
         $this->registerRoutesArray([
             'GET'  => [
-                '/audience'                            => ['getAudiences'              => $permissionPastoralModeratorWrite],
-                '/audience/type/{typeId}/modify'       => ['getAudiencesTypeModify'    => $permissionPastoralModeratorWrite],
-                '/audience/subtype/{subtypeId}/modify' => ['getAudiencesSubTypeModify' => $permissionPastoralModeratorWrite],
-                '/groups'                              => ['getGroups'                 => $permissionPastoralModeratorWrite],
-                '/groups/modify{/groupId}'             => ['getGroupsModify'           => $permissionPastoralModeratorWrite],
+                ''                  => ['getGroups'        => $permissionPastoralModeratorWrite],
+                '/modify{/groupId}' => ['getGroupsModify'  => $permissionPastoralModeratorWrite],
             ],
             'POST' => [
-                '/groups/delete'                       => ['postGroupsDelete'          => $permissionPastoralModeratorWrite],
-                '/groups/modify'                       => ['postGroupsModify'          => $permissionPastoralModeratorWrite],
-                '/audience/type/{typeId}/modify'       => ['postAudienceTypeModify'    => $permissionPastoralModeratorWrite],
-                '/audience/subtype/{subtypeId}/modify' => ['postAudienceSubTypeModify' => $permissionPastoralModeratorWrite],
+                '/delete'           => ['postGroupsDelete' => $permissionPastoralModeratorWrite],
+                '/modify'           => ['postGroupsModify' => $permissionPastoralModeratorWrite],
             ],
         ]);
     }
@@ -66,10 +57,6 @@ class Module extends BaseModule
             'pastoralAccessMapper'      => $this->getMapperFactory()->getLazy(Pastoral\Access\Mapper::class),
             'pastoralGroupMapper'       => $this->getMapperFactory()->getLazy(Pastoral\Group\Mapper::class),
             'pastoralGroupMemberMapper' => $this->getMapperFactory()->getLazy(Pastoral\Group\Member\Mapper::class),
-            'pastoralAudienceMapper'    => $this->getMapperFactory()->getLazy(Pastoral\Audience\Mapper::class),
-            'roleMapper'                => $this->getMapperFactory()->getLazy(RoleMapper::class),
-            'pastoralTypeMapper'        => $this->getMapperFactory()->getLazy(Pastoral\Type\Mapper::class),
-            'pastoralSubTypeMapper'     => $this->getMapperFactory()->getLazy(Pastoral\SubType\Mapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
@@ -98,34 +85,9 @@ class Module extends BaseModule
                     if (($params['group'] ?? null) instanceof Pastoral\Group\Model) {
                         $returnArray['group'] = $params['group'];
                     } else {
-                        $groupMapper          = $this->getMapperFactory()->get(GroupMapper::class);
+                        $groupMapper          = $this->getMapperFactory()->get(Pastoral\Group\Mapper::class);
                         $returnArray['group'] = $params['groupId'] ? $groupMapper->findById($params['groupId']) : $groupMapper->createModel();
                     }
-                }
-                if (\array_key_exists('typeId', $params)) {
-                    if (($params['type'] ?? null) instanceof Pastoral\Type\Model) {
-                        $returnArray['type'] = $params['type'];
-                    } else {
-                        $typeMapper          = $this->getMapperFactory()->get(Pastoral\Type\Mapper::class);
-                        $returnArray['type'] = $typeMapper->findById($params['typeId']);
-                    }
-                }
-
-                if (\array_key_exists('subtypeId', $params)) {
-                    if (($params['subType'] ?? null) instanceof Pastoral\SubType\Model) {
-                        $subType = $params['subType'];
-                    } else {
-                        $subTypeMapper = $this->getMapperFactory()->get(Pastoral\SubType\Mapper::class);
-                        $subType       = $subTypeMapper->findById($params['subtypeId']);
-                    }
-                    // Need to ensure the subType's type is hydrated
-                    /** @var Pastoral\SubType\Model $subType */
-                    if (null === $subType->getPastoralType()->getName()) {
-                        /** @var Pastoral\Type\Mapper $typeMapper */
-                        $typeMapper = $this->getMapperFactory()->get(Pastoral\Type\Mapper::class);
-                        $subType->setPastoralType($typeMapper->findById($subType->getPastoralType()->getId()));
-                    }
-                    $returnArray['subType'] = $subType;
                 }
 
                 return $returnArray;

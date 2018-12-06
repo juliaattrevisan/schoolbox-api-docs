@@ -29,7 +29,7 @@
                         <li class="actions-small-2">
                             <div class="list-item">
                                 <div class="card small-12 actions-1">
-                                    <a href={{ routeLookupIfAuthorized('pastoralManagement.getAudiencesTypeModify', {type: type, typeId: type.id}) }}>{{ type.name }}</a>
+                                    <a href={{ routeLookupIfAuthorized('pastoralAudience.getAudiencesTypeModify', {type: type, typeId: type.id}) }}>{{ type.name }}</a>
                                 </div>
                             </div>
                         </li>
@@ -38,7 +38,7 @@
                                 <li class="actions-small-2">
                                     <div class="list-item">
                                         <div class="card small-12">
-                                            <a href={{ routeLookupIfAuthorized('pastoralManagement.getAudiencesSubTypeModify', {subtype: subtype, subtypeId: subtype.id}) }}>
+                                            <a href={{ routeLookupIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', {subtype: subtype, subtypeId: subtype.id}) }}>
                                             {{ type.name }} : {{ subtype.name }}</a>
                                         </div>
                                     </div>
