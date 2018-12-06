@@ -82,7 +82,7 @@ class Model implements ISoftDeletable
      * @param PastoralGroup|null $pastoralGroup
      * @return $this
      */
-    public function setGroup(PastoralGroup $pastoralGroup): self
+    public function setGroup(?PastoralGroup $pastoralGroup): self
     {
         $this->group = $pastoralGroup;
 
@@ -98,11 +98,11 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param User $user
+     * @param null|User $user
      *
      * @return self
      */
-    public function setUser(User $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 
@@ -128,10 +128,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param Role $role
+     * @param null|Role $role
      * @return $this
      */
-    public function setRole(Role $role): self
+    public function setRole(?Role $role): self
     {
         $this->role = $role;
 
@@ -147,10 +147,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Type $type
+     * @param null|Type $type
      * @return $this
      */
-    public function setType(Type $type): self
+    public function setType(?Type $type): self
     {
         $this->type = $type;
         return $this;
@@ -165,10 +165,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param SubType $subtype
+     * @param null|SubType $subtype
      * @return $this
      */
-    public function setSubtype(SubType $subtype): self
+    public function setSubtype(?SubType $subtype): self
     {
         $this->subtype = $subtype;
         return $this;
