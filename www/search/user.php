@@ -371,20 +371,13 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
             }
         }
     }
-    if ($formTeacher instanceof Schoolbox\User) {
-        $emails[] = $formTeacher->getFormattedEmailDisplay();
-    }
-    if ($tutorTeacher instanceof Schoolbox\User) {
-        $emails[] = $tutorTeacher->getFormattedEmailDisplay();
-    }
-    if ($hohTeacher instanceof Schoolbox\User) {
-        $emails[] = $hohTeacher->getFormattedEmailDisplay();
-    }
-    if ($coordTeacher instanceof Schoolbox\User) {
-        $emails[] = $coordTeacher->getFormattedEmailDisplay();
-    }
-    if ($studentCoach instanceof Schoolbox\User) {
-        $emails[] = $studentCoach->getFormattedEmailDisplay();
+
+    $teacherEmails = array_filter([$formTeacher, $tutorTeacher, $hohTeacher, $coordTeacher, $studentCoach]);
+
+    foreach ($teacherEmails as $object) {
+        if ($object instanceof Schoolbox\User) {
+            $emails[] = $object->getFormattedEmailDisplay();
+        }
     }
 
     $allTeacherEmails = implode(AbstractMailer::implodeGlue(), array_filter(array_unique($emails)));
