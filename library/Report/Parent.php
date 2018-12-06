@@ -577,7 +577,7 @@ class Report_Parent extends Report_Abstract
             $filteredEmails = array_filter(array_unique($allEmails));
 
             $this->getPage()->parse('student_block', 'student', true);
-            $this->getPage()->setVar('EMAIL_ALL_PARENTS', implode(AbstractMailer::emailSeparator(), $filteredEmails));
+            $this->getPage()->setVar('EMAIL_ALL_PARENTS', implode(AbstractMailer::implodeGlue(), $filteredEmails));
             $this->getPage()->setVar('empty_block', '');
         }
         else {

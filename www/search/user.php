@@ -387,7 +387,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
         $emails[] = $studentCoach->getFormattedEmailDisplay();
     }
 
-    $allTeacherEmails = implode(AbstractMailer::emailSeparator(), array_filter(array_unique($emails)));
+    $allTeacherEmails = implode(AbstractMailer::implodeGlue(), array_filter(array_unique($emails)));
 
     $pd = null;
     if (ConfigMapper::getInstance()->get('site_location') === 'help') {
@@ -432,7 +432,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
                 'allTeacherEmails'   => $allTeacherEmails,
                 'pdStates'           => $pdMapper->getStates(),
                 'pd'                 => $pd,
-                'emailSeparator'     => AbstractMailer::emailSeparator(),
+                'emailSeparator'     => AbstractMailer::implodeGlue(),
             ]
         )
     );

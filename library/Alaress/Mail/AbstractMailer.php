@@ -488,7 +488,7 @@ abstract class AbstractMailer implements IMailer
      * Implode glue to join email addresses array
      * @return string
      */
-    public static function emailSeparator() :string
+    public static function implodeGlue() :string
     {
         return \chr(self::EMAIL_SEPARATOR_CODE);
     }

@@ -266,7 +266,7 @@ if (is_numeric($this->arg[0])) {
 
         if (!empty($all_emails)) {
             $this->setVar([
-                'EMAILALL' => implode(AbstractMailer::emailSeparator(), $all_emails),
+                'EMAILALL' => implode(AbstractMailer::implodeGlue(), $all_emails),
             ]);
             $this->parse('mail_all_block', 'mail_all');
             $this->parse('mail_all_form_block', 'mail_all_form');
