@@ -53,7 +53,7 @@ class UnreadRetriever
                         if (!$data) {
                             // the message doesn't exist? remove the reference
                             // (precedent: `\Alaress\Async\Queue\RedisQueue::fetch`)
-                            $this->syncClient->srem($messageKey, $setIdentifier);
+                            $this->syncClient->srem($setIdentifier, $messageKey);
                             return false;
                         }
                         return unserialize(
