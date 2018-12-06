@@ -5,6 +5,7 @@
         assessmentsToMark:         IAssessable[]            indexed by assessment.id
         assessmentsToChase:        IAssessable[]            indexed by assessment.id
         assessmentStudentsToEmail: string[][]               indexed by assessment.id, user.id
+        emailSeparator:            string                   ASCII Character
 #}
 {% import 'sub/assessmentContext.twig' as assessmentContext %}
 {% import 'sub/assessmentResponse.twig' as assessmentResponse %}
@@ -47,7 +48,8 @@
             {% include '@learning/fragments/toSubmitAssessment.twig' with {
                 assessment:      assessment,
                 stats:           statistics[assessment.id],
-                studentsToEmail: assessmentStudentsToEmail[assessment.id]
+                studentsToEmail: assessmentStudentsToEmail[assessment.id],
+                emailSeparator:  emailSeparator
             } only %}
         {% endfor %}
         </div>

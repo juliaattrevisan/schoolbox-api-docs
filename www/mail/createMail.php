@@ -25,7 +25,7 @@ if (Cfg::get('mail_enable') == 1) {
 
     foreach ($addressLists as $type => $request) {
         if (null !== $_REQUEST[$type]) {
-            $emailAddresses = Mailer::parseAddressString($_REQUEST[$type], false);
+            $emailAddresses = Mailer::parseAddressString(Mailer::standardiseEmailSeparator($_REQUEST[$type]), false);
             if(!empty($emailAddresses['valid'])) {
                 foreach ($emailAddresses['valid'] as $email => $name) {
                     $addressLists[$type][] = Mailer::buildAddress($email, $name);

@@ -333,11 +333,12 @@
 
                             {% block buttons_email_all_staff %}
                                 {% if isStaff and config.email_all_staff %}
+                                    {% set replyTo = session.user.getFormattedEmailDisplay %}
                                     <li>
                                         <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">Email All Teachers</a>
                                         <form id="email-all-form" action="/mail/createMail.php" class="hide">
                                             <input name="cc" value="{{ allTeacherEmails }}" type="hidden">
-                                            <input name="replyto" value="{{ session.user.email }}" type="hidden">
+                                            <input name="replyto" value="{{ replyTo }}" type="hidden">
                                         </form>
                                     </li>
                                 {% endif %}
@@ -600,7 +601,7 @@
             {% if showSubjects %}
                 {% for group, subjectGroup in subjects %}
                     {# Keep a running total of all teachers emails in this group #}
-                    {% set teacherEmails = '' %}
+                    {% set teacherEmails = [] %}
                     <div class="row">
                         <div class="small-12 island">
                             <h2 class="subheader">{{ group }}</h2>
@@ -620,7 +621,8 @@
                                         {% block folderListItemActions %}{% endblock %}
                                     </li>
                                     {% for teacher in subject.teachers %}
-                                        {% set teacherEmails = teacherEmails ~ teacher.email ~ ',' %}
+                                        {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
+                                        {% set teacherEmails = teacherEmails|merge([email]) %}
                                         <li class="actions-small-1">
                                             <div class="list-item">
                                                 <div class="compact card small-12">
@@ -640,22 +642,25 @@
                                                 </div>
                                             </div>
                                             <nav>
+
                                                 {% if not teacher.email is empty %}
-                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ teacher.email }}" title="Email {{ teacher.email }}"></a>
+                                                    {% set replyTo = teacher.getFormattedEmailDisplay %}
+                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
                                                 {% endif %}
                                             </nav>
                                         </li>
                                     {% endfor %}
                                 </ul>
                                 {% endfor %}
-
                                 {% if session.user.role.staff and config.email_all_staff and config.mail_enable %}
+                                    {% set teacherEmails = teacherEmails|join(emailSeparator)  %}
+                                    {% set replyTo = session.user.getFormattedEmailDisplay %}
                                     <div class="component-action">
                                         <section>
                                             <form action="/mail/createMail.php" method="post">
                                                 <div class="row">
                                                     <div class="small-12 columns">
-                                                        <input type="hidden" name="replyto" value="{{ session.user.email }}"/>
+                                                        <input type="hidden" name="replyto" value="{{ replyTo }}"/>
                                                         <input type="hidden" name="bcc" value="{{ teacherEmails }}"/>
                                                         <button type="submit" class="button">Email All {{ group }} Teachers</button>
                                                     </div>
@@ -712,7 +717,8 @@
                                             </div>
                                             <nav>
                                                 {% if not owner.email is empty %}
-                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ owner.email }}" title="Email {{ owner.email }}"></a>
+                                                    {% set replyTo = owner.getFormattedEmailDisplay %}
+                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
                                                 {% endif %}
                                             </nav>
                                         </li>

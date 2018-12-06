@@ -9,6 +9,7 @@
         isTask:          bool                   (optional) Override to indicate to render as Task
         isQuiz:          bool                   (optional) Override to indicate to render as Quiz
         isDueWork:       bool                   (optional) Override to indicate to render as DueWork
+        emailSeparator: string                  ASCII Character
 #}
 {% import 'sub/assessmentContext.twig' as assessmentContext %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
@@ -85,7 +86,7 @@
                     <div class="small-12 columns">
                         <input type="hidden" name="subject" value="Overdue - {{ assessment.title }}"/>
                         <input type="hidden" name="replyto" value="&quot;{{assessment.baseContext.folder.title}}&quot;<{{USER.email}}>"/>
-                        <input data-email-students type="hidden" name="bcc" value="{{ studentsToEmail|join(',') }}"/>
+                        <input data-email-students type="hidden" name="bcc" value="{{ studentsToEmail|join(emailSeparator) }}"/>
                         <button type="submit" class="button icon-email">Email all</button>
                     </div>
                 </div>

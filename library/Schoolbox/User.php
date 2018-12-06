@@ -1383,4 +1383,13 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
         }
     }
 
+    /**
+     * Returns formatted email display e.g: "Alaress Admin" <alaress@alaress.com.au>
+     * @return string
+     */
+    public function getFormattedEmailDisplay() :string
+    {
+        return '"' . $this->formatName() . '" <' . $this->getEmail() . '>';
+    }
+
 }

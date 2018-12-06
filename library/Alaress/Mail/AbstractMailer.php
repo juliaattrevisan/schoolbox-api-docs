@@ -483,4 +483,13 @@ abstract class AbstractMailer implements IMailer
     {
         return str_replace(',', \chr(self::EMAIL_SEPARATOR_CODE), $string);
     }
+
+    /**
+     * Implode glue to join email addresses array
+     * @return string
+     */
+    public static function implodeGlue() :string
+    {
+        return \chr(self::EMAIL_SEPARATOR_CODE);
+    }
 } 

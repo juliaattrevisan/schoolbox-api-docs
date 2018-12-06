@@ -148,7 +148,7 @@ if (is_numeric($this->arg[0])) {
 
         // Store member email for 'email group members' button
         if ($member->getId() != $_SESSION['id']) { // Don't email yourself
-            $all_emails[] = $member->getEmail();
+            $all_emails[] = Scrub::text($member->getFormattedEmailDisplay());
         }
 
         if ($memberAccess->getAccessLevel() == UserAccess::ACCESS_FULL) {
@@ -266,7 +266,7 @@ if (is_numeric($this->arg[0])) {
 
         if (!empty($all_emails)) {
             $this->setVar([
-                'EMAILALL' => implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), $all_emails),
+                'EMAILALL' => implode(AbstractMailer::implodeGlue(), $all_emails),
             ]);
             $this->parse('mail_all_block', 'mail_all');
             $this->parse('mail_all_form_block', 'mail_all_form');

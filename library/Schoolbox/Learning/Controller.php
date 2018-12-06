@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning;
 
+use Alaress\Mail\AbstractMailer;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
@@ -261,7 +262,7 @@ class Controller extends Base
                 foreach($assessment->getAllParticipants() as $participant){
                     if($participant->isResponseRequired()){
                         $student = $participant->getUser();
-                        $assessmentStudentsToEmail[$assessment->getId()][$student->getId()] = $student->getEmail();
+                        $assessmentStudentsToEmail[$assessment->getId()][$student->getId()] = $student->getFormattedEmailDisplay();
                     }
                 }
             }
@@ -273,6 +274,7 @@ class Controller extends Base
             'assessmentsToMark'         => $assessmentsToMark,
             'assessmentsToChase'        => $assessmentsToChase,
             'assessmentStudentsToEmail' => $assessmentStudentsToEmail,
+            'emailSeparator'            => AbstractMailer::implodeGlue(),
         ])->getAsString();
     }
 

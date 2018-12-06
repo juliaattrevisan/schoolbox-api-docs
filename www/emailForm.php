@@ -43,7 +43,7 @@ if (validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.h
 
         $key = strtoupper($key);
         if (is_array($var)) {
-            $context[$key] = implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), $var);
+            $context[$key] = implode(AbstractMailer::implodeGlue(), $var);
         } else {
             $context[$key] = $var;
         }

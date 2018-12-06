@@ -2,6 +2,7 @@
 
 use Schoolbox\Config\ConfigMapper;
 use Alaress\Mail\AbstractMailer;
+use Embera\Providers\Screenr;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as Access;
@@ -84,7 +85,7 @@ function renderStaff(SitePage $page, $user, External_User $synUserHandler, UserM
     $externalUser = $synUserHandler->getStaff($user['synergy_id']);
     /** @var SchoolboxUser $sessionUser */
     $sessionUser = $_SESSION["user"];
-    
+
     try {
         $user    = $userMapper->findById($user['uid']);
         $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($user, $sessionUser);
@@ -366,27 +367,20 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
         foreach ($subject as $class) {
             /** @var SchoolboxUser $teacher */
             foreach ($class["teachers"] as $teacher) {
-                $emails[] = $teacher->getEmail();
+                $emails[] = $teacher->getFormattedEmailDisplay();
             }
         }
     }
-    if ($formTeacher instanceof SchoolboxUser) {
-        $emails[] = $formTeacher->getEmail();
-    }
-    if ($tutorTeacher instanceof SchoolboxUser) {
-        $emails[] = $tutorTeacher->getEmail();
-    }
-    if ($hohTeacher instanceof SchoolboxUser) {
-        $emails[] = $hohTeacher->getEmail();
-    }
-    if ($coordTeacher instanceof SchoolboxUser) {
-        $emails[] = $coordTeacher->getEmail();
-    }
-    if ($studentCoach instanceof SchoolboxUser) {
-        $emails[] = $studentCoach->getEmail();
+
+    $teacherEmails = array_filter([$formTeacher, $tutorTeacher, $hohTeacher, $coordTeacher, $studentCoach]);
+
+    foreach ($teacherEmails as $object) {
+        if ($object instanceof Schoolbox\User) {
+            $emails[] = $object->getFormattedEmailDisplay();
+        }
     }
 
-    $allTeacherEmails = implode(\chr(AbstractMailer::EMAIL_SEPARATOR_CODE), array_filter($emails));
+    $allTeacherEmails = implode(AbstractMailer::implodeGlue(), array_filter(array_unique($emails)));
 
     $pd = null;
     if (ConfigMapper::getInstance()->get('site_location') === 'help') {
@@ -431,6 +425,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
                 'allTeacherEmails'   => $allTeacherEmails,
                 'pdStates'           => $pdMapper->getStates(),
                 'pd'                 => $pd,
+                'emailSeparator'     => AbstractMailer::implodeGlue(),
             ]
         )
     );
