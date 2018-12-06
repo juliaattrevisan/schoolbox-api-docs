@@ -88,7 +88,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'uuid'         => '4a73e905-f5b9-11e7-9503-08002751fd3c',
             'tooltip_uuid' => '4f508e88-ff4a-11e7-bd23-08002751fd3c',
             'type'         => 'tooltip',
-            'selector'     => '#top-menu',
+            'selector'     => '#hybrid-bar',
             'content'      => "The top menu contains major features and functions that you will need to frequently access. You can hover over the links to get more detail about each link.",
         ],
 

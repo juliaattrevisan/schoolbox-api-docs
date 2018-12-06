@@ -158,6 +158,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		position: relative;
 	}
 	#search {
+		background: $navigation-background;
 		margin: 0;
 		position: absolute;
 		right: $tabbar-height * 2;
@@ -300,7 +301,16 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 
 		&.open {
 			display: block;
+		}
 
+		// intro.js fix
+		&.introjs-fixParent {
+			overflow: visible;
+
+			#profile-options {
+				position: relative;
+				z-index: 1;
+			}
 		}
 
 		a {
@@ -484,6 +494,13 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 	}
 
+	#side-menu-mylinks h3 {
+		padding: 0;
+		a {
+			padding: 1rem;
+		}
+	}
+
 	h3 {
 		text-transform: $off-canvas-label-text-transform;
 	}
@@ -598,6 +615,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			.logo {
 				display: none;
 			}
+		}
+		.left-small {
+			display: none;
 		}
 	}
 }
