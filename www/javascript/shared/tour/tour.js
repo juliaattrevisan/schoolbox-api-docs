@@ -14,6 +14,10 @@ $(function () {
         // Close an accordion
         'accordion.close': function (element) {
             $(element).foundation('accordion', 'close');
+        },
+
+        'dropdown.open': function (element) {
+            $(element).addClass('open');
         }
     };
 
