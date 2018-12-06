@@ -114,11 +114,6 @@ class Mapper extends BaseMapper
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            // The record must have a user, role or group specified
-            if (empty($row['u.id']) && empty($row['r.id']) && empty($row['g.id'])) {
-                continue;
-            }
-
             $access = $this->hydrate($row);
 
             if (!empty($row['st.id'])) {
