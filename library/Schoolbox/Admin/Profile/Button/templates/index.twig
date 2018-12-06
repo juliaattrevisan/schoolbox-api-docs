@@ -34,8 +34,24 @@
                                         <a>
                                             <div class="icon-{{ item.icon }} size-32"></div>
                                             <h3>{{ item.text }}</h3>
-                                            <p class="meta">{{ item.title }}</p>
                                         </a>
+
+                                        <p class="meta">
+                                            Shown for:
+                                            {% for role in roles %}
+                                                {% if rolesSelected[item.id][role.id] %}
+                                                    {{ role.name }}{% if loop.index < (rolesSelected[item.id] | length) - 1 %}, {% elseif loop.index == (rolesSelected[item.id] | length) - 1 %} and {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+
+                                            in
+                                            {% for campus in campuses %}
+                                                {% if campusesSelected[item.id][campus.id] %}
+                                                    {{ campus.name }}{% if loop.index < (campusesSelected[item.id] | length) - 1 %}, {% elseif loop.index == (campusesSelected[item.id] | length) - 1 %} and {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            campus
+                                        </p>
                                     </div>
                                 </div>
                                 <nav>
