@@ -118,7 +118,8 @@ class Mapper extends BaseMapper
 
             if (!empty($row['st.id'])) {
                 $access->setSubtype($subTypeMapper->hydrate($row, 'st'));
-            } else {
+            }
+            if (!empty($row['t.id'])) {
                 $access->setType($typeMapper->hydrate($row, 't'));
             }
 
