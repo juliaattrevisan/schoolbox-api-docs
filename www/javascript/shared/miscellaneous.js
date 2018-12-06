@@ -47,13 +47,13 @@ $(function () {
         $('[data-inner-offcanvas]').toggleClass('right-open');
         $(this).toggleClass('raquo');
 
+        var notificationState;
         if ($('[data-inner-offcanvas]').hasClass('right-open')){
-            $.post('/ajax/notificationsTray', {state: 'show'}, function(responseText) {
-            });
+            notificationState = 'show';
         } else {
-            $.post('/ajax/notificationsTray', {state: 'hide'}, function(responseText) {
-            });
+            notificationState = 'hide';
         }
+        $.post('/ajax/notificationsTray', {state: notificationState}, function(responseText) { });
     });
 
     /* Left menu toggle
@@ -69,11 +69,13 @@ $(function () {
         }
         $(this).attr('title', title);
 
+        var leftnavState;
         if ($('[data-inner-offcanvas]').hasClass('left-open')){
-            $.post('/ajax/sidenav', {state: 'show'});
+            leftnavState = 'show';
         } else {
-            $.post('/ajax/sidenav', {state: 'hide'});
+            leftnavState = 'hide';
         }
+        $.post('/ajax/sidenav', {state: leftnavState});
     });
 
     /* Open / Close account menu
