@@ -65,14 +65,14 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Deletes any pastoral audiences for this subType
+     * Deletes any pastoral audiences for this Type
      *
-     * @param Model $subType
+     * @param Model $type
      * @return bool
      */
-    protected function deletePastoralAudiences(Model $subType): bool
+    protected function deletePastoralAudiences(Model $type): bool
     {
-        Pastoral\Audience\Mapper::getInstance()->deleteByColumn('subtype_id', $subType->getId());
+        Pastoral\Audience\Mapper::getInstance()->deleteByColumn('type_id', $type->getId());
         return true;
     }
 }
