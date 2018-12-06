@@ -499,7 +499,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         $config,
                         $session->getAuthUser(),
                         new UnreadRetriever($redis),
-                        $_SERVER
+                        $_SERVER,
+                        INSTANCE_ID
                     )
                 )
                 ->addDataGenerator(

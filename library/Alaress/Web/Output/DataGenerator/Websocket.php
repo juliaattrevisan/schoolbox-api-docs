@@ -44,23 +44,32 @@ class Websocket implements IDataGenerator
 
 
     /**
+     * @var string
+     */
+    private $instanceId;
+
+
+    /**
      * Constructor
      *
      * @param IConfigLoader   $config
      * @param UserModel       $currentUser
      * @param UnreadRetriever $unreadRetriever
      * @param array           $serverVars
+     * @param string          $instanceId
      */
     public function __construct(
         IConfigLoader $config,
         UserModel $currentUser,
         UnreadRetriever $unreadRetriever,
-        array $serverVars
+        array $serverVars,
+        string $instanceId
     ) {
         $this->config          = $config;
         $this->currentUser     = $currentUser;
         $this->unreadRetriever = $unreadRetriever;
         $this->serverVars      = $serverVars;
+        $this->instanceId      = $instanceId;
     }
 
 
@@ -69,7 +78,7 @@ class Websocket implements IDataGenerator
      */
     public function generate(?array $chromeData = []): array
     {
-        $unread = $this->unreadRetriever->getUnread(INSTANCE_ID, $this->currentUser->getId());
+        $unread = $this->unreadRetriever->getUnread($this->instanceId, $this->currentUser->getId());
         $bundle = new NotificationBundle();
         $bundle->appendInstances($unread);
         return [
