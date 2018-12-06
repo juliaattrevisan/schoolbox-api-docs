@@ -120,7 +120,10 @@
                     $(this).confirmDialog({
                         text: 'Are you sure you wish to remove the pastoral roles visibility record?',
                         confirmEvent: function () {
-                            window.rolesAdded[roleId] = false;
+                            // Remove from window.rolesAdded
+                            var index = window.rolesAdded.indexOf(roleId);
+                            window.rolesAdded.splice(index);
+
                             row.remove();
                             updateRolesModal();
                             updateVisibility();
@@ -141,7 +144,7 @@
                         var roleId = $(this).attr('data-role-id');
 
                         if (roleId !== '{ID}') {
-                            if (window.rolesAdded[roleId] === true) {
+                            if (window.rolesAdded.indexOf(roleId) !== -1) {
                                 $("[data-role-add=" + roleId + "]").addClass('hide');
                             } else {
                                 $("[data-role-add=" + roleId + "]").removeClass('hide');
@@ -162,14 +165,14 @@
             {# Add role to table #}
 
             window.addRole = function(roleId, roleName, permission = 1) {
-                if (window.rolesAdded[roleId] !== true) {
+                if (window.rolesAdded.indexOf(roleId) === -1) {
                     $('#empty-roles').remove();
 
                     html = $('[data-role-permission-clone]').html()
                         .replace(/{NAME}/g, roleName)
                         .replace(/{ID}/g, roleId);
 
-                    window.rolesAdded[roleId] = true;
+                    window.rolesAdded.push(roleId);
 
                     var permissionListRoles = $('#permission-roles');
                     permissionListRoles.html(permissionListRoles.html() + html);
@@ -212,7 +215,7 @@
             window.rolesAdded = [];
 
             {% for userAccess in record.access if userAccess.role.id != '' %}
-                window.rolesAdded[{{ userAccess.role.id }}] = true;
+                window.rolesAdded.push({{ userAccess.role.id }});
             {% endfor %}
 
             updateRolePermissionsClick();

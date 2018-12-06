@@ -130,9 +130,13 @@
                     $("#permission-users tr").remove();
                     $("#permission-groups tr").remove();
 
+                    // Reset roles, users and groups to empty, they will updated below
                     window.rolesAdded = [];
                     window.usersAdded = [];
                     window.groupsAdded = [];
+                    $('[data-role-add]').removeClass('hide');
+                    $('[data-group-add]').removeClass('hide');
+                    $("[data-reveal-id='modal-role']").removeAttr('disabled');
 
                     var typeId = $("#typeId").val();
                     var subtypeId = $("#subtypeId").val();
