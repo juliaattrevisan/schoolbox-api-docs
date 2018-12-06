@@ -25,7 +25,7 @@ class Model implements ISoftDeletable
     use UpdatedAtDate;
     use DeletedAtDate;
 
-    /** @var User */
+    /** @var null|User */
     private $user;
 
     /** @var null|PastoralGroup */
