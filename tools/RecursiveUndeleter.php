@@ -248,10 +248,10 @@ class RecursiveUndeleter
             Pastoral\Group\Member\Mapper::class => 'group_id',
         ],
         Pastoral\Type\Mapper::class     => [
-            Pastoral\Audience\Mapper::class => [],
+            Pastoral\Audience\Mapper::class => 'type_id',
         ],
         Pastoral\SubType\Mapper::class  => [
-            Pastoral\Audience\Mapper::class => [],
+            Pastoral\Audience\Mapper::class => 'subtype_id',
         ],
         Pastoral\Access\Mapper::class   => [],
         Pastoral\Audience\Mapper::class => [],
