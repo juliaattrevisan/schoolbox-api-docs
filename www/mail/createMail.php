@@ -25,7 +25,7 @@ if (Cfg::get('mail_enable') == 1) {
 
     foreach ($addressLists as $type => $request) {
         if (null !== $_REQUEST[$type]) {
-            $emailAddresses = Mailer::parseAddressString(Mailer::standardiseEmailSeparator($_REQUEST[$type]), false);
+            $emailAddresses = Mailer::parseAddressString($_REQUEST[$type], false);
             if(!empty($emailAddresses['valid'])) {
                 foreach ($emailAddresses['valid'] as $email => $name) {
                     $addressLists[$type][] = Mailer::buildAddress($email, $name);
@@ -37,6 +37,7 @@ if (Cfg::get('mail_enable') == 1) {
                 $_SESSION['user']->getFullName()
             );
         }
+
         $invalidEmails[] = $emailAddresses['invalid'];
     }
 
@@ -44,7 +45,8 @@ if (Cfg::get('mail_enable') == 1) {
     $page->setTitle('Webmail');
     $page->setTab('webmail');
 
-    $invalidEmails = array_reduce(array_filter($invalidEmails), 'array_merge', []);
+    // Uniquify invalid email result
+    $invalidEmails = array_unique(array_reduce(array_filter($invalidEmails), 'array_merge', []));
 
     $page->setBlock(TEMPLATE_content, 'alert_box', 'alert_box_block');
 

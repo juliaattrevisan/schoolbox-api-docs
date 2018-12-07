@@ -8,6 +8,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Alaress\Mail\AbstractMailer;
+
 require_once('../../../../library/Bootstrap.php');
 
 /* avviare la sessione con il solito sitepage
@@ -45,4 +48,4 @@ if ($allStudents && count($allParents)) {
 $emailString = array_filter(array_unique($emailString));
 
 header('Content-Type: application/json');
-echo json_encode($emailString);
+echo json_encode([implode(AbstractMailer::implodeGlue(), $emailString)]);
