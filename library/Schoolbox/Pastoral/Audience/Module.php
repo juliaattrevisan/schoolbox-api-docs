@@ -7,8 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Audience;
 
-use Alaress\Authorizer\Failure\InvalidPath;
-use Alaress\Authorizer\Failure\Unauthenticated;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Module as AlaressModule;
 use Alaress\Web\Router\PathMatcher;
@@ -20,7 +19,6 @@ use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
 use InvalidArgumentException;
 use Alaress\Authorizer\Rule;
-use Schoolbox\User;
 
 class Module extends AlaressModule\Module
 {
@@ -46,7 +44,7 @@ class Module extends AlaressModule\Module
                     /** @var Pastoral\Type\Model $type */
                     $type = $params['type'];
                     if ($type->getSubTypes()->count()) {
-                        throw new Unauthenticated('Cannot set default audience rules for a PastoralType than has SubTypes');
+                        throw new Unauthorized('Cannot set default audience rules for a PastoralType than has SubTypes');
                     }
                 })
             );
