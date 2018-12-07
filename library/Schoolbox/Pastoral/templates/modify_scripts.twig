@@ -121,7 +121,7 @@
         });
 
         function loadAudience() {
-            //Only load the audience defaults if this is a new record
+            // Only load the audience defaults if the record does not yet have any access rules
             {% if record.access | length < 1 %}
                 //Only change between defaults if no other changes have been made
                 if(window.hasChanged == false) {
