@@ -13,7 +13,6 @@ use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
-use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\UserMapper;
 
@@ -107,8 +106,6 @@ class Controller extends Base
         $post = $this->getRequest()->post;
 
         $memberIds = explode(",", $post['members']);
-
-        /** @var PastoralGroup $group */
 
         if (empty($post['id'])) {
             // Creating new group

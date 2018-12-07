@@ -84,7 +84,6 @@ class Mapper extends BaseMapper
             if ($subType) {
                 $model->getSubTypes()[$subType->getId()] = $subType;
             }
-
         }
         return $collection;
     }

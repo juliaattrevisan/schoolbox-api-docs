@@ -15,7 +15,6 @@ use Schoolbox\Pastoral\SubType\Mapper as SubTypeMapper;
 use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
-use Schoolbox\Pastoral;
 use UnexpectedValueException;
 use InvalidArgumentException;
 
@@ -32,11 +31,6 @@ use InvalidArgumentException;
  */
 class Mapper extends BaseMapper
 {
-    // Define record access levels
-    private const ACCESS_DENY    = Pastoral\Access\Mapper::ACCESS_DENY;     // Deny trumps all other access to allow exclusion of a user/group/role
-    private const ACCESS_PUBLIC  = Pastoral\Access\Mapper::ACCESS_PUBLIC;
-    private const ACCESS_PRIVATE = Pastoral\Access\Mapper::ACCESS_PRIVATE;
-
 
     /**
      * Setup mapper
