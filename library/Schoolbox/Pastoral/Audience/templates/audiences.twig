@@ -1,3 +1,7 @@
+{#
+    Data:
+        types       GenericCollection|Pastoral\Type\Model[]
+#}
 {% import '@pastoral/macros/profile.twig' as profile %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -29,17 +33,19 @@
                         <li class="actions-small-2">
                             <div class="list-item">
                                 <div class="card small-12 actions-1">
-                                    <a href={{ routeLookupIfAuthorized('pastoralAudience.getAudiencesTypeModify', {type: type, typeId: type.id}) }}>{{ type.name }}</a>
+                                    {% set route = routeLookupIfAuthorized('pastoralAudience.getAudiencesTypeModify', {type: type, typeId: type.id}) %}
+                                    {% if route %}<a href="{{ route }}">{{ type.name }}</a>{% else %}{{ type.name }}{% endif %}
                                 </div>
                             </div>
                         </li>
-                        {% for subtype in subtypes %}
+                        {% for subtype in type.subTypes %}
                             {% if subtype.pastoralType.Id == type.id %}
                                 <li class="actions-small-2">
                                     <div class="list-item">
                                         <div class="card small-12">
-                                            <a href={{ routeLookupIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', {subtype: subtype, subtypeId: subtype.id}) }}>
-                                            {{ type.name }} : {{ subtype.name }}</a>
+                                            {% set route = routeLookupIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', {subtype: subtype, subtypeId: subtype.id}) %}
+                                            {% set label = type.name ~ ' : ' ~ subtype.name %}
+                                            {% if route %}<a href={{ route }}>{{ label }}</a>{% else %}{{ label }}{% endif %}
                                         </div>
                                     </div>
                                 </li>

@@ -7,6 +7,8 @@
 
 namespace Schoolbox\Pastoral\Type;
 
+use PDOStatement;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
@@ -32,10 +34,61 @@ class Mapper extends BaseMapper
         $this->uses('external_code', self::TYPE_STRING);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->joinsReverseMulti('pastoral_type_id', Pastoral\SubType\Mapper::class, 'subTypes', 'subTypes');
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
     }
+
+
+    /**
+     * @return string
+     * @throws BaseMapper\DefinitionException
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT      {$this->getColumnString()},
+                        {$this->getJoinColumnString('subTypes', 'st')}
+            FROM        {$this->getTable()}
+            LEFT JOIN   {$this->getJoinSql('subTypes', '', 'st')}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        $collection = $this->createCollection();
+
+        /** @var Pastoral\SubType\Mapper $subTypeMapper */
+        $subTypeMapper = $this->getJoinMapper('subTypes');
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $modelId = $row[$this->getIdentifierColumn()];
+
+            if ($collection->keyExists($modelId)) {
+                $model = $collection[$modelId];
+            } else {
+                $model                = $this->hydrate($row);
+                $collection[$modelId] = $model;
+            }
+
+            $subType = $subTypeMapper->hydrate($row, 'st');
+            if ($subType) {
+                $model->getSubTypes()[$subType->getId()] = $subType;
+            }
+
+        }
+        return $collection;
+    }
+
 
     /**
      * Pre-soft-delete callback to ensure there are no

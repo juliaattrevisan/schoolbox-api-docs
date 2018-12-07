@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Audience;
 
+use Alaress\Authorizer\Failure\InvalidPath;
+use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Module as AlaressModule;
 use Alaress\Web\Router\PathMatcher;
@@ -17,6 +19,8 @@ use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
 use InvalidArgumentException;
+use Alaress\Authorizer\Rule;
+use Schoolbox\User;
 
 class Module extends AlaressModule\Module
 {
@@ -27,16 +31,35 @@ class Module extends AlaressModule\Module
      */
     protected function registerRoutes(): void
     {
-        $loggedInAndPastoralWritePerm = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE);
+        $loggedInAndPastoralWritePerm = new Rule\LazyCallback(function () {
+            return new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE);
+        });
+
+        // Don't permit creation of default audience for a PastoralType if it has SubTypes
+        $pastoralWriteAndTypeHasSubTypes = new Rule\LazyCallback(function () use ($loggedInAndPastoralWritePerm) {
+            return new Rule\All(
+                $loggedInAndPastoralWritePerm,
+                new Rule\Callback(function (array $params = []) {
+                    if (!\array_key_exists('type', $params)) {
+                        throw new InvalidArgumentException("No 'type' found in route params");
+                    }
+                    /** @var Pastoral\Type\Model $type */
+                    $type = $params['type'];
+                    if ($type->getSubTypes()->count()) {
+                        throw new Unauthenticated('Cannot set default audience rules for a PastoralType than has SubTypes');
+                    }
+                })
+            );
+        });
 
         $this->registerRoutesArray([
             'GET'  => [
                 ''                            => ['getAudiences'              => $loggedInAndPastoralWritePerm],
-                '/type/{typeId}/modify'       => ['getAudiencesTypeModify'    => $loggedInAndPastoralWritePerm],
+                '/type/{typeId}/modify'       => ['getAudiencesTypeModify'    => $pastoralWriteAndTypeHasSubTypes],
                 '/subtype/{subtypeId}/modify' => ['getAudiencesSubTypeModify' => $loggedInAndPastoralWritePerm],
             ],
             'POST' => [
-                '/type/{typeId}/modify'       => ['postAudienceTypeModify'    => $loggedInAndPastoralWritePerm],
+                '/type/{typeId}/modify'       => ['postAudienceTypeModify'    => $pastoralWriteAndTypeHasSubTypes],
                 '/subtype/{subtypeId}/modify' => ['postAudienceSubTypeModify' => $loggedInAndPastoralWritePerm],
             ],
         ]);
@@ -55,7 +78,6 @@ class Module extends AlaressModule\Module
             'pastoralAudienceMapper' => $this->getMapperFactory()->getLazy(Pastoral\Audience\Mapper::class),
             'roleMapper'             => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'pastoralTypeMapper'     => $this->getMapperFactory()->getLazy(Pastoral\Type\Mapper::class),
-            'pastoralSubTypeMapper'  => $this->getMapperFactory()->getLazy(Pastoral\SubType\Mapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));

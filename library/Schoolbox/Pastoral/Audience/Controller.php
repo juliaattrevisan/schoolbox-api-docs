@@ -34,9 +34,6 @@ class Controller extends Base
     /** @var Pastoral\Type\Mapper */
     private $pastoralTypeMapper;
 
-    /** @var Pastoral\SubType\Mapper */
-    private $pastoralSubTypeMapper;
-
 
     /**
      * Constructor
@@ -46,22 +43,19 @@ class Controller extends Base
      * @param Mapper                  $pastoralAudienceMapper
      * @param RoleMapper              $roleMapper
      * @param Pastoral\Type\Mapper    $pastoralTypeMapper
-     * @param Pastoral\SubType\Mapper $pastoralSubTypeMapper
      */
     public function __construct(
         UserMapper $userMapper,
         Pastoral\Group\Mapper $pastoralGroupMapper,
         Mapper $pastoralAudienceMapper,
         RoleMapper $roleMapper,
-        Pastoral\Type\Mapper $pastoralTypeMapper,
-        Pastoral\SubType\Mapper $pastoralSubTypeMapper
+        Pastoral\Type\Mapper $pastoralTypeMapper
     ) {
         $this->userMapper             = $userMapper;
         $this->pastoralGroupMapper    = $pastoralGroupMapper;
         $this->pastoralAudienceMapper = $pastoralAudienceMapper;
         $this->roleMapper             = $roleMapper;
         $this->pastoralTypeMapper     = $pastoralTypeMapper;
-        $this->pastoralSubTypeMapper  = $pastoralSubTypeMapper;
     }
 
 
@@ -77,7 +71,6 @@ class Controller extends Base
             'template' => '@pastoralAudience/audiences.twig',
             'data'     => [
                 'types'    => $this->pastoralTypeMapper->findAll(),
-                'subtypes' => $this->pastoralSubTypeMapper->findAll(),
             ],
             'title'    => 'Pastoral Group Management',
         ]);
