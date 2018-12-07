@@ -57,11 +57,10 @@
         {% else %}
             <div class="empty-state">
                 <i class="icon-group"></i>
-                <p>No {{ locale.pastoral }} groups have been created.</p>
-                {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
-                    <p>{{ locale.pastoral.proper }} groups can be used to dynamically audience {{ locale.pastoral }}
-                        records. Do you want to <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}">create
-                            a {{ locale.pastoral }} group</a>?</p>
+                <p>No {{ locale.pastoral.proper }} Types have been created.</p>
+                {% set route = routeLookupIfAuthorized('adminLists.getIndex', {table: 'pastoral-type'}) %}
+                {% if route %}
+                    <p>Configure <a href="{{ route }}">{{ locale.pastoral.proper }} Types</a></p>
                 {% endif %}
             </div>
         {% endif %}
