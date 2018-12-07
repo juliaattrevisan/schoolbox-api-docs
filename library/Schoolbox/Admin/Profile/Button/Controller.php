@@ -203,8 +203,8 @@ class Controller extends Base
      */
     public function postDelete(): void
     {
+        $post = $this->getRequest()->post;
         if (!empty($post['id'])) {
-            $post = $this->getRequest()->post;
             $this->profileButtonMapper->deleteByColumn("id", $post["id"]);
         }
     }
