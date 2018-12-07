@@ -11,9 +11,7 @@ Data:
 
 <p class="meta">Academic Achievement Matrix</p>
 {% if error|default(null) %}
-    <div class="empty-state">
-        <p>{{ error }}</p>
-    </div>
+    <div data-alert class="alert-box alert">{{ error }}</div>
 {% else %}
     <table>
         <thead>
