@@ -324,7 +324,9 @@ class Controller extends Web\Controller\Base
             $this->visibility,
             $this->getUser(),
             $aamWorkTypeId,
-            $this->rubricMapper
+            $this->rubricMapper,
+            $this->getAuthorizer(),
+            $this->getRouter()
         );
 
         return $aam->toContext();

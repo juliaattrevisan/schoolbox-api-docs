@@ -32,6 +32,12 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
+     * @return string
+     */
+    public static function getDefaultTypeName(): string;
+
+
+    /**
      * Returns this IAssessable if this IAssessable is not inside a project,
      * otherwise returns this IAssessable's root project.
      *

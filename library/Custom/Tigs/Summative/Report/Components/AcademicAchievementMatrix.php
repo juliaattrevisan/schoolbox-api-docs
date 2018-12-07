@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\Report\Components;
 
+use Alaress\Authorizer\Authorizer;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
@@ -17,6 +18,7 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DueWork;
+use Aura\Router;
 
 /**
  * Builds a suitable data structure for rendering the AAM components
@@ -42,6 +44,12 @@ class AcademicAchievementMatrix
     /** @var RubricMapper */
     private $rubricMapper;
 
+    /** @var Authorizer */
+    private $authorizer;
+
+    /** @var Router\Router */
+    private $router;
+
 
     /**
      * @param GenericCollection $unitImpls
@@ -50,6 +58,8 @@ class AcademicAchievementMatrix
      * @param User              $viewer
      * @param int               $aamWorkTypeId
      * @param RubricMapper      $rubricMapper
+     * @param Authorizer        $authorizer
+     * @param Router\Router     $router
      */
     public function __construct(
         GenericCollection $unitImpls,
@@ -57,7 +67,9 @@ class AcademicAchievementMatrix
         Visibility $visibility,
         User $viewer,
         int $aamWorkTypeId,
-        RubricMapper $rubricMapper
+        RubricMapper $rubricMapper,
+        Authorizer $authorizer,
+        Router\Router $router
     ) {
         $this->unitImpls     = $unitImpls;
         $this->student       = $student;
@@ -65,6 +77,8 @@ class AcademicAchievementMatrix
         $this->viewer        = $viewer;
         $this->aamWorkTypeId = $aamWorkTypeId;
         $this->rubricMapper  = $rubricMapper;
+        $this->authorizer    = $authorizer;
+        $this->router        = $router;
     }
 
 
@@ -76,10 +90,11 @@ class AcademicAchievementMatrix
      * * if invalid data found, returns an error message to aid resolution
      *
      * @return array
-     * @var string     $data['data'][unitImplId]['error']      Optional. If cannot build due to invalid data
-     * @var Grid       $data['data'][unitImplId]['grid']       Optional. If a valid AAM rubric is found for the unit
-     * @var MarkedGrid $data['data'][unitImplId]['markedGrid'] Optional. If student has visible marks for the rubric
+     * @var string     $data ['data'][unitImplId]['error']      Optional. If cannot build due to invalid data
+     * @var Grid       $data ['data'][unitImplId]['grid']       Optional. If a valid AAM rubric is found for the unit
+     * @var MarkedGrid $data ['data'][unitImplId]['markedGrid'] Optional. If student has visible marks for the rubric
      * @throws \Schoolbox\Mapper\Exception
+     * @throws Router\Exception\RouteNotFound
      */
     public function toContext(): array
     {
@@ -101,6 +116,7 @@ class AcademicAchievementMatrix
      * @param UnitImpl\Model $unitImpl
      * @return array|null
      * @throws \Schoolbox\Mapper\Exception
+     * @throws Router\Exception\RouteNotFound
      */
     private function buildUnitData(UnitImpl\Model $unitImpl): ?array
     {
@@ -120,12 +136,32 @@ class AcademicAchievementMatrix
         /** @var IAssessable $assessment */
         $assessment = \reset($aamAssessables);
 
+        // Not a Due Work?
         if (!$assessment instanceof DueWork\Model) {
-            return ['error' => "Only DueWork assessables can be used for the Academic Achievement Matrix. Found: {$assessment->getTypeName()}"];
+            $requiredType = DueWork\Model::getDefaultTypeName();
+            $msg          = \sprintf('Only %ss can have rubrics.', $requiredType);
+            $routeName    = 'learningAssessment.getAssessment';
+            $routeParams  = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
+            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->viewer)) {
+                $route      = $this->router->generate($routeName, $routeParams);
+                $actualType = $assessment::getDefaultTypeName();
+                $title      = $assessment->getTitle();
+                $msg        .= \sprintf(' Found: %s - <a href="%s">%s</a>', $actualType, $route, $title);
+            }
+            return ['error' => $msg];
         }
 
+        // No Rubric?
         if (!$assessment->getUseRubric()) {
-            return ['error' => "Assessment {$assessment->getId()} has a AAM work-type but does not have a rubric grid"];
+            $routeName   = 'learningAssessment.getAssessment';
+            $routeParams = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
+            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->viewer)) {
+                $route = $this->router->generate($routeName, $routeParams);
+                $title = \sprintf('<a href="%s">%s</a>', $route, $assessment->getTitle());
+            } else {
+                $title = $assessment->getTitle();
+            }
+            return ['error' => "DueWork {$title} has a AAM/ATL work-type but does not have a rubric grid"];
         }
 
         // Did we find an assessment, but it shouldn't be visible to the current viewer?
