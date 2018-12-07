@@ -78,16 +78,25 @@ class Websocket implements IDataGenerator
      */
     public function generate(?array $chromeData = []): array
     {
-        $unread = $this->unreadRetriever->getUnread($this->instanceId, $this->currentUser->getId());
-        $bundle = new NotificationBundle();
-        $bundle->appendInstances($unread);
+        $userId = $this->currentUser->getId();
+        if ($userId) {
+            $unread = $this->unreadRetriever->getUnread($this->instanceId, $userId);
+            $bundle = new NotificationBundle();
+            $bundle->appendInstances($unread);
+
+            $enabled     = $this->config->get('messaging_enabled');
+            $unreadCount = $bundle->count();
+        } else {
+            $enabled     = false;
+            $unreadCount = 0;
+        }
         return [
-            'enabled'    => $this->config->get('messaging_enabled'),
+            'enabled'    => $enabled,
             'host'       => $this->serverVars['HTTP_HOST'] ?? '',
             'port'       => $this->config->get('websocket_port_ssl') ?: 8081,
             'path'       => $this->config->get('websocket_path') ?: '/',
             'secure'     => true,
-            'unread'     => $bundle->count(),
+            'unread'     => $unreadCount,
             'stackLimit' => \Schoolbox\Realtime\Notification\Decorator::STACK_LIMIT,
         ];
     }
