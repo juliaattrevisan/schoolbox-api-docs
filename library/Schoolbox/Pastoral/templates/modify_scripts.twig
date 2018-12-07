@@ -123,6 +123,7 @@
         function loadAudience() {
             // Only load the audience defaults if the record does not yet have any access rules
             {% if record.access | length < 1 %}
+                {% set noSubTypeVal = 0 %}
                 //Only change between defaults if no other changes have been made
                 if(window.hasChanged == false) {
                     //Remove all other rows
@@ -140,12 +141,16 @@
 
                     var typeId = $("#typeId").val();
                     var subtypeId = $("#subtypeId").val();
+                    if(!subtypeId){
+                        // Cast null (no selection) to '0' string
+                        subtypeId = '{{ noSubTypeVal }}';
+                    }
 
                     {% for audience in audiences %}
                         {% set subtype = audience.subtype %}
                         {% set type    = subtype is null ? audience.type : subtype.pastoralType %}
 
-                        if ('{{ type.id }}' === typeId && '{{ subtype.id }}' === subtypeId) {
+                        if ('{{ type.id }}' === typeId && '{{ subtype.id|default(noSubTypeVal) }}' === subtypeId) {
                             {% if audience.group.id %}
                             window.addGroup("{{ audience.group.id }}", "{{ audience.group.name }}", "{{ audience.access }}");
                             {% elseif audience.role.id %}
