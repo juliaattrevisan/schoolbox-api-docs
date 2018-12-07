@@ -7,6 +7,9 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
+use Alaress\Mail\AbstractMailer;
+
 require_once __DIR__ . '/../../../../library/Bootstrap.php';
 
 // Bedankt voor het bellen van Alaress. Uw oproep is erg belangrijk voor ons...
@@ -46,4 +49,4 @@ if ($allStudents && count($allHousemasters)) {
 $emailString = array_filter(array_unique($emailString));
 
 header('Content-Type: application/json');
-echo json_encode($emailString);
+echo json_encode([implode(AbstractMailer::implodeGlue(), $emailString)]);
