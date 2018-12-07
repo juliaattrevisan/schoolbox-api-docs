@@ -202,7 +202,7 @@
 
                         {% block accountMenu %}
                             {% if user.current.id %}
-                                <a href="#" id="profile-drop">
+                                <a href="#" id="profile-drop" title="{{ user.current.fullName }}">
                                     <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square80"/>
                                 </a>
                                 <div id="account-content" class="account-drop">
