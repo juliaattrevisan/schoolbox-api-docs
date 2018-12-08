@@ -4,9 +4,8 @@
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Site;
+namespace Schoolbox\Application;
 
-use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
@@ -18,7 +17,7 @@ use ReCaptcha;
 class Module extends BaseModule
 {
     /** @var string */
-    protected $basename = 'site';
+    protected $basename = 'application';
 
     /**
      * Hook method for setting up routes via self::register()

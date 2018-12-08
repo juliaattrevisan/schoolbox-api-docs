@@ -14,7 +14,7 @@ use Alaress\Application\Kernel;
 use Config\ModuleLoader;
 use Schoolbox;
 
-class Site extends ModuleLoader {
+class Application extends ModuleLoader {
 
     /**
      * Run configuration for the given module
@@ -24,7 +24,7 @@ class Site extends ModuleLoader {
      */
     public function configure($kernel)
     {
-        $this->loadModule($kernel, Schoolbox\Site\Module::class, '');
+        $this->loadModule($kernel, Schoolbox\Application\Module::class, '');
     }
 
 }

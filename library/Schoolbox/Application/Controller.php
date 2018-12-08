@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Site;
+namespace Schoolbox\Application;
 
 use Alaress\Web\Controller\Base;
 use ReCaptcha;
@@ -58,7 +58,8 @@ class Controller extends Base
             $data = ['recaptcha' => $this->reCaptcha->form()];
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@site/feedback.twig', $data)->setTitle($this->getConfigLoader()->get('feedback_text')));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@application/feedback.twig', $data)
+                                                ->setTitle($this->getConfigLoader()->get('feedback_text')));
     }
 
     /**
@@ -68,7 +69,8 @@ class Controller extends Base
      */
     public function getFeedbackReceipt()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@site/feedback-thankyou.twig', [])->setTitle('Message Delivered'));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@application/feedback-thankyou.twig', [])
+                                                ->setTitle('Message Delivered'));
     }
 
 
@@ -79,7 +81,7 @@ class Controller extends Base
      */
     public function getPolicy()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@site/policy.twig', []));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@application/policy.twig', []));
     }
 
     /**
@@ -147,7 +149,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@site/login.twig', $data));
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@application/login.twig', $data));
     }
 
 
