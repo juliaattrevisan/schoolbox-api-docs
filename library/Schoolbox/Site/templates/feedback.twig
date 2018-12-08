@@ -1,0 +1,59 @@
+<script src="/javascript/shared/feedback/validation.js"></script>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ config.feedback_text }}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <form id="feedbackForm" action="/emailForm.php" method="post" class="top">
+            <input type="hidden" name="template" value="feedback.html" />
+            <input type="hidden" name="confirmation" value="/feedback/thank-you" />
+
+            <h2 class="subheader">Enquiry</h2>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Your Name
+                            <input {{ USER.fullname is null ? '' : 'disabled' }} type="text" name="name" id="name" size="35" value="{{ USER.fullname }}" />
+                        </label>
+
+                        <label>
+                            Email
+                            <input type="email" name="email" id="email" size="35"  value="{{ USER.email }}" />
+                        </label>
+
+                        <label>
+                            Type of Enquiry
+                            <select name="subject" id="subject">
+                                <option></option>
+                                <option value="Technical Issue">Technical Issue</option>
+                                <option value="Support">Support</option>
+                                <option value="Enquiry">Enquiry</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Enquiry
+                            <textarea id="message" name="message" rows="10"></textarea>
+                        </label>
+
+                        {% if recaptcha %}
+                        <label>
+                            Human Checker
+                            <span class="hint has-tip tip-top" data-tooltip title="Please complete the check below so that we know you're not a bot.">?</span>
+                            {{ recaptcha | raw }}
+                        </label>
+                        {% endif %}
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Submit Enquiry"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

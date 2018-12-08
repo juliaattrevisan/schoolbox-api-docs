@@ -1,0 +1,1 @@
+UPDATE config SET value  = '/feedback' WHERE value = '/feedback.php' AND name = 'feedback_url';

@@ -74,7 +74,7 @@ if (validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.h
 if (preg_match("/^[a-zA-Z0-9\/\-\_]+/", $_POST['confirmation'])) {
     SitePage::localRedir($_POST['confirmation']);
 } else {
-    SitePage::localRedir('/thank-you');
+    SitePage::localRedir('/feedback/thank-you');
 }
 
 function checkSpamHeaders($text)
