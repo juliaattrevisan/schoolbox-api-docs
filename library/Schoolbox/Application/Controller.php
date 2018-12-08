@@ -11,11 +11,6 @@ use Alaress\Web\Controller\Base;
 use ReCaptcha;
 use Schoolbox\User;
 use Session;
-use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
-use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
-use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
-use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredException;
-
 
 class Controller extends Base
 {
@@ -50,7 +45,7 @@ class Controller extends Base
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getFeedback()
+    public function getFeedback() : void
     {
         $data = [];
         $authUser = $this->getSession()->getAuthUser();
@@ -91,7 +86,7 @@ class Controller extends Base
      * @param string|null $page
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getLogin($error = null, $page = null)
+    public function getLogin($error = null, $page = null) : void
     {
 
         $samlAuth = $this->getRequest()->query->get('samlAuth');
@@ -108,15 +103,15 @@ class Controller extends Base
         // don't show the login page, redirect to the SAML login page.
         // (unless ?samlLogin=0 is set)
         // (or the users IP exists in the blacklist
-        if ($this->getConfigLoader()->get('saml_enabled') == '1'
-            && (strlen($this->getConfigLoader()->get('saml_sso_url')) || strlen($this->getConfigLoader()->get('saml_idp_metadata_url')))
+        if ($this->getConfigLoader()->get('saml_enabled') === '1'
+            && ($this->getConfigLoader()->get('saml_sso_url') !== '' || $this->getConfigLoader()->get('saml_idp_metadata_url') !== '')
             && $samlAuth !== '0'
             && (!$this->samlBlacklist() || $samlAuth === '1' )) {
             $redirectUrl = '/saml/index.php';
             if (isset($_GET['page'])) {
                 $redirectUrl .= '?page=' . urlencode($page);
             }
-            $this->localRedir($redirectUrl);
+            $this->getResponse()->redirect->to($redirectUrl,303);
         }
 
         $getParams = ['page'=>$page,'samlAuth'=>$samlAuth];
@@ -153,7 +148,7 @@ class Controller extends Base
     }
 
 
-    public function postLogin() {
+    public function postLogin() : void {
         $username = trim($this->getRequest()->post['username']);
         $password = $this->getRequest()->post['password'];
         $page = $this->getRequest()->post['page'];
@@ -168,7 +163,7 @@ class Controller extends Base
                 $message =
                     'You have attempted more than ' .
                     $this->getConfigLoader()->get('login_allowed') . ' logins in ' .
-                    $this->getConfigLoader()->get('login_grace') . ' seconds.<br>'.
+                    $this->getConfigLoader()->get('login_grace') . ' seconds. '.
                     'Please try again in a short while.'
                 ;
             } elseif ($tandc && strlen($this->getConfigLoader()->get('login_terms_and_conditions')) ) {
@@ -184,16 +179,16 @@ class Controller extends Base
                         $message = 'The username or password you typed is incorrect, please try again.';
                     }
                 }
-                catch (SchoolboxNotFoundException $e) {
+                catch (Exception\NotFound $e) {
                     $message = 'The username or password you typed is incorrect, please try again.';
                 }
-                catch (SchoolboxAccountDisabledException $e) {
+                catch (Exception\AccountDisabled $e) {
                     $message = 'This account is currently disabled.';
                 }
-                catch (SchoolboxAccessDeniedException $e) {
+                catch (Exception\AccessDenied $e) {
                     $message = 'The username or password you typed is incorrect, please try again.';
                 }
-                catch (SchoolboxPasswordExpiredException $e) {
+                catch (Exception\PasswordExpired $e) {
                     $message = $e->getMessage();
                 }
                 if ($authenticated) {
@@ -231,11 +226,11 @@ class Controller extends Base
      * Check if the users IP exists in the SAML blacklist.
      * @return bool
      */
-    private function samlBlacklist()
+    private function samlBlacklist() : bool
     {
         $ipBlacklist = $this->getConfigLoader()->get('saml_ip_blacklist');
         foreach (explode(',', $ipBlacklist) as $ip) {
-            if ($ip == Session::getIP()) {
+            if ($ip === Session::getIP()) {
                 return true;
             }
         }
