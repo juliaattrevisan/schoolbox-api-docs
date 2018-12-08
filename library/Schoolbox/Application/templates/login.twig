@@ -54,11 +54,7 @@ $(function() {
             'custom_map': {
                 'dimension1': 'site_school_code',
                 'dimension2': 'site_type',
-                'dimension3': 'role_name',
-                'dimension4': 'role_type',
-                'dimension5': 'user_year',
                 'dimension6': 'site_version',
-                'dimension7': 'impersonated'
             }
         });
 
@@ -67,18 +63,6 @@ $(function() {
         gtag('event', 'site_type_dimension', {'site_type': '{{ config.site_type }}'});
         gtag('event', 'site_version_dimension', {'site_version': '{{ config.site_version }}'});
 
-        if (schoolboxUser.id) {
-            gtag('event', 'role_name_dimension', {'role_name': schoolboxUser.role.name });
-            gtag('event', 'role_type_dimension', {'role_type': schoolboxUser.role.type });
-
-            if (schoolboxUser.role.student) {
-                gtag('event', 'user_year_dimension', {'user_year': schoolboxUser.year});
-            }
-
-            if (schoolboxUser.impersonated) {
-                gtag('event', 'impersonated_dimension', {'impersonated': 1});
-            }
-        }
     </script>
     {% endautoescape %}
 
