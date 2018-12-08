@@ -24,7 +24,6 @@
 <link rel="apple-touch-icon" sizes="152x152" href="/images/logo.php?logo=skin_logo_square&size=apple152">
 <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.php?logo=skin_logo_square&size=apple180">
 <link rel="Shortcut Icon" href="/images/logo.php?logo=skin_logo_square&size=favicon" type="image/x-icon" />
-
 <link rel="stylesheet" type="text/css" href="/css/{{ config.site_location }}/chrome-foundation.css?v={{ config.site_version }}" />
 <style type="text/css">
     body.login {
@@ -96,11 +95,9 @@ $(function() {
                         <img src="/images/logo.php?logo=skin_logo_login&size=normal" alt="{{ config.title }}" />
                     </div>
                 </div>
-                {% if error != '' %}
                 <div class="small-12 column">
                     <p id="error-msg" class="alert-box alert">{{ error }}</p>
                 </div>
-                {% endif %}
                 <div class="small-12 column">
                     <input type="text" name="username" id="username" placeholder="Username" />
                 </div>
@@ -119,7 +116,7 @@ $(function() {
                            type="checkbox"
                            title="{{ config.login_terms_and_conditions_error }}" />
                     <label for="tandc" class="tandc">
-                        {{ config.login_terms_and_conditions }}
+                        {{ config.login_terms_and_conditions|purify }}
                     </label>
                 </div>
                 {% endif %}
@@ -179,6 +176,7 @@ $(function() {
 
         // Validation of terms and conditions
         l.alaressValidate({
+            ignoreTitle: false,
             submitHandler: function(form) {
                 form.submit();
                 l.find('input[type=submit]').prop('disabled', true);
@@ -186,6 +184,7 @@ $(function() {
             errorPlacement: function(error, element) {
                 if (element.attr("name") == "tandc") {
                     error.appendTo("#error-msg");
+
                 } else {
                     error.appendTo(element);
                 }
