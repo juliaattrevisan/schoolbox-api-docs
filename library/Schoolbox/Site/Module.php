@@ -32,7 +32,9 @@ class Module extends BaseModule
         $this->register('GET', '/feedback/thank-you', 'getFeedbackReceipt', null, null);
 
         $this->register('GET', '/policy', 'getPolicy', null, null);
-        //$this->register('GET', '/login', 'getLogin', null, null);
+        $this->register('GET', '/login', 'getLogin', null, null);
+        $this->register('POST', '/login', 'postLogin', null, null);
+
     }
 
     /**
