@@ -449,7 +449,7 @@
                 <div id="footer" class="clearfix">
                     <ul>
                         <li>{{ NOW.year }} &copy; Copyright <a href="{{ config.school_address }}">{{ config.school_name }}</a></li>
-                        <li><a href="/policy">Guidelines of Use and Privacy Policy</a></li>
+                        <li><a href="{{ routeLookup('application.getPolicy') }}">Guidelines of Use and Privacy Policy</a></li>
                         <li><a href="http://www.schoolbox.com.au" title="Schoolbox, Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a>
                             {{ config.site_version }} by <a href="http://www.alaress.com.au">Alaress</a></li>
                         {% if config.feedback_url and config.feedback_text %}
