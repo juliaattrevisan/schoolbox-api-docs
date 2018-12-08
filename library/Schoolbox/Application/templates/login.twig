@@ -135,9 +135,12 @@ $(function() {
                     <p>or</p>
                     <p><a href="/account/anonymous.php?{{ requestParams|escape }}" class="guest button expand">Sign in as Guest</a></p>
                     {% endif %}
+                    {% if config.saml_enabled == '1' and config.saml_sso_url != '' %}
+                    <p>or</p>
+                    <p><a href="/saml/index.php?{{ requestParams|escape }}" class="button expand samlbutton">Login using Single Sign-On</a></p>
+                    {% endif %}
                 </div>
             </div>
-
             {% if config.forgotten_password_text and config.forgotten_password_url %}
             <div class="row collapse">
                 <div class="small-12 column">
