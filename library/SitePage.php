@@ -1026,21 +1026,6 @@ class SitePage extends Page
     }
 
     /**
-     * Check if the users IP exists in the SAML blacklist.
-     * @return bool
-     */
-    private function samlBlacklist()
-    {
-        $ipBlacklist = $this->config->get('saml_ip_blacklist');
-        foreach (explode(',', $ipBlacklist) as $ip) {
-            if ($ip == Session::getIP()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Render a 404 Page Not Found
      */
     public function pageNotFound()
