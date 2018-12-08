@@ -28,9 +28,9 @@
                             Type of Enquiry
                             <select name="subject" id="subject">
                                 <option></option>
-                                <option value="Technical Issue">Technical Issue</option>
-                                <option value="Support">Support</option>
-                                <option value="Enquiry">Enquiry</option>
+                                {% for type in types %}
+                                <option value="{{type}}">{{type}}</option>
+                                {% endfor %}
                             </select>
                         </label>
 

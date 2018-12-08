@@ -174,10 +174,10 @@ $(function() {
                 }
             }
         });
-        // T&C: remove error message completely on check
+        // T&C: remove error message completely on check`
         l.find('#tandc').on('change', function () {
             if (this.checked) {
-                $('label.error[for="tandc"]').remove();
+                $('#error-msg').remove();
             }
         });
     });

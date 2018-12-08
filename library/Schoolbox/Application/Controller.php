@@ -14,12 +14,6 @@ use Session;
 
 class Controller extends Base
 {
-
-    /**
-     * Error message text appears in this key
-     */
-    public const ERROR_LOGIN_MESSAGE = 'LoginErrorMessage';
-
     /**
      * @var \Schoolbox\Error\Mapper
      */
@@ -52,6 +46,8 @@ class Controller extends Base
         if ($authUser instanceof User && !$authUser->getId()) {
             $data = ['recaptcha' => $this->reCaptcha->form()];
         }
+
+        $data['types'] = explode(',',$this->getConfigLoader()->get('site_feedback_types'));
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@application/feedback.twig', $data)
                                                 ->setTitle($this->getConfigLoader()->get('feedback_text')));
@@ -166,7 +162,7 @@ class Controller extends Base
                     $this->getConfigLoader()->get('login_grace') . ' seconds. '.
                     'Please try again in a short while.'
                 ;
-            } elseif ($tandc && strlen($this->getConfigLoader()->get('login_terms_and_conditions')) ) {
+            } elseif ($tandc !== true && strlen($this->getConfigLoader()->get('login_terms_and_conditions')) ) {
                 // then check if they checked the terms and conditions checkbox
                 $message = $this->getConfigLoader()->get('login_terms_and_conditions_error');
             } else {
