@@ -4,6 +4,7 @@
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Application;
 
 use Alaress\Module\Module as BaseModule;
@@ -33,7 +34,6 @@ class Module extends BaseModule
         $this->register('GET', '/policy', 'getPolicy', null, null);
         $this->register('GET', '/login', 'getLogin', null, null);
         $this->register('POST', '/login', 'postLogin', null, null);
-
     }
 
     /**
@@ -51,7 +51,7 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
-            'reCaptcha'   => new ReCaptcha($this->getConfig()->get('recaptcha_public_api_key'), $this->getConfig()->get('recaptcha_private_api_key'))
+            'reCaptcha'   => new ReCaptcha($this->getConfig()->get('recaptcha_public_api_key'), $this->getConfig()->get('recaptcha_private_api_key')),
         ];
     }
 
@@ -71,6 +71,6 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 }

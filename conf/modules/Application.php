@@ -1,6 +1,5 @@
 <?php
 /**
- * 
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -12,8 +11,8 @@ use Alaress\Application\Kernel;
 use Config\ModuleLoader;
 use Schoolbox;
 
-class Application extends ModuleLoader {
-
+class Application extends ModuleLoader
+{
     /**
      * Run configuration for the given module
      *
@@ -24,5 +23,4 @@ class Application extends ModuleLoader {
     {
         $this->loadModule($kernel, Schoolbox\Application\Module::class, '');
     }
-
 }
