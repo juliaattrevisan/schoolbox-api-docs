@@ -30,7 +30,7 @@ $(function() {
                 freeEntry[this.settings.searchField] = input;
                 return freeEntry;
             },
-            onItemAdd(key, $item) {
+            onItemAdd: function(key, $item) {
                 if (validateEmail(key) === false) {
                     $item.addClass('error');
                     var closeTab = '<a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a>';
