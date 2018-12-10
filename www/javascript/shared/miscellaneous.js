@@ -56,21 +56,23 @@ $(function () {
         $.post('/ajax/notificationsTray', {state: notificationState}, function(responseText) { });
     });
 
-    /* Left menu toggle
-     */
-    $('#left-menu-dock').attr('title', 'Hide navigation').on('click', function(){
+    // Left menu dock/undock
+    $('#left-menu-dock').on('click', function() {
+        // Hide/show the sidebar
         $('[data-offcanvas]').removeClass('move-right');
         $('[data-inner-offcanvas]').toggleClass('left-open');
         $(this).toggleClass('open');
 
+        // Update the hover title on the dock button
         var title = 'Hide navigation';
         if ($(this).hasClass('open')){
             title = 'Show navigation';
         }
         $(this).attr('title', title);
 
+        // Update the user's sidebar state in the DB
         var leftnavState;
-        if ($('[data-inner-offcanvas]').hasClass('left-open')){
+        if ($('[data-inner-offcanvas]').hasClass('left-open')) {
             leftnavState = 'show';
         } else {
             leftnavState = 'hide';
