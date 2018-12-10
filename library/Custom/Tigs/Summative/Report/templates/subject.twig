@@ -34,7 +34,24 @@ Data:
             </div>
         {% endif %}
     </div>
-    <div class="small-12">
+
+
+    <div class="column small-12 medium-6">
+        <h2 class="subheader">MYP Grade</h2>
+        {% if dpData.error is defined %}
+            <div data-alert class="alert-box alert">
+                {{ dpData.error|raw }}
+            </div>
+        {% endif %}
+    </div>
+
+
+    <div class="column small-12 medium-6">
+        <h2 class="subheader">NESA Score</h2>
+    </div>
+
+
+    <div class="column small-12">
         {% for unitId, unit in unitImpls %}
             <h2 class="subheader">{{ unit.title }}</h2>
             {# Were we given AAM data for this unit? #}
