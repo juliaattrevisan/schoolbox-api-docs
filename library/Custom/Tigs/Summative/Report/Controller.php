@@ -11,6 +11,7 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\Report\Components\AcademicAchievementMatrix;
+use Custom\Tigs\Summative\Report\Components\AcademicAchievementSummary;
 use Custom\Tigs\Summative\Report\Components\DiplomaProgrammeGraph;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
@@ -135,13 +136,16 @@ class Controller extends Web\Controller\Base
                 $error .= \sprintf(' <a href="%s">Manage Course imports</a>', $route);
             }
             $errors[]  = $error;
-            $unitImpls = $aamData = [];
+            $unitImpls = $aamData = $aasData = [];
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitImpls = $this->getUnitImpls($courseImplsWithUnits);
 
             // Build component data
             $aamData = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
+
+            // Only relevant for MYP students
+            $aasData = $this->buildAcademicAchievementSummaryData($studentAttributes, $unitImpls, $user);
         }
 
         // The cohort check assumes that cohort classes have the same courses.
@@ -164,6 +168,7 @@ class Controller extends Web\Controller\Base
             'errors'              => $errors,
             'unitImpls'           => $unitImpls,
             'aamData'             => $aamData,
+            'aasData'             => $aasData,
             'dpData'              => $dpData,
         ];
         $output = $this->buildHtmlOutput('@tigsSummativeReport/subject.twig', $data, "Subject Report");
@@ -380,6 +385,53 @@ class Controller extends Web\Controller\Base
             $this->visibility,
             $this->getUser(),
             $aamWorkTypeId,
+            $this->rubricMapper,
+            $this->getAuthorizer(),
+            $this->getRouter()
+        );
+
+        return $aam->toContext();
+    }
+
+
+    /**
+     * Builds data for rendering the AAS components.
+     *
+     * @param StudentAttributes                  $attributes
+     * @param GenericCollection|UnitImpl\Model[] $unitImpls
+     * @param User                               $student
+     * @return array
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function buildAcademicAchievementSummaryData(StudentAttributes $attributes, GenericCollection $unitImpls, User $student): array
+    {
+        // Only relevant for MYP students
+        if(!$attributes->isMyp()){
+            return [];
+        }
+
+        $aasWorkTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_SUMMARY);
+        $aasWorkTypeId = \is_numeric($aasWorkTypeId) ? (int)$aasWorkTypeId : null;
+
+        // Not set? Then we can't identify AAS assessments.
+        if (null === $aasWorkTypeId) {
+            $errorMsg = 'Cannot render Academic Achievement Summary components. Work type not set.';
+            $routeConfig = $this->getRouteIfAuthorized('tigsSummativeAdmin.getAdmin');
+            // If user is permitted, prompt them to fix this.
+            if ($routeConfig) {
+                $hash        = Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_SUMMARY;
+                $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">Set Academic Achievement Summary Work Type</a>";
+            }
+            return ['error' => $errorMsg];
+        }
+
+        $aam = new AcademicAchievementSummary(
+            $unitImpls,
+            $student,
+            $this->visibility,
+            $this->getUser(),
+            $aasWorkTypeId,
             $this->rubricMapper,
             $this->getAuthorizer(),
             $this->getRouter()
