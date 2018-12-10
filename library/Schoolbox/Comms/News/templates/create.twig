@@ -11,7 +11,15 @@
 {% import '@commsNews/macro/indicator.twig' as indicator %}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
-{{ bread.crumbs([locale.news.properPlural, routeLookup('commsNews.getIndex')], ['Create']) }}
+{% if action == 'Create' %}
+    {{ bread.crumbs([locale.news.properPlural, routeLookup('commsNews.getIndex')], [action]) }}
+{% else %}
+    {{ bread.crumbs(
+        [locale.news.properPlural, routeLookup('commsNews.getIndex')],
+        [article.title, routeLookup('commsNews.getDetail', {articleId: article.id})],
+        [action]
+    ) }}
+{% endif %}
 
 {% set audienceIsReadOnly = article.isApproved%}
 
