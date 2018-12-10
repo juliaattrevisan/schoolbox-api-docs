@@ -134,7 +134,7 @@ class Controller extends Web\Controller\Base
             $unitImpls = $this->getUnitImpls($courseImplsWithUnits);
 
             // Build component data
-            $aamData = $this->buildAcademicAchievementSummaryData($unitImpls, $user);
+            $aamData = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
         }
 
         $data   = [
@@ -319,7 +319,7 @@ class Controller extends Web\Controller\Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    private function buildAcademicAchievementSummaryData(GenericCollection $unitImpls, User $student): array
+    private function buildAcademicAchievementMatrixData(GenericCollection $unitImpls, User $student): array
     {
         $aamWorkTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX);
         $aamWorkTypeId = \is_numeric($aamWorkTypeId) ? (int)$aamWorkTypeId : null;
