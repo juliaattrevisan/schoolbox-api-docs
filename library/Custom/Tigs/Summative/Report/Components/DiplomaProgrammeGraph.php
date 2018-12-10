@@ -15,6 +15,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -27,6 +28,18 @@ use UnexpectedValueException;
  */
 class DiplomaProgrammeGraph
 {
+    private const BASE_MARKS = [
+        0 => 0,
+        1 => 0,
+        2 => 0,
+        3 => 0,
+        4 => 0,
+        5 => 0,
+        6 => 0,
+        7 => 0,
+    ];
+
+
     /**
      * @var GenericCollection|UnitImpl\Model[]
      */
@@ -103,13 +116,14 @@ class DiplomaProgrammeGraph
         // * the student themselves
 
 
-        /** @var DueWork\Model[][] $dpAssessments */
-        $markData    = [];
+        $markData    = self::BASE_MARKS;
         $studentMark = null;
         $error       = null;
         try {
             [$markData, $studentMark] = $this->collateMarks($this->collateAssessments());
         } catch (UnexpectedValueException $e) {
+            $error = $e->getMessage();
+        } catch (MapperException $e) {
             $error = $e->getMessage();
         }
 
@@ -141,12 +155,15 @@ class DiplomaProgrammeGraph
 
 
         // Dummy data: just output counts
-        return [
+        $context = [
             'header'       => 'MYP Grade',
             'data'         => $markData,
             'studentValue' => $studentMark,
-            'error'        => $error,
         ];
+        if (isset($error)) {
+            $context['error'] = $error;
+        }
+        return $context;
     }
 
 
@@ -224,19 +241,11 @@ class DiplomaProgrammeGraph
      * @return array 0: all marks; [mark value => number of students with this mark]
      *               1: the mark this student received, if any
      * @throws \Schoolbox\Mapper\Exception
+     * @throws UnexpectedValueException if a folder has more or less than one DP assessment
      */
     private function collateMarks(array $dpAssessments): array
     {
-        $markData = [
-            0 => 0,
-            1 => 0,
-            2 => 0,
-            3 => 0,
-            4 => 0,
-            5 => 0,
-            6 => 0,
-            7 => 0,
-        ];
+        $markData    = self::BASE_MARKS;
         $studentMark = null;
         foreach ($dpAssessments as $folderId => $folderAssessments) {
             /**
@@ -273,9 +282,9 @@ class DiplomaProgrammeGraph
                     continue;
                 }
                 if ($dpAssessment->getUseRubric()) {
-                    $markedGrid = $this->rubricMapper->retrieveMarkedGrid($feedback);
-                    // Finagle student mark from rubric grid
+                    $markedGrid     = $this->rubricMapper->retrieveMarkedGrid($feedback);
                     $rawStudentMark = $markedGrid->retrieveHumanReadableMark();
+                    // Finagle student mark from rubric grid
                     if ($rawStudentMark === 0) {
                         $mark = 0;
                     } elseif ($rawStudentMark <= 5) {
