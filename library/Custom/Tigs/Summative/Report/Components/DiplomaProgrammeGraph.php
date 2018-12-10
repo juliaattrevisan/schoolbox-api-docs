@@ -98,6 +98,7 @@ class DiplomaProgrammeGraph
 
         /** @var DueWork\Model[][] $dpAssessments */
         $dpAssessments = [];
+        $error         = null;
         foreach ($this->unitImpls as $unitImpl) {
             // Get the DP assessment out of each unit impl
             // If any impl has zero, or more than one: that's an error
@@ -113,17 +114,17 @@ class DiplomaProgrammeGraph
 
                     // Validate the assessment
                     if (!$assessment instanceof DueWork\Model) {
-                        // error
+                        $error = "Only due works can be used for the MYP/DP graph. Found: {$assessment->getTypeName()}.";
                         continue;
                     }
 
-                    if ($assessment->getMarkType()->getSlug() !== MarkType::SLUG_TOTAL) {
-                        // error
-                        continue;
-                    }
-
-                    if ($assessment->getMaxMark() !== 7) {
-                        // error
+                    // Assessment must either be:
+                    // * Total mark = 7
+                    // * Use rubric
+                    if (!($assessment->getUseRubric()
+                        || ($assessment->getMarkType()->getSlug() !== MarkType::SLUG_TOTAL && $assessment->getMaxMark() !== 7)
+                    )) {
+                        $error = "A MYP/DP due work must either have a rubric, or a max mark of 7.";
                         continue;
                     }
 
@@ -146,10 +147,9 @@ class DiplomaProgrammeGraph
         $studentMark = null;
         foreach ($dpAssessments as $folderId => $folderAssessments) {
             $count = count($folderAssessments);
-            if ($count === 0) {
-                // error
-            } elseif ($count > 1) {
-                // error
+            if ($count !== 1) {
+                $error = "A unit must have exactly one MYP/DP assessment. Found {$count}.";
+                continue;
             }
 
             $dpAssessment = current($folderAssessments);
@@ -158,6 +158,8 @@ class DiplomaProgrammeGraph
                 $mark     = null;
                 $feedback = $participant->findAuthoritativeVisibleFeedback($this->viewer);
                 if (!$feedback) {
+                    // No visible feedback for this user?
+                    // Show nothing, but this is not an error
                     continue;
                 }
                 if ($dpAssessment->getUseRubric()) {
@@ -181,16 +183,18 @@ class DiplomaProgrammeGraph
                     } elseif ($rawStudentMark <= 32) {
                         $mark = 7;
                     } else {
-                        // out of range: error
+                        $mark = null;
                     }
                 } else {
                     $mark = $feedback->getHumanReadableMark();
                 }
 
-                if ($participant->getUser()->getId() === $this->student->getId()) {
-                    $studentMark = $mark;
+                if (isset($mark)) {
+                    if ($participant->getUser()->getId() === $this->student->getId()) {
+                        $studentMark = $mark;
+                    }
+                    $markData[$mark]++;
                 }
-                $markData[$mark]++;
             }
         }
 
@@ -221,8 +225,10 @@ class DiplomaProgrammeGraph
 
         // Dummy data: just output counts
         return [
+            'header'       => 'MYP Grade',
             'data'         => $markData,
             'studentValue' => $studentMark,
+            'error'        => $error,
         ];
     }
 }

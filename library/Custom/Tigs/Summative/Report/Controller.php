@@ -376,7 +376,14 @@ class Controller extends Web\Controller\Base
             return ['error' => $errorMsg];
         }
 
-        $dp = new DiplomaProgrammeGraph();
+        $dp = new DiplomaProgrammeGraph(
+            $unitImpls,
+            $student,
+            $this->visibility,
+            $this->getUser(),
+            $dpWorkTypeId,
+            $this->rubricMapper
+        );
 
         return $dp->toContext();
     }
