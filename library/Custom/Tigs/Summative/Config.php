@@ -18,5 +18,6 @@ class Config
     public const _TIGS_PARTICIPATION_REPORT_ENABLED = self::PREFIX_TIGS_CRP . 'participation_report_enabled';
     public const _TIGS_SUBJECT_REPORT_ENABLED = self::PREFIX_TIGS_CRP . 'subject_report_enabled';
     public const _TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX = self::PREFIX_TIGS_CRP . 'work_type_academic_achievement_matrix';
-    public const _TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_SUMMARY= self::PREFIX_TIGS_CRP . 'work_type_academic_achievement_summary';
+    public const _TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_SUMMARY = self::PREFIX_TIGS_CRP . 'work_type_academic_achievement_summary';
+    public const _TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE = self::PREFIX_TIGS_CRP . 'work_type_diploma_programme_report_grade';
 }
