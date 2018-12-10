@@ -528,27 +528,30 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 
 	.left-menu-dock {
-		display: block;
-		height: 2.5rem;
-		padding: .5rem;
-		position: absolute;
-		right: 0;
-		width: 2.5rem;
+		display: none;
+	}
 
-		&:hover {
-			background-color: $off-canvas-hover;
-		}
+	@media #{$mediumwide-up} {
+		.left-menu-dock {
+			display: block;
+			height: 2.5rem;
+			padding: .5rem;
+			position: absolute;
+			right: 0;
+			width: 2.5rem;
 
-		&::after {
-			content: '\e655';
-			font-family: $font-family-icon;
-			padding-left: rem-calc(4);
-		}
+			&:hover {
+				background-color: $off-canvas-hover;
+			}
 
-		@media #{$mediumwide-down} {
-			display: none;
+			&::after {
+				content: '\e655';
+				font-family: $font-family-icon;
+				padding-left: rem-calc(4);
+			}
 		}
 	}
+
 	/* A background colour specifically for the logo/crest
 	 */
 	.logo-wrapper {
