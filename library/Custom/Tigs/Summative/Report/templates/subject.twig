@@ -33,16 +33,17 @@ Data:
                 {{ aamData.error|raw }}
             </div>
         {% endif %}
-    </div>
-
-
-    <div class="column small-12 medium-6">
-        <h2 class="subheader">MYP Grade</h2>
         {% if dpData.error is defined %}
             <div data-alert class="alert-box alert">
                 {{ dpData.error|raw }}
             </div>
         {% endif %}
+    </div>
+
+
+    <div class="column small-12 medium-6">
+        <h2 class="subheader">MYP Grade</h2>
+        {% include '@tigsSummativeReport/components/diplomaProgrammeGraph.twig' with dpData only %}
     </div>
 
 
