@@ -137,6 +137,8 @@ class Controller extends Web\Controller\Base
             $aamData = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
         }
 
+        $dpData  = $this->buildDiplomaProgrammeReportData($unitImpls, $user);
+
         $data   = [
             'user'                => $user,
             'folder'              => $folder,
@@ -150,6 +152,7 @@ class Controller extends Web\Controller\Base
             'errors'              => $errors,
             'unitImpls'           => $unitImpls,
             'aamData'             => $aamData,
+            'dpData'              => $dpData,
         ];
         $output = $this->buildHtmlOutput('@tigsSummativeReport/subject.twig', $data, "Subject Report");
 
@@ -346,5 +349,33 @@ class Controller extends Web\Controller\Base
         );
 
         return $aam->toContext();
+    }
+
+
+    /**
+     * Builds Diploma Programme report data.
+     *
+     * @param GenericCollection $unitImpls
+     * @param User              $student
+     * @return array
+     */
+    private function buildDiplomaProgrammeReportData(GenericCollection $unitImpls, User $student): array
+    {
+        $dpWorkTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE);
+        $dpWorkTypeId = \is_numeric($dpWorkTypeId) ? (int)$dpWorkTypeId : null;
+
+        if (null === $dpWorkTypeId) {
+            $errorMsg = 'Cannot render DP Report components. Work type not set.';
+            // If user is superuser, prompt them to fix this.
+            if ($this->getUser()->isSuperuser()) {
+                $routeConfig = $this->getRouter()->generate('tigsSummativeAdmin.getAdmin');
+                $hash        = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
+                $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">Set DP Report Work Type</a>";
+            }
+            return ['error' => $errorMsg];
+        }
+
+        // Figure out what format to output in
+        return [];
     }
 }
