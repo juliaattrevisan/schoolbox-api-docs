@@ -311,8 +311,6 @@ class Controller extends Web\Controller\Base
     /**
      * Builds data for rendering the AAM components.
      *
-     * If
-     *
      * @param GenericCollection|UnitImpl\Model[] $unitImpls
      * @param User                               $student
      * @return array
