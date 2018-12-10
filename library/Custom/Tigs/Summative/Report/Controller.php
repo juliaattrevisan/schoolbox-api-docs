@@ -117,7 +117,7 @@ class Controller extends Web\Controller\Base
      */
     public function getSubjectReport(User $user, Folder\Model $folder): void
     {
-        [$isHsc, $isIb, $sbSem, $term, $curriculumYearLevel, $curriculumSemester] = $this->deriveStudentAttributes($user);
+        $studentAttributes = $this->deriveStudentAttributes($user);
 
         $errors = [];
 
@@ -153,12 +153,14 @@ class Controller extends Web\Controller\Base
             'user'                => $user,
             'folder'              => $folder,
             'isEnabled'           => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
-            'isHsc'               => $isHsc,
-            'isIb'                => $isIb,
-            'sbSem'               => $sbSem,
-            'term'                => $term,
-            'curriculumYearLevel' => $curriculumYearLevel,
-            'curriculumSemester'  => $curriculumSemester,
+            'isIb'                => $studentAttributes->isIb(),
+            'isMyp'               => $studentAttributes->isMyp(),
+            'isDp'                => $studentAttributes->isDp(),
+            'isHsc'               => $studentAttributes->isHsc(),
+            'sbSem'               => $studentAttributes->getSbSem(),
+            'term'                => $studentAttributes->getTerm(),
+            'curriculumYearLevel' => $studentAttributes->getCurriculumYearLevel(),
+            'curriculumSemester'  => $studentAttributes->getCurriculumSemester(),
             'errors'              => $errors,
             'unitImpls'           => $unitImpls,
             'aamData'             => $aamData,
@@ -174,17 +176,15 @@ class Controller extends Web\Controller\Base
      * Helper to derive relevant student attributes
      *
      * @param User $user
-     * @return array
+     * @return StudentAttributes
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    private function deriveStudentAttributes(User $user): array
+    private function deriveStudentAttributes(User $user): StudentAttributes
     {
-        $ibFlagOn = (bool)$this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'];
+        $isIb = (bool)$this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'];
 
         $year  = (int)$user->getYear();
-        $isHsc = !$ibFlagOn || $year <= 10;
-        $isIb  = $ibFlagOn  || $year <= 10;
 
         // Hardcoded term dates for now
         $firstDayTerm1Relative = '1 January';
@@ -248,7 +248,7 @@ class Controller extends Web\Controller\Base
             $curriculumSemester  = $sbSem;
         }
 
-        return [$isHsc, $isIb, $sbSem, $term, $curriculumYearLevel, $curriculumSemester];
+        return new StudentAttributes($isIb, $sbSem, $term, $curriculumYearLevel, $curriculumSemester);
     }
 
 
