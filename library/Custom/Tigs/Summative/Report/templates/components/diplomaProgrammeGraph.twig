@@ -2,41 +2,52 @@
 Renders a MYP/DP graph.
 
 Data:
-    error:               string           - Optional. If present, the reason why we can't render the component
-    data:                Rubric\Grid      - The rubric grid
-    markedGrid:          MarkedGrid       - Optional. The student's marks for the rubric
+    error: string - Optional. If present, the reason why we can't render the component
+    data:  array  - The results to render. key: column, value: height
 #}
 
-<p class="meta">Academic Achievement Matrix</p>
 {% if error|default(null) %}
     <div class="empty-state">
         <p>{{ error }}</p>
     </div>
 {% else %}
-    <table>
-        <thead>
-        <tr>
-            <td></td>
-            {% for level in grid.levels %}
-                <td>{{ level.name }}</td>
-            {% endfor %}
-        </tr>
-        </thead>
-        <tbody>
-        {% for capabilityUsage in grid.capabilityUsages %}
-            {% for indicatorUsage in capabilityUsage.indicatorUsages %}
-                <tr>
-                    <th>{{ indicatorUsage.indicator.name }}</th>
-
-                    {% set indicatorMark = markedGrid is defined ? markedGrid.retrieveIndicatorMark(indicatorUsage) : null %}
-                    {% set indicatorMarkDescriptor = indicatorMark ? indicatorMark.descriptor : null %}
-
-                    {% for descriptor in indicatorUsage.descriptors %}
-                        <td{% if indicatorMarkDescriptor and indicatorMarkDescriptor.id == descriptor.id %} class="rb-selected"{% endif %}>{{ descriptor.description }}</td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        {% endfor %}
-        </tbody>
-    </table>
+    {% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function(){
+            $("#myp-graph").highcharts({
+                legend: {
+                    enabled: false
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: null
+                },
+                xAxis: {
+                    categories: [0,1,2,3,4,5,6,7],
+                    title: {
+                        text: null
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: '# Students (Cohort)'
+                    },
+                    tickInterval: 10
+                },
+                series: [
+                    {
+                        type: 'column',
+                        data: {{ data|json_encode|raw }},
+                        label: {
+                            enabled: false
+                        }
+                    }
+                ]
+            });
+        });
+    </script>
+    {% endautoescape %}
+    <div id="myp-graph"></div>
 {% endif %}
