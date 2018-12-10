@@ -157,7 +157,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		padding-left: $tabbar-height;
 		position: relative;
 	}
-	#search {
+	.global-search {
 		background: $navigation-background;
 		margin: 0;
 		position: absolute;
@@ -378,7 +378,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 }
 
 // When notifications are disabled
-.disableNotifications .hybrid-bar #search {
+.disableNotifications .hybrid-bar .global-search {
 	right: 0;
 	&:hover, &.focus{
 		padding-left: 0;
@@ -689,7 +689,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 }
 
 @media #{$medium-up} {
-	.hybrid-bar #search {
+	.hybrid-bar .global-search {
 		right:  $tabbar-icon-width * 2;
 	}
 }
@@ -704,7 +704,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		.right-off-canvas-menu.overlap {
 			box-shadow: none;
 		}
-		#search {
+		.global-search {
 			right: $tabbar-height;
 			&:hover, &.focus {
 				padding-left: 9rem;
@@ -718,17 +718,17 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			right: 0;
 		}
 	}
-	.inner-wrap.left-open #search {
+	.inner-wrap.left-open .global-search {
 		&:hover, &.focus {
 			padding-left: 9rem;
 		}
 	}
-	.inner-wrap.right-open.left-open #search {
+	.inner-wrap.right-open.left-open .global-search {
 		&:hover, &.focus {
 			padding-left: 4.5rem;
 		}
 	}
-	.right-off-canvas-menu.right-open + #search {
+	.right-off-canvas-menu.right-open + .global-search {
 		right: 0;
 		padding-left: 0;
 	}
@@ -761,7 +761,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 
 // < 1024px
 @media #{$medium-down} {
-	.disableNotifications .hybrid-bar #search {
+	.disableNotifications .hybrid-bar .global-search {
 		&:hover, &.focus{
 			padding-left: 5rem;
 		}
@@ -802,7 +802,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 	.hybrid-bar .top-menu li:nth-child(-n+4) {
 		display: block;
 	}
-	#left-menu .second-nav li:nth-child(-n+4) {
+	.left-off-canvas-menu .second-nav li:nth-child(-n+4) {
 		display: none;
 	}
 
@@ -817,7 +817,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 			.hybrid-bar .top-menu li:nth-child(-n+#{$i}) {
 				display: block;
 			}
-			#left-menu .second-nav li:nth-child(-n+#{$i}) {
+			.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
 				display: none;
 			}
 		}
@@ -826,7 +826,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 			.disableNotifications .top-menu li:nth-child(-n+#{$i}) {
 				display: block;
 			}
-			.disableNotifications #left-menu .second-nav li:nth-child(-n+#{$i}) {
+			.disableNotifications .left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
 				display: none;
 			}
 		}
@@ -840,7 +840,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 	.hybrid-bar .top-menu li:nth-child(-n+6) {
 		display: block;
 	}
-	#left-menu .second-nav li:nth-child(-n+6) {
+	.left-off-canvas-menu .second-nav li:nth-child(-n+6) {
 		display: none;
 	}
 
@@ -855,7 +855,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 			.hybrid-bar .top-menu li:nth-child(-n+#{$i}) {
 				display: block;
 			}
-			#left-menu .second-nav li:nth-child(-n+#{$i}) {
+			.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
 				display: none;
 			}
 		}
@@ -864,7 +864,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 			.disableNotifications .top-menu li:nth-child(-n+#{$i}) {
 				display: block;
 			}
-			.disableNotifications #left-menu .second-nav li:nth-child(-n+#{$i}) {
+			.disableNotifications .left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
 				display: none;
 			}
 		}
@@ -879,7 +879,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 	.hybrid-bar .top-menu li:nth-child(-n+11) {
 		display: block;
 	}
-	#left-menu .second-nav li:nth-child(-n+12) {
+	.left-off-canvas-menu .second-nav li:nth-child(-n+12) {
 		display: none;
 	}
 
@@ -896,7 +896,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 			.hybrid-bar .top-menu li:nth-child(-n+#{$i}) {
 				display: block;
 			}
-			#left-menu .second-nav li:nth-child(-n+#{$i}) {
+			.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
 				display: none;
 			}
 		}
@@ -906,7 +906,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 				.hybrid-bar .top-menu li:nth-child(-n+#{$i}) {
 					display: block;
 				}
-				#left-menu .second-nav li:nth-child(-n+#{$i}) {
+				.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
 					display: none;
 				}
 			}
@@ -916,7 +916,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 			.disableNotifications .top-menu li:nth-child(-n+#{$i}) {
 				display: block;
 			}
-			.disableNotifications #left-menu .second-nav li:nth-child(-n+#{$i}) {
+			.disableNotifications .left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
 				display: none;
 			}
 		}
