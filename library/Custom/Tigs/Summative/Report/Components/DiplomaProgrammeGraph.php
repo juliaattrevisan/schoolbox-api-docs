@@ -153,6 +153,12 @@ class DiplomaProgrammeGraph
             }
 
             $dpAssessment = current($folderAssessments);
+
+            // Not visible to the viewer? Show no results
+            if (!$this->visibility->isVisibleToUser($dpAssessment, $this->viewer, true)) {
+                continue;
+            }
+
             foreach ($dpAssessment->getAllParticipants() as $participant) {
                 // What kind of assessment is this?
                 $mark     = null;
