@@ -222,7 +222,8 @@ class DiplomaProgrammeGraph
         foreach ($this->unitImpls as $unitImpl) {
             // Get the DP assessment out of each unit impl
             // If any impl has zero, or more than one: that's an error
-            $folderId = $unitImpl->getBaseContext()->getFolder()->getId();
+            $folder   = $unitImpl->getBaseContext()->getFolder();
+            $folderId = $folder->getId();
             if (!isset($dpAssessments[$folderId])) {
                 $dpAssessments[$folderId] = [];
             }
@@ -235,7 +236,12 @@ class DiplomaProgrammeGraph
                     // Validate the assessment
                     if (!$assessment instanceof DueWork\Model) {
                         throw new UnexpectedValueException(
-                            "Only due works can be used for the MYP/DP graph. Found: {$assessment->getTypeName()}."
+                            sprintf(
+                                'Only due works can be used for the MYP/DP graph. Assessment "%s" in folder "%s" is a %s.',
+                                $assessment->getTitle(),
+                                $folder->getTitle(),
+                                $assessment->getTypeName()
+                            )
                         );
                     }
 
@@ -246,7 +252,13 @@ class DiplomaProgrammeGraph
                         || ($assessment->getMarkType()->getSlug() !== MarkType::SLUG_TOTAL && $assessment->getMaxMark() !== 7)
                     )) {
                         throw new UnexpectedValueException(
-                            "A MYP/DP due work must either have a rubric, or a max mark of 7."
+                            sprintf(
+                                'A MYP/DP due work must either have a rubric, or a max mark of 7. Assessment "%s" in folder "%s" is a %s with max mark %d.',
+                                $assessment->getTitle(),
+                                $folder->getTitle(),
+                                $assessment->getMarkType()->getName(),
+                                $assessment->getMaxMark()
+                            )
                         );
                     }
 
