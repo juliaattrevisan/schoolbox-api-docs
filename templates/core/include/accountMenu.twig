@@ -1,0 +1,48 @@
+{#
+ # Account dropdown of options for the user, including switch users
+ #
+ # @param Object user
+ # @param boolean mobile
+ #}
+{% if mobile %}
+    {% set mobileSuffix = '-mobile' %}
+{% else %}
+    {% set mobileSuffix = '' %}
+{% endif %}
+
+<ul id="profile-options{{ mobileSuffix }}">
+    <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
+    <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
+    {% if user.current.superuser %}
+        <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
+    {% endif %}
+    <li><a class="icon-logout" href="/logout.php">Logout</a></li>
+</ul>
+<ul id="switch-user{{ mobileSuffix }}">
+    {% if user.current.linkedUser is not empty %}
+        <li class="separator">Switch User</li>
+        {% for linkedUser in user.current.linkedUser %}
+            <li class="user">
+                <div class="card small-12">
+                    <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
+                        <img src="/portrait.php?userId={{ linkedUser.externalId }}&amp;size=square64" />
+                        <p>{{ linkedUser.formatName }}</p>
+                        <p class="meta">{{ linkedUser.role.name }}</p>
+                    </a>
+                </div>
+            </li>
+        {% endfor %}
+    {% endif %}
+
+    {% if user.previous %}
+        <li class="user">
+            <div class="card small-12">
+                <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
+                    <img src="/portrait.php?userId={{ user.previous.externalId }}&amp;size=square64" />
+                    <p>{{ user.previous.formatName }}</p>
+                    <p class="meta">{{ user.previous.role.name }}</p>
+                </a>
+            </div>
+        </li>
+    {% endif %}
+</ul>

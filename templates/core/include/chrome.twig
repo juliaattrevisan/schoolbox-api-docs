@@ -158,45 +158,7 @@
                                     <span>{{ user.current.formatName }}</span>
                                 </a>
                                 <div id="account-content-mobile" class="content">
-                                    <ul id="profile-options-mobile">
-                                        <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
-                                        <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
-                                        {% if user.current.superuser %}
-                                            <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
-                                        {% endif %}
-                                        <li><a class="icon-logout" href="/logout.php">Logout</a></li>
-                                    </ul>
-                                    <ul id="avatar2-mobile">
-                                         {% if user.current.linkedUser is not empty %}
-                                            <li>
-                                                <ul id="switch-user-mobile">
-                                                    <li class="separator">Switch User</li>
-                                                    {% for linkedUser in user.current.linkedUser %}
-                                                        <li class="switch-user">
-                                                            <div class="card small-12">
-                                                                <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
-                                                                    <img src="/portrait.php?userId={{ linkedUser.externalId }}&amp;size=square64" />
-                                                                    <p>{{ linkedUser.formatName }}</p>
-                                                                    <p class="meta">{{ linkedUser.role.name }}</p>
-                                                                </a>
-                                                            </div>
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </li>
-                                        {% endif %}	
-                                        {% if user.previous %}
-                                            <li class="switch-user">
-                                                <div class="card small-12">
-                                                    <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
-                                                        <img src="/portrait.php?userId={{ user.previous.externalId }}&amp;size=square64" />
-                                                        <p>{{ user.previous.formatName }}</p>
-                                                        <p class="meta">{{ user.previous.role.name }}</p>
-                                                    </a>
-                                                </div>
-                                            </li>
-                                        {% endif %}
-                                    </ul>
+                                    {% include 'include/accountMenu.twig' with {user: user, mobile: true} only %}
                                 </div>
                             </li>
                         </ul>
@@ -262,42 +224,7 @@
                                     <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square80"/>
                                 </a>
                                 <div id="account-content" class="account-drop">
-                                    <ul id="profile-options">
-                                        <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
-                                        <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
-                                        {% if user.current.superuser %}
-                                            <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
-                                        {% endif %}
-                                        <li><a class="icon-logout" href="/logout.php">Logout</a></li>
-                                    </ul>
-                                    <ul id="switch-user">
-                                        {% if user.current.linkedUser is not empty %}
-                                            <li class="separator">Switch User</li>
-                                            {% for linkedUser in user.current.linkedUser %}
-                                                <li class="user">
-                                                    <div class="card small-12">
-                                                        <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
-                                                            <img src="/portrait.php?userId={{ linkedUser.externalId }}&amp;size=square64" />
-                                                            <p>{{ linkedUser.formatName }}</p>
-                                                            <p class="meta">{{ linkedUser.role.name }}</p>
-                                                        </a>
-                                                    </div>
-                                                </li>
-                                            {% endfor %}
-                                        {% endif %}
-
-                                        {% if user.previous %}
-                                            <li class="user">
-                                                <div class="card small-12">
-                                                    <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
-                                                        <img src="/portrait.php?userId={{ user.previous.externalId }}&amp;size=square64" />
-                                                        <p>{{ user.previous.formatName }}</p>
-                                                        <p class="meta">{{ user.previous.role.name }}</p>
-                                                    </a>
-                                                </div>
-                                            </li>
-                                        {% endif %}
-                                    </ul>
+                                    {% include 'include/accountMenu.twig' with {user: user} only %}
                                 </div>
                             {% endif %}
                         {% endblock accountMenu %}
