@@ -13,7 +13,7 @@
 
 {{ bread.crumbs(
     [locale.news.properPlural, routeLookup('commsNews.getIndex')],
-    [article.title, routeLookup('commsNews.getDetail', {articleId: article.id})],
+    [article.title |default("(untitled)"), routeLookup('commsNews.getDetail', {articleId: article.id})],
     ['Statistics']
 ) }}
 
