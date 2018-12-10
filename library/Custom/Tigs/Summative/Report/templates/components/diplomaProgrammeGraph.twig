@@ -13,7 +13,26 @@ Data:
 {% else %}
     {% autoescape 'js' %}
     <script type="text/javascript">
+
+        var buildColorList = function(data, studentValue, highlightColor, defaultColor) {
+            var dataLength = data.length,
+                colorList  = [];
+            for (var i = 0; i < dataLength; i++) {
+                colorList.push(defaultColor);
+            }
+
+            if (studentValue in colorList) {
+                colorList[studentValue] = highlightColor;
+            }
+
+            return colorList;
+        };
+
         $(function(){
+
+            var data = {{ data|json_encode|raw }},
+                studentValue = Number("{{ studentValue }}");
+
             $("#myp-graph").highcharts({
                 legend: {
                     enabled: false
@@ -39,10 +58,12 @@ Data:
                 series: [
                     {
                         type: 'column',
-                        data: {{ data|json_encode|raw }},
+                        data: data,
                         label: {
                             enabled: false
-                        }
+                        },
+                        colorByPoint: true,
+                        colors: buildColorList(data, studentValue, '#DBCB46', '#454549')
                     }
                 ]
             });

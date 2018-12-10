@@ -11,6 +11,7 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\Report\Components\AcademicAchievementMatrix;
+use Custom\Tigs\Summative\Report\Components\DiplomaProgrammeGraph;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -375,33 +376,8 @@ class Controller extends Web\Controller\Base
             return ['error' => $errorMsg];
         }
 
+        $dp = new DiplomaProgrammeGraph();
 
-        // There are two types of assessment that could feed this graph:
-        // MYP students: a rubric with total indicator mark of 32
-        // Mapping from total rubric indicator marks to graph value:
-        // 0:     0
-        // 1-5:   1
-        // 6-9:   2
-        // 10-14: 3
-        // 15-18: 4
-        // 19-23: 5
-        // 24-27: 6
-        // 28-32: 7
-        // DP students: a due work with a max mark of 7
-
-
-        // Dummy data: just output counts
-        return [
-            'data' => [
-                0 => 0,
-                1 => 3,
-                2 => 4,
-                3 => 7,
-                4 => 11,
-                5 => 9,
-                6 => 8,
-                7 => 1,
-            ]
-        ];
+        return $dp->toContext();
     }
 }
