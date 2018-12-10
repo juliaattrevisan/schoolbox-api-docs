@@ -531,7 +531,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		display: none;
 	}
 
-	@media #{$large-up} {
+	@media #{$mediumwide-up} {
 		.left-menu-dock {
 			display: block;
 			height: 2.5rem;
@@ -561,11 +561,11 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 	}
 
-	@media #{$large-up} {
+	@media #{$mediumwide-up} {
 		.logo-wrapper .logo {
 			display: block;
 			margin: 3rem 2rem 1rem 2rem;
-			
+
 			img {
 				display: block;
 				margin: 0 auto;
