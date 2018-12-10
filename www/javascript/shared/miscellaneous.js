@@ -58,7 +58,7 @@ $(function () {
 
     /* Left menu toggle
      */
-    $('[data-drawer]').attr('title', 'Hide navigation').on('click', function(){
+    $('#left-menu-dock').attr('title', 'Hide navigation').on('click', function(){
         $('[data-offcanvas]').removeClass('move-right');
         $('[data-inner-offcanvas]').toggleClass('left-open');
         $(this).toggleClass('open');
