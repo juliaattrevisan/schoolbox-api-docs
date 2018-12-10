@@ -119,6 +119,19 @@ $app = new class extends App
             true,
             ConfigMapper::MODULE_CUSTOM
         );
+
+        $this->insertConfig(
+            Tigs\Summative\Config::_TIGS_WORK_TYPE_FINAL_ACHIEVEMENT_LEVELS,
+            '',
+            'Work Type - MYP Final Achievement Levels',
+            "Marks given to the rubric attached to Due Works with this work-type will populate the student's 'MYP - Final Achievement Levels' table and 'MYP Grade' graph",
+            ConfigMapper::FIELD_SELECT_LOOKUP,
+            \serialize([SelectLookup\Renderer::OPTION_KEY_MAPPER => WorkType\Mapper::class,]),
+            true,
+            false,
+            true,
+            ConfigMapper::MODULE_CUSTOM
+        );
     }
 
 
