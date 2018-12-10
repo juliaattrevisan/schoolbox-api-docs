@@ -112,12 +112,30 @@ class Controller extends Web\Controller\Base
     {
         [$isHsc, $isIb, $sbSem, $term, $curriculumYearLevel, $curriculumSemester] = $this->deriveStudentAttributes($user);
 
-        // Fetch courses, units, assessments and interactions
-        $courseImports = $this->findCourseImportsForFolder($folder);
-        $unitImpls     = $this->getUnitImpls($courseImports);
+        $errors = [];
 
-        // Build component data
-        $aamData = $this->buildAcademicAchievementSummaryData($unitImpls, $user);
+        $courseImplsWithUnits = $this->courseImplMapper->findByFolderId($folder->getId());
+
+        // Check that multiple course specs have not been imported to this page
+        $courseSpecCount = $this->getCourseSpecCount($courseImplsWithUnits);
+        if ($courseSpecCount >= 2) {
+            // Don't bother loading model graph if we have multiple courses imported to this folder.
+            // We can't render the page in this case because we rely on a single course-textbox being available.
+            // It may be ok to import the same courseSpec multiple times, because each import may be a discrete subset of units.
+            $error = \sprintf('Only 1 course can be imported to the class. Found %d.', $courseSpecCount);
+            $route = $this->getRouteIfAuthorized('courseImport.getManagement', ['folderId' => $folder->getId(), 'folder' => $folder]);
+            if ($route) {
+                $error .= \sprintf(' <a href="%s">Manage Course imports</a>', $route);
+            }
+            $errors[]  = $error;
+            $unitImpls = $aamData = [];
+        } else {
+            $this->loadParticipation($courseImplsWithUnits);
+            $unitImpls = $this->getUnitImpls($courseImplsWithUnits);
+
+            // Build component data
+            $aamData = $this->buildAcademicAchievementSummaryData($unitImpls, $user);
+        }
 
         $data   = [
             'user'                => $user,
@@ -129,6 +147,7 @@ class Controller extends Web\Controller\Base
             'term'                => $term,
             'curriculumYearLevel' => $curriculumYearLevel,
             'curriculumSemester'  => $curriculumSemester,
+            'errors'              => $errors,
             'unitImpls'           => $unitImpls,
             'aamData'             => $aamData,
         ];
@@ -226,30 +245,15 @@ class Controller extends Web\Controller\Base
      *
      * @todo consider only loading participation of current student by default, load participation for all users for cohort components only.
      *
-     * @param Folder\Model $folder
-     * @return GenericCollection|CourseImpl\Model[]
+     * @param GenericCollection|CourseImpl\Model[] $courseImplsWithUnits
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
      * @throws \LogicException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    private function findCourseImportsForFolder(Folder\Model $folder): GenericCollection
+    private function loadParticipation(GenericCollection $courseImplsWithUnits): void
     {
-        $courseImplsWithUnits = $this->courseImplMapper->findByFolderId($folder->getId());
-
-        // Check that multiple course specs have not been imported to this page
-        $courseSpecIds = [];
-        foreach ($courseImplsWithUnits as $courseImpl) {
-            $courseSpecIds[$courseImpl->getSpecification()->getId()] = true;
-        }
-        if (\count($courseSpecIds) >= 2) {
-            // Don't bother loading model graph if we have multiple courses imported to this folder.
-            // We can't render the page in this case because we rely on a single course-textbox being available.
-            // It may be ok to import the same courseSpec multiple times, because each import may be a discrete subset of units.
-            return $courseImplsWithUnits;
-        }
-
         // Load assessments + participations
         /** @var UnitImpl\Model[] $unitImpls */
         $unitImpls = [];
@@ -262,8 +266,22 @@ class Controller extends Web\Controller\Base
         foreach ($this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline(\array_keys($unitImpls)) as $assessable) {
             $unitImpls[$assessable->getBaseContext()->getId()]->getAssessables()[$assessable->getId()] = $assessable;
         }
+    }
 
-        return $courseImplsWithUnits;
+
+    /**
+     * Returns the number of course specs the course impls were imported from
+     *
+     * @param GenericCollection|CourseImpl\Model[] $courseImplsWithUnits
+     * @return int
+     */
+    private function getCourseSpecCount(GenericCollection $courseImplsWithUnits): int
+    {
+        $courseSpecIds = [];
+        foreach ($courseImplsWithUnits as $courseImpl) {
+            $courseSpecIds[$courseImpl->getSpecification()->getId()] = true;
+        }
+        return \count($courseSpecIds);
     }
 
 

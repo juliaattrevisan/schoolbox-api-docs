@@ -11,6 +11,7 @@ Data:
     term:                int            - an integer from 1-4
     curriculumYearLevel: int            - an integer from 7-12
     curriculumSemester:  int            - an integer from 1-2
+    errors               string[]       - Any errors that affect the whole page
     unitImpls            UnitImpl\Model - All units imported to this folder.
     aamData              array          - Data to render the Academic Achievement Matrix components
 #}
@@ -22,6 +23,11 @@ Data:
                 This report is currently not visible to the student or their parents.
             </div>
         {% endif %}
+        {% for error in errors %}
+            <div data-alert class="alert-box alert">
+                {{ error|raw }}
+            </div>
+        {% endfor %}
         {% if aamData.error is defined %}
             <div data-alert class="alert-box alert">
                 {{ aamData.error|raw }}
