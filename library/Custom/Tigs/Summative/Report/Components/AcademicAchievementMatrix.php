@@ -161,7 +161,7 @@ class AcademicAchievementMatrix
             } else {
                 $title = $assessment->getTitle();
             }
-            return ['error' => "DueWork {$title} has a AAM/ATL work-type but does not have a rubric grid"];
+            return ['error' => "Due Work {$title} has a AAM/ATL work-type but does not have a rubric grid"];
         }
 
         // Did we find an assessment, but it shouldn't be visible to the current viewer?
