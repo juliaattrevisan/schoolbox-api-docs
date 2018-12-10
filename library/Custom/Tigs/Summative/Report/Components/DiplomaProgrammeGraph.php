@@ -15,6 +15,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DueWork;
@@ -31,25 +32,30 @@ class DiplomaProgrammeGraph
      */
     private $unitImpls;
 
+
     /**
      * @var User
      */
     private $student;
+
 
     /**
      * @var Visibility
      */
     private $visibility;
 
+
     /**
      * @var User
      */
     private $viewer;
 
+
     /**
      * @var int
      */
     private $dpWorkTypeId;
+
 
     /**
      * @var RubricMapper
@@ -98,10 +104,129 @@ class DiplomaProgrammeGraph
 
 
         /** @var DueWork\Model[][] $dpAssessments */
-        $error         = null;
-        $dpAssessments = $this->collateAssessments();
+        $markData    = [];
+        $studentMark = null;
+        $error       = null;
+        try {
+            [$markData, $studentMark] = $this->collateMarks($this->collateAssessments());
+        } catch (UnexpectedValueException $e) {
+            $error = $e->getMessage();
+        }
 
 
+
+
+        // The validation gauntlet has been passed
+
+
+
+        // Cohort is determined by:
+        // * taking the unit impl
+        // * finding all assessments within it
+        // * determining which one(s) are the MYP/DP work type
+
+
+        // There are two types of assessment that could feed this graph:
+        // MYP students: a rubric with total indicator mark of 32
+        // Mapping from total rubric indicator marks to graph value:
+        // 0:     0
+        // 1-5:   1
+        // 6-9:   2
+        // 10-14: 3
+        // 15-18: 4
+        // 19-23: 5
+        // 24-27: 6
+        // 28-32: 7
+        // DP students: a due work with a max mark of 7
+
+
+        // Dummy data: just output counts
+        return [
+            'header'       => 'MYP Grade',
+            'data'         => $markData,
+            'studentValue' => $studentMark,
+            'error'        => $error,
+        ];
+    }
+
+
+    /**
+     * Collate the unit implementations into a set of assessments.
+     *
+     * @return array
+     * @var Folder          $dpAssessments[$folderId]['folder']      The folder the assessments are in
+     * @var DueWork\Model[] $dpAssessments[$folderId]['assessments'] The MYP/DP assessments for this folder
+     * @throws UnexpectedValueException if a DP assessment isn't a due work,
+     *                                  and has neither a rubric or a max mark
+     *                                  of 7.
+     */
+    private function collateAssessments(): array
+    {
+        $dpAssessments = [];
+        foreach ($this->unitImpls as $unitImpl) {
+            // Get the DP assessment out of each unit impl
+            // If any impl has zero, or more than one: that's an error
+            $folder   = $unitImpl->getBaseContext()->getFolder();
+            $folderId = $folder->getId();
+            if (!isset($dpAssessments[$folderId])) {
+                $dpAssessments[$folderId] = [
+                    'folder'      => $folder,
+                    'assessments' => [],
+                ];
+            }
+            foreach ($unitImpl->getAssessables() as $assessment) {
+                $workType = $assessment->getWorkType();
+                if ($workType && $workType->getId() === $this->dpWorkTypeId) {
+
+                    // Iterate deeper into projects
+
+                    // Validate the assessment
+                    if (!$assessment instanceof DueWork\Model) {
+                        throw new UnexpectedValueException(
+                            sprintf(
+                                'Only due works can be used for the MYP/DP graph. Assessment "%s" in folder "%s" is a %s.',
+                                $assessment->getTitle(),
+                                $folder->getTitle(),
+                                $assessment->getTypeName()
+                            )
+                        );
+                    }
+
+                    // Assessment must either be:
+                    // * Total mark = 7
+                    // * Use rubric
+                    if (!($assessment->getUseRubric()
+                        || ($assessment->getMarkType()->getSlug() !== MarkType::SLUG_TOTAL && $assessment->getMaxMark() !== 7)
+                    )) {
+                        throw new UnexpectedValueException(
+                            sprintf(
+                                'A MYP/DP due work must either have a rubric, or a max mark of 7. Assessment "%s" in folder "%s" is a %s with max mark %d.',
+                                $assessment->getTitle(),
+                                $folder->getTitle(),
+                                $assessment->getMarkType()->getName(),
+                                $assessment->getMaxMark()
+                            )
+                        );
+                    }
+
+                    $dpAssessments[$folderId]['assessments'][$assessment->getId()] = $assessment;
+                }
+            }
+        }
+        return $dpAssessments;
+    }
+
+
+    /**
+     * Collates marks, given a set of MYP/DP assessments.
+     *
+     * @param array $dpAssessments A set of assessments, from `$this->collateAssessments`.
+     * @return array 0: all marks; [mark value => number of students with this mark]
+     *               1: the mark this student received, if any
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function collateMarks(array $dpAssessments): array
+    {
         $markData = [
             0 => 0,
             1 => 0,
@@ -114,13 +239,24 @@ class DiplomaProgrammeGraph
         ];
         $studentMark = null;
         foreach ($dpAssessments as $folderId => $folderAssessments) {
-            $count = count($folderAssessments);
+            /**
+             * @var Folder          $folder
+             * @var DueWork\Model[] $assessments
+             */
+            $folder      = $folderAssessments['folder'];
+            $assessments = $folderAssessments['assessments'];
+            $count = count($assessments);
             if ($count !== 1) {
-                $error = "A unit must have exactly one MYP/DP assessment. Found {$count}.";
-                continue;
+                throw new UnexpectedValueException(
+                    sprintf(
+                        'A folder must have exactly one MYP/DP assessment. Folder "%s" contains %d.',
+                        $folder->getTitle(),
+                        $count
+                    )
+                );
             }
 
-            $dpAssessment = current($folderAssessments);
+            $dpAssessment = current($assessments);
 
             // Not visible to the viewer? Show no results
             if (!$this->visibility->isVisibleToUser($dpAssessment, $this->viewer, true)) {
@@ -171,101 +307,6 @@ class DiplomaProgrammeGraph
                 }
             }
         }
-
-
-        // The validation gauntlet has been passed
-
-
-
-        // Cohort is determined by:
-        // * taking the unit impl
-        // * finding all assessments within it
-        // * determining which one(s) are the MYP/DP work type
-
-
-        // There are two types of assessment that could feed this graph:
-        // MYP students: a rubric with total indicator mark of 32
-        // Mapping from total rubric indicator marks to graph value:
-        // 0:     0
-        // 1-5:   1
-        // 6-9:   2
-        // 10-14: 3
-        // 15-18: 4
-        // 19-23: 5
-        // 24-27: 6
-        // 28-32: 7
-        // DP students: a due work with a max mark of 7
-
-
-        // Dummy data: just output counts
-        return [
-            'header'       => 'MYP Grade',
-            'data'         => $markData,
-            'studentValue' => $studentMark,
-            'error'        => $error,
-        ];
-    }
-
-
-    /**
-     * Collate the unit implementations into a set of assessments.
-     *
-     * @return DueWork\Model[][] A list of DP assessments, indexed by folder ID
-     *                           and then by assessment ID
-     * @throws UnexpectedValueException if a DP assessment isn't a due work,
-     *                                  and has neither a rubric or a max mark
-     *                                  of 7.
-     */
-    private function collateAssessments(): array
-    {
-        $dpAssessments = [];
-        foreach ($this->unitImpls as $unitImpl) {
-            // Get the DP assessment out of each unit impl
-            // If any impl has zero, or more than one: that's an error
-            $folder   = $unitImpl->getBaseContext()->getFolder();
-            $folderId = $folder->getId();
-            if (!isset($dpAssessments[$folderId])) {
-                $dpAssessments[$folderId] = [];
-            }
-            foreach ($unitImpl->getAssessables() as $assessment) {
-                $workType = $assessment->getWorkType();
-                if ($workType && $workType->getId() === $this->dpWorkTypeId) {
-
-                    // Iterate deeper into projects
-
-                    // Validate the assessment
-                    if (!$assessment instanceof DueWork\Model) {
-                        throw new UnexpectedValueException(
-                            sprintf(
-                                'Only due works can be used for the MYP/DP graph. Assessment "%s" in folder "%s" is a %s.',
-                                $assessment->getTitle(),
-                                $folder->getTitle(),
-                                $assessment->getTypeName()
-                            )
-                        );
-                    }
-
-                    // Assessment must either be:
-                    // * Total mark = 7
-                    // * Use rubric
-                    if (!($assessment->getUseRubric()
-                        || ($assessment->getMarkType()->getSlug() !== MarkType::SLUG_TOTAL && $assessment->getMaxMark() !== 7)
-                    )) {
-                        throw new UnexpectedValueException(
-                            sprintf(
-                                'A MYP/DP due work must either have a rubric, or a max mark of 7. Assessment "%s" in folder "%s" is a %s with max mark %d.',
-                                $assessment->getTitle(),
-                                $folder->getTitle(),
-                                $assessment->getMarkType()->getName(),
-                                $assessment->getMaxMark()
-                            )
-                        );
-                    }
-
-                    $dpAssessments[$folderId][$assessment->getId()] = $assessment;
-                }
-            }
-        }
-        return $dpAssessments;
+        return [$markData, $studentMark];
     }
 }
