@@ -3,7 +3,7 @@
         <h1>{{ config.title }}: Guidelines of Use and Privacy Policy</h1>
 
         <section class="content">
-            <article>{{ config.policy }}</article>
+            <article>{{ config.policy | purify }}</article>
         </section>
     </div>
 </div>
