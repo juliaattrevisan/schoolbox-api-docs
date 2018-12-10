@@ -162,7 +162,7 @@ class DiplomaProgrammeGraph
             foreach ($dpAssessment->getAllParticipants() as $participant) {
                 // What kind of assessment is this?
                 $mark     = null;
-                $feedback = $participant->findAuthoritativeVisibleFeedback($this->viewer);
+                $feedback = $participant->getAuthoritativeFeedback(true);
                 if (!$feedback) {
                     // No visible feedback for this user?
                     // Show nothing, but this is not an error
