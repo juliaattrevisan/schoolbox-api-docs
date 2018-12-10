@@ -44,11 +44,11 @@ $(function () {
         });
 
     $('.right-small a, .right-off-canvas-menu label').on('click', function() {
-        $('[data-inner-offcanvas]').toggleClass('right-open');
+        $('#inner-wrap').toggleClass('right-open');
         $(this).toggleClass('raquo');
 
         var notificationState;
-        if ($('[data-inner-offcanvas]').hasClass('right-open')){
+        if ($('#inner-wrap').hasClass('right-open')){
             notificationState = 'show';
         } else {
             notificationState = 'hide';
@@ -58,26 +58,27 @@ $(function () {
 
     // Left menu dock/undock
     $('#left-menu-dock').on('click', function() {
-        // Hide/show the sidebar
-        $('[data-offcanvas]').removeClass('move-right');
-        $('[data-inner-offcanvas]').toggleClass('left-open');
-        $(this).toggleClass('open');
+        var dockState = $(this).data('dock-state');
+
+        // Adjust classes
+        if (dockState) {
+            $('#inner-wrap').removeClass('left-open');
+        } else {
+            $('#inner-wrap').addClass('left-open');
+        }
+
+        $('#off-canvas-wrap').removeClass('move-right');
 
         // Update the hover title on the dock button
-        var title = 'Hide navigation';
-        if ($(this).hasClass('open')){
-            title = 'Show navigation';
-        }
+        var title = dockState ? $(this).data('title-undock') : $(this).data('title-dock');
         $(this).attr('title', title);
 
         // Update the user's sidebar state in the DB
-        var leftnavState;
-        if ($('[data-inner-offcanvas]').hasClass('left-open')) {
-            leftnavState = 'show';
-        } else {
-            leftnavState = 'hide';
-        }
+        var leftnavState = dockState ? 'hide' : 'show';
         $.post('/ajax/sidenav', {state: leftnavState});
+
+         // Update dock state in the element's data property
+         $(this).data('dock-state', !dockState);
     });
 
     /* Open / Close account menu
@@ -90,7 +91,7 @@ $(function () {
         accountMenu.toggleClass('open');
     });
 
-    $('[data-offcanvas]').on('click', function(){
+    $('#off-canvas-wrap').on('click', function(){
         accountMenu.removeClass('open');
     });
 

@@ -137,11 +137,20 @@
 
 </head>
 <body class="{{ ws.enabled ? '' : 'disableNotifications' }}">
-<div class="off-canvas-wrap docs-wrap" data-offcanvas data-transition="overlap">
-    <div class="inner-wrap {{ user.current.getHideSidenav ? '' : 'left-open' }} {{ user.current.getHideNotificationsTray ? '' : 'right-open' }}" data-inner-offcanvas>
+<div class="off-canvas-wrap" id="off-canvas-wrap" data-offcanvas data-transition="overlap">
+    <div class="inner-wrap {{ user.current.getHideSidenav ? '' : 'left-open' }} {{ user.current.getHideNotificationsTray ? '' : 'right-open' }}" id="inner-wrap" data-inner-offcanvas>
 
+        {% set dockTitle = 'Dock side menu' %}
+        {% set undockTitle = 'Undock side menu' %}
         <aside id="left-menu" class="left-off-canvas-menu hide-for-print" data-side-nav>
-            <a href="#" title="Hide navigation" class="left-menu-dock" id="left-menu-dock"></a>
+            <a 
+                href="#"
+                title="{{ user.current.getHideSidenav ? dockTitle : undockTitle }}"
+                class="left-menu-dock" id="left-menu-dock"
+                data-dock-state="{{ not user.current.getHideSidenav }}"
+                data-title-dock="{{ dockTitle }}"
+                data-title-undock="{{ undockTitle }}"
+            ></a>
             <div class="logo-wrapper">
                 <a href="/" class="logo">
                     <img src="/images/logo.php?logo=skin_logo_large&size=normal" srcset="/images/logo.php?logo=skin_logo_large&size=normal 1x,/images/logo.php?logo=skin_logo_large&size=hidpi 2x" alt="{{ config.school_name }}"/>
