@@ -51,3 +51,16 @@
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
+
+{# @param article: News\Model #}
+{%- macro authorMetaString(article) -%}
+    {% spaceless %}
+        {% if article.isDraft %}
+            Drafted by
+        {% elseif article.isPublished or article.isExpired %}
+            Published by
+        {% else %}
+            Submitted by
+        {% endif %}
+    {% endspaceless %}
+{%- endmacro -%}
