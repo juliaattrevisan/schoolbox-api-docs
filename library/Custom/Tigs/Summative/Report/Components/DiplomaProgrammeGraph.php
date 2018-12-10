@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DueWork;
+use UnexpectedValueException;
 
 /**
  * Builds a suitable data structure for rendering the Diploma Programme
@@ -209,7 +210,11 @@ class DiplomaProgrammeGraph
     /**
      * Collate the unit implementations into a set of assessments.
      *
-     * @return array
+     * @return DueWork\Model[][] A list of DP assessments, indexed by folder ID
+     *                           and then by assessment ID
+     * @throws UnexpectedValueException if a DP assessment isn't a due work,
+     *                                  and has neither a rubric or a max mark
+     *                                  of 7.
      */
     private function collateAssessments(): array
     {
@@ -229,8 +234,9 @@ class DiplomaProgrammeGraph
 
                     // Validate the assessment
                     if (!$assessment instanceof DueWork\Model) {
-                        $error = "Only due works can be used for the MYP/DP graph. Found: {$assessment->getTypeName()}.";
-                        continue;
+                        throw new UnexpectedValueException(
+                            "Only due works can be used for the MYP/DP graph. Found: {$assessment->getTypeName()}."
+                        );
                     }
 
                     // Assessment must either be:
@@ -239,8 +245,9 @@ class DiplomaProgrammeGraph
                     if (!($assessment->getUseRubric()
                         || ($assessment->getMarkType()->getSlug() !== MarkType::SLUG_TOTAL && $assessment->getMaxMark() !== 7)
                     )) {
-                        $error = "A MYP/DP due work must either have a rubric, or a max mark of 7.";
-                        continue;
+                        throw new UnexpectedValueException(
+                            "A MYP/DP due work must either have a rubric, or a max mark of 7."
+                        );
                     }
 
                     $dpAssessments[$folderId][$assessment->getId()] = $assessment;
