@@ -1642,6 +1642,16 @@ dl {
     }
 }
 
+// Alert anchors/links
+.alert-box {
+  a {
+    &:not(.close) {
+      color: inherit;
+      text-decoration: underline;
+    }
+  }
+}
+
 // gradient 1-10
 @include rotate-color-list;
 

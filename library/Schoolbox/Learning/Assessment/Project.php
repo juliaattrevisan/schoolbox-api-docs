@@ -25,14 +25,9 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Resource\Folder\Model as Folder;
-use BadMethodCallException;
 
 class Project extends AbstractAssessment implements AssessmentContext
 {
-    /**
-     * @var string
-     */
-    protected $defaultTypeName = 'Project';
 
     /**
      * @var GenericCollection|IAssessable[]
@@ -52,6 +47,16 @@ class Project extends AbstractAssessment implements AssessmentContext
      * @var int
      */
     protected $precision = 11;
+
+
+    /**
+     * @return string
+     */
+    public static function getDefaultTypeName(): string
+    {
+        return 'Project';
+    }
+
 
     /**
      * Project constructor.

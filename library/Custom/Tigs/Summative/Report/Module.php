@@ -14,7 +14,6 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
@@ -104,7 +103,7 @@ class Module extends Alaress\Module\Module
      * @param array $params
      * @return array
      * @throws InvalidArgumentException
-     * @throws NotFound
+     * @throws InvalidPath
      * @throws UnexpectedValueException
      */
     private function preloadUser(array $params): array
@@ -120,7 +119,7 @@ class Module extends Alaress\Module\Module
         try {
             return ['user' => $this->getUserMapper()->findById($params['userId'])];
         } catch (Mapper\Exception $e) {
-            throw new NotFound('User Not Found', 0, $e);
+            throw new InvalidPath('User Not Found', 0, $e);
         }
     }
 
@@ -131,7 +130,7 @@ class Module extends Alaress\Module\Module
      * @param array $params
      * @return array
      * @throws InvalidArgumentException
-     * @throws NotFound
+     * @throws InvalidPath
      * @throws UnexpectedValueException
      */
     private function preloadUserAndFolder(array $params): array
@@ -146,7 +145,7 @@ class Module extends Alaress\Module\Module
             try {
                 $preload['folder'] = $this->getFolderMapper()->findById($params['folderId']);
             } catch (Mapper\Exception $e) {
-                throw new NotFound('Folder Not Found', 0, $e);
+                throw new InvalidPath('Folder Not Found', 0, $e);
             }
         }
         return $preload;

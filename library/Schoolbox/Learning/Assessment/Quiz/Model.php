@@ -26,10 +26,6 @@ use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 class Model extends AbstractAssessment
 {
-    /**
-     * @var string
-     */
-    protected $defaultTypeName = 'Quiz';
 
     /**
      * Possible value for `$this->maxAttempts`.
@@ -69,6 +65,16 @@ class Model extends AbstractAssessment
      * @var string
      */
     private $completionMessage;
+
+
+    /**
+     * @return string
+     */
+    public static function getDefaultTypeName(): string
+    {
+        return 'Quiz';
+    }
+
 
     /**
      * @param GradeGroup|null $gradeGroup

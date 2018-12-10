@@ -28,11 +28,6 @@ use Schoolbox\Learning\Assessment\Participant;
 class Model extends AbstractAssessment implements ISelfAssessable
 {
     /**
-     * @var string
-     */
-    protected $defaultTypeName = 'Due Work';
-
-    /**
      * Accept zero submissions online
      */
     public const ACCEPT_ONLINE_NONE = 0;
@@ -121,6 +116,15 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * @see SubmissionBox::SELF_REVIEWABILITY_FULL
      */
     private $selfReviewability;
+
+
+    /**
+     * @return string
+     */
+    public static function getDefaultTypeName(): string
+    {
+        return 'Due Work';
+    }
 
 
     /**

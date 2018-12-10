@@ -37,12 +37,6 @@ abstract class AbstractAssessment implements IAssessable
     use UpdatedAtDate;
     use DeletedAtDate;
 
-    /**
-     * Default type name for this assessment.
-     *
-     * @var string
-     */
-    protected $defaultTypeName = 'Assessment';
 
     /**
      * @var string
@@ -196,6 +190,15 @@ abstract class AbstractAssessment implements IAssessable
         $this->setCreatedAt($this->getCreatedAt() instanceof Alaress_Date_Format ? clone $this->getCreatedAt() : new Alaress_Date_NullDate());
         $this->setUpdatedAt($this->getUpdatedAt() instanceof Alaress_Date_Format ? clone $this->getUpdatedAt() : new Alaress_Date_NullDate());
         $this->setDeletedAt($this->getDeletedAt() instanceof Alaress_Date_Format ? clone $this->getDeletedAt() : new Alaress_Date_NullDate());
+    }
+
+
+    /**
+     * @return string
+     */
+    public static function getDefaultTypeName(): string
+    {
+        return 'Assessment';
     }
 
 
@@ -655,7 +658,7 @@ abstract class AbstractAssessment implements IAssessable
     public function getTypeName()
     {
         $subTypeName = $this->getWorkType() ? $this->getWorkType()->getName() : '';
-        return $subTypeName ?: $this->defaultTypeName;
+        return $subTypeName ?: $this::getDefaultTypeName();
     }
 
     /* Getters/Setters
