@@ -97,41 +97,8 @@ class DiplomaProgrammeGraph
 
 
         /** @var DueWork\Model[][] $dpAssessments */
-        $dpAssessments = [];
         $error         = null;
-        foreach ($this->unitImpls as $unitImpl) {
-            // Get the DP assessment out of each unit impl
-            // If any impl has zero, or more than one: that's an error
-            $folderId = $unitImpl->getBaseContext()->getFolder()->getId();
-            if (!isset($dpAssessments[$folderId])) {
-                $dpAssessments[$folderId] = [];
-            }
-            foreach ($unitImpl->getAssessables() as $assessment) {
-                $workType = $assessment->getWorkType();
-                if ($workType && $workType->getId() === $this->dpWorkTypeId) {
-
-                    // Iterate deeper into projects
-
-                    // Validate the assessment
-                    if (!$assessment instanceof DueWork\Model) {
-                        $error = "Only due works can be used for the MYP/DP graph. Found: {$assessment->getTypeName()}.";
-                        continue;
-                    }
-
-                    // Assessment must either be:
-                    // * Total mark = 7
-                    // * Use rubric
-                    if (!($assessment->getUseRubric()
-                        || ($assessment->getMarkType()->getSlug() !== MarkType::SLUG_TOTAL && $assessment->getMaxMark() !== 7)
-                    )) {
-                        $error = "A MYP/DP due work must either have a rubric, or a max mark of 7.";
-                        continue;
-                    }
-
-                    $dpAssessments[$folderId][$assessment->getId()] = $assessment;
-                }
-            }
-        }
+        $dpAssessments = $this->collateAssessments();
 
 
         $markData = [
@@ -236,5 +203,50 @@ class DiplomaProgrammeGraph
             'studentValue' => $studentMark,
             'error'        => $error,
         ];
+    }
+
+
+    /**
+     * Collate the unit implementations into a set of assessments.
+     *
+     * @return array
+     */
+    private function collateAssessments(): array
+    {
+        $dpAssessments = [];
+        foreach ($this->unitImpls as $unitImpl) {
+            // Get the DP assessment out of each unit impl
+            // If any impl has zero, or more than one: that's an error
+            $folderId = $unitImpl->getBaseContext()->getFolder()->getId();
+            if (!isset($dpAssessments[$folderId])) {
+                $dpAssessments[$folderId] = [];
+            }
+            foreach ($unitImpl->getAssessables() as $assessment) {
+                $workType = $assessment->getWorkType();
+                if ($workType && $workType->getId() === $this->dpWorkTypeId) {
+
+                    // Iterate deeper into projects
+
+                    // Validate the assessment
+                    if (!$assessment instanceof DueWork\Model) {
+                        $error = "Only due works can be used for the MYP/DP graph. Found: {$assessment->getTypeName()}.";
+                        continue;
+                    }
+
+                    // Assessment must either be:
+                    // * Total mark = 7
+                    // * Use rubric
+                    if (!($assessment->getUseRubric()
+                        || ($assessment->getMarkType()->getSlug() !== MarkType::SLUG_TOTAL && $assessment->getMaxMark() !== 7)
+                    )) {
+                        $error = "A MYP/DP due work must either have a rubric, or a max mark of 7.";
+                        continue;
+                    }
+
+                    $dpAssessments[$folderId][$assessment->getId()] = $assessment;
+                }
+            }
+        }
+        return $dpAssessments;
     }
 }
