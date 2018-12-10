@@ -16,7 +16,7 @@ $include-html-off-canvas-classes: $include-html-classes !default;
 
 $tabbar-bg: $navigation-background;
 $tabbar-height: rem-calc(72);
-$tabbar-icon-width: rem-calc(80);
+$tabbar-icon-width: rem-calc(72);
 $tabbar-line-height: $tabbar-height;
 $tabbar-color: $black;
 $tabbar-middle-padding: 0;
@@ -33,7 +33,7 @@ $tabbar-header-margin: 0;
 $tabbar-menu-icon-color: $navigation-foreground;
 $tabbar-menu-icon-hover: $navigation-hover;
 $tabbar-menu-icon-text-indent: rem-calc(35);
-$tabbar-menu-icon-width: $tabbar-icon-width;
+$tabbar-menu-icon-width: rem-calc(80);
 $tabbar-menu-icon-height: $tabbar-height;
 $tabbar-menu-icon-padding: 0;
 
@@ -124,7 +124,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
  */
 .hybrid-bar {
 	.logo {
-		width: $tabbar-menu-icon-width;
+		width: $tabbar-icon-width;
 		height: $tabbar-height;
 		float: left;
 
@@ -161,7 +161,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		background: $navigation-background;
 		margin: 0;
 		position: absolute;
-		right: $tabbar-menu-icon-width;
+		right: $tabbar-icon-width;
 		top: 0;
 		width: $tabbar-height;
 		@include placeholder-color(transparent, $font-weight-normal);
@@ -223,10 +223,11 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 	}
 
-	#top-menu {
+	.top-menu {
 		@include inline-list;
 		margin: 0;
 		height: inherit;
+		padding: 0 0 0 $tabbar-padding-left;
 
 		li {
 			margin: 0;
@@ -363,7 +364,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 	}
 	@media #{$small-only} {
-		#top-menu {
+		.top-menu {
 			padding: 0;
 			position: absolute;
 			left: 0;
@@ -689,7 +690,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 
 @media #{$medium-up} {
 	.hybrid-bar #search {
-		right:  $tabbar-menu-icon-width * 2;
+		right:  $tabbar-icon-width * 2;
 	}
 }
 
@@ -776,21 +777,21 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 /**
  * Top nav & left side bar nav items hiding and showing
  *
- * Based on the width of the page squeeze as many icons on the top bar (#top-menu) as possible.
+ * Based on the width of the page squeeze as many icons on the top bar (.top-menu) as possible.
  * The items that cannot fit show in the profile drop down (.second-nav)
  */
 
 // Calculate the total widths of the possible views
-$offcanvas-width-used: ($tabbar-menu-icon-width * 4) + $tabbar-padding-left; // logo + menu + search + notifications
-$offcanvas-width-no-notif: $offcanvas-width-used - $tabbar-menu-icon-width; // same as above minus the notifications button
+$offcanvas-width-used: ($tabbar-icon-width * 4) + $tabbar-padding-left; // logo + menu + search + notifications
+$offcanvas-width-no-notif: $offcanvas-width-used - $tabbar-icon-width; // same as above minus the notifications button
 
-$normal-width-used: $off-canvas-width + ($tabbar-menu-icon-width * 2) + $tabbar-padding-left; // sidebar + search + notifications
-$normal-width-no-notif: $normal-width-used - $tabbar-menu-icon-width; // same as above minus the notifications button
+$normal-width-used: $off-canvas-width + ($tabbar-icon-width * 2) + $tabbar-padding-left; // sidebar + search + notifications
+$normal-width-no-notif: $normal-width-used - $tabbar-icon-width; // same as above minus the notifications button
 
-$rightopen-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sidebars + the search button
+$rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars + the search button
 
 // Hide all top menu items as a starting point
-.hybrid-bar #top-menu li {
+.hybrid-bar .top-menu li {
 	display: none;
 }
 
@@ -798,7 +799,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sid
 @media #{$medium-down} {
 
 	// Display 4 on top by default
-	.hybrid-bar #top-menu li:nth-child(-n+4) {
+	.hybrid-bar .top-menu li:nth-child(-n+4) {
 		display: block;
 	}
 	#left-menu .second-nav li:nth-child(-n+4) {
@@ -813,7 +814,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sid
 		$min-width-no-notif: $offcanvas-width-no-notif + $icon-width-needed;
 
 		@media screen and (min-width: $min-width) {
-			.hybrid-bar #top-menu li:nth-child(-n+#{$i}) {
+			.hybrid-bar .top-menu li:nth-child(-n+#{$i}) {
 				display: block;
 			}
 			#left-menu .second-nav li:nth-child(-n+#{$i}) {
@@ -822,7 +823,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sid
 		}
 
 		@media screen and (min-width: $min-width-no-notif) {
-			.disableNotifications #top-menu li:nth-child(-n+#{$i}) {
+			.disableNotifications .top-menu li:nth-child(-n+#{$i}) {
 				display: block;
 			}
 			.disableNotifications #left-menu .second-nav li:nth-child(-n+#{$i}) {
@@ -836,7 +837,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sid
 @media #{$screen} and (min-width:#{lower-bound($mediumwide-range)}) and (max-width:#{upper-bound($large-range)}) {
 
 	// Display 6 by default
-	.hybrid-bar #top-menu li:nth-child(-n+6) {
+	.hybrid-bar .top-menu li:nth-child(-n+6) {
 		display: block;
 	}
 	#left-menu .second-nav li:nth-child(-n+6) {
@@ -851,7 +852,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sid
 		$min-width-no-notif: $normal-width-no-notif + $icon-width-needed;
 
 		@media screen and (min-width: $min-width) {
-			.hybrid-bar #top-menu li:nth-child(-n+#{$i}) {
+			.hybrid-bar .top-menu li:nth-child(-n+#{$i}) {
 				display: block;
 			}
 			#left-menu .second-nav li:nth-child(-n+#{$i}) {
@@ -860,7 +861,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sid
 		}
 
 		@media screen and (min-width: $min-width-no-notif) {
-			.disableNotifications #top-menu li:nth-child(-n+#{$i}) {
+			.disableNotifications .top-menu li:nth-child(-n+#{$i}) {
 				display: block;
 			}
 			.disableNotifications #left-menu .second-nav li:nth-child(-n+#{$i}) {
@@ -875,7 +876,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sid
 @media #{$xlarge-up} {
 
 	// Display 11 by default
-	.hybrid-bar #top-menu li:nth-child(-n+11) {
+	.hybrid-bar .top-menu li:nth-child(-n+11) {
 		display: block;
 	}
 	#left-menu .second-nav li:nth-child(-n+12) {
@@ -892,7 +893,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sid
 		$min-width-rightopen: $rightopen-width-used + $icon-width-needed;
 
 		@media screen and (min-width: $min-width-rightopen) {
-			.hybrid-bar #top-menu li:nth-child(-n+#{$i}) {
+			.hybrid-bar .top-menu li:nth-child(-n+#{$i}) {
 				display: block;
 			}
 			#left-menu .second-nav li:nth-child(-n+#{$i}) {
@@ -902,7 +903,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sid
 
 		@media screen and (min-width: $min-width) {
 			.inner-wrap:not(.right-open) {
-				.hybrid-bar #top-menu li:nth-child(-n+#{$i}) {
+				.hybrid-bar .top-menu li:nth-child(-n+#{$i}) {
 					display: block;
 				}
 				#left-menu .second-nav li:nth-child(-n+#{$i}) {
@@ -912,7 +913,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sid
 		}
 
 		@media screen and (min-width: $min-width-no-notif) {
-			.disableNotifications #top-menu li:nth-child(-n+#{$i}) {
+			.disableNotifications .top-menu li:nth-child(-n+#{$i}) {
 				display: block;
 			}
 			.disableNotifications #left-menu .second-nav li:nth-child(-n+#{$i}) {

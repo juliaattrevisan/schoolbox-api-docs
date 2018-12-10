@@ -212,7 +212,7 @@
 
                         {% block menuTop %}
                             {% if user.current.id %}
-                                <ul id="top-menu">
+                                <ul id="top-menu" class="top-menu">
                                     {% include '@menuTop/renderer.twig' with topMenu only %}
                                 </ul>
                             {% endif %}
