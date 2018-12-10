@@ -86,6 +86,9 @@ $menu-slide: transform 100ms ease;
 
 $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($background: $tabbar-bg, $opacity: 0.65));
 
+// The point at which to allow the left sidebar to dock, the account menu to move to the top menu, and the full logo to show
+$allow-sidebar-stash: $large-up;
+
 /* Display a logo/background for non-authenticated screens
  * like Forgotten Password, Privacy Policy, Feedback Form etc
  *
@@ -271,17 +274,23 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			}
 		}
 	}
-	/* Profile Drop down
-	 */
-	#profile-drop {
-		right: 4.5rem;
-		position: absolute;
-		top: 0;
-		height: $tabbar-height;
-		width: $tabbar-height;
+	// Account menu
+	.account-menu {
+		display: none;
+	}
 
-		img {
-			vertical-align: top;
+	@media #{$allow-sidebar-stash} {
+		.account-menu {
+			display: block;
+			right: $tabbar-icon-width;
+			position: absolute;
+			top: 0;
+			height: $tabbar-height;
+			width: $tabbar-height;
+
+			img {
+				vertical-align: top;
+			}
 		}
 	}
 
@@ -406,10 +415,10 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
  */
 .left-off-canvas-menu {
 	/* Profile Accordion Menu
-	* This is the currently-logged-in user's dom element
-	* Appears when you click a guy's username in the left menu
-	*/
-	.account-menu {
+	 * This is the currently-logged-in user's dom element
+	 * Appears when you click a guy's username in the left menu
+	 */
+	.account-menu-mobile {
 		color: $off-canvas-foreground;
 		background-color: transparent;
 		@include single-transition(all, 0.15s, linear);
@@ -532,7 +541,11 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		display: none;
 	}
 
-	@media #{$mediumwide-up} {
+	@media #{$allow-sidebar-stash} {
+		.account-menu-mobile {
+			display: none;
+		}
+
 		.left-menu-dock {
 			display: block;
 			height: 2.5rem;
@@ -562,7 +575,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 	}
 
-	@media #{$mediumwide-up} {
+	@media #{$allow-sidebar-stash} {
 		.logo-wrapper .logo {
 			display: block;
 			margin: 3rem 2rem 1rem 2rem;
@@ -688,7 +701,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	&::-webkit-scrollbar-thumb:vertical:active { background: $monsoon; }
 }
 
-@media #{$medium-up} {
+@media #{$allow-sidebar-stash} {
 	.hybrid-bar .global-search {
 		right:  $tabbar-icon-width * 2;
 	}
@@ -739,7 +752,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 }
 
-@media #{$large-up} {
+@media #{$allow-sidebar-stash} {
 	.inner-wrap.left-open {
 		.left-off-canvas-menu{
 			transition: $menu-slide;

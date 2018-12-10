@@ -159,8 +159,8 @@
 
             {% block accountMenuMobile %}
                 {% if user.current.id %}
-                    <div class="row show-for-small">
-                        <ul class="account-menu accordion" id="account-menu-mobile" data-accordion>
+                    <div class="row">
+                        <ul class="account-menu-mobile accordion" id="account-menu-mobile" data-accordion>
                             <li class="accordion-navigation">
                                 <a href="#account-content-mobile" class="profile-drop" id="profile-accordion">
                                     <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square80"/>
@@ -229,7 +229,7 @@
 
                         {% block accountMenu %}
                             {% if user.current.id %}
-                                <a href="#" id="profile-drop" title="{{ user.current.fullName }}" class="show-for-medium-up">
+                                <a href="#" id="profile-drop" title="{{ user.current.fullName }}" class="account-menu">
                                     <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square80"/>
                                 </a>
                                 <div id="account-content" class="account-drop">
