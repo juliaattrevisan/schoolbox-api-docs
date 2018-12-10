@@ -38,6 +38,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
+use InvalidArgumentException;
 
 class Module extends BaseModule
 {
@@ -181,8 +182,10 @@ class Module extends BaseModule
         ]);
     }
 
+
     /**
      * {@inheritdoc}
+     * @throws InvalidArgumentException If invalid mapper name is specified
      */
     public function initControllers(ContainerInterface $injector)
     {
@@ -205,6 +208,7 @@ class Module extends BaseModule
             'roleMapper'                 => RoleMapper::getInstance(),
             'userMapper'                 => UserMapper::getInstance(),
             'userAccessMapper'           => UserAccessMapper::getInstance(),
+            'audienceMapper'             => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));

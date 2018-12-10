@@ -8,10 +8,14 @@
 
 namespace Schoolbox\Pastoral\Type;
 
+use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Pastoral\DocumentClassification\Model as DocumentClassification;
+use Schoolbox\Pastoral;
+use DomainException;
 
 class Model implements ISoftDeletable
 {
@@ -26,6 +30,17 @@ class Model implements ISoftDeletable
 
     /** @var string */
     protected $externalCode;
+
+    /** @var GenericCollection|Pastoral\SubType\Model[] */
+    private $subTypes;
+
+
+    public function __construct()
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->subTypes = new GenericCollection(Pastoral\SubType\Model::class);
+    }
+
 
     /**
      * @param DocumentClassification $documentClassification
@@ -85,5 +100,26 @@ class Model implements ISoftDeletable
     public function getExternalCode()
     {
         return $this->externalCode;
+    }
+
+
+    /**
+     * @return GenericCollection|Pastoral\SubType\Model[]
+     */
+    public function getSubTypes(): GenericCollection
+    {
+        return $this->subTypes;
+    }
+
+
+    /**
+     * @param Collection|Pastoral\SubType\Model[] $subTypes
+     * @return $this
+     * @throws DomainException
+     */
+    public function setSubTypes(Collection $subTypes): self
+    {
+        $this->subTypes->replaceWith($subTypes);
+        return $this;
     }
 }

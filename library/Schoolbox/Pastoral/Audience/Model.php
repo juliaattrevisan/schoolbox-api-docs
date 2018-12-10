@@ -1,12 +1,9 @@
 <?php
 /**
- * This maintains an audit trail of every record a staff member views, and all the searches that they perform (and the
- * results that these searches returned)
- *
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Audience;
 
@@ -14,10 +11,10 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 use Schoolbox\Pastoral\Type\Model as Type;
-
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -25,12 +22,13 @@ class Model implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
 
-    /** @var User $user Schoolbox user whose actions we are tracking */
+    /** @var null|User */
     private $user;
 
-    /** @var null|PastoralGroup $pastoralGroup */
+    /** @var null|PastoralGroup */
     private $group;
 
     /** @var null|Role  */
@@ -47,10 +45,44 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Returns whether this AudienceRule is equal to some other AudienceRule
+     *
+     * @param self $other
+     * @param bool $ignoreAccess If true, consider rules equal if they differ only by accessLevel
+     * @return bool
+     */
+    public function equals(Model $other, bool $ignoreAccess = false): bool
+    {
+        // TODO remove explicit type-coercion once model hydration is fixed SA-4539
+        if (($this->user xor $other->user) || ($this->user && (int)$this->user->getId() !== (int)$other->user->getId())) {
+            return false;
+        }
+
+        if (($this->role xor $other->role) || ($this->role && (int)$this->role->getId() !== (int)$other->role->getId())) {
+            return false;
+        }
+
+        if (($this->group xor $other->group) || ($this->group && (int)$this->group->getId() !== (int)$other->group->getId())) {
+            return false;
+        }
+
+        if (($this->type xor $other->type) || ($this->type && (int)$this->type->getId() !== (int)$other->type->getId())) {
+            return false;
+        }
+
+        if (($this->subtype xor $other->subtype) || ($this->subtype && (int)$this->subtype->getId() !== (int)$other->subtype->getId())) {
+            return false;
+        }
+
+        return $ignoreAccess || $this->access === $other->access;
+    }
+
+
+    /**
      * @param PastoralGroup|null $pastoralGroup
      * @return $this
      */
-    public function setGroup(PastoralGroup $pastoralGroup): self
+    public function setGroup(?PastoralGroup $pastoralGroup): self
     {
         $this->group = $pastoralGroup;
 
@@ -66,11 +98,11 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param User $user
+     * @param null|User $user
      *
      * @return self
      */
-    public function setUser(User $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 
@@ -96,10 +128,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param Role $role
-     * @return Model
+     * @param null|Role $role
+     * @return $this
      */
-    public function setRole($role): self
+    public function setRole(?Role $role): self
     {
         $this->role = $role;
 
@@ -115,11 +147,13 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Type|null $type
+     * @param null|Type $type
+     * @return $this
      */
-    public function setType(?Type $type): void
+    public function setType(?Type $type): self
     {
         $this->type = $type;
+        return $this;
     }
 
     /**
@@ -131,17 +165,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param SubType|null $subtype
+     * @param null|SubType $subtype
+     * @return $this
      */
-    public function setSubtype(?SubType $subtype): void
+    public function setSubtype(?SubType $subtype): self
     {
         $this->subtype = $subtype;
+        return $this;
     }
 
     /**
      * @return int
      */
-    public function getAccess(): int
+    public function getAccess(): ?int
     {
         return $this->access;
     }

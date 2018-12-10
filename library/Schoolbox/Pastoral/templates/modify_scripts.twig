@@ -116,9 +116,14 @@
 
         window.hasChanged = false;
 
+        $('#table-permission').on('change', '[type=radio]', function () {
+            window.hasChanged = true;
+        });
+
         function loadAudience() {
-            //Only load the audience defaults if this is a new record
+            // Only load the audience defaults if the record does not yet have any access rules
             {% if record.access | length < 1 %}
+                {% set noSubTypeVal = 0 %}
                 //Only change between defaults if no other changes have been made
                 if(window.hasChanged == false) {
                     //Remove all other rows
@@ -126,15 +131,26 @@
                     $("#permission-users tr").remove();
                     $("#permission-groups tr").remove();
 
+                    // Reset roles, users and groups to empty, they will updated below
                     window.rolesAdded = [];
                     window.usersAdded = [];
                     window.groupsAdded = [];
+                    $('[data-role-add]').removeClass('hide');
+                    $('[data-group-add]').removeClass('hide');
+                    $("[data-reveal-id='modal-role']").removeAttr('disabled');
 
                     var typeId = $("#typeId").val();
                     var subtypeId = $("#subtypeId").val();
+                    if(!subtypeId){
+                        // Cast null (no selection) to '0' string
+                        subtypeId = '{{ noSubTypeVal }}';
+                    }
 
                     {% for audience in audiences %}
-                        if ({{ audience.type.id }} == typeId && {{ audience.subtype.id | default("null") }} == subtypeId) {
+                        {% set subtype = audience.subtype %}
+                        {% set type    = subtype is null ? audience.type : subtype.pastoralType %}
+
+                        if ('{{ type.id }}' === typeId && '{{ subtype.id|default(noSubTypeVal) }}' === subtypeId) {
                             {% if audience.group.id %}
                             window.addGroup("{{ audience.group.id }}", "{{ audience.group.name }}", "{{ audience.access }}");
                             {% elseif audience.role.id %}
@@ -156,11 +172,6 @@
         }
 
         loadAudience();
-
-        $('[data-delete-visibility], input[name  *= "user"], input[name *= "groups"], input[name *= "role"], [data-button *= "add"]').on('click', function() {
-            window.hasChanged = true;
-        });
-
 });
 </script>
 {% endautoescape %}

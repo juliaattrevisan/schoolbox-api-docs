@@ -12,6 +12,9 @@ use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use UnexpectedValueException;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -28,6 +31,7 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
     }
 
     /**
@@ -52,6 +56,19 @@ class Mapper extends BaseMapper
             throw new UnexpectedValueException(sprintf($message, $countRecords));
         }
 
+        return true;
+    }
+
+
+    /**
+     * Deletes any pastoral audiences for this SubType
+     *
+     * @param Model $subType
+     * @return bool
+     */
+    protected function deletePastoralAudiences(Model $subType): bool
+    {
+        Pastoral\Audience\Mapper::getInstance()->deleteByColumn('subtype_id', $subType->getId());
         return true;
     }
 }

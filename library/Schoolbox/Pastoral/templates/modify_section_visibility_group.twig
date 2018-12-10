@@ -114,6 +114,7 @@
                             row.remove();
                             updateGroupsModal();
                             updateVisibility();
+                            window.hasChanged = true;
                         }
                     });
                 });
@@ -156,7 +157,7 @@
 
 
 
-            window.addGroup = function(groupId, groupName, permission = 1) {
+            window.addGroup = function(groupId, groupName, permission) {
                 if (window.groupsAdded[groupId] !== true) {
                     $('#empty-groups').remove();
 
@@ -187,7 +188,7 @@
                 var groupId = $(this).attr('data-group-add');
                 var groupName = $(this).attr('data-group-name');
 
-                addGroup(groupId, groupName);
+                addGroup(groupId, groupName, 1);
 
                 var remaining = 0;
 

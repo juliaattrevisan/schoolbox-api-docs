@@ -1,14 +1,8 @@
 <?php
 /**
- * Pastoral care pastoral type audience defaults
- *
- * This allows the user to set a default audience for a pastoral type/subtype
- *
- * @author      Mattherw Schembri <matt.schembri@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Pastoral\Audience;
 
 use PDO;
@@ -20,28 +14,30 @@ use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
 use Schoolbox\Pastoral\SubType\Mapper as SubTypeMapper;
 use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
 use Schoolbox\RoleMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
-
+use UnexpectedValueException;
+use InvalidArgumentException;
 
 /**
- * Class Mapper
- * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * Pastoral care pastoral type audience defaults
  *
- * @package Schoolbox\Pastoral\Audience
+ * This allows the user to set a default audience for a pastoral type/subtype
+ *
+ * @method Model createModel($idValue = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method GenericCollection|Model[] createCollection($contents = [])
+ * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
+ * @method GenericCollection|Model[] findAll($options = [])
  */
 class Mapper extends BaseMapper
 {
-    // Define record access levels
-
-    const ACCESS_DENY = 0;                      // Deny trumps all other access to allow exclusion of a user/group/role
-    const ACCESS_PUBLIC = 1;
-    const ACCESS_PRIVATE = 2;
 
     /**
      * Setup mapper
+     *
+     * @throws InvalidArgumentException
      */
-    protected function mapping()
+    protected function mapping(): void
     {
         $this->hasTable('pastoral_audience');
         $this->hasModel(Model::class);
@@ -53,7 +49,10 @@ class Mapper extends BaseMapper
         $this->joins('type_id', TypeMapper::class, 'id', null, null, 'type', 'type');
         $this->joins('subtype_id', SubTypeMapper::class, 'id', null, null, 'subtype', 'subtype');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateRelationships']);
     }
 
     /**
@@ -62,92 +61,113 @@ class Mapper extends BaseMapper
      * @throws BaseMapper\DefinitionException
      * @return string
      */
-    protected function getSelectString()
+    protected function getSelectString(): string
     {
-        // Intentionally does not join onto soft-deleted strong entities
-        // (e.g. An access is for a User, and user is soft-deleted)
-
         return "
-			SELECT      {$this->getColumnString()},
-			            {$this->getJoinColumnString('type', 't')},
+            SELECT      {$this->getColumnString()},
+                        {$this->getJoinColumnString('type', 't')},
                         {$this->getJoinColumnString('subtype', 'st')},
                         {$this->getJoinColumnString('role', 'r')},
                         {$this->getJoinColumnString('user', 'u')},
+                        {$this->getJoinColumnString('user.role', 'ur')},
                         {$this->getJoinColumnString('group', 'g')}
-			FROM        {$this->getTable()}
-            JOIN        {$this->getJoinSql('type', '', 't')}
-            LEFT JOIN   {$this->getJoinSql('subtype', '', 'st')}
-            LEFT JOIN   {$this->getJoinSql('role', '', 'r')}
-            LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
-            LEFT JOIN   {$this->getJoinSql('group', '', 'g')}
+            FROM        {$this->getTable()}
+            LEFT JOIN   {$this->getJoinSql('type', '', 't', true)}
+            LEFT JOIN   {$this->getJoinSql('subtype', '', 'st', true)}
+            LEFT JOIN   {$this->getJoinSql('role', '', 'r', true)}
+            LEFT JOIN   {$this->getJoinSql('user', '', 'u', true)}
+            LEFT JOIN   {$this->getJoinSql('user.role', 'u', 'ur', true)}
+            LEFT JOIN   {$this->getJoinSql('group', '', 'g', true)}
         ";
     }
+
 
     /**
      * @param PDOStatement $statement
      *
      * @throws Exception
+     * @throws BaseMapper\DefinitionException
      * @return GenericCollection
      */
-    protected function hydrateSelect(PDOStatement $statement)
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         $results = $this->createCollection();
 
+        /**
+         * @var UserMapper    $userMapper
+         * @var RoleMapper    $roleMapper
+         * @var TypeMapper    $typeMapper
+         * @var SubTypeMapper $subTypeMapper
+         * @var GroupMapper   $pGroupMapper
+         */
+        $userMapper    = $this->getJoinMapper('user');
+        $roleMapper    = $this->getJoinMapper('role');
+        $typeMapper    = $this->getJoinMapper('type');
+        $subTypeMapper = $this->getJoinMapper('subtype');
+        $pGroupMapper  = $this->getJoinMapper('group');
+
+        /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            // The record must have a user, role or group specified
-
-            if (empty($row['u.id']) && empty($row['r.id']) && empty($row['g.id'])) {
-                continue;
-            }
-
             $access = $this->hydrate($row);
 
-            $access->setType($this->hydrateJoin($row, 'type', 't'));
             if (!empty($row['st.id'])) {
-                $access->setSubtype($this->hydrateJoin($row, 'subtype', 'st'));
+                $access->setSubtype($subTypeMapper->hydrate($row, 'st'));
+            }
+            if (!empty($row['t.id'])) {
+                $access->setType($typeMapper->hydrate($row, 't'));
             }
 
             // Hydrate user
-
             if (!empty($row['u.id'])) {
-                /** @var User $user */
-                $user = $this->hydrateJoin($row, 'user', 'u');
-                $user->setRole = $this->getJoinMapper('role')->findByIdWithFallback($user->getRole()->getId());
+                $user = $userMapper->hydrate($row, 'u');
+                $user->setRole($roleMapper->hydrate($row, 'ur'));
                 $access->setUser($user);
             }
 
             // Hydrate role
-
             if (!empty($row['r.id'])) {
-                $access->setRole($this->hydrateJoin($row, 'role', 'r'));
+                $access->setRole($roleMapper->hydrate($row, 'r'));
             }
 
             // Hydrate group
-
             if (!empty($row['g.id'])) {
-                $access->setGroup($this->hydrateJoin($row, 'group', 'g'));
+                $access->setGroup($pGroupMapper->hydrate($row, 'g'));
             }
 
-            $results->add($access);
+            $results[$access->getId()] = $access;
         }
 
         return $results;
     }
 
-    /**
-     * @param int $typeId
-     * @param int $subtypeId
-     * @throws Exception
-     */
-    public function hardDeleteByType($typeId, $subtypeId): void
-    {
-        $oldPerms = $this->findByColumnList(['type_id' => $typeId, 'subtype_id' => $subtypeId], ['deleted' => true]);
 
-        if (\count($oldPerms) > 0) {
-            foreach ($oldPerms as $oldie) {
-                $this->hardDelete($oldie);
-            }
+    /**
+     * Ensures the model has correct relationships
+     *
+     * @param Model $model
+     * @return bool
+     * @throws UnexpectedValueException If invalid relationship combination detected
+     */
+    protected function validateRelationships(Model $model): bool
+    {
+        $errors = [];
+        if ($model->getType() && $model->getSubtype()) {
+            $errors[] = "Audience cannot be for both a Type and SubType";
+        } elseif (!$model->getType() && !$model->getSubtype()) {
+            $errors[] = "Audience must have either a Type and SubType";
         }
 
+        $count = (int)$model->getUser() + (int)$model->getRole() + (int)$model->getGroup();
+        if (!$count) {
+            $errors[] = "Audience must have either a User, Role, or Group";
+        } elseif ($count > 1) {
+            $errors[] = "Audience must be for only one of User, Role, or Group";
+        }
+
+        if (\count($errors)) {
+            throw new UnexpectedValueException(\implode("\n", $errors));
+        }
+
+        return true;
     }
 }
