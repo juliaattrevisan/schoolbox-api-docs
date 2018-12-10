@@ -8,6 +8,11 @@
 
 {% extends '@commsNews/page-layout.twig' %}
 
+{% block breadCrumbs %}
+    {% import 'sub/breadcrumbs.twig' as bread %}
+    {{ bread.crumbs([locale.news.properPlural, routeLookup('commsNews.getIndex')], ['My Saved ' ~ locale.news.properPlural]) }}
+{% endblock %}
+
 {% block newsTitle %}My Saved {{ locale.news.proper }}{% endblock %}
 
 {% block createLink %}

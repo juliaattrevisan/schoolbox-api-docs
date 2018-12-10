@@ -1,5 +1,10 @@
 {% extends '@commsNews/page-layout.twig' %}
 
+{% block breadCrumbs %}
+    {% import 'sub/breadcrumbs.twig' as bread %}
+    {{ bread.crumbs([locale.news.properPlural, routeLookup('commsNews.getIndex')], ['Requiring Moderation']) }}
+{% endblock %}
+
 {% block newsTitle %}Requiring Moderation{% endblock %}
 
 {% block createLink %}

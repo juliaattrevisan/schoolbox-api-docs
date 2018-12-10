@@ -9,6 +9,14 @@
     });
 </script>
 
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbs(
+    [locale.news.properPlural, routeLookup('commsNews.getIndex')],
+    [article.title |default("(untitled)"), routeLookup('commsNews.getDetail', {articleId: article.id})],
+    ['Statistics']
+) }}
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Statistics for {{ article.title }}</h1>

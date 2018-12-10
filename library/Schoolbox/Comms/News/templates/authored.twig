@@ -1,5 +1,10 @@
 {% extends '@commsNews/page-layout.twig' %}
 
+{% block breadCrumbs %}
+    {% import 'sub/breadcrumbs.twig' as bread %}
+    {{ bread.crumbs([locale.news.properPlural, routeLookup('commsNews.getIndex')], ['Created By Me']) }}
+{% endblock %}
+
 {% block newsTitle %}Created By Me{% endblock %}
 
 {% block newsContent %}
