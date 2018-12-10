@@ -1013,6 +1013,26 @@ class SitePage extends Page
         }
     }
 
+
+    /**
+     * Detects the presence of a .php extension in the request URI's path, and
+     * redirects to the same page without the extension if it finds it.
+     */
+    public static function redirectToPageWithoutPhpExtension(): void
+    {
+        $parts = parse_url($_SERVER['REQUEST_URI']);
+
+        // strip out .php from the path
+        if (preg_match('[\\.php$]i', $parts['path'])) {
+            $newUrl = substr($parts['path'], 0, -4);
+            if (isset($parts['query'])) {
+                $newUrl .= '?' . $parts['query'];
+            }
+            self::localRedir($newUrl);
+        }
+    }
+
+
     /**
      * Keeps the script running in the background, and switches off the ability
      * for the user to terminate the script. After this, no more output is sent.

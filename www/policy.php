@@ -5,12 +5,16 @@ use Alaress\Application\Kernel;
 /** @var Kernel $kernel */
 $kernel = require_once '../library/Bootstrap.php';
 
-/** @var SitePage $page */
-$page = $kernel->getDependencyInjector()->get('layoutEngine');
-$page->setSite();
-$page->setFile(TEMPLATE_content, 'policy/view.html');
-$page->setTitle('Guidelines of Use and Privacy Policy');
 
-$page->setVar('POLICY', Cfg::get('policy'));
+// /policy.php? redirect to /policy
+SitePage::redirectToPageWithoutPhpExtension();
 
-$page->outputPage();
+
+/** @var SitePage $this */
+$this->setSite();
+$this->setFile(TEMPLATE_content, 'policy/view.html');
+$this->setTitle('Guidelines of Use and Privacy Policy');
+
+$this->setVar('POLICY', Scrub::html($this->getDi()->get('config')->get('policy')));
+
+$this->outputPage();
