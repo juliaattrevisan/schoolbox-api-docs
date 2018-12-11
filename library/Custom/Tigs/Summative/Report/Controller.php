@@ -182,8 +182,9 @@ class Controller extends Web\Controller\Base
     {
         $ibFlagOn = (bool)$this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'];
 
-        $isHsc = !$ibFlagOn || $user->getYear() <= 10;
-        $isIb  = $ibFlagOn || $user->getYear() <= 10;
+        $year  = (int)$user->getYear();
+        $isHsc = !$ibFlagOn || $year <= 10;
+        $isIb  = $ibFlagOn  || $year <= 10;
 
         // Hardcoded term dates for now
         $firstDayTerm1Relative = '1 January';
@@ -233,17 +234,17 @@ class Controller extends Web\Controller\Base
         }
 
         // Apply SB to Curriculum mapping
-        if (4 === $term && (int)$user->getYear() === 11) {
+        if (4 === $term && $year === 11) {
             // Year 11, Term 4 => Sem1 Yr 12 Curriculum
             $curriculumYearLevel = 12;
             $curriculumSemester  = 1;
-        } elseif (2 === $term && (int)$user->getYear() === 12) {
+        } elseif (2 === $term && $year === 12) {
             // Year 12, Term 2 => Sem2 Yr 12 Curriculum
             $curriculumYearLevel = 12;
             $curriculumSemester  = 2;
         } else {
             // Normal Case
-            $curriculumYearLevel = $user->getYear();
+            $curriculumYearLevel = $year;
             $curriculumSemester  = $sbSem;
         }
 
@@ -392,10 +393,16 @@ class Controller extends Web\Controller\Base
      *
      * @param GenericCollection $unitImpls
      * @param User              $student
+     * @param int               $curriculumYearLevel
+     * @param int               $curriculumSemester
      * @return array
      */
-    private function buildDiplomaProgrammeReportData(GenericCollection $unitImpls, User $student): array
-    {
+    private function buildDiplomaProgrammeReportData(
+        GenericCollection $unitImpls,
+        User $student,
+        int $curriculumYearLevel,
+        int $curriculumSemester
+    ): array {
         // $unitImpls needs to contain the entire cohort's impls, not just this one
 
         $dpWorkTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE);
@@ -418,7 +425,9 @@ class Controller extends Web\Controller\Base
             $this->visibility,
             $this->getUser(),
             $dpWorkTypeId,
-            $this->rubricMapper
+            $this->rubricMapper,
+            $curriculumYearLevel,
+            $curriculumSemester
         );
 
         return $dp->toContext();
