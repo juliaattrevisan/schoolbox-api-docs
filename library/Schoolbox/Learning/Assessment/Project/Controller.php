@@ -142,6 +142,27 @@ class Controller extends Assessment\Controller
         $visibility    = new Assessment\Visibility($this->getAccess());
         $now           = Alaress_Date_Format::now();
         $mutator       = new Participant\AssessmentListMutator($this->getUser(), $visibility, $now, true);
+        $classFolder          = $assessment->getBaseContext()->getFolder();
+        $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $classFolder);
+
+        // OPTION 1
+        // If $student is an instructor, all assessments appear on project summary page
+        // *except for* assessments which the instructor has participated to and then has been excluded from.
+
+        $subActivities = $subActivities
+            ->filter(function (IAssessable $subAssessable) use ($student, $isViewerAnInstructor) {
+                try {
+                    $participant = $subAssessable->getParticipant($student);
+                    return !$participant->isExcluded();
+                } catch (\UnexpectedValueException $e) {
+                    // not participant
+                    return $isViewerAnInstructor;
+                }
+            });
+
+        // OPTION 2
+        // If $student is an instructor, all assessments appear on project summary page
+        // *even when* the instructor is excluded for the assessment.
         $subActivities = $subActivities
             ->map([$mutator, 'map'])
             ->filter([$mutator, 'filter'])
@@ -153,8 +174,6 @@ class Controller extends Assessment\Controller
         $assessment->setAssessables($subActivities);
 
         // How should the jewelry transition?
-        $classFolder          = $assessment->getBaseContext()->getFolder();
-        $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $classFolder);
         $tickTransitions      = [
             'incomplete'      => $isViewerAnInstructor ? 'teacherAssessed' : 'selfAssessed',
             'selfAssessed'    => $isViewerAnInstructor ? 'teacherAssessed' : 'incomplete',
