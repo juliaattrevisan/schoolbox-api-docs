@@ -75,6 +75,18 @@ class DiplomaProgrammeGraph
 
 
     /**
+     * @var int
+     */
+    private $curriculumYearLevel;
+
+
+    /**
+     * @var int
+     */
+    private $curriculumSemester;
+
+
+    /**
      * Constructor
      *
      * @param GenericCollection $unitImpls
@@ -83,6 +95,8 @@ class DiplomaProgrammeGraph
      * @param User              $viewer
      * @param int               $workTypeId
      * @param RubricMapper      $rubricMapper
+     * @param int               $curriculumYearLevel
+     * @param int               $curriculumSemester
      */
     public function __construct(
         GenericCollection $unitImpls,
@@ -90,14 +104,18 @@ class DiplomaProgrammeGraph
         Visibility $visibility,
         User $viewer,
         int $workTypeId,
-        RubricMapper $rubricMapper
+        RubricMapper $rubricMapper,
+        int $curriculumYearLevel,
+        int $curriculumSemester
     ) {
-        $this->unitImpls    = $unitImpls;
-        $this->student      = $student;
-        $this->visibility   = $visibility;
-        $this->viewer       = $viewer;
-        $this->workTypeId   = $workTypeId;
-        $this->rubricMapper = $rubricMapper;
+        $this->unitImpls           = $unitImpls;
+        $this->student             = $student;
+        $this->visibility          = $visibility;
+        $this->viewer              = $viewer;
+        $this->workTypeId          = $workTypeId;
+        $this->rubricMapper        = $rubricMapper;
+        $this->curriculumYearLevel = $curriculumYearLevel;
+        $this->curriculumSemester  = $curriculumSemester;
     }
 
 
@@ -108,15 +126,10 @@ class DiplomaProgrammeGraph
      */
     public function toContext(): array
     {
-        // What do I need to generate this data set?
-        // * the DP grade assessment for this student
-        // * the DP grade assessments for the cohort
-        // * the student themselves
-
-
         $markData    = self::BASE_MARKS;
         $studentMark = null;
         $error       = null;
+        $header      = $this->generateHeader();
         try {
             [$markData, $studentMark] = $this->collateMarks($this->collateAssessments());
         } catch (UnexpectedValueException $e) {
@@ -125,33 +138,8 @@ class DiplomaProgrammeGraph
             $error = $e->getMessage();
         }
 
-
-        // The validation gauntlet has been passed
-
-
-        // Cohort is determined by:
-        // * taking the unit impl
-        // * finding all assessments within it
-        // * determining which one(s) are the MYP/DP work type
-
-
-        // There are two types of assessment that could feed this graph:
-        // MYP students: a rubric with total indicator mark of 32
-        // Mapping from total rubric indicator marks to graph value:
-        // 0:     0
-        // 1-5:   1
-        // 6-9:   2
-        // 10-14: 3
-        // 15-18: 4
-        // 19-23: 5
-        // 24-27: 6
-        // 28-32: 7
-        // DP students: a due work with a max mark of 7
-
-
-        // Dummy data: just output counts
         $context = [
-            'header'       => 'MYP Grade',
+            'header'       => $header,
             'data'         => $markData,
             'studentValue' => $studentMark,
         ];
@@ -332,5 +320,35 @@ class DiplomaProgrammeGraph
             }
         }
         return [$markData, $studentMark];
+    }
+
+
+    /**
+     * Generates a header for this graph.
+     *
+     * * Year 12, Sem 2: Predicted Grade
+     * * Year 12, Sem 1: Early Indicator
+     * * Year 11, Sem 2: Early Indicator
+     * * Year 11, Sem 1: MYP Grade
+     *
+     * @return string
+     */
+    private function generateHeader(): string
+    {
+        if ($this->curriculumYearLevel > 12) {
+            return 'Predicted Grade';
+        }
+        if ($this->curriculumYearLevel === 12) {
+            if ($this->curriculumSemester >= 2) {
+                return 'Predicted Grade';
+            }
+            return 'Early Indicator';
+        }
+        if ($this->curriculumYearLevel === 11) {
+            if ($this->curriculumSemester >= 2) {
+                return 'Early Indicator';
+            }
+        }
+        return 'MYP Grade';
     }
 }

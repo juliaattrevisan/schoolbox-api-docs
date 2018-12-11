@@ -147,7 +147,7 @@ class Controller extends Web\Controller\Base
         // The cohort check assumes that cohort classes have the same courses.
         $cohortUnitImpls = $this->findCohortUnitImpls($unitImpls);
 
-        $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user);
+        $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user, $curriculumYearLevel, $curriculumSemester);
 
         $data   = [
             'user'                => $user,
