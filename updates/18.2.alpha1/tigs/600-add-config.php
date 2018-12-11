@@ -111,7 +111,7 @@ $app = new class extends App
             Tigs\Summative\Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE,
             '',
             'Work Type - DP Report Grade',
-            "Expected to be assigned to wue works that uses the 'Total Mark' mark scheme. Marks given in this assessment will displayed on students' DP Grade graph",
+            "Expected to be assigned to due works that uses the 'Total Mark' mark scheme. Marks given in this assessment will displayed on students' DP Grade graph",
             ConfigMapper::FIELD_SELECT_LOOKUP,
             \serialize([SelectLookup\Renderer::OPTION_KEY_MAPPER => WorkType\Mapper::class,]),
             true,
