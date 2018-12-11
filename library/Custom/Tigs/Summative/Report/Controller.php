@@ -407,7 +407,7 @@ class Controller extends Web\Controller\Base
     private function buildAcademicAchievementSummaryData(StudentAttributes $attributes, GenericCollection $unitImpls, User $student): array
     {
         // Only relevant for MYP students
-        if(!$attributes->isMyp()){
+        if (!$attributes->isMyp()) {
             return [];
         }
 
