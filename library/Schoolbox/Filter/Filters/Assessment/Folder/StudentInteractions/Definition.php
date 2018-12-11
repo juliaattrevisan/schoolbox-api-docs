@@ -7,6 +7,7 @@
 namespace Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions;
 
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
+use Schoolbox\Filter\Page;
 
 /**
  * Display a list of folders (either classes, groups or both) where the student has submitted IResponses or received IFeedback.
@@ -34,6 +35,7 @@ class Definition extends FolderFilter\Definition
     {
         return [
 //            Option\Model::PAGE_GRADES,
+            Page\Model::PAGE_DUE_WORK_CALENDAR,
         ];
     }
 
