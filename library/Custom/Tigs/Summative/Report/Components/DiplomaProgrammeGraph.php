@@ -139,9 +139,10 @@ class DiplomaProgrammeGraph
         }
 
         $context = [
-            'header'       => $header,
-            'data'         => $markData,
-            'studentValue' => $studentMark,
+            'header'         => $header,
+            'data'           => $markData,
+            'dataCategories' => array_keys($markData),
+            'studentValue'   => $studentMark,
         ];
         if (isset($error)) {
             $context['error'] = $error;
