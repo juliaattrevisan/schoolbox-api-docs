@@ -790,27 +790,31 @@ $allow-sidebar-stash: $large-up;
 /**
  * Top nav & left side bar nav items hiding and showing
  *
- * Based on the width of the page squeeze as many icons on the top bar (.top-menu) as possible.
- * The items that cannot fit show in the profile drop down (.second-nav)
+ * Based on the width of the page squeeze as many icons on the top bar as possible.
+ * The items that cannot fit show in the left sidebar (.second-nav)
  */
 
 // Calculate the total widths of the possible views
-$offcanvas-width-used: ($tabbar-icon-width * 4) + $tabbar-padding-left; // logo + menu + search + notifications
+
+// Browser scrollbar width, probably not perfect given different browsers,
+// plus the page might not have a scrollbar, but the best we can do without moving this to JS
+$scrollbar-width: 1rem;
+
+$offcanvas-width-used: ($tabbar-icon-width*4) + $tabbar-padding-left + $scrollbar-width; // (hamburger menu + logo  + search + notifications) + topnav padding & scrollbar
 $offcanvas-width-no-notif: $offcanvas-width-used - $tabbar-icon-width; // same as above minus the notifications button
 
-$normal-width-used: $off-canvas-width + ($tabbar-icon-width * 2) + $tabbar-padding-left; // sidebar + search + notifications
+$normal-width-used: $off-canvas-width + ($tabbar-icon-width*3) + $tabbar-padding-left + $scrollbar-width; // sidebar + (search + notifications + account menu) + topnav padding & scrollbar
 $normal-width-no-notif: $normal-width-used - $tabbar-icon-width; // same as above minus the notifications button
 
-$rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars + the search button
+$rightopen-width-used: ($off-canvas-width*2) + ($tabbar-icon-width*2) + $tabbar-padding-left + $scrollbar-width; // Both left and right sidebars + (search + account menu) + topnav padding & scrollbar
 
 // Hide all top menu items as a starting point
 .hybrid-bar .top-menu li {
 	display: none;
 }
 
-// Medium and down
-@media #{$medium-down} {
-
+// Small, medium & mediumwide (before the left sidebar & account menu are a factor)
+@media #{$mediumwide-down} {
 	// Display 4 on top by default
 	.hybrid-bar .top-menu li:nth-child(-n+4) {
 		display: block;
@@ -846,9 +850,9 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 	}
 }
 
-// Medium wide & large
-@media #{$screen} and (min-width:#{lower-bound($mediumwide-range)}) and (max-width:#{upper-bound($large-range)}) {
-
+// Large up
+// Account menu is now showing always, and we either have a hidden sidebar with a hamburger, or a docked sidemenu
+@media #{$large-up} {
 	// Display 6 by default
 	.hybrid-bar .top-menu li:nth-child(-n+6) {
 		display: block;
@@ -859,8 +863,7 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 
 	// Allow up to 13, showing an extra one each time there's space
 	@for $i from 7 through 13 {
-
-		$icon-width-needed: 5rem * $i;
+		$icon-width-needed: $tabbar-menu-icon-width * $i;
 		$min-width: $normal-width-used + $icon-width-needed;
 		$min-width-no-notif: $normal-width-no-notif + $icon-width-needed;
 
@@ -887,7 +890,6 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 // Xlarge and beyond
 // Have to deal with the possibility of a docked notifications sidebar in this view
 @media #{$xlarge-up} {
-
 	// Display 11 by default
 	.hybrid-bar .top-menu li:nth-child(-n+11) {
 		display: block;
@@ -897,10 +899,9 @@ $rightopen-width-used: ($off-canvas-width*2) + $tabbar-icon-width; // 2 sidebars
 	}
 
 	// Allow up to 40 (random number to max out), showing one each time there's space
-	// Expect the docked sidebar to be showing, then overwrite if that's not the case
+	// Expect the docked notification menu to be showing, then overwrite if that's not the case
 	@for $i from 12 through 40 {
-
-		$icon-width-needed: 5rem * $i;
+		$icon-width-needed: $tabbar-menu-icon-width * $i;
 		$min-width: $normal-width-used + $icon-width-needed;
 		$min-width-no-notif: $normal-width-no-notif + $icon-width-needed;
 		$min-width-rightopen: $rightopen-width-used + $icon-width-needed;
