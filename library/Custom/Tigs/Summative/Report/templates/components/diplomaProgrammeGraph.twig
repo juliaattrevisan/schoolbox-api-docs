@@ -11,6 +11,14 @@ Data:
         <p>{{ error|raw }}</p>
     </div>
 {% else %}
+
+    {% if studentValue is not null %}
+        {# TODO style this properly, of course #}
+        <div style="background-color: #DBCB46; color: white">
+            <h3>{{ studentValue }}</h3>
+        </div>
+    {% endif %}
+
     {% autoescape 'js' %}
     <script type="text/javascript">
 
