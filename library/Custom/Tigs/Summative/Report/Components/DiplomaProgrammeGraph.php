@@ -298,7 +298,9 @@ class DiplomaProgrammeGraph
                     $markedGrid     = $this->rubricMapper->retrieveMarkedGrid($feedback);
                     $rawStudentMark = $markedGrid->retrieveHumanReadableMark();
                     // Finagle student mark from rubric grid
-                    if ($rawStudentMark === 0) {
+                    if (!isset($rawStudentMark)) {
+                        $mark = null;
+                    } elseif ($rawStudentMark === 0) {
                         $mark = 0;
                     } elseif ($rawStudentMark <= 5) {
                         $mark = 1;
