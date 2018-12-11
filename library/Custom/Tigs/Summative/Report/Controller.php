@@ -12,6 +12,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\Report\Components\AcademicAchievementMatrix;
 use Custom\Tigs\Summative\Report\Components\AcademicAchievementSummary;
+use Custom\Tigs\Summative\Report\Components\FinalAchievementLevels;
 use Custom\Tigs\Summative\Report\Components\DiplomaProgrammeGraph;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
@@ -137,14 +138,14 @@ class Controller extends Web\Controller\Base
             }
             $errors[]  = $error;
             $unitImpls = $aamData = $aasData = [];
+            $falData   = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitImpls = $this->getUnitImpls($courseImplsWithUnits);
 
             // Build component data
+            $falData = $this->buildFinalAchievementLevelsData($attributes, $unitImpls, $user);
             $aamData = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
-
-            // Only relevant for MYP students
             $aasData = $this->buildAcademicAchievementSummaryData($attributes, $unitImpls, $user);
         }
 
@@ -168,6 +169,7 @@ class Controller extends Web\Controller\Base
             'curriculumSemester'  => $attributes->getCurriculumSemester(),
             'errors'              => $errors,
             'unitImpls'           => $unitImpls,
+            'falData'             => $falData,
             'aamData'             => $aamData,
             'aasData'             => $aasData,
             'dpData'              => $dpData,
@@ -325,6 +327,40 @@ class Controller extends Web\Controller\Base
         return $unitImpls->sortByCallback(function (UnitImpl\Model $left, UnitImpl\Model $right) {
             return \strnatcasecmp($left->getTitle(), $right->getTitle());
         }, true);
+    }
+
+
+    /**
+     * Build data for the MYP-FAL component.
+     *
+     * @param StudentAttributes $attributes
+     * @param GenericCollection $unitImpls
+     * @param User              $student
+     * @return array|null
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function buildFinalAchievementLevelsData(StudentAttributes $attributes, GenericCollection $unitImpls, User $student): ?array
+    {
+        // Only relevant for MYP students in Curriculum Semester 2
+        if (!$attributes->isMyp() || $attributes->getCurriculumSemester() !== 2) {
+            return null;
+        }
+
+        $falWorkTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_FINAL_ACHIEVEMENT_LEVELS);
+
+        $fal = new FinalAchievementLevels(
+            $unitImpls,
+            $student,
+            $this->visibility,
+            $this->getUser(),
+            \is_numeric($falWorkTypeId) ? (int)$falWorkTypeId : null,
+            $this->rubricMapper,
+            $this->getAuthorizer(),
+            $this->getRouter()
+        );
+
+        return $fal->toContext();
     }
 
 
