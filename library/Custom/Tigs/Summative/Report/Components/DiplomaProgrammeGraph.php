@@ -15,6 +15,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
@@ -191,7 +192,7 @@ class DiplomaProgrammeGraph
                     'assessments' => [],
                 ];
             }
-            foreach ($unitImpl->getAssessables() as $assessment) {
+            foreach ($this->retrieveAssessments($unitImpl) as $assessment) {
                 $workType = $assessment->getWorkType();
                 if ($workType && $workType->getId() === $this->dpWorkTypeId) {
 
@@ -231,6 +232,24 @@ class DiplomaProgrammeGraph
             }
         }
         return $dpAssessments;
+    }
+
+
+    /**
+     * Helper function for retrieving a list of assessments out of a context.
+     *
+     * @param AssessmentContext $context
+     * @return iterable|IAssessable[]
+     */
+    private function retrieveAssessments(AssessmentContext $context): iterable
+    {
+        foreach ($context->getAssessables() as $assessment) {
+            if ($assessment instanceof AssessmentContext) {
+                yield from $this->retrieveAssessments($assessment);
+            } else {
+                yield $assessment;
+            }
+        }
     }
 
 
