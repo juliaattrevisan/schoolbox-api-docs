@@ -146,7 +146,7 @@ class Controller extends Web\Controller\Base
         // The cohort check assumes that cohort classes have the same courses.
         $cohortUnitImpls = $this->findCohortUnitImpls($unitImpls);
 
-        $dpData  = $this->buildDiplomaProgrammeReportData($unitImpls, $user);
+        $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user);
 
         $data   = [
             'user'                => $user,
@@ -316,6 +316,32 @@ class Controller extends Web\Controller\Base
         return $unitImpls->sortByCallback(function (UnitImpl\Model $left, UnitImpl\Model $right) {
             return \strnatcasecmp($left->getTitle(), $right->getTitle());
         }, true);
+    }
+
+
+    /**
+     * Find all the cohort unit implementations of these unit implementations.
+     *
+     * @param GenericCollection|UnitImpl\Model[] $unitImpls
+     * @return GenericCollection|UnitImpl\Model[]
+     * @throws UnexpectedValueException
+     */
+    private function findCohortUnitImpls(GenericCollection $unitImpls): GenericCollection
+    {
+        $cohortUnitImpls = new GenericCollection(UnitImpl\Model::class);
+        foreach ($unitImpls as $unitImpl) {
+
+            // Find unit impls that use this same ID, that aren't this one
+            // (and also are due at around the same time?)
+            foreach ($this->unitImplMapper->findByColumn('course_unit_specification_id', $unitImpl->getSpecification()->getId()) as $cohortUnitImpl) {
+                $cohortUnitImpls[$cohortUnitImpl->getId()] = $cohortUnitImpl;
+            }
+        }
+
+        // Load assessments
+        $this->loadAssessmentsIntoUnitImpls($cohortUnitImpls);
+
+        return $cohortUnitImpls;
     }
 
 
