@@ -1324,8 +1324,8 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 $config                   = $di->get('config');
                 $args['outputStackTrace'] = $config->get('debug_show_stack_trace');
 
-                $response = $di->get('webFactory')->newResponse();
-                if ((new IsJson())->isSatisfiedBy($response)) {
+                $request = $di->get('webFactory')->newRequest();
+                if ((new IsJson())->isSatisfiedBy($request)) {
                     $problem = (new ApiProblem($message))
                         ->setStatus($code)
                         ->setDetail($info)
@@ -1356,6 +1356,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 }
 
                 // Finagle a response?
+                $response = $di->get('webFactory')->newResponse();
                 $response->status->setCode($code);
                 $output->output($response);
                 return;
