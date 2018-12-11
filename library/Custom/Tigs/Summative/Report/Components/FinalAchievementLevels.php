@@ -37,7 +37,7 @@ class FinalAchievementLevels extends BaseComponent
     /** @var User */
     private $viewer;
 
-    /** @var int */
+    /** @var null|int */
     private $falWorkTypeId;
 
     /** @var RubricMapper */
@@ -55,7 +55,7 @@ class FinalAchievementLevels extends BaseComponent
      * @param User              $student
      * @param Visibility        $visibility
      * @param User              $viewer
-     * @param int               $aamWorkTypeId
+     * @param null|int          $falWorkTypeId
      * @param RubricMapper      $rubricMapper
      * @param Authorizer        $authorizer
      * @param Router\Router     $router
@@ -65,7 +65,7 @@ class FinalAchievementLevels extends BaseComponent
         User $student,
         Visibility $visibility,
         User $viewer,
-        int $aamWorkTypeId,
+        ?int $falWorkTypeId,
         RubricMapper $rubricMapper,
         Authorizer $authorizer,
         Router\Router $router
@@ -74,7 +74,7 @@ class FinalAchievementLevels extends BaseComponent
         $this->student       = $student;
         $this->visibility    = $visibility;
         $this->viewer        = $viewer;
-        $this->falWorkTypeId = $aamWorkTypeId;
+        $this->falWorkTypeId = $falWorkTypeId;
         $this->rubricMapper  = $rubricMapper;
         $this->authorizer    = $authorizer;
         $this->router        = $router;
