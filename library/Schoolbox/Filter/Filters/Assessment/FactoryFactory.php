@@ -74,6 +74,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
             case Filters\Assessment\Folder\StudentInteractions\Definition::class:
                 return $this->buildFactory(Filters\Assessment\Folder\StudentInteractions\Factory::class, [
                     'folderMapper' => $this->getMapperFactory()->get(Folder\Mapper::class),
+                    'access'       => $this->getAccess(),
                 ]);
             case Filters\Assessment\Term\Due\Definition::class:
                 return $this->buildFactory(Filters\Assessment\Term\Due\Factory::class, [
