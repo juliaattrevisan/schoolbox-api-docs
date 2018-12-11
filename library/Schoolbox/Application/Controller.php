@@ -14,6 +14,8 @@ use Session;
 
 class Controller extends Base
 {
+    public const LOGIN_ERROR_FLASH = 'login';
+
     /**
      * @var \Schoolbox\Error\Mapper
      */
@@ -141,7 +143,7 @@ class Controller extends Base
         if ($error) {
             $data['error'] = $error;
         } else {
-            if ($this->session->getSegment(self::class)->getFlash('login')) {  //TODO: check if user has expired session
+            if ($this->session->getSegment(self::class)->getFlash(self::LOGIN_ERROR_FLASH)) {
                 $data['error'] = 'Your session has expired. Please log in below to continue browsing the portal.';
             } else {
                 $data ['error'] = null;
