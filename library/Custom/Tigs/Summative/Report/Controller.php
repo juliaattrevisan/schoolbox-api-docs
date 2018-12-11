@@ -37,6 +37,9 @@ class Controller extends Web\Controller\Base
     /** @var CourseImpl\Mapper */
     private $courseImplMapper;
 
+    /** @var UnitImpl\Mapper */
+    private $unitImplMapper;
+
     /** @var Assessment\MapperProxy */
     private $assessmentMapperProxy;
 
@@ -59,6 +62,7 @@ class Controller extends Web\Controller\Base
         External_UserInterface $externalUser,
         Term\Mapper $termMapper,
         CourseImpl\Mapper $courseImplMapper,
+        UnitImpl\Mapper $unitImplMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
         RubricMapper $rubricMapper,
         Access $access
@@ -66,6 +70,7 @@ class Controller extends Web\Controller\Base
         $this->externalUser          = $externalUser;
         $this->termMapper            = $termMapper;
         $this->courseImplMapper      = $courseImplMapper;
+        $this->unitImplMapper        = $unitImplMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->rubricMapper          = $rubricMapper;
         $this->visibility            = new Visibility($access);
@@ -137,6 +142,9 @@ class Controller extends Web\Controller\Base
             // Build component data
             $aamData = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
         }
+
+        // The cohort check assumes that cohort classes have the same courses.
+        $cohortUnitImpls = $this->findCohortUnitImpls($unitImpls);
 
         $dpData  = $this->buildDiplomaProgrammeReportData($unitImpls, $user);
 
@@ -259,18 +267,17 @@ class Controller extends Web\Controller\Base
     private function loadParticipation(GenericCollection $courseImplsWithUnits): void
     {
         // Load assessments + participations
+        // $unitImpls stores references to unit implementation objects, which
+        // are also in $courseImplsWithUnits.
         /** @var UnitImpl\Model[] $unitImpls */
-        $unitImpls = [];
+        $unitImpls = new GenericCollection(UnitImpl\Model::class);
         foreach ($courseImplsWithUnits as $courseImpl) {
             foreach ($courseImpl->getUnits() as $unitImpl) {
                 $unitImpls[$unitImpl->getId()] = $unitImpl;
             }
         }
 
-        foreach ($this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline(\array_keys($unitImpls)) as $assessable) {
-            $unitImpls[$assessable->getBaseContext()->getId()]->getAssessables()[$assessable->getId()] = $assessable;
-        }
-    }
+        $this->loadAssessmentsIntoUnitImpls($unitImpls);
 
 
     /**
@@ -388,5 +395,20 @@ class Controller extends Web\Controller\Base
         );
 
         return $dp->toContext();
+    }
+
+
+    /**
+     * Load the assessments into each unit implementation.
+     *
+     * @param GenericCollection|UnitImpl\Model[] $unitImpls
+     * @return GenericCollection
+     */
+    private function loadAssessmentsIntoUnitImpls(GenericCollection $unitImpls): GenericCollection
+    {
+        foreach ($this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline($unitImpls->keys()) as $assessable) {
+            $unitImpls[$assessable->getBaseContext()->getId()]->getAssessables()[$assessable->getId()] = $assessable;
+        }
+        return $unitImpls;
     }
 }
