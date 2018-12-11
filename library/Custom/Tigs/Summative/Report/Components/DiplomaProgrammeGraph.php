@@ -65,7 +65,7 @@ class DiplomaProgrammeGraph
     /**
      * @var int
      */
-    private $dpWorkTypeId;
+    private $workTypeId;
 
 
     /**
@@ -81,7 +81,7 @@ class DiplomaProgrammeGraph
      * @param User              $student
      * @param Visibility        $visibility
      * @param User              $viewer
-     * @param int               $dpWorkTypeId
+     * @param int               $workTypeId
      * @param RubricMapper      $rubricMapper
      */
     public function __construct(
@@ -89,14 +89,14 @@ class DiplomaProgrammeGraph
         User $student,
         Visibility $visibility,
         User $viewer,
-        int $dpWorkTypeId,
+        int $workTypeId,
         RubricMapper $rubricMapper
     ) {
         $this->unitImpls    = $unitImpls;
         $this->student      = $student;
         $this->visibility   = $visibility;
         $this->viewer       = $viewer;
-        $this->dpWorkTypeId = $dpWorkTypeId;
+        $this->workTypeId   = $workTypeId;
         $this->rubricMapper = $rubricMapper;
     }
 
@@ -188,7 +188,7 @@ class DiplomaProgrammeGraph
             }
             foreach ($this->retrieveAssessments($unitImpl) as $assessment) {
                 $workType = $assessment->getWorkType();
-                if ($workType && $workType->getId() === $this->dpWorkTypeId) {
+                if ($workType && $workType->getId() === $this->workTypeId) {
 
                     // Iterate deeper into projects
 
@@ -278,14 +278,14 @@ class DiplomaProgrammeGraph
                 );
             }
 
-            $dpAssessment = current($assessments);
+            $assessment = current($assessments);
 
             // Not visible to the viewer? Show no results
-            if (!$this->visibility->isVisibleToUser($dpAssessment, $this->viewer, true)) {
+            if (!$this->visibility->isVisibleToUser($assessment, $this->viewer, true)) {
                 continue;
             }
 
-            foreach ($dpAssessment->getAllParticipants() as $participant) {
+            foreach ($assessment->getAllParticipants() as $participant) {
                 // What kind of assessment is this?
                 $mark     = null;
                 $feedback = $participant->getAuthoritativeFeedback(true);
@@ -294,7 +294,7 @@ class DiplomaProgrammeGraph
                     // Show nothing, but this is not an error
                     continue;
                 }
-                if ($dpAssessment->getUseRubric()) {
+                if ($assessment->getUseRubric()) {
                     $markedGrid     = $this->rubricMapper->retrieveMarkedGrid($feedback);
                     $rawStudentMark = $markedGrid->calculateScaledMark();
                     // Finagle student mark from rubric grid

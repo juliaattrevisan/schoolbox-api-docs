@@ -362,6 +362,8 @@ class Controller extends Web\Controller\Base
      */
     private function buildDiplomaProgrammeReportData(GenericCollection $unitImpls, User $student): array
     {
+        // $unitImpls needs to contain the entire cohort's impls, not just this one
+
         $dpWorkTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE);
         $dpWorkTypeId = \is_numeric($dpWorkTypeId) ? (int)$dpWorkTypeId : null;
 
