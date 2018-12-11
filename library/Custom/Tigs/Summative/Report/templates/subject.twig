@@ -15,6 +15,7 @@ Data:
     unitImpls            UnitImpl\Model - All units imported to this folder.
     aasData              array          - Data to render the Academic Achievement Summary components
     aamData              array          - Data to render the Academic Achievement Matrix components
+    falData              array|null     - Data to render the Final Achievement Level component
     dpData               array          - Data to render the MYP/DP Graph component
 #}
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
@@ -48,12 +49,17 @@ Data:
         {% include '@tigsSummativeReport/components/diplomaProgrammeGraph.twig' with dpData only %}
     </div>
 
-
     <div class="column small-12 medium-6">
         <h2 class="subheader">NESA Score</h2>
     </div>
 
-    <div class="column small-12">
+    {% if falData %}
+    <div class="small-12">
+        {% include '@tigsSummativeReport/components/finalAchievementLevels.twig' with falData only %}
+    </div>
+    {% endif %}
+
+    <div class="small-12">
         {% for unitId, unit in unitImpls %}
             {# Do we have a link to an AAS assessment for this unit? #}
             {% set unitRoute = (aasData.data is defined and aasData.data[unitId] is defined) ? aasData.data[unitId].link : '' %}
