@@ -8,7 +8,7 @@
 } %}
 
 {% for tab in tabs %}
-    <li>
+    <li data-id="{{ tab.id }}">
         <a class="icon-{{ tab.icon }} {% if tabCurrent | lower == tab.token | lower and tab.token is not empty %}navthis{% endif %}"
            {# Should href tokens be url-encoded? #}
            href="{{ tab.url | ireplace(tokens) }}"

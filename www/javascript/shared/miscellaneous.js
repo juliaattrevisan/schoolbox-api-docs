@@ -195,4 +195,68 @@ $(function () {
         });
     }
 
+    /**
+     * Show/hide top nav items based on space available
+     */
+    function updateTopNavItems() {
+        var topMenuItemWidth = $('#top-menu > li').width();
+
+        // All the possible things to remove from the #top-menu width
+        var profileWidth = $('#profile-drop').is(':visible') ? $('#profile-drop').width() : 0;
+        var searchWidth = $('#search').is(':visible') ? $('#search').width() : 0;
+        var notificationsWidth = $('#notification-toggle').is(':visible') ? $('#notification-toggle').width() : 0;
+        var extraWidth = profileWidth + searchWidth + notificationsWidth;
+
+        // Store the width left in top nav after subtracting 
+        var spaceLeft = $('#top-menu').width() - extraWidth;
+
+        $('#top-menu > li').each(function(index) {
+            // Always show the first 4 on the top nav
+            if (index < 4) {
+                toggleTopNavItem(true, $(this));
+
+                // Remove the space used from the 'spaceLeft' var
+                spaceLeft -= topMenuItemWidth;
+
+                return;
+            }
+
+            if (spaceLeft > topMenuItemWidth) { // if there's space
+                toggleTopNavItem(true, $(this));
+
+                // Remove the space used from the 'spaceLeft' var
+                spaceLeft -= topMenuItemWidth;
+            } else {
+                toggleTopNavItem(false, $(this));
+            }
+        });
+    }
+
+    /**
+     * Show a top nav item, and hide from the sidebar
+     * 
+     * @param {boolean} show 
+     * @param {Object} $item 
+     */
+    function toggleTopNavItem(show, $item) {
+        var itemId = $item.data('id');
+
+        // Show top nav
+        show ? $item.show() : $item.hide();
+
+        // Hide this item from the sidebar
+        var $sidebarItem = $('#overflow-nav li[data-id=' + itemId + ']');
+        show ? $sidebarItem.hide() : $sidebarItem.show();
+    }
+
+    // Run the top nav update on page load
+    updateTopNavItems();
+
+    // Listen for changes to window size and run the top nav update
+    // Apply a timeout so that the function doesn't run a million times while resizing
+    var resizeTimeout;
+    $(window).resize(function() {
+        this.clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(updateTopNavItems, 100);
+    });
 });
