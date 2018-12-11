@@ -8,7 +8,7 @@ Data:
 
 {% if error|default(null) %}
     <div class="empty-state">
-        <p>{{ error }}</p>
+        <p>{{ error|raw }}</p>
     </div>
 {% else %}
     {% autoescape 'js' %}
