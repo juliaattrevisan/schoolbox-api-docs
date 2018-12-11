@@ -9,18 +9,15 @@ namespace Custom\Tigs\Summative\Report\Components;
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Rubric\Grid\Grid;
-use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
-use Schoolbox\Learning\Assessment\DueWork;
 use UnexpectedValueException;
 
 /**
@@ -129,10 +126,7 @@ class DiplomaProgrammeGraph
         }
 
 
-
-
         // The validation gauntlet has been passed
-
 
 
         // Cohort is determined by:
@@ -172,8 +166,8 @@ class DiplomaProgrammeGraph
      * Collate the unit implementations into a set of assessments.
      *
      * @return array
-     * @var Folder          $dpAssessments[$folderId]['folder']      The folder the assessments are in
-     * @var DueWork\Model[] $dpAssessments[$folderId]['assessments'] The MYP/DP assessments for this folder
+     * @var Folder          $dpAssessments [$folderId]['folder']      The folder the assessments are in
+     * @var DueWork\Model[] $dpAssessments [$folderId]['assessments'] The MYP/DP assessments for this folder
      * @throws UnexpectedValueException if a DP assessment isn't a due work,
      *                                  and has neither a rubric or a max mark
      *                                  of 7.
@@ -273,7 +267,7 @@ class DiplomaProgrammeGraph
              */
             $folder      = $folderAssessments['folder'];
             $assessments = $folderAssessments['assessments'];
-            $count = count($assessments);
+            $count       = count($assessments);
             if ($count !== 1) {
                 throw new UnexpectedValueException(
                     sprintf(
