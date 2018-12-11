@@ -109,7 +109,7 @@ class Controller extends Base
         // don't show the login page, redirect to the SAML login page.
         // (unless ?samlLogin=0 is set)
         // (or the users IP exists in the blacklist
-        if ($this->getConfigLoader()->get('saml_enabled') === '1'
+        if ($this->getConfigLoader()->get('saml_enabled')
             && ($this->getConfigLoader()->get('saml_sso_url') !== '' || $this->getConfigLoader()->get('saml_idp_metadata_url') !== '')
             && $samlAuth !== '0'
             && (!$this->samlBlacklist() || $samlAuth === '1')) {
