@@ -280,6 +280,7 @@ class Controller extends Web\Controller\Base
         }
 
         $this->loadAssessmentsIntoUnitImpls($unitImpls);
+    }
 
 
     /**
