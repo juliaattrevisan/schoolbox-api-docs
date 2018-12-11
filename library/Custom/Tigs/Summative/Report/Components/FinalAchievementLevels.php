@@ -98,7 +98,7 @@ class FinalAchievementLevels extends BaseComponent
         // Not set? Then we can't identify FAL assessments.
         if (null === $this->falWorkTypeId) {
             $errorMsg = 'Cannot render Final Achievement Levels component. Work type not set.';
-            if ($this->authorizer->isPathAuthorizedForUser('tigsSummativeAdmin.getAdmin', $this->viewer)) {
+            if ($this->authorizer->isPathAuthorizedForUser('tigsSummativeAdmin.getAdmin', [], $this->viewer)) {
                 $routeConfig = $this->router->generate('tigsSummativeAdmin.getAdmin');
                 $hash        = Config::_TIGS_WORK_TYPE_FINAL_ACHIEVEMENT_LEVELS;
                 $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">Set Final Achievement Levels Work Type</a>";
