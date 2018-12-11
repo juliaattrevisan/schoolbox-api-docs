@@ -10,7 +10,6 @@ namespace Custom\Tigs\Summative\Report\Components;
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -127,7 +126,6 @@ class AcademicAchievementSummary extends BaseComponent
             return null;
         }
 
-        /** @var IAssessable $assessment */
         $assessment = \reset($aasAssessables);
 
         // Not a Due Work?

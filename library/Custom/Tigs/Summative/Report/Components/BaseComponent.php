@@ -22,7 +22,7 @@ class BaseComponent
      *
      * @param UnitImpl\Model $unitImpl
      * @param int|null       $workTypeId
-     * @return array
+     * @return IAssessable[]
      */
     protected function findAssessmentsWithWorkType(UnitImpl\Model $unitImpl, ?int $workTypeId): array
     {

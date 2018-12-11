@@ -12,7 +12,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -132,7 +131,6 @@ class AcademicAchievementMatrix extends BaseComponent
             return null;
         }
 
-        /** @var IAssessable $assessment */
         $assessment = \reset($aamAssessables);
 
         // Not a Due Work?
