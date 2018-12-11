@@ -54,12 +54,12 @@ Data:
     </div>
 
     {% if falData %}
-    <div class="small-12">
+    <div class="column small-12">
         {% include '@tigsSummativeReport/components/finalAchievementLevels.twig' with falData only %}
     </div>
     {% endif %}
 
-    <div class="small-12">
+    <div class="column small-12">
         {% for unitId, unit in unitImpls %}
             {# Do we have a link to an AAS assessment for this unit? #}
             {% set unitRoute = (aasData.data is defined and aasData.data[unitId] is defined) ? aasData.data[unitId].link : '' %}
