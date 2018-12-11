@@ -138,22 +138,21 @@ class Controller extends Web\Controller\Base
             }
             $errors[]  = $error;
             $unitImpls = $aamData = $aasData = [];
-            $falData   = null;
+            $falData   = $dpData = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitImpls = $this->getUnitImpls($courseImplsWithUnits);
+
+            // The cohort check assumes that cohort classes have the same courses.
+            $cohortUnitImpls = $this->findCohortUnitImpls($unitImpls);
 
             // Build component data
             $falData = $this->buildFinalAchievementLevelsData($attributes, $unitImpls, $user);
             $aamData = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
             $aasData = $this->buildAcademicAchievementSummaryData($attributes, $unitImpls, $user);
+            $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user, $attributes->getCurriculumYearLevel(), $attributes->getCurriculumSemester());
         }
 
-        // The cohort check assumes that cohort classes have the same courses.
-//        $cohortUnitImpls = $this->findCohortUnitImpls($unitImpls); // TODO TEMP comment out
-
-//        $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user, $attributes->getCurriculumYearLevel(), $attributes->getCurriculumSemester());
-        $dpData = []; // TODO TEMP comment out
 
         $data   = [
             'user'                => $user,
