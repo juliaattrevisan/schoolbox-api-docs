@@ -1,6 +1,6 @@
 <?php
 
-use \Schoolbox\Collection;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Redirect;
 
 /**
@@ -15,18 +15,18 @@ class Component_Renderer
     /**
      * Renders all components for an admin page.
      *
-     * @param SitePage $page
+     * @param SitePage                                  $page
      * @param Collection|Component_ControllerAbstract[] $componentCollection
      */
     public function renderAllAdminComponents(SitePage $page, $componentCollection)
     {
-        $page->setFile(TEMPLATE_body, 'adminv2/component/layout.html');
+        $page->setFile(TEMPLATE_content, 'adminv2/component/layout.html');
 
-        $page->setBlock(TEMPLATE_body, 'position_top', 'position_top_block');
-        $page->setBlock(TEMPLATE_body, 'position_left', 'position_left_block');
-        $page->setBlock(TEMPLATE_body, 'position_right', 'position_right_block');
+        $page->setBlock(TEMPLATE_content, 'position_top', 'position_top_block');
+        $page->setBlock(TEMPLATE_content, 'position_left', 'position_left_block');
+        $page->setBlock(TEMPLATE_content, 'position_right', 'position_right_block');
 
-        $occupiedPositionList = array();
+        $occupiedPositionList = [];
 
         foreach ($componentCollection as $component) {
             $instance_no  = $component->getInstance()->getId();
@@ -40,7 +40,7 @@ class Component_Renderer
 
             $component->setup();
 
-            $page->setVar(array(
+            $page->setVar([
                 'ID'                        => $instance_no,
                 'COMPONENT_INSTANCE_ID'     => $instance_no,
                 'COMPONENT_DEFINITION_ID'   => $definitionId,
@@ -48,7 +48,7 @@ class Component_Renderer
                 'component.instance.id'     => $instance_no,
                 'component.definition.id'   => $definitionId,
                 'component.definition.name' => $component->getInstance()->getDefinition()->getName(),
-            ));
+            ]);
 
             $component->setConfigurationTemplate('component/config/_templatewrapper.html');
             $component->parseConfigForTemplate();
@@ -60,7 +60,7 @@ class Component_Renderer
             }
         }
 
-        $emptyPositionList = array_diff(array('top', 'left', 'right'), $occupiedPositionList);
+        $emptyPositionList = array_diff(['top', 'left', 'right'], $occupiedPositionList);
 
         foreach ($emptyPositionList as $emptyPosition) {
             $page->setVar("position_{$emptyPosition}_block", '');
@@ -70,18 +70,18 @@ class Component_Renderer
     /**
      * Renders a single component for an admin page.
      *
-     * @param SitePage $page
+     * @param SitePage                     $page
      * @param Component_ControllerAbstract $component
      */
     public function renderAdminComponent(SitePage $page, Component_ControllerAbstract $component)
     {
-        $page->setFile(TEMPLATE_body, 'adminv2/component/placeholder.html');
+        $page->setFile(TEMPLATE_content, 'adminv2/component/placeholder.html');
 
         $component->setup();
 
         $instance_no  = $component->getInstance()->getId();
         $definitionId = $component->getInstance()->getDefinition()->getId();
-        $page->setVar(array(
+        $page->setVar([
             'ID'                        => $instance_no,
             'COMPONENT_INSTANCE_ID'     => $instance_no,
             'COMPONENT_DEFINITION_ID'   => $definitionId,
@@ -89,7 +89,7 @@ class Component_Renderer
             'component.instance.id'     => $instance_no,
             'component.definition.id'   => $definitionId,
             'component.definition.name' => $component->getInstance()->getDefinition()->getName(),
-        ));
+        ]);
 
         $component->setConfigurationTemplate('component/config/_templatewrapper.html');
         $component->parseConfigForTemplate();
@@ -98,7 +98,7 @@ class Component_Renderer
     /**
      * Renders a template into the Sitepage within $component.
      *
-     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @param \Schoolbox\Resource\Folder\Model      $folder
      * @param Component_Homepage_ControllerAbstract $component
      */
     public function renderHomepageComponent(
@@ -119,7 +119,7 @@ class Component_Renderer
 
         /* Accumulate folder codes
          */
-        $temp = array();
+        $temp = [];
 
         foreach ($folder->getCodes() as $currentCode) {
             $temp[] = $currentCode->getCode();
@@ -139,7 +139,7 @@ class Component_Renderer
     /**
      * Renders an ePortfolio template into the Sitepage within $component.
      *
-     * @param Eportfolio_Page_Instance $eportfolioPage
+     * @param Eportfolio_Page_Instance                $eportfolioPage
      * @param Component_Eportfolio_ControllerAbstract $component
      */
     public function renderEportfolioComponent(
@@ -159,7 +159,7 @@ class Component_Renderer
                 // These aren't normally parsed so have to do it explicitly
 
                 $component->getPageTemplate()->setVar([
-                    'PAGE_ID' => $eportfolioPage->getPageId(),
+                    'PAGE_ID'                 => $eportfolioPage->getPageId(),
                     'EPORTFOLIO_PAGE_USER_ID' => $eportfolioPage->getUserId(),
                 ]);
 
