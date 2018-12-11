@@ -52,6 +52,27 @@ Data:
     </div>
 {% endif %}
 
+{% if not isPublishable %}
+    <script>
+        $(function() {
+            $('#unpublishable-box > #flash').on('click', '.close', function (event) {
+                event.preventDefault();
+
+                $('#unpublishable-box > #flash').remove();
+            })
+        });
+    </script>
+
+    <div class="small-12 columns" id="unpublishable-box">
+        <div id="flash" class="alert-box highlight">
+            <span id="error-message">
+                Not all the required fields have been completed. Please <a href="{{ modifyRoute }}">modify this {{ locale.news }}</a> to make it ready for publishing
+            </span>
+            <a class="close">×</a>
+        </div>
+    </div>
+{% endif %}
+
 <div class="small-12 columns">
     <div class="actions-small-2 row">
         <div class="list-item">
@@ -274,29 +295,31 @@ Data:
                 <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
             {% endif %}
 
-            {# If you have permission to submit and implicitly approve your own articles, do that, otherwise submit for moderation #}
-            {% if article.canBeApproved %}
-                {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
-            {% endif %}
-            {% if article.canBeSubmitted %}
-                {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
-            {% endif %}
-            {% if approveRoute or submitRoute %}
-                {% if approveRoute %}
-                    {% set buttonText = 'Publish ' ~ locale.news %}
-                {% elseif article.isRejected %}
-                    {% set buttonText = 'Resubmit for moderation' %}
-                {% else %}
-                    {% set buttonText = 'Submit for moderation' %}
+            {% if isPublishable %}
+                {# If you have permission to submit and implicitly approve your own articles, do that, otherwise submit for moderation #}
+                {% if article.canBeApproved %}
+                    {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
                 {% endif %}
-                <li>
-                    <form action="{{ approveRoute ?: submitRoute }}" method="post">
-                        {% if returnUrl|length %}
-                            <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}" />
-                        {% endif %}
-                        <input type="submit" value="{{ buttonText }}" />
-                    </form>
-                </li>
+                {% if article.canBeSubmitted %}
+                    {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
+                {% endif %}
+                {% if approveRoute or submitRoute %}
+                    {% if approveRoute %}
+                        {% set buttonText = 'Publish ' ~ locale.news %}
+                    {% elseif article.isRejected %}
+                        {% set buttonText = 'Resubmit for moderation' %}
+                    {% else %}
+                        {% set buttonText = 'Submit for moderation' %}
+                    {% endif %}
+                    <li>
+                        <form action="{{ approveRoute ?: submitRoute }}" method="post" id="article-form">
+                            {% if returnUrl|length %}
+                                <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}" />
+                            {% endif %}
+                            <input type="submit" value="{{ buttonText }}" id="article-submit" />
+                        </form>
+                    </li>
+                {% endif %}
             {% endif %}
         </ul>
     </div>
@@ -432,4 +455,45 @@ Data:
         });
     });
 </script>
+{% endif %}
+
+{# Publish news asynchronous #}
+{% if (isPublishable) and (approveRoute or submitRoute) %}
+    {% autoescape 'js' %}
+    <script>
+        $(function() {
+            var form = $('#article-form');
+            var articleSubmitButton = $('#article-submit');
+
+            form.submit(function( event ) {
+                event.preventDefault();
+
+                var $toast     = $('#toast');
+
+                $toast.toastActivate({text: 'Saving...'});
+                // Prevent clickjacking...
+                articleSubmitButton.prop('disabled', true);
+
+                $.ajax({
+                    type: 'POST',
+                    url: form.attr('action'),
+                    data: {articleId: {{ article.id }}},
+                    dataType: 'json'
+                }).success(function (response) {
+                    $toast.toastTimeout({
+                        text: response.message,
+                        css: 'success'
+                    });
+
+                    window.location.reload();
+                }).error(function (response) {
+                    $toast.toastTimeout({
+                        text: 'Error: ' + response.message,
+                        css: 'alert'
+                    });
+                });
+            });
+        });
+    </script>
+    {% endautoescape %}
 {% endif %}

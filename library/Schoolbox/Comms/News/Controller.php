@@ -601,6 +601,7 @@ class Controller extends Base
                 'encodedSegments'       => $this->getAudienceSegments($article),
                 'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(true),
                 'entityTypesData'       => $this->getEntityTypesData(false),
+                'isPublishable'         => $article->getAudience()->count() && trim($article->getTitle()) !== ''
             ];
         }
 
