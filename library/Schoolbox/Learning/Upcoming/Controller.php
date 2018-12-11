@@ -20,7 +20,7 @@ use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -79,7 +79,7 @@ class Controller extends Base
     protected $participantDataSource;
 
     /**
-     * @var GradeGroup
+     * @var GradeGroup\Model
      */
     protected $defaultGradeGroup;
 
@@ -92,7 +92,7 @@ class Controller extends Base
      * @param TermMapper              $termMapper
      * @param AssessmentMapperProxy   $assessmentDataSource
      * @param ParticipantDataSource   $participantDataSource
-     * @param GradeGroup              $defaultGradeGroup
+     * @param GradeGroup\Model        $defaultGradeGroup
      */
     public function __construct(
         External_ClassInterface $externalClass,
@@ -101,7 +101,7 @@ class Controller extends Base
         TermMapper $termMapper,
         AssessmentMapperProxy $assessmentDataSource,
         ParticipantDataSource $participantDataSource,
-        GradeGroup $defaultGradeGroup
+        GradeGroup\Model $defaultGradeGroup
     ) {
         $this->externalClass         = $externalClass;
         $this->folderMapper          = $folderMapper;
