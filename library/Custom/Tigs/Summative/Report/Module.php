@@ -15,6 +15,8 @@ use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -93,6 +95,8 @@ class Module extends Alaress\Module\Module
             'assessmentMapperProxy' => $injector->get('assessmentDataSource'),
             'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
             'access'                => $this->getMapperFactory()->getLazy(Access::class),
+            'courseImplMapper'      => $this->getMapperFactory()->getLazy(CourseImpl\Mapper::class),
+            'unitImplMapper'        => $this->getMapperFactory()->getLazy(UnitImpl\Mapper::class),
         ];
     }
 

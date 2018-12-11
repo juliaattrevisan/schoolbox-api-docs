@@ -15,6 +15,7 @@ Data:
     unitImpls            UnitImpl\Model - All units imported to this folder.
     aamData              array          - Data to render the Academic Achievement Matrix components
 #}
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <div class="row">
     <div class="island small-12">
         <h1>{{ folder.title }}</h1>
@@ -34,7 +35,20 @@ Data:
             </div>
         {% endif %}
     </div>
-    <div class="small-12">
+
+
+    <div class="column small-12 medium-6">
+        <h2 class="subheader">{{ dpData.header }}</h2>
+        {% include '@tigsSummativeReport/components/diplomaProgrammeGraph.twig' with dpData only %}
+    </div>
+
+
+    <div class="column small-12 medium-6">
+        <h2 class="subheader">NESA Score</h2>
+    </div>
+
+
+    <div class="column small-12">
         {% for unitId, unit in unitImpls %}
             <h2 class="subheader">{{ unit.title }}</h2>
             {# Were we given AAM data for this unit? #}

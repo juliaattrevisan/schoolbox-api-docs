@@ -11,6 +11,7 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\Report\Components\AcademicAchievementMatrix;
+use Custom\Tigs\Summative\Report\Components\DiplomaProgrammeGraph;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -36,6 +37,9 @@ class Controller extends Web\Controller\Base
     /** @var CourseImpl\Mapper */
     private $courseImplMapper;
 
+    /** @var UnitImpl\Mapper */
+    private $unitImplMapper;
+
     /** @var Assessment\MapperProxy */
     private $assessmentMapperProxy;
 
@@ -50,6 +54,7 @@ class Controller extends Web\Controller\Base
      * @param External_UserInterface $externalUser
      * @param Term\Mapper            $termMapper
      * @param CourseImpl\Mapper      $courseImplMapper
+     * @param UnitImpl\Mapper        $unitImplMapper
      * @param Assessment\MapperProxy $assessmentMapperProxy
      * @param RubricMapper           $rubricMapper
      * @param Access                 $access
@@ -58,6 +63,7 @@ class Controller extends Web\Controller\Base
         External_UserInterface $externalUser,
         Term\Mapper $termMapper,
         CourseImpl\Mapper $courseImplMapper,
+        UnitImpl\Mapper $unitImplMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
         RubricMapper $rubricMapper,
         Access $access
@@ -65,6 +71,7 @@ class Controller extends Web\Controller\Base
         $this->externalUser          = $externalUser;
         $this->termMapper            = $termMapper;
         $this->courseImplMapper      = $courseImplMapper;
+        $this->unitImplMapper        = $unitImplMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->rubricMapper          = $rubricMapper;
         $this->visibility            = new Visibility($access);
@@ -137,6 +144,11 @@ class Controller extends Web\Controller\Base
             $aamData = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
         }
 
+        // The cohort check assumes that cohort classes have the same courses.
+        $cohortUnitImpls = $this->findCohortUnitImpls($unitImpls);
+
+        $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user, $curriculumYearLevel, $curriculumSemester);
+
         $data   = [
             'user'                => $user,
             'folder'              => $folder,
@@ -150,6 +162,7 @@ class Controller extends Web\Controller\Base
             'errors'              => $errors,
             'unitImpls'           => $unitImpls,
             'aamData'             => $aamData,
+            'dpData'              => $dpData,
         ];
         $output = $this->buildHtmlOutput('@tigsSummativeReport/subject.twig', $data, "Subject Report");
 
@@ -169,8 +182,9 @@ class Controller extends Web\Controller\Base
     {
         $ibFlagOn = (bool)$this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'];
 
-        $isHsc = !$ibFlagOn || $user->getYear() <= 10;
-        $isIb  = $ibFlagOn || $user->getYear() <= 10;
+        $year  = (int)$user->getYear();
+        $isHsc = !$ibFlagOn || $year <= 10;
+        $isIb  = $ibFlagOn  || $year <= 10;
 
         // Hardcoded term dates for now
         $firstDayTerm1Relative = '1 January';
@@ -220,17 +234,17 @@ class Controller extends Web\Controller\Base
         }
 
         // Apply SB to Curriculum mapping
-        if (4 === $term && (int)$user->getYear() === 11) {
+        if (4 === $term && $year === 11) {
             // Year 11, Term 4 => Sem1 Yr 12 Curriculum
             $curriculumYearLevel = 12;
             $curriculumSemester  = 1;
-        } elseif (2 === $term && (int)$user->getYear() === 12) {
+        } elseif (2 === $term && $year === 12) {
             // Year 12, Term 2 => Sem2 Yr 12 Curriculum
             $curriculumYearLevel = 12;
             $curriculumSemester  = 2;
         } else {
             // Normal Case
-            $curriculumYearLevel = $user->getYear();
+            $curriculumYearLevel = $year;
             $curriculumSemester  = $sbSem;
         }
 
@@ -255,17 +269,17 @@ class Controller extends Web\Controller\Base
     private function loadParticipation(GenericCollection $courseImplsWithUnits): void
     {
         // Load assessments + participations
+        // $unitImpls stores references to unit implementation objects, which
+        // are also in $courseImplsWithUnits.
         /** @var UnitImpl\Model[] $unitImpls */
-        $unitImpls = [];
+        $unitImpls = new GenericCollection(UnitImpl\Model::class);
         foreach ($courseImplsWithUnits as $courseImpl) {
             foreach ($courseImpl->getUnits() as $unitImpl) {
                 $unitImpls[$unitImpl->getId()] = $unitImpl;
             }
         }
 
-        foreach ($this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline(\array_keys($unitImpls)) as $assessable) {
-            $unitImpls[$assessable->getBaseContext()->getId()]->getAssessables()[$assessable->getId()] = $assessable;
-        }
+        $this->loadAssessmentsIntoUnitImpls($unitImpls);
     }
 
 
@@ -309,6 +323,32 @@ class Controller extends Web\Controller\Base
 
 
     /**
+     * Find all the cohort unit implementations of these unit implementations.
+     *
+     * @param GenericCollection|UnitImpl\Model[] $unitImpls
+     * @return GenericCollection|UnitImpl\Model[]
+     * @throws UnexpectedValueException
+     */
+    private function findCohortUnitImpls(GenericCollection $unitImpls): GenericCollection
+    {
+        $cohortUnitImpls = new GenericCollection(UnitImpl\Model::class);
+        foreach ($unitImpls as $unitImpl) {
+
+            // Find unit impls that use this same ID, that aren't this one
+            // (and also are due at around the same time?)
+            foreach ($this->unitImplMapper->findByColumn('course_unit_specification_id', $unitImpl->getSpecification()->getId()) as $cohortUnitImpl) {
+                $cohortUnitImpls[$cohortUnitImpl->getId()] = $cohortUnitImpl;
+            }
+        }
+
+        // Load assessments
+        $this->loadAssessmentsIntoUnitImpls($cohortUnitImpls);
+
+        return $cohortUnitImpls;
+    }
+
+
+    /**
      * Builds data for rendering the AAM components.
      *
      * @param GenericCollection|UnitImpl\Model[] $unitImpls
@@ -346,5 +386,66 @@ class Controller extends Web\Controller\Base
         );
 
         return $aam->toContext();
+    }
+
+
+    /**
+     * Builds Middle Years Programme / Diploma Programme (MYP/DP) report data.
+     *
+     * @param GenericCollection $unitImpls
+     * @param User              $student
+     * @param int               $curriculumYearLevel
+     * @param int               $curriculumSemester
+     * @return array
+     */
+    private function buildDiplomaProgrammeReportData(
+        GenericCollection $unitImpls,
+        User $student,
+        int $curriculumYearLevel,
+        int $curriculumSemester
+    ): array {
+        // $unitImpls needs to contain the entire cohort's impls, not just this one
+
+        $dpWorkTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE);
+        $dpWorkTypeId = \is_numeric($dpWorkTypeId) ? (int)$dpWorkTypeId : null;
+
+        if (null === $dpWorkTypeId) {
+            $errorMsg = 'Cannot render DP Report components. Work type not set.';
+            // If user is superuser, prompt them to fix this.
+            if ($this->getUser()->isSuperuser()) {
+                $routeConfig = $this->getRouter()->generate('tigsSummativeAdmin.getAdmin');
+                $hash        = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
+                $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">Set DP Report Work Type</a>";
+            }
+            return ['error' => $errorMsg];
+        }
+
+        $dp = new DiplomaProgrammeGraph(
+            $unitImpls,
+            $student,
+            $this->visibility,
+            $this->getUser(),
+            $dpWorkTypeId,
+            $this->rubricMapper,
+            $curriculumYearLevel,
+            $curriculumSemester
+        );
+
+        return $dp->toContext();
+    }
+
+
+    /**
+     * Load the assessments into each unit implementation.
+     *
+     * @param GenericCollection|UnitImpl\Model[] $unitImpls
+     * @return GenericCollection
+     */
+    private function loadAssessmentsIntoUnitImpls(GenericCollection $unitImpls): GenericCollection
+    {
+        foreach ($this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline($unitImpls->keys()) as $assessable) {
+            $unitImpls[$assessable->getBaseContext()->getId()]->getAssessables()[$assessable->getId()] = $assessable;
+        }
+        return $unitImpls;
     }
 }

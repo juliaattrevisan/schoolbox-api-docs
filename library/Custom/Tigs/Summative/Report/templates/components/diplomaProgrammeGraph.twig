@@ -1,0 +1,83 @@
+{#
+Renders a MYP/DP graph.
+
+Data:
+    error: string - Optional. If present, the reason why we can't render the component
+    data:  array  - The results to render. key: column, value: height
+#}
+
+{% if error|default(null) %}
+    <div class="empty-state">
+        <p>{{ error|raw }}</p>
+    </div>
+{% else %}
+
+    {% if studentValue is not null %}
+        {# TODO style this properly, of course #}
+        <div style="background-color: #DBCB46; color: white">
+            <h3>{{ studentValue }}</h3>
+        </div>
+    {% endif %}
+
+    {% autoescape 'js' %}
+    <script type="text/javascript">
+
+        var buildColorList = function(data, studentValue, highlightColor, defaultColor) {
+            var dataLength = data.length,
+                colorList  = [];
+            for (var i = 0; i < dataLength; i++) {
+                colorList.push(defaultColor);
+            }
+
+            if (studentValue in colorList) {
+                colorList[studentValue] = highlightColor;
+            }
+
+            return colorList;
+        };
+
+        $(function(){
+
+            var data = {{ data|json_encode|raw }},
+                dataCategories = {{ dataCategories|json_encode|raw }},
+                studentValue = Number("{{ studentValue }}");
+
+            $("#myp-graph").highcharts({
+                legend: {
+                    enabled: false
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: null
+                },
+                xAxis: {
+                    categories: dataCategories,
+                    title: {
+                        text: null
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: '# Students (Cohort)'
+                    },
+                    tickInterval: 10
+                },
+                series: [
+                    {
+                        type: 'column',
+                        data: data,
+                        label: {
+                            enabled: false
+                        },
+                        colorByPoint: true,
+                        colors: buildColorList(data, studentValue, '#DBCB46', '#454549')
+                    }
+                ]
+            });
+        });
+    </script>
+    {% endautoescape %}
+    <div id="myp-graph"></div>
+{% endif %}
