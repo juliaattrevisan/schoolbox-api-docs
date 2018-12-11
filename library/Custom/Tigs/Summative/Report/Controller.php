@@ -150,7 +150,7 @@ class Controller extends Web\Controller\Base
             $falData = $this->buildFinalAchievementLevelsData($attributes, $unitImpls, $user);
             $aamData = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
             $aasData = $this->buildAcademicAchievementSummaryData($attributes, $unitImpls, $user);
-            $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user, $attributes->getCurriculumYearLevel(), $attributes->getCurriculumSemester());
+            $dpData  = $this->buildDiplomaProgrammeReportData($attributes, $cohortUnitImpls, $user);
         }
 
 
@@ -480,17 +480,16 @@ class Controller extends Web\Controller\Base
     /**
      * Builds Middle Years Programme / Diploma Programme (MYP/DP) report data.
      *
+     * @param StudentAttributes $attributes
      * @param GenericCollection $unitImpls
      * @param User              $student
-     * @param int               $curriculumYearLevel
-     * @param int               $curriculumSemester
      * @return array
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function buildDiplomaProgrammeReportData(
+        StudentAttributes $attributes,
         GenericCollection $unitImpls,
-        User $student,
-        int $curriculumYearLevel,
-        int $curriculumSemester
+        User $student
     ): array {
         // $unitImpls needs to contain the entire cohort's impls, not just this one
 
@@ -515,8 +514,8 @@ class Controller extends Web\Controller\Base
             $this->getUser(),
             $dpWorkTypeId,
             $this->rubricMapper,
-            $curriculumYearLevel,
-            $curriculumSemester
+            $attributes->getCurriculumYearLevel(),
+            $attributes->getCurriculumSemester()
         );
 
         return $dp->toContext();
