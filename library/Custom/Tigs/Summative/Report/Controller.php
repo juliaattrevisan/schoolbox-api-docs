@@ -118,7 +118,7 @@ class Controller extends Web\Controller\Base
      */
     public function getSubjectReport(User $user, Folder\Model $folder): void
     {
-        $studentAttributes = $this->deriveStudentAttributes($user);
+        $attributes = $this->deriveStudentAttributes($user);
 
         $errors = [];
 
@@ -145,26 +145,26 @@ class Controller extends Web\Controller\Base
             $aamData = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
 
             // Only relevant for MYP students
-            $aasData = $this->buildAcademicAchievementSummaryData($studentAttributes, $unitImpls, $user);
+            $aasData = $this->buildAcademicAchievementSummaryData($attributes, $unitImpls, $user);
         }
 
         // The cohort check assumes that cohort classes have the same courses.
         $cohortUnitImpls = $this->findCohortUnitImpls($unitImpls);
 
-        $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user, $curriculumYearLevel, $curriculumSemester);
+        $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user, $attributes->getCurriculumYearLevel(), $attributes->getCurriculumSemester());
 
         $data   = [
             'user'                => $user,
             'folder'              => $folder,
             'isEnabled'           => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
-            'isIb'                => $studentAttributes->isIb(),
-            'isMyp'               => $studentAttributes->isMyp(),
-            'isDp'                => $studentAttributes->isDp(),
-            'isHsc'               => $studentAttributes->isHsc(),
-            'sbSem'               => $studentAttributes->getSbSem(),
-            'term'                => $studentAttributes->getTerm(),
-            'curriculumYearLevel' => $studentAttributes->getCurriculumYearLevel(),
-            'curriculumSemester'  => $studentAttributes->getCurriculumSemester(),
+            'isIb'                => $attributes->isIb(),
+            'isMyp'               => $attributes->isMyp(),
+            'isDp'                => $attributes->isDp(),
+            'isHsc'               => $attributes->isHsc(),
+            'sbSem'               => $attributes->getSbSem(),
+            'term'                => $attributes->getTerm(),
+            'curriculumYearLevel' => $attributes->getCurriculumYearLevel(),
+            'curriculumSemester'  => $attributes->getCurriculumSemester(),
             'errors'              => $errors,
             'unitImpls'           => $unitImpls,
             'aamData'             => $aamData,
