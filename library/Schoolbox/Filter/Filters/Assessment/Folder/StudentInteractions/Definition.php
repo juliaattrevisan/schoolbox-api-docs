@@ -68,9 +68,9 @@ class Definition extends FolderFilter\Definition
     {
         switch ($key) {
             case self::KEY_CLASSES:
-                return 'Currently enrolled classes';
+                return 'Currently-enrolled classes';
             case self::KEY_GROUPS:
-                return 'Current group members';
+                return 'Current group memberships';
             case self::KEY_RESPONSE:
                 return 'Folders where student responded';
             case self::KEY_FEEDBACK:
