@@ -34,26 +34,23 @@ $(function () {
     */
     $.fn.schoolboxResource_ProxyReplacment();
 
-    /* Notifications toggle
-     */
-    $('.right-small, .right-off-canvas-menu').hover(function(){
-            $('.right-off-canvas-menu').addClass('overlap');
-        },
-        function(){
-            $('.right-off-canvas-menu').removeClass('overlap');
-        });
+    // Notifications hover
+    $('#notification-toggle, .right-off-canvas-menu').hover(function() {
+        $('.right-off-canvas-menu').addClass('overlap');
+    }, function() {
+        $('.right-off-canvas-menu').removeClass('overlap');
+    });
 
-    $('.right-small a, .right-off-canvas-menu label').on('click', function() {
+    // Notifications menu click
+    $('#notification-toggle a, .right-off-canvas-menu label').on('click', function() {
         $('#inner-wrap').toggleClass('right-open');
         $(this).toggleClass('raquo');
 
-        var notificationState;
-        if ($('#inner-wrap').hasClass('right-open')){
-            notificationState = 'show';
-        } else {
-            notificationState = 'hide';
-        }
-        $.post('/ajax/notificationsTray', {state: notificationState}, function(responseText) { });
+        var notificationState = $('#inner-wrap').hasClass('right-open') ? 'show' : 'hide';
+        $.post('/ajax/notificationsTray', {state: notificationState});
+        
+        // Update top nav items
+        updateTopNavItems();
     });
 
     // Left menu dock/undock
@@ -79,6 +76,9 @@ $(function () {
 
          // Update dock state in the element's data property
          $(this).data('dock-state', !dockState);
+
+         // Update top nav items
+         updateTopNavItems();
     });
 
     /* Open / Close account menu
@@ -204,7 +204,7 @@ $(function () {
         // All the possible things to remove from the #top-menu width
         var profileWidth = $('#profile-drop').is(':visible') ? $('#profile-drop').width() : 0;
         var searchWidth = $('#search').is(':visible') ? $('#search').width() : 0;
-        var notificationsWidth = $('#notification-toggle').is(':visible') ? $('#notification-toggle').width() : 0;
+        var notificationsWidth = $('#notification-toggle').is(':visible') && !$('#inner-wrap').hasClass('right-open') ? $('#notification-toggle').width() : 0;
         var extraWidth = profileWidth + searchWidth + notificationsWidth;
 
         // Store the width left in top nav after subtracting 
