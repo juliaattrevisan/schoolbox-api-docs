@@ -31,7 +31,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getPages(): array
     {
         return [
 //            Option\Model::PAGE_GRADES,
@@ -42,7 +42,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    protected function getCustomKeys(): array
     {
         return [
             self::KEY_CLASSES,
@@ -56,7 +56,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    protected static function getTemplatesDir()
+    protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/Folder/StudentInteractions/templates';
     }
@@ -64,7 +64,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public function getLabel($key)
+    public function getLabel($key): string
     {
         switch ($key) {
             case self::KEY_CLASSES:
