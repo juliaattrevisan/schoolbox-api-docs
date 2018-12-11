@@ -227,6 +227,7 @@ class Kernel extends \Alaress\Application\Kernel
                     'data'   => ['error' => 'Unauthenticated'],
                 ]);
             } else {
+                $session->getSegment(\Schoolbox\Application\Controller::class)->setFlash('login', $e->getMessage());
                 $response->redirect->to('/login/?page=' . urlencode($uri));
             }
         } catch (Deleted $e) {
