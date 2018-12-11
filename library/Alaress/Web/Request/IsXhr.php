@@ -10,6 +10,7 @@ namespace Alaress\Web\Request;
 
 use Alaress\Specification;
 use Aura\Web\Request;
+use TypeError;
 
 class IsXhr extends Specification\Leaf
 {
@@ -22,6 +23,14 @@ class IsXhr extends Specification\Leaf
      */
     public function isSatisfiedBy($candidate): bool
     {
+        if (!$candidate instanceof Request) {
+            throw new TypeError(
+                sprintf(
+                    '$candidate must be a "Aura\Web\Request" object: received %s',
+                    get_class($candidate)
+                )
+            );
+        }
         return $candidate->isXhr();
     }
 }
