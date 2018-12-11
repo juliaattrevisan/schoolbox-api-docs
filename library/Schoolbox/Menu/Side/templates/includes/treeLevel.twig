@@ -6,16 +6,16 @@
             <ul class="left-submenu">
             <li class="back"><a href="#">Back</a></li>
             {% if node.url %}
-                <a href="{{ node.url }}" {%  if node.target is not empty %}target="{{ node.target }}"{% endif %}>
+                <a href="{{ node.url | ireplace(tokens) }}" {%  if node.target is not empty %}target="{{ node.target }}"{% endif %}>
                     <span>{{ node.title }}</span>
                 </a>
             {% endif %}
         {% endif %}
         <li {% if childNode.children | length %}class="has-submenu"{% endif %}>
-            <a href="{{ childNode.url | replace(tokens) }}"
+            <a href="{{ childNode.url | ireplace(tokens) }}"
                {% if childNode.target is not empty %}target="{{ childNode.target }}"{% endif %}
             >
-                <span>{{ childNode.title | replace(tokens) }}</span>
+                <span>{{ childNode.title }}</span>
             </a>
             {% if childNode.children | length %}
                 {% include "@menuSide/includes/treeLevel.twig" with {'node': childNode } %}

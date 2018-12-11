@@ -19,10 +19,10 @@
                         <ul class="off-canvas-list">
                             {% for node in nodes %}
                                 <li {% if node.children | length %}class="has-submenu"{% endif %}>
-                                    <a href="{{ node.url | replace(tokens) }}"
+                                    <a href="{{ node.url | ireplace(tokens) }}"
                                        {% if node.target is not empty %}target="{{ node.target }}"{% endif %}
                                     >
-                                        <span>{{ node.title | replace(tokens) }}</span>
+                                        <span>{{ node.title }}</span>
                                     </a>
                                     {% if node.children | length %}
                                         {% include "@menuSide/includes/treeLevel.twig" with {node: node, tokens: tokens} %}

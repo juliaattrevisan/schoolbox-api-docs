@@ -664,6 +664,15 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         )
                     );
 
+                    // Case insenstive replace function
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'ireplace',
+                            function($string, array $tokens = []) {
+                                return str_ireplace(array_keys($tokens), array_values($tokens), $string);
+                            }
+                        )
+                    );
 
                     // Global access to config object and localisation
                     // TODO capitalize globals
