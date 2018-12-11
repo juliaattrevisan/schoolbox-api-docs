@@ -24,8 +24,8 @@ class Definition extends FolderFilter\Definition
     // The name to expose in the UI
     protected const NAME = 'Student Folders';
 
-    const KEY_RESPONSE = 'response';
-    const KEY_FEEDBACK = 'feedback';
+    public const KEY_RESPONSE = 'response';
+    public const KEY_FEEDBACK = 'feedback';
 
 
     /**
