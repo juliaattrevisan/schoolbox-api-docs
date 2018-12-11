@@ -296,12 +296,7 @@ class DiplomaProgrammeGraph
                 }
                 if ($dpAssessment->getUseRubric()) {
                     $markedGrid     = $this->rubricMapper->retrieveMarkedGrid($feedback);
-                    $rawStudentMark = 0;
-                    foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
-                        foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
-                            $rawStudentMark += $indicatorMark->getValue();
-                        }
-                    }
+                    $rawStudentMark = $markedGrid->calculateScaledMark();
                     // Finagle student mark from rubric grid
                     if (!isset($rawStudentMark)) {
                         $mark = null;
