@@ -145,14 +145,8 @@ class Controller extends Assessment\Controller
         $subActivities = $subActivities
             ->map([$mutator, 'map'])
             ->filter([$mutator, 'filter'])
-            ->filter(function(IAssessable $subAssessable) use ($student) {
-                // Don't show assessment if user is excluded
-                $participant = $subAssessable->getParticipantIfExtant($student);
-                if (!$participant) {
-                    return false;
-                }
-                // If a parent, only show sub-assessments if the current viewee is participating
-                return !(!$subAssessable->isParticipant($student) && $this->getUser()->getRole()->isParent());
+            ->filter(function (IAssessable $subAssessable) use ($student, $visibility) {
+                return ($visibility->isVisibleToUser($subAssessable, $student, true));
             });
 
         // hack the project object for good measure
