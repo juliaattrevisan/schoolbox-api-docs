@@ -182,7 +182,7 @@ $allow-sidebar-stash: $large-up;
 		}
 		&:hover, &.focus {
 			width: 100%;
-			padding-left: 13.5rem;
+			padding-left: ($tabbar-icon-width*2);
 			@include placeholder-color($black, $font-weight-normal);
 		}
 
@@ -222,6 +222,14 @@ $allow-sidebar-stash: $large-up;
 			 */
 			&:before {
 				color: $navigation-background;
+			}
+		}
+	}
+
+	@media #{$allow-sidebar-stash} {
+		.global-search {
+			&:hover, &.focus {
+				padding-left: $tabbar-icon-width * 3;
 			}
 		}
 	}
@@ -779,6 +787,7 @@ $allow-sidebar-stash: $large-up;
 			padding-left: 5rem;
 		}
 	}
+
 }
 
 @media #{$small-only} {
