@@ -54,6 +54,7 @@ class Controller extends Web\Controller\Base
      * @param External_UserInterface $externalUser
      * @param Term\Mapper            $termMapper
      * @param CourseImpl\Mapper      $courseImplMapper
+     * @param UnitImpl\Mapper        $unitImplMapper
      * @param Assessment\MapperProxy $assessmentMapperProxy
      * @param RubricMapper           $rubricMapper
      * @param Access                 $access
