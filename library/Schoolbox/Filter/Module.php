@@ -46,6 +46,7 @@ class Module extends AlaressModule
                 case Page\Model::PAGE_MARK_BOOK:
                 case Page\Model::PAGE_COURSE_MARK_BOOK:
                 case Page\Model::PAGE_GRADES:
+                case Page\Model::PAGE_DUE_WORK_CALENDAR:
                     return ['factoryFactory' => new Filters\Assessment\FactoryFactory($this->getMapperFactory())];
                 // Other entity types can have their factory factories registered here
             }
