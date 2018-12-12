@@ -276,11 +276,9 @@ class Controller extends Base
                     $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
                 }
             }
-            if($this->isXhrRequest()) {
-                $this->buildAjaxResponse($httpCode, $errorCode, $message);
-            } else {
-                $this->getResponse()->redirect->to($route);
-            }
+
+            $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);
+
         } else {
             $this->buildAjaxResponse($httpCode, $errorCode, $message);
         }
