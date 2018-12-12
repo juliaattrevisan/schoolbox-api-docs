@@ -201,6 +201,8 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
             $envelope->targetToUser($studentId, $bob->build());
         } // if parent, 3rd-person language
         elseif ($target === Role::PARENT && $this->parentCanView($box)) {
+            // hydrate student to display name properly.
+            $student = $this->userMapper->findById($studentId);
             // If parent can't view results for this grade:
             // target to student's grades page
             if (!$box->isMarkShownToParents()) {
