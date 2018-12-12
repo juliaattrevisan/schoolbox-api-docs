@@ -242,10 +242,10 @@
                     {% block messaging %}
                         {% if ws.enabled and user.current.id %}
                             <section class="right-small" id="notification-toggle">
-                                <a href="#msgs" class="right-off-canvas-toggle icon-notifications hidden-for-xlarge-up" data-unread="{{ ws.unread }}">
+                                <a class="right-off-canvas-toggle icon-notifications hidden-for-xlarge-up" data-unread="{{ ws.unread }}">
                                     <span data-unread-count>{{ ws.unread ?? ''}}</span>
                                 </a>
-                                <a href="#msgs" class="icon-notifications show-for-xlarge-up" data-unread="{{ ws.unread }}">
+                                <a class="icon-notifications show-for-xlarge-up" data-unread="{{ ws.unread }}">
                                     <span data-unread-count>{{ ws.unread ?? '' }}</span>
                                 </a>
                             </section>
