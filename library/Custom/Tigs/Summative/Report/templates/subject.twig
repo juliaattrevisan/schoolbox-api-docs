@@ -5,18 +5,13 @@ Data:
     user:                User           - a student in years 7-12
     folder:              Folder\Model   - a class folder
     isEnabled:           bool           - is this report enabled for the student and their parents?
-    isHsc:               bool           - is user reported on using HSC
-    isIb:                bool           - is user reported on using IB
-    sbSem:               int            - an integer from 1-2
-    term:                int            - an integer from 1-4
-    curriculumYearLevel: int            - an integer from 7-12
-    curriculumSemester:  int            - an integer from 1-2
+    attributes:          StudentAttributes
     errors               string[]       - Any errors that affect the whole page
     unitImpls            UnitImpl\Model - All units imported to this folder.
     aasData              array          - Data to render the Academic Achievement Summary components
     aamData              array          - Data to render the Academic Achievement Matrix components
     falData              array|null     - Data to render the Final Achievement Level component
-    dpData               array          - Data to render the MYP/DP Graph component
+    ibGraphData          array          - Data to render the MYP/DP Graph component
 #}
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <div class="row">
@@ -45,8 +40,12 @@ Data:
     </div>
 
     <div class="column small-12 medium-6">
-        <h2 class="subheader">{{ dpData.header }}</h2>
-        {% include '@tigsSummativeReport/components/diplomaProgrammeGraph.twig' with dpData only %}
+        {% if ibGraphData %}
+            <h2 class="subheader">{{ ibGraphData.header }}</h2>
+            {% include '@tigsSummativeReport/components/diplomaProgrammeGraph.twig' with ibGraphData only %}
+        {% else %}
+            <p></p>
+        {% endif %}
     </div>
 
     <div class="column small-12 medium-6">
@@ -89,18 +88,18 @@ Data:
             <p>userId: {{ user.id }}</p>
             <p>folderId: {{ folder.id }}</p>
             <br>
-            <p>isIb: {% if isIb %}true{% else %}false{% endif %}</p>
-            <p>isMyp: {% if isMyp %}true{% else %}false{% endif %}</p>
-            <p>isDp: {% if isDp %}true{% else %}false{% endif %}</p>
-            <p>isHsc: {% if isHsc %}true{% else %}false{% endif %}</p>
+            <p>isIb: {% if attributes.isIb %}true{% else %}false{% endif %}</p>
+            <p>isMyp: {% if attributes.isMyp %}true{% else %}false{% endif %}</p>
+            <p>isDp: {% if attributes.isDp %}true{% else %}false{% endif %}</p>
+            <p>isHsc: {% if attributes.isHsc %}true{% else %}false{% endif %}</p>
             <br>
-            <p>SB Term: {{ term }}</p>
+            <p>SB Term: {{ attributes.term }}</p>
             <br>
             <p>SB Year Level: {{ user.year }}</p>
-            <p>SB Semester: {{ sbSem }}</p>
+            <p>SB Semester: {{ attributes.sbSem }}</p>
             <br>
-            <p>Curriculum Year Level: {{ curriculumYearLevel }}</p>
-            <p>Curriculum Semester: {{ curriculumSemester }}</p>
+            <p>Curriculum Year Level: {{ attributes.curriculumYearLevel }}</p>
+            <p>Curriculum Semester: {{ attributes.curriculumSemester }}</p>
         </section>
     </div>
 </div>

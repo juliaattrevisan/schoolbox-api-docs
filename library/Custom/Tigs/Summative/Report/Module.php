@@ -26,6 +26,8 @@ use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Filter;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 class Module extends Alaress\Module\Module
 {
@@ -96,7 +98,13 @@ class Module extends Alaress\Module\Module
             'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
             'access'                => $this->getMapperFactory()->getLazy(Access::class),
             'courseImplMapper'      => $this->getMapperFactory()->getLazy(CourseImpl\Mapper::class),
-            'unitImplMapper'        => $this->getMapperFactory()->getLazy(UnitImpl\Mapper::class),
+            'assessmentIdFinder'    => $injector->lazy(function(){
+                /** @var Filter\Mapper $filterMapper */
+                $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
+                return Filter\Filters\Assessment\IdFinder::getInstance(
+                    $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
+                );
+            }),
         ];
     }
 

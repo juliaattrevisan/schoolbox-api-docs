@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\Report\Components;
 
+use Custom\Tigs\Summative\Report\StudentAttributes;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
@@ -24,10 +25,10 @@ use UnexpectedValueException;
  * Builds a suitable data structure for rendering the Diploma Programme
  * components.
  */
-class DiplomaProgrammeGraph
+class InternationalBaccalaureateGraph
 {
     private const BASE_MARKS = [
-        0 => 0,
+        0 => 0,                   // TODO MYP cannot have 0 (as from rubric), DP can (no min for total mark). How should we handle?
         1 => 0,
         2 => 0,
         3 => 0,
@@ -48,6 +49,9 @@ class DiplomaProgrammeGraph
      * @var User
      */
     private $student;
+
+    /** @var StudentAttributes */
+    private $attributes;
 
 
     /**
@@ -91,6 +95,7 @@ class DiplomaProgrammeGraph
      *
      * @param GenericCollection $unitImpls
      * @param User              $student
+     * @param StudentAttributes $attributes
      * @param Visibility        $visibility
      * @param User              $viewer
      * @param int               $workTypeId
@@ -101,6 +106,7 @@ class DiplomaProgrammeGraph
     public function __construct(
         GenericCollection $unitImpls,
         User $student,
+        StudentAttributes $attributes,
         Visibility $visibility,
         User $viewer,
         int $workTypeId,
@@ -110,6 +116,7 @@ class DiplomaProgrammeGraph
     ) {
         $this->unitImpls           = $unitImpls;
         $this->student             = $student;
+        $this->attributes          = $attributes;
         $this->visibility          = $visibility;
         $this->viewer              = $viewer;
         $this->workTypeId          = $workTypeId;
@@ -157,20 +164,20 @@ class DiplomaProgrammeGraph
      * @return array
      * @var Folder          $dpAssessments [$folderId]['folder']      The folder the assessments are in
      * @var DueWork\Model[] $dpAssessments [$folderId]['assessments'] The MYP/DP assessments for this folder
-     * @throws UnexpectedValueException if a DP assessment isn't a due work,
+     * @throws UnexpectedValueException if a IB Report Grade assessment isn't a due work,
      *                                  and has neither a rubric or a max mark
      *                                  of 7.
      */
     private function collateAssessments(): array
     {
-        $dpAssessments = [];
+        $ibAssessments = [];
         foreach ($this->unitImpls as $unitImpl) {
             // Get the DP assessment out of each unit impl
             // If any impl has zero, or more than one: that's an error
             $folder   = $unitImpl->getBaseContext()->getFolder();
             $folderId = $folder->getId();
-            if (!isset($dpAssessments[$folderId])) {
-                $dpAssessments[$folderId] = [
+            if (!isset($ibAssessments[$folderId])) {
+                $ibAssessments[$folderId] = [
                     'folder'      => $folder,
                     'assessments' => [],
                 ];
@@ -193,15 +200,21 @@ class DiplomaProgrammeGraph
                         );
                     }
 
-                    // Assessment must either be:
-                    // * Total mark = 7
-                    // * Use rubric
-                    if (!($assessment->getUseRubric()
-                        || ($assessment->getMarkType()->getSlug() !== MarkType::SLUG_TOTAL && $assessment->getMaxMark() !== 7)
-                    )) {
+                    if($this->attributes->isMyp()){
+                        // MYP Assessment must use a rubric:
+                        if(!$assessment->getUseRubric()){
+                            throw new UnexpectedValueException(
+                                sprintf(
+                                    'An MYP due work must have a rubric. Assessment "%s" in folder "%s" does not have a rubric.',
+                                    $assessment->getTitle(),
+                                    $folder->getTitle()
+                                )
+                            );
+                        }
+                    } elseif($assessment->getMaxMark() !== 7.0 || $assessment->getMarkType()->getSlug() !== MarkType::SLUG_TOTAL){
                         throw new UnexpectedValueException(
                             sprintf(
-                                'A MYP/DP due work must either have a rubric, or a max mark of 7. Assessment "%s" in folder "%s" is a %s with max mark %d.',
+                                'A DP due work must either have a max mark of 7. Assessment "%s" in folder "%s" is a %s with max mark %d.',
                                 $assessment->getTitle(),
                                 $folder->getTitle(),
                                 $assessment->getMarkType()->getName(),
@@ -210,11 +223,11 @@ class DiplomaProgrammeGraph
                         );
                     }
 
-                    $dpAssessments[$folderId]['assessments'][$assessment->getId()] = $assessment;
+                    $ibAssessments[$folderId]['assessments'][$assessment->getId()] = $assessment;
                 }
             }
         }
-        return $dpAssessments;
+        return $ibAssessments;
     }
 
 
@@ -269,12 +282,20 @@ class DiplomaProgrammeGraph
 
             $assessment = current($assessments);
 
-            // Not visible to the viewer? Show no results
+            // Assessment not visible to the viewer? Show no results
             if (!$this->visibility->isVisibleToUser($assessment, $this->viewer, true)) {
                 continue;
             }
 
+
+            // Feedback not visible to the viewer? Show no results
+            if (!$assessment->isFeedbackVisibleToUser($this->viewer)) {
+                continue;
+            }
+
+
             foreach ($assessment->getAllParticipants() as $participant) {
+
                 // What kind of assessment is this?
                 $mark     = null;
                 $feedback = $participant->getAuthoritativeFeedback(true);
@@ -283,7 +304,7 @@ class DiplomaProgrammeGraph
                     // Show nothing, but this is not an error
                     continue;
                 }
-                if ($assessment->getUseRubric()) {
+                if ($this->attributes->isMyp()) {
                     $markedGrid     = $this->rubricMapper->retrieveMarkedGrid($feedback);
                     $rawStudentMark = $markedGrid->calculateScaledMark();
                     // Finagle student mark from rubric grid
