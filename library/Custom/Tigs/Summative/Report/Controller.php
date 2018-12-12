@@ -346,7 +346,7 @@ class Controller extends Web\Controller\Base
             return null;
         }
 
-        $falWorkTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_FINAL_ACHIEVEMENT_LEVELS);
+        $falWorkTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS);
 
         $fal = new FinalAchievementLevels(
             $unitImpls,

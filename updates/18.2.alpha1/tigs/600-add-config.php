@@ -108,7 +108,7 @@ $app = new class extends App
         );
 
         $this->insertConfig(
-            Tigs\Summative\Config::_TIGS_WORK_TYPE_FINAL_ACHIEVEMENT_LEVELS,
+            Tigs\Summative\Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS,
             '',
             'Work Type - MYP Final Achievement Levels',
             "Marks given to the rubric attached to Due Works with this work-type will populate the student's 'MYP - Final Achievement Levels' table and 'MYP Grade' graph",

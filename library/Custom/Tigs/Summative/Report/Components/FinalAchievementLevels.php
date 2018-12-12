@@ -100,7 +100,7 @@ class FinalAchievementLevels extends BaseComponent
             $errorMsg = 'Cannot render Final Achievement Levels component. Work type not set.';
             if ($this->authorizer->isPathAuthorizedForUser('tigsSummativeAdmin.getAdmin', [], $this->viewer)) {
                 $routeConfig = $this->router->generate('tigsSummativeAdmin.getAdmin');
-                $hash        = Config::_TIGS_WORK_TYPE_FINAL_ACHIEVEMENT_LEVELS;
+                $hash        = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
                 $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">Set Final Achievement Levels Work Type</a>";
             }
             return ['error' => $errorMsg];
