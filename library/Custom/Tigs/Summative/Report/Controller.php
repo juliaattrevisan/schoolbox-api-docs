@@ -149,9 +149,10 @@ class Controller extends Web\Controller\Base
         }
 
         // The cohort check assumes that cohort classes have the same courses.
-        $cohortUnitImpls = $this->findCohortUnitImpls($unitImpls);
+//        $cohortUnitImpls = $this->findCohortUnitImpls($unitImpls); // TODO TEMP comment out
 
-        $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user, $attributes->getCurriculumYearLevel(), $attributes->getCurriculumSemester());
+//        $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user, $attributes->getCurriculumYearLevel(), $attributes->getCurriculumSemester());
+        $dpData = null; // TODO TEMP comment out
 
         $data   = [
             'user'                => $user,
