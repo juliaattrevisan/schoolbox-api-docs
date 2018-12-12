@@ -137,6 +137,7 @@ $allow-sidebar-stash: $large-up;
 			max-width: none;
 		}
 	}
+
 	.left-small{
 		width: $tabbar-height;
 		z-index: 100;
@@ -148,18 +149,22 @@ $allow-sidebar-stash: $large-up;
 			}
 		}
 	}
+
 	.right-small {
 		width: $tabbar-height;
 		z-index: 100;
 	}
+
 	.tab-bar {
 		position: inherit;
 	}
+
 	.tab-bar-section{
 		width: 100%;
 		padding-left: $tabbar-height;
 		position: relative;
 	}
+
 	.global-search {
 		background: $navigation-background;
 		margin: 0;
@@ -226,14 +231,6 @@ $allow-sidebar-stash: $large-up;
 		}
 	}
 
-	@media #{$allow-sidebar-stash} {
-		.global-search {
-			&:hover, &.focus {
-				padding-left: $tabbar-icon-width * 3;
-			}
-		}
-	}
-
 	.top-menu {
 		@include inline-list;
 		margin: 0;
@@ -282,6 +279,7 @@ $allow-sidebar-stash: $large-up;
 			}
 		}
 	}
+
 	// Account menu
 	.account-menu {
 		display: none;
@@ -380,6 +378,7 @@ $allow-sidebar-stash: $large-up;
 			}
 		}
 	}
+
 	@media #{$small-only} {
 		.top-menu {
 			padding: 0;
@@ -393,6 +392,27 @@ $allow-sidebar-stash: $large-up;
 		}
 	}
 }
+
+@media #{$allow-sidebar-stash} {
+	.inner-wrap:not(.left-open) .hybrid-bar .global-search {
+		&:hover, &.focus {
+			padding-left: $tabbar-icon-width * 3;
+		}
+	}
+
+	.hybrid-bar .global-search {
+		right:  $tabbar-icon-width * 2; // Adjust right offset for the account menu
+	}
+}
+
+@media #{$medium-down} {
+	.disableNotifications .hybrid-bar .global-search {
+		&:hover, &.focus{
+			padding-left: $tabbar-icon-width;
+		}
+	}
+}
+
 
 // When notifications are disabled
 .disableNotifications .hybrid-bar .global-search {
@@ -709,12 +729,6 @@ $allow-sidebar-stash: $large-up;
 	&::-webkit-scrollbar-thumb:vertical:active { background: $monsoon; }
 }
 
-@media #{$allow-sidebar-stash} {
-	.hybrid-bar .global-search {
-		right:  $tabbar-icon-width * 2;
-	}
-}
-
 @media #{$xlarge-up} {
 	.inner-wrap.right-open {
 		.right-off-canvas-menu{
@@ -780,19 +794,9 @@ $allow-sidebar-stash: $large-up;
 	}
 }
 
-// < 1024px
-@media #{$medium-down} {
-	.disableNotifications .hybrid-bar .global-search {
-		&:hover, &.focus{
-			padding-left: $tabbar-icon-width;
-		}
-	}
-
-}
-
 @media #{$small-only} {
 	.tab-bar {
-		// Top menu items drop to a new row- adjust height to top nav height + another row for 0
+		// On small - top menu items drop to a new row- adjust height suit
 		height: $tabbar-height + $tabbar-menu-icon-height + $tabbar-menu-icon-padding;
 	}
 }
