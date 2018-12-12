@@ -11,6 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 
@@ -20,7 +21,6 @@ use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
  */
 class Factory extends FolderFilter\Factory
 {
-
     /**
      * @inheritdoc
      * @param Filter\Model $filter
@@ -57,26 +57,26 @@ class Factory extends FolderFilter\Factory
         GenericCollection $overrides
     ): Filter\IComponent {
         $options = $pageFilter->getOptions();
-        $folders = $this->getFolderMapper()->createCollection();
 
         if (!$viewee) {
             throw new \InvalidArgumentException('$viewee cannot be null for StudentInteraction filter');
         }
 
-        /** @noinspection PhpStatementHasEmptyBodyInspection */
-        /** @noinspection MissingOrEmptyGroupStatementInspection */
-        if($options[Definition::KEY_CLASSES]->getAvailable()){
-            // TODO insert enrolled classes
+        $getClasses = $options[Definition::KEY_CLASSES]->getAvailable();
+        $getGroups  = $options[Definition::KEY_GROUPS]->getAvailable();
+
+        if ($getClasses || $getGroups) {
+            // Note: '4' is a hack to mean 'INVALID', to force no group folders to be matched.
+            $groupAccessLevel = $getGroups ? UserAccess::ACCESS_READ : UserAccess::ACCESS_FULL + 1;
+            $folders          = $this->getFolderMapper()->findForUser($viewee, $getClasses, $groupAccessLevel, false)->indexBy('id');
+        } else {
+            $folders = $this->getFolderMapper()->createCollection();
         }
-        /** @noinspection PhpStatementHasEmptyBodyInspection */
-        /** @noinspection MissingOrEmptyGroupStatementInspection */
-        if($options[Definition::KEY_GROUPS]->getAvailable()){
-            // TODO insert enrolled groups
-        }
-        if($options[Definition::KEY_RESPONSE]->getAvailable()){
+
+        if ($options[Definition::KEY_RESPONSE]->getAvailable()) {
             $folders = $folders->mergeUnique($this->getFolderMapper()->findFoldersWithResponses($viewee), 'id');
         }
-        if($options[Definition::KEY_FEEDBACK]->getAvailable()){
+        if ($options[Definition::KEY_FEEDBACK]->getAvailable()) {
             $folders = $folders->mergeUnique($this->getFolderMapper()->findFoldersWithFeedbackToStudent($viewee), 'id');
         }
 
