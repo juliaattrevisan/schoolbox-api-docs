@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Filter;
 
 /**
  * Sub-module for a student's upcoming due work.
@@ -83,6 +84,8 @@ class Module extends BaseModule
                 }
             }
         );
+
+        $this->register('GET', '', 'postUpcomingForStudent');
     }
 
     /**
@@ -114,6 +117,9 @@ class Module extends BaseModule
             'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
             'participantDataSource' => $injector->lazyGet('participantDataSource'),
             'defaultGradeGroup'     => $this->getInjector()->lazyGet('defaultGradeGroup'),
+            'filterFactoryFactory'  => $injector->lazy(function () {
+                return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
+            }),
         ];
     }
 

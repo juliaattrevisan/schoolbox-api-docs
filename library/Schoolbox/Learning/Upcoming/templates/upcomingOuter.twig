@@ -184,6 +184,8 @@
 </script>
 <!-- END custom_head -->
 
+
+
 {# Header #}
 <div class="row">
     <div class="small-12 columns">
@@ -216,6 +218,13 @@
         </div>
     </div>
 </div>
+
+{% include '@filters/panel.twig' with {
+    contentId: reportContentId,
+    panel:     filterPanel,
+    quickload: true,
+    page:      filteredPage
+} only %}
 
 <div class="row">
     <div class="small-12 island">

@@ -24,6 +24,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Filter;
 
 /**
  * Controller for the upcoming work screen.
@@ -83,16 +84,21 @@ class Controller extends Base
      */
     protected $defaultGradeGroup;
 
+    /** @var Filter\Filters\Assessment\FactoryFactory */
+    private $filterFactoryFactory;
+
+
     /**
      * Constructor
      *
-     * @param External_ClassInterface $externalClass
-     * @param FolderMapper            $folderMapper
-     * @param UserMapper              $userMapper
-     * @param TermMapper              $termMapper
-     * @param AssessmentMapperProxy   $assessmentDataSource
-     * @param ParticipantDataSource   $participantDataSource
-     * @param GradeGroup\Model        $defaultGradeGroup
+     * @param External_ClassInterface                  $externalClass
+     * @param FolderMapper                             $folderMapper
+     * @param UserMapper                               $userMapper
+     * @param TermMapper                               $termMapper
+     * @param AssessmentMapperProxy                    $assessmentDataSource
+     * @param ParticipantDataSource                    $participantDataSource
+     * @param GradeGroup\Model                         $defaultGradeGroup
+     * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
      */
     public function __construct(
         External_ClassInterface $externalClass,
@@ -101,7 +107,8 @@ class Controller extends Base
         TermMapper $termMapper,
         AssessmentMapperProxy $assessmentDataSource,
         ParticipantDataSource $participantDataSource,
-        GradeGroup\Model $defaultGradeGroup
+        GradeGroup\Model $defaultGradeGroup,
+        Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
     ) {
         $this->externalClass         = $externalClass;
         $this->folderMapper          = $folderMapper;
@@ -110,6 +117,7 @@ class Controller extends Base
         $this->assessmentDataSource  = $assessmentDataSource;
         $this->participantDataSource = $participantDataSource;
         $this->defaultGradeGroup     = $defaultGradeGroup;
+        $this->filterFactoryFactory  = $filterFactoryFactory;
     }
 
     /**
@@ -134,12 +142,26 @@ class Controller extends Base
      * @api   GET /learning/due/:studentId{/:date}
      * @param User                $student
      * @param Alaress_Date_Format $date The date to show on the work calendar.
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \ReflectionException
      * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     public function getUpcomingForStudent(User $student, Alaress_Date_Format $date): void
     {
+        $namespace   = Module::BASENAME;
+        $page        = Filter\Page\Model::PAGE_DUE_WORK_CALENDAR;
+        $route       = $this->getRouter()->generate("$namespace.postUpcomingForStudent", ['student' => $student, 'studentId' => $student->getId()]);
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $student);
+
+
         $term = $this->termMapper->findForDate($date);
 
         // Student's subjects and teachers
@@ -208,12 +230,14 @@ class Controller extends Base
             'currentTerm'  => $term,
             'children'     => $children,
             'upcomingWork' => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
-            'returnUrl'    => $returnUrl
+            'returnUrl'    => $returnUrl,
+            'filterPanel'  => $filterPanel,
+            'filteredPage' => Filter\Page\Model::PAGE_DUE_WORK_CALENDAR,
         ];
 
         $namespace = Module::BASENAME;
         $this->getResponse()->content->set(
-            $this->buildHtmlOutput("@$namespace/upcoming.twig", $data)
+            $this->buildHtmlOutput("@$namespace/upcomingOuter.twig", $data)
              ->setTitle('Upcoming Work for '.$student->formatName())
              ->setTab('submission') // ¯\_(ツ)_/¯
         );
