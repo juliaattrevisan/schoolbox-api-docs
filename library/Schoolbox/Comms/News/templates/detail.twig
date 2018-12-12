@@ -488,7 +488,7 @@ Data:
                     window.location.reload();
                 }).error(function (response) {
                     $toast.toastTimeout({
-                        text: 'Error: ' + response.message,
+                        text: 'Error: ' + response.responseJSON.message,
                         css: 'alert'
                     });
                 });
