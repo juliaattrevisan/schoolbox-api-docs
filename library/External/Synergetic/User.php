@@ -630,7 +630,7 @@ class External_Synergetic_User implements External_UserInterface
                         StudentCampus = Year.Campus
             LEFT JOIN   dbo.luCountry StudentCountry ON StudentContactCountryCode = StudentCountry.Code
             LEFT JOIN   dbo.luCountry StudentHomeCountry ON StudentContactHomeCountryCode = StudentHomeCountry.Code
-			LEFT JOIN   dbo.StudentContactsPortal ON vStudentContactAllAddress.StudentID = StudentContactsPortal.StudentID
+            LEFT JOIN   dbo.StudentContactsPortal ON vStudentContactAllAddress.StudentID = StudentContactsPortal.StudentID
             JOIN        FileSemesters Semester ON
                             Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
                             Semester.FileYear = vStudentContactAllAddress.FileYear AND
