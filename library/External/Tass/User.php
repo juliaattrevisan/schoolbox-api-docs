@@ -260,6 +260,68 @@ class External_Tass_User implements External_UserInterface
                       AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
                       AND parent.cmpy_code = sf.cmpy_code
                   WHERE stud_code = '$tassID'
+
+              UNION
+
+                SELECT DISTINCT
+                    'P' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
+                                        AS StudentContactID,
+                    sf.sfa_num          AS StudentContactSplitFamilyNumber,
+                    pa.add_num          AS StudentContactAddressNumber,
+                    parent.f_name       AS StudentContactPreferred,
+                    0                   AS StudentContactSilentPhoneFlag,
+                    pa.home_phone       AS StudentContactPhoneActual,
+                    pa.bus_phone        AS StudentContactOccupPhone,
+                    pa.e_mail           AS StudentContactDefaultEmail,
+                    ''                  AS StudentContactSpouseID,
+                    CASE
+                        WHEN RTRIM(pa.mobile1) IS NOT NULL
+                        THEN RTRIM(pa.mobile1)
+                        ELSE RTRIM(pa.mobile2)
+                    END                 AS StudentContactMobilePhone,
+                    pa.mobile2          AS StudentContactSpouseMobilePhone
+
+                FROM pia_sfaccess AS sf
+                INNER JOIN parent
+                    ON parent.par_code = sf.par_code
+                    AND parent.cmpy_code = sf.cmpy_code
+                JOIN paraddress AS pa
+                    ON parent.par_code = pa.par_code
+                    AND pa.cmpy_code = parent.cmpy_code
+                    AND pa.add_num IN ($addnum_father,'1')
+                    AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
+                WHERE (CHARINDEX(','+ '$tassID' +',', ','+RTRIM(sf.stud_codes)+',') > 0)
+
+              UNION
+
+                SELECT DISTINCT
+                    'S' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
+                                        AS StudentContactID,
+                    sf.sfa_num          AS StudentContactSplitFamilyNumber,
+                    pa.add_num          AS StudentContactAddressNumber,
+                    parent.f_name       AS StudentContactPreferred,
+                    0                   AS StudentContactSilentPhoneFlag,
+                    pa.home_phone       AS StudentContactPhoneActual,
+                    pa.bus_phone        AS StudentContactOccupPhone,
+                    pa.e_mail           AS StudentContactDefaultEmail,
+                    ''                  AS StudentContactSpouseID,
+                    CASE
+                        WHEN RTRIM(pa.mobile1) IS NOT NULL
+                        THEN RTRIM(pa.mobile1)
+                        ELSE RTRIM(pa.mobile2)
+                    END                 AS StudentContactMobilePhone,
+                    pa.mobile2          AS StudentContactSpouseMobilePhone
+
+                FROM pia_sfaccess AS sf
+                INNER JOIN parent
+                    ON parent.par_code = sf.par_code
+                    AND parent.cmpy_code = sf.cmpy_code
+                JOIN paraddress AS pa
+                    ON parent.par_code = pa.par_code
+                    AND pa.cmpy_code = parent.cmpy_code
+                    AND pa.add_num IN ($addnum_mother,'1')
+                    AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
+                WHERE (CHARINDEX(','+ '$tassID' +',', ','+RTRIM(sf.stud_codes)+',') > 0)
         ";
         $parents = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
 
