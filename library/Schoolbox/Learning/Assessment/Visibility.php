@@ -49,9 +49,10 @@ class Visibility
      * @param User                     $viewer
      * @param bool                     $showClosed Should we exclude assessments if their close date has passed?
      * @param Alaress_Date_Format|null $now
+     * @param bool                     $respectSivo
      * @return bool
      */
-    public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed, Alaress_Date_Format $now = null): bool
+    public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed, Alaress_Date_Format $now = null, bool $respectSivo = true): bool
     {
         $now = $now ?? Alaress_Date_Format::now();
 
@@ -66,7 +67,7 @@ class Visibility
                 return true;
             }
         } // Not an instructor. Can they see due to their participation?
-        elseif ($this->isVisibleToNonInstructor($assessment, $viewer, $showClosed, $now)) {
+        elseif ($this->isVisibleToNonInstructor($assessment, $viewer, $showClosed, $now, $respectSivo)) {
             return true;
         }
 
@@ -84,17 +85,17 @@ class Visibility
      * @param User                     $viewer
      * @param bool                     $showClosed
      * @param Alaress_Date_Format|null $now
+     * @param bool                     $respectSivo
      * @return bool
      */
-    public function isVisibleToUserOrChildOfUser(IAssessable $assessment, User $viewer, bool $showClosed, Alaress_Date_Format $now = null): bool
-    {
+    public function isVisibleToUserOrChildOfUser(IAssessable $assessment, User $viewer, bool $showClosed, Alaress_Date_Format $now = null, bool $respectSivo = true): bool {
         $now = $now ?? Alaress_Date_Format::now();
 
-        if ($this->isVisibleToUser($assessment, $viewer, $showClosed, $now)) {
+        if ($this->isVisibleToUser($assessment, $viewer, $showClosed, $now, $respectSivo)) {
             return true;
         }
         foreach ($viewer->getChildren() as $child) {
-            if ($this->isVisibleToUser($assessment, $child, $showClosed, $now)) {
+            if ($this->isVisibleToUser($assessment, $child, $showClosed, $now, $respectSivo)) {
                 return true;
             }
         }
@@ -151,11 +152,12 @@ class Visibility
      * @param User                $nonInstructor
      * @param bool                $showClosed Should we show assessments after their closed date?
      * @param Alaress_Date_Format $now
+     * @param bool                $respectSivo
      * @return bool
      */
-    private function isVisibleToNonInstructor(IAssessable $assessable, User $nonInstructor, bool $showClosed, Alaress_Date_Format $now): bool
+    private function isVisibleToNonInstructor(IAssessable $assessable, User $nonInstructor, bool $showClosed, Alaress_Date_Format $now, bool $respectSivo): bool
     {
-        if ($assessable->isStaffOrInstructorVisibleOnly() && !$nonInstructor->getRole()->isStaff()) {
+        if ($respectSivo && $assessable->isStaffOrInstructorVisibleOnly() && !$nonInstructor->getRole()->isStaff()) {
             // Staff can always see SIVO assessments, regardless of folder perm
             return false;
         }
