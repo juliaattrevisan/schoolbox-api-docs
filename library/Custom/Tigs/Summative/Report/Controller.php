@@ -152,7 +152,7 @@ class Controller extends Web\Controller\Base
 //        $cohortUnitImpls = $this->findCohortUnitImpls($unitImpls); // TODO TEMP comment out
 
 //        $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user, $attributes->getCurriculumYearLevel(), $attributes->getCurriculumSemester());
-        $dpData = null; // TODO TEMP comment out
+        $dpData = []; // TODO TEMP comment out
 
         $data   = [
             'user'                => $user,
