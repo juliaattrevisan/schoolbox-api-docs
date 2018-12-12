@@ -533,14 +533,7 @@ class External_Synergetic_User implements External_UserInterface
             $filters .= " AND StudentForm = :form";
         }
 
-        if ($this->config->get('external_synergetic_student_contact_types') === '') {
-            // No relationships were found, use the default values we had before introducing this feature
-            $studentContactTypes = ['SC1','SC2','SC3'];
-        } else {
-            $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
-        }
-
-        $contactTypes = Builder::getArrayBindings($studentContactTypes, 'types');
+        $contactTypes = $this->getStudentContactTypeBindings();
 
         // Now can build the query string
 
@@ -671,14 +664,7 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStudentBoarderContactListExtended()
     {
-        if ($this->config->get('external_synergetic_student_contact_types') === '') {
-            // No relationships were found, use the default values we had before introducing this feature
-            $studentContactTypes = ['SC1','SC2','SC3'];
-        } else {
-            $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
-        }
-
-        $contactTypes = Builder::getArrayBindings($studentContactTypes, 'types');
+        $contactTypes = $this->getStudentContactTypeBindings();
 
         $query =
         "
@@ -744,14 +730,7 @@ class External_Synergetic_User implements External_UserInterface
             return [];
         }
 
-        if ($this->config->get('external_synergetic_student_contact_types') === '') {
-            // No relationships were found, use the default values we had before introducing this feature
-            $studentContactTypes = ['SC1','SC2','SC3'];
-        } else {
-            $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
-        }
-
-        $contactTypes = Builder::getArrayBindings($studentContactTypes, 'types');
+        $contactTypes = $this->getStudentContactTypeBindings();
 
         $query =
         "
@@ -907,48 +886,35 @@ class External_Synergetic_User implements External_UserInterface
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
+        $relationships = $this->getRelationshipBindings();
 
-        // Get student contact types from config, and wrangle into a query
-
-        if ($this->config->get('external_synergetic_student_relationships') === '') {
-            // No relationships were found, use the default values we had before introducing this feature
-            $relationships = ['SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS','HOMES','HSS'];
-        } else {
-            $relationships = explode(',', $this->config->get('external_synergetic_student_relationships'));
-        }
-
-        $relationshipBindings = Builder::getArrayBindings($relationships, 'relationship');
+        $contactTypes = $this->getStudentContactTypeBindings();
 
         $query = "
-            SELECT      Relationships.RelatedID
-            FROM        dbo.Constituencies Constituencies
-            LEFT JOIN   dbo.Relationships Relationships ON Relationships.RelatedID = Constituencies.ID
-            LEFT JOIN   dbo.Community Community ON Relationships.RelatedID = Community.ID
-            WHERE       Relationships.ID = :externalId AND
-                        Constituencies.ConstitCode = '@SC' AND
-                        Relationships.Relationship IN ({$relationshipBindings['placeholders']})
-            ORDER BY    Community.BirthDate
+            SELECT   r.RelatedID
+            FROM     Relationships r
+            JOIN     vStudentContactAllAddress a ON r.RelatedID = a.StudentID
+            JOIN     FileSemesters Semester ON
+                     Semester.FileSemester = a.FileSemester AND
+                     Semester.FileYear = a.FileYear AND
+                     Semester.SystemCurrentFlag = 1
+            WHERE    r.ID = :externalId1 AND
+                     r.Relationship IN ({$relationships['placeholders']}) AND
+                     (a.StudentContactID = :externalId2 OR
+                      (a.StudentContactSpouseID = :externalId3 AND a.StudentContactPrimaryOnlyFlag = 0)) AND
+                     a.StudentContactType IN ({$contactTypes['placeholders']})
+            ORDER BY a.StudentBirthDate;
         ";
 
-        $students = $this->getConnector()->executeQuery(
+        return $this->getConnector()->executeQuery(
             $query,
             array_merge(
-                $relationshipBindings['bindings'],
-                ['externalId' => $externalUserId]
+                $relationships['bindings'],
+                ['externalId1' => $externalId, 'externalId2' => $externalId, 'externalId3' => $externalUserId],
+                $contactTypes['bindings']
             )
         )->fetchAll();
 
-        foreach ($students as $key => $student) {
-            $contacts = $this->getStudentContactList((int)$student['RelatedID']);
-            foreach ($contacts as $contact) {
-                if ((int)$contact['StudentContactID'] === (int)$externalId ||
-                    (int)$contact['StudentContactSpouseID'] === (int)$externalId) {
-                    continue 2;
-                }
-            }
-            // current parent is not a contact of current student
-            unset($students[$key]);
-        }
         return $students;
     }
 
@@ -993,16 +959,7 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getParentUserAccountInfo(): array
     {
-        // Get student contact types from config, and wrangle into a query
-
-        if ($this->config->get('external_synergetic_student_contact_types') === '') {
-            // No relationships were found, use the default values we had before introducing this feature
-            $studentContactTypes = ['SC1','SC2','SC3'];
-        } else {
-            $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
-        }
-
-        $contactTypes = Builder::getArrayBindings($studentContactTypes, 'types');
+        $contactTypes = $this->getStudentContactTypeBindings();
 
         $query =
         "
@@ -1377,5 +1334,38 @@ class External_Synergetic_User implements External_UserInterface
     {
         $query = "SELECT DISTINCT Code, Description FROM  dbo.luYearLevel";
         return $this->getConnector()->executeQuery($query)->fetchAll();
+    }
+
+    /**
+     * Gets query bindings for student contact type from admin config
+     * @return string[]
+     */
+    private function getStudentContactTypeBindings()
+    {
+        if ($this->config->get('external_synergetic_student_contact_types') === '') {
+            // No relationships were found, use the default values we had before introducing this feature
+            $studentContactTypes = ['SC1', 'SC2', 'SC3'];
+        } else {
+            $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
+        }
+
+        $contactTypes = Builder::getArrayBindings($studentContactTypes, 'types');
+        return $contactTypes;
+    }
+
+    /**
+     * Gets query bindings for relationship from admin config
+     * @return string[]
+     */
+    private function getRelationshipBindings()
+    {
+        if ($this->config->get('external_synergetic_student_relationships') === '') {
+            // No relationships were found, use the default values we had before introducing this feature
+            $relationships = ['SN', 'STSN', 'DR', 'STDR', 'WD', 'GRASN', 'GRADR', 'FOCD', 'HOPT', 'HOCD', 'HS', 'HOMES', 'HSS'];
+        } else {
+            $relationships = explode(',', $this->config->get('external_synergetic_student_relationships'));
+        }
+        $relationshipBindings = Builder::getArrayBindings($relationships, 'relationship');
+        return $relationshipBindings;
     }
 }
