@@ -55,7 +55,7 @@ class Controller extends \Schoolbox\Learning\Upcoming\Controller
      * @param Alaress_Date_Format $now
      * @return Alaress_Date_Format[]|array
      */
-    protected function findTermDates(Alaress_Date_Format $now)
+    private function findTermDates(Alaress_Date_Format $now): array
     {
         /** @var IConnector $edb */
         $edb = $this->getDi()->get('databaseExternal');
