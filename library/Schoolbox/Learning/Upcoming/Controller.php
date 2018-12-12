@@ -34,7 +34,7 @@ class Controller extends Base
     /**
      * Limit of upcoming assessments shown in list
      */
-    private const UPCOMING_WORK_LIMIT = 20;
+    protected const UPCOMING_WORK_LIMIT = 20;
 
     /**
      * External Class data source
