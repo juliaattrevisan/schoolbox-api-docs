@@ -13,7 +13,9 @@ Data:
     curriculumSemester:  int            - an integer from 1-2
     errors               string[]       - Any errors that affect the whole page
     unitImpls            UnitImpl\Model - All units imported to this folder.
+    aasData              array          - Data to render the Academic Achievement Summary components
     aamData              array          - Data to render the Academic Achievement Matrix components
+    dpData               array          - Data to render the MYP/DP Graph component
 #}
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <div class="row">
@@ -29,13 +31,17 @@ Data:
                 {{ error|raw }}
             </div>
         {% endfor %}
+        {% if aasData.error is defined %}
+            <div data-alert class="alert-box alert">
+                {{ aasData.error|raw }}
+            </div>
+        {% endif %}
         {% if aamData.error is defined %}
             <div data-alert class="alert-box alert">
                 {{ aamData.error|raw }}
             </div>
         {% endif %}
     </div>
-
 
     <div class="column small-12 medium-6">
         <h2 class="subheader">{{ dpData.header }}</h2>
@@ -47,10 +53,20 @@ Data:
         <h2 class="subheader">NESA Score</h2>
     </div>
 
-
     <div class="column small-12">
         {% for unitId, unit in unitImpls %}
-            <h2 class="subheader">{{ unit.title }}</h2>
+            {# Do we have a link to an AAS assessment for this unit? #}
+            {% set unitRoute = (aasData.data is defined and aasData.data[unitId] is defined) ? aasData.data[unitId].link : '' %}
+            {% if unitRoute %}
+                <h2 class="subheader"><a href="{{ unitRoute }}"><span class="icon-link" style="color: inherit;"></span>{{ unit.title }}</a></h2>
+            {% else %}
+                <h2 class="subheader">{{ unit.title }}</h2>
+            {% endif %}
+
+            {# Were we given AAS data for this unit? #}
+            {% if aasData.data is defined and aasData.data[unitId] is defined %}
+                {% include '@tigsSummativeReport/components/academicAchievementSummary.twig' with aasData.data[unitId] only %}
+            {% endif %}
             {# Were we given AAM data for this unit? #}
             {% if aamData.data is defined and aamData.data[unitId] is defined %}
                 {% include '@tigsSummativeReport/components/academicAchievementMatrix.twig' with aamData.data[unitId] only %}
@@ -67,8 +83,10 @@ Data:
             <p>userId: {{ user.id }}</p>
             <p>folderId: {{ folder.id }}</p>
             <br>
-            <p>isHsc: {% if isHsc %}true{% else %}false{% endif %}</p>
             <p>isIb: {% if isIb %}true{% else %}false{% endif %}</p>
+            <p>isMyp: {% if isMyp %}true{% else %}false{% endif %}</p>
+            <p>isDp: {% if isDp %}true{% else %}false{% endif %}</p>
+            <p>isHsc: {% if isHsc %}true{% else %}false{% endif %}</p>
             <br>
             <p>SB Term: {{ term }}</p>
             <br>

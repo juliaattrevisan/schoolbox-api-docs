@@ -1,0 +1,31 @@
+{#
+Renders an Academic Achievement Summary component.
+
+This is a table derived from a rubric. It does not render the capability column.
+
+Data:
+    error:               string           - Optional. If present, the reason why we can't render the component
+    marks                int[]            - Keyed by criterion name
+#}
+
+<p class="meta">Academic Achievement Summary</p>
+{% if error|default(null) %}
+    <div data-alert class="alert-box alert">{{ error|raw }}</div>
+{% else %}
+    <table>
+        <thead>
+        <tr>
+            <td>Criterion</td>
+            <td>Mark</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for criterion, mark in marks %}
+            <tr>
+                <td>{{ criterion }}</td>
+                <td>{{ mark }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

@@ -11,6 +11,7 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\Report\Components\AcademicAchievementMatrix;
+use Custom\Tigs\Summative\Report\Components\AcademicAchievementSummary;
 use Custom\Tigs\Summative\Report\Components\DiplomaProgrammeGraph;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
@@ -117,7 +118,7 @@ class Controller extends Web\Controller\Base
      */
     public function getSubjectReport(User $user, Folder\Model $folder): void
     {
-        [$isHsc, $isIb, $sbSem, $term, $curriculumYearLevel, $curriculumSemester] = $this->deriveStudentAttributes($user);
+        $attributes = $this->deriveStudentAttributes($user);
 
         $errors = [];
 
@@ -135,33 +136,40 @@ class Controller extends Web\Controller\Base
                 $error .= \sprintf(' <a href="%s">Manage Course imports</a>', $route);
             }
             $errors[]  = $error;
-            $unitImpls = $aamData = [];
+            $unitImpls = $aamData = $aasData = [];
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitImpls = $this->getUnitImpls($courseImplsWithUnits);
 
             // Build component data
             $aamData = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
+
+            // Only relevant for MYP students
+            $aasData = $this->buildAcademicAchievementSummaryData($attributes, $unitImpls, $user);
         }
 
         // The cohort check assumes that cohort classes have the same courses.
-        $cohortUnitImpls = $this->findCohortUnitImpls($unitImpls);
+//        $cohortUnitImpls = $this->findCohortUnitImpls($unitImpls); // TODO TEMP comment out
 
-        $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user, $curriculumYearLevel, $curriculumSemester);
+//        $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user, $attributes->getCurriculumYearLevel(), $attributes->getCurriculumSemester());
+        $dpData = []; // TODO TEMP comment out
 
         $data   = [
             'user'                => $user,
             'folder'              => $folder,
             'isEnabled'           => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
-            'isHsc'               => $isHsc,
-            'isIb'                => $isIb,
-            'sbSem'               => $sbSem,
-            'term'                => $term,
-            'curriculumYearLevel' => $curriculumYearLevel,
-            'curriculumSemester'  => $curriculumSemester,
+            'isIb'                => $attributes->isIb(),
+            'isMyp'               => $attributes->isMyp(),
+            'isDp'                => $attributes->isDp(),
+            'isHsc'               => $attributes->isHsc(),
+            'sbSem'               => $attributes->getSbSem(),
+            'term'                => $attributes->getTerm(),
+            'curriculumYearLevel' => $attributes->getCurriculumYearLevel(),
+            'curriculumSemester'  => $attributes->getCurriculumSemester(),
             'errors'              => $errors,
             'unitImpls'           => $unitImpls,
             'aamData'             => $aamData,
+            'aasData'             => $aasData,
             'dpData'              => $dpData,
         ];
         $output = $this->buildHtmlOutput('@tigsSummativeReport/subject.twig', $data, "Subject Report");
@@ -174,17 +182,15 @@ class Controller extends Web\Controller\Base
      * Helper to derive relevant student attributes
      *
      * @param User $user
-     * @return array
+     * @return StudentAttributes
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    private function deriveStudentAttributes(User $user): array
+    private function deriveStudentAttributes(User $user): StudentAttributes
     {
-        $ibFlagOn = (bool)$this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'];
+        $isIb = (bool)$this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'];
 
         $year  = (int)$user->getYear();
-        $isHsc = !$ibFlagOn || $year <= 10;
-        $isIb  = $ibFlagOn  || $year <= 10;
 
         // Hardcoded term dates for now
         $firstDayTerm1Relative = '1 January';
@@ -248,7 +254,7 @@ class Controller extends Web\Controller\Base
             $curriculumSemester  = $sbSem;
         }
 
-        return [$isHsc, $isIb, $sbSem, $term, $curriculumYearLevel, $curriculumSemester];
+        return new StudentAttributes($isIb, $sbSem, $term, $curriculumYearLevel, $curriculumSemester);
     }
 
 
@@ -386,6 +392,53 @@ class Controller extends Web\Controller\Base
         );
 
         return $aam->toContext();
+    }
+
+
+    /**
+     * Builds data for rendering the AAS components.
+     *
+     * @param StudentAttributes                  $attributes
+     * @param GenericCollection|UnitImpl\Model[] $unitImpls
+     * @param User                               $student
+     * @return array
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function buildAcademicAchievementSummaryData(StudentAttributes $attributes, GenericCollection $unitImpls, User $student): array
+    {
+        // Only relevant for MYP students
+        if (!$attributes->isMyp()) {
+            return [];
+        }
+
+        $aasWorkTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_SUMMARY);
+        $aasWorkTypeId = \is_numeric($aasWorkTypeId) ? (int)$aasWorkTypeId : null;
+
+        // Not set? Then we can't identify AAS assessments.
+        if (null === $aasWorkTypeId) {
+            $errorMsg = 'Cannot render Academic Achievement Summary components. Work type not set.';
+            $routeConfig = $this->getRouteIfAuthorized('tigsSummativeAdmin.getAdmin');
+            // If user is permitted, prompt them to fix this.
+            if ($routeConfig) {
+                $hash        = Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_SUMMARY;
+                $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">Set Academic Achievement Summary Work Type</a>";
+            }
+            return ['error' => $errorMsg];
+        }
+
+        $aas = new AcademicAchievementSummary(
+            $unitImpls,
+            $student,
+            $this->visibility,
+            $this->getUser(),
+            $aasWorkTypeId,
+            $this->rubricMapper,
+            $this->getAuthorizer(),
+            $this->getRouter()
+        );
+
+        return $aas->toContext();
     }
 
 

@@ -75,6 +75,34 @@ class Visibility
 
 
     /**
+     * Returns whether a user is permitted to see the existence of an assessment, or one of the user's children can.
+     *
+     * Use this when you don't need to know whether the user can see the assessment due to their own permissions, or
+     * because of one of their children
+     *
+     * @param IAssessable              $assessment
+     * @param User                     $viewer
+     * @param bool                     $showClosed
+     * @param Alaress_Date_Format|null $now
+     * @return bool
+     */
+    public function isVisibleToUserOrChildOfUser(IAssessable $assessment, User $viewer, bool $showClosed, Alaress_Date_Format $now = null): bool
+    {
+        $now = $now ?? Alaress_Date_Format::now();
+
+        if ($this->isVisibleToUser($assessment, $viewer, $showClosed, $now)) {
+            return true;
+        }
+        foreach ($viewer->getChildren() as $child) {
+            if ($this->isVisibleToUser($assessment, $child, $showClosed, $now)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * Is the assessable visible to the Instructor? (Assumes the user is an instructor)
      *
      * @param IAssessable         $assessable

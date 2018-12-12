@@ -12,8 +12,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -23,7 +21,7 @@ use Aura\Router;
 /**
  * Builds a suitable data structure for rendering the AAM components
  */
-class AcademicAchievementMatrix
+class AcademicAchievementMatrix extends BaseComponent
 {
 
     /** @var GenericCollection|UnitImpl\Model[] */
@@ -120,7 +118,7 @@ class AcademicAchievementMatrix
      */
     private function buildUnitData(UnitImpl\Model $unitImpl): ?array
     {
-        $aamAssessables = $this->findAamAssessments($unitImpl);
+        $aamAssessables = $this->findAssessmentsWithWorkType($unitImpl, $this->aamWorkTypeId);
 
         // Did we find 2+ AAM assessments in this unit?
         $countAam = \count($aamAssessables);
@@ -133,7 +131,6 @@ class AcademicAchievementMatrix
             return null;
         }
 
-        /** @var IAssessable $assessment */
         $assessment = \reset($aamAssessables);
 
         // Not a Due Work?
@@ -165,54 +162,11 @@ class AcademicAchievementMatrix
         }
 
         // Did we find an assessment, but it shouldn't be visible to the current viewer?
-        if (!$this->visibility->isVisibleToUser($assessment, $this->viewer, true)) {
+        if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true)) {
             return null;
         }
 
         return $this->buildAssessmentData($assessment);
-    }
-
-
-    /**
-     * Iterates through a unit to return all AAM assessments
-     *
-     * @param UnitImpl\Model $unitImpl
-     * @return array
-     */
-    private function findAamAssessments(UnitImpl\Model $unitImpl): array
-    {
-        $aamAssessables = [];
-        foreach ($unitImpl->getAssessables() as $assessable) {
-            if ($assessable instanceof Project) {
-                foreach ($assessable->getAssessables() as $subAssessable) {
-                    if ($this->isWorkType($subAssessable, $this->aamWorkTypeId)) {
-                        $aamAssessables[$subAssessable->getId()] = $subAssessable;
-                    }
-                }
-            } elseif ($this->isWorkType($assessable, $this->aamWorkTypeId)) {
-                $aamAssessables[$assessable->getId()] = $assessable;
-            }
-        }
-        return $aamAssessables;
-    }
-
-
-    /**
-     * Returns whether an assessment is of the specified work type.
-     *
-     * A NULL $workTypeId semantically represents an assessment with no work type.
-     *
-     * @param IAssessable $assessable
-     * @param null|int    $workTypeId
-     * @return bool
-     */
-    private function isWorkType(IAssessable $assessable, ?int $workTypeId): bool
-    {
-        if (!$assessable->getWorkType()) {
-            return null === $workTypeId;
-        }
-
-        return $assessable->getWorkType()->getId() === $workTypeId;
     }
 
 
