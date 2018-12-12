@@ -1,6 +1,8 @@
 <?php
 /**
- * Update dashboard feature tour (adjustments required because of side menu stash)
+ * Update dashboard feature tour
+ * 
+ * These adjustments were required because of the side menu stash feature
  */
 
 use Psr\Log\LoggerInterface;
@@ -17,9 +19,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
     $database = Database::getInstance();
 
-    // Put all the variable details of the tour in... variables
-    $tour_uuid        = 'c0e11cc2-f402-11e7-9a86-08002771865f';
-
+    $tour_uuid = 'c0e11cc2-f402-11e7-9a86-08002771865f';
 
     $steps = [
         // Introduction
@@ -160,6 +160,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         ],
     ];
 
+    // Delete all the current steps in the tour for a fresh slate
     $database->query("SET FOREIGN_KEY_CHECKS=0" );
     $statement = $database->prepare("
         DELETE `tour_step`, `tst`, `tse`, `tsm` FROM `tour_step` 
@@ -171,7 +172,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $database->query("SET FOREIGN_KEY_CHECKS=1" );
 
 
-    // Reverse the array so that we can insert the 'next_step_uuid' without getting an FK error
+    // Reverse the step array so that we can insert the 'next_step_uuid' without getting an FK error
     $stepsReversed = array_reverse($steps);
 
     // Insert the content
@@ -244,7 +245,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
                 'selector'       => $step['selector'],
             ]);
 
-        } elseif ($step['type'] === 'modal') {
+        } else if ($step['type'] === 'modal') {
 
             $statement = $database->prepare("
               INSERT INTO   `tour_step_modal`
@@ -316,7 +317,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
         $i++;
     }
-
 
     // Update the tour table with the first step uuid
     $statement = $database->prepare("

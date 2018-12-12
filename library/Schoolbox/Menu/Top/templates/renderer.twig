@@ -8,7 +8,7 @@
 } %}
 
 {% for tab in tabs %}
-    <li data-id="{{ tab.id }}">
+    <li data-id="{{ tab.id }}"> {# data-id is used by JS to map between the top menu and side menu (overflow) version of these menu items #}
         <a class="icon-{{ tab.icon }} {% if tabCurrent | lower == tab.token | lower and tab.token is not empty %}navthis{% endif %}"
            {# Should href tokens be url-encoded? #}
            href="{{ tab.url | ireplace(tokens) }}"
