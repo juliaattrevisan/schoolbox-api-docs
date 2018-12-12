@@ -185,7 +185,14 @@ class Controller extends Web\Controller\Base
      */
     private function deriveStudentAttributes(User $user): StudentAttributes
     {
-        $isIb = (bool)$this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'];
+        // Allow GET param to override real ibFlag
+        $isIb = $this->getRequest()->query->get('ibFlag');
+        if(null === $isIb){
+            $isIb = (bool)$this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'];
+        } else {
+            $isIb = (bool)$isIb;
+        }
+
 
         $year  = (int)$user->getYear();
 
