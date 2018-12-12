@@ -123,8 +123,7 @@ $allow-sidebar-stash: $large-up;
 	}
 }
 
-/* Main navigation tab bar at top
- */
+// Main navigation tab bar at top
 .hybrid-bar {
 	.logo {
 		width: $tabbar-icon-width;
@@ -280,7 +279,20 @@ $allow-sidebar-stash: $large-up;
 		}
 	}
 
-	// Account menu
+	@media #{$small-only} {
+		.top-menu {
+			padding: 0;
+			position: absolute;
+			left: 0;
+			top: 80px;
+			width: 100%;
+			li {
+				width: 25%;
+			}
+		}
+	}
+
+	// Account menu in top bar
 	.account-menu {
 		display: none;
 	}
@@ -319,75 +331,13 @@ $allow-sidebar-stash: $large-up;
 			display: block;
 		}
 
-		// intro.js fix
+		intro.js fix
 		&.introjs-fixParent {
 			overflow: visible;
 
 			#profile-options {
 				position: relative;
 				z-index: 1;
-			}
-		}
-
-		a {
-			color: $off-canvas-foreground;
-			background-color: $off-canvas;
-			display: block;
-			padding: 0.625rem 0.8125rem;
-			font-size: 1rem;
-			font-weight: 300;
-			&:hover {
-				background-color: $off-canvas-hover;
-			}
-		}
-		ul{
-			margin: 0;
-			list-style: none;
-		}
-		.separator {
-			color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
-			background: $off-canvas;
-			padding: 0.625rem 0.8125rem;
-			font-weight: 300;
-			text-transform: uppercase;
-			cursor: default;
-			font-size: 0.8125rem;
-
-			&:hover {
-				background: $off-canvas;
-			}
-		}
-		#switch-user {
-			overflow: auto;
-		}
-		.user .card {
-			background-color: $off-canvas;
-			padding: 0.5rem 0 0 1rem;
-
-			.meta {
-				color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
-			}
-			a {
-				background-color: transparent;
-				&:hover {
-					background-color: transparent;
-				}
-			}
-			&:hover {
-				background: $off-canvas-hover;
-			}
-		}
-	}
-
-	@media #{$small-only} {
-		.top-menu {
-			padding: 0;
-			position: absolute;
-			left: 0;
-			top: 80px;
-			width: 100%;
-			li {
-				width: 25%;
 			}
 		}
 	}
@@ -439,8 +389,7 @@ $allow-sidebar-stash: $large-up;
 	}
 }
 
-/* Off Canvas Menu
- */
+// Left sidebar
 .left-off-canvas-menu {
 	/* Profile Accordion Menu
 	 * This is the currently-logged-in user's dom element
@@ -456,17 +405,19 @@ $allow-sidebar-stash: $large-up;
 		}
 
 		.accordion-navigation {
-			.profile-drop{
+			.profile-drop {
 				background: transparent;
 				color: $off-canvas-foreground;
 				display: table;
 				padding: 0;
 				font-size: $paragraph-font-size;
 				width: $off-canvas-width;
-				img{
+
+				img {
 					display: table-cell;
 					vertical-align: middle;
 				}
+
 				span {
 					white-space: nowrap;
 					overflow: hidden;
@@ -478,6 +429,7 @@ $allow-sidebar-stash: $large-up;
 					max-width: 122px;
 				}
 			}
+
 			.profile-drop:after {
 				font-family: $font-family-icon;
 				content: "\e901";
@@ -486,17 +438,21 @@ $allow-sidebar-stash: $large-up;
 				padding: 0px 10px;
 				vertical-align: middle;
 			}
-			&:hover .profile-drop{
+
+			&:hover .profile-drop {
 				background-color: $off-canvas-hover;
 			}
-			&.active .profile-drop{
+
+			&.active .profile-drop {
 				background-color: $off-canvas;
 			}
+
 			&.active > a:after {
 				font-family: $font-family-icon;
 				content: "\e900";
 			}
-			.content{
+
+			.content {
 				display: block;
 				max-height: 0;
 				visibility: hidden;
@@ -511,57 +467,8 @@ $allow-sidebar-stash: $large-up;
 			}
 		}
 
-		.content{
+		.content {
 			padding: 0;
-			a {
-				color: $off-canvas-foreground;
-				background-color: $off-canvas;
-				display: block;
-				padding: 0.625rem 0.8125rem;
-				font-size: 1rem;
-				font-weight: 300;
-				&:hover {
-					background-color: $off-canvas-hover;
-				}
-			}
-			ul{
-				margin: 0;
-				list-style: none;
-			}
-			.separator {
-				color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
-				background: $off-canvas;
-				padding: 0.625rem 0.8125rem;
-				font-weight: 300;
-				text-transform: uppercase;
-				cursor: default;
-				font-size: 0.8125rem;
-
-				&:hover {
-					background: $off-canvas;
-				}
-			}
-			.user {
-				background: $off-canvas;
-				overflow: auto;
-
-				&:hover {
-					background: $off-canvas-hover;
-				}
-
-				.card {
-					padding: 0.5rem 0rem 0rem 1rem;
-					.meta {
-						color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
-					}
-					a {
-						background-color: transparent;
-						&:hover {
-							background-color: transparent;
-						}
-					}
-				}
-			}
 		}
 	}
 
@@ -713,8 +620,66 @@ $allow-sidebar-stash: $large-up;
 	}
 }
 
+// Right sidebar (notifications)
 .right-off-canvas-menu {
 	z-index: 99;
+}
+
+// Common account menu styles (sidebar & top menu variations)
+.account-menu-mobile,
+.account-drop {
+	a {
+		color: $off-canvas-foreground;
+		background-color: $off-canvas;
+		display: block;
+		padding: 0.625rem 0.8125rem;
+		font-size: 1rem;
+		font-weight: 300;
+		&:hover {
+			background-color: $off-canvas-hover;
+		}
+	}
+
+	ul {
+		margin: 0;
+		list-style: none;
+	}
+
+	.separator {
+		color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
+		background: $off-canvas;
+		padding: 0.625rem 0.8125rem;
+		font-weight: 300;
+		text-transform: uppercase;
+		cursor: default;
+		font-size: 0.8125rem;
+
+		&:hover {
+			background: $off-canvas;
+		}
+	}
+
+	.user {
+		background: $off-canvas;
+		overflow: auto;
+
+		&:hover {
+			background: $off-canvas-hover;
+		}
+
+		.card {
+			padding: 0.5rem 0rem 0rem 1rem;
+			.meta {
+				color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
+			}
+			a {
+				background-color: transparent;
+				&:hover {
+					background-color: transparent;
+				}
+			}
+		}
+	}
 }
 
 // A nicer looking scrollbar
