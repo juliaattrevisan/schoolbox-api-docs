@@ -427,7 +427,7 @@ class Controller extends Web\Controller\Base
             return ['error' => $errorMsg];
         }
 
-        $aam = new AcademicAchievementSummary(
+        $aas = new AcademicAchievementSummary(
             $unitImpls,
             $student,
             $this->visibility,
@@ -438,7 +438,7 @@ class Controller extends Web\Controller\Base
             $this->getRouter()
         );
 
-        return $aam->toContext();
+        return $aas->toContext();
     }
 
 
