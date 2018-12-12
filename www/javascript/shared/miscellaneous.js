@@ -204,7 +204,8 @@ $(function () {
         // All the possible things to remove from the #top-menu width
         var profileWidth = $('#profile-drop').is(':visible') ? $('#profile-drop').width() : 0;
         var searchWidth = $('#search').is(':visible') ? $('#search').width() : 0;
-        var notificationsWidth = $('#notification-toggle').is(':visible') && !$('#inner-wrap').hasClass('right-open') ? $('#notification-toggle').width() : 0;
+        var notificationsWidth = $('#notification-toggle').is(':visible') && $('#message-list').not(':visible') ? $('#notification-toggle').width() : 0;
+        // ^ have to check that the notfications bar isn't docked as well, if it is- it's not part of the #top-menu width
         var extraWidth = profileWidth + searchWidth + notificationsWidth;
 
         // Store the width left in top nav after subtracting 
