@@ -283,7 +283,7 @@ class InternationalBaccalaureateGraph
             $assessment = current($assessments);
 
             // Assessment not visible to the viewer? Show no results
-            if (!$this->visibility->isVisibleToUser($assessment, $this->viewer, true)) {
+            if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, false)) {
                 continue;
             }
 

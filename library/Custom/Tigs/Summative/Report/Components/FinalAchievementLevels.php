@@ -154,7 +154,7 @@ class FinalAchievementLevels extends BaseComponent
         }
 
         // Did we find an assessment, but it shouldn't be visible to the current viewer?
-        if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true)) {
+        if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, false)) {
             return null;
         }
 
