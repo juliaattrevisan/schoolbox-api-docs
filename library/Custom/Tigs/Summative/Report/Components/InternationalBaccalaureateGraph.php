@@ -256,7 +256,7 @@ class DiplomaProgrammeGraph
              */
             $folder      = $folderAssessments['folder'];
             $assessments = $folderAssessments['assessments'];
-            $count       = count($assessments);
+            $count       = \count($assessments);
             if ($count !== 1) {
                 throw new UnexpectedValueException(
                     sprintf(
