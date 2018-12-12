@@ -331,9 +331,14 @@ class InternationalBaccalaureateGraph
                     }
                 } else {
                     $mark = $feedback->getHumanReadableMark();
+                    if (preg_match('#(\d) / 7#', $mark, $matches)) {
+                        $mark = $matches[1];
+                    } else {
+                        $mark = null;
+                    }
                 }
 
-                if (isset($mark)) {
+                if (null !== $mark) {
                     if ($participant->getUser()->getId() === $this->student->getId()) {
                         $studentMark = $mark;
                     }
