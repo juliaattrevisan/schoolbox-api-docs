@@ -1,29 +1,194 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
 namespace Custom\Mggs\Learning\Upcoming;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress_Date_Format;
+use Schoolbox\Learning\Assessment\DueDateSortStrategy;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Custom\Mggs\Learning\Personalised;
 
-
 class Controller extends \Schoolbox\Learning\Upcoming\Controller
 {
+
     /**
+     * Displays upcoming work for the given user.
+     *
+     * If(request is for JSON)                       TODO (for a calendar scheduler?) If so, can we move this to a new route?
+     *   returns JSON
+     * elseif (user is in specific set of roles)
+     *   returns custom HTML
+     * else
+     *   return core HTML
+     *
+     * @api   GET /learning/due/:studentId{/:date}
+     * @param User                $student
+     * @param Alaress_Date_Format $date The date to show on the work calendar.
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
+     * @throws \Alaress\Database\Exception
+     */
+    public function getUpcomingForStudent(User $student, Alaress_Date_Format $date): void
+    {
+        // A little different for JSON requests
+        if (\strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
+            $this->getUpcomingForStudentJson($student, $date);
+        } elseif (\in_array($student->getRole()->getId(), \explode(',', $this->getConfigLoader()->get(Personalised\Admin\Controller::CONFIG)), false)) {
+            // Custom Page
+            $this->getUpcomingForStudentCustom($student, $date);
+        } else {
+            // Core Page
+            parent::getUpcomingForStudent($student, $date);
+        }
+    }
+
+
+    /**
+     * @api GET /learning/due/terms/:date
+     *
+     * @param Alaress_Date_Format $now
+     * @throws \Alaress\Database\Exception
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getTermDates(Alaress_Date_Format $now): void
+    {
+        $this->getResponse()->content->set($this->buildJsonOutput(array_map(function (Alaress_Date_Format $d) {
+            return $d->getDatabaseDate();
+        }, $this->findTermDates($now))));
+    }
+
+
+    /**
+     * Returns a JSON payload of dueWork
+     *
      * @param User                $student
      * @param Alaress_Date_Format $date
-     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
      */
-    protected function buildPayloadForHtml(User $student, Alaress_Date_Format $date)
+    private function getUpcomingForStudentJson(User $student, Alaress_Date_Format $date): void
     {
-        $payload = parent::buildPayloadForHtml($student, $date);
+        $term = $this->termMapper->findForDate($date);
+
+        // Student's work
+        $allWork = $this->assessmentDataSource
+            ->findAllByStudent($student, true, $term)
+            ->sortBy('dueAt', 'asc');
+
+        $data = $allWork->map(function(IAssessable $assessable) {
+            return [
+                'id'          => $assessable->getId(),
+                'title'       => $assessable->getTitle(),
+                'folderId'    => $assessable->getBaseContext()->getFolder()->getId(),
+                'folderTitle' => $assessable->getBaseContext()->getFolder()->getTitle(),
+            ];
+        });
+
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+
+    /**
+     * Renders the custom DueWork HTML page
+     *
+     * @param User                $student
+     * @param Alaress_Date_Format $date
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
+     * @throws \Alaress\Database\Exception
+     */
+    private function getUpcomingForStudentCustom(User $student, Alaress_Date_Format $date): void
+    {
+        $term = $this->termMapper->findForDate($date);
+
+        // Student's subjects and teachers
+        $subjects = [];
+
+        // Student's work
+        $allWork = $this->assessmentDataSource
+            ->findAllByStudent($student, true, $term)
+            ->sortByCallback(new DueDateSortStrategy($student));
+
+        // Only get subjects from external if student's timetable isn't hidden.
+        // I don't get this logic as class list != timetable, but apparently
+        // it's important. ¯\_(ツ)_/¯
+        foreach ($this->folderMapper->findForUser($student, !$student->getHideTimetable(), UserAccess::ACCESS_READ, false, true) as $folder) {
+            // Load teachers for this subject (if this subject has them)
+            $teachers = [];
+            if (\count($folder->getCodes()) > 0) {
+                // Actual teachers only
+                $teacherCodes = $this->externalClass->getTeacherName($folder->getCodeString());
+                if(\is_array($teacherCodes) && \count($teacherCodes) > 1) {
+                    $teachers = $this->userMapper->findByColumn('synergy_id', $teacherCodes)
+                                                 ->filter(
+                                                     function (User $teacher) {
+                                                         return $teacher->getRole()->isStaff();
+                                                     }
+                                                 );
+                }
+            }
+
+            // Student's grades
+            // I can just get the assessments out of $allWork
+            $assessments = $allWork->filter(function (IAssessable $assessable) use ($folder) {
+                return (int)$assessable->getBaseContext()->getFolder()->getId() === (int)$folder->getId();
+            });
+
+            // Markbook
+            $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
+
+            if (!isset($subjects[$folder->getId()])) {
+                $subjects[$folder->getId()] = [
+                    'teachers' => $teachers,
+                    'folder'   => $folder,
+                    'grade'    => $this->getConfigLoader()->get('show_overall_grade') ? $markbook->getStudentStatistics()[$student->getId()]: '',
+                    'hasPerms'    => Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId()) > UserAccess::ACCESS_DENY,
+                ];
+            }
+        }
+
+        $visibility = new Visibility(Access::getInstance());
+
+        // Only show work that student has permission to view, and can accept their submission
+        $upcomingWork = $allWork->filter(function (IAssessable $assessable) use ($student, $visibility) {
+            return $visibility->isVisibleToUser($assessable, $student, false);
+        });
+
+        // TODO Populate $_SESSION[children] properly
+        $children = $this->userMapper->findByColumn('id', array_column($this->getSession()->get('children', []), 'id'));
+
+        $returnUrl = Redirect::queryString($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent', ['id' => $student->getId()]));
+
+        $payload = [
+            'student'      => $student,
+            'date'         => $date,
+            'subjects'     => $subjects,
+            'mailHandle'   => $this->getSession()->get('mailhandle'),
+            'currentTerm'  => $term,
+            'children'     => $children,
+            'upcomingWork' => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
+            'returnUrl'    => $returnUrl
+        ];
 
         $termDates = $this->findTermDates($date);
 
@@ -35,27 +200,22 @@ class Controller extends \Schoolbox\Learning\Upcoming\Controller
             $payload['termWeekCount'] = $termDates[0]->diffInWeeks($termDates[3]);
         }
 
-        return $payload;
+        $namespace = Module::BASENAME . 'Mggs';
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput("@$namespace/upcoming.twig", $payload)
+                 ->setTitle('Upcoming Work for '.$student->formatName())
+                 ->setTab('submission')
+        );
     }
 
-
-    /**
-     * @api GET /learning/due/terms/:date
-     *
-     * @param Alaress_Date_Format $now
-     */
-    public function getTermDates(Alaress_Date_Format $now)
-    {
-        $this->getResponse()->content->set($this->buildJsonOutput(array_map(function (Alaress_Date_Format $d) {
-            return $d->getDatabaseDate();
-        }, $this->findTermDates($now))));
-    }
 
     /**
      * @param Alaress_Date_Format $now
      * @return Alaress_Date_Format[]|array
+     * @throws \Alaress\Database\Exception
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    protected function findTermDates(Alaress_Date_Format $now)
+    private function findTermDates(Alaress_Date_Format $now): array
     {
         /** @var IConnector $edb */
         $edb = $this->getDi()->get('databaseExternal');
@@ -122,21 +282,4 @@ class Controller extends \Schoolbox\Learning\Upcoming\Controller
 
         return $termDates;
     }
-
-
-    /**
-     * @param User $student
-     * @return string
-     */
-    protected function getTemplateNamespace(User $student)
-    {
-        $enabledRoles = explode(',', $this->getConfigLoader()->get(Personalised\Admin\Controller::CONFIG));
-
-        if (in_array($student->getRole()->getId(), $enabledRoles)) {
-            return Module::BASENAME . 'Mggs';
-        }
-
-        return parent::getTemplateNamespace($student);
-    }
-
 }

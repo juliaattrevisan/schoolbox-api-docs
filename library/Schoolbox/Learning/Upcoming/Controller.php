@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Upcoming;
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use External_ClassInterface;
-use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -20,7 +19,6 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -140,65 +138,7 @@ class Controller extends Base
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getUpcomingForStudent(User $student, Alaress_Date_Format $date)
-    {
-        // A little different for JSON requests
-        // TODO determine if it's appropriate to display in this way
-        if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
-            $this->getResponse()->content->set($this->buildJsonOutput($this->buildPayloadForJson($student, $date)));
-            return;
-        }
-
-        $namespace = $this->getTemplateNamespace($student);
-
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput("@$namespace/upcoming.twig", $this->buildPayloadForHtml($student, $date))
-             ->setTitle('Upcoming Work for '.$student->formatName())
-             ->setTab('submission') // ¯\_(ツ)_/¯
-        );
-    }
-
-
-    /**
-     * @param User                $student
-     * @param Alaress_Date_Format $date
-     * @return Collection|IAssessable[]
-     */
-    protected function buildPayloadForJson(User $student, Alaress_Date_Format $date)
-    {
-        $term = $this->termMapper->findForDate($date);
-
-        // Student's work
-        $allWork = $this->assessmentDataSource
-            ->findAllByStudent($student, $term)
-            ->sortBy('dueAt', 'asc');
-
-        return $allWork->map(function(IAssessable $assessable) {
-            return [
-                'id'          => $assessable->getId(),
-                'title'       => $assessable->getTitle(),
-                'folderId'    => $assessable->getBaseContext()->getFolder()->getId(),
-                'folderTitle' => $assessable->getBaseContext()->getFolder()->getTitle(),
-            ];
-        });
-    }
-
-
-    /**
-     * @param User $student
-     * @return string
-     */
-    protected function getTemplateNamespace(User $student)
-    {
-        return Module::BASENAME;
-    }
-
-    /**
-     * @param User                $student
-     * @param Alaress_Date_Format $date
-     * @return array
-     */
-    protected function buildPayloadForHtml(User $student, Alaress_Date_Format $date)
+    public function getUpcomingForStudent(User $student, Alaress_Date_Format $date): void
     {
         $term = $this->termMapper->findForDate($date);
 
@@ -221,11 +161,11 @@ class Controller extends Base
                 $teacherCodes = $this->externalClass->getTeacherName($folder->getCodeString());
                 if(is_array($teacherCodes) && count($teacherCodes) > 1) {
                     $teachers = $this->userMapper->findByColumn('synergy_id', $teacherCodes)
-                        ->filter(
-                            function (User $teacher) {
-                                return $teacher->getRole()->isStaff();
-                            }
-                        );
+                                                 ->filter(
+                                                     function (User $teacher) {
+                                                         return $teacher->getRole()->isStaff();
+                                                     }
+                                                 );
                 }
             }
 
@@ -260,7 +200,7 @@ class Controller extends Base
 
         $returnUrl = Redirect::queryString($this->getRouter()->generate('learningUpcoming.getUpcomingForStudent', ['id' => $student->getId()]));
 
-        return [
+        $data = [
             'student'      => $student,
             'date'         => $date,
             'subjects'     => $subjects,
@@ -270,5 +210,12 @@ class Controller extends Base
             'upcomingWork' => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
             'returnUrl'    => $returnUrl
         ];
+
+        $namespace = Module::BASENAME;
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput("@$namespace/upcoming.twig", $data)
+             ->setTitle('Upcoming Work for '.$student->formatName())
+             ->setTab('submission') // ¯\_(ツ)_/¯
+        );
     }
 }
