@@ -513,7 +513,7 @@ $allow-sidebar-stash: $large-up;
 	@media #{$allow-sidebar-stash} {
 		.logo-wrapper .logo {
 			display: block;
-			margin: 3rem 2rem 1rem 2rem;
+			padding: 2rem 0;
 
 			img {
 				display: block;
