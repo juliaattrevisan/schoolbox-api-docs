@@ -56,8 +56,7 @@ Data:
     <div class="actions-small-2 row">
         <div class="list-item">
             <h1>{{ article.title |default("(untitled)") }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
-            <ul class="meta">
-                <li class="icon-user">{{ indicator.byLine(article) }}</li>
+            <ul class="meta">{{ indicator.byLine(article) }}
                 {# Topics #}
                 {% if article.topics|length %}
                     <li class="icon-breadcrumbs">Topics:

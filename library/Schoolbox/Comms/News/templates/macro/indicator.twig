@@ -54,6 +54,7 @@
 
 {# @param article: News\Model #}
 {%- macro byLine(article) -%}
+    {% spaceless %}
     {% if article.isDraft or article.isRejected %}
         {% set metaPrefix = 'Created by' %}
         {% set metaDate = {displayDate: {long: article.createdAt.long, short: article.createdAt.short}} %}
@@ -77,11 +78,11 @@
         {% set author = article.author.fullname %}
     {% endif %}
 
-    {% spaceless %}
-        {{ metaPrefix }} {{ author|raw }} on <span title="{{ metaDate.displayDate.long }}">{{ metaDate.displayDate.short }}</span>
-        {% if metaDate.publicationDate is defined %}
-            <br />Publish date: <span title="{{ metaDate.publicationDate.long }}">{{ metaDate.publicationDate.short }}</span>
-        {% endif %}
+    <li class="icon-user">{{ metaPrefix }} {{ author|raw }} on <span title="{{ metaDate.displayDate.long }}">{{ metaDate.displayDate.short }}</span></li>
+    {% if metaDate.publicationDate is defined %}
+        <li class="icon-clock">Publish date: <span title="{{ metaDate.publicationDate.long }}">{{ metaDate.publicationDate.short }}</span></li>
+    {% endif %}
+
     {% endspaceless %}
 
 {%- endmacro -%}
