@@ -513,7 +513,7 @@ class Controller extends Web\Controller\Base
                 // If user is permitted, prompt them to fix this.
                 if ($routeConfig) {
                     $hash        = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
-                    $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">Set MYP Report Work Type</a>";
+                    $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">MYP Final Achievement Levels</a>";
                 }
                 return ['error' => $errorMsg];
             }
