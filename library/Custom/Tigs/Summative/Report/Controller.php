@@ -499,21 +499,21 @@ class Controller extends Web\Controller\Base
             ($attributes->isMyp() && 2 === $attributes->getCurriculumSemester()) ||
             ($attributes->isDp() && (12 === $attributes->getCurriculumYearLevel() || 2 === $attributes->getCurriculumSemester()));
 
-        if(!$relevant){
+        if (!$relevant) {
             return null;
         }
 
-        if($attributes->isMyp() && 2 === $attributes->getCurriculumSemester()){
+        if ($attributes->isMyp() && 2 === $attributes->getCurriculumSemester()) {
             $workTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS);
             $workTypeId = \is_numeric($workTypeId) ? (int)$workTypeId : null;
 
             if (null === $workTypeId) {
-                $errorMsg = 'Cannot render MYP Report components. Work type not set.';
+                $errorMsg    = 'Cannot render MYP Report components. Work type not set.';
                 $routeConfig = $this->getRouteIfAuthorized('tigsSummativeAdmin.getAdmin');
                 // If user is permitted, prompt them to fix this.
                 if ($routeConfig) {
-                    $hash        = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
-                    $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">MYP Final Achievement Levels</a>";
+                    $hash     = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
+                    $errorMsg .= " <a href =\"{$routeConfig}#{$hash}\">MYP Final Achievement Levels</a>";
                 }
                 return ['error' => $errorMsg];
             }
@@ -522,12 +522,12 @@ class Controller extends Web\Controller\Base
             $workTypeId = \is_numeric($workTypeId) ? (int)$workTypeId : null;
 
             if (null === $workTypeId) {
-                $errorMsg = 'Cannot render DP Report components. Work type not set.';
+                $errorMsg    = 'Cannot render DP Report components. Work type not set.';
                 $routeConfig = $this->getRouteIfAuthorized('tigsSummativeAdmin.getAdmin');
                 // If user is permitted, prompt them to fix this.
                 if ($routeConfig) {
-                    $hash        = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
-                    $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">Set DP Report Work Type</a>";
+                    $hash     = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
+                    $errorMsg .= " <a href =\"{$routeConfig}#{$hash}\">Set DP Report Work Type</a>";
                 }
                 return ['error' => $errorMsg];
             }
