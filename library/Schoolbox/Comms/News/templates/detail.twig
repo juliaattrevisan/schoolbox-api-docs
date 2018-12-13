@@ -52,27 +52,6 @@ Data:
     </div>
 {% endif %}
 
-{% if not isPublishable %}
-    <script>
-        $(function() {
-            $('#unpublishable-box > #flash').on('click', '.close', function (event) {
-                event.preventDefault();
-
-                $('#unpublishable-box > #flash').remove();
-            })
-        });
-    </script>
-
-    <div class="small-12 columns" id="unpublishable-box">
-        <div id="flash" class="alert-box highlight">
-            <span id="error-message">
-                Not all the required fields have been completed. Please <a href="{{ modifyRoute }}">modify this {{ locale.news }}</a> to make it ready for publishing
-            </span>
-            <a class="close">×</a>
-        </div>
-    </div>
-{% endif %}
-
 <div class="small-12 columns">
     <div class="actions-small-2 row">
         <div class="list-item">
@@ -286,6 +265,15 @@ Data:
     {#}#}
 {#} only %}#}
 
+{% if not isPublishable %}
+<div class="small-12 columns" id="unpublishable-box">
+    <div id="flash" class="alert-box highlight">
+        <span id="error-message">
+            Not all the required fields have been completed. Please <a href="{{ modifyRoute }}">modify this {{ locale.news }}</a> to make it ready for publishing
+        </span>
+    </div>
+</div>
+{% endif %}
 
 <div class="row">
     <div class="small-12 columns">
@@ -467,10 +455,8 @@ Data:
 
             form.submit(function( event ) {
                 event.preventDefault();
-
                 var $toast     = $('#toast');
 
-                $toast.toastActivate({text: 'Saving...'});
                 // Prevent clickjacking...
                 articleSubmitButton.prop('disabled', true);
 
@@ -485,7 +471,7 @@ Data:
                         css: 'success'
                     });
 
-                    window.location.reload();
+                    window.location.href = response.redirect;
                 }).error(function (response) {
                     $toast.toastTimeout({
                         text: 'Error: ' + response.responseJSON.message,
