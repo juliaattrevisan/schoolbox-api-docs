@@ -53,14 +53,35 @@
 {%- endmacro -%}
 
 {# @param article: News\Model #}
-{%- macro authorMetaString(article) -%}
+{%- macro byLine(article) -%}
+    {% if article.isDraft or article.isRejected %}
+        {% set metaPrefix = 'Created by' %}
+        {% set metaDate = {displayDate: {long: article.createdAt.long, short: article.createdAt.short}} %}
+
+    {% elseif article.isApproved and article.publishAt.unixTimestamp <= NOW.unixTimestamp %}
+        {% set metaPrefix = 'Published by' %}
+        {% set metaDate = {displayDate: {long: article.publishAt.long, short: article.publishAt.short}} %}
+
+    {% else %}
+        {% set metaPrefix = 'Submitted by' %}
+        {% set metaDate = {
+                displayDate:        {long: article.submittedAt.long, short: article.submittedAt.short},
+                publicationDate:    {long: article.publishAt.long, short: article.publishAt.short}
+            }
+        %}
+    {% endif %}
+
+    {% if article.author.deletedAt.isNull %}
+        {% set author = '<a href="/search/user/'~ article.author.id ~ '" title="View Profile">'~ article.author.fullname ~ '</a>' %}
+    {% else %}
+        {% set author = article.author.fullname %}
+    {% endif %}
+
     {% spaceless %}
-        {% if article.isDraft %}
-            Drafted by
-        {% elseif article.isPublished or article.isExpired %}
-            Published by
-        {% else %}
-            Submitted by
+        {{ metaPrefix }} {{ author|raw }} on <span title="{{ metaDate.displayDate.long }}">{{ metaDate.displayDate.short }}</span>
+        {% if metaDate.publicationDate is defined %}
+            <br />Publish date: <span title="{{ metaDate.publicationDate.long }}">{{ metaDate.publicationDate.short }}</span>
         {% endif %}
     {% endspaceless %}
+
 {%- endmacro -%}
