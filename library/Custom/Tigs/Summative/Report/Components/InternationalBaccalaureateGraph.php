@@ -20,6 +20,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use UnexpectedValueException;
+use Alaress\Authorizer\Authorizer;
+use Aura\Router;
 
 /**
  * Builds a suitable data structure for rendering the Diploma Programme
@@ -89,6 +91,12 @@ class InternationalBaccalaureateGraph
      */
     private $curriculumSemester;
 
+    /** @var Authorizer */
+    private $authorizer;
+
+    /** @var Router\Router */
+    private $router;
+
 
     /**
      * Constructor
@@ -102,6 +110,8 @@ class InternationalBaccalaureateGraph
      * @param RubricMapper      $rubricMapper
      * @param int               $curriculumYearLevel
      * @param int               $curriculumSemester
+     * @param Authorizer        $authorizer
+     * @param Router\Router     $router
      */
     public function __construct(
         GenericCollection $unitImpls,
@@ -112,7 +122,9 @@ class InternationalBaccalaureateGraph
         int $workTypeId,
         RubricMapper $rubricMapper,
         int $curriculumYearLevel,
-        int $curriculumSemester
+        int $curriculumSemester,
+        Authorizer $authorizer,
+        Router\Router $router
     ) {
         $this->unitImpls           = $unitImpls;
         $this->student             = $student;
@@ -123,6 +135,8 @@ class InternationalBaccalaureateGraph
         $this->rubricMapper        = $rubricMapper;
         $this->curriculumYearLevel = $curriculumYearLevel;
         $this->curriculumSemester  = $curriculumSemester;
+        $this->authorizer          = $authorizer;
+        $this->router              = $router;
     }
 
 
@@ -130,6 +144,7 @@ class InternationalBaccalaureateGraph
      * Generates and returns a data structure, suitable for passing to twig.
      *
      * @return array
+     * @throws Router\Exception\RouteNotFound
      */
     public function toContext(): array
     {
@@ -257,6 +272,7 @@ class InternationalBaccalaureateGraph
      *               1: the mark this student received, if any
      * @throws \Schoolbox\Mapper\Exception
      * @throws UnexpectedValueException if a folder has more or less than one DP assessment
+     * @throws Router\Exception\RouteNotFound
      */
     private function collateMarks(array $dpAssessments): array
     {
@@ -332,10 +348,28 @@ class InternationalBaccalaureateGraph
                 } else {
                     $mark = $feedback->getHumanReadableMark();
                     if (preg_match('#(\d) / 7#', $mark, $matches)) {
-                        $mark = $matches[1];
+                        $mark = (int)$matches[1];
                     } else {
                         $mark = null;
                     }
+                }
+
+                if (0 === $mark || $mark > 7) {
+                    $student        = $participant->getUser();
+                    $studentName    = $student->getFullName();
+                    $assessmentName = $assessment->getTitle();
+                    $routeName      = 'learningAssessment.getSummary';
+                    $routeParams    = [
+                        'assessmentId' => $assessment->getId(),
+                        'assessment'   => $assessment,
+                        'studentId'    => $student->getId(),
+                        'student'      => $student,
+                    ];
+                    if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->viewer)) {
+                        $route          = $this->router->generate($routeName, $routeParams);
+                        $assessmentName = \sprintf('<a href="%s">%s</a>', $route, $assessmentName);
+                    }
+                    throw new UnexpectedValueException("Invalid mark found. $studentName has been assigned a mark of 0 in $assessmentName. Required 1-7");
                 }
 
                 if (null !== $mark) {

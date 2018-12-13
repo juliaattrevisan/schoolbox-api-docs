@@ -559,7 +559,9 @@ class Controller extends Web\Controller\Base
             $workTypeId,
             $this->rubricMapper,
             $attributes->getCurriculumYearLevel(),
-            $attributes->getCurriculumSemester()
+            $attributes->getCurriculumSemester(),
+            $this->getAuthorizer(),
+            $this->getRouter()
         );
 
         return $ib->toContext();
