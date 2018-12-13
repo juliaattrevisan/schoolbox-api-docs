@@ -97,7 +97,6 @@ if (!empty($_POST)) {
         'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
         'SECTION_ID'           => $section['section_id'],
         'SECTION_TITLE'        => Scrub::text($section['title']),
-        'TITLE'                => Scrub::text($section['title']),
         'DESCRIPTION'          => Scrub::html($section['description']),
         'SEQUENCE'             => $section['sequence'],
         'RANDOM_SELECTED'      => $section['random'] == 0 ? '' : 'checked=\'checked\'',
