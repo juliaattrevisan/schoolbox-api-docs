@@ -64,8 +64,8 @@
                 {% endif %}
 
             {% elseif section.section == 'bookmarks' and section.visible %}
-                <li id="side-menu-mylinks" class="side-menu-mylinks">
-                    <h3><a href="/cms/myLinks" class="icon-modify" title="Modify">{{ section.title }}</a></h3>
+                <li id="side-menu-mylinks">
+                    <h3 class="side-menu-heading-link"><a href="/cms/myLinks" class="icon-modify" title="Modify">{{ section.title }}</a></h3>
                     <div class="nav-wrapper my-links">
                         <ul class="off-canvas-list">
                             {% for link in bookmarks %}

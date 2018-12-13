@@ -543,50 +543,52 @@ $allow-sidebar-stash: $large-up;
 					padding: 0;
 				}
 			}
-		}
-	}
-	/* These are used to style implicit separators within My Groups etc.
-	 * as opposed to explicit .separator elements
-	 *
-	 * Not sure why there's a distinction between the two. That requires
-	 * some additional investigation
-	 */
-	h3, h4 {
-		font-weight: $off-canvas-label-font-weight;
-		padding: $off-canvas-label-padding;
-		margin: $off-canvas-label-margin;
-		font-size: $off-canvas-label-font-size;
 
-		/* Use adaptive for separators
-		 */
-		color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
-		a{
-			color: inherit;
-			&:hover{
-				color: $anchor-font-color-hover;
+			/* These are used to style implicit separators within My Groups etc.
+			* as opposed to explicit .separator elements
+			*
+			* Not sure why there's a distinction between the two. That requires
+			* some additional investigation
+			*/
+			h3, h4 {
+				font-weight: $off-canvas-label-font-weight;
+				padding: $off-canvas-label-padding;
+				margin: $off-canvas-label-margin;
+				font-size: $off-canvas-label-font-size;
+
+				/* Use adaptive for separators
+				*/
+				color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
+				a{
+					color: inherit;
+					&:hover{
+						color: $anchor-font-color-hover;
+					}
+					&[class^="icon-"]:before,
+					&[class*=" icon-"]:before{
+						float: right;
+						padding: 0;
+					}
+				}
 			}
-			&[class^="icon-"]:before,
-			&[class*=" icon-"]:before{
-				float: right;
+
+			h3.side-menu-heading-link {
 				padding: 0;
+				a {
+					padding: 1rem;
+				}
+			}
+
+			h3 {
+				text-transform: $off-canvas-label-text-transform;
+			}
+
+			h4 {
+				font-size: $paragraph-font-size;
 			}
 		}
 	}
-
-	.side-menu-mylinks h3 {
-		padding: 0;
-		a {
-			padding: 1rem;
-		}
-	}
-
-	h3 {
-		text-transform: $off-canvas-label-text-transform;
-	}
-
-	h4 {
-		font-size: $paragraph-font-size;
-	}
+	
 
 	// 5.5.3 shrinks the submenu for some reason
 	.left-submenu {
@@ -613,6 +615,7 @@ $allow-sidebar-stash: $large-up;
 			background-color: $off-canvas-hover;
 		}
 	}
+
 	.left-submenu .back > a:before{
 		font-family: $font-family-icon;
 		content: "\e655";
