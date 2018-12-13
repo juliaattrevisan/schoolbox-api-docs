@@ -30,7 +30,6 @@ use Aura\Router;
 class InternationalBaccalaureateGraph
 {
     private const BASE_MARKS = [
-        0 => 0,                   // TODO MYP cannot have 0 (as from rubric), DP can (no min for total mark). How should we handle?
         1 => 0,
         2 => 0,
         3 => 0,

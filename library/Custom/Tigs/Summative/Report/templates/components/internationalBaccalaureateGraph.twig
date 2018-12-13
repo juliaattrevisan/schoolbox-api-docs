@@ -20,6 +20,15 @@ Data:
     {% autoescape 'js' %}
     <script type="text/javascript">
 
+        /**
+         * Returns a set of colours for the columns
+         *
+         * @param {Array}    data
+         * @param {null|int} studentValue
+         * @param {string}   highlightColor
+         * @param {string}   defaultColor
+         * @return {Array}
+         */
         var buildColorList = function(data, studentValue, highlightColor, defaultColor) {
             var dataLength = data.length,
                 colorList  = [];
@@ -39,6 +48,9 @@ Data:
             var data = {{ data|json_encode|raw }},
                 dataCategories = {{ dataCategories|json_encode|raw }},
                 studentValue = Number("{{ studentValue }}");
+
+                {# Convert JSON object to plain array #}
+                data = Object.values(data);
 
             $("#ib-graph").highcharts({
                 legend: {
