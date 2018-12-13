@@ -601,7 +601,7 @@ class Controller extends Base
                 'encodedSegments'       => $this->getAudienceSegments($article),
                 'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(true),
                 'entityTypesData'       => $this->getEntityTypesData(false),
-                'isPublishable'         => $article->getAudience()->count() && trim($article->getTitle()) !== ''
+                'isPublishable'         => $this->validateSubmittedArticle()->isSatisfiedBy($article),
             ];
         }
 
@@ -1304,7 +1304,7 @@ class Controller extends Base
         }
 
         // Validate article + authenticate proposed audience
-        $validSubmittedArticleSpec = (new Factory($this->strategyFactory))->buildSpecCanBeSubmitted($this->getUser());
+        $validSubmittedArticleSpec = $this->validateSubmittedArticle();
         if (!$validSubmittedArticleSpec->isSatisfiedBy($article)) {
             throw new UnsatisfiedException($article, $validSubmittedArticleSpec, "Article audience appears to be invalid");
         }
@@ -1432,4 +1432,11 @@ class Controller extends Base
         ];
     }
 
+    /**
+     * @return \Alaress\Specification\ISpecification
+     */
+    private function validateSubmittedArticle () :\Alaress\Specification\ISpecification
+    {
+        return (new Factory($this->strategyFactory))->buildSpecCanBeSubmitted($this->getUser());
+    }
 }

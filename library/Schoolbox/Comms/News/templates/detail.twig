@@ -457,8 +457,8 @@ Data:
                 event.preventDefault();
                 var $toast     = $('#toast');
 
-                // Prevent clickjacking...
-                articleSubmitButton.prop('disabled', true);
+                // Prevent clickjacking and update button text...
+                articleSubmitButton.prop('disabled', true).attr('value','Working...');
 
                 $.ajax({
                     type: 'POST',
@@ -466,11 +466,6 @@ Data:
                     data: {articleId: {{ article.id }}},
                     dataType: 'json'
                 }).success(function (response) {
-                    $toast.toastTimeout({
-                        text: response.message,
-                        css: 'success'
-                    });
-
                     window.location.href = response.redirect;
                 }).error(function (response) {
                     $toast.toastTimeout({
