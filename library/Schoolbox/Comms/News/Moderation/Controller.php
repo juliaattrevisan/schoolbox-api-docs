@@ -277,8 +277,11 @@ class Controller extends Base
                 }
             }
 
-            $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);
-
+            if ($this->isXhrRequest()) {
+                $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);
+            } else {
+                $this->getResponse()->redirect->to($route);
+            }
         } else {
             $this->buildAjaxResponse($httpCode, $errorCode, $message);
         }
