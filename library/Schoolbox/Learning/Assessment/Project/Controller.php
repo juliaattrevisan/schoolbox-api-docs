@@ -145,11 +145,12 @@ class Controller extends Assessment\Controller
         $classFolder          = $assessment->getBaseContext()->getFolder();
         $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $classFolder);
 
-        // OPTION 1
         // If $student is an instructor, all assessments appear on project summary page
         // *except for* assessments which the instructor has participated to and then has been excluded from.
 
         $subActivities = $subActivities
+            ->map([$mutator, 'map'])
+            ->filter([$mutator, 'filter'])
             ->filter(function (IAssessable $subAssessable) use ($student, $isViewerAnInstructor) {
                 try {
                     $participant = $subAssessable->getParticipant($student);
@@ -158,16 +159,6 @@ class Controller extends Assessment\Controller
                     // not participant
                     return $isViewerAnInstructor;
                 }
-            });
-
-        // OPTION 2
-        // If $student is an instructor, all assessments appear on project summary page
-        // *even when* the instructor is excluded for the assessment.
-        $subActivities = $subActivities
-            ->map([$mutator, 'map'])
-            ->filter([$mutator, 'filter'])
-            ->filter(function (IAssessable $subAssessable) use ($student, $visibility) {
-                return ($visibility->isVisibleToUser($subAssessable, $student, true));
             });
 
         // hack the project object for good measure
