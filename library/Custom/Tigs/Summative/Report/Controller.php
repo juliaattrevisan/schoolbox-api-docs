@@ -535,6 +535,7 @@ class Controller extends Web\Controller\Base
 
         $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
 
+        // TODO filter to assessment due in the report's time period
         $filters = [
             Filters\Assessment\NullableContext\UnitImpl\Definition::class => $cohortUnitImpls->getPropertyValues('id'),
             Filters\Assessment\WorkType\Definition::class                 => [$workTypeId],
