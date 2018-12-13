@@ -450,8 +450,10 @@ Data:
     {% autoescape 'js' %}
     <script>
         $(function() {
+
             var form = $('#article-form');
             var articleSubmitButton = $('#article-submit');
+            var buttonOriginalValue = articleSubmitButton.val();
 
             form.submit(function( event ) {
                 event.preventDefault();
@@ -468,9 +470,18 @@ Data:
                 }).success(function (response) {
                     window.location.href = response.redirect;
                 }).error(function (response) {
+
+                    $toast.toastActivate({
+                        text: 'Error: ' + response.responseJSON.message,
+                        css: 'alert',
+                    });
+
+                    // Revert text to its original value and enable the button back
+                    articleSubmitButton.prop('disabled', false).attr('value',buttonOriginalValue);
+
                     $toast.toastTimeout({
                         text: 'Error: ' + response.responseJSON.message,
-                        css: 'alert'
+                        duration: 3000
                     });
                 });
             });
