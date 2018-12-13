@@ -946,7 +946,7 @@ class SitePage extends Page
      */
     public function setTitle($title = '')
     {
-        $this->setVar('TITLE', $this->config->get('title') . (!empty($title) ? ' - ' . Scrub::text($title) : ''));
+        $this->setVar('TITLE', $title);
     }
 
     /**
