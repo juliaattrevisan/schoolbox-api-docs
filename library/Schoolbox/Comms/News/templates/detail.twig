@@ -56,16 +56,7 @@ Data:
     <div class="actions-small-2 row">
         <div class="list-item">
             <h1>{{ article.title |default("(untitled)") }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
-            <ul class="meta">
-                <li class="icon-user">{{ indicator.authorMetaString(article) }}
-                    {% if article.author.deletedAt.isNull %}
-                    <a href="/search/user/{{ article.author.id }}" title="View Profile">
-                        {{  article.author.fullname }}
-                    </a>
-                {% else %}
-                    {{ article.author.fullname }}
-                    {% endif %} on <span title="{{ article.publishAt.long }}" >{{ article.publishAt.short }}</span>
-                </li>
+            <ul class="meta">{{ indicator.byLine(article) }}
                 {# Topics #}
                 {% if article.topics|length %}
                     <li class="icon-breadcrumbs">Topics:
