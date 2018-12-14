@@ -64,7 +64,7 @@ class ApixuClient
      * @throws \DomainException
      */
     private function makeRequest(int $forecastLimit, string $location) {
-        $requestUrl = "forecast.json?q={$location}&days={$forecastLimit}&key=" . self::API_KEY;
+        $requestUrl = "forecast.json?q={$location}&days={$forecastLimit}&key=" . $this->apiUrl;
 
         // Cache the request
         $cache = new \Alaress_Weather_Cache();
