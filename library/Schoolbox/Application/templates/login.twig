@@ -71,7 +71,7 @@ $(function() {
 <body class="login side">
 <div id="container">
 	<div id="content">
-		<form id="login" method="post" action="/login?{{ requestParams|escape }}">
+		<form id="login" method="post" action="{{ routeLookup('application.postLogin') }}?{{ requestParams|escape }}">
             <input type="hidden" name="page" value="{{ page|escape }}" />
             <div class="row collapse">
                 <div class="small-12 column">

@@ -229,7 +229,7 @@ class Kernel extends \Alaress\Application\Kernel
             } else {
                 $session->getSegment(\Schoolbox\Application\Controller::class)
                     ->setFlash(\Schoolbox\Application\Controller::LOGIN_ERROR_FLASH, get_class($e));
-                $response->redirect->to('/login/?page=' . urlencode($uri));
+                $response->redirect->to($this->di->get('router')->generate('application.getLogin').'?page='.urlencode($uri));
             }
         } catch (Deleted $e) {
             $response = $this->di->get('webFactory')->newResponse();
