@@ -68,7 +68,7 @@ class ApixuClient
 
         // Cache the request
         $cache = new \Alaress_Weather_Cache();
-        $cache->init(self::API_BASE_URL . $requestUrl);
+        $cache->init($this->apiUrl . $requestUrl);
         $response = $cache->getStreamContents();
 
         // Attempt to json decode the response body

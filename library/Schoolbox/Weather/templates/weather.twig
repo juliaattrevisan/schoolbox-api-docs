@@ -3,9 +3,8 @@ Weather details page (linked from dashboard component)
 #}
 
 {% if weatherUnavailable %}
-    <div class="content">
-        <p class="meta">Weather forecast is temporarily unavailable.</p>
-        <p>{{ error }}</p>
+    <div data-alert="" class="alert-box alert">
+        Weather forecast is temporarily unavailable.
     </div>
 {% else %}
     <div class="row">
