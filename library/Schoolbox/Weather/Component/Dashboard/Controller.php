@@ -72,7 +72,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
             ? self::DEFAULT_LOCATION
             : $this->getConfig('url');
 
-        $apixuClient = new ApixuClient();
+        $apiKey = $this->getConfigMapper()->getConfigLoader()->get('weather_api_key');
+        $apiUrl = $this->getConfigMapper()->getConfigLoader()->get('weather_api_url');
+        $apixuClient = new ApixuClient($apiKey, $apiUrl);
         $data = $apixuClient->getForecast($forecastLimit, $location);
         return $this->renderTwigTemplate($templateHandle, '@weatherDashboard/component.twig', $data);
     }
