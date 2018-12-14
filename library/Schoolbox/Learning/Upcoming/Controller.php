@@ -125,7 +125,7 @@ class Controller extends Base
      *
      * @api GET /learning/due/
      */
-    public function getUpcoming()
+    public function getUpcoming(): void
     {
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate(
