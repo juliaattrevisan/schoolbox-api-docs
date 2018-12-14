@@ -343,6 +343,14 @@ $allow-sidebar-stash: $large-up;
 	}
 }
 
+// When notifications are disabled
+.disableNotifications .hybrid-bar {
+	.global-search {
+		right: 0;
+		padding-left: $tabbar-icon-width;
+	}
+}
+
 @media #{$allow-sidebar-stash} {
 	.inner-wrap:not(.left-open) .hybrid-bar .global-search {
 		&:hover, &.focus {
@@ -353,25 +361,25 @@ $allow-sidebar-stash: $large-up;
 	.hybrid-bar .global-search {
 		right:  $tabbar-icon-width * 2; // Adjust right offset for the account menu
 	}
-}
 
-@media #{$medium-down} {
-	.disableNotifications .hybrid-bar .global-search {
-		&:hover, &.focus{
+	// When notifications are disabled
+	.disableNotifications .hybrid-bar {
+		.global-search {
+			right: $tabbar-icon-width;
 			padding-left: $tabbar-icon-width;
+		}
+
+		.account-menu {
+			right: 0;
+		}
+	}
+
+	.disableNotifications .inner-wrap:not(.left-open) .hybrid-bar .global-search {
+		&:hover, &.focus {
+			padding-left: $tabbar-icon-width * 2;
 		}
 	}
 }
-
-
-// When notifications are disabled
-.disableNotifications .hybrid-bar .global-search {
-	right: 0;
-	&:hover, &.focus{
-		padding-left: 0;
-	}
-}
-
 
 .left-off-canvas-toggle,
 .right-off-canvas-toggle {
