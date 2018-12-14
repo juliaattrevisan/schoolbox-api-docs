@@ -120,10 +120,12 @@ class Controller extends Base
         $this->filterFactoryFactory  = $filterFactoryFactory;
     }
 
+
     /**
      * Redirects to the upcoming work screen for the current user.
      *
      * @api GET /learning/due/
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getUpcoming(): void
     {
