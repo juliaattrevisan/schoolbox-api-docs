@@ -16,14 +16,25 @@ namespace Schoolbox\Weather;
  */
 class ApixuClient
 {
-    // TODO these are just test API details, a key will be stored in the DB for each school
-    // there is already a ticket and PR to support that, see SA-7950
-    private const API_KEY = '93cc4486b7ba4afdafe44837182011';
-    private const API_BASE_URL = 'http://api.apixu.com/v1/';
-
     private const PROVIDER_NAME = 'Apixu';
     private const PROVIDER_URL = 'https://apixu.com';
     private const PROVIDER_LOGO = 'https://cdn.apixu.com/v2/images/logo.png';
+
+    /*
+     * @var string $apiKey
+     */
+    private $apiKey;
+
+    /*
+     * @var string $apiUrl
+     */
+    private $apiUrl;
+
+    public function __construct(string $apiKey, string $apiUrl)
+    {
+        $this->apiKey = $apiKey;
+        $this->apiUrl = $apiUrl;
+    }
 
     /**
      * Get the data from the API in a JSON format usable by Twig
