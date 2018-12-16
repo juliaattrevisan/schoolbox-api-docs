@@ -99,6 +99,8 @@ class Javascript extends Base
     protected function deriveMeta()
     {
         $event = $this->getEvent();
+        $assessable = $event->getAssessment();
+        $workType   = $assessable->getWorkType();
 
         return [
             'eventId'   => $event->getEventId(),
@@ -111,6 +113,12 @@ class Javascript extends Base
             'authorId'  => $event->getAuthorId(),
             'level'     => $event->getEventClasses(),
             'completed' => '',
+            'folderName'=> $assessable->getContext()->getFolder()->getTitle(),
+            'folderId'  => $assessable->getContext()->getFolder()->getId(),
+            'workType'  => $workType ? $workType->getName() : null,
+            'workTypeId'=> $workType ? $workType->getId() : null,
+            'weighted'  => $assessable->getWeight() ? 1 : 0,
+            'assessmentType' => $assessable::getDefaultTypeName(),
         ];
     }
 
