@@ -298,7 +298,7 @@
         <!-- END CONTAINER -->
 
         {% block instant %}
-            {% if user.current.id %}
+            {% if ws.enabled and user.current.id %}
                 <aside class="right-off-canvas-menu island no-pad hide-for-print" id="msgs" data-unread="{{ ws.unread }}">
                     <ul class="off-canvas-list" id="message-list">
                         <li>
