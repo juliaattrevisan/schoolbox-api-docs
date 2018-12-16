@@ -92,6 +92,10 @@ abstract class Definition extends Filter\AbstractDefinition
     {
         $isAvailable = false;
         $page        = $pageFilter->getPage();
+        if (Filter\Page\Model::PAGE_DUE_WORK_CALENDAR === $page) {
+            return \in_array($customAbstractKey, [self::KEY_FUTURE, self::KEY_CURRENT, self::KEY_PREVIOUS], true);
+        }
+
         switch ($customAbstractKey) {
             case self::KEY_ALL:
                 return Filter\Page\Model::PAGE_PENDING_ASSESSMENTS !== $page;
@@ -104,6 +108,7 @@ abstract class Definition extends Filter\AbstractDefinition
             case self::KEY_PAST:
                 return false;
         }
+
         return $isAvailable;
     }
 
@@ -113,6 +118,10 @@ abstract class Definition extends Filter\AbstractDefinition
      */
     protected function getInitialSelectedState($key, $page, $roleType)
     {
+        if (Filter\Page\Model::PAGE_DUE_WORK_CALENDAR === $page) {
+            return $key === self::KEY_CURRENT;
+        }
+
         if (Filter\Page\Model::PAGE_PENDING_ASSESSMENTS === $page) {
             return in_array($key, [self::KEY_FUTURE, self::KEY_CURRENT], true);
         }
