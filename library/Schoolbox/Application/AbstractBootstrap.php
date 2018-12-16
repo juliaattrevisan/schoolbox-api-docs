@@ -1238,10 +1238,6 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 }
 
                 // explain that something went cataclysmically wrong.
-
-                // Use Sitepage to output an error message in the school's design.
-                // If there's no SitePage in DI yet: just output a styleless error.
-
                 if (!$isException) {
                     $e = $error;
                     $e['code'] = $code;

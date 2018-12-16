@@ -24,20 +24,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 function error($ec, $message="", $code = 400)
 {
     throw ErrorMapper::getInstance()->generateException($ec, null, $message, $code);
-//    /** @var Schoolbox\Application\WebRequest\Kernel $kernel */
-//    global $kernel;
-//    /** @var SitePage $page */
-//    global $page;
-//    if (isset($page) && $page instanceof SitePage) {
-//        $page->setDi($kernel->getDependencyInjector());
-//        $page->error($ec, $message, $code);
-//    } elseif (isset($this) && $this instanceof SitePage) {
-//        $this->setDi($kernel->getDependencyInjector());
-//        $this->error($ec, $message, $code);
-//    } else {
-//        $page = $kernel->getDependencyInjector()->get('layoutEngine');
-//        $page->error($ec, $message, $code);
-//    }
 }
 
 /**
