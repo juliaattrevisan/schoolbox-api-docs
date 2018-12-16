@@ -14,7 +14,7 @@ interface IExceptionGenerator
     /**
      * Generates an exception of some sort.
      *
-     * @param int             $errorCode         The error code used to generate the exception
+     * @param int|null        $errorCode         The error code used to generate the exception
      * @param \Exception|null $previousException The exception that got us here, if any
      * @param string          $additionalInfo    An error message. Probably interspersed with the
      *                                           exception's message somehow.
@@ -23,7 +23,7 @@ interface IExceptionGenerator
      * @return \Exception
      */
     public function generateException(
-        int $errorCode,
+        ?int $errorCode,
         \Exception $previousException = null,
         string $additionalInfo = '',
         int $httpStatusCode = 400
