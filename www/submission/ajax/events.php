@@ -8,7 +8,6 @@
  */
 
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
