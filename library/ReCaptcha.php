@@ -13,7 +13,7 @@
 use GuzzleHttp\Client;
 
 
-class git ReCaptcha
+class ReCaptcha
 {
 
     /**
