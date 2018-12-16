@@ -210,7 +210,7 @@ class Mapper extends BaseMapper implements IExceptionGenerator
      * @param int|null        $errorCode
      * @param \Throwable|null $previous
      * @param string          $additionalInfo
-     * @param int|null        $httpStatusCode
+     * @param int             $httpStatusCode
      * @return SchoolboxException
      */
     public function generateException(
@@ -225,7 +225,7 @@ class Mapper extends BaseMapper implements IExceptionGenerator
             $msg = str_replace("%MESSAGE%", $additionalInfo, $this->getMessageById($errorCode));
         }
 
-        return new SchoolboxException($msg, $errorCode, $previous);
+        return new SchoolboxException($msg, $errorCode, $previous, $httpStatusCode);
     }
 
     /**

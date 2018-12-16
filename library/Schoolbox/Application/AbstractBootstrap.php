@@ -1181,7 +1181,6 @@ abstract class AbstractBootstrap implements BootstrapInterface
             );
 
             $this->getKernel()->callExceptionCallbacks($e);
-
         } elseif (is_array($e)) {
             $error = $e;
         } else {
@@ -1192,15 +1191,13 @@ abstract class AbstractBootstrap implements BootstrapInterface
         if ($error !== null) {
 
             // if it was a fatal error or exception that triggered our sudden but inevitable demise...
-            if (
-                $isException
+            if ( $isException
                 || (intval($error['type']) & (E_ERROR | E_CORE_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR))
             ) {
                 // RedisException extends RuntimeException: occurs when Redis
                 // session management isn't working for whatever reason.
                 $code    = 400;
                 $info    = 'If the problem persists, please contact your System Administrator including the following information:';
-
 
                 if (isset($_SERVER['HTTP_HOST'])) {
                     $url = 'http'.(getenv("SERVER_PORT") == 443 ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -1213,7 +1210,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $message = $e->getMessage();
                     $info    = '';
                     $url     = '';
-                } elseif ($e instanceof \PDOException){
+                } elseif ($e instanceof \PDOException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
                 } elseif ($e instanceof \RuntimeException) {
@@ -1337,9 +1334,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
 
                     /** @var Output\Json $output */
                     $output = $di->get('webOutput:json');
-                    $output
-                        ->setData($problem->asArray());
-
+                    $output->setData($problem->asArray());
                 } else {
                     /** @var Output\ThemedHtml $output */
                     $output = $di->get('webOutput:html');
