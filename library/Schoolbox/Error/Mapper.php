@@ -208,14 +208,14 @@ class Mapper extends BaseMapper implements IExceptionGenerator
 
     /**
      * @param int|null        $errorCode
-     * @param \Exception|null $previousException
+     * @param \Throwable|null $previous
      * @param string          $additionalInfo
      * @param int|null        $httpStatusCode
      * @return SchoolboxException
      */
     public function generateException(
         ?int $errorCode,
-        \Exception $previousException = null,
+        \Throwable $previous = null,
         string $additionalInfo = '',
         int $httpStatusCode = 400
     ): \Exception {
@@ -225,7 +225,7 @@ class Mapper extends BaseMapper implements IExceptionGenerator
             $msg = str_replace("%MESSAGE%", $additionalInfo, $this->getMessageById($errorCode));
         }
 
-        return new SchoolboxException($msg, $errorCode, $previousException);
+        return new SchoolboxException($msg, $errorCode, $previous);
     }
 
     /**
