@@ -5,20 +5,20 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Application;
+namespace Schoolbox\Application\Feedback;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use InvalidArgumentException;
 use Twig_Error_Loader;
+use Aura\Di\Container;
+use InvalidArgumentException;
 use ReCaptcha;
 
 class Module extends BaseModule
 {
     /** @var string */
-    protected $basename = 'application';
+    protected $basename = 'feedback';
 
     /**
      * Hook method for setting up routes via self::register()
@@ -28,20 +28,12 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $this->register('GET', '/feedback', 'getFeedback', null, null);
-        $this->register('GET', '/feedback/thank-you', 'getFeedbackReceipt', null, null);
-
-        $this->register('GET', '/policy', 'getPolicy', null, null);
-        $this->register('GET', '/login', 'getLogin', null, null);
-        $this->register('POST', '/login', 'postLogin', null, null);
+        $this->register('GET', '', 'getFeedback', null, null);
+        $this->register('GET', '/thank-you', 'getFeedbackReceipt', null, null);
     }
 
+
     /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
      *
      * @param Container|ContainerInterface $injector The dependency injection container.
      * @throws InvalidArgumentException
@@ -50,8 +42,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
-            'reCaptcha'   => new ReCaptcha($this->getConfig()->get('recaptcha_public_api_key'), $this->getConfig()->get('recaptcha_private_api_key')),
+            'reCaptcha' => new ReCaptcha($this->getConfig()->get('recaptcha_public_api_key'), $this->getConfig()->get('recaptcha_private_api_key')),
         ];
     }
 

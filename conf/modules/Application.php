@@ -21,6 +21,9 @@ class Application extends ModuleLoader
      */
     public function configure($kernel)
     {
-        $this->loadModule($kernel, Schoolbox\Application\Module::class, '');
+        $this->loadModule($kernel, Schoolbox\Application\Login\Module::class, '/login');
+        $this->loadModule($kernel, Schoolbox\Application\Feedback\Module::class, '/feedback');
+        $this->loadModule($kernel, Schoolbox\Application\Policy\Module::class, '/policy');
+
     }
 }

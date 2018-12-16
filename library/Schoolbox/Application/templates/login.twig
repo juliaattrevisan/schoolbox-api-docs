@@ -71,7 +71,7 @@ $(function() {
 <body class="login side">
 <div id="container">
 	<div id="content">
-		<form id="login" method="post" action="{{ routeLookup('application.postLogin') }}?{{ requestParams|escape }}">
+		<form id="login" method="post" action="{{ routeLookup('login.postLogin') }}?{{ requestParams|escape }}">
             <input type="hidden" name="page" value="{{ page|escape }}" />
             <div class="row collapse">
                 <div class="small-12 column">
@@ -135,7 +135,7 @@ $(function() {
     <div id="footer">
         <ul>
             <li>{{ NOW.year }} &copy; Copyright <a href="{{ config.school_address }}">{{ config.school_name }}</a></li>
-            <li><a href="{{ routeLookup('application.getPolicy') }}">Guidelines of Use and Privacy Policy</a></li>
+            <li><a href="{{ routeLookup('policy.getPolicy') }}">Guidelines of Use and Privacy Policy</a></li>
             <li><a href="http://www.schoolbox.com.au" title="Schoolbox, Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a>
                 {{ config.site_version }} by <a href="http://www.alaress.com.au">Alaress</a></li>
             {% if config.feedback_url and config.feedback_text %}

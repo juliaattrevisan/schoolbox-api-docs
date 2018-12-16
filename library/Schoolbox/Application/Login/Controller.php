@@ -5,83 +5,15 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Application;
+namespace Schoolbox\Application\Login;
 
 use Alaress\Web\Controller\Base;
-use ReCaptcha;
 use Schoolbox\User;
 use Session;
 
 class Controller extends Base
 {
     public const LOGIN_ERROR_FLASH = 'login';
-
-    /**
-     * @var \Schoolbox\Error\Mapper
-     */
-    private $errorMapper;
-
-    /** @var ReCaptcha $reCaptcha */
-    private $reCaptcha;
-
-    /**
-     * Controller constructor.
-     *
-     * @param \Schoolbox\Error\Mapper $errorMapper
-     * @param ReCaptcha               $reCaptcha
-     */
-    public function __construct(\Schoolbox\Error\Mapper $errorMapper, ReCaptcha $reCaptcha)
-    {
-        $this->errorMapper = $errorMapper;
-        $this->reCaptcha = $reCaptcha;
-    }
-
-    /**
-     * Provides a form that users can use to submit support requests or feedback via.  Can be accessed without session
-     * @api   GET /feedback
-     * @level 18.2
-     *
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    public function getFeedback(): void
-    {
-        $data = [];
-        $authUser = $this->getSession()->getAuthUser();
-        if ($authUser instanceof User && !$authUser->getId()) {
-            $data = ['recaptcha' => $this->reCaptcha->form()];
-        }
-
-        $data['types'] = explode(',', $this->getConfigLoader()->get('site_feedback_types'));
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@application/feedback.twig', $data)
-                                                ->setTitle($this->getConfigLoader()->get('feedback_text')));
-    }
-
-    /**
-     * Thank you page after submitting feedback, can be accessed with and without a session
-     * @api   GET /feedback/thank-you
-     * @level 18.2
-     *
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    public function getFeedbackReceipt()
-    {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@application/feedback-thankyou.twig', [])
-                                                ->setTitle('Message Delivered'));
-    }
-
-
-    /**
-     * Schoolbox policy page, can be accessed with and without a session
-     * @api   GET /policy
-     * @level 18.2
-     *
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    public function getPolicy()
-    {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@application/policy.twig', []));
-    }
 
     /**
      * Displays login page, will show error if XHR, will redirect to SAML if enabled
@@ -150,7 +82,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@application/login.twig', $data));
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@login/login.twig', $data));
     }
 
 
@@ -188,7 +120,7 @@ class Controller extends Base
             } else {
                 try {
                     $user = $sessionHandler->authenticate($username, $password);
-                    if ($user instanceof \Schoolbox\User) {
+                    if ($user instanceof User) {
                         $authenticated = $sessionHandler->create($user->getUsername(), $remember);
                     } else {
                         $message = 'The username or password you typed is incorrect, please try again.';
