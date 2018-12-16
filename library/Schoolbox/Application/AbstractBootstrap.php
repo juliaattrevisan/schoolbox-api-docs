@@ -1331,6 +1331,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                         ->setDetail($info)
                         ->setInstance($url);
 
+                    $problem['message'] = $message;
                     if ($args['outputStackTrace']) {
                         $problem['trace'] = array_merge(
                             [$error],
