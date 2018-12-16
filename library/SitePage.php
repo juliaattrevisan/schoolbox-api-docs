@@ -2,6 +2,8 @@
 
 use Alaress\Web\Output;
 use Aura\Router\Router;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Menu\Side\Renderer as MenuSideRender;
 use Schoolbox\Menu\Top\Renderer as MenuTopRenderer;
@@ -69,9 +71,6 @@ class SitePage extends Page
     /** @var Config */
     private $config;
 
-    /** @var DeprecatedDatabase $db */
-    private $db;
-
     /**
      * Constructor
      *
@@ -83,7 +82,6 @@ class SitePage extends Page
         parent::__construct();
 
         $this->config = \Config::getInstance();
-        $this->db = \DeprecatedDatabase::getInstance();
         if ($di) {
             $this->di = $di;
         }
@@ -741,105 +739,15 @@ class SitePage extends Page
     /**
      * Outputs an error message.
      *
-     * @param mixed $ec
-     *                        Integer: retrieves error text from code from database
-     *                        null:    outputs whatever's in $message as error
-     * @param array $args Replaces '%MESSAGE%' in $ec
-     * @param int $code HTTP response code, defaults to 400 (Bad Request)
+     * @param mixed  $ec      int:  retrieves error text from code from database
+     *                        null: outputs whatever's in $message as error
+     * @param string $message Replaces '%MESSAGE%' in $ec
+     * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
+     * @throws Exception
      */
-    public function error($ec, $args = [], $code = 400)
+    public function error($ec, $message = '', $code = 400)
     {
-        // Backward-compatibility with $args being a message
-        if (is_string($args)) {
-            $args = ['message' => $args];
-        }
-        /* Enforce structure
-         */
-        if (!is_array($args)) {
-            $args = [];
-        }
-
-        $defaultArgs = [
-            'code' => '',
-            'header' => '',
-            'info' => '',
-            'summary' => '',
-            'url' => '',
-            'date' => '',
-            'meta' => '',
-            'outputStackTrace' => '',
-            'stackTrace' => '',
-            'message' => '',
-        ];
-        $args = array_merge($defaultArgs, $args);
-
-        /* If an error code is set, extract textual information from
-         * the db via ErrorMapper. Otherwise just use a custom message
-         */
-        $errorMapper = \Schoolbox\Error\Mapper::getInstance();
-
-        if (isset($ec)) {
-            try {
-                $error = $errorMapper->findById($ec);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $error = $errorMapper->createModel();
-                $error->setMessage('%MESSAGE%');
-            }
-        } else {
-            $error = $errorMapper->createModel();
-            $error->setMessage('%MESSAGE%');
-        }
-
-        /** @var RosettaStone $l10n */
-        $l10n = $this->getDi()->get('l10n');
-
-        /* Set up any replacements
-         */
-        $error->setMessage(str_replace("%MESSAGE%", $args['message'], $l10n->translateSentence($error->getMessage())));
-
-        http_response_code($code);
-
-        // if we're in ajax mode, spit out in ajax-friendly (ie JSON) format
-        if ($this->ajax) {
-            header('Content-Type: application/json');
-            die(json_encode($error->getMessage()));
-        } else {
-            $errorContents = $this->getTwig()->render('common/error/general.twig', [
-                'code' => $ec,
-                'header' => isset($args['message']) ? $args['message'] : '',
-                'info' => isset($args['info']) ? $args['info'] : '',
-                'summary' => $error,
-                'url' => $args['url'],
-                'date' => \Alaress_Date_Format::now(),
-                'meta' => $args['error'],
-                'outputStackTrace' => $args['outputStackTrace'],
-                'stackTrace' => $args['stackTrace'],
-                'exceptionClass' => is_object($args['stackTrace']) ? get_class($args['stackTrace']) : 'Error',
-            ]);
-
-            $this->renderError('Error Encountered', $errorContents);
-        }
-    }
-
-    /**
-     * Render an Error layout with $errorContents in it
-     *
-     * @param string $title
-     * @param string $errorContents
-     */
-    private function renderError($title, $errorContents)
-    {
-        $this->setVar(TEMPLATE_content, '');
-        $this->setFile(TEMPLATE_content, 'common/error/container.html');
-        $this->setTitle($title);
-
-        $this->setVar([
-            'OUTPUT' => $errorContents
-        ]);
-
-        $this->buildPage(false);
-        $this->outputPage(true);
-        exit();
+        throw ErrorMapper::getInstance()->generateException($ec, null, $message, $code);
     }
 
     /**
@@ -1288,11 +1196,7 @@ class SitePage extends Page
      */
     public function pageNotFound()
     {
-        http_response_code(404);
-
-        $errorContents = $this->getTwig()->render('common/error/404.twig', []);
-
-        $this->renderError('Page Not Found', $errorContents);
+        throw new NotFound();
     }
 
     /**

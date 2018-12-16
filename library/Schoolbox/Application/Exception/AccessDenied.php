@@ -13,5 +13,8 @@ namespace Schoolbox\Application\Exception;
 
 class AccessDenied extends Exception
 {
-
+    /**
+     * @inheritdoc
+     */
+    protected $httpStatusCode = 401;
 }

@@ -8,30 +8,22 @@
 *                                                           *
 ************************************************************/
 
+use Schoolbox\Error\Mapper as ErrorMapper;
+
 /**
  * Function for handling error conditions
  * @deprecated 17.5
  * @see Schoolbox\Error\Mapper::generateException()
  *
- * @param $ec
- * @param $message
- * @param $code
+ * @param mixed  $ec      int:  retrieves error text from code from database
+ *                        null: outputs whatever's in $message as error
+ * @param string $message Replaces '%MESSAGE%' in $ec
+ * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
+ * @throws Exception
  */
-function error($ec, $message="", $code = 400) {
-    /** @var Schoolbox\Application\WebRequest\Kernel $kernel */
-    global $kernel;
-    /** @var SitePage $page */
-    global $page;
-    if (isset($page) && $page instanceof SitePage) {
-        $page->setDi($kernel->getDependencyInjector());
-        $page->error($ec, $message, $code);
-    } elseif (isset($this) && $this instanceof SitePage) {
-        $this->setDi($kernel->getDependencyInjector());
-        $this->error($ec, $message, $code);
-    } else {
-        $page = $kernel->getDependencyInjector()->get('layoutEngine');
-        $page->error($ec, $message, $code);
-    }
+function error($ec, $message="", $code = 400)
+{
+    throw ErrorMapper::getInstance()->generateException($ec, null, $message, $code);
 }
 
 /**

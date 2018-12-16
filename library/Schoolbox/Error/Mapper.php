@@ -207,16 +207,25 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     }
 
     /**
-     * @param int        $errorCode
-     * @param \Exception $previousException
-     * @param string     $additionalInfo
+     * @param int|null        $errorCode
+     * @param \Throwable|null $previous
+     * @param string          $additionalInfo
+     * @param int             $httpStatusCode
      * @return SchoolboxException
      */
-    public function generateException($errorCode, \Exception $previousException = null, $additionalInfo = '')
-    {
-        $msg = str_replace("%MESSAGE%", $additionalInfo, $this->getMessageById($errorCode));
+    public function generateException(
+        ?int $errorCode,
+        \Throwable $previous = null,
+        string $additionalInfo = '',
+        int $httpStatusCode = 400
+    ): \Exception {
+        if (null === $errorCode) {
+            $msg = $additionalInfo;
+        } else {
+            $msg = str_replace("%MESSAGE%", $additionalInfo, $this->getMessageById($errorCode));
+        }
 
-        return new SchoolboxException($msg, $errorCode, $previousException);
+        return new SchoolboxException($msg, $errorCode, $previous, $httpStatusCode);
     }
 
     /**

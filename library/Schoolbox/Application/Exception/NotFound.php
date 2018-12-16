@@ -20,4 +20,10 @@ class NotFound extends Exception
      * @var int
      */
     protected $code = ErrorMapper::ERROR_GENERIC_NOT_FOUND;
+
+
+    /**
+     * @inheritdoc
+     */
+    protected $httpStatusCode = 404;
 }

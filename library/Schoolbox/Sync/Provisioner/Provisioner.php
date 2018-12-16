@@ -312,7 +312,7 @@ class Provisioner
      */
     public function onInterrupt($reason = null)
     {
-        if ($reason instanceof \Exception) {
+        if ($reason instanceof \Throwable) {
             $message = sprintf("Execution interrupted by exception:\n%s", $reason->getTraceAsString());
         } else {
             switch ($reason) {

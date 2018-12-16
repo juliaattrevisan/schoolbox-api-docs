@@ -71,7 +71,8 @@
         "roave/security-advisories": "dev-master",
         "zendframework/zend-uri": "~2.5.2",
         "onelogin/php-saml": "^2.12",
-        "karriere/json-decoder": "^2.1.1"
+        "karriere/json-decoder": "^2.1.1",
+        "crell/api-problem": "^3.0"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
