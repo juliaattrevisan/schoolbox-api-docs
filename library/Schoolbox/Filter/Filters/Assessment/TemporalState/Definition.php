@@ -15,12 +15,17 @@ use Schoolbox\Filter;
  * Filters assessments by their publish, open, due and close dates.
  *
  * Available options:
- * □ Unpublished (           now < publish)
- * □ Upcoming    (publish <= now < open)
- * □ Open        (open    <= now < late)
- * □ Overdue     (late    <= now < close)
- * □ Closed      (close   <= now )
- * □ Custom Plan (customPublishDate <= now)
+ * □ Unpublished (             now < a.publish)
+ * □ Upcoming    (a.publish <= now < a.open)
+ * □ Open        (a.open    <= now < a.late)
+ * □ Overdue     (a.late    <= now < a.close)
+ * □ Closed      (a.close   <= now )
+ *
+ * □ Plan Unpublished (             now < p.publish)
+ * □ Plan Upcoming    (p.publish <= now < p.open)
+ * □ Plan Open        (p.open    <= now < p.late)
+ * □ Plan Overdue     (p.late    <= now < p.close)
+ * □ Plan Closed      (p.close   <= now )
  */
 class Definition extends Filter\AbstractDefinition
 {
@@ -28,12 +33,19 @@ class Definition extends Filter\AbstractDefinition
     // The name to expose in the UI
     protected const NAME = 'Activity State';
 
-    const KEY_UNPUBLISHED = 'unpublished';
-    const KEY_UPCOMING = 'upcoming';
-    const KEY_OPEN = 'open';
-    const KEY_OVERDUE = 'overdue';
-    const KEY_CLOSED = 'closed';
-    const KEY_CUSTOM_PUBLISH_DATE = 'customPublishDate';
+    // Filter on the assessment dates
+    public const KEY_UNPUBLISHED = 'unpublished';
+    public const KEY_UPCOMING = 'upcoming';
+    public const KEY_OPEN = 'open';
+    public const KEY_OVERDUE = 'overdue';
+    public const KEY_CLOSED = 'closed';
+
+    // Filter on plan dates (ie CAP)
+    public const KEY_CUSTOM_UNPUBLISHED = 'cap_unpublished';
+    public const KEY_CUSTOM_UPCOMING = 'cap_upcoming';
+    public const KEY_CUSTOM_OPEN = 'cap_open';
+    public const KEY_CUSTOM_OVERDUE = 'cap_overdue';
+    public const KEY_CUSTOM_CLOSED = 'cap_closed';
 
 
     /** @var Collection|string[] */
@@ -100,7 +112,7 @@ class Definition extends Filter\AbstractDefinition
         if (self::KEY_CLOSED === $key) {
             return 'Closed';
         }
-        if (self::KEY_CUSTOM_PUBLISH_DATE === $key) {
+        if (self::KEY_CUSTOM_UNPUBLISHED === $key) {
             return 'Custom Plan Publish Date';
         }
         throw new \InvalidArgumentException("Unknown TemporalState key: $key");

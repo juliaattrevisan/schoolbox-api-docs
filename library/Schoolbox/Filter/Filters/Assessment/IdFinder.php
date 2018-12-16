@@ -711,7 +711,7 @@ class IdFinder extends Filter\AbstractIdFinder
      * @param Collection|string[] $temporalStates (can also be NULL but storm doesn't like iterating that type-hint)
      * @return mixed[]
      */
-    private function getClauseTemporalState(Collection $temporalStates = null)
+    private function getClauseTemporalState(Collection $temporalStates = null): array
     {
         // If no weighting types are selected, don't filter
         if (null === $temporalStates) {
@@ -724,7 +724,6 @@ class IdFinder extends Filter\AbstractIdFinder
 
         $now     = \Alaress_Date_Format::now()->getDatabase();
         $orParts = [];
-        $joinParticipantPlan = false;
 
         foreach ($temporalStates as $temporalState) {
             if (TemporalState\Definition::KEY_UNPUBLISHED === $temporalState) {
@@ -737,21 +736,32 @@ class IdFinder extends Filter\AbstractIdFinder
                 $orParts[] = '(a.due_date <= :now AND :now < a.close_date)';
             } elseif (TemporalState\Definition::KEY_CLOSED === $temporalState) {
                 $orParts[] = '(a.close_date <= :now)';
-            } elseif (TemporalState\Definition::KEY_CUSTOM_PUBLISH_DATE === $temporalState) {
-                $joinParticipantPlan = true;
-                $orParts[] = '(pp.publish_date <= :now)';
             }
         }
 
-        if ($joinParticipantPlan) {
-            return [
-                '(' . implode(' OR ', $orParts) . ')',
-                [':now' => $now],
-                'LEFT JOIN participant_plan pp  ON pp.assessment_id = a.id'
-            ];
+        $joinParticipantPlan = false;
+        foreach ($temporalStates as $temporalState) {
+            if (TemporalState\Definition::KEY_CUSTOM_UNPUBLISHED === $temporalState) {
+                $joinParticipantPlan = true;
+                $orParts[]           = '(:now < COALESCE(pp.publish_date, a.publish_date))';
+            } elseif (TemporalState\Definition::KEY_CUSTOM_UPCOMING === $temporalState) {
+                $joinParticipantPlan = true;
+                $orParts[]           = '(COALESCE(pp.publish_date, a.publish_date) <= :now AND :now < COALESCE(pp.open_date, a.open_date))';
+            } elseif (TemporalState\Definition::KEY_CUSTOM_OPEN === $temporalState) {
+                $joinParticipantPlan = true;
+                $orParts[]           = '(COALESCE(pp.open_date, a.open_date) <= :now AND :now < COALESCE(pp.due_date, a.due_date))';
+            } elseif (TemporalState\Definition::KEY_CUSTOM_OVERDUE === $temporalState) {
+                $joinParticipantPlan = true;
+                $orParts[]           = '(COALESCE(pp.due_date, a.due_date) <= :now AND :now < COALESCE(pp.close_date, a.close_date))';
+            } elseif (TemporalState\Definition::KEY_CUSTOM_CLOSED === $temporalState) {
+                $joinParticipantPlan = true;
+                $orParts[]           = '(COALESCE(pp.close_date, a.close_date) <= :now)';
+            }
         }
 
-        return ['(' . implode(' OR ', $orParts) . ')', [':now' => $now], ''];
+        $participantPlanJoin = $joinParticipantPlan ? 'LEFT JOIN participant_plan pp ON pp.assessment_id = a.id' : '';
+
+        return ['(' . implode(' OR ', $orParts) . ')', [':now' => $now], $participantPlanJoin];
     }
 
 
