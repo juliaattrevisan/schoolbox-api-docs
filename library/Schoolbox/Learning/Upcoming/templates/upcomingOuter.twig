@@ -1,5 +1,4 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
-{% import '@learning/macro/dueDate.twig' as dueDate %}
 
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
@@ -217,6 +216,7 @@
     </div>
 </div>
 
+{% set reportContentId = 'report_content' %}
 {% include '@filters/panel.twig' with {
     contentId: reportContentId,
     panel:     filterPanel,
@@ -236,43 +236,7 @@
     <div class="row">
         <div class="small-12 medium-6 columns island">
             <h2 class="subheader">Upcoming {{ locale.dueWork.proper }}</h2>
-            {% if upcomingWork|length %}
-                <section>
-                    <ul class="action-list">
-                        {% for upcoming in upcomingWork %}
-                            <li>
-                                <div class="card small-12">
-                                    <h3>
-                                        {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: upcoming.id, student: student, studentId: student.id, assessment: upcoming}) %}
-                                        {% if route %}
-                                            <a class="title" href="{{ route }}{{ returnUrl }}">{{ upcoming.title }}</a>
-                                        {% else %}
-                                            {{ upcoming.title }}
-                                        {% endif %}
-                                    </h3>
-                                    {% if subjects[upcoming.context.folder.id].hasPerms %}
-                                        <p class="meta">
-                                            <a href="/homepage/{{ upcoming.context.folder.id }}">{{ upcoming.context.folder.title }}</a>
-                                            {{ upcoming.typeName }}
-                                        </p>
-                                    {% else %}
-                                        <p class="meta">
-                                            {{ upcoming.context.folder.title }}
-                                            {{ upcoming.typeName }}
-                                        </p>
-                                    {% endif %}
-                                    <p class="meta">{{ dueDate.forParticipant(upcoming.participant(student)) }}</p>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </section>
-            {% else %}
-                <div class="empty-state">
-                    <i class="icon-due-work"></i>
-                    <p>Currently no work has been set, nice one.</p>
-                </div>
-            {% endif %}
+            <div id="{{ reportContentId }}"></div>
         </div>
 
         <div class="small-12 medium-6 columns">

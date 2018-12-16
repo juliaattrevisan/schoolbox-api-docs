@@ -1,0 +1,48 @@
+{#
+    Renders a list of Assessments
+
+    Data:
+        student           User
+        upcomingWork      IAssessable[]
+        returnUrl         string
+        readableFolders   int[]          Folder ids where the current user has READ+ perm
+        isFiltered        bool           Whether we are filtering to a subset of upcoming assessments
+#}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
+{% if upcomingWork|length %}
+    <section>
+        <ul class="action-list">
+            {% for upcoming in upcomingWork %}
+                <li>
+                    <div class="card small-12">
+                        <h3>
+                            {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: upcoming.id, student: student, studentId: student.id, assessment: upcoming}) %}
+                            {% if route %}
+                                <a class="title" href="{{ route }}{{ returnUrl }}">{{ upcoming.title }}</a>
+                            {% else %}
+                                {{ upcoming.title }}
+                            {% endif %}
+                        </h3>
+                        {% if upcoming.context.folder.id in readableFolders %}
+                            <p class="meta">
+                                <a href="/homepage/{{ upcoming.context.folder.id }}">{{ upcoming.context.folder.title }}</a>
+                                {{ upcoming.typeName }}
+                            </p>
+                        {% else %}
+                            <p class="meta">
+                                {{ upcoming.context.folder.title }}
+                                {{ upcoming.typeName }}
+                            </p>
+                        {% endif %}
+                        <p class="meta">{{ dueDate.forParticipant(upcoming.participant(student)) }}</p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% else %}
+    <div class="empty-state">
+        <i class="icon-due-work"></i>
+        <p>Currently no work has been set{% if isFiltered %} that matches your filter selections{% endif %}, nice one.</p>
+    </div>
+{% endif %}

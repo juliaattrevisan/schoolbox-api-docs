@@ -11,6 +11,7 @@ use Alaress_Date_Format;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Role;
@@ -20,6 +21,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 /**
  * Sub-module for a student's upcoming due work.
@@ -53,39 +55,41 @@ class Module extends BaseModule
             }));
         }
 
-        $this->register('GET', '', 'getUpcoming', new Rule\IsLoggedIn());
-        $this->register(
-            'GET',
-            '/{studentId:\d+}{/date}',
-            'getUpcomingForStudent',
-            $access,
-            function ($params) {
-
-                // Build a date
-                if (isset($params['date'])) {
-                    try {
-                        $date = Alaress_Date_Format::newUrlDate($params['date']);
-                    } catch (\Exception $e) {
-                        // noop
-                    }
-                }
-                if (!isset($date)) {
-                    $date = Alaress_Date_Format::now();
-                }
-
-                // Pass the date and student to the controller action
+        $preloadStudent = function (array $params) {
+            if (\array_key_exists('student', $params)) {
+                $student = $params['student'];
+            } else {
                 try {
-                    return [
-                        'student' => $this->getUserMapper()->findById($params['studentId']),
-                        'date'    => $date,
-                    ];
+                    $student = $this->getUserMapper()->findById($params['studentId']);
                 } catch (MapperException $e) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
                 }
             }
-        );
+            return ['student' => $student,];
+        };
 
-        $this->register('GET', '', 'postUpcomingForStudent');
+        $preloadStudentAndDate = function (array $params) use ($preloadStudent) {
+
+            $preload = $preloadStudent($params);
+
+            // Build a date
+            if (isset($params['date'])) {
+                try {
+                    $date = Alaress_Date_Format::newUrlDate($params['date']);
+                } catch (\Exception $e) {
+                    // noop
+                }
+            }
+            if (!isset($date)) {
+                $date = Alaress_Date_Format::now();
+            }
+            $preload['date'] = $date;
+            return $preload;
+        };
+
+        $this->register('GET',  '',                        'getUpcoming', new Rule\IsLoggedIn());
+        $this->register('GET',  '/{studentId:\d+}{/date}', 'getUpcomingForStudent',  $access, $preloadStudentAndDate);
+        $this->register('POST', '/{studentId:\d+}',        'postUpcomingForStudent', $access, $preloadStudent);
     }
 
     /**
@@ -120,6 +124,15 @@ class Module extends BaseModule
             'filterFactoryFactory'  => $injector->lazy(function () {
                 return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
             }),
+            'assessmentIdFinder'    => $injector->lazy(function () {
+                /** @var Filter\Mapper $filterMapper */
+                $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
+                return Filter\Filters\Assessment\IdFinder::getInstance(
+                    $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
+                );
+            }),
+            'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
+            'access'                => $this->getMapperFactory()->getLazy(Access::class),
         ];
     }
 
