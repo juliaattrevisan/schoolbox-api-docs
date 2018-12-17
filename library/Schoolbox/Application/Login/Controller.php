@@ -8,6 +8,7 @@
 namespace Schoolbox\Application\Login;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Application\Exception;
 use Schoolbox\User;
 use Session;
 
