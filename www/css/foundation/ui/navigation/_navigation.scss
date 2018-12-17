@@ -112,7 +112,7 @@ $allow-sidebar-stash: $large-up;
 	}
 	.left-off-canvas-menu {
 		box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
-		transform: translate3d(0, 0, 0);
+		transform: none;
 
 		.left-menu-dock::after {
 			content: '\e64b';
