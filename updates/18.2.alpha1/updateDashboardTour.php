@@ -76,7 +76,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'tooltip_uuid' => '7f5035ca-f14f-11e8-8eb2-08002751fd3c',
             'type'         => 'tooltip',
             'selector'     => '#drawer',
-            'content'      => "<p>If you would like more screen space, you can collapse side panel using this button.</p>",
+            'content'      => "<p>If you would like more screen space, you can collapse the side panel using this button.</p>",
         ],
 
         // Top Nav
