@@ -21,6 +21,11 @@ interface IComponent
 {
 
     /**
+     * @return IDefinition
+     */
+    public function getDefinition(): IDefinition;
+
+    /**
      * Return the sub-template to include in the filter panel
      *
      * @return string
