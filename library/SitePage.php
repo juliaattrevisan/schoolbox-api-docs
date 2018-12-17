@@ -5,12 +5,9 @@ use Aura\Router\Router;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Menu\Side\Renderer as MenuSideRender;
-use Schoolbox\Menu\Top\Renderer as MenuTopRenderer;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
-use Schoolbox\Learning\Assessment\Redirect;
+
 
 class SitePage extends Page
 {
@@ -179,10 +176,7 @@ class SitePage extends Page
             $this->pageNotFound();
         }
 
-        /* If you try to access the login screen but you are already logged in, just go home */
-        if ($pageFile == '/login/' || $pageFile == '/login') {
-            $pageFile = '/home/';
-        }
+
 
         $this->arg = array();
         $path = explode('/', trim($pageFile, '/'));
@@ -367,247 +361,6 @@ class SitePage extends Page
 
 
         return true;
-    }
-
-    /**
-     * @param bool $customHead
-     */
-    public function buildPage($customHead = true)
-    {
-        $this->setFile(TEMPLATE_body, 'include/body.html');
-        $this->setFile('headerTpl', 'include/header.html');
-        $this->setFile('footerTpl', 'include/footer.html');
-        $this->setFile('bannerTpl', 'include/banner.html');
-        $this->setFile('instantTpl', 'include/instant.html');
-
-        $this->renderScriptIncludes();
-
-        // Check if the user is being impersonated
-        $impersonated = false;
-        if ($this->user instanceof User) {
-            if (isset($_SESSION['previous']['user'])) {
-                /** @var User $previousUser */
-                $previousUser = $_SESSION['previous']['user'];
-                if ($previousUser->isSuperuser()) {
-                    $impersonated = true;
-                }
-            }
-        }
-
-        if ($this->user instanceof User) {
-            $this->renderInstantMessages();
-        } else {
-            // Go away phantom block
-            $this->setVar('INSTANTMESSAGE_BLOCK', '');
-        }
-
-        $config = new \Schoolbox\Config\Loader();
-
-        // -----------------------------------------------
-        // Alaress Google Analytics
-        // -----------------------------------------------
-        $this->setBlock('headerTpl', 'google_analytics', 'google_analytics_block');
-        $this->setBlock('google_analytics', 'ga_user_events', 'ga_user_events_block');
-        $this->setBlock('ga_user_events', 'ga_year_event', 'ga_year_event_block');
-        $this->setBlock('ga_user_events', 'ga_impersonated', 'ga_impersonated_block');
-
-        $optIn = $config->get('site_usage_tracking');
-
-        $this->setVar([
-            'SITE_SCHOOL_CODE' => $config->get('site_school_code'),
-            'SITE_TYPE' => $config->get('site_type'),
-            'SITE_VERSION' => $config->get('site_version'),
-        ]);
-
-        if ($this->user instanceof User) {
-
-            $this->setVar([
-                'ROLE_NAME' => $this->user->getRole()->getName(),
-                'ROLE_TYPE' => $this->user->getRole()->getType(),
-            ]);
-
-            // Show year level event block if user is a student
-            if ($this->user->getRole()->getType() == Schoolbox\Role::STUDENT) {
-                $this->setVar('USER_YEAR', $this->user->getYear());
-                $this->parse('ga_year_event_block', 'ga_year_event');
-            } else {
-                $this->setVar('ga_year_event_block', '');
-            }
-
-            // If the user has come from a previous session and is a superuser: we're going to log this
-            // as impersonated. All others will be considered a legitimate switch and logged normally.
-
-            if ($impersonated) {
-                $this->parse('ga_impersonated_block', 'ga_impersonated');
-            } else {
-                $this->setVar('ga_impersonated_block', '');
-            }
-
-            $this->parse('ga_user_events_block', 'ga_user_events');
-
-        } else {
-            $this->setVar('ga_user_events_block', '');
-        }
-
-        if ($optIn) {
-            $this->parse('google_analytics_block', 'google_analytics');
-        } else {
-            $this->setVar('google_analytics_block', '');
-        }
-
-        // -----------------------------------------------
-        // Feature tours
-        // -----------------------------------------------
-        $this->setBlock('headerTpl', 'tour_script', 'tour_script_block');
-
-        if ($this->user instanceof User && !$impersonated && $config->get('tours_enabled')) {
-            $request = parse_url($_SERVER['REQUEST_URI']);
-            $tourList = new \Schoolbox\Tour\Lists(new \Schoolbox\Tour\Mapper(), new Schoolbox\Tour\Step\Mapper());
-            $this->setVar('TOUR_JSON', json_encode($tourList->getTours($this->user, $request['path'])));
-            $this->parse('tour_script_block', 'tour_script', true);
-        } else {
-            $this->setVar('tour_script_block', '');
-        }
-
-        // -----------------------------------------------
-        // Support and Feedback custom link
-        // -----------------------------------------------
-        $this->setBlock('footerTpl', 'feedback_link', 'feedback_link_block');
-
-        $feedbackText = $config->get('feedback_text');
-        $feedbackURL = $config->get('feedback_url');
-
-        if (strlen(trim($feedbackText)) && strlen(trim($feedbackURL))) {
-            $this->parse('feedback_link_block', 'feedback_link');
-        } else {
-            $this->setVar('feedback_link_block', '');
-        }
-
-        $this->parse('MAIN_HEADER_REGION', 'headerTpl');
-        $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
-
-        $this->setBlock(TEMPLATE_body, 'banner_logged_in', 'banner_logged_in_block');
-
-        if ($_SESSION['user'] instanceof User) {
-
-            if (!$this->user instanceof User) {
-                $this->user = $_SESSION['user'];
-            }
-
-            // quasi-localisation
-            $this->localise();
-
-            /* Output superuser link to administration */
-            $this->setBlock('banner_logged_in', 'admin_only_menu', 'admin_only_menu_block');
-            if ($this->user->isSuperuser()) {
-                $this->parse('admin_only_menu_block', 'admin_only_menu');
-            } else {
-                $this->setVar('admin_only_menu_block', '');
-            }
-
-            $canSwitch = false;
-
-            /* Output switch user options */
-            $this->setBlock('banner_logged_in', 'switch_user', 'switch_user_block');
-            $this->setBlock('banner_logged_in', 'can_switch', 'can_switch_block');
-
-            $this->setVar([
-                'switch_user_block' => '',
-                'can_switch_block' => ''
-            ]);
-            $linkedUserList = array();
-
-            $previousUser = $_SESSION['previous']['user'];
-            foreach ($this->user->getLinkedUser() as $linkedUser) {
-                // Don't link to this user if I was that user
-                if ($previousUser instanceof User) {
-                    if ($linkedUser->getId() == $previousUser->getId()) {
-                        continue;
-                    }
-                }
-                // Skip if user account is disable
-                if (!$linkedUser->getEnabled()) {
-                    continue;
-                }
-
-                $linkedUserList[] = $linkedUser;
-            }
-
-            /** @var User[] $linkedUserList */
-            $linkedUserList = UserMapper::getInstance()->findByColumn('id', array_map(function (User $user) { return $user->getId(); }, $linkedUserList))->getAll();
-
-            foreach ($linkedUserList as $linkedUser) {
-                $this->setVar(array(
-                        'MENU_SWITCH_USERID' => $linkedUser->getId(),
-                        'MENU_SWITCH_EXTERNAL_ID' => $linkedUser->getExternalId(),
-                        'MENU_SWITCH_USER_FULLNAME' => $linkedUser->getFullName(),
-                        'MENU_SWITCH_USER_ROLE' => $linkedUser->getRole()->getName(),
-                    )
-                );
-                $this->parse('switch_user_block', 'switch_user', true);
-                $canSwitch = true;
-            }
-
-            if (count($linkedUserList) > 0) {
-                $this->user->setLinkedUser($linkedUserList);
-            }
-
-            $this->setBlock('banner_logged_in', 'recover_user', 'recover_user_block');
-            $this->setVar('recover_user_block', '');
-
-            if ($previousUser instanceof User) {
-                $this->setVar(array(
-                        'MENU_SWITCH_USERID' => $previousUser->getId(),
-                        'MENU_SWITCH_EXTERNAL_ID' => $previousUser->getExternalId(),
-                        'MENU_SWITCH_USER_FULLNAME' => $previousUser->getFullName(),
-                        'MENU_SWITCH_USER_ROLE' => $previousUser->getRole()->getName(),
-                    )
-                );
-                $this->parse('recover_user_block', 'recover_user', true);
-                $canSwitch = true;
-            }
-
-            if ($canSwitch) {
-                $this->parse('can_switch_block', 'can_switch');
-            }
-
-            // Render side menu
-
-            try {
-                $menuSideRenderer = new MenuSideRender();
-                $menuSideContents = $menuSideRenderer->menuSideRenderer($this->getTwig(), $this->user);
-                $this->setVar('MENU_SIDE', $menuSideContents);
-            } catch (Twig_Error_Loader $e) {
-                // This can happen if rendering an error message where the error happens before the menu module has loaded
-                $this->setVar('MENU_SIDE', '');
-            }
-
-            // Render top menu
-
-            try {
-                $menuTopRenderer = new MenuTopRenderer();
-                $menuTopContents = $menuTopRenderer->menuTopRenderer($this->getTwig(), $this->currentTab, $this->user);
-                $this->setVar('MENU_TOP', $menuTopContents);
-            } catch (Twig_Error_Loader $e) {
-                // This can happen if rendering an error message where the error happens before the menu module has loaded
-                $this->setVar('MENU_TOP', '');
-            }
-
-            $this->parse('banner_logged_in_block', 'banner_logged_in');
-        } else {
-            $this->setVar('MENU_SIDE', '');
-            $this->setVar('MENU_TOP', '');
-            $this->setVar('banner_logged_in_block', '');
-        }
-
-        $this->parse('MAIN_BANNER_REGION', 'bannerTpl');
-        $this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
-
-        if ($this->getVar('custom_head') && $customHead) {
-            $this->parse('CUSTOM_HEADER_REGION', 'custom_head');
-        } else {
-            $this->setVar('CUSTOM_HEADER_REGION', '');
-        }
     }
 
     /**
@@ -1019,12 +772,12 @@ class SitePage extends Page
      * @param string $error An error message to display on the login page.
      * @param string $page If set, this page is set as the path to redirect to.
      */
-    public function goLoginPage($error = '', $page = '')
+    public function goLoginPage()
     {
         $parts = parse_url($_SERVER['REQUEST_URI']);
         if (!($parts['path'] == '/login/' || $parts['path'] == '/login')) {
             if ($parts['path'] != '/') {
-                $this->localRedir('/login/?page=' . urlencode($_SERVER['REQUEST_URI']));
+                $this->localRedir('/login/?page=' . rawurlencode($_SERVER['REQUEST_URI']));
             } else {
                 $this->localRedir('/login/');
             }

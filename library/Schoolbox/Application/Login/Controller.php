@@ -27,6 +27,11 @@ class Controller extends Base
     public function getLogin($error = null, $page = null): void
     {
 
+        // If you try to access the login screen but you are already logged in, just go home
+        if ($this->getSession()->getAuthUser() instanceof User && $this->getSession()->getAuthUser()->getId()) {
+            $this->getResponse()->redirect->to('/');
+        }
+
         $samlAuth = $this->getRequest()->query->get('samlAuth');
         $page = $page ?: $this->getRequest()->query->get('page');
 
@@ -47,16 +52,16 @@ class Controller extends Base
             && (!$this->samlBlacklist() || $samlAuth === '1')) {
             $redirectUrl = '/saml/index.php';
             if (isset($_GET['page'])) {
-                $redirectUrl .= '?page=' . urlencode($page);
+                $redirectUrl .= '?page=' . rawurlencode($page);
             }
             $this->getResponse()->redirect->to($redirectUrl, 303);
         }
 
-        $getParams = ['page' => $page, 'samlAuth' => $samlAuth];
+        $getParams = ['samlAuth' => $samlAuth];
         $data['requestParams'] = http_build_query($getParams);
 
         //Determine if page redirect is valid
-        if ($page && preg_match('#^[\w_=\-:\/.\&\?]+$#i', $page)) {
+        if ($page && preg_match('#^[\w_=%\-:\/.\&\?]+$#i', $page)) {
             $data['page'] = $page;
         } else {
             $data['page'] = '';
