@@ -1,9 +1,6 @@
 {#
     Data:
         filterIdSlugMap        string[]     Maps filter ids to semantic slugs
-        sbTerms                array        Keyed by term.id
-        sbTerms[]['start']     int          Timestamp when a term starts
-        sbTerms[]['finish']    int|null     Timestamp when the term ends, NULL if no end date set
         ...
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -155,8 +152,6 @@
                     return $event.attr('data-meta-assessmenttype');
                 case 'studentFolders':
                     return $event.attr('data-meta-folderid');
-                case 'termDue':
-                    return getTermId($event.attr('data-meta-duedate'));
                 case 'weighting':
                     return $event.attr('data-meta-weighted');
                 case 'workType':
@@ -168,31 +163,6 @@
                 default:
                     console.log('Unrecognised filter slug: ' + slug);
             }
-        };
-
-        var sbTerms = {{ sbTerms|json_encode|raw }};
-
-        /**
-         * Returns the ID of the SB term that contains the given date
-         *
-         * @param {string} dueDate eg 1545639420
-         * @return {string}
-         */
-        var getTermId = function (dueDate) {
-            var termId = '';
-            $.each(sbTerms, function (key, term) {
-                var start = term.start,
-                    finish = term.finish;
-
-                if (start <= dueDate && (!finish || dueDate <= finish)) {
-                    termId = key;
-                    return false;
-                }
-            });
-            if (!termId) {
-                console.log('No term found for due date timestamp: ' + dueDate);
-            }
-            return termId;
         };
 
         // Allow checking of anchor for view to display
@@ -257,8 +227,6 @@
                     $.each(calEvent.data.meta, function (k, v) {
                         $elem.attr(prefix + k, v);
                     });
-                    // Also insert the due date as a unix timestamp
-                    $elem.attr(prefix + 'duedate', calEvent.start.unix());
 
                     // Always render placeholders in the most basic manner
                     if (calEvent.id === 'placeholder') {

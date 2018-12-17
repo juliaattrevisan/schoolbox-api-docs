@@ -37,7 +37,7 @@ class Definition extends AssessmentTermFilter\Definition
 //            Page\Model::PAGE_GRADES,
             Page\Model::PAGE_MARK_BOOK,
             Page\Model::PAGE_COURSE_MARK_BOOK,
-            Page\Model::PAGE_DUE_WORK_CALENDAR,
+//            Page\Model::PAGE_DUE_WORK_CALENDAR,
         ];
     }
 
