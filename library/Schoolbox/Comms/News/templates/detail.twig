@@ -256,6 +256,15 @@ Data:
     {#}#}
 {#} only %}#}
 
+{% if not isPublishable %}
+<div class="small-12 columns" id="unpublishable-box">
+    <div id="flash" class="alert-box highlight">
+        <span id="error-message">
+            This isn't quite ready for publishing, please <a href="{{ modifyRoute }}">modify this {{ locale.news }}</a> and complete the required fields.
+        </span>
+    </div>
+</div>
+{% endif %}
 
 <div class="row">
     <div class="small-12 columns">
@@ -265,29 +274,31 @@ Data:
                 <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
             {% endif %}
 
-            {# If you have permission to submit and implicitly approve your own articles, do that, otherwise submit for moderation #}
-            {% if article.canBeApproved %}
-                {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
-            {% endif %}
-            {% if article.canBeSubmitted %}
-                {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
-            {% endif %}
-            {% if approveRoute or submitRoute %}
-                {% if approveRoute %}
-                    {% set buttonText = 'Publish ' ~ locale.news %}
-                {% elseif article.isRejected %}
-                    {% set buttonText = 'Resubmit for moderation' %}
-                {% else %}
-                    {% set buttonText = 'Submit for moderation' %}
+            {% if isPublishable %}
+                {# If you have permission to submit and implicitly approve your own articles, do that, otherwise submit for moderation #}
+                {% if article.canBeApproved %}
+                    {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
                 {% endif %}
-                <li>
-                    <form action="{{ approveRoute ?: submitRoute }}" method="post">
-                        {% if returnUrl|length %}
-                            <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}" />
-                        {% endif %}
-                        <input type="submit" value="{{ buttonText }}" />
-                    </form>
-                </li>
+                {% if article.canBeSubmitted %}
+                    {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
+                {% endif %}
+                {% if approveRoute or submitRoute %}
+                    {% if approveRoute %}
+                        {% set buttonText = 'Publish ' ~ locale.news %}
+                    {% elseif article.isRejected %}
+                        {% set buttonText = 'Resubmit for moderation' %}
+                    {% else %}
+                        {% set buttonText = 'Submit for moderation' %}
+                    {% endif %}
+                    <li>
+                        <form action="{{ approveRoute ?: submitRoute }}" method="post" id="article-form">
+                            {% if returnUrl|length %}
+                                <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}" />
+                            {% endif %}
+                            <input type="submit" value="{{ buttonText }}" id="article-submit" />
+                        </form>
+                    </li>
+                {% endif %}
             {% endif %}
         </ul>
     </div>
@@ -423,4 +434,49 @@ Data:
         });
     });
 </script>
+{% endif %}
+
+{# Publish news asynchronous #}
+{% if (isPublishable) and (approveRoute or submitRoute) %}
+    {% autoescape 'js' %}
+    <script>
+        $(function() {
+
+            var form = $('#article-form');
+            var articleSubmitButton = $('#article-submit');
+            var buttonOriginalValue = articleSubmitButton.val();
+
+            form.submit(function( event ) {
+                event.preventDefault();
+                var $toast     = $('#toast');
+
+                // Prevent clickjacking and update button text...
+                articleSubmitButton.prop('disabled', true).attr('value','Working...');
+
+                $.ajax({
+                    type: 'POST',
+                    url: form.attr('action'),
+                    data: {articleId: {{ article.id }}},
+                    dataType: 'json'
+                }).success(function (response) {
+                    window.location.href = response.redirect;
+                }).error(function (response) {
+
+                    $toast.toastActivate({
+                        text: 'Error: ' + response.responseJSON.message,
+                        css: 'alert',
+                    });
+
+                    // Revert text to its original value and enable the button back
+                    articleSubmitButton.prop('disabled', false).attr('value',buttonOriginalValue);
+
+                    $toast.toastTimeout({
+                        text: 'Error: ' + response.responseJSON.message,
+                        duration: 3000
+                    });
+                });
+            });
+        });
+    </script>
+    {% endautoescape %}
 {% endif %}
