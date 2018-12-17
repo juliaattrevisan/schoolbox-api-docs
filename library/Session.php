@@ -5,6 +5,7 @@ use Schoolbox\Notif\Notifactory;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -184,6 +185,7 @@ class Session
      * @throws SchoolboxAccessDeniedException    if password doesn't match
      * @throws SchoolboxAccountDisabledException if user account is disabled
      * @throws SchoolboxNotFoundException        if user doesn't exist
+     * @throws SchoolboxPasswordExpiredException if ldap password expired
      */
     public function authenticate($username, $password)
     {
@@ -276,6 +278,19 @@ class Session
         }
     }
 
+    /**
+     * @param string    $username
+     * @param string    $password
+     * @param string    $ds
+     * @param string    $ldap_user
+     * @param string    $ldap_base
+     * @param int       $version
+     * @param int       $referrals
+     * @throws SchoolboxAccountDisabledException
+     * @throws SchoolboxPasswordExpiredException
+     * @return bool
+     *
+     */
     private function _authLDAP($username, $password, $ds, $ldap_user, $ldap_base, $version = 3, $referrals = 0)
     {
         // perform search for user in ldap server specified
@@ -310,30 +325,12 @@ class Session
 
                                 case '701': // ACCOUNT_EXPIRED
                                 case '533': // ACCOUNT_DISABLED
-                                    // do not fall back. Throw error indicating expired account.
-                                    $page = new SitePage(false);
-                                    $errMsg = 'Your account has expired or been disabled.<br />
-                                               Please contact a system administrator to regain access to your account.';
-                                    $page->goLoginPage($errMsg);
-                                    break;
+                                    throw new SchoolboxAccountDisabledException('Your account has expired or been disabled.');
 
                                 case '773': // USER_MUST_RESET_PASSWORD
                                 case '532': // PASSWORD_EXPIRED
                                     // do not fall back. Soft-redirect to password reset function.
-                                    $page = new SitePage(false);
-                                    $errMsg = 'Your password has expired and needs to be reset before you can log in.<br />';
-
-                                    // site-specific handling for how to go about resetting a password
-                                    switch (Cfg::get('site_location')) {
-
-                                        case 'bialik':
-                                            $errMsg .= 'Please visit the school email system with this link:- <a href="https://webmail.bialik.vic.edu.au/owa">webmail.bialik.vic.edu.au</a> to reset your password.';
-                                            break;
-                                        default:
-                                            $errMsg .= 'Please contact a system administrator to regain access to your account.';
-                                            break;
-                                    }
-                                    $page->goLoginPage($errMsg);
+                                    throw new SchoolboxPasswordExpiredException('Your password has expired and needs to be reset before you can log in.');
                                     break;
 
                                 case '52e': // INVALID_CREDENTIALS

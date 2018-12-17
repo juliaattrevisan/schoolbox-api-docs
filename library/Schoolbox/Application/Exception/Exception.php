@@ -28,11 +28,11 @@ class Exception extends \RuntimeException
      * Constructor
      *
      * @param string         $message
-     * @param int            $code
+     * @param int|null            $code
      * @param Throwable|null $previous
      * @param int|null       $httpStatusCode
      */
-    public function __construct(string $message = "", int $code = 0, Throwable $previous = null, ?int $httpStatusCode = null)
+    public function __construct(string $message = "", ?int $code = 0, Throwable $previous = null, ?int $httpStatusCode = null)
     {
         parent::__construct($message, $code, $previous);
         if ($httpStatusCode !== null) {
