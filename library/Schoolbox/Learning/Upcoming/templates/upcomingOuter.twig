@@ -1,4 +1,13 @@
+{#
+    Data:
+        filterIdSlugMap        string[]     Maps filter ids to semantic slugs
+        sbTerms                array        Keyed by term.id
+        sbTerms[]['start']     int          Timestamp when a term starts
+        sbTerms[]['finish']    int|null     Timestamp when the term ends, NULL if no end date set
+        ...
+#}
 {% import '@learning/macro/urgency.twig' as urgency %}
+{% set reportContentId = 'report_content' %}
 
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
@@ -37,6 +46,155 @@
 
     // once the DOM has loaded, punch a fancy calendar into it
     $(function() {
+
+        /**
+         * Apply the most-recently applied filter panel selections to the events being displayed on the Calendar
+         */
+        var applyFiltersToCalendarEvents = function () {
+
+            // Update JS representation of current filter option selections
+            updateFilterOptionValues();
+
+            // Apply filter settings to each event
+            $('[data-meta-filter-sync]').each(function (idx, elem) {
+                var $event = $(elem);
+                if (hideEvent($event)) {
+                    $event.hide();
+                } else {
+                    $event.show();
+                }
+            });
+        };
+
+
+        // Filtered content has been [re]loaded
+        $('#{{ reportContentId }}').on('filterContentLoaded', function () {
+            applyFiltersToCalendarEvents();
+        });
+
+        // Maps filterId to currently-applied selections
+        var appliedFilters;
+
+        // Maps a filterId to a semantic slug
+        var filterIdSlugMap = {{ filterIdSlugMap|json_encode|raw }};
+
+        /**
+         * Examines the filter panel's most-recently submitted settings and
+         * converts to a suitable JS representation we can use to filter events.
+         *
+         * Only filters that are actually being applied are included in data structure.
+         */
+        var updateFilterOptionValues = function () {
+            appliedFilters = {};
+            $('#filter_panel').find('[data-component]').each(function (idx, elem) {
+                var $panelComponent = $(elem),
+                    filterSelections = {},
+                    filterId = $panelComponent.attr('data-component'),
+                    $options = $panelComponent.find('[data-value-original]');
+
+                var countSelected = 0;
+                $options.each(function (idx, elem) {
+                    var $option = $(elem),
+                        key = $option.attr('data-key'),
+                        val = $option.attr('data-value-original');
+
+                    if ('1' === val) {
+                        countSelected++;
+                    }
+                    filterSelections[key] = val;
+                });
+
+                if (countSelected && countSelected !== $options.length) {
+                    appliedFilters[filterId] = filterSelections;
+                }
+            });
+        };
+
+
+        /**
+         * Returns whether we should hide this event due to the current filter panel selections
+         *
+         * @param {jQuery} $event
+         * @return {boolean}
+         */
+        var hideEvent = function ($event) {
+
+            // For each filter present in the panel
+            for (var filterId in filterIdSlugMap) {
+
+                // Ignore inherited properties
+                if (!filterIdSlugMap.hasOwnProperty(filterId)) {
+                    continue;
+                }
+
+                // Is this filter not being applied?
+                if (!appliedFilters.hasOwnProperty(filterId)) {
+                    continue;
+                }
+
+                // Which filter is are we currently applying?
+                // Hide the event if it's attribute is not selected in the filter options.
+                var key = getFilterOptionKey(filterIdSlugMap[filterId], $event);
+                return '0' === appliedFilters[filterId][key];
+            }
+
+            // Filter is not being applied, so don't hide event.
+            return false;
+        };
+
+        /**
+         * Converts an event attribute into a filter key
+         *
+         * @param {string} slug
+         * @param {jQuery} $event
+         * @return {string}
+         */
+        var getFilterOptionKey = function (slug, $event) {
+            switch (slug) {
+                case 'activityType':
+                    return $event.attr('data-meta-assessmenttype');
+                case 'studentFolders':
+                    return $event.attr('data-meta-folderid');
+                case 'termDue':
+                    return getTermId($event.attr('data-meta-duedate'));
+                case 'weighting':
+                    return $event.attr('data-meta-weighted');
+                case 'workType':
+                    var key = $event.attr('data-meta-worktypeid');
+                    if (!key) {
+                        key = 'none';
+                    }
+                    return key;
+                default:
+                    console.log('Unrecognised filter slug: ' + slug);
+            }
+        };
+
+        var sbTerms = {{ sbTerms|json_encode|raw }};
+
+        /**
+         * Returns the ID of the SB term that contains the given date
+         *
+         * @param {string} dueDate eg 1545639420
+         * @return {string}
+         */
+        var getTermId = function (dueDate) {
+            var termId = '';
+            $.each(sbTerms, function (key, term) {
+                var start = term.start,
+                    finish = term.finish;
+
+                if (start <= dueDate && (!finish || dueDate <= finish)) {
+                    termId = key;
+                    return false;
+                }
+            });
+            if (!termId) {
+                console.log('No term found for due date timestamp: ' + dueDate);
+            }
+            return termId;
+        };
+
         // Allow checking of anchor for view to display
         var anchor = '';
         var parts  = location.href.split('#');
@@ -86,10 +244,22 @@
                 firstDay: Number('{{ config.calendar_start_day|escape('js') }}'),
 
                 /**
-                 * When an event is drawn on the calendar
-                 * @param calEvent
+                 * Called when an event is about to be rendered on the calendar
+                 *
+                 * @param {object} calEvent
+                 * @param {jQuery} $elem
+                 * @see https://fullcalendar.io/docs/eventRender
                  */
-                eventRender: function(calEvent) {
+                eventRender: function(calEvent, $elem) {
+                    // Convert all meta to HTML attributes
+                    var prefix = 'data-meta-';
+                    $elem.attr(prefix + 'filter-sync', '');
+                    $.each(calEvent.data.meta, function (k, v) {
+                        $elem.attr(prefix + k, v);
+                    });
+                    // Also insert the due date as a unix timestamp
+                    $elem.attr(prefix + 'duedate', calEvent.start.unix());
+
                     // Always render placeholders in the most basic manner
                     if (calEvent.id === 'placeholder') {
                         return true;
@@ -175,6 +345,15 @@
                         },
                         cache: false
                     });
+                },
+
+                /**
+                 * Triggered after all events have finished rendering.
+                 *
+                 * @see https://fullcalendar.io/docs/viewRender
+                 */
+                eventAfterAllRender: function () {
+                    applyFiltersToCalendarEvents();
                 }
             },
             x: false
@@ -216,7 +395,6 @@
     </div>
 </div>
 
-{% set reportContentId = 'report_content' %}
 {% include '@filters/panel.twig' with {
     contentId: reportContentId,
     panel:     filterPanel,

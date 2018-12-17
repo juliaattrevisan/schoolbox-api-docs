@@ -253,14 +253,16 @@ class Controller extends Base
         $children = $this->userMapper->findByColumn('id', \array_column($this->getSession()->get('children', []), 'id'));
 
         $data = [
-            'student'      => $student,
-            'date'         => $date,
-            'subjects'     => $subjects,
-            'mailHandle'   => $this->getSession()->get('mailhandle'),
-            'currentTerm'  => $term,
-            'children'     => $children,
-            'filterPanel'  => $filterPanel,
-            'filteredPage' => Filter\Page\Model::PAGE_DUE_WORK_CALENDAR,
+            'student'         => $student,
+            'date'            => $date,
+            'subjects'        => $subjects,
+            'mailHandle'      => $this->getSession()->get('mailhandle'),
+            'currentTerm'     => $term,
+            'children'        => $children,
+            'filterPanel'     => $filterPanel,
+            'filteredPage'    => Filter\Page\Model::PAGE_DUE_WORK_CALENDAR,
+            'filterIdSlugMap' => $this->buildFilterIdSlugMap($filterPanel),
+            'sbTerms'         => $this->buildSchoolboxTermData($filterPanel),
         ];
 
         $namespace = Module::BASENAME;
@@ -341,6 +343,54 @@ class Controller extends Base
             'status'  => 200,
             'content' => $this->buildUnthemedHtmlOutput('@learningUpcoming/upcomingInner.twig', $data)->getAsString(),
         ]));
+    }
+
+
+    /**
+     * Returns a array that maps filter ids to slugs so we can apply semantics to the IDs
+     *
+     * @param Filter\Panel $filterPanel
+     * @return array
+     */
+    private function buildFilterIdSlugMap(Filter\Panel $filterPanel): array
+    {
+        $filterIdMap = [];
+        foreach ($filterPanel->getComponents() as $component) {
+            $definition                                     = $component->getDefinition();
+            $filterIdMap[$definition->getFilter()->getId()] = $definition::getSlug();
+        }
+        return $filterIdMap;
+    }
+
+
+    /**
+     * Extracts term data from the filter panel's 'Term Due' component
+     *
+     * @param Filter\Panel $filterPanel
+     * @return array
+     */
+    private function buildSchoolboxTermData(Filter\Panel $filterPanel): array
+    {
+        $termDueComponent = $filterPanel->getComponents()[Filters\Assessment\Term\Due\Definition::class];
+
+        if (!$termDueComponent) {
+            // If not it use, we can just inject an empty array as it will not get used.
+            return [];
+        }
+
+        /** @var Filters\Assessment\Term\Due\Definition $definition */
+        $definition = $termDueComponent->getDefinition();
+
+        $data = [];
+        foreach ($definition->getTerms() as $term) {
+            $finish               = $term->getActualFinish();
+            $data[$term->getId()] = [
+                'start'  => $term->getStart()->getUnixTimeStamp(),
+                'finish' => (null === $finish || $finish->isNull()) ? null : $finish->getUnixTimeStamp(),
+            ];
+        }
+
+        return $data;
     }
 
 
