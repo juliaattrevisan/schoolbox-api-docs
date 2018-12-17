@@ -118,7 +118,7 @@ class Javascript extends Base
             'workType'  => $workType ? $workType->getName() : null,
             'workTypeId'=> $workType ? $workType->getId() : null,
             'weighted'  => $assessable->getWeight() ? 1 : 0,
-            'assessmentType' => $assessable::getDefaultTypeName(),
+            'assessmentType' => $assessable->getFamilyName(),
         ];
     }
 
