@@ -20,6 +20,14 @@ interface IDefinition
 {
 
     /**
+     * Returns a string by which to identify this filter
+     *
+     * @return string
+     */
+    public static function getSlug(): string;
+
+
+    /**
      * Return the name of the filter to expose in the UI
      *
      * @return string

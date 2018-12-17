@@ -30,6 +30,18 @@ abstract class AbstractDefinition implements IDefinition
 
 
     /**
+     * Capitalises the UI name, then removes any spaces
+     *
+     * @return string
+     * @throws \DomainException
+     */
+    public static function getSlug(): string
+    {
+        return \lcfirst(\str_replace(' ', '', \ucfirst(self::getName())));
+    }
+
+
+    /**
      * @param Model                       $filter
      * @param Page\Option\Mapper          $filterOptionMapper
      * @param Page\Option\Defaults\Mapper $filterDefaultMapper
