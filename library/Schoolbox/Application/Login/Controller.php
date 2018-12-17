@@ -58,7 +58,7 @@ class Controller extends Base
             $this->getResponse()->redirect->to($redirectUrl, 303);
         }
 
-        $getParams = ['samlAuth' => $samlAuth];
+        $getParams = ['samlAuth' => $samlAuth, 'page' => $page,];
         $data['requestParams'] = http_build_query($getParams);
 
         //Determine if page redirect is valid
