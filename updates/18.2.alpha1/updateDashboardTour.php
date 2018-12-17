@@ -67,7 +67,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'tooltip_uuid' => '49d02613-ff4a-11e7-bd23-08002751fd3c',
             'type'         => 'tooltip',
             'selector'     => '#side-menu-mylinks',
-            'content'      => "This section can be customised by you. By clicking on the pencil icon, you can add your own individual links that are important for you.",
+            'content'      => "<p>This section can be customised by you. By clicking on the pencil icon, you can add your own individual links that are important for you.</p>",
         ],
 
         // Hide side menu
@@ -76,7 +76,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'tooltip_uuid' => '7f5035ca-f14f-11e8-8eb2-08002751fd3c',
             'type'         => 'tooltip',
             'selector'     => '#drawer',
-            'content'      => "If you would like more screen space, you can collapse side panel using this button.",
+            'content'      => "<p>If you would like more screen space, you can collapse side panel using this button.</p>",
         ],
 
         // Top Nav
@@ -85,7 +85,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'tooltip_uuid' => '4f508e88-ff4a-11e7-bd23-08002751fd3c',
             'type'         => 'tooltip',
             'selector'     => '#hybrid-bar',
-            'content'      => "The top menu contains major features and functions that you will need to frequently access. You can hover over the links to get more detail about each link.",
+            'content'      => "<p>The top menu contains major features and functions that you will need to frequently access. You can hover over the links to get more detail about each link.</p>",
         ],
 
         // Search
@@ -94,7 +94,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'tooltip_uuid' => '543e6d76-ff4a-11e7-bd23-08002751fd3c',
             'type'         => 'tooltip',
             'selector'     => '#search',
-            'content'      => "In the top right hand corner you will see a search icon. Hovering over this reveals a search bar. You can search for users, page content, files, folders, links, news and events.",
+            'content'      => "<p>In the top right hand corner you will see a search icon. Hovering over this reveals a search bar. You can search for users, page content, files, folders, links, news and events.</p>",
         ],
 
         // Account details
@@ -147,7 +147,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'tooltip_uuid' => '58170527-ff4a-11e7-bd23-08002751fd3c',
             'type'         => 'tooltip',
             'selector'     => '#notification-toggle',
-            'content'      => "The bell or notifications menu on the right of the screen is used to view your instant notifications. There are many notifications you can receive such as when a user posts in a social stream on a page you are involved in or if you have been added to a group page. Text in bold denotes a link that can be clicked. The notifications found here are customised by you and your school.",
+            'content'      => "<p>The bell or notifications menu on the right of the screen is used to view your instant notifications. There are many notifications you can receive such as when a user posts in a social stream on a page you are involved in or if you have been added to a group page. Text in bold denotes a link that can be clicked. The notifications found here are customised by you and your school.</p>",
         ],
 
         // Dashboard
@@ -156,7 +156,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'tooltip_uuid' => '5c2af8ec-ff4a-11e7-bd23-08002751fd3c',
             'type'         => 'tooltip',
             'selector'     => '#content',
-            'content'      => "The central area of your screen is your dashboard.  This has been setup to provide you with important information and features from around the school.",
+            'content'      => "<p>The central area of your screen is your dashboard.  This has been setup to provide you with important information and features from around the school.</p>",
         ],
     ];
 
