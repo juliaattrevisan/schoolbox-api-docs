@@ -331,14 +331,9 @@ $allow-sidebar-stash: $large-up;
 			display: block;
 		}
 
-		// intro.js fix
+		// Fix slight issue with this appearing on the feature tour
 		&.introjs-fixParent {
 			overflow: visible;
-
-			#profile-options {
-				position: relative;
-				z-index: 1;
-			}
 		}
 	}
 }
