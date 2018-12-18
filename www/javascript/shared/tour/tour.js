@@ -87,7 +87,7 @@ $(function () {
                     doneLabel: buttonLabels.done,
                     skipLabel: buttonLabels.skip,
                     scrollTo: 'tooltip',
-                    disableInteraction: false,
+                    disableInteraction: true,
                     exitOnOverlayClick: false,
                     steps: stepsToDisplay.filter(function(obj) {
                         if (obj.type == 'tooltip') {
