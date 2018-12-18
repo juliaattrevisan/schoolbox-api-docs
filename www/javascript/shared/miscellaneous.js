@@ -42,9 +42,9 @@ $(function () {
     });
 
     // Notifications menu click
-    $('#notification-toggle a, .right-off-canvas-menu label').on('click', function() {
+    $('#notification-toggle a, #notification-toggle-full').on('click', function() {
         $('#inner-wrap').toggleClass('right-open');
-        $(this).toggleClass('raquo');
+        $('#notification-toggle-full').toggleClass('raquo');
 
         var notificationState = $('#inner-wrap').hasClass('right-open') ? 'show' : 'hide';
         $.post('/ajax/notificationsTray', {state: notificationState});
@@ -67,7 +67,7 @@ $(function () {
         $('#off-canvas-wrap').removeClass('move-right');
 
         // Update the hover title on the dock button
-        var title = dockState ? $(this).data('title-undock') : $(this).data('title-dock');
+        var title = dockState ? $(this).data('title-dock') : $(this).data('title-undock');
         $(this).attr('title', title);
 
         // Update the user's sidebar state in the DB

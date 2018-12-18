@@ -140,13 +140,14 @@
 <div class="off-canvas-wrap" id="off-canvas-wrap" data-offcanvas data-transition="overlap">
     <div class="inner-wrap {{ user.current.getHideSidenav ? '' : 'left-open' }} {{ user.current.getHideNotificationsTray ? '' : 'right-open' }}" id="inner-wrap" data-inner-offcanvas>
 
-        {% set dockTitle = 'Dock side menu' %}
-        {% set undockTitle = 'Undock side menu' %}
+        {% set dockTitle = 'Pin side menu' %}
+        {% set undockTitle = 'Unpin side menu' %}
         <aside id="left-menu" class="left-off-canvas-menu hide-for-print" data-side-nav>
             <a 
                 href="#"
                 title="{{ user.current.getHideSidenav ? dockTitle : undockTitle }}"
-                class="left-menu-dock" id="left-menu-dock"
+                class="left-menu-dock"
+                id="left-menu-dock"
                 data-dock-state="{{ not user.current.getHideSidenav }}"
                 data-title-dock="{{ dockTitle }}"
                 data-title-undock="{{ undockTitle }}"
@@ -302,7 +303,7 @@
                 <aside class="right-off-canvas-menu island no-pad hide-for-print" id="msgs" data-unread="{{ ws.unread }}">
                     <ul class="off-canvas-list" id="message-list">
                         <li>
-                            <label title="Show or hide notifications">Notifications</label>
+                            <label id="notification-toggle-full" title="Show or hide notifications">Notifications</label>
                         </li>
                         <li>
                             <a id="msg-mar" class="mark-all-read button icon-approve" href="#">Mark all read</a>

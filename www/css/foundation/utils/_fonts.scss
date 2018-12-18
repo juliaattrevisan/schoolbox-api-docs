@@ -536,10 +536,20 @@
     font-family: $font-family-icon;
 }
 
+.icon-pin-hollow:before {
+    content: "\e912";
+    font-family: $font-family-icon;
+}
+.icon-pin:before {
+    content: "\e913";
+    font-family: $font-family-icon;
+}
+
 .icon-pinterest:before {
     content: '\e652';
     font-family: $font-family-icon;
 }
+
 
 .icon-podcast:before {
     content: '\e653';

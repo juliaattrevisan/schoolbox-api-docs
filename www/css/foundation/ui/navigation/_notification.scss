@@ -85,13 +85,13 @@ $notification-header-background: $navigation-background !default;
 
         @media #{$xlarge-up} {
             &:before {
-                content: '\e64b';
+                content: '\e913'; // pin icon
                 font-family: $font-family-icon;
                 font-size: .8rem;
                 padding-right: 0.5rem;
             }
             &.raquo:before {
-                content: '\e655';
+                content: '\e912'; // hollow pin icon
             }
         }
     }

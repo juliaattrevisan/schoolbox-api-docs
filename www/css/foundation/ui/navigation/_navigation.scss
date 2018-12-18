@@ -115,7 +115,7 @@ $allow-sidebar-stash: $large-up;
 		transform: none;
 
 		.left-menu-dock::after {
-			content: '\e64b';
+			content: '\e912'; // hollow pin icon
 		}
 	}
 	.exit-off-canvas {
@@ -502,7 +502,7 @@ $allow-sidebar-stash: $large-up;
 			}
 
 			&::after {
-				content: '\e655';
+				content: '\e913'; // pin icon
 				font-family: $font-family-icon;
 				padding-left: rem-calc(4);
 			}
@@ -535,7 +535,7 @@ $allow-sidebar-stash: $large-up;
 		li {
 			&.has-submenu > a:after {
 				font-family: $font-family-icon;
-				content: "\e64b";
+				content: "\e913"; // pin icon
 				float: right;
 			}
 			a {
@@ -626,7 +626,7 @@ $allow-sidebar-stash: $large-up;
 
 	.left-submenu .back > a:before{
 		font-family: $font-family-icon;
-		content: "\e655";
+		content: "\e913";
 		font-family: 'schoolbox';
 	}
 }
