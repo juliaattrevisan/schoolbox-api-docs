@@ -1,0 +1,56 @@
+{#
+ # Account dropdown of options for the user (profile, settings, logout, etc) & including switch users
+ # This was split into a twig fragment so that it could be used on the mobile and non-mobile versions of the account menu
+ #
+ # @param Object user
+ # @param boolean mobile
+ #}
+{% if mobile %}
+    {% set mobileSuffix = '-mobile' %}
+{% else %}
+    {% set mobileSuffix = '' %}
+{% endif %}
+
+<ul id="profile-options{{ mobileSuffix }}">
+    {% if not mobile %}
+        <li class="separator">{{ user.current.fullName }}</li>
+    {% endif %}
+
+    <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
+    <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
+    {% if user.current.superuser %}
+        <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
+    {% endif %}
+    <li><a class="icon-logout" href="/logout.php">Logout</a></li>
+</ul>
+{% if user.current.linkedUser is not empty or user.previous  %}
+    <ul id="switch-user{{ mobileSuffix }}">
+        <li class="separator">Switch User</li>
+
+        {% if user.current.linkedUser is not empty %}
+            {% for linkedUser in user.current.linkedUser %}
+                <li class="user">
+                    <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
+                        <div class="card small-12">
+                            <img src="/portrait.php?userId={{ linkedUser.externalId }}&amp;size=square64" />
+                            <p>{{ linkedUser.formatName }}</p>
+                            <p class="meta">{{ linkedUser.role.name }}</p>
+                        </div>
+                    </a>
+                </li>
+            {% endfor %}
+        {% endif %}
+
+        {% if user.previous %}
+            <li class="user">
+                <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
+                    <div class="card small-12">
+                        <img src="/portrait.php?userId={{ user.previous.externalId }}&amp;size=square64" />
+                        <p>{{ user.previous.formatName }}</p>
+                        <p class="meta">{{ user.previous.role.name }}</p>
+                    </div>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+{% endif %}

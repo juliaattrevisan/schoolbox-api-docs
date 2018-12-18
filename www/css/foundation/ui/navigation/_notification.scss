@@ -4,17 +4,16 @@ $notification-header-background: $navigation-background !default;
 
 // where data-unread != 0
 .right-small a {
-    width: $tabbar-menu-icon-width;
+    background: $notification-header-background;
+    width: $tabbar-height;
     height: $tabbar-height;
     display: block;
     cursor: pointer;
 
-    background: $notification-header-background;
-
     /* The Notification Bell
      */
     &[data-unread] {
-        padding-left: 1.75rem;
+        padding-left: 1.65rem;
         color: $navigation-foreground;
 
         /* The colour of the bell in its idle state
@@ -45,7 +44,9 @@ $notification-header-background: $navigation-background !default;
 }
 
 .right-off-canvas-menu {
-    background: transparent;
+    background-color: $off-canvas-background;
+    flex: 0 0 $off-canvas-width;
+
     &[data-unread="0"] {
         ul.off-canvas-list {
             label {
@@ -69,24 +70,28 @@ $notification-header-background: $navigation-background !default;
             }
         }
     }
-    ul.off-canvas-list {
-        label {
-            height: $tabbar-height;
-            line-height: $tabbar-height;
-            padding-top: 0;
-            padding-bottom: 0;
-            background: $notification-unread-background;
-            color: $notification-unread-color;
-            z-index: 1003;
-            @media #{$xlarge-up} {
-                &:after {
-                    content: "\00BB";
-                    font-size: $h2-font-size;
-                    padding-left: 0.5rem;
-                }
-                &.raquo:after {
-                    content: "\00AB";
-                }
+    ul.off-canvas-list label {
+        height: $tabbar-height;
+        line-height: $tabbar-height;
+        padding-top: 0;
+        padding-bottom: 0;
+        background: $notification-unread-background;
+        color: $notification-unread-color;
+        z-index: 1003;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        @media #{$xlarge-up} {
+            &:before {
+                content: '\e913'; // pin icon
+                font-family: $font-family-icon;
+                font-size: .8rem;
+                padding-right: 0.5rem;
+            }
+            &.raquo:before {
+                content: '\e915'; // hollow pin icon
             }
         }
     }

@@ -1,5 +1,22 @@
+.inner-wrap {
+    @include flex;
+    height: 100%;
+}
+
+.main {
+    flex: 1;
+    overflow: hidden;
+}
+
 #container {
     padding-top: 1rem;
+    min-height: calc(100vh - 222px);
+
+    @media #{$medium-up} {
+        // min-height - top menu + footer heights
+        min-height: calc(100vh - 111px);
+    }
+
     @media #{$large-up} {
         padding: 1rem;
     }

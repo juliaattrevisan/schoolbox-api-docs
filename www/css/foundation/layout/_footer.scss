@@ -1,19 +1,12 @@
 $footer-margin-bottom: 1rem;
 
 #footer {
-    /* http://www.w3schools.com/cssref/pr_margin.asp
-     * Three-argument margin: third arg is margin-bottom
-     */
     @media #{$small-up} {
-        margin: 0 1rem 17rem;
+        margin: 0 1rem;
     }
 
     @media #{$medium-up} {
-        margin: 0 2.5rem 17rem;
-    }
-
-    @media #{$large-up} {
-        margin: 0 3rem 17rem;
+        margin: 0 2rem;
     }
 
     ul {

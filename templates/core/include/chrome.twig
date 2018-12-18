@@ -49,96 +49,8 @@
 
         {% autoescape 'js' %}
         <script type="text/javascript">
-
             // Disable $ formula encoding
             M.$mathQ = false;
-
-            $(function() {
-                $('#infoPanel').find('a[data-menu]').flyout();
-                $('#nav').touchMenu()
-                    .scrollToTop({
-                            cancel: function () {
-                                return !$(this).parent().hasClass('has-submenu');
-                            }
-                        }
-                    );
-
-                var s = $('#search');
-                s.on('click', '[data-jsubmit]', function () {
-                    if (s.find('input').val()) {
-                        s.submit();
-                    }
-                });
-
-                /* Replace all editor video/audio placeholders
-                 */
-                $.fn.schoolboxResource_ProxyReplacment();
-
-                $('.right-small, .right-off-canvas-menu').hover(function(){
-                        $('.right-off-canvas-menu').addClass('overlap');
-                    },
-                    function(){
-                        $('.right-off-canvas-menu').removeClass('overlap');
-                    });
-
-                $('.right-small a, .right-off-canvas-menu label').click(function() {
-                    $('.inner-wrap').toggleClass('docking');
-                    $(this).toggleClass('raquo');
-
-                    if ($('.inner-wrap').hasClass('docking')){
-                        $.post('/ajax/notificationsTray', {state: 'show'}, function(responseText) {
-                        });
-                    }
-                    else {
-                        $.post('/ajax/notificationsTray', {state: 'hide'}, function(responseText) {
-                        });
-                    }
-                });
-
-                /* Ensure modals always appear in a visible location
-                 *
-                 * The callback open.fndtn.reveal doesn't fire when the
-                 * modal is built dynamically with js -_-
-                 *
-                 * Also, arbitrary 6.25rem padding at top (in the design)
-                 */
-                var modalTop = 6.25*16;
-
-                $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
-                    $(this).css({'top': $(window).scrollTop() + modalTop + 'px'});
-                });
-
-                $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
-                    $(this).css({'top': $(window).scrollTop() + modalTop + 'px'});
-                });
-
-                var splash, d, x, y, splashTimeout;
-                $(document).on('click', ".button, button, .sub-nav a, .pagination a, .flex-list a, [data-component-palette]", function(e) {
-
-                    splash = $(this).find(".splash");
-                    splash.removeClass('animate');
-                    clearTimeout(splashTimeout);
-
-                    if (splash.length === 0) {
-                        $(this).prepend("<span class='splash'></span>");
-                    }
-
-                    if (!splash.height() && !splash.width()) {
-                        d = Math.max($(this).outerWidth(), $(this).outerHeight());
-                        splash.css({height: d, width: d});
-                    }
-
-                    x = e.pageX - $(this).offset().left - splash.width()/2;
-                    y = e.pageY - $(this).offset().top - splash.height()/2;
-
-                    splash.css({top: y+'px', left: x+'px'}).addClass("animate");
-
-                    // Remove the animation after a bit of time, otherwise this animation will happen every time the element hides and becomes visible again
-                    splashTimeout = setTimeout(function() {
-                        splash.removeClass('animate');
-                    }, 300);
-                });
-            });
 
             // Date formats (global variable)
             var siteLocation = "{{ config.site_location }}";
@@ -228,153 +140,49 @@
 
 </head>
 <body class="{{ ws.enabled ? '' : 'disableNotifications' }}">
-<div class="off-canvas-wrap docs-wrap" data-offcanvas>
-    <div class="inner-wrap {{ user.current.getHideNotificationsTray ? '' : 'docking' }}">
+<div class="off-canvas-wrap" id="off-canvas-wrap" data-offcanvas data-transition="overlap">
+    <div class="inner-wrap {{ user.current.getHideSidenav ? '' : 'left-open' }} {{ user.current.getHideNotificationsTray ? '' : 'right-open' }}" id="inner-wrap" data-inner-offcanvas>
 
-        {% block instant %}
-            {% if user.current.id %}
-            <aside class="right-off-canvas-menu island no-pad hide-for-print" id="msgs" data-unread="{{ ws.unread }}">
-                <ul class="off-canvas-list" id="message-list">
-                    <li>
-                        <label title="Click to hide or show Notifications">Notifications</label>
-                    </li>
-                    <li>
-                        <a id="msg-mar" class="mark-all-read button icon-approve" href="#">Mark all read</a>
-                    </li>
-                    <li>
-                        <section>
-                            <ul id="msg-content" class="action-list">
-                                <li data-msgitem class="actions-small-1">
-                                    <div class="list-item">
-                                        <div class="compact card wrap-down small-12">
-                                            <a data-msgitem-href class="no-pad">
-                                                <img data-msgitem-thumb />
-                                                <p data-msgitem-title></p>
-                                                <p class="meta spaced" data-msgitem-time></p>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <nav>
-                                        <a data-msgitem-ack class="icon-approve no-pad" title="Mark as read"></a>
-                                    </nav>
-                                </li>
-                            </ul>
-                        </section>
-                    </li>
-                    <li>
-                        <a href="/messages" class="button" data-msgfooter-action>
-                            <span class="connecting"></span>&nbsp;Connecting&hellip;
-                        </a>
-                    </li>
-                </ul>
-            </aside>
-            <div id="alert-dialog" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-                <h2 data-modal-title></h2>
-                <ul id="alert-content" class="information-list no-pad">
-                    <li data-msgitem>
-                        <div class="card wrap-down small-12">
-                            <a data-msgitem-href>
-                                <img data-msgitem-thumb />
-                                <p data-msgitem-title></p>
-                            </a>
-                        </div>
-                    </li>
-                </ul>
-                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-            </div>
-
-            {% autoescape 'js' %}
-            <script type="text/javascript">
-                $(function () {
-                    // launch the notifier
-                    $('#msgs').notifier({
-                        host:     '{{ ws.host }}',
-                        port:     Number('{{ ws.port }}'),
-                        path:     '{{ ws.path }}',
-                        secure:   Boolean('{{ ws.secure }}'),
-                        unread:   Number('{{ ws.unread }}'),
-                        maxstack: Number('{{ ws.stackLimit }}')
-                    });
-
-                    $('#alert-dialog').on('click', 'a.action', function (e) {
-                        e.preventDefault();
-                    })
-                });
-            </script>
-            {% endautoescape %}
-            {% endif %}
-        {% endblock %}
-
-
-        <aside class="left-off-canvas-menu hide-for-print" data-side-nav>
+        {% set dockTitle = 'Pin side menu' %}
+        {% set undockTitle = 'Unpin side menu' %}
+        <aside id="left-menu" class="left-off-canvas-menu hide-for-print" data-side-nav>
+            <a 
+                href="#"
+                title="{{ user.current.getHideSidenav ? dockTitle : undockTitle }}"
+                class="left-menu-dock"
+                id="left-menu-dock"
+                data-dock-state="{{ not user.current.getHideSidenav }}"
+                data-title-dock="{{ dockTitle }}"
+                data-title-undock="{{ undockTitle }}"
+            ></a>
             <div class="logo-wrapper">
                 <a href="/" class="logo">
                     <img src="/images/logo.php?logo=skin_logo_large&size=normal" srcset="/images/logo.php?logo=skin_logo_large&size=normal 1x,/images/logo.php?logo=skin_logo_large&size=hidpi 2x" alt="{{ config.school_name }}"/>
                 </a>
             </div>
 
-            {% block accountMenu %}
+            {% block accountMenuMobile %}
                 {% if user.current.id %}
                     <div class="row">
-                        <ul class="account-menu accordion" id="account-menu" data-accordion>
+                        <ul class="account-menu-mobile accordion" id="account-menu-mobile" data-accordion>
                             <li class="accordion-navigation">
-                                <a href="#accountContent" class="profile-drop" id="profile-accordion">
+                                <a href="#account-content-mobile" class="profile-drop" id="profile-accordion">
                                     <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square80"/>
                                     <span>{{ user.current.formatName }}</span>
                                 </a>
-                                <div id="accountContent" class="content">
-                                    <ul id="profile-options">
-                                        <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
-                                        <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
-                                        {% if user.current.superuser %}
-                                            <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
-                                        {% endif %}
-                                        <li><a class="icon-logout" href="/logout.php">Logout</a></li>
-                                    </ul>
-                                    <ul id="avatar2">
-
-                                        {% if user.current.linkedUser is not empty %}
-                                            <li>
-                                                <ul id="switch-user">
-                                                    <li class="separator">Switch User</li>
-                                                    {% for linkedUser in user.current.linkedUser %}
-                                                        <li class="switch-user">
-                                                            <div class="card small-12">
-                                                                <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
-                                                                    <img src="/portrait.php?userId={{ linkedUser.externalId }}&amp;size=square64" />
-                                                                    <p>{{ linkedUser.formatName }}</p>
-                                                                    <p class="meta">{{ linkedUser.role.name }}</p>
-                                                                </a>
-                                                            </div>
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </li>
-                                        {% endif %}
-
-                                        {% if user.previous %}
-                                            <li class="switch-user">
-                                                <div class="card small-12">
-                                                    <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
-                                                        <img src="/portrait.php?userId={{ user.previous.externalId }}&amp;size=square64" />
-                                                        <p>{{ user.previous.formatName }}</p>
-                                                        <p class="meta">{{ user.previous.role.name }}</p>
-                                                    </a>
-                                                </div>
-                                            </li>
-                                        {% endif %}
-                                    </ul>
+                                <div id="account-content-mobile" class="content">
+                                    {% include 'include/accountMenu.twig' with {user: user, mobile: true} only %}
                                 </div>
                             </li>
                         </ul>
                     </div>
-                {% endif %}
-            {% endblock accountMenu %}
+                {% endif %}	
+            {% endblock accountMenuMobile %}
 
             {% block menuTopOffCanvas %}
                 {% if user.current.id %}
                     <nav class="row">
-                        <ul class="off-canvas-list second-nav">
+                        <ul class="off-canvas-list second-nav" id="overflow-nav">
                             {% include '@menuTop/renderer.twig' with topMenu only %}
                         </ul>
                     </nav>
@@ -388,18 +196,17 @@
             {% endblock menuSideOffCanvas %}
         </aside>
 
-        <!-- START CONTAINER -->
-        <section class="main-section">
+        <!-- CONTAINER -->
+        <section class="main">
             <div id="header">
                 {# Never used AFAICT #}
                 {#{MAIN_BANNER_REGION}#}
             </div>
 
-            <!-- The Schoolbox Hybrid Bar -->
             <div class="hybrid-bar hide-for-print" id="hybrid-bar">
                 <nav class="tab-bar">
                     <section class="left-small">
-                        <a class="left-off-canvas-toggle menu-icon hide-for-large-up" id="left-off-canvas-toggle" href="#"><span></span></a>
+                        <a class="left-off-canvas-toggle menu-icon" id="left-off-canvas-toggle" href="left-menu"><span></span></a>
                     </section>
 
                     <section class="tab-bar-section">
@@ -409,7 +216,7 @@
 
                         {% block menuTop %}
                             {% if user.current.id %}
-                                <ul id="top-menu">
+                                <ul id="top-menu" class="top-menu">
                                     {% include '@menuTop/renderer.twig' with topMenu only %}
                                 </ul>
                             {% endif %}
@@ -417,12 +224,23 @@
 
                         {% block search %}
                             {% if user.current.id %}
-                                <form id="search" action="/search" method="get">
+                                <form id="search" class="global-search" action="/search" method="get">
                                     <input id="search-field" type="text" name="keyword" placeholder="Search"/>
                                     <label data-jsubmit for="search-field" class="icon-search no-text"></label>
                                 </form>
                             {% endif %}
                         {% endblock search %}
+
+                        {% block accountMenu %}
+                            {% if user.current.id %}
+                                <a href="#" id="profile-drop" title="{{ user.current.fullName }}" class="account-menu">
+                                    <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square80"/>
+                                </a>
+                                <div id="account-content" class="account-drop">
+                                    {% include 'include/accountMenu.twig' with {user: user} only %}
+                                </div>
+                            {% endif %}
+                        {% endblock accountMenu %}
                     </section>
 
                     {% block messaging %}
@@ -455,7 +273,7 @@
                         <li><a href="http://www.schoolbox.com.au" title="Schoolbox, Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a>
                             {{ config.site_version }} by <a href="http://www.alaress.com.au">Alaress</a></li>
                         {% if config.feedback_url and config.feedback_text %}
-                        <li><a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
+                            <li><a href="{{ config.feedback_url }}">{{ config.feedback_text }}</a></li>
                         {% endif %}
                     </ul>
                 </div>
@@ -482,6 +300,80 @@
             {{ debugBar.body | raw }}
         </section>
         <!-- END CONTAINER -->
+
+        {% block instant %}
+            {% if ws.enabled and user.current.id %}
+                <aside class="right-off-canvas-menu island no-pad hide-for-print" id="msgs" data-unread="{{ ws.unread }}">
+                    <ul class="off-canvas-list" id="message-list">
+                        <li>
+                            <label id="notification-toggle-full" title="Show or hide notifications" class="{{ user.current.getHideNotificationsTray ? 'raquo' : '' }}">Notifications</label>
+                        </li>
+                        <li>
+                            <a id="msg-mar" class="mark-all-read button icon-approve" href="#">Mark all read</a>
+                        </li>
+                        <li>
+                            <section>
+                                <ul id="msg-content" class="action-list">
+                                    <li data-msgitem class="actions-small-1">
+                                        <div class="list-item">
+                                            <div class="compact card wrap-down small-12">
+                                                <a data-msgitem-href class="no-pad">
+                                                    <img data-msgitem-thumb />
+                                                    <p data-msgitem-title></p>
+                                                    <p class="meta spaced" data-msgitem-time></p>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <nav>
+                                            <a data-msgitem-ack class="icon-approve no-pad" title="Mark as read"></a>
+                                        </nav>
+                                    </li>
+                                </ul>
+                            </section>
+                        </li>
+                        <li>
+                            <a href="/messages" class="button" data-msgfooter-action>
+                                <span class="connecting"></span>&nbsp;Connecting&hellip;
+                            </a>
+                        </li>
+                    </ul>
+                </aside>
+                <div id="alert-dialog" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+                    <h2 data-modal-title></h2>
+                    <ul id="alert-content" class="information-list no-pad">
+                        <li data-msgitem>
+                            <div class="card wrap-down small-12">
+                                <a data-msgitem-href>
+                                    <img data-msgitem-thumb />
+                                    <p data-msgitem-title></p>
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                </div>
+
+                {% autoescape 'js' %}
+                <script type="text/javascript">
+                    $(function () {
+                        // launch the notifier
+                        $('#msgs').notifier({
+                            host:     '{{ ws.host }}',
+                            port:     Number('{{ ws.port }}'),
+                            path:     '{{ ws.path }}',
+                            secure:   Boolean('{{ ws.secure }}'),
+                            unread:   Number('{{ ws.unread }}'),
+                            maxstack: Number('{{ ws.stackLimit }}')
+                        });
+
+                        $('#alert-dialog').on('click', 'a.action', function (e) {
+                            e.preventDefault();
+                        })
+                    });
+                </script>
+                {% endautoescape %}
+            {% endif %}
+        {% endblock %}
         <a href="#" class="exit-off-canvas"></a>
     </div>
 </div>

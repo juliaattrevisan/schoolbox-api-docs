@@ -48,18 +48,18 @@
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 <script type="text/javascript">
-  $(function () {
-    // launch the notifier
-    $('#msgs').notifier({
-      host:     '{WEBSOCKET_HOST}',
-      port:     '{WEBSOCKET_PORT}',
-      path:     '{WEBSOCKET_PATH}',
-      secure:   '{PAGE_SECURE}',
-      maxstack: '{WEBSOCKET_STACK_LIMIT}'
-    });
+    $(function () {
+        // launch the notifier
+        $('#msgs').notifier({
+            host:     '{WEBSOCKET_HOST}',
+            port:     '{WEBSOCKET_PORT}',
+            path:     '{WEBSOCKET_PATH}',
+            secure:   '{PAGE_SECURE}',
+            maxstack: '{WEBSOCKET_STACK_LIMIT}'
+        });
 
-    $('#alert-dialog').on('click', 'a.action', function (e) {
-      e.preventDefault();
-    })
-  });
+        $('#alert-dialog').on('click', 'a.action', function (e) {
+            e.preventDefault();
+        })
+    });
 </script>

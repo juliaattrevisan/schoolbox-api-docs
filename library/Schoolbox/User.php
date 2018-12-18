@@ -130,6 +130,13 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     private $hideTimetable;
 
     /**
+     * Hide side navigation
+     *
+     * @var bool
+     */
+    private $hideSidenav;
+
+    /**
      * Hide notifications tray
      *
      * @var bool
@@ -1201,6 +1208,23 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
         $this->setEmailRecipients($this->findEmailRecipients($this));
     }
 
+
+    /**
+     * Hide the sidenav
+     */
+    public function hideSidenav()
+    {
+        $this->setHideSidenav(true);
+    }
+
+    /**
+     * Show the sidenav
+     */
+    public function showSidenav()
+    {
+        $this->setHideSidenav(false);
+    }
+
     /**
      * Hide notifications tray
      */
@@ -1297,6 +1321,32 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     {
         $this->hideNotificationsTray = $hideNotificationsTray;
     }
+
+
+    /**
+     * Get hide side navigation setting
+     *
+     * @return null|bool
+     */
+    public function getHideSidenav(): ?bool
+    {
+        return $this->hideSidenav;
+    }
+
+
+    /**
+     * Set hide side navigation setting
+     *
+     * @param null|bool $hideSidenav
+     * @return $this
+     */
+    public function setHideSidenav(?bool $hideSidenav): self
+    {
+        $this->hideSidenav = $hideSidenav;
+        return $this;
+    }
+
+
 
     /**
      * `Schoolbox\Config\Loader` got removed in 16.0.0, but it got serialized.

@@ -508,16 +508,29 @@ class SitePage extends Page
      */
     public function renderInstantMessages()
     {
+
+        /* Dock the sidenav
+         */
+        if ($this->user->getHideSidenav()) {
+            $this->setVar([
+                'HIDE_SIDENAV' => ''
+            ]);
+        } else {
+            $this->setVar([
+                'HIDE_SIDENAV' => 'left-open'
+            ]);
+        }
+
+
         /* Docking the tray
          */
         if ($this->user->getHideNotificationsTray()) {
-
             $this->setVar([
                 'HIDE_NOTIFICATIONS_TRAY' => ''
             ]);
         } else {
             $this->setVar([
-                'HIDE_NOTIFICATIONS_TRAY' => 'docking'
+                'HIDE_NOTIFICATIONS_TRAY' => 'right-open'
             ]);
         }
 

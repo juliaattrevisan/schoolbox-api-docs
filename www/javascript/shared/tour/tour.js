@@ -14,11 +14,16 @@ $(function () {
         // Close an accordion
         'accordion.close': function (element) {
             $(element).foundation('accordion', 'close');
+        },
+
+        // Open a standard dropdown
+        'dropdown.open': function (element) {
+            $(element).addClass('open');
         }
     };
 
     // Only show tours windows larger than medium (has sidebar showing)
-    if (typeof(window.tourData) !== 'undefined' && window.tourData.length > 0 && !windowIsMediumDown()) {
+    if (typeof(window.tourData) !== 'undefined' && window.tourData.length > 0 && !windowIsMediumWideDown()) {
         // Function to initiate a joyride
 
         window.tourStart = function (uuid) {
@@ -82,7 +87,7 @@ $(function () {
                     doneLabel: buttonLabels.done,
                     skipLabel: buttonLabels.skip,
                     scrollTo: 'tooltip',
-                    disableInteraction: false,
+                    disableInteraction: true,
                     exitOnOverlayClick: false,
                     steps: stepsToDisplay.filter(function(obj) {
                         if (obj.type == 'tooltip') {

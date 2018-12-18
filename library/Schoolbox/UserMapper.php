@@ -98,6 +98,7 @@ class UserMapper extends Mapper
         $this->uses('enabled', self::TYPE_BOOLEAN);
         $this->uses('hide_contacts', self::TYPE_BOOLEAN);
         $this->uses('hide_timetable', self::TYPE_BOOLEAN);
+        $this->uses('hide_sidenav', self::TYPE_BOOLEAN);
         $this->uses('hide_notifications_tray', self::TYPE_BOOLEAN);
         $this->uses('display_grade_graph', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

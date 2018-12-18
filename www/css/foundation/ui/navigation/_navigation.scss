@@ -16,7 +16,7 @@ $include-html-off-canvas-classes: $include-html-classes !default;
 
 $tabbar-bg: $navigation-background;
 $tabbar-height: rem-calc(72);
-$tabbar-icon-width: rem-calc(80);
+$tabbar-icon-width: rem-calc(72);
 $tabbar-line-height: $tabbar-height;
 $tabbar-color: $black;
 $tabbar-middle-padding: 0;
@@ -33,9 +33,9 @@ $tabbar-header-margin: 0;
 $tabbar-menu-icon-color: $navigation-foreground;
 $tabbar-menu-icon-hover: $navigation-hover;
 $tabbar-menu-icon-text-indent: rem-calc(35);
-$tabbar-menu-icon-width: $tabbar-icon-width;
+$tabbar-menu-icon-width: rem-calc(80);
 $tabbar-menu-icon-height: $tabbar-height;
-$tabbar-menu-icon-padding: 0;
+$tabbar-menu-icon-padding: 0.875rem;
 
 $tabbar-hamburger-icon-width: rem-calc(($base-font-size));
 $tabbar-hamburger-icon-left: false;
@@ -72,19 +72,22 @@ $off-canvas-back-hover-border-top: 0px;
 $off-canvas-back-hover-border-bottom: none;
 
 // Off Canvas Back-Link Overlay
-$off-canvas-overlay-transition: background 300ms ease;
-$off-canvas-overlay-cursor: pointer;
-$off-canvas-overlay-box-shadow: -1px 0 1px rgba(#000, 0.5), 1px 0 1px rgba(#000, 0.5);
-$off-canvas-overlay-background: rgba(#000, 0.5);
-$off-canvas-overlay-background-hover: rgba(#000, 0.5);
+$off-canvas-overlay-transition: background 100ms ease;
+$off-canvas-overlay-cursor: default;
+$off-canvas-overlay-box-shadow: none;
+$off-canvas-overlay-background: transparent;
+$off-canvas-overlay-background-hover: transparent;
 
 // Transition Variables
-$menu-slide: transform 300ms ease 0s;
+$menu-slide: transform 100ms ease;
 
 @import "../../../../javascript/components/foundation/scss/foundation/components/magellan";
 @import "../../../../javascript/components/foundation/scss/foundation/components/offcanvas";
 
 $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($background: $tabbar-bg, $opacity: 0.65));
+
+// The point at which to allow the left sidebar to dock, the account menu to move to the top menu, and the full logo to show
+$allow-sidebar-stash: $large-up;
 
 /* Display a logo/background for non-authenticated screens
  * like Forgotten Password, Privacy Policy, Feedback Form etc
@@ -96,57 +99,86 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	padding: 0;
 	background-color: $tabbar-bg;
 	height: $tabbar-height;
+
 	img {
-		display: block;
-		max-height: 5rem;
-		max-width: none;
+		height: $tabbar-height;
+		margin-left: 1rem;
 	}
 }
 
-/* Main navigation tab bar at top
- */
-.hybrid-bar{
+.move-right {
+	>.inner-wrap {
+		transform: none;
+	}
+	.left-off-canvas-menu {
+		box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+		transform: none;
+
+		.left-menu-dock::after {
+			content: '\e915'; // hollow pin icon
+		}
+	}
+	.exit-off-canvas {
+		z-index: 1000;
+	}
+}
+
+// Main navigation tab bar at top
+.hybrid-bar {
 	.logo {
-		width: $tabbar-menu-icon-width;
+		width: $tabbar-icon-width;
 		height: $tabbar-height;
 		float: left;
-		@media #{$mediumwide-up} {
-			display: none !important;
-		}
+
 		img{
 			display: block;
 			height: 100%;
 			max-width: none;
 		}
 	}
+
 	.left-small{
+		width: $tabbar-height;
 		z-index: 100;
+
 		.menu-icon{
-			height: $tabbar-height;
+			width: $tabbar-height;
+			span::after {
+				left: 1.75rem;
+			}
 		}
 	}
-	.right-small{
-		z-index: 1002;
+
+	.right-small {
+		width: $tabbar-height;
+		z-index: 100;
 	}
+
 	.tab-bar {
 		position: inherit;
 	}
+
 	.tab-bar-section{
 		width: 100%;
+		padding-left: $tabbar-height;
 		position: relative;
 	}
-	#search {
+
+	.global-search {
+		background: $navigation-background;
 		margin: 0;
 		position: absolute;
-		right: $tabbar-menu-icon-width;
+		right: $tabbar-icon-width;
 		top: 0;
+		width: $tabbar-height;
 		@include placeholder-color(transparent, $font-weight-normal);
+
 		input[type="text"]{
 			border: 0;
 			background-color: transparent;
 			color: $body-bg;
 			height: $tabbar-height;
-			width: $tabbar-menu-icon-width;
+			width: $tabbar-height;
 			padding: $base-font-size;
 			margin: 0;
 			opacity: 0;
@@ -154,21 +186,21 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 		&:hover, &.focus {
 			width: 100%;
+			padding-left: ($tabbar-icon-width*2);
 			@include placeholder-color($black, $font-weight-normal);
-			padding-left: $tabbar-icon-width;
 		}
 
 		/* Search icon in its idle state
 		 */
 		.icon-search {
-			@include absolute (0, auto, auto, 32px);
+			@include absolute (0, auto, auto, 28px);
 			@include transition(all, 0.3s, ease-in);
+			line-height: inherit;
 			margin: 0;
 			z-index: 1;
 			&:before {
 				color: $navigation-foreground;
 			}
-			line-height: inherit;
 		}
 
 		/* Input field when Search feature is activated
@@ -198,7 +230,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 	}
 
-	ul{
+	.top-menu {
 		@include inline-list;
 		margin: 0;
 		height: inherit;
@@ -209,7 +241,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			width: $tabbar-menu-icon-width;
 			a {
 				height: $tabbar-height;
-				padding: rem-calc(($base-font-size - 2)) 0;
+				padding: $tabbar-menu-icon-padding 0;
 				text-align: center;
 				@extend .size-24;
 				@extend .no-text;
@@ -246,28 +278,103 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			}
 		}
 	}
+
 	@media #{$small-only} {
-		ul{
+		.top-menu {
 			padding: 0;
 			position: absolute;
 			left: 0;
 			top: 80px;
 			width: 100%;
-			li{
+			li {
 				width: 25%;
 			}
+		}
+	}
+
+	// Account menu in top bar
+	.account-menu {
+		display: none;
+	}
+
+	@media #{$allow-sidebar-stash} {
+		.account-menu {
+			display: block;
+			right: $tabbar-icon-width;
+			position: absolute;
+			top: 0;
+			height: $tabbar-height;
+			width: $tabbar-height;
+
+			img {
+				vertical-align: top;
+			}
+		}
+	}
+
+	.account-drop {
+		@include box-shadow(-2px, 2px, 4px, rgba(0,0,0,0.15));
+		display: none;
+		right: $tabbar-icon-width;
+		position: absolute;
+		max-height: rem-calc(500);
+		overflow-y: scroll;
+		text-align: left;
+		width: $off-canvas-width;
+		z-index: 100;
+
+		@media #{$small-only} {
+			top: $tabbar-height;
+		}
+
+		&.open {
+			display: block;
+		}
+
+		// Fix slight issue with this appearing on the feature tour
+		&.introjs-fixParent {
+			overflow: visible;
 		}
 	}
 }
 
 // When notifications are disabled
-.disableNotifications .hybrid-bar #search {
-	right: 0;
-	&:hover, &.focus{
-		padding-left: 0;
+.disableNotifications .hybrid-bar {
+	.global-search {
+		right: 0;
+		padding-left: $tabbar-icon-width;
 	}
 }
 
+@media #{$allow-sidebar-stash} {
+	.inner-wrap:not(.left-open) .hybrid-bar .global-search {
+		&:hover, &.focus {
+			padding-left: $tabbar-icon-width * 3;
+		}
+	}
+
+	.hybrid-bar .global-search {
+		right:  $tabbar-icon-width * 2; // Adjust right offset for the account menu
+	}
+
+	// When notifications are disabled
+	.disableNotifications .hybrid-bar {
+		.global-search {
+			right: $tabbar-icon-width;
+		}
+
+		.account-menu,
+		.account-drop {
+			right: 0;
+		}
+	}
+
+	.disableNotifications .inner-wrap:not(.left-open) .hybrid-bar .global-search {
+		&:hover, &.focus {
+			padding-left: $tabbar-icon-width * 2;
+		}
+	}
+}
 
 .left-off-canvas-toggle,
 .right-off-canvas-toggle {
@@ -285,35 +392,13 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 }
 
-/* Off Canvas Menu
- * This can be summoned using the hamburger if it's not already visible
- */
+// Left sidebar
 .left-off-canvas-menu {
-	/* A background colour specifically for the logo/crest
-	 * so a school logo won't be mashed by the off-canvas colour
-	 * set selections they are allowed to make
-	 */
-	.logo-wrapper {
-		background-color: $logo-background;
-
-		.logo {
-			@media #{$medium-down} {
-				display: none !important;
-			}
-			display: block;
-			padding: 2rem 0;
-			img {
-				display: block;
-				margin: 0 auto;
-			}
-		}
-	}
-
 	/* Profile Accordion Menu
 	 * This is the currently-logged-in user's dom element
 	 * Appears when you click a guy's username in the left menu
 	 */
-	.account-menu {
+	.account-menu-mobile {
 		color: $off-canvas-foreground;
 		background-color: transparent;
 		@include single-transition(all, 0.15s, linear);
@@ -323,17 +408,19 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 
 		.accordion-navigation {
-			.profile-drop{
+			.profile-drop {
 				background: transparent;
 				color: $off-canvas-foreground;
 				display: table;
 				padding: 0;
 				font-size: $paragraph-font-size;
 				width: $off-canvas-width;
-				img{
+
+				img {
 					display: table-cell;
 					vertical-align: middle;
 				}
+
 				span {
 					white-space: nowrap;
 					overflow: hidden;
@@ -345,6 +432,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 					max-width: 122px;
 				}
 			}
+
 			.profile-drop:after {
 				font-family: $font-family-icon;
 				content: "\e901";
@@ -353,17 +441,21 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 				padding: 0px 10px;
 				vertical-align: middle;
 			}
-			&:hover .profile-drop{
+
+			&:hover .profile-drop {
 				background-color: $off-canvas-hover;
 			}
-			&.active .profile-drop{
+
+			&.active .profile-drop {
 				background-color: $off-canvas;
 			}
+
 			&.active > a:after {
 				font-family: $font-family-icon;
 				content: "\e900";
 			}
-			.content{
+
+			.content {
 				display: block;
 				max-height: 0;
 				visibility: hidden;
@@ -378,94 +470,59 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			}
 		}
 
-		.content{
+		.content {
 			padding: 0;
-			a {
-				color: $off-canvas-foreground;
-				background-color: $off-canvas;
+		}
+	}
+
+	.left-menu-dock {
+		display: none;
+	}
+
+	@media #{$allow-sidebar-stash} {
+		.account-menu-mobile {
+			display: none;
+		}
+
+		.left-menu-dock {
+			display: block;
+			height: 2.5rem;
+			padding: .5rem;
+			position: absolute;
+			right: 0;
+			width: 2.5rem;
+
+			&:hover {
+				background-color: $off-canvas-hover;
+			}
+
+			&::after {
+				content: '\e913'; // pin icon
+				font-family: $font-family-icon;
+				padding-left: rem-calc(4);
+			}
+		}
+	}
+
+	
+	.logo-wrapper {
+		background-color: $logo-background;
+
+		.logo {
+			display: none;
+		}
+	}
+
+	@media #{$allow-sidebar-stash} {
+		.logo-wrapper .logo {
+			display: block;
+			padding: 2rem 0;
+
+			img {
 				display: block;
-				padding: 0.625rem 0.8125rem;
-				font-size: 1rem;
-				font-weight: 300;
-				&:hover {
-					background-color: $off-canvas-hover;
-				}
-			}
-			ul{
-				margin: 0;
-				list-style: none;
-			}
-			.separator {
-				color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
-				background: $off-canvas;
-				padding: 0.625rem 0.8125rem;
-				font-weight: 300;
-				text-transform: uppercase;
-				cursor: default;
-				font-size: 0.8125rem;
-
-				&:hover {
-					background: $off-canvas;
-				}
-			}
-			.switch-user {
-				background: $off-canvas;
-                overflow: auto;
-
-				&:hover {
-					background: $off-canvas-hover;
-				}
-
-				.card {
-					padding: 0.5rem 0rem 0rem 1rem;
-					.meta {
-						color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
-					}
-					a {
-						background-color: transparent;
-						&:hover {
-							background-color: transparent;
-						}
-					}
-				}
+				margin: 0 auto;
 			}
 		}
-	}
-
-	/* These are used to style implicit separators within My Groups etc.
-	 * as opposed to explicit .separator elements
-	 *
-	 * Not sure why there's a distinction between the two. That requires
-	 * some additional investigation
-	 */
-	h3, h4 {
-		font-weight: $off-canvas-label-font-weight;
-		padding: $off-canvas-label-padding;
-		margin: $off-canvas-label-margin;
-		font-size: $off-canvas-label-font-size;
-
-		/* Use adaptive for separators
-		 */
-		color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
-		a{
-			color: inherit;
-			&:hover{
-				color: $anchor-font-color-hover;
-			}
-			&[class^="icon-"]:before,
-			&[class*=" icon-"]:before{
-				float: right;
-				padding: 0;
-			}
-		}
-	}
-
-	h3 {
-		text-transform: $off-canvas-label-text-transform;
-	}
-
-	h4 {
-		font-size: $paragraph-font-size;
 	}
 
 	// Left nav arrow override
@@ -473,8 +530,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		li {
 			&.has-submenu > a:after {
 				font-family: $font-family-icon;
-				content: "\e64b";
-				font-family: 'schoolbox';
+				content: "\e64b"; // right caret
 				float: right;
 			}
 			a {
@@ -490,8 +546,52 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 					padding: 0;
 				}
 			}
+
+			/* These are used to style implicit separators within My Groups etc.
+			* as opposed to explicit .separator elements
+			*
+			* Not sure why there's a distinction between the two. That requires
+			* some additional investigation
+			*/
+			h3, h4 {
+				font-weight: $off-canvas-label-font-weight;
+				padding: $off-canvas-label-padding;
+				margin: $off-canvas-label-margin;
+				font-size: $off-canvas-label-font-size;
+
+				/* Use adaptive for separators
+				*/
+				color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
+				a{
+					color: inherit;
+					&:hover{
+						color: $anchor-font-color-hover;
+					}
+					&[class^="icon-"]:before,
+					&[class*=" icon-"]:before{
+						float: right;
+						padding: 0;
+					}
+				}
+			}
+
+			h3.side-menu-heading-link {
+				padding: 0;
+				a {
+					padding: 1rem;
+				}
+			}
+
+			h3 {
+				text-transform: $off-canvas-label-text-transform;
+			}
+
+			h4 {
+				font-size: $paragraph-font-size;
+			}
 		}
 	}
+	
 
 	// 5.5.3 shrinks the submenu for some reason
 	.left-submenu {
@@ -518,6 +618,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			background-color: $off-canvas-hover;
 		}
 	}
+
 	.left-submenu .back > a:before{
 		font-family: $font-family-icon;
 		content: "\e655";
@@ -525,241 +626,154 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 }
 
+// Right sidebar (notifications)
+.right-off-canvas-menu {
+	z-index: 99;
+}
+
+// Common account menu styles (sidebar & top menu variations)
+.account-menu-mobile,
+.account-drop {
+	a {
+		color: $off-canvas-foreground;
+		background-color: $off-canvas;
+		display: block;
+		padding: 0.625rem 0.8125rem;
+		font-size: 1rem;
+		font-weight: 300;
+		&:hover {
+			background-color: $off-canvas-hover;
+		}
+	}
+
+	ul {
+		margin: 0;
+		list-style: none;
+	}
+
+	.separator {
+		color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
+		background: $off-canvas;
+		padding: 0.625rem 0.8125rem;
+		font-weight: 300;
+		text-transform: uppercase;
+		cursor: default;
+		font-size: 0.8125rem;
+
+		&:hover {
+			background: $off-canvas;
+		}
+	}
+
+	.user {
+		background: $off-canvas;
+		overflow: auto;
+
+		&:hover {
+			background: $off-canvas-hover;
+		}
+
+		.card {
+			padding: 0.5rem 0rem 0rem 1rem;
+			.meta {
+				color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
+			}
+			a {
+				background-color: transparent;
+				&:hover {
+					background-color: transparent;
+				}
+			}
+		}
+	}
+}
+
+// A nicer looking scrollbar
+.left-off-canvas-menu,
+.right-off-canvas-menu,
+.hybrid-bar .account-drop {
+	&::-webkit-scrollbar { width: .5rem; }
+	&::-webkit-scrollbar-track { background: $white-smoke; }
+	&::-webkit-scrollbar-thumb { background: $gainsboro; }
+	&:hover::-webkit-scrollbar-thumb { background: $iron; }
+	&::-webkit-scrollbar-thumb:vertical:hover { background: $aluminum; }
+	&::-webkit-scrollbar-thumb:vertical:active { background: $monsoon; }
+}
+
 @media #{$xlarge-up} {
-	.inner-wrap.docking{
+	.inner-wrap.right-open {
 		.right-off-canvas-menu{
 			transition: $menu-slide;
 			position: relative;
 			transform: none;
-			float: right;
 		}
-		#search{
-			right: 0;
-			&:hover, &.focus{
-				padding-left: 0;
+		.right-off-canvas-menu.overlap {
+			box-shadow: none;
+		}
+		.global-search {
+			right: $tabbar-height;
+			&:hover, &.focus {
+				padding-left: $tabbar-icon-width * 2;
 			}
 		}
+		#profile-drop {
+			right: 0;
+			z-index: 101;
+		}
+		.account-drop {
+			right: 0;
+		}
 	}
-}
-
-@media #{$xlarge-up} {
-	.right-off-canvas-menu.docking + #search{
+	.inner-wrap.left-open .global-search {
+		&:hover, &.focus {
+			padding-left: $tabbar-icon-width * 2;
+		}
+	}
+	.inner-wrap.right-open.left-open .global-search {
+		&:hover, &.focus {
+			padding-left: $tabbar-icon-width * 2;
+		}
+	}
+	.right-off-canvas-menu.right-open + .global-search {
 		right: 0;
 		padding-left: 0;
 	}
 	.right-off-canvas-menu.overlap {
+		@include box-shadow(-2px, 0px, 4px, rgba(0,0,0,0.15));
 		@include transform(none);
 		transition: $menu-slide;
-		background-color: $off-canvas-background;
-	}
-	.main-section {
-		overflow: hidden;
 	}
 }
 
-// Large down
-@media #{$large-down} {
-	.hybrid-bar #search {
-		right: 5rem;
+@media #{$allow-sidebar-stash} {
+	.inner-wrap.left-open {
+		.left-off-canvas-menu{
+			transition: $menu-slide;
+			position: relative;
+			transform: none;
+		}
+		.tab-bar-section{
+			padding-left: 0;
 
-		&:hover, &.focus{
-			padding-left: 5rem;
+			.logo {
+				display: none;
+			}
+		}
+		.left-small {
+			display: none;
 		}
 	}
 }
 
-// Only show left nav on large-up screens
-// 1024px >
-@media #{$mediumwide-up} {
-	.move-right > .inner-wrap {
-		transform: none;
-	}
-	.left-off-canvas-menu {
-		position: relative;
-		@include transform(none);
-		float: left;
-	}
-	.main-section {
-		overflow: hidden;
-	}
-}
-
-// Medium
-// < 1024px
-@media #{$medium-down} {
-	.hybrid-bar #search{
-		&:hover, &.focus{
-			padding-left: 10rem;
-		}
-	}
-	.disableNotifications .hybrid-bar #search {
-		&:hover, &.focus{
-			padding-left: 5rem;
-		}
-	}
-	.tab-bar-section {
-		padding-left: 5rem;
-	}
-}
-
-// Small
 @media #{$small-only} {
-	.hybrid-bar #search{
-		&:hover, &.focus{
-			padding-left: 10rem;
-		}
-	}
-	.tab-bar{
-		height: 10rem;
+	.tab-bar {
+		// On small - top menu items drop to a new row- adjust height suit
+		height: $tabbar-height + $tabbar-menu-icon-height + $tabbar-menu-icon-padding;
 	}
 }
 
-
-/**
- * Top nav & left side bar nav items hiding and showing
- *
- * Based on the width of the page squeeze as many icons on the top bar (.hybrid-bar) as possible.
- * The items that cannot fit show in the left side bar (.second-nav)
- */
-
-// Calculate the total widths of the possible views
-$offcanvas-width-used: ($tabbar-menu-icon-width * 4) + $tabbar-padding-left; // logo + menu + search + notifications
-$offcanvas-width-no-notif: $offcanvas-width-used - $tabbar-menu-icon-width; // same as above minus the notifications button
-
-$normal-width-used: $off-canvas-width + ($tabbar-menu-icon-width * 2) + $tabbar-padding-left; // sidebar + search + notifications
-$normal-width-no-notif: $normal-width-used - $tabbar-menu-icon-width; // same as above minus the notifications button
-
-$docking-width-used: ($off-canvas-width*2) + $tabbar-menu-icon-width; // 2 sidebars + the search button
-
-// Hide all top menu items as a starting point
-.hybrid-bar ul li {
+// Hide all top nav items (JS will show them based on the space available)
+.hybrid-bar .top-menu li,
+.second-nav li {
 	display: none;
-}
-
-// Medium and down
-@media #{$medium-down} {
-
-	// Display 4 on top by default
-	.hybrid-bar ul li:nth-child(-n+4) {
-		display: block;
-	}
-	.left-off-canvas-menu .second-nav li:nth-child(-n+4) {
-		display: none;
-	}
-
-	// Allow up to 8 icons, showing an extra one each time there's space
-	@for $i from 5 through 8 {
-
-		$icon-width-needed: 5rem * $i;
-		$min-width: $offcanvas-width-used + $icon-width-needed;
-		$min-width-no-notif: $offcanvas-width-no-notif + $icon-width-needed;
-
-		@media screen and (min-width: $min-width) {
-			.hybrid-bar ul li:nth-child(-n+#{$i}) {
-				display: block;
-			}
-			.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
-				display: none;
-			}
-		}
-
-		@media screen and (min-width: $min-width-no-notif) {
-			.disableNotifications .hybrid-bar ul li:nth-child(-n+#{$i}) {
-				display: block;
-			}
-			.disableNotifications .left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
-				display: none;
-			}
-		}
-	}
-}
-
-// Medium wide & large
-@media #{$screen} and (min-width:#{lower-bound($mediumwide-range)}) and (max-width:#{upper-bound($large-range)}) {
-
-	// Display 6 by default
-	.hybrid-bar ul li:nth-child(-n+6) {
-		display: block;
-	}
-	.left-off-canvas-menu .second-nav li:nth-child(-n+6) {
-		display: none;
-	}
-
-	// Allow up to 13, showing an extra one each time there's space
-	@for $i from 7 through 13 {
-
-		$icon-width-needed: 5rem * $i;
-		$min-width: $normal-width-used + $icon-width-needed;
-		$min-width-no-notif: $normal-width-no-notif + $icon-width-needed;
-
-		@media screen and (min-width: $min-width) {
-			.hybrid-bar ul li:nth-child(-n+#{$i}) {
-				display: block;
-			}
-			.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
-				display: none;
-			}
-		}
-
-		@media screen and (min-width: $min-width-no-notif) {
-			.disableNotifications .hybrid-bar ul li:nth-child(-n+#{$i}) {
-				display: block;
-			}
-			.disableNotifications .left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
-				display: none;
-			}
-		}
-	}
-}
-
-// Xlarge and beyond
-// Have to deal with the possibility of a docked notifications sidebar in this view
-@media #{$xlarge-up} {
-
-	// Display 11 by default
-	.hybrid-bar ul li:nth-child(-n+11) {
-		display: block;
-	}
-	.left-off-canvas-menu .second-nav li:nth-child(-n+12) {
-		display: none;
-	}
-
-	// Allow up to 40 (random number to max out), showing one each time there's space
-	// Expect the docked sidebar to be showing, then overwrite if that's not the case
-	@for $i from 12 through 40 {
-
-		$icon-width-needed: 5rem * $i;
-		$min-width: $normal-width-used + $icon-width-needed;
-		$min-width-no-notif: $normal-width-no-notif + $icon-width-needed;
-		$min-width-docking: $docking-width-used + $icon-width-needed;
-
-		@media screen and (min-width: $min-width-docking) {
-			.hybrid-bar ul li:nth-child(-n+#{$i}) {
-				display: block;
-			}
-			.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
-				display: none;
-			}
-		}
-
-		@media screen and (min-width: $min-width) {
-			.inner-wrap:not(.docking) {
-				.hybrid-bar ul li:nth-child(-n+#{$i}) {
-					display: block;
-				}
-				.left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
-					display: none;
-				}
-			}
-		}
-
-		@media screen and (min-width: $min-width-no-notif) {
-			.disableNotifications .hybrid-bar ul li:nth-child(-n+#{$i}) {
-				display: block;
-			}
-			.disableNotifications .left-off-canvas-menu .second-nav li:nth-child(-n+#{$i}) {
-				display: none;
-			}
-		}
-	}
 }
