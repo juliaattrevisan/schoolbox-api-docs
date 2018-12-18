@@ -67,6 +67,7 @@ class Controller extends BaseController
             'PAGE_GRADES'              => Page\Model::PAGE_GRADES,
             'PAGE_MARK_BOOK'           => Page\Model::PAGE_MARK_BOOK,
             'PAGE_COURSE_MARK_BOOK'    => Page\Model::PAGE_COURSE_MARK_BOOK,
+            'PAGE_DUE_WORK_CALENDAR'   => Page\Model::PAGE_DUE_WORK_CALENDAR,
             'showCourseMarkbook'       => $this->getConfigLoader()->get('course_markbook_enable'),
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
             'pageCurrent'              => basename($this->getRequest()->query->get('page')),

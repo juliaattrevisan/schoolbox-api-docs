@@ -66,14 +66,14 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getPages(): array
     {
         return [
             Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
             Filter\Page\Model::PAGE_GRADES,
             Filter\Page\Model::PAGE_MARK_BOOK,
             Filter\Page\Model::PAGE_COURSE_MARK_BOOK,
-//            Filter\Page\Model::PAGE_DUE_WORK_CALENDAR,
+            Filter\Page\Model::PAGE_DUE_WORK_CALENDAR,
         ];
     }
 

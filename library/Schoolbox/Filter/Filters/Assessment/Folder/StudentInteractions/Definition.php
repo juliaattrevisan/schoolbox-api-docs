@@ -1,6 +1,5 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
@@ -8,6 +7,7 @@
 namespace Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions;
 
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
+use Schoolbox\Filter\Page;
 
 /**
  * Display a list of folders (either classes, groups or both) where the student has submitted IResponses or received IFeedback.
@@ -24,24 +24,25 @@ class Definition extends FolderFilter\Definition
     // The name to expose in the UI
     protected const NAME = 'Student Folders';
 
-    const KEY_RESPONSE = 'response';
-    const KEY_FEEDBACK = 'feedback';
+    public const KEY_RESPONSE = 'response';
+    public const KEY_FEEDBACK = 'feedback';
 
 
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getPages(): array
     {
         return [
 //            Option\Model::PAGE_GRADES,
+            Page\Model::PAGE_DUE_WORK_CALENDAR,
         ];
     }
 
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    protected function getCustomKeys(): array
     {
         return [
             self::KEY_CLASSES,
@@ -55,7 +56,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    protected static function getTemplatesDir()
+    protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/Folder/StudentInteractions/templates';
     }
@@ -63,13 +64,13 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public function getLabel($key)
+    public function getLabel($key): string
     {
         switch ($key) {
             case self::KEY_CLASSES:
-                return 'Currently enrolled classes';
+                return 'Currently-enrolled classes';
             case self::KEY_GROUPS:
-                return 'Current group members';
+                return 'Current group memberships';
             case self::KEY_RESPONSE:
                 return 'Folders where student responded';
             case self::KEY_FEEDBACK:

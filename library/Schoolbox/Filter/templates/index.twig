@@ -8,6 +8,7 @@
             PAGE_COURSE_MARK_BOOK    string
             showCourseMarkbook       bool
             PAGE_PENDING_ASSESSMENTS string
+            PAGE_DUE_WORK_CALENDAR   string
             ENTITY_ASSESSMENTS       string
             pageCurrent              string
 #}
@@ -29,6 +30,8 @@
                         {% set pageName = 'Course Markbook' %}
                     {% elseif PAGE_PENDING_ASSESSMENTS == page %}
                         {% set pageName = 'Pending ' ~ locale.assessment.proper %}
+                    {% elseif PAGE_DUE_WORK_CALENDAR == page %}
+                        {% set pageName = 'Due Work Calendar' %}
                     {% else %}
                         {# Graceful fallback if constant not injected into twig #}
                         {% set pageName = page %}

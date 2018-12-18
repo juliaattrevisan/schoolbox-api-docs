@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Filter;
 
 /**
  * Sub-module for a student's upcoming due work.
@@ -31,8 +32,10 @@ class Module extends BaseModule
      */
     protected $basename = self::BASENAME;
 
+
     /**
      * @inheritdoc
+     * @throws \InvalidArgumentException
      */
     public function registerRoutes()
     {
@@ -81,6 +84,8 @@ class Module extends BaseModule
                 }
             }
         );
+
+        $this->register('GET', '', 'postUpcomingForStudent');
     }
 
     /**
@@ -100,6 +105,7 @@ class Module extends BaseModule
      * init time.
      *
      * @param Container|ContainerInterface $injector The dependency injection container.
+     * @throws \InvalidArgumentException
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
@@ -111,6 +117,9 @@ class Module extends BaseModule
             'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
             'participantDataSource' => $injector->lazyGet('participantDataSource'),
             'defaultGradeGroup'     => $this->getInjector()->lazyGet('defaultGradeGroup'),
+            'filterFactoryFactory'  => $injector->lazy(function () {
+                return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
+            }),
         ];
     }
 
@@ -127,25 +136,29 @@ class Module extends BaseModule
      */
 
     /**
-     * @return UserMapper
+     * @return UserMapper|\Schoolbox\Mapper
+     * @throws \InvalidArgumentException
      */
-    protected function getUserMapper()
+    private function getUserMapper()
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
 
     /**
-     * @return ConfigMapper
+     * @return ConfigMapper|\Schoolbox\Mapper
+     * @throws \InvalidArgumentException
      */
-    protected function getConfigMapper()
+    private function getConfigMapper()
     {
         return $this->getMapperFactory()->get(ConfigMapper::class);
     }
 
+
     /**
-     * @return ErrorMapper
+     * @return ErrorMapper|\Schoolbox\Mapper
+     * @throws \InvalidArgumentException
      */
-    protected function getErrorMapper()
+    private function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
     }
