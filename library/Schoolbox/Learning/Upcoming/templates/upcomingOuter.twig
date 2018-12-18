@@ -84,16 +84,16 @@
         var updateFilterOptionValues = function () {
             appliedFilters = {};
             $('#filter_panel').find('[data-component]').each(function (idx, elem) {
-                var $panelComponent = $(elem),
+                var $panelComponent  = $(elem),
                     filterSelections = {},
-                    filterId = $panelComponent.attr('data-component'),
-                    $options = $panelComponent.find('[data-value-original]');
+                    filterId         = $panelComponent.attr('data-component'),
+                    $options         = $panelComponent.find('[data-value-original]');
 
                 var countSelected = 0;
                 $options.each(function (idx, elem) {
                     var $option = $(elem),
-                        key = $option.attr('data-key'),
-                        val = $option.attr('data-value-original');
+                        key     = $option.attr('data-key'),
+                        val     = $option.attr('data-value-original');
 
                     if ('1' === val) {
                         countSelected++;
