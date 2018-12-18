@@ -524,6 +524,7 @@ class Healthcheck
             'luTutor',
             'luYearLevel',
             'Relationships',
+            'StudentContactsPortal',
             'StudentClasses',
             'SubjectClasses',
             'SubjectClassStaff',

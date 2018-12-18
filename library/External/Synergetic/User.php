@@ -558,7 +558,7 @@ class External_Synergetic_User implements External_UserInterface
         // Now can build the query string
 
         $query = "
-            SELECT      StudentID,
+            SELECT      vStudentContactAllAddress.StudentID,
                         StudentPreferred,
                         StudentSurname,
                         StudentYearLevel,
@@ -570,7 +570,10 @@ class External_Synergetic_User implements External_UserInterface
                         StudentContactPreferred,
                         StudentContactLegalFullName,
                         StudentContactSurname,
-                        StudentContactDefaultEmail,
+                        CASE
+                            WHEN ShareEmailFlag = 1 THEN StudentContactDefaultEmail
+                            ELSE ''
+                        END AS StudentContactDefaultEmail,
                         vStudentContactAllAddress.ValidAddressFlag,
                         StudentContactAddress1,
                         StudentContactAddress2,
@@ -586,23 +589,36 @@ class External_Synergetic_User implements External_UserInterface
                         StudentContactHomePostCode,
                         StudentContactHomeState,
                         StudentCountry.Description AS StudentContactHomeCountryCode,
-                        StudentContactPhoneActual,
-                        StudentContactMobilePhone,
+                        CASE
+                            WHEN ShareHomePhoneFlag = 1 THEN StudentContactPhoneActual
+                            ELSE ''
+                        END AS StudentContactPhoneActual,
+                        CASE
+                            WHEN ShareMobileFlag = 1 THEN StudentContactMobilePhone
+                            ELSE ''
+                        END AS StudentContactMobilePhone,
                         StudentContactOccupPhone,
                         StudentContactSpouseID,
                         StudentContactSpouseTitle,
                         StudentContactSpousePreferred,
                         StudentContactSpouseLegalFullName,
                         StudentContactSpouseSurname,
-                        StudentContactSpouseMobilePhone,
+                        CASE
+                            WHEN ShareMobileFlag = 1 THEN StudentContactSpouseMobilePhone
+                            ELSE ''
+                        END AS StudentContactSpouseMobilePhone,
                         StudentContactSpouseOccupPhone,
-                        StudentContactSpouseDefaultEmail,
+                        CASE
+                            WHEN ShareEmailFlag = 1 THEN StudentContactSpouseDefaultEmail
+                            ELSE ''
+                        END AS StudentContactSpouseDefaultEmail,
                         StudentContactType,
                         StudentContactSilentPhoneFlag,
                         Contact.SilentMobilePhoneFlag AS StudentContactSilentMobilePhoneFlag,
                         Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
                         Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
                         ContactAddress.SilentHomeAddressFlag SilentHomeAddressFlag,
+                        ShareHomeAddressFlag,
                         StudentParentsSeparatedFlag
             FROM        dbo.vStudentContactAllAddress
             LEFT JOIN   dbo.Community Contact ON StudentContactID = Contact.ID
@@ -614,6 +630,7 @@ class External_Synergetic_User implements External_UserInterface
                         StudentCampus = Year.Campus
             LEFT JOIN   dbo.luCountry StudentCountry ON StudentContactCountryCode = StudentCountry.Code
             LEFT JOIN   dbo.luCountry StudentHomeCountry ON StudentContactHomeCountryCode = StudentHomeCountry.Code
+            LEFT JOIN   dbo.StudentContactsPortal ON vStudentContactAllAddress.StudentID = StudentContactsPortal.StudentID
             JOIN        FileSemesters Semester ON
                             Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
                             Semester.FileYear = vStudentContactAllAddress.FileYear AND
@@ -637,7 +654,7 @@ class External_Synergetic_User implements External_UserInterface
 
             // Remove invalid and silent contact details
 
-            if ($contact['ValidAddressFlag'] == 0 || $contact['SilentHomeAddressFlag'] == 1) {
+            if ($contact['ValidAddressFlag'] == 0 || $contact['SilentHomeAddressFlag'] == 1 || $contact['ShareHomeAddressFlag'] !== '1') {
                 $contact['StudentContactAddress1'] = '';
                 $contact['StudentContactAddress2'] = '';
                 $contact['StudentContactAddress3'] = '';
