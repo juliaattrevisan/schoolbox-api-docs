@@ -49,6 +49,9 @@
 
         {% autoescape 'js' %}
         <script type="text/javascript">
+            // Disable $ formula encoding
+            M.$mathQ = false;
+
             // Date formats (global variable)
             var siteLocation = "{{ config.site_location }}";
 

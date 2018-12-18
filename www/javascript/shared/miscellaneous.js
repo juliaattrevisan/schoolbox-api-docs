@@ -11,9 +11,6 @@ $(function () {
     // (Fastclick stops mousedown from triggering?)
     $(document).on('touchstart', $.datepicker._checkExternalClick);
 
-    // Disable $ formula encoding
-    M.$mathQ = false;
-
     $('#infoPanel').find('a[data-menu]').flyout();
     $('#nav').touchMenu()
         .scrollToTop({
