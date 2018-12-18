@@ -115,7 +115,7 @@ $allow-sidebar-stash: $large-up;
 		transform: none;
 
 		.left-menu-dock::after {
-			content: '\e912'; // hollow pin icon
+			content: '\e915'; // hollow pin icon
 		}
 	}
 	.exit-off-canvas {
@@ -535,7 +535,7 @@ $allow-sidebar-stash: $large-up;
 		li {
 			&.has-submenu > a:after {
 				font-family: $font-family-icon;
-				content: "\e913"; // pin icon
+				content: "\e64b"; // right caret
 				float: right;
 			}
 			a {
