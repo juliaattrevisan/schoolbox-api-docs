@@ -60,6 +60,13 @@ $tooltip-padding: 1rem;
     bottom: 1rem;
     left: -1rem;
   }
+
+  &.bottom-middle {
+    border-color: $white transparent transparent transparent;
+    left: 50%;
+    margin-left: -5px;
+    bottom: -1rem;
+  }
 }
 
 .introjs-tooltiptext {
