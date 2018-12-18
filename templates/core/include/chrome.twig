@@ -303,7 +303,7 @@
                 <aside class="right-off-canvas-menu island no-pad hide-for-print" id="msgs" data-unread="{{ ws.unread }}">
                     <ul class="off-canvas-list" id="message-list">
                         <li>
-                            <label id="notification-toggle-full" title="Show or hide notifications">Notifications</label>
+                            <label id="notification-toggle-full" title="Show or hide notifications" class="{{ user.current.getHideNotificationsTray ? 'raquo' : '' }}">Notifications</label>
                         </li>
                         <li>
                             <a id="msg-mar" class="mark-all-read button icon-approve" href="#">Mark all read</a>
