@@ -142,25 +142,29 @@ class Controller extends Assessment\Controller
         $visibility    = new Assessment\Visibility($this->getAccess());
         $now           = Alaress_Date_Format::now();
         $mutator       = new Participant\AssessmentListMutator($this->getUser(), $visibility, $now, true);
+        $classFolder          = $assessment->getBaseContext()->getFolder();
+        $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $classFolder);
+
+        // If $student is an instructor, all assessments appear on project summary page
+        // *except for* assessments which the instructor has participated to and then has been excluded from.
+
         $subActivities = $subActivities
             ->map([$mutator, 'map'])
             ->filter([$mutator, 'filter'])
-            ->filter(function(IAssessable $subAssessable) use ($student) {
-                // Don't show assessment if user is excluded
-                $participant = $subAssessable->getParticipantIfExtant($student);
-                if (!$participant) {
-                    return false;
+            ->filter(function (IAssessable $subAssessable) use ($student, $isViewerAnInstructor) {
+                try {
+                    $participant = $subAssessable->getParticipant($student);
+                    return !$participant->isExcluded();
+                } catch (\UnexpectedValueException $e) {
+                    // not participant
+                    return $isViewerAnInstructor;
                 }
-                // If a parent, only show sub-assessments if the current viewee is participating
-                return !(!$subAssessable->isParticipant($student) && $this->getUser()->getRole()->isParent());
             });
 
         // hack the project object for good measure
         $assessment->setAssessables($subActivities);
 
         // How should the jewelry transition?
-        $classFolder          = $assessment->getBaseContext()->getFolder();
-        $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $classFolder);
         $tickTransitions      = [
             'incomplete'      => $isViewerAnInstructor ? 'teacherAssessed' : 'selfAssessed',
             'selfAssessed'    => $isViewerAnInstructor ? 'teacherAssessed' : 'incomplete',
