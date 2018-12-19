@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Create Course Instances', [
+$kernel = new Schoolbox\Application\Daemon\Kernel('Update dashboard feature tour', [
     'verbose' => [false, false, false],
     'errors'  => E_ALL,
 ]);
