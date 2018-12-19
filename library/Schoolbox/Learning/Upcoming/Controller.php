@@ -249,16 +249,13 @@ class Controller extends Base
             }
         }
 
-        // TODO Populate $_SESSION[children] properly
-        $children = $this->userMapper->findByColumn('id', \array_column($this->getSession()->get('children', []), 'id'));
-
         $data = [
             'student'         => $student,
             'date'            => $date,
             'subjects'        => $subjects,
             'mailHandle'      => $this->getSession()->get('mailhandle'),
             'currentTerm'     => $term,
-            'children'        => $children,
+            'children'        => $this->getUser()->getChildren(),
             'filterPanel'     => $filterPanel,
             'filteredPage'    => Filter\Page\Model::PAGE_DUE_WORK_CALENDAR,
             'filterIdSlugMap' => $this->buildFilterIdSlugMap($filterPanel),
