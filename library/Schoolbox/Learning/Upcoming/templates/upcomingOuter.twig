@@ -155,7 +155,7 @@
                 case 'studentFolders':
                     return $event.attr('data-meta-folderid');
                 case 'weighting':
-                    return $event.attr('data-meta-weighted');
+                    return "1" === $event.attr('data-meta-weighted') ? 'weighted' : 'unweighted';
                 case 'workType':
                     var key = $event.attr('data-meta-worktypeid');
                     if (!key) {
