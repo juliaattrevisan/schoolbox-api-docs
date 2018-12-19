@@ -25,8 +25,7 @@ use Aura\Router;
 use LogicException;
 
 /**
- * Builds a suitable data structure for rendering the Diploma Programme
- * components.
+ * Builds a suitable data structure for rendering the MYP/DP Graph component.
  */
 class InternationalBaccalaureateGraph
 {
