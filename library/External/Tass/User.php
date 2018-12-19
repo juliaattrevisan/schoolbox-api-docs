@@ -266,7 +266,7 @@ class External_Tass_User implements External_UserInterface
                 SELECT DISTINCT
                     'P' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
                                         AS StudentContactID,
-                    sf.sfa_num          AS StudentContactSplitFamilyNumber,
+                    NULL                AS StudentContactSplitFamilyNumber,
                     pa.add_num          AS StudentContactAddressNumber,
                     parent.f_name       AS StudentContactPreferred,
                     0                   AS StudentContactSilentPhoneFlag,
@@ -297,7 +297,7 @@ class External_Tass_User implements External_UserInterface
                 SELECT DISTINCT
                     'S' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
                                         AS StudentContactID,
-                    sf.sfa_num          AS StudentContactSplitFamilyNumber,
+                    NULL                AS StudentContactSplitFamilyNumber,
                     pa.add_num          AS StudentContactAddressNumber,
                     parent.f_name       AS StudentContactPreferred,
                     0                   AS StudentContactSilentPhoneFlag,
