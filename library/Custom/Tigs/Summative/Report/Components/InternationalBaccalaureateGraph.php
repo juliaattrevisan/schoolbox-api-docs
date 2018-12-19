@@ -256,18 +256,18 @@ class InternationalBaccalaureateGraph
     /**
      * Collates marks, given a set of MYP/DP assessments.
      *
-     * @param array $dpAssessments A set of assessments, from `$this->collateAssessments`.
+     * @param array $ibAssessments A set of assessments, from `$this->collateAssessments`.
      * @return array 0: all marks; [mark value => number of students with this mark]
      *               1: the mark this student received, if any
      * @throws \Schoolbox\Mapper\Exception
-     * @throws UnexpectedValueException if a folder has more or less than one DP assessment
+     * @throws UnexpectedValueException if a folder has more or less than one MYP/DP assessment
      * @throws Router\Exception\RouteNotFound
      */
-    private function collateMarks(array $dpAssessments): array
+    private function collateMarks(array $ibAssessments): array
     {
         $markData    = self::BASE_MARKS;
         $studentMark = null;
-        foreach ($dpAssessments as $folderId => $folderAssessments) {
+        foreach ($ibAssessments as $folderId => $folderAssessments) {
             /**
              * @var Folder\Model    $folder
              * @var DueWork\Model[] $assessments
@@ -275,7 +275,9 @@ class InternationalBaccalaureateGraph
             $folder      = $folderAssessments['folder'];
             $assessments = $folderAssessments['assessments'];
             $count       = \count($assessments);
-            if ($count !== 1) {
+
+            // No folder can have multiple assessments, and the current folder must have a single assessment
+            if ($count > 1 || ($count === 0 && $folderId === $this->folder->getId())) {
                 throw new UnexpectedValueException(
                     sprintf(
                         'A folder must have exactly one MYP/DP assessment. Folder "%s" contains %d.',
@@ -286,6 +288,9 @@ class InternationalBaccalaureateGraph
             }
 
             $assessment = current($assessments);
+            if (!$assessment) {
+                continue;
+            }
 
             // Assessment not visible to the viewer? Show no results
             if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, false)) {
