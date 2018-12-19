@@ -1,5 +1,3 @@
-const path = require("path");
-
 module.exports = {
   devtool: "source-map",
   resolve: {
@@ -14,11 +12,7 @@ module.exports = {
           loader: "babel-loader"
         }
       },
-      { enforce: "pre", test: /\.js$/, loader: "source-map-loader" },
-      {
-        test: /\.css$/,
-        use: ["style-loader", "css-loader"]
-      }
+      { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
     ]
   }
 };
