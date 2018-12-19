@@ -17,11 +17,12 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnexpectedValueException;
 use Alaress\Authorizer\Authorizer;
 use Aura\Router;
+use LogicException;
 
 /**
  * Builds a suitable data structure for rendering the Diploma Programme
@@ -78,23 +79,14 @@ class InternationalBaccalaureateGraph
      */
     private $rubricMapper;
 
-
-    /**
-     * @var int
-     */
-    private $curriculumYearLevel;
-
-
-    /**
-     * @var int
-     */
-    private $curriculumSemester;
-
     /** @var Authorizer */
     private $authorizer;
 
     /** @var Router\Router */
     private $router;
+
+    /** @var Folder\Model */
+    private $folder;
 
 
     /**
@@ -107,10 +99,9 @@ class InternationalBaccalaureateGraph
      * @param User              $viewer
      * @param int               $workTypeId
      * @param RubricMapper      $rubricMapper
-     * @param int               $curriculumYearLevel
-     * @param int               $curriculumSemester
      * @param Authorizer        $authorizer
      * @param Router\Router     $router
+     * @param Folder\Model      $folder
      */
     public function __construct(
         GenericCollection $unitImpls,
@@ -120,10 +111,9 @@ class InternationalBaccalaureateGraph
         User $viewer,
         int $workTypeId,
         RubricMapper $rubricMapper,
-        int $curriculumYearLevel,
-        int $curriculumSemester,
         Authorizer $authorizer,
-        Router\Router $router
+        Router\Router $router,
+        Folder\Model $folder
     ) {
         $this->unitImpls           = $unitImpls;
         $this->student             = $student;
@@ -132,10 +122,9 @@ class InternationalBaccalaureateGraph
         $this->viewer              = $viewer;
         $this->workTypeId          = $workTypeId;
         $this->rubricMapper        = $rubricMapper;
-        $this->curriculumYearLevel = $curriculumYearLevel;
-        $this->curriculumSemester  = $curriculumSemester;
         $this->authorizer          = $authorizer;
         $this->router              = $router;
+        $this->folder              = $folder;
     }
 
 
@@ -144,6 +133,7 @@ class InternationalBaccalaureateGraph
      *
      * @return array
      * @throws Router\Exception\RouteNotFound
+     * @throws LogicException
      */
     public function toContext(): array
     {
@@ -176,7 +166,7 @@ class InternationalBaccalaureateGraph
      * Collate the unit implementations into a set of assessments.
      *
      * @return array
-     * @var Folder          $dpAssessments [$folderId]['folder']      The folder the assessments are in
+     * @var Folder\Model    $dpAssessments [$folderId]['folder']      The folder the assessments are in
      * @var DueWork\Model[] $dpAssessments [$folderId]['assessments'] The MYP/DP assessments for this folder
      * @throws UnexpectedValueException if a IB Report Grade assessment isn't a due work,
      *                                  and has neither a rubric or a max mark
@@ -198,47 +188,48 @@ class InternationalBaccalaureateGraph
             }
             foreach ($this->retrieveAssessments($unitImpl) as $assessment) {
                 $workType = $assessment->getWorkType();
-                if ($workType && $workType->getId() === $this->workTypeId) {
-
-                    // Iterate deeper into projects
-
-                    // Validate the assessment
-                    if (!$assessment instanceof DueWork\Model) {
-                        throw new UnexpectedValueException(
-                            sprintf(
-                                'Only due works can be used for the MYP/DP graph. Assessment "%s" in folder "%s" is a %s.',
-                                $assessment->getTitle(),
-                                $folder->getTitle(),
-                                $assessment->getTypeName()
-                            )
-                        );
-                    }
-
-                    if($this->attributes->isMyp()){
-                        // MYP Assessment must use a rubric:
-                        if(!$assessment->getUseRubric()){
-                            throw new UnexpectedValueException(
-                                sprintf(
-                                    'An MYP due work must have a rubric. Assessment "%s" in folder "%s" does not have a rubric.',
-                                    $assessment->getTitle(),
-                                    $folder->getTitle()
-                                )
-                            );
-                        }
-                    } elseif($assessment->getMaxMark() !== 7.0 || $assessment->getMarkType()->getSlug() !== MarkType::SLUG_TOTAL){
-                        throw new UnexpectedValueException(
-                            sprintf(
-                                'A DP due work must either have a max mark of 7. Assessment "%s" in folder "%s" is a %s with max mark %d.',
-                                $assessment->getTitle(),
-                                $folder->getTitle(),
-                                $assessment->getMarkType()->getName(),
-                                $assessment->getMaxMark()
-                            )
-                        );
-                    }
-
-                    $ibAssessments[$folderId]['assessments'][$assessment->getId()] = $assessment;
+                if (!$workType || $workType->getId() !== $this->workTypeId) {
+                    continue;
                 }
+
+                // Iterate deeper into projects
+
+                // Validate the assessment
+                if (!$assessment instanceof DueWork\Model) {
+                    throw new UnexpectedValueException(
+                        sprintf(
+                            'Only due works can be used for the MYP/DP graph. Assessment "%s" in folder "%s" is a %s.',
+                            $assessment->getTitle(),
+                            $folder->getTitle(),
+                            $assessment->getTypeName()
+                        )
+                    );
+                }
+
+                if($this->attributes->isMyp()){
+                    // MYP Assessment must use a rubric:
+                    if(!$assessment->getUseRubric()){
+                        throw new UnexpectedValueException(
+                            sprintf(
+                                'An MYP due work must have a rubric. Assessment "%s" in folder "%s" does not have a rubric.',
+                                $assessment->getTitle(),
+                                $folder->getTitle()
+                            )
+                        );
+                    }
+                } elseif($assessment->getMaxMark() !== 7.0 || $assessment->getMarkType()->getSlug() !== MarkType::SLUG_TOTAL){
+                    throw new UnexpectedValueException(
+                        sprintf(
+                            'A DP due work must either have a max mark of 7. Assessment "%s" in folder "%s" is a %s with max mark %d.',
+                            $assessment->getTitle(),
+                            $folder->getTitle(),
+                            $assessment->getMarkType()->getName(),
+                            $assessment->getMaxMark()
+                        )
+                    );
+                }
+
+                $ibAssessments[$folderId]['assessments'][$assessment->getId()] = $assessment;
             }
         }
         return $ibAssessments;
@@ -279,7 +270,7 @@ class InternationalBaccalaureateGraph
         $studentMark = null;
         foreach ($dpAssessments as $folderId => $folderAssessments) {
             /**
-             * @var Folder          $folder
+             * @var Folder\Model    $folder
              * @var DueWork\Model[] $assessments
              */
             $folder      = $folderAssessments['folder'];
@@ -372,7 +363,9 @@ class InternationalBaccalaureateGraph
                 }
 
                 if (null !== $mark) {
-                    if ($participant->getUser()->getId() === $this->student->getId()) {
+                    // Only care about student's mark in current folder. This caters for case where student does not yet have mark in this class, but
+                    // has participation record in a different class in this cohort.
+                    if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
                         $studentMark = $mark;
                     }
                     $markData[$mark]++;
@@ -392,23 +385,22 @@ class InternationalBaccalaureateGraph
      * * Year 11, Sem 1: MYP Grade
      *
      * @return string
+     * @throws LogicException
      */
     private function generateHeader(): string
     {
-        if ($this->curriculumYearLevel > 12) {
-            return 'Predicted Grade';
+        $year     = $this->attributes->getCurriculumYearLevel();
+        $semester = $this->attributes->getCurriculumSemester();
+
+        if ($year <= 10 && $semester === 2) {
+            return 'MYP Grade';
         }
-        if ($this->curriculumYearLevel === 12) {
-            if ($this->curriculumSemester >= 2) {
-                return 'Predicted Grade';
-            }
+        if ($year === 11) {
             return 'Early Indicator';
         }
-        if ($this->curriculumYearLevel === 11) {
-            if ($this->curriculumSemester >= 2) {
-                return 'Early Indicator';
-            }
+        if ($year === 12 && $semester === 2) {
+            return 'Predicted Grade';
         }
-        return 'MYP Grade';
+        throw new LogicException("Unable to determine header. Curriculum Year: {$year}, Curriculum Semester: {$semester}");
     }
 }

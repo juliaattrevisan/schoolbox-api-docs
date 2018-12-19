@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\Report\Components;
 
 use Alaress\Authorizer\Authorizer;
-use Custom\Tigs\Summative\Config;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
@@ -37,7 +36,7 @@ class FinalAchievementLevels extends BaseComponent
     /** @var User */
     private $viewer;
 
-    /** @var null|int */
+    /** @var int */
     private $falWorkTypeId;
 
     /** @var RubricMapper */
@@ -55,7 +54,7 @@ class FinalAchievementLevels extends BaseComponent
      * @param User              $student
      * @param Visibility        $visibility
      * @param User              $viewer
-     * @param null|int          $falWorkTypeId
+     * @param int               $falWorkTypeId
      * @param RubricMapper      $rubricMapper
      * @param Authorizer        $authorizer
      * @param Router\Router     $router
@@ -65,7 +64,7 @@ class FinalAchievementLevels extends BaseComponent
         User $student,
         Visibility $visibility,
         User $viewer,
-        ?int $falWorkTypeId,
+        int $falWorkTypeId,
         RubricMapper $rubricMapper,
         Authorizer $authorizer,
         Router\Router $router
@@ -95,17 +94,6 @@ class FinalAchievementLevels extends BaseComponent
      */
     public function toContext(): ?array
     {
-        // Not set? Then we can't identify FAL assessments.
-        if (null === $this->falWorkTypeId) {
-            $errorMsg = 'Cannot render Final Achievement Levels component. Work type not set.';
-            if ($this->authorizer->isPathAuthorizedForUser('tigsSummativeAdmin.getAdmin', [], $this->viewer)) {
-                $routeConfig = $this->router->generate('tigsSummativeAdmin.getAdmin');
-                $hash        = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
-                $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">Set Final Achievement Levels Work Type</a>";
-            }
-            return ['error' => $errorMsg];
-        }
-
         $falAssessables = [];
         foreach($this->unitImpls as $unitImpl){
             /** @noinspection SlowArrayOperationsInLoopInspection */
