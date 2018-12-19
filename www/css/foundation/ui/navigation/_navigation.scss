@@ -490,7 +490,8 @@ $allow-sidebar-stash: $large-up;
 			padding: .5rem;
 			position: absolute;
 			right: 0;
-			width: 2.5rem;
+      width: 2.5rem;
+      z-index: 1; // Safari will not see the icon without this
 
 			&:hover {
 				background-color: $off-canvas-hover;
