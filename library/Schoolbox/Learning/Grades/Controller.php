@@ -343,7 +343,7 @@ class Controller extends Base
             AssessmentFilters\Term\Due\Definition::class                   => $term->getId(),
             AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
             AssessmentFilters\TemporalState\Definition::class              => [
-                AssessmentFilters\TemporalState\Definition::KEY_CUSTOM_UNPUBLISHED,
+                AssessmentFilters\TemporalState\Definition::KEY_CUSTOM_UPCOMING,
                 AssessmentFilters\TemporalState\Definition::KEY_CUSTOM_OPEN,
                 AssessmentFilters\TemporalState\Definition::KEY_CUSTOM_OVERDUE,
                 AssessmentFilters\TemporalState\Definition::KEY_CUSTOM_CLOSED,
