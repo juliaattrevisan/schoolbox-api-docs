@@ -713,7 +713,7 @@ class IdFinder extends Filter\AbstractIdFinder
      */
     private function getClauseTemporalState(Collection $temporalStates = null): array
     {
-        // If no weighting types are selected, don't filter
+        // If no options are selected, don't filter
         if (null === $temporalStates) {
             return ['TRUE', [], ''];
         }
