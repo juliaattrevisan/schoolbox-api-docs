@@ -380,7 +380,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return Collection|IStorage[]
+     * @return Collection|SubmissionBox\SingleFile\Model[]
      */
     public function getAttachments()
     {
@@ -388,7 +388,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @param Collection|IStorage[] $attachments
+     * @param Collection|SubmissionBox\SingleFile\Model[] $attachments
      * @return static
      */
     public function setAttachments(Collection $attachments)
@@ -398,10 +398,10 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @param IStorage $attachment
+     * @param SubmissionBox\SingleFile\Model $attachment
      * @return static
      */
-    public function addAttachment(IStorage $attachment)
+    public function addAttachment(SubmissionBox\SingleFile\Model $attachment)
     {
         $this->attachments->add($attachment);
         return $this;
