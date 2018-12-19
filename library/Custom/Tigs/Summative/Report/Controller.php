@@ -382,7 +382,7 @@ class Controller extends Web\Controller\Base
             $workTypeId = $this->checkWorkType(
                 Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS,
                 'Cannot render Final Achievement Levels component. Work type not set.',
-                'Set Final Achievement Levels Work Type'
+                'Set MYP Final Achievement Levels Work Type'
             );
         } catch (UnexpectedValueException $e) {
             return ['error' => $e->getMessage()];
