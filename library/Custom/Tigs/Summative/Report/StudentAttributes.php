@@ -58,7 +58,7 @@ class StudentAttributes
         Alaress_Date_Format $now = null
     ) {
         if ($termOverride && $now) {
-            throw new InvalidArgumentException('You may simulate a term or now, but now both');
+            throw new InvalidArgumentException('You may simulate a term or now, but not both');
         }
 
         $this->yearLevel           = $this->deriveUserYearLevel($user);
