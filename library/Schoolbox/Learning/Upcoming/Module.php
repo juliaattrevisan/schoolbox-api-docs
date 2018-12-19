@@ -54,6 +54,10 @@ class Module extends BaseModule
                 return new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId');
             }));
         }
+        $access = new Rule\All(
+            new Rule\IsLoggedIn(),
+            $access
+        );
 
         $preloadStudent = function (array $params) {
             if (\array_key_exists('student', $params)) {
