@@ -132,7 +132,9 @@
                 // Which filter are we currently applying?
                 // Hide the event if it's attribute is not selected in the filter options.
                 var key = getFilterOptionKey(filterIdSlugMap[filterId], $event);
-                return '0' === appliedFilters[filterId][key];
+                if ('0' === appliedFilters[filterId][key]) {
+                    return true;
+                }
             }
 
             // Filter is not being applied, so don't hide event.
