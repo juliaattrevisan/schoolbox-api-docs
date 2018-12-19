@@ -133,6 +133,7 @@ class Module extends BaseModule
             }),
             'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
             'access'                => $this->getMapperFactory()->getLazy(Access::class),
+            'rosettaStone'          => $injector->lazyGet('l10n'),
         ];
     }
 

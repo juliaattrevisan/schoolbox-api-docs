@@ -11,6 +11,7 @@ use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use External_ClassInterface;
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueDateSortStrategy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -99,6 +100,8 @@ class Controller extends Base
     /** @var Access */
     private $access;
 
+    private $rosettaStone;
+
 
     /**
      * Constructor
@@ -114,6 +117,7 @@ class Controller extends Base
      * @param Filter\Filters\Assessment\IdFinder       $assessmentIdFinder
      * @param Filter\Selection\Mapper                  $filterSelectionMapper
      * @param Access                                   $access
+     * @param         RosettaStone                     $rosettaStone
      */
     public function __construct(
         External_ClassInterface $externalClass,
@@ -125,8 +129,9 @@ class Controller extends Base
         GradeGroup\Model $defaultGradeGroup,
         Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Filter\Selection\Mapper                  $filterSelectionMapper,
-        Access                                   $access
+        Filter\Selection\Mapper $filterSelectionMapper,
+        Access $access,
+        RosettaStone $rosettaStone
     ) {
         $this->externalClass         = $externalClass;
         $this->folderMapper          = $folderMapper;
@@ -139,6 +144,7 @@ class Controller extends Base
         $this->assessmentIdFinder    = $assessmentIdFinder;
         $this->filterSelectionMapper = $filterSelectionMapper;
         $this->access                = $access;
+        $this->rosettaStone          = $rosettaStone;
     }
 
 
@@ -264,7 +270,7 @@ class Controller extends Base
         $namespace = Module::BASENAME;
         $this->getResponse()->content->set(
             $this->buildHtmlOutput("@$namespace/upcomingOuter.twig", $data)
-                 ->setTitle('Upcoming Work for ' . $student->formatName())
+                 ->setTitle("Upcoming {$this->rosettaStone->translate('assessment', true, true)} for {$student->formatName()}")
                  ->setTab('submission') // ¯\_(ツ)_/¯
         );
     }
