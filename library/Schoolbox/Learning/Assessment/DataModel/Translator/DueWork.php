@@ -8,7 +8,6 @@
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
@@ -19,7 +18,6 @@ use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Resource\Storage\Model as StorageModel;
-use Schoolbox\Collection;
 
 /**
  * Sub-translator for due work specific fields.
@@ -78,13 +76,13 @@ class DueWork implements IAssessmentTypeTranslator
      */
     public function recognisesDataModel(IAssessableDataModel $dataModel): bool
     {
-        return $dataModel instanceof SubmissionBox;
+        return $dataModel instanceof DueWorkModel;
     }
 
 
     /**
-     * @param IAssessable|DueWorkObject          $domainObject
-     * @param IAssessableDataModel|SubmissionBox $dataModel
+     * @param IAssessable|DueWorkObject         $domainObject
+     * @param IAssessableDataModel|DueWorkModel $dataModel
      */
     public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
     {
@@ -146,8 +144,8 @@ class DueWork implements IAssessmentTypeTranslator
     /**
      * Copies all attributes from the dataModel to domainObject
      *
-     * @param IAssessableDataModel|SubmissionBox $dataModel
-     * @param IAssessable|DueWorkObject          $domainObject
+     * @param IAssessableDataModel|DueWorkModel $dataModel
+     * @param IAssessable|DueWorkObject         $domainObject
      */
     public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
     {
