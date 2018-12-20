@@ -25,7 +25,7 @@ class Model
     public const PAGE_MARK_BOOK           = 'markbook';
     public const PAGE_COURSE_MARK_BOOK    = 'courseMarkbook';
     public const PAGE_LEARNING_ANALYTICS  = 'analytics';
-    public const PAGE_UPCOMING_ASSESSMENTS= 'upcoming';
+    public const PAGE_UPCOMING_ASSESSMENTS= 'dueWorkCal';
 
 
     /**
