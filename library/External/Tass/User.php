@@ -33,16 +33,12 @@ class External_Tass_User implements External_UserInterface
     /** @var External_Tass_Helper */
     private $helper;
 
-    /** @var Group */
-    private $groupHandler;
-
     /**
      * External_Tass_User constructor.
      */
     function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
-        $this->groupHandler = new Group;
         $this->companyCode  = Config::get('external_tass_company_code');
         $this->helper = new External_Tass_Helper();
     }
