@@ -24,10 +24,16 @@ In order for a card to have content- it needs to be contained in an `.informatio
 </div>
 ```
 
-#### Loading card
+### Loading card
 
 A loading card will show by default when there is no content sent to the card.
 
 ```jsx
 <Card />
+```
+
+This can be disabled by sending `loader={false}` as a prop.
+
+```jsx
+<Card loader={false} />
 ```
