@@ -100,6 +100,7 @@ class Controller extends Base
     /** @var Access */
     private $access;
 
+    /** @var RosettaStone */
     private $rosettaStone;
 
 
@@ -117,7 +118,7 @@ class Controller extends Base
      * @param Filter\Filters\Assessment\IdFinder       $assessmentIdFinder
      * @param Filter\Selection\Mapper                  $filterSelectionMapper
      * @param Access                                   $access
-     * @param         RosettaStone                     $rosettaStone
+     * @param RosettaStone                             $rosettaStone
      */
     public function __construct(
         External_ClassInterface $externalClass,
@@ -189,7 +190,7 @@ class Controller extends Base
         /** @noinspection SuspiciousAssignmentsInspection */
         $date = Alaress_Date_Format::now();
 
-        $page        = Filter\Page\Model::PAGE_DUE_WORK_CALENDAR;
+        $page        = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $route       = $this->getRouter()->generate("learningUpcoming.postUpcomingForStudent", ['student' => $student, 'studentId' => $student->getId()]);
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $student);
 
@@ -263,7 +264,7 @@ class Controller extends Base
             'currentTerm'     => $term,
             'children'        => $this->getUser()->getChildren(),
             'filterPanel'     => $filterPanel,
-            'filteredPage'    => Filter\Page\Model::PAGE_DUE_WORK_CALENDAR,
+            'filteredPage'    => Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS,
             'filterIdSlugMap' => $this->buildFilterIdSlugMap($filterPanel),
         ];
 
@@ -292,7 +293,7 @@ class Controller extends Base
     public function postUpcomingForStudent(User $student): void
     {
         $request             = $this->request->post->get('filter_selection', []);
-        $page                = Filter\Page\Model::PAGE_DUE_WORK_CALENDAR;
+        $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $codec               = $this->filterFactoryFactory->buildCodec();
         $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
         $filters             = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);

@@ -7,26 +7,12 @@
         page                     string
         definitions              IDefinition[]         Indexed by definition.class
         pageFilters              Filter\Page\Model[]   Indexed by definition.class
-        PAGE_GRADES              string
-        PAGE_MARK_BOOK           string
-        PAGE_COURSE_MARK_BOOK    string
-        PAGE_PENDING_ASSESSMENTS string
+        pageLabels               string[]
         ENTITY_ASSESSMENTS       string
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
-{% if PAGE_GRADES == page %}
-    {% set pageName = 'Grades' %}
-{% elseif PAGE_MARK_BOOK == page %}
-    {% set pageName = 'Markbook' %}
-{% elseif PAGE_COURSE_MARK_BOOK == page %}
-    {% set pageName = 'Course Markbook' %}
-{% elseif PAGE_PENDING_ASSESSMENTS == page %}
-    {% set pageName = 'Pending ' ~ locale.assessment.proper %}
-{% else %}
-    {# Graceful fallback if constant not injected into twig #}
-    {% set pageName = page %}
-{% endif %}
+{% set pageName = pageLabels[page]|default(page) %}
 
 {% set entity = (definitions | first).filter.entity %}
 {%- if ENTITY_ASSESSMENTS == entity -%}

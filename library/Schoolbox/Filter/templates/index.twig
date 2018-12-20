@@ -3,14 +3,10 @@
 
     Usage:
             filtersPerPage           Filter\Model[][] Indexed by page, then filter.class.name
-            PAGE_GRADES              string
-            PAGE_MARK_BOOK           string
-            PAGE_COURSE_MARK_BOOK    string
             showCourseMarkbook       bool
-            PAGE_PENDING_ASSESSMENTS string
-            PAGE_DUE_WORK_CALENDAR   string
             ENTITY_ASSESSMENTS       string
             pageCurrent              string
+            pageLabels               string[]
 #}
 
 
@@ -22,20 +18,8 @@
         <section>
             <ul class="information-list">
                 {% for page, pageFilters in filtersPerPage if showCourseMarkbook or page != PAGE_COURSE_MARK_BOOK %}
-                    {% if PAGE_GRADES == page %}
-                        {% set pageName = 'Grades' %}
-                    {% elseif PAGE_MARK_BOOK == page %}
-                        {% set pageName = 'Markbook' %}
-                    {% elseif PAGE_COURSE_MARK_BOOK == page %}
-                        {% set pageName = 'Course Markbook' %}
-                    {% elseif PAGE_PENDING_ASSESSMENTS == page %}
-                        {% set pageName = 'Pending ' ~ locale.assessment.proper %}
-                    {% elseif PAGE_DUE_WORK_CALENDAR == page %}
-                        {% set pageName = 'Due Work Calendar' %}
-                    {% else %}
-                        {# Graceful fallback if constant not injected into twig #}
-                        {% set pageName = page %}
-                    {% endif %}
+
+                    {% set pageName = pageLabels[page]|default(page) %}
 
                     {# Filters on a page are all for same entity type, so just inspect first #}
                     {% set entity = (pageFilters | first).entity %}

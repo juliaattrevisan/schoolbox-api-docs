@@ -10,6 +10,7 @@ namespace Schoolbox\Filter;
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Role;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
@@ -28,23 +29,29 @@ class Controller extends BaseController
     /** @var Page\Option\Defaults\Mapper $defaultsMapper */
     private $defaultsMapper;
 
+    /** @var RosettaStone */
+    private $rosettaStone;
+
 
     /**
      * @param Mapper                      $filterMapper
      * @param Page\Mapper                 $pageMapper
      * @param Page\Option\Mapper          $optionsMapper
      * @param Page\Option\Defaults\Mapper $defaultsMapper
+     * @param RosettaStone                $rosettaStone
      */
     public function __construct(
         Mapper $filterMapper,
         Page\Mapper $pageMapper,
         Page\Option\Mapper $optionsMapper,
-        Page\Option\Defaults\Mapper $defaultsMapper
+        Page\Option\Defaults\Mapper $defaultsMapper,
+        RosettaStone $rosettaStone
     ) {
         $this->filterMapper   = $filterMapper;
         $this->pageMapper     = $pageMapper;
         $this->optionsMapper  = $optionsMapper;
         $this->defaultsMapper = $defaultsMapper;
+        $this->rosettaStone   = $rosettaStone;
     }
 
 
@@ -61,13 +68,7 @@ class Controller extends BaseController
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
             'filtersPerPage'           => $filtersPerPage,
-
-            // Constants to enable presentation language delegation to TWIG
-            'PAGE_PENDING_ASSESSMENTS' => Page\Model::PAGE_PENDING_ASSESSMENTS,
-            'PAGE_GRADES'              => Page\Model::PAGE_GRADES,
-            'PAGE_MARK_BOOK'           => Page\Model::PAGE_MARK_BOOK,
-            'PAGE_COURSE_MARK_BOOK'    => Page\Model::PAGE_COURSE_MARK_BOOK,
-            'PAGE_DUE_WORK_CALENDAR'   => Page\Model::PAGE_DUE_WORK_CALENDAR,
+            'pageLabels'               => $this->buildFilteredPageLabels(),
             'showCourseMarkbook'       => $this->getConfigLoader()->get('course_markbook_enable'),
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
             'pageCurrent'              => basename($this->getRequest()->query->get('page')),
@@ -103,12 +104,7 @@ class Controller extends BaseController
             'definitions'              => $definitions,
             'pageFilters'              => $pageFilters,
             'roleTypes'                => Role::getRoleTypes(),
-
-            // Constants to enable presentation language delegation to TWIG
-            'PAGE_PENDING_ASSESSMENTS' => Page\Model::PAGE_PENDING_ASSESSMENTS,
-            'PAGE_GRADES'              => Page\Model::PAGE_GRADES,
-            'PAGE_MARK_BOOK'           => Page\Model::PAGE_MARK_BOOK,
-            'PAGE_COURSE_MARK_BOOK'    => Page\Model::PAGE_COURSE_MARK_BOOK,
+            'pageLabels'               => $this->buildFilteredPageLabels(),
             'ENTITY_ASSESSMENTS'       => Assessment\Mapper::class,
         ])->setTitle(ucfirst($page) . ' filters'));
     }
@@ -231,5 +227,23 @@ class Controller extends BaseController
             }
         }
         return $filtersPerPage;
+    }
+
+
+    /**
+     * Returns labels for each type of filtered page, indexed by page
+     *
+     * @return string[]
+     */
+    private function buildFilteredPageLabels(): array
+    {
+        return [
+            Page\Model::PAGE_PENDING_ASSESSMENTS  => "Pending {$this->rosettaStone->translate('assessment', true, true)}",
+            Page\Model::PAGE_GRADES               => 'Grades',
+            Page\Model::PAGE_MARK_BOOK            => 'Class Markbook',
+            Page\Model::PAGE_COURSE_MARK_BOOK     => 'Course Markbook',
+            Page\Model::PAGE_LEARNING_ANALYTICS   => 'Learning Analytics',
+            Page\Model::PAGE_UPCOMING_ASSESSMENTS => "Upcoming {$this->rosettaStone->translate('assessment', true, true)}",
+        ];
     }
 }
