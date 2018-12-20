@@ -190,7 +190,7 @@ trait DueWorkTrait
     }
 
     /**
-     * @param float $maxMark
+     * @param float|null $maxMark
      */
     protected function setMaxMark($maxMark)
     {

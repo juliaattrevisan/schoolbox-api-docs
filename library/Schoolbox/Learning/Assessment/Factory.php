@@ -39,6 +39,8 @@ use \Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait as ProjectTrai
 use \Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+
 class Factory
 {
     use DueWorkTrait;
@@ -150,14 +152,31 @@ class Factory
          */
         $this->setAcceptOnline(trim($post['acceptOnline']));
         $this->setWorkType(trim($post['workType']));
-        $this->setMarkType(trim($post['markType']));
+        $markType = trim($post['markType']);
+        $this->setMarkType($markType);
         $this->setGradingScheme(trim($post['gradingScheme']));
         $this->setUseRubric(trim($post['useRubric']));
 
         $this->setMarkPerCapability(trim($post['markPerCapability']) === 'on');
         $this->setUseMarkRange(trim($post['useMarkRange']) === 'on');
 
-        $maxMark = (float)trim($post['maxMark']);
+        // MaxMark is the maximum available marks for the entire assessment, and should exist in some form
+        // for all mark types except None.
+        // Unfortunately, the due work crate form uses these deprecated values, not the new "slug" ones.
+        switch($markType) {
+            case MarkType::TYPE_PERCENT:
+            case MarkType::TYPE_LETTER:
+                $maxMark = 100.0;
+                break;
+            case MarkType::TYPE_NONE:
+                $maxMark = null;
+                break;
+            default:
+                $maxMark = (float)trim($post['maxMark']);
+                break;
+        }
+
+        // We should never end up with a 0 max mark unless something goes very wrong, but if that does happen, we want to handle it nicely.
         if ($maxMark === 0.0) {
             throw new \UnexpectedValueException('provide maximum available marks greater than 0');
         }
