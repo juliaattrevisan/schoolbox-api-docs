@@ -234,12 +234,21 @@ class Controller extends Base
 
         if (\count($displayGradesForFolderIds)) {
 
+            $visibility = new Visibility($this->access);
             // Student's work
             $workPerFolder = $this->assessmentDataSource
                 ->findAllByStudent($student, true, $term)
+                ->filter(function (IAssessable $assessable) use ($visibility, $student) {
+                    return $visibility->isVisibleToUser($assessable, $student, true);
+                })
                 ->groupByCallback(function (IAssessable $assessable) {
                     return $assessable->getContext()->getFolder()->getId();
                 });
+
+
+            foreach ($workPerFolder as $folderId => $assessments) {
+                $workPerFolder[$folderId] = $assessments->indexBy('id');
+            }
 
             foreach ($displayGradesForFolderIds as $folderId) {
                 if ($workPerFolder->keyExists($folderId)) {
