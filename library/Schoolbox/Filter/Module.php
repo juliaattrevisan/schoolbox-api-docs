@@ -46,7 +46,7 @@ class Module extends AlaressModule
                 case Page\Model::PAGE_MARK_BOOK:
                 case Page\Model::PAGE_COURSE_MARK_BOOK:
                 case Page\Model::PAGE_GRADES:
-                case Page\Model::PAGE_DUE_WORK_CALENDAR:
+                case Page\Model::PAGE_UPCOMING_ASSESSMENTS:
                     return ['factoryFactory' => new Filters\Assessment\FactoryFactory($this->getMapperFactory())];
                 // Other entity types can have their factory factories registered here
             }
@@ -71,6 +71,7 @@ class Module extends AlaressModule
             'pageMapper'     => $this->getMapperFactory()->getLazy(Page\Mapper::class),
             'optionsMapper'  => $this->getMapperFactory()->getLazy(Page\Option\Mapper::class),
             'defaultsMapper' => $this->getMapperFactory()->getLazy(Page\Option\Defaults\Mapper::class),
+            'rosettaStone'   => $injector->lazyGet('l10n'),
         ]));
     }
 

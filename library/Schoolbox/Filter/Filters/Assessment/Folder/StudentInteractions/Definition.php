@@ -35,7 +35,7 @@ class Definition extends FolderFilter\Definition
     {
         return [
 //            Option\Model::PAGE_GRADES,
-            Page\Model::PAGE_DUE_WORK_CALENDAR,
+            Page\Model::PAGE_UPCOMING_ASSESSMENTS,
         ];
     }
 

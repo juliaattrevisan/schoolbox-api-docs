@@ -198,7 +198,7 @@ class BaseComponent implements IComponent
     /**
      * @return IDefinition
      */
-    protected function getDefinition()
+    public function getDefinition(): IDefinition
     {
         return $this->definition;
     }

@@ -10,8 +10,6 @@
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Submission\Event;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;

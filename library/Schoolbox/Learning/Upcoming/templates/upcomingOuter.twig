@@ -1,5 +1,10 @@
+{#
+    Data:
+        filterIdSlugMap        string[]     Maps filter ids to semantic slugs
+        ...
+#}
 {% import '@learning/macro/urgency.twig' as urgency %}
-{% import '@learning/macro/dueDate.twig' as dueDate %}
+{% set reportContentId = 'report_content' %}
 
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
@@ -38,6 +43,140 @@
 
     // once the DOM has loaded, punch a fancy calendar into it
     $(function() {
+
+        /**
+         * Apply the most-recently applied filter panel selections to the events being displayed on the Calendar
+         */
+        var applyFiltersToCalendarEvents = function () {
+
+            // Update JS representation of current filter option selections
+            updateFilterOptionValues();
+
+            // Apply filter settings to each event
+            $('[data-meta-filter-sync]').each(function (idx, elem) {
+                var $event = $(elem);
+                if (hideEvent($event)) {
+                    $event.hide();
+                } else {
+                    $event.show();
+                }
+            });
+
+            $(window).trigger('resize');
+        };
+
+
+        // Filtered content has been [re]loaded
+        $('#{{ reportContentId }}').on('filterContentLoaded', function () {
+            applyFiltersToCalendarEvents();
+        });
+
+        // Maps filterId to currently-applied selections
+        var appliedFilters;
+
+        // Maps a filterId to a semantic slug
+        var filterIdSlugMap = {{ filterIdSlugMap|json_encode|raw }};
+
+        /**
+         * Examines the filter panel's most-recently submitted settings and
+         * converts to a suitable JS representation we can use to filter events.
+         *
+         * We need to include all filter selections because the options displayed may be a sub-set of all possible options.
+         * eg consider when Tasks are configured by the SU to never be available, we need to ensure they are always filtered out.
+         */
+        var updateFilterOptionValues = function () {
+            appliedFilters = {};
+            $('#filter_panel').find('[data-component]').each(function (idx, elem) {
+                var $panelComponent  = $(elem),
+                    filterSelections = {},
+                    filterId         = $panelComponent.attr('data-component'),
+                    $options         = $panelComponent.find('[data-value-original]');
+
+                var countSelected = 0;
+                $options.each(function (idx, elem) {
+                    var $option = $(elem),
+                        key     = $option.attr('data-key'),
+                        val     = $option.attr('data-value-original');
+
+                    if ('1' === val) {
+                        countSelected++;
+                    }
+                    filterSelections[key] = val;
+                });
+
+                // If no options were selected, then flip the value so that all options are selected in this representation
+                if (!countSelected) {
+                    for (var i in filterSelections) {
+                        if (filterSelections.hasOwnProperty(i)) {
+                            filterSelections[i] = '1';
+                        }
+                    }
+                }
+
+                appliedFilters[filterId] = filterSelections;
+            });
+        };
+
+
+        /**
+         * Returns whether we should hide this event due to the current filter panel selections
+         *
+         * @param {jQuery} $event
+         * @return {boolean}
+         */
+        var hideEvent = function ($event) {
+
+            // For each filter present in the panel
+            for (var filterId in filterIdSlugMap) {
+
+                // Ignore inherited properties
+                if (!filterIdSlugMap.hasOwnProperty(filterId)) {
+                    continue;
+                }
+
+                // Is this filter not being applied?
+                if (!appliedFilters.hasOwnProperty(filterId)) {
+                    continue;
+                }
+
+                // Which filter are we currently applying?
+                // Hide the event if its attribute is not present or not selected in the filter options.
+                var key = getFilterOptionKey(filterIdSlugMap[filterId], $event);
+                if (!(key in appliedFilters[filterId]) || '1' !== appliedFilters[filterId][key]) {
+                    return true;
+                }
+            }
+
+            // Filter is not being applied, so don't hide event.
+            return false;
+        };
+
+        /**
+         * Converts an event attribute into a filter key
+         *
+         * @param {string} slug
+         * @param {jQuery} $event
+         * @return {string}
+         */
+        var getFilterOptionKey = function (slug, $event) {
+            switch (slug) {
+                case 'activityType':
+                    return $event.attr('data-meta-assessmenttype');
+                case 'studentFolders':
+                    return $event.attr('data-meta-folderid');
+                case 'weighting':
+                    return "1" === $event.attr('data-meta-weighted') ? 'weighted' : 'unweighted';
+                case 'workType':
+                    var key = $event.attr('data-meta-worktypeid');
+                    if (!key) {
+                        key = 'none';
+                    }
+                    return key;
+                default:
+                    console.log('Unrecognised filter slug: ' + slug);
+            }
+        };
+
         // Allow checking of anchor for view to display
         var anchor = '';
         var parts  = location.href.split('#');
@@ -87,10 +226,20 @@
                 firstDay: Number('{{ config.calendar_start_day|escape('js') }}'),
 
                 /**
-                 * When an event is drawn on the calendar
-                 * @param calEvent
+                 * Called when an event is about to be rendered on the calendar
+                 *
+                 * @param {object} calEvent
+                 * @param {jQuery} $elem
+                 * @see https://fullcalendar.io/docs/eventRender
                  */
-                eventRender: function(calEvent) {
+                eventRender: function(calEvent, $elem) {
+                    // Convert all meta to HTML attributes
+                    var prefix = 'data-meta-';
+                    $elem.attr(prefix + 'filter-sync', '');
+                    $.each(calEvent.data.meta, function (k, v) {
+                        $elem.attr(prefix + k, v);
+                    });
+
                     // Always render placeholders in the most basic manner
                     if (calEvent.id === 'placeholder') {
                         return true;
@@ -176,6 +325,15 @@
                         },
                         cache: false
                     });
+                },
+
+                /**
+                 * Triggered after all events have finished rendering.
+                 *
+                 * @see https://fullcalendar.io/docs/viewRender
+                 */
+                eventAfterAllRender: function () {
+                    applyFiltersToCalendarEvents();
                 }
             },
             x: false
@@ -190,7 +348,7 @@
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 column">
-                    <h1>{{ locale.dueWork.proper }} for {{ student.formatName }}</h1>
+                    <h1>Upcoming Due Work for {{ student.formatName }}</h1>
                 </div>
             </div>
 
@@ -203,8 +361,8 @@
                     {% for child in children %}
                         <li>
                             <div class="card small-12">
-                                <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id, student: child}) }}" title="View upcoming work">
-                                    <img src="/portrait.php?userId={{ child.externalId }}&size=square64" alt="View upcoming work" />
+                                <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id, student: child}) }}" title="View upcoming Due Work">
+                                    <img src="/portrait.php?userId={{ child.externalId }}&size=square64" alt="View upcoming {{ locale.assessment.properPlural }}" />
                                     <p>{{ child.formatName }}</p>
                                     <p class="meta">{{ child.role.name }}</p>
                                 </a>
@@ -235,44 +393,8 @@
 {% if subjects|length %}
     <div class="row">
         <div class="small-12 medium-6 columns island">
-            <h2 class="subheader">Upcoming {{ locale.dueWork.proper }}</h2>
-            {% if upcomingWork|length %}
-                <section>
-                    <ul class="action-list">
-                        {% for upcoming in upcomingWork %}
-                            <li>
-                                <div class="card small-12">
-                                    <h3>
-                                        {% set route = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: upcoming.id, student: student, studentId: student.id, assessment: upcoming}) %}
-                                        {% if route %}
-                                            <a class="title" href="{{ route }}{{ returnUrl }}">{{ upcoming.title }}</a>
-                                        {% else %}
-                                            {{ upcoming.title }}
-                                        {% endif %}
-                                    </h3>
-                                    {% if subjects[upcoming.context.folder.id].hasPerms %}
-                                        <p class="meta">
-                                            <a href="/homepage/{{ upcoming.context.folder.id }}">{{ upcoming.context.folder.title }}</a>
-                                            {{ upcoming.typeName }}
-                                        </p>
-                                    {% else %}
-                                        <p class="meta">
-                                            {{ upcoming.context.folder.title }}
-                                            {{ upcoming.typeName }}
-                                        </p>
-                                    {% endif %}
-                                    <p class="meta">{{ dueDate.forParticipant(upcoming.participant(student)) }}</p>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </section>
-            {% else %}
-                <div class="empty-state">
-                    <i class="icon-due-work"></i>
-                    <p>Currently no work has been set, nice one.</p>
-                </div>
-            {% endif %}
+            <h2 class="subheader">Upcoming Due Work</h2>
+            <div id="{{ reportContentId }}"></div>
         </div>
 
         <div class="small-12 medium-6 columns">

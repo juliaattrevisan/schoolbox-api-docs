@@ -710,10 +710,11 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @param Collection|string[] $temporalStates (can also be NULL but storm doesn't like iterating that type-hint)
      * @return mixed[]
+     * @throws \UnexpectedValueException
      */
-    private function getClauseTemporalState(Collection $temporalStates = null)
+    private function getClauseTemporalState(Collection $temporalStates = null): array
     {
-        // If no weighting types are selected, don't filter
+        // If no options are selected, don't filter
         if (null === $temporalStates) {
             return ['TRUE', [], ''];
         }
@@ -724,34 +725,53 @@ class IdFinder extends Filter\AbstractIdFinder
 
         $now     = \Alaress_Date_Format::now()->getDatabase();
         $orParts = [];
-        $joinParticipantPlan = false;
 
+        $joinParticipantPlan = false;
         foreach ($temporalStates as $temporalState) {
-            if (TemporalState\Definition::KEY_UNPUBLISHED === $temporalState) {
-                $orParts[] = '(:now < a.publish_date)';
-            } elseif (TemporalState\Definition::KEY_UPCOMING === $temporalState) {
-                $orParts[] = '(a.publish_date <= :now AND :now < a.open_date)';
-            } elseif (TemporalState\Definition::KEY_OPEN === $temporalState) {
-                $orParts[] = '(a.open_date <= :now AND :now < a.due_date)';
-            } elseif (TemporalState\Definition::KEY_OVERDUE === $temporalState) {
-                $orParts[] = '(a.due_date <= :now AND :now < a.close_date)';
-            } elseif (TemporalState\Definition::KEY_CLOSED === $temporalState) {
-                $orParts[] = '(a.close_date <= :now)';
-            } elseif (TemporalState\Definition::KEY_CUSTOM_PUBLISH_DATE === $temporalState) {
-                $joinParticipantPlan = true;
-                $orParts[] = '(pp.publish_date <= :now)';
+            switch ($temporalState) {
+                case TemporalState\Definition::KEY_UNPUBLISHED:
+                    $orParts[] = '(:now < a.publish_date)';
+                    break;
+                case TemporalState\Definition::KEY_UPCOMING:
+                    $orParts[] = '(a.publish_date <= :now AND :now < a.open_date)';
+                    break;
+                case TemporalState\Definition::KEY_OPEN:
+                    $orParts[] = '(a.open_date <= :now AND :now < a.due_date)';
+                    break;
+                case TemporalState\Definition::KEY_OVERDUE:
+                    $orParts[] = '(a.due_date <= :now AND :now < a.close_date)';
+                    break;
+                case TemporalState\Definition::KEY_CLOSED:
+                    $orParts[] = '(a.close_date <= :now)';
+                    break;
+                case TemporalState\Definition::KEY_CUSTOM_UNPUBLISHED:
+                    $joinParticipantPlan = true;
+                    $orParts[]           = '(:now < COALESCE(pp.publish_date, a.publish_date))';
+                    break;
+                case TemporalState\Definition::KEY_CUSTOM_UPCOMING:
+                    $joinParticipantPlan = true;
+                    $orParts[]           = '(COALESCE(pp.publish_date, a.publish_date) <= :now AND :now < COALESCE(pp.open_date, a.open_date))';
+                    break;
+                case TemporalState\Definition::KEY_CUSTOM_OPEN:
+                    $joinParticipantPlan = true;
+                    $orParts[]           = '(COALESCE(pp.open_date, a.open_date) <= :now AND :now < COALESCE(pp.due_date, a.due_date))';
+                    break;
+                case TemporalState\Definition::KEY_CUSTOM_OVERDUE:
+                    $joinParticipantPlan = true;
+                    $orParts[]           = '(COALESCE(pp.due_date, a.due_date) <= :now AND :now < COALESCE(pp.close_date, a.close_date))';
+                    break;
+                case  TemporalState\Definition::KEY_CUSTOM_CLOSED:
+                    $joinParticipantPlan = true;
+                    $orParts[]           = '(COALESCE(pp.close_date, a.close_date) <= :now)';
+                    break;
+                default:
+                    throw new \UnexpectedValueException("Unrecognised temporal state filter key: '{$temporalState}");
             }
         }
 
-        if ($joinParticipantPlan) {
-            return [
-                '(' . implode(' OR ', $orParts) . ')',
-                [':now' => $now],
-                'LEFT JOIN participant_plan pp  ON pp.assessment_id = a.id'
-            ];
-        }
+        $participantPlanJoin = $joinParticipantPlan ? 'LEFT JOIN participant_plan pp ON pp.assessment_id = a.id' : '';
 
-        return ['(' . implode(' OR ', $orParts) . ')', [':now' => $now], ''];
+        return ['(' . implode(' OR ', $orParts) . ')', [':now' => $now], $participantPlanJoin];
     }
 
 

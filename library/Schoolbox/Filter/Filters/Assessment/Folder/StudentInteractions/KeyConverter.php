@@ -12,5 +12,11 @@ use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 
 class KeyConverter extends FolderFilter\KeyConverter
 {
+    /**
+     * @inheritdoc
+     */
+    protected function assertValidKey(string $key, \Schoolbox\User $user, string $page): void
+    {
 
+    }
 }

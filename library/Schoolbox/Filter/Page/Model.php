@@ -25,7 +25,7 @@ class Model
     public const PAGE_MARK_BOOK           = 'markbook';
     public const PAGE_COURSE_MARK_BOOK    = 'courseMarkbook';
     public const PAGE_LEARNING_ANALYTICS  = 'analytics';
-    public const PAGE_DUE_WORK_CALENDAR   = 'dueWorkCal';
+    public const PAGE_UPCOMING_ASSESSMENTS= 'dueWorkCal';
 
 
     /**
@@ -46,24 +46,24 @@ class Model
     public static function getPageRoleTypes()
     {
         return [
-            self::PAGE_PENDING_ASSESSMENTS => [
+            self::PAGE_PENDING_ASSESSMENTS  => [
                 Role::STAFF,
             ],
-            self::PAGE_GRADES              => [
+            self::PAGE_GRADES               => [
                 Role::STAFF,
                 Role::PARENT,
                 Role::STUDENT,
             ],
-            self::PAGE_MARK_BOOK           => [
+            self::PAGE_MARK_BOOK            => [
                 Role::STAFF,
             ],
-            self::PAGE_COURSE_MARK_BOOK    => [
+            self::PAGE_COURSE_MARK_BOOK     => [
                 Role::STAFF,
             ],
-            self::PAGE_LEARNING_ANALYTICS  => [
+            self::PAGE_LEARNING_ANALYTICS   => [
                 Role::STAFF,
             ],
-            self::PAGE_DUE_WORK_CALENDAR   => [
+            self::PAGE_UPCOMING_ASSESSMENTS => [
                 Role::STAFF,
                 Role::PARENT,
                 Role::STUDENT,

@@ -1,6 +1,6 @@
 <?php
 /**
- * Event source for the due work screen (/submission/dueWork)
+ * Event source for the due work screen (/learning/due/{student.id})
  *
  * Differs from the base source in that its colors come from the color list.
  *
