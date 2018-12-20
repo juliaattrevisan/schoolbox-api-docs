@@ -12,7 +12,7 @@
 
 
 {% if not userSelection %}
-    <input type="hidden" name="filter_selection[{{ roleSelection.filter.id }}][{{ roleSelection.key }}]" value="{{ roleSelection.selected ? '1' : '0' }}">
+    <input type="hidden" name="filter_selection[{{ roleSelection.filter.id }}][{{ roleSelection.key }}]" data-key="{{ roleSelection.key }}" data-value-original value="{{ roleSelection.selected ? '1' : '0' }}">
 {% else %}
     <input type="hidden" name="filter_selection[{{ userSelection.filter.id }}][{{ userSelection.key }}]" value="{% if userSelection.selected and disabled %}1{% else %}0{% endif %}">
     <input
