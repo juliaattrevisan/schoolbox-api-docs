@@ -38,6 +38,12 @@ class StudentAttributes
     /** @var int */
     private $curriculumSemester;
 
+    /** @var Alaress_Date_Format */
+    private $reportStart;
+
+    /** @var Alaress_Date_Format */
+    private $reportFinish;
+
 
     /**
      * @param User        $user
@@ -65,6 +71,8 @@ class StudentAttributes
         $this->term                = $this->deriveTerm($now);
         $this->curriculumYearLevel = ($this->yearLevel === 11 && $this->term === 4) ? 12 : $this->yearLevel;
         $this->curriculumSemester  = $this->deriveCurriculumSemester($this->yearLevel, $this->term);
+        $this->reportStart         = $this->deriveReportStartDate($this->yearLevel, $this->term);
+        $this->reportFinish        = $this->deriveReportFinishDate($this->yearLevel, $this->term);
     }
 
 
@@ -167,22 +175,24 @@ class StudentAttributes
 
 
     /**
-     * Returns the date that the report logically starts at.
+     * Derive the date that the report logically starts at.
      *
+     * @param int $yearLevel
+     * @param int $term
      * @return Alaress_Date_Format
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function getReportStartDate(): Alaress_Date_Format
+    public function deriveReportStartDate(int $yearLevel, int $term): Alaress_Date_Format
     {
-        if ($this->yearLevel === 11 && $this->term === 4) {
+        if ($yearLevel === 11 && $term === 4) {
             $reportStart = self::FIRST_DAY_TERM4_RELATIVE;
-        } elseif ($this->yearLevel === 12) {
-            if ($this->term === 1) {
+        } elseif ($yearLevel === 12) {
+            if ($term === 1) {
                 $reportStart = self::FIRST_DAY_TERM4_RELATIVE . (date('Y') - 1);
             } else {
                 $reportStart = self::FIRST_DAY_TERM2_RELATIVE;
             }
-        } elseif (\in_array($this->term, [1, 2], true)) {
+        } elseif (\in_array($term, [1, 2], true)) {
             $reportStart = self::FIRST_DAY_TERM1_RELATIVE;
         } else {
             // Terms 3+4
@@ -194,25 +204,27 @@ class StudentAttributes
 
 
     /**
-     * Returns the date that the report logically ends at.
+     * Derive the date that the report logically finishes at.
      *
+     * @param int $yearLevel
+     * @param int $term
      * @return Alaress_Date_Format
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function getReportFinishDate(): Alaress_Date_Format
+    public function deriveReportFinishDate(int $yearLevel, int $term): Alaress_Date_Format
     {
-        $isYear11 = $this->yearLevel === 11;
-        $isYear12 = $this->yearLevel === 12;
+        $isYear11 = $yearLevel === 11;
+        $isYear12 = $yearLevel === 12;
 
-        if ($isYear11 && $this->term === 3) {
+        if ($isYear11 && $term === 3) {
             $reportEnd = self::FIRST_DAY_TERM4_RELATIVE;
-        } elseif ($isYear11 && $this->term === 4) {
+        } elseif ($isYear11 && $term === 4) {
             $reportEnd = self::FIRST_DAY_TERM2_RELATIVE . (date('Y') + 1);
-        } elseif ($isYear12 && $this->term === 1) {
+        } elseif ($isYear12 && $term === 1) {
             $reportEnd = self::FIRST_DAY_TERM2_RELATIVE;
-        } elseif ($isYear12 && $this->term === 2) {
+        } elseif ($isYear12 && $term === 2) {
             $reportEnd = self::FIRST_DAY_TERM1_RELATIVE . (date('Y') + 1);
-        } elseif (\in_array($this->term, [1, 2], true)) {
+        } elseif (\in_array($term, [1, 2], true)) {
             $reportEnd = self::FIRST_DAY_TERM3_RELATIVE;
         } else {
             // Terms 3+4
@@ -269,5 +281,25 @@ class StudentAttributes
     public function getCurriculumSemester(): int
     {
         return $this->curriculumSemester;
+    }
+
+    /**
+     * Returns the date that the report logically starts at.
+     *
+     * @return Alaress_Date_Format
+     */
+    public function getReportStartDate(): Alaress_Date_Format
+    {
+        return $this->reportStart;
+    }
+
+    /**
+     * Returns the date that the report logically finishes at.
+     *
+     * @return Alaress_Date_Format
+     */
+    public function getReportFinishDate(): Alaress_Date_Format
+    {
+        return $this->reportFinish;
     }
 }
