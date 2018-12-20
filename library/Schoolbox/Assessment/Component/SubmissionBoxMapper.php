@@ -262,7 +262,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
 			LEFT JOIN {$this->getJoinSql('category',  'sb', 'cat')}
-			LEFT JOIN {$this->getJoinSql('submission_box_file', 'sb', 'at')}
 			WHERE sb.id=?
 		";
         $statement = $this->database->prepare($query);
