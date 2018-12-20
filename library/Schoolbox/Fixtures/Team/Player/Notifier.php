@@ -91,12 +91,16 @@ class Notifier extends AbstractModuleNotifier
         switch ($method) {
             case Mapper::METHOD_DELETE:
                 $team = $this->getTeamMapper()->findById($bundle->getEvent()->getObject()->getTeam()->getId());
-                $match = $this->getMatchMapper()->findNextMatch($team);
+                try {
+                    $match = $this->getMatchMapper()->findNextMatch($team);
 
-                $diff = \Alaress_Date_Format::now()->diffInHours($match->getStartAt());
+                    $diff = \Alaress_Date_Format::now()->diffInHours($match->getStartAt());
 
-                if ($diff > 0 && $diff < 24) {
-                    $bundle->attach(self::TRIGGER_REMOVED, self::IMMEDIATELY);
+                    if ($diff > 0 && $diff < 24) {
+                        $bundle->attach(self::TRIGGER_REMOVED, self::IMMEDIATELY);
+                    }
+                } catch (\OutOfBoundsException $e) {
+                    //no match found, no future notifications to remove
                 }
 
                 break;

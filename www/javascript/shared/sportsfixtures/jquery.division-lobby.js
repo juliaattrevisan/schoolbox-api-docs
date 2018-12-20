@@ -241,7 +241,7 @@
 
                                 /* Activate indicators
                                  */
-                                toFeedback.toastTimeout({text: 'Added to team', css: 'success'});
+                                toFeedback.toastTimeout({text: 'Player moved to team', css: 'success'});
 
                                 /* Reapply filter settings to division player list
                                  */
