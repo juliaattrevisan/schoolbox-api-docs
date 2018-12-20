@@ -196,8 +196,7 @@
 
                         /* Activate indicators
                          */
-                        fromFeedback.toastActivate({text: 'Removing from team...'});
-                        toFeedback.toastActivate({text: 'Adding to team...'});
+                        toFeedback.toastActivate({text: 'Moving between teams...'});
 
                         /* Execute db transaction - ajax call here
                          */
@@ -242,7 +241,6 @@
 
                                 /* Activate indicators
                                  */
-                                fromFeedback.toastTimeout({text: 'Removed from team', css: 'success'});
                                 toFeedback.toastTimeout({text: 'Added to team', css: 'success'});
 
                                 /* Reapply filter settings to division player list
@@ -250,7 +248,7 @@
                                 applyPlayerFilter();
                             })
                             .fail(function() {
-                                toFeedback.toastTimeout({text: 'Add failed', css: 'alert'});
+                                toFeedback.toastTimeout({text: 'Moving player failed', css: 'alert'});
                                 player.remove();
                             });
                     }
