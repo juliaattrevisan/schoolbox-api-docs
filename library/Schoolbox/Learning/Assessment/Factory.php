@@ -124,6 +124,7 @@ class Factory
      * Factory constructor.
      * @param User $creator
      * @param $post (an array of post vars from the create/update forms)
+     * @throws \UnexpectedValueException
      */
     public function __construct(User $creator, $post) {
 
@@ -156,7 +157,11 @@ class Factory
         $this->setMarkPerCapability(trim($post['markPerCapability']) === 'on');
         $this->setUseMarkRange(trim($post['useMarkRange']) === 'on');
 
-        $this->setMaxMark(trim($post['maxMark']));
+        $maxMark = (float)trim($post['maxMark']);
+        if ($maxMark === 0.0) {
+            throw new \UnexpectedValueException('provide maximum available marks greater than 0');
+        }
+        $this->setMaxMark($maxMark);
 
         if (isset($post['self_reviewable'])) {
             // Value has come though from the form, use that
