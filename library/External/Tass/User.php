@@ -198,7 +198,6 @@ class External_Tass_User implements External_UserInterface
         $query = "SELECT DISTINCT
                       'P' + RTRIM(parent.par_code)
                                           AS StudentContactID,
-                      NULL                AS StudentContactSplitFamilyNumber,
                       pa.add_num          AS StudentContactAddressNumber,
                       parent.f_name       AS StudentContactPreferred,
                       0                   AS StudentContactSilentPhoneFlag,
@@ -223,7 +222,6 @@ class External_Tass_User implements External_UserInterface
                   SELECT DISTINCT
                       'S' + RTRIM(parent.par_code)
                                           AS StudentContactID,
-                      NULL                AS StudentContactSplitFamilyNumber,
                       pa.add_num          AS StudentContactAddressNumber,
                       parent.m_name       AS StudentContactPreferred,
                       0                   AS StudentContactSilentPhoneFlag,
@@ -248,7 +246,6 @@ class External_Tass_User implements External_UserInterface
                 SELECT DISTINCT
                     'P' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
                                         AS StudentContactID,
-                    NULL                AS StudentContactSplitFamilyNumber,
                     pa.add_num          AS StudentContactAddressNumber,
                     parent.f_name       AS StudentContactPreferred,
                     0                   AS StudentContactSilentPhoneFlag,
@@ -279,7 +276,6 @@ class External_Tass_User implements External_UserInterface
                 SELECT DISTINCT
                     'S' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
                                         AS StudentContactID,
-                    NULL                AS StudentContactSplitFamilyNumber,
                     pa.add_num          AS StudentContactAddressNumber,
                     parent.f_name       AS StudentContactPreferred,
                     0                   AS StudentContactSilentPhoneFlag,
@@ -308,14 +304,6 @@ class External_Tass_User implements External_UserInterface
         $parents = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
 
         foreach ($parents as $key => $parent) {
-            /* If a parent is a split family via split family access (SFA) codes
-             * or by communications rules (commrules),
-             * don't display contact information
-             */
-            if (!empty($parent['StudentContactSplitFamilyNumber'])) {
-                unset($parents[$key]);
-            }
-
             /* Fallback to add_num 1 when there is no add_num mother or add_num father
              */
             if ($parent['StudentContactAddressNumber'] == '1') {
