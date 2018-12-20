@@ -719,7 +719,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
      * @returns {*}
      */
     function parseTime(text) {
-        return strtotime(denaturalize(text));
+        return $.fn.strtotime(denaturalize(text));
     }
 
 
