@@ -654,7 +654,7 @@ class External_Synergetic_User implements External_UserInterface
 
             // Remove invalid and silent contact details
 
-            if ($contact['ValidAddressFlag'] == 0 || $contact['SilentHomeAddressFlag'] == 1 || $contact['ShareHomeAddressFlag'] !== '1') {
+            if ($contact['ValidAddressFlag'] == 0 || $contact['SilentHomeAddressFlag'] == 1 || $contact['ShareHomeAddressFlag'] != 1) {
                 $contact['StudentContactAddress1'] = '';
                 $contact['StudentContactAddress2'] = '';
                 $contact['StudentContactAddress3'] = '';
