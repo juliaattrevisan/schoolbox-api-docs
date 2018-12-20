@@ -86,7 +86,10 @@ class Zone {
 
 
     /**
-     * @param iterable $hashlist
+     * Attach a list of files to this attachzone.
+     *
+     * @param iterable $hashlist Each value is either a string (hash) or an
+     *                           `IStorage` object
      * @return self
      */
     public function attachFiles(iterable $hashlist)
