@@ -149,7 +149,7 @@ class Controller extends Web\Controller\Base
             // Build component data
             $ibGraphData = $this->buildInternationalBaccalaureateGraphData($folder, $attributes, $courseSpec, $user);
             $falData     = $this->buildFinalAchievementLevelsData($attributes, $unitImpls, $user);
-            $aamData     = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
+            $aamData     = $this->buildAcademicAchievementMatrixData($attributes, $unitImpls, $user);
             $aasData     = $this->buildAcademicAchievementSummaryData($attributes, $unitImpls, $user);
         }
 
@@ -284,13 +284,14 @@ class Controller extends Web\Controller\Base
     /**
      * Builds data for rendering the AAM components.
      *
+     * @param StudentAttributes                  $attributes
      * @param GenericCollection|UnitImpl\Model[] $unitImpls
      * @param User                               $student
      * @return array
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    private function buildAcademicAchievementMatrixData(GenericCollection $unitImpls, User $student): array
+    private function buildAcademicAchievementMatrixData(StudentAttributes $attributes, GenericCollection $unitImpls, User $student): array
     {
         $configName = Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX;
 
@@ -305,6 +306,7 @@ class Controller extends Web\Controller\Base
         }
 
         $aam = new AcademicAchievementMatrix(
+            $attributes,
             $unitImpls,
             $student,
             $this->visibility,
@@ -347,6 +349,7 @@ class Controller extends Web\Controller\Base
         }
 
         $aas = new AcademicAchievementSummary(
+            $attributes,
             $unitImpls,
             $student,
             $this->visibility,
@@ -389,6 +392,7 @@ class Controller extends Web\Controller\Base
         }
 
         $fal = new FinalAchievementLevels(
+            $attributes,
             $unitImpls,
             $student,
             $this->visibility,
@@ -520,7 +524,7 @@ class Controller extends Web\Controller\Base
             ->isNull('a.deleted_at')
             ->in('ui.id', $unitImpls->getPropertyValues('id'))
             ->equals('a.work_type_id', $workTypeId)
-            ->betweenDates('a.due_date', $attributes->getReportStartDate(), $attributes->getReportFinishDate());
+            ->betweenDates('a.due_date', $attributes->getReportStart(), $attributes->getReportFinish());
 
         $whereClause = \implode(' AND ', $pb->getWhere());
 

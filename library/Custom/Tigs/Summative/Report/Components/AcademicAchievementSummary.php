@@ -8,9 +8,12 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\Report\Components;
 
 use Alaress\Authorizer\Authorizer;
+use Custom\Tigs\Summative\Report\BaseComponent;
+use Custom\Tigs\Summative\Report\StudentAttributes;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
@@ -50,6 +53,7 @@ class AcademicAchievementSummary extends BaseComponent
 
 
     /**
+     * @param StudentAttributes $attributes
      * @param GenericCollection $unitImpls
      * @param User              $student
      * @param Visibility        $visibility
@@ -60,6 +64,7 @@ class AcademicAchievementSummary extends BaseComponent
      * @param Router\Router     $router
      */
     public function __construct(
+        StudentAttributes $attributes,
         GenericCollection $unitImpls,
         User $student,
         Visibility $visibility,
@@ -69,6 +74,8 @@ class AcademicAchievementSummary extends BaseComponent
         Authorizer $authorizer,
         Router\Router $router
     ) {
+        parent::__construct($attributes);
+
         $this->unitImpls     = $unitImpls;
         $this->student       = $student;
         $this->visibility    = $visibility;
@@ -113,7 +120,10 @@ class AcademicAchievementSummary extends BaseComponent
      */
     private function buildUnitData(UnitImpl\Model $unitImpl): ?array
     {
-        $aasAssessables = $this->findAssessmentsWithWorkType($unitImpl, $this->aasWorkTypeId);
+        $aasAssessables = $this->findAssessmentsWithWorkType($unitImpl, $this->aasWorkTypeId)
+                               ->filter(function (IAssessable $assessable) {
+                                   return $this->isDueWithinReportWindow($assessable);
+                               });
 
         // Did we find 2+ AAS assessments in this unit?
         $countAas = \count($aasAssessables);

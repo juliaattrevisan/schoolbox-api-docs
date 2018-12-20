@@ -8,10 +8,13 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\Report\Components;
 
 use Alaress\Authorizer\Authorizer;
+use Custom\Tigs\Summative\Report\BaseComponent;
+use Custom\Tigs\Summative\Report\StudentAttributes;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -50,6 +53,7 @@ class AcademicAchievementMatrix extends BaseComponent
 
 
     /**
+     * @param StudentAttributes $attributes
      * @param GenericCollection $unitImpls
      * @param User              $student
      * @param Visibility        $visibility
@@ -60,6 +64,7 @@ class AcademicAchievementMatrix extends BaseComponent
      * @param Router\Router     $router
      */
     public function __construct(
+        StudentAttributes $attributes,
         GenericCollection $unitImpls,
         User $student,
         Visibility $visibility,
@@ -69,6 +74,8 @@ class AcademicAchievementMatrix extends BaseComponent
         Authorizer $authorizer,
         Router\Router $router
     ) {
+        parent::__construct($attributes);
+
         $this->unitImpls     = $unitImpls;
         $this->student       = $student;
         $this->visibility    = $visibility;
@@ -118,7 +125,10 @@ class AcademicAchievementMatrix extends BaseComponent
      */
     private function buildUnitData(UnitImpl\Model $unitImpl): ?array
     {
-        $aamAssessables = $this->findAssessmentsWithWorkType($unitImpl, $this->aamWorkTypeId);
+        $aamAssessables = $this->findAssessmentsWithWorkType($unitImpl, $this->aamWorkTypeId)
+                               ->filter(function (IAssessable $assessable) {
+                                   return $this->isDueWithinReportWindow($assessable);
+                               });
 
         // Did we find 2+ AAM assessments in this unit?
         $countAam = \count($aamAssessables);

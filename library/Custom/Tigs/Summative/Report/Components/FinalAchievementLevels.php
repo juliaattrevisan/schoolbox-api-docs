@@ -8,9 +8,12 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\Report\Components;
 
 use Alaress\Authorizer\Authorizer;
+use Custom\Tigs\Summative\Report\BaseComponent;
+use Custom\Tigs\Summative\Report\StudentAttributes;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
@@ -50,6 +53,7 @@ class FinalAchievementLevels extends BaseComponent
 
 
     /**
+     * @param StudentAttributes $attributes
      * @param GenericCollection $unitImpls
      * @param User              $student
      * @param Visibility        $visibility
@@ -60,6 +64,7 @@ class FinalAchievementLevels extends BaseComponent
      * @param Router\Router     $router
      */
     public function __construct(
+        StudentAttributes $attributes,
         GenericCollection $unitImpls,
         User $student,
         Visibility $visibility,
@@ -69,6 +74,8 @@ class FinalAchievementLevels extends BaseComponent
         Authorizer $authorizer,
         Router\Router $router
     ) {
+        parent::__construct($attributes);
+
         $this->unitImpls     = $unitImpls;
         $this->student       = $student;
         $this->visibility    = $visibility;
@@ -87,18 +94,22 @@ class FinalAchievementLevels extends BaseComponent
      * * if invalid data found, returns an error message to aid resolution
      *
      * @return null|array
-     * @var string    $data ['error']     Optional. If invalid data encountered
-     * @var int[]     $data ['data']      Optional. Indexed by concat(Criterion.name, Indicator.name)
+     * @var string $data ['error']     Optional. If invalid data encountered
+     * @var int[]  $data ['data']      Optional. Indexed by concat(Criterion.name, Indicator.name)
      * @throws \Schoolbox\Mapper\Exception
      * @throws Router\Exception\RouteNotFound
+     * @throws \UnexpectedValueException
      */
     public function toContext(): ?array
     {
-        $falAssessables = [];
+        $falAssessables = new GenericCollection(IAssessable::class);
         foreach($this->unitImpls as $unitImpl){
             /** @noinspection SlowArrayOperationsInLoopInspection */
-            $falAssessables = \array_merge($falAssessables, $this->findAssessmentsWithWorkType($unitImpl, $this->falWorkTypeId));
+            $falAssessables = $falAssessables->merge($this->findAssessmentsWithWorkType($unitImpl, $this->falWorkTypeId));
         }
+        $falAssessables = $falAssessables->filter(function (IAssessable $assessable) {
+            return $this->isDueWithinReportWindow($assessable);
+        });
 
         // Did we find 2+ FAL assessments in this class?
         $countFal = \count($falAssessables);

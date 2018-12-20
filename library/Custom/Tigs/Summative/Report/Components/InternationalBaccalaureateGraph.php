@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\Report\Components;
 
 use Custom\Tigs\Summative\Report\StudentAttributes;
+use Custom\Tigs\Summative\Report\BaseComponent;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
@@ -27,7 +28,7 @@ use LogicException;
 /**
  * Builds a suitable data structure for rendering the MYP/DP Graph component.
  */
-class InternationalBaccalaureateGraph
+class InternationalBaccalaureateGraph extends BaseComponent
 {
     private const BASE_MARKS = [
         1 => 0,
@@ -50,9 +51,6 @@ class InternationalBaccalaureateGraph
      * @var User
      */
     private $student;
-
-    /** @var StudentAttributes */
-    private $attributes;
 
 
     /**
@@ -114,9 +112,10 @@ class InternationalBaccalaureateGraph
         Router\Router $router,
         Folder\Model $folder
     ) {
+        parent::__construct($attributes);
+
         $this->unitImpls           = $unitImpls;
         $this->student             = $student;
-        $this->attributes          = $attributes;
         $this->visibility          = $visibility;
         $this->viewer              = $viewer;
         $this->workTypeId          = $workTypeId;
@@ -175,6 +174,7 @@ class InternationalBaccalaureateGraph
         $ibAssessments = [];
         foreach ($this->unitImpls as $unitImpl) {
             // Get the DP assessment out of each unit impl
+            // We only care about assessments due within the report's window
             // If any impl has zero, or more than one: that's an error
             $folder   = $unitImpl->getBaseContext()->getFolder();
             $folderId = $folder->getId();
@@ -185,6 +185,11 @@ class InternationalBaccalaureateGraph
                 ];
             }
             foreach ($this->retrieveAssessments($unitImpl) as $assessment) {
+
+                if (!$this->isDueWithinReportWindow($assessment)) {
+                    continue;
+                }
+
                 $workType = $assessment->getWorkType();
                 if (!$workType || $workType->getId() !== $this->workTypeId) {
                     continue;
@@ -204,7 +209,7 @@ class InternationalBaccalaureateGraph
                     );
                 }
 
-                if($this->attributes->isMyp()){
+                if($this->getAttributes()->isMyp()){
                     // MYP Assessment must use a rubric:
                     if(!$assessment->getUseRubric()){
                         throw new UnexpectedValueException(
@@ -313,7 +318,7 @@ class InternationalBaccalaureateGraph
                     // Show nothing, but this is not an error
                     continue;
                 }
-                if ($this->attributes->isMyp()) {
+                if ($this->getAttributes()->isMyp()) {
                     $markedGrid     = $this->rubricMapper->retrieveMarkedGrid($feedback);
                     $rawStudentMark = $markedGrid->calculateScaledMark();
                     // Finagle student mark from rubric grid
@@ -392,8 +397,8 @@ class InternationalBaccalaureateGraph
      */
     private function generateHeader(): string
     {
-        $year     = $this->attributes->getCurriculumYearLevel();
-        $semester = $this->attributes->getCurriculumSemester();
+        $year     = $this->getAttributes()->getCurriculumYearLevel();
+        $semester = $this->getAttributes()->getCurriculumSemester();
 
         if ($year <= 10 && $semester === 2) {
             return 'MYP Grade';

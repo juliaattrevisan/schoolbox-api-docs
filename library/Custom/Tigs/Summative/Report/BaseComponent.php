@@ -5,8 +5,9 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Tigs\Summative\Report\Components;
+namespace Custom\Tigs\Summative\Report;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -17,16 +18,45 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 class BaseComponent
 {
 
+    /** @var StudentAttributes */
+    private $attributes;
+
+
+    /**
+     * @param StudentAttributes $attributes
+     */
+    public function __construct(StudentAttributes $attributes)
+    {
+        $this->attributes = $attributes;
+    }
+
+
+    /**
+     * Returns whether an assessable is due within this component's report's window
+     *
+     * @param IAssessable $assessable
+     * @return bool
+     */
+    protected function isDueWithinReportWindow(IAssessable $assessable): bool
+    {
+        $dueDate      = $assessable->getDueAt();
+        $reportStart  = $this->attributes->getReportStart();
+        $reportFinish = $this->attributes->getReportFinish();
+        return $dueDate->gte($reportStart) && $dueDate->lt($reportFinish);
+    }
+
+
     /**
      * Iterates through a unit to return all AAS assessments
      *
      * @param UnitImpl\Model $unitImpl
      * @param int|null       $workTypeId
-     * @return IAssessable[]
+     * @return IAssessable[]|GenericCollection
+     * @throws \UnexpectedValueException
      */
-    protected function findAssessmentsWithWorkType(UnitImpl\Model $unitImpl, ?int $workTypeId): array
+    protected function findAssessmentsWithWorkType(UnitImpl\Model $unitImpl, ?int $workTypeId): GenericCollection
     {
-        $assessables = [];
+        $assessables = new GenericCollection(IAssessable::class);
         foreach ($unitImpl->getAssessables() as $assessable) {
             if ($assessable instanceof Project) {
                 foreach ($assessable->getAssessables() as $subAssessable) {
@@ -58,5 +88,16 @@ class BaseComponent
         }
 
         return $assessable->getWorkType()->getId() === $workTypeId;
+    }
+
+    // Getters
+
+
+    /**
+     * @return StudentAttributes
+     */
+    protected function getAttributes(): StudentAttributes
+    {
+        return $this->attributes;
     }
 }
