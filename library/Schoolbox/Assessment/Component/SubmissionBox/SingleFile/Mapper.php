@@ -22,6 +22,8 @@ class Mapper extends BaseMapper
         $this->hasTable('submission_box_file');
         $this->hasModel(Model::class);
 
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+
         $this->joins('box_id', SubmissionBoxMapper::class, 'id', null, null, 'box', 'box');
         $this->joins('storage_id', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('realname', self::TYPE_STRING, null, 'filename');
