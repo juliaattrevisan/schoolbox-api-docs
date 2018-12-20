@@ -113,22 +113,11 @@ class Factory
         $zone = new Zone('files');
         $zone->setMulti(true)->setAttachmentsLabel('');
 
-        $files = [];
-
         /* Sort files alphabetically
          */
         $response->getAllFiles()->sortBy('filename', 'asc');
 
-        foreach ($response->getAllFiles() as $file) {
-
-            /* Ignore accumulation of wizzywig contents
-             */
-            if (!$file->getEditableInline()) {
-                $files[] = $file->getHash();
-            }
-        }
-
-        $zone->attachFiles($files);
+        $zone->attachFiles($response->getAllFiles());
 
         return $zone;
     }
@@ -145,18 +134,14 @@ class Factory
             ->setMulti(true)
             ->setAttachmentsLabel('');
 
-        $files = [];
         if ($feedback instanceof Feedback) {
 
             /* Sort files alphabetically
              */
             $feedback->getAllFiles()->sortBy('filename', 'asc');
 
-            foreach ($feedback->getAllFiles() as $file) {
-                $files[] = $file->getHash();
-            }
+            $zone->attachFiles($feedback->getAllFiles());
         }
-        $zone->attachFiles($files);
         return $zone;
     }
 }

@@ -980,9 +980,9 @@ class Controller extends Base
                 /** @var PastoralAttachmentModel $attachment */
                 foreach ($record->getAttachments() as $attachment) {
                     if ($name === self::ATTACHZONE_PRIVATE && $attachment->getPrivate()) {
-                        $zone->attachFiles([$attachment->getStorage()->getHash()]);
+                        $zone->attachFiles([$attachment]);
                     } elseif ($name === self::ATTACHZONE_PUBLIC && !$attachment->getPrivate()) {
-                        $zone->attachFiles([$attachment->getStorage()->getHash()]);
+                        $zone->attachFiles([$attachment]);
                     }
                 }
             }

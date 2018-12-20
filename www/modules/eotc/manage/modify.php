@@ -184,18 +184,13 @@ if (is_numeric($_GET['eventID'])) {
 
         // RAM in the RAMS
         if ($event->getMetadata()->getRamsRequired()) {
-            $hashes = [];
-
-            foreach ($event->getMetadata()->getRamsFiles() as $ramsFile) {
-                $hashes[] = $ramsFile->getHash();
-            }
 
             $zone = new Attachzone('ramsZone');
             /** @var Schoolbox\L10n\RosettaStone $l10n */
             $l10n = $page->getDi()->get('l10n');
             $zone
                 ->setMulti(true)
-                ->attachFiles($hashes)
+                ->attachFiles($event->getMetadata()->getRamsFiles())
                 ->setThumbnailSize(64)
                 ->setModalTitle($l10n->translateSentence('Select {:eotcRamsAbbreviation} files'))
                 ->setMimeFilter('*/*')

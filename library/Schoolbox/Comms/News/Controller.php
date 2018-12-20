@@ -380,7 +380,7 @@ class Controller extends Base
             ->setMimeFilter('image/*');
 
         if ($article->getFeatureImage()) {
-            $zone->attachFiles([$article->getFeatureImage()->getHash()]);
+            $zone->attachFiles([$article->getFeatureImage()]);
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [

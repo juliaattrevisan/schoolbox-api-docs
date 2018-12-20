@@ -65,11 +65,8 @@ class Controller extends Base
             ->setAttachPrompt('Upload images')
             ->setMimeFilter('image/*')
             ->setReadOnly(false)
-            ->setMulti(true);
-
-        if ($attachments != null)
-            foreach ($attachments as $attachment)
-                $zone->attachFiles(array($attachment->getHash()));
+            ->setMulti(true)
+            ->attachFiles($attachments ?? []);
 
         return $zone->getTwigContext();
     }
