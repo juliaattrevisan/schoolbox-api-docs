@@ -243,7 +243,7 @@ class Controller extends BaseController
             Page\Model::PAGE_MARK_BOOK            => 'Class Markbook',
             Page\Model::PAGE_COURSE_MARK_BOOK     => 'Course Markbook',
             Page\Model::PAGE_LEARNING_ANALYTICS   => 'Learning Analytics',
-            Page\Model::PAGE_UPCOMING_ASSESSMENTS => "Upcoming {$this->rosettaStone->translate('assessment', true, true)}",
+            Page\Model::PAGE_UPCOMING_ASSESSMENTS => "Upcoming Due Work", // intentionally not localised.
         ];
     }
 }

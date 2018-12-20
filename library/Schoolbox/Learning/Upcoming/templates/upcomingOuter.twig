@@ -348,7 +348,7 @@
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 column">
-                    <h1>Upcoming {{ locale.assessment.properPlural }} for {{ student.formatName }}</h1>
+                    <h1>Upcoming Due Work for {{ student.formatName }}</h1>
                 </div>
             </div>
 
@@ -361,7 +361,7 @@
                     {% for child in children %}
                         <li>
                             <div class="card small-12">
-                                <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id, student: child}) }}" title="View upcoming {{ locale.assessment.properPlural }}">
+                                <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id, student: child}) }}" title="View upcoming Due Work">
                                     <img src="/portrait.php?userId={{ child.externalId }}&size=square64" alt="View upcoming {{ locale.assessment.properPlural }}" />
                                     <p>{{ child.formatName }}</p>
                                     <p class="meta">{{ child.role.name }}</p>
@@ -393,7 +393,7 @@
 {% if subjects|length %}
     <div class="row">
         <div class="small-12 medium-6 columns island">
-            <h2 class="subheader">Upcoming {{ locale.assessment.properPlural }}</h2>
+            <h2 class="subheader">Upcoming Due Work</h2>
             <div id="{{ reportContentId }}"></div>
         </div>
 
