@@ -65,6 +65,18 @@ const cardActions = [
 </div>;
 ```
 
+### Card with multiple lines of meta
+
+If you need multiple meta lines, you can send these in an array like so. Please keep this to a maximum of two lines.
+
+```jsx
+<Card
+  title="Multiple meta"
+  meta={["Meta line one", "Meta line two"]}
+  image="https://via.placeholder.com/64"
+/>
+```
+
 ### Loading card
 
 A loading card will show by default when there is no content sent to the card.

@@ -79,7 +79,9 @@ const CardTitle = props => {
 
 const CardMeta = props => {
   const { meta } = props;
-  if (meta) {
+  if (meta && Array.isArray(meta)) {
+    return meta.map(thisMeta => <p className="meta">{thisMeta}</p>);
+  } else if (meta) {
     return <p className="meta">{meta}</p>;
   }
 
