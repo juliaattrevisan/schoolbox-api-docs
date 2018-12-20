@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
+use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Model as DueWorkFileModel;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
@@ -17,7 +18,6 @@ use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
-use Schoolbox\Resource\Storage\Model as StorageModel;
 
 /**
  * Sub-translator for due work specific fields.
@@ -123,14 +123,13 @@ class DueWork implements IAssessmentTypeTranslator
         }
 
         // Translate files
-        // TODO consider whether the DueWorkFile model is required - should Storage be used directly?
         $dataModel->setAttachments($dataModel->getAttachments()->emptyClone());
         foreach ($domainObject->getAttachedFiles() as $file) {
             $dataModel->addAttachment(
-                (new StorageModel())
-                    ->setHash($file->getHash())
+                (new DueWorkFileModel())
+                    ->setBox($dataModel)
+                    ->setStorage($file)
                     ->setFilename($file->getFilename())
-                    ->setExtension($file->getExtension())
             );
         }
 
