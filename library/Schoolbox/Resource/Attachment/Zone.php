@@ -86,14 +86,18 @@ class Zone {
 
 
     /**
-     * @param array $hashlist
+     * @param iterable $hashlist
      * @return self
      */
-    public function attachFiles(array $hashlist)
+    public function attachFiles(iterable $hashlist)
     {
         foreach ($hashlist as $hash) {
             try {
-                $this->attachments[$hash] = $this->findFile($hash);
+                if ($hash instanceof IStorage) {
+                    $this->attachments[$hash->getHash()] = $hash;
+                } else {
+                    $this->attachments[$hash] = $this->findFile($hash);
+                }
             } catch (Exception $e) {
                 // file given doesn't exist in Storage
             }

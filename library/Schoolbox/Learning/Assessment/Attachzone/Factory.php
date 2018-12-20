@@ -95,15 +95,9 @@ class Factory
     protected function buildForDueWork(DueWork $dueWork)
     {
         $zone = new Zone('files');
-        $zone->setMulti(true)->setAttachmentsLabel('');
-
-        $files = [];
-
-        foreach ($dueWork->getAttachedFiles() as $file) {
-            $files[] = $file->getHash();
-        }
-
-        $zone->attachFiles($files);
+        $zone->setMulti(true)
+             ->setAttachmentsLabel('')
+             ->attachFiles($dueWork->getAttachedFiles());
 
         return $zone;
     }
