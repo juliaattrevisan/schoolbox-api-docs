@@ -151,7 +151,6 @@ class InternationalBaccalaureateGraph
         $context = [
             'header'         => $header,
             'data'           => $markData,
-            'dataCategories' => array_keys($markData),
             'studentValue'   => $studentMark,
         ];
         if (isset($error)) {
