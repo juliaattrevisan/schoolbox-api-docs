@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Preview;
 
-use Aura\Router\Router;
 use Schoolbox\Cyberhound\Url\Translator;
 use Schoolbox\Preview\Chain\Internal;
 use Schoolbox\Preview\Chain\External;
@@ -18,22 +17,15 @@ class Factory
 {
 
     /**
-     * @var Router
-     */
-    private $router;
-
-    /**
      * @var Translator
      */
     private $translator;
 
     /**
-     * @param Router $router
      * @param Translator $translator
      */
-    public function __construct(Router $router, Translator $translator)
+    public function __construct(Translator $translator)
     {
-        $this->router = $router;
         $this->translator = $translator;
     }
 
