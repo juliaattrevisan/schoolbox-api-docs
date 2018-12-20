@@ -37,6 +37,34 @@ Add an `href` prop to add a link to the title and image on the card.
 />
 ```
 
+### Card with actions
+
+```jsx
+const cardActions = [
+  {
+    href: "#",
+    icon: "modify",
+    title: "Modify this"
+  },
+  {
+    href: "#",
+    icon: "more",
+    title: "More actions"
+  }
+];
+
+<div className="information-list">
+  <div className="actions-small-2">
+    <Card
+      title="Card with actions"
+      meta="Meta information"
+      image="https://via.placeholder.com/64"
+      actions={cardActions}
+    />
+  </div>
+</div>;
+```
+
 ### Loading card
 
 A loading card will show by default when there is no content sent to the card.

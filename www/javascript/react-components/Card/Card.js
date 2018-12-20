@@ -5,7 +5,7 @@ import classnames from "classnames";
  * Flexible container for small amounts of content, often displayed in a list.
  */
 const Card = props => {
-  const { title, meta, image, href, children, loader } = props;
+  const { title, meta, image, href, actions, children, loader } = props;
   let imageElement, titleElement, metaElement, actionsElement, contentElement;
 
   // Determine if the card has some sort of content
@@ -31,6 +31,21 @@ const Card = props => {
     } else if (image) {
       imageElement = <img src={image} />;
     }
+
+    if (actions && actions.length) {
+      actionsElement = (
+        <nav>
+          {actions.map((action, index) => (
+            <a
+              key={index}
+              href={action.href}
+              className={`icon-${action.icon} no-text`}
+              title={action.title}
+            />
+          ))}
+        </nav>
+      );
+    }
   } else if (loader) {
     // Populate elements for the loading state
     imageElement = <div className="img" />;
@@ -47,6 +62,7 @@ const Card = props => {
           {metaElement}
         </div>
       </div>
+      {actionsElement}
       {contentElement}
     </>
   );
