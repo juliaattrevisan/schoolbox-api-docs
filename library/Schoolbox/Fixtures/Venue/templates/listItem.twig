@@ -1,7 +1,7 @@
 <li class="actions-small-1" data-venue>
     <div class="list-item">
         <div class="small-12 card">
-            <h3>{{ venue.name }}</h3>
+            <h3><a href="{{ routeLookup('sportsfixturesVenue.getModifyForm', {entityId: venue.id}) }}">{{ venue.name }}</a></h3>
             <p class="meta">{{ venue.address }}</p>
         </div>
     </div>
