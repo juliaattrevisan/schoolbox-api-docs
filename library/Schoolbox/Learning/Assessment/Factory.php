@@ -162,7 +162,7 @@ class Factory
 
         // MaxMark is the maximum available marks for the entire assessment, and should exist in some form
         // for all mark types except None.
-        // Unfortunately, the due work crate form uses these deprecated values, not the new "slug" ones.
+        // Unfortunately, the due work create form uses these deprecated values, not the new "slug" ones.
         switch($markType) {
             case MarkType::TYPE_PERCENT:
             case MarkType::TYPE_LETTER:
