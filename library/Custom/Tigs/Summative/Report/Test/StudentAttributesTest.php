@@ -181,7 +181,7 @@ class StudentAttributesTest extends TestCase
         $user       = (new User())->setYear($yearLevel);
         $attributes = new StudentAttributes($user, null, '1', $date);
 
-        $this->assertSame($expected, $attributes->getReportStartDate()->getDatabaseDate());
+        $this->assertSame($expected, $attributes->getReportStart()->getDatabaseDate());
     }
 
 
@@ -197,7 +197,7 @@ class StudentAttributesTest extends TestCase
         $user       = (new User())->setYear($yearLevel);
         $attributes = new StudentAttributes($user, null, '1', $date);
 
-        $this->assertSame($expected, $attributes->getReportFinishDate()->getDatabaseDate());
+        $this->assertSame($expected, $attributes->getReportFinish()->getDatabaseDate());
     }
 
 
@@ -394,18 +394,18 @@ class StudentAttributesTest extends TestCase
     public function providerReportStartNowOverride(): array
     {
         return [
-            ['10', '2018-01-10', '2018-01-01'],  // Term 1
-            ['10', '2018-04-10', '2018-01-01'],  // Term 2
-            ['10', '2018-07-10', '2018-07-01'],  // Term 3
-            ['10', '2018-10-10', '2018-07-01'],  // Term 4
-            ['11', '2018-01-10', '2018-01-01'],  // Term 1
-            ['11', '2018-04-10', '2018-01-01'],  // Term 2
-            ['11', '2018-07-10', '2018-07-01'],  // Term 3
-            ['11', '2018-10-10', '2018-10-01'],  // Term 4
-            ['12', '2018-01-10', '2017-10-01'],  // Term 1
-            ['12', '2018-04-10', '2018-04-01'],  // Term 2
-            ['12', '2018-07-10', '2018-04-01'],  // Term 3
-            ['12', '2018-10-10', '2018-04-01'],  // Term 4
+            ['10', '2010-01-10', '2010-01-01'],  // Term 1
+            ['10', '2010-04-10', '2010-01-01'],  // Term 2
+            ['10', '2010-07-10', '2010-07-01'],  // Term 3
+            ['10', '2010-10-10', '2010-07-01'],  // Term 4
+            ['11', '2010-01-10', '2010-01-01'],  // Term 1
+            ['11', '2010-04-10', '2010-01-01'],  // Term 2
+            ['11', '2010-07-10', '2010-07-01'],  // Term 3
+            ['11', '2010-10-10', '2010-10-01'],  // Term 4
+            ['12', '2010-01-10', '2009-10-01'],  // Term 1
+            ['12', '2010-04-10', '2010-04-01'],  // Term 2
+            ['12', '2010-07-10', '2010-04-01'],  // Term 3
+            ['12', '2010-10-10', '2010-04-01'],  // Term 4
         ];
     }
 
@@ -416,18 +416,18 @@ class StudentAttributesTest extends TestCase
     public function providerReportFinishNowOverride(): array
     {
         return [
-            ['10', '2018-01-10', '2018-06-30'],  // Term 1
-            ['10', '2018-04-10', '2018-06-30'],  // Term 2
-            ['10', '2018-07-10', '2018-12-31'],  // Term 3
-            ['10', '2018-10-10', '2018-12-31'],  // Term 4
-            ['11', '2018-01-10', '2018-06-30'],  // Term 1
-            ['11', '2018-04-10', '2018-06-30'],  // Term 2
-            ['11', '2018-07-10', '2018-09-30'],  // Term 3
-            ['11', '2018-10-10', '2019-03-31'],  // Term 4
-            ['12', '2018-01-10', '2018-03-31'],  // Term 1
-            ['12', '2018-04-10', '2018-12-31'],  // Term 2
-            ['12', '2018-07-10', '2018-12-31'],  // Term 3
-            ['12', '2018-10-10', '2018-12-31'],  // Term 4
+            ['10', '2010-01-10', '2010-06-30'],  // Term 1
+            ['10', '2010-04-10', '2010-06-30'],  // Term 2
+            ['10', '2010-07-10', '2010-12-31'],  // Term 3
+            ['10', '2010-10-10', '2010-12-31'],  // Term 4
+            ['11', '2010-01-10', '2010-06-30'],  // Term 1
+            ['11', '2010-04-10', '2010-06-30'],  // Term 2
+            ['11', '2010-07-10', '2010-09-30'],  // Term 3
+            ['11', '2010-10-10', '2011-03-31'],  // Term 4
+            ['12', '2010-01-10', '2010-03-31'],  // Term 1
+            ['12', '2010-04-10', '2010-12-31'],  // Term 2
+            ['12', '2010-07-10', '2010-12-31'],  // Term 3
+            ['12', '2010-10-10', '2010-12-31'],  // Term 4
         ];
     }
 

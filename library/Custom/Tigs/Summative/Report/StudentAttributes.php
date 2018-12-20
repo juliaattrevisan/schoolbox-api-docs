@@ -71,8 +71,8 @@ class StudentAttributes
         $this->term                = $this->deriveTerm($now);
         $this->curriculumYearLevel = ($this->yearLevel === 11 && $this->term === 4) ? 12 : $this->yearLevel;
         $this->curriculumSemester  = $this->deriveCurriculumSemester($this->yearLevel, $this->term);
-        $this->reportStart         = $this->deriveReportStartDate($this->yearLevel, $this->term);
-        $this->reportFinish        = $this->deriveReportFinishDate($this->yearLevel, $this->term);
+        $this->reportStart         = $this->deriveReportStartDate($this->yearLevel, $this->term, $now);
+        $this->reportFinish        = $this->deriveReportFinishDate($this->yearLevel, $this->term, $now);
     }
 
 
@@ -105,9 +105,10 @@ class StudentAttributes
     private function deriveTerm(Alaress_Date_Format $now): int
     {
         // Current Term + Semester
-        $firstDayTerm2 = new Alaress_Date_Format(\strtotime(self::FIRST_DAY_TERM2_RELATIVE), Alaress_Date_Format::TIMESTAMP);
-        $firstDayTerm3 = new Alaress_Date_Format(\strtotime(self::FIRST_DAY_TERM3_RELATIVE), Alaress_Date_Format::TIMESTAMP);
-        $firstDayTerm4 = new Alaress_Date_Format(\strtotime(self::FIRST_DAY_TERM4_RELATIVE), Alaress_Date_Format::TIMESTAMP);
+        $nowYear = $now->getUsingFormat('Y');
+        $firstDayTerm2 = new Alaress_Date_Format(\strtotime(self::FIRST_DAY_TERM2_RELATIVE . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
+        $firstDayTerm3 = new Alaress_Date_Format(\strtotime(self::FIRST_DAY_TERM3_RELATIVE . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
+        $firstDayTerm4 = new Alaress_Date_Format(\strtotime(self::FIRST_DAY_TERM4_RELATIVE . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
         if ($now->lt($firstDayTerm2)) {
             return 1;
         }
@@ -177,26 +178,30 @@ class StudentAttributes
     /**
      * Derive the date that the report logically starts at.
      *
-     * @param int $yearLevel
-     * @param int $term
+     * @param int                 $yearLevel
+     * @param int                 $term
+     * @param Alaress_Date_Format $now
      * @return Alaress_Date_Format
      * @throws InvalidArgumentException
      */
-    public function deriveReportStartDate(int $yearLevel, int $term): Alaress_Date_Format
+    public function deriveReportStartDate(int $yearLevel, int $term, Alaress_Date_Format $now): Alaress_Date_Format
     {
+        $nowYear = (int)$now->getUsingFormat('Y');
+
         if ($yearLevel === 11 && $term === 4) {
-            $reportStart = self::FIRST_DAY_TERM4_RELATIVE;
+            $reportStart = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
         } elseif ($yearLevel === 12) {
             if ($term === 1) {
-                $reportStart = self::FIRST_DAY_TERM4_RELATIVE . (date('Y') - 1);
+                $nowYear--;
+                $reportStart = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
             } else {
-                $reportStart = self::FIRST_DAY_TERM2_RELATIVE;
+                $reportStart = self::FIRST_DAY_TERM2_RELATIVE . " $nowYear";
             }
         } elseif (\in_array($term, [1, 2], true)) {
-            $reportStart = self::FIRST_DAY_TERM1_RELATIVE;
+            $reportStart = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
         } else {
             // Terms 3+4
-            $reportStart = self::FIRST_DAY_TERM3_RELATIVE;
+            $reportStart = self::FIRST_DAY_TERM3_RELATIVE . " $nowYear";
         }
 
         return new Alaress_Date_Format(\strtotime($reportStart), Alaress_Date_Format::TIMESTAMP);
@@ -206,32 +211,37 @@ class StudentAttributes
     /**
      * Derive the date that the report logically finishes at.
      *
-     * @param int $yearLevel
-     * @param int $term
+     * @param int                 $yearLevel
+     * @param int                 $term
+     * @param Alaress_Date_Format $now
      * @return Alaress_Date_Format
      * @throws InvalidArgumentException
      */
-    public function deriveReportFinishDate(int $yearLevel, int $term): Alaress_Date_Format
+    public function deriveReportFinishDate(int $yearLevel, int $term, Alaress_Date_Format $now): Alaress_Date_Format
     {
         $isYear11 = $yearLevel === 11;
         $isYear12 = $yearLevel === 12;
+        $nowYear  = (int)$now->getUsingFormat('Y');
 
         if ($isYear11 && $term === 3) {
-            $reportEnd = self::FIRST_DAY_TERM4_RELATIVE;
+            $reportEnd = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
         } elseif ($isYear11 && $term === 4) {
-            $reportEnd = self::FIRST_DAY_TERM2_RELATIVE . (date('Y') + 1);
+            $nowYear++;
+            $reportEnd = self::FIRST_DAY_TERM2_RELATIVE  . " $nowYear";
         } elseif ($isYear12 && $term === 1) {
-            $reportEnd = self::FIRST_DAY_TERM2_RELATIVE;
+            $reportEnd = self::FIRST_DAY_TERM2_RELATIVE . " $nowYear";
         } elseif ($isYear12 && $term === 2) {
-            $reportEnd = self::FIRST_DAY_TERM1_RELATIVE . (date('Y') + 1);
+            $nowYear++;
+            $reportEnd = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
         } elseif (\in_array($term, [1, 2], true)) {
-            $reportEnd = self::FIRST_DAY_TERM3_RELATIVE;
+            $reportEnd = self::FIRST_DAY_TERM3_RELATIVE . " $nowYear";
         } else {
             // Terms 3+4
-            $reportEnd = self::FIRST_DAY_TERM1_RELATIVE . (date('Y') + 1);
+            $nowYear++;
+            $reportEnd = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
         }
 
-        return (new Alaress_Date_Format(\strtotime($reportEnd), Alaress_Date_Format::TIMESTAMP))->addDays(-1);
+        return (new Alaress_Date_Format(\strtotime($reportEnd), Alaress_Date_Format::TIMESTAMP))->addDays(-1)->endOfDay();
     }
 
 
@@ -288,7 +298,7 @@ class StudentAttributes
      *
      * @return Alaress_Date_Format
      */
-    public function getReportStartDate(): Alaress_Date_Format
+    public function getReportStart(): Alaress_Date_Format
     {
         return $this->reportStart;
     }
@@ -298,7 +308,7 @@ class StudentAttributes
      *
      * @return Alaress_Date_Format
      */
-    public function getReportFinishDate(): Alaress_Date_Format
+    public function getReportFinish(): Alaress_Date_Format
     {
         return $this->reportFinish;
     }
