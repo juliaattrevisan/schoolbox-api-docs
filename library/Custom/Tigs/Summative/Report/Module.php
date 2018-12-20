@@ -15,8 +15,8 @@ use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -25,7 +25,6 @@ use UnexpectedValueException;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Assessment\Term;
 
 class Module extends Alaress\Module\Module
 {
@@ -91,12 +90,15 @@ class Module extends Alaress\Module\Module
     {
         $injector->params[Controller::class] = [
             'externalUser'          => $injector->lazyGet('externalUser'),
-            'termMapper'            => $this->getMapperFactory()->getLazy(Term\Mapper::class),
             'assessmentMapperProxy' => $injector->get('assessmentDataSource'),
             'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
-            'access'                => $this->getMapperFactory()->getLazy(Access::class),
+            'visibility'            => $injector->lazy(function () {
+                /** @var Access $access */
+                $access = $this->getMapperFactory()->get(Access::class);
+                return new Visibility($access);
+            }),
             'courseImplMapper'      => $this->getMapperFactory()->getLazy(CourseImpl\Mapper::class),
-            'unitImplMapper'        => $this->getMapperFactory()->getLazy(UnitImpl\Mapper::class),
+            'database'              => $injector->lazyGet('databaseInternal'),
         ];
     }
 

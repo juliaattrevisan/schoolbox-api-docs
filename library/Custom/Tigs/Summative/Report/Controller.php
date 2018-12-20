@@ -7,24 +7,29 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\Report;
 
+use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\Report\Components\AcademicAchievementMatrix;
 use Custom\Tigs\Summative\Report\Components\AcademicAchievementSummary;
-use Custom\Tigs\Summative\Report\Components\DiplomaProgrammeGraph;
+use Custom\Tigs\Summative\Report\Components\FinalAchievementLevels;
+use Custom\Tigs\Summative\Report\Components\InternationalBaccalaureateGraph;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Visibility;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use External_UserInterface;
-use Schoolbox\Assessment\Term;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use UnexpectedValueException;
+use Schoolbox\Filter\Filters;
+use PDO;
+use Aura\Web\Request;
 
 class Controller extends Web\Controller\Base
 {
@@ -32,14 +37,8 @@ class Controller extends Web\Controller\Base
     /** @var External_UserInterface */
     private $externalUser;
 
-    /** @var Term\Mapper */
-    private $termMapper;
-
     /** @var CourseImpl\Mapper */
     private $courseImplMapper;
-
-    /** @var UnitImpl\Mapper */
-    private $unitImplMapper;
 
     /** @var Assessment\MapperProxy */
     private $assessmentMapperProxy;
@@ -50,32 +49,32 @@ class Controller extends Web\Controller\Base
     /** @var Visibility */
     private $visibility;
 
+    /** @var IConnector */
+    private $database;
+
 
     /**
      * @param External_UserInterface $externalUser
-     * @param Term\Mapper            $termMapper
      * @param CourseImpl\Mapper      $courseImplMapper
-     * @param UnitImpl\Mapper        $unitImplMapper
      * @param Assessment\MapperProxy $assessmentMapperProxy
      * @param RubricMapper           $rubricMapper
-     * @param Access                 $access
+     * @param Visibility             $visibility
+     * @param IConnector             $database
      */
     public function __construct(
         External_UserInterface $externalUser,
-        Term\Mapper $termMapper,
         CourseImpl\Mapper $courseImplMapper,
-        UnitImpl\Mapper $unitImplMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
         RubricMapper $rubricMapper,
-        Access $access
+        Visibility $visibility,
+        IConnector $database
     ) {
         $this->externalUser          = $externalUser;
-        $this->termMapper            = $termMapper;
         $this->courseImplMapper      = $courseImplMapper;
-        $this->unitImplMapper        = $unitImplMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->rubricMapper          = $rubricMapper;
-        $this->visibility            = new Visibility($access);
+        $this->visibility            = $visibility;
+        $this->database              = $database;
     }
 
 
@@ -86,6 +85,7 @@ class Controller extends Web\Controller\Base
      * @level 18.1.0
      * @param User $user
      * @throws ServiceNotFound
+     * @todo Move to own controller
      */
     public function getParticipationReport(User $user): void
     {
@@ -115,62 +115,55 @@ class Controller extends Web\Controller\Base
      * @throws \UnexpectedValueException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \UnderflowException
      */
     public function getSubjectReport(User $user, Folder\Model $folder): void
     {
-        $attributes = $this->deriveStudentAttributes($user);
+        $attributes = $this->deriveStudentAttributes($user, $this->getRequest()->query);
 
         $errors = [];
 
         $courseImplsWithUnits = $this->courseImplMapper->findByFolderId($folder->getId());
 
         // Check that multiple course specs have not been imported to this page
-        $courseSpecCount = $this->getCourseSpecCount($courseImplsWithUnits);
-        if ($courseSpecCount >= 2) {
-            // Don't bother loading model graph if we have multiple courses imported to this folder.
+        $courseSpecs = $this->getImportedCourseSpecs($courseImplsWithUnits);
+        if (1 !== \count($courseSpecs)) {
+            // Don't bother loading model graph if we have 0 or multiple courses imported to this folder.
             // We can't render the page in this case because we rely on a single course-textbox being available.
             // It may be ok to import the same courseSpec multiple times, because each import may be a discrete subset of units.
-            $error = \sprintf('Only 1 course can be imported to the class. Found %d.', $courseSpecCount);
+            $error = \sprintf('There must be exactly 1 course imported to the class. Found %d.', $courseSpecs);
             $route = $this->getRouteIfAuthorized('courseImport.getManagement', ['folderId' => $folder->getId(), 'folder' => $folder]);
             if ($route) {
                 $error .= \sprintf(' <a href="%s">Manage Course imports</a>', $route);
             }
             $errors[]  = $error;
             $unitImpls = $aamData = $aasData = [];
+            $falData   = $ibGraphData = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitImpls = $this->getUnitImpls($courseImplsWithUnits);
 
-            // Build component data
-            $aamData = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
+            /** @var CourseSpec\Model $courseSpec */
+            $courseSpec = $courseSpecs->first();
 
-            // Only relevant for MYP students
-            $aasData = $this->buildAcademicAchievementSummaryData($attributes, $unitImpls, $user);
+            // Build component data
+            $ibGraphData = $this->buildInternationalBaccalaureateGraphData($folder, $attributes, $courseSpec, $user);
+            $falData     = $this->buildFinalAchievementLevelsData($attributes, $unitImpls, $user);
+            $aamData     = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
+            $aasData     = $this->buildAcademicAchievementSummaryData($attributes, $unitImpls, $user);
         }
 
-        // The cohort check assumes that cohort classes have the same courses.
-//        $cohortUnitImpls = $this->findCohortUnitImpls($unitImpls); // TODO TEMP comment out
-
-//        $dpData  = $this->buildDiplomaProgrammeReportData($cohortUnitImpls, $user, $attributes->getCurriculumYearLevel(), $attributes->getCurriculumSemester());
-        $dpData = []; // TODO TEMP comment out
-
         $data   = [
-            'user'                => $user,
-            'folder'              => $folder,
-            'isEnabled'           => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
-            'isIb'                => $attributes->isIb(),
-            'isMyp'               => $attributes->isMyp(),
-            'isDp'                => $attributes->isDp(),
-            'isHsc'               => $attributes->isHsc(),
-            'sbSem'               => $attributes->getSbSem(),
-            'term'                => $attributes->getTerm(),
-            'curriculumYearLevel' => $attributes->getCurriculumYearLevel(),
-            'curriculumSemester'  => $attributes->getCurriculumSemester(),
-            'errors'              => $errors,
-            'unitImpls'           => $unitImpls,
-            'aamData'             => $aamData,
-            'aasData'             => $aasData,
-            'dpData'              => $dpData,
+            'user'        => $user,
+            'folder'      => $folder,
+            'isEnabled'   => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
+            'attributes'  => $attributes,
+            'errors'      => $errors,
+            'unitImpls'   => $unitImpls,
+            'falData'     => $falData,
+            'aamData'     => $aamData,
+            'aasData'     => $aasData,
+            'ibGraphData' => $ibGraphData,
         ];
         $output = $this->buildHtmlOutput('@tigsSummativeReport/subject.twig', $data, "Subject Report");
 
@@ -181,80 +174,19 @@ class Controller extends Web\Controller\Base
     /**
      * Helper to derive relevant student attributes
      *
-     * @param User $user
+     * @param User           $user
+     * @param Request\Values $query
      * @return StudentAttributes
      * @throws \InvalidArgumentException
-     * @throws \UnexpectedValueException
      */
-    private function deriveStudentAttributes(User $user): StudentAttributes
+    private function deriveStudentAttributes(User $user, Request\Values $query): StudentAttributes
     {
-        $isIb = (bool)$this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'];
-
-        $year  = (int)$user->getYear();
-
-        // Hardcoded term dates for now
-        $firstDayTerm1Relative = '1 January';
-        $firstDayTerm2Relative = '1 April';
-        $firstDayTerm3Relative = '1 July';
-        $firstDayTerm4Relative = '1 October';
-
-        $term = $this->getRequest()->query->get('term');
-        if (!$term || !preg_match('/^[1234]$/', $term)) {
-            // Current Term + Semester
-            $now           = \Alaress_Date_Format::now();
-            $firstDayTerm1 = new \Alaress_Date_Format(\strtotime($firstDayTerm1Relative), \Alaress_Date_Format::TIMESTAMP);
-            $firstDayTerm2 = new \Alaress_Date_Format(\strtotime($firstDayTerm2Relative), \Alaress_Date_Format::TIMESTAMP);
-            $firstDayTerm3 = new \Alaress_Date_Format(\strtotime($firstDayTerm3Relative), \Alaress_Date_Format::TIMESTAMP);
-            $firstDayTerm4 = new \Alaress_Date_Format(\strtotime($firstDayTerm4Relative), \Alaress_Date_Format::TIMESTAMP);
-            if ($now->gte($firstDayTerm1) && $now->lt($firstDayTerm2)) {
-                $term = 1;
-            } elseif ($now->lt($firstDayTerm3)) {
-                $term = 2;
-            } elseif ($now->lt($firstDayTerm4)) {
-                $term = 3;
-            } else {
-                $term = 4;
-            }
-            $semTitle = $this->termMapper->findForDate($now)->getTitle();
-
-            // Vagrant + TIGS current share the same term title scheme, eg 'Semester 2, 2018'
-            if (!\preg_match('/Semester (\d)/', $semTitle, $matches)) {
-                throw new \UnexpectedValueException("Unable to recognise a semester");
-            }
-            $sbSem = (int)$matches[1];
-        } else {
-            $term = (int)$term;
-            // Simulated Term + Semester
-            switch ($term) {
-                case 1:
-                case 2:
-                    $sbSem = 1;
-                    break;
-                case 3:
-                case 4:
-                    $sbSem = 2;
-                    break;
-                default:
-                    throw new \UnexpectedValueException("Unable to recognise a term");
-            }
-        }
-
-        // Apply SB to Curriculum mapping
-        if (4 === $term && $year === 11) {
-            // Year 11, Term 4 => Sem1 Yr 12 Curriculum
-            $curriculumYearLevel = 12;
-            $curriculumSemester  = 1;
-        } elseif (2 === $term && $year === 12) {
-            // Year 12, Term 2 => Sem2 Yr 12 Curriculum
-            $curriculumYearLevel = 12;
-            $curriculumSemester  = 2;
-        } else {
-            // Normal Case
-            $curriculumYearLevel = $year;
-            $curriculumSemester  = $sbSem;
-        }
-
-        return new StudentAttributes($isIb, $sbSem, $term, $curriculumYearLevel, $curriculumSemester);
+        return new StudentAttributes(
+            $user,
+            $query->get('term'),
+            $this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'],
+            $query->get('ibFlag')
+        );
     }
 
 
@@ -290,18 +222,20 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * Returns the number of course specs the course impls were imported from
+     * Returns the course specs the course impls were imported from
      *
      * @param GenericCollection|CourseImpl\Model[] $courseImplsWithUnits
-     * @return int
+     * @return GenericCollection|CourseSpec\Model[]
+     * @throws UnexpectedValueException
      */
-    private function getCourseSpecCount(GenericCollection $courseImplsWithUnits): int
+    private function getImportedCourseSpecs(GenericCollection $courseImplsWithUnits): GenericCollection
     {
-        $courseSpecIds = [];
+        $courseSpecs = new GenericCollection(CourseSpec\Model::class);
         foreach ($courseImplsWithUnits as $courseImpl) {
-            $courseSpecIds[$courseImpl->getSpecification()->getId()] = true;
+            $spec                        = $courseImpl->getSpecification();
+            $courseSpecs[$spec->getId()] = $spec;
         }
-        return \count($courseSpecIds);
+        return $courseSpecs;
     }
 
 
@@ -331,25 +265,18 @@ class Controller extends Web\Controller\Base
     /**
      * Find all the cohort unit implementations of these unit implementations.
      *
-     * @param GenericCollection|UnitImpl\Model[] $unitImpls
+     * @param CourseSpec\Model $courseSpec
      * @return GenericCollection|UnitImpl\Model[]
      * @throws UnexpectedValueException
      */
-    private function findCohortUnitImpls(GenericCollection $unitImpls): GenericCollection
+    private function findCohortUnitImpls(CourseSpec\Model $courseSpec): GenericCollection
     {
         $cohortUnitImpls = new GenericCollection(UnitImpl\Model::class);
-        foreach ($unitImpls as $unitImpl) {
-
-            // Find unit impls that use this same ID, that aren't this one
-            // (and also are due at around the same time?)
-            foreach ($this->unitImplMapper->findByColumn('course_unit_specification_id', $unitImpl->getSpecification()->getId()) as $cohortUnitImpl) {
-                $cohortUnitImpls[$cohortUnitImpl->getId()] = $cohortUnitImpl;
+        foreach ($this->courseImplMapper->findAllByCourseSpecificationId($courseSpec->getId(), [], true) as $courseImport) {
+            foreach ($courseImport->getUnits() as $unitImpl) {
+                $cohortUnitImpls[$unitImpl->getId()] = $unitImpl;
             }
         }
-
-        // Load assessments
-        $this->loadAssessmentsIntoUnitImpls($cohortUnitImpls);
-
         return $cohortUnitImpls;
     }
 
@@ -365,19 +292,16 @@ class Controller extends Web\Controller\Base
      */
     private function buildAcademicAchievementMatrixData(GenericCollection $unitImpls, User $student): array
     {
-        $aamWorkTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX);
-        $aamWorkTypeId = \is_numeric($aamWorkTypeId) ? (int)$aamWorkTypeId : null;
+        $configName = Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX;
 
-        // Not set? Then we can't identify AAM assessments.
-        if (null === $aamWorkTypeId) {
-            $errorMsg = 'Cannot render Academic Achievement Matrix components. Work type not set.';
-            // If user is superuser, prompt them to fix this.
-            if ($this->getUser()->isSuperuser()) {
-                $routeConfig = $this->getRouter()->generate('tigsSummativeAdmin.getAdmin');
-                $hash        = Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX;
-                $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">Set Academic Achievement Matrix Work Type</a>";
-            }
-            return ['error' => $errorMsg];
+        try {
+            $workTypeId = $this->checkWorkType(
+                $configName,
+                'Cannot render Academic Achievement Matrix components. Work type not set.',
+                'Set Academic Achievement Matrix Work Type'
+            );
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
         }
 
         $aam = new AcademicAchievementMatrix(
@@ -385,7 +309,7 @@ class Controller extends Web\Controller\Base
             $student,
             $this->visibility,
             $this->getUser(),
-            $aamWorkTypeId,
+            $workTypeId,
             $this->rubricMapper,
             $this->getAuthorizer(),
             $this->getRouter()
@@ -412,19 +336,14 @@ class Controller extends Web\Controller\Base
             return [];
         }
 
-        $aasWorkTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_SUMMARY);
-        $aasWorkTypeId = \is_numeric($aasWorkTypeId) ? (int)$aasWorkTypeId : null;
-
-        // Not set? Then we can't identify AAS assessments.
-        if (null === $aasWorkTypeId) {
-            $errorMsg = 'Cannot render Academic Achievement Summary components. Work type not set.';
-            $routeConfig = $this->getRouteIfAuthorized('tigsSummativeAdmin.getAdmin');
-            // If user is permitted, prompt them to fix this.
-            if ($routeConfig) {
-                $hash        = Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_SUMMARY;
-                $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">Set Academic Achievement Summary Work Type</a>";
-            }
-            return ['error' => $errorMsg];
+        try {
+            $workTypeId = $this->checkWorkType(
+                Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_SUMMARY,
+                'Cannot render Academic Achievement Summary components. Work type not set..',
+                'Set Academic Achievement Summary Work Type'
+            );
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
         }
 
         $aas = new AcademicAchievementSummary(
@@ -432,7 +351,7 @@ class Controller extends Web\Controller\Base
             $student,
             $this->visibility,
             $this->getUser(),
-            $aasWorkTypeId,
+            $workTypeId,
             $this->rubricMapper,
             $this->getAuthorizer(),
             $this->getRouter()
@@ -443,48 +362,115 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * Builds Middle Years Programme / Diploma Programme (MYP/DP) report data.
+     * Build data for the MYP-FAL component.
      *
+     * @param StudentAttributes $attributes
      * @param GenericCollection $unitImpls
      * @param User              $student
-     * @param int               $curriculumYearLevel
-     * @param int               $curriculumSemester
-     * @return array
+     * @return array|null
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
      */
-    private function buildDiplomaProgrammeReportData(
-        GenericCollection $unitImpls,
-        User $student,
-        int $curriculumYearLevel,
-        int $curriculumSemester
-    ): array {
-        // $unitImpls needs to contain the entire cohort's impls, not just this one
-
-        $dpWorkTypeId = $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE);
-        $dpWorkTypeId = \is_numeric($dpWorkTypeId) ? (int)$dpWorkTypeId : null;
-
-        if (null === $dpWorkTypeId) {
-            $errorMsg = 'Cannot render DP Report components. Work type not set.';
-            // If user is superuser, prompt them to fix this.
-            if ($this->getUser()->isSuperuser()) {
-                $routeConfig = $this->getRouter()->generate('tigsSummativeAdmin.getAdmin');
-                $hash        = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
-                $errorMsg    .= " <a href =\"{$routeConfig}#{$hash}\">Set DP Report Work Type</a>";
-            }
-            return ['error' => $errorMsg];
+    private function buildFinalAchievementLevelsData(StudentAttributes $attributes, GenericCollection $unitImpls, User $student): ?array
+    {
+        // Only relevant for MYP students in Curriculum Semester 2
+        if (!$attributes->isMyp() || $attributes->getCurriculumSemester() !== 2) {
+            return null;
         }
 
-        $dp = new DiplomaProgrammeGraph(
+        try {
+            $workTypeId = $this->checkWorkType(
+                Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS,
+                'Cannot render Final Achievement Levels component. Work type not set.',
+                'Set MYP Final Achievement Levels Work Type'
+            );
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
+        }
+
+        $fal = new FinalAchievementLevels(
             $unitImpls,
             $student,
             $this->visibility,
             $this->getUser(),
-            $dpWorkTypeId,
+            $workTypeId,
             $this->rubricMapper,
-            $curriculumYearLevel,
-            $curriculumSemester
+            $this->getAuthorizer(),
+            $this->getRouter()
         );
 
-        return $dp->toContext();
+        return $fal->toContext();
+    }
+
+
+    /**
+     * Builds IB Grade Graph report data.
+     *
+     * @param Folder\Model      $folder
+     * @param StudentAttributes $attributes
+     * @param CourseSpec\Model  $courseSpec
+     * @param User              $student
+     * @return null|array
+     * @throws Predicate\InvalidColumnException
+     * @throws UnexpectedValueException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnderflowException
+     */
+    private function buildInternationalBaccalaureateGraphData(
+        Folder\Model $folder,
+        StudentAttributes $attributes,
+        CourseSpec\Model $courseSpec,
+        User $student
+    ): ?array {
+        // Only relevant for:
+        // * MYP-S2
+        // * DP-Y11-S2, DP-Y12-S1 + DP-Y12-S2
+        if ($attributes->isMyp() && 2 === $attributes->getCurriculumSemester()) {
+            $configName   = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
+            $errorMsg     = 'Cannot render MYP Report components. Work type not set.';
+            $errorMsgLink = 'Set MYP Final Achievement Levels Work Type';
+        } elseif ($attributes->isDp() && (12 === $attributes->getCurriculumYearLevel() || 2 === $attributes->getCurriculumSemester())) {
+            $configName   = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
+            $errorMsg     = 'Cannot render DP Report components. Work type not set.';
+            $errorMsgLink = 'Set DP Report Work Type';
+        } else {
+            return null;
+        }
+
+        try {
+            $workTypeId = $this->checkWorkType($configName, $errorMsg, $errorMsgLink);
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
+        }
+
+        // Find relevant assessments and participation and insert into units
+        $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
+        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes));
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
+        foreach ($assessables as $assessable) {
+            $unitImpl                                                                        = $assessable->getBaseContext();
+            $baseAssessable                                                                  = $assessable->getBaseAssessable();
+            $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
+        }
+
+        $ib = new InternationalBaccalaureateGraph(
+            $cohortUnitImpls,
+            $student,
+            $attributes,
+            $this->visibility,
+            $this->getUser(),
+            $workTypeId,
+            $this->rubricMapper,
+            $this->getAuthorizer(),
+            $this->getRouter(),
+            $folder
+        );
+
+        return $ib->toContext();
     }
 
 
@@ -492,7 +478,12 @@ class Controller extends Web\Controller\Base
      * Load the assessments into each unit implementation.
      *
      * @param GenericCollection|UnitImpl\Model[] $unitImpls
-     * @return GenericCollection
+     * @return GenericCollection|UnitImpl\Model[]
+     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     private function loadAssessmentsIntoUnitImpls(GenericCollection $unitImpls): GenericCollection
     {
@@ -500,5 +491,81 @@ class Controller extends Web\Controller\Base
             $unitImpls[$assessable->getBaseContext()->getId()]->getAssessables()[$assessable->getId()] = $assessable;
         }
         return $unitImpls;
+    }
+
+
+    /**
+     * Efficiently fetch a set of assessment IDs where the assessments:
+     * * Reside inside the specified Unit Implementations,
+     * * Have the specified work type, and
+     * * Are due within the specified range
+     *
+     * @param GenericCollection $unitImpls
+     * @param int               $workTypeId
+     * @param StudentAttributes $attributes
+     * @return array
+     * @throws Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException
+     * @throws \UnderflowException
+     */
+    private function findAssessmentIds(GenericCollection $unitImpls, int $workTypeId, StudentAttributes $attributes): array
+    {
+        if (!\count($unitImpls)) {
+            return [];
+        }
+
+        $pb = (new Predicate\Builder(new \Alaress\Database\Quoter\Mysql\Quoter(), ''))
+            ->isNull('a.deleted_at')
+            ->in('ui.id', $unitImpls->getPropertyValues('id'))
+            ->equals('a.work_type_id', $workTypeId)
+            ->betweenDates('a.due_date', $attributes->getReportStartDate(), $attributes->getReportFinishDate());
+
+        $whereClause = \implode(' AND ', $pb->getWhere());
+
+        $sql = "
+            SELECT a.id FROM `assessment` a
+            JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
+            JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
+            WHERE {$whereClause}
+
+            UNION
+
+            SELECT a.id FROM `assessment` a
+            JOIN project_assessment ap                     ON ap.assessment_id                  = a.id
+            JOIN project p                                 ON ap.project_id                     = p.id 
+            JOIN assessment_course_unit_implementation aui ON aui.assessment_id                 = p.assessment_id
+            JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
+            WHERE {$whereClause}
+        ";
+
+        return $this->database->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+
+    /**
+     * Checks that the specified workType config has been set and returns the workType's id
+     *
+     * If not set, throws an exception containing a HTML message fragment we can insert in the DOM to prompt
+     * the user to configure the relevant config setting.
+     *
+     * @param string $configName
+     * @param string $errorMsg
+     * @param string $errorMsgLink
+     * @return int
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws UnexpectedValueException
+     */
+    private function checkWorkType(string $configName, string $errorMsg, string $errorMsgLink): int
+    {
+        $workTypeId = $this->getConfigLoader()->get($configName);
+        if (!\is_numeric($workTypeId)) {
+            $routeConfig = $this->getRouteIfAuthorized('tigsSummativeAdmin.getAdmin');
+            // If user is permitted, prompt them to fix this.
+            if ($routeConfig) {
+                $errorMsg .= " <a href =\"{$routeConfig}#{$configName}\">{$errorMsgLink}</a>";
+            }
+            throw new UnexpectedValueException($errorMsg);
+        }
+        return (int)$workTypeId;
     }
 }

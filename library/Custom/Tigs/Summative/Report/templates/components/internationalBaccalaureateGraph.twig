@@ -2,26 +2,33 @@
 Renders a MYP/DP graph.
 
 Data:
-    error: string - Optional. If present, the reason why we can't render the component
-    data:  array  - The results to render. key: column, value: height
+    error:        string   - Optional. If present, the reason why we can't render the component
+    studentValue: int|null - Optional. The student's mark for the IB graph assessment
+    data:         array    - The results to render. key: column, value: height
 #}
-
 {% if error|default(null) %}
-    <div class="empty-state">
-        <p>{{ error|raw }}</p>
-    </div>
+    <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
 
     {% if studentValue is not null %}
         {# TODO style this properly, of course #}
-        <div style="background-color: #DBCB46; color: white">
-            <h3>{{ studentValue }}</h3>
+        <div style="background-color: #DBCB46;">
+            <h3 style="color: white; text-align: center; margin-bottom: 0;">{{ studentValue }}</h3>
         </div>
     {% endif %}
 
     {% autoescape 'js' %}
     <script type="text/javascript">
 
+        /**
+         * Returns a set of colours for the columns
+         *
+         * @param {Array}    data
+         * @param {null|int} studentValue
+         * @param {string}   highlightColor
+         * @param {string}   defaultColor
+         * @return {Array}
+         */
         var buildColorList = function(data, studentValue, highlightColor, defaultColor) {
             var dataLength = data.length,
                 colorList  = [];
@@ -30,7 +37,7 @@ Data:
             }
 
             if (studentValue in colorList) {
-                colorList[studentValue] = highlightColor;
+                colorList[studentValue - 1] = highlightColor;
             }
 
             return colorList;
@@ -42,7 +49,10 @@ Data:
                 dataCategories = {{ dataCategories|json_encode|raw }},
                 studentValue = Number("{{ studentValue }}");
 
-            $("#myp-graph").highcharts({
+                {# Convert JSON object to plain array #}
+                data = Object.values(data);
+
+            $("#ib-graph").highcharts({
                 legend: {
                     enabled: false
                 },
@@ -79,5 +89,6 @@ Data:
         });
     </script>
     {% endautoescape %}
-    <div id="myp-graph"></div>
+    {# TODO style this properly #}
+    <div id="ib-graph" style="margin-bottom: 30px;"></div>
 {% endif %}

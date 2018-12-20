@@ -174,7 +174,7 @@ class AcademicAchievementSummary extends BaseComponent
     private function buildAssessmentData(DueWork\Model $dueWork): ?array
     {
         // Did we find an assessment, but it shouldn't be visible to the current viewer?
-        if (!$this->visibility->isVisibleToUserOrChildOfUser($dueWork, $this->viewer, true)) {
+        if (!$this->visibility->isVisibleToUserOrChildOfUser($dueWork, $this->viewer, true, null, false)) {
             return null;
         }
 
