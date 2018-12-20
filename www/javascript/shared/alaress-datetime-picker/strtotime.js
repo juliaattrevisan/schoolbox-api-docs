@@ -1,4 +1,4 @@
-(function(){
+(function($){
     'use strict';
 
     var reSpace = '[ \\t]+';
@@ -1017,7 +1017,7 @@
         }
     };
 
-    window.strtotime = function(str, now) {
+    $.fn.strtotime = function(str, now) {
         //       discuss at: http://locutus.io/php/strtotime/
         //      original by: Caio Ariede (http://caioariede.com)
         //      improved by: Kevin van Zonneveld (http://kvz.io)
@@ -1082,4 +1082,4 @@
 
         return Math.floor(result.toDate(new Date(now * 1000)) / 1000);
     };
-})();
+})(jQuery);
