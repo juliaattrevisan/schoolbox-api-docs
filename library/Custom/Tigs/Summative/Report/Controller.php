@@ -183,9 +183,9 @@ class Controller extends Web\Controller\Base
     {
         return new StudentAttributes(
             $user,
-            $query->get('term'),
             $this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'],
-            $query->get('ibFlag')
+            $query->get('ibFlag'),
+            $query->get('now')
         );
     }
 

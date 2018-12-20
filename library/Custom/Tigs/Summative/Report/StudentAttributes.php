@@ -30,9 +30,6 @@ class StudentAttributes
     private $isIb;
 
     /** @var int */
-    private $sbSem;
-
-    /** @var int */
     private $term;
 
     /** @var int */
@@ -43,30 +40,31 @@ class StudentAttributes
 
 
     /**
-     * @param User                     $user
-     * @param string|null              $termOverride
-     * @param string|null              $ibFlag
-     * @param string|null              $ibFlagOverride
-     * @param Alaress_Date_Format|null $now Enable now() simulation for unit tests
+     * @param User        $user
+     * @param string|null $ibFlag
+     * @param string|null $ibFlagOverride
+     * @param string|null $nowOverride Enable now() simulation for testing
      * @throws InvalidArgumentException
      */
     public function __construct(
         User $user,
-        ?string $termOverride,
         ?string $ibFlag,
         ?string $ibFlagOverride,
-        Alaress_Date_Format $now = null
+        ?string $nowOverride = null
     ) {
-        if ($termOverride && $now) {
-            throw new InvalidArgumentException('You may simulate a term or now, but not both');
+        // Either $ibFlag or $ibFlagOverride must be provided
+        if (null === $ibFlag && null === $ibFlagOverride) {
+            throw new InvalidArgumentException('Either an ibFlag or ibFlagOverride value must be set');
         }
+        $now = $nowOverride
+            ? new Alaress_Date_Format(\strtotime($nowOverride), Alaress_Date_Format::TIMESTAMP)
+            : Alaress_Date_Format::now();
 
         $this->yearLevel           = $this->deriveUserYearLevel($user);
         $this->isIb                = (bool)($ibFlagOverride ?? $ibFlag);
-        $this->term                = $this->deriveTerm($termOverride, $now ?? Alaress_Date_Format::now());
-        $this->sbSem               = \in_array($this->term, [1, 2], true) ? 1 : 2;
+        $this->term                = $this->deriveTerm($now);
         $this->curriculumYearLevel = ($this->yearLevel === 11 && $this->term === 4) ? 12 : $this->yearLevel;
-        $this->curriculumSemester  = $this->deriveCurriculumSemester($this->yearLevel, $this->sbSem, $this->term);
+        $this->curriculumSemester  = $this->deriveCurriculumSemester($this->yearLevel, $this->term);
     }
 
 
@@ -81,6 +79,10 @@ class StudentAttributes
         if ('' === $userYear || null === $userYear) {
             throw new InvalidArgumentException("User must have a year level set");
         }
+        if (!\is_numeric($userYear)) {
+            throw new InvalidArgumentException("User must have a numeric year. Found '{$userYear}'");
+        }
+
         return (int)$userYear;
     }
 
@@ -88,18 +90,12 @@ class StudentAttributes
     /**
      * Returns the term we are currently in.
      *
-     * @param string|null         $termOverride
      * @param Alaress_Date_Format $now
      * @return int
      * @throws InvalidArgumentException
      */
-    private function deriveTerm(?string $termOverride, Alaress_Date_Format $now): int
+    private function deriveTerm(Alaress_Date_Format $now): int
     {
-        // Was a term override provided?
-        if (null !== $termOverride && \preg_match('/^[1234]$/', $termOverride)) {
-            return (int)$termOverride;
-        }
-
         // Current Term + Semester
         $firstDayTerm2 = new Alaress_Date_Format(\strtotime(self::FIRST_DAY_TERM2_RELATIVE), Alaress_Date_Format::TIMESTAMP);
         $firstDayTerm3 = new Alaress_Date_Format(\strtotime(self::FIRST_DAY_TERM3_RELATIVE), Alaress_Date_Format::TIMESTAMP);
@@ -121,11 +117,10 @@ class StudentAttributes
      * Returns the student's Curriculum Semester
      *
      * @param int $userYearLevel
-     * @param int $sbSem
      * @param int $term
      * @return int
      */
-    private function deriveCurriculumSemester(int $userYearLevel, int $sbSem, int $term): int
+    private function deriveCurriculumSemester(int $userYearLevel, int $term): int
     {
         // Apply SB to Curriculum mapping
         if (($userYearLevel === 11 && $term === 4) || ($userYearLevel === 12 && $term === 1)) {
@@ -134,7 +129,7 @@ class StudentAttributes
         if ($userYearLevel === 12 && $term === 2) {
             return 2;
         }
-        return $sbSem;
+        return \in_array($term, [1, 2], true) ? 1 : 2;
     }
 
 
@@ -145,7 +140,7 @@ class StudentAttributes
      */
     public function isMyp(): bool
     {
-        return $this->yearLevel <= 10;
+        return $this->yearLevel >= 7 && $this->yearLevel <= 10;
     }
 
 
@@ -247,15 +242,6 @@ class StudentAttributes
     public function isIb(): bool
     {
         return $this->isIb;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getSbSem(): int
-    {
-        return $this->sbSem;
     }
 
 
