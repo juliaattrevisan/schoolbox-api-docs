@@ -196,12 +196,9 @@ class External_Tass_User implements External_UserInterface
         $addnum_mother = $this->helper->getAddNumMother();
         $addnum_father = $this->helper->getAddNumFather();
         $query = "SELECT DISTINCT
-                      CASE
-                          WHEN (sf.sfa_num) IS NULL
-                          THEN 'P' + RTRIM(parent.par_code)
-                          ELSE 'P' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
-                      END                 AS StudentContactID,
-                      sf.sfa_num          AS StudentContactSplitFamilyNumber,
+                      'P' + RTRIM(parent.par_code)
+                                          AS StudentContactID,
+                      NULL                AS StudentContactSplitFamilyNumber,
                       pa.add_num          AS StudentContactAddressNumber,
                       parent.f_name       AS StudentContactPreferred,
                       0                   AS StudentContactSilentPhoneFlag,
@@ -219,21 +216,14 @@ class External_Tass_User implements External_UserInterface
                   FROM student
                   JOIN parent ON student.par_code = parent.par_code AND student.cmpy_code = parent.cmpy_code
                   JOIN paraddress AS pa ON parent.par_code = pa.par_code AND pa.cmpy_code = parent.cmpy_code AND pa.add_num IN ($addnum_father,'1')
-                  LEFT JOIN pia_sfaccess AS sf
-                      ON parent.par_code = sf.par_code
-                      AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
-                      AND parent.cmpy_code = sf.cmpy_code
                   WHERE stud_code = '$tassID'
 
               UNION
 
                   SELECT DISTINCT
-                      CASE
-                          WHEN (sf.sfa_num) IS NULL
-                          THEN 'S' + RTRIM(parent.par_code)
-                          ELSE 'S' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
-                      END                 AS StudentContactID,
-                      sf.sfa_num          AS StudentContactSplitFamilyNumber,
+                      'S' + RTRIM(parent.par_code)
+                                          AS StudentContactID,
+                      NULL                AS StudentContactSplitFamilyNumber,
                       pa.add_num          AS StudentContactAddressNumber,
                       parent.m_name       AS StudentContactPreferred,
                       0                   AS StudentContactSilentPhoneFlag,
@@ -251,10 +241,6 @@ class External_Tass_User implements External_UserInterface
                   FROM student
                   JOIN parent ON student.par_code = parent.par_code AND student.cmpy_code = parent.cmpy_code
                   JOIN paraddress AS pa ON parent.par_code = pa.par_code AND pa.cmpy_code = parent.cmpy_code AND pa.add_num IN ($addnum_mother,'1')
-                  LEFT JOIN pia_sfaccess AS sf
-                      ON parent.par_code = sf.par_code
-                      AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
-                      AND parent.cmpy_code = sf.cmpy_code
                   WHERE stud_code = '$tassID'
 
               UNION
