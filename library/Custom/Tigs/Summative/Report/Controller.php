@@ -429,11 +429,13 @@ class Controller extends Web\Controller\Base
         // Only relevant for:
         // * MYP-S2
         // * DP-Y11-S2, DP-Y12-S1 + DP-Y12-S2
-        if ($attributes->isMyp() && 2 === $attributes->getCurriculumSemester()) {
+        $yearLevel = $attributes->getCurriculumYearLevel();
+        $semester  = $attributes->getCurriculumSemester();
+        if (2 === $semester && $attributes->isMyp()) {
             $configName   = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
             $errorMsg     = 'Cannot render MYP Report components. Work type not set.';
             $errorMsgLink = 'Set MYP Final Achievement Levels Work Type';
-        } elseif ($attributes->isDp() && (12 === $attributes->getCurriculumYearLevel() || 2 === $attributes->getCurriculumSemester())) {
+        } elseif ((11 === $yearLevel || 2 === $semester) && $attributes->isDp()) {
             $configName   = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
             $errorMsg     = 'Cannot render DP Report components. Work type not set.';
             $errorMsgLink = 'Set DP Report Work Type';
