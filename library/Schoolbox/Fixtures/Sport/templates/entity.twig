@@ -126,16 +126,18 @@
                                     <div class="actions-small-1">
                                         <div class="list-item">
                                             <div class="card compact small-12">
-                                            <span class="icon-team"></span>
                                                 {% set routeModifyTeam = routeLookupIfAuthorized('sportsfixturesTeam.getModifyForm', {
                                                     entityId: team.id,
                                                     entity:   team,
                                                 }) %}
                                                 {% if routeModifyTeam %}
-                                                    <a href="{{ routeModifyTeam }}">{{ team.name }}</a>
+                                                    <a href="{{ routeModifyTeam }}">
+                                                        <span class="icon-team"></span>
+                                                        {{ team.name }}
                                                     {% if team.coaches | length %}
-                                                        | <span class="meta">({{ team.coaches | column('name') | join(', ') }})</span>
+                                                        | <span class="pipe meta">({{ team.coaches | column('name') | join(', ') }})</span>
                                                     {% endif %}
+                                                    </a>
                                                 {% endif %}
                                             </div>
                                         </div>
