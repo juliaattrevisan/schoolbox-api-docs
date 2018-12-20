@@ -127,8 +127,9 @@ class DueWork implements IAssessmentTypeTranslator
         foreach ($domainObject->getAttachedFiles() as $file) {
             $dataModel->addAttachment(
                 (new DueWorkFileModel())
+                    ->setId($file->getId())
                     ->setBox($dataModel)
-                    ->setStorage($file)
+                    ->setStorage($file->getStorage())
                     ->setFilename($file->getFilename())
             );
         }
@@ -191,6 +192,7 @@ class DueWork implements IAssessmentTypeTranslator
         foreach ($dataModel->getAttachments() as $attachment) {
             $domainObject->getAttachedFiles()->add(
                 (new DueWorkFile())
+                    ->setId($attachment->getId())
                     ->setFilename($attachment->getFilename())
                     ->setStorage($attachment)
             );
