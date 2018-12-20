@@ -81,7 +81,8 @@
          * Examines the filter panel's most-recently submitted settings and
          * converts to a suitable JS representation we can use to filter events.
          *
-         * Only filters that are actually being applied are included in data structure.
+         * We need to include all filter selections because the options displayed may be a sub-set of all possible options.
+         * eg consider when Tasks are configured by the SU to never be available, we need to ensure they are always filtered out.
          */
         var updateFilterOptionValues = function () {
             appliedFilters = {};
@@ -103,9 +104,16 @@
                     filterSelections[key] = val;
                 });
 
-                if (countSelected && countSelected !== $options.length) {
-                    appliedFilters[filterId] = filterSelections;
+                // If no options were selected, then flip the value so that all options are selected in this representation
+                if (!countSelected) {
+                    for (var i in filterSelections) {
+                        if (filterSelections.hasOwnProperty(i)) {
+                            filterSelections[i] = '1';
+                        }
+                    }
                 }
+
+                appliedFilters[filterId] = filterSelections;
             });
         };
 
@@ -132,9 +140,9 @@
                 }
 
                 // Which filter are we currently applying?
-                // Hide the event if it's attribute is not selected in the filter options.
+                // Hide the event if its attribute is not present or not selected in the filter options.
                 var key = getFilterOptionKey(filterIdSlugMap[filterId], $event);
-                if ('0' === appliedFilters[filterId][key]) {
+                if (!(key in appliedFilters[filterId]) || '1' !== appliedFilters[filterId][key]) {
                     return true;
                 }
             }
