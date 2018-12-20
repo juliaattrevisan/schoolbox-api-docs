@@ -81,7 +81,7 @@ class Controller extends Base
          */
 
         $translator = new \Schoolbox\Cyberhound\Url\Translator(
-            $_SESSION['ip'],
+            $this->getSession()->get('ip'),
             $this->getConfigLoader()->get('cyberhound_api_url'),
             $this->getConfigLoader()->get('cyberhound_api_shared_key')
         );
