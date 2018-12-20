@@ -23,3 +23,11 @@ In order for a card to have content- it needs to be contained in an `.informatio
   </Card>
 </div>
 ```
+
+#### Loading card
+
+A loading card will show by default when there is no content sent to the card.
+
+```jsx
+<Card />
+```
