@@ -527,12 +527,14 @@ if [[ "$(readlink /proc/1/exe)" == */systemd ]];
 then
     echo "[SB][`date +%Y-%m-%d\ %X`] Installing daemon systemd configurations";
     cp -f /vagrant/tools/init/schoolbox-*.service /lib/systemd/system/;
+    cp -f /vagrant/tools/styleguide/styleguide.service /lib/systemd/system/;
     sed -i 's/usr\/share\/schoolbox/vagrant/g' /lib/systemd/system/schoolbox-*d.service;
     systemctl daemon-reload;
     systemctl enable schoolbox-scheduled.service;
     systemctl enable schoolbox-routed.service;
     systemctl enable schoolbox-socketd.service;
     systemctl enable schoolbox-digestd.service;
+    systemctl enable styleguide.service;
     #systemctl enable schoolbox-belld.service;
 else
     echo "[SB][`date +%Y-%m-%d\ %X`] Installing daemon upstart configurations";
@@ -599,6 +601,7 @@ service schoolbox-epl restart > /dev/null 2>&1;
 service apache2 restart > /dev/null 2>&1;
 service php7.1-fpm restart > /dev/null 2>&1;
 service nginx restart > /dev/null 2>&1;
+service styleguide restart > /dev/null 2>&1;
 
 # call custom provisioning
 if [ -f /vagrant/post-provision.sh ];
