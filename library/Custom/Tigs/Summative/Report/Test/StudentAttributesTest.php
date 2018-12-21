@@ -14,6 +14,7 @@ use InvalidArgumentException;
 
 /**
  * @covers \Custom\Tigs\Summative\Report\StudentAttributes
+ * @codeCoverageIgnore
  */
 class StudentAttributesTest extends TestCase
 {
@@ -208,6 +209,7 @@ class StudentAttributesTest extends TestCase
      */
     public function providerValidYearLevel(): array
     {
+        // yearLevel, yearLevel
         return [
             [1,    1],
             ['1',  1],
@@ -223,6 +225,7 @@ class StudentAttributesTest extends TestCase
      */
     public function providerInvalidYearLevel(): array
     {
+        // yearLevel
         return [
             [null],
             [''],
@@ -238,6 +241,7 @@ class StudentAttributesTest extends TestCase
      */
     public function providerIsIb(): array
     {
+        // ibFlag, ibFlagOverride, isIb
         return [
             [null, '0', false],
             [null, '1', true],
@@ -254,71 +258,65 @@ class StudentAttributesTest extends TestCase
 
     public function providerIsMyp(): array
     {
-        $isIb    = '1';
-        $isNotIb = '0';
-
+        // yearLevel, isIb, isMyp
         return [
-            [6,  $isIb,    false],
-            [6,  $isNotIb, false],
-            [7,  $isIb,    true],
-            [7,  $isNotIb, true],
-            [8,  $isIb,    true],
-            [8,  $isNotIb, true],
-            [9,  $isIb,    true],
-            [9,  $isNotIb, true],
-            [10, $isIb,    true],
-            [10, $isNotIb, true],
-            [11, $isIb,    false],
-            [11, $isNotIb, false],
-            [12, $isIb,    false],
-            [12, $isNotIb, false],
+            [6,  '1', false],
+            [6,  '0', false],
+            [7,  '1', true],
+            [7,  '0', true],
+            [8,  '1', true],
+            [8,  '0', true],
+            [9,  '1', true],
+            [9,  '0', true],
+            [10, '1', true],
+            [10, '0', true],
+            [11, '1', false],
+            [11, '0', false],
+            [12, '1', false],
+            [12, '0', false],
         ];
     }
 
 
     public function providerIsDp(): array
     {
-        $isIb    = '1';
-        $isNotIb = '0';
-
+        // yearLevel, isIb, isDp
         return [
-            [6,  $isIb,    false],
-            [6,  $isNotIb, false],
-            [7,  $isIb,    false],
-            [7,  $isNotIb, false],
-            [8,  $isIb,    false],
-            [8,  $isNotIb, false],
-            [9,  $isIb,    false],
-            [9,  $isNotIb, false],
-            [10, $isIb,    false],
-            [10, $isNotIb, false],
-            [11, $isIb,    true],
-            [11, $isNotIb, false],
-            [12, $isIb,    true],
-            [12, $isNotIb, false],
+            [6,  '1', false],
+            [6,  '0', false],
+            [7,  '1', false],
+            [7,  '0', false],
+            [8,  '1', false],
+            [8,  '0', false],
+            [9,  '1', false],
+            [9,  '0', false],
+            [10, '1', false],
+            [10, '0', false],
+            [11, '1', true],
+            [11, '0', false],
+            [12, '1', true],
+            [12, '0', false],
         ];
     }
 
     public function providerIsHsc(): array
     {
-        $isIb    = '1';
-        $isNotIb = '0';
-
+        // yearLevel, isIb, isHsc
         return [
-            [6,  $isIb,    false],
-            [6,  $isNotIb, false],
-            [7,  $isIb,    false],
-            [7,  $isNotIb, false],
-            [8,  $isIb,    false],
-            [8,  $isNotIb, false],
-            [9,  $isIb,    false],
-            [9,  $isNotIb, false],
-            [10, $isIb,    false],
-            [10, $isNotIb, false],
-            [11, $isIb,    false],
-            [11, $isNotIb, true],
-            [12, $isIb,    false],
-            [12, $isNotIb, true],
+            [6,  '1', false],
+            [6,  '0', false],
+            [7,  '1', false],
+            [7,  '0', false],
+            [8,  '1', false],
+            [8,  '0', false],
+            [9,  '1', false],
+            [9,  '0', false],
+            [10, '1', false],
+            [10, '0', false],
+            [11, '1', false],
+            [11, '0', true],
+            [12, '1', false],
+            [12, '0', true],
         ];
     }
 
@@ -327,19 +325,20 @@ class StudentAttributesTest extends TestCase
      */
     public function providerTermDerivation(): array
     {
+        // yearLevel, now, term
         return [
-            ['10', '2018-01-10', 1],
-            ['10', '2018-04-10', 2],
-            ['10', '2018-07-10', 3],
-            ['10', '2018-10-10', 4],
-            ['11', '2018-01-10', 1],
-            ['11', '2018-04-10', 2],
-            ['11', '2018-07-10', 3],
-            ['11', '2018-10-10', 4],
-            ['12', '2018-01-10', 1],
-            ['12', '2018-04-10', 2],
-            ['12', '2018-07-10', 3],
-            ['12', '2018-10-10', 4],
+            ['10', '2010-01-10', 1],
+            ['10', '2010-04-10', 2],
+            ['10', '2010-07-10', 3],
+            ['10', '2010-10-10', 4],
+            ['11', '2010-01-10', 1],
+            ['11', '2010-04-10', 2],
+            ['11', '2010-07-10', 3],
+            ['11', '2010-10-10', 4],
+            ['12', '2010-01-10', 1],
+            ['12', '2010-04-10', 2],
+            ['12', '2010-07-10', 3],
+            ['12', '2010-10-10', 4],
         ];
     }
 
@@ -349,19 +348,20 @@ class StudentAttributesTest extends TestCase
      */
     public function providerCurriculumYearLevelNowOverride(): array
     {
+        // yearLevel, yearLevel
         return [
-            ['10', '2018-01-10', 10],
-            ['10', '2018-04-10', 10],
-            ['10', '2018-07-10', 10],
-            ['10', '2018-10-10', 10],
-            ['11', '2018-01-10', 11],
-            ['11', '2018-04-10', 11],
-            ['11', '2018-07-10', 11],
-            ['11', '2018-10-10', 12],
-            ['12', '2018-01-10', 12],
-            ['12', '2018-04-10', 12],
-            ['12', '2018-07-10', 12],
-            ['12', '2018-10-10', 12],
+            ['10', '2010-01-10', 10],
+            ['10', '2010-04-10', 10],
+            ['10', '2010-07-10', 10],
+            ['10', '2010-10-10', 10],
+            ['11', '2010-01-10', 11],
+            ['11', '2010-04-10', 11],
+            ['11', '2010-07-10', 11],
+            ['11', '2010-10-10', 12],
+            ['12', '2010-01-10', 12],
+            ['12', '2010-04-10', 12],
+            ['12', '2010-07-10', 12],
+            ['12', '2010-10-10', 12],
         ];
     }
 
@@ -371,6 +371,7 @@ class StudentAttributesTest extends TestCase
      */
     public function providerCurriculumSemesterNowOverride(): array
     {
+        // yearLevel, now, curriculumSemester
         return [
             ['10', '2018-01-10', 1],
             ['10', '2018-04-10', 1],
@@ -393,6 +394,7 @@ class StudentAttributesTest extends TestCase
      */
     public function providerReportStartNowOverride(): array
     {
+        // yearLevel, now, reportStart
         return [
             ['10', '2010-01-10', '2010-01-01'],  // Term 1
             ['10', '2010-04-10', '2010-01-01'],  // Term 2
@@ -415,6 +417,7 @@ class StudentAttributesTest extends TestCase
      */
     public function providerReportFinishNowOverride(): array
     {
+        // yearLevel, now, reportEnd
         return [
             ['10', '2010-01-10', '2010-06-30'],  // Term 1
             ['10', '2010-04-10', '2010-06-30'],  // Term 2
