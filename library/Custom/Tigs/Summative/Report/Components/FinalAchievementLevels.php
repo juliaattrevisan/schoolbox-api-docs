@@ -122,7 +122,8 @@ class FinalAchievementLevels extends BaseComponent
             return null;
         }
 
-        $assessment = \reset($falAssessables);
+        /** @var IAssessable $assessment */
+        $assessment = $falAssessables->first();
 
         // Not a Due Work?
         if (!$assessment instanceof DueWork\Model) {

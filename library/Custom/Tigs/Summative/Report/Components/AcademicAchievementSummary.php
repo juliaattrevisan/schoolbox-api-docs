@@ -136,7 +136,8 @@ class AcademicAchievementSummary extends BaseComponent
             return null;
         }
 
-        $assessment = \reset($aasAssessables);
+        /** @var IAssessable $assessment */
+        $assessment = $aasAssessables->first();
 
         // Not a Due Work?
         if (!$assessment instanceof DueWork\Model) {

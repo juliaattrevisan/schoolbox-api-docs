@@ -141,7 +141,8 @@ class AcademicAchievementMatrix extends BaseComponent
             return null;
         }
 
-        $assessment = \reset($aamAssessables);
+        /** @var IAssessable $assessment */
+        $assessment = $aamAssessables->first();
 
         // Not a Due Work?
         if (!$assessment instanceof DueWork\Model) {
