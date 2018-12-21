@@ -182,7 +182,7 @@ trait DueWorkTrait
     }
 
     /**
-     * @return float
+     * @return float|null
      */
     protected function getMaxMark()
     {
