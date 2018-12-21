@@ -35,7 +35,6 @@ $login-img-max-height: 12rem !default; // 192px
         }
 
         #content {
-
             @media #{$small-only} {
                 max-width: 360px;
             }
@@ -98,6 +97,12 @@ $login-img-max-height: 12rem !default; // 192px
         a, label{
             color: calc-text-color($login-form-background-color);
             font-size: inherit;
+        }
+
+        a.button {
+            @extend .expand;
+            color:$content-ui-foreground;
+            margin-top: 1rem;
         }
 
         #footer,
