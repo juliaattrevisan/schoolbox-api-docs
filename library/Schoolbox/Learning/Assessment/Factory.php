@@ -160,14 +160,12 @@ class Factory
         $this->setMarkPerCapability(trim($post['markPerCapability']) === 'on');
         $this->setUseMarkRange(trim($post['useMarkRange']) === 'on');
 
-        // MaxMark is the maximum available marks for the entire assessment, and should exist in some form
-        // for all mark types except None.
+        // MaxMark is the maximum available marks for the entire assessment.
+        // Percentage based mark types are permitted to have no max mark; at marking time they are marked out of 1.
         // Unfortunately, the due work create form uses these deprecated values, not the new "slug" ones.
         switch($markType) {
             case MarkType::TYPE_PERCENT:
             case MarkType::TYPE_LETTER:
-                $maxMark = 100.0;
-                break;
             case MarkType::TYPE_NONE:
                 $maxMark = null;
                 break;
