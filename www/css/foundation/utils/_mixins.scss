@@ -244,8 +244,8 @@
 		}
 		.#{$prefix}-#{$i}-bg {
 			background-color: $derived;
-			fill: $derived;
 			color: $white;
+			fill: $derived;
 		}
 	}
 }
