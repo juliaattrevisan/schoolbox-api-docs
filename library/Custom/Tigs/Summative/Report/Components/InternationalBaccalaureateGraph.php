@@ -209,9 +209,9 @@ class InternationalBaccalaureateGraph extends BaseComponent
                     );
                 }
 
-                if($this->getAttributes()->isMyp()){
+                if ($this->getAttributes()->isMyp()) {
                     // MYP Assessment must use a rubric:
-                    if(!$assessment->getUseRubric()){
+                    if (!$assessment->getUseRubric()) {
                         throw new UnexpectedValueException(
                             sprintf(
                                 'An MYP due work must have a rubric. Assessment "%s" in folder "%s" does not have a rubric.',
