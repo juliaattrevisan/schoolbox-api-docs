@@ -161,7 +161,7 @@ class Factory
         $this->setUseMarkRange(trim($post['useMarkRange']) === 'on');
 
         // MaxMark is the maximum available marks for the entire assessment.
-        // Percentage based mark types are permitted to have no max mark; at marking time they are marked out of 1.
+        // It is permitted to be null for all mark types except Total Mark.
         // Unfortunately, the due work create form uses these deprecated values, not the new "slug" ones.
         switch($markType) {
             case MarkType::TYPE_PERCENT:
