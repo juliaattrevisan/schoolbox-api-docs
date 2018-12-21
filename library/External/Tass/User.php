@@ -206,11 +206,8 @@ class External_Tass_User implements External_UserInterface
                 pa.bus_phone        AS StudentContactOccupPhone,
                 pa.e_mail           AS StudentContactDefaultEmail,
                 ''                  AS StudentContactSpouseID,
-                CASE
-                    WHEN RTRIM(pa.mobile1) IS NOT NULL
-                    THEN RTRIM(pa.mobile1)
-                    ELSE RTRIM(pa.mobile2)
-                END                 AS StudentContactMobilePhone,
+                COALESCE(RTRIM(pa.mobile1), RTRIM(pa.mobile2))
+                                    AS StudentContactMobilePhone,
                 pa.mobile2          AS StudentContactSpouseMobilePhone
             FROM student
             JOIN parent
@@ -234,11 +231,8 @@ class External_Tass_User implements External_UserInterface
                 pa.bus_phone        AS StudentContactOccupPhone,
                 pa.e_mail           AS StudentContactDefaultEmail,
                 ''                  AS StudentContactSpouseID,
-                CASE
-                    WHEN RTRIM(pa.mobile1) IS NOT NULL
-                    THEN RTRIM(pa.mobile1)
-                    ELSE RTRIM(pa.mobile2)
-                END                 AS StudentContactMobilePhone,
+                COALESCE(RTRIM(pa.mobile1), RTRIM(pa.mobile2))
+                                    AS StudentContactMobilePhone,
                 pa.mobile2          AS StudentContactSpouseMobilePhone
             FROM student
             JOIN parent
@@ -262,11 +256,8 @@ class External_Tass_User implements External_UserInterface
                 pa.bus_phone        AS StudentContactOccupPhone,
                 pa.e_mail           AS StudentContactDefaultEmail,
                 ''                  AS StudentContactSpouseID,
-                CASE
-                    WHEN RTRIM(pa.mobile1) IS NOT NULL
-                    THEN RTRIM(pa.mobile1)
-                    ELSE RTRIM(pa.mobile2)
-                END                 AS StudentContactMobilePhone,
+                COALESCE(RTRIM(pa.mobile1), RTRIM(pa.mobile2))
+                                    AS StudentContactMobilePhone,
                 pa.mobile2          AS StudentContactSpouseMobilePhone
 
             FROM pia_sfaccess AS sf
@@ -292,11 +283,8 @@ class External_Tass_User implements External_UserInterface
                 pa.bus_phone        AS StudentContactOccupPhone,
                 pa.e_mail           AS StudentContactDefaultEmail,
                 ''                  AS StudentContactSpouseID,
-                CASE
-                    WHEN RTRIM(pa.mobile1) IS NOT NULL
-                    THEN RTRIM(pa.mobile1)
-                    ELSE RTRIM(pa.mobile2)
-                END                 AS StudentContactMobilePhone,
+                COALESCE(RTRIM(pa.mobile1), RTRIM(pa.mobile2))
+                                    AS StudentContactMobilePhone,
                 pa.mobile2          AS StudentContactSpouseMobilePhone
 
             FROM pia_sfaccess AS sf
