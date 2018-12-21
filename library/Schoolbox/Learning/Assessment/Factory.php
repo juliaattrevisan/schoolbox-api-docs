@@ -39,6 +39,8 @@ use \Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait as ProjectTrai
 use \Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+
 class Factory
 {
     use DueWorkTrait;
@@ -124,6 +126,7 @@ class Factory
      * Factory constructor.
      * @param User $creator
      * @param $post (an array of post vars from the create/update forms)
+     * @throws \UnexpectedValueException
      */
     public function __construct(User $creator, $post) {
 
@@ -149,14 +152,33 @@ class Factory
          */
         $this->setAcceptOnline(trim($post['acceptOnline']));
         $this->setWorkType(trim($post['workType']));
-        $this->setMarkType(trim($post['markType']));
+        $markType = trim($post['markType']);
+        $this->setMarkType($markType);
         $this->setGradingScheme(trim($post['gradingScheme']));
         $this->setUseRubric(trim($post['useRubric']));
 
         $this->setMarkPerCapability(trim($post['markPerCapability']) === 'on');
         $this->setUseMarkRange(trim($post['useMarkRange']) === 'on');
 
-        $this->setMaxMark(trim($post['maxMark']));
+        // MaxMark is the maximum available marks for the entire assessment.
+        // It is permitted to be null for all mark types except Total Mark.
+        // Unfortunately, the due work create form uses these deprecated values, not the new "slug" ones.
+        switch($markType) {
+            case MarkType::TYPE_PERCENT:
+            case MarkType::TYPE_LETTER:
+            case MarkType::TYPE_NONE:
+                $maxMark = null;
+                break;
+            default:
+                $maxMark = (float)trim($post['maxMark']);
+                break;
+        }
+
+        // We should never end up with a 0 max mark unless something goes very wrong, but if that does happen, we want to handle it nicely.
+        if ($maxMark === 0.0) {
+            throw new \UnexpectedValueException('provide maximum available marks greater than 0');
+        }
+        $this->setMaxMark($maxMark);
 
         if (isset($post['self_reviewable'])) {
             // Value has come though from the form, use that

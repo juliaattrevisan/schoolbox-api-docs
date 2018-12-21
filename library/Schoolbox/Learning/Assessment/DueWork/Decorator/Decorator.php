@@ -59,7 +59,7 @@ class Decorator implements DecoratorInterface
         $this->setUseRubric(trim($useRubric));
         $this->setMarkPerCapability(trim($markPerCapability));
         $this->setUseMarkRange(trim($useMarkRange));
-        $this->setMaxMark(trim($maxMark));
+        $this->setMaxMark($maxMark);
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
         $this->setSelfReviewable($selfReviewable);

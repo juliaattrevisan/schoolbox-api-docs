@@ -699,7 +699,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @return float
+     * @return float|null
      */
     public function getMaxMark(): ?float
     {
@@ -707,10 +707,10 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @param float $maxMark
+     * @param float|null $maxMark
      * @return static
      */
-    public function setMaxMark(float $maxMark): self
+    public function setMaxMark(?float $maxMark): self
     {
         $this->maxMark = $maxMark;
         return $this;
