@@ -230,15 +230,11 @@ class StudentAttributes
             $reportEnd = self::FIRST_DAY_TERM2_RELATIVE  . " $nowYear";
         } elseif ($isYear12 && $term === 1) {
             $reportEnd = self::FIRST_DAY_TERM2_RELATIVE . " $nowYear";
-        } elseif ($isYear12 && $term === 2) {
+        } elseif (($isYear12 && $term === 2 )|| \in_array($term, [3, 4], true)) {
             $nowYear++;
             $reportEnd = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
-        } elseif (\in_array($term, [1, 2], true)) {
-            $reportEnd = self::FIRST_DAY_TERM3_RELATIVE . " $nowYear";
         } else {
-            // Terms 3+4
-            $nowYear++;
-            $reportEnd = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+            $reportEnd = self::FIRST_DAY_TERM3_RELATIVE . " $nowYear";
         }
 
         return (new Alaress_Date_Format(\strtotime($reportEnd), Alaress_Date_Format::TIMESTAMP))->addDays(-1)->endOfDay();
