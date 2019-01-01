@@ -131,13 +131,13 @@
                                                     entity:   team,
                                                 }) %}
                                                 {% if routeModifyTeam %}
-                                                    <a href="{{ routeModifyTeam }}">
+                                                    <div>
                                                         <span class="icon-team"></span>
-                                                        {{ team.name }}
-                                                    {% if team.coaches | length %}
-                                                        | <span class="pipe meta">({{ team.coaches | column('name') | join(', ') }})</span>
-                                                    {% endif %}
-                                                    </a>
+                                                        <a href="{{ routeModifyTeam }}">{{ team.name }}</a>
+                                                        {% if team.coaches | length %}
+                                                            <span class="pipe meta">({{ team.coaches | column('name') | join(', ') }})</span>
+                                                        {% endif %}
+                                                    </div>
                                                 {% endif %}
                                             </div>
                                         </div>
