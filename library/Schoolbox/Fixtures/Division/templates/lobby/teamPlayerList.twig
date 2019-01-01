@@ -4,15 +4,17 @@
             <div class="grip"></div>
             <div class="list-item">
                 <div class="small-12 compact card wrap-down">
-                    <a href="/search/user/{{ teamPlayer.id }}">
-                        <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
-                        <p>{{ teamPlayer.fullName }}</p>
+                    <div>
+                        <a href="/search/user/{{ teamPlayer.id }}">
+                            <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
+                        </a>
+                        <p><a href="/search/user/{{ teamPlayer.id }}">{{ teamPlayer.fullName }}</a></p>
                         <p class="pipe meta">
                             {% for currentPosition in positions[teamPlayer.id] %}
                                 {{ currentPosition.position.name }}{% if not loop.last %}, {% endif %}
                             {% endfor %}
                         </p>
-                    </a>
+                    </div>
                 </div>
             </div>
             <nav>
