@@ -143,7 +143,7 @@
 
                         /* Execute db transaction - ajax call here
                          */
-                        $.post(to.data('addPlayersAction'), [{name: 'userId[]', value: player.data('player')}])
+                        $.post(to.data('addPlayersAction'), [{name: 'userId[]', value: player.data('player')}], null, "json")
                             .then(function(response) {
 
                                 /* Save new team player order
@@ -196,8 +196,7 @@
 
                         /* Activate indicators
                          */
-                        fromFeedback.toastActivate({text: 'Removing from team...'});
-                        toFeedback.toastActivate({text: 'Adding to team...'});
+                        toFeedback.toastActivate({text: 'Moving between teams...'});
 
                         /* Execute db transaction - ajax call here
                          */
@@ -207,11 +206,11 @@
                         $.when(
                             $.post(from.data('removePlayersAction'), [{name: 'userId[]', value: player.data('player')}], function(response) {
                                 fromTeamConfiguration = response;
-                            }),
+                            }, "json"),
 
                             $.post(to.data('addPlayersAction'), [{name: 'userId[]', value: player.data('player')}], function(response) {
                                 toTeamConfiguration = response;
-                            })
+                            }, "json")
                         ).then(function(response) {
 
                                 /* Save new team player order
@@ -242,15 +241,14 @@
 
                                 /* Activate indicators
                                  */
-                                fromFeedback.toastTimeout({text: 'Removed from team', css: 'success'});
-                                toFeedback.toastTimeout({text: 'Added to team', css: 'success'});
+                                toFeedback.toastTimeout({text: 'Player moved to team', css: 'success'});
 
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
                             })
                             .fail(function() {
-                                toFeedback.toastTimeout({text: 'Add failed', css: 'alert'});
+                                toFeedback.toastTimeout({text: 'Moving player failed', css: 'alert'});
                                 player.remove();
                             });
                     }
@@ -273,7 +271,7 @@
 
                         /* Execute db transaction - ajax call here
                          */
-                        $.post(from.data('removePlayersAction'), [{name: 'userId[]', value: player.data('player')}])
+                        $.post(from.data('removePlayersAction'), [{name: 'userId[]', value: player.data('player')}], null, "json")
                             .then(function(response) {
 
                                 /* Save new team player order
@@ -364,7 +362,7 @@
                 var feedback = findIndicator(el.parents('[data-division-player-list]'));
                 feedback.toastActivate({text: 'Adding to team...'});
 
-                $.post(el.attr('href'), [{name: 'userId[]', value: el.data('addTeamPlayer')}])
+                $.post(el.attr('href'), [{name: 'userId[]', value: el.data('addTeamPlayer')}], null, "json")
                     .done(function(response) {
                         updateTeamMetadata($('[data-team='+el.attr('data-affected-team')+']'), response);
                         updateDivisionLobby(response.divisionLobby);
@@ -395,7 +393,7 @@
                         var feedback = findIndicator(el.parents('[data-team-player-list]'));
                         feedback.toastActivate({text: 'Removing from team...'});
 
-                        $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removeTeamPlayer')}])
+                        $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removeTeamPlayer')}], null, "json")
                             .done(function(response) {
                                 updateTeamMetadata($('[data-team='+el.attr('data-affected-team')+']'), response);
                                 updateDivisionLobby(response.divisionLobby);
@@ -429,7 +427,7 @@
                         var feedback = findIndicator(el.parents('[data-division-player-list]'));
                         feedback.toastActivate({text: 'Removing from division...'});
 
-                        $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removePlayer')}])
+                        $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removePlayer')}], null, "json")
                             .done(function(response) {
 
                                 /* Remove player from Division List
@@ -474,7 +472,7 @@
                 return {name: 'userId[]', value: $(this).data('player')};
             });
 
-            return $.post(sortable.data('reorderPlayersAction'), data);
+            return $.post(sortable.data('reorderPlayersAction'), data, null, "json");
         }
 
         /**
