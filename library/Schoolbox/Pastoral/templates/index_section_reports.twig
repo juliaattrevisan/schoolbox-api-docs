@@ -7,8 +7,8 @@
             {% for report in reportsDashboard %}
                 <li>
                     <div class="card small-12">
-                        <a href="{{ profile.link(user) }}">
-                            {{ profile.imageSquare64(user) }}
+                        <a href="{{ profile.link(report.owner) }}">
+                            {{ profile.imageSquare64(report.owner) }}
                         </a>
                         <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id}) }}'>
                             <h3>{{ report.name }}</h3>
