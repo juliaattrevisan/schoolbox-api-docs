@@ -28,10 +28,10 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
     $this->setBlock('student_list', 'select_student', 'select_student_block');
     $this->setBlock('student_list', 'medical', 'medical_block');
     $this->setBlock('student_list', 'special', 'special_block');
+    $this->setBlock('student_list', 'esl', 'esl_block');
     // Start custom for SCC
     $this->setBlock('student_list', 'nonresident', 'nonresident_block');
     $this->setBlock('student_list', 'ib', 'ib_block');
-    $this->setBlock('student_list', 'esl', 'esl_block');
     // Warning: TSI Flag is used for "boarder" at SCC
     $this->setBlock('student_list', 'tsi', 'tsi_block');
     $this->setBlock('student_list', 'integration', 'integration_block');
@@ -187,6 +187,12 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
                 $this->parse('medical_block', 'medical');
             } else {
                 $this->setVar('medical_block', '');
+            }
+
+            if (!empty($student['EnglishSecondFlag']) && Cfg::get('protect_medicalspecial') == 0) {
+                $this->parse('esl_block', 'esl');
+            } else {
+                $this->setVar('esl_block', '');
             }
 
             if (!empty($student['StudentSpecialNeedsFlag']) && Cfg::get('protect_medicalspecial') == 0) {
