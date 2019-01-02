@@ -67,7 +67,7 @@
                         {% endblock specialAlert %}
 
                         {% block englishSecond %}
-                            {% if externalUser.EnglishSecondFlag %}
+                            {% if externalUser.EnglishSecondFlag and showSpecialAlert  %}
                                 <div class="alert-box highlight icon-eng-second-lang">
                                     English as a second language
                                 </div>
