@@ -8,10 +8,10 @@ Usage:
 #}
 <li class="actions-small-1 content">
     <h3>{{ unitSpec.folder.name }}</h3>
-    {% if unitSpec.assessments | length %}
+    {% if unitSpec.assessables | length %}
         <ul class="information-list no-pad">
-            {% for assessment in unitSpec.assessments %}
-                {% include '@course/assessments.twig' with {
+            {% for assessment in unitSpec.assessables %}
+                {% include '@course/assessment/readonly.twig' with {
                     assessment: assessment,
                     _writable:  false
                 } only %}
