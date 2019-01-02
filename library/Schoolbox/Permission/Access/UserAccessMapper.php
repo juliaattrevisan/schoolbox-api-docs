@@ -35,6 +35,12 @@ use Schoolbox\UserMapper;
  */
 class UserAccessMapper extends Mapper
 {
+    /**
+     * Status of your acceptance into the group
+     * 0 awaiting authorisation
+     * 1 you're in
+     */
+    public const TYPE_AWAITING_AUTHORISATION = 0;
 
     /**
      * Cached permissions

@@ -14,7 +14,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper as RerouteOverrideMapper;
-
+use Schoolbox\Permission\Access\UserAccessMapper;
 
 class Mapper extends BaseMapper
 {
@@ -90,7 +90,7 @@ class Mapper extends BaseMapper
      * @param \Schoolbox\User $user
      * @return array
      */
-    public function findGroupsForUser($user) {
+    public function findGroupsForUser($user) :array {
 
         $query = "
             SELECT `ua`.sid, `f`.name
@@ -98,6 +98,7 @@ class Mapper extends BaseMapper
             JOIN `folder` AS `f` ON `f`.id = `ua`.sid AND `f`.`deleted_at` IS NULL
             JOIN `homepage_config` ON `f`.id = `homepage_config`.cid
             WHERE `ua`.`service` = :service AND `ua`.`uid` = :userId
+            AND `ua`.`type` != " . UserAccessMapper::TYPE_AWAITING_AUTHORISATION . "
             ORDER BY `f`.`name`
         ";
 
