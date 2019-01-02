@@ -208,8 +208,9 @@ class EventMapper extends CalendarEventMapper
         $sql = '';
 
         // Build a query around from/to dates
-        $queryParts  = [];
+        $queryParts  = ['WHERE (e.deleted_at IS NULL)'];
         $queryParams = [];
+
         if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
             $queryParts[]        = 'e.start_datetime >= :from';
             $queryParams['from'] = $from->getDatabaseDate();
@@ -220,7 +221,7 @@ class EventMapper extends CalendarEventMapper
         }
 
         if (!empty($queryParts)) {
-            $sql = 'WHERE ' . implode(' AND ', $queryParts);
+            $sql = implode(' AND ', $queryParts);
         }
 
         /* Looked for a way to convince GROUP BY to group records with
@@ -343,8 +344,8 @@ class EventMapper extends CalendarEventMapper
             LEFT JOIN {$this->getJoinSql('author', 'e', 'a', true)}
             LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c', true)}
             LEFT JOIN {$this->getJoinSql('eventType', 'e', 't', true)}
-            WHERE e.author_id = :userId
-            OR e.teacher_in_charge_id = :userId
+            WHERE e.deleted_at IS NULL
+            AND (e.author_id = :userId OR e.teacher_in_charge_id = :userId)
             ORDER BY e.start_datetime
         ";
 
