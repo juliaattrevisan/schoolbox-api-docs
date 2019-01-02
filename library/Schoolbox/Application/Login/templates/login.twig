@@ -113,12 +113,10 @@ $(function() {
                 <div class="small-12 column">
                     <input type="submit" name="Submit" value="Sign in" alt="Sign in" />
                     {% if config.login_anonymous != '' %}
-                    <p>or</p>
-                    <p><a href="/account/anonymous.php?{{ requestParams|escape }}" class="guest button expand">Sign in as Guest</a></p>
+                    <a href="/account/anonymous.php?{{ requestParams|escape }}" class="button guest">Sign in as Guest</a>
                     {% endif %}
-                    {% if config.saml_sso_url != '' %}
-                    <p>or</p>
-                    <p><a href="/saml/index.php?{{ requestParams|escape }}" class="button expand samlbutton">Login using Single Sign-On</a></p>
+                    {% if config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
+                    <a href="/saml/index.php?{{ requestParams|escape }}" class="button samlbutton">Login using Single Sign-On</a>
                     {% endif %}
                 </div>
             </div>
