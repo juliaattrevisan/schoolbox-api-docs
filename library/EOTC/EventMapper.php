@@ -18,6 +18,7 @@ use Schoolbox\Calendar\EventType;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -86,7 +87,7 @@ class EventMapper extends CalendarEventMapper
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      */
-    protected function hydrateSelect(\PDOStatement $statement) : Collection
+    protected function hydrateSelect(\PDOStatement $statement) : GenericCollection
     {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
