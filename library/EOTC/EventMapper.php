@@ -47,8 +47,9 @@ class EventMapper extends CalendarEventMapper
 
     /**
      * @return string
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    protected function getSelectString()
+    protected function getSelectString() : string
     {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
@@ -66,8 +67,9 @@ class EventMapper extends CalendarEventMapper
 
     /**
      * @return string
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    protected function getFromString()
+    protected function getFromString() : string
     {
         return "
             FROM `{$this->table}`
@@ -81,8 +83,10 @@ class EventMapper extends CalendarEventMapper
     /**
      * @param \PDOStatement $statement
      * @return \Schoolbox\GenericCollection
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
      */
-    protected function hydrateSelect(\PDOStatement $statement)
+    protected function hydrateSelect(\PDOStatement $statement) : Collection
     {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
@@ -190,12 +194,14 @@ class EventMapper extends CalendarEventMapper
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
      * @return ListGroup\Collection
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function findAllByListGroups(
-        $allowedStatus = [],
+        array $allowedStatus = [],
         Alaress_Date_Format $from = null,
         Alaress_Date_Format $to = null
-    ) {
+    ) : ListGroup\Collection {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
@@ -268,8 +274,7 @@ class EventMapper extends CalendarEventMapper
                 /* Ignore this event, because it's not one of the Status
                  * we've chosen to include
                  */
-                if (count($allowedStatus) && !in_array($eventItem->getMetadata()->getStatus()->getId(),
-                        $allowedStatus)) {
+                if (\count($allowedStatus) && !\in_array($eventItem->getMetadata()->getStatus()->getId(), $allowedStatus, false)) {
                     continue;
                 }
 
@@ -311,8 +316,10 @@ class EventMapper extends CalendarEventMapper
      *
      * @param User $user
      * @return ListGroup\Collection
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function findAllByListGroupsForUser($user)
+    public function findAllByListGroupsForUser($user) : ListGroup\Collection
     {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
@@ -385,7 +392,7 @@ class EventMapper extends CalendarEventMapper
             /* Only add the first in a series; ignore the others
              */
             if (is_numeric($eventItem->getSeriesId())) {
-                if (!in_array($eventItem->getSeriesId(), $processedSeriesIds)) {
+                if (!\in_array($eventItem->getSeriesId(), $processedSeriesIds, false)) {
                     $processedSeriesIds[] = $eventItem->getSeriesId();
 
                     $allEvents->add($eventItem);
@@ -425,6 +432,9 @@ class EventMapper extends CalendarEventMapper
      *
      * @param EventMetadata $metadata
      * @param Event         $event
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function updateMetadata($metadata, $event)
     {
