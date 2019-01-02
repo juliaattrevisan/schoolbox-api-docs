@@ -340,7 +340,8 @@ class ListController extends Web\Controller\Base
             /* Figure out what kind of assessment was chosen
              * and spawn a new instance of it to manipulate
              */
-            $assessmentFactory = new Factory($user, $postData);
+            $assessmentType = $postData['assessmentType'];
+            $assessmentFactory = new Factory($user, $postData, $assessmentType);
             $assessment = $assessmentFactory->produce($assessment);
 
             $transactionSummary = $this->getTransactor()->transact($assessment);
