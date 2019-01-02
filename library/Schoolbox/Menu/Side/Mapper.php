@@ -97,7 +97,7 @@ class Mapper extends BaseMapper
             JOIN `folder` AS `f` ON `f`.id = `ua`.sid AND `f`.`deleted_at` IS NULL
             JOIN `homepage_config` ON `f`.id = `homepage_config`.cid
             WHERE `ua`.`service` = :service AND `ua`.`uid` = :userId
-            AND `ua`.`type` != " . UserAccess::ACCESS_DENY . "
+            AND `ua`.`type` != " . UserAccess::ACCESS_AWAITING_AUTHORISATION . "
             ORDER BY `f`.`name`
         ";
 
