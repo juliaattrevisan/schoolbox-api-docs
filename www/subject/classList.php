@@ -214,12 +214,6 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
                 $this->setVar('ib_block', '');
             }
 
-            if (!empty($student['EnglishSecondFlag'])) {
-                $this->parse('esl_block', 'esl');
-            } else {
-                $this->setVar('esl_block', '');
-            }
-
             if (!empty($student['StudentTSIFlag'])) {
                 $this->parse('tsi_block', 'tsi');
             } else {
