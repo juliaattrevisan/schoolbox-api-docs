@@ -97,6 +97,7 @@ const CardActions = props => {
           <a
             key={index}
             href={action.href}
+            onClick={action.onClick}
             className={`icon-${action.icon} no-text`}
             title={action.title}
           />

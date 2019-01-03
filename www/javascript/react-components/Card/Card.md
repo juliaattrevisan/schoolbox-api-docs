@@ -47,7 +47,7 @@ const cardActions = [
     title: "Modify this"
   },
   {
-    href: "#",
+    onClick: () => alert('JS functionality on an action'),
     icon: "more",
     title: "More actions"
   }
