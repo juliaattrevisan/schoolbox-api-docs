@@ -10,9 +10,7 @@ const Card = props => {
   // Used to decide whether to show loaders or not
   const hasContent = title || meta || image || children;
 
-  if (!hasContent && loader) {
-    return <CardLoader />;
-  } else if (hasContent) {
+  if (hasContent) {
     return (
       <>
         <div className="list-item">
@@ -26,6 +24,8 @@ const Card = props => {
         <CardContent {...props} />
       </>
     );
+  } else if (loader) {
+    return <CardLoader />;
   }
 
   return null;
