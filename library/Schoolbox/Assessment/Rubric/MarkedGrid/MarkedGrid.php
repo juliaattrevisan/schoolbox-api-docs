@@ -90,7 +90,7 @@ class MarkedGrid
      */
     public function calculateScaledMark(): float
     {
-        $value = 0;
+        $value = 0.0;
         foreach ($this->capabilityMarks as $capabilityMark) {
             $value += $capabilityMark->calculateScaledMark();
         }
