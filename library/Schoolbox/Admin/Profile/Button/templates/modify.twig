@@ -145,13 +145,6 @@
                 },
                 'campuses[]': {required: 'Please select at least one campus.'},
                 'roles[]': {required: 'Please select at least one role.'},
-            },
-            submitHandler: function(form) {
-                // Disable submit button
-                $('#profile-button-submit').prop('disabled', true).text('Working...');
-
-                // Submit the form
-                form.submit();
             }
         });
 
