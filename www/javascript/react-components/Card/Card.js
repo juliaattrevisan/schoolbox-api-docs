@@ -21,7 +21,6 @@ const Card = props => {
           </div>
         </div>
         <CardActions {...props} />
-        <CardContent {...props} />
       </>
     );
   } else if (loader) {
@@ -37,13 +36,16 @@ Card.defaultProps = {
 
 const CardLoader = () => {
   return (
-    <div className="list-item">
-      <div className="small-12 card skeleton">
-        <div className="img" />
-        <h3 />
-        <p className="meta" />
+    <>
+      <div className="list-item">
+        <div className="small-12 card skeleton">
+          <div className="img" />
+          <h3 />
+          <p className="meta" />
+        </div>
       </div>
-    </div>
+      <article></article>
+    </>
   );
 };
 
@@ -104,15 +106,6 @@ const CardActions = props => {
         ))}
       </nav>
     );
-  }
-
-  return null;
-};
-
-const CardContent = props => {
-  const { children } = props;
-  if (children) {
-    return <article>{children}</article>;
   }
 
   return null;
