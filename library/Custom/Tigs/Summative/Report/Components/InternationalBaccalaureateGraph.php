@@ -221,7 +221,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
                             )
                         );
                     }
-                } elseif($assessment->getMarkType()->getSlug() !== MarkType::SLUG_LETTER){
+                } elseif ($assessment->getMarkType()->getSlug() !== MarkType::SLUG_LETTER) {
                     throw new UnexpectedValueException(
                         sprintf(
                             "A DP due work must have Mark Type of 'Letter Grade'. Assessment '%s' in folder '%s' has a mark type of  '%s'",
@@ -370,7 +370,6 @@ class InternationalBaccalaureateGraph extends BaseComponent
                     $studentMark = $mark;
                 }
                 $markData[$mark]++;
-
             }
         }
         return [$markData, $studentMark];

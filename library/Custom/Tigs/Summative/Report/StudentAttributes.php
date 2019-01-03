@@ -189,22 +189,22 @@ class StudentAttributes
         $nowYear = (int)$now->getUsingFormat('Y');
 
         if ($yearLevel === 11 && $term === 4) {
-            $reportStart = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
+            $start = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
         } elseif ($yearLevel === 12) {
             if ($term === 1) {
                 $nowYear--;
-                $reportStart = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
+                $start = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
             } else {
-                $reportStart = self::FIRST_DAY_TERM2_RELATIVE . " $nowYear";
+                $start = self::FIRST_DAY_TERM2_RELATIVE . " $nowYear";
             }
         } elseif (\in_array($term, [1, 2], true)) {
-            $reportStart = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+            $start = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
         } else {
             // Terms 3+4
-            $reportStart = self::FIRST_DAY_TERM3_RELATIVE . " $nowYear";
+            $start = self::FIRST_DAY_TERM3_RELATIVE . " $nowYear";
         }
 
-        return new Alaress_Date_Format(\strtotime($reportStart), Alaress_Date_Format::TIMESTAMP);
+        return new Alaress_Date_Format(\strtotime($start), Alaress_Date_Format::TIMESTAMP);
     }
 
 
@@ -224,20 +224,20 @@ class StudentAttributes
         $nowYear  = (int)$now->getUsingFormat('Y');
 
         if ($isYear11 && $term === 3) {
-            $reportEnd = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
+            $end = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
         } elseif ($isYear11 && $term === 4) {
             $nowYear++;
-            $reportEnd = self::FIRST_DAY_TERM2_RELATIVE  . " $nowYear";
+            $end = self::FIRST_DAY_TERM2_RELATIVE  . " $nowYear";
         } elseif ($isYear12 && $term === 1) {
-            $reportEnd = self::FIRST_DAY_TERM2_RELATIVE . " $nowYear";
+            $end = self::FIRST_DAY_TERM2_RELATIVE . " $nowYear";
         } elseif (($isYear12 && $term === 2 )|| \in_array($term, [3, 4], true)) {
             $nowYear++;
-            $reportEnd = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+            $end = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
         } else {
-            $reportEnd = self::FIRST_DAY_TERM3_RELATIVE . " $nowYear";
+            $end = self::FIRST_DAY_TERM3_RELATIVE . " $nowYear";
         }
 
-        return (new Alaress_Date_Format(\strtotime($reportEnd), Alaress_Date_Format::TIMESTAMP))->addDays(-1)->endOfDay();
+        return (new Alaress_Date_Format(\strtotime($end), Alaress_Date_Format::TIMESTAMP))->addDays(-1)->endOfDay();
     }
 
 
