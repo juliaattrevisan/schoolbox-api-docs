@@ -221,14 +221,13 @@ class InternationalBaccalaureateGraph extends BaseComponent
                             )
                         );
                     }
-                } elseif($assessment->getMaxMark() !== 7.0 || $assessment->getMarkType()->getSlug() !== MarkType::SLUG_TOTAL){
+                } elseif($assessment->getMarkType()->getSlug() !== MarkType::SLUG_LETTER){
                     throw new UnexpectedValueException(
                         sprintf(
-                            'A DP due work must either have a max mark of 7. Assessment "%s" in folder "%s" is a %s with max mark %d.',
+                            "A DP due work must have Mark Type of 'Letter Grade'. Assessment '%s' in folder '%s' has a mark type of  '%s'",
                             $assessment->getTitle(),
                             $folder->getTitle(),
-                            $assessment->getMarkType()->getName(),
-                            $assessment->getMaxMark()
+                            $assessment->getMarkType()->getName()
                         )
                     );
                 }
@@ -348,7 +347,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
                     }
                 } else {
                     $mark = $feedback->getHumanReadableMark();
-                    if (preg_match('#(\d) / 7#', $mark, $matches)) {
+                    if (preg_match('#(\d)#', $mark, $matches)) {
                         $mark = (int)$matches[1];
                     } else {
                         $mark = null;
@@ -428,7 +427,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
         if ($year <= 10 && $semester === 2) {
             return 'MYP Grade';
         }
-        if ($year === 11) {
+        if (($year === 11 && $semester === 2) || ($year === 12 && $semester === 1)) {
             return 'Early Indicator';
         }
         if ($year === 12 && $semester === 2) {

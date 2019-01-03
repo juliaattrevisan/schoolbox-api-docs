@@ -439,11 +439,12 @@ class Controller extends Web\Controller\Base
             $configName   = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
             $errorMsg     = 'Cannot render MYP Report components. Work type not set.';
             $errorMsgLink = 'Set MYP Final Achievement Levels Work Type';
-        } elseif ((11 === $yearLevel || 2 === $semester) && $attributes->isDp()) {
+        } elseif ((12 === $yearLevel || 2 === $semester) && $attributes->isDp()) {
             $configName   = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
             $errorMsg     = 'Cannot render DP Report components. Work type not set.';
             $errorMsgLink = 'Set DP Report Work Type';
         } else {
+            // Component is not relevant for this report.
             return null;
         }
 
