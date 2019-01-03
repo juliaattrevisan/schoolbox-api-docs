@@ -41,7 +41,6 @@ const CardLoader = () => {
           <p className="meta" />
         </div>
       </div>
-      <article></article>
     </>
   );
 };
