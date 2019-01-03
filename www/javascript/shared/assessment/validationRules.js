@@ -120,6 +120,16 @@ function attachValidationRules() {
     $("[data-criterion-name]").each(function() {
         $(this).rules("add", { descriptorsAreMonotonic: true });
     });
+
+    $("[data-group-max-value]").each(function() {
+        $(this).rules("add", {
+            required: true,
+            number: true,
+            messages: {
+                number: "Please enter a numeric value"
+            }
+        });
+    });
 }
 
 function reValidate() {

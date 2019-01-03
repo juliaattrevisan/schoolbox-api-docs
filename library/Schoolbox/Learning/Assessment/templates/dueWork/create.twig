@@ -403,17 +403,6 @@
                 $closestMaxMarkInput.removeAttr("data-customised");
                 calculateGridTotal();
             });
-
-
-            $("[data-group-max-value]").each(function() {
-                $(this).rules("add", {
-                    required: true,
-                    number: true,
-                    messages: {
-                        number: "Please enter a numeric value"
-                    }
-                });
-            });
         }
 
         // Init the entire grid on document.ready
