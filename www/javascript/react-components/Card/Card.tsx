@@ -1,9 +1,17 @@
 import * as React from "react";
 
+interface ICard {
+  title?: string;
+  meta?: string | string[];
+  href?: string;
+  image?: string;
+  loader?: boolean;
+}
+
 /**
  * Flexible container for small amounts of content, often displayed in a list.
  */
-const Card = props => {
+const Card: React.SFC<ICard> = props => {
   const { title, meta, image, loader } = props;
 
   // Determine if the card has some sort of content
@@ -31,7 +39,7 @@ Card.defaultProps = {
   loader: true
 };
 
-const CardLoader = () => {
+const CardLoader: React.SFC = () => {
   return (
     <>
       <div className="list-item">
@@ -45,7 +53,7 @@ const CardLoader = () => {
   );
 };
 
-const CardImage = props => {
+const CardImage: React.SFC<ICard> = props => {
   const { image, href } = props;
   if (image && href) {
     return (
@@ -60,7 +68,7 @@ const CardImage = props => {
   return null;
 };
 
-const CardTitle = props => {
+const CardTitle: React.SFC<ICard> = props => {
   const { title, href } = props;
   if (title && href) {
     return (
@@ -75,10 +83,16 @@ const CardTitle = props => {
   return null;
 };
 
-const CardMeta = props => {
+const CardMeta: React.SFC<ICard> = props => {
   const { meta } = props;
   if (meta && Array.isArray(meta)) {
-    return meta.map(thisMeta => <p className="meta">{thisMeta}</p>);
+    return (
+      <>
+        {meta.map(thisMeta => (
+          <p className="meta">{thisMeta}</p>
+        ))}
+      </>
+    );
   } else if (meta) {
     return <p className="meta">{meta}</p>;
   }

@@ -1,8 +1,9 @@
 module.exports = {
-  components: "www/javascript/react-components/**/*.js",
+  components: "www/javascript/react-components/**/*.tsx",
   serverPort: 8883,
   pagePerSection: true,
   assetsDir: "www",
+  propsParser: require("react-docgen-typescript").withDefaultConfig().parse,
   template: {
     head: {
       links: [
