@@ -329,6 +329,9 @@ cp -f $cachedir/schoolboxdemo-latest-cron /etc/cron.d/vagrant
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing grunt-cli if not already installed";
 /vagrant/tools/grunt.sh;
 
+echo "[SB][`date +%Y-%m-%d\ %X`] Installing npx if not already installed";
+/vagrant/tools/npx.sh
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
 cd $cachedir;
 npmfile='';

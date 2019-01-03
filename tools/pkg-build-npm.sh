@@ -6,7 +6,6 @@ PATH="$PATH:$instdir/node_modules/.bin";
 
 echo "Installing NPM dependencies";
 npm install;
-npm install -g npx;
 check=$?;
 if [ $? -ne 0 ];
 then
