@@ -173,7 +173,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
     {
         $ibAssessments = [];
         foreach ($this->unitImpls as $unitImpl) {
-            // Get the DP assessment out of each unit impl
+            // Get the IB assessment out of each unit impl
             // We only care about assessments due within the report's window
             // If any impl has zero, or more than one: that's an error
             $folder   = $unitImpl->getBaseContext()->getFolder();
