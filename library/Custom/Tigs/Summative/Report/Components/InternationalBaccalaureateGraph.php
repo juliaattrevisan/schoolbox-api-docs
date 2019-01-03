@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -322,26 +323,28 @@ class InternationalBaccalaureateGraph extends BaseComponent
                     $markedGrid     = $this->rubricMapper->retrieveMarkedGrid($feedback);
                     $rawStudentMark = $markedGrid->calculateScaledMark();
                     // Finagle student mark from rubric grid
-                    if (!isset($rawStudentMark)) {
+                    if ($rawStudentMark === 0.0) {
+                        // The call to calculateScaledMark() currently returns 0.0 for an unmarked rubric. It should probably return NULL
+                        // so we can distinguish between an unmarked rubric, and a rubric with a mark of 0.0. However that change is pretty deep.
+                        // Instead, since we know this rubric cannot have a mark of 0 (because all descriptor values are 1-8), we'll just compensate
+                        // for it here by assuming this means the rubric is unmarked.
                         $mark = null;
-                    } elseif ($rawStudentMark === 0) {
-                        $mark = 0;
-                    } elseif ($rawStudentMark <= 5) {
+                    } elseif ($rawStudentMark <= 5.0) {
                         $mark = 1;
-                    } elseif ($rawStudentMark <= 9) {
+                    } elseif ($rawStudentMark <= 9.0) {
                         $mark = 2;
-                    } elseif ($rawStudentMark <= 14) {
+                    } elseif ($rawStudentMark <= 14.0) {
                         $mark = 3;
-                    } elseif ($rawStudentMark <= 18) {
+                    } elseif ($rawStudentMark <= 18.0) {
                         $mark = 4;
-                    } elseif ($rawStudentMark <= 23) {
+                    } elseif ($rawStudentMark <= 23.0) {
                         $mark = 5;
-                    } elseif ($rawStudentMark <= 27) {
+                    } elseif ($rawStudentMark <= 27.0) {
                         $mark = 6;
-                    } elseif ($rawStudentMark <= 32) {
+                    } elseif ($rawStudentMark <= 32.0) {
                         $mark = 7;
                     } else {
-                        $mark = null;
+                        throw $this->generateException($participant, "Invalid rubric total: {$rawStudentMark}");
                     }
                 } else {
                     $mark = $feedback->getHumanReadableMark();
@@ -352,35 +355,57 @@ class InternationalBaccalaureateGraph extends BaseComponent
                     }
                 }
 
-                if (0 === $mark || $mark > 7) {
-                    $student        = $participant->getUser();
-                    $studentName    = $student->getFullName();
-                    $assessmentName = $assessment->getTitle();
-                    $routeName      = 'learningAssessment.getSummary';
-                    $routeParams    = [
-                        'assessmentId' => $assessment->getId(),
-                        'assessment'   => $assessment,
-                        'studentId'    => $student->getId(),
-                        'student'      => $student,
-                    ];
-                    if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->viewer)) {
-                        $route          = $this->router->generate($routeName, $routeParams);
-                        $assessmentName = \sprintf('<a href="%s">%s</a>', $route, $assessmentName);
-                    }
-                    throw new UnexpectedValueException("Invalid mark found. $studentName has been assigned a mark of 0 in $assessmentName. Required 1-7");
+                // NULL marks do not contribute
+                if (null === $mark) {
+                    continue;
                 }
 
-                if (null !== $mark) {
-                    // Only care about student's mark in current folder. This caters for case where student does not yet have mark in this class, but
-                    // has participation record in a different class in this cohort.
-                    if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
-                        $studentMark = $mark;
-                    }
-                    $markData[$mark]++;
+                // Ensure mark is valid
+                if (0 === $mark || $mark > 7) {
+                    throw $this->generateException($participant, "Invalid mark found: {$mark}. Required 1-7");
                 }
+
+                // Only care about student's mark in current folder. This caters for case where student does not yet have mark in this class, but
+                // has participation record in a different class in this cohort.
+                if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
+                    $studentMark = $mark;
+                }
+                $markData[$mark]++;
+
             }
         }
         return [$markData, $studentMark];
+    }
+
+
+    /**
+     * Creates and returns an UnexpectedValueException with a message that links to
+     * the student's summary page if authorised
+     *
+     * @param Participant $participant
+     * @param string      $message
+     * @return UnexpectedValueException
+     * @throws Router\Exception\RouteNotFound
+     */
+    private function generateException(Participant $participant, string $message): UnexpectedValueException
+    {
+        $assessment     = $participant->getAssessable();
+        $student        = $participant->getUser();
+        $studentName    = $student->getFullName();
+        $assessmentName = $assessment->getTitle();
+        $routeName      = 'learningAssessment.getSummary';
+        $routeParams    = [
+            'assessmentId' => $assessment->getId(),
+            'assessment'   => $assessment,
+            'studentId'    => $student->getId(),
+            'student'      => $student,
+        ];
+        if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->viewer)) {
+            $route          = $this->router->generate($routeName, $routeParams);
+            /** @noinspection HtmlUnknownTarget */
+            $assessmentName = \sprintf('<a href="%s">%s</a>', $route, $assessmentName);
+        }
+        return new UnexpectedValueException("Invalid data found for $studentName in $assessmentName. $message");
     }
 
 
