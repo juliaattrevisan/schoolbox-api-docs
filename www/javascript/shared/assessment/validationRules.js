@@ -84,18 +84,13 @@ function initDynamicValidationTriggers() {
         indicatorObserver.observe(this, moConfig);
     });
 
-    // TODO this isn't working either
     // on change of checked indicators
     $("[data-criterion-name]").change(function() {
         var $indicatorCheckbox = $(this);
        if ($indicatorCheckbox.is(":checked")) {
-           $("[data-descriptor]").each(function() {
-               $(this).find("label.error").show();
-           });
+           $indicatorCheckbox.prev("label.error").show();
        } else {
-           $("[data-descriptor]").each(function() {
-               $(this).find("label.error").hide();
-           });
+           $indicatorCheckbox.prev("label.error").hide();
        }
     });
 }
