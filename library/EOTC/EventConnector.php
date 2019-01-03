@@ -26,14 +26,18 @@ class EventConnector extends EventMapper
      */
     protected $user;
 
+
     /**
      * Get details of a single event (used in Mobile)
      *
      * @param $eventId
      *
      * @return Collection
+     * @throws DefinitionException
+     * @throws MapperException
+     * @throws \InvalidArgumentException
      */
-    public function getEvent($eventId)
+    public function getEvent($eventId): Collection
     {
         $authorMapper    = $this->getJoinMapper('author');
         $eventTypeMapper = $this->getJoinMapper('eventType');
@@ -50,6 +54,7 @@ class EventConnector extends EventMapper
             FROM `{$this->table}` e
             JOIN {$this->getJoinSql('author', 'e', 'a',true)}
             JOIN {$this->getJoinSql('eventType', 'e', 't')}
+            WHERE e.deleted_at IS NULL
         ";
 
         $statement = $this->database->prepare($query);
@@ -145,6 +150,7 @@ class EventConnector extends EventMapper
         return $collection;
     }
 
+
     /**
      * Get events within a particular time span
      *
@@ -153,8 +159,9 @@ class EventConnector extends EventMapper
      * @return Collection
      * @throws MapperException
      * @throws DefinitionException
+     * @throws \InvalidArgumentException
      */
-    public function getDayEvents($startTimestamp, $endTimestamp)
+    public function getDayEvents($startTimestamp, $endTimestamp): Collection
     {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
@@ -242,6 +249,7 @@ class EventConnector extends EventMapper
                 AND
                 DATE(e.start_datetime) <= :endDate
                 AND eotc_metadata.status_id != :rejected
+                AND e.deleted_at IS NULL
             ORDER BY e.start_datetime, e.end_datetime
         ";
 
