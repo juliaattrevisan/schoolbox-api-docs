@@ -79,7 +79,6 @@ function initDynamicValidationTriggers() {
 
     // on change of number of indicators/capabilities
     var indicatorObserver = new MutationObserver(attachValidationRules);
-    // TODO this is not working for capabilities
     $("table[data-rubric] tbody").each(function() {
         indicatorObserver.observe(this, moConfig);
     });
