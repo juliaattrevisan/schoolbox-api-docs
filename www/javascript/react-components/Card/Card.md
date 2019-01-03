@@ -21,34 +21,6 @@ Add an `href` prop to add a link to the title and image on the card.
 />
 ```
 
-### Card with actions
-
-```jsx
-const cardActions = [
-  {
-    href: "#",
-    icon: "modify",
-    title: "Modify this"
-  },
-  {
-    onClick: () => alert('JS functionality on an action'),
-    icon: "more",
-    title: "More actions"
-  }
-];
-
-<div className="information-list">
-  <div className="actions-small-2">
-    <Card
-      title="Card with actions"
-      meta="Meta information"
-      image="https://via.placeholder.com/64"
-      actions={cardActions}
-    />
-  </div>
-</div>;
-```
-
 ### Card with multiple lines of meta
 
 If you need multiple meta lines, you can send these in an array like so. Please keep this to a maximum of two lines.

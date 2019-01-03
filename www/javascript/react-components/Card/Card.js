@@ -12,16 +12,13 @@ const Card = props => {
 
   if (hasContent) {
     return (
-      <>
-        <div className="list-item">
-          <div className="small-12 card">
-            <CardImage {...props} />
-            <CardTitle {...props} />
-            <CardMeta {...props} />
-          </div>
+      <div className="list-item">
+        <div className="small-12 card">
+          <CardImage {...props} />
+          <CardTitle {...props} />
+          <CardMeta {...props} />
         </div>
-        <CardActions {...props} />
-      </>
+      </div>
     );
   } else if (loader) {
     return <CardLoader />;
@@ -85,27 +82,6 @@ const CardMeta = props => {
     return meta.map(thisMeta => <p className="meta">{thisMeta}</p>);
   } else if (meta) {
     return <p className="meta">{meta}</p>;
-  }
-
-  return null;
-};
-
-const CardActions = props => {
-  const { actions } = props;
-  if (actions && actions.length) {
-    return (
-      <nav>
-        {actions.map((action, index) => (
-          <a
-            key={index}
-            href={action.href}
-            onClick={action.onClick}
-            className={`icon-${action.icon} no-text`}
-            title={action.title}
-          />
-        ))}
-      </nav>
-    );
   }
 
   return null;
