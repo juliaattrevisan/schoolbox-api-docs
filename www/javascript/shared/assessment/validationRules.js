@@ -87,9 +87,17 @@ function initDynamicValidationTriggers() {
     $("[data-criterion-name]").change(function() {
         var $indicatorCheckbox = $(this);
        if ($indicatorCheckbox.is(":checked")) {
+           // Show any errors for the indicator itself
            $indicatorCheckbox.prev("label.error").show();
+
+           // Show any errors for descriptors within the indicator
+           $indicatorCheckbox.parents("[data-group]").find("[data-descriptor] label.error").show();
        } else {
+           // Hide any errors for the indicator itself
            $indicatorCheckbox.prev("label.error").hide();
+
+           // Hide any errors for descriptors within the indicator
+           $indicatorCheckbox.parents("[data-group]").find("[data-descriptor] label.error").hide();
        }
     });
 }
