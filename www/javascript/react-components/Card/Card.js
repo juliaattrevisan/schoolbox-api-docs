@@ -4,11 +4,11 @@ import * as React from "react";
  * Flexible container for small amounts of content, often displayed in a list.
  */
 const Card = props => {
-  const { title, meta, image, loader, children } = props;
+  const { title, meta, image, loader } = props;
 
   // Determine if the card has some sort of content
   // Used to decide whether to show loaders or not
-  const hasContent = title || meta || image || children;
+  const hasContent = title || meta || image;
 
   if (hasContent) {
     return (
