@@ -17,7 +17,7 @@
 
         {# Update the heading displayed on the component #}
 
-        component.find('h2').html('{{ componentTitle | e('js') }}');
+        $('#component-title-{{ componentId }}').html('{{ componentTitle | e('js') }}');
 
     {% endif %}
 

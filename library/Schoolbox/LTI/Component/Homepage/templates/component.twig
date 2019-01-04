@@ -110,7 +110,7 @@
                         component.find('input[name="componentname"]').val(result.providerName);
 
                         {# Update component heading #}
-                        component.find('h2').html(result.providerName);
+                        $('#component-title-{{ componentInstanceId }}').html(result.providerName);
 
                         {# Launch LTI in the iframe and make it visibile #}
                         var iframe = $('#lti-frame{{ componentInstanceId }}');
