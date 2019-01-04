@@ -88,12 +88,6 @@ class Alaress_Twitter_Search
                         $this->getFilter()->filterText($result->retweeted_status->full_text) :
                         $this->getFilter()->filterText($result->full_text);
 
-                    // Skip direct @ mentions
-                    $mentionPattern = '/^@/';
-                    if (preg_match($mentionPattern, strip_tags($tweetText)) === 1) {
-                        continue;
-                    }
-
                     // Text is in a different variable now; need to change it to full_text
                     if (isset($result->retweeted_status)) {
                         $processed[] = array(
