@@ -57,7 +57,7 @@ interface External_UserInterface {
      * StudentLeavingDate
      * StudentIBFlag
      * countIndividualEducationPlans
-     * EnglishSecondFlag
+     * EnglishSecondFlag: string. '0' => false, '1' => true, '' => unknown
      *
      * @importance high - used on student profile page
      *

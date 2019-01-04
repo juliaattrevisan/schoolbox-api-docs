@@ -17,6 +17,7 @@ interface External_ClassInterface {
      * yearlevel,
      * house,
      * StudentMedicalAlert,
+     * EnglishSecondFlag: string. '0' => false, '1' => true, '' => unknown
      * StudentSpecialNeedsFlag,
      * StudentTutorDescription,
      * synergy_id,
