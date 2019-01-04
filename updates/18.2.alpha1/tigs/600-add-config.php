@@ -44,6 +44,7 @@ $app = new class extends App
      * @param LoggerInterface $log
      * @param array           $opts
      * @throws PDOException
+     * @throws Di\Exception\ServiceNotFound
      */
     public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
     {
@@ -138,6 +139,19 @@ $app = new class extends App
             '',
             'Work Type - DP Report Grade',
             "Expected to be assigned to due works that uses the 'Total Mark' mark scheme. Marks given in this assessment will displayed on students' DP Grade graph",
+            ConfigMapper::FIELD_SELECT_LOOKUP,
+            \serialize([SelectLookup\Renderer::OPTION_KEY_MAPPER => WorkType\Mapper::class,]),
+            true,
+            false,
+            true,
+            ConfigMapper::MODULE_CUSTOM
+        );
+
+        $this->insertConfig(
+            Tigs\Summative\Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK,
+            '',
+            'Work Type - HSC Assessment Task',
+            "A per-unit assessment. Marks given to this assessment will populate student's 'HSC Task Mark' component",
             ConfigMapper::FIELD_SELECT_LOOKUP,
             \serialize([SelectLookup\Renderer::OPTION_KEY_MAPPER => WorkType\Mapper::class,]),
             true,
