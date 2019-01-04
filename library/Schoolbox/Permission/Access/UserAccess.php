@@ -79,6 +79,13 @@ class UserAccess
     public const SERVICE_SPORTS_ADMINISTRATOR = 10;
 
     /**
+     * Status of your acceptance into the group
+     * 0 awaiting authorisation
+     * 1 you're in
+     */
+    public const ACCESS_AWAITING_AUTHORISATION = 0;
+
+    /**
      * Value for $this->accessLevel:
      * $this->user is denied access to resource in $this->service.
      */
