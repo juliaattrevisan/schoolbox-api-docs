@@ -1,11 +1,20 @@
 import * as React from "react";
 
 interface ICard {
-  title?: string;
-  meta?: string | string[];
-  href?: string;
-  image?: string;
+  /** Whether to show a loading skeleton or not when there's no content. */
   loader?: boolean;
+
+  /** Title to display on the card */
+  title?: string;
+
+  /** Meta information to display below the title */
+  meta?: string | string[];
+
+  /** Adds a link to the image and title of the card */
+  href?: string;
+
+  /** URL of the image to display on the card */
+  image?: string;
 }
 
 /**
