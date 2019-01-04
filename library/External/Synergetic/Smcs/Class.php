@@ -35,7 +35,7 @@ class External_Synergetic_Smcs_Class extends External_Synergetic_Class
                         uvStudents.StudentMedicalAlert, 
                         uvStudents.StudentSpecialNeedsFlag,
                         uvStudents.StudentTutorDescription,
-                        vStudents.EnglishSecondFlag,
+                        uvStudents.EnglishSecondFlag,
                         StudentClasses.StudentID as synergy_id,
                         StudentClasses.ClassCampus
         FROM            dbo.vStudentClasses StudentClasses
