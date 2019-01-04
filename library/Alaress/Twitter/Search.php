@@ -86,12 +86,20 @@ class Alaress_Twitter_Search
                         continue;
                     }
 
-                    $fulltext = $result->full_text;
+                    $tweetText = isset($result->retweeted_status) ?
+                        $this->getFilter()->filterText($result->retweeted_status->full_text) :
+                        $this->getFilter()->filterText($result->full_text);
+
+                    // Skip direct @ mentions
+                    $mentionPattern = '/^@/';
+                    if (preg_match($mentionPattern, strip_tags($tweetText)) === 1) {
+                        continue;
+                    }
 
                     // Text is in a different variable now; need to change it to full_text
                     if (isset($result->retweeted_status)) {
                         $processed[] = array(
-                            'full_text'     => $this->getFilter()->filterText($result->retweeted_status->full_text),
+                            'full_text'     => $tweetText,
                             'action'   => 'Retweeted by ' . $result->user->name,
                             'date'     => $result->created_at,
                             'fullname' => $result->retweeted_status->user->name,
@@ -102,7 +110,7 @@ class Alaress_Twitter_Search
                         );
                     } else {
                         $processed[] = array(
-                            'full_text'     => $this->getFilter()->filterText($result->full_text),
+                            'full_text'     => $tweetText,
                             'action'   => 'Tweeted',
                             'date'     => $result->created_at,
                             'fullname' => $result->user->name,
