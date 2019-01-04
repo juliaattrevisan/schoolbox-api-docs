@@ -29,6 +29,8 @@ class Component_Dashboard_TwitterController extends Component_Dashboard_Controll
         $this->setBlock('twitter_feed', 'tweet', 'tweet_block');
         $this->setBlock('tweet', 'tweet_media', 'tweet_media_block');
         $this->setBlock('tweet_media', 'tweet_media_thumbnails', 'tweet_media_thumbnails_block');
+        $this->setBlock('tweet_media_thumbnails', 'media_photo', 'media_photo_block');
+        $this->setBlock('tweet_media_thumbnails', 'media_video', 'media_video_block');
         $this->setVar('tweet_block', '');
 
         $emptyState = false;
@@ -135,7 +137,17 @@ class Component_Dashboard_TwitterController extends Component_Dashboard_Controll
 
                 if (is_array($currentTweet['media']) && count($currentTweet['media'])) {
                     foreach ($currentTweet['media'] as $currentMedia) {
-                        $this->setVar('TWEET_MEDIA_URL', $currentMedia->media_url_https);
+                        $photoURL = $currentMedia->media_url_https;
+                        $videoURL = $currentMedia->video_info->variants[2]->url;
+                        if ($currentMedia->type === 'video') {
+                            $this->setVar('TWEET_MEDIA_URL', $videoURL);
+                            $this->parse('media_video_block', 'media_video');
+                            $this->setVar('media_photo_block', '');
+                        } else {
+                            $this->setVar('TWEET_MEDIA_URL', $photoURL);
+                            $this->parse('media_photo_block', 'media_photo');
+                            $this->setVar('media_video_block', '');
+                        }
                         $this->parse('tweet_media_thumbnails_block', 'tweet_media_thumbnails', true);
                     }
                     $this->parse('tweet_media_block', 'tweet_media', true);
