@@ -144,11 +144,6 @@ $(function () {
     // Set up lightboxes globally, group galleries by lightbox relation.
     var lightboxGroups = {};
 
-    // Hack to prevent bypassing the lightbox before magnificPopup plugin has loaded (idk why this works)
-    $("a[rel^='lightbox']").click(function(e) {
-        e.preventDefault();
-    });
-
     $("a[rel^='lightbox']").each(function () {
         var rel = $(this).attr('rel');
 
