@@ -47,7 +47,7 @@ interface External_UserInterface {
      * StudentMedicalAlert
      * StudentMobilePhone
      * StudentSpecialNeedsFlag
-     * EnglishSecondFlag
+     * EnglishSecondFlag: string. '0' => false, '1' => true, '' => unknown
      * StudentStudiesCode
      * CourtOrderType
      * AlertMessage
@@ -57,7 +57,6 @@ interface External_UserInterface {
      * StudentLeavingDate
      * StudentIBFlag
      * countIndividualEducationPlans
-     * EnglishSecondFlag: string. '0' => false, '1' => true, '' => unknown
      *
      * @importance high - used on student profile page
      *
