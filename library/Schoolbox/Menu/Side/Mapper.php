@@ -80,7 +80,7 @@ class Mapper extends BaseMapper
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
-        return $this->hydrateList($statement);
+        return $this->hydrateSelect($statement);
     }
 
 
@@ -89,7 +89,8 @@ class Mapper extends BaseMapper
      * @param \Schoolbox\User $user
      * @return array
      */
-    public function findGroupsForUser($user) :array {
+    public function findGroupsForUser($user) :array
+    {
 
         $query = "
             SELECT `ua`.sid, `f`.name
