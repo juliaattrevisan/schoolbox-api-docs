@@ -166,8 +166,6 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
         }
         $q .= urlencode($this->getConfig('keywords'));
 
-        $q .= urlencode("&tweet_mode=extended");
-
         $this->setVar('SEARCH_URL', $q);
 
         return true;
