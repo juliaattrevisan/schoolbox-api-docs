@@ -1,0 +1,105 @@
+{#
+Renders a NESA Score graph.
+
+Data:
+    error:        string   - Optional. If present, the reason why we can't render the component
+    studentValue: int|null - Optional. The student's mark for the NESA graph assessment
+    data:         array    - The results to render. key: column, value: height
+#}
+{% import '@learning/macro/urgency.twig' as urgency %}
+
+{# Convert A-E to a normalised value for gradient colours #}
+{% set studentValues = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
+{% set gradientClass = urgency.marks(studentValues[studentValue] / studentValues | length * 100) %}
+
+{% if error|default(null) %}
+    <div data-alert class="alert-box alert">{{ error|raw }}</div>
+{% else %}
+
+    {% if studentValue is not null %}
+        {# TODO style this properly, of course #}
+        <div class="{{ gradientClass }}-bg">
+            <h3 style="color: white; text-align: center; margin-bottom: 0;">{{ studentValue }}</h3>
+        </div>
+    {% endif %}
+
+    {% autoescape 'js' %}
+        <script type="text/javascript">
+
+            $(function () {
+
+                var rawData = {{ data|json_encode|raw }},
+                    studentValue = "{{ studentValue }}",
+                    studentValues = {{ studentValues|json_encode|raw }},
+                    studentValuesInverted = {};
+
+                for (var key in studentValues) {
+                    if (!studentValues.hasOwnProperty(key)) {
+                        continue;
+                    }
+                    studentValuesInverted[studentValues[key]] = key;
+                }
+
+                {#
+                    Convert into object format so we can add css classes for colour gradients.
+                    @see https://api.highcharts.com/highcharts/series.column.data
+                #}
+                var data = [];
+                for (var key in rawData) {
+                    if (!rawData.hasOwnProperty(key)) {
+                        continue;
+                    }
+                    var column = {
+                        x: studentValues[key],
+                        y: rawData[key],
+                        name: key
+                    };
+                    if (studentValue === key) {
+                        column.className = '{{ gradientClass }}-bg';
+                    } else {
+                        column.color = '#454549';
+                    }
+                    data.push(column);
+                }
+
+                $("#nesa-graph").highcharts({
+                    legend: {
+                        enabled: false
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    title: {
+                        text: null
+                    },
+                    tooltip: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        title: {
+                            text: null
+                        },
+                        categories: studentValuesInverted
+                    },
+                    yAxis: {
+                        title: {
+                            text: '# Students (Cohort)'
+                        },
+                        allowDecimals: false
+                    },
+                    series: [
+                        {
+                            type: 'column',
+                            data: data,
+                            label: {
+                                enabled: false
+                            }
+                        }
+                    ]
+                });
+            });
+        </script>
+    {% endautoescape %}
+    {# TODO style this properly #}
+    <div id="nesa-graph" style="margin-bottom: 30px;"></div>
+{% endif %}
