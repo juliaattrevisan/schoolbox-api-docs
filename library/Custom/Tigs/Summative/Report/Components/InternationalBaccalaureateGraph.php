@@ -291,6 +291,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
                 );
             }
 
+            /** @var IAssessable $assessment */
             $assessment = current($assessments);
             if (!$assessment) {
                 continue;
@@ -354,6 +355,12 @@ class InternationalBaccalaureateGraph extends BaseComponent
                     }
                 }
 
+                // Only care about student's mark in current folder. This caters for case where student does not yet have mark in this class, but
+                // has participation record in a different class in this cohort.
+                if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
+                    $studentMark = $mark;
+                }
+
                 // NULL marks do not contribute
                 if (null === $mark) {
                     continue;
@@ -364,11 +371,6 @@ class InternationalBaccalaureateGraph extends BaseComponent
                     throw $this->generateException($participant, "Invalid mark found: {$mark}. Required 1-7");
                 }
 
-                // Only care about student's mark in current folder. This caters for case where student does not yet have mark in this class, but
-                // has participation record in a different class in this cohort.
-                if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
-                    $studentMark = $mark;
-                }
                 $markData[$mark]++;
             }
         }
