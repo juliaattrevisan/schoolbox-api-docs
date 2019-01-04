@@ -129,6 +129,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
               '' AS STUDENTLEAVINGDATE,
               '' AS STUDENTIBFLAG,
               '' AS STUDENTSTUDIESCODE,
+              '' AS ENGLISHSECONDFLAG,
               0 AS COUNTINDIVIDUALEDUCATIONPLANS
             FROM DB2INST1.SCHOOLBOX_STUDENTS S
             LEFT JOIN DB2INST1.SCHOOLBOX_PARENT_STUDENT PS ON S.STUDENT_NUMBER = PS.STUDENT_NUMBER
