@@ -345,6 +345,7 @@ class Leave_Controller extends Controller
             'custom_head', 'student_autocomplete_javascript', 'student_autocomplete_javascript_block'
         );
         $this->getPage()->setBlock(TEMPLATE_content, 'student_autocomplete', 'student_autocomplete_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'student_name', 'student_name_block');
 
         /* Render dropdowns
            */
@@ -382,6 +383,7 @@ class Leave_Controller extends Controller
         $this->getPage()->setVar('student_selector_block', '');
         $this->getPage()->setVar('student_autocomplete_block', '');
         $this->getPage()->setVar('student_autocomplete_javascript_block', '');
+        $this->getPage()->setVar('student_name_block', '');
 
         // Get the houses on which this user has housemaster permission, if any
         // and integrate those into the list of student group IDs
@@ -419,6 +421,15 @@ class Leave_Controller extends Controller
                 )
             );
             $this->getPage()->parse('student_selector_block', 'student_selector');
+        } else {
+
+            /* Student creating their own leave request
+             */
+            $this->getPage()->setVar([
+                'STUDENT_NAME' => $this->getRequestMapper()->getSessionUser()->getFullName()
+            ]);
+
+            $this->getPage()->parse('student_name_block', 'student_name');
         }
     }
 
