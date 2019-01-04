@@ -75,7 +75,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $this->getPage()->setBlock(TEMPLATE_content, 'has_groups', 'has_groups_block');
         $this->getPage()->setBlock('has_groups', 'group', 'group_block');
         $this->getPage()->setBlock('group', 'group_linked', 'group_linked_block');
-        $this->getPage()->setBlock('group', 'group_unlinked', 'group_unlinked_block');
 
         $this->getPage()->setBlock(TEMPLATE_content, 'no_showcased_work', 'no_showcased_work_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_showcased_work', 'has_showcased_work_block');
@@ -362,30 +361,29 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
         if ($allGroups->count() > 0) {
             foreach ($allGroups as $currentGroup) {
-                $this->getPage()->setVar(array(
-                    'GROUP_ID' => $currentGroup->getId(),
-                    'GROUP_NAME' => $currentGroup->getName(),
-                ));
 
-                /* Check permissions on whether you can view this subject's
-                 * homepage - if not, don't link it
+                /* Check permissions on whether you can view this subject's homepage
+                 * If you can get there, you can see it, otherwise it's hidden
                  */
-                if ($groupHandler->getPermission($currentGroup->getId()) < READ_ACCESS) {
-                    $this->getPage()->parse('group_unlinked_block', 'group_unlinked');
-                } else {
+                if ($groupHandler->getPermission($currentGroup->getId()) >= READ_ACCESS) {
+                    $this->getPage()->setVar(array(
+                        'GROUP_ID' => $currentGroup->getId(),
+                        'GROUP_NAME' => $currentGroup->getName(),
+                    ));
+
                     $this->getPage()->parse('group_linked_block', 'group_linked');
+
+                    /* Parse out group
+                     */
+                    $this->getPage()->parse('group_block', 'group', true);
+
+                    /* Clear children after parsing out the parent
+                     */
+                    $this->getPage()->setVar(array(
+                        'group_linked_block' => '',
+                        'group_unlinked_block' => ''
+                    ));
                 }
-
-                /* Parse out group
-                 */
-                $this->getPage()->parse('group_block', 'group', true);
-
-                /* Clear children after parsing out the parent
-                 */
-                $this->getPage()->setVar(array(
-                    'group_linked_block' => '',
-                    'group_unlinked_block' => ''
-                ));
             }
 
             $this->getPage()->parse('has_groups_block', 'has_groups');
