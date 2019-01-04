@@ -113,7 +113,8 @@ class Component_Instance
 
                 $output[$key] = [
                     'label' => $opt->getLabel(),
-                    'value' => $val
+                    'value' => $val,
+                    'defaultValue' => $opt->getDefaultValue(),
                 ];
             }
 
