@@ -35,10 +35,7 @@ class Component_Dashboard_TextboxController extends Component_Dashboard_Controll
 				);
 			}
 			catch(\Exception $e) {
-				$this->content = array(
-					'BOX_TITLE' => '',
-					'BOX_CONTENT' => ''
-				);
+                return false;
 			}
 			return true;
 		}
