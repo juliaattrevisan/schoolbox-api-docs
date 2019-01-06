@@ -269,12 +269,14 @@ class UserMapper extends Mapper
                     {$this->getJoinColumnString('role', 'g')},
                     {$this->getJoinColumnString('userCampus', 'c')},
                     {$this->getJoinColumnString('schoolHouse', 'h')},
-                    {$this->getColumnString('lu')}
+                    {$this->getColumnString('lu')},
+                    {$this->getJoinColumnString('role', 'lur')}
             FROM `user`
             LEFT JOIN superusers su ON su.id = user.id
             LEFT JOIN {$this->getJoinSql('role', '', 'g')}
             LEFT JOIN {$this->getJoinSql('userCampus', '', 'c')}
             LEFT JOIN {$this->getJoinSql('user_link', '', 'lu')}
+            LEFT JOIN {$this->getJoinSql('role', 'lu', 'lur')}
             LEFT JOIN {$this->getJoinSql('schoolHouse', '', 'h')}
 
         ";
@@ -321,6 +323,7 @@ class UserMapper extends Mapper
 
             if ($linkedUser) {
                 // Don't double add
+                $linkedUser->setRole($this->hydrateJoin($row, 'role', 'lur'));
                 $users[$userId]->getLinkedUser()->setOffset($linkedUser->getId(), $linkedUser);
             }
 
