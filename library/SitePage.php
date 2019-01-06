@@ -5,7 +5,6 @@ use Aura\Router\Router;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
 
