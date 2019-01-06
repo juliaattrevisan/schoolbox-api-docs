@@ -63,9 +63,8 @@ Data:
         {% include '@tigsSummativeReport/components/finalAchievementLevels.twig' with falData only %}
     </div>
     {% endif %}
-
+    {% for unitSpecId, unitSpec in unitSpecs %}
     <div class="column small-12">
-        {% for unitSpecId, unitSpec in unitSpecs %}
             {# Do we have a link to an AAS assessment for this unit? #}
             {% set unitRoute = (aasData.data is defined and aasData.data[unitSpecId] is defined) ? aasData.data[unitSpecId].link : '' %}
             {% if unitRoute %}
@@ -82,9 +81,16 @@ Data:
             {% if aamData.data is defined and aamData.data[unitSpecId] is defined %}
                 {% include '@tigsSummativeReport/components/academicAchievementMatrix.twig' with aamData.data[unitSpecId] only %}
             {% endif %}
-            {% if not loop.last %}<br>{% endif %}
-        {% endfor %}
     </div>
+        {% if aasData.data[unitSpecId].comment %}
+        <div class="column island small-12">
+            <h2 class="subheader">Comments by {{ aasData.data[unitSpecId].commentBy.fullname }}</h2>
+            <section class="content">
+                <p>{{ aasData.data[unitSpecId].comment }}</p>
+            </section>
+        </div>
+        {% endif %}
+    {% endfor %}
 </div>
 
 <div class="row">
