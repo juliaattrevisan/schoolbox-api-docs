@@ -12,6 +12,7 @@ Data:
     aamData              array          - Data to render the Academic Achievement Matrix components
     falData              array|null     - Data to render the Final Achievement Level component
     ibGraphData          array          - Data to render the MYP/DP Graph component
+    nesaGraphData        array          - Data to render the NESA Score Graph component
 #}
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <div class="row">
@@ -49,7 +50,12 @@ Data:
     </div>
 
     <div class="column small-12 medium-6">
-        <h2 class="subheader">NESA Score</h2>
+        {% if nesaGraphData %}
+            <h2 class="subheader">NESA Score</h2>
+            {% include '@tigsSummativeReport/components/nesaScoreGraph.twig' with nesaGraphData only %}
+        {% else %}
+            <p></p>
+        {% endif %}
     </div>
 
     {% if falData %}

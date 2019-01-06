@@ -16,6 +16,7 @@ use Custom\Tigs\Summative\Report\Components\AcademicAchievementMatrix;
 use Custom\Tigs\Summative\Report\Components\AcademicAchievementSummary;
 use Custom\Tigs\Summative\Report\Components\FinalAchievementLevels;
 use Custom\Tigs\Summative\Report\Components\InternationalBaccalaureateGraph;
+use Custom\Tigs\Summative\Report\Components\NesaScoreGraph;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -138,7 +139,7 @@ class Controller extends Web\Controller\Base
             }
             $errors[]  = $error;
             $unitImpls = $aamData = $aasData = [];
-            $falData   = $ibGraphData = null;
+            $falData   = $ibGraphData = $nesaGraphData = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitImpls = $this->getUnitImpls($courseImplsWithUnits);
@@ -147,23 +148,25 @@ class Controller extends Web\Controller\Base
             $courseSpec = $courseSpecs->first();
 
             // Build component data
-            $ibGraphData = $this->buildInternationalBaccalaureateGraphData($folder, $attributes, $courseSpec, $user);
-            $falData     = $this->buildFinalAchievementLevelsData($attributes, $unitImpls, $user);
-            $aamData     = $this->buildAcademicAchievementMatrixData($attributes, $unitImpls, $user);
-            $aasData     = $this->buildAcademicAchievementSummaryData($attributes, $unitImpls, $user);
+            $ibGraphData   = $this->buildInternationalBaccalaureateGraphData($folder, $attributes, $courseSpec, $user);
+            $nesaGraphData = $this->buildNesaScoreGraphData($folder, $attributes, $courseSpec, $user);
+            $falData       = $this->buildFinalAchievementLevelsData($attributes, $unitImpls, $user);
+            $aamData       = $this->buildAcademicAchievementMatrixData($attributes, $unitImpls, $user);
+            $aasData       = $this->buildAcademicAchievementSummaryData($attributes, $unitImpls, $user);
         }
 
         $data   = [
-            'user'        => $user,
-            'folder'      => $folder,
-            'isEnabled'   => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
-            'attributes'  => $attributes,
-            'errors'      => $errors,
-            'unitImpls'   => $unitImpls,
-            'falData'     => $falData,
-            'aamData'     => $aamData,
-            'aasData'     => $aasData,
-            'ibGraphData' => $ibGraphData,
+            'user'          => $user,
+            'folder'        => $folder,
+            'isEnabled'     => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
+            'attributes'    => $attributes,
+            'errors'        => $errors,
+            'unitImpls'     => $unitImpls,
+            'falData'       => $falData,
+            'aamData'       => $aamData,
+            'aasData'       => $aasData,
+            'ibGraphData'   => $ibGraphData,
+            'nesaGraphData' => $nesaGraphData,
         ];
         $output = $this->buildHtmlOutput('@tigsSummativeReport/subject.twig', $data, "Subject Report");
 
@@ -478,6 +481,76 @@ class Controller extends Web\Controller\Base
         );
 
         return $ib->toContext();
+    }
+
+
+    /**
+     * Builds NESA Score Graph report data.
+     *
+     * @param Folder\Model      $folder
+     * @param StudentAttributes $attributes
+     * @param CourseSpec\Model  $courseSpec
+     * @param User              $student
+     * @return array|null
+     * @throws Predicate\InvalidColumnException
+     * @throws UnexpectedValueException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnderflowException
+     */
+    private function buildNesaScoreGraphData(
+        Folder\Model $folder,
+        StudentAttributes $attributes,
+        CourseSpec\Model $courseSpec,
+        User $student
+    ): ?array {
+        // Only relevant for:
+        // * MYP S1
+        // * MYP S2
+        // * HSC-Y11-S2
+        $yearLevel = $attributes->getCurriculumYearLevel();
+        $semester  = $attributes->getCurriculumSemester();
+        if (($semester === 1 && $attributes->isMyp()) || (11 === $yearLevel && $semester === 2 && $attributes->isHsc())) {
+            $configName   = Config::_TIGS_WORK_TYPE_NESA_SCORE;
+            $errorMsgLink = 'Set NESA Score Work Type';
+        } elseif ($semester === 2 && $attributes->isMyp()) {
+            $configName   = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
+            $errorMsgLink = 'Set MYP FAL Work Type';
+        } else {
+            // Component is not relevant for this report.
+            return null;
+        }
+
+        try {
+            $workTypeId = $this->checkWorkType($configName, 'Cannot render NESA Score graph. Work type not set.', $errorMsgLink);
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
+        }
+
+        // Find relevant assessments and participation and insert into units
+        $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
+        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes));
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
+        foreach ($assessables as $assessable) {
+            $unitImpl                                                                        = $assessable->getBaseContext();
+            $baseAssessable                                                                  = $assessable->getBaseAssessable();
+            $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
+        }
+
+        $nesa = new NesaScoreGraph(
+            $cohortUnitImpls,
+            $student,
+            $attributes,
+            $this->visibility,
+            $this->getUser(),
+            $workTypeId,
+            $folder
+        );
+
+        return $nesa->toContext();
     }
 
 

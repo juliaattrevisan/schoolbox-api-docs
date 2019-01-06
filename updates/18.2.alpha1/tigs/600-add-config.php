@@ -108,6 +108,19 @@ $app = new class extends App
         );
 
         $this->insertConfig(
+            Tigs\Summative\Config::_TIGS_WORK_TYPE_NESA_SCORE,
+            '',
+            'Work Type - NESA Score',
+            "Marks given to assessments of this work type will populate the 'NESA Score' graph",
+            ConfigMapper::FIELD_SELECT_LOOKUP,
+            \serialize([SelectLookup\Renderer::OPTION_KEY_MAPPER => WorkType\Mapper::class,]),
+            true,
+            false,
+            true,
+            ConfigMapper::MODULE_CUSTOM
+        );
+
+        $this->insertConfig(
             Tigs\Summative\Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS,
             '',
             'Work Type - MYP Final Achievement Levels',
