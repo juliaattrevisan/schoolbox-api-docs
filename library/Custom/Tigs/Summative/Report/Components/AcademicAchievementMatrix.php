@@ -17,9 +17,10 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Assessment\DueWork;
 use Aura\Router;
+use Schoolbox\Resource\Folder;
 
 /**
  * Builds a suitable data structure for rendering the AAM components
@@ -27,11 +28,14 @@ use Aura\Router;
 class AcademicAchievementMatrix extends BaseComponent
 {
 
-    /** @var GenericCollection|UnitImpl\Model[] */
-    private $unitImpls;
+    /** @var GenericCollection|UnitSpec\Model[] */
+    private $unitSpecs;
 
     /** @var User */
     private $student;
+
+    /** Folder\Model $folder */
+    private $folder;
 
     /** @var Visibility */
     private $visibility;
@@ -54,8 +58,9 @@ class AcademicAchievementMatrix extends BaseComponent
 
     /**
      * @param StudentAttributes $attributes
-     * @param GenericCollection $unitImpls
+     * @param GenericCollection $unitSpecs
      * @param User              $student
+     * @param Folder\Model      $folder
      * @param Visibility        $visibility
      * @param User              $viewer
      * @param int               $aamWorkTypeId
@@ -65,8 +70,9 @@ class AcademicAchievementMatrix extends BaseComponent
      */
     public function __construct(
         StudentAttributes $attributes,
-        GenericCollection $unitImpls,
+        GenericCollection $unitSpecs,
         User $student,
+        Folder\Model $folder,
         Visibility $visibility,
         User $viewer,
         int $aamWorkTypeId,
@@ -76,8 +82,9 @@ class AcademicAchievementMatrix extends BaseComponent
     ) {
         parent::__construct($attributes);
 
-        $this->unitImpls     = $unitImpls;
+        $this->unitSpecs     = $unitSpecs;
         $this->student       = $student;
+        $this->folder        = $folder;
         $this->visibility    = $visibility;
         $this->viewer        = $viewer;
         $this->aamWorkTypeId = $aamWorkTypeId;
@@ -90,24 +97,24 @@ class AcademicAchievementMatrix extends BaseComponent
     /**
      * Generates and returns a data structure, suitable for passing to twig
      *
-     * Data is indexed by unitImpl.id. For each unit:
+     * Data is indexed by unitSpec.id. For each unit:
      * * if no data is found, returns null.
      * * if invalid data found, returns an error message to aid resolution
      *
      * @return array
-     * @var string     $data ['data'][unitImplId]['error']      Optional. If cannot build due to invalid data
-     * @var Grid       $data ['data'][unitImplId]['grid']       Optional. If a valid AAM rubric is found for the unit
-     * @var MarkedGrid $data ['data'][unitImplId]['markedGrid'] Optional. If student has visible marks for the rubric
+     * @var string     $data ['data'][unitSpecId]['error']      Optional. If cannot build due to invalid data
+     * @var Grid       $data ['data'][unitSpecId]['grid']       Optional. If a valid AAM rubric is found for the unit
+     * @var MarkedGrid $data ['data'][unitSpecId]['markedGrid'] Optional. If student has visible marks for the rubric
      * @throws \Schoolbox\Mapper\Exception
      * @throws Router\Exception\RouteNotFound
      */
     public function toContext(): array
     {
         $data = [];
-        foreach ($this->unitImpls as $unitImpl) {
-            $unitData = $this->buildUnitData($unitImpl);
+        foreach ($this->unitSpecs as $unitSpec) {
+            $unitData = $this->buildUnitData($unitSpec);
             if ($unitData) {
-                $data[$unitImpl->getId()] = $unitData;
+                $data[$unitSpec->getId()] = $unitData;
             }
         }
 
@@ -118,14 +125,14 @@ class AcademicAchievementMatrix extends BaseComponent
     /**
      * Builds AAM data for the specified unit.
      *
-     * @param UnitImpl\Model $unitImpl
+     * @param UnitSpec\Model $unitSpec
      * @return array|null
      * @throws \Schoolbox\Mapper\Exception
      * @throws Router\Exception\RouteNotFound
      */
-    private function buildUnitData(UnitImpl\Model $unitImpl): ?array
+    private function buildUnitData(UnitSpec\Model $unitSpec): ?array
     {
-        $aamAssessables = $this->findAssessmentsWithWorkType($unitImpl, $this->aamWorkTypeId)
+        $aamAssessables = $this->findAssessmentsForFolderAndWorkType($unitSpec, $this->folder, $this->aamWorkTypeId)
                                ->filter(function (IAssessable $assessable) {
                                    return $this->isDueWithinReportWindow($assessable);
                                });

@@ -9,8 +9,9 @@ namespace Custom\Tigs\Summative\Report;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Resource\Folder;
 
 /**
  * Common logic for Report components
@@ -46,26 +47,33 @@ class BaseComponent
     }
 
 
+    /** @noinspection PhpDocMissingThrowsInspection */
     /**
-     * Iterates through a unit to return all AAS assessments
+     * Iterates through a unit spec to return all AAS assessment implementations that were imported to the specified folder
      *
-     * @param UnitImpl\Model $unitImpl
+     * @param UnitSpec\Model $unitSpec
+     * @param Folder\Model   $folder
      * @param int|null       $workTypeId
      * @return IAssessable[]|GenericCollection
-     * @throws \UnexpectedValueException
      */
-    protected function findAssessmentsWithWorkType(UnitImpl\Model $unitImpl, ?int $workTypeId): GenericCollection
+    protected function findAssessmentsForFolderAndWorkType(UnitSpec\Model $unitSpec, Folder\Model $folder, ?int $workTypeId): GenericCollection
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         $assessables = new GenericCollection(IAssessable::class);
-        foreach ($unitImpl->getAssessables() as $assessable) {
-            if ($assessable instanceof Project) {
-                foreach ($assessable->getAssessables() as $subAssessable) {
-                    if ($this->isWorkType($subAssessable, $workTypeId)) {
-                        $assessables[$subAssessable->getId()] = $subAssessable;
+        foreach ($unitSpec->getUnitImplementations() as $unitImpl) {
+            if ((int)$unitImpl->getFolder()->getId() !== (int)$folder->getId()) {
+                continue;
+            }
+            foreach ($unitImpl->getAssessables() as $assessable) {
+                if ($assessable instanceof AssessmentContext) {
+                    foreach ($assessable->getAssessables() as $subAssessable) {
+                        if ($this->isWorkType($subAssessable, $workTypeId)) {
+                            $assessables[$subAssessable->getId()] = $subAssessable;
+                        }
                     }
+                } elseif ($this->isWorkType($assessable, $workTypeId)) {
+                    $assessables[$assessable->getId()] = $assessable;
                 }
-            } elseif ($this->isWorkType($assessable, $workTypeId)) {
-                $assessables[$assessable->getId()] = $assessable;
             }
         }
         return $assessables;

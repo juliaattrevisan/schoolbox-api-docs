@@ -7,7 +7,7 @@ Data:
     isEnabled:           bool           - is this report enabled for the student and their parents?
     attributes:          StudentAttributes
     errors               string[]       - Any errors that affect the whole page
-    unitImpls            UnitImpl\Model - All units imported to this folder.
+    unitSpecs            unitSpec\Model - All unit specs imported to this folder. (TODO filter to only unitSpecs that contain visible data, defferred till later)
     aasData              array          - Data to render the Academic Achievement Summary components
     aamData              array          - Data to render the Academic Achievement Matrix components
     falData              array|null     - Data to render the Final Achievement Level component
@@ -65,22 +65,22 @@ Data:
     {% endif %}
 
     <div class="column small-12">
-        {% for unitId, unit in unitImpls %}
+        {% for unitSpecId, unitSpec in unitSpecs %}
             {# Do we have a link to an AAS assessment for this unit? #}
-            {% set unitRoute = (aasData.data is defined and aasData.data[unitId] is defined) ? aasData.data[unitId].link : '' %}
+            {% set unitRoute = (aasData.data is defined and aasData.data[unitSpecId] is defined) ? aasData.data[unitSpecId].link : '' %}
             {% if unitRoute %}
-                <h2 class="subheader"><a href="{{ unitRoute }}"><span class="icon-link" style="color: inherit;"></span>{{ unit.title }}</a></h2>
+                <h2 class="subheader"><a href="{{ unitRoute }}"><span class="icon-link" style="color: inherit;"></span>{{ unitSpec.title }}</a></h2>
             {% else %}
-                <h2 class="subheader">{{ unit.title }}</h2>
+                <h2 class="subheader">{{ unitSpec.title }}</h2>
             {% endif %}
 
             {# Were we given AAS data for this unit? #}
-            {% if aasData.data is defined and aasData.data[unitId] is defined %}
-                {% include '@tigsSummativeReport/components/academicAchievementSummary.twig' with aasData.data[unitId] only %}
+            {% if aasData.data is defined and aasData.data[unitSpecId] is defined %}
+                {% include '@tigsSummativeReport/components/academicAchievementSummary.twig' with aasData.data[unitSpecId] only %}
             {% endif %}
             {# Were we given AAM data for this unit? #}
-            {% if aamData.data is defined and aamData.data[unitId] is defined %}
-                {% include '@tigsSummativeReport/components/academicAchievementMatrix.twig' with aamData.data[unitId] only %}
+            {% if aamData.data is defined and aamData.data[unitSpecId] is defined %}
+                {% include '@tigsSummativeReport/components/academicAchievementMatrix.twig' with aamData.data[unitSpecId] only %}
             {% endif %}
             {% if not loop.last %}<br>{% endif %}
         {% endfor %}
