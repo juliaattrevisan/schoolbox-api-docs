@@ -25,6 +25,7 @@ use Schoolbox\User;
 use External_UserInterface;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use UnexpectedValueException;
@@ -138,11 +139,11 @@ class Controller extends Web\Controller\Base
                 $error .= \sprintf(' <a href="%s">Manage Course imports</a>', $route);
             }
             $errors[]  = $error;
-            $unitImpls = $aamData = $aasData = [];
+            $unitSpecs = $aamData = $aasData = [];
             $falData   = $ibGraphData = $nesaGraphData = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
-            $unitImpls = $this->getUnitImpls($courseImplsWithUnits);
+            $unitSpecs = $this->getUnitSpecs($courseImplsWithUnits);
 
             /** @var CourseSpec\Model $courseSpec */
             $courseSpec = $courseSpecs->first();
@@ -150,9 +151,9 @@ class Controller extends Web\Controller\Base
             // Build component data
             $ibGraphData   = $this->buildInternationalBaccalaureateGraphData($folder, $attributes, $courseSpec, $user);
             $nesaGraphData = $this->buildNesaScoreGraphData($folder, $attributes, $courseSpec, $user);
-            $falData       = $this->buildFinalAchievementLevelsData($attributes, $unitImpls, $user);
-            $aamData       = $this->buildAcademicAchievementMatrixData($attributes, $unitImpls, $user);
-            $aasData       = $this->buildAcademicAchievementSummaryData($attributes, $unitImpls, $user);
+            $falData       = $this->buildFinalAchievementLevelsData($folder, $attributes, $unitSpecs, $user);
+            $aamData       = $this->buildAcademicAchievementMatrixData($folder, $attributes, $unitSpecs, $user);
+            $aasData       = $this->buildAcademicAchievementSummaryData($folder, $attributes, $unitSpecs, $user);
         }
 
         $data   = [
@@ -161,7 +162,7 @@ class Controller extends Web\Controller\Base
             'isEnabled'     => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
             'attributes'    => $attributes,
             'errors'        => $errors,
-            'unitImpls'     => $unitImpls,
+            'unitSpecs'     => $unitSpecs,
             'falData'       => $falData,
             'aamData'       => $aamData,
             'aasData'       => $aasData,
@@ -243,23 +244,24 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * Gets a list of all Units to render, sorted by unit title
+     * Gets a list of all Units Specifications to render, sorted by unit title
      *
      * @param GenericCollection|CourseImpl\Model[] $courseImports
-     * @return GenericCollection|UnitImpl\Model[]
+     * @return GenericCollection|UnitSpec\Model[]
      * @throws UnexpectedValueException
      */
-    private function getUnitImpls(GenericCollection $courseImports): GenericCollection
+    private function getUnitSpecs(GenericCollection $courseImports): GenericCollection
     {
-        $unitImpls = new GenericCollection(UnitImpl\Model::class);
+        $unitSpecs = new GenericCollection(UnitSpec\Model::class);
 
         foreach ($courseImports as $courseImport) {
             foreach ($courseImport->getUnits() as $unitImpl) {
-                $unitImpls[$unitImpl->getId()] = $unitImpl;
+                $unitSpec = $unitImpl->getSpecification();
+                $unitSpecs[$unitSpec->getId()] = $unitSpec;
             }
         }
 
-        return $unitImpls->sortByCallback(function (UnitImpl\Model $left, UnitImpl\Model $right) {
+        return $unitSpecs->sortByCallback(function (UnitSpec\Model $left, UnitSpec\Model $right) {
             return \strnatcasecmp($left->getTitle(), $right->getTitle());
         }, true);
     }
@@ -287,14 +289,15 @@ class Controller extends Web\Controller\Base
     /**
      * Builds data for rendering the AAM components.
      *
+     * @param Folder\Model                       $folder
      * @param StudentAttributes                  $attributes
-     * @param GenericCollection|UnitImpl\Model[] $unitImpls
+     * @param GenericCollection|UnitSpec\Model[] $unitSpecs
      * @param User                               $student
      * @return array
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
      */
-    private function buildAcademicAchievementMatrixData(StudentAttributes $attributes, GenericCollection $unitImpls, User $student): array
+    private function buildAcademicAchievementMatrixData(Folder\Model $folder, StudentAttributes $attributes, GenericCollection $unitSpecs, User $student): array
     {
         $configName = Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX;
 
@@ -310,8 +313,9 @@ class Controller extends Web\Controller\Base
 
         $aam = new AcademicAchievementMatrix(
             $attributes,
-            $unitImpls,
+            $unitSpecs,
             $student,
+            $folder,
             $this->visibility,
             $this->getUser(),
             $workTypeId,
@@ -327,14 +331,15 @@ class Controller extends Web\Controller\Base
     /**
      * Builds data for rendering the AAS components.
      *
+     * @param Folder\Model                       $folder
      * @param StudentAttributes                  $attributes
-     * @param GenericCollection|UnitImpl\Model[] $unitImpls
+     * @param GenericCollection|UnitSpec\Model[] $unitSpecs
      * @param User                               $student
      * @return array
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function buildAcademicAchievementSummaryData(StudentAttributes $attributes, GenericCollection $unitImpls, User $student): array
+    private function buildAcademicAchievementSummaryData(Folder\Model $folder, StudentAttributes $attributes, GenericCollection $unitSpecs, User $student): array
     {
         // Only relevant for MYP students
         if (!$attributes->isMyp()) {
@@ -353,8 +358,9 @@ class Controller extends Web\Controller\Base
 
         $aas = new AcademicAchievementSummary(
             $attributes,
-            $unitImpls,
+            $unitSpecs,
             $student,
+            $folder,
             $this->visibility,
             $this->getUser(),
             $workTypeId,
@@ -370,14 +376,16 @@ class Controller extends Web\Controller\Base
     /**
      * Build data for the MYP-FAL component.
      *
-     * @param StudentAttributes $attributes
-     * @param GenericCollection $unitImpls
-     * @param User              $student
+     * @param Folder\Model                       $folder
+     * @param StudentAttributes                  $attributes
+     * @param GenericCollection|UnitSpec\Model[] $unitSpecs
+     * @param User                               $student
      * @return array|null
+     * @throws UnexpectedValueException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function buildFinalAchievementLevelsData(StudentAttributes $attributes, GenericCollection $unitImpls, User $student): ?array
+    private function buildFinalAchievementLevelsData(Folder\Model $folder, StudentAttributes $attributes, GenericCollection $unitSpecs, User $student): ?array
     {
         // Only relevant for MYP students in Curriculum Semester 2
         if (!$attributes->isMyp() || $attributes->getCurriculumSemester() !== 2) {
@@ -396,8 +404,9 @@ class Controller extends Web\Controller\Base
 
         $fal = new FinalAchievementLevels(
             $attributes,
-            $unitImpls,
+            $unitSpecs,
             $student,
+            $folder,
             $this->visibility,
             $this->getUser(),
             $workTypeId,

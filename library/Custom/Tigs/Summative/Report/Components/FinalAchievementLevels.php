@@ -17,8 +17,9 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Aura\Router;
+use Schoolbox\Resource\Folder;
 
 /**
  * Responsible for generating data that can be used by a template to render the
@@ -27,11 +28,14 @@ use Aura\Router;
 class FinalAchievementLevels extends BaseComponent
 {
 
-    /** @var GenericCollection|UnitImpl\Model[] */
-    private $unitImpls;
+    /** @var GenericCollection|UnitSpec\Model[] */
+    private $unitSpecs;
 
     /** @var User */
     private $student;
+
+    /** Folder\Model $folder */
+    private $folder;
 
     /** @var Visibility */
     private $visibility;
@@ -53,20 +57,22 @@ class FinalAchievementLevels extends BaseComponent
 
 
     /**
-     * @param StudentAttributes $attributes
-     * @param GenericCollection $unitImpls
-     * @param User              $student
-     * @param Visibility        $visibility
-     * @param User              $viewer
-     * @param int               $falWorkTypeId
-     * @param RubricMapper      $rubricMapper
-     * @param Authorizer        $authorizer
-     * @param Router\Router     $router
+     * @param StudentAttributes                  $attributes
+     * @param GenericCollection|UnitSpec\Model[] $unitSpecs
+     * @param User                               $student
+     * @param Folder\Model                       $folder
+     * @param Visibility                         $visibility
+     * @param User                               $viewer
+     * @param int                                $falWorkTypeId
+     * @param RubricMapper                       $rubricMapper
+     * @param Authorizer                         $authorizer
+     * @param Router\Router                      $router
      */
     public function __construct(
         StudentAttributes $attributes,
-        GenericCollection $unitImpls,
+        GenericCollection $unitSpecs,
         User $student,
+        Folder\Model $folder,
         Visibility $visibility,
         User $viewer,
         int $falWorkTypeId,
@@ -76,8 +82,9 @@ class FinalAchievementLevels extends BaseComponent
     ) {
         parent::__construct($attributes);
 
-        $this->unitImpls     = $unitImpls;
+        $this->unitSpecs     = $unitSpecs;
         $this->student       = $student;
+        $this->folder        = $folder;
         $this->visibility    = $visibility;
         $this->viewer        = $viewer;
         $this->falWorkTypeId = $falWorkTypeId;
@@ -103,9 +110,9 @@ class FinalAchievementLevels extends BaseComponent
     public function toContext(): ?array
     {
         $falAssessables = new GenericCollection(IAssessable::class);
-        foreach($this->unitImpls as $unitImpl){
+        foreach($this->unitSpecs as $unitSpec){
             /** @noinspection SlowArrayOperationsInLoopInspection */
-            $falAssessables = $falAssessables->merge($this->findAssessmentsWithWorkType($unitImpl, $this->falWorkTypeId));
+            $falAssessables = $falAssessables->merge($this->findAssessmentsForFolderAndWorkType($unitSpec, $this->folder, $this->falWorkTypeId));
         }
         $falAssessables = $falAssessables->filter(function (IAssessable $assessable) {
             return $this->isDueWithinReportWindow($assessable);

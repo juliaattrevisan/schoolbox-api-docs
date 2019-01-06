@@ -17,8 +17,9 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Aura\Router;
+use Schoolbox\Resource\Folder;
 
 /**
  * Responsible for generating data that can be used by a template to render the
@@ -27,11 +28,14 @@ use Aura\Router;
 class AcademicAchievementSummary extends BaseComponent
 {
 
-    /** @var GenericCollection|UnitImpl\Model[] */
-    private $unitImpls;
+    /** @var GenericCollection|UnitSpec\Model[] */
+    private $unitSpecs;
 
     /** @var User */
     private $student;
+
+    /** Folder\Model $folder */
+    private $folder;
 
     /** @var Visibility */
     private $visibility;
@@ -54,8 +58,9 @@ class AcademicAchievementSummary extends BaseComponent
 
     /**
      * @param StudentAttributes $attributes
-     * @param GenericCollection $unitImpls
+     * @param GenericCollection $unitSpecs
      * @param User              $student
+     * @param Folder\Model      $folder
      * @param Visibility        $visibility
      * @param User              $viewer
      * @param int               $aasWorkTypeId
@@ -65,8 +70,9 @@ class AcademicAchievementSummary extends BaseComponent
      */
     public function __construct(
         StudentAttributes $attributes,
-        GenericCollection $unitImpls,
+        GenericCollection $unitSpecs,
         User $student,
+        Folder\Model $folder,
         Visibility $visibility,
         User $viewer,
         int $aasWorkTypeId,
@@ -76,8 +82,9 @@ class AcademicAchievementSummary extends BaseComponent
     ) {
         parent::__construct($attributes);
 
-        $this->unitImpls     = $unitImpls;
+        $this->unitSpecs     = $unitSpecs;
         $this->student       = $student;
+        $this->folder        = $folder;
         $this->visibility    = $visibility;
         $this->viewer        = $viewer;
         $this->aasWorkTypeId = $aasWorkTypeId;
@@ -95,10 +102,10 @@ class AcademicAchievementSummary extends BaseComponent
     public function toContext(): array
     {
         $data = [];
-        foreach ($this->unitImpls as $unitImpl) {
-            $unitData = $this->buildUnitData($unitImpl);
+        foreach ($this->unitSpecs as $unitSpec) {
+            $unitData = $this->buildUnitData($unitSpec);
             if ($unitData) {
-                $data[$unitImpl->getId()] = $unitData;
+                $data[$unitSpec->getId()] = $unitData;
             }
         }
         return ['data' => $data];
@@ -106,21 +113,21 @@ class AcademicAchievementSummary extends BaseComponent
 
 
     /**
-     * Builds AAS data for the specified unit.
+     * Builds AAS data for the specified unit spec.
      *
      * Returns an array containing one of:
      * * an error message as to why it can't render,
      * * display data, or
-     * * null if no AAS assessment found for unit
+     * * null if no AAS assessment found for unit spec
      *
-     * @param UnitImpl\Model $unitImpl
+     * @param UnitSpec\Model $unitSpec
      * @return array|null
      * @throws \Schoolbox\Mapper\Exception
      * @throws Router\Exception\RouteNotFound
      */
-    private function buildUnitData(UnitImpl\Model $unitImpl): ?array
+    private function buildUnitData(UnitSpec\Model $unitSpec): ?array
     {
-        $aasAssessables = $this->findAssessmentsWithWorkType($unitImpl, $this->aasWorkTypeId)
+        $aasAssessables = $this->findAssessmentsForFolderAndWorkType($unitSpec, $this->folder, $this->aasWorkTypeId)
                                ->filter(function (IAssessable $assessable) {
                                    return $this->isDueWithinReportWindow($assessable);
                                });
@@ -128,7 +135,7 @@ class AcademicAchievementSummary extends BaseComponent
         // Did we find 2+ AAS assessments in this unit?
         $countAas = \count($aasAssessables);
         if ($countAas >= 2) {
-            return ['error' => "A unit may have 0 or 1 Academic Achievement Summary assessments per unit. Found {$countAas}."];
+            return ['error' => "A folder may have 0 or 1 Academic Achievement Summary assessments per unit. Found {$countAas}."];
         }
 
         // Did we find no data?
