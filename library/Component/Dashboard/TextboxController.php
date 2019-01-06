@@ -60,5 +60,4 @@ class Component_Dashboard_TextboxController extends Component_Dashboard_Controll
         $this->parseConfig();
         return true;
     }
-
 }
