@@ -245,6 +245,7 @@
 		.#{$prefix}-#{$i}-bg {
 			background-color: $derived;
 			color: $white;
+			fill: $derived;
 		}
 	}
 }

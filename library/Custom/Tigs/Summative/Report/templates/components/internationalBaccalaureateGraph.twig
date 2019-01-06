@@ -6,13 +6,16 @@ Data:
     studentValue: int|null - Optional. The student's mark for the IB graph assessment
     data:         array    - The results to render. key: column, value: height
 #}
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% set gradientClass = urgency.marks(studentValue / 7 * 100) %}
+
 {% if error|default(null) %}
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
 
     {% if studentValue is not null %}
         {# TODO style this properly, of course #}
-        <div style="background-color: #DBCB46;">
+        <div class="{{ gradientClass }}-bg">
             <h3 style="color: white; text-align: center; margin-bottom: 0;">{{ studentValue }}</h3>
         </div>
     {% endif %}
@@ -20,37 +23,33 @@ Data:
     {% autoescape 'js' %}
     <script type="text/javascript">
 
-        /**
-         * Returns a set of colours for the columns
-         *
-         * @param {Array}    data
-         * @param {null|int} studentValue
-         * @param {string}   highlightColor
-         * @param {string}   defaultColor
-         * @return {Array}
-         */
-        var buildColorList = function(data, studentValue, highlightColor, defaultColor) {
-            var dataLength = data.length,
-                colorList  = [];
-            for (var i = 0; i < dataLength; i++) {
-                colorList.push(defaultColor);
-            }
-
-            if (studentValue in colorList) {
-                colorList[studentValue - 1] = highlightColor;
-            }
-
-            return colorList;
-        };
 
         $(function(){
 
-            var data = {{ data|json_encode|raw }},
-                dataCategories = {{ dataCategories|json_encode|raw }},
+            var rawData = {{ data|json_encode|raw }},
                 studentValue = Number("{{ studentValue }}");
 
-                {# Convert JSON object to plain array #}
-                data = Object.values(data);
+            {#
+                Convert into object format so we can add css classes for colour gradients.
+                @see https://api.highcharts.com/highcharts/series.column.data
+            #}
+            var data = [];
+            for(var key in rawData){
+                if(!rawData.hasOwnProperty(key)){
+                    continue;
+                }
+                var column = {
+                    x: Number(key),
+                    y: rawData[key],
+                    name: rawData[key]
+                };
+                if(studentValue === Number(key)){
+                    column.className = '{{ gradientClass }}-bg';
+                } else {
+                    column.color = '#454549';
+                }
+                data.push(column);
+            }
 
             $("#ib-graph").highcharts({
                 legend: {
@@ -66,7 +65,6 @@ Data:
                     enabled: false
                 },
                 xAxis: {
-                    categories: dataCategories,
                     title: {
                         text: null
                     }
@@ -83,9 +81,7 @@ Data:
                         data: data,
                         label: {
                             enabled: false
-                        },
-                        colorByPoint: true,
-                        colors: buildColorList(data, studentValue, '#DBCB46', '#454549')
+                        }
                     }
                 ]
             });

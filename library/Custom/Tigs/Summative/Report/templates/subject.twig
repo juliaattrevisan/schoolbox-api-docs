@@ -88,18 +88,17 @@ Data:
             <p>userId: {{ user.id }}</p>
             <p>folderId: {{ folder.id }}</p>
             <br>
-            <p>isIb: {% if attributes.isIb %}true{% else %}false{% endif %}</p>
-            <p>isMyp: {% if attributes.isMyp %}true{% else %}false{% endif %}</p>
-            <p>isDp: {% if attributes.isDp %}true{% else %}false{% endif %}</p>
-            <p>isHsc: {% if attributes.isHsc %}true{% else %}false{% endif %}</p>
-            <br>
-            <p>SB Term: {{ attributes.term }}</p>
-            <br>
-            <p>SB Year Level: {{ user.year }}</p>
-            <p>SB Semester: {{ attributes.sbSem }}</p>
+            <p>isIb: {{ attributes.isIb ? 'true' : 'false' }}</p>
+            <p>userYearLevel: {{ attributes.yearLevel }}</p>
+            <p>term: {{ attributes.term }}</p>
             <br>
             <p>Curriculum Year Level: {{ attributes.curriculumYearLevel }}</p>
             <p>Curriculum Semester: {{ attributes.curriculumSemester }}</p>
+            <p>Report Start: {{ attributes.reportStart.database }}</p>
+            <p>Report Finish: {{ attributes.reportFinish.database }}</p>
+            <p>isMyp: {% if attributes.isMyp %}true{% else %}false{% endif %}</p>
+            <p>isDp: {% if attributes.isDp %}true{% else %}false{% endif %}</p>
+            <p>isHsc: {% if attributes.isHsc %}true{% else %}false{% endif %}</p>
         </section>
     </div>
 </div>

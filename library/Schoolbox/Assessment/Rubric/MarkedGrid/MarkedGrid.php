@@ -90,7 +90,7 @@ class MarkedGrid
      */
     public function calculateScaledMark(): float
     {
-        $value = 0;
+        $value = 0.0;
         foreach ($this->capabilityMarks as $capabilityMark) {
             $value += $capabilityMark->calculateScaledMark();
         }
@@ -108,7 +108,7 @@ class MarkedGrid
         if ($this->calculateTotalAvailableMarks() > 0) {
             return round(($this->calculateScaledMark() / $this->calculateTotalAvailableMarks()) * 100, self::PRECISION);
         } else {
-            return 0;
+            return 0.0;
         }
     }
 
@@ -119,7 +119,7 @@ class MarkedGrid
      */
     public function calculateTotalAvailableMarks() : float
     {
-        $totalAvailableMarks = 0;
+        $totalAvailableMarks = 0.0;
         foreach ($this->iterateCapabilityUsages() as $capabilityUsage) {
             $totalAvailableMarks += $capabilityUsage->getMaxValue();
         }

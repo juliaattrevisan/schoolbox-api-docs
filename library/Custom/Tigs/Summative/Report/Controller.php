@@ -149,7 +149,7 @@ class Controller extends Web\Controller\Base
             // Build component data
             $ibGraphData = $this->buildInternationalBaccalaureateGraphData($folder, $attributes, $courseSpec, $user);
             $falData     = $this->buildFinalAchievementLevelsData($attributes, $unitImpls, $user);
-            $aamData     = $this->buildAcademicAchievementMatrixData($unitImpls, $user);
+            $aamData     = $this->buildAcademicAchievementMatrixData($attributes, $unitImpls, $user);
             $aasData     = $this->buildAcademicAchievementSummaryData($attributes, $unitImpls, $user);
         }
 
@@ -183,9 +183,9 @@ class Controller extends Web\Controller\Base
     {
         return new StudentAttributes(
             $user,
-            $query->get('term'),
             $this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'],
-            $query->get('ibFlag')
+            $query->get('ibFlag'),
+            $query->get('now')
         );
     }
 
@@ -284,13 +284,14 @@ class Controller extends Web\Controller\Base
     /**
      * Builds data for rendering the AAM components.
      *
+     * @param StudentAttributes                  $attributes
      * @param GenericCollection|UnitImpl\Model[] $unitImpls
      * @param User                               $student
      * @return array
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    private function buildAcademicAchievementMatrixData(GenericCollection $unitImpls, User $student): array
+    private function buildAcademicAchievementMatrixData(StudentAttributes $attributes, GenericCollection $unitImpls, User $student): array
     {
         $configName = Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX;
 
@@ -305,6 +306,7 @@ class Controller extends Web\Controller\Base
         }
 
         $aam = new AcademicAchievementMatrix(
+            $attributes,
             $unitImpls,
             $student,
             $this->visibility,
@@ -347,6 +349,7 @@ class Controller extends Web\Controller\Base
         }
 
         $aas = new AcademicAchievementSummary(
+            $attributes,
             $unitImpls,
             $student,
             $this->visibility,
@@ -389,6 +392,7 @@ class Controller extends Web\Controller\Base
         }
 
         $fal = new FinalAchievementLevels(
+            $attributes,
             $unitImpls,
             $student,
             $this->visibility,
@@ -429,15 +433,18 @@ class Controller extends Web\Controller\Base
         // Only relevant for:
         // * MYP-S2
         // * DP-Y11-S2, DP-Y12-S1 + DP-Y12-S2
-        if ($attributes->isMyp() && 2 === $attributes->getCurriculumSemester()) {
+        $yearLevel = $attributes->getCurriculumYearLevel();
+        $semester  = $attributes->getCurriculumSemester();
+        if (2 === $semester && $attributes->isMyp()) {
             $configName   = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
             $errorMsg     = 'Cannot render MYP Report components. Work type not set.';
             $errorMsgLink = 'Set MYP Final Achievement Levels Work Type';
-        } elseif ($attributes->isDp() && (12 === $attributes->getCurriculumYearLevel() || 2 === $attributes->getCurriculumSemester())) {
+        } elseif ((12 === $yearLevel || 2 === $semester) && $attributes->isDp()) {
             $configName   = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
             $errorMsg     = 'Cannot render DP Report components. Work type not set.';
             $errorMsgLink = 'Set DP Report Work Type';
         } else {
+            // Component is not relevant for this report.
             return null;
         }
 
@@ -518,7 +525,7 @@ class Controller extends Web\Controller\Base
             ->isNull('a.deleted_at')
             ->in('ui.id', $unitImpls->getPropertyValues('id'))
             ->equals('a.work_type_id', $workTypeId)
-            ->betweenDates('a.due_date', $attributes->getReportStartDate(), $attributes->getReportFinishDate());
+            ->betweenDates('a.due_date', $attributes->getReportStart(), $attributes->getReportFinish());
 
         $whereClause = \implode(' AND ', $pb->getWhere());
 
