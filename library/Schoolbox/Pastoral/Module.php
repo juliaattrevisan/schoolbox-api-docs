@@ -64,7 +64,7 @@ class Module extends BaseModule
 
         $permissionParentOfStudent =
             new Rule\LazyCallback(function () {
-                new Rule\All(
+                return new Rule\All(
                     new Rule\IsLoggedIn(),
                     new IsParentAccessAllowed(),
                     new Rule\HasRole(Role::PARENT),
