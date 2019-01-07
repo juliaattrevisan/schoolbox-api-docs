@@ -9,27 +9,30 @@
 
 namespace Calendar\Event\Type\Day\Renderer;
 
+use Calendar\Event\Type\Day;
 use \Calendar\Event\Type\RendererBase;
 use Schoolbox\Calendar\Event;
+use Schoolbox\User;
+use SitePage;
 
 abstract class Base extends RendererBase
 {
 
+    /** @var Day\Event */
+    private $event;
+
     /**
-     * If the Publish Date hasn't been reached yet, only show the events to Superusers
-     * in a different way so they can still edit/click them. Otherwise, they don't appear
-     * at all for everyone else
-     *
-     * @return bool
+     * @param SitePage  $page
+     * @param Day\Event $event
+     * @param User      $user
+     * @param \Group    $groupHandler
+     * @param \Calendar $calHandler
+     * @param User      $viewer
      */
-    public function isVisible()
+    public function __construct(SitePage $page, Day\Event $event, User $user, \Group $groupHandler, \Calendar $calHandler, User $viewer)
     {
-        $isFutureEvent   = ($this->getEvent()->getPublishDate()->getUnixTimestamp() >= time());
-        $isAlwaysVisible = ($this->getViewer()->isSuperuser() || $this->getEvent()->isOwner() || $this->getEvent()->isEditable());
-        if ($isFutureEvent && !($isAlwaysVisible)) {
-            return false;
-        }
-        return true;
+        parent::__construct($page, $user, $groupHandler, $calHandler, $viewer);
+        $this->event = $event;
     }
 
 
@@ -43,11 +46,11 @@ abstract class Base extends RendererBase
 
         /* TODO: This is a temporary fix and should be repaired when ADN merges into ADF
          */
-        if ($this->getEvent()->getPublishDate() instanceof \Alaress_Date_NullDate) {
+        if ($this->event->getPublishDate() instanceof \Alaress_Date_NullDate) {
             return false;
         }
 
-        return $this->getEvent()->getPublishDate()->gt(\Alaress_Date_Format::now());
+        return $this->event->getPublishDate()->gt(\Alaress_Date_Format::now());
     }
 
 
@@ -58,7 +61,7 @@ abstract class Base extends RendererBase
      */
     public function attendanceStatus()
     {
-        if ($attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($this->getEvent()->getEventId(), $this->getViewer()->getId())) {
+        if ($attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($this->event->getEventId(), $this->getViewer()->getId())) {
             if ($attendance['status'] == Event::ATTENDANCE_STATUS_PENDING) {
                 return 'Pending';
             } else if ($attendance['status'] == Event::ATTENDANCE_STATUS_APPROVED) {
@@ -71,4 +74,12 @@ abstract class Base extends RendererBase
         return '';
     }
 
+
+    /**
+     * @return Day\Event
+     */
+    protected function getEvent(): Day\Event
+    {
+        return $this->event;
+    }
 } 

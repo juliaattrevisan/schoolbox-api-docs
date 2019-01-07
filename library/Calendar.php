@@ -603,7 +603,7 @@ class Calendar extends DeprecatedModel
         // get single events for the day
         // Don't get events for resources, get them separately.
         $query = "
-			SELECT DISTINCT event.id, event.series_id, owner,
+			SELECT DISTINCT event.id, event.series_id, event.owner,
 				GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
 				start_datetime, end_datetime, allday,
 				YEAR(event.start_datetime) AS year,
@@ -684,7 +684,15 @@ class Calendar extends DeprecatedModel
                 $event->setAttendance($currentEvent['attendance']);
                 $event->setCompleted($currentEvent['completed']);
 
-                $stack->add($event);
+                // TODO port this into SQL query so we don't bother building the event just to throw it away
+                $isFutureEvent   = $event->getPublishDate()->getUnixTimeStamp() >= time();
+                /** @var \Schoolbox\User $viewer */
+                $viewer = $_SESSION['user'];
+                $isAlwaysVisible = $viewer->isSuperuser() || $event->isOwner() || $event->isEditable();
+
+                if($isAlwaysVisible || !$isFutureEvent) {
+                    $stack->add($event);
+                }
             }
         }
 

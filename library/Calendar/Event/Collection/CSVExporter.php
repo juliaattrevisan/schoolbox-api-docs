@@ -9,80 +9,40 @@
 
 namespace Calendar\Event\Collection;
 
-use Html2Text\Html2Text;
-use Sabre\VObject\Component\VCalendar;
-use Schoolbox\User;
-
-
-class CSVExporter extends Renderer {
-
-    var $csvFormat = array( 'start_date',
-                            'start_time',
-                            'finish_date',
-                            'finish_time',
-                            'all_day',
-                            'name',
-                            'detail',
-                            'location',
-                            'event_type',
-                            'publish_date',
-                            'attendance',
-                           );
-
-    /**
-     * @var VCalendar $vCalendar
-     */
-    protected $vCalendar;
-
-    /**
-     * @var Html2Text
-     */
-    protected $textConverter;
+class CSVExporter
+{
 
     /**
      * This will stream the vcal output as it parses over the event collection
+     *
+     * @param Renderer $renderer
+     * @param string   $filename
+     * @throws \Exception
      */
-    public function renderAll($type = null) {
-		// Output base calendar, and output its start and end separately
-		echo implode(',',$this->csvFormat)."\n";
+    public function renderAll(Renderer $renderer, string $filename): void
+    {
+        header('Cache-Control: private');
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: filename=' . $filename . '.csv');
 
-		foreach ($this->getAllEvents() as $currentEvent) {
-            echo $this->renderEvent($currentEvent, 'csv');
+        $csvFormat = array( 'start_date',
+            'start_time',
+            'finish_date',
+            'finish_time',
+            'all_day',
+            'name',
+            'detail',
+            'location',
+            'event_type',
+            'publish_date',
+            'attendance',
+        );
+
+		// Output base calendar, and output its start and end separately
+		echo implode(',', $csvFormat)."\n";
+
+		foreach ($renderer->getAllEvents() as $currentEvent) {
+            echo $renderer->renderEvent($currentEvent, 'csv');
 		}
 	}
-
-    /**
-     * @param VCalendar $vCalendar
-     */
-    public function setVCalendar($vCalendar)
-    {
-        $this->vCalendar = $vCalendar;
-    }
-
-    /**
-     * @return VCalendar
-     */
-    public function getVCalendar()
-    {
-        return $this->vCalendar;
-    }
-
-    /**
-     * @param Html2Text $textConverter
-     */
-    public function setTextConverter($textConverter)
-    {
-        $this->textConverter = $textConverter;
-    }
-
-    /**
-     * @return Html2Text
-     */
-    public function getTextConverter()
-    {
-        return $this->textConverter;
-    }
-
-
-
 }

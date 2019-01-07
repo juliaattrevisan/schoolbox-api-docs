@@ -104,15 +104,15 @@ class Renderer
     /**
      * Render all events
      *
-     * @param string $type
+     * @param string $format
      * @return string
      * @throws \Exception If unable to find a rendering class for the specified type
      */
-    public function renderAll($type)
+    public function renderAll($format)
     {
         $output = '';
         foreach ($this->allEvents as $currentEvent) {
-            $output .= $this->renderEvent($currentEvent, $type);
+            $output .= $this->renderEvent($currentEvent, $format);
         }
         return $output;
     }
@@ -120,14 +120,14 @@ class Renderer
 
     /**
      * @param EventInterface $event
-     * @param string         $type
+     * @param string         $format
      *
      * @return mixed
      * @throws \Exception If unable to find a rendering class for the specified type
      */
-    public function renderEvent($event, $type)
+    public function renderEvent($event, $format)
     {
-        $rendererClass = $event->getRendererClass($type);
+        $rendererClass = $event->getRendererClass($format);
         /** @var RendererInterface $renderObj */
         $renderObj = new $rendererClass(
             $this->page,

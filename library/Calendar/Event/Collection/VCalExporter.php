@@ -1,0 +1,45 @@
+<?php
+/**
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Calendar\Event\Collection;
+
+use Sabre\VObject\Component\VCalendar;
+use Config;
+
+class VCalExporter
+{
+
+    /**
+     * This will stream the vcal output as it parses over the event collection
+     *
+     * @param Renderer $renderer
+     * @param string   $filename
+     * @throws \InvalidArgumentException
+     * @throws \Exception
+     */
+    public function renderAll(Renderer $renderer, string $filename): void
+    {
+        header('Cache-Control: private');
+        header('Content-Type: text/calendar; charset=utf-8');
+        header('Content-Disposition: filename=' . $filename . '.ics');
+
+
+        $vCalendar = new VCalendar();
+        $vCalendar->add('method', 'PUBLISH');
+        $vCalendar->add('X-WR-CALNAME', Config::get('title') . ' Calendar');
+        $vCalendar->add('X-WR-CALDESC', 'Calendar for ' . Config::get('school_name'));
+
+        // Output base calendar, and output its start and end separately
+        echo trim(str_replace('END:VCALENDAR', '', $vCalendar->serialize())) . "\r\n";
+
+        foreach ($renderer->getAllEvents() as $currentEvent) {
+            echo $renderer->renderEvent($currentEvent, 'vcal');
+        }
+
+        echo "END:VCALENDAR";
+    }
+}

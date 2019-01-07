@@ -14,8 +14,6 @@ use \Alaress_Date_Format;
 interface EventInterface
 {
 
-    public function __construct();
-
     /**
      * Set author
      *
@@ -174,20 +172,13 @@ interface EventInterface
 
 
     /**
-     * Set renderer class
-     *
-     * @param string $rendererClass
-     */
-    public function setRendererClass($rendererClass);
-
-    /**
      * Get renderer class
      *
-     * @param string $type
-     * @throws \Exception If unable to find a rendering class for the specified type
+     * @param string $format
+     * @throws \Exception If unable to find a rendering class for the specified format
      * @return string
      */
-    public function getRendererClass($type);
+    public function getRendererClass($format): string;
 
     /**
      * Set isEditable

@@ -10,38 +10,49 @@
 namespace Calendar\Event\Type\Submission\Renderer;
 
 use \Calendar\Event\Type\RendererBase;
-use Calendar\Event\Type\Submission\Event;
+use Schoolbox\User;
+use SitePage;
+use Calendar\Event\Type\Submission;
 
 abstract class Base extends RendererBase
 {
 
+    /** @var Submission\Event */
+    private $event;
+
+
     /**
-     * Hide submissions from Students and Parents if not yet published
-     *
-     * @return bool
+     * @param SitePage         $page
+     * @param Submission\Event $event
+     * @param User             $user
+     * @param \Group           $groupHandler
+     * @param \Calendar        $calHandler
+     * @param User             $viewer
      */
-    public function isVisible() {
-        $alwaysVisible = $this->getViewer()->isSuperuser() || $this->getViewer()->getRole()->isStaff();
-        if(!$alwaysVisible){
-            /**
-             * @var Event $submissionEvent
-             */
-            $submissionEvent = $this->getEvent();
-            return $submissionEvent->getPublishDate()->lte(new \Alaress_Date_Format());
-        }
-        return true;
+    public function __construct(SitePage $page, Submission\Event $event, User $user, \Group $groupHandler, \Calendar $calHandler, User $viewer)
+    {
+        parent::__construct($page, $user, $groupHandler, $calHandler, $viewer);
+        $this->event = $event;
     }
+
 
     /**
      * Helper function to determine if person viewing assessment event can edit it, this should probably be on the
      * event itself but its not so this will help
+     *
      * @return bool
      */
-    public function isEditable() {
-        if ($this->getViewer()->getRole()->isStaff()) {
-            return true;
-        } else {
-            return false;
-        }
+    public function isEditable()
+    {
+        return $this->getViewer()->getRole()->isStaff();
+    }
+
+
+    /**
+     * @return Submission\Event
+     */
+    protected function getEvent(): Submission\Event
+    {
+        return $this->event;
     }
 } 

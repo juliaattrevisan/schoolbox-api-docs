@@ -7,9 +7,6 @@
 
 namespace Calendar\Event\Render;
 
-use Calendar\Event\Type\Day\Event;
-
-
 /**
  * Default CSV rendering for all types of Calendar events.
  *
@@ -18,14 +15,10 @@ use Calendar\Event\Type\Day\Event;
 trait CSVTrait
 {
     /**
-     * @return Event
-     */
-    public abstract function getEvent();
-
-    /**
      * Render this event out as CSV data
+     * @return string
      */
-    public function render()
+    public function render(): string
     {
         $fd = fopen('php://temp/maxmemory:10000', 'rw');
 

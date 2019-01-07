@@ -13,20 +13,10 @@
 
 namespace Calendar\Event\Type\Timetable;
 
-use Calendar\Event\Type\Day\Event as DayEvent;
-use Calendar\Event\Type\EventInterface;
+use Calendar\Event\Type\Day;
 
-
-class Event extends DayEvent implements EventInterface {
-
-    /**
-     * Renderer classes
-     */
-    protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
-                                        'html'          => Renderer\Html::class,
-                                        'vcal'          => Renderer\VObject::class,
-                                        'csv'           => Renderer\Csv::class,
-    );
+class Event extends Day\Event
+{
 
     /**
      * @var string $timetableCode Timetable external definition code
@@ -155,5 +145,16 @@ class Event extends DayEvent implements EventInterface {
     }
 
 
-
+    /**
+     * @return string[]
+     */
+    protected function getRenderClasses(): array
+    {
+        return [
+            'javascript' => Renderer\Javascript::class,
+            'html'       => Renderer\Html::class,
+            'vcal'       => Renderer\VObject::class,
+            'csv'        => Renderer\Csv::class,
+        ];
+    }
 }

@@ -12,17 +12,31 @@ namespace Calendar\Event\Type\Timetable\Renderer;
 use \Calendar\Event\Type\RendererBase;
 use \Calendar\Event\Type\Timetable\Event;
 use \Schoolbox\Config\Loader as Config;
+use Calendar\Event\Type\Timetable;
+use Schoolbox\User;
+use SitePage;
 
 abstract class Base extends RendererBase
 {
 
+    /** @var Timetable\Event */
+    private $event;
+
+
     /**
-     * @return bool
+     * @param SitePage        $page
+     * @param Timetable\Event $event
+     * @param User            $user
+     * @param \Group          $groupHandler
+     * @param \Calendar       $calHandler
+     * @param User            $viewer
      */
-    public function isVisible()
+    public function __construct(SitePage $page, Timetable\Event $event, User $user, \Group $groupHandler, \Calendar $calHandler, User $viewer)
     {
-        return true;
+        parent::__construct($page, $user, $groupHandler, $calHandler, $viewer);
+        $this->event = $event;
     }
+
 
     /**
      * Helper function to control showing the attendance link
@@ -52,5 +66,14 @@ abstract class Base extends RendererBase
             }
         }
         return false;
+    }
+
+
+    /**
+     * @return Timetable\Event
+     */
+    protected function getEvent(): Timetable\Event
+    {
+        return $this->event;
     }
 }

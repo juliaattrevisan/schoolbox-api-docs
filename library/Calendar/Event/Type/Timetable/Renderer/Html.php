@@ -16,17 +16,11 @@ class Html extends Base {
      * Render this event as html using twig
      *
      */
-    public function render()
+    public function render(): string
     {
-
-        if ($this->isVisible()) {
-            return $this->getTemplate()->render('calendar/type/timetable.twig',
-                array(  'event' => $this->getEvent(),
-                        'renderer' => $this)
-            );
-        } else {
-            return '';
-        }
-
+        return $this->getTemplate()->render('calendar/type/timetable.twig',
+            array(  'event' => $this->getEvent(),
+                    'renderer' => $this)
+        );
     }
 }

@@ -16,7 +16,7 @@ class Html extends Base {
      * Render this event as html using twig
      * @return string
      */
-    public function render()
+    public function render(): string
     {
 
         $returnUrl = $_SERVER["REQUEST_URI"];
@@ -40,15 +40,12 @@ class Html extends Base {
         else {
             $returnStr .= urlencode($returnUrl);
         }
-        if ($this->isVisible()) {
-            return $this->getTemplate()->render('calendar/type/day.twig',
-                array(  'event' => $this->getEvent(),
-                        'renderer' => $this,
-                        'returnStr' => $returnStr,
-                )
-            );
-        } else {
-            return '';
-        }
+
+        return $this->getTemplate()->render('calendar/type/day.twig',
+            array(  'event' => $this->getEvent(),
+                    'renderer' => $this,
+                    'returnStr' => $returnStr,
+            )
+        );
     }
 }

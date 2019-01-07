@@ -9,18 +9,10 @@
 namespace Calendar\Event\Type\External;
 
 use Calendar\Event\Type\EventBase;
-use Calendar\Event\Type\EventInterface;
 
-class Event extends EventBase implements EventInterface {
+class Event extends EventBase
+{
 
-    /**
-     * Renderer classes
-     */
-    protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
-                                        'html'          => Renderer\Html::class,
-                                        'vcal'          => Renderer\VObject::class,
-                                        'csv'           => Renderer\Csv::class,
-    );
 
     /**
      * Event location
@@ -56,5 +48,19 @@ class Event extends EventBase implements EventInterface {
      */
     public function canAttend() {
         return false;
+    }
+
+
+    /**
+     * @return string[]
+     */
+    protected function getRenderClasses(): array
+    {
+        return [
+            'javascript' => Renderer\Javascript::class,
+            'html'       => Renderer\Html::class,
+            'vcal'       => Renderer\VObject::class,
+            'csv'        => Renderer\Csv::class,
+        ];
     }
 }

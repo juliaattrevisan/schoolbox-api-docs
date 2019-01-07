@@ -11,105 +11,101 @@ namespace Calendar\Event\Type\Timetable\Renderer;
 
 class Javascript extends Base
 {
-    public function render()
+    public function render(): string
     {
-        if ($this->isVisible()) {
+        /* Event attendance
+         */
+        $hasIcon = false;
+        $hasStatus = false;
+        $hasAttendanceRequestButton = false;
+
+        /* Output list button */
+        if ($this->showAttendanceLink()) {
+            $encodedClass = urlencode(urlencode(urlencode($this->getEvent()->getCode())));
+            $classLink = $this->getEvent()->getCampus() ? $this->getEvent()->getCampus() . '/' . $encodedClass : '0/' . $encodedClass;
+
+            $hasListButton = "<a class='button icon-class-list' href='/modules/attendance/modify/{$classLink}/{$this->getEvent()->getStartTime()->getDatabaseDate()}/{$this->getEvent()->getPeriod()}/{$this->getEvent()->getTimetableCode()}' title='Mark Attendance'>Attendance</a>";
+        } else {
+            $hasListButton = false;
+        }
 
 
-            /* Event attendance
+        /* Congeal all that stuff
+         */
+        $start = $this->getEvent()->getStartTime()->getDatabaseDate();
+        $end = $this->getEvent()->getEndTime()->getDatabaseDate();
+        $all_day = $this->getEvent()->getAllday();
+        if (!$all_day) {
+            $start .= ' ' . $this->getEvent()->getStartTime()->getDatabaseTime();
+            $end .= ' ' . $this->getEvent()->getEndTime()->getDatabaseTime();
+        } else {
+            // FullCalendar (and vCal) 2.0 treats event ends as exclusive.
+            // Doesn't really matter for timed events, but all day events
+            // get truncated by one day.
+            $end = $this->getEvent()->getEndTime()->addDays(1)->getDatabaseDate();
+        }
+
+        //
+        // Add campus list to list of classes
+        $classes = $this->getEvent()->getEventClasses();
+
+        $event = array(
+            'title'     => $this->getEvent()->getTitle(),
+            'start'     => $start,
+            'end'       => $end,
+
+            /* Whether you can edit this event or not
              */
-            $hasIcon = false;
-            $hasStatus = false;
-            $hasAttendanceRequestButton = false;
+            'editable'  => false,
 
-            /* Output list button */
-            if ($this->showAttendanceLink()) {
-                $encodedClass = urlencode(urlencode(urlencode($this->event->getCode())));
-                $classLink = $this->event->getCampus() ? $this->event->getCampus() . '/' . $encodedClass : '0/' . $encodedClass;
-
-                $hasListButton = "<a class='button icon-class-list' href='/modules/attendance/modify/{$classLink}/{$this->event->getStartTime()->getDatabaseDate()}/{$this->event->getPeriod()}/{$this->event->getTimetableCode()}' title='Mark Attendance'>Attendance</a>";
-            } else {
-                $hasListButton = false;
-            }
-
-
-            /* Congeal all that stuff
+            /* Whether it's an all-day event or not
+             * If allDay is true, then you can't resize it
              */
-            $start = $this->event->getStartTime()->getDatabaseDate();
-            $end = $this->event->getEndTime()->getDatabaseDate();
-            $all_day = $this->event->getAllDay();
-            if (!$all_day) {
-                $start .= ' ' . $this->event->getStartTime()->getDatabaseTime();
-                $end .= ' ' . $this->event->getEndTime()->getDatabaseTime();
-            } else {
-                // FullCalendar (and vCal) 2.0 treats event ends as exclusive.
-                // Doesn't really matter for timed events, but all day events
-                // get truncated by one day.
-                $end = $this->event->getEndTime()->addDays(1)->getDatabaseDate();
-            }
+            'allDay'    => $all_day,
 
-            //
-            // Add campus list to list of classes
-            $classes = $this->getEvent()->getEventClasses();
+            /* Colour of the event
+             */
+            'color'     => $this->getEvent()->getColour(),
 
-            $event = array(
-                'title'     => $this->event->getTitle(),
-                'start'     => $start,
-                'end'       => $end,
+            /* Campus slug so you can filter events
+             */
+            'className' => $classes,
 
-                /* Whether you can edit this event or not
-                 */
-                'editable'  => false,
-
-                /* Whether it's an all-day event or not
-                 * If allDay is true, then you can't resize it
-                 */
-                'allDay'    => $all_day,
-
-                /* Colour of the event
-                 */
-                'color'     => $this->event->getColour(),
-
-                /* Campus slug so you can filter events
-                 */
-                'className' => $classes,
-
-                /* Extra data that the Event Object doesn't directly support
-                 */
-                'data'      => array(
-                    'meta'       => array(
-                        'eventId'     => $this->event->getEventId(),
-                        'time'        => $this->event->getTime(),
-                        'detail'      => \Scrub::html($this->event->getDetail()),
-                        'location'    => $this->event->getLocation(),
-                        'eventTypeId' => $this->event->getType(),
-                        'eventType'   => 'type' . $this->event->getType(),
-                        'type'        => $this->event->getEventType(),
-                        'author'      => $this->event->getAuthorName(),
-                        'authorId'    => $this->event->getAuthorId(),
-                        'level'       => $this->event->getEventClasses(),
-                        'completed'   => $this->event->getCompleted(),
-                    ),
-                    'links'      => array(
-                        'category' => array(
-                            'id'   => $this->event->getCategoryId(),
-                            'name' => $this->event->getCategoryName(),
-                        ),
-                    ),
-                    'styles'     => array(
-                        'visible' => '',
-                    ),
-                    'attendance' => array(
-                        'icon'          => $hasIcon,
-                        'status'        => $hasStatus,
-                        'listButton'    => $hasListButton,
-                        'requestButton' => $hasAttendanceRequestButton,
+            /* Extra data that the Event Object doesn't directly support
+             */
+            'data'      => array(
+                'meta'       => array(
+                    'eventId'     => $this->getEvent()->getEventId(),
+                    'time'        => $this->getEvent()->getTime(),
+                    'detail'      => \Scrub::html($this->getEvent()->getDetail()),
+                    'location'    => $this->getEvent()->getLocation(),
+                    'eventTypeId' => $this->getEvent()->getType(),
+                    'eventType'   => 'type' . $this->getEvent()->getType(),
+                    'type'        => $this->getEvent()->getEventType(),
+                    'author'      => $this->getEvent()->getAuthorName(),
+                    'authorId'    => $this->getEvent()->getAuthorId(),
+                    'level'       => $this->getEvent()->getEventClasses(),
+                    'completed'   => $this->getEvent()->getCompleted(),
+                ),
+                'links'      => array(
+                    'category' => array(
+                        'id'   => $this->getEvent()->getCategoryId(),
+                        'name' => $this->getEvent()->getCategoryName(),
                     ),
                 ),
-            );
+                'styles'     => array(
+                    'visible' => '',
+                ),
+                'attendance' => array(
+                    'icon'          => $hasIcon,
+                    'status'        => $hasStatus,
+                    'listButton'    => $hasListButton,
+                    'requestButton' => $hasAttendanceRequestButton,
+                ),
+            ),
+        );
 
-            return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
-        }
+        return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
     }
 
 

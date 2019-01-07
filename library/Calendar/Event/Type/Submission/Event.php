@@ -18,19 +18,8 @@ use Custom\Mggs\Calendar\Event\Type\Submission as Mggs;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
 
-class Event extends EventBase {
-
-    /**
-     * Renderer classes
-     */
-    protected $renderClasses = [
-        'javascript'     => Renderer\Javascript::class,
-        'html'           => Renderer\Html::class,
-        'vcal'           => Renderer\VObject::class,
-        'csv'            => Renderer\Csv::class,
-        'pbl-javascript' => Mggs\Renderer\Javascript::class
-    ];
-
+class Event extends EventBase
+{
 
     /* Contextual: The owner of the submission box
       */
@@ -156,5 +145,16 @@ class Event extends EventBase {
     {
         $this->assessment = $assessment;
         return $this;
+    }
+
+    protected function getRenderClasses(): array
+    {
+        return [
+            'javascript'     => Renderer\Javascript::class,
+            'html'           => Renderer\Html::class,
+            'vcal'           => Renderer\VObject::class,
+            'csv'            => Renderer\Csv::class,
+            'pbl-javascript' => Mggs\Renderer\Javascript::class
+        ];
     }
 }

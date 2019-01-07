@@ -14,10 +14,9 @@
 namespace Calendar\Event\Type\Day;
 
 use Calendar\Event\Type\EventBase;
-use Calendar\Event\Type\EventInterface;
 
-
-class Event extends EventBase implements EventInterface {
+class Event extends EventBase
+{
 
     /**
      * These constants define the levels of access an day event can be
@@ -89,15 +88,6 @@ class Event extends EventBase implements EventInterface {
      * @var bool
      */
     private $attendance = false;
-
-    /**
-     * Renderer classes
-     */
-    protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
-                                        'html'          => Renderer\Html::class,
-                                        'vcal'          => Renderer\VObject::class,
-                                        'csv'           => Renderer\Csv::class,
-                                    );
 
     /**
      * Can someone attend this event
@@ -350,4 +340,16 @@ class Event extends EventBase implements EventInterface {
     }
 
 
+    /**
+     * @return string[]
+     */
+    protected function getRenderClasses(): array
+    {
+        return [
+            'javascript' => Renderer\Javascript::class,
+            'html'       => Renderer\Html::class,
+            'vcal'       => Renderer\VObject::class,
+            'csv'        => Renderer\Csv::class,
+        ];
+    }
 }

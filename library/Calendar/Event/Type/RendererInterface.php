@@ -17,28 +17,5 @@ interface RendererInterface {
      *
      * @return string
      */
-    public function render();
-
-    /**
-     * Set the event that you want to render
-     *
-     * @param EventBase
-     */
-    public function setEvent($event);
-
-    /**
-     * Get the event that you want to render
-     *
-     * @return EventBase
-     */
-    public function getEvent();
-
-    /**
-     * Is this event visible by this user, sometimes we can't tell till we render if we should show it
-     * or not apparently.  Would of thought that this would of been solved in the collection, but it might be render
-     * specific
-     *
-     * @return bool
-     */
-    public function isVisible();
+    public function render(): string;
 }

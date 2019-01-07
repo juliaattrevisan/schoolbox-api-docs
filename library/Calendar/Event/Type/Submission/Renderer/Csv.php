@@ -14,12 +14,8 @@ class Csv extends Base{
     /**
      * Render this event out as CSV data
      */
-    public function render()
+    public function render(): string
     {
-        if(!$this->isVisible()){
-            return '';
-        }
-
         $fd = fopen('php://temp/maxmemory:10000', 'rw');
 
 
@@ -36,9 +32,7 @@ class Csv extends Base{
 
         fputcsv($fd, $data);
         rewind($fd);
-        $row = fread($fd, 10000);
-
-        return $row;
+        return fread($fd, 10000);
     }
 }
 

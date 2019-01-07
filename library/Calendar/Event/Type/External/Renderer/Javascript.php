@@ -11,64 +11,61 @@ namespace Calendar\Event\Type\External\Renderer;
 
 class Javascript extends Base
 {
-    public function render()
+    public function render(): string
     {
-        if ($this->isVisible()) {
+        /* Event attendance
+         */
+        $hasIcon = false;
+        $hasStatus = false;
+        $hasListButton = false;
+        $hasAttendanceRequestButton = false;
 
+        $classes = Array();
 
-            /* Event attendance
+        if (($connectorId = $this->getEvent()->getConnectorId()) > 0) {
+            $classes[] = 'source' . $connectorId;
+        }
+
+        $classes[] = 'type' . $this->getEvent()->getType();
+
+        $event = array(
+            'title'     => $this->getEvent()->getTitle(),
+            'start'     => $this->getEvent()->getStartTime()->getDatabase(),
+            'end'       => $this->getEvent()->getEndTime()->getDatabase(),
+
+            /* Whether you can edit this event or not
              */
-            $hasIcon = false;
-            $hasStatus = false;
-            $hasListButton = false;
-            $hasAttendanceRequestButton = false;
+            'editable'  => false,
 
-            $classes = Array();
+            /* Whether it's an all-day event or not
+             * If allDay is true, then you can't resize it
+             */
+            'allDay'    => false,
 
-            if (($connectorId = $this->getEvent()->getConnectorId()) > 0) {
-                $classes[] = 'source' . $connectorId;
-            }
+            /* Colour of the event
+             */
+            'color'     => $this->getEvent()->getColour(),
 
-            $classes[] = 'type' . $this->event->getType();
+            /* Campus slug so you can filter events
+             */
+            'className' => implode(' ', $classes),
 
-            $event = array(
-                'title'     => $this->event->getTitle(),
-                'start'     => $this->event->getStartTime()->getDatabase(),
-                'end'       => $this->event->getEndTime()->getDatabase(),
-
-                /* Whether you can edit this event or not
-                 */
-                'editable'  => false,
-
-                /* Whether it's an all-day event or not
-                 * If allDay is true, then you can't resize it
-                 */
-                'allDay'    => false,
-
-                /* Colour of the event
-                 */
-                'color'     => $this->event->getColour(),
-
-                /* Campus slug so you can filter events
-                 */
-                'className' => implode(' ', $classes),
-
-                /* Extra data that the Event Object doesn't directly support
-                 */
-                'data'      => array(
-                    'meta'       => array(
-                        'eventId'     => $this->event->getEventId(),
-                        'time'        => $this->event->getTime(),
-                        'detail'      => \Scrub::html($this->event->getDetail()),
-                        'location'    => $this->event->getLocation(),
-                        'eventTypeId' => $this->event->getType(),
-                        'eventType'   => 'type' . $this->event->getType(),
-                        'type'        => $this->event->getEventType(),
-                        'author'      => $this->event->getAuthorName(),
-                        'authorId'    => $this->event->getAuthorId(),
-                        'level'       => $this->event->getEventClasses(),
-                    ),
-                    // Do I need this? TODO
+            /* Extra data that the Event Object doesn't directly support
+             */
+            'data'      => array(
+                'meta'       => array(
+                    'eventId'     => $this->getEvent()->getEventId(),
+                    'time'        => $this->getEvent()->getTime(),
+                    'detail'      => \Scrub::html($this->getEvent()->getDetail()),
+                    'location'    => $this->getEvent()->getLocation(),
+                    'eventTypeId' => $this->getEvent()->getType(),
+                    'eventType'   => 'type' . $this->getEvent()->getType(),
+                    'type'        => $this->getEvent()->getEventType(),
+                    'author'      => $this->getEvent()->getAuthorName(),
+                    'authorId'    => $this->getEvent()->getAuthorId(),
+                    'level'       => $this->getEvent()->getEventClasses(),
+                ),
+                // Do I need this? TODO
 
 //                    'links'      => array(
 //                    'category' => array(
@@ -76,20 +73,19 @@ class Javascript extends Base
 //                    'name' => $this->event->getCategoryName(),
 //                        )
 //                    ),
-                    'styles'     => array(
-                        'visible' => '',
-                    ),
-                    'attendance' => array(
-                        'icon'          => $hasIcon,
-                        'status'        => $hasStatus,
-                        'listButton'    => $hasListButton,
-                        'requestButton' => $hasAttendanceRequestButton,
-                    ),
+                'styles'     => array(
+                    'visible' => '',
                 ),
-            );
+                'attendance' => array(
+                    'icon'          => $hasIcon,
+                    'status'        => $hasStatus,
+                    'listButton'    => $hasListButton,
+                    'requestButton' => $hasAttendanceRequestButton,
+                ),
+            ),
+        );
 
-            return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
-        }
+        return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
     }
 
 

@@ -130,25 +130,6 @@ abstract class EventBase implements EventInterface
      */
     protected $seriesId = null;
 
-    /**
-     * Constructor
-     *
-     * Set up default settings
-     */
-    public function __construct()
-    {
-        $this->setup();
-    }
-
-
-    /**
-     * Hook method for your own customisations
-     *
-     * Empty by default
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Find out if the currently logged in user is the owner (creator)
@@ -495,32 +476,22 @@ abstract class EventBase implements EventInterface
         return $this->startTime;
     }
 
-    /**
-     * Set renderer class
-     *
-     * @param string $renderClasses
-     */
-    public function setRendererClass($renderClasses)
-    {
-        $this->renderClasses = $renderClasses;
-    }
 
     /**
      * Get renderer class
      *
-     * @param string $type
-     * @throws \Exception If unable to find a rendering class for the specified type
+     * @param string $format
+     * @throws \Exception If unable to find a rendering class for the specified format
      * @return string
      */
-    public function getRendererClass($type)
+    public function getRendererClass($format): string
     {
-        if($this->renderClasses[$type]) {
-            return $this->renderClasses[$type];
-        }
-        else {
-            throw new \Exception("Unable to find rendering class for $type");
+        $renderClasses = $this->getRenderClasses();
+        if (\array_key_exists($format, $renderClasses)) {
+            return $renderClasses[$format];
         }
 
+        throw new \Exception("Unable to find rendering class for $format");
     }
 
     /**
@@ -653,4 +624,15 @@ abstract class EventBase implements EventInterface
         $this->resourceId = $resourceId;
         return $this;
     }
+
+
+    /**
+     * Returns the available Render Classes for this event
+     *
+     * These are PHP class names, each representing a different output format, eg VCal, HTML, etc that are able
+     * to process events of this type.
+     *
+     * @return string[]
+     */
+    abstract protected function getRenderClasses(): array;
 }
