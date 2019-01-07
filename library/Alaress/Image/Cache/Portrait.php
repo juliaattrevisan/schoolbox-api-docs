@@ -52,14 +52,16 @@ class Portrait extends BrokenFS
     {
         /* A value for $externalId would be useful
          */
-        if ('' === trim($externalId)) {
+        $trimmedExternalId = trim($externalId);
+
+        if ('' === $trimmedExternalId) {
             throw new \InvalidArgumentException('Portrait not found');
         }
 
         /* See if a path can be generated for this user
          */
         $this->setExternalHandler(new External_User());
-        $this->setExternalUserId($externalId);
+        $this->setExternalUserId($trimmedExternalId);
 
         $portraitPath = $this->getExternalHandler()->getPortrait($this->getExternalUserId());
 
