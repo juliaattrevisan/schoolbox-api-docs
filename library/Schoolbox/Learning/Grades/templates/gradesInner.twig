@@ -57,9 +57,16 @@
                                 <div class="list-item content">
                                     <div class="row">
                                         <div class="small-12 large-6 card column xl">
-                                            <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
+                                            {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessment.id, assessment: assessment, studentId: student.id, student: student}) %}
+
+                                            {% if summaryRoute %}
+                                            <a href="{{ summaryRoute }}{{ returnUrlSuffix }}">
                                                 <h3>{{ assessment.title }}</h3>
                                             </a>
+                                            {% else %}
+                                                <h3>{{ assessment.title }}</h3>
+                                            {% endif %}
+
                                             <p>
                                                 <span class="meta">{{ assessment.typeName }}</span><span
                                                         class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
