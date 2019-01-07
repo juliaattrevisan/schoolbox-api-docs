@@ -29,7 +29,7 @@ class Portrait extends BrokenFS
     private $externalUserId = -1;
 
     /** @var External_User */
-    private $externalHandler = null;
+    private $externalHandler;
 
     /** @var UserMapper */
     private $userMapper;
@@ -40,31 +40,42 @@ class Portrait extends BrokenFS
     /** @var IConfigLoader */
     private $conf;
 
+
     /**
      * Portrait constructor.
      *
      * @param string $externalId
      * @param string $key
-     * @param User $sessionUser
-     * @throws SchoolboxAccessDeniedException
+     * @param User   $sessionUser
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Exception
      */
-    public function __construct($externalId, $key, User $sessionUser)
+    public function __construct(string $externalId, string $key, User $sessionUser)
     {
-        //var_dump(realpath( \Config::get('portrait_dir') ));exit;
 
-        $this->setConfig(new Loader());
-        $this->setSessionUser($sessionUser);
+        /* A value for $externalId would be useful
+         */
+        if ('' === trim($externalId)) {
+            throw new \InvalidArgumentException('Portrait not found');
+        }
+
+        /* See if a path can be generated for this user
+         */
         $this->setExternalHandler(new External_User());
-        $this->setUserMapper(UserMapper::getInstance());
-        $this->setExternalUserId($externalId);
-
 
         $portraitPath = $this->getExternalHandler()->getPortrait($this->getExternalUserId());
 
         if (!$portraitPath) {
             throw new \InvalidArgumentException('Portrait not found');
         }
+
+        /* Continue trying to render image
+         */
+        $this->setConfig(new Loader());
+        $this->setSessionUser($sessionUser);
+        $this->setUserMapper(UserMapper::getInstance());
+        $this->setExternalUserId($externalId);
 
         $portraitDir = realpath($this->getConfig()->get('portrait_dir'));
 
