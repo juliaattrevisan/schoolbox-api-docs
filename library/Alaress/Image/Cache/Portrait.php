@@ -59,6 +59,7 @@ class Portrait extends BrokenFS
         /* See if a path can be generated for this user
          */
         $this->setExternalHandler(new External_User());
+        $this->setExternalUserId($externalId);
 
         $portraitPath = $this->getExternalHandler()->getPortrait($this->getExternalUserId());
 
@@ -71,7 +72,6 @@ class Portrait extends BrokenFS
         $this->setConfig(new Loader());
         $this->setSessionUser($sessionUser);
         $this->setUserMapper(UserMapper::getInstance());
-        $this->setExternalUserId($externalId);
 
         $portraitDir = realpath($this->getConfig()->get('portrait_dir'));
 
