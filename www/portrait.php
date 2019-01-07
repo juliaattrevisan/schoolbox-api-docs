@@ -31,7 +31,7 @@ if(! ($_SESSION['user'] instanceof Schoolbox\User)) {
 
 try {
     $image = new Image\Processor\Standard(
-        new Image\Cache\Portrait(trim($_GET['userId']), $_GET['size'], $_SESSION['user']),
+        new Image\Cache\Portrait($_GET['userId'], $_GET['size'], $_SESSION['user']),
         new Image\Transformation\Portrait(),
         new Imagine\Filetype\Factory(),
         new Imagine\Processor\Strategy\Factory()
