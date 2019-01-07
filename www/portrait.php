@@ -48,11 +48,6 @@ catch (\RuntimeException $e) {
 catch (\InvalidArgumentException $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
 }
-/* Invalid file type
- */
-catch (\DomainException $e) {
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
-}
 /* All other exceptions
  * BadMethodCallException
  */
