@@ -18,11 +18,8 @@ require_once __DIR__ . '/../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\BasicRequest');
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
-//
 // Alaress_Image_Cache_Portrait needs to know if someone is logged in.
 session_start();
-
-
 
 /* If current user is not available return permission denied */
 if(! ($_SESSION['user'] instanceof Schoolbox\User)) {
@@ -54,4 +51,3 @@ catch (\InvalidArgumentException $e) {
 catch (Exception $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 500);
 }
-
