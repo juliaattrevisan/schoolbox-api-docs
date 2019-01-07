@@ -90,8 +90,8 @@
                                                 {% endif %}
                                                 {% if feedback %}
                                                     <p class="comment">{{ feedback.comment | nl2br }}</p>
-                                                    {% if assessment.useRubric  %}
-                                                        <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
+                                                    {% if assessment.useRubric and summaryRoute %}
+                                                        <a href="{{ summaryRoute }}{{ returnUrlSuffix }}">
                                                             View more feedback</a>
                                                     {% endif %}
                                                 {% endif %}
