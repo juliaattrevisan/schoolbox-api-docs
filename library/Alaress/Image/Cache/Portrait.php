@@ -1,18 +1,16 @@
 <?php
 /**
  * Alaress\Image\Cache\Portrait
+ *
  * Load user's portraits from the external database.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Alaress\Image\Cache;
 
-use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
-use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use External_User;
 use Group;
 use Schoolbox\Config\Loader;
@@ -20,7 +18,6 @@ use Schoolbox\File\Exception;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use League\Flysystem as Fly;
 
 class Portrait extends BrokenFS
 {
@@ -53,7 +50,6 @@ class Portrait extends BrokenFS
      */
     public function __construct(string $externalId, string $key, User $sessionUser)
     {
-
         /* A value for $externalId would be useful
          */
         if ('' === trim($externalId)) {
