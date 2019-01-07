@@ -18,11 +18,8 @@ require_once __DIR__ . '/../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\BasicRequest');
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
-//
 // Alaress_Image_Cache_Portrait needs to know if someone is logged in.
 session_start();
-
-
 
 /* If current user is not available return permission denied */
 if(! ($_SESSION['user'] instanceof Schoolbox\User)) {
@@ -31,7 +28,7 @@ if(! ($_SESSION['user'] instanceof Schoolbox\User)) {
 
 try {
     $image = new Image\Processor\Standard(
-        new Image\Cache\Portrait(trim($_GET['userId']), $_GET['size'], $_SESSION['user']),
+        new Image\Cache\Portrait($_GET['userId'], $_GET['size'], $_SESSION['user']),
         new Image\Transformation\Portrait(),
         new Imagine\Filetype\Factory(),
         new Imagine\Processor\Strategy\Factory()
@@ -48,15 +45,9 @@ catch (\RuntimeException $e) {
 catch (\InvalidArgumentException $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
 }
-/* Invalid file type
- */
-catch (\DomainException $e) {
-    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
-}
 /* All other exceptions
  * BadMethodCallException
  */
 catch (Exception $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 500);
 }
-

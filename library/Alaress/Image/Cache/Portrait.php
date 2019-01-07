@@ -1,18 +1,16 @@
 <?php
 /**
  * Alaress\Image\Cache\Portrait
+ *
  * Load user's portraits from the external database.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Alaress\Image\Cache;
 
-use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
-use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use External_User;
 use Group;
 use Schoolbox\Config\Loader;
@@ -20,7 +18,6 @@ use Schoolbox\File\Exception;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use League\Flysystem as Fly;
 
 class Portrait extends BrokenFS
 {
@@ -29,7 +26,7 @@ class Portrait extends BrokenFS
     private $externalUserId = -1;
 
     /** @var External_User */
-    private $externalHandler = null;
+    private $externalHandler;
 
     /** @var UserMapper */
     private $userMapper;
@@ -40,31 +37,43 @@ class Portrait extends BrokenFS
     /** @var IConfigLoader */
     private $conf;
 
+
     /**
      * Portrait constructor.
      *
      * @param string $externalId
      * @param string $key
-     * @param User $sessionUser
-     * @throws SchoolboxAccessDeniedException
+     * @param User   $sessionUser
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \Exception
      */
-    public function __construct($externalId, $key, User $sessionUser)
+    public function __construct(string $externalId, string $key, User $sessionUser)
     {
-        //var_dump(realpath( \Config::get('portrait_dir') ));exit;
+        /* A value for $externalId would be useful
+         */
+        $trimmedExternalId = trim($externalId);
 
-        $this->setConfig(new Loader());
-        $this->setSessionUser($sessionUser);
+        if ('' === $trimmedExternalId) {
+            throw new \InvalidArgumentException('Portrait not found');
+        }
+
+        /* See if a path can be generated for this user
+         */
         $this->setExternalHandler(new External_User());
-        $this->setUserMapper(UserMapper::getInstance());
-        $this->setExternalUserId($externalId);
-
+        $this->setExternalUserId($trimmedExternalId);
 
         $portraitPath = $this->getExternalHandler()->getPortrait($this->getExternalUserId());
 
         if (!$portraitPath) {
             throw new \InvalidArgumentException('Portrait not found');
         }
+
+        /* Continue trying to render image
+         */
+        $this->setConfig(new Loader());
+        $this->setSessionUser($sessionUser);
+        $this->setUserMapper(UserMapper::getInstance());
 
         $portraitDir = realpath($this->getConfig()->get('portrait_dir'));
 
