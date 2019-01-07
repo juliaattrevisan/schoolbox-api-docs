@@ -57,10 +57,11 @@ class Module extends BaseModule
          */
         $permission =
             new Rule\LazyCallback(function () {
-                return new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
+                return new Rule\All(
+                    new Rule\IsLoggedIn(),
                     new Rule\Any(
+                        new Rule\IsSuperuser(),
+                        new Rule\HasRole(Role::STAFF),
                         new Rule\All(
                             new Rule\IsTrue($this->getConfig()->get('academic_reports_available_to_students')),
                             new Rule\IsUser('studentId')
