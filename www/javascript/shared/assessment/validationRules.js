@@ -87,13 +87,17 @@ function initDynamicValidationTriggers() {
     $("[data-criterion-name]").change(function() {
         var $indicatorCheckbox = $(this);
        if ($indicatorCheckbox.is(":checked")) {
-           $("[data-descriptor]").each(function() {
-               $(this).find("label.error").show();
-           });
+           // Show any errors for the indicator itself
+           $indicatorCheckbox.prev("label.error").show();
+
+           // Show any errors for descriptors within the indicator
+           $indicatorCheckbox.parents("[data-group]").find("[data-descriptor] label.error").show();
        } else {
-           $("[data-descriptor]").each(function() {
-               $(this).find("label.error").hide();
-           });
+           // Hide any errors for the indicator itself
+           $indicatorCheckbox.prev("label.error").hide();
+
+           // Hide any errors for descriptors within the indicator
+           $indicatorCheckbox.parents("[data-group]").find("[data-descriptor] label.error").hide();
        }
     });
 }
@@ -122,6 +126,16 @@ function attachValidationRules() {
     // Validate all rows of descriptors
     $("[data-criterion-name]").each(function() {
         $(this).rules("add", { descriptorsAreMonotonic: true });
+    });
+
+    $("[data-group-max-value]").each(function() {
+        $(this).rules("add", {
+            required: true,
+            number: true,
+            messages: {
+                number: "Please enter a numeric value"
+            }
+        });
     });
 }
 

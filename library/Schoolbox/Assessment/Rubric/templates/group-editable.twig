@@ -57,6 +57,10 @@
 <tr data-group="{{ groupId }}" data-group-max-value-row {% if not showGroupMaxValue %}class="hide"{% endif %}>
     <th class="rb-group-summary" data-group-max-value-cell colspan="{{ rubricGrid.levels|length + 3 }}">
         <label for="{{ groupInput }}[maxValue]">Maximum points for {{ locale.translate('rubricGroup') }}</label>
+        {# This is a tel input rather than number because in Firefox and Chrome, scrolling while the number field is focused changes the value.
+           We found this to be a significant UX issue, and disabling it is kinda gross: https://stackoverflow.com/questions/9712295/disable-scrolling-on-input-type-number
+           Number inputs also do not consistently restrict entry to numeric values across browsers: https://bugzilla.mozilla.org/show_bug.cgi?id=1398528
+           #}
         <input type="tel"
                value="{{ rubricGrid.retrieveCapabilityUsage(group).maxValue }}"
                name="{{ groupInput }}[maxValue]"
