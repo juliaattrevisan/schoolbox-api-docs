@@ -74,11 +74,11 @@
         {# Hidden form input for this tile - used in sorting #}
         <input type="hidden" name="tile[]" value="{{ tile.id|e('html_attr') }}" />
         <a href="{{ routeLookup('tile.delete:post', {id: tile.id}) }}"
-           class="button icon-delete no-text right"
+           class="button icon-delete right"
            data-role="delete"
            title="Delete"></a>
         <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}"
-           class="button icon-modify no-text right"
+           class="button icon-modify right"
            title="Modify"></a>
     </div>
     {% endif %}

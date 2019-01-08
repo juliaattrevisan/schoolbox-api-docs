@@ -139,10 +139,10 @@
                 reorderFeedback.toastActivate({text: 'Saving order...'});
                 $.post(form.attr('action'), form.serializeArray())
                     .done(function() {
-                        reorderFeedback.toastTimeout({text: 'Saved!', 'css': 'success'});
+                        reorderFeedback.toastTimeout({text: 'Saved!', css: 'success'});
                     })
                     .fail(function() {
-                        reorderFeedback.toastTimeout({text: 'Save Failed!', 'css': 'alert'});
+                        reorderFeedback.toastTimeout({text: 'Save Failed!', css: 'alert'});
                     })
             }
         });
@@ -159,7 +159,7 @@
                 confirmEvent: function() {
                     // Add some sort of deleting animation
                     deletedTile.addClass('marked-for-delete');
-                    reorderFeedback.toastActivate({text: 'Deleting...', 'css': 'alert'});
+                    reorderFeedback.toastActivate({text: 'Deleting...', css: 'alert'});
                     // Send delete request
                     $.post(element.attr('href'))
                         .done(function() {
@@ -169,7 +169,7 @@
                             })
                         })
                         .fail(function() {
-                            reorderFeedback.toastTimeout({text: 'Delete Failed!', 'css': 'alert'});
+                            reorderFeedback.toastTimeout({text: 'Delete Failed!', css: 'alert'});
                             deletedTile.removeClass('marked-for-delete');
                         })
                 }
