@@ -119,19 +119,7 @@
 
 <div class="empty-state" id="visibility-empty">
     <i class="icon-locked"></i>
-    <p>There are no visibility rules on this record, it will only be visible by {{ name }} and the {{ locale.pastoral }} moderators.</p>
-    <p>
-        To grant access to other users add a
-        <a href="#" data-reveal-id="modal-role" title="Add Role">role</a>
-        {%- if allowIndividual -%}
-            {%- if groups | length == 0 %} or{% else %},{% endif %}
-            <a href="#" data-user-search="{{ guid }}" title="Add User">user</a>
-        {%- endif -%}
-        {% if groups | length > 0 %}
-            or <a href="#" data-reveal-id="modal-group" title="Add Pastoral Group">pastoral group</a>
-        {%- endif %}
-        visibility rule to this record.
-    </p>
+    {% include '@pastoral/modify_section_visibility_empty_state.twig' %}
 </div>
 
 
