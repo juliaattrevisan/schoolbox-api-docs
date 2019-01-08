@@ -349,7 +349,7 @@ if(typeof window.location.origin == 'undefined') {
         // if the modal already exists, destroy it
         this.destroy();
 
-        singletonModal = $('<div data-reveal class="reveal-modal file-picker" />')
+        singletonModal = $('<div data-reveal class="reveal-modal file-picker" id="file-picker" />')
             .data('content', data)
             .data('rtn', this);
 

@@ -674,7 +674,16 @@
 
         // Open modal
         $customiseModal.foundation('reveal', 'open', {
-            clearData: true
+            clearData: false,
+            multiple_opened : true,
+            opened: function () {
+                $('#participant-customise-modal').css('z-index', '10000');
+                $('.cke_dialog_background_cover').css('display', 'block').removeClass('hide');
+            },
+            closed: function () {
+                $('#participant-customise-modal').css('z-index', '1000');
+                $('.cke_dialog_background_cover').css('display', 'none').addClass('hide');
+            }
         });
     }
 
