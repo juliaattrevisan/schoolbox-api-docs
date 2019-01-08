@@ -20,7 +20,7 @@
 
 {% block rssLink %}
     {% if rssRoute and topic %}
-        <li id="news-rss-link"><a :href="link" class='icon-rss' title="Download RSS feed for this topic" id="rss">RSS Link</a></li>
+        <span id="news-rss-link"><a :href="link" class='icon-rss' title="Download RSS feed for this topic" id="rss"></a></span>
     {% endif %}
 {% endblock %}
 
