@@ -202,7 +202,8 @@
                                     {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] %}
                                     {% set publishedMark      = marks.published %}
                                     {% set draftMark          = marks.draft %}
-                                    {% if marks.published is defined %}
+
+                                    {% if marks.published is defined or marks.draft is defined %}
                                         {% if marks.draft is defined %}
                                             {% set indicator = 'pending' %}
                                             {% set notchTitle = labelPubMarkDraftPending %}
