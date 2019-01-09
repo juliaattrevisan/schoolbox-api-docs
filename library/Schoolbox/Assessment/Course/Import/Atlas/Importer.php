@@ -19,6 +19,10 @@ use Schoolbox\Assessment\Rubric\Competency\Level;
 use Schoolbox\Assessment\Rubric\Criteria\Criterion;
 use Schoolbox\Assessment\Rubric\Criteria\Group;
 use Schoolbox\Assessment\Rubric\Descriptor;
+use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
+use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Curriculum\Node\Model as Node;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -391,6 +395,73 @@ class Importer
 
         // Build a rubric for this due work
         if (\count($assessment->getStandards())) {
+
+            // Pass 1: build the rowset, adding capabilities+indicators as required
+            foreach ($assessment->getStandards() as $standard) {
+                $groupDataModel = $this->rubricGroupMapper->findOrCreateOneForFolderByName(
+                    $unitSpec->getFolder()->getId(),
+                    $standard->getTitle(),
+                    false
+                );
+
+                // Create node and re-save
+                $standardNode = $this->findOrCreateCurriculumNodeFromStandard($standard, $standardsNode);
+                if ($standardNode) {
+                    $groupDataModel->getCurriculumNodes()->add($standardNode);
+                    $this->rubricGroupMapper->save($groupDataModel);
+                }
+
+                // Add a criterion with an empty name for now, I guess
+                $this->rubricCriterionMapper->findOrCreateOneForFolderByKey(
+                    $unitSpec->getFolder()->getId(),
+                    '',
+                    $standard->getTitle(),
+                    false
+                );
+            }
+
+
+            // Pass 2: load the created rowset, and build the actual rubric grid
+            $rubricMapper = new Rubric\RubricMapper();
+            $rowSet       = $rubricMapper->retrieveRowSet($unitSpec->getFolder(), false);
+            $grid         = new Grid($dueWork, $rowSet);
+
+            // Dummy data: I have nothing better to put here
+            $grid->getLevels()->add(
+                (new \Schoolbox\Assessment\Rubric\Grid\Level())->setName('Level')
+            );
+
+            foreach ($assessment->getStandards() as $standard) {
+                $capabilityName = $standard->getTitle();
+                $indicatorName  = '';
+
+                foreach ($grid->getRowSet()->getCapabilities() as $capability) {
+                    if ($capabilityName === $capability->getName()) {
+                        // Use this capability
+                        $capabilityUsage = new CapabilityUsage($capability);
+                        foreach ($capability->getIndicators() as $indicator) {
+                            if ($indicatorName === $indicator->getName()) {
+                                // Use this indicator
+                                $indicatorUsage = new IndicatorUsage($indicator);
+                                $indicatorUsage->getDescriptors()->add(
+                                    (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
+                                        ->setDescription('')
+                                        ->setMinValue(1.0)
+                                        ->setMaxValue(1.0)
+                                );
+                                $capabilityUsage->getIndicatorUsages()->add($indicatorUsage);
+                                break;
+                            }
+                        }
+                        $grid->getCapabilityUsages()->add($capabilityUsage);
+                        break;
+                    }
+                }
+            }
+
+            $rubricMapper->persistGrid($grid, null);
+
+
             $rubric = new Rubric\Rubric();
 
 
