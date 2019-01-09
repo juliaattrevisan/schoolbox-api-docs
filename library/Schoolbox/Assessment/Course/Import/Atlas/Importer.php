@@ -379,8 +379,7 @@ class Importer
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $hasStandards = \count($assessment->getStandards()) > 0;
-        $dueWork      = new DueWork();
+        $dueWork = new DueWork();
         $dueWork
             ->setContext($unitSpec)
             ->setTitle($assessment->getTitle())
@@ -388,16 +387,14 @@ class Importer
             ->setWeight(0)
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE)
             ->setCreator($this->currentUser)
-            ->setMarkScheme(new Percentage())
-            ->setUseRubric($hasStandards);
+            ->setMarkScheme(new Percentage());
 
         $dueWorkNode = $this->findOrCreateCurriculumNodeFromAssessment($assessment, $unitSpecNode);
         $dueWork->getCurriculumNodes()->add($dueWorkNode);
-        $this->assessmentDataSource->save($dueWork);
 
 
         // Build a rubric for this due work, if it has standards
-        if ($hasStandards) {
+        if (\count($assessment->getStandards())) {
 
             // Pass 1: build the rowset, adding capabilities+indicators as required
             foreach ($assessment->getStandards() as $standard) {
@@ -467,7 +464,9 @@ class Importer
                 }
             }
 
-            $rubricMapper->persistGrid($grid, null);
+            $dueWork
+                ->setUseRubric(true)
+                ->setRubricGrid($grid);
 
 
 //            $rubric = new Rubric\Rubric();
@@ -525,6 +524,7 @@ class Importer
 //                ->setRubric($rubric);
         }
 
+        $this->assessmentDataSource->save($dueWork);
         return $dueWork;
     }
 
