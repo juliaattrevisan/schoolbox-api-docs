@@ -394,20 +394,22 @@ class DataSource
         // Use cached list of users for a folder
         if (!isset($this->cacheForFolder[$folder->getId()])) {
             // Cache isn't set - populate
+            if(count($folder->getCodes()) > 0) {
+                // Class members: convert to list of users
+                $classCodes = $this->externalDb->getStudents($folder->getCodeString());
+                if (!empty($classCodes)) {
+                    $students = $students->merge($this->userMapper->findByColumn('synergy_id', array_column($classCodes, 'synergy_id')));
+                }
 
-            // Class members: convert to list of users
-            $classCodes = $this->externalDb->getStudents($folder->getCodeString());
-            if (!empty($classCodes)) {
-                $students = $students->merge($this->userMapper->findByColumn('synergy_id', array_column($classCodes, 'synergy_id')));
+                // I want to search for ALL read-level users, not just students
+                // Deliberately don't search external DB, I have already done that
+                $students = $students->mergeUnique(
+                    $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, true),
+                    'id'
+                );
             }
-
-            // I want to search for ALL read-level users, not just students
-            // Deliberately don't search external DB, I have already done that
-            $students                               = $students->mergeUnique(
-                $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, true),
-                'id'
-            );
             $this->cacheForFolder[$folder->getId()] = $students;
+
         }
         return $this->cacheForFolder[$folder->getId()];
     }
