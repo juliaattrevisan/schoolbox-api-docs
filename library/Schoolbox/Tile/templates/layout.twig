@@ -137,12 +137,12 @@
             stop: function(event, ui) {
                 // save this form
                 reorderFeedback.toastActivate({text: 'Saving order...'});
-                $.post(form.attr('action'), form.serializeArray())
+                $.post(form.attr('action'), form.serializeArray(), null, 'json')
                     .done(function() {
-                        reorderFeedback.toastTimeout({text: 'Saved!', 'css': 'success'});
+                        reorderFeedback.toastTimeout({text: 'Saved', css: 'success'});
                     })
                     .fail(function() {
-                        reorderFeedback.toastTimeout({text: 'Save Failed!', 'css': 'alert'});
+                        reorderFeedback.toastTimeout({text: 'Save Failed', css: 'alert'});
                     })
             }
         });
@@ -159,17 +159,17 @@
                 confirmEvent: function() {
                     // Add some sort of deleting animation
                     deletedTile.addClass('marked-for-delete');
-                    reorderFeedback.toastActivate({text: 'Deleting...', 'css': 'alert'});
+                    reorderFeedback.toastActivate({text: 'Deleting...'});
                     // Send delete request
-                    $.post(element.attr('href'))
+                    $.post(element.attr('href'), null, null, 'json')
                         .done(function() {
-                            reorderFeedback.toastTimeout({text: 'Deleted!'});
+                            reorderFeedback.toastTimeout({text: 'Deleted', css: 'success'});
                             deletedTile.fadeOut('slow', function() {
                                 deletedTile.remove();
                             })
                         })
                         .fail(function() {
-                            reorderFeedback.toastTimeout({text: 'Delete Failed!', 'css': 'alert'});
+                            reorderFeedback.toastTimeout({text: 'Delete Failed', css: 'alert'});
                             deletedTile.removeClass('marked-for-delete');
                         })
                 }

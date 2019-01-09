@@ -269,8 +269,13 @@ ul.tileList {
         }
     }
 
-    a{
-        overflow: hidden;
+    .button {
+        width: $global-button-height;
+        line-height: 1.5;
+        &:before {
+            float: none;
+            padding-right: 0;
+        }
     }
 }
 
