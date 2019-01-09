@@ -13,6 +13,9 @@ class Alaress_Twitter_Search
     private $user = '';
     private $keywords = '';
     private $tweets = array();
+
+    // This is just a default and is customised on a per-component basis in the component controllers
+    // by setting it to whatever the user supplied in the component config
     private $maxTweets = 20;
 
     /** @var Alaress_Twitter_Filter_Search */
