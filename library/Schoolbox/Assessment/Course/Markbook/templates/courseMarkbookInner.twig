@@ -200,17 +200,15 @@
                                     {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: aImpl.id, studentId: student.id}) %}
                                     {% set comment            = studentComments[courseImpl.id][student.id][assessment.id] %}
                                     {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] %}
-                                    {% set publishedMark      = marks.published %}
-                                    {% set draftMark          = marks.draft %}
-
-                                    {% if marks.published is defined or marks.draft is defined %}
-                                        {% if marks.draft is defined %}
-                                            {% set indicator = 'pending' %}
-                                            {% set notchTitle = labelPubMarkDraftPending %}
-                                        {% else %}
-                                            {% set indicator = 'published' %}
-                                            {% set notchTitle = labelPublishedMark %}
-                                        {% endif %}
+                                    {% set publishedMark      = marks.published is defined ?: false %}
+                                    {% set draftMark          = marks.draft is defined ?: false %}
+                                    
+                                    {% if publishedMark %}
+                                        {% set indicator = 'published' %}
+                                        {% set notchTitle = labelPublishedMark %}
+                                    {% elseif draftMark %}
+                                        {% set indicator = 'pending' %}
+                                        {% set notchTitle = labelPubMarkDraftPending %}
                                     {% else %}
                                         {% set indicator = 'none' %}
                                         {% set notchTitle = labelNoPublishedMark %}
