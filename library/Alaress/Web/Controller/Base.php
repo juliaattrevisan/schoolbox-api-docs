@@ -535,6 +535,10 @@ abstract class Base {
         if (!$this->sentry instanceof Raven_Client) {
             return false;
         }
+
+        // Suppress this inspection:
+        // Sentry doesn't have proper typedefs anyway so it doesn't matter
+        /** @noinspection PhpParamsInspection */
         $this->sentry->captureException($e, $data);
         return true;
     }
