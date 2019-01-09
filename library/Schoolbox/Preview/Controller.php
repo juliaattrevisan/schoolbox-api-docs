@@ -8,6 +8,7 @@
 namespace Schoolbox\Preview;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Cyberhound\Url\Translator;
 
 class Controller extends Base
 {
@@ -74,13 +75,21 @@ class Controller extends Base
     /**
      * Test method
      * @param array $params
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function preview($params)
     {
-        /* Regurgitate it
-         */
 
-        $previewFragment = (new Factory($this->getRouter()))->urlFragment($params['encodedUrl'], $this->getUser());
+        /* Test safeness of requested url via Cyberhound blacklist
+         */
+        $translator = new Translator(
+            $this->getSession()->get('ip'),
+            $this->getConfigLoader()->get('cyberhound_api_url'),
+            $this->getConfigLoader()->get('cyberhound_api_shared_key')
+        );
+
+        $previewFragment = (new Factory($translator))->urlFragment($params['encodedUrl'], $this->getUser());
 
         if ($previewFragment['type'] === 'inline') {
             $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])
@@ -95,6 +104,5 @@ class Controller extends Base
                 'data' => $previewFragment,
             ]
         );
-
     }
 }
