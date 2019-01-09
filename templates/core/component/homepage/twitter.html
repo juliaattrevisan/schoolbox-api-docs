@@ -58,7 +58,22 @@
                             <p>{TWEET_TEXT}</p>
 
                             <!-- BEGIN tweet_media -->
-                            <p><img src="{TWEET_MEDIA_URL}:small" /></p>
+                                <!-- BEGIN tweet_media_thumbnails -->
+                                    <div class="tweet-image-thumbnails row">
+                                        <div class="tweet-thumbnail small-4 columns" style="background-image: url({TWEET_MEDIA_URL}); ">
+                                            <!-- BEGIN media_video -->
+                                                <a href="{TWEET_MEDIA_URL}" title="Play video">
+                                                    <i class="icon-video alert size-64"></i>
+                                                </a>
+                                            <!-- END media_video -->
+
+                                            <!-- BEGIN media_photo -->
+                                                <a class="image-popup-vertical-fit" href="{TWEET_MEDIA_URL}" rel="lightbox[{TWEET_ID}-{COMPONENT_INSTANCE_ID}]">
+                                                </a>
+                                            <!-- END media_photo -->
+                                        </div>
+                                    </div>
+                                <!-- END tweet_media_thumbnails -->
                             <!-- END tweet_media -->
                         </article>
                     </li>
@@ -76,4 +91,3 @@
         </div>
     </div>
 </div>
-

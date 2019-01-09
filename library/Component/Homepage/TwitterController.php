@@ -28,6 +28,9 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
         $this->setBlock('twitter_feed', 'tweet', 'tweet_block');
         $this->setBlock('tweet', 'tweet_media', 'tweet_media_block');
+        $this->setBlock('tweet_media', 'tweet_media_thumbnails', 'tweet_media_thumbnails_block');
+        $this->setBlock('tweet_media_thumbnails', 'media_photo', 'media_photo_block');
+        $this->setBlock('tweet_media_thumbnails', 'media_video', 'media_video_block');
         $this->setVar('tweet_block', '');
 
         $emptyState = false;
@@ -123,23 +126,35 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
                 $avatarUrl = UriFactory::factory($currentTweet['avatar']);
                 $avatarUrl->setScheme(null);
                 $this->setVar([
-                    'TWEET_TEXT'     => Scrub::html($currentTweet['text']),
+                    'TWEET_TEXT'     => Scrub::html($currentTweet['full_text']),
                     'TWEET_ACTION'   => Scrub::text($currentTweet['action']),
                     'TWEET_DATE'     => $date->getShort(),
                     'TWEET_AUTHOR'   => Scrub::text($currentTweet['author']),
                     'TWEET_FULLNAME' => Scrub::text($currentTweet['fullname']),
-                    'TWEET_AVATAR'   => Scrub::text($avatarUrl)
+                    'TWEET_AVATAR'   => Scrub::text($avatarUrl),
+                    'TWEET_ID'       => Scrub::text($currentTweet['id'])
                 ]);
 
                 if (is_array($currentTweet['media']) && count($currentTweet['media'])) {
-
                     foreach ($currentTweet['media'] as $currentMedia) {
-                        $this->setVar('TWEET_MEDIA_URL', $currentMedia->media_url_https);
-                        $this->parse('tweet_media_block', 'tweet_media', true);
+                        $photoURL = $currentMedia->media_url_https;
+                        $videoURL = $currentMedia->video_info->variants[2]->url;
+                        if ($currentMedia->type === 'video') {
+                            $this->setVar('TWEET_MEDIA_URL', $videoURL);
+                            $this->parse('media_video_block', 'media_video');
+                            $this->setVar('media_photo_block', '');
+                        } else {
+                            $this->setVar('TWEET_MEDIA_URL', $photoURL);
+                            $this->parse('media_photo_block', 'media_photo');
+                            $this->setVar('media_video_block', '');
+                        }
+                        $this->parse('tweet_media_thumbnails_block', 'tweet_media_thumbnails', true);
                     }
+                    $this->parse('tweet_media_block', 'tweet_media', true);
 
                 } else {
                     $this->setVar('tweet_media_block', '');
+                    $this->setVar('tweet_media_thumbnails_block', '');
                 }
 
                 $this->parse('tweet_block', 'tweet', true);
@@ -147,6 +162,7 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
                 /* Clear children after parsing out the parent
                  */
                 $this->setVar('tweet_media_block', '');
+                $this->setVar('tweet_media_thumbnails_block', '');
             }
 
             $this->parse('twitter_feed_block', 'twitter_feed');

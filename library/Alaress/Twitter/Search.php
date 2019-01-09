@@ -9,11 +9,13 @@
  */
 class Alaress_Twitter_Search
 {
-    private $searchPrefix = 'https://api.twitter.com/1.1/search/tweets.json?q=';
+    private $apiUrl = 'https://api.twitter.com/1.1/search/tweets.json?tweet_mode=extended';
     private $user = '';
-    private $searchUrl = '';
     private $keywords = '';
     private $tweets = array();
+
+    // This is just a default and is customised on a per-component basis in the component controllers
+    // by setting it to whatever the user supplied in the component config
     private $maxTweets = 20;
 
     /** @var Alaress_Twitter_Filter_Search */
@@ -56,7 +58,7 @@ class Alaress_Twitter_Search
 
         $search .= urlencode(trim($this->getKeywords()));
 
-        return array('q' => $search);
+        return ['q' => $search, 'count' => 100];
     }
 
     /**
@@ -65,13 +67,11 @@ class Alaress_Twitter_Search
     public function load()
     {
         $processed = array();
-        $resource = 'https://api.twitter.com/1.1/search/tweets.json';
         $params = $this->generateParameters();
 
         if (!empty($params)) {
             $cache = new Alaress_Twitter_Cache();
-            $cache->init($resource, $params);
-
+            $cache->init($this->apiUrl, $params);
             $all_tweets = $cache->load();
 
             if (is_array($all_tweets)) {
@@ -85,25 +85,35 @@ class Alaress_Twitter_Search
                         continue;
                     }
 
+                    // The Twitter API provides a filter that is supposed to hide sensitive tweets, filter:safe
+                    // (see https://developer.twitter.com/en/docs/tweets/search/guides/standard-operators)
+                    // Unfortunately this does not filter out quoted sensitive tweets, so to be certain we have to manually filter them out as below.
+                    $tweetText = isset($result->retweeted_status) ?
+                        $this->getFilter()->filterText($result->retweeted_status->full_text) :
+                        $this->getFilter()->filterText($result->full_text);
+
+                    // Text is in a different variable now; need to change it to full_text
                     if (isset($result->retweeted_status)) {
                         $processed[] = array(
-                            'text'     => $this->getFilter()->filterText($result->retweeted_status->text),
+                            'full_text'     => $tweetText,
                             'action'   => 'Retweeted by ' . $result->user->name,
                             'date'     => $result->created_at,
                             'fullname' => $result->retweeted_status->user->name,
                             'author'   => $result->retweeted_status->user->screen_name,
                             'avatar'   => str_replace('_normal', '_bigger', $result->retweeted_status->user->profile_image_url),
-                            'media'    => $result->retweeted_status->entities->media,
+                            'media'    => $result->retweeted_status->extended_entities->media,
+                            'id'       => $result->id
                         );
                     } else {
                         $processed[] = array(
-                            'text'     => $this->getFilter()->filterText($result->text),
+                            'full_text'     => $tweetText,
                             'action'   => 'Tweeted',
                             'date'     => $result->created_at,
                             'fullname' => $result->user->name,
                             'author'   => $result->user->screen_name,
                             'avatar'   => str_replace('_normal', '_bigger', $result->user->profile_image_url),
-                            'media'    => $result->entities->media,
+                            'media'    => $result->extended_entities->media,
+                            'id'       => $result->id
                         );
                     }
                 }
@@ -161,26 +171,6 @@ class Alaress_Twitter_Search
     }
 
     /**
-     * Set search url
-     *
-     * @param $searchUrl
-     */
-    protected function setSearchUrl($searchUrl)
-    {
-        $this->searchUrl = $searchUrl;
-    }
-
-    /**
-     * Get search url
-     *
-     * @return string
-     */
-    protected function getSearchUrl()
-    {
-        return $this->searchUrl;
-    }
-
-    /**
      * Set user
      *
      * @param $user
@@ -223,16 +213,6 @@ class Alaress_Twitter_Search
     protected function getMaxTweets()
     {
         return $this->maxTweets;
-    }
-
-    /**
-     * Get search prefix
-     *
-     * @return string
-     */
-    protected function getSearchPrefix()
-    {
-        return $this->searchPrefix;
     }
 
     /**
