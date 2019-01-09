@@ -86,7 +86,7 @@ Data:
             <div class="column island small-12">
                 <h2 class="subheader">Comments by {{ aasData.data[unitSpecId].commentBy.fullname }}</h2>
                 <section class="content">
-                    <p>{{ aasData.data[unitSpecId].comment }}</p>
+                    <p>{{ aasData.data[unitSpecId].comment | nl2br }}</p>
                 </section>
             </div>
         {% endif %}
