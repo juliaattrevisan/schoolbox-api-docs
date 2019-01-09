@@ -1,3 +1,7 @@
+DELETE u1 FROM sportsfixtures_team_participantuser u1
+  JOIN sportsfixtures_team_participantuser u2
+    ON u1.id < u2.id AND u1.match_id = u2.match_id AND u1.team_id = u2.team_id AND u1.user_id = u2.user_id;
+
 ALTER TABLE `sportsfixtures_match`
   ADD INDEX `fk_sportsfixtures_match_away_school_idx` (`away_school_id` ASC),
   ADD INDEX `fk_sportsfixtures_match_home_school_idx` (`home_school_id` ASC),
