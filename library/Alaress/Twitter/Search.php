@@ -11,7 +11,6 @@ class Alaress_Twitter_Search
 {
     private $apiUrl = 'https://api.twitter.com/1.1/search/tweets.json?tweet_mode=extended';
     private $user = '';
-    private $searchUrl = '';
     private $keywords = '';
     private $tweets = array();
     private $maxTweets = 20;
@@ -166,26 +165,6 @@ class Alaress_Twitter_Search
     protected function getKeywords()
     {
         return $this->keywords;
-    }
-
-    /**
-     * Set search url
-     *
-     * @param $searchUrl
-     */
-    protected function setSearchUrl($searchUrl)
-    {
-        $this->searchUrl = $searchUrl;
-    }
-
-    /**
-     * Get search url
-     *
-     * @return string
-     */
-    protected function getSearchUrl()
-    {
-        return $this->searchUrl;
     }
 
     /**
