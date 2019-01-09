@@ -525,16 +525,20 @@ abstract class Base {
      * Method signature is intentionally vague to abstract away exception reporting implementation
      * in the event we want to switch it out in the future.
      *
-     * @param \Exception $e    The exception you wish to report
+     * @param \Throwable $e    The exception you wish to report
      * @param array|null $data Any extra data you wish to include in report
      * @return bool
      */
-    protected function captureException(\Exception $e, array $data = null): bool
+    protected function captureException(\Throwable $e, array $data = null): bool
     {
         // Not installed?
         if (!$this->sentry instanceof Raven_Client) {
             return false;
         }
+
+        // Suppress this inspection:
+        // Sentry doesn't have proper typedefs anyway so it doesn't matter
+        /** @noinspection PhpParamsInspection */
         $this->sentry->captureException($e, $data);
         return true;
     }
