@@ -83,6 +83,9 @@ class Alaress_Twitter_Search
                         continue;
                     }
 
+                    // The Twitter API provides a filter that is supposed to hide sensitive tweets, filter:safe
+                    // (see https://developer.twitter.com/en/docs/tweets/search/guides/standard-operators)
+                    // Unfortunately this does not filter out quoted sensitive tweets, so to be certain we have to manually filter them out as below.
                     $tweetText = isset($result->retweeted_status) ?
                         $this->getFilter()->filterText($result->retweeted_status->full_text) :
                         $this->getFilter()->filterText($result->full_text);
