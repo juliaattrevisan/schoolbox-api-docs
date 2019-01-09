@@ -379,7 +379,8 @@ class Importer
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $dueWork = new DueWork();
+        $hasStandards = \count($assessment->getStandards()) > 0;
+        $dueWork      = new DueWork();
         $dueWork
             ->setContext($unitSpec)
             ->setTitle($assessment->getTitle())
@@ -387,15 +388,16 @@ class Importer
             ->setWeight(0)
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE)
             ->setCreator($this->currentUser)
-            ->setMarkScheme(new Percentage());
+            ->setMarkScheme(new Percentage())
+            ->setUseRubric($hasStandards);
 
         $dueWorkNode = $this->findOrCreateCurriculumNodeFromAssessment($assessment, $unitSpecNode);
         $dueWork->getCurriculumNodes()->add($dueWorkNode);
         $this->assessmentDataSource->save($dueWork);
 
 
-        // Build a rubric for this due work
-        if (\count($assessment->getStandards())) {
+        // Build a rubric for this due work, if it has standards
+        if ($hasStandards) {
 
             // Pass 1: build the rowset, adding capabilities+indicators as required
             foreach ($assessment->getStandards() as $standard) {
@@ -422,20 +424,25 @@ class Importer
             }
 
 
-            // Pass 2: load the created rowset, and build the actual rubric grid
+            // Build the rowset and rubric grid for this due work
             $rubricMapper = new Rubric\RubricMapper();
             $rowSet       = $rubricMapper->retrieveRowSet($unitSpec->getFolder(), false);
             $grid         = new Grid($dueWork, $rowSet);
 
-            // Dummy data: I have nothing better to put here
+
+            // Dummy level data: I have nothing better to put here
             $grid->getLevels()->add(
                 (new \Schoolbox\Assessment\Rubric\Grid\Level())->setName('Level')
             );
 
+
+            // Pass 2: load the created rowset, and build the actual rubric grid
             foreach ($assessment->getStandards() as $standard) {
                 $capabilityName = $standard->getTitle();
                 $indicatorName  = '';
 
+                // Need to iterate each capability, and indicator within,
+                // to get a match
                 foreach ($grid->getRowSet()->getCapabilities() as $capability) {
                     if ($capabilityName === $capability->getName()) {
                         // Use this capability
