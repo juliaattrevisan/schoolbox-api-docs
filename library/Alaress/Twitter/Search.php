@@ -9,7 +9,7 @@
  */
 class Alaress_Twitter_Search
 {
-    private $searchPrefix = 'https://api.twitter.com/1.1/search/tweets.json?q=';
+    private $apiUrl = 'https://api.twitter.com/1.1/search/tweets.json?tweet_mode=extended';
     private $user = '';
     private $searchUrl = '';
     private $keywords = '';
@@ -65,12 +65,11 @@ class Alaress_Twitter_Search
     public function load()
     {
         $processed = array();
-        $resource = 'https://api.twitter.com/1.1/search/tweets.json?tweet_mode=extended';
         $params = $this->generateParameters();
 
         if (!empty($params)) {
             $cache = new Alaress_Twitter_Cache();
-            $cache->init($resource, $params);
+            $cache->init($this->apiUrl, $params);
             $all_tweets = $cache->load();
 
             if (is_array($all_tweets)) {
@@ -229,16 +228,6 @@ class Alaress_Twitter_Search
     protected function getMaxTweets()
     {
         return $this->maxTweets;
-    }
-
-    /**
-     * Get search prefix
-     *
-     * @return string
-     */
-    protected function getSearchPrefix()
-    {
-        return $this->searchPrefix;
     }
 
     /**
