@@ -56,7 +56,7 @@ class Alaress_Twitter_Search
 
         $search .= urlencode(trim($this->getKeywords()));
 
-        return array('q' => $search);
+        return ['q' => $search, 'count' => 100];
     }
 
     /**
