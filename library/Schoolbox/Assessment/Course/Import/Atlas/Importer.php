@@ -391,6 +391,7 @@ class Importer
 
         $dueWorkNode = $this->findOrCreateCurriculumNodeFromAssessment($assessment, $unitSpecNode);
         $dueWork->getCurriculumNodes()->add($dueWorkNode);
+        $this->assessmentDataSource->save($dueWork);
 
 
         // Build a rubric for this due work
@@ -462,62 +463,61 @@ class Importer
             $rubricMapper->persistGrid($grid, null);
 
 
-            $rubric = new Rubric\Rubric();
-
-
-            // Dummy data: I have nothing better to put here
-            $level = new Level();
-            $level->setName('Level');
-            $rubric->putLevel($level);
-
-
-            // I can only create groups, as there's no sub-standards.
-            // Provided there's mark-by-group without needing a criterion,
-            // this should be okay.
-            foreach ($assessment->getStandards() as $standard) {
-                $groupDataModel = $this->rubricGroupMapper->findOrCreateOneForFolderByName(
-                    $unitSpec->getFolder()->getId(),
-                    $standard->getTitle(),
-                    false
-                );
-
-                // Create node and re-save
-                $standardNode = $this->findOrCreateCurriculumNodeFromStandard($standard, $standardsNode);
-                if ($standardNode) {
-                    $groupDataModel->getCurriculumNodes()->add($standardNode);
-                    $this->rubricGroupMapper->save($groupDataModel);
-                }
-
-                // Add that rubric group
-                $group = new Group($groupDataModel->getId(), $groupDataModel->getName());
-                $rubric->putGroup($group);
-
-                // Add a criterion with an empty name for now, I guess
-                $criterionDataModel = $this->rubricCriterionMapper->findOrCreateOneForFolderByKey(
-                    $unitSpec->getFolder()->getId(),
-                    '',
-                    $standard->getTitle(),
-                    false
-                );
-                $criterion = new Criterion($criterionDataModel->getId(), $criterionDataModel->getName());
-                $rubric->putCriterion($group, $criterion);
-
-                // And an empty descriptor for that level?
-                $rubric->putDescriptor(
-                    $group,
-                    $criterion,
-                    $level,
-                    new Descriptor('', 1),
-                    false
-                );
-            }
-
-            $dueWork
-                ->setUseRubric(true)
-                ->setRubric($rubric);
+//            $rubric = new Rubric\Rubric();
+//
+//
+//            // Dummy data: I have nothing better to put here
+//            $level = new Level();
+//            $level->setName('Level');
+//            $rubric->putLevel($level);
+//
+//
+//            // I can only create groups, as there's no sub-standards.
+//            // Provided there's mark-by-group without needing a criterion,
+//            // this should be okay.
+//            foreach ($assessment->getStandards() as $standard) {
+//                $groupDataModel = $this->rubricGroupMapper->findOrCreateOneForFolderByName(
+//                    $unitSpec->getFolder()->getId(),
+//                    $standard->getTitle(),
+//                    false
+//                );
+//
+//                // Create node and re-save
+//                $standardNode = $this->findOrCreateCurriculumNodeFromStandard($standard, $standardsNode);
+//                if ($standardNode) {
+//                    $groupDataModel->getCurriculumNodes()->add($standardNode);
+//                    $this->rubricGroupMapper->save($groupDataModel);
+//                }
+//
+//                // Add that rubric group
+//                $group = new Group($groupDataModel->getId(), $groupDataModel->getName());
+//                $rubric->putGroup($group);
+//
+//                // Add a criterion with an empty name for now, I guess
+//                $criterionDataModel = $this->rubricCriterionMapper->findOrCreateOneForFolderByKey(
+//                    $unitSpec->getFolder()->getId(),
+//                    '',
+//                    $standard->getTitle(),
+//                    false
+//                );
+//                $criterion = new Criterion($criterionDataModel->getId(), $criterionDataModel->getName());
+//                $rubric->putCriterion($group, $criterion);
+//
+//                // And an empty descriptor for that level?
+//                $rubric->putDescriptor(
+//                    $group,
+//                    $criterion,
+//                    $level,
+//                    new Descriptor('', 1),
+//                    false
+//                );
+//            }
+//
+//            $dueWork
+//                ->setUseRubric(true)
+//                ->setRubric($rubric);
         }
 
-        $this->assessmentDataSource->save($dueWork);
         return $dueWork;
     }
 
