@@ -89,8 +89,8 @@ class Connector
      */
     public function __construct($plagscanClientId, $plagscanApiKey)
     {
-        $this->setValidFiles(new ValidFiles());
-        $this->setAccessTokenGenerator(new AccessTokenGenerator($plagscanClientId, $plagscanApiKey));
+        $this->validFiles = new ValidFiles();
+        $this->accessTokenGenerator = new AccessTokenGenerator($plagscanClientId, $plagscanApiKey);
     }
 
     /**
@@ -108,7 +108,7 @@ class Connector
         /* Check valid extensions and die early if trying
          * to analyse an illegal file type
          */
-        if (!$this->getValidFiles()->isPlagscannable($submissionFile->getBasename())) {
+        if (!$this->validFiles->isPlagscannable($submissionFile->getBasename())) {
             throw new \DomainException('Invalid file type');
         }
 
@@ -129,7 +129,7 @@ class Connector
 
         try {
             $client = new Client([
-                "base_uri"    => $this->getApiUrl(),
+                "base_uri"    => $this->apiUrl,
                 "timeout"     => self::PLAGSCAN_TIMEOUT,
                 "http_errors" => false,
             ]);
@@ -137,7 +137,7 @@ class Connector
             throw new \RuntimeException('Error: Plagscan unavailable. Could not transmit file.');
         }
 
-        $response = $client->post("documents?access_token={$this->getAccessTokenGenerator()->generate()}", [
+        $response = $client->post("documents?access_token={$this->accessTokenGenerator->generate()}", [
             "multipart" => $postData,
         ]);
 
@@ -197,11 +197,11 @@ class Connector
         }
 
         $postData = [
-            'access_token' => $this->getAccessTokenGenerator()->generate(),
+            'access_token' => $this->accessTokenGenerator->generate(),
         ];
 
         $client = new Client([
-            "base_uri"    => $this->getApiUrl(),
+            "base_uri"    => $this->apiUrl,
             "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
@@ -399,12 +399,12 @@ class Connector
     private function retrieve($plagscanId, $mode)
     {
         $postData = [
-            'access_token' => $this->getAccessTokenGenerator()->generate(),
+            'access_token' => $this->accessTokenGenerator->generate(),
             'mode'         => $mode,
         ];
 
         $client = new Client([
-            "base_uri"    => $this->getApiUrl(),
+            "base_uri"    => $this->apiUrl,
             "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
@@ -436,11 +436,11 @@ class Connector
     public function delete($plagscanId)
     {
         $postData = [
-            'access_token' => $this->getAccessTokenGenerator()->generate(),
+            'access_token' => $this->accessTokenGenerator->generate(),
         ];
 
         $client = new Client([
-            "base_uri"    => $this->getApiUrl(),
+            "base_uri"    => $this->apiUrl,
             "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
@@ -472,11 +472,11 @@ class Connector
     public function privatise($plagscanId)
     {
         $postData = [
-            'access_token' => $this->getAccessTokenGenerator()->generate(),
+            'access_token' => $this->accessTokenGenerator->generate(),
         ];
 
         $client = new Client([
-            "base_uri"    => $this->getApiUrl(),
+            "base_uri"    => $this->apiUrl,
             "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
@@ -490,52 +490,5 @@ class Connector
         }
 
         return $response;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return string
-     */
-    private function getApiUrl()
-    {
-        return $this->apiUrl;
-    }
-
-    /**
-     * @return ValidFiles
-     */
-    private function getValidFiles()
-    {
-        return $this->validFiles;
-    }
-
-    /**
-     * @param ValidFiles $validFiles
-     * @return $this
-     */
-    private function setValidFiles($validFiles)
-    {
-        $this->validFiles = $validFiles;
-        return $this;
-    }
-
-    /**
-     * @return AccessTokenGenerator
-     */
-    private function getAccessTokenGenerator()
-    {
-        return $this->accessTokenGenerator;
-    }
-
-    /**
-     * @param AccessTokenGenerator $accessTokenGenerator
-     * @return $this
-     */
-    private function setAccessTokenGenerator($accessTokenGenerator)
-    {
-        $this->accessTokenGenerator = $accessTokenGenerator;
-        return $this;
     }
 }
