@@ -140,6 +140,15 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
     /** @var SchoolboxUser $sessionUser */
     $sessionUser = $_SESSION["user"];
 
+    // Court orders (shown to staff only and if config flag enabled)
+    if (\Config::get('show_court_order_student_profile')) {
+        if ($sessionUser->getRole()->isStaff()) {
+            if (strlen(trim($externalUser["CourtOrderType"])) !== 0) {
+                $externalUser['AlertMessages'][] = "Court Order";
+            }
+        }
+    }
+
     $student = $userMapper->findById($user['uid']);
 
     // Load the list of subjects, and their teacher.
