@@ -16,8 +16,10 @@ use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler\IAttachmentHandle
 use Schoolbox\Assessment\Course\Import\Atlas\Validator\AssessmentSpecification;
 use Schoolbox\Assessment\Course\Import\Atlas\Validator\AttachmentSpecification;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
+use Schoolbox\Assessment\Rubric\Grid\Descriptor;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
+use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Curriculum\Node\Model as Node;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -432,7 +434,7 @@ class Importer
 
             // Dummy level data: I have nothing better to put here
             $grid->getLevels()->add(
-                (new \Schoolbox\Assessment\Rubric\Grid\Level())->setName('Level')
+                (new Level())->setName('Level')
             );
 
 
@@ -452,7 +454,7 @@ class Importer
                                 // Use this indicator
                                 $indicatorUsage = new IndicatorUsage($indicator);
                                 $indicatorUsage->getDescriptors()->add(
-                                    (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
+                                    (new Descriptor())
                                         ->setDescription('')
                                         ->setMinValue(1.0)
                                         ->setMaxValue(1.0)
