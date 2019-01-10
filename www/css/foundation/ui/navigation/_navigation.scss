@@ -114,6 +114,25 @@ $allow-sidebar-stash: $large-up;
   }
 }
 
+// Notifications slide out
+.move-left {
+    > .inner-wrap {
+        transform: none;
+    }
+    .right-off-canvas-menu {
+        box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.15);
+        transform: none;
+
+        .right-menu-dock::after {
+            content: "\e915"; // hollow pin icon
+        }
+    }
+    .exit-off-canvas {
+        z-index: 1000;
+    }
+}
+
+// Left slide out
 .move-right {
   > .inner-wrap {
     transform: none;
@@ -159,7 +178,7 @@ $allow-sidebar-stash: $large-up;
 
   .right-small {
     width: $tabbar-height;
-    z-index: 100;
+    z-index: 1002;
   }
 
   .tab-bar {
@@ -737,9 +756,6 @@ $allow-sidebar-stash: $large-up;
       position: relative;
       transform: none;
     }
-    .right-off-canvas-menu.overlap {
-      box-shadow: none;
-    }
     .global-search {
       right: $tabbar-height;
       &:hover,
@@ -770,11 +786,6 @@ $allow-sidebar-stash: $large-up;
   .right-off-canvas-menu.right-open + .global-search {
     right: 0;
     padding-left: 0;
-  }
-  .right-off-canvas-menu.overlap {
-    @include box-shadow(-2px, 0px, 4px, rgba(0, 0, 0, 0.15));
-    @include transform(none);
-    transition: $menu-slide;
   }
 }
 

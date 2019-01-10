@@ -1,6 +1,7 @@
 $notification-unread-background: $alert-color !default;
 $notification-unread-color: calc-text-color($notification-unread-background);
 $notification-header-background: $navigation-background !default;
+$allow-notification-stash: $xlarge-up;
 
 // where data-unread != 0
 .right-small a {
@@ -46,6 +47,7 @@ $notification-header-background: $navigation-background !default;
 .right-off-canvas-menu {
     background-color: $off-canvas-background;
     flex: 0 0 $off-canvas-width;
+    z-index: 1001;
 
     &[data-unread="0"] {
         ul.off-canvas-list {
@@ -73,25 +75,32 @@ $notification-header-background: $navigation-background !default;
     ul.off-canvas-list label {
         height: $tabbar-height;
         line-height: $tabbar-height;
-        padding-top: 0;
-        padding-bottom: 0;
+        padding: 0 0 0 1rem;
         background: $notification-unread-background;
         color: $notification-unread-color;
         z-index: 1003;
 
-        &:hover {
-            cursor: pointer;
+        @media #{$allow-notification-stash} {
+            padding: 0 0 0 2.5rem;
         }
+    }
 
-        @media #{$xlarge-up} {
-            &:before {
-                content: '\e913'; // pin icon
+    @media #{$allow-notification-stash} {
+        .right-menu-dock {
+            color: $navigation-foreground;
+            display: block;
+            height: 2.5rem;
+            padding: 0.5rem;
+            position: absolute;
+            left: 0;
+            transform: translateY(50%);
+            width: 2.5rem;
+            z-index: 1; // Safari will not see the icon without this
+
+            &::after {
+                content: "\e913"; // pin icon
                 font-family: $font-family-icon;
-                font-size: .8rem;
-                padding-right: 0.5rem;
-            }
-            &.raquo:before {
-                content: '\e915'; // hollow pin icon
+                padding-left: rem-calc(4);
             }
         }
     }
