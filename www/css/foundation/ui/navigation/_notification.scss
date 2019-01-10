@@ -87,7 +87,7 @@ $allow-notification-stash: $xlarge-up;
 
     @media #{$allow-notification-stash} {
         .right-menu-dock {
-            color: $navigation-foreground;
+            color: $white;
             display: block;
             height: 2.5rem;
             padding: 0.5rem;
@@ -101,6 +101,11 @@ $allow-notification-stash: $xlarge-up;
                 content: "\e913"; // pin icon
                 font-family: $font-family-icon;
                 padding-left: rem-calc(4);
+            }
+        }
+        &[data-unread="0"] {
+            .right-menu-dock {
+                color: $navigation-foreground;
             }
         }
     }
