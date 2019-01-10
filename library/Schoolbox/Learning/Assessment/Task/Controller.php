@@ -153,7 +153,7 @@ class Controller extends Assessment\Controller
 
                 /* Just forward if we only have a URL, regardless of iframe safe or not.
                  */
-                $this->getResponse()->redirect->temporaryRedirect($assessment->getUrl());
+                $this->getResponse()->redirect->temporaryRedirect($previewFragment['fragment']);
                 return;
             }
             elseif ($previewFragment['type'] == 'image') {
