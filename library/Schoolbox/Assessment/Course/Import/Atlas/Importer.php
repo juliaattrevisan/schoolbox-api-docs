@@ -97,6 +97,12 @@ class Importer
 
 
     /**
+     * @var Rubric\RubricMapper
+     */
+    private $rubricMapper;
+
+
+    /**
      * @var Rubric\GroupMapper
      */
     private $rubricGroupMapper;
@@ -160,6 +166,7 @@ class Importer
      * @param CourseSpecMapper       $courseSpecMapper
      * @param UnitSpecMapper         $unitSpecMapper
      * @param RoleAccessMapper       $roleAccessMapper
+     * @param Rubric\RubricMapper    $rubricMapper
      * @param Rubric\GroupMapper     $rubricGroupMapper
      * @param Rubric\CriterionMapper $rubricCriterionMapper
      * @param AssessmentDataSource   $assessmentDataSource
@@ -176,6 +183,7 @@ class Importer
         CourseSpecMapper $courseSpecMapper,
         UnitSpecMapper $unitSpecMapper,
         RoleAccessMapper $roleAccessMapper,
+        Rubric\RubricMapper $rubricMapper,
         Rubric\GroupMapper $rubricGroupMapper,
         Rubric\CriterionMapper $rubricCriterionMapper,
         AssessmentDataSource $assessmentDataSource,
@@ -192,6 +200,7 @@ class Importer
         $this->courseSpecMapper       = $courseSpecMapper;
         $this->unitSpecMapper         = $unitSpecMapper;
         $this->roleAccessMapper       = $roleAccessMapper;
+        $this->rubricMapper           = $rubricMapper;
         $this->rubricGroupMapper      = $rubricGroupMapper;
         $this->rubricCriterionMapper  = $rubricCriterionMapper;
         $this->assessmentDataSource   = $assessmentDataSource;
@@ -422,9 +431,8 @@ class Importer
 
 
             // Build the rowset and rubric grid for this due work
-            $rubricMapper = new Rubric\RubricMapper();
-            $rowSet       = $rubricMapper->retrieveRowSet($unitSpec->getFolder(), false);
-            $grid         = new Grid($dueWork, $rowSet);
+            $rowSet = $this->rubricMapper->retrieveRowSet($unitSpec->getFolder(), false);
+            $grid   = new Grid($dueWork, $rowSet);
 
 
             // Dummy level data: I have nothing better to put here
