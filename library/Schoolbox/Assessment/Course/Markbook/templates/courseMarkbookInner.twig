@@ -217,8 +217,10 @@
 
                                     {% if publishedMark %}
                                         <a href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %} title="{{ comment }}" >{{ publishedMark['hr'] | default('–') }}</a>
+                                    {% elseif participant.hasSubmittedResponse %}
+                                        <a href="{{ participationRoute }}">Pending</a>
                                     {% else %}
-                                        <a href="{{ participationRoute }}" {% if marks.draft is defined %}data-actual-mark{% endif %} title="Pending" >–</a>
+                                        <a href="{{ participationRoute }}">–</a>
                                     {% endif %}
 
                                     {% if marks.draft is defined %}
