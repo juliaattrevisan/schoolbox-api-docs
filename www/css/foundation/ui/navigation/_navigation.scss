@@ -116,20 +116,23 @@ $allow-sidebar-stash: $large-up;
 
 // Notifications slide out
 .move-left {
-    > .inner-wrap {
-        transform: none;
-    }
-    .right-off-canvas-menu {
-        box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.15);
-        transform: none;
+  > .inner-wrap {
+    transform: none;
+  }
+  .right-off-canvas-menu {
+    box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.15);
+    transform: none;
 
-        .right-menu-dock::after {
-            content: "\e915"; // hollow pin icon
-        }
+    .right-menu-dock::after {
+      content: "\e915"; // hollow pin icon
     }
-    .exit-off-canvas {
-        z-index: 1000;
-    }
+  }
+  .right-open .right-off-canvas-menu {
+    box-shadow: none;
+  }
+  .exit-off-canvas {
+    z-index: 1000;
+  }
 }
 
 // Left slide out

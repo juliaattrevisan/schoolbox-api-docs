@@ -31,12 +31,7 @@ $(function () {
     */
     $.fn.schoolboxResource_ProxyReplacment();
 
-    // Notifications hover
-    // $('#notification-toggle').on('click', function() {
-    //     $('#off-canvas-wrap').toggleClass('move-left');
-    // });
-
-    // Notifications menu click
+    // Notifications dock/undock
     $('#right-menu-dock').on('click', function() {
         var dockState = $(this).data('dock-state');
 
