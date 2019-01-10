@@ -34,29 +34,28 @@ class Connector
     /**
      * An int for a data struct that contains the percentage plagiarised
      */
-    const PLAGSCAN_MODE_SCORE = 0;
+    private const PLAGSCAN_MODE_SCORE = 0;
 
     /**
      * An int for a data struct that contains the old Mode 6 report
      */
-    const PLAGSCAN_MODE_REPORT = 6;
+    private const PLAGSCAN_MODE_REPORT = 6;
 
     /**
      * An int for a data struct that contains the new Mode 7 report
      */
-    const PLAGSCAN_MODE_INTERACTIVE = 7;
-
+    private const PLAGSCAN_MODE_INTERACTIVE = 7;
 
     /**
      * Maximum time that we allow plagscan to upload files
      */
-    const PLAGSCAN_TIMEOUT = 360;
+    private const PLAGSCAN_TIMEOUT = 360;
 
     /**
      * Maximum size of files allowed for submission: 100MB
      * @see http://blog.plagscan.com/plagscan-updates-possible-uploading-file-size/
      */
-    const PLAGSCAN_FILESIZE_LIMIT = 104857600;
+    private const PLAGSCAN_FILESIZE_LIMIT = 104857600;
 
     /**
      * Api url where stuff is sent
