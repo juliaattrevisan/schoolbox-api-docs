@@ -190,15 +190,17 @@ class Connector
         return $fullName;
     }
 
+
     /**
      * Analyse a document that we sent to plag
      *
-     * @param int $plagscanId
+     * @param int|null $plagscanId
      * @return bool whether the report is ready or not
-     * @throws \RuntimeException if Plagscan is unavailable
-     * @throws \DomainException if some unexpected thing went wrong
+     * @throws \DomainException  if some unexpected thing went wrong
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException  if Plagscan is unavailable
      */
-    public function analyse($plagscanId)
+    public function analyse(?int $plagscanId)
     {
         if (!$plagscanId) {
             throw new \DomainException('No plagscan document id - document has not been transmitted yet');
@@ -371,6 +373,7 @@ class Connector
         throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
+
     /**
      * Retrieve report data for $plagscanId in mode selection integer $mode
      *
@@ -394,6 +397,8 @@ class Connector
      * @param int $plagscanId
      * @param int $mode
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      * @throws \RuntimeException if Plagscan is unavailable
      */
     private function retrieve($plagscanId, $mode)
@@ -420,6 +425,7 @@ class Connector
         return $response;
     }
 
+
     /**
      * Delete a document from the plagscan account
      *
@@ -428,6 +434,8 @@ class Connector
      *
      * @param $plagscanId
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      * @throws \RuntimeException if Plagscan is unavailable
      */
     public function delete($plagscanId)
@@ -453,6 +461,7 @@ class Connector
         return $response;
     }
 
+
     /**
      * Privatise a document in the plagscan account
      *
@@ -461,6 +470,8 @@ class Connector
      *
      * @param $plagscanId
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      * @throws \RuntimeException if Plagscan is unavailable
      */
     public function privatise($plagscanId)
