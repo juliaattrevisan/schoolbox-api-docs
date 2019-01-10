@@ -81,25 +81,16 @@ class Connector
      */
     private $validFiles;
 
-    /**
-     * A ConfigLoader instance
-     *
-     * @var IConfigLoader
-     */
-    private $configLoader;
 
     /**
      * Connector constructor.
      *
-     * @param IConfigLoader $configLoader
      * @param int           $plagscanClientId
      * @param string        $plagscanApiKey
      */
-    public function __construct(IConfigLoader $configLoader, $plagscanClientId, $plagscanApiKey)
+    public function __construct($plagscanClientId, $plagscanApiKey)
     {
-        $this->setConfigLoader($configLoader);
         $this->setValidFiles(new ValidFiles());
-
         $this->setAccessTokenGenerator(new AccessTokenGenerator($plagscanClientId, $plagscanApiKey));
     }
 
@@ -499,22 +490,6 @@ class Connector
 
     /* Getters/Setters
      */
-
-    /**
-     * @return IConfigLoader
-     */
-    private function getConfigLoader()
-    {
-        return $this->configLoader;
-    }
-
-    /**
-     * @param IConfigLoader $configLoader
-     */
-    private function setConfigLoader($configLoader)
-    {
-        $this->configLoader = $configLoader;
-    }
 
     /**
      * @return string

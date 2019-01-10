@@ -139,7 +139,7 @@ class Mapper extends \Schoolbox\Mapper
          */
         if (strlen($plagscanApiKey) && strlen($plagscanClientId) && strlen($plagscanUsername)) {
             try {
-                $this->setConnector(new Connector($this->getConfigLoader(), $plagscanClientId, $plagscanApiKey));
+                $this->setConnector(new Connector($plagscanClientId, $plagscanApiKey));
             }
             catch (\DomainException $e) {
                 /* Could not spawn for some reason, but due to mapper usage
