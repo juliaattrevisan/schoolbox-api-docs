@@ -80,14 +80,13 @@ class Connector
      */
     private $validFiles;
 
-
     /**
      * Connector constructor.
      *
-     * @param int           $plagscanClientId
-     * @param string        $plagscanApiKey
+     * @param int    $plagscanClientId
+     * @param string $plagscanApiKey
      */
-    public function __construct($plagscanClientId, $plagscanApiKey)
+    public function __construct(int $plagscanClientId, string $plagscanApiKey)
     {
         $this->validFiles = new ValidFiles();
         $this->accessTokenGenerator = new AccessTokenGenerator($plagscanClientId, $plagscanApiKey);
@@ -103,7 +102,7 @@ class Connector
      * @throws \InvalidArgumentException if Plagscan changed their API on us
      * @throws \DomainException if some other unexpected thing went wrong
      */
-    public function transmit(SubmissionFile $submissionFile, $filename)
+    public function transmit(SubmissionFile $submissionFile, string $filename): int
     {
         /* Check valid extensions and die early if trying
          * to analyse an illegal file type
@@ -138,7 +137,7 @@ class Connector
         }
 
         $response = $client->post("documents?access_token={$this->accessTokenGenerator->generate()}", [
-            "multipart" => $postData,
+            'multipart' => $postData,
         ]);
 
         /* What was the outcome?
@@ -167,7 +166,7 @@ class Connector
      * @param                $filename
      * @return string
      */
-    private function makeFileName(SubmissionFile $submissionFile, $filename)
+    private function makeFileName(SubmissionFile $submissionFile, string $filename): string
     {
         $documentName = $submissionFile->getStorage()->getFilename();
         $documentExt = $submissionFile->getStorage()->getExtension();
@@ -175,9 +174,8 @@ class Connector
         // Sanitise the file name to ensure valid characters and length
         $name = preg_replace('/[^A-Za-z0-9_\-\. ]/', '',$filename.'_'.$documentName);
         $name = mb_strcut($name, 0, 255 - ($documentExt ? \strlen($documentExt) + 1 : 0));
-        $fullName = $name.'.'.$documentExt;
 
-        return $fullName;
+        return "{$name}.{$documentExt}";
     }
 
 
@@ -190,7 +188,7 @@ class Connector
      * @throws \InvalidArgumentException
      * @throws \RuntimeException  if Plagscan is unavailable
      */
-    public function analyse(?int $plagscanId)
+    public function analyse(?int $plagscanId): bool
     {
         if (!$plagscanId) {
             throw new \DomainException('No plagscan document id - document has not been transmitted yet');
@@ -282,7 +280,7 @@ class Connector
      * @throws \DomainException if some other unexpected thing went wrong
      * @throws \RuntimeException if Plagscan is unavailable
      */
-    public function fetchInteractiveReportUrl($plagscanId)
+    public function fetchInteractiveReportUrl(int $plagscanId): string
     {
         $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_INTERACTIVE);
 
@@ -317,7 +315,7 @@ class Connector
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    public function fetchReport($plagscanId)
+    public function fetchReport(int $plagscanId): string
     {
         $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_REPORT);
 
@@ -339,13 +337,13 @@ class Connector
     /**
      * Have to get the score separately -_-
      *
-     * @param $plagscanId
+     * @param int $plagscanId
      * @return string
      * @throws \InvalidArgumentException if Plagscan changed their API on us
      * @throws \DomainException if some other unexpected thing went wrong
      * @throws \RuntimeException
      */
-    public function fetchScore($plagscanId)
+    public function fetchScore(int $plagscanId): string
     {
         $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_SCORE);
 
@@ -396,7 +394,7 @@ class Connector
      * @throws \InvalidArgumentException
      * @throws \RuntimeException if Plagscan is unavailable
      */
-    private function retrieve($plagscanId, $mode)
+    private function retrieve(int $plagscanId, int $mode): \Psr\Http\Message\ResponseInterface
     {
         $postData = [
             'access_token' => $this->accessTokenGenerator->generate(),
@@ -427,13 +425,13 @@ class Connector
      * This prevents it being used to compare against future documents
      * Used when resubmitting one's own file again
      *
-     * @param $plagscanId
+     * @param int $plagscanId
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException if Plagscan is unavailable
      */
-    public function delete($plagscanId)
+    public function delete(int $plagscanId): \Psr\Http\Message\ResponseInterface
     {
         $postData = [
             'access_token' => $this->accessTokenGenerator->generate(),
@@ -463,13 +461,13 @@ class Connector
      * This prevents it being used to compare against future documents
      * Used when resubmitting one's own file again
      *
-     * @param $plagscanId
+     * @param int $plagscanId
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException if Plagscan is unavailable
      */
-    public function privatise($plagscanId)
+    public function privatise(int $plagscanId): \Psr\Http\Message\ResponseInterface
     {
         $postData = [
             'access_token' => $this->accessTokenGenerator->generate(),
