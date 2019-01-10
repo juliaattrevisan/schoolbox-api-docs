@@ -194,7 +194,7 @@ class Connector
      * Analyse a document that we sent to plag
      *
      * @param int $plagscanId
-     * @return bool
+     * @return bool whether the report is ready or not
      * @throws \RuntimeException if Plagscan is unavailable
      * @throws \DomainException if some unexpected thing went wrong
      */
@@ -239,22 +239,31 @@ class Connector
              * Get the latest version of the report and cache it locally
              * Sadly must check error strings, because plagscan
              */
-            if ($content['error']['message'] == 'The document is already checked') {
-                return true;
+            switch ($content['error']['message']) {
+
+                /* pseudo-errors: nothing actually went wrong, plagscan puts notices here
+                 * for you to interpret
+                 */
+                case 'The document is already checked':
+                case 'This document has a report already':
+                    return true;
+
+                /* actual errors: something really went wrong and makes this plagscan record unscannable
+                 */
+                case 'The document has been deleted.':
+                case 'The document has failed during the upload/convertion process: Document without text or broken file - minimum length is 50 characters':
+                    throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
+
+                /* Otherwise document is one of the following and we don't need
+                 * to take any further action at the moment
+                 *
+                 * - in the queue to be checked
+                 * - currently being checked
+                 */
+                default:
+                    return false;
             }
-            if ($content['error']['message'] == 'This document has a report already') {
-                return true;
-            }
-            if ($content['error']['message'] == 'The document has been deleted.') {
-                throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
-            }
-            /* Otherwise document is one of the following and we don't need
-             * to take any further action at the moment
-             *
-             * - in the queue to be checked
-             * - currently being checked
-             */
-            return false;
+
         } elseif ($response->getStatusCode() == 404) {
 
             /* This document is getting checked; wait for plagscan to do its thing
