@@ -16,7 +16,7 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 
 {# Legend + Notch titles #}
-{% set labelNoPublishedMark     = 'No published mark' %}
+{% set labelNoPublishedMark     = 'No mark' %}
 {% set labelPubMarkDraftPending = 'Unpublished draft' %}
 {% set labelPublishedMark       = 'Mark Published' %}
 
@@ -200,15 +200,15 @@
                                     {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: aImpl.id, studentId: student.id}) %}
                                     {% set comment            = studentComments[courseImpl.id][student.id][assessment.id] %}
                                     {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] %}
-                                    {% set publishedMark      = marks.published is defined ?: false %}
-                                    {% set draftMark          = marks.draft is defined ?: false %}
-                                    
-                                    {% if publishedMark %}
-                                        {% set indicator = 'published' %}
-                                        {% set notchTitle = labelPublishedMark %}
-                                    {% elseif draftMark %}
+                                    {% set publishedMark      = marks.published %}
+                                    {% set draftMark          = marks.draft %}
+
+                                    {% if draftMark %}
                                         {% set indicator = 'pending' %}
                                         {% set notchTitle = labelPubMarkDraftPending %}
+                                    {% elseif publishedMark %}
+                                        {% set indicator = 'published' %}
+                                        {% set notchTitle = labelPublishedMark %}
                                     {% else %}
                                         {% set indicator = 'none' %}
                                         {% set notchTitle = labelNoPublishedMark %}
