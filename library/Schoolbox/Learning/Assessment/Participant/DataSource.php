@@ -400,14 +400,15 @@ class DataSource
                 if (!empty($classCodes)) {
                     $students = $students->merge($this->userMapper->findByColumn('synergy_id', array_column($classCodes, 'synergy_id')));
                 }
-
-                // I want to search for ALL read-level users, not just students
-                // Deliberately don't search external DB, I have already done that
-                $students = $students->mergeUnique(
-                    $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, true),
-                    'id'
-                );
             }
+
+            // I want to search for ALL read-level users, not just students
+            // Deliberately don't search external DB, I have already done that
+            $students = $students->mergeUnique(
+                $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, true),
+                'id'
+            );
+
             $this->cacheForFolder[$folder->getId()] = $students;
 
         }
