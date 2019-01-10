@@ -89,7 +89,8 @@ class External_Schoolbox_Class implements External_ClassInterface
                               u.firstname,
                               u.lastname,
                               u.year,
-                              u.house
+                              u.house,
+                              u.esl_flag
                 FROM          class c
                 LEFT JOIN     class_user cu ON cu.class_id = c.id
                 LEFT JOIN     user u ON u.id = cu.user_id

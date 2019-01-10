@@ -14,7 +14,7 @@ BEGIN
       WHERE COLUMN_NAME = 'esl_flag' AND TABLE_NAME = 'user_profile' AND TABLE_SCHEMA = DATABASE()
     )
   THEN
-    ALTER TABLE user_profile ADD COLUMN columnName BOOLEAN NULL;
+    ALTER TABLE user_profile ADD COLUMN esl_flag BOOLEAN NULL;
   END IF;
 END $$
 
