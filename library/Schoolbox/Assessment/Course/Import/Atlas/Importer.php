@@ -102,13 +102,13 @@ class Importer
     /**
      * @var Rubric\GroupMapper
      */
-    private $rubricGroupMapper;
+    private $rubricCapabilityMapper;
 
 
     /**
      * @var Rubric\CriterionMapper
      */
-    private $rubricCriterionMapper;
+    private $rubricIndicatorMapper;
 
 
     /**
@@ -198,8 +198,8 @@ class Importer
         $this->unitSpecMapper         = $unitSpecMapper;
         $this->roleAccessMapper       = $roleAccessMapper;
         $this->rubricMapper           = $rubricMapper;
-        $this->rubricGroupMapper      = $rubricGroupMapper;
-        $this->rubricCriterionMapper  = $rubricCriterionMapper;
+        $this->rubricCapabilityMapper = $rubricGroupMapper;
+        $this->rubricIndicatorMapper  = $rubricCriterionMapper;
         $this->assessmentDataSource   = $assessmentDataSource;
         $this->nodeMapper             = $nodeMapper;
         $this->errorMapper            = $errorMapper;
@@ -404,9 +404,13 @@ class Importer
 
             // Pass 1: build the rowset, adding capabilities+indicators as required
             foreach ($assessment->getStandards() as $standard) {
-                $groupDataModel = $this->rubricGroupMapper->findOrCreateOneForFolderByName(
+                $capabilityName = $standard->getTitle();
+                $indicatorName  = '';
+
+                // Build capability
+                $groupDataModel = $this->rubricCapabilityMapper->findOrCreateOneForFolderByName(
                     $unitSpec->getFolder()->getId(),
-                    $standard->getTitle(),
+                    $capabilityName,
                     false
                 );
 
@@ -414,14 +418,14 @@ class Importer
                 $standardNode = $this->findOrCreateCurriculumNodeFromStandard($standard, $standardsNode);
                 if ($standardNode) {
                     $groupDataModel->getCurriculumNodes()->add($standardNode);
-                    $this->rubricGroupMapper->save($groupDataModel);
+                    $this->rubricCapabilityMapper->save($groupDataModel);
                 }
 
-                // Add a criterion with an empty name for now, I guess
-                $this->rubricCriterionMapper->findOrCreateOneForFolderByKey(
+                // Build indicator with an empty name for now, I guess
+                $this->rubricIndicatorMapper->findOrCreateOneForFolderByKey(
                     $unitSpec->getFolder()->getId(),
-                    '',
-                    $standard->getTitle(),
+                    $indicatorName,
+                    $capabilityName,
                     false
                 );
             }
