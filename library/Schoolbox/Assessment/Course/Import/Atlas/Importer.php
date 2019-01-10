@@ -399,13 +399,18 @@ class Importer
         $dueWork->getCurriculumNodes()->add($dueWorkNode);
 
 
+        // Common names for indicators and levels, as I have nothing better to
+        // put there
+        $commonIndicatorName = '';
+        $commonLevelName     = '';
+
+
         // Build a rubric for this due work, if it has standards
         if (\count($assessment->getStandards())) {
 
             // Pass 1: build the rowset, adding capabilities+indicators as required
             foreach ($assessment->getStandards() as $standard) {
                 $capabilityName = $standard->getTitle();
-                $indicatorName  = '';
 
                 // Build capability
                 $groupDataModel = $this->rubricCapabilityMapper->findOrCreateOneForFolderByName(
@@ -424,7 +429,7 @@ class Importer
                 // Build indicator with an empty name for now, I guess
                 $this->rubricIndicatorMapper->findOrCreateOneForFolderByKey(
                     $unitSpec->getFolder()->getId(),
-                    $indicatorName,
+                    $commonIndicatorName,
                     $capabilityName,
                     false
                 );
@@ -438,14 +443,13 @@ class Importer
 
             // Dummy level data: I have nothing better to put here
             $grid->getLevels()->add(
-                (new Level())->setName('Level')
+                (new Level())->setName($commonLevelName)
             );
 
 
             // Pass 2: load the created rowset, and build the actual rubric grid
             foreach ($assessment->getStandards() as $standard) {
                 $capabilityName = $standard->getTitle();
-                $indicatorName  = '';
 
                 // Need to iterate each capability, and indicator within,
                 // to get a match
@@ -454,7 +458,7 @@ class Importer
                         // Use this capability
                         $capabilityUsage = new CapabilityUsage($capability);
                         foreach ($capability->getIndicators() as $indicator) {
-                            if ($indicatorName === $indicator->getName()) {
+                            if ($commonIndicatorName === $indicator->getName()) {
                                 // Use this indicator
                                 $indicatorUsage = new IndicatorUsage($indicator);
                                 $indicatorUsage->getDescriptors()->add(
