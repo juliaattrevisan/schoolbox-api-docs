@@ -22,7 +22,6 @@ use Schoolbox\Assessment\Rubric\Descriptor;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
-use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Curriculum\Node\Model as Node;
 use Schoolbox\Error\Mapper as ErrorMapper;
