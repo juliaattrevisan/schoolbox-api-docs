@@ -305,6 +305,7 @@ class Connector
         throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
+
     /**
      * Fetch report contents
      *
@@ -313,6 +314,8 @@ class Connector
      * @param int $plagscanId
      * @return string
      * @throws \DomainException if some unexpected thing went wrong
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function fetchReport($plagscanId)
     {
@@ -332,6 +335,7 @@ class Connector
         throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
+
     /**
      * Have to get the score separately -_-
      *
@@ -339,6 +343,7 @@ class Connector
      * @return string
      * @throws \InvalidArgumentException if Plagscan changed their API on us
      * @throws \DomainException if some other unexpected thing went wrong
+     * @throws \RuntimeException
      */
     public function fetchScore($plagscanId)
     {
