@@ -281,8 +281,10 @@ class RelationshipFilterer
 
         // Find students for these folders codes
         $classStudentExternalIds = [];
-        foreach ($this->externalClass->getStudents(\implode(',', $folderCodes)) as $classStudent) {
-            $classStudentExternalIds[$classStudent['synergy_id']] = $classStudent['synergy_id'];
+        if(\count($folderCodes) > 0) {
+            foreach ($this->externalClass->getStudents(\implode(',', $folderCodes)) as $classStudent) {
+                $classStudentExternalIds[$classStudent['synergy_id']] = $classStudent['synergy_id'];
+            }
         }
 
         if (!\count($groupMemberIds) && !\count($classStudentExternalIds)) {
