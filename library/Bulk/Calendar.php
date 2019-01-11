@@ -41,6 +41,9 @@ class Bulk_Calendar extends Bulk_Abstract
      * Wrapper for uploading a calendar file which could be in either format
      *
      * @return array
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function addCalendar()
     {

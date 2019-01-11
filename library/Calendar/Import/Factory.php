@@ -59,7 +59,7 @@ class Factory {
 	/**
 	 * The source file from which to import
 	 *
-	 * @var null
+	 * @var string
 	 */
 	protected $file;
 
@@ -100,11 +100,10 @@ class Factory {
 	 * @return mixed
 	 */
 	public function build() {
+        $classname = '\Calendar\Import\Csv';
+
 		if (stristr(file_get_contents($this->getFile(), null, null, 0, 20), 'BEGIN:VCALENDAR')) {
 			$classname = '\Calendar\Import\Vcal';
-		}
-		else {
-			$classname = '\Calendar\Import\Csv';
 		}
 
 		return new $classname($this->getUser(), $this->getAuthor(), $this->getCategoryList(), $this->getGroupList(), $this->getCampusList(), $this->getAccess(), $this->getFile(), $this->getSource());
