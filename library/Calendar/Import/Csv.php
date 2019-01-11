@@ -26,7 +26,7 @@ class Csv extends Base
     /**
      * Load all events into schoolbox, generate outcome array
      */
-    public function load()
+    public function load(): void
     {
         $output = array();
 

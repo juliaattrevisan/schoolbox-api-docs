@@ -57,9 +57,9 @@ class Vcal extends Base
     /**
      * Load all events into schoolbox, generate outcome array
      */
-    public function load()
+    public function load(): void
     {
-        $output = array();
+        $output = [];
 
         if (is_file($this->getFile())) {
             $campusMapper = new CampusMapper();

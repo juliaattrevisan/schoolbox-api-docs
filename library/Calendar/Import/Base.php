@@ -20,35 +20,35 @@ abstract class Base {
 	 *
 	 * @var int
 	 */
-	protected $user = null;
+	protected $user;
 
 	/**
 	 * The person who spawned the event
 	 *
 	 * @var int
 	 */
-	protected $author = null;
+	protected $author;
 
 	/**
 	 * A list of selected event_category relations
 	 *
 	 * @var array
 	 */
-	protected $categoryList = array();
+	protected $categoryList = [];
 
 	/**
 	 * A list of selected event_group relations
 	 *
 	 * @var array
 	 */
-	protected $groupList = array();
+	protected $groupList = [];
 
 	/**
 	 * A list of selected event_campus relations
 	 *
 	 * @var array
 	 */
-	protected $campusList = array();
+	protected $campusList = [];
 
 	/**
 	 * Access level for each event imported
@@ -60,44 +60,46 @@ abstract class Base {
 	/**
 	 * The source file from which to import
 	 *
-	 * @var null
+	 * @var string
 	 */
-	protected $file = null;
+	protected $file;
 
 	/**
 	 * The outcome of each event's processing
 	 * This is an array of name, status, and error message values
 	 *
-	 * @var null
+	 * @var array
 	 */
-	protected $output = array();
+	protected $output = [];
 
 	/**
 	 * All event types, from the lookup
 	 *
 	 * @var GenericCollection
 	 */
-	protected $allEventTypes = null;
+	protected $allEventTypes;
 
     /**
      * Source of import
      *
-     * @var string
+     * @var string|null
      */
     protected $source;
 
-	/**
-	 * Constructor
-	 *
-	 * @param $user
-	 * @param $author
-	 * @param $categoryList
-	 * @param $groupList
-	 * @param $campusList
-	 * @param $access
-	 * @param $file
-	 */
-	public function __construct($user, $author, $categoryList, $groupList, $campusList, $access, $file, $source = null) {
+
+    /**
+     * Base constructor.
+     *
+     * @param int         $user
+     * @param int         $author
+     * @param array       $categoryList
+     * @param array       $groupList
+     * @param array       $campusList
+     * @param int         $access
+     * @param string      $file
+     * @param string|null $source
+     */
+	public function __construct(int $user, int $author, array $categoryList, array $groupList, array $campusList, int $access, string $file, string $source = null) {
 		$this->setUser($user);
 		$this->setAuthor($author);
 		$this->setCategoryList($categoryList);
@@ -124,18 +126,22 @@ abstract class Base {
 	/**
 	 * Set author id
 	 *
-	 * @param null $author
+	 * @param int $author
+     * @return Base
 	 */
-	protected function setAuthor($author) {
+	protected function setAuthor(int $author): Base
+    {
 		$this->author = $author;
+		return $this;
 	}
 
 	/**
 	 * Get author id
 	 *
-	 * @return null
+	 * @return int
 	 */
-	protected function getAuthor() {
+	protected function getAuthor(): int
+    {
 		return $this->author;
 	}
 
@@ -143,9 +149,12 @@ abstract class Base {
 	 * Set campus list
 	 *
 	 * @param array $campusList
+     * @return Base
 	 */
-	protected function setCampusList($campusList) {
+	protected function setCampusList($campusList): Base
+    {
 		$this->campusList = $campusList;
+		return $this;
 	}
 
 	/**
@@ -153,25 +162,30 @@ abstract class Base {
 	 *
 	 * @return array
 	 */
-	protected function getCampusList() {
+	protected function getCampusList(): array
+    {
 		return $this->campusList;
 	}
 
 	/**
 	 * Set file
 	 *
-	 * @param null $file
+	 * @param string $file
+     * @return Base
 	 */
-	protected function setFile($file) {
+	protected function setFile($file): Base
+    {
 		$this->file = $file;
+		return $this;
 	}
 
 	/**
 	 * Get file
 	 *
-	 * @return null
+	 * @return string
 	 */
-	protected function getFile() {
+	protected function getFile(): string
+    {
 		return $this->file;
 	}
 
@@ -179,9 +193,12 @@ abstract class Base {
 	 * Set group list
 	 *
 	 * @param array $groupList
+     * @return Base
 	 */
-	protected function setGroupList($groupList) {
+	protected function setGroupList($groupList): Base
+    {
 		$this->groupList = $groupList;
+		return $this;
 	}
 
 	/**
@@ -189,43 +206,52 @@ abstract class Base {
 	 *
 	 * @return array
 	 */
-	protected function getGroupList() {
+	protected function getGroupList(): array
+    {
 		return $this->groupList;
 	}
 
 	/**
 	 * Set user
 	 *
-	 * @param null $user
+	 * @param int $user
+     * @return Base
 	 */
-	protected function setUser($user) {
+	protected function setUser(int $user): Base
+    {
 		$this->user = $user;
+        return $this;
 	}
 
 	/**
 	 * Get user
 	 *
-	 * @return null
+	 * @return int
 	 */
-	protected function getUser() {
+	protected function getUser(): int
+    {
 		return $this->user;
 	}
 
 	/**
 	 * Set output
 	 *
-	 * @param null $output
+	 * @param array $output
+     * @return Base
 	 */
-	protected function setOutput($output) {
+	protected function setOutput(array $output): Base
+    {
 		$this->output = $output;
+        return $this;
 	}
 
 	/**
 	 * Get output
 	 *
-	 * @return null
+	 * @return array
 	 */
-	public function getOutput() {
+	public function getOutput(): array
+    {
 		return $this->output;
 	}
 
@@ -233,9 +259,12 @@ abstract class Base {
 	 * Set all event types
 	 *
 	 * @param GenericCollection $allEventTypes
+     * @return Base
 	 */
-	public function setAllEventTypes($allEventTypes) {
+	public function setAllEventTypes(GenericCollection $allEventTypes): Base
+    {
 		$this->allEventTypes = $allEventTypes;
+        return $this;
 	}
 
 	/**
@@ -243,7 +272,8 @@ abstract class Base {
 	 *
 	 * @return GenericCollection
 	 */
-	public function getAllEventTypes() {
+	public function getAllEventTypes(): GenericCollection
+    {
 		return $this->allEventTypes;
 	}
 
@@ -251,9 +281,12 @@ abstract class Base {
 	 * Set category list
 	 *
 	 * @param array $categoryList
+     * @return Base
 	 */
-	protected function setCategoryList($categoryList) {
+	protected function setCategoryList(array $categoryList): Base
+    {
 		$this->categoryList = $categoryList;
+        return $this;
 	}
 
 	/**
@@ -261,17 +294,21 @@ abstract class Base {
 	 *
 	 * @return array
 	 */
-	protected function getCategoryList() {
+	protected function getCategoryList(): array
+    {
 		return $this->categoryList;
 	}
 
-	/**
-	 * Set access
-	 *
-	 * @param int $access
-	 */
-	protected function setAccess($access) {
+    /**
+     * Set access
+     *
+     * @param int $access
+     * @return Base
+     */
+	protected function setAccess(int $access): Base
+    {
 		$this->access = $access;
+        return $this;
 	}
 
 	/**
@@ -279,24 +316,27 @@ abstract class Base {
 	 *
 	 * @return int
 	 */
-	protected function getAccess() {
+	protected function getAccess(): int
+    {
 		return $this->access;
 	}
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getSource()
+    public function getSource(): ?string
     {
         return $this->source;
     }
 
+
     /**
-     * @param string $source
+     * @param string|null $source
+     * @return Base
      */
-    public function setSource($source)
+    public function setSource(?string $source): Base
     {
         $this->source = $source;
+        return $this;
     }
-
 }

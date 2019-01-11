@@ -18,35 +18,35 @@ class Factory {
 	 *
 	 * @var int
 	 */
-	protected $user = null;
+	protected $user;
 
 	/**
 	 * The person who spawned the event
 	 *
 	 * @var int
 	 */
-	protected $author = null;
+	protected $author;
 
 	/**
 	 * A list of selected event_category relations
 	 *
 	 * @var array
 	 */
-	protected $categoryList = array();
+	protected $categoryList = [];
 
 	/**
 	 * A list of selected event_group relations
 	 *
 	 * @var array
 	 */
-	protected $groupList = array();
+	protected $groupList = [];
 
 	/**
 	 * A list of selected event_campus relations
 	 *
 	 * @var array
 	 */
-	protected $campusList = array();
+	protected $campusList = [];
 
 	/**
 	 * Access level for each event imported
@@ -60,27 +60,28 @@ class Factory {
 	 *
 	 * @var null
 	 */
-	protected $file = null;
+	protected $file;
 
     /**
      * Source of import
      *
-     * @var string
+     * @var string|null
      */
     protected $source;
 
     /**
-	 * Constructor
-	 *
-	 * @param $user
-	 * @param $author
-	 * @param $categoryList
-	 * @param $groupList
-	 * @param $campusList
-	 * @param $access
-	 * @param $file
-	 */
-	public function __construct($user, $author, $categoryList, $groupList, $campusList, $access, $file, $source = null) {
+     * Factory constructor.
+     *
+     * @param int         $user
+     * @param int         $author
+     * @param array       $categoryList
+     * @param array       $groupList
+     * @param array       $campusList
+     * @param int         $access
+     * @param string      $file
+     * @param string|null $source
+     */
+    public function __construct(int $user, int $author, array $categoryList, array $groupList, array $campusList, int $access, string $file, string $source = null) {
 		$this->setUser($user);
 		$this->setAuthor($author);
 		$this->setCategoryList($categoryList);
@@ -111,146 +112,175 @@ class Factory {
 	/* Getters/Setters
 	 */
 
-	/**
-	 * Set author id
-	 *
-	 * @param null $author
-	 */
-	protected function setAuthor($author) {
-		$this->author = $author;
-	}
-
-	/**
-	 * Get author id
-	 *
-	 * @return null
-	 */
-	protected function getAuthor() {
-		return $this->author;
-	}
-
-	/**
-	 * Set campus list
-	 *
-	 * @param array $campusList
-	 */
-	protected function setCampusList($campusList) {
-		$this->campusList = $campusList;
-	}
-
-	/**
-	 * Get campus list
-	 *
-	 * @return array
-	 */
-	protected function getCampusList() {
-		return $this->campusList;
-	}
-
-	/**
-	 * Set file
-	 *
-	 * @param null $file
-	 */
-	protected function setFile($file) {
-		$this->file = $file;
-	}
-
-	/**
-	 * Get file
-	 *
-	 * @return null
-	 */
-	protected function getFile() {
-		return $this->file;
-	}
-
-	/**
-	 * Set group list
-	 *
-	 * @param array $groupList
-	 */
-	protected function setGroupList($groupList) {
-		$this->groupList = $groupList;
-	}
-
-	/**
-	 * Get group list
-	 *
-	 * @return array
-	 */
-	protected function getGroupList() {
-		return $this->groupList;
-	}
-
-	/**
-	 * Set user
-	 *
-	 * @param null $user
-	 */
-	protected function setUser($user) {
-		$this->user = $user;
-	}
-
-	/**
-	 * Get user
-	 *
-	 * @return null
-	 */
-	protected function getUser() {
-		return $this->user;
-	}
-
-	/**
-	 * Set category list
-	 *
-	 * @param array $categoryList
-	 */
-	protected function setCategoryList($categoryList) {
-		$this->categoryList = $categoryList;
-	}
-
-	/**
-	 * Get category list
-	 *
-	 * @return array
-	 */
-	protected function getCategoryList() {
-		return $this->categoryList;
-	}
-
-	/**
-	 * Set access
-	 *
-	 * @param int $access
-	 */
-	protected function setAccess($access) {
-		$this->access = $access;
-	}
-
-	/**
-	 * Get access
-	 *
-	 * @return int
-	 */
-	protected function getAccess() {
-		return $this->access;
-	}
+    /**
+     * Set author id
+     *
+     * @param int $author
+     * @return Factory
+     */
+    protected function setAuthor(int $author): Factory
+    {
+        $this->author = $author;
+        return $this;
+    }
 
     /**
-     * @return mixed
+     * Get author id
+     *
+     * @return int
      */
-    public function getSource()
+    protected function getAuthor(): int
+    {
+        return $this->author;
+    }
+
+    /**
+     * Set campus list
+     *
+     * @param array $campusList
+     * @return Factory
+     */
+    protected function setCampusList($campusList): Factory
+    {
+        $this->campusList = $campusList;
+        return $this;
+    }
+
+    /**
+     * Get campus list
+     *
+     * @return array
+     */
+    protected function getCampusList(): array
+    {
+        return $this->campusList;
+    }
+
+    /**
+     * Set file
+     *
+     * @param string $file
+     * @return Factory
+     */
+    protected function setFile($file): Factory
+    {
+        $this->file = $file;
+        return $this;
+    }
+
+    /**
+     * Get file
+     *
+     * @return string
+     */
+    protected function getFile(): string
+    {
+        return $this->file;
+    }
+
+    /**
+     * Set group list
+     *
+     * @param array $groupList
+     * @return Factory
+     */
+    protected function setGroupList($groupList): Factory
+    {
+        $this->groupList = $groupList;
+        return $this;
+    }
+
+    /**
+     * Get group list
+     *
+     * @return array
+     */
+    protected function getGroupList(): array
+    {
+        return $this->groupList;
+    }
+
+    /**
+     * Set user
+     *
+     * @param int $user
+     * @return Factory
+     */
+    protected function setUser(int $user): Factory
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return int
+     */
+    protected function getUser(): int
+    {
+        return $this->user;
+    }
+
+    /**
+     * Set category list
+     *
+     * @param array $categoryList
+     * @return Factory
+     */
+    protected function setCategoryList(array $categoryList): Factory
+    {
+        $this->categoryList = $categoryList;
+        return $this;
+    }
+
+    /**
+     * Get category list
+     *
+     * @return array
+     */
+    protected function getCategoryList(): array
+    {
+        return $this->categoryList;
+    }
+
+    /**
+     * Set access
+     *
+     * @param int $access
+     * @return Factory
+     */
+    protected function setAccess(int $access): Factory
+    {
+        $this->access = $access;
+        return $this;
+    }
+
+    /**
+     * Get access
+     *
+     * @return int
+     */
+    protected function getAccess(): int
+    {
+        return $this->access;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSource(): ?string
     {
         return $this->source;
     }
 
-
     /**
-     * @param mixed $source
+     * @param string|null $source
+     * @return Factory
      */
-    public function setSource($source)
+    public function setSource(?string $source): Factory
     {
         $this->source = $source;
+        return $this;
     }
 }
