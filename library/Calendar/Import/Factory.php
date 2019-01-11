@@ -10,20 +10,21 @@
 
 namespace Calendar\Import;
 
+use Schoolbox\User;
 
 class Factory {
 
 	/**
 	 * The person to whom these imported events are relevant
 	 *
-	 * @var int
+	 * @var User
 	 */
 	protected $user;
 
 	/**
 	 * The person who spawned the event
 	 *
-	 * @var int
+	 * @var User
 	 */
 	protected $author;
 
@@ -72,8 +73,8 @@ class Factory {
     /**
      * Factory constructor.
      *
-     * @param int         $user
-     * @param int         $author
+     * @param User        $user
+     * @param User        $author
      * @param array       $categoryList
      * @param array       $groupList
      * @param array       $campusList
@@ -81,7 +82,7 @@ class Factory {
      * @param string      $file
      * @param string|null $source
      */
-    public function __construct(int $user, int $author, array $categoryList, array $groupList, array $campusList, int $access, string $file, string $source = null) {
+    public function __construct(User $user, User $author, array $categoryList, array $groupList, array $campusList, int $access, string $file, string $source = null) {
 		$this->setUser($user);
 		$this->setAuthor($author);
 		$this->setCategoryList($categoryList);
@@ -113,23 +114,23 @@ class Factory {
 	 */
 
     /**
-     * Set author id
+     * Set author
      *
-     * @param int $author
+     * @param User $author
      * @return Factory
      */
-    protected function setAuthor(int $author): Factory
+    protected function setAuthor(User $author): Factory
     {
         $this->author = $author;
         return $this;
     }
 
     /**
-     * Get author id
+     * Get author
      *
-     * @return int
+     * @return User
      */
-    protected function getAuthor(): int
+    protected function getAuthor(): User
     {
         return $this->author;
     }
@@ -203,10 +204,10 @@ class Factory {
     /**
      * Set user
      *
-     * @param int $user
+     * @param User $user
      * @return Factory
      */
-    protected function setUser(int $user): Factory
+    protected function setUser(User $user): Factory
     {
         $this->user = $user;
         return $this;
@@ -215,9 +216,9 @@ class Factory {
     /**
      * Get user
      *
-     * @return int
+     * @return User
      */
-    protected function getUser(): int
+    protected function getUser(): User
     {
         return $this->user;
     }

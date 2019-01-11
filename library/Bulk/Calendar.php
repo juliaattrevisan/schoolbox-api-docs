@@ -64,7 +64,7 @@ class Bulk_Calendar extends Bulk_Abstract
 
             /* Use factory to spawn a builder
              */
-            $factory = new \Calendar\Import\Factory($user->getId(), $author->getId(), $this->categoryList, $this->groupList, $this->campusList, \Schoolbox\Calendar\Event::ACCESS_CAMPUS, $this->getFile(), $this->source);
+            $factory = new \Calendar\Import\Factory($user, $author, $this->categoryList, $this->groupList, $this->campusList, \Schoolbox\Calendar\Event::ACCESS_CAMPUS, $this->getFile(), $this->source);
             $strategy = $factory->build();
             $strategy->load();
 

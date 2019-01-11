@@ -10,22 +10,23 @@
 
 namespace Calendar\Import;
 
-use \Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\User;
 
 abstract class Base {
 
 	/**
 	 * The person to whom these imported events are relevant
 	 *
-	 * @var int
+	 * @var User
 	 */
 	protected $user;
 
 	/**
 	 * The person who spawned the event
 	 *
-	 * @var int
+	 * @var User
 	 */
 	protected $author;
 
@@ -90,8 +91,8 @@ abstract class Base {
     /**
      * Base constructor.
      *
-     * @param int         $user
-     * @param int         $author
+     * @param User        $user
+     * @param User        $author
      * @param array       $categoryList
      * @param array       $groupList
      * @param array       $campusList
@@ -99,7 +100,7 @@ abstract class Base {
      * @param string      $file
      * @param string|null $source
      */
-	public function __construct(int $user, int $author, array $categoryList, array $groupList, array $campusList, int $access, string $file, string $source = null) {
+	public function __construct(User $user, User $author, array $categoryList, array $groupList, array $campusList, int $access, string $file, string $source = null) {
 		$this->setUser($user);
 		$this->setAuthor($author);
 		$this->setCategoryList($categoryList);
@@ -124,23 +125,23 @@ abstract class Base {
 	 */
 
 	/**
-	 * Set author id
+	 * Set author
 	 *
-	 * @param int $author
+	 * @param User $author
      * @return Base
 	 */
-	protected function setAuthor(int $author): Base
+	protected function setAuthor(User $author): Base
     {
 		$this->author = $author;
 		return $this;
 	}
 
 	/**
-	 * Get author id
+	 * Get author
 	 *
-	 * @return int
+	 * @return User
 	 */
-	protected function getAuthor(): int
+	protected function getAuthor(): User
     {
 		return $this->author;
 	}
@@ -214,10 +215,10 @@ abstract class Base {
 	/**
 	 * Set user
 	 *
-	 * @param int $user
+	 * @param User $user
      * @return Base
 	 */
-	protected function setUser(int $user): Base
+	protected function setUser(User $user): Base
     {
 		$this->user = $user;
         return $this;
@@ -226,9 +227,9 @@ abstract class Base {
 	/**
 	 * Get user
 	 *
-	 * @return int
+	 * @return User
 	 */
-	protected function getUser(): int
+	protected function getUser(): User
     {
 		return $this->user;
 	}
