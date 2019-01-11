@@ -16,7 +16,7 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 
 {# Legend + Notch titles #}
-{% set labelNoPublishedMark     = 'No published mark' %}
+{% set labelNoPublishedMark     = 'No mark' %}
 {% set labelPubMarkDraftPending = 'Unpublished draft' %}
 {% set labelPublishedMark       = 'Mark Published' %}
 
@@ -202,14 +202,13 @@
                                     {% set marks              = studentMarks[courseImpl.id][assessment.id][student.id] %}
                                     {% set publishedMark      = marks.published %}
                                     {% set draftMark          = marks.draft %}
-                                    {% if marks.published is defined %}
-                                        {% if marks.draft is defined %}
-                                            {% set indicator = 'pending' %}
-                                            {% set notchTitle = labelPubMarkDraftPending %}
-                                        {% else %}
-                                            {% set indicator = 'published' %}
-                                            {% set notchTitle = labelPublishedMark %}
-                                        {% endif %}
+
+                                    {% if draftMark %}
+                                        {% set indicator = 'pending' %}
+                                        {% set notchTitle = labelPubMarkDraftPending %}
+                                    {% elseif publishedMark %}
+                                        {% set indicator = 'published' %}
+                                        {% set notchTitle = labelPublishedMark %}
                                     {% else %}
                                         {% set indicator = 'none' %}
                                         {% set notchTitle = labelNoPublishedMark %}
