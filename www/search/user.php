@@ -136,6 +136,9 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
         -1,
         PREG_SPLIT_NO_EMPTY
     );
+    if (strlen(trim($externalUser["CourtOrderType"])) !== 0) {
+        $externalUser['AlertMessages'][] = "Court Order - ".trim($externalUser["CourtOrderType"]);
+    }
 
     /** @var SchoolboxUser $sessionUser */
     $sessionUser = $_SESSION["user"];

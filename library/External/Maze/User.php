@@ -339,6 +339,7 @@ class External_Maze_User implements External_UserInterface
 				'' AS StudentStudiesCode,
 				'' AS StudentSpecialNeedsFlag,
 				'' AS AlertMessage,
+				'' AS CourtOrderType,
 				'' AS StudentBoarder,
 				'' AS Comment,
                 '' AS StudentEnrolmentDate,

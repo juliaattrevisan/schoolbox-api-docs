@@ -123,6 +123,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
               S.FORM_STAFF_NAME AS STUDENTTUTOR, P.FULL_NAME AS STUDENTEMERGENCYNAME,
               P.MOBILE AS STUDENTEMERGENCYPHONE,
               '' AS COMMENT,
+              '' AS COURTORDERTYPE,
               '' AS STUDENTENROLMENTDATE,
               '' AS STUDENTLEAVINGDATE,
               '' AS STUDENTIBFLAG,
