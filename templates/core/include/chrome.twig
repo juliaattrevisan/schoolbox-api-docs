@@ -246,7 +246,7 @@
                     {% block messaging %}
                         {% if ws.enabled and user.current.id %}
                             <section class="right-small" id="notifications">
-                                <a class="right-off-canvas-toggle icon-notifications show-for-xlarge-up" id="notification-toggle" data-unread="{{ ws.unread }}">
+                                <a class="right-off-canvas-toggle icon-notifications" id="notification-toggle" data-unread="{{ ws.unread }}">
                                     <span data-unread-count>{{ ws.unread ?? '' }}</span>
                                 </a>
                             </section>
