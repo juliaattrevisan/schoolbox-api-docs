@@ -27,7 +27,7 @@
     {# a task link should display as a link regardless of whether iframe safe url or not #}
     {% elseif preview.type == 'redirect' or preview.type == 'iframe' %}
         <div class="card small-12">
-            <a href="{{ assessment.url }}" target="_blank" title="Visit {{ preview.fragment }}">
+            <a href="{{ preview.fragment }}" target="_blank" title="Visit {{ preview.fragment }}">
                 <div class="icon-link"></div>
                 <h3>{{ assessment.title }}</h3>
                 <p class="meta">{{ preview.fragment }}</p>
