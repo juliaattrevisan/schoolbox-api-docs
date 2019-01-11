@@ -84,7 +84,7 @@ class Csv extends Base
                     ) = $thisRow;
             } catch (\ErrorException $e) {
                 $output[] = array(
-                    'name'   => \Scrub::text($name),
+                    'name'   => \Scrub::text($thisRow[5]),
                     'status' => 'Not Added',
                     'error'  => 'Not enough columns in CSV',
                 );
