@@ -31,21 +31,29 @@ $(function () {
     */
     $.fn.schoolboxResource_ProxyReplacment();
 
-    // Notifications hover
-    $('#notification-toggle, .right-off-canvas-menu').hover(function() {
-        $('.right-off-canvas-menu').addClass('overlap');
-    }, function() {
-        $('.right-off-canvas-menu').removeClass('overlap');
-    });
+    // Notifications dock/undock
+    $('#right-menu-dock').on('click', function() {
+        var dockState = $(this).data('dock-state');
 
-    // Notifications menu click
-    $('#notification-toggle a, #notification-toggle-full').on('click', function() {
-        $('#inner-wrap').toggleClass('right-open');
-        $('#notification-toggle-full').toggleClass('raquo');
+        // Adjust classes
+        if (dockState) {
+            $('#inner-wrap').removeClass('right-open');
+        } else {
+            $('#inner-wrap').addClass('right-open');
+        }
 
-        var notificationState = $('#inner-wrap').hasClass('right-open') ? 'show' : 'hide';
+        $('#off-canvas-wrap').removeClass('move-left');
+
+        // Update the hover title on the dock button
+        var title = dockState ? $(this).data('title-dock') : $(this).data('title-undock');
+        $(this).attr('title', title);
+
+        var notificationState = dockState ? 'hide' : 'show';
         $.post('/ajax/notificationsTray', {state: notificationState});
-        
+
+        // Update dock state in the element's data property
+        $(this).data('dock-state', !dockState);
+
         // Update top nav items
         updateTopNavItems();
     });
@@ -201,7 +209,7 @@ $(function () {
         // All the possible things to remove from the #top-menu width
         var profileWidth = $('#profile-drop').is(':visible') ? document.getElementById('profile-drop').offsetWidth : 0;
         var searchWidth = $('#search').is(':visible') ? document.getElementById('search').offsetWidth : 0;
-        var notificationsWidth = $('#notification-toggle').is(':visible') && $('#message-list').not(':visible') ? document.getElementById('notification-toggle').offsetWidth : 0;
+        var notificationsWidth = $('#notifications').is(':visible') && $('#message-list').not(':visible') ? document.getElementById('notifications').offsetWidth : 0;
         // ^ have to check that the notfications bar isn't docked as well, if it is- it's not part of the #top-menu width
         var extraWidth = profileWidth + searchWidth + notificationsWidth;
 

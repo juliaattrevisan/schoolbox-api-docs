@@ -245,11 +245,8 @@
 
                     {% block messaging %}
                         {% if ws.enabled and user.current.id %}
-                            <section class="right-small" id="notification-toggle">
-                                <a class="right-off-canvas-toggle icon-notifications hidden-for-xlarge-up" data-unread="{{ ws.unread }}">
-                                    <span data-unread-count>{{ ws.unread ?? ''}}</span>
-                                </a>
-                                <a class="icon-notifications show-for-xlarge-up" data-unread="{{ ws.unread }}">
+                            <section class="right-small" id="notifications">
+                                <a class="right-off-canvas-toggle icon-notifications" id="notification-toggle" data-unread="{{ ws.unread }}">
                                     <span data-unread-count>{{ ws.unread ?? '' }}</span>
                                 </a>
                             </section>
@@ -303,10 +300,21 @@
 
         {% block instant %}
             {% if ws.enabled and user.current.id %}
+                {% set dockNotifsTitle = 'Pin notifications' %}
+                {% set undockNotifsTitle = 'Unpin notifications' %}
                 <aside class="right-off-canvas-menu island no-pad hide-for-print" id="msgs" data-unread="{{ ws.unread }}">
                     <ul class="off-canvas-list" id="message-list">
                         <li>
-                            <label id="notification-toggle-full" title="Show or hide notifications" class="{{ user.current.getHideNotificationsTray ? 'raquo' : '' }}">Notifications</label>
+                            <a
+                                href="#"
+                                title="{{ user.current.getHideNotificationsTray ? dockNotifsTitle : undockNotifsTitle }}"
+                                class="right-menu-dock show-for-xlarge-up"
+                                id="right-menu-dock"
+                                data-dock-state="{{ not user.current.getHideNotificationsTray }}"
+                                data-title-dock="{{ dockNotifsTitle }}"
+                                data-title-undock="{{ undockNotifsTitle }}"
+                            ></a>
+                            <label id="notification-toggle-full">Notifications</label>
                         </li>
                         <li>
                             <a id="msg-mar" class="mark-all-read button icon-approve" href="#">Mark all read</a>
