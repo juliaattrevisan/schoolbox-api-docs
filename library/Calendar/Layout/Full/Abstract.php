@@ -52,7 +52,7 @@ abstract class Calendar_Layout_Full_Abstract
      */
     public function __construct($page, User $user, $date, User $viewer, Calendar_Api_Factory $factory, ModuleChecker $moduleChecker)
     {
-        $api = $factory->produceForUser($user);
+        $api = $factory->produceForUser($user, $viewer);
 
         $this->setApi($api);
 

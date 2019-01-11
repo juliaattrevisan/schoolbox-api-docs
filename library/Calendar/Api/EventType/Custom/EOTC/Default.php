@@ -24,9 +24,9 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
     /**
      * @inheritdoc
      */
-    public function __construct(int $connectorId, User $user)
+    public function __construct(int $connectorId, User $user, User $viewer)
     {
-        parent::__construct($connectorId, $user);
+        parent::__construct($connectorId, $user, $viewer);
         $this->calendarHandler = (new \EOTC\EventConnector())->setUser($user);
     }
 

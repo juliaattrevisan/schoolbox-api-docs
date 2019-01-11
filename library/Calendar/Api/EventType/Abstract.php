@@ -30,15 +30,24 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
      */
     private $user;
 
+    /**
+     * The user who is viewing the current user (the current session)
+     *
+     * @var Schoolbox\User
+     */
+    private $viewer;
+
 
     /**
      * @param int  $connectorId
      * @param User $user
+     * @param User $viewer
      */
-    public function __construct(int $connectorId, User $user)
+    public function __construct(int $connectorId, User $user, User $viewer)
     {
         $this->connectorId = $connectorId;
         $this->user        = $user;
+        $this->viewer      = $viewer;
     }
 
     /* Getters/Setters
@@ -64,6 +73,13 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
         return $this->user;
     }
 
+    /**
+     * @return User
+     */
+    protected function getViewer(): User
+    {
+        return $this->user;
+    }
 
     /**
      * Helper method for loading this event type's calendar connector config.

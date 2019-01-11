@@ -439,6 +439,7 @@ class Calendar extends DeprecatedModel
      * Get all events occurring across the specified date span.
      *
      * @param \Schoolbox\User $user
+     * @param \Schoolbox\User $user
      * @param int             $startTimestamp If not null, filter out events that end on
      *                                        or before this time
      *                                        (end times are exclusive in calendars)
@@ -456,7 +457,7 @@ class Calendar extends DeprecatedModel
      *                                * type: if set, only events of this type will be retrieved.
      * @return Collection
      */
-    public function getDayEvents(\Schoolbox\User $user, $startTimestamp, $endTimestamp, $filter = array())
+    public function getDayEvents(\Schoolbox\User $user, \Schoolbox\User $viewer, $startTimestamp, $endTimestamp, $filter = array())
     {
         $firstCampus = false;
 
@@ -686,8 +687,6 @@ class Calendar extends DeprecatedModel
 
                 // TODO port this into SQL query so we don't bother building the event just to throw it away
                 $isFutureEvent   = $event->getPublishDate()->getUnixTimeStamp() >= time();
-                /** @var \Schoolbox\User $viewer */
-                $viewer = $_SESSION['user'];
                 $isAlwaysVisible = $viewer->isSuperuser() || $event->isOwner() || $event->isEditable();
 
                 if($isAlwaysVisible || !$isFutureEvent) {

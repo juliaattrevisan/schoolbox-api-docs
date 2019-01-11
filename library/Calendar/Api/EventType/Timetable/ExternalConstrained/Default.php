@@ -29,9 +29,9 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
     /**
      * @inheritdoc
      */
-    public function __construct(int $connectorId, User $user, IConfigLoader $configLoader)
+    public function __construct(int $connectorId, User $user, User $viewer, IConfigLoader $configLoader)
     {
-        parent::__construct($connectorId, $user);
+        parent::__construct($connectorId, $user, $viewer);
         $this->externalTimetable = new External_Timetable();
         $this->configLoader = $configLoader;
     }

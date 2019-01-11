@@ -31,16 +31,18 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
      *
      * @param int                    $connectorId
      * @param User                   $user
+     * @param User                   $viewer
      * @param AssessmentDataSource   $assessmentDataSource
      * @param Visibility             $visibility
      */
     public function __construct(
         int $connectorId,
         User $user,
+        User $viewer,
         AssessmentDataSource $assessmentDataSource,
         Visibility $visibility
     ) {
-        parent::__construct($connectorId, $user);
+        parent::__construct($connectorId, $user, $viewer);
         $this->calendarHandler       = new Calendar();
         $this->assessmentDataSource  = $assessmentDataSource;
         $this->visibility            = $visibility;

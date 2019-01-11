@@ -54,11 +54,12 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      *
      * @param int             $connectorId
      * @param User            $user
+     * @param User            $viewer
      * @param IExternalEvents $externalEvents
      */
-    public function __construct(int $connectorId, User $user, $externalEvents)
+    public function __construct(int $connectorId, User $user, User $viewer, $externalEvents)
     {
-        parent::__construct($connectorId, $user);
+        parent::__construct($connectorId, $user, $viewer);
         $this->externalEvents  = $externalEvents;
         $this->eventTypeMapper = EventTypeMapper::getInstance();
         $this->userMapper      = UserMapper::getInstance();
