@@ -169,6 +169,7 @@ if (is_numeric($this->arg[0])) {
             }
         }
 
+        $output['QUOTE_ID'] = $quotePostID;
         $output['ACTION']       = 'Post';
         $output['ACTION_CLASS'] = 'icon-add';
         $output['THREAD_POST']  = 'Reply';

@@ -170,6 +170,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
             ->setIcon("/portrait.php?size={$this->iconSize}&userId=" . $poster->getExternalId())
             ->setHref($href . ($deduplicate ? "#$postId" : ''))
             ->setSeverity(Logger::INFO)
+            ->setFolderId($cat->getId())
             ->setNamespace($this->getSlug())
             ->setBody($post->getBodyWithoutQuote())
             ->addTopic("forum.$postId.$action");
@@ -192,7 +193,6 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 
         try {
             $bob      = $this->newBuilder($post, $poster, ':user posted in :thread in :folder', self::TRIGGER_FOLLOWED)
-                             ->setFolderId($post->getThread()->getCategory()->getId())
                              ->addFilter('roletype', array($roletype));
         } catch (Mapper\Exception $e) {
             return $envelope;
