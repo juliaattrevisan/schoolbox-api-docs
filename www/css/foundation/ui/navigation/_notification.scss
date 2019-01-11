@@ -81,7 +81,7 @@ $allow-notification-stash: $xlarge-up;
         z-index: 1003;
 
         @media #{$allow-notification-stash} {
-            padding: 0 0 0 2.5rem;
+            padding: 0 0 0 3rem;
         }
     }
 
@@ -93,13 +93,14 @@ $allow-notification-stash: $xlarge-up;
             padding: 0.5rem;
             position: absolute;
             left: 0;
-            transform: translateY(50%);
+            transform: translateY(40%);
             width: 2.5rem;
             z-index: 1; // Safari will not see the icon without this
 
             &::after {
-                content: "\e913"; // pin icon
+                content: "\e915"; // hollow pin icon
                 font-family: $font-family-icon;
+                font-size: 1rem;
                 padding-left: rem-calc(4);
             }
         }
@@ -154,6 +155,14 @@ $allow-notification-stash: $xlarge-up;
         background-color: $accent-background;
         a {
             font-weight: bold;
+        }
+    }
+}
+
+@media #{$allow-notification-stash} {
+    .right-open {
+        .right-menu-dock::after {
+            content: "\e913"; // pin icon
         }
     }
 }
