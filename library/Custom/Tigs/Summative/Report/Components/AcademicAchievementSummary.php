@@ -202,10 +202,21 @@ class AcademicAchievementSummary extends BaseComponent
             return null;
         }
 
-        return [
+        $marks = [
             'link'  => $this->getAasLink($dueWork),
             'marks' => $this->getMarks($dueWork, $participant),
-        ];
+            ];
+
+        $authFeedback = $participant->getAuthoritativeFeedback(true);
+        if($dueWork->isFeedbackVisibleToUser($this->viewer)) {
+            $marks = [
+                'comment' => $authFeedback->getComment(),
+                'commentBy' => $authFeedback->getReviewer(),
+            ];
+        }
+
+        return $marks;
+
     }
 
 

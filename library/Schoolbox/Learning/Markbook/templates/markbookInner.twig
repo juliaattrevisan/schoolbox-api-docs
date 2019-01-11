@@ -148,7 +148,7 @@
                                     %}
                                     <a class="{{ urgency.marks(normalisedMark) }}"
                                        href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
-                                       title="{{ participant.mostRecentFeedback.comment }}">{{ label }}</a>
+                                       title="{{ participant.authoritativeFeedback(true).comment }}">{{ label }}</a>
                                 {% endif %}
                             {% endif %}
                         </td>
