@@ -28,6 +28,7 @@ use Schoolbox\Pastoral\Comment\Model as PastoralComment;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
+use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
@@ -201,6 +202,14 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
+        $groups = $this->pastoralGroupMemberMapper->findByColumn(
+            'user_id',
+            $this->getUser()->getId()
+        );
+        $groups->sortByCallback(function (PastoralGroupMember $a, PastoralGroupMember $b) {
+            return strnatcasecmp($a->getGroup()->getName(), $b->getGroup()->getName());
+        });
+
         $this->getResponse()->content->set([
             'template' => '@pastoral/index.twig',
             'data'     => [
@@ -208,10 +217,7 @@ class Controller extends Base
                 'recentStudents'   => $this->pastoralAuditMapper->findRecentlyViewedStudentsForUser($this->getUser()),
                 'recentDashboard'  => $this->pastoralDataSource->findRecentDashboard($this->getUser()),
                 'reportsDashboard' => $this->pastoralReportMapper->findForUserDashboard($this->getUser()),
-                'groups'           => $this->pastoralGroupMemberMapper->findByColumn(
-                    'user_id',
-                    $this->getUser()->getId()
-                ),
+                'groups'           => $groups,
             ],
             'title' => 'Dashboard',
         ]);
