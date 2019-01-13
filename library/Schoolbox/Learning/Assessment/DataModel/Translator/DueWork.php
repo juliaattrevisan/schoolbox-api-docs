@@ -130,7 +130,7 @@ class DueWork implements IAssessmentTypeTranslator
                     ->setId($file->getId())
                     ->setBox($dataModel)
                     ->setStorage($file->getStorage())
-                    ->setFilename($file->getFilename())
+                    ->setBasename($file->getFilename())
             );
         }
 
