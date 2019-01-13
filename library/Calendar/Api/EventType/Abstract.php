@@ -78,7 +78,7 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
      */
     protected function getViewer(): User
     {
-        return $this->user;
+        return $this->viewer;
     }
 
     /**
