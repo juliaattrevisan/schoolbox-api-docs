@@ -261,7 +261,8 @@ try {
             if (ConfigMapper::getInstance()->get('resource_booking_enabled')) {
                 $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
                     getConnector(Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class)->getId(),
-                    $user, $viewer
+                    $user,
+                    $viewer,
                     [$resourceId]
                 );
             }
