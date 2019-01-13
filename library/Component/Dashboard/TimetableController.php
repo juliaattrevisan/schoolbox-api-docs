@@ -263,7 +263,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     $router   = $this->getSitePage()->getDi()->get('router');
                     $deepLink = urlencode(http_build_query($deepLinkParams));
                     return "{$router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}";
-                } catch (\Aura\Router\Exception\RouteNotFound|RuntimeException|\Aura\Di\Exception\ServiceNotFound $e) {
+                } catch (\Throwable $e) {
                     \trigger_error($e->getMessage(), E_USER_WARNING);
                     return '';
                 }
@@ -281,9 +281,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      * @param array               $timetable
      * @param Alaress_Date_Format $now
      * @return array
-     * @throws RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function buildTimetableContext(array $campusList, int $campusId, array $timetable, Alaress_Date_Format $now): array
     {
@@ -316,9 +313,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      * @param string[][][]        $period
      * @param Alaress_Date_Format $now
      * @return array
-     * @throws RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function buildPeriodContext(array $campusList, int $campusId, ?array $currentPeriod, array $period, Alaress_Date_Format $now): array
     {
@@ -350,9 +344,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      * @param Alaress_Date_Format $now
      * @param array               $class
      * @return array
-     * @throws RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function buildClassContext(array $campusList, int $campusId, array $period, Alaress_Date_Format $now, array $class): array
     {
