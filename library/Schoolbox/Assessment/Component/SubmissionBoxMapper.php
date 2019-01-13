@@ -9,20 +9,19 @@
 
 namespace Schoolbox\Assessment\Component;
 
+use Eportfolio\ShowcaseMapper;
+use External_Markbook;
 use PDO;
 use PDOStatement;
 use Schoolbox;
-use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use Schoolbox\Assessment\ActivityFactory;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Storage;
-use Eportfolio\ShowcaseMapper;
 use Schoolbox\User;
-use External_Markbook;
-use Schoolbox\GenericCollection;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 /**
  * Class SubmissionBoxMapper
@@ -102,14 +101,14 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         ));
 
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToExternalMarkbook'));
-        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteFromMarkbook']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteFromMarkbook']);
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteRubricLevels']);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteSubmissions'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteReturns'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteShowcase'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteSubmissions']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteReturns']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteShowcase']);
 
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreToExternalMarkbook']);
     }
@@ -163,6 +162,21 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
     {
         /** @var SubmissionBox $model */
         return parent::createModel($idValue)->setAssessmentModel($this->getJoinMapper('assessmentModel')->createModel());
+    }
+
+
+    /**
+     * Persist due work files.
+     *
+     * (This could be used as a callback, but I don't know all the points at
+     *  which a due work is saved, so for safety's sake it must be called
+     *  manually.)
+     *
+     * @param SubmissionBox $dueWork
+     */
+    public function saveFiles(SubmissionBox $dueWork): void
+    {
+        $this->cascadeJoin('files', ['box_id' => $dueWork->getId()], $dueWork->getAttachments());
     }
 
 

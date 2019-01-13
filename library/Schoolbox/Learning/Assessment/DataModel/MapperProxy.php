@@ -842,6 +842,8 @@ class MapperProxy
                 $boxMapper->save($subObject);
             }
 
+            $boxMapper->saveFiles($subObject);
+
         } elseif ($subObject instanceof Quiz) {
             // Legacy Quiz SitePage Controllers require that we preserve this field
             $subObject->setCategory($assessable->getBaseContext()->getFolder());
