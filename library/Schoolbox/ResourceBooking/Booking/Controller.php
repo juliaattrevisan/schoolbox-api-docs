@@ -638,6 +638,7 @@ class Controller extends Base
             $roomSource = new \Calendar_Api_EventType_Timetable_Room(
                 Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                 $this->getUser(),
+                $this->getUser(),
                 $this->externalTimetableHandler,
                 [$item->getRoomCode() => $item->getId()]
             );

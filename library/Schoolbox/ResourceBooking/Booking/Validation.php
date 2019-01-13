@@ -92,7 +92,7 @@ class Validation
         External_Timetable $externalTimetableHandler,
         CampusMapper $campusMapper
     ) {
-        $this->setUser($user);
+        $this->user = $user;
         $this->setBookingMapper($bookingMapper);
         $this->setStatusMapper($statusMapper);
         $this->setTermMapper($termMapper);
@@ -130,7 +130,7 @@ class Validation
 
         // Only moderators of this booking may override validation
         $override = !empty($postData['override_validation'])
-            && $resource->canUserModerateThisItem($this->getUser());
+            && $resource->canUserModerateThisItem($this->user);
 
         try {
             $startDate = Alaress_Date_Format::newLocal($postData['startDate'])->getDateTimeObject();
@@ -539,30 +539,11 @@ class Validation
     protected function getTimetableRoomEvents($roomCode, DateTime $startDate, DateTime $endDate)
     {
         // Using  [$roomCode => true] to make Calendar_Api_EventType_Timetable_Room::getEvents happy
-        $timetableRoom = new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->getUser(), $this->externalTimetableHandler, [$roomCode => true]);
+        $timetableRoom = new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, [$roomCode => true]);
 
         return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
     }
 
-    /**
-     * @return User
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * @param  User $user
-     *
-     * @return $this
-     */
-    public function setUser($user)
-    {
-        $this->user = $user;
-
-        return $this;
-    }
 
     /**
      * @return BookingMapper

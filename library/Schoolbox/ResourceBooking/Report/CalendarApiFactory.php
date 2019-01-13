@@ -57,6 +57,7 @@ class CalendarApiFactory
         $resourceApi = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
             Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
             $this->user,
+            $this->user,
             [$resource->getId()]
         );
         $api->add($resourceApi);
@@ -65,6 +66,7 @@ class CalendarApiFactory
         if ($roomCode = $resource->getRoomCode()) {
             $timetableApi = new Calendar_Api_EventType_Timetable_Room(
                 Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $this->user,
                 $this->user,
                 $this->timetable,
                 [$roomCode => $resource->getId()]
@@ -105,6 +107,7 @@ class CalendarApiFactory
             $resourceApi = new \Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
                 Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                 $this->user,
+                $this->user,
                 $resourceIds
             );
             $api->add($resourceApi);
@@ -112,6 +115,7 @@ class CalendarApiFactory
         if ($getTimetabledRooms && !empty($roomCodes)) {
             $timetableApi = new Calendar_Api_EventType_Timetable_Room(
                 Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $this->user,
                 $this->user,
                 $this->timetable,
                 $roomCodes
