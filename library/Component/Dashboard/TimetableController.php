@@ -218,9 +218,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      * @param array               $campusList
      * @param int                 $campusId
      * @return string
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     private function getAttendanceLink(array $class, Alaress_Date_Format $now, array $period, array $campusList, int $campusId): string
     {
@@ -261,10 +258,15 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     'daycode'     => $this->dayNumber[$campusId],
                 ];
 
-                /** @var Router $router */
-                $router   = $this->getSitePage()->getDi()->get('router');
-                $deepLink = urlencode(http_build_query($deepLinkParams));
-                return "{$router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}";
+                try {
+                    /** @var Router $router */
+                    $router   = $this->getSitePage()->getDi()->get('router');
+                    $deepLink = urlencode(http_build_query($deepLinkParams));
+                    return "{$router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}";
+                } catch (\Aura\Router\Exception\RouteNotFound|RuntimeException|\Aura\Di\Exception\ServiceNotFound $e) {
+                    \trigger_error($e->getMessage(), E_USER_WARNING);
+                    return '';
+                }
             default:
                 return '';
         }
