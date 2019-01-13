@@ -5,7 +5,8 @@ This is a table derived from a rubric. It does not render the capability column.
 
 Data:
     error:               string           - Optional. If present, the reason why we can't render the component
-    marks                int[]            - Keyed by criterion name
+    marks                array            -
+    marks['rubric']      int[]            - Keyed by criterion name
 #}
 
 <p class="meta">Academic Achievement Summary</p>
@@ -20,7 +21,7 @@ Data:
         </tr>
         </thead>
         <tbody>
-        {% for criterion, mark in marks %}
+        {% for criterion, mark in marks.rubric %}
             <tr>
                 <td>{{ criterion }}</td>
                 <td>{{ mark }}</td>
