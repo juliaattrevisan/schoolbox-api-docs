@@ -164,8 +164,8 @@ class Importer
      * @param UnitSpecMapper         $unitSpecMapper
      * @param RoleAccessMapper       $roleAccessMapper
      * @param Rubric\RubricMapper    $rubricMapper
-     * @param Rubric\GroupMapper     $rubricGroupMapper
-     * @param Rubric\CriterionMapper $rubricCriterionMapper
+     * @param Rubric\GroupMapper     $rubricCapabilityMapper
+     * @param Rubric\CriterionMapper $rubricIndicatorMapper
      * @param AssessmentDataSource   $assessmentDataSource
      * @param NodeMapper             $nodeMapper
      * @param ErrorMapper            $errorMapper
@@ -181,8 +181,8 @@ class Importer
         UnitSpecMapper $unitSpecMapper,
         RoleAccessMapper $roleAccessMapper,
         Rubric\RubricMapper $rubricMapper,
-        Rubric\GroupMapper $rubricGroupMapper,
-        Rubric\CriterionMapper $rubricCriterionMapper,
+        Rubric\GroupMapper $rubricCapabilityMapper,
+        Rubric\CriterionMapper $rubricIndicatorMapper,
         AssessmentDataSource $assessmentDataSource,
         NodeMapper $nodeMapper,
         ErrorMapper $errorMapper
@@ -198,8 +198,8 @@ class Importer
         $this->unitSpecMapper         = $unitSpecMapper;
         $this->roleAccessMapper       = $roleAccessMapper;
         $this->rubricMapper           = $rubricMapper;
-        $this->rubricCapabilityMapper = $rubricGroupMapper;
-        $this->rubricIndicatorMapper  = $rubricCriterionMapper;
+        $this->rubricCapabilityMapper = $rubricCapabilityMapper;
+        $this->rubricIndicatorMapper  = $rubricIndicatorMapper;
         $this->assessmentDataSource   = $assessmentDataSource;
         $this->nodeMapper             = $nodeMapper;
         $this->errorMapper            = $errorMapper;
