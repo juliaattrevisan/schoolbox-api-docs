@@ -47,6 +47,7 @@ interface External_UserInterface {
      * StudentMedicalAlert
      * StudentMobilePhone
      * StudentSpecialNeedsFlag
+     * EnglishSecondFlag: string. '0' => false, '1' => true, '' => unknown
      * StudentStudiesCode
      * CourtOrderType
      * AlertMessage

@@ -104,16 +104,17 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         // StudentEmergencyPhoneAlt
         // StudentMedicalAlert
         // StudentSpecialNeedsFlag
+        // EnglishSecondFlag
         // AlertMessage
         // StudentBoarder
         // StudentMobilePhone
 
-        // use this for mapping DB2INDICES to NormalIndices
+        // Use this for mapping DB2INDICES to NormalIndices
 
         $caseSensitiveFields = array(
             'StudentID', 'StudentGiven1', 'StudentSurname', 'StudentBirthDate',
             'StudentHouseDescription', 'StudentYearLevel', 'StudentTutor', 'StudentHeadOfHouse', 'StudentForm',
-            'StudentFormStaffName', 'StudentEmergencyName', 'StudentEmergencyPhone', 'StudentMobilePhone'
+            'StudentFormStaffName', 'StudentEmergencyName', 'StudentEmergencyPhone', 'StudentMobilePhone', 'EnglishSecondFlag'
         );
 
         $stmt = $this->getConnection()->prepareQuery("
@@ -128,6 +129,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
               '' AS STUDENTLEAVINGDATE,
               '' AS STUDENTIBFLAG,
               '' AS STUDENTSTUDIESCODE,
+              '' AS ENGLISHSECONDFLAG,
               0 AS COUNTINDIVIDUALEDUCATIONPLANS
             FROM DB2INST1.SCHOOLBOX_STUDENTS S
             LEFT JOIN DB2INST1.SCHOOLBOX_PARENT_STUDENT PS ON S.STUDENT_NUMBER = PS.STUDENT_NUMBER

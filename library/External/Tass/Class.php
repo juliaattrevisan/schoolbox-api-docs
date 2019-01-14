@@ -58,6 +58,7 @@ class External_Tass_Class implements External_ClassInterface {
                 student.year_grp as yearlevel, 
                 student.house, 
                 '' AS StudentMedicalAlert, 
+                '' AS EnglishSecondFlag,
                 '' AS StudentSpecialNeedsFlag, 
                 '' as StudentTutorDescription
             FROM studsub

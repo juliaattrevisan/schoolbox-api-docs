@@ -55,6 +55,7 @@ class External_Humanedge_Ngsl_Class extends External_Humanedge_Class implements 
                 '' AS house,
                 '' AS StudentMedicalAlert,
                 '' AS StudentSpecialNeedsFlag,
+                '' AS EnglishSecondFlag,
                 '' AS StudentTutorDescription,
                 st.Code AS synergy_id,
                 '' AS ClassCampus

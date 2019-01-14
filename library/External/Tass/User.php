@@ -160,6 +160,7 @@ class External_Tass_User implements External_UserInterface
             '' AS StudentMedicalAlert,
             '' AS StudentMobilePhone,
             '' AS StudentSpecialNeedsFlag,
+            '' AS EnglishSecondFlag,
             '' AS StudentStudiesCode,
             '' AS AlertMessage,
             '' AS CourtOrderType,
@@ -317,23 +318,23 @@ class External_Tass_User implements External_UserInterface
         }
         if ($user->getRole()->isStudent()) {
             $sql = "SELECT class, studsub.cmpy_code, semester, studsub.sub_code, student.year_grp, sub_desc, sub_type
-					FROM studsub
-					JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
-					JOIN subtab ON subtab.sub_code=studsub.sub_code AND subtab.cmpy_code=studsub.cmpy_code
-					WHERE studsub.stud_code = '$externalId'
-					AND semester = '{$this->database->quote($this->getCurrentSemester($externalId))}'
-					AND yr_study = '{$this->database->quote($this->getCurrentYear($externalId))}'
-					ORDER BY studsub.sub_code ASC, studsub.class ASC
-			";
+                    FROM studsub
+                    JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
+                    JOIN subtab ON subtab.sub_code=studsub.sub_code AND subtab.cmpy_code=studsub.cmpy_code
+                    WHERE studsub.stud_code = '$externalId'
+                    AND semester = '{$this->database->quote($this->getCurrentSemester($externalId))}'
+                    AND yr_study = '{$this->database->quote($this->getCurrentYear($externalId))}'
+                    ORDER BY studsub.sub_code ASC, studsub.class ASC
+            ";
         } else if ($user->getRole()->isStaff()) {
             $sql = "SELECT class, tchsub.cmpy_code, semester, tchsub.sub_code, year_num, tchsub.year_grp, sub_desc, sub_type
-					FROM tchsub
-					JOIN subtab ON subtab.sub_code=tchsub.sub_code AND subtab.cmpy_code=tchsub.cmpy_code
-					WHERE tch_code = '$externalId'
-					AND semester = '{$this->database->quote($this->getCurrentSemester($externalId))}'
-					AND year_num = '{$this->database->quote($this->getCurrentYear($externalId))}'
-					ORDER BY tchsub.sub_code ASC, tchsub.class ASC
-			";
+                    FROM tchsub
+                    JOIN subtab ON subtab.sub_code=tchsub.sub_code AND subtab.cmpy_code=tchsub.cmpy_code
+                    WHERE tch_code = '$externalId'
+                    AND semester = '{$this->database->quote($this->getCurrentSemester($externalId))}'
+                    AND year_num = '{$this->database->quote($this->getCurrentYear($externalId))}'
+                    ORDER BY tchsub.sub_code ASC, tchsub.class ASC
+            ";
         } else {
             return [];
         }
@@ -363,8 +364,8 @@ class External_Tass_User implements External_UserInterface
     public function getEnrolledStudents($tassID)
     {
         /* If the TassID is 8 characters long then it is assumed to be
-		 * someone in the split-parent scenario.
-		 */
+         * someone in the split-parent scenario.
+         */
 
         // id has to have a [P]arent prefix (or [S]pouse)
         if (!preg_match('#(?:P|S)[0-9A-Za-z]+#s', $tassID)) {

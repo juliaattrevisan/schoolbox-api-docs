@@ -180,6 +180,7 @@ class External_Schoolpro_User implements External_UserInterface
                 'StudentMedicalAlert'     => $medicalNoteStr,
                 'StudentMobilePhone'      => '',
                 'StudentSpecialNeedsFlag' => '',
+                'EnglishSecondFlag'       => '',
                 'AlertMessage'            => '',
                 'CourtOrderType'          => '',
                 'Comment'                 => '',

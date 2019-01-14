@@ -66,6 +66,7 @@ class External_Humanedge_Class implements External_ClassInterface
                 '' AS StudentHouseDescription,
                 '' AS StudentMedicalAlert,
                 '' AS StudentSpecialNeedsFlag,
+                '' AS EnglishSecondFlag,
                 '' AS StudentTutorDescription,
                 st.Code AS synergy_id,
                 '' AS ClassCampus

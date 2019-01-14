@@ -44,6 +44,7 @@ class Synchronise_Synergetic_Kings_KingsUser extends External_Synergetic_User {
 					vStudents.StudentEmergency3Phone,
 					vStudents.StudentEmergency3PhoneAlt,
 					vStudents.StudentMedicalAlert,
+					vStudents.EnglishSecondFlag,
 					vStudents.StudentSpecialNeedsFlag,
 					AlertMessage,
 					vStudents.StudentBoarder,

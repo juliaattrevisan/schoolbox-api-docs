@@ -59,6 +59,7 @@ class External_Doublefirst_Class implements External_ClassInterface
                     pbi.House as house, 
                     CAST(pbi.UrgentNotes as NVARCHAR(max)) as StudentMedicalAlert, 
                     0 as StudentSpecialNeedsFlag,
+                    '' as EnglishSecondFlag,
                     null AS StudentTutorDescription,
                     pbi.PupilID as synergy_id, 
                     null AS ClassCampus 

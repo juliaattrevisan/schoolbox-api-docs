@@ -40,6 +40,7 @@ class External_Pcschools_Class implements External_ClassInterface
                     st.HOUSE AS house,
                     st.ALERT AS StudentMedicalAlert,
                     '' AS StudentSpecialNeedsFlag,
+                    '' AS EnglishSecondFlag,
                     '' AS StudentTutorDescription,
                     st.STUDKEY AS synergy_id,
                     st.CAMPUS AS ClassCampus

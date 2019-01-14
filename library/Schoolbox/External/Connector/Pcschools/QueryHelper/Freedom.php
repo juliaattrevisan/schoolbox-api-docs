@@ -221,6 +221,7 @@ class Freedom implements IQueryHelper
                 ''                              AS CourtOrderType,
                 ''                              AS StudentMobilePhone,
                 ''                              AS StudentSpecialNeedsFlag,
+                ''                              AS EnglishSecondFlag,
                 ''                              AS StudentStudiesCode,
                 S.ALERT                         AS AlertMessage,
                 0                               AS countIndividualEducationPlans

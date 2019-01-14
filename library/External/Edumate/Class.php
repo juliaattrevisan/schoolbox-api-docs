@@ -43,6 +43,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
                 HOUSE,
                 '' AS StudentMedicalAlert,
                 '' AS StudentSpecialNeedsFlag,
+                '' AS EnglishSecondFlag,
                 '' AS StudentTutorDescription,
                 '' AS ClassCampus
             FROM  $studentClass

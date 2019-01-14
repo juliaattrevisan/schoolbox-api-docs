@@ -92,6 +92,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
                 s.House        AS StudentHouseDescription,
                 s.MedicalConditions AS StudentMedicalAlert,
                 s.SpecialNeeds AS StudentSpecialNeedsFlag,
+                ''             AS EnglishSecondFlag,
                 s.HomeGroup    AS StudentTutorDescription,
                 s.Code         AS synergy_id,
                 ''             AS ClassCampus

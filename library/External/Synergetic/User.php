@@ -284,7 +284,7 @@ class External_Synergetic_User implements External_UserInterface
                         END AS Email
             FROM        dbo.RelationShips r
             JOIN        dbo.vCommunityAddresses ON RelatedID = vCommunityAddresses.ID
-			WHERE		CASE 
+            WHERE		CASE 
                             WHEN UseEmail = 'O' THEN OccupEmail
                             WHEN UseEmail = 'P' THEN Email
                             WHEN UseEmail = 'D' THEN DefaultEmail
@@ -368,6 +368,7 @@ class External_Synergetic_User implements External_UserInterface
                         vStudents.StudentMedicalAlert,
                         vStudents.StudentMobilePhone,
                         vStudents.StudentSpecialNeedsFlag,
+                        vStudents.EnglishSecondFlag,
                         vStudents.StudentStudiesCode,
                         AlertMessage,
                         vStudents.LegalCourtOrderType AS CourtOrderType,
@@ -1025,13 +1026,13 @@ class External_Synergetic_User implements External_UserInterface
                             s.StudentYearLevel,
                             s.StudentCampus,
                             s.StudentGender
-			FROM            dbo.vStudentContactAllAddress s
+            FROM            dbo.vStudentContactAllAddress s
             JOIN            FileSemesters Semester ON
                                 Semester.FileSemester = s.FileSemester AND
                                 Semester.FileYear = s.FileYear AND
                                 Semester.SystemCurrentFlag = 1
-			LEFT JOIN       dbo.Community cp ON s.StudentContactID = cp.ID
-			LEFT JOIN       dbo.Community cs ON s.StudentContactSpouseID = cs.ID
+            LEFT JOIN       dbo.Community cp ON s.StudentContactID = cp.ID
+            LEFT JOIN       dbo.Community cs ON s.StudentContactSpouseID = cs.ID
             WHERE           StudentContactType IN ({$contactTypes['placeholders']})
             ORDER BY        StudentContactID
         ";

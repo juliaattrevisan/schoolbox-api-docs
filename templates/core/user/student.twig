@@ -60,11 +60,19 @@
                     <div class="small-12 medium-10 columns no-pad">
                         {% block specialAlert %}
                             {% if externalUser.StudentSpecialNeedsFlag and showSpecialAlert %}
-                                <div class="alert-box warning icon-bell">
+                                <div class="alert-box highlight icon-bell">
                                     {{ locale.translate('specialNeeds', false, true) }}
                                 </div>
                             {% endif %}
                         {% endblock specialAlert %}
+
+                        {% block englishSecond %}
+                            {% if externalUser.EnglishSecondFlag and showSpecialAlert  %}
+                                <div class="alert-box highlight icon-eng-second-lang">
+                                    English as a second language
+                                </div>
+                            {% endif %}
+                        {% endblock englishSecond %}
 
                         {% block medicalAlert %}
                             {% if externalUser.StudentMedicalAlert and showMedicalAlert %}
@@ -76,7 +84,7 @@
 
                         {% block individualEducationPlan %}
                             {% if isStaff and externalUser.countIndividualEducationPlans > 0 %}
-                                <div class="alert-box warning icon-bell">
+                                <div class="alert-box highlight icon-curriculum">
                                     Individual Education Plan
                                 </div>
                             {% endif %}

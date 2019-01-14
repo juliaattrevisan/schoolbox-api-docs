@@ -59,7 +59,8 @@ class External_Isams_Class implements External_ClassInterface
                       V_Student.Grade               AS yearlevel, 
                       ''                            AS house, 
                       V_Student.MedicalFlag         AS StudentMedicalAlert, 
-                      V_Student.txtadditionalHealth AS StudentSpecialNeedsFlag, 
+                      V_Student.txtadditionalHealth AS StudentSpecialNeedsFlag,
+                      ''                            AS EnglishSecondFlag,
                       ''                            AS StudentTutorDescription,
                       V_Student.StudentID           AS synergy_id, 
                       null                          AS ClassCampus 

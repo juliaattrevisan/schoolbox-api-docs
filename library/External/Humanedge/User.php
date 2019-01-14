@@ -80,6 +80,7 @@ class External_Humanedge_User implements External_UserInterface
                 s.MedicalConditions AS StudentMedicalAlert,
                 '' AS StudentMobilePhone,
                 s.SpecialNeeds AS StudentSpecialNeedsFlag,
+                '' AS EnglishSecondFlag,
                 '' AS StudentStudiesCode,
                 '' AS AlertMessage,
                 '' AS CourtOrderType,
