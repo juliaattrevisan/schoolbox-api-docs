@@ -19,16 +19,16 @@ CKEDITOR.plugins.add('schoolboxresource', {
 
         CKEDITOR.dialog.add('schoolboxresourceDialog', this.path + 'dialogs/schoolboxresource.js');
 
-        var $participatCustomiseModal = $('#participant-customise-modal');
+        var $participantCustomiseModal = $('#participant-customise-modal');
         var $ckeDialogBgCover = $('.cke_dialog_background_cover');
 
         editorInstance.on('dialogShow', function (event) {
-            $participatCustomiseModal.css('z-index', '1001');
+            $participantCustomiseModal.css('z-index', '1001');
             $ckeDialogBgCover.removeClass('hide');
         });
 
         editorInstance.on('dialogHide', function (event) {
-            $participatCustomiseModal.css('z-index', '10000');
+            $participantCustomiseModal.css('z-index', '10000');
             $ckeDialogBgCover.addClass('hide');
         });
     }

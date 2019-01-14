@@ -672,7 +672,7 @@
             CKEDITOR.instances['plan-desc'].setData(CKEDITOR.instances['assessment-description'].getData());
         }
 
-        var $participatCustomiseModal = $('#participant-customise-modal');
+        var $participantCustomiseModal = $('#participant-customise-modal');
         var $ckeDialogBgCover = $('.cke_dialog_background_cover');
 
         // Open modal
@@ -681,16 +681,16 @@
             multiple_opened : true,
             close_on_background_click: false,
             opened: function () {
-                if ($participatCustomiseModal.hasClass('toback')) {
-                    $participatCustomiseModal.css('z-index', '1001');
+                if ($participantCustomiseModal.hasClass('toback')) {
+                    $participantCustomiseModal.css('z-index', '1001');
                 } else {
-                    $participatCustomiseModal.css('z-index', '10000');
+                    $participantCustomiseModal.css('z-index', '10000');
                 }
                 $ckeDialogBgCover.addClass('hide');
             },
             closed: function () {
-                $participatCustomiseModal.attr('modal-status', 'closed');
-                $participatCustomiseModal.css('z-index', '1001');
+                $participantCustomiseModal.attr('modal-status', 'closed');
+                $participantCustomiseModal.css('z-index', '1001');
                 $ckeDialogBgCover.removeClass('hide');
             }
         });
