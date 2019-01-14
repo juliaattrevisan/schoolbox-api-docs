@@ -15,10 +15,11 @@ use Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler\IAttachmentHandler;
 use Schoolbox\Assessment\Course\Import\Atlas\Validator\AssessmentSpecification;
 use Schoolbox\Assessment\Course\Import\Atlas\Validator\AttachmentSpecification;
-use Schoolbox\Assessment\Rubric\Competency\Level;
-use Schoolbox\Assessment\Rubric\Criteria\Criterion;
-use Schoolbox\Assessment\Rubric\Criteria\Group;
-use Schoolbox\Assessment\Rubric\Descriptor;
+use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
+use Schoolbox\Assessment\Rubric\Grid\Descriptor;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
+use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Curriculum\Node\Model as Node;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -93,15 +94,21 @@ class Importer
 
 
     /**
+     * @var Rubric\RubricMapper
+     */
+    private $rubricMapper;
+
+
+    /**
      * @var Rubric\GroupMapper
      */
-    private $rubricGroupMapper;
+    private $rubricCapabilityMapper;
 
 
     /**
      * @var Rubric\CriterionMapper
      */
-    private $rubricCriterionMapper;
+    private $rubricIndicatorMapper;
 
 
     /**
@@ -156,8 +163,9 @@ class Importer
      * @param CourseSpecMapper       $courseSpecMapper
      * @param UnitSpecMapper         $unitSpecMapper
      * @param RoleAccessMapper       $roleAccessMapper
-     * @param Rubric\GroupMapper     $rubricGroupMapper
-     * @param Rubric\CriterionMapper $rubricCriterionMapper
+     * @param Rubric\RubricMapper    $rubricMapper
+     * @param Rubric\GroupMapper     $rubricCapabilityMapper
+     * @param Rubric\CriterionMapper $rubricIndicatorMapper
      * @param AssessmentDataSource   $assessmentDataSource
      * @param NodeMapper             $nodeMapper
      * @param ErrorMapper            $errorMapper
@@ -172,8 +180,9 @@ class Importer
         CourseSpecMapper $courseSpecMapper,
         UnitSpecMapper $unitSpecMapper,
         RoleAccessMapper $roleAccessMapper,
-        Rubric\GroupMapper $rubricGroupMapper,
-        Rubric\CriterionMapper $rubricCriterionMapper,
+        Rubric\RubricMapper $rubricMapper,
+        Rubric\GroupMapper $rubricCapabilityMapper,
+        Rubric\CriterionMapper $rubricIndicatorMapper,
         AssessmentDataSource $assessmentDataSource,
         NodeMapper $nodeMapper,
         ErrorMapper $errorMapper
@@ -188,8 +197,9 @@ class Importer
         $this->courseSpecMapper       = $courseSpecMapper;
         $this->unitSpecMapper         = $unitSpecMapper;
         $this->roleAccessMapper       = $roleAccessMapper;
-        $this->rubricGroupMapper      = $rubricGroupMapper;
-        $this->rubricCriterionMapper  = $rubricCriterionMapper;
+        $this->rubricMapper           = $rubricMapper;
+        $this->rubricCapabilityMapper = $rubricCapabilityMapper;
+        $this->rubricIndicatorMapper  = $rubricIndicatorMapper;
         $this->assessmentDataSource   = $assessmentDataSource;
         $this->nodeMapper             = $nodeMapper;
         $this->errorMapper            = $errorMapper;
@@ -389,24 +399,23 @@ class Importer
         $dueWork->getCurriculumNodes()->add($dueWorkNode);
 
 
-        // Build a rubric for this due work
+        // Common names for indicators and levels, as I have nothing better to
+        // put there
+        $commonIndicatorName = '';
+        $commonLevelName     = '';
+
+
+        // Build a rubric for this due work, if it has standards
         if (\count($assessment->getStandards())) {
-            $rubric = new Rubric\Rubric();
 
-
-            // Dummy data: I have nothing better to put here
-            $level = new Level();
-            $level->setName('Level');
-            $rubric->putLevel($level);
-
-
-            // I can only create groups, as there's no sub-standards.
-            // Provided there's mark-by-group without needing a criterion,
-            // this should be okay.
+            // Pass 1: build the rowset, adding capabilities+indicators as required
             foreach ($assessment->getStandards() as $standard) {
-                $groupDataModel = $this->rubricGroupMapper->findOrCreateOneForFolderByName(
+                $capabilityName = $standard->getTitle();
+
+                // Build capability
+                $groupDataModel = $this->rubricCapabilityMapper->findOrCreateOneForFolderByName(
                     $unitSpec->getFolder()->getId(),
-                    $standard->getTitle(),
+                    $capabilityName,
                     false
                 );
 
@@ -414,38 +423,67 @@ class Importer
                 $standardNode = $this->findOrCreateCurriculumNodeFromStandard($standard, $standardsNode);
                 if ($standardNode) {
                     $groupDataModel->getCurriculumNodes()->add($standardNode);
-                    $this->rubricGroupMapper->save($groupDataModel);
+                    $this->rubricCapabilityMapper->save($groupDataModel);
                 }
 
-                // Add that rubric group
-                $group = new Group($groupDataModel->getId(), $groupDataModel->getName());
-                $rubric->putGroup($group);
-
-                // Add a criterion with an empty name for now, I guess
-                $criterionDataModel = $this->rubricCriterionMapper->findOrCreateOneForFolderByKey(
+                // Build indicator with an empty name for now, I guess
+                $this->rubricIndicatorMapper->findOrCreateOneForFolderByKey(
                     $unitSpec->getFolder()->getId(),
-                    '',
-                    $standard->getTitle(),
-                    false
-                );
-                $criterion = new Criterion($criterionDataModel->getId(), $criterionDataModel->getName());
-                $rubric->putCriterion($group, $criterion);
-
-                // And an empty descriptor for that level?
-                $rubric->putDescriptor(
-                    $group,
-                    $criterion,
-                    $level,
-                    new Descriptor('', 1),
+                    $commonIndicatorName,
+                    $capabilityName,
                     false
                 );
             }
 
+
+            // Build the rowset and rubric grid for this due work
+            $rowSet = $this->rubricMapper->retrieveRowSet($unitSpec->getFolder(), false);
+            $grid   = new Grid($dueWork, $rowSet);
+
+
+            // Dummy level data: I have nothing better to put here
+            $grid->getLevels()->add(
+                (new Level())->setName($commonLevelName)
+            );
+
+
+            // Pass 2: load the created rowset, and build the actual rubric grid
+            foreach ($assessment->getStandards() as $standard) {
+                $capabilityName = $standard->getTitle();
+
+                // Need to iterate each capability, and indicator within,
+                // to get a match
+                foreach ($grid->getRowSet()->getCapabilities() as $capability) {
+                    if ($capabilityName === $capability->getName()) {
+                        // Use this capability
+                        $capabilityUsage = new CapabilityUsage($capability);
+                        foreach ($capability->getIndicators() as $indicator) {
+                            if ($commonIndicatorName === $indicator->getName()) {
+                                // Use this indicator
+                                $indicatorUsage = new IndicatorUsage($indicator);
+                                $indicatorUsage->getDescriptors()->add(
+                                    (new Descriptor())
+                                        ->setDescription('')
+                                        ->setMinValue(1.0)
+                                        ->setMaxValue(1.0)
+                                );
+                                $capabilityUsage->getIndicatorUsages()->add($indicatorUsage);
+                                break;
+                            }
+                        }
+                        $grid->getCapabilityUsages()->add($capabilityUsage);
+                        break;
+                    }
+                }
+            }
+
             $dueWork
                 ->setUseRubric(true)
-                ->setRubric($rubric);
+                ->setRubricGrid($grid);
         }
 
+
+        // And finally save
         $this->assessmentDataSource->save($dueWork);
         return $dueWork;
     }
