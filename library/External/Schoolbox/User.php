@@ -115,7 +115,7 @@ class External_Schoolbox_User implements External_UserInterface
                           '' AS Comment,
                           '' AS StudentEnrolmentDate,
                           '' AS StudentLeavingDate,
-                          '' AS StudentIBFlag,
+                          user_profile.ib_flag AS StudentIBFlag,
                           0 AS countIndividualEducationPlans
                 FROM      `user`
                 LEFT JOIN user_profile ON user.id = user_profile.user_id
