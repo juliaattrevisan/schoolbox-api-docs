@@ -672,9 +672,27 @@
             CKEDITOR.instances['plan-desc'].setData(CKEDITOR.instances['assessment-description'].getData());
         }
 
+        var $participantCustomiseModal = $('#participant-customise-modal');
+        var $ckeDialogBgCover = $('.cke_dialog_background_cover');
+
         // Open modal
         $customiseModal.foundation('reveal', 'open', {
-            clearData: true
+            clearData: false,
+            multiple_opened : true,
+            close_on_background_click: false,
+            opened: function () {
+                if ($participantCustomiseModal.hasClass('toback')) {
+                    $participantCustomiseModal.css('z-index', '1001');
+                } else {
+                    $participantCustomiseModal.css('z-index', '10000');
+                }
+                $ckeDialogBgCover.addClass('hide');
+            },
+            closed: function () {
+                $participantCustomiseModal.attr('modal-status', 'closed');
+                $participantCustomiseModal.css('z-index', '1001');
+                $ckeDialogBgCover.removeClass('hide');
+            }
         });
     }
 

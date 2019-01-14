@@ -85,7 +85,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
             /* Set dialog input contents
              */
-            fields.preview.contents().find('html').html(preview);
+            $('.' + fields.parentSelector).find('#schoolboxresource-preview').contents().find('html').html(preview);
 
             /* Don't change width or height if they were already set
              *
@@ -505,7 +505,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                 onChange: function() {
                                     var dialog = this.getDialog();
                                     var fields = dialogFields(dialog);
-
+                                    fields.parentSelector = dialog.getParentEditor().id
                                     /* Render image
                                      */
                                     var url = fields.url.getValue();
@@ -535,7 +535,6 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     else {
                                         fields.type.setValue('image');
                                     }
-
                                     render(fields, fields.url.getValue(), false);
                                 }
                             },
@@ -608,9 +607,11 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                                         fields.aspectRatio.setValue(true);
                                                     }
 
-                                                    /* Shut modal, go back to Dialog
+                                                    /* Shut file picker modal, go back to Dialog
                                                      */
-                                                    $('[data-reveal]').foundation('reveal', 'close');
+                                                    $('#file-picker').foundation('reveal', 'close');
+                                                    $('#participant-customise-modal').css('z-index', '10000');
+
                                                 });
                                             } else {
                                                 // The file was rejected, probably cause it was the wrong mimetype.
@@ -985,6 +986,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
             editorInstance.insertElement(inject(editorInstance, fields, fields.url.getValue()));
             editorInstance.insertHtml('<p>&nbsp;</p>');
+            $('#participant-customise-modal').css('z-index', '10000');
         },
 
         /**

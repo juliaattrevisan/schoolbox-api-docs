@@ -120,7 +120,7 @@
                 singletonModal = $('#attachment-browser').parent();
             }
             else {
-                singletonModal = $('<div data-reveal class="reveal-modal file-picker" />')
+                singletonModal = $('<div data-reveal class="reveal-modal file-picker" id="file-picker" />')
                     .data('content', data);
 
                 body.append(singletonModal);
