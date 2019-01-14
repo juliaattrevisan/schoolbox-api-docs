@@ -52,6 +52,14 @@ class AllRubrics
         })->getAll();
         $folderIds = array_unique($folderIds);
 
+        // What are the actual due works within each unit implementation?
+        $unitImplAssessmentIds = [];
+        foreach ($unitImplementations as $unitImplementation) {
+            foreach ($unitImplementation->getAssessables() as $assessment) {
+                $unitImplAssessmentIds[$assessment->getId()] = true;
+            }
+        }
+
         $studentRubricMarks = $rubricMapper->getStudentMarksByCriteriaInFolder($folderIds, $term);
         $allCriteria        = $rubricMapper->getAvailableCriteria($folderIds);
 
@@ -63,7 +71,11 @@ class AllRubrics
         }
 
         // Aggregate student results per criteria
-        foreach ($studentRubricMarks as $boxId => $boxData) {
+        foreach ($studentRubricMarks as $assessmentId => $boxData) {
+            if (empty($unitImplAssessmentIds[$assessmentId])) {
+                continue;
+            }
+
             /** @var float[][][] $boxData */
             foreach ($boxData as $criterionId => $criteria) {
                 $key = $this->buildCriterionArrayKey($criteria['grouping'], $criteria['name']);

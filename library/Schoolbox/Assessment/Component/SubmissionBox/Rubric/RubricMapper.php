@@ -2332,7 +2332,7 @@ class RubricMapper
         $where             = implode(' AND ', $pb->getWhere());
         $maxMarksStatement = $this->database->prepare("
             SELECT
-                rl.box_id AS boxId,
+                a.id,
                 rc.id     AS criterionId,
                 rg.name   AS grouping,
                 rc.name,
@@ -2341,6 +2341,8 @@ class RubricMapper
             JOIN rubric_criterion rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
             JOIN rubric_group     rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
             JOIN rubric_level     rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
+            JOIN submission_box   sb ON rl.box_id = sb.id
+            JOIN assessment        a ON sb.assessment_id = a.id
             WHERE {$where}
             GROUP BY rl.box_id, rc.id
             ORDER BY rl.box_id, rc.id
@@ -2349,7 +2351,7 @@ class RubricMapper
 
 
         foreach ($maxMarksStatement as $row) {
-            $boxId       = $row['boxId'];
+            $boxId       = $row['id'];
             $criterionId = $row['criterionId'];
             $results[$boxId][$criterionId] = [
                 'grouping' => $row['grouping'],
@@ -2367,7 +2369,6 @@ class RubricMapper
         $where               = implode(' AND ', $pb->getWhere());
         $descriptorStatement = $this->database->prepare("
             SELECT
-                sb.id    AS boxId,
                 sr.owner AS studentId,
                 rc.id    AS criterionId,
                 rg.name  AS grouping,
@@ -2392,7 +2393,7 @@ class RubricMapper
 
         // Step 4: smoosh them all together
         foreach ($descriptorStatement as $row) {
-            $boxId       = $row['boxId'];
+            $boxId       = $row['id'];
             $criterionId = $row['criterionId'];
             $mark        = $row['value'];
             $maxMark     = $results[$boxId][$criterionId]['maxMark'] ?? 0;
