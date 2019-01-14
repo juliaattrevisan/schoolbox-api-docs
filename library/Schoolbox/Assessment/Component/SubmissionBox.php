@@ -73,7 +73,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $task;
 
     /**
-     * @var Collection|IStorage
+     * @var SubmissionBox\SingleFile\Model[]|GenericCollection
      */
     protected $attachments;
 
@@ -185,7 +185,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
     public function __construct()
     {
-        $this->setAttachments(new Collection());
         $this->setCategory(new FolderModel());
         $this->setCurriculumNodes(new Collection());
         $this->setPublishDate(new \Alaress_Date_NullDate());
@@ -194,6 +193,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
         $this->setLateDate(new \Alaress_Date_NullDate());
         $this->setAssessmentModel(new Model());
         $this->submissions = new GenericCollection(Submission::class);
+        $this->attachments = new GenericCollection(SubmissionBox\SingleFile\Model::class);
     }
 
     /**
@@ -380,7 +380,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return Collection|SubmissionBox\SingleFile\Model[]
+     * @return GenericCollection|SubmissionBox\SingleFile\Model[]
      */
     public function getAttachments()
     {
@@ -388,12 +388,12 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @param Collection|SubmissionBox\SingleFile\Model[] $attachments
+     * @param GenericCollection|SubmissionBox\SingleFile\Model[] $attachments
      * @return static
      */
-    public function setAttachments(Collection $attachments)
+    public function setAttachments(GenericCollection $attachments)
     {
-        $this->attachments = $attachments;
+        $this->attachments->replaceWith($attachments);
         return $this;
     }
 
