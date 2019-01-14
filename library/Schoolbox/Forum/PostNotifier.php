@@ -4,14 +4,13 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Forum;
 
-
 use Alaress\Async\Notification\Instance\Builder;
-use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
 use Schoolbox\Feed\FeedableMapperInterface;
@@ -31,7 +30,9 @@ use Schoolbox\User;
 class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 {
 
+    // somebody posts on a forum
     const TRIGGER_FOLLOWED  = 'followed';
+    // somebody replied to your forum post or thread
     const TRIGGER_MENTIONED = 'mentioned';
 
     /** @var ThreadMapper */
@@ -43,7 +44,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
     /**
      * @param array $dependencies
      */
-    public function loadDependencies($dependencies = null)
+    public function loadDependencies($dependencies = null): void
     {
         if (empty($dependencies['threadMapper'])) {
             $dependencies['threadMapper'] = ThreadMapper::getInstance();
@@ -59,7 +60,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
     /**
      * @param Mapper $mapper
      */
-    protected function setThreadMapper($mapper)
+    protected function setThreadMapper($mapper): void
     {
         $this->threadMapper = $mapper;
     }
@@ -68,7 +69,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
     /**
      * @param Mapper $mapper
      */
-    protected function setCategoryMapper($mapper)
+    protected function setCategoryMapper($mapper): void
     {
         $this->categoryMapper = $mapper;
     }
@@ -77,7 +78,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
     /**
      * @return string
      */
-    protected function getSlug()
+    protected function getSlug(): string
     {
         return NSMapper::NS_FORUM;
     }
@@ -87,7 +88,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param TriggerBundleInterface $bundle
      * @return void
      */
-    public function bundleTriggers($bundle)
+    public function bundleTriggers($bundle): void
     {
         // this is the only case we're interested in notifying at the moment
         if ($bundle->getMethod() == Mapper::METHOD_CREATE) {
@@ -135,7 +136,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param Post $model
      * @return bool
      */
-    protected function isHydrated($model)
+    protected function isHydrated($model): bool
     {
         $thread = !!$model->getThread()->getId();
         $owner  = !!$model->getOwner()->getId();
@@ -153,11 +154,16 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param bool   $deduplicate
      * @return Builder
      */
-    protected function newBuilder($post, $poster, $title, $action, $deduplicate = false)
+    protected function newBuilder($post, User $poster, string $title, string $action, bool $deduplicate = false): Builder
     {
         $bob    = new Builder();
-        $thread = $this->threadMapper->findById($post->getThread()->getId());
-        $cat    = $this->categoryMapper->findById($thread->getCategory()->getId());
+        try {
+            $thread = $this->threadMapper->findById($post->getThread()->getId());
+            $cat    = $this->categoryMapper->findById($thread->getCategory()->getId());
+        } catch (Mapper\Exception $e) {
+            return $bob;
+        }
+
         $postId = $post->getId();
         $href   = '/forum/thread/' . $thread->getId();
 
@@ -185,18 +191,14 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param User   $poster
      * @return Envelope
      */
-    protected function notifyFollowed($roletype, $post, $poster)
+    protected function notifyFollowed(string $roletype, Post $post, User $poster): Envelope
     {
         /** @var Post $post */
         $post     = $this->hydrate($post);
         $envelope = new Envelope();
 
-        try {
-            $bob      = $this->newBuilder($post, $poster, ':user posted in :thread in :folder', self::TRIGGER_FOLLOWED)
-                             ->addFilter('roletype', array($roletype));
-        } catch (Mapper\Exception $e) {
-            return $envelope;
-        }
+        $bob = $this->newBuilder($post, $poster, ':user posted in :thread in :folder', self::TRIGGER_FOLLOWED)
+            ->addFilter('roletype', array($roletype));
 
         /** @var Post $parent */
         $quotedId = 0;
@@ -210,8 +212,11 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
             }
         }
 
+        // The thread user will be notified by notifyMentioned. Suppressing here.
+        $threadUserId = $post->getThread()->getUser();
+
         foreach ($this->threadMapper->findInvolvedUsers($post->getThread()) as $user) {
-            if ($user->getId() != $quotedId) {
+            if ($user->getId() != $quotedId && $user->getId() != $threadUserId) {
                 $envelope->targetToUser($user->getId(), $bob->build());
             }
         }
@@ -226,23 +231,24 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param User   $poster
      * @return Envelope
      */
-    protected function notifyMentioned($roletype, $post, $poster)
+    protected function notifyMentioned(string $roletype, Post $post, User $poster): Envelope
     {
         /** @var Post $post */
         $post     = $this->hydrate($post);
         $envelope = new Envelope();
-        try {
-            $bob      = $this->newBuilder($post, $poster, ':user replied to your post in :thread in :folder', self::TRIGGER_MENTIONED, true)
-                             ->addFilter('roletype', array($roletype));
-        } catch (Mapper\Exception $e) {
-            return $envelope;
-        }
+        $bob = $this->newBuilder($post, $poster, ':user replied to your post in :thread in :folder', self::TRIGGER_MENTIONED, true)
+            ->addFilter('roletype', array($roletype));
 
         $parent = $post->getParent();
         if ($parent instanceof Post) {
             try {
+                /** @var Post $parent */
                 $parent = $this->mapper->findById($parent->getId());
                 $envelope->targetToUser($parent->getOwner(), $bob->build());
+                // Target to the thread user as well
+                if ($parent->getOwner()->getId() !== $parent->getThread()->getUser()->getId()) {
+                    $envelope->targetToUser($parent->getThread()->getUser(), $bob->build());
+                }
             } catch (Mapper\Exception $e) {
                 // I can't target a non-existent post
             }
@@ -257,7 +263,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param User $poster
      * @return Envelope
      */
-    public function notifyStaffFollowed($post, $poster)
+    public function notifyStaffFollowed(Post $post, User $poster): Envelope
     {
         return $this->notifyFollowed(Role::STAFF, $post, $poster);
     }
@@ -268,7 +274,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param User $poster
      * @return Envelope
      */
-    public function notifyStudentFollowed($post, $poster)
+    public function notifyStudentFollowed(Post $post, User $poster): Envelope
     {
         return $this->notifyFollowed(Role::STUDENT, $post, $poster);
     }
@@ -279,7 +285,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param User $poster
      * @return Envelope
      */
-    public function notifyParentFollowed($post, $poster)
+    public function notifyParentFollowed(Post $post, User $poster): Envelope
     {
         return $this->notifyFollowed(Role::PARENT, $post, $poster);
     }
@@ -290,7 +296,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param User $poster
      * @return Envelope
      */
-    public function notifyStaffMentioned($post, $poster)
+    public function notifyStaffMentioned(Post $post, User $poster): Envelope
     {
         return $this->notifyMentioned(Role::STAFF, $post, $poster);
     }
@@ -301,7 +307,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param User $poster
      * @return Envelope
      */
-    public function notifyStudentMentioned($post, $poster)
+    public function notifyStudentMentioned(Post $post, User $poster): Envelope
     {
         return $this->notifyMentioned(Role::STUDENT, $post, $poster);
     }
@@ -312,7 +318,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      * @param User $poster
      * @return Envelope
      */
-    public function notifyParentMentioned($post, $poster)
+    public function notifyParentMentioned(Post $post, User $poster): Envelope
     {
         return $this->notifyMentioned(Role::PARENT, $post, $poster);
     }
