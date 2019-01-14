@@ -15,6 +15,7 @@ use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\Report\Components\AcademicAchievementMatrix;
 use Custom\Tigs\Summative\Report\Components\AcademicAchievementSummary;
 use Custom\Tigs\Summative\Report\Components\FinalAchievementLevels;
+use Custom\Tigs\Summative\Report\Components\HscAssessmentTasks;
 use Custom\Tigs\Summative\Report\Components\InternationalBaccalaureateGraph;
 use Custom\Tigs\Summative\Report\Components\NesaScoreGraph;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
@@ -139,7 +140,7 @@ class Controller extends Web\Controller\Base
                 $error .= \sprintf(' <a href="%s">Manage Course imports</a>', $route);
             }
             $errors[]  = $error;
-            $unitSpecs = $aamData = $aasData = [];
+            $unitSpecs = $aamData = $aasData = $hscTaskMarks = [];
             $falData   = $ibGraphData = $nesaGraphData = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
@@ -154,6 +155,7 @@ class Controller extends Web\Controller\Base
             $falData       = $this->buildFinalAchievementLevelsData($folder, $attributes, $unitSpecs, $user);
             $aamData       = $this->buildAcademicAchievementMatrixData($folder, $attributes, $unitSpecs, $user);
             $aasData       = $this->buildAcademicAchievementSummaryData($folder, $attributes, $unitSpecs, $user);
+            $hscTaskMarks  = $this->buildHscTaskMarksData($folder, $attributes, $courseSpec, $user);
         }
 
         $data   = [
@@ -168,6 +170,7 @@ class Controller extends Web\Controller\Base
             'aasData'       => $aasData,
             'ibGraphData'   => $ibGraphData,
             'nesaGraphData' => $nesaGraphData,
+            'hscTaskMarks'  => $hscTaskMarks,
         ];
         $output = $this->buildHtmlOutput('@tigsSummativeReport/subject.twig', $data, "Subject Report");
 
@@ -563,6 +566,65 @@ class Controller extends Web\Controller\Base
 
 
     /**
+     * @param Folder\Model                       $folder
+     * @param StudentAttributes                  $attributes
+     * @param CourseSpec\Model                   $courseSpec
+     * @param User                               $student
+     * @return array|null
+     * @throws Predicate\InvalidColumnException
+     * @throws UnexpectedValueException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnderflowException
+     */
+    private function buildHscTaskMarksData(
+        Folder\Model $folder,
+        StudentAttributes $attributes,
+        CourseSpec\Model $courseSpec,
+        User $student
+    ): ?array {
+        // Only relevant for HSC students
+        if (!$attributes->isHsc()) {
+            return null;
+        }
+
+        try {
+            $workTypeId = $this->checkWorkType(
+                Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK,
+                "Cannot render 'HSC Task Marks' components. Work type not set.",
+                "Set 'HSC Assessment Task' Work Type"
+            );
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
+        }
+
+        // Find relevant assessments and participation and insert into units
+        $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
+        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes));
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
+        foreach ($assessables as $assessable) {
+            $unitImpl                                                                        = $assessable->getBaseContext();
+            $baseAssessable                                                                  = $assessable->getBaseAssessable();
+            $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
+        }
+
+        $hscTaskMarks = new HscAssessmentTasks(
+            $courseSpec,
+            $student,
+            $attributes,
+            $this->visibility,
+            $this->getUser(),
+            $workTypeId,
+            $folder
+        );
+        return ['data' => $hscTaskMarks->toContext()];
+    }
+
+
+    /**
      * Load the assessments into each unit implementation.
      *
      * @param GenericCollection|UnitImpl\Model[] $unitImpls
@@ -593,7 +655,6 @@ class Controller extends Web\Controller\Base
      * @param StudentAttributes $attributes
      * @return array
      * @throws Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
      * @throws \UnderflowException
      */
     private function findAssessmentIds(GenericCollection $unitImpls, int $workTypeId, StudentAttributes $attributes): array

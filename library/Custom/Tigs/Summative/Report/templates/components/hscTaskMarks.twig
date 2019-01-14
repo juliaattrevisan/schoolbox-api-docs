@@ -1,0 +1,33 @@
+{#
+Renders an Academic Achievement Summary component.
+
+This is a table derived from a rubric. It does not render the capability column.
+
+Data:
+    error:               string           - Optional. If present, the reason why we can't render the component
+    studentMark          string|null      - eg '15 %'
+    cohortRank           string|null      - eg '3 / 8'
+    cohortAverage        string|null      - eg '25 %'
+#}
+
+<p class="meta">HSC Task Marks (%)</p>
+{% if error|default(null) %}
+    <div data-alert class="alert-box alert">{{ error|raw }}</div>
+{% else %}
+    <table>
+      <tbody>
+        <tr>
+            <th>Student Mark %</th>
+            <td>{{ studentMark|default('-') }}</td>
+        </tr>
+        <tr>
+            <th>Cohort Rank</th>
+            <td>{{ cohortRank|default('-') }}</td>
+        </tr>
+        <tr>
+            <th>Cohort Average %</th>
+            <td>{{ cohortAverage }}</td>
+        </tr>
+      </tbody>
+    </table>
+{% endif %}

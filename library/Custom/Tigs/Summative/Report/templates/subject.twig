@@ -10,6 +10,9 @@ Data:
     unitSpecs            unitSpec\Model - All unit specs imported to this folder. (TODO filter to only unitSpecs that contain visible data, defferred till later)
     aasData              array          - Data to render the Academic Achievement Summary components
     aamData              array          - Data to render the Academic Achievement Matrix components
+    hscTaskMarks         array          - Data to render the HSC Task Marks components
+    hscTaskMarks['error'] string        - Optional. If present, the reason we can't render these components
+    hscTaskMarks['data'] array          - Optional. If present, the per-unit data. Indexed by unitImpl.id
     falData              array|null     - Data to render the Final Achievement Level component
     ibGraphData          array          - Data to render the MYP/DP Graph component
     nesaGraphData        array          - Data to render the NESA Score Graph component
@@ -36,6 +39,11 @@ Data:
         {% if aamData.error is defined %}
             <div data-alert class="alert-box alert">
                 {{ aamData.error|raw }}
+            </div>
+        {% endif %}
+        {% if hscTaskMarks.error is defined %}
+            <div data-alert class="alert-box alert">
+                {{ hscTaskMarks.error|raw }}
             </div>
         {% endif %}
     </div>
@@ -80,6 +88,11 @@ Data:
             {# Were we given AAM data for this unit? #}
             {% if aamData.data is defined and aamData.data[unitSpecId] is defined %}
                 {% include '@tigsSummativeReport/components/academicAchievementMatrix.twig' with aamData.data[unitSpecId] only %}
+            {% endif %}
+
+            {# Were we given HSC Task Marks data for this unit? #}
+            {% if hscTaskMarks.data is defined and hscTaskMarks.data[unitSpecId] is defined %}
+                {% include '@tigsSummativeReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId] only %}
             {% endif %}
         </div>
         {% if aasData.data[unitSpecId].comment %}
