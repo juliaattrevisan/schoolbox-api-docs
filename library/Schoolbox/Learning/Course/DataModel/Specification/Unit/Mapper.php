@@ -131,6 +131,7 @@ class Mapper extends AbstractUnitMapper
             $courseFolder = $this->hydrateJoin($row, 'course.folder', 'cf');
             $course->setFolder($courseFolder);
             $model->setCourse($course);
+            $course->getUnits()[$model->getId()] = $model;
 
             // Add to list
             $modelList->add($model);

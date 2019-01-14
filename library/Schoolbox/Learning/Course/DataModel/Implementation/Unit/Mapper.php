@@ -148,6 +148,7 @@ class Mapper extends AbstractUnitMapper
             $specFolder = $this->hydrateJoin($row, 'specification.folder', 'sf');
             $specification->setFolder($specFolder);
             $model->setSpecification($specification);
+            $specification->getCourse()->getUnits()[$specification->getId()] = $specification;
             $specification->getUnitImplementations()[$model->getId()] = $model;
 
             // Add
