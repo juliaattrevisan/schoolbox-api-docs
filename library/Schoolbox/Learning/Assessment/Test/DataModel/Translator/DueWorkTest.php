@@ -384,20 +384,20 @@ class DueWorkTest extends TestCase
 
         $this->assertCount(3, $dueWork->getAttachedFiles());
 
-        $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[0]);
-        $this->assertEquals('a file', $dueWorkModel->getAttachments()[0]->getFilename());
-        $this->assertEquals('a file.txt', $dueWorkModel->getAttachments()[0]->getBasename());
-        $this->assertEquals('1234567890123456789012345678901234567890', $dueWorkModel->getAttachments()[0]->getHash());
+        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAttachedFiles()[0]);
+        $this->assertEquals('a file', $dueWork->getAttachedFiles()[0]->getFilename());
+        $this->assertEquals('a file.txt', $dueWork->getAttachedFiles()[0]->getBasename());
+        $this->assertEquals('1234567890123456789012345678901234567890', $dueWork->getAttachedFiles()[0]->getHash());
 
-        $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[1]);
-        $this->assertEquals('an image', $dueWorkModel->getAttachments()[1]->getFilename());
-        $this->assertEquals('an image.jpg', $dueWorkModel->getAttachments()[1]->getBasename());
-        $this->assertEquals('0000000000000000000000000000000000000002', $dueWorkModel->getAttachments()[1]->getHash());
+        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAttachedFiles()[1]);
+        $this->assertEquals('an image', $dueWork->getAttachedFiles()[1]->getFilename());
+        $this->assertEquals('an image.jpg', $dueWork->getAttachedFiles()[1]->getBasename());
+        $this->assertEquals('0000000000000000000000000000000000000002', $dueWork->getAttachedFiles()[1]->getHash());
 
-        $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[2]);
-        $this->assertEquals('a sound', $dueWorkModel->getAttachments()[2]->getFilename());
-        $this->assertEquals('a sound.mp3', $dueWorkModel->getAttachments()[2]->getBasename());
-        $this->assertEquals('0000000000000000000000000000000000000001', $dueWorkModel->getAttachments()[2]->getHash());
+        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAttachedFiles()[2]);
+        $this->assertEquals('a sound', $dueWork->getAttachedFiles()[2]->getFilename());
+        $this->assertEquals('a sound.mp3', $dueWork->getAttachedFiles()[2]->getBasename());
+        $this->assertEquals('0000000000000000000000000000000000000001', $dueWork->getAttachedFiles()[2]->getHash());
 
         $this->assertInstanceOf(WorkType::class, $dueWork->getWorkType());
         $this->assertEquals(12, $dueWork->getWorkType()->getId());
