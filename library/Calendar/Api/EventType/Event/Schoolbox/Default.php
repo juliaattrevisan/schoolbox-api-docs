@@ -61,7 +61,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
 		return $this->getCalendarHandler()->getDayEvents(
 			$this->getUser(),
-			$this->getViewer(),
+            $this->getViewer(),
 			$startTimestamp,
 			$endTimestamp
 		);
@@ -78,7 +78,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	public function getEvent($eventId) {
 		return $this->getCalendarHandler()->getDayEvents(
 			$this->getUser(),
-			$this->getViewer(),
+            $this->getViewer(),
 			null,
 			null,
 			array('id' => $eventId)

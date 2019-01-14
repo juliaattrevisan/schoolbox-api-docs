@@ -44,7 +44,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Group extends Calendar_Api_EventTyp
 	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
 		return $this->getCalendarHandler()->getDayEvents(
 			$this->getUser(),
-			$this->getViewer(),
+            $this->getViewer(),
 			$startTimestamp,
 			$endTimestamp,
             ['group' => $this->group_id]

@@ -98,7 +98,7 @@ class Calendar_Api_Factory
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
-    public function produceForUser(\Schoolbox\User $user, \Schoolbox\User $viewer )
+    public function produceForUser(\Schoolbox\User $user, \Schoolbox\User $viewer)
     {
         $compositeApi = new Calendar_Api_Composite();
 

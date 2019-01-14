@@ -26,7 +26,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Personal extends Calendar_Api_Event
 	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
 		return $this->getCalendarHandler()->getDayEvents(
 			$this->getUser(),
-			$this->getViewer(),
+            $this->getViewer(),
 			$startTimestamp,
 			$endTimestamp,
 			array('personal' => $this->getUser()->getId())
