@@ -49,19 +49,21 @@ class BaseComponent
 
     /** @noinspection PhpDocMissingThrowsInspection */
     /**
-     * Iterates through a unit spec to return all AAS assessment implementations that were imported to the specified folder
+     * Iterates through a unit spec to return all AAS assessment implementations.
      *
-     * @param UnitSpec\Model $unitSpec
-     * @param Folder\Model   $folder
-     * @param int|null       $workTypeId
+     * If folder is provided, filters to only assessments that were imported to the specified folder
+     *
+     * @param UnitSpec\Model    $unitSpec
+     * @param Folder\Model|null $folder
+     * @param int|null          $workTypeId
      * @return IAssessable[]|GenericCollection
      */
-    protected function findAssessmentsForFolderAndWorkType(UnitSpec\Model $unitSpec, Folder\Model $folder, ?int $workTypeId): GenericCollection
+    protected function findAssessmentsForFolderAndWorkType(UnitSpec\Model $unitSpec, ?Folder\Model $folder, ?int $workTypeId): GenericCollection
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $assessables = new GenericCollection(IAssessable::class);
         foreach ($unitSpec->getUnitImplementations() as $unitImpl) {
-            if ((int)$unitImpl->getFolder()->getId() !== (int)$folder->getId()) {
+            if ($folder && (int)$unitImpl->getFolder()->getId() !== (int)$folder->getId()) {
                 continue;
             }
             foreach ($unitImpl->getAssessables() as $assessable) {
