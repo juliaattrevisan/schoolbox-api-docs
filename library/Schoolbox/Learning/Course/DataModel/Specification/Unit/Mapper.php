@@ -116,7 +116,6 @@ class Mapper extends AbstractUnitMapper
     {
         $modelList = $this->createCollection();
         foreach ($statement as $row) {
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             /** @var FolderModel $folder */
