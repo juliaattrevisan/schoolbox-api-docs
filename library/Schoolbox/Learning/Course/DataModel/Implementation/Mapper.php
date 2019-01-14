@@ -101,7 +101,6 @@ class Mapper extends AbstractCourseMapper
     {
         $modelList = $this->createCollection();
         foreach ($statement as $row) {
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             /** @var Folder $folder */
