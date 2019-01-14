@@ -23,7 +23,6 @@ use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
 use Schoolbox\MapperFactory;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
@@ -63,18 +62,26 @@ class ImporterFactory
 
 
     /**
+     * @var RubricMapper
+     */
+    private $rubricMapper;
+
+
+    /**
      * Constructor
      *
      * @param User                 $user
      * @param IConfigLoader        $config
      * @param MapperFactory        $mapperFactory
      * @param AssessmentDataSource $assessmentDataSource
+     * @param RubricMapper         $rubricMapper
      */
     public function __construct(
         User $user,
         IConfigLoader $config,
         MapperFactory $mapperFactory,
-        AssessmentDataSource $assessmentDataSource
+        AssessmentDataSource $assessmentDataSource,
+        RubricMapper $rubricMapper
     ) {
         // I'm aware that passing a DI container (which the mapper factory
         // effectively is) is an anti-pattern, but is it less of one than
@@ -83,6 +90,7 @@ class ImporterFactory
         $this->config               = $config;
         $this->mapperFactory        = $mapperFactory;
         $this->assessmentDataSource = $assessmentDataSource;
+        $this->rubricMapper         = $rubricMapper;
     }
 
 
@@ -103,7 +111,7 @@ class ImporterFactory
             $this->mapperFactory->get(CourseSpecMapper::class),
             $this->mapperFactory->get(UnitSpecMapper::class),
             $this->mapperFactory->get(RoleAccessMapper::class),
-            $this->mapperFactory->get(RubricMapper::class),
+            $this->rubricMapper,
             $this->mapperFactory->get(RubricGroupMapper::class),
             $this->mapperFactory->get(RubricCriterionMapper::class),
             $this->assessmentDataSource,

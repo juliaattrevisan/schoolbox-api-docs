@@ -9,10 +9,10 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\BridgeFactory;
 use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Twig\Error\LoaderError;
 
@@ -87,7 +87,8 @@ class Module extends \Alaress\Module\Module
                                 $injector->get('user'),
                                 $this->getConfig(),
                                 $this->getMapperFactory(),
-                                $injector->get('assessmentDataSource')
+                                $injector->get('assessmentDataSource'),
+                                RubricMapper::getInstance()
                             ))->build();
                         }
                     ),
