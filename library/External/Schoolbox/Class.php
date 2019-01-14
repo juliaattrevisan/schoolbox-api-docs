@@ -90,10 +90,11 @@ class External_Schoolbox_Class implements External_ClassInterface
                               u.lastname,
                               u.year,
                               u.house,
-                              u.esl_flag
+                              up.esl_flag
                 FROM          class c
                 LEFT JOIN     class_user cu ON cu.class_id = c.id
                 LEFT JOIN     user u ON u.id = cu.user_id
+                LEFT JOIN     user_profile up ON u.id = up.user_id
                 LEFT JOIN     groups g ON g.id = u.group_id
                 WHERE         c.code IN ({$predicate["placeholders"]}) AND
                               g.group_type = :type AND
