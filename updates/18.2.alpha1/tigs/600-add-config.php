@@ -146,19 +146,6 @@ $app = new class extends App
             true,
             ConfigMapper::MODULE_CUSTOM
         );
-
-        $this->insertConfig(
-            Tigs\Summative\Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK,
-            '',
-            'Work Type - HSC Assessment Task',
-            "A per-unit assessment. Marks given to this assessment will populate student's 'HSC Task Mark' component",
-            ConfigMapper::FIELD_SELECT_LOOKUP,
-            \serialize([SelectLookup\Renderer::OPTION_KEY_MAPPER => WorkType\Mapper::class,]),
-            true,
-            false,
-            true,
-            ConfigMapper::MODULE_CUSTOM
-        );
     }
 
 
