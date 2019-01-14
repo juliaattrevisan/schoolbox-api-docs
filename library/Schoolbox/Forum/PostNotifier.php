@@ -186,6 +186,9 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
+     * Notifies about the new post to all the users who has posted in the same thread,
+     * except for the author of its parent post and the owner of the thread.
+     *
      * @param string $roletype
      * @param Post   $post
      * @param User   $poster
@@ -212,11 +215,9 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
             }
         }
 
-        // The thread user will be notified by notifyMentioned. Suppressing here.
-        $threadUserId = $post->getThread()->getUser();
-
+        $threadOwnerId = $post->getThread()->getUser();
         foreach ($this->threadMapper->findInvolvedUsers($post->getThread()) as $user) {
-            if ($user->getId() != $quotedId && $user->getId() != $threadUserId) {
+            if ($user->getId() !== $quotedId && $user->getId() !== $threadOwnerId) {
                 $envelope->targetToUser($user->getId(), $bob->build());
             }
         }
@@ -226,6 +227,8 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
+     * Notifies the author of the parent post of the given post and the owner of the thread, that a reply has been posted.
+     *
      * @param string $roletype
      * @param Post   $post
      * @param User   $poster
@@ -245,9 +248,9 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
                 /** @var Post $parent */
                 $parent = $this->mapper->findById($parent->getId());
                 $envelope->targetToUser($parent->getOwner(), $bob->build());
-                // Target to the thread user as well
-                if ($parent->getOwner()->getId() !== $parent->getThread()->getUser()->getId()) {
-                    $envelope->targetToUser($parent->getThread()->getUser(), $bob->build());
+                // Target to the thread owner as well
+                if ($parent->getOwner()->getId() !== $post->getThread()->getUser()->getId()) {
+                    $envelope->targetToUser($post->getThread()->getUser(), $bob->build());
                 }
             } catch (Mapper\Exception $e) {
                 // I can't target a non-existent post
