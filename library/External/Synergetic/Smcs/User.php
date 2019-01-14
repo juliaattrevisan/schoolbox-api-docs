@@ -65,6 +65,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                         uvStudents.StudentSpecialNeedsFlag,
                         uvStudents.StudentStudiesCode,
                         AlertMessage,
+                        '' AS CourtOrderType,
                         uvStudents.StudentBoarder,
                         uvStudents.StudentsComment as Comment,
                         '' AS StudentEnrolmentDate,

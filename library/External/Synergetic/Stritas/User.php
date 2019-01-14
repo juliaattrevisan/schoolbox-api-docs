@@ -71,6 +71,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                 vStudents.StudentSpecialNeedsFlag,
                 vStudents.StudentStudiesCode,
                 AlertMessage,
+                vStudents.LegalCourtOrderType AS CourtOrderType,
                 vStudents.StudentBoarder,
                 vStudents.StudentsComment as Comment,
                 '' AS StudentEnrolmentDate,
