@@ -28,7 +28,7 @@ class StudentAttributesTest extends TestCase
     public function testValidYearLevel($validYear, int $expected): void
     {
         $user       = (new User())->setYear($validYear);
-        $attributes = new StudentAttributes($user, null, '1');
+        $attributes = new StudentAttributes($user);
 
         $this->assertSame($expected, $attributes->getYearLevel());
     }
@@ -43,32 +43,20 @@ class StudentAttributesTest extends TestCase
     public function testInvalidYearLevel($invalidYear): void
     {
         $user = (new User())->setYear($invalidYear);
-        new StudentAttributes($user, null, '1');
-    }
-
-
-    /**
-     * @throws InvalidArgumentException
-     * @expectedException InvalidArgumentException
-     */
-    public function testNoIbFlag(): void
-    {
-        $user = (new User())->setYear(10);
-        new StudentAttributes($user, null, null);
+        new StudentAttributes($user);
     }
 
 
     /**
      * @dataProvider providerIsIb
      * @param string|null $ibFlag
-     * @param string|null $ibFlagOverride
      * @param bool        $expected
      * @throws InvalidArgumentException
      */
-    public function testIsIb(?string $ibFlag, ?string $ibFlagOverride, bool $expected): void
+    public function testIsIb(?string $ibFlag, bool $expected): void
     {
         $user = (new User())->setYear(10);
-        $attributes = new StudentAttributes($user, $ibFlag, $ibFlagOverride);
+        $attributes = new StudentAttributes($user, $ibFlag);
 
         $this->assertSame($expected, $attributes->isIb());
     }
@@ -84,7 +72,7 @@ class StudentAttributesTest extends TestCase
     public function testIsMyp(int $yearLevel, string $ibFlag, bool $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $ibFlag);
+        $attributes = new StudentAttributes($user, $ibFlag);
 
         $this->assertSame($expected, $attributes->isMyp());
     }
@@ -100,7 +88,7 @@ class StudentAttributesTest extends TestCase
     public function testDp(int $yearLevel, string $ibFlag, bool $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $ibFlag);
+        $attributes = new StudentAttributes($user, $ibFlag);
 
         $this->assertSame($expected, $attributes->isDp());
     }
@@ -116,7 +104,7 @@ class StudentAttributesTest extends TestCase
     public function testHsc(int $yearLevel, string $ibFlag, bool $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $ibFlag);
+        $attributes = new StudentAttributes($user, $ibFlag);
 
         $this->assertSame($expected, $attributes->isHsc());
     }
@@ -132,7 +120,7 @@ class StudentAttributesTest extends TestCase
     public function testTermDerivation(string $yearLevel, string $date, int $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, '1', $date);
+        $attributes = new StudentAttributes($user, null, $date);
 
         $this->assertSame($expected, $attributes->getTerm());
     }
@@ -148,7 +136,7 @@ class StudentAttributesTest extends TestCase
     public function testCurriculumYearLevelNowOverride(string $yearLevel, string $date, int $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, '1', $date);
+        $attributes = new StudentAttributes($user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumYearLevel());
     }
@@ -164,7 +152,7 @@ class StudentAttributesTest extends TestCase
     public function testCurriculumSemesterNowOverride(string $yearLevel, string $date, int $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, '1', $date);
+        $attributes = new StudentAttributes($user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumSemester());
     }
@@ -180,7 +168,7 @@ class StudentAttributesTest extends TestCase
     public function testReportStartNowOverride(string $yearLevel, string $date, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, '1', $date);
+        $attributes = new StudentAttributes($user, null, $date);
 
         $this->assertSame($expected, $attributes->getReportStart()->getDatabaseDate());
     }
@@ -196,7 +184,7 @@ class StudentAttributesTest extends TestCase
     public function testReportFinishNowOverride(string $yearLevel, string $date, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, '1', $date);
+        $attributes = new StudentAttributes($user, null, $date);
 
         $this->assertSame($expected, $attributes->getReportFinish()->getDatabaseDate());
     }
@@ -241,17 +229,11 @@ class StudentAttributesTest extends TestCase
      */
     public function providerIsIb(): array
     {
-        // ibFlag, ibFlagOverride, isIb
+        // ibFlag, isIb
         return [
-            [null, '0', false],
-            [null, '1', true],
-            ['0', null, false],
-            ['0', '0',  false],
-            ['0', '1',  true],
-            ['1', null, true],
-            ['1', '0',  false],
-            ['1', '1',  true],
-
+            [null, false],
+            ['0',  false],
+            ['1',  true],
         ];
 
     }
