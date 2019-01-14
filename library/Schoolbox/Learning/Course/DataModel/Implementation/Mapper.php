@@ -116,6 +116,7 @@ class Mapper extends AbstractCourseMapper
             /** @var Folder $folder */
             $folder = $this->hydrateJoin($row, 'specification.folder', 'sf');
             $specification->setFolder($folder);
+            $folder->setCourseSpecification($specification);
             $model->setSpecification($specification);
 
             // Add
