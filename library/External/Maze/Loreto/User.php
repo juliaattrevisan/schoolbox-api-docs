@@ -71,6 +71,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				'' AS StudentStudiesCode,
 				'' AS StudentSpecialNeedsFlag,
 				'' AS AlertMessage,
+                '' AS CourtOrderType,
 				'' AS StudentBoarder,
 				'' AS Comment,
                 '' AS StudentEnrolmentDate,
