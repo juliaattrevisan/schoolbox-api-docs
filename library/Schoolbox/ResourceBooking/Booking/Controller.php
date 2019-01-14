@@ -14,7 +14,6 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress\Date\Recurrence;
 use Calendar_Api_Config_Mapper;
-use Calendar_Api_EventType_Timetable_Room;
 use DateTime;
 use External_Timetable;
 use Schoolbox\Calendar;
@@ -612,6 +611,7 @@ class Controller extends Base
         $source = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
             Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
             $this->getUser(),
+            $this->getUser(),
             [$item->getId()]
         );
         $source
@@ -637,6 +637,7 @@ class Controller extends Base
         if ('' !== $roomCode) {
             $roomSource = new \Calendar_Api_EventType_Timetable_Room(
                 Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $this->getUser(),
                 $this->getUser(),
                 $this->externalTimetableHandler,
                 [$item->getRoomCode() => $item->getId()]

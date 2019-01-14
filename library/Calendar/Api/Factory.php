@@ -93,16 +93,17 @@ class Calendar_Api_Factory
      * Produce an API Composite
      *
      * @param \Schoolbox\User $user
+     * @param \Schoolbox\User $viewer
      * @return Calendar_Api_Composite
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
-    public function produceForUser(\Schoolbox\User $user)
+    public function produceForUser(\Schoolbox\User $user, \Schoolbox\User $viewer)
     {
         $compositeApi = new Calendar_Api_Composite();
 
         foreach ($this->allTypes as $config) {
-            $compositeApi->add($this->produceFromConfig($config, $user));
+            $compositeApi->add($this->produceFromConfig($config, $user, $viewer));
             // InvalidArgumentException or ReflectionException: NOT caught
         }
 
@@ -115,43 +116,45 @@ class Calendar_Api_Factory
      *
      * @param Calendar_Api_Config_Record $config
      * @param \Schoolbox\User            $user
+     * @param \Schoolbox\User            $viewer
      * @return Calendar_Api_EventType_Abstract
      * @throws InvalidArgumentException If the item can't be built
      * @throws UnexpectedValueException If unable to build the external event factory
      */
-    private function produceFromConfig($config, \Schoolbox\User $user): Calendar_Api_EventType_Interface
+    private function produceFromConfig($config, \Schoolbox\User $user, \Schoolbox\User $viewer): Calendar_Api_EventType_Interface
     {
         $className   = "Calendar_Api_EventType_{$config->getEventType()}_{$config->getConnectorClass()}_Default";
         $connectorId = $config->getId();
 
         switch ($className) {
             case Calendar_Api_EventType_Custom_EOTC_Default::class:
-                return new Calendar_Api_EventType_Custom_EOTC_Default($connectorId, $user);
+                return new Calendar_Api_EventType_Custom_EOTC_Default($connectorId, $user, $viewer);
             case Calendar_Api_EventType_Event_External_Default::class:
                 // Same as default constructor, but add the assessment data source
                 $factory        = new ExternalConnectorFactory();
                 $externalEvents = $factory->build($this->configLoader, $this->databaseExternal, ExternalConnectorFactory::EXTERNAL_EVENTS);
-                return new Calendar_Api_EventType_Event_External_Default($connectorId, $user, $externalEvents);
+                return new Calendar_Api_EventType_Event_External_Default($connectorId, $user, $viewer, $externalEvents);
             case Calendar_Api_EventType_Event_Schoolbox_Campus::class:
-                return new Calendar_Api_EventType_Event_Schoolbox_Campus($connectorId, $user);
+                return new Calendar_Api_EventType_Event_Schoolbox_Campus($connectorId, $user, $viewer);
             case Calendar_Api_EventType_Event_Schoolbox_Default::class:
-                return new Calendar_Api_EventType_Event_Schoolbox_Default($connectorId, $user);
+                return new Calendar_Api_EventType_Event_Schoolbox_Default($connectorId, $user, $viewer);
             case Calendar_Api_EventType_Event_Schoolbox_Group::class:
-                return new Calendar_Api_EventType_Event_Schoolbox_Group($connectorId, $user);
+                return new Calendar_Api_EventType_Event_Schoolbox_Group($connectorId, $user, $viewer);
             case Calendar_Api_EventType_Event_Schoolbox_Personal::class:
-                return new Calendar_Api_EventType_Event_Schoolbox_Personal($connectorId, $user);
+                return new Calendar_Api_EventType_Event_Schoolbox_Personal($connectorId, $user, $viewer);
             case Calendar_Api_EventType_Event_Schoolbox_Type::class:
-                return new Calendar_Api_EventType_Event_Schoolbox_Type($connectorId, $user);
+                return new Calendar_Api_EventType_Event_Schoolbox_Type($connectorId, $user, $viewer);
             case Calendar_Api_EventType_Event_Vcal_Default::class:
-                return new Calendar_Api_EventType_Event_Vcal_Default($connectorId, $user);
+                return new Calendar_Api_EventType_Event_Vcal_Default($connectorId, $user, $viewer);
             case Calendar_Api_EventType_ResourceBooking_Booking_Default::class:
-                return new Calendar_Api_EventType_ResourceBooking_Booking_Default($connectorId, $user);
+                return new Calendar_Api_EventType_ResourceBooking_Booking_Default($connectorId, $user, $viewer);
             case Calendar_Api_EventType_ResourceBooking_Moderation_Default::class:
-                return new Calendar_Api_EventType_ResourceBooking_Moderation_Default($connectorId, $user);
+                return new Calendar_Api_EventType_ResourceBooking_Moderation_Default($connectorId, $user, $viewer);
             case Calendar_Api_EventType_Submission_Schoolbox_Default::class:
                 return new Calendar_Api_EventType_Submission_Schoolbox_Default(
                     $connectorId,
                     $user,
+                    $viewer,
                     $this->assessmentDataSource,
                     new Visibility(Access::getInstance())
                 );
@@ -159,26 +162,27 @@ class Calendar_Api_Factory
             /* These don't have connector configs
              */
             case Calendar_Api_EventType_ResourceBooking_Booking_ForCategory::class:
-                return new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $user);
+                return new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $user, $viewer);
             case Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class:
-                return new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $user);
+                return new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $user, $viewer);
             case Calendar_Api_EventType_ResourceBooking_Booking_ForUser::class:
-                return new Calendar_Api_EventType_ResourceBooking_Booking_ForUser(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $user);
+                return new Calendar_Api_EventType_ResourceBooking_Booking_ForUser(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $user, $viewer);
 
             case Calendar_Api_EventType_Submission_Schoolbox_ForDueWork::class:
                 return new Calendar_Api_EventType_Submission_Schoolbox_ForDueWork(
                     $connectorId,
                     $user,
+                    $viewer,
                     $this->assessmentDataSource,
                     new Visibility(Access::getInstance()),
                     new Timetable_ColourManager(Timetable_ColourMapper::getInstance()->findAll())
                 );
             case Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class:
-                return new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($connectorId, $user, $this->configLoader);
+                return new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($connectorId, $user, $viewer, $this->configLoader);
             case Calendar_Api_EventType_Timetable_Room::class:
-                return new Calendar_Api_EventType_Timetable_Room($connectorId, $user, new External_Timetable());
+                return new Calendar_Api_EventType_Timetable_Room($connectorId, $user, $viewer, new External_Timetable());
             case Calendar_Api_EventType_TimetableDays_External_Default::class:
-                return new Calendar_Api_EventType_TimetableDays_External_Default($connectorId, $user);
+                return new Calendar_Api_EventType_TimetableDays_External_Default($connectorId, $user, $viewer);
             default:
                 throw new InvalidArgumentException("Calendar connector not recognised: $className");
         }

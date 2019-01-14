@@ -64,6 +64,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
         $config = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_ResourceBooking_Moderation_Default::class);
         $bookingApi = new Calendar_Api_EventType_ResourceBooking_Moderation_Default(
             $config->getId(),
+            $this->getUser(),
             $this->getUser()
         );
         $bookingApi->setStatus(

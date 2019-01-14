@@ -47,7 +47,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
         // Produce API for schoolbox group events
         $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_Event_Schoolbox_Group::class);
-        $calendarApi    = new Calendar_Api_EventType_Event_Schoolbox_Group($calendarConfig->getId(), $this->getUser(), $this->getContext()->getId());
+        $calendarApi    = new Calendar_Api_EventType_Event_Schoolbox_Group($calendarConfig->getId(), $this->getUser(), $this->getUser(), $this->getContext()->getId());
 
         // Render all events for group using html renderer
         $eventRenderer = new Lister(

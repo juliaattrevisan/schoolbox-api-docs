@@ -92,7 +92,7 @@ if (isset($_POST['title']) && isset($_POST['detail'])) {
 $owner = UserMapper::getInstance()->createModel()->setId($event['owner']);
 if ($eventId = $calendarHandler->update($updatedEvent)) {
     $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_Event_Schoolbox_Default::class);
-    $connector      = new Calendar_Api_EventType_Event_Schoolbox_Default($calendarConfig->getId(), $owner);
+    $connector      = new Calendar_Api_EventType_Event_Schoolbox_Default($calendarConfig->getId(), $owner, $_SESSION['user']);
 
     foreach ($connector->getEvent($eventId) as $calendarEvent) {
         // Only one event should ever be gotten here, so render that one only

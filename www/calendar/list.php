@@ -89,7 +89,7 @@ $this->setVar(
 
 /** @var Calendar_Api_Factory $factory */
 $factory = $this->getDi()->get('calendarApiFactory');
-$api = $factory->produceForUser($user);
+$api = $factory->produceForUser($user, $user);
 
 // Extend finish by one day for search
 

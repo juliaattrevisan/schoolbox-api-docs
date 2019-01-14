@@ -20,9 +20,9 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
     /**
      * @inheritdoc
      */
-    public function __construct(int $connectorId, User $user)
+    public function __construct(int $connectorId, User $user, User $viewer)
     {
-        parent::__construct($connectorId, $user);
+        parent::__construct($connectorId, $user, $viewer);
         $this->calendarHandler = new Calendar();
     }
 
@@ -61,6 +61,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
 		return $this->getCalendarHandler()->getDayEvents(
 			$this->getUser(),
+            $this->getViewer(),
 			$startTimestamp,
 			$endTimestamp
 		);
@@ -77,6 +78,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	public function getEvent($eventId) {
 		return $this->getCalendarHandler()->getDayEvents(
 			$this->getUser(),
+            $this->getViewer(),
 			null,
 			null,
 			array('id' => $eventId)

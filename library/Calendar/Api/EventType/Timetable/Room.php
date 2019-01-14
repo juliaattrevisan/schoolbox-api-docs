@@ -39,6 +39,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      *
      * @param int                         $connectorId
      * @param User                        $user
+     * @param User                        $viewer
      * @param External_TimetableInterface $externalTimetable
      * @param array                       $roomCodes // TODO what type of array? Calls to this constructor are utilising various hacks.
      *                                               // TODO This should document how to not filter by room code at all.
@@ -47,9 +48,9 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      *                                                        []    => return nothing,
      *                                                        [x,y] => filter to x and y
      */
-    public function __construct(int $connectorId, User $user, External_TimetableInterface $externalTimetable, $roomCodes = [])
+    public function __construct(int $connectorId, User $user, User $viewer, External_TimetableInterface $externalTimetable, $roomCodes = [])
     {
-        parent::__construct($connectorId, $user);
+        parent::__construct($connectorId, $user, $viewer);
         $this->externalTimetable = new External_Timetable();
         $this->roomCodes         = $roomCodes;
     }

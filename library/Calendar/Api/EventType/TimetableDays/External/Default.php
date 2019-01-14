@@ -31,9 +31,9 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
     /**
      * @inheritdoc
      */
-    public function __construct(int $connectorId, User $user)
+    public function __construct(int $connectorId, User $user, User $viewer)
     {
-        parent::__construct($connectorId, $user);
+        parent::__construct($connectorId, $user, $viewer);
         $this->externalTimetable = new External_Timetable();
         $this->eventTypeMapper   = EventTypeMapper::getInstance();
     }

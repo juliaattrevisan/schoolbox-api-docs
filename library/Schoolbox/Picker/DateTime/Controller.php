@@ -345,7 +345,7 @@ class Controller extends Base
 
         /** @var Calendar_Api_Factory $factory */
         $factory = $this->getDi()->get('calendarApiFactory');
-        $api = $factory->produceForUser($this->getUser());
+        $api = $factory->produceForUser($this->getUser(), $this->getUser());
 
         $events = $api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
 

@@ -26,11 +26,12 @@ class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventTy
     /**
      * @param int      $connectorId
      * @param User     $user
+     * @param User     $viewer
      * @param null|int $campusId
      */
-    public function __construct(int $connectorId, User $user, int $campusId = null)
+    public function __construct(int $connectorId, User $user, User $viewer, int $campusId = null)
     {
-        parent::__construct($connectorId, $user);
+        parent::__construct($connectorId, $user, $viewer);
         $this->campus_id = $campusId;
     }
 
@@ -46,6 +47,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventTy
 	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
 		return $this->getCalendarHandler()->getDayEvents(
 			$this->getUser(),
+            $this->getViewer(),
 			$startTimestamp,
 			$endTimestamp,
             ['campus' => $this->campus_id]
