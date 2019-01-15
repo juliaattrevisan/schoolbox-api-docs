@@ -23,4 +23,5 @@ class Config
     public const _TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS = self::PREFIX_TIGS_CRP . 'work_type_myp_final_achievement_levels';
     public const _TIGS_WORK_TYPE_NESA_SCORE = self::PREFIX_TIGS_CRP . 'work_type_nesa_score';
     public const _TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK = self::PREFIX_TIGS_CRP . 'work_type_hsc_assessment_task';
+    public const _TIGS_WORK_TYPE_HSC_ASSESSMENT_RANK = self::PREFIX_TIGS_CRP . 'work_type_hsc_assessment_rank';
 }
