@@ -21,6 +21,7 @@ Data:
 <div class="row">
     <div class="island small-12">
         <h1>{{ folder.title }}</h1>
+        <p class="meta">Curriculum Year {{ attributes.curriculumYearLevel }}, Semester {{ attributes.curriculumSemester }}</p>
         {% if not isEnabled %}
             <div data-alert class="alert-box highlight">
                 This report is currently not visible to the student or their parents.
