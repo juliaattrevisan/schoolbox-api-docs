@@ -100,7 +100,7 @@ class HscAssessmentTasks extends BaseComponent
      * Builds data for a single UnitSpec
      *
      * @param UnitSpec\Model $unitSpec
-     * @return array
+     * @return array|null
      * @throws UnexpectedValueException If unable to generate data for this unit's component
      */
     private function buildUnitSpecData(UnitSpec\Model $unitSpec): ?array
