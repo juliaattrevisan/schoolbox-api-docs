@@ -4,6 +4,7 @@ Displays a report for the selected user and folder for the current term.
 Data:
     user:                User           - a student in years 7-12
     folder:              Folder\Model   - a class folder
+    courseSpec:          CourseSpec\Model|null - if present, the single courseSpec imported to this class
     isEnabled:           bool           - is this report enabled for the student and their parents?
     attributes:          StudentAttributes
     errors               string[]       - Any errors that affect the whole page
@@ -20,7 +21,7 @@ Data:
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <div class="row">
     <div class="island small-12">
-        <h1>{{ folder.title }}</h1>
+        <h1>{{ courseSpec ? courseSpec.title : folder.title }}</h1>
         <p class="meta">Curriculum Year {{ attributes.curriculumYearLevel }}, Semester {{ attributes.curriculumSemester }}</p>
         {% if not isEnabled %}
             <div data-alert class="alert-box highlight">

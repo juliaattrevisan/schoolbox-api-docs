@@ -141,7 +141,7 @@ class Controller extends Web\Controller\Base
             }
             $errors[]  = $error;
             $unitSpecs = $aamData = $aasData = $hscTaskMarks = [];
-            $falData   = $ibGraphData = $nesaGraphData = null;
+            $falData   = $ibGraphData = $nesaGraphData = $courseSpec = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitSpecs = $this->getUnitSpecs($courseImplsWithUnits);
@@ -161,6 +161,7 @@ class Controller extends Web\Controller\Base
         $data   = [
             'user'          => $user,
             'folder'        => $folder,
+            'courseSpec'    => $courseSpec,
             'isEnabled'     => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
             'attributes'    => $attributes,
             'errors'        => $errors,
