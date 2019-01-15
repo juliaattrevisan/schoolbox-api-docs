@@ -147,18 +147,18 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
-     * @param Post   $post
-     * @param User   $poster
+     * @param Post $post
+     * @param Thread $thread
+     * @param User $poster
      * @param string $title
      * @param string $action
-     * @param bool   $deduplicate
+     * @param bool $deduplicate
      * @return Builder
      */
-    protected function newBuilder($post, User $poster, string $title, string $action, bool $deduplicate = false): Builder
+    protected function newBuilder($post, $thread, User $poster, string $title, string $action, bool $deduplicate = false): Builder
     {
         $bob    = new Builder();
         try {
-            $thread = $this->threadMapper->findById($post->getThread()->getId());
             $cat    = $this->categoryMapper->findById($thread->getCategory()->getId());
         } catch (Mapper\Exception $e) {
             return $bob;
@@ -199,8 +199,13 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         /** @var Post $post */
         $post     = $this->hydrate($post);
         $envelope = new Envelope();
+        try {
+            $thread = $this->threadMapper->findById($post->getThread()->getId());
+        } catch (Mapper\Exception $e) {
+            return $envelope;
+        }
 
-        $bob = $this->newBuilder($post, $poster, ':user posted in :thread in :folder', self::TRIGGER_FOLLOWED)
+        $bob = $this->newBuilder($post, $thread, $poster, ':user posted in :thread in :folder', self::TRIGGER_FOLLOWED)
             ->addFilter('roletype', array($roletype));
 
         /** @var Post $parent */
@@ -215,7 +220,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
             }
         }
 
-        $threadOwnerId = $post->getThread()->getUser();
+        $threadOwnerId = $thread->getUser()->getId();
         foreach ($this->threadMapper->findInvolvedUsers($post->getThread()) as $user) {
             if ($user->getId() !== $quotedId && $user->getId() !== $threadOwnerId) {
                 $envelope->targetToUser($user->getId(), $bob->build());
@@ -239,7 +244,13 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         /** @var Post $post */
         $post     = $this->hydrate($post);
         $envelope = new Envelope();
-        $bob = $this->newBuilder($post, $poster, ':user replied to your post in :thread in :folder', self::TRIGGER_MENTIONED, true)
+        try {
+            $thread = $this->threadMapper->findById($post->getThread()->getId());
+        } catch (Mapper\Exception $e) {
+            return $envelope;
+        }
+
+        $bob = $this->newBuilder($post, $thread, $poster, ':user replied to your post in :thread in :folder', self::TRIGGER_MENTIONED, true)
             ->addFilter('roletype', array($roletype));
 
         $parent = $post->getParent();
@@ -249,8 +260,8 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
                 $parent = $this->mapper->findById($parent->getId());
                 $envelope->targetToUser($parent->getOwner(), $bob->build());
                 // Target to the thread owner as well
-                if ($parent->getOwner()->getId() !== $post->getThread()->getUser()->getId()) {
-                    $envelope->targetToUser($post->getThread()->getUser(), $bob->build());
+                if ($parent->getOwner()->getId() !== $thread->getUser()->getId()) {
+                    $envelope->targetToUser($thread->getUser(), $bob->build());
                 }
             } catch (Mapper\Exception $e) {
                 // I can't target a non-existent post
