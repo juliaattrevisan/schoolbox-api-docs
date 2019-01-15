@@ -97,11 +97,14 @@ Data:
                 {% include '@tigsSummativeReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId] only %}
             {% endif %}
         </div>
-        {% if aasData.data[unitSpecId].marks.comment %}
+
+        {# Comments always come from the 'MYP AAS' or 'HSC Task Marks' assessments #}
+        {% set commentData = aasData ? aasData.data[unitSpecId].marks : hscTaskMarks.data[unitSpecId] %}
+        {% if commentData.comment %}
             <div class="column island small-12">
-                <h2 class="subheader">Comments by {{ aasData.data[unitSpecId].marks.commentBy.fullname }}</h2>
+                <h2 class="subheader">Comments by {{ commentData.commentBy.fullname }}</h2>
                 <section class="content">
-                    <p>{{ aasData.data[unitSpecId].marks.comment | nl2br }}</p>
+                    <p>{{ commentData.comment | nl2br }}</p>
                 </section>
             </div>
         {% endif %}
