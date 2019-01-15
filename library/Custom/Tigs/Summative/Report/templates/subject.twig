@@ -14,6 +14,7 @@ Data:
     hscTaskMarks         array          - Data to render the HSC Task Marks components
     hscTaskMarks['error'] string        - Optional. If present, the reason we can't render these components
     hscTaskMarks['data'] array          - Optional. If present, the per-unit data. Indexed by unitSpec.id
+    hscRankData          array          - Data to render the 'HSC Assessment Rank' component
     falData              array|null     - Data to render the Final Achievement Level component
     ibGraphData          array          - Data to render the MYP/DP Graph component
     nesaGraphData        array          - Data to render the NESA Score Graph component
@@ -54,6 +55,8 @@ Data:
         {% if ibGraphData %}
             <h2 class="subheader">{{ ibGraphData.header }}</h2>
             {% include '@tigsSummativeReport/components/internationalBaccalaureateGraph.twig' with ibGraphData only %}
+        {% elseif hscRankData %}
+            {% include '@tigsSummativeReport/components/hscAssessmentRank.twig' with hscRankData only %}
         {% else %}
             <p></p>
         {% endif %}

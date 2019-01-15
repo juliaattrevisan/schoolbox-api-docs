@@ -1,0 +1,34 @@
+{#
+Renders the 'HSC Assessment Rank' component.
+
+Data:
+    error:               string           - Optional. If present, the reason why we can't render the component
+    assessmentMark:      string           - Optional. eg '65 %'
+    assessmentAverage:   string           - Optional. eg '76.33 %'
+    assessmentRank:      string           -           eg '7 / 9'
+#}
+<h2 class="subheader">HSC Assessment Rank</h2>
+{% if error|default(null) %}
+    <div data-alert class="alert-box alert">{{ error|raw }}</div>
+{% else %}
+    <table>
+        <tbody>
+        {% if assessmentMark is defined %}
+            <tr>
+                <th>Assessment Mark</th>
+                <td>{{ assessmentMark|default('-') }}</td>
+            </tr>
+        {% endif %}
+        {% if assessmentAverage is defined %}
+            <tr>
+                <th>Assessment Average</th>
+                <td>{{ assessmentAverage|default('-') }}</td>
+            </tr>
+        {% endif %}
+        <tr>
+            <th>Assessment Rank</th>
+            <td>{{ assessmentRank|default('-') }}</td>
+        </tr>
+        </tbody>
+    </table>
+{% endif %}
