@@ -554,6 +554,8 @@ class Healthcheck
             'tAttendances',
             'IndividualPlans',
             'StudentYears',
+            'vStudentsAll',
+            'luStudentStatus'
         ];
 
         // Pastoral Care Tables (Only If Module Enabled)
