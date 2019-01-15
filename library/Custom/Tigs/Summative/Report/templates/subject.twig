@@ -4,6 +4,7 @@ Displays a report for the selected user and folder for the current term.
 Data:
     user:                User           - a student in years 7-12
     folder:              Folder\Model   - a class folder
+    teachers:            User[]         - teachers of this class folder
     courseSpec:          CourseSpec\Model|null - if present, the single courseSpec imported to this class
     isEnabled:           bool           - is this report enabled for the student and their parents?
     attributes:          StudentAttributes
@@ -50,7 +51,30 @@ Data:
             </div>
         {% endif %}
     </div>
+</div>
 
+<div class="row">
+    <div class="column small-12 medium-6">
+        <h2 class="subheader">Student</h2>
+        <div class="card small-12">
+            <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" alt="View Profile">
+            <h3><a href="/search/user/{{ user.id }}">{{ user.fullName }}</a></h3>
+            <p class="meta">{{ user.role.name }}</p>
+        </div>
+    </div>
+    <div class="column small-12 medium-6">
+        <h2 class="subheader">Teacher{% if teachers | length > 1 %}s{% endif %}</h2>
+        {% for teacher in teachers %}
+            <div class="card small-12">
+                <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="View Profile">
+                <h3><a href="/search/user/{{ teacher.id }}">{{ teacher.fullName }}</a></h3>
+                <p class="meta">{{ teacher.role.name }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="row">
     <div class="column small-12 medium-6">
         {% if ibGraphData %}
             <h2 class="subheader">{{ ibGraphData.header }}</h2>
