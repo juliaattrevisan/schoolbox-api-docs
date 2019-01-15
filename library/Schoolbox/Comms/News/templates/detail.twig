@@ -256,7 +256,14 @@ Data:
     {#}#}
 {#} only %}#}
 
-{% if not isPublishable %}
+{# If you have permission to submit and implicitly approve your own articles, do that, otherwise submit for moderation #}
+{% if article.canBeApproved %}
+    {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
+{% endif %}
+{% if article.canBeSubmitted %}
+    {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
+{% endif %}
+{% if (approveRoute or submitRoute) and not isPublishable %}
 <div class="small-12 columns" id="unpublishable-box">
     <div id="flash" class="alert-box highlight">
         <span id="error-message">
@@ -274,31 +281,22 @@ Data:
                 <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
             {% endif %}
 
-            {% if isPublishable %}
-                {# If you have permission to submit and implicitly approve your own articles, do that, otherwise submit for moderation #}
-                {% if article.canBeApproved %}
-                    {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
+            {% if isPublishable and (approveRoute or submitRoute) %}
+                {% if approveRoute %}
+                    {% set buttonText = 'Publish ' ~ locale.news %}
+                {% elseif article.isRejected %}
+                    {% set buttonText = 'Resubmit for moderation' %}
+                {% else %}
+                    {% set buttonText = 'Submit for moderation' %}
                 {% endif %}
-                {% if article.canBeSubmitted %}
-                    {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
-                {% endif %}
-                {% if approveRoute or submitRoute %}
-                    {% if approveRoute %}
-                        {% set buttonText = 'Publish ' ~ locale.news %}
-                    {% elseif article.isRejected %}
-                        {% set buttonText = 'Resubmit for moderation' %}
-                    {% else %}
-                        {% set buttonText = 'Submit for moderation' %}
-                    {% endif %}
-                    <li>
-                        <form action="{{ approveRoute ?: submitRoute }}" method="post" id="article-form">
-                            {% if returnUrl|length %}
-                                <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}" />
-                            {% endif %}
-                            <input type="submit" value="{{ buttonText }}" id="article-submit" />
-                        </form>
-                    </li>
-                {% endif %}
+                <li>
+                    <form action="{{ approveRoute ?: submitRoute }}" method="post" id="article-form">
+                        {% if returnUrl|length %}
+                            <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}"/>
+                        {% endif %}
+                        <input type="submit" value="{{ buttonText }}" id="article-submit"/>
+                    </form>
+                </li>
             {% endif %}
         </ul>
     </div>
