@@ -35,94 +35,27 @@ class Mapper extends BaseMapper
         $this->uses('title_position',self::TYPE_INTEGER);
 
         // Link
-        $this->hasMap(
-            array(
-                'column'   => 'link',
-                'property' => 'link',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'link_target',
-                'property' => 'linkTarget',
-                'type'     => self::TYPE_STRING,
-            )
-        );
+        $this->uses('link',self::TYPE_STRING);
+        $this->uses('link_target',self::TYPE_STRING);
 
         // Background related fields
-        $this->hasMap(
-            array(
-                'column'   => 'background_image_hash',
-                'property' => 'backgroundImage',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'backgroundImage',
-                'join_def' => array(
-                    'mapper'    => StorageMapper::class,
-                    'other_key' => 'hash',
-                )
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'background_image_contained',
-                'property' => 'backgroundImageContained',
-                'type'     => self::TYPE_BOOLEAN,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'background_color',
-                'property' => 'backgroundColor',
-                'type'     => self::TYPE_COLOR,
-            )
-        );
+        $this->joins('background_image_hash',StorageMapper::class, 'hash', null, null, 'backgroundImage', 'backgroundImage');
+        $this->uses('background_image_contained',self::TYPE_BOOLEAN);
+        $this->uses('background_color',self::TYPE_COLOR);
         $this->uses('background_position', self::TYPE_INTEGER);
 
         // Hover color
-        $this->hasMap(
-            array(
-                'column'   => 'hover_color',
-                'property' => 'hoverColor',
-                'type'     => self::TYPE_COLOR,
-            )
-        );
+        $this->uses('hover_color',self::TYPE_COLOR);
 
         // Order
-        $this->hasMap(
-            array(
-                'column'   => 'order',
-                'property' => 'order',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
+        $this->uses('order',self::TYPE_INTEGER);
 
         // Created/Modified/Deleted
-        $this->hasMap(
-            array(
-                'column'            => 'created_at',
-                'property'          => 'createdAt',
-                'type'              => self::TYPE_DATETIME,
-                'created_timestamp' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'            => 'modified_at',
-                'property'          => 'modifiedAt',
-                'type'              => self::TYPE_DATETIME,
-                'updated_timestamp' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'deleted_at',
-                'property' => 'deletedAt',
-                'type'     => self::TYPE_DATETIME,
-            )
-        );
-        $this->hasSoftDeleteDateField('deleted_at');
-        $this->registerCallback('preSave', array($this, 'preSave'));
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('modified_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback('preSave', [$this, 'preSave']);
     }
 
 
