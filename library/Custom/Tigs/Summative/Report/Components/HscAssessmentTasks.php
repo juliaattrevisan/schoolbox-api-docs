@@ -119,7 +119,7 @@ class HscAssessmentTasks extends BaseComponent
             }
         }
 
-        // Filter anything not due withing this report's window
+        // Filter anything not due within this report's window
         foreach ($cohortAssessments as $assessable) {
             if (!$this->isDueWithinReportWindow($assessable)) {
                 $cohortAssessments->offsetUnset($assessable->getId());
