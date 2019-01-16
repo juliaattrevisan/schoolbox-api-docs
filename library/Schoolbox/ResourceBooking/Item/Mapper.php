@@ -268,7 +268,7 @@ class Mapper extends BaseMapper
     /**
      * Overrides hydrate() to populate the list of moderators, and the image.
      *
-     * @todo Replace with a method which doesn't involve a query per resource.
+     * @todo migrate this into hydrateSelect
      *
      * @param array  $row
      * @param string $alias
