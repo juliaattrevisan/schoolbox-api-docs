@@ -48,26 +48,20 @@ class StudentAttributes
     /**
      * @param User        $user
      * @param string|null $ibFlag
-     * @param string|null $ibFlagOverride
      * @param string|null $nowOverride Enable now() simulation for testing
      * @throws InvalidArgumentException
      */
     public function __construct(
         User $user,
-        ?string $ibFlag,
-        ?string $ibFlagOverride,
+        ?string $ibFlag = null,
         ?string $nowOverride = null
     ) {
-        // Either $ibFlag or $ibFlagOverride must be provided
-        if (null === $ibFlag && null === $ibFlagOverride) {
-            throw new InvalidArgumentException('Either an ibFlag or ibFlagOverride value must be set');
-        }
         $now = $nowOverride
             ? new Alaress_Date_Format(\strtotime($nowOverride), Alaress_Date_Format::TIMESTAMP)
             : Alaress_Date_Format::now();
 
         $this->yearLevel           = $this->deriveUserYearLevel($user);
-        $this->isIb                = (bool)($ibFlagOverride ?? $ibFlag);
+        $this->isIb                = (bool)$ibFlag; // If unknown (NULL), assume FALSE
         $this->term                = $this->deriveTerm($now);
         $this->curriculumYearLevel = ($this->yearLevel === 11 && $this->term === 4) ? 12 : $this->yearLevel;
         $this->curriculumSemester  = $this->deriveCurriculumSemester($this->yearLevel, $this->term);

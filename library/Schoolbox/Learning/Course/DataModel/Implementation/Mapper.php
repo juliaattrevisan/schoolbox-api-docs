@@ -101,7 +101,6 @@ class Mapper extends AbstractCourseMapper
     {
         $modelList = $this->createCollection();
         foreach ($statement as $row) {
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             /** @var Folder $folder */
@@ -113,9 +112,11 @@ class Mapper extends AbstractCourseMapper
 
             /** @var CourseSpecification $specification */
             $specification = $this->hydrateJoin($row, 'specification', 's');
+            $specification->getCourseImplementations()[$model->getId()] = $model;
             /** @var Folder $folder */
             $folder = $this->hydrateJoin($row, 'specification.folder', 'sf');
             $specification->setFolder($folder);
+            $folder->setCourseSpecification($specification);
             $model->setSpecification($specification);
 
             // Add

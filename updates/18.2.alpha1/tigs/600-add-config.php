@@ -44,6 +44,7 @@ $app = new class extends App
      * @param LoggerInterface $log
      * @param array           $opts
      * @throws PDOException
+     * @throws Di\Exception\ServiceNotFound
      */
     public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
     {
