@@ -4,7 +4,7 @@ hide empty fields
 hide empty methods
 
 object discussion_thread {
-    id: int, PK
+    <<PK>> id: int
     open: bool
     created: datetime
     updated: datetime
@@ -12,9 +12,9 @@ object discussion_thread {
 }
 
 object discussion_post {
-    id: int, PK
-    discussion_thread_id: int, FK(discussion_thread)
-    author_id: int, FK(user)
+    <<PK>> id: int
+    discussion_thread_id: int
+    author_id: int
     content: text
     created: datetime
     updated: datetime
@@ -22,8 +22,8 @@ object discussion_post {
 }
 
 object discussion_thread_link {
-    id: int, PK
-    discussion_thread_id: int, FK(discussion_thread)
+    <<PK>> id: int
+    discussion_thread_id: int
     link_type: enum(news)
     link_id: int
 }
@@ -46,10 +46,10 @@ object user {
     ...
 }
 
-discussion_thread -r-{ discussion_post
+discussion_thread -r-{ discussion_post : discussion_thread_id >
 
-discussion_post }-r- user
+discussion_post }-r- user : author_id <
 
-discussion_thread -d-{ discussion_thread_link
+discussion_thread -d-{ discussion_thread_link : discussion_thread_id >
 
 @enduml
