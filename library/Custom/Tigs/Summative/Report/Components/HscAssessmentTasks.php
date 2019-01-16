@@ -194,7 +194,7 @@ class HscAssessmentTasks extends BaseComponent
                 if (null === $normalisedMark) {
                     continue;
                 }
-                $cohortMarks[$participant->getUser()->getId()] = $normalisedMark;
+                $cohortMarks[] = $normalisedMark;
             }
         }
         return $cohortMarks;
