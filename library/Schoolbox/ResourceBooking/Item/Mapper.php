@@ -12,6 +12,8 @@ namespace Schoolbox\ResourceBooking\Item;
 
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage;
+use Schoolbox\ResourceBooking\Booking;
+use Schoolbox\ResourceBooking\Category;
 use Schoolbox\Collection;
 use Schoolbox\Role;
 
@@ -22,125 +24,26 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('resource');
         $this->hasModel(Model::class);
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'resource_category_id',
-                'property' => 'category',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'category',
-                'join_def' => array(
-                    'mapper'    => '\\Schoolbox\\ResourceBooking\\Category\\Mapper',
-                    'other_key' => 'id',
-                )
-            )
-        );
-
+        $this->uses('id',self::TYPE_INTEGER,self::COLUMN_IDENTIFIER);
+        $this->joins('resource_category_id', Category\Mapper::class, 'id', null, null, 'category', 'category');
         $this->joins('image_hash', Storage\Mapper::class, 'hash', null, null, 'image', 'image');
+        $this->joins('resource_moderation_type_id', ModerationType\Mapper::class, 'id', null, null, 'moderationType', 'moderation_type');
+        $this->uses('name',self::TYPE_STRING);
+        $this->uses('room_code',self::TYPE_STRING);
+        $this->uses('description',self::TYPE_STRING);
+        $this->uses('min_lead_time',self::TYPE_TIMESPAN);
+        $this->uses('min_reservation_time',self::TYPE_TIMESPAN);
+        $this->uses('max_reservation_time',self::TYPE_TIMESPAN);
+        $this->uses('current_term_restriction',self::TYPE_BOOLEAN);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('modified_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->hasMap(
-            array(
-                'column'   => 'resource_moderation_type_id',
-                'property' => 'moderationType',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'moderation_type',
-                'join_def' => array(
-                    'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\ModerationType\\Mapper',
-                    'this_key'  => 'resource_moderation_type_id',
-                    'other_key' => 'id',
-                )
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'name',
-                'property' => 'name',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'room_code',
-                'property' => 'roomCode',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'description',
-                'property' => 'description',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-
-        // Minimum lead time, min and max reservation time
-        $this->hasMap(
-            array(
-                'column'   => 'min_lead_time',
-                'property' => 'minLeadTime',
-                'type'     => self::TYPE_TIMESPAN,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'min_reservation_time',
-                'property' => 'minReservationTime',
-                'type'     => self::TYPE_TIMESPAN,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'max_reservation_time',
-                'property' => 'maxReservationTime',
-                'type'     => self::TYPE_TIMESPAN,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'current_term_restriction',
-                'property' => 'currentTermRestriction',
-                'type'     => self::TYPE_BOOLEAN,
-            )
-        );
-
-        // Created/Modified/Deleted
-        $this->hasMap(
-            array(
-                'column'            => 'created_at',
-                'property'          => 'createdAt',
-                'type'              => self::TYPE_DATETIME,
-                'created_timestamp' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'            => 'modified_at',
-                'property'          => 'modifiedAt',
-                'type'              => self::TYPE_DATETIME,
-                'updated_timestamp' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'deleted_at',
-                'property' => 'deletedAt',
-                'type'     => self::TYPE_DATETIME,
-            )
-        );
-        $this->hasSoftDeleteDateField('deleted_at');
-
-        // Joins
+        // Unmapped joins
         $this->hasJoin(
             'moderator',
             array(
-                'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\Moderator\\Mapper',
+                'mapper'    => Moderator\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'resource_id',
                 'multiple'  => true,
@@ -154,34 +57,34 @@ class Mapper extends BaseMapper
         );
         $this->hasJoin(
             'booking',
-            array(
-                'mapper'    => '\\Schoolbox\\ResourceBooking\\Booking\\Mapper',
+            [
+                'mapper'    => Booking\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'resource_id',
                 'multiple'  => true,
-            )
+            ]
         );
         $this->hasJoin(
             'related_resource',
-            array(
-                'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\RelatedResource\\Mapper',
+            [
+                'mapper'    => RelatedResource\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'resource_id',
                 'multiple'  => true,
-            )
+            ]
         );
         $this->hasJoin(
             'role',
-            array(
-                'mapper'    => '\\Schoolbox\\ResourceBooking\\Item\\RolePermission\\Mapper',
+            [
+                'mapper'    => RolePermission\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'resource_id',
                 'multiple'  => true,
-            )
+            ]
         );
-        $this->registerCallback('postSave', array($this, 'postSave'));
-        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'postDelete'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'postDelete'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'postSave']);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'postDelete']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'postDelete']);
     }
 
     /**
