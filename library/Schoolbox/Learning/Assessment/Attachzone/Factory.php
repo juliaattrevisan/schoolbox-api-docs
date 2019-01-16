@@ -113,11 +113,21 @@ class Factory
         $zone = new Zone('files');
         $zone->setMulti(true)->setAttachmentsLabel('');
 
+        $files = [];
         /* Sort files alphabetically
          */
         $response->getAllFiles()->sortBy('filename', 'asc');
 
-        $zone->attachFiles($response->getAllFiles());
+        foreach ($response->getAllFiles() as $file) {
+
+            /* Ignore accumulation of wizzywig contents
+             */
+            if (!$file->getEditableInline()) {
+                $files[] = $file;
+            }
+        }
+
+        $zone->attachFiles($files);
 
         return $zone;
     }
