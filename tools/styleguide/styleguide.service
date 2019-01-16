@@ -1,0 +1,14 @@
+[Unit]
+Description=Styleguide Server
+
+[Service]
+# This requires npx to installed globally
+# ^ this is done on provision with tools/npx.sh
+ExecStart=/usr/local/bin/npx styleguidist server
+WorkingDirectory=/vagrant
+Restart=always
+ # Restart service after 10 seconds if node service crashes
+ RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
