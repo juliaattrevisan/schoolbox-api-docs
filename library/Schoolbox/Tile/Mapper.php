@@ -23,71 +23,16 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('tile');
         $this->hasModel(Model::class);
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'tile_layout_id',
-                'property' => 'tileLayout',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'tile_container',
-                'join_def' => array(
-                    'mapper'    => Layout\Mapper::class,
-                    'other_key' => 'id',
-                )
-            )
-        );
+        $this->uses('id',self::TYPE_INTEGER,self::COLUMN_IDENTIFIER);
+        $this->joins('tile_layout_id',Layout\Mapper::class, 'id', null, null, 'tileLayout', 'tile_container');
 
         // Title related fields
-        $this->hasMap(
-            array(
-                'column'   => 'title_text',
-                'property' => 'titleText',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'title_text_min_size',
-                'property' => 'titleTextMinSize',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'title_text_max_size',
-                'property' => 'titleTextMaxSize',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'title_color',
-                'property' => 'titleColor',
-                'type'     => self::TYPE_COLOR,
-            )
-        );
-        // Hydrate as a color object?
-        $this->hasMap(
-            array(
-                'column'   => 'title_background_color',
-                'property' => 'titleBackgroundColor',
-                'type'     => self::TYPE_COLOR,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'title_position',
-                'property' => 'titlePosition',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
+        $this->uses('title_text',self::TYPE_STRING);
+        $this->uses('title_text_min_size',self::TYPE_INTEGER);
+        $this->uses('title_text_max_size',self::TYPE_INTEGER);
+        $this->uses('title_color',self::TYPE_COLOR);
+        $this->uses('title_background_color',self::TYPE_COLOR);
+        $this->uses('title_position',self::TYPE_INTEGER);
 
         // Link
         $this->hasMap(
