@@ -10,6 +10,9 @@
 
 namespace Schoolbox\ResourceBooking\Item;
 
+use PDO;
+use PDOStatement;
+use Schoolbox\File\Mimetype;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\ResourceBooking\Booking;
@@ -152,41 +155,115 @@ class Mapper extends BaseMapper
         $bookingMapper->delete($bookings);
     }
 
-    /**
-     * Gets item with this ID.
-     *
-     * @param int $id
-     *
-     * @return Model
-     * @throws BaseMapper\Exception         if item with $id wasn't found
-     * @throws BaseMapper\Exception\Deleted if item with $id is soft-deleted
-     */
-    public function findById($id)
-    {
-        $query = "
-            SELECT
-                {$this->getColumnString('r')},
-                {$this->getJoinColumnString('category', 'c')}
-            FROM {$this->getTable()} `r`
-            LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
-            WHERE r.id = ?
-        ";
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array($id));
+//    /**
+//     * Gets item with this ID.
+//     *
+//     * @param int $id
+//     *
+//     * @return Model
+//     * @throws BaseMapper\Exception         if item with $id wasn't found
+//     * @throws BaseMapper\Exception\Deleted if item with $id is soft-deleted
+//     */
+//    public function findById($id)
+//    {
+//        $query = "
+//            SELECT
+//                {$this->getColumnString('r')},
+//                {$this->getJoinColumnString('category', 'c')}
+//            FROM {$this->getTable()} `r`
+//            LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
+//            WHERE r.id = ?
+//        ";
+//        $statement = $this->getDatabase()->prepare($query);
+//        $statement->execute(array($id));
+//
+//        // Hydration:
+//        // progress through each join that was passed.
+//        /** @var Model $item */
+//        foreach ($statement as $row) {
+//            $item = $this->hydrate($row, 'r');
+//            if ($item->getCategory()->getId()) {
+//                $item->setCategory($this->hydrateJoin($row, 'category', 'c'));
+//            }
+//            $this->throwIfDeleted($item);
+//            return $item;
+//        }
+//        throw new BaseMapper\Exception('Instance of object not found');
+//    }
 
-        // Hydration:
-        // progress through each join that was passed.
-        /** @var Model $item */
-        foreach ($statement as $row) {
-            $item = $this->hydrate($row, 'r');
-            if ($item->getCategory()->getId()) {
-                $item->setCategory($this->hydrateJoin($row, 'category', 'c'));
-            }
-            $this->throwIfDeleted($item);
-            return $item;
-        }
-        throw new BaseMapper\Exception('Instance of object not found');
+
+    /**
+     * Always join onto category, image and its mime type
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('category', 'c')},
+                {$this->getJoinColumnString('image', 'i')},
+                {$this->getJoinColumnString('image.allowedFileExtension', 'im')}
+        ";
     }
+
+
+    /**
+     * Always join onto category, image and its mime type
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        $table = $this->database->quoteIdentifier($this->table);
+        return "
+            FROM $table
+            LEFT JOIN {$this->getJoinSql('category', '', 'c', true)}
+            LEFT JOIN {$this->getJoinSql('image', '', 'i', true)}
+            LEFT JOIN {$this->getJoinSql('image.allowedFileExtension', 'i', 'im', true)}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     *
+     * @return Collection
+     * @throws BaseMapper\Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = $this->createCollection();
+
+        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /** @var Model $item */
+            $item = $this->hydrate($r);
+
+            /** @var Category\Model $category */
+            $category = $this->hydrateJoin($r, 'category', 'c');
+            if ($category) {
+                $item->setCategory($category);
+            }
+
+            /** @var Storage\Model $image */
+            $image = $this->hydrateJoin($r, 'image', 'i');
+            if ($image) {
+                /** @var Mimetype $mimeType */
+                $mimeType = $this->hydrateJoin($r, 'image.allowedFileExtension', 'im');
+                if ($mimeType) {
+                    $image->setMimetype($mimeType);
+                }
+
+                $item->setImage($image);
+            }
+
+            $c->add($item);
+        }
+
+        return $c;
+    }
+
 
     /**
      * Overrides hydrate() to populate the list of moderators, and the image.
