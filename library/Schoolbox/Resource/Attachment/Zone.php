@@ -115,7 +115,7 @@ class Zone {
      * @return StorageModel
      * @throws Exception if the file couldn't be found
      */
-    protected function findFile($hash): StorageModel
+    protected function findFile($hash)
     {
         return $this->mapper->findByHash($hash);
     }
