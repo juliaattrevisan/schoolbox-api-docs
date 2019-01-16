@@ -5,8 +5,9 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Tigs\Summative\Report;
+namespace Custom\Tigs\Summative\SubjectReport;
 
+use Custom\Tigs\Summative\StudentAttributes;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;

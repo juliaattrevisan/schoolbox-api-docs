@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Tigs\Summative\Report;
+namespace Custom\Tigs\Summative;
 
 use Alaress_Date_Format;
 use Schoolbox\User;

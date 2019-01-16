@@ -90,9 +90,9 @@ Data:
     <div class="column small-12 medium-6">
         {% if ibGraphData %}
             <h2 class="subheader">{{ ibGraphData.header }}</h2>
-            {% include '@tigsSummativeReport/components/internationalBaccalaureateGraph.twig' with ibGraphData only %}
+            {% include '@tigsSubjectReport/components/internationalBaccalaureateGraph.twig' with ibGraphData only %}
         {% elseif hscRankData %}
-            {% include '@tigsSummativeReport/components/hscAssessmentRank.twig' with hscRankData only %}
+            {% include '@tigsSubjectReport/components/hscAssessmentRank.twig' with hscRankData only %}
         {% else %}
             <p></p>
         {% endif %}
@@ -101,7 +101,7 @@ Data:
     <div class="column small-12 medium-6">
         {% if nesaGraphData %}
             <h2 class="subheader">NESA Score</h2>
-            {% include '@tigsSummativeReport/components/nesaScoreGraph.twig' with nesaGraphData only %}
+            {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData only %}
         {% else %}
             <p></p>
         {% endif %}
@@ -109,7 +109,7 @@ Data:
 
     {% if falData %}
     <div class="column small-12">
-        {% include '@tigsSummativeReport/components/finalAchievementLevels.twig' with falData only %}
+        {% include '@tigsSubjectReport/components/finalAchievementLevels.twig' with falData only %}
     </div>
     {% endif %}
     {% for unitSpecId, unitSpec in unitSpecs %}
@@ -124,16 +124,16 @@ Data:
 
             {# Were we given AAS data for this unit? #}
             {% if aasData.data is defined and aasData.data[unitSpecId] is defined %}
-                {% include '@tigsSummativeReport/components/academicAchievementSummary.twig' with aasData.data[unitSpecId] only %}
+                {% include '@tigsSubjectReport/components/academicAchievementSummary.twig' with aasData.data[unitSpecId] only %}
             {% endif %}
             {# Were we given AAM data for this unit? #}
             {% if aamData.data is defined and aamData.data[unitSpecId] is defined %}
-                {% include '@tigsSummativeReport/components/academicAchievementMatrix.twig' with aamData.data[unitSpecId] only %}
+                {% include '@tigsSubjectReport/components/academicAchievementMatrix.twig' with aamData.data[unitSpecId] only %}
             {% endif %}
 
             {# Were we given HSC Task Marks data for this unit? #}
             {% if hscTaskMarks.data is defined and hscTaskMarks.data[unitSpecId] is defined %}
-                {% include '@tigsSummativeReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId] only %}
+                {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId] only %}
             {% endif %}
         </div>
 

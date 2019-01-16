@@ -5,10 +5,10 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Tigs\Summative\Report\Components;
+namespace Custom\Tigs\Summative\SubjectReport\Components;
 
-use Custom\Tigs\Summative\Report\StudentAttributes;
-use Custom\Tigs\Summative\Report\BaseComponent;
+use Custom\Tigs\Summative\StudentAttributes;
+use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;

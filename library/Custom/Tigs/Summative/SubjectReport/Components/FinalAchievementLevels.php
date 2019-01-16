@@ -5,11 +5,11 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Tigs\Summative\Report\Components;
+namespace Custom\Tigs\Summative\SubjectReport\Components;
 
 use Alaress\Authorizer\Authorizer;
-use Custom\Tigs\Summative\Report\BaseComponent;
-use Custom\Tigs\Summative\Report\StudentAttributes;
+use Custom\Tigs\Summative\SubjectReport\BaseComponent;
+use Custom\Tigs\Summative\StudentAttributes;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
