@@ -34,6 +34,7 @@ use UnexpectedValueException;
 use Schoolbox\Filter\Filters;
 use PDO;
 use Aura\Web\Request;
+use Schoolbox\Resource\Textbox;
 
 class Controller extends Web\Controller\Base
 {
@@ -50,6 +51,9 @@ class Controller extends Web\Controller\Base
     /** @var RubricMapper */
     private $rubricMapper;
 
+    /** @var Textbox\Mapper */
+    private $textBoxMapper;
+
     /** @var Visibility */
     private $visibility;
 
@@ -62,6 +66,7 @@ class Controller extends Web\Controller\Base
      * @param CourseImpl\Mapper      $courseImplMapper
      * @param Assessment\MapperProxy $assessmentMapperProxy
      * @param RubricMapper           $rubricMapper
+     * @param Textbox\Mapper         $textboxMapper
      * @param Visibility             $visibility
      * @param IConnector             $database
      */
@@ -70,6 +75,7 @@ class Controller extends Web\Controller\Base
         CourseImpl\Mapper $courseImplMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
         RubricMapper $rubricMapper,
+        Textbox\Mapper $textboxMapper,
         Visibility $visibility,
         IConnector $database
     ) {
@@ -77,6 +83,7 @@ class Controller extends Web\Controller\Base
         $this->courseImplMapper      = $courseImplMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->rubricMapper          = $rubricMapper;
+        $this->textBoxMapper         = $textboxMapper;
         $this->visibility            = $visibility;
         $this->database              = $database;
     }
@@ -142,7 +149,7 @@ class Controller extends Web\Controller\Base
             }
             $errors[]  = $error;
             $unitSpecs = $aamData = $aasData = $hscTaskMarks = [];
-            $falData   = $ibGraphData = $nesaGraphData = $courseSpec = $hscRankData = null;
+            $falData   = $ibGraphData = $nesaGraphData = $courseSpec = $hscRankData = $courseDescription = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitSpecs = $this->getUnitSpecs($courseImplsWithUnits);
@@ -151,6 +158,7 @@ class Controller extends Web\Controller\Base
             $courseSpec = $courseSpecs->first();
 
             // Build component data
+            $courseDescription = $this->buildCourseDescription($courseSpec);
             $ibGraphData   = $this->buildInternationalBaccalaureateGraphData($folder, $attributes, $courseSpec, $user);
             $nesaGraphData = $this->buildNesaScoreGraphData($folder, $attributes, $courseSpec, $user);
             $falData       = $this->buildFinalAchievementLevelsData($folder, $attributes, $unitSpecs, $user);
@@ -169,6 +177,7 @@ class Controller extends Web\Controller\Base
             'attributes'    => $attributes,
             'errors'        => $errors,
             'unitSpecs'     => $unitSpecs,
+            'courseDescription' => $courseDescription,
             'falData'       => $falData,
             'aamData'       => $aamData,
             'aasData'       => $aasData,
@@ -423,6 +432,35 @@ class Controller extends Web\Controller\Base
         );
 
         return $fal->toContext();
+    }
+
+
+    /**
+     * Returns the body of a textbox with a specific heading on the CourseSpec's homepage
+     *
+     * @param CourseSpec\Model $courseSpec
+     * @return string|null
+     * @throws Predicate\InvalidColumnException
+     */
+    private function buildCourseDescription(CourseSpec\Model $courseSpec): ?string
+    {
+        $textboxHeading = $this->getConfigLoader()->get(Config::_TEXTBOX_HEADING);
+        if (null === $textboxHeading) {
+            return null;
+        }
+        $pb = $this->textBoxMapper->getPredicateBuilder()
+                                  ->equals('categoryId', $courseSpec->getFolder()->getId())
+                                  ->equals('heading', $textboxHeading);
+
+        $textBoxes = $this->textBoxMapper->findByPredicates($pb);
+
+        if (1 !== $textBoxes->count()) {
+            return null;
+        }
+        /** @var Textbox\Model $textbox */
+        $textbox = $textBoxes->first();
+
+        return $textbox->getBody();
     }
 
 

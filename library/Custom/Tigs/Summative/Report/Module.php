@@ -25,6 +25,7 @@ use UnexpectedValueException;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Textbox;
 
 class Module extends Alaress\Module\Module
 {
@@ -92,6 +93,7 @@ class Module extends Alaress\Module\Module
             'externalUser'          => $injector->lazyGet('externalUser'),
             'assessmentMapperProxy' => $injector->get('assessmentDataSource'),
             'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
+            'textboxMapper'         => $this->getMapperFactory()->getLazy(Textbox\Mapper::class),
             'visibility'            => $injector->lazy(function () {
                 /** @var Access $access */
                 $access = $this->getMapperFactory()->get(Access::class);
