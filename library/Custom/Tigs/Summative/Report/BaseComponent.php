@@ -49,7 +49,7 @@ class BaseComponent
 
     /** @noinspection PhpDocMissingThrowsInspection */
     /**
-     * Iterates through a unit spec to return all AAS assessment implementations.
+     * Iterates through a unit spec to return all assessments with the specified work type
      *
      * If folder is provided, filters to only assessments that were imported to the specified folder
      *
