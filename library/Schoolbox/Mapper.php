@@ -1047,8 +1047,8 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param string          $column
      * @param int|IColumnType $type
-     * @param int             $options
-     * @param string          $property
+     * @param null|int        $options
+     * @param null|string     $property
      * @param null|mixed      $params   Any extra params required for a special column type, eg permitted enum values
      * @return bool
      * @throws InvalidArgumentException
