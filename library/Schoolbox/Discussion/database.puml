@@ -29,11 +29,15 @@ object discussion_thread_link {
 }
 
 note right
-link_type is planned to also be:
-* blog
-* forum
-* socialstream
-* grades
+link_type is slated to include
+these existing discussion types:
+• blog
+• forum
+• socialstream
+• grades
+
+and possibly new discussion types:
+• assessment
 end note
 
 object user {
