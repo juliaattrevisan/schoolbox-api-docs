@@ -50,7 +50,13 @@ class NonFreedom implements IQueryHelper
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, getdate()) <= 0)
+            WHERE (
+                S.DATE_DEPART IS NULL
+                OR
+                DATEDIFF(YEAR, S.DATE_DEPART, '1901') >= 0
+                OR
+                DATEDIFF(DAY, S.DATE_DEPART, getdate()) <= 0
+            )
             AND   F.DAD_LMS = :contactLevel
 
             UNION ALL
@@ -69,7 +75,13 @@ class NonFreedom implements IQueryHelper
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, getdate()) <= 0)
+            WHERE (
+                S.DATE_DEPART IS NULL
+                OR
+                DATEDIFF(YEAR, S.DATE_DEPART, '1901') >= 0
+                OR
+                DATEDIFF(DAY, S.DATE_DEPART, getdate()) <= 0
+            )
             AND   F.MUM_LMS = :contactLevel
 
             UNION ALL
@@ -88,7 +100,13 @@ class NonFreedom implements IQueryHelper
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, getdate()) <= 0)
+            WHERE (
+                S.DATE_DEPART IS NULL
+                OR
+                DATEDIFF(YEAR, S.DATE_DEPART, '1901') >= 0
+                OR
+                DATEDIFF(DAY, S.DATE_DEPART, getdate()) <= 0
+            )
             AND   F.CGIVE_LMS = :contactLevel
 
             UNION ALL
@@ -107,7 +125,13 @@ class NonFreedom implements IQueryHelper
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, getdate()) <= 0)
+            WHERE (
+                S.DATE_DEPART IS NULL
+                OR
+                DATEDIFF(YEAR, S.DATE_DEPART, '1901') >= 0
+                OR
+                DATEDIFF(DAY, S.DATE_DEPART, getdate()) <= 0
+            )
             AND   F.GUARD_LMS = :contactLevel
 
             ORDER BY student_contact_id ASC

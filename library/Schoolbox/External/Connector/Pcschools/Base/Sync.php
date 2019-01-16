@@ -75,7 +75,13 @@ class Sync extends Base implements ISync
                 S.CAMPUS        AS student_campus
             FROM STUDENT S
             LEFT JOIN [IDENTITY] AS ID ON S.STUDENT# = ID.MEMBER#
-            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, getdate()) <= 0)
+            WHERE (
+                S.DATE_DEPART IS NULL
+                OR
+                DATEDIFF(YEAR, S.DATE_DEPART, '1901') >= 0
+                OR
+                DATEDIFF(DAY, S.DATE_DEPART, getdate()) <= 0
+            )
             ORDER BY S.STUDKEY ASC
         ";
 
@@ -128,7 +134,13 @@ class Sync extends Base implements ISync
                 ''               AS staff_year_level_description
             FROM TEACHER T
             LEFT JOIN [IDENTITY] AS ID ON T.TEACHER# = ID.MEMBER#
-            WHERE (T.DATE_LEFT IS NULL OR DATEDIFF(DAY, T.DATE_LEFT, getdate()) <= 0)
+            WHERE (
+                T.DATE_LEFT IS NULL
+                OR
+                DATEDIFF(YEAR, T.DATE_LEFT, '1901') >= 0
+                OR
+                DATEDIFF(DAY, T.DATE_LEFT, getdate()) <= 0
+            )
             ORDER BY T.TEACHER_CODE ASC
         ";
 
