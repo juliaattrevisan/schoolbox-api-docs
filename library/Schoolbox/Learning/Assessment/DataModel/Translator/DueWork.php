@@ -133,11 +133,6 @@ class DueWork implements IAssessmentTypeTranslator
                     ->setBasename($file->getBasename())
             );
         }
-
-        // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
-        // TODO figure out rubric result set
-        // TODO figure out mark per rubric group
-        // TODO set model's grade group, mark type, max mark based on mark scheme
     }
 
 
