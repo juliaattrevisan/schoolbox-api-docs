@@ -9,14 +9,20 @@
 
 namespace Schoolbox\Tile;
 
+use PDO;
+use PDOStatement;
+use Schoolbox\Collection;
+use Schoolbox\File\Mimetype;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 
 class Mapper extends BaseMapper
 {
     public function mapping()
     {
         $this->hasTable('tile');
-        $this->hasModel('Schoolbox\\Tile\\Model');
+        $this->hasModel(Model::class);
         $this->hasMap(
             array(
                 'column'     => 'id',
@@ -32,7 +38,7 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'tile_container',
                 'join_def' => array(
-                    'mapper'    => 'Schoolbox\\Tile\\Layout\\Mapper',
+                    'mapper'    => Layout\Mapper::class,
                     'other_key' => 'id',
                 )
             )
@@ -107,7 +113,7 @@ class Mapper extends BaseMapper
                 'type'     => self::TYPE_MODEL,
                 'join'     => 'backgroundImage',
                 'join_def' => array(
-                    'mapper'    => \Schoolbox\Resource\Storage\Mapper::class,
+                    'mapper'    => StorageMapper::class,
                     'other_key' => 'hash',
                 )
             )
@@ -174,53 +180,71 @@ class Mapper extends BaseMapper
         $this->registerCallback('preSave', array($this, 'preSave'));
     }
 
-    // When this item is fetched, in list or by ID: fetch all uploaded images
-    // How do I do that?
 
     /**
-     * Helper method for getting a query that retrieves a tile, and joins to
-     * the background image view.
+     * Always join onto image and its mime type
      *
      * @return string
      */
-    protected function getBaseQuery()
+    protected function getSelectString()
     {
         return "
             SELECT
-                {$this->getColumnString('t')},
-                {$this->getJoinColumnString('backgroundImage', 'bi')}
-            FROM `{$this->getTable()}` `t`
-            LEFT JOIN {$this->getJoinSql('backgroundImage', 't', 'bi')}
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('backgroundImage', 'bi')},
+                {$this->getJoinColumnString('backgroundImage.allowedFileExtension', 'bim')}
         ";
     }
 
-    /**
-     * Gets the tile and its image.
-     *
-     * @param  int $identifierValue
-     * @return Model
-     * @throws BaseMapper\Exception if tile doesn't exist
-     * @throws BaseMapper\Exception\Deleted if tile was soft deleted
-     */
-    public function findById($identifierValue)
-    {
-        $query = $this->getBaseQuery()
-                . ' WHERE `t`.`deleted_at` IS NULL'
-                . ' AND `t`.`id` = :id';
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array('id' => $identifierValue));
 
-        if ($row = $statement->fetch()) {
-            /** @var Model $model */
-            $model = $this->hydrate($row, 't');
-            if (!empty($row['background_image_hash'])) {
-                $model->setBackgroundImage($this->hydrateJoin($row, 'backgroundImage', 'bi'));
-            }
-            $this->throwIfDeleted($model);
-            return $model;
-        }
-        throw new BaseMapper\Exception('Instance of object not found');
+    /**
+     * Always join onto image and its mime type
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        $table = $this->database->quoteIdentifier($this->table);
+        return "
+            FROM $table
+            LEFT JOIN {$this->getJoinSql('backgroundImage', '', 'bi', true)}
+            LEFT JOIN {$this->getJoinSql('backgroundImage.allowedFileExtension', 'bi', 'bim', true)}
+        ";
     }
+
+
+    /**
+     * @param PDOStatement $statement
+     *
+     * @return Collection
+     * @throws BaseMapper\Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = $this->createCollection();
+
+        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /** @var Model $item */
+            $item = $this->hydrate($r);
+
+            /** @var StorageModel $backgroundImage */
+            $backgroundImage = $this->hydrateJoin($r, 'backgroundImage', 'bi');
+            if ($backgroundImage) {
+                /** @var Mimetype $mimeType */
+                $mimeType = $this->hydrateJoin($r, 'backgroundImage.allowedFileExtension', 'bim');
+                if ($mimeType) {
+                    $backgroundImage->setMimetype($mimeType);
+                }
+
+                $item->setBackgroundImage($backgroundImage);
+            }
+
+            $c->add($item);
+        }
+
+        return $c;
+    }
+
 
     /**
      * Gets all tiles for this layout ID, as well as all of its images.
@@ -230,22 +254,7 @@ class Mapper extends BaseMapper
      */
     public function findForLayout($layoutId)
     {
-        $query = $this->getBaseQuery()
-                . ' WHERE `t`.`deleted_at` IS NULL'
-                . ' AND `t`.`tile_layout_id` = :layoutId'
-                . ' ORDER BY `t`.`order` ASC';
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array('layoutId' => $layoutId));
-        return $this->hydrateList(
-            $statement,
-            't',
-            function ($mapper, $model, $row) {
-                if (!empty($row['background_image_hash'])) {
-                    $model->setBackgroundImage($mapper->hydrateJoin($row, 'backgroundImage', 'bi'));
-                }
-                return $model;
-            }
-        );
+        return $this->findByColumn('tile_layout_id', $layoutId);
     }
 
     /**
