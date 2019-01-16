@@ -352,7 +352,7 @@ class Controller extends Web\Controller\Base
         try {
             $workTypeId = $this->checkWorkType(
                 Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_SUMMARY,
-                'Cannot render Academic Achievement Summary components. Work type not set..',
+                'Cannot render Academic Achievement Summary components. Work type not set.',
                 'Set Academic Achievement Summary Work Type'
             );
         } catch (UnexpectedValueException $e) {
