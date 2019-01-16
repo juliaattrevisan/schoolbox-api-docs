@@ -1,0 +1,51 @@
+@startuml
+
+hide empty fields
+hide empty methods
+
+object discussion_thread {
+    id: int, PK
+    open: bool
+    created: datetime
+    updated: datetime
+    deleted: datetime
+}
+
+object discussion_post {
+    id: int, PK
+    discussion_thread_id: int, FK(discussion_thread)
+    author_id: int, FK(user)
+    content: text
+    created: datetime
+    updated: datetime
+    deleted: datetime
+}
+
+object discussion_thread_link {
+    id: int, PK
+    discussion_thread_id: int, FK(discussion_thread)
+    link_type: enum(news)
+    link_id: int
+}
+
+note right
+link_type is planned to also be:
+* blog
+* forum
+* socialstream
+* grades
+end note
+
+object user {
+    id: int, PK
+    username: varchar
+    ...
+}
+
+discussion_thread -r-{ discussion_post
+
+discussion_post }-r- user
+
+discussion_thread -d-{ discussion_thread_link
+
+@enduml
