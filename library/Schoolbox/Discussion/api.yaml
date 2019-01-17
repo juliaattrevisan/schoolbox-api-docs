@@ -1,0 +1,179 @@
+openapi: 3.0.2
+
+info:
+  title:       Schoolbox Discussion Threads API
+  description: |
+    Schoolbox Discussion Threads API
+  x-api-id:    7786c5c6-5fc9-4613-827e-f4170f9ffe27
+  x-audience:  external-partner
+  version:     1.0.0
+  contact:
+    name:  Schoolbox Team
+    url:   https://schoolbox.com.au
+    email: developers@schoolbox.com.au
+
+paths:
+  /posts:
+    post:
+      operationId: createPost
+      summary: Creates a new post
+      responses:
+        201:
+
+    delete:
+      operationId: deletePost
+      summary: Deletes a post
+      responses:
+        204:
+
+  /threads/context/{contextType}/{contextId}:
+    get:
+      operationId: getThreadsByContext
+      summary: Returns threads by their context
+      responses:
+        '200':
+          $ref: '#/components/responses/threadList'
+#      parameters:
+#        - $ref: '#components/parameters/q'
+#        - $ref: '#components/parameters/sort'
+#        - $ref: '#components/parameters/limit'
+#        - $ref: '#components/parameters/offset'
+
+  /threads/{id}/posts:
+    get:
+      operationId: getPostsByThread
+      summary: Returns posts for a thread
+      responses:
+        '200':
+          $ref: '#/components/responses/postList'
+#      parameters:
+#        - $ref: '#components/parameters/q'
+#        - $ref: '#components/parameters/sort'
+#        - $ref: '#components/parameters/limit'
+#        - $ref: '#components/parameters/offset'
+
+
+components:
+  schemas:
+
+    thread:
+      title: Thread
+      description: Common fields for discussion threads
+      type: object
+      properties:
+        id:
+          type: integer
+        open:
+          type: boolean
+          description: Is the thread open for further comments?
+        created:
+          type: date-time
+        updated:
+          type: date-time
+      required:
+        - id
+
+
+    post:
+      title: Post
+      description: Common fields for discussion posts
+      properties:
+        id:
+          type: integer
+        thread:
+          $ref: '#/components/schemas/thread'
+        author:
+          $ref: '#/components/schemas/user'
+        content:
+          type: string
+        created:
+          type: date-time
+        updated:
+          type: date-time
+
+
+    user:
+      title: User
+      description: Common fields for users
+      type: object
+      properties:
+        id:
+          type: integer
+        external_id:
+          type: string
+        title:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        full_name:
+          type: string
+        profile_image:
+          type: string
+      required:
+        - id
+
+
+    problem:
+      title: Problem Details
+      description: Schema for RFC 7807 (Problem Details for HTTP APIs)
+      readOnly: true
+      type: object
+      properties:
+        type:
+          type: string
+          required: true
+          description: A URI reference that identifies the problem type
+        title:
+          type: string
+          required: true
+          description: A short human-readable summary of the problem type
+        status:
+          type: integer
+          required: true
+          description: The HTTP status code
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence of the problem
+
+
+  responses:
+    problem:
+      description: RFC 7807 Problem Details
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+
+
+  parameters:
+    q:
+      name:        q
+      in:          query
+      description: Query (search) parameter
+    sort:
+      name:        sort
+      in:          query
+      description: Sort parameter
+#    fields:
+#      name:        fields
+#      in:          query
+#      description: Fields parameter. Use this to request a subset of a record's fields.
+    limit:
+      name:        sort
+      in:          query
+      description: Maximum number of records to return
+    offset:
+      name:        offset
+      in:          query
+      description: The offset of the first record to return
+    cursor:
+      name:        cursor
+      in:          query
+      description: |
+      Alternative to offset. A generated but decodable pointer to the first
+      record to return.
