@@ -126,8 +126,7 @@ class External_Synergetic_Class implements External_ClassInterface
             AND (StudentClasses.StartDate <= getdate() OR StudentClasses.StartDate IS NULL)
             AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
             AND cstu.DeceasedFlag = 0
-            AND NOT (lS.SynergyMeaning = 'LEFT' AND ISNULL(sy.LeavingDate,GETDATE()) < CONVERT(DATETIME, CONVERT(DATE, GETDATE()))) 
-            AND NOT (lS.SynergyMeaning = 'LEAVING'  AND ISNULL(sy.LeavingDate,GETDATE()) < CONVERT(DATETIME, CONVERT(DATE, GETDATE()))) 
+            AND NOT (lS.SynergyMeaning IN ('LEFT', 'LEAVING') AND DATEDIFF(DAY, sy.LeavingDate, GETDATE()) < 0)
         ORDER BY vStudentsAll.StudentSurname, vStudentsAll.StudentPreferred";
 
         return $this->clearInvalidValues(
