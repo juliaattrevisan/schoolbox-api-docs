@@ -20,11 +20,14 @@ paths:
       responses:
         201:
 
+  /posts/{id}:
     delete:
       operationId: deletePost
       summary: Deletes a post
       responses:
         204:
+      parameters:
+        - $ref: '#components/parameters/id'
 
   /threads/context/{contextType}/{contextId}:
     get:
