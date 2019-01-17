@@ -56,11 +56,11 @@ paths:
         - name: contextType
           in:   path
           schema:
-            $ref: '#/components/schemas/contextType'
+            $ref: '#/components/schemas/threadContext/properties/type'
         - name: contextId
           in:   path
           schema:
-            $ref: '#/components/schemas/contextId'
+            $ref: '#/components/schemas/threadContext/properties/id'
 
   /threads/{id}/posts:
     get:
@@ -96,25 +96,23 @@ components:
           type: string
           format: date-time
         context:
-          type: object
-          properties:
-            type:
-              $ref: '#/components/schemas/contextType'
-            id:
-              $ref: '#/components/schemas/contextId'
+          $ref: '#/components/schemas/threadContext'
 
 
-    contextType:
-      title: Context Type
-      description: The type of the context for a given thread
-      type: string
-      enum: [news]
-
-
-    contextId:
-      title: Context ID
-      description: The identifier of the context for a given thread
-      type: int
+    threadContext:
+      title: Thread Context
+      description: The context for a thread
+      type: object
+      properties:
+        type:
+          description: |
+            The type of the context for a given thread. Currently, only news is
+            supported.
+          type: string
+          enum: [news]
+        id:
+          description: The identifier of the context for a given thread
+          type: int
 
 
     post:
