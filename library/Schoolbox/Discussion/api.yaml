@@ -42,8 +42,7 @@ paths:
           description: The type of context to return threads for
           schema:
             type: string
-            enum:
-              - news
+            enum: [news]
         - name:        contextId
           in:          path
           description: The identifier for the context to return threads for
