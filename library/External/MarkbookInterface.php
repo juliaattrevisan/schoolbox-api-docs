@@ -20,15 +20,15 @@ interface External_MarkbookInterface
      * @param Activity $assessment
      * @return array
      */
-    public function getAssessment(Activity $assessment);
+    public function getAssessment(Activity $assessment): array;
 
     /**
-     * Indicates if assessment exists
+     * Indicates if assessment exists in external system's markbook
      *
      * @param Activity $assessment
      * @return bool
      */
-    public function hasAssessment(Activity $assessment);
+    public function hasAssessment(Activity $assessment): bool;
 
     /**
      * Creates a new assessment item in the markbook
@@ -36,7 +36,7 @@ interface External_MarkbookInterface
      * @param Activity $assessment
      * @return bool
      */
-    public function createAssessment(Activity $assessment);
+    public function createAssessment(Activity $assessment): bool;
 
     /**
      * Updates an existing markbook assessment
@@ -44,7 +44,7 @@ interface External_MarkbookInterface
      * @param Activity $assessment
      * @return bool
      */
-    public function updateAssessment(Activity $assessment);
+    public function updateAssessment(Activity $assessment): bool;
 
     /**
      * Deletes an existing markbook assessment
@@ -52,7 +52,7 @@ interface External_MarkbookInterface
      * @param Activity $assessment
      * @return bool
      */
-    public function deleteAssessment(Activity $assessment);
+    public function deleteAssessment(Activity $assessment): bool;
 
     /**
      * Creates or updates the mark for a student in the remote markbook
@@ -60,7 +60,6 @@ interface External_MarkbookInterface
      * @param ReturnedWork|QuizAttempt $returnedWork
      * @return bool
      */
-    public function setMark($returnedWork);
-
+    public function setMark($returnedWork): bool;
 }
 

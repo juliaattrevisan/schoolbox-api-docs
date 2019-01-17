@@ -445,8 +445,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         $from_date = new \Alaress_Date_Format($from_timestamp, 'U');
         $to_date   = new \Alaress_Date_Format($to_timestamp, 'U');
         $params    = $this->getArrayParameters($category_list, 'category');
-        $params['from_date'] = $from_date->getDatabaseDate();
-        $params['to_date']   = $to_date->getDatabaseDate();
+        $params['from_date'] = $from_date->getDatabase();
+        $params['to_date']   = $to_date->getDatabase();
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 

@@ -576,11 +576,15 @@ class Builder implements IBuilder
 
 
     /**
-     * @param array       $input
-     * @param string|null $prefix
+     * Returns strongly-typed bindings, suitable for use in a IN clause.
+     *
+     * Does not support positional binding (?) style. Enforces named bindings.
+     *
+     * @param array  $input
+     * @param string $prefix
      * @return Bindings
      */
-    public static function getBindings(array $input, string $prefix = null): Bindings
+    public static function getBindings(array $input, string $prefix): Bindings
     {
         $arrayBindings = self::getArrayBindings($input, $prefix);
         return new Bindings($arrayBindings['placeholders'], $arrayBindings['bindings']);

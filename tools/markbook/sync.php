@@ -39,8 +39,8 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Schoolbox Markbook Sync Scrip
     'verbose' => isset($options['v']) ? $options['v'] : null,
     'help' => isset($options['h']) || isset($options['help']) ? true : false,
     'parentId' => isset($options['p']) ? $options['p'] : 0,
-    'year' => isset($options['year']) ? $options['year'] : false,
-    'semester' => isset($options['semester']) ? $options['semester'] : false,
+    'year'     => $options['year'] ?? null,
+    'semester' => $options['semester'] ?? null,
     'start' => isset($options['start']) ? $options['start'] : false,
     'end' => isset($options['end']) ? $options['end'] : false,
     'updateOnly' => isset($options['update-only']),
@@ -82,8 +82,8 @@ function help($configMapper)
     // Synergetic receives some additional options around FileYear/FileSemester
 
     if ($configMapper->get('external_type') == 'synergetic') {
-        $additionalParameters .= "    --year=yyyy          Synergetic FileYear into which to export the markbook, format --year=2016 (must be used with semester parameter)\n";
-        $additionalParameters .= "    --semester=s         Synergetic FileSemester into which to export the markbook, --semester=1 (must be used with year parameter)\n";
+        $additionalParameters .= "    --year=yyyy          Synergetic FileYear into which to export the markbook and student marks, format --year=2016 (must be used with semester parameter)\n";
+        $additionalParameters .= "    --semester=s         Synergetic FileSemester into which to export the markbook and student marks, --semester=1 (must be used with year parameter)\n";
         $addParamsShort = "[--year=yyyy] [--semester=s] ";
     }
 
@@ -98,7 +98,7 @@ Schoolbox Markbook Sync Script
 Description:   Syncs existing markbook data from Schoolbox into {$remoteSystemName}
 Usage:         php sync.php -p=[folderID] {$addParamsShort}[--start=yyyy-mm-dd] [--end=yyyy-mm-dd] [--dry-run] [--update-only]
 
-    -p=xxx               the Schoolbox ID of parent folder to start the traversal, defaults to 0, format --p=237 
+    -p=xxx               the Schoolbox ID of parent folder to start the traversal, defaults to 0, format -p=237
     --start=yyyy-mm-dd   Only sync work due after this date, format --start=2016-04-20, defaults to current semester
     --end=yyyy-mm-dd     Only sync work due before this date, format --end=2016-08-15, default to current semester
     --dry-run:           if set, does not actually update anything, but shows what would be updated
@@ -145,33 +145,15 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     $markbookHandler = new SubmissionReturn();
 
     // Synergetic Markbook uses FileYear/FileSemester and exposes command line parameters not available to other connectors.
-
-    if ($configMapper->get('external_type') == 'synergetic') {
-
-        /** @var External_Synergetic_Markbook $markbookExternal */
-        $markbookExternal = new External_Synergetic_Markbook();
-
-        // Check if we've got a year and semester override set. Both must be set for this to be used.
-
-        if ($opts['year'] && $opts['semester']) {
-
-            // User override year/semester for export
-
-            $markbookExternal->setFileYear($opts['year']);
-            $markbookExternal->setFileSemester($opts['semester']);
-
-        } elseif ($opts['year'] || $opts['semester']) {
-
-            // Both year/semester were not supplied- need to kick them back to command prompt.
-
-            $log->error("ERROR: You must specify both a year and semester to user this option.");
+    if ($configMapper->get('external_type') === 'synergetic') {
+        try {
+            $markbookExternal = new External_Synergetic_Markbook($opts['year'], $opts['semester']);
+        } catch (InvalidArgumentException $e) {
+            $log->error("ERROR: {$e->getMessage()}");
             help($configMapper);
             exit(1);
         }
-
     } else {
-
-        /** @var External_Markbook $markbookExternal */
         $markbookExternal = new External_Markbook();
     }
 
@@ -222,7 +204,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     }
 
     // Retrieve all of the folders that we are going to traverse
-
+    /** @var Folder[] $folderList */
     $folderList = [];
 
     // If we aren't starting at the root folder, include the actual root folder
@@ -243,9 +225,9 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     // Iterate all assessments in these folders
 
     $log->info('Markbook synchronisation starting...');
-    $log->info("Syncing work between {$startTime->getLocalShort()} and {$endTime->getLocalShort()}...");
+    $log->info("Syncing work due between {$startTime->getLocalShort()} and {$endTime->getLocalShort()}...");
 
-    /** @var Folder $folder */
+
     foreach ($folderList as $folder) {
 
         $action = str_pad("Processing folder: ", 34, " ");
@@ -309,7 +291,9 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                     $log->info("    {$action}Update Only");
 
                     if (!$opts['dryRun']) {
-                        $markbookExternal->updateAssessment($submissionBox);
+                        if ($markbookExternal->hasAssessment($submissionBox)) {
+                            $markbookExternal->updateAssessment($submissionBox);
+                        }
                     }
                 }
 
@@ -391,9 +375,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
                 $log->info("    {$action}{$quiz->getTitle()} ({$quiz->getId()})");
 
-                $markbook = $markbookExternal->getAssessment($activity);
-
-                if (is_array($markbook) && count($markbook) >= 1) {
+                if ($markbookExternal->hasAssessment($activity)) {
 
                     $action = str_pad("Updating assessment:", 30, " ");
 

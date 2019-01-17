@@ -20,7 +20,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function getAssessment(Activity $assessment)
+    public function getAssessment(Activity $assessment): array
     {
         return [];
     }
@@ -28,7 +28,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function hasAssessment(Activity $assessment)
+    public function hasAssessment(Activity $assessment): bool
     {
         return false;
     }
@@ -36,7 +36,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function createAssessment(Activity $assessment)
+    public function createAssessment(Activity $assessment): bool
     {
         return false;
     }
@@ -44,7 +44,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function updateAssessment(Activity $assessment)
+    public function updateAssessment(Activity $assessment): bool
     {
         return false;
     }
@@ -52,7 +52,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
     /**
      * @inheritDoc
      */
-    public function deleteAssessment(Activity $assessment)
+    public function deleteAssessment(Activity $assessment): bool
     {
         return false;
     }
@@ -63,7 +63,7 @@ class External_Offline_Markbook implements External_MarkbookInterface
      * @param ReturnedWork|QuizAttempt $returnedWork
      * @return bool
      */
-    public function setMark($returnedWork)
+    public function setMark($returnedWork): bool
     {
         return false;
     }
