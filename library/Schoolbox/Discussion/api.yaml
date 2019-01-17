@@ -92,6 +92,7 @@ components:
     post:
       title: Post
       description: Common fields for discussion posts
+      type: object
       properties:
         id:
           type: integer
@@ -111,7 +112,6 @@ components:
       required:
         - id
         - thread
-        - author
         - content
 
 
