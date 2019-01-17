@@ -104,7 +104,7 @@ class External_Synergetic_Class implements External_ClassInterface
                         vStudentsAll.StudentYearLevelDescription as yearlevel,
                         vStudentsAll.StudentHouseDescription as house,
                         vStudentsAll.StudentMedicalAlert, 
-                        vStudentsAll.EnglishSecondFlag
+                        vStudentsAll.EnglishSecondFlag,
                         vStudentsAll.StudentSpecialNeedsFlag,
                         vStudentsAll.StudentTutorDescription,
                         vStudentsAll.StudentID as synergy_id,
