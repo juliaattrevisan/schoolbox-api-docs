@@ -159,6 +159,31 @@ components:
           description: A URI reference that identifies the specific occurrence of the problem
 
 
+    listMetadata:
+      title: List metadata
+      description: Metadata for lists of items retrieved
+      readOnly: true
+      type: object
+      properties:
+        count:
+          type: int
+          required: false
+          description: If provided, the number of items in the collection
+        cursor:
+          type: object
+          properties:
+            prev:
+              type: string
+              format: uri
+              required: false
+              description: If provided, a link to the previous page of results
+            next:
+              type: string
+              format: uri
+              required: false
+              description: If provided, a link to the next page of results
+
+
   responses:
     problem:
       description: RFC 7807 Problem Details
@@ -166,6 +191,30 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/problem'
+
+    threadList:
+      description: a list of threads
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/thread'
+              metadata:
+                $ref: '#/components/schemas/listMetadata'
+
+    postList:
+      description: a list of posts
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/post'
+              metadata:
+                $ref: '#/components/schemas/listMetadata'
 
 
   parameters:
