@@ -63,13 +63,16 @@ components:
       properties:
         id:
           type: integer
+          format: int32
         open:
           type: boolean
           description: Is the thread open for further comments?
         created:
-          type: date-time
+          type: string
+          format: date-time
         updated:
-          type: date-time
+          type: string
+          format: date-time
       required:
         - id
 
@@ -80,6 +83,7 @@ components:
       properties:
         id:
           type: integer
+          format: int32
         thread:
           $ref: '#/components/schemas/thread'
         author:
@@ -87,9 +91,16 @@ components:
         content:
           type: string
         created:
-          type: date-time
+          type: string
+          format: date-time
         updated:
-          type: date-time
+          type: string
+          format: date-time
+      required:
+        - id
+        - thread
+        - author
+        - content
 
 
     user:
@@ -99,6 +110,7 @@ components:
       properties:
         id:
           type: integer
+          format: int32
         external_id:
           type: string
         title:
@@ -111,6 +123,8 @@ components:
           type: string
         profile_image:
           type: string
+          format: uri-reference
+          nullable: true
       required:
         - id
 
@@ -123,14 +137,17 @@ components:
       properties:
         type:
           type: string
+          format: uri
           required: true
           description: A URI reference that identifies the problem type
+          default: 'about:blank'
         title:
           type: string
           required: true
           description: A short human-readable summary of the problem type
         status:
           type: integer
+          format: int32
           required: true
           description: The HTTP status code
         detail:
@@ -138,6 +155,7 @@ components:
           description: A human-readable explanation specific to this occurrence of the problem
         instance:
           type: string
+          format: uri
           description: A URI reference that identifies the specific occurrence of the problem
 
 
