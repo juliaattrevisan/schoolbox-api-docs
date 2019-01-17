@@ -289,15 +289,8 @@ class Zone {
      */
     protected function deriveSitePageVars(IStorage $file): array
     {
-        // Find the mimetype if it isn't in the file for some reason
-        $mimetype = $file->getMimetype();
-//        if (!$mimetype) {
-//            $storageFile = $this->findFile($file->getHash());
-//            $mimetype    = $storageFile->getMimetype();
-//        }
-
         // if it's an image, render it out, otherwise use its mime thumbnail
-        if ($mimetype->isImage()) {
+        if ($file->getMimetype()->isImage()) {
             $href = "/storage/image.php?hash={$file->getHash()}&size=square{$this->size}";
             $isImage = true;
         } else {
