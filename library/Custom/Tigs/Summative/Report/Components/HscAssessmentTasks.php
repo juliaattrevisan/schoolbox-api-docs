@@ -139,6 +139,23 @@ class HscAssessmentTasks extends BaseComponent
             return null;
         }
 
+        // Ensure there is only 1 such assessment per UnitSpec imported to a class
+        $cohortAssessmentsPerFolder = $cohortAssessments->groupByCallback(function (IAssessable $assessable) {
+            return $assessable->getBaseContext()->getFolder()->getId();
+        });
+        foreach ($cohortAssessmentsPerFolder as $folderId => $assessments) {
+            $count = $assessments->count();
+            if ($count !== 1) {
+                /** @var IAssessable $firstAssessment */
+                $firstAssessment = $assessments->first();
+                $folder          = $firstAssessment->getBaseContext()->getFolder();
+                $folderLink      = \sprintf('<a href="/homepage/%d">%s</a>', $folder->getId(), $folder->getTitle());
+                $unitName        = $unitSpec->getTitle();
+                $msg             = "There must be only 1 'HSC Task Marks' assessments per class unit. Found {$count} in class '{$folderLink}' for unit '{$unitName}'";
+                throw new UnexpectedValueException($msg);
+            }
+        }
+
         $feedback       = $this->findStudentFeedback($classAssessment);
         $normalisedMark = $feedback ? $feedback->getNormalisedMark() : null;
         $cohortMarks    = $this->deriveCohortMarks($cohortAssessments);
