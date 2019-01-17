@@ -61,6 +61,8 @@ paths:
           in:   path
           schema:
             $ref: '#/components/schemas/threadContext/properties/id'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/limit'
 
   /threads/{id}/posts:
     get:
@@ -73,6 +75,8 @@ paths:
           $ref: '#/components/responses/problem'
       parameters:
         - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/limit'
 
 
 components:
