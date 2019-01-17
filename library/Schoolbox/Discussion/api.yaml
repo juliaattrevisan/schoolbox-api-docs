@@ -19,6 +19,11 @@ paths:
       summary: Creates a new post
       responses:
         201:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post'
 
   /posts/{id}:
     delete:
