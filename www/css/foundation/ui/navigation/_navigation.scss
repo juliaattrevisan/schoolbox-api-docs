@@ -515,6 +515,7 @@ $allow-sidebar-stash: $large-up;
     }
 
     .left-menu-dock {
+      color: $off-canvas-foreground;
       display: block;
       height: 2.5rem;
       padding: 0.5rem;
