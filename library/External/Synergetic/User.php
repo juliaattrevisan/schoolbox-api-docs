@@ -987,7 +987,9 @@ class External_Synergetic_User implements External_UserInterface
                             Semester.FileSemester = vStudentsAll.FileSemester AND
                             Semester.FileYear = vStudentsAll.FileYear AND
                             Semester.SystemCurrentFlag = 1
-            LEFT JOIN   Community ON Community.ID = StudentID
+            LEFT JOIN   Community ON Community.ID = StudentID WHERE 
+			NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') 
+			AND DATEDIFF(DAY, vStudentsAll.StudentLeavingDate, GETDATE()) > 0)
         ";
 
         return $this->getConnector()->executeQuery($query)->fetchAll();
