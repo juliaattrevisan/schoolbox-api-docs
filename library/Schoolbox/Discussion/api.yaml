@@ -200,17 +200,16 @@ components:
           description: If provided, the number of items in the collection
         cursor:
           type: object
+          required: false
           properties:
             prev:
               type: string
-              format: uri
               required: false
-              description: If provided, a link to the previous page of results
+              description: If provided, a cursor to the previous page of results
             next:
               type: string
-              format: uri
               required: false
-              description: If provided, a link to the next page of results
+              description: If provided, a cursor to the next page of results
 
 
   responses:
