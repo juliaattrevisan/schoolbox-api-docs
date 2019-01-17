@@ -22,7 +22,7 @@ class Alaress_Saml_Cache extends Alaress_Cache_Abstract {
 	 * @return mixed|void
 	 */
 	protected function setup() {
-		$this->setCachedTime(86400);
+		$this->setCachedTime(3600);
 		$this->setLockTime($this->getLockTimeMultiplier() * $this->getCachedTime());
 	}
 
