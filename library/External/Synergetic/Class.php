@@ -118,7 +118,6 @@ class External_Synergetic_Class implements External_ClassInterface
           vStudentsAll.ID = sy.ID AND
           vStudentsAll.FileYear = sy.FileYear
         )
-		JOIN dbo.luStudentStatus lS ON (sy.Status = lS.Code)
 		JOIN dbo.Community cstu ON (vStudentsAll.ID = cstu.ID)
         WHERE $classQuery
             AND (StudentClasses.FileYear='" . $fileYear . "')
@@ -126,7 +125,7 @@ class External_Synergetic_Class implements External_ClassInterface
             AND (StudentClasses.StartDate <= getdate() OR StudentClasses.StartDate IS NULL)
             AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
             AND cstu.DeceasedFlag = 0
-            AND NOT (lS.SynergyMeaning IN ('LEFT', 'LEAVING') AND DATEDIFF(DAY, sy.LeavingDate, GETDATE()) < 0)
+            AND NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') AND DATEDIFF(DAY, sy.LeavingDate, GETDATE()) < 0)
         ORDER BY vStudentsAll.StudentSurname, vStudentsAll.StudentPreferred";
 
         return $this->clearInvalidValues(
