@@ -33,11 +33,19 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/threadList'
-#      parameters:
-#        - $ref: '#components/parameters/q'
-#        - $ref: '#components/parameters/sort'
-#        - $ref: '#components/parameters/limit'
-#        - $ref: '#components/parameters/offset'
+      parameters:
+        - name:        contextType
+          in:          path
+          description: The type of context to return threads for
+          schema:
+            type: string
+            enum:
+              - news
+        - name:        contextId
+          in:          path
+          description: The identifier for the context to return threads for
+          schema:
+            type: int
 
   /threads/{id}/posts:
     get:
@@ -46,11 +54,8 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/postList'
-#      parameters:
-#        - $ref: '#components/parameters/q'
-#        - $ref: '#components/parameters/sort'
-#        - $ref: '#components/parameters/limit'
-#        - $ref: '#components/parameters/offset'
+      parameters:
+        - $ref: '#components/parameters/id'
 
 
 components:
@@ -218,6 +223,13 @@ components:
 
 
   parameters:
+    id:
+      name:        id
+      in:          path
+      description: ID of an item to use
+      required:    true
+      schema:
+        type: int
     q:
       name:        q
       in:          query
