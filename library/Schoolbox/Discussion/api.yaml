@@ -18,7 +18,7 @@ paths:
       operationId: createPost
       summary: Creates a new post
       responses:
-        '201':
+        '2XX':
           description: The post that was created
           content:
             application/json:
@@ -37,7 +37,7 @@ paths:
       operationId: deletePost
       summary: Deletes a post
       responses:
-        '204':
+        '2XX':
         default:
           $ref: '#/components/responses/problem'
       parameters:
@@ -48,7 +48,7 @@ paths:
       operationId: getThreadsByContext
       summary: Returns threads by their context
       responses:
-        '200':
+        '2XX':
           $ref: '#/components/responses/threadList'
         default:
           $ref: '#/components/responses/problem'
@@ -70,7 +70,7 @@ paths:
       operationId: getPostsByThread
       summary: Returns posts for a thread
       responses:
-        '200':
+        '2XX':
           $ref: '#/components/responses/postList'
         default:
           $ref: '#/components/responses/problem'
