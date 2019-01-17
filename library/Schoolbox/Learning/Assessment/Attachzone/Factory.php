@@ -95,15 +95,9 @@ class Factory
     protected function buildForDueWork(DueWork $dueWork)
     {
         $zone = new Zone('files');
-        $zone->setMulti(true)->setAttachmentsLabel('');
-
-        $files = [];
-
-        foreach ($dueWork->getAttachedFiles() as $file) {
-            $files[] = $file->getHash();
-        }
-
-        $zone->attachFiles($files);
+        $zone->setMulti(true)
+             ->setAttachmentsLabel('')
+             ->attachFiles($dueWork->getAttachedFiles());
 
         return $zone;
     }
@@ -120,7 +114,6 @@ class Factory
         $zone->setMulti(true)->setAttachmentsLabel('');
 
         $files = [];
-
         /* Sort files alphabetically
          */
         $response->getAllFiles()->sortBy('filename', 'asc');
@@ -130,7 +123,7 @@ class Factory
             /* Ignore accumulation of wizzywig contents
              */
             if (!$file->getEditableInline()) {
-                $files[] = $file->getHash();
+                $files[] = $file;
             }
         }
 
@@ -151,18 +144,14 @@ class Factory
             ->setMulti(true)
             ->setAttachmentsLabel('');
 
-        $files = [];
         if ($feedback instanceof Feedback) {
 
             /* Sort files alphabetically
              */
             $feedback->getAllFiles()->sortBy('filename', 'asc');
 
-            foreach ($feedback->getAllFiles() as $file) {
-                $files[] = $file->getHash();
-            }
+            $zone->attachFiles($feedback->getAllFiles());
         }
-        $zone->attachFiles($files);
         return $zone;
     }
 }

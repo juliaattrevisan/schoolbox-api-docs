@@ -11,67 +11,19 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 
+use Alaress_Date_Format;
 use Schoolbox\Resource\File\StorableTrait;
+use Schoolbox\Resource\Storage\IStorage;
 
-class File
+class File implements IStorage
 {
     use StorableTrait;
 
     /**
-     * @var int
+     * @return Alaress_Date_Format
      */
-    protected $id;
-
-    /**
-     * The filename which was submitted
-     *
-     * @var string
-     */
-    protected $filename;
-
-    /**
-     * File constructor.
-     */
-    public function __construct()
+    public function getCreatedAt()
     {
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFilename()
-    {
-        return $this->filename;
-    }
-
-    /**
-     * @param string $filename
-     * @return self
-     */
-    public function setFilename($filename)
-    {
-        $this->filename = $filename;
-        return $this;
+        return $this->storage->getCreatedAt();
     }
 }

@@ -15,6 +15,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 use UnexpectedValueException;
 
 /**
@@ -86,14 +87,21 @@ class Zone {
 
 
     /**
-     * @param array $hashlist
+     * Attach a list of files to this attachzone.
+     *
+     * @param iterable $hashlist Each value is either a string (hash) or an
+     *                           `IStorage` object
      * @return self
      */
-    public function attachFiles(array $hashlist)
+    public function attachFiles(iterable $hashlist)
     {
         foreach ($hashlist as $hash) {
             try {
-                $this->attachments[$hash] = $this->findFile($hash);
+                if ($hash instanceof IStorage) {
+                    $this->attachments[$hash->getHash()] = $hash;
+                } else {
+                    $this->attachments[$hash] = $this->findFile($hash);
+                }
             } catch (Exception $e) {
                 // file given doesn't exist in Storage
             }
@@ -104,7 +112,8 @@ class Zone {
 
     /**
      * @param string $hash
-     * @return IStorage
+     * @return StorageModel
+     * @throws Exception if the file couldn't be found
      */
     protected function findFile($hash)
     {
@@ -278,10 +287,17 @@ class Zone {
      * @param IStorage $file
      * @return array
      */
-    protected function deriveSitePageVars($file)
+    protected function deriveSitePageVars(IStorage $file): array
     {
+        // Find the mimetype if it isn't in the file for some reason
+        $mimetype = $file->getMimetype();
+        if (!$mimetype) {
+            $storageFile = $this->findFile($file->getHash());
+            $mimetype    = $storageFile->getMimetype();
+        }
+
         // if it's an image, render it out, otherwise use its mime thumbnail
-        if ($file->getMimetype()->isImage()) {
+        if ($mimetype->isImage()) {
             $href = "/storage/image.php?hash={$file->getHash()}&size=square{$this->size}";
             $isImage = true;
         } else {
@@ -289,12 +305,12 @@ class Zone {
             $isImage = false;
         }
 
-        return array(
+        return [
             'AZ_FILE_NAME'     => $file->getFilename(),
             'AZ_FILE_HASH'     => NodeFactory::STORE . ':' . $file->getHash(),
             'AZ_FILE_PREVIEW'  => $href,
             'AZ_FILE_IS_IMAGE' => $isImage,
-        );
+        ];
 
     }
 

@@ -20,9 +20,7 @@ use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\Model;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Role;
@@ -73,7 +71,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $task;
 
     /**
-     * @var Collection|IStorage
+     * @var SubmissionBox\SingleFile\Model[]|GenericCollection
      */
     protected $attachments;
 
@@ -185,7 +183,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
     public function __construct()
     {
-        $this->setAttachments(new Collection());
         $this->setCategory(new FolderModel());
         $this->setCurriculumNodes(new Collection());
         $this->setPublishDate(new \Alaress_Date_NullDate());
@@ -194,6 +191,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
         $this->setLateDate(new \Alaress_Date_NullDate());
         $this->setAssessmentModel(new Model());
         $this->submissions = new GenericCollection(Submission::class);
+        $this->attachments = new GenericCollection(SubmissionBox\SingleFile\Model::class);
     }
 
     /**
@@ -380,7 +378,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return Collection|IStorage[]
+     * @return GenericCollection|SubmissionBox\SingleFile\Model[]
      */
     public function getAttachments()
     {
@@ -388,20 +386,20 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @param Collection|IStorage[] $attachments
+     * @param GenericCollection|SubmissionBox\SingleFile\Model[] $attachments
      * @return static
      */
-    public function setAttachments(Collection $attachments)
+    public function setAttachments(GenericCollection $attachments)
     {
-        $this->attachments = $attachments;
+        $this->attachments->replaceWith($attachments);
         return $this;
     }
 
     /**
-     * @param IStorage $attachment
+     * @param SubmissionBox\SingleFile\Model $attachment
      * @return static
      */
-    public function addAttachment(IStorage $attachment)
+    public function addAttachment(SubmissionBox\SingleFile\Model $attachment)
     {
         $this->attachments->add($attachment);
         return $this;

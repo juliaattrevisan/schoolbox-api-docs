@@ -401,7 +401,7 @@ class Controller extends Base
             ->setMulti(false);
 
         if ($model->getImage()->getHash()) {
-            $zone->attachFiles(array($model->getImage()->getHash()));
+            $zone->attachFiles([$model->getImage()]);
         }
         return $zone->getTwigContext();
     }

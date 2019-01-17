@@ -206,13 +206,8 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setAttachPrompt('Upload CSV')
             ->setReadOnly(false)
-            ->setMulti(true);
-
-        if ($attachments != null) {
-            foreach ($attachments as $attachment) {
-                $zone->attachFiles(array($attachment->getHash()));
-            }
-        }
+            ->setMulti(true)
+            ->attachFiles($attachments ?? []);
 
         return $zone->getTwigContext();
     }

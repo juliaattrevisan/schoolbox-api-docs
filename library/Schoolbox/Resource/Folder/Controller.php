@@ -171,7 +171,7 @@ class Controller extends BaseController
         ;
 
         if ($folder->hasCoverImage()) {
-            $zone->attachFiles([ $folder->getCoverImage()->getHash() ]);
+            $zone->attachFiles([ $folder->getCoverImage() ]);
         }
 
         $this->getResponse()->content->set(

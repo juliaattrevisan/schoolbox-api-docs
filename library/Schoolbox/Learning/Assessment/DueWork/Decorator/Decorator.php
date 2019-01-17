@@ -144,7 +144,7 @@ class Decorator implements DecoratorInterface
                 $newList->add(
                     (new DueWorkFile())
                         ->setStorage($file)
-                        ->setFilename($file->getBasename())
+                        ->setBasename($file->getBasename())
                 );
             }
         }

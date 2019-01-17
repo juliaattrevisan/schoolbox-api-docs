@@ -753,7 +753,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @return Collection
+     * @return Collection|File[]
      */
     public function getAttachedFiles()
     {
@@ -761,7 +761,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     }
 
     /**
-     * @param Collection $attachedFiles
+     * @param Collection|File[] $attachedFiles
      * @return $this
      */
     public function setAttachedFiles($attachedFiles)

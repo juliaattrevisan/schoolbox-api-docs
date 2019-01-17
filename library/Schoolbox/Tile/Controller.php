@@ -286,7 +286,7 @@ class Controller extends Base
             ->setMulti(false);
 
         if ($model->getBackgroundImage()) {
-            $zone->attachFiles(array($model->getBackgroundImage()->getHash()));
+            $zone->attachFiles([$model->getBackgroundImage()]);
         }
 
         return $zone->getTwigContext();

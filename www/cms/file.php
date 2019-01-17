@@ -37,7 +37,7 @@ if (is_numeric($this->arg[0])) {
     $this->setTitle('Modify File');
     $this->setTab('resources');
 
-    $zone->attachFiles(array($file->getId()));
+    $zone->attachFiles([$file]);
 
     $output = array(
         'ACTION'           => 'Modify',

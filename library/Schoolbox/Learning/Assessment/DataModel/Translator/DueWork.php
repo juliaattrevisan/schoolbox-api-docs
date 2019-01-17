@@ -8,7 +8,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
-use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Model as DueWorkFileModel;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
@@ -18,8 +18,6 @@ use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
-use Schoolbox\Resource\Storage\Model as StorageModel;
-use Schoolbox\Collection;
 
 /**
  * Sub-translator for due work specific fields.
@@ -78,13 +76,13 @@ class DueWork implements IAssessmentTypeTranslator
      */
     public function recognisesDataModel(IAssessableDataModel $dataModel): bool
     {
-        return $dataModel instanceof SubmissionBox;
+        return $dataModel instanceof DueWorkModel;
     }
 
 
     /**
-     * @param IAssessable|DueWorkObject          $domainObject
-     * @param IAssessableDataModel|SubmissionBox $dataModel
+     * @param IAssessable|DueWorkObject         $domainObject
+     * @param IAssessableDataModel|DueWorkModel $dataModel
      */
     public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
     {
@@ -125,29 +123,24 @@ class DueWork implements IAssessmentTypeTranslator
         }
 
         // Translate files
-        // TODO consider whether the DueWorkFile model is required - should Storage be used directly?
         $dataModel->setAttachments($dataModel->getAttachments()->emptyClone());
         foreach ($domainObject->getAttachedFiles() as $file) {
             $dataModel->addAttachment(
-                (new StorageModel())
-                    ->setHash($file->getHash())
-                    ->setFilename($file->getFilename())
-                    ->setExtension($file->getExtension())
+                (new DueWorkFileModel())
+                    ->setId($file->getId())
+                    ->setBox($dataModel)
+                    ->setStorage($file->getStorage())
+                    ->setBasename($file->getBasename())
             );
         }
-
-        // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
-        // TODO figure out rubric result set
-        // TODO figure out mark per rubric group
-        // TODO set model's grade group, mark type, max mark based on mark scheme
     }
 
 
     /**
      * Copies all attributes from the dataModel to domainObject
      *
-     * @param IAssessableDataModel|SubmissionBox $dataModel
-     * @param IAssessable|DueWorkObject          $domainObject
+     * @param IAssessableDataModel|DueWorkModel $dataModel
+     * @param IAssessable|DueWorkObject         $domainObject
      */
     public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
     {
@@ -194,6 +187,7 @@ class DueWork implements IAssessmentTypeTranslator
         foreach ($dataModel->getAttachments() as $attachment) {
             $domainObject->getAttachedFiles()->add(
                 (new DueWorkFile())
+                    ->setId($attachment->getId())
                     ->setFilename($attachment->getFilename())
                     ->setStorage($attachment)
             );
