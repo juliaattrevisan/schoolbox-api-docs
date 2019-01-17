@@ -257,6 +257,7 @@ components:
       required:    true
       schema:
         type: int
+        minimum: 1
 #    q:
 #      name:        q
 #      in:          query
@@ -275,6 +276,9 @@ components:
       description: Maximum number of records to return
       schema:
         type: int
+        minimum: 1
+        maximum: 100
+        default: 20
 #    offset:
 #      name:        offset
 #      in:          query
