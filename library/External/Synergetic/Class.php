@@ -124,7 +124,6 @@ class External_Synergetic_Class implements External_ClassInterface
             AND (StudentClasses.FileSemester='" . $fileSemester . "')
             AND (StudentClasses.StartDate <= getdate() OR StudentClasses.StartDate IS NULL)
             AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
-            AND cstu.DeceasedFlag = 0
             AND NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') AND DATEDIFF(DAY, sy.LeavingDate, GETDATE()) < 0)
         ORDER BY vStudentsAll.StudentSurname, vStudentsAll.StudentPreferred";
 
