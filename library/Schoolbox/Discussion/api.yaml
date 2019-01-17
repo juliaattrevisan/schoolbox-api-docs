@@ -27,7 +27,7 @@ paths:
       responses:
         204:
       parameters:
-        - $ref: '#components/parameters/id'
+        - $ref: '#/components/parameters/id'
 
   /threads/context/{contextType}/{contextId}:
     get:
@@ -58,7 +58,7 @@ paths:
         '200':
           $ref: '#/components/responses/postList'
       parameters:
-        - $ref: '#components/parameters/id'
+        - $ref: '#/components/parameters/id'
 
 
 components:
