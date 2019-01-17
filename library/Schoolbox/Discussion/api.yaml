@@ -77,7 +77,6 @@ paths:
 
 components:
   schemas:
-
     thread:
       title: Thread
       description: Common fields for discussion threads
@@ -98,7 +97,6 @@ components:
         context:
           $ref: '#/components/schemas/threadContext'
 
-
     threadContext:
       title: Thread Context
       description: The context for a thread
@@ -113,7 +111,6 @@ components:
         id:
           description: The identifier of the context for a given thread
           type: int
-
 
     post:
       title: Post
@@ -139,7 +136,6 @@ components:
         - thread
         - content
 
-
     user:
       title: User
       description: Common fields for users
@@ -162,7 +158,6 @@ components:
           type: string
           format: uri-reference
           nullable: true
-
 
     problem:
       title: Problem Details
@@ -192,7 +187,6 @@ components:
           type: string
           format: uri
           description: A URI reference that identifies the specific occurrence of the problem
-
 
     listMetadata:
       title: List metadata
