@@ -21,15 +21,15 @@ object discussion_post {
     deleted: datetime
 }
 
-object discussion_thread_link {
+object discussion_thread_context {
     <<PK>> id: int
     discussion_thread_id: int
-    link_type: enum(news)
-    link_id: int
+    context_type: enum(news)
+    context_id: int
 }
 
 note right
-link_type is slated to include
+context_type is slated to include
 these existing discussion types:
 • blog
 • forum
@@ -50,6 +50,6 @@ discussion_thread -r-{ discussion_post : discussion_thread_id >
 
 discussion_post }-r- user : author_id <
 
-discussion_thread -d-{ discussion_thread_link : discussion_thread_id >
+discussion_thread -d-{ discussion_thread_context : discussion_thread_id >
 
 @enduml
