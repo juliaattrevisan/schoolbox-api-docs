@@ -45,7 +45,9 @@ class Sync extends Base implements ISync
             FROM            dbo.vStudentsAll vStudentsAll
             LEFT JOIN       Community ON Community.ID = StudentID
             WHERE           FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND 
-                            FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
+                            FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1) AND
+                            NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') 
+			                AND DATEDIFF(DAY, vStudentsAll.StudentLeavingDate, GETDATE()) > 0)
             ORDER BY        vStudentsAll.StudentID ASC
         ");
 
