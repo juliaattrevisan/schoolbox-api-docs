@@ -53,17 +53,14 @@ paths:
         default:
           $ref: '#/components/responses/problem'
       parameters:
-        - name:        contextType
-          in:          path
-          description: The type of context to return threads for
+        - name: contextType
+          in:   path
           schema:
-            type: string
-            enum: [news]
-        - name:        contextId
-          in:          path
-          description: The identifier for the context to return threads for
+            $ref: '#/components/schemas/contextType'
+        - name: contextId
+          in:   path
           schema:
-            type: int
+            $ref: '#/components/schemas/contextId'
 
   /threads/{id}/posts:
     get:
@@ -98,6 +95,26 @@ components:
         updated:
           type: string
           format: date-time
+        context:
+          type: object
+          properties:
+            type:
+              $ref: '#/components/schemas/contextType'
+            id:
+              $ref: '#/components/schemas/contextId'
+
+
+    contextType:
+      title: Context Type
+      description: The type of the context for a given thread
+      type: string
+      enum: [news]
+
+
+    contextId:
+      title: Context ID
+      description: The identifier of the context for a given thread
+      type: int
 
 
     post:
