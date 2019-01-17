@@ -18,7 +18,14 @@ paths:
       operationId: createPost
       summary: Creates a new post
       responses:
-        201:
+        '201':
+          description: The post that was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/post'
+        default:
+          $ref: '#/components/responses/problem'
       requestBody:
         content:
           application/json:
@@ -30,7 +37,9 @@ paths:
       operationId: deletePost
       summary: Deletes a post
       responses:
-        204:
+        '204':
+        default:
+          $ref: '#/components/responses/problem'
       parameters:
         - $ref: '#/components/parameters/id'
 
@@ -41,6 +50,8 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/threadList'
+        default:
+          $ref: '#/components/responses/problem'
       parameters:
         - name:        contextType
           in:          path
@@ -61,6 +72,8 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/postList'
+        default:
+          $ref: '#/components/responses/problem'
       parameters:
         - $ref: '#/components/parameters/id'
 
