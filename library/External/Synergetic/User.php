@@ -887,8 +887,9 @@ class External_Synergetic_User implements External_UserInterface
             return [];
         }
         $relationships = $this->getRelationshipBindings();
-
         $contactTypes = $this->getStudentContactTypeBindings();
+        $externalIds = Builder::getArrayBindings(array_fill(0, 3, $externalId), 'externalId');
+        $externalIdPlaceholders = array_keys($externalIds['bindings']);
 
         $query = "
             SELECT   r.RelatedID
@@ -898,10 +899,10 @@ class External_Synergetic_User implements External_UserInterface
                      Semester.FileSemester = a.FileSemester AND
                      Semester.FileYear = a.FileYear AND
                      Semester.SystemCurrentFlag = 1
-            WHERE    r.ID = :externalId1 AND
+            WHERE    r.ID = {$externalIdPlaceholders[0]} AND
                      r.Relationship IN ({$relationships['placeholders']}) AND
-                     (a.StudentContactID = :externalId2 OR
-                      (a.StudentContactSpouseID = :externalId3 AND a.StudentContactPrimaryOnlyFlag = 0)) AND
+                     (a.StudentContactID = {$externalIdPlaceholders[1]} OR
+                      (a.StudentContactSpouseID = {$externalIdPlaceholders[2]} AND a.StudentContactPrimaryOnlyFlag = 0)) AND
                      a.StudentContactType IN ({$contactTypes['placeholders']})
             ORDER BY a.StudentBirthDate;
         ";
@@ -910,7 +911,7 @@ class External_Synergetic_User implements External_UserInterface
             $query,
             array_merge(
                 $relationships['bindings'],
-                ['externalId1' => $externalId, 'externalId2' => $externalId, 'externalId3' => $externalUserId],
+                $externalIds['bindings'],
                 $contactTypes['bindings']
             )
         )->fetchAll();
