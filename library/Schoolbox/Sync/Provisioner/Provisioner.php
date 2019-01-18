@@ -16,6 +16,7 @@ use Schoolbox\External\Normalise;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
@@ -119,6 +120,7 @@ class Provisioner
         $this->rulesetFactory = $rulesetFactory;
         $this->grammarFactory = $grammarFactory;
         $this->externalUserSource = $externalUserSource;
+        $userMapper->setEventPropagator(new MockPropagator());
         $this->userMapper = $userMapper;
         $this->logger = $logger;
         $this->logMapper = $logMapper;
