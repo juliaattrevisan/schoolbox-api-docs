@@ -32,7 +32,7 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function getAssessment(Activity $assessment)
+    public function getAssessment(Activity $assessment): array
     {
         return $this->getDatabase()->getAssessment($assessment);
     }
@@ -40,7 +40,7 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function hasAssessment(Activity $assessment)
+    public function hasAssessment(Activity $assessment): bool
     {
         return $this->getDatabase()->hasAssessment($assessment);
     }
@@ -48,7 +48,7 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function createAssessment(Activity $assessment)
+    public function createAssessment(Activity $assessment): bool
     {
         return $this->getDatabase()->createAssessment($assessment);
     }
@@ -56,7 +56,7 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * @inheritdoc
      */
-    public function updateAssessment(Activity $assessment)
+    public function updateAssessment(Activity $assessment): bool
     {
         return $this->getDatabase()->updateAssessment($assessment);
     }
@@ -64,7 +64,7 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * @inheritDoc
      */
-    public function deleteAssessment(Activity $assessment)
+    public function deleteAssessment(Activity $assessment): bool
     {
         return $this->getDatabase()->deleteAssessment($assessment);
     }
@@ -75,7 +75,7 @@ class External_Markbook implements External_MarkbookInterface
      *
      * @inheritdoc
      */
-    public function setMark($returnedWork)
+    public function setMark($returnedWork): bool
     {
         return $this->getDatabase()->setMark($returnedWork);
     }
