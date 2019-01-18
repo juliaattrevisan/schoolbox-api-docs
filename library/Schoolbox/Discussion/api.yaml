@@ -81,14 +81,17 @@ paths:
 
 components:
   schemas:
+    id:
+      type: integer
+      format: int32
+
     thread:
       title: Thread
       description: Common fields for discussion threads
       type: object
       properties:
         id:
-          type: integer
-          format: int32
+          $ref: '#/components/schemas/id'
         open:
           type: boolean
           description: Is the thread open for further comments?
@@ -113,8 +116,7 @@ components:
           type: string
           enum: [news]
         id:
-          description: The identifier of the context for a given thread
-          type: int
+          $ref: '#/components/schemas/id'
 
     post:
       title: Post
@@ -122,8 +124,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int32
+          $ref: '#/components/schemas/id'
         thread:
           $ref: '#/components/schemas/thread'
         author:
@@ -146,8 +147,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int32
+          $ref: '#/components/schemas/id'
         external_id:
           type: string
         title:
