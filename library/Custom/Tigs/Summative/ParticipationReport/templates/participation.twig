@@ -37,16 +37,28 @@ Data:
         <h2 class="subheader">Dean</h2>
         <div class="card small-12">
             <img src="/portrait.php?userId={{ dean.externalId }}&amp;size=square64" alt="View Profile">
-            <h3><a href="/search/user/{{ dean.id }}">{{ dean.fullName }}</a></h3>
-            <p class="meta">{{ dean.role.name }}</p>
+            <h3>
+                {%- if dean.id -%}
+                    <a href="/search/user/{{ dean.id }}">{{ dean.fullName }}</a>
+                {%- else -%}
+                    {{ dean.fullName }}
+                {%- endif -%}
+            </h3>
+            {% if dean.role.name %}<p class="meta">{{ dean.role.name }}</p>{% endif %}
         </div>
     </div>
     <div class="column small-12 medium-6">
         <h2 class="subheader">Student Mentor</h2>
         <div class="card small-12">
             <img src="/portrait.php?userId={{ mentor.externalId }}&amp;size=square64" alt="View Profile">
-            <h3><a href="/search/user/{{ mentor.id }}">{{ mentor.fullName }}</a></h3>
-            <p class="meta">{{ mentor.role.name }}</p>
+            <h3>
+                {%- if mentor.id -%}
+                    <a href="/search/user/{{ mentor.id }}">{{ mentor.fullName }}</a>
+                {%- else -%}
+                    {{ mentor.fullName }}
+                {%- endif -%}
+            </h3>
+            {% if mentor.role.name %}<p class="meta">{{ mentor.role.name }}</p>{% endif %}
         </div>
     </div>
 </div>
