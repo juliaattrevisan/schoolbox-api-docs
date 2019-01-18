@@ -126,7 +126,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->uses('colour', self::TYPE_COLOR);
 
         // Joins:
-        $this->joins('image_hash', \Schoolbox\Resource\Storage\Mapper::class, 'hash', null, null, 'coverImage', 'coverImage');
+        $this->joins('image_hash', Storage\Mapper::class, 'hash', null, null, 'coverImage', 'coverImage');
 
         $this->hasJoin(
             'codes', array(

@@ -11,8 +11,8 @@ namespace Schoolbox\Tile;
 
 use PDO;
 use PDOStatement;
-use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as StorageModel;
@@ -23,32 +23,33 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('tile');
         $this->hasModel(Model::class);
-        $this->uses('id',self::TYPE_INTEGER,self::COLUMN_IDENTIFIER);
-        $this->joins('tile_layout_id',Layout\Mapper::class, 'id', null, null, 'tileLayout', 'tile_container');
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins('tile_layout_id', Layout\Mapper::class, 'id', null, null, 'tileLayout', 'tile_container');
 
         // Title related fields
-        $this->uses('title_text',self::TYPE_STRING);
-        $this->uses('title_text_min_size',self::TYPE_INTEGER);
-        $this->uses('title_text_max_size',self::TYPE_INTEGER);
-        $this->uses('title_color',self::TYPE_COLOR);
-        $this->uses('title_background_color',self::TYPE_COLOR);
-        $this->uses('title_position',self::TYPE_INTEGER);
+        $this->uses('title_text', self::TYPE_STRING);
+        $this->uses('title_text_min_size', self::TYPE_INTEGER);
+        $this->uses('title_text_max_size', self::TYPE_INTEGER);
+        $this->uses('title_color', self::TYPE_COLOR);
+        $this->uses('title_background_color', self::TYPE_COLOR);
+        $this->uses('title_position', self::TYPE_INTEGER);
 
         // Link
-        $this->uses('link',self::TYPE_STRING);
-        $this->uses('link_target',self::TYPE_STRING);
+        $this->uses('link', self::TYPE_STRING);
+        $this->uses('link_target', self::TYPE_STRING);
 
         // Background related fields
-        $this->joins('background_image_hash',StorageMapper::class, 'hash', null, null, 'backgroundImage', 'backgroundImage');
-        $this->uses('background_image_contained',self::TYPE_BOOLEAN);
-        $this->uses('background_color',self::TYPE_COLOR);
+        $this->joins('background_image_hash', StorageMapper::class, 'hash', null, null, 'backgroundImage',
+            'backgroundImage');
+        $this->uses('background_image_contained', self::TYPE_BOOLEAN);
+        $this->uses('background_color', self::TYPE_COLOR);
         $this->uses('background_position', self::TYPE_INTEGER);
 
         // Hover color
-        $this->uses('hover_color',self::TYPE_COLOR);
+        $this->uses('hover_color', self::TYPE_COLOR);
 
         // Order
-        $this->uses('order',self::TYPE_INTEGER);
+        $this->uses('order', self::TYPE_INTEGER);
 
         // Created/Modified/Deleted
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -94,7 +95,7 @@ class Mapper extends BaseMapper
     /**
      * @param PDOStatement $statement
      *
-     * @return Collection
+     * @return GenericCollection
      * @throws BaseMapper\Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
@@ -151,7 +152,7 @@ class Mapper extends BaseMapper
             );
             $statement->bindValue('id', $object->getTileLayout()->getId(), \PDO::PARAM_INT);
             $statement->execute();
-            $object->setOrder(intval($statement->fetchColumn())+1);
+            $object->setOrder(intval($statement->fetchColumn()) + 1);
         }
     }
 }

@@ -6,18 +6,19 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
- 
+
 
 namespace Schoolbox\ResourceBooking\Item;
 
 use PDO;
 use PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Category;
-use Schoolbox\Collection;
 use Schoolbox\Role;
 
 class Mapper extends BaseMapper
@@ -27,17 +28,18 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('resource');
         $this->hasModel(Model::class);
-        $this->uses('id',self::TYPE_INTEGER,self::COLUMN_IDENTIFIER);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('resource_category_id', Category\Mapper::class, 'id', null, null, 'category', 'category');
         $this->joins('image_hash', Storage\Mapper::class, 'hash', null, null, 'image', 'image');
-        $this->joins('resource_moderation_type_id', ModerationType\Mapper::class, 'id', null, null, 'moderationType', 'moderation_type');
-        $this->uses('name',self::TYPE_STRING);
-        $this->uses('room_code',self::TYPE_STRING);
-        $this->uses('description',self::TYPE_STRING);
-        $this->uses('min_lead_time',self::TYPE_TIMESPAN);
-        $this->uses('min_reservation_time',self::TYPE_TIMESPAN);
-        $this->uses('max_reservation_time',self::TYPE_TIMESPAN);
-        $this->uses('current_term_restriction',self::TYPE_BOOLEAN);
+        $this->joins('resource_moderation_type_id', ModerationType\Mapper::class, 'id', null, null, 'moderationType',
+            'moderation_type');
+        $this->uses('name', self::TYPE_STRING);
+        $this->uses('room_code', self::TYPE_STRING);
+        $this->uses('description', self::TYPE_STRING);
+        $this->uses('min_lead_time', self::TYPE_TIMESPAN);
+        $this->uses('min_reservation_time', self::TYPE_TIMESPAN);
+        $this->uses('max_reservation_time', self::TYPE_TIMESPAN);
+        $this->uses('current_term_restriction', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('modified_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -45,18 +47,18 @@ class Mapper extends BaseMapper
         // Unmapped joins
         $this->hasJoin(
             'moderator',
-            array(
+            [
                 'mapper'    => Moderator\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'resource_id',
                 'multiple'  => true,
                 // Better M2M joins:
-            //                'mapper'    => '\\Schoolbox\\User',
-            //                'this_key'  => 'id',
-            //                'other_key' => 'id',
-            //                'multiple'  => true,
-            //                'through'   => '\\Schoolbox\\ResourceBooking\\Item\\Moderator\\Mapper',
-            )
+//                'mapper'    => '\\Schoolbox\\User',
+//                'this_key'  => 'id',
+//                'other_key' => 'id',
+//                'multiple'  => true,
+//                'through'   => '\\Schoolbox\\ResourceBooking\\Item\\Moderator\\Mapper',
+            ]
         );
         $this->hasJoin(
             'booking',
@@ -109,7 +111,7 @@ class Mapper extends BaseMapper
 
         // Save all newList items that aren't in oldList
         // Delete all vice versa
-        $diffMethod = function($a, $b) {
+        $diffMethod = function ($a, $b) {
             return $a->getModerator()->getId() == $b->getModerator()->getId();
         };
         $mapper->save($newList->diff($oldList, $diffMethod));
@@ -128,7 +130,7 @@ class Mapper extends BaseMapper
 
         // Save all newList items that aren't in oldList
         // Delete all vice versa
-        $diffMethod = function($a, $b) {
+        $diffMethod = function ($a, $b) {
             return $a->getRelatedResource()->getId() == $b->getRelatedResource()->getId();
         };
         $mapper->save($newList->diff($oldList, $diffMethod));
@@ -154,42 +156,6 @@ class Mapper extends BaseMapper
         $bookings      = $bookingMapper->findByColumn('resource_id', $object->getId());
         $bookingMapper->delete($bookings);
     }
-
-//    /**
-//     * Gets item with this ID.
-//     *
-//     * @param int $id
-//     *
-//     * @return Model
-//     * @throws BaseMapper\Exception         if item with $id wasn't found
-//     * @throws BaseMapper\Exception\Deleted if item with $id is soft-deleted
-//     */
-//    public function findById($id)
-//    {
-//        $query = "
-//            SELECT
-//                {$this->getColumnString('r')},
-//                {$this->getJoinColumnString('category', 'c')}
-//            FROM {$this->getTable()} `r`
-//            LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
-//            WHERE r.id = ?
-//        ";
-//        $statement = $this->getDatabase()->prepare($query);
-//        $statement->execute(array($id));
-//
-//        // Hydration:
-//        // progress through each join that was passed.
-//        /** @var Model $item */
-//        foreach ($statement as $row) {
-//            $item = $this->hydrate($row, 'r');
-//            if ($item->getCategory()->getId()) {
-//                $item->setCategory($this->hydrateJoin($row, 'category', 'c'));
-//            }
-//            $this->throwIfDeleted($item);
-//            return $item;
-//        }
-//        throw new BaseMapper\Exception('Instance of object not found');
-//    }
 
 
     /**
@@ -229,7 +195,7 @@ class Mapper extends BaseMapper
     /**
      * @param PDOStatement $statement
      *
-     * @return Collection
+     * @return GenericCollection
      * @throws BaseMapper\Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
@@ -284,14 +250,14 @@ class Mapper extends BaseMapper
         return parent::hydrate(
             $row,
             $alias,
-            function($mapper, $model, $row) {
+            function ($mapper, $model, $row) {
                 /** @var self $mapper */
                 /** @var Model $model */
 
                 // populate the moderator list
-                $modMapper   = $mapper->getJoinMapper('moderator');
-                $userMapper  = $modMapper->getJoinMapper('moderator');
-                $query       = "
+                $modMapper  = $mapper->getJoinMapper('moderator');
+                $userMapper = $modMapper->getJoinMapper('moderator');
+                $query      = "
                     SELECT
                       {$modMapper->getColumnString('m')},
                       {$userMapper->getColumnString('u')}
@@ -299,8 +265,8 @@ class Mapper extends BaseMapper
                     INNER JOIN {$modMapper->getJoinSql('moderator', 'm', 'u')}
                     WHERE m.resource_id=?
                 ";
-                $statement = $userMapper->getDatabase()->prepare($query);
-                $statement->execute(array($model->getId()));
+                $statement  = $userMapper->getDatabase()->prepare($query);
+                $statement->execute([$model->getId()]);
                 $model->setModeratorList($userMapper->hydrateList($statement, 'u'));
 
                 // populate related resources
@@ -314,12 +280,12 @@ class Mapper extends BaseMapper
                     INNER JOIN {$relationMapper->getJoinSql('related_resource', 'r', 'm')}
                     WHERE r.resource_id=? AND m.deleted_at IS NULL
                 ";
-                $statement = $userMapper->getDatabase()->prepare($query);
-                $statement->execute(array($model->getId()));
+                $statement          = $userMapper->getDatabase()->prepare($query);
+                $statement->execute([$model->getId()]);
                 $model->setRelatedResourceList(
                     $relatedModelMapper->hydrateList(
                         $statement, 'm',
-                        function($mapper, $model) {
+                        function ($mapper, $model) {
                             return $model;
                         }
                     )
@@ -379,7 +345,7 @@ class Mapper extends BaseMapper
                 break;
         }
 
-        $query = "
+        $query     = "
             SELECT {$this->getColumnString('re')}
             FROM {$this->getTable()} `re`
             WHERE
@@ -390,7 +356,7 @@ class Mapper extends BaseMapper
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue('search', $keyword);
-        $statement->bindValue('searchLike', '%'.$this->getDatabase()->escapeForLike($keyword).'%');
+        $statement->bindValue('searchLike', '%' . $this->getDatabase()->escapeForLike($keyword) . '%');
         $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
         $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
         $statement->execute();
@@ -405,7 +371,7 @@ class Mapper extends BaseMapper
      */
     public function searchCount($keyword)
     {
-        $query = "
+        $query     = "
             SELECT COUNT(*)
             FROM {$this->getTable()} `re`
             WHERE
@@ -414,7 +380,7 @@ class Mapper extends BaseMapper
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue('search', $keyword);
-        $statement->bindValue('searchLike', '%'.$this->getDatabase()->escapeForLike($keyword).'%');
+        $statement->bindValue('searchLike', '%' . $this->getDatabase()->escapeForLike($keyword) . '%');
         $statement->execute();
         return $statement->fetchColumn();
     }
@@ -429,8 +395,8 @@ class Mapper extends BaseMapper
     public function isUserModerator($itemId, $userId)
     {
         $list = $this->getJoinMapper('moderator')->findByColumnList(
-            array('resource_id' => $itemId, 'moderator_id' => $userId),
-            array('limit' => 1)
+            ['resource_id' => $itemId, 'moderator_id' => $userId],
+            ['limit' => 1]
         );
         return count($list) >= 1;
     }
@@ -448,7 +414,7 @@ class Mapper extends BaseMapper
     public function findForModerator($moderatorId)
     {
 
-        $query = "
+        $query     = "
             SELECT {$this->getColumnString('r')}
             FROM {$this->getTable()} `r`
             INNER JOIN {$this->getJoinSql('moderator', 'r', 'm')}
@@ -456,7 +422,7 @@ class Mapper extends BaseMapper
             AND r.deleted_at IS NULL
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array($moderatorId));
+        $statement->execute([$moderatorId]);
 
         // Hydration:
         // progress through each join that was passed.
