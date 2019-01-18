@@ -4,8 +4,8 @@ Renders the 'HSC Assessment Rank' component.
 Data:
     error:               string           - Optional. If present, the reason why we can't render the component
     assessmentMark:      string|null      - Optional. eg '65 %'
-    assessmentAverage:   string|null      - Optional. eg '76.33 %'
-    assessmentRank:      string|null      -           eg '7 / 9'
+    assessmentAverage:   string|null      - Optional. eg '76.33 %'    The average mark given to students across the cohort
+    assessmentRank:      string|null      -           eg '7 / 9'      Where the student ranked compared the cohort
 #}
 <h2 class="subheader">HSC Assessment Rank</h2>
 {% if error|default(null) %}
