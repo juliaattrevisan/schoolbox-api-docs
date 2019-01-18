@@ -15,6 +15,7 @@ use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\Report\Components\AcademicAchievementMatrix;
 use Custom\Tigs\Summative\Report\Components\AcademicAchievementSummary;
 use Custom\Tigs\Summative\Report\Components\FinalAchievementLevels;
+use Custom\Tigs\Summative\Report\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\Report\Components\HscAssessmentTasks;
 use Custom\Tigs\Summative\Report\Components\InternationalBaccalaureateGraph;
 use Custom\Tigs\Summative\Report\Components\NesaScoreGraph;
@@ -141,7 +142,7 @@ class Controller extends Web\Controller\Base
             }
             $errors[]  = $error;
             $unitSpecs = $aamData = $aasData = $hscTaskMarks = [];
-            $falData   = $ibGraphData = $nesaGraphData = $courseSpec = null;
+            $falData   = $ibGraphData = $nesaGraphData = $courseSpec = $hscRankData = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitSpecs = $this->getUnitSpecs($courseImplsWithUnits);
@@ -156,6 +157,7 @@ class Controller extends Web\Controller\Base
             $aamData       = $this->buildAcademicAchievementMatrixData($folder, $attributes, $unitSpecs, $user);
             $aasData       = $this->buildAcademicAchievementSummaryData($folder, $attributes, $unitSpecs, $user);
             $hscTaskMarks  = $this->buildHscTaskMarksData($folder, $attributes, $courseSpec, $user);
+            $hscRankData   = $this->buildHscAssessmentRankData($folder, $attributes, $courseSpec, $user);
         }
 
         $data   = [
@@ -172,6 +174,7 @@ class Controller extends Web\Controller\Base
             'ibGraphData'   => $ibGraphData,
             'nesaGraphData' => $nesaGraphData,
             'hscTaskMarks'  => $hscTaskMarks,
+            'hscRankData'   => $hscRankData,
         ];
         $output = $this->buildHtmlOutput('@tigsSummativeReport/subject.twig', $data, "Subject Report");
 
@@ -622,6 +625,71 @@ class Controller extends Web\Controller\Base
             $folder
         );
         return ['data' => $hscTaskMarks->toContext()];
+    }
+
+
+    /**
+     * Build data for the 'HSC Assessment Rank' component
+     *
+     * @param Folder\Model      $folder
+     * @param StudentAttributes $attributes
+     * @param CourseSpec\Model  $courseSpec
+     * @param User              $student
+     * @return array|null
+     * @throws Predicate\InvalidColumnException
+     * @throws UnexpectedValueException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnderflowException
+     */
+    private function buildHscAssessmentRankData(
+        Folder\Model $folder,
+        StudentAttributes $attributes,
+        CourseSpec\Model $courseSpec,
+        User $student
+    ): ?array {
+        // Only relevant for HSC students in Semester 2
+        if (!$attributes->isHsc() || 2 !== $attributes->getCurriculumSemester()) {
+            return null;
+        }
+
+        try {
+            $workTypeId = $this->checkWorkType(
+                Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_RANK,
+                "Cannot render 'HSC Assessment Rank' component. Work type not set.",
+                "Set 'HSC Assessment Rank' Work Type"
+            );
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
+        }
+
+        // Find relevant assessments and participation and insert into units
+        $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
+        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes));
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
+        foreach ($assessables as $assessable) {
+            $unitImpl                                                                        = $assessable->getBaseContext();
+            $baseAssessable                                                                  = $assessable->getBaseAssessable();
+            $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
+        }
+
+        $hscRank = new HscAssessmentRank(
+            $assessables,
+            $student,
+            $attributes,
+            $this->visibility,
+            $this->getUser(),
+            $folder
+        );
+
+        try {
+            return $hscRank->toContext();
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
+        }
     }
 
 
