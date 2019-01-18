@@ -202,21 +202,10 @@ class AcademicAchievementSummary extends BaseComponent
             return null;
         }
 
-        $marks = [
+        return [
             'link'  => $this->getAasLink($dueWork),
             'marks' => $this->getMarks($dueWork, $participant),
-            ];
-
-        $authFeedback = $participant->getAuthoritativeFeedback(true);
-        if($dueWork->isFeedbackVisibleToUser($this->viewer)) {
-            $marks = [
-                'comment' => $authFeedback->getComment(),
-                'commentBy' => $authFeedback->getReviewer(),
-            ];
-        }
-
-        return $marks;
-
+        ];
     }
 
 
@@ -264,13 +253,15 @@ class AcademicAchievementSummary extends BaseComponent
         if (!$feedback || !$dueWork->isFeedbackVisibleToUser($this->viewer)) {
             foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
                 $capabilityName         = $capabilityUsage->getCapability()->getName();
-                $marks[$capabilityName] = '';
+                $marks['rubric'][$capabilityName] = '';
             }
         } else {
             foreach ($this->rubricMapper->retrieveMarkedGrid($feedback)->getCapabilityMarks() as $capabilityMark) {
                 $capabilityName         = $capabilityMark->getCapabilityUsage()->getCapability()->getName();
-                $marks[$capabilityName] = $capabilityMark->getValue();
+                $marks['rubric'][$capabilityName] = $capabilityMark->getValue();
             }
+            $marks['comment'] = $feedback->getComment();
+            $marks['commentBy'] = $feedback->getReviewer();
         }
         return $marks;
     }

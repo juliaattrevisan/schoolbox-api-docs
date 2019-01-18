@@ -167,6 +167,8 @@ class HscAssessmentTasks extends BaseComponent
             'studentMark'   => $feedback ? $feedback->getHumanReadableMark() : null,
             'cohortRank'    => null === $cohortRank ? null : "$cohortRank / $countCohort",
             'cohortAverage' => null === $cohortAverage ? null : "$cohortAverage %",
+            'comment'       => $feedback ? $feedback->getComment() : null,
+            'commentBy'     => $feedback ? $feedback->getReviewer() : null,
         ];
     }
 
