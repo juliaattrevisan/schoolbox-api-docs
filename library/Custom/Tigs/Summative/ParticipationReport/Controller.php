@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
@@ -28,15 +29,20 @@ class Controller extends Web\Controller\Base
     /** @var UserMapper */
     private $userMapper;
 
+    /** IConnector $externalDatabase */
+    private $externalDatabase;
+
 
     /**
      * @param External_UserInterface $externalUser
      * @param UserMapper             $userMapper
+     * @param IConnector             $externalDatabase
      */
-    public function __construct(External_UserInterface $externalUser, UserMapper $userMapper)
+    public function __construct(External_UserInterface $externalUser, UserMapper $userMapper, IConnector $externalDatabase)
     {
         $this->externalUser = $externalUser;
         $this->userMapper   = $userMapper;
+        $this->externalDatabase = $externalDatabase;
     }
 
 
@@ -61,6 +67,7 @@ class Controller extends Web\Controller\Base
         );
 
         $deanAndMentor = $this->getDeanAndMentor($user, $externalStudent);
+        $awards        = $this->getAwardsData($user, $attributes);
 
         $data   = [
             'user'       => $user,
@@ -68,7 +75,7 @@ class Controller extends Web\Controller\Base
             'attributes' => $attributes,
             'dean'       => $deanAndMentor['dean'],
             'mentor'     => $deanAndMentor['mentor'],
-
+            'awards'     => $awards,
         ];
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
 
@@ -158,5 +165,47 @@ class Controller extends Web\Controller\Base
             'dean'   => $dean,
             'mentor' => $mentor,
         ];
+    }
+
+
+    /**
+     * Returns awards data for the student given within the reports period
+     *
+     * @param User              $user
+     * @param StudentAttributes $attributes
+     * @return array
+     */
+    private function getAwardsData(User $user, StudentAttributes $attributes): array
+    {
+        $sql = "
+            SELECT Award, Detail, GivenDate
+            FROM uvContinuousReportingAwards
+            WHERE StudentID = :student_id
+            AND GivenDate >= :start AND GivenDate < :finish
+            ORDER BY GivenDate ASC
+        ";
+
+        // TODO this is wrong for Semester 2 because the participation report, unlike the Subject Report, covers both Sem1 and Sem2
+        // TODO Need to update getReportStart/Finish to be getCurriculumSemesterStart/Finish + getCurriculumYearStart/Finish
+        $start = $attributes->getReportStart();
+        if ($attributes->getCurriculumSemester() === 2 && $attributes->getCurriculumYearLevel() !== 11) {
+            // TODO Just a rough hack for now to move the start back by 6 months if we're in the second semester.
+            // TODO We exclude Year 11 as their Sem2 only runs for a single Semester
+            $start->addDays(-365 / 2);
+        }
+
+        $finish = $attributes->getReportFinish();
+        if ($attributes->getCurriculumSemester() === 1) {
+            // TODO Just a rough hack for now to move the finish forward by 6 months if we're in the first semester.
+            $finish->addDays(365 / 2);
+        }
+
+        $params = [
+            'student_id' => $user->getExternalId(),
+            'start'      => $start->getDatabaseDate(),
+            'finish'     => $finish->getDatabaseDate(),
+        ];
+
+        return $this->externalDatabase->executeQuery($sql, $params)->fetchAll();
     }
 }

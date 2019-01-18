@@ -7,6 +7,9 @@ Data:
     attributes:       StudentAttributes
     dean:             User|null
     mentor:           User|null
+    awards:           string[]
+    awards['Award']:  string
+    awards['Detail']: string
 #}
 
 <div class="row">
@@ -60,5 +63,27 @@ Data:
             </h3>
             {% if mentor.role.name %}<p class="meta">{{ mentor.role.name }}</p>{% endif %}
         </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="column small-12">
+        <h2 class="subheader">House Participation</h2>
+        <table>
+            <thead>
+                <tr>
+                    <td>Award</td>
+                    <td>Description</td>
+                </tr>
+            </thead>
+            <tbody>
+            {% for award in awards %}
+                <tr>
+                    <td>{{ award.Award }}</td>
+                    <td>{{ award.Detail }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
