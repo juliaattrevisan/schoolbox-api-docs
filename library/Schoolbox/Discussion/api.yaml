@@ -43,7 +43,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/id'
 
-  /threads/{context_type}:{context_id}:
+  /threads/context/{context_type}/id/{context_id}:
     get:
       operationId: getThreadsByContext
       summary: Returns threads by their context
