@@ -43,7 +43,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/id'
 
-  /threads/context/{contextType}/{contextId}:
+  /threads/context/{context_type}/id/{context_id}:
     get:
       operationId: getThreadsByContext
       summary: Returns threads by their context
@@ -53,11 +53,11 @@ paths:
         default:
           $ref: '#/components/responses/problem'
       parameters:
-        - name: contextType
+        - name: context_type
           in:   path
           schema:
             $ref: '#/components/schemas/threadContext/properties/type'
-        - name: contextId
+        - name: context_id
           in:   path
           schema:
             $ref: '#/components/schemas/threadContext/properties/id'
@@ -183,6 +183,10 @@ components:
           type: integer
           format: int32
           required: true
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+          example: 503
           description: The HTTP status code
         detail:
           type: string
