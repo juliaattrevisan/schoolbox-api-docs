@@ -178,7 +178,7 @@ class StudentAttributes
      * @return Alaress_Date_Format
      * @throws InvalidArgumentException
      */
-    public function deriveReportStartDate(int $yearLevel, int $term, Alaress_Date_Format $now): Alaress_Date_Format
+    private function deriveReportStartDate(int $yearLevel, int $term, Alaress_Date_Format $now): Alaress_Date_Format
     {
         $nowYear = (int)$now->getUsingFormat('Y');
 
@@ -211,7 +211,7 @@ class StudentAttributes
      * @return Alaress_Date_Format
      * @throws InvalidArgumentException
      */
-    public function deriveReportFinishDate(int $yearLevel, int $term, Alaress_Date_Format $now): Alaress_Date_Format
+    private function deriveReportFinishDate(int $yearLevel, int $term, Alaress_Date_Format $now): Alaress_Date_Format
     {
         $isYear11 = $yearLevel === 11;
         $isYear12 = $yearLevel === 12;
