@@ -68,7 +68,7 @@ class Controller extends Web\Controller\Base
             $externalIdMentor = ($user->getId() % 2) ? '' : '8';   // Celia Glenn
         } else {
             $externalIdDean   = $externalStudent['YearLevelCoordID'];
-            $externalIdMentor = $externalStudent['StudentTutor'];
+            $externalIdMentor = $externalStudent['TeacherTutorID'];
         }
 
         $deanAndMentor = $this->userMapper->findByColumn('synergy_id', [$externalIdDean, $externalIdMentor]);
