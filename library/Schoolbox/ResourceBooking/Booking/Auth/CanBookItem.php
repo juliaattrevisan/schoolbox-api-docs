@@ -56,6 +56,7 @@ class CanBookItem implements Rule\IAuthorizationRule
     public function authorize(array $params = array(), User $user = null)
     {
         // TODO simplify this rule, and define it as separate ones
+        /** @var Item\Model $item */
         if ($params['item'] instanceof Item\Model) {
             $item = $params['item'];
         } else {

@@ -44,6 +44,7 @@ use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\LinkMapper;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
@@ -125,7 +126,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->uses('colour', self::TYPE_COLOR);
 
         // Joins:
-        $this->joins('image_hash', \Schoolbox\Resource\Storage\Mapper::class, 'hash', null, null, 'coverImage', 'coverImage');
+        $this->joins('image_hash', Storage\Mapper::class, 'hash', null, null, 'coverImage', 'coverImage');
 
         $this->hasJoin(
             'codes', array(
@@ -768,6 +769,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return "
             SELECT
                 {$this->getColumnString()},
+                {$this->getJoinColumnString('coverImage', 'ci')},
+                {$this->getJoinColumnString('coverImage.allowedFileExtension', 'cim')},
                 {$code_mapper->getColumnString('cc')},
                 {$homepageConfig_mapper->getColumnString('hp')},
                 {$group_mapper->getColumnString('ug')},
@@ -792,6 +795,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('codes', '', 'cc')}
+            LEFT JOIN {$this->getJoinSql('coverImage', '', 'ci', true)}
+            LEFT JOIN {$this->getJoinSql('coverImage.allowedFileExtension', 'ci', 'cim', true)}
             LEFT JOIN {$this->getJoinSql('homepages', '', 'hp')}
             LEFT JOIN {$this->getJoinSql('groups', '', 'ug')}
             LEFT JOIN {$this->getJoinSql('course_specification', '', 'cs')}
@@ -911,6 +916,16 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $unitSpec = $unitSpecMapper->hydrate($row, 'us');
                 if($unitSpec){
                     $folders[$folderId]->setUnitSpecification($unitSpec);
+                }
+
+                /** @var Storage\Model $coverImage */
+                $coverImage = $this->hydrateJoin($row, 'coverImage', 'ci');
+                if ($coverImage) {
+                    $coverImageMimeType = $this->hydrateJoin($row, 'coverImage.allowedFileExtension', 'cim');
+                    if ($coverImageMimeType) {
+                        $coverImage->setMimetype($coverImageMimeType);
+                    }
+                    $folders[$folderId]->setCoverImage($coverImage);
                 }
             }
 

@@ -9,218 +9,121 @@
 
 namespace Schoolbox\Tile;
 
+use PDO;
+use PDOStatement;
+use Schoolbox\File\Mimetype;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 
 class Mapper extends BaseMapper
 {
     public function mapping()
     {
         $this->hasTable('tile');
-        $this->hasModel('Schoolbox\\Tile\\Model');
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'tile_layout_id',
-                'property' => 'tileLayout',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'tile_container',
-                'join_def' => array(
-                    'mapper'    => 'Schoolbox\\Tile\\Layout\\Mapper',
-                    'other_key' => 'id',
-                )
-            )
-        );
+        $this->hasModel(Model::class);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins('tile_layout_id', Layout\Mapper::class, 'id', null, null, 'tileLayout', 'tile_container');
 
         // Title related fields
-        $this->hasMap(
-            array(
-                'column'   => 'title_text',
-                'property' => 'titleText',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'title_text_min_size',
-                'property' => 'titleTextMinSize',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'title_text_max_size',
-                'property' => 'titleTextMaxSize',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'title_color',
-                'property' => 'titleColor',
-                'type'     => self::TYPE_COLOR,
-            )
-        );
-        // Hydrate as a color object?
-        $this->hasMap(
-            array(
-                'column'   => 'title_background_color',
-                'property' => 'titleBackgroundColor',
-                'type'     => self::TYPE_COLOR,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'title_position',
-                'property' => 'titlePosition',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
+        $this->uses('title_text', self::TYPE_STRING);
+        $this->uses('title_text_min_size', self::TYPE_INTEGER);
+        $this->uses('title_text_max_size', self::TYPE_INTEGER);
+        $this->uses('title_color', self::TYPE_COLOR);
+        $this->uses('title_background_color', self::TYPE_COLOR);
+        $this->uses('title_position', self::TYPE_INTEGER);
 
         // Link
-        $this->hasMap(
-            array(
-                'column'   => 'link',
-                'property' => 'link',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'link_target',
-                'property' => 'linkTarget',
-                'type'     => self::TYPE_STRING,
-            )
-        );
+        $this->uses('link', self::TYPE_STRING);
+        $this->uses('link_target', self::TYPE_STRING);
 
         // Background related fields
-        $this->hasMap(
-            array(
-                'column'   => 'background_image_hash',
-                'property' => 'backgroundImage',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'backgroundImage',
-                'join_def' => array(
-                    'mapper'    => \Schoolbox\Resource\Storage\Mapper::class,
-                    'other_key' => 'hash',
-                )
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'background_image_contained',
-                'property' => 'backgroundImageContained',
-                'type'     => self::TYPE_BOOLEAN,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'background_color',
-                'property' => 'backgroundColor',
-                'type'     => self::TYPE_COLOR,
-            )
-        );
+        $this->joins('background_image_hash', StorageMapper::class, 'hash', null, null, 'backgroundImage',
+            'backgroundImage');
+        $this->uses('background_image_contained', self::TYPE_BOOLEAN);
+        $this->uses('background_color', self::TYPE_COLOR);
         $this->uses('background_position', self::TYPE_INTEGER);
 
         // Hover color
-        $this->hasMap(
-            array(
-                'column'   => 'hover_color',
-                'property' => 'hoverColor',
-                'type'     => self::TYPE_COLOR,
-            )
-        );
+        $this->uses('hover_color', self::TYPE_COLOR);
 
         // Order
-        $this->hasMap(
-            array(
-                'column'   => 'order',
-                'property' => 'order',
-                'type'     => self::TYPE_INTEGER,
-            )
-        );
+        $this->uses('order', self::TYPE_INTEGER);
 
         // Created/Modified/Deleted
-        $this->hasMap(
-            array(
-                'column'            => 'created_at',
-                'property'          => 'createdAt',
-                'type'              => self::TYPE_DATETIME,
-                'created_timestamp' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'            => 'modified_at',
-                'property'          => 'modifiedAt',
-                'type'              => self::TYPE_DATETIME,
-                'updated_timestamp' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'deleted_at',
-                'property' => 'deletedAt',
-                'type'     => self::TYPE_DATETIME,
-            )
-        );
-        $this->hasSoftDeleteDateField('deleted_at');
-        $this->registerCallback('preSave', array($this, 'preSave'));
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('modified_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback('preSave', [$this, 'preSave']);
     }
 
-    // When this item is fetched, in list or by ID: fetch all uploaded images
-    // How do I do that?
 
     /**
-     * Helper method for getting a query that retrieves a tile, and joins to
-     * the background image view.
+     * Always join onto image and its mime type
      *
      * @return string
      */
-    protected function getBaseQuery()
+    protected function getSelectString()
     {
         return "
             SELECT
-                {$this->getColumnString('t')},
-                {$this->getJoinColumnString('backgroundImage', 'bi')}
-            FROM `{$this->getTable()}` `t`
-            LEFT JOIN {$this->getJoinSql('backgroundImage', 't', 'bi')}
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('backgroundImage', 'bi')},
+                {$this->getJoinColumnString('backgroundImage.allowedFileExtension', 'bim')}
         ";
     }
 
-    /**
-     * Gets the tile and its image.
-     *
-     * @param  int $identifierValue
-     * @return Model
-     * @throws BaseMapper\Exception if tile doesn't exist
-     * @throws BaseMapper\Exception\Deleted if tile was soft deleted
-     */
-    public function findById($identifierValue)
-    {
-        $query = $this->getBaseQuery()
-                . ' WHERE `t`.`deleted_at` IS NULL'
-                . ' AND `t`.`id` = :id';
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array('id' => $identifierValue));
 
-        if ($row = $statement->fetch()) {
-            /** @var Model $model */
-            $model = $this->hydrate($row, 't');
-            if (!empty($row['background_image_hash'])) {
-                $model->setBackgroundImage($this->hydrateJoin($row, 'backgroundImage', 'bi'));
-            }
-            $this->throwIfDeleted($model);
-            return $model;
-        }
-        throw new BaseMapper\Exception('Instance of object not found');
+    /**
+     * Always join onto image and its mime type
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        $table = $this->database->quoteIdentifier($this->table);
+        return "
+            FROM $table
+            LEFT JOIN {$this->getJoinSql('backgroundImage', '', 'bi', true)}
+            LEFT JOIN {$this->getJoinSql('backgroundImage.allowedFileExtension', 'bi', 'bim', true)}
+        ";
     }
+
+
+    /**
+     * @param PDOStatement $statement
+     *
+     * @return GenericCollection
+     * @throws BaseMapper\Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = $this->createCollection();
+
+        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
+            /** @var Model $item */
+            $item = $this->hydrate($r);
+
+            /** @var StorageModel $backgroundImage */
+            $backgroundImage = $this->hydrateJoin($r, 'backgroundImage', 'bi');
+            if ($backgroundImage) {
+                /** @var Mimetype $mimeType */
+                $mimeType = $this->hydrateJoin($r, 'backgroundImage.allowedFileExtension', 'bim');
+                if ($mimeType) {
+                    $backgroundImage->setMimetype($mimeType);
+                }
+
+                $item->setBackgroundImage($backgroundImage);
+            }
+
+            $c->add($item);
+        }
+
+        return $c;
+    }
+
 
     /**
      * Gets all tiles for this layout ID, as well as all of its images.
@@ -230,22 +133,7 @@ class Mapper extends BaseMapper
      */
     public function findForLayout($layoutId)
     {
-        $query = $this->getBaseQuery()
-                . ' WHERE `t`.`deleted_at` IS NULL'
-                . ' AND `t`.`tile_layout_id` = :layoutId'
-                . ' ORDER BY `t`.`order` ASC';
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array('layoutId' => $layoutId));
-        return $this->hydrateList(
-            $statement,
-            't',
-            function ($mapper, $model, $row) {
-                if (!empty($row['background_image_hash'])) {
-                    $model->setBackgroundImage($mapper->hydrateJoin($row, 'backgroundImage', 'bi'));
-                }
-                return $model;
-            }
-        );
+        return $this->findByColumn('tile_layout_id', $layoutId);
     }
 
     /**
@@ -264,7 +152,7 @@ class Mapper extends BaseMapper
             );
             $statement->bindValue('id', $object->getTileLayout()->getId(), \PDO::PARAM_INT);
             $statement->execute();
-            $object->setOrder(intval($statement->fetchColumn())+1);
+            $object->setOrder(intval($statement->fetchColumn()) + 1);
         }
     }
 }
