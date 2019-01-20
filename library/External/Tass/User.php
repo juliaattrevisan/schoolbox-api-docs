@@ -33,16 +33,12 @@ class External_Tass_User implements External_UserInterface
     /** @var External_Tass_Helper */
     private $helper;
 
-    /** @var Group */
-    private $groupHandler;
-
     /**
      * External_Tass_User constructor.
      */
     function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
-        $this->groupHandler = new Group;
         $this->companyCode  = Config::get('external_tass_company_code');
         $this->helper = new External_Tass_Helper();
     }
@@ -199,79 +195,112 @@ class External_Tass_User implements External_UserInterface
          */
         $addnum_mother = $this->helper->getAddNumMother();
         $addnum_father = $this->helper->getAddNumFather();
-        $query = "SELECT DISTINCT
-                      CASE
-                          WHEN (sf.sfa_num) IS NULL
-                          THEN 'P' + RTRIM(parent.par_code)
-                          ELSE 'P' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
-                      END                 AS StudentContactID,
-                      sf.sfa_num          AS StudentContactSplitFamilyNumber,
-                      pa.add_num          AS StudentContactAddressNumber,
-                      parent.f_name       AS StudentContactPreferred,
-                      0                   AS StudentContactSilentPhoneFlag,
-                      pa.home_phone       AS StudentContactPhoneActual,
-                      pa.bus_phone        AS StudentContactOccupPhone,
-                      pa.e_mail           AS StudentContactDefaultEmail,
-                      ''                  AS StudentContactSpouseID,
-                      CASE
-                          WHEN
-                               RTRIM(pa.mobile1) IS NOT NULL
-                          THEN RTRIM(pa.mobile1)
-                          ELSE RTRIM(pa.mobile2)
-                      END                 AS StudentContactMobilePhone,
-                      pa.mobile2          AS StudentContactSpouseMobilePhone
-                  FROM student
-                  JOIN parent ON student.par_code = parent.par_code AND student.cmpy_code = parent.cmpy_code
-                  JOIN paraddress AS pa ON parent.par_code = pa.par_code AND pa.cmpy_code = parent.cmpy_code AND pa.add_num IN ($addnum_father,'1')
-                  LEFT JOIN pia_sfaccess AS sf
-                      ON parent.par_code = sf.par_code
-                      AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
-                      AND parent.cmpy_code = sf.cmpy_code
-                  WHERE stud_code = '$tassID'
+        $query = "
+            SELECT DISTINCT
+                'P' + RTRIM(parent.par_code)
+                                  AS StudentContactID,
+                pa.add_num          AS StudentContactAddressNumber,
+                parent.f_name       AS StudentContactPreferred,
+                0                   AS StudentContactSilentPhoneFlag,
+                pa.home_phone       AS StudentContactPhoneActual,
+                pa.bus_phone        AS StudentContactOccupPhone,
+                pa.e_mail           AS StudentContactDefaultEmail,
+                ''                  AS StudentContactSpouseID,
+                COALESCE(RTRIM(pa.mobile1), RTRIM(pa.mobile2))
+                                    AS StudentContactMobilePhone,
+                pa.mobile2          AS StudentContactSpouseMobilePhone
+            FROM student
+            JOIN parent
+                ON student.par_code = parent.par_code
+                AND student.cmpy_code = parent.cmpy_code
+            JOIN paraddress AS pa
+                ON parent.par_code = pa.par_code
+                AND pa.cmpy_code = parent.cmpy_code
+                AND pa.add_num IN ($addnum_father,'1')
+            WHERE stud_code = '$tassID'
 
-              UNION
+            UNION
 
-                  SELECT DISTINCT
-                      CASE
-                          WHEN (sf.sfa_num) IS NULL
-                          THEN 'S' + RTRIM(parent.par_code)
-                          ELSE 'S' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
-                      END                 AS StudentContactID,
-                      sf.sfa_num          AS StudentContactSplitFamilyNumber,
-                      pa.add_num          AS StudentContactAddressNumber,
-                      parent.m_name       AS StudentContactPreferred,
-                      0                   AS StudentContactSilentPhoneFlag,
-                      pa.home_phone       AS StudentContactPhoneActual,
-                      pa.bus_phone        AS StudentContactOccupPhone,
-                      pa.e_mail           AS StudentContactDefaultEmail,
-                      ''                  AS StudentContactSpouseID,
-                      CASE
-                          WHEN
-                               RTRIM(pa.mobile1) IS NOT NULL
-                          THEN RTRIM(pa.mobile1)
-                          ELSE RTRIM(pa.mobile2)
-                      END                 AS StudentContactMobilePhone,
-                      pa.mobile2          AS StudentContactSpouseMobilePhone
-                  FROM student
-                  JOIN parent ON student.par_code = parent.par_code AND student.cmpy_code = parent.cmpy_code
-                  JOIN paraddress AS pa ON parent.par_code = pa.par_code AND pa.cmpy_code = parent.cmpy_code AND pa.add_num IN ($addnum_mother,'1')
-                  LEFT JOIN pia_sfaccess AS sf
-                      ON parent.par_code = sf.par_code
-                      AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
-                      AND parent.cmpy_code = sf.cmpy_code
-                  WHERE stud_code = '$tassID'
+            SELECT DISTINCT
+                'S' + RTRIM(parent.par_code)
+                                    AS StudentContactID,
+                pa.add_num          AS StudentContactAddressNumber,
+                parent.m_name       AS StudentContactPreferred,
+                0                   AS StudentContactSilentPhoneFlag,
+                pa.home_phone       AS StudentContactPhoneActual,
+                pa.bus_phone        AS StudentContactOccupPhone,
+                pa.e_mail           AS StudentContactDefaultEmail,
+                ''                  AS StudentContactSpouseID,
+                COALESCE(RTRIM(pa.mobile1), RTRIM(pa.mobile2))
+                                    AS StudentContactMobilePhone,
+                pa.mobile2          AS StudentContactSpouseMobilePhone
+            FROM student
+            JOIN parent
+                ON student.par_code = parent.par_code
+                AND student.cmpy_code = parent.cmpy_code
+            JOIN paraddress AS pa
+                ON parent.par_code = pa.par_code
+                AND pa.cmpy_code = parent.cmpy_code
+                AND pa.add_num IN ($addnum_mother,'1')
+            WHERE stud_code = '$tassID'
+
+            UNION
+
+            SELECT DISTINCT
+                'P' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
+                                    AS StudentContactID,
+                pa.add_num          AS StudentContactAddressNumber,
+                parent.f_name       AS StudentContactPreferred,
+                0                   AS StudentContactSilentPhoneFlag,
+                pa.home_phone       AS StudentContactPhoneActual,
+                pa.bus_phone        AS StudentContactOccupPhone,
+                pa.e_mail           AS StudentContactDefaultEmail,
+                ''                  AS StudentContactSpouseID,
+                COALESCE(RTRIM(pa.mobile1), RTRIM(pa.mobile2))
+                                    AS StudentContactMobilePhone,
+                pa.mobile2          AS StudentContactSpouseMobilePhone
+
+            FROM pia_sfaccess AS sf
+            JOIN parent
+                ON parent.par_code = sf.par_code
+                AND parent.cmpy_code = sf.cmpy_code
+            JOIN paraddress AS pa
+                ON parent.par_code = pa.par_code
+                AND pa.cmpy_code = parent.cmpy_code
+                AND pa.add_num IN ($addnum_father,'1')
+                AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
+            WHERE (CHARINDEX(','+ '$tassID' +',', ','+RTRIM(sf.stud_codes)+',') > 0)
+
+            UNION
+
+            SELECT DISTINCT
+                'S' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
+                                    AS StudentContactID,
+                pa.add_num          AS StudentContactAddressNumber,
+                parent.m_name       AS StudentContactPreferred,
+                0                   AS StudentContactSilentPhoneFlag,
+                pa.home_phone       AS StudentContactPhoneActual,
+                pa.bus_phone        AS StudentContactOccupPhone,
+                pa.e_mail           AS StudentContactDefaultEmail,
+                ''                  AS StudentContactSpouseID,
+                COALESCE(RTRIM(pa.mobile1), RTRIM(pa.mobile2))
+                                    AS StudentContactMobilePhone,
+                pa.mobile2          AS StudentContactSpouseMobilePhone
+
+            FROM pia_sfaccess AS sf
+            JOIN parent
+                ON parent.par_code = sf.par_code
+                AND parent.cmpy_code = sf.cmpy_code
+            JOIN paraddress AS pa
+                ON parent.par_code = pa.par_code
+                AND pa.cmpy_code = parent.cmpy_code
+                AND pa.add_num IN ($addnum_mother,'1')
+                AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
+            WHERE (CHARINDEX(','+ '$tassID' +',', ','+RTRIM(sf.stud_codes)+',') > 0)
         ";
         $parents = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
 
         foreach ($parents as $key => $parent) {
-            /* If a parent is a split family via split family access (SFA) codes
-             * or by communications rules (commrules),
-             * don't display contact information
-             */
-            if (!empty($parent['StudentContactSplitFamilyNumber'])) {
-                unset($parents[$key]);
-            }
-
             /* Fallback to add_num 1 when there is no add_num mother or add_num father
              */
             if ($parent['StudentContactAddressNumber'] == '1') {
