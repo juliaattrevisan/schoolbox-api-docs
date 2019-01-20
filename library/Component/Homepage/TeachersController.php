@@ -126,43 +126,43 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                             continue;
                         }
 
+                        $this->setVar([
+                            'PERSON_UID'         => $teacher->getId(),
+                            'PERSON_NAME'        => Scrub::text($teacher->getFullName()),
+                            'PERSON_EXTERNAL_ID' => $synid,
+                            'PERSON_GROUP'       => Scrub::text($teacher->getPreferredTitle()),
+                        ]);
+
+                        /* Don't display images in list view
+                         */
+                        if ($this->getConfig('displayPortraits') == 'grid') {
                             $this->setVar([
-                                'PERSON_UID'         => $teacher->getId(),
-                                'PERSON_NAME'        => Scrub::text($teacher->getFullName()),
-                                'PERSON_EXTERNAL_ID' => $synid,
-                                'PERSON_GROUP'       => Scrub::text($teacher->getPreferredTitle()),
+                                'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
                             ]);
+                        } else {
+                            $this->setVar([
+                                'GRID_VIEW_CLASSES' => ''
+                            ]);
+                        }
 
-                            /* Don't display images in list view
-                             */
-                            if ($this->getConfig('displayPortraits') == 'grid') {
-                                $this->setVar([
-                                    'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
-                                ]);
+                        if ($teacher->getRole()->isStaff()) {
+                            if ($staffPhotoVisibility == 2 && $this->getUser()->getRole()->isStudent()) {
+                                $this->setVar('photo_block', '');
+                            } elseif ($staffPhotoVisibility == 1 && !$this->getUser()->getRole()->isStaff()) {
+                                $this->setVar('photo_block', '');
                             } else {
-                                $this->setVar([
-                                    'GRID_VIEW_CLASSES' => ''
-                                ]);
-                            }
-
-                            if ($teacher->getRole()->isStaff()) {
-                                if ($staffPhotoVisibility == 2 && $this->getUser()->getRole()->isStudent()) {
-                                    $this->setVar('photo_block', '');
-                                } elseif ($staffPhotoVisibility == 1 && !$this->getUser()->getRole()->isStaff()) {
-                                    $this->setVar('photo_block', '');
-                                } else {
-                                    $this->parse('photo_block', 'photo');
-                                }
-                            }
-                            else {
                                 $this->parse('photo_block', 'photo');
                             }
+                        }
+                        else {
+                            $this->parse('photo_block', 'photo');
+                        }
 
-                            $this->parse('person_block', 'person', true);
+                        $this->parse('person_block', 'person', true);
 
-                            /* Clear children after parsing out the parent
-                             */
-                            $this->setVar('photo_block', '');
+                        /* Clear children after parsing out the parent
+                         */
+                        $this->setVar('photo_block', '');
                     }
                 }
             }
