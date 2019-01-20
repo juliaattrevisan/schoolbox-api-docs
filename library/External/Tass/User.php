@@ -277,7 +277,7 @@ class External_Tass_User implements External_UserInterface
                 'S' + RTRIM(parent.par_code) + RTRIM(sf.sfa_num)
                                     AS StudentContactID,
                 pa.add_num          AS StudentContactAddressNumber,
-                parent.f_name       AS StudentContactPreferred,
+                parent.m_name       AS StudentContactPreferred,
                 0                   AS StudentContactSilentPhoneFlag,
                 pa.home_phone       AS StudentContactPhoneActual,
                 pa.bus_phone        AS StudentContactOccupPhone,
