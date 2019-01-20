@@ -16,7 +16,7 @@ use Schoolbox\Mapper as BaseMapper;
 abstract class AbstractCourseMapper extends BaseMapper
 {
     /**
-     * @param mixed $identifierValue
+     * @inheritdoc
      * @return AbstractCourse
      */
     public function findById($identifierValue)

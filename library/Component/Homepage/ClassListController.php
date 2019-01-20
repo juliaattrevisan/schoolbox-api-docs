@@ -148,66 +148,66 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                     try {
                         $user = $userMapper->findByExternalId($currentStudent['synergy_id']);
+                    } catch (MapperException $e) {
+                        // Ok to silently ignore. This just means the SIS has students who are not in SB
+                        continue;
+                    }
 
-                        /* Accumulate this for a giant parent-based bcc
-                            */
-                        $synergyIds[] = $currentStudent['synergy_id'];
+                    /* Accumulate this for a giant parent-based bcc
+                     */
+                    $synergyIds[] = $currentStudent['synergy_id'];
 
-                        /* Agglutinate a giant bcc
-                            */
-                        if ($user->getEmail()) {
-                            $allStudentEmails[] = Scrub::text($user->getFormattedEmailDisplay());
-                        }
+                    /* Agglutinate a giant bcc
+                     */
+                    if ($user->getEmail()) {
+                        $allStudentEmails[] = Scrub::text($user->getFormattedEmailDisplay());
+                    }
 
+                    $this->setVar([
+                        'PERSON_UID'         => $user->getId(),
+                        'PERSON_EXTERNAL_ID' => $user->getExternalId(),
+                        'PERSON_NAME'        => Scrub::text($user->getFullName()),
+                        'PERSON_GROUP'       => Scrub::text($user->getPreferredTitle()),
+                    ]);
+
+                    /* Don't display images in list view
+                     */
+                    if ($this->getConfig('displayPortraits') == 'grid') {
                         $this->setVar([
-                            'PERSON_UID'         => $user->getId(),
-                            'PERSON_EXTERNAL_ID' => $user->getExternalId(),
-                            'PERSON_NAME'        => Scrub::text($user->getFullName()),
-                            'PERSON_GROUP'       => Scrub::text($user->getPreferredTitle()),
+                            'GRID_VIEW_CLASSES' => 'medium-block-grid-2',
                         ]);
+                    } else {
+                        $this->setVar([
+                            'GRID_VIEW_CLASSES' => '',
+                        ]);
+                    }
 
-                        /* Don't display images in list view
-                            */
-                        if ($this->getConfig('displayPortraits') == 'grid') {
-                            $this->setVar([
-                                'GRID_VIEW_CLASSES' => 'medium-block-grid-2',
-                            ]);
+                    if($user->getRole()->isStudent()) {
+                        //Hide Student Photo
+                        if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
+                            $this->setVar('photo_block', '');
+                        } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user->loadParents())) {
+                            $this->setVar('photo_block', '');
                         } else {
-                            $this->setVar([
-                                'GRID_VIEW_CLASSES' => '',
-                            ]);
-                        }
-
-                        if($user->getRole()->isStudent()) {
-                            //Hide Student Photo
-                            if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
-                                $this->setVar('photo_block', '');
-                            } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user->loadParents())) {
-                                $this->setVar('photo_block', '');
-                            } else {
-                                $this->parse('photo_block', 'photo');
-                            }
-                        }
-                        else if($user->getRole()->isStaff()) {
-                            //Hide Staff Photo
-
-                            if ($staffPhotoVisibility == 2 && $viewer->getRole()->isStudent()) {
-                                $this->setVar('photo_block', '');
-                            } elseif ($staffPhotoVisibility == 1 && !$viewer->getRole()->isStaff()) {
-                                $this->setVar('photo_block', '');
-                            } else {
-                                $this->parse('photo_block', 'photo');
-                            }
-                        }
-                        else {
                             $this->parse('photo_block', 'photo');
                         }
-
-                        $this->parse('person_block', 'person', true);
-
-                    } catch (MapperException $e) {
-                        //noop
                     }
+                    else if($user->getRole()->isStaff()) {
+                        //Hide Staff Photo
+
+                        if ($staffPhotoVisibility == 2 && $viewer->getRole()->isStudent()) {
+                            $this->setVar('photo_block', '');
+                        } elseif ($staffPhotoVisibility == 1 && !$viewer->getRole()->isStaff()) {
+                            $this->setVar('photo_block', '');
+                        } else {
+                            $this->parse('photo_block', 'photo');
+                        }
+                    }
+                    else {
+                        $this->parse('photo_block', 'photo');
+                    }
+
+                    $this->parse('person_block', 'person', true);
                 }
 
                 /* Student bulk email

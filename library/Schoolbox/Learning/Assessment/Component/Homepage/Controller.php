@@ -53,10 +53,16 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
         $this->setTermMapper(TermMapper::getInstance());
     }
 
+
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \LogicException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
      */
     public function execute(): bool
     {
@@ -64,39 +70,33 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             return false;
         }
 
-        try {
-            $now        = Alaress_Date_Format::now();
-            $showClosed = $this->getConfig('showClosed');
+        $now        = Alaress_Date_Format::now();
+        $showClosed = $this->getConfig('showClosed');
 
-            // Note: findAllByFolderIdForReview retrieves response+feedback for all
-            // assessment types, not just tasks (as it did previously).
-            $options = [
-                'type'  => $this->getAssessmentType(),
-                'order' => ['due_date' => 'asc'],
-            ];
+        // Note: findAllByFolderIdForReview retrieves response+feedback for all
+        // assessment types, not just tasks (as it did previously).
+        $options = [
+            'type'  => $this->getAssessmentType(),
+            'order' => ['due_date' => 'asc'],
+        ];
 
-            if (!$showClosed) {
-                $options['closed_before'] = $now;
-            }
-
-            // If a parent, we need to hydrate all participants so we can check parent visibility via child participation
-            $user    = $this->getUser();
-            $mutator = new AssessmentListMutator($this->getUser(), new Visibility($this->getAccess()), $now, $showClosed);
-            $this->assessments = $this->getAssessmentMapper()
-                ->findAllByFolderIdForReview(
-                    $this->getSource()->getId(),
-                    $user->getRole()->isParent() ? null : $user,
-                    $options
-                )
-                ->map([$mutator, 'map'])
-                ->filter([$mutator, 'filter'])
-                ->sortByCallback(new DueDateSortStrategy($this->getUser()))
-                ->limit($this->getConfig('size') ?: null);
-
-        } catch (\DomainException $e) {
-            // if something goes wrong, this component will not be displayed
-            return false;
+        if (!$showClosed) {
+            $options['closed_before'] = $now;
         }
+
+        // If a parent, we need to hydrate all participants so we can check parent visibility via child participation
+        $user    = $this->getUser();
+        $mutator = new AssessmentListMutator($this->getUser(), new Visibility($this->getAccess()), $now, $showClosed);
+        $this->assessments = $this->getAssessmentMapper()
+            ->findAllByFolderIdForReview(
+                $this->getSource()->getId(),
+                $user->getRole()->isParent() ? null : $user,
+                $options
+            )
+            ->map([$mutator, 'map'])
+            ->filter([$mutator, 'filter'])
+            ->sortByCallback(new DueDateSortStrategy($this->getUser()))
+            ->limit($this->getConfig('size') ?: null);
 
         return true;
     }

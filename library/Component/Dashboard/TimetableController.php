@@ -180,6 +180,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         try {
             return $this->getFolderMapper()->findByCode($subjectCode)->getName();
         } catch (MapperException $e) {
+            // Is ok to ignore. $subjectCode is coming from SIS and may not be present in Schoolbox.
             return '';
         }
     }
@@ -201,6 +202,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             }
             return '';
         } catch (MapperException $e) {
+            // We're ignoring this as $subjectCode is being supplied from the SIS and it simply means this SIS class is not
+            // present in Schoolbox
             return '';
         }
     }
@@ -254,12 +257,14 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     'periodcode'  => $period['periodNumber'],
                     'daycode'     => $this->dayNumber[$campusId],
                 ];
+
                 try {
                     /** @var Router $router */
                     $router   = $this->getSitePage()->getDi()->get('router');
                     $deepLink = urlencode(http_build_query($deepLinkParams));
                     return "{$router->generate('tassportal.teacherKiosk')}?deep_link={$deepLink}";
                 } catch (\Throwable $e) {
+                    \trigger_error($e->getMessage(), E_USER_WARNING);
                     return '';
                 }
             default:

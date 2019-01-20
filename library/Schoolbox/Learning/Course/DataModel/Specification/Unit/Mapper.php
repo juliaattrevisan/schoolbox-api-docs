@@ -139,12 +139,15 @@ class Mapper extends AbstractUnitMapper
         return $modelList;
     }
 
+
     /**
      * Finds the unit spec for this folder.
      *
      * @param int   $folderId
      * @param array $options
      * @return Model
+     * @throws BaseMapper\Exception
+     * @throws BaseMapper\Exception\Deleted
      */
     public function findByFolderId($folderId, $options = [])
     {

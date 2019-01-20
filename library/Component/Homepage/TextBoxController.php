@@ -14,7 +14,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 {
 
     /** @var \Schoolbox\Resource\Textbox\Model */
-    protected $textbox;
+    private $textbox;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -34,9 +34,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         try {
             $this->textbox = \Schoolbox\Resource\Textbox\Mapper::getInstance()->findById($this->getConfig('textbox'));
-            if ($this->getTextbox()->isDeleted()) {
-                throw new \Schoolbox\Mapper\Exception("Requested textbox has been deleted");
-            }
         } catch (\Schoolbox\Mapper\Exception $e) {
             // didn't find it or it's been deleted: create a blank template box instead
             $this->textbox = new \Schoolbox\Resource\Textbox\Model();
@@ -45,7 +42,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             $this->setComponentName('Text Box');
         }
 
-        $textBoxHeading = Scrub::text($this->getTextbox()->getHeading());
+        $textBoxHeading = Scrub::text($this->textbox->getHeading());
 
         /**
          * If there's content and the heading isn't empty - use that as the component name
@@ -79,9 +76,9 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         $this->setBlock($templateHandle, 'textbox_form', 'textbox_form_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-        $textBoxContent = Scrub::text($this->getTextbox()->getBody());
+        $textBoxContent = Scrub::text($this->textbox->getBody());
 
-        if ($this->getSitePage()->arg[2] != $this->getInstance()->getId() && (empty($this->getTextbox()->getId()) || empty($textBoxContent))) {
+        if ($this->getSitePage()->arg[2] != $this->getInstance()->getId() && (empty($this->textbox->getId()) || empty($textBoxContent))) {
 
             $this->setBlock('empty_state', 'empty_custom', 'empty_custom_block');
             $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
@@ -111,7 +108,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 $this->setVar('EMPTY_STATE_MESSAGE', Scrub::text($emptyStateMessage));
                 $this->parse('empty_custom_block', 'empty_custom');
 
-            } elseif ($this->getTextbox()->getId()) {
+            } elseif ($this->textbox->getId()) {
                 /**
                  * They submitted the form with nothing or just a heading
                  */
@@ -146,15 +143,15 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                  * textBox which comes from another homepage, you were able to
                  * inadvertently steal ownership of it
                  */
-                $heading = Scrub::text($this->getTextbox()->getHeading());
-                $body = Scrub::html($this->getTextbox()->getBody());
+                $heading = Scrub::text($this->textbox->getHeading());
+                $body = Scrub::html($this->textbox->getBody());
 
                 $this->setVar(array(
                     'TEXTBOX_HEADING' => $heading,
                     'TEXTBOX_BODY' => $body,
-                    'TEXTBOX_ID' => $this->getTextbox()->getId(),
+                    'TEXTBOX_ID' => $this->textbox->getId(),
                     'ID' => $this->getContext()->getId(),
-                    'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
+                    'TEXTBOX_CATEGORY_ID' => $this->textbox->getCategory()->getId(),
                     'text_editable_block' => '',
                     'modify_text_block' => '',
                     'text_locked_block' => '',
@@ -216,13 +213,5 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         }
 
         return true; // everything went according to plan
-    }
-
-    /**
-     * @return \Schoolbox\Resource\Textbox\Model
-     */
-    protected function getTextbox()
-    {
-        return $this->textbox;
     }
 }

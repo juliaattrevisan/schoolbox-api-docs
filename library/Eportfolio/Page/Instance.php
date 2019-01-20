@@ -293,10 +293,10 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                     throw $e;
                 }
 
-                try {
-                    $this->getPage()->getDi()->get('sentry')->captureException($e);
-                } catch (\Aura\Di\Exception $e) {
-                    // ¯\_(ツ)_/¯
+                if ($this->getPage()->getDi()->has('sentry')) {
+                    /** @var Raven_Client $sentry */
+                    $sentry = $this->$this->getPage()->get('sentry');
+                    $sentry->captureException($e);
                 }
             }
         }

@@ -121,8 +121,16 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         $this->courseImplementation = null;
 
-        try {
-            $this->courseImplementation = $this->courseImplementationMapper->findById($courseImplId);
+        // Don't attempt to load course if not configured.
+        if ($courseImplId) {
+            try {
+                $this->courseImplementation = $this->courseImplementationMapper->findById($courseImplId);
+            } catch (MapperException\Deleted $e) {
+                // Safe to ignore this, it simply means the course impl has been deleted
+            }
+        }
+
+        if ($this->courseImplementation) {
             $this->courseImplementation->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImplId));
 
             // Load all assessments in a single query
@@ -157,10 +165,6 @@ class Controller extends Component_Homepage_ControllerAbstract
                 if (isset($assessments[$unitImpl->getId()])) {
                     $unitImpl->setAssessables($assessments[$unitImpl->getId()]);
                 }
-            }
-        } catch (MapperException $e) {
-            if (ConfigMapper::getInstance()->get('debug_mode')) {
-                throw $e;
             }
         }
 

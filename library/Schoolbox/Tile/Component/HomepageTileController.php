@@ -12,7 +12,6 @@ namespace Schoolbox\Tile\Component;
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Tile\Layout;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use SitePage;
 

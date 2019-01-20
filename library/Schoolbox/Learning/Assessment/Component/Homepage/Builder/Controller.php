@@ -9,8 +9,11 @@
 
 namespace Schoolbox\Learning\Assessment\Component\Homepage\Builder;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use LogicException;
+use RuntimeException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
@@ -22,6 +25,11 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Twig_Error_Loader;
+use Twig_Error_Runtime;
+use Twig_Error_Syntax;
+use TypeError;
+use UnexpectedValueException;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
@@ -57,35 +65,48 @@ class Controller extends Component_Homepage_ControllerAbstract
         return $this->getContentPermission() >= UserAccess::ACCESS_WRITE;
     }
 
+
     /**
      * @param String $templateHandle
      * @return bool
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
+     * @throws LogicException         If cyclic graph detected during translation
+     * @throws TypeError              If a PredicateBuilder method is called with wrong data type
+     * @throws Twig_Error_Loader      When the template cannot be found
+     * @throws Twig_Error_Syntax      When an error occurred during compilation
+     * @throws Twig_Error_Runtime     When an error occurred during rendering
+     * @throws RuntimeException       When Twig renderer not found in this Sitepage object's dependency injector.
+     * @throws UnexpectedValueException If source not set. TODO source should be runtime arg
      */
     public function renderTemplate($templateHandle)
     {
         // Get the current folder and hydrate its parent
         $folder = $this->getSource();
+        if (!$folder) {
+            throw new UnexpectedValueException('Source has not been set');
+        }
 
         // Ensure this CourseBuilder component is being placed on a Folder which has a UnitSpec
-        if(!$folder->getUnitSpecification() instanceof UnitSpecification || !$folder->getUnitSpecification()->getId()){
+        $unitSpec = $folder->getUnitSpecification();
+        if (!$unitSpec) {
             return $this->renderNotAUnitSpecification($templateHandle);
         }
 
-        // Get the unit's details
-        try {
-            $unitSpec = $this->unitSpecificationMapper->findByFolderId($folder->getId());
-            $options = ['order' => ['sequence' => 'ASC']];
-            $assessables = $this->assessmentMapperProxy->findAllByUnitSpecificationId($unitSpec->getId(), $options);
-            $unitSpec->setAssessables($assessables);
+        // Re-hydrate to get the unit's details (eg unit.course.name)
+        $unitSpec = $this->unitSpecificationMapper->findByFolderId($folder->getId());
 
-            $data = [
-                'unitSpec'         => $unitSpec,
-                'returnUrlName'    => Assessment\Redirect::RETURN_URL,
-                'encodedReturnUrl' => Assessment\Redirect::encode('/homepage/'.$folder->getId()),
-            ];
-        } catch (MapperException $e) {
-            // noop
-        }
+        $options = ['order' => ['sequence' => 'ASC']];
+        $assessables = $this->assessmentMapperProxy->findAllByUnitSpecificationId($unitSpec->getId(), $options);
+        $unitSpec->setAssessables($assessables);
+
+        $data = [
+            'unitSpec'         => $unitSpec,
+            'returnUrlName'    => Assessment\Redirect::RETURN_URL,
+            'encodedReturnUrl' => Assessment\Redirect::encode('/homepage/'.$folder->getId()),
+        ];
+
         $data['componentInstance'] = $this->getInstance();
 
         // Retrieve all of the parents for use as breadcrumbs
@@ -101,7 +122,6 @@ class Controller extends Component_Homepage_ControllerAbstract
             $data,
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );
-
     }
 
     /**
