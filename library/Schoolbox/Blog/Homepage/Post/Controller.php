@@ -141,7 +141,7 @@ class Controller extends Base
                 if (!in_array($storage->getHash(), $retainedAttachments)) {
                     $attachment = new BlogImageModel();
                     $attachment->setBlogId($blog->getId());
-                    $attachment->setHash($storage->getHash());
+                    $attachment->setStorage($storage);
                     $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                     $this->getBlogImageMapper()->save($attachment);
                 }
