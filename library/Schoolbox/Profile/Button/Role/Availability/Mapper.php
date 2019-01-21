@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Schoolbox\Profile\Button\Role;
+namespace Schoolbox\Profile\Button\Role\Availability;
 
 use Schoolbox\Mapper as BaseMapper;
 

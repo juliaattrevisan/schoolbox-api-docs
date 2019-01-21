@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Schoolbox\Profile\Button\Campus;
+namespace Schoolbox\Profile\Button\Role\Availability;
 
 class Model
 {
@@ -12,20 +12,20 @@ class Model
     protected $profileButtonId;
 
     /** @var int */
-    protected $campusId;
+    protected $roleId;
 
     /**
      * @param int $id
      * @return self
      */
-    public function setId($id): self
+    public function setId(int $id): self
     {
         $this->id = $id;
         return $this;
     }
 
     /**
-     * @return null|int
+     * @return nulL|int
      */
     public function getId(): ?int
     {
@@ -51,20 +51,20 @@ class Model
     }
 
     /**
-     * @param int $campusId
+     * @param int $roleId
      * @return self
      */
-    public function setCampusId(int $campusId): self
+    public function setRoleId(int $roleId): self
     {
-        $this->campusId = $campusId;
+        $this->roleId = $roleId;
         return $this;
     }
 
     /**
      * @return int
      */
-    public function getCampusId(): int
+    public function getRoleId(): int
     {
-        return $this->campusId;
+        return $this->roleId;
     }
 }

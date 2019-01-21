@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Schoolbox\Profile\Button\Campus;
+namespace Schoolbox\Profile\Button\Campus\Availability;
 
 use Schoolbox\Mapper as BaseMapper;
 
