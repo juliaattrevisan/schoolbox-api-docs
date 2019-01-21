@@ -27,6 +27,7 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
+use Crell\ApiProblem\ApiProblem;
 
 /**
  * Returns the config id for the specified calendar connector.
@@ -161,13 +162,17 @@ try {
         $permittedPeriodMonths = $back + $forward;
         $requestedPeriodMonths = (int)(($end - $start) / (3600 * 24 * 31));
         if ($requestedPeriodMonths > $permittedPeriodMonths) {
-            $message = "Requested period '{$requestedPeriodMonths}' is greater than permitted period '{$permittedPeriodMonths}'";
+            $message = "Requested period is {$requestedPeriodMonths} months, but permitted period is {$permittedPeriodMonths} months";
+            \http_response_code(401);
+
+            $problem = new ApiProblem($message);
+            $problem->setTitle("You requested a period of time that is longer than permitted");
+            $problem->setDetail($message);
 
             $format = $_GET['format'] ?? '';
-            \http_response_code(401);
             switch (\strtolower($format)) {
                 case 'json':
-                    echo json_encode(['errors' => [$message]]);
+                    echo $problem->asJson();
                     break;
                 case 'csv':
                 default:
