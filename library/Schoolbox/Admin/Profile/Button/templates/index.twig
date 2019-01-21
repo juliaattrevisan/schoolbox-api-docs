@@ -39,15 +39,15 @@
                                         <p class="meta">
                                             Shown for:
                                             {% for role in roles %}
-                                                {% if rolesSelected[item.id][role.id] %}
-                                                    {{ role.name }}{% if loop.index < (rolesSelected[item.id] | length) - 1 %}, {% elseif loop.index == (rolesSelected[item.id] | length) - 1 %} and {% endif %}
+                                                {% if roleAvailabilitySelected[item.id][role.id] %}
+                                                    {{ role.name }}{% if loop.index < (roleAvailabilitySelected[item.id] | length) - 1 %}, {% elseif loop.index == (roleAvailabilitySelected[item.id] | length) - 1 %} and {% endif %}
                                                 {% endif %}
                                             {% endfor %}
 
                                             in
                                             {% for campus in campuses %}
-                                                {% if campusesSelected[item.id][campus.id] %}
-                                                    {{ campus.name }}{% if loop.index < (campusesSelected[item.id] | length) - 1 %}, {% elseif loop.index == (campusesSelected[item.id] | length) - 1 %} and {% endif %}
+                                                {% if campusAvailabilitySelected[item.id][campus.id] %}
+                                                    {{ campus.name }}{% if loop.index < (campusAvailabilitySelected[item.id] | length) - 1 %}, {% elseif loop.index == (campusAvailabilitySelected[item.id] | length) - 1 %} and {% endif %}
                                                 {% endif %}
                                             {% endfor %}
                                             campus

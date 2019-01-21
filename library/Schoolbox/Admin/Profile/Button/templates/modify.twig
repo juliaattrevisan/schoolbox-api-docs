@@ -73,7 +73,7 @@
                                 <input id="campus-all" type="checkbox">
                                 <label for="campus-all">Select All</label>
                                 {% for campus in campuses %}
-                                    <input name="campuses[]" data-campus id="campus-{{ campus.id }}" type="checkbox" {% if campusesSelected[campus.id] %}checked{% endif %} value="{{ campus.id }}">
+                                    <input name="campuses[]" data-campus id="campus-{{ campus.id }}" type="checkbox" {% if campusAvailabilitySelected[campus.id] %}checked{% endif %} value="{{ campus.id }}">
                                     <label for="campus-{{ campus.id }}">{{ campus.name }}</label>
                                 {% endfor %}
                             </div>
@@ -86,7 +86,7 @@
                                 <input id="role-all" type="checkbox">
                                 <label for="role-all">Select All</label>
                                 {% for role in roles %}
-                                    <input name="roles[]" data-role id="role-{{ role.id }}" type="checkbox" {% if rolesSelected[role.id] %}checked{% endif %} value="{{ role.id }}">
+                                    <input name="roles[]" data-role id="role-{{ role.id }}" type="checkbox" {% if roleAvailabilitySelected[role.id] %}checked{% endif %} value="{{ role.id }}">
                                     <label for="role-{{ role.id }}">{{ role.name }}</label>
                                 {% endfor %}
                             </div>

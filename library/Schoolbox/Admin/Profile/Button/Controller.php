@@ -65,15 +65,15 @@ class Controller extends Base
     {
         $buttons = $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc');
 
-        $rolesSelected = [];
-        $campusesSelected = [];
+        $roleAvailabilitySelected = [];
+        $campusAvailabilitySelected = [];
 
         foreach($buttons as $button) {
-            $roleSelections = $this->roleAvailabilityMapper->findByColumn('profile_button_id', $button->getId());
-            $rolesSelected[$button->getId()] = array_fill_keys($roleSelections->indexBy('roleId')->keys(), true);
+            $roleAvailabilitySelections = $this->roleAvailabilityMapper->findByColumn('profile_button_id', $button->getId());
+            $roleAvailabilitySelected[$button->getId()] = array_fill_keys($roleAvailabilitySelections->indexBy('roleId')->keys(), true);
 
-            $campusSelections = $this->campusAvailabilityMapper->findByColumn('profile_button_id', $button->getId());
-            $campusesSelected[$button->getId()] = array_fill_keys($campusSelections->indexBy('campusId')->keys(), true);
+            $campusAvailabilitySelections = $this->campusAvailabilityMapper->findByColumn('profile_button_id', $button->getId());
+            $campusAvailabilitySelected[$button->getId()] = array_fill_keys($campusAvailabilitySelections->indexBy('campusId')->keys(), true);
         }
 
         $this->getResponse()->content->set([
@@ -82,9 +82,10 @@ class Controller extends Base
                 'pageCurrent' => self::PAGE_CURRENT,
                 'profile' => $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
-                'rolesSelected' => $rolesSelected,
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
-                'campusesSelected' => $campusesSelected
+
+                'roleAvailabilitySelected' => $roleAvailabilitySelected,
+                'campusAvailabilitySelected' => $campusAvailabilitySelected
             ],
             'title' => 'Admin - Profile Buttons'
         ]);
@@ -104,11 +105,11 @@ class Controller extends Base
     {
         // Get selected campuses and roles
 
-        $roleSelections = $this->roleAvailabilityMapper->findByColumn('profile_button_id', $id);
-        $rolesSelected = array_fill_keys($roleSelections->indexBy('roleId')->keys(), true);
+        $roleAvailabilitySelections = $this->roleAvailabilityMapper->findByColumn('profile_button_id', $id);
+        $roleAvailabilitySelected = array_fill_keys($roleAvailabilitySelections->indexBy('roleId')->keys(), true);
 
-        $campusSelections = $this->campusAvailabilityMapper->findByColumn('profile_button_id', $id);
-        $campusesSelected = array_fill_keys($campusSelections->indexBy('campusId')->keys(), true);
+        $campusAvailabilitySelections = $this->campusAvailabilityMapper->findByColumn('profile_button_id', $id);
+        $campusAvailabilitySelected = array_fill_keys($campusAvailabilitySelections->indexBy('campusId')->keys(), true);
 
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/modify.twig',
@@ -117,9 +118,10 @@ class Controller extends Base
                 'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [], ['cache'=>false]),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
-                'rolesSelected' => $rolesSelected,
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
-                'campusesSelected' => $campusesSelected                
+
+                'roleAvailabilitySelected' => $roleAvailabilitySelected,
+                'campusAvailabilitySelected' => $campusAvailabilitySelected
             ],
             'title' => 'Admin - Modify Profile Button'
         ]);
