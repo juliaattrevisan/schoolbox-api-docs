@@ -11,8 +11,8 @@ use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
-use Schoolbox\Profile\Button\Campus\Availability\Mapper as ProfileButtonCampusAvailabilityMapper;
-use Schoolbox\Profile\Button\Role\Availability\Mapper as ProfileButtonRoleAvailabilityMapper;
+use Schoolbox\Profile\Button\Campus;
+use Schoolbox\Profile\Button\Role;
 use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
 
@@ -68,8 +68,8 @@ class Module extends BaseModule
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class), [
             'iconMapper'   => $this->getMapperFactory()->getLazy(IconMapper::class),
             'profileButtonMapper' => $this->getMapperFactory()->getLazy(ProfileButtonMapper::class),
-            'profileButtonCampusAvailabilityMapper' => $this->getMapperFactory()->getLazy(ProfileButtonCampusAvailabilityMapper::class),
-            'profileButtonRoleAvailabilityMapper' => $this->getMapperFactory()->getLazy(ProfileButtonRoleAvailabilityMapper::class),
+            'campusAvailabilityMapper' => $this->getMapperFactory()->getLazy(Campus\Availability\Mapper::class),
+            'roleAvailabilityMapper' => $this->getMapperFactory()->getLazy(Role\Availability\Mapper::class),
             'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'campusMapper' => $this->getMapperFactory()->getLazy(CampusMapper::class),
         ]);
