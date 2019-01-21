@@ -70,25 +70,10 @@ class Controller extends Base
 
         foreach($buttons as $button) {
             $roleSelections = $this->roleAvailabilityMapper->findByColumn('profile_button_id', $button->getId());
-
-            $rolesForButton = [];
-
-            /** @var Role\Availability\Model $roleSelection */
-            foreach ($roleSelections as $roleSelection) {
-                $rolesForButton[$roleSelection->getRoleId()] = true;
-            }
+            $rolesSelected[$button->getId()] = array_fill_keys($roleSelections->indexBy('roleId')->keys(), true);
 
             $campusSelections = $this->campusAvailabilityMapper->findByColumn('profile_button_id', $button->getId());
-
-            $campusesForButton = [];
-
-            /** @var Campus\Availability\Model $campusSelection */
-            foreach ($campusSelections as $campusSelection) {
-                $campusesForButton[$campusSelection->getCampusId()] = true;
-            }
-
-            $rolesSelected[$button->getId()] = $rolesForButton;
-            $campusesSelected[$button->getId()] = $campusesForButton;
+            $campusesSelected[$button->getId()] = array_fill_keys($campusSelections->indexBy('campusId')->keys(), true);
         }
 
         $this->getResponse()->content->set([
