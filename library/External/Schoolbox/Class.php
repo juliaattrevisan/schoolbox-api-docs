@@ -31,6 +31,11 @@ class External_Schoolbox_Class implements External_ClassInterface
      */
     public function getStudents(string $classCode): array
     {
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return [];
+        }
+
         $studentIterator = $this->getClassIterator($classCode, Role::STUDENT);
 
         if (!$studentIterator instanceof IIterator) {
@@ -114,6 +119,11 @@ class External_Schoolbox_Class implements External_ClassInterface
      */
     public function getTeacherName(string $classCode): array
     {
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return [];
+        }
+
         $teachers = [];
 
         $classIterator = $this->getClassIterator($classCode, Role::STAFF);

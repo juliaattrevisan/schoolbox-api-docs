@@ -133,6 +133,11 @@ class External_Synergetic_Class implements External_ClassInterface
      */
     public function getTeacherName(string $classCode): array
     {
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return [];
+        }
+
         $teachers   = [];
         $classQuery = $this->getClassCodeQuery($classCode);
 
