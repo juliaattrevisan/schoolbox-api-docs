@@ -137,11 +137,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         LEFT JOIN     dbo.luPastoralCareCategory ON dbo.tPastoralCare.CategoryCode = dbo.luPastoralCareCategory.Code
         INNER JOIN    dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID 
         INNER JOIN    dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
-        INNER JOIN    dbo.vStudents ON dbo.vStudents.ID = dbo.tPastoralCare.ID
+        INNER JOIN    dbo.vStudentsAll ON dbo.vStudentsAll.ID = dbo.tPastoralCare.ID
         INNER JOIN    dbo.FileSemesters ON 
-                          dbo.FileSemesters.FileYear = dbo.vStudents.FileYear AND
-                          dbo.FileSemesters.FileSemester = dbo.vStudents.FileSemester AND
-                          dbo.FileSemesters.SystemCurrentFlag = 1
+                          dbo.FileSemesters.FileYear = dbo.vStudentsAll.FileYear AND
+                          dbo.FileSemesters.FileSemester = dbo.vStudentsAll.FileSemester AND
+                          dbo.FileSemesters.SystemCurrentFlag = 1 AND 
+                          NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') 
+                                AND DATEDIFF(DAY, vStudentsAll.StudentLeavingDate, GETDATE()) > 0)
     ";
 
     /** @var Html2Text $htmlConverter */
