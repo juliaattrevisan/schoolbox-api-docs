@@ -51,7 +51,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     public function __construct(int $connectorId, User $user, User $viewer, External_TimetableInterface $externalTimetable, $roomCodes = [])
     {
         parent::__construct($connectorId, $user, $viewer);
-        $this->externalTimetable = new External_Timetable();
+        $this->externalTimetable = $externalTimetable;
         $this->roomCodes         = $roomCodes;
     }
 
