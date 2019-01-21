@@ -27,9 +27,6 @@ class Model implements IStorage, ISoftDeletable {
 	/** @var int */
 	protected $blogId;
 
-	/** @var string */
-	protected $hash;
-
 	/**
 	 * @param int $blogId
 	 * @return self
