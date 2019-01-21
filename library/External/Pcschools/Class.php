@@ -29,9 +29,14 @@ class External_Pcschools_Class implements External_ClassInterface
     /**
      * @inheritdoc
      */
-    public function getStudents(string $classCodes): array
+    public function getStudents(string $classCode): array
     {
-        $codeQuery = $this->getTimefileFilter($classCodes);
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return [];
+        }
+
+        $codeQuery = $this->getTimefileFilter($classCode);
 
         $query = "SELECT DISTINCT
                     st.LEGAL_SURNAME AS lastname,
@@ -62,9 +67,14 @@ class External_Pcschools_Class implements External_ClassInterface
     /**
      * @inheritdoc
      */
-    public function getTeacherName(string $classCodes): array
+    public function getTeacherName(string $classCode): array
     {
-        $query = $this->getTimefileFilter($classCodes);
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return [];
+        }
+
+        $query = $this->getTimefileFilter($classCode);
         
         return array_map(
             function($v) { return $v['TEACHER']; },

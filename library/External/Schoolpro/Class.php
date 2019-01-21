@@ -25,6 +25,11 @@ class External_Schoolpro_Class implements External_ClassInterface
      */
     public function getStudents(string $classCode): array
     {
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return [];
+        }
+
         $allStudents = [];
 
         /* Class Codes, when combined, are joined by a comma
@@ -99,6 +104,11 @@ class External_Schoolpro_Class implements External_ClassInterface
      */
     public function getTeacherName(string $classCode): array
     {
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return [];
+        }
+
         $allTeachers = [];
         $allClassCodes = explode(',', $classCode);
         foreach ($allClassCodes as $currentClassCode) {

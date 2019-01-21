@@ -29,6 +29,11 @@ class External_Tass_Class implements External_ClassInterface {
      */
     public function getStudents(string $classCode): array
     {
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return [];
+        }
+
         $classQuery = '';
 		if(stristr($classCode, ',')) {
 			$subCodeArray = explode(',',$classCode);
@@ -78,6 +83,11 @@ class External_Tass_Class implements External_ClassInterface {
      */
 	public function getTeacherName(string $classCode): array
     {
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return [];
+        }
+
 		$classQuery = '';
 		if(stristr($classCode, ',')) {
 			$subCodeArray = explode(',',$classCode);

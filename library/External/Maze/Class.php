@@ -35,6 +35,11 @@ class External_Maze_Class implements External_ClassInterface {
 	 */
 	public function getStudents(string $classCode): array
     {
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return [];
+        }
+
 		$ttPeriod = $this->getHelper()->getCurrentTTPERIOD();
 
 		$ingredients = $this->getHelper()->degenerateClassCode($classCode);
@@ -136,6 +141,11 @@ class External_Maze_Class implements External_ClassInterface {
      */
     public function getTeacherName(string $classCode): array
     {
+        if (!$classCode) {
+            /* Dont bother if you got no code */
+            return [];
+        }
+
 		$ttPeriod = $this->getHelper()->getCurrentTTPERIOD();
 
 		/* Assume Schoolbox $classCodes are in the format: '07SCI-1'
