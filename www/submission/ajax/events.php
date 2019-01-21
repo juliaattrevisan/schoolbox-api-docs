@@ -34,6 +34,7 @@ $colourManager         = new Timetable_ColourManager(Timetable_ColourMapper::get
 $calendarApi           = new Calendar_Api_EventType_Submission_Schoolbox_ForDueWork(
     $config->getId(),
     $user,
+    $viewer,
     $assessmentDataSource,
     $visibility,
     $colourManager
