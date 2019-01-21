@@ -105,22 +105,10 @@ class Controller extends Base
         // Get selected campuses and roles
 
         $roleSelections = $this->roleAvailabilityMapper->findByColumn('profile_button_id', $id);
-
-        $rolesSelected = [];
-
-        /** @var Role\Availability\Model $roleSelection */
-        foreach ($roleSelections as $roleSelection) {
-            $rolesSelected[$roleSelection->getRoleId()] = true;
-        }
+        $rolesSelected = array_fill_keys($roleSelections->indexBy('roleId')->keys(), true);
 
         $campusSelections = $this->campusAvailabilityMapper->findByColumn('profile_button_id', $id);
-
-        $campusesSelected = [];
-
-        /** @var Campus\Availability\Model $campusSelection */
-        foreach ($campusSelections as $campusSelection) {
-            $campusesSelected[$campusSelection->getCampusId()] = true;
-        }
+        $campusesSelected = array_fill_keys($campusSelections->indexBy('campusId')->keys(), true);
 
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/modify.twig',
