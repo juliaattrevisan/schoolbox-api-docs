@@ -37,19 +37,30 @@
                                         </a>
 
                                         <p class="meta">
-                                            Shown for:
+                                            Available in profiles for
+
+                                            {% set i = 1 %}
+                                            {% set n = roleAvailabilitySelected[item.id] | length %}
+
                                             {% for role in roles %}
                                                 {% if roleAvailabilitySelected[item.id][role.id] %}
-                                                    {{ role.name }}{% if loop.index < (roleAvailabilitySelected[item.id] | length) - 1 %}, {% elseif loop.index == (roleAvailabilitySelected[item.id] | length) - 1 %} and {% endif %}
+                                                    {{ role.name }}{% if i < (n-1) %}, {% elseif i == (n-1) %} and {% endif %}
+                                                    {% set i = i+1 %}
                                                 {% endif %}
                                             {% endfor %}
 
                                             in
+
+                                            {% set i = 1 %}
+                                            {% set n = campusAvailabilitySelected[item.id] | length %}
+
                                             {% for campus in campuses %}
                                                 {% if campusAvailabilitySelected[item.id][campus.id] %}
-                                                    {{ campus.name }}{% if loop.index < (campusAvailabilitySelected[item.id] | length) - 1 %}, {% elseif loop.index == (campusAvailabilitySelected[item.id] | length) - 1 %} and {% endif %}
+                                                    {{ campus.name }}{% if i < (n-1) %}, {% elseif i == (n-1) %} and {% endif %}
+                                                    {% set i = i+1 %}
                                                 {% endif %}
                                             {% endfor %}
+
                                             campus
                                         </p>
                                     </div>
