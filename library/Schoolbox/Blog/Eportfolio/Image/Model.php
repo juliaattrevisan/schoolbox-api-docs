@@ -45,4 +45,15 @@ class Model implements IStorage, ISoftDeletable
     {
         return $this->blogId;
     }
+
+    /**
+     * Proxy filename request through to storage, as this mapper doesn't store
+     * a filename.
+     *
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->storage->getFilename();
+    }
 }
