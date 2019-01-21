@@ -11,7 +11,7 @@
 
     {% for obj in collection %}
         {% if selectedCollection[item.id][obj.id] %}
-            {{ obj.name }}{% if i < (n-1) %}, {% elseif i == (n-1) %} and {% endif %}
+            {{ obj.name }}{% if i < (n-1) %}, {% elseif i == (n-1) %}, {% endif %}
             {% set i = i+1 %}
         {% endif %}
     {% endfor %}
@@ -52,15 +52,23 @@
                                 <div class="list-item">
                                     <div class="card small-12">
                                         <a>
-                                            <div class="icon-{{ item.icon }} size-32"></div>
+                                            <div class="icon-{{ item.icon }} size-64"></div>
                                             <h3>{{ item.text }}</h3>
                                         </a>
 
                                         <p class="meta">
-                                            Available in profiles for
-                                            {{ macro.checkboxString(item, roles, roleAvailabilitySelected) }}
-                                            in
-                                            {{ macro.checkboxString(item, campuses, campusAvailabilitySelected) }}
+                                            Available on profiles for
+                                            <strong>{{ macro.checkboxString(item, roles, roleAvailabilitySelected) }}</strong> role(s)
+                                            within
+                                            <strong>{{ macro.checkboxString(item, campuses, campusAvailabilitySelected) }}</strong>
+                                            campus
+                                        </p>
+
+                                        <p class="meta">
+                                            Visible to viewers in
+                                            <strong>{{ macro.checkboxString(item, roles, roleVisibilitySelected) }}</strong> role(s)
+                                            within
+                                            <strong>{{ macro.checkboxString(item, campuses, campusVisibilitySelected) }}</strong>
                                             campus
                                         </p>
                                     </div>
