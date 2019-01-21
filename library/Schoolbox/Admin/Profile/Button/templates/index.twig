@@ -11,7 +11,7 @@
 
     {% for obj in collection %}
         {% if selectedCollection[item.id][obj.id] %}
-            {{ obj.name }}{% if i < (n-1) %}, {% elseif i == (n-1) %}, {% endif %}
+            {{ obj.name }}{% if i < n %}, {% endif %}
             {% set i = i+1 %}
         {% endif %}
     {% endfor %}
