@@ -10,18 +10,19 @@
 
 namespace Schoolbox\Blog\Eportfolio\Image;
 
-use \Schoolbox\ISoftDeletable;
-use \Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\ISoftDeletable;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Resource\File\StorableTrait;
+use Schoolbox\Resource\Storage\IStorage;
 
-class Model implements ISoftDeletable {
+class Model implements IStorage, ISoftDeletable {
 
-    use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+    use StorableTrait;
 
 	/** @var int */
 	protected $blogId;
@@ -44,20 +45,4 @@ class Model implements ISoftDeletable {
 	public function getBlogId() {
 		return $this->blogId;
 	}
-
-	/**
-	 * @param string $hash
-	 * @return self
-	 */
-	public function setHash($hash) {
-		$this->hash = $hash;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getHash() {
-		return $this->hash;
-	}
-} 
+}
