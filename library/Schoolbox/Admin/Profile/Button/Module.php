@@ -68,8 +68,10 @@ class Module extends BaseModule
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class), [
             'iconMapper'   => $this->getMapperFactory()->getLazy(IconMapper::class),
             'profileButtonMapper' => $this->getMapperFactory()->getLazy(ProfileButtonMapper::class),
-            'campusAvailabilityMapper' => $this->getMapperFactory()->getLazy(Campus\Availability\Mapper::class),
             'roleAvailabilityMapper' => $this->getMapperFactory()->getLazy(Role\Availability\Mapper::class),
+            'campusAvailabilityMapper' => $this->getMapperFactory()->getLazy(Campus\Availability\Mapper::class),
+            'roleVisibilityMapper' => $this->getMapperFactory()->getLazy(Role\Visibility\Mapper::class),
+            'campusVisibilityMapper' => $this->getMapperFactory()->getLazy(Campus\Visibility\Mapper::class),
             'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'campusMapper' => $this->getMapperFactory()->getLazy(CampusMapper::class),
         ]);

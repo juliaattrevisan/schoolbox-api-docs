@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Button;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Campus;
@@ -29,8 +30,14 @@ class Controller extends Base
     /** @var Campus\Availability\Mapper $campusAvailabilityMapper */
     private $campusAvailabilityMapper;
 
-    /** @var Role\Availability\Mapper $profileButtonRoleMapper */
+    /** @var Role\Availability\Mapper $roleAvailabilityMapper */
     private $roleAvailabilityMapper;
+
+    /** @var Campus\Availability\Mapper $campusVisibilityMapper */
+    private $campusVisibilityMapper;
+
+    /** @var Role\Availability\Mapper $roleVisibilityMapper */
+    private $roleVisibilityMapper;
 
     /** @var RoleMapper $roleMapper */
     private $roleMapper;
@@ -44,7 +51,9 @@ class Controller extends Base
       RoleMapper $roleMapper,
       CampusMapper $campusMapper,
       Campus\Availability\Mapper $campusAvailabilityMapper,
-      Role\Availability\Mapper $roleAvailabilityMapper
+      Role\Availability\Mapper $roleAvailabilityMapper,
+      Campus\Visibility\Mapper $campusVisibilityMapper,
+      Role\Visibility\Mapper $roleVisibilityMapper
     )
     {
         $this->iconMapper = $iconMapper;
@@ -53,6 +62,8 @@ class Controller extends Base
         $this->campusMapper = $campusMapper;
         $this->campusAvailabilityMapper = $campusAvailabilityMapper;
         $this->roleAvailabilityMapper = $roleAvailabilityMapper;
+        $this->campusVisibilityMapper = $campusVisibilityMapper;
+        $this->roleVisibilityMapper = $roleVisibilityMapper;
     }
 
     /**
@@ -63,10 +74,14 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
+        /** @var Collection $buttons */
         $buttons = $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc');
 
         $roleAvailabilitySelected = [];
         $campusAvailabilitySelected = [];
+
+        $roleVisibilitySelected = [];
+        $campusVisibilitySelected = [];
 
         foreach($buttons as $button) {
             $roleAvailabilitySelections = $this->roleAvailabilityMapper->findByColumn('profile_button_id', $button->getId());
@@ -74,6 +89,12 @@ class Controller extends Base
 
             $campusAvailabilitySelections = $this->campusAvailabilityMapper->findByColumn('profile_button_id', $button->getId());
             $campusAvailabilitySelected[$button->getId()] = array_fill_keys($campusAvailabilitySelections->indexBy('campusId')->keys(), true);
+
+            $roleVisibilitySelections = $this->roleVisibilityMapper->findByColumn('profile_button_id', $button->getId());
+            $roleVisibilitySelected[$button->getId()] = array_fill_keys($roleVisibilitySelections->indexBy('roleId')->keys(), true);
+
+            $campusVisibilitySelections = $this->campusVisibilityMapper->findByColumn('profile_button_id', $button->getId());
+            $campusVisibilitySelected[$button->getId()] = array_fill_keys($campusVisibilitySelections->indexBy('campusId')->keys(), true);
         }
 
         $this->getResponse()->content->set([
@@ -85,7 +106,9 @@ class Controller extends Base
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
 
                 'roleAvailabilitySelected' => $roleAvailabilitySelected,
-                'campusAvailabilitySelected' => $campusAvailabilitySelected
+                'campusAvailabilitySelected' => $campusAvailabilitySelected,
+                'roleVisibilitySelected' => $roleVisibilitySelected,
+                'campusVisibilitySelected' => $campusVisibilitySelected
             ],
             'title' => 'Admin - Profile Buttons'
         ]);
@@ -111,6 +134,12 @@ class Controller extends Base
         $campusAvailabilitySelections = $this->campusAvailabilityMapper->findByColumn('profile_button_id', $id);
         $campusAvailabilitySelected = array_fill_keys($campusAvailabilitySelections->indexBy('campusId')->keys(), true);
 
+        $roleVisibilitySelections = $this->roleVisibilityMapper->findByColumn('profile_button_id', $id);
+        $roleVisibilitySelected = array_fill_keys($roleVisibilitySelections->indexBy('roleId')->keys(), true);
+
+        $campusVisibilitySelections = $this->campusVisibilityMapper->findByColumn('profile_button_id', $id);
+        $campusVisibilitySelected = array_fill_keys($campusVisibilitySelections->indexBy('campusId')->keys(), true);
+
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/modify.twig',
             'data'     => [
@@ -121,7 +150,9 @@ class Controller extends Base
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
 
                 'roleAvailabilitySelected' => $roleAvailabilitySelected,
-                'campusAvailabilitySelected' => $campusAvailabilitySelected
+                'campusAvailabilitySelected' => $campusAvailabilitySelected,
+                'roleVisibilitySelected' => $roleVisibilitySelected,
+                'campusVisibilitySelected' => $campusVisibilitySelected,
             ],
             'title' => 'Admin - Modify Profile Button'
         ]);
@@ -243,7 +274,29 @@ class Controller extends Base
                 $this->roleAvailabilityMapper->save($profileButtonRole);
             }
         }
-        
+
+        $this->campusVisibilityMapper->deleteByColumn('profile_button_id', $item->getId());
+
+        if (\is_array($post['campusVisibility'])) {
+            foreach ($post['campusVisibility'] as $campusId) {
+                $profileButtonCampus = new Campus\Visibility\Model();
+                $profileButtonCampus->setProfileButtonId($item->getId());
+                $profileButtonCampus->setCampusId((int)$campusId);
+                $this->campusVisibilityMapper->save($profileButtonCampus);
+            }
+        }
+
+        $this->roleVisibilityMapper->deleteByColumn('profile_button_id', $item->getId());
+
+        if (\is_array($post['roleVisibility'])) {
+            foreach ($post['roleVisibility'] as $roleId) {
+                $profileButtonRole = new Role\Visibility\Model();
+                $profileButtonRole->setProfileButtonId($item->getId());
+                $profileButtonRole->setRoleId((int)$roleId);
+                $this->roleVisibilityMapper->save($profileButtonRole);
+            }
+        }
+
         $this->getResponse()->redirect->afterPost('/adminv2/profile-button');
     }
 }
