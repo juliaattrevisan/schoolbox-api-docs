@@ -6,10 +6,8 @@ namespace Schoolbox\Admin\Profile\Button;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Profile\Button\Campus\Availability\Mapper as CampusAvailabilityMapper;
-use Schoolbox\Profile\Button\Campus\Availability\Model as ProfileButtonCampus;
-use Schoolbox\Profile\Button\Role\Availability\Mapper as RoleAvailabilityMapper;
-use Schoolbox\Profile\Button\Role\Availability\Model as ProfileButtonRole;
+use Schoolbox\Profile\Button\Campus;
+use Schoolbox\Profile\Button\Role;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Schoolbox\Profile\Button\Model as ProfileButton;
 use Schoolbox\CampusMapper;
@@ -28,10 +26,10 @@ class Controller extends Base
     /** @var ProfileButtonMapper $profileButtonMapper */
     private $profileButtonMapper;
 
-    /** @var CampusAvailabilityMapper $campusAvailabilityMapper */
+    /** @var Campus\Availability\Mapper $campusAvailabilityMapper */
     private $campusAvailabilityMapper;
 
-    /** @var RoleAvailabilityMapper $profileButtonRoleMapper */
+    /** @var Role\Availability\Mapper $profileButtonRoleMapper */
     private $roleAvailabilityMapper;
 
     /** @var RoleMapper $roleMapper */
@@ -45,8 +43,8 @@ class Controller extends Base
       ProfileButtonMapper $profileButtonMapper,
       RoleMapper $roleMapper,
       CampusMapper $campusMapper,
-      CampusAvailabilityMapper $campusAvailabilityMapper,
-      RoleAvailabilityMapper $roleAvailabilityMapper
+      Campus\Availability\Mapper $campusAvailabilityMapper,
+      Role\Availability\Mapper $roleAvailabilityMapper
     )
     {
         $this->iconMapper = $iconMapper;
@@ -69,12 +67,13 @@ class Controller extends Base
 
         $rolesSelected = [];
         $campusesSelected = [];
+
         foreach($buttons as $button) {
             $roleSelections = $this->roleAvailabilityMapper->findByColumn('profile_button_id', $button->getId());
 
             $rolesForButton = [];
 
-            /** @var ProfileButtonRole $selection */
+            /** @var Role\Availability\Model $roleSelection */
             foreach ($roleSelections as $roleSelection) {
                 $rolesForButton[$roleSelection->getRoleId()] = true;
             }
@@ -83,7 +82,7 @@ class Controller extends Base
 
             $campusesForButton = [];
 
-            /** @var ProfileButtonCampus $selection */
+            /** @var Campus\Availability\Model $campusSelection */
             foreach ($campusSelections as $campusSelection) {
                 $campusesForButton[$campusSelection->getCampusId()] = true;
             }
@@ -112,7 +111,9 @@ class Controller extends Base
      * @api   GET /adminv2/profile-button/modify/{id}
      * @level 182
      *
-     * @param $id
+     * @param int $id
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     public function getModify(int $id): void
     {
@@ -122,7 +123,7 @@ class Controller extends Base
 
         $rolesSelected = [];
 
-        /** @var ProfileButtonRole $selection */
+        /** @var Role\Availability\Model $roleSelection */
         foreach ($roleSelections as $roleSelection) {
             $rolesSelected[$roleSelection->getRoleId()] = true;
         }
@@ -131,7 +132,7 @@ class Controller extends Base
 
         $campusesSelected = [];
 
-        /** @var ProfileButtonCampus $selection */
+        /** @var Campus\Availability\Model $campusSelection */
         foreach ($campusSelections as $campusSelection) {
             $campusesSelected[$campusSelection->getCampusId()] = true;
         }
@@ -181,7 +182,7 @@ class Controller extends Base
     public function postOrder(): void
     {
         $post = $this->getRequest()->post;
-        $orderArray = explode(",", $post['order']);
+        $orderArray = explode(',', $post['order']);
 
         $order = 0;
         foreach ($orderArray as $id) {
@@ -205,7 +206,7 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
         if (!empty($post['id'])) {
-            $this->profileButtonMapper->deleteByColumn("id", $post["id"]);
+            $this->profileButtonMapper->deleteByColumn('id', $post['id']);
         }
     }
 
@@ -248,9 +249,9 @@ class Controller extends Base
 
         $this->campusAvailabilityMapper->deleteByColumn('profile_button_id', $item->getId());
 
-        if (is_array($post['campuses'])) {
+        if (\is_array($post['campuses'])) {
             foreach ($post['campuses'] as $campusId) {
-                $profileButtonCampus = new ProfileButtonCampus();
+                $profileButtonCampus = new Campus\Availability\Model();
                 $profileButtonCampus->setProfileButtonId($item->getId());
                 $profileButtonCampus->setCampusId((int)$campusId);
                 $this->campusAvailabilityMapper->save($profileButtonCampus);
@@ -259,15 +260,15 @@ class Controller extends Base
         
         $this->roleAvailabilityMapper->deleteByColumn('profile_button_id', $item->getId());
 
-        if (is_array($post['roles'])) {
+        if (\is_array($post['roles'])) {
             foreach ($post['roles'] as $roleId) {
-                $profileButtonRole = new ProfileButtonRole();
+                $profileButtonRole = new Role\Availability\Model();
                 $profileButtonRole->setProfileButtonId($item->getId());
                 $profileButtonRole->setRoleId((int)$roleId);
                 $this->roleAvailabilityMapper->save($profileButtonRole);
             }
         }
         
-        $this->getResponse()->redirect->afterPost("/adminv2/profile-button");
+        $this->getResponse()->redirect->afterPost('/adminv2/profile-button');
     }
 }
