@@ -1,3 +1,23 @@
+{# checkboxString
+ # Renders a text string that describes the checkboxes you ticked
+ #
+ # @param Profile\Button\Model      item a profileButton instance
+ # @param Collection collection     a collection of checkbox item instances (e.g. all the role instances)
+ # @param array selectedCollection  an associative array of index=>true pairs
+ #}
+{% macro checkboxString(item, collection, selectedCollection) %}
+    {% set i = 1 %}
+    {% set n = selectedCollection[item.id] | length %}
+
+    {% for obj in collection %}
+        {% if selectedCollection[item.id][obj.id] %}
+            {{ obj.name }}{% if i < (n-1) %}, {% elseif i == (n-1) %} and {% endif %}
+            {% set i = i+1 %}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+{% import _self as macro %}
+
 {# Shared navigation profile #}
 {{ renderAdminNavigation(pageCurrent) }}
 
@@ -38,29 +58,9 @@
 
                                         <p class="meta">
                                             Available in profiles for
-
-                                            {% set i = 1 %}
-                                            {% set n = roleAvailabilitySelected[item.id] | length %}
-
-                                            {% for role in roles %}
-                                                {% if roleAvailabilitySelected[item.id][role.id] %}
-                                                    {{ role.name }}{% if i < (n-1) %}, {% elseif i == (n-1) %} and {% endif %}
-                                                    {% set i = i+1 %}
-                                                {% endif %}
-                                            {% endfor %}
-
+                                            {{ macro.checkboxString(item, roles, roleAvailabilitySelected) }}
                                             in
-
-                                            {% set i = 1 %}
-                                            {% set n = campusAvailabilitySelected[item.id] | length %}
-
-                                            {% for campus in campuses %}
-                                                {% if campusAvailabilitySelected[item.id][campus.id] %}
-                                                    {{ campus.name }}{% if i < (n-1) %}, {% elseif i == (n-1) %} and {% endif %}
-                                                    {% set i = i+1 %}
-                                                {% endif %}
-                                            {% endfor %}
-
+                                            {{ macro.checkboxString(item, campuses, campusAvailabilitySelected) }}
                                             campus
                                         </p>
                                     </div>
