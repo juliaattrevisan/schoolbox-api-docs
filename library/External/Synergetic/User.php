@@ -326,7 +326,7 @@ class External_Synergetic_User implements External_UserInterface
             $learningPlanQuery = "(
                             SELECT    COUNT(*) 
                             FROM      dbo.IndividualPlans IEP
-                            WHERE     IEP.ID = vStudents.ID AND
+                            WHERE     IEP.ID = vStudentsAll.ID AND
                             StartDate <= CURRENT_TIMESTAMP AND
                             (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
                         ) AS countIndividualEducationPlans";
@@ -336,49 +336,49 @@ class External_Synergetic_User implements External_UserInterface
 
         $query =
         "
-            SELECT      vStudents.StudentID,
-                        vStudents.StudentGiven1,
-                        vStudents.StudentSurname,
-                        CONVERT(nvarchar(30), vStudents.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
-                        vStudents.StudentTutorName,
-                        vStudents.StudentHeadOfHouse,
+            SELECT      vStudentsAll.StudentID,
+                        vStudentsAll.StudentGiven1,
+                        vStudentsAll.StudentSurname,
+                        CONVERT(nvarchar(30), vStudentsAll.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
+                        vStudentsAll.StudentTutorName,
+                        vStudentsAll.StudentHeadOfHouse,
                         House.HeadOfHouseID,
-                        vStudents.StudentFormStaffName,
-                        vStudents.StudentTutorDescription,
+                        vStudentsAll.StudentFormStaffName,
+                        vStudentsAll.StudentTutorDescription,
                         luForm.ID AS TeacherFormID,
-                        vStudents.StudentForm,
+                        vStudentsAll.StudentForm,
                         luTutor.ID AS TeacherTutorID,
-                        vStudents.StudentTutor,
+                        vStudentsAll.StudentTutor,
                         luForm.Description AS FormDescription,
-                        vStudents.StudentHouseDescription,
-                        vStudents.StudentHouse,
-                        vStudents.StudentYearLevel,
-                        vStudents.StudentYearLevelCoordinator,
+                        vStudentsAll.StudentHouseDescription,
+                        vStudentsAll.StudentHouse,
+                        vStudentsAll.StudentYearLevel,
+                        vStudentsAll.StudentYearLevelCoordinator,
                         luYearLevel.YearLevelCoordID,
-                        vStudents.StudentLockerBook,
-                        vStudents.StudentEmergencyName,
-                        vStudents.StudentEmergencyPhone,
-                        vStudents.StudentEmergencyPhoneAlt,
-                        vStudents.StudentEmergency2Name,
-                        vStudents.StudentEmergency2Phone,
-                        vStudents.StudentEmergency2PhoneAlt,
-                        vStudents.StudentEmergency3Name,
-                        vStudents.StudentEmergency3Phone,
-                        vStudents.StudentEmergency3PhoneAlt,
-                        vStudents.StudentMedicalAlert,
-                        vStudents.StudentMobilePhone,
-                        vStudents.StudentSpecialNeedsFlag,
-                        vStudents.EnglishSecondFlag,
-                        vStudents.StudentStudiesCode,
+                        vStudentsAll.StudentLockerBook,
+                        vStudentsAll.StudentEmergencyName,
+                        vStudentsAll.StudentEmergencyPhone,
+                        vStudentsAll.StudentEmergencyPhoneAlt,
+                        vStudentsAll.StudentEmergency2Name,
+                        vStudentsAll.StudentEmergency2Phone,
+                        vStudentsAll.StudentEmergency2PhoneAlt,
+                        vStudentsAll.StudentEmergency3Name,
+                        vStudentsAll.StudentEmergency3Phone,
+                        vStudentsAll.StudentEmergency3PhoneAlt,
+                        vStudentsAll.StudentMedicalAlert,
+                        vStudentsAll.StudentMobilePhone,
+                        vStudentsAll.StudentSpecialNeedsFlag,
+                        vStudentsAll.EnglishSecondFlag,
+                        vStudentsAll.StudentStudiesCode,
                         AlertMessage,
-                        vStudents.LegalCourtOrderType AS CourtOrderType,
-                        vStudents.StudentBoarder,
-                        vStudents.StudentsComment as Comment,   
+                        vStudentsAll.LegalCourtOrderType AS CourtOrderType,
+                        vStudentsAll.StudentBoarder,
+                        vStudentsAll.StudentsComment as Comment,   
                         '' AS StudentEnrolmentDate,
                         '' AS StudentLeavingDate,
-                        vStudents.StudentIBFlag,
+                        vStudentsAll.StudentIBFlag,
                         $learningPlanQuery
-            FROM        dbo.vStudents vStudents
+            FROM        dbo.vStudentsAll vStudentsAll
             LEFT JOIN   CommunityAlerts ON 
                             CommunityAlerts.ID = StudentID AND 
                             (
@@ -389,19 +389,19 @@ class External_Synergetic_User implements External_UserInterface
                                 CommunityAlerts.AlertDateTo IS NULL OR 
                                 CommunityAlerts.AlertDateTo >= CAST(GETDATE() AS DATE)
                             )
-            LEFT JOIN   luForm ON vStudents.StudentForm = luForm.Code
-            LEFT JOIN   luTutor ON vStudents.StudentTutor = luTutor.Code
+            LEFT JOIN   luForm ON vStudentsAll.StudentForm = luForm.Code
+            LEFT JOIN   luTutor ON vStudentsAll.StudentTutor = luTutor.Code
             LEFT JOIN   luYearLevel ON 
-                            vStudents.StudentCampus = luYearLevel.Campus AND 
-                            vStudents.StudentYearLevel = luYearLevel.Code
+                            vStudentsAll.StudentCampus = luYearLevel.Campus AND 
+                            vStudentsAll.StudentYearLevel = luYearLevel.Code
             LEFT JOIN   luHouse House ON 
                             StudentCampus = House.Campus AND 
                             StudentHouse = House.Code
             JOIN        FileSemesters Semester ON
-                            Semester.FileSemester = vStudents.FileSemester AND
-                            Semester.FileYear = vStudents.FileYear AND
+                            Semester.FileSemester = vStudentsAll.FileSemester AND
+                            Semester.FileYear = vStudentsAll.FileYear AND
                             Semester.SystemCurrentFlag = 1
-            WHERE       vStudents.StudentID = :externalId
+            WHERE       vStudentsAll.StudentID = :externalId
         ";
 
         $student = [];
@@ -969,25 +969,27 @@ class External_Synergetic_User implements External_UserInterface
     {
         $query =
             "
-            SELECT      vStudents.StudentID,
+            SELECT      vStudentsAll.StudentID,
                         NetworkLogin,
-                        vStudents.StudentTitle,
-                        vStudents.StudentPreferred,
-                        vStudents.StudentSurname,
+                        vStudentsAll.StudentTitle,
+                        vStudentsAll.StudentPreferred,
+                        vStudentsAll.StudentSurname,
                         StudentGender,
                         StudentEmail,
                         StudentOccupEmail,
-                        vStudents.StudentYearLevel,
-                        vStudents.StudentHouse,
-                        vStudents.StudentBoarder,
-                        vStudents.StudentBoardingHouse,
+                        vStudentsAll.StudentYearLevel,
+                        vStudentsAll.StudentHouse,
+                        vStudentsAll.StudentBoarder,
+                        vStudentsAll.StudentBoardingHouse,
                         StudentCampus
-            FROM        dbo.vStudents vStudents
+            FROM        dbo.vStudentsAll vStudentsAll
             JOIN        FileSemesters Semester ON
-                            Semester.FileSemester = vStudents.FileSemester AND
-                            Semester.FileYear = vStudents.FileYear AND
+                            Semester.FileSemester = vStudentsAll.FileSemester AND
+                            Semester.FileYear = vStudentsAll.FileYear AND
                             Semester.SystemCurrentFlag = 1
-            LEFT JOIN   Community ON Community.ID = StudentID
+            LEFT JOIN   Community ON Community.ID = StudentID WHERE 
+			NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') 
+			AND DATEDIFF(DAY, vStudentsAll.StudentLeavingDate, GETDATE()) > 0)
         ";
 
         return $this->getConnector()->executeQuery($query)->fetchAll();

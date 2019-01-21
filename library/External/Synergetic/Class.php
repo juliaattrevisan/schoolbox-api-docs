@@ -101,27 +101,33 @@ class External_Synergetic_Class implements External_ClassInterface
         $fileYear       = $this->getDatabase()->quote($this->getExternalUser()->getCurrentYear($userExternalId));
 
         $query = "
-        SELECT DISTINCT StudentClasses.StudentSurname as lastname, 
-                        StudentClasses.StudentPreferred as firstname,
-                        StudentClasses.StudentYearLevelDescription as yearlevel,
-                        StudentClasses.StudentHouseDescription as house,
-                        vStudents.StudentMedicalAlert, 
-                        vStudents.EnglishSecondFlag,
-                        vStudents.StudentSpecialNeedsFlag,
-                        vStudents.StudentTutorDescription,
-                        StudentClasses.StudentID as synergy_id,
+        SELECT DISTINCT vStudentsAll.StudentSurname as lastname, 
+                        vStudentsAll.StudentPreferred as firstname,
+                        vStudentsAll.StudentYearLevelDescription as yearlevel,
+                        vStudentsAll.StudentHouseDescription as house,
+                        vStudentsAll.StudentMedicalAlert, 
+                        vStudentsAll.EnglishSecondFlag,
+                        vStudentsAll.StudentSpecialNeedsFlag,
+                        vStudentsAll.StudentTutorDescription,
+                        vStudentsAll.StudentID as synergy_id,
                         StudentClasses.ClassCampus
-        FROM            dbo.vStudentClasses StudentClasses
-        JOIN dbo.vStudents vStudents ON (
-            vStudents.FileYear = StudentClasses.FileYear AND
-            vStudents.FileSemester = StudentClasses.FileSemester AND
-            vStudents.ID = StudentClasses.StudentID)
+        FROM            dbo.StudentClasses StudentClasses
+        JOIN dbo.vStudentsAll vStudentsAll ON (
+            vStudentsAll.FileYear = StudentClasses.FileYear AND
+            vStudentsAll.FileSemester = StudentClasses.FileSemester AND
+            vStudentsAll.ID = StudentClasses.ID)
+        JOIN dbo.StudentYears sy ON (
+          vStudentsAll.ID = sy.ID AND
+          vStudentsAll.FileYear = sy.FileYear
+        )
+		JOIN dbo.Community cstu ON (vStudentsAll.ID = cstu.ID)
         WHERE $classQuery
             AND (StudentClasses.FileYear='" . $fileYear . "')
             AND (StudentClasses.FileSemester='" . $fileSemester . "')
             AND (StudentClasses.StartDate <= getdate() OR StudentClasses.StartDate IS NULL)
             AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
-        ORDER BY StudentClasses.StudentSurname, StudentClasses.StudentPreferred";
+            AND NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') AND DATEDIFF(DAY, sy.LeavingDate, GETDATE()) > 0)
+        ORDER BY vStudentsAll.StudentSurname, vStudentsAll.StudentPreferred";
 
         return $this->clearInvalidValues(
             $this->getDatabase()->getAll($query)

@@ -22,12 +22,12 @@ class Sync extends Base implements ISync
     {
         $studentIterator = $this->databaseExternal->getQueryIterator("
             
-            SELECT          vStudents.StudentID                           AS student_id,
+            SELECT          vStudentsAll.StudentID                           AS student_id,
                             NetworkLogin                                  AS network_login,
-                            vStudents.StudentTitle                        AS student_title,
-                            vStudents.StudentGiven1                       AS student_given_name,
-                            vStudents.StudentPreferred                    AS student_preferred,
-                            vStudents.StudentSurname                      AS student_surname,
+                            vStudentsAll.StudentTitle                        AS student_title,
+                            vStudentsAll.StudentGiven1                       AS student_given_name,
+                            vStudentsAll.StudentPreferred                    AS student_preferred,
+                            vStudentsAll.StudentSurname                      AS student_surname,
                             StudentGender                                 AS student_gender,
                             StudentEmail                                  AS student_home_email,
                             
@@ -37,16 +37,18 @@ class Sync extends Base implements ISync
                             END AS student_default_email,
                             
                             StudentOccupEmail                             AS student_work_email,
-                            vStudents.StudentYearLevel                    AS student_year_level,
-                            vStudents.StudentHouse                        AS student_house,
-                            vStudents.StudentBoarder                      AS student_boarder,
-                            vStudents.StudentBoardingHouse                AS student_boarding_house,
+                            vStudentsAll.StudentYearLevel                    AS student_year_level,
+                            vStudentsAll.StudentHouse                        AS student_house,
+                            vStudentsAll.StudentBoarder                      AS student_boarder,
+                            vStudentsAll.StudentBoardingHouse                AS student_boarding_house,
                             StudentCampus                                 AS student_campus
-            FROM            dbo.vStudents vStudents
+            FROM            dbo.vStudentsAll vStudentsAll
             LEFT JOIN       Community ON Community.ID = StudentID
             WHERE           FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND 
-                            FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
-            ORDER BY        vStudents.StudentID ASC
+                            FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1) AND
+                            NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') 
+			                AND DATEDIFF(DAY, vStudentsAll.StudentLeavingDate, GETDATE()) > 0)
+            ORDER BY        vStudentsAll.StudentID ASC
         ");
 
         return new Iterator\Student($studentIterator);
