@@ -224,8 +224,8 @@ class Controller extends Base
 
         $this->campusAvailabilityMapper->deleteByColumn('profile_button_id', $item->getId());
 
-        if (\is_array($post['campuses'])) {
-            foreach ($post['campuses'] as $campusId) {
+        if (\is_array($post['campusAvailability'])) {
+            foreach ($post['campusAvailability'] as $campusId) {
                 $profileButtonCampus = new Campus\Availability\Model();
                 $profileButtonCampus->setProfileButtonId($item->getId());
                 $profileButtonCampus->setCampusId((int)$campusId);
@@ -235,8 +235,8 @@ class Controller extends Base
         
         $this->roleAvailabilityMapper->deleteByColumn('profile_button_id', $item->getId());
 
-        if (\is_array($post['roles'])) {
-            foreach ($post['roles'] as $roleId) {
+        if (\is_array($post['roleAvailability'])) {
+            foreach ($post['roleAvailability'] as $roleId) {
                 $profileButtonRole = new Role\Availability\Model();
                 $profileButtonRole->setProfileButtonId($item->getId());
                 $profileButtonRole->setRoleId((int)$roleId);

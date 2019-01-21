@@ -60,9 +60,9 @@
                         </select>
                     </div>
                 </fieldset>
-                <fieldset class="content" id="profile-button-user-selections">
+                <fieldset class="content" id="profile-button-user-availability-selections">
                     <legend>
-                        User Profiles To Show On
+                        Button Availability
                         <span data-tooltip class="has-tip hint" title="The button will appear on the profiles of the users in the selected roles and campuses.">?</span>
                     </legend>
 
@@ -70,11 +70,11 @@
                         <fieldset>
                             <label class="required">Campuses</label>
                             <div class="checklist">
-                                <input id="campus-all" type="checkbox">
-                                <label for="campus-all">Select All</label>
+                                <input id="campus-availability-all" type="checkbox">
+                                <label for="campus-availability-all">Select All</label>
                                 {% for campus in campuses %}
-                                    <input name="campuses[]" data-campus id="campus-{{ campus.id }}" type="checkbox" {% if campusAvailabilitySelected[campus.id] %}checked{% endif %} value="{{ campus.id }}">
-                                    <label for="campus-{{ campus.id }}">{{ campus.name }}</label>
+                                    <input name="campusAvailability[]" data-campus-availability id="campus-availability-{{ campus.id }}" type="checkbox" {% if campusAvailabilitySelected[campus.id] %}checked{% endif %} value="{{ campus.id }}">
+                                    <label for="campus-availability-{{ campus.id }}">{{ campus.name }}</label>
                                 {% endfor %}
                             </div>
                         </fieldset>
@@ -83,24 +83,48 @@
                         <fieldset>
                             <label class="required">Roles</label>
                             <div class="checklist">
-                                <input id="role-all" type="checkbox">
-                                <label for="role-all">Select All</label>
+                                <input id="role-availability-all" type="checkbox">
+                                <label for="role-availability-all">Select All</label>
                                 {% for role in roles %}
-                                    <input name="roles[]" data-role id="role-{{ role.id }}" type="checkbox" {% if roleAvailabilitySelected[role.id] %}checked{% endif %} value="{{ role.id }}">
-                                    <label for="role-{{ role.id }}">{{ role.name }}</label>
+                                    <input name="roleAvailability[]" data-role-availability id="role-availability-{{ role.id }}" type="checkbox" {% if roleAvailabilitySelected[role.id] %}checked{% endif %} value="{{ role.id }}">
+                                    <label for="role-availability-{{ role.id }}">{{ role.name }}</label>
                                 {% endfor %}
                             </div>
                         </fieldset>
                     </div>
                 </fieldset>
-                <fieldset>
+
+                <fieldset class="content" id="profile-button-user-visibility-selections">
                     <legend>
-                        Visibility
+                        Button Visibility
+                        <span data-tooltip class="has-tip hint" title="The button will appear for profile viewers in the selected roles and campuses.">?</span>
                     </legend>
-                    <div class="small-12 columns">
-                        <div class="meta">
-                            Buttons will be visible to all staff, users viewing their own profile, and parents viewing their child's profile or My Students component.
-                        </div>
+
+                    <div class="small-12 medium-6 columns">
+                        <fieldset>
+                            <label class="required">Campuses</label>
+                            <div class="checklist">
+                                <input id="campus-visibility-all" type="checkbox">
+                                <label for="campus-visibility-all">Select All</label>
+                                {% for campus in campuses %}
+                                    <input name="campusVisibility[]" data-campus-visibility id="campus-visibility-{{ campus.id }}" type="checkbox" {% if campusVisibilitySelected[campus.id] %}checked{% endif %} value="{{ campus.id }}">
+                                    <label for="campus-visibility-{{ campus.id }}">{{ campus.name }}</label>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <fieldset>
+                            <label class="required">Roles</label>
+                            <div class="checklist">
+                                <input id="role-visibility-all" type="checkbox">
+                                <label for="role-visibility-all">Select All</label>
+                                {% for role in roles %}
+                                    <input name="roleVisibility[]" data-role-visibility id="role-visibility-{{ role.id }}" type="checkbox" {% if roleVisibilitySelected[role.id] %}checked{% endif %} value="{{ role.id }}">
+                                    <label for="role-visibility-{{ role.id }}">{{ role.name }}</label>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
                     </div>
                 </fieldset>
             </section>
@@ -143,8 +167,10 @@
                     required: 'Please enter a destination URL for the profile button.',
                     isURL: 'Please enter a valid URL for the profile button.'
                 },
-                'campuses[]': {required: 'Please select at least one campus.'},
-                'roles[]': {required: 'Please select at least one role.'},
+                'campusAvailability[]': {required: 'Please select at least one campus.'},
+                'roleAvailability[]': {required: 'Please select at least one role.'},
+                'campusVisibility[]': {required: 'Please select at least one campus.'},
+                'roleVisibility[]': {required: 'Please select at least one role.'},
             }
         });
 
@@ -181,16 +207,29 @@
             updateIconPreview($('#icon-select').val());
         });
 
-        // Select all
-        $("#profile-button-user-selections").selectAll({    
-            selector: "#campus-all",
-            checkboxes: "[data-campus]"
+        /* Availability select-all
+         */
+        $("#profile-button-user-availability-selections").selectAll({
+            selector: "#campus-availability-all",
+            checkboxes: "[data-campus-availability]"
         });
 
-         $("#profile-button-user-selections").selectAll({    
-            selector: "#role-all",
-            checkboxes: "[data-role]"
+         $("#profile-button-user-availability-selections").selectAll({
+            selector: "#role-availability-all",
+            checkboxes: "[data-role-availability]"
         });
-       
+
+         /* Visibility select-all
+          */
+        $("#profile-button-user-visibility-selections").selectAll({
+            selector: "#campus-visibility-all",
+            checkboxes: "[data-campus-visibility]"
+        });
+
+        $("#profile-button-user-visibility-selections").selectAll({
+            selector: "#role-visibility-all",
+            checkboxes: "[data-role-visibility]"
+        });
+
     });
 </script>
