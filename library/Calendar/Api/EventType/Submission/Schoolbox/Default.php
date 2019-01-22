@@ -130,7 +130,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 
             // Will only be all day if the event's date is one second before
             // midnight.
-            $event->setAllday($dueDate->isAtEndOfDay());
+            $event->setAllDay($dueDate->isAtEndOfDay());
 
             // All assessment events can be populated identically now
             $event->setEventId($assessment->getId());

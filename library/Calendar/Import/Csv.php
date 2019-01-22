@@ -26,7 +26,7 @@ class Csv extends Base
     /**
      * Load all events into schoolbox, generate outcome array
      */
-    public function load()
+    public function load(): void
     {
         $output = array();
 
@@ -57,6 +57,8 @@ class Csv extends Base
         $handle = fopen($this->getFile(), 'r');
         $headerRow = fgetcsv($handle, 0, ",");
 
+        $eventTypeMapper = new EventTypeMapper();
+
         while (($thisRow = fgetcsv($handle, 0, ",")) !== false) {
             //
             // We cannot determine encoding, so strip everything not ascii
@@ -82,7 +84,7 @@ class Csv extends Base
                     ) = $thisRow;
             } catch (\ErrorException $e) {
                 $output[] = array(
-                    'name'   => \Scrub::text($name),
+                    'name'   => \Scrub::text($thisRow[5]),
                     'status' => 'Not Added',
                     'error'  => 'Not enough columns in CSV',
                 );
@@ -152,9 +154,8 @@ class Csv extends Base
              * If one not found, report error and move on
              */
             try {
-                $eventTypeMapper = new EventTypeMapper();
                 $eventType = $eventTypeMapper->findById($event_type);
-            } catch (\Exception $e) {
+            } catch (\Schoolbox\Mapper\Exception $e) {
                 $output[] = array(
                     'name'   => \Scrub::text($name),
                     'status' => 'Not Added',

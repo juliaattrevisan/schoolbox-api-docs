@@ -161,7 +161,7 @@ interface EventInterface
      *
      * @param bool $allday
      */
-    public function setAllday($allday);
+    public function setAllDay($allday);
 
     /**
      * Is event an all day event

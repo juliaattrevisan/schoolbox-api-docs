@@ -103,7 +103,7 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
                     $dayName = $this->externalTimetable->getDayName($dayNumber);
 
                     $event = new Event();
-                    $event->setAllday(true);
+                    $event->setAllDay(true);
                     $event->setStartTime(
                         new Alaress_Date_Format(strtotime('00:00:00', $currentTimestamp), 'U')
                     );

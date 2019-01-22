@@ -56,10 +56,16 @@ class Vcal extends Base
 
     /**
      * Load all events into schoolbox, generate outcome array
+     *
+     * @throws VObject\InvalidDataException
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    public function load()
+    public function load(): void
     {
-        $output = array();
+        $output = [];
 
         if (is_file($this->getFile())) {
             $campusMapper = new CampusMapper();
@@ -113,7 +119,7 @@ class Vcal extends Base
                     $allDay = !$currentEvent->DTSTART->hasTime();
 
                     if ($allDay) {
-                        $eventEndTimestamp -= 1;
+                        --$eventEndTimestamp;
                     }
 
                     /* Determine some metadata about the event
@@ -137,7 +143,7 @@ class Vcal extends Base
                     $event->setCampusCollection($allCampuses);
                     $event->setDetail(nl2br((string)$currentEvent->DESCRIPTION));
                     $event->setLocation((string)$currentEvent->LOCATION);
-                    $event->setAllday($allDay);
+                    $event->setAllDay($allDay);
                     $event->setAttendance(0);
                     $event->setCompleted(0);
 
@@ -165,7 +171,7 @@ class Vcal extends Base
 
                     /* Output messages
                      */
-                    if (is_array($result) && count($result)) {
+                    if (\is_array($result) && \count($result)) {
                         $output[] = array(
                             'name'   => $event->getTitle(),
                             'status' => 'Added',
