@@ -35,10 +35,14 @@
         {# Month/Year Selector #}
         <nav>
             <ul class="news-archive-filter side-nav">
+                {% set folderParam = '' %}
+                {% if folderId %}
+                    {% set folderParam = '?f=' ~ folderId %}
+                {% endif %}
                 {% for availableYear, availableMonths in availableYearsAndMonths %}
 
                     <li class="{{ year == availableYear ? 'active' : '' }} {% if month %}has-month-selected{% endif %}" role="menuitem">
-                        <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear}) }}">
+                        <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear}) ~ folderParam }}">
                             {{ availableYear }}
                         </a>
                         <ul class="months">
@@ -46,7 +50,7 @@
                                 {% set archiveDate = availableYear ~ '-' ~ availableMonth ~ '-01' %}
 
                                 <li class="{{ archiveDate == selectedDate ? 'active' : '' }}" role="menuitem">
-                                    <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear, month: availableMonth}) }}">
+                                    <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear, month: availableMonth}) ~ folderParam }}">
                                         {{ archiveDate | date('F') }}
                                     </a>
                                 </li>
@@ -91,7 +95,8 @@
                     slug: slug,
                     compactMode: false,
                     limit: limit,
-                    referrer: referrer
+                    referrer: referrer,
+                    folderId: folderId
                 } %}
 
                 <div id="news-container">
