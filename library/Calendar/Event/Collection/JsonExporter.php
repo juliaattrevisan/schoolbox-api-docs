@@ -22,5 +22,12 @@ class JsonExporter implements IExporter
         header("Content-Disposition: attachment; filename={$filename}.json");
 
         printf("[%s]", \implode(',', $renderer->renderAll('javascript')));
+
+        // TODO possible alternative, if the above causes memory issues
+//        echo '[';
+//        foreach ($events as $i => $event) {
+//            echo ($i > 0 ? ',' : '') . $renderer->renderEvent($event, 'javascript');
+//        }
+//        echo ']';
     }
 }
