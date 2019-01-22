@@ -15,7 +15,6 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\ValidFiles;
 
