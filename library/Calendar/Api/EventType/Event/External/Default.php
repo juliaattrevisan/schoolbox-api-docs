@@ -149,7 +149,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             $event->setLocation($location);
 
             $event->setEventType(self::EXTERNAL_EVENT_TYPE);
-            $event->setAllday(false);
+            $event->setAllDay(false);
 
             /* If you can't find this user by external id, assume unknown
              */

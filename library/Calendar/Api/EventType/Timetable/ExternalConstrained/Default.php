@@ -137,12 +137,12 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                             // Set the start and end time
                             $event->setStartTime(new Alaress_Date_Format($startTime, Alaress_Date_Format::TIMESTAMP));
                             $event->setEndTime(new Alaress_Date_Format($endTime, Alaress_Date_Format::TIMESTAMP));
-                            $event->setAllday(false);
+                            $event->setAllDay(false);
                         } else {
                             // No start and end time - show this as an all day event
                             $event->setStartTime(clone $date);
                             $event->setEndTime(clone $date);
-                            $event->setAllday(true);
+                            $event->setAllDay(true);
                         }
 
                         $event->setLocation($period['room']);

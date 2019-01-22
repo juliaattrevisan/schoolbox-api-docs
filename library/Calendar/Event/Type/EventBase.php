@@ -537,7 +537,7 @@ abstract class EventBase implements EventInterface
     /**
      * @param bool $allday
      */
-    public function setAllday($allday)
+    public function setAllDay($allday)
     {
         $this->allday = $allday;
     }
