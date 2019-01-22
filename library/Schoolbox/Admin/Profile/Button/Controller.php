@@ -33,10 +33,10 @@ class Controller extends Base
     /** @var Role\Availability\Mapper $roleAvailabilityMapper */
     private $roleAvailabilityMapper;
 
-    /** @var Campus\Availability\Mapper $campusVisibilityMapper */
+    /** @var Campus\Visibility\Mapper $campusVisibilityMapper */
     private $campusVisibilityMapper;
 
-    /** @var Role\Availability\Mapper $roleVisibilityMapper */
+    /** @var Role\Visibility\Mapper $roleVisibilityMapper */
     private $roleVisibilityMapper;
 
     /** @var RoleMapper $roleMapper */
@@ -45,6 +45,17 @@ class Controller extends Base
     /** @var CampusMapper $campusMapper */
     private $campusMapper;
 
+    /**
+     * Controller constructor.
+     * @param IconMapper                 $iconMapper
+     * @param ProfileButtonMapper        $profileButtonMapper
+     * @param RoleMapper                 $roleMapper
+     * @param CampusMapper               $campusMapper
+     * @param Campus\Availability\Mapper $campusAvailabilityMapper
+     * @param Role\Availability\Mapper   $roleAvailabilityMapper
+     * @param Campus\Visibility\Mapper   $campusVisibilityMapper
+     * @param Role\Visibility\Mapper     $roleVisibilityMapper
+     */
     public function __construct(
       IconMapper $iconMapper,
       ProfileButtonMapper $profileButtonMapper,
