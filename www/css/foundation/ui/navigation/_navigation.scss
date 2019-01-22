@@ -378,6 +378,13 @@ $allow-sidebar-stash: $large-up;
   .inner-wrap:not(.left-open) .hybrid-bar .global-search {
     &:hover,
     &.focus {
+      padding-left: $tabbar-icon-width * 2;
+    }
+  }
+
+  .inner-wrap:not(.left-open):not(.right-open) .hybrid-bar .global-search {
+    &:hover,
+    &.focus {
       padding-left: $tabbar-icon-width * 3;
     }
   }
@@ -779,7 +786,7 @@ $allow-sidebar-stash: $large-up;
   .inner-wrap.right-open.left-open .global-search {
     &:hover,
     &.focus {
-      padding-left: $tabbar-icon-width * 2;
+      padding-left: $tabbar-icon-width;
     }
   }
   .right-off-canvas-menu.right-open + .global-search {
