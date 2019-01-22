@@ -194,7 +194,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
                 try {
                     $group['owners'][] = $userMapper->findById($owner['uid']);
                 } catch (MapperException $e) {
-                    $group['owners'][] = $userMapper->getUnknownUser();
+                    // This user no longer exists. Not populating.
                 }
             }
         }
