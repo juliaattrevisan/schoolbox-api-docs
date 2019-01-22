@@ -171,7 +171,7 @@ abstract class AbstractTreeBuilder
                 null,
                 null,
                 [
-                    'data-permission' => UserAccess::ACCESS_READ,
+                    'data-permission' => $this->getFolderPermission($folder->getId()),
                     'data-type' => 'folder'
                 ]
             );
