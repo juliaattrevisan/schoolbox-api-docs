@@ -49,19 +49,6 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
                         'icon' => $f['type'],
                         'content' => $f['messageHTML'] . (empty($f['cat_name']) ? '' : ' in <a href="/homepage/' . $f['cat_id'] . '">' . $f['cat_name'] . '</a>'),
                         'time' => $feedTime->getRelativeTime(),
-                        'avatar' => $f['external_id'] != false ? '/portrait.php?userId=' . $f['external_id'] . '&size=square64' : '',
-                        'avatar_title' => $f['user_name'] != false ? $f['user_name'] : '',
-                        'has_grade' => 'no-grade',
-                        'gradeiant' => '',
-                        'grade' => '',
-                        'cat_id' => $f['cat_id'],
-                        'cat_name' => $f['cat_name'],
-                        'external_id' => $f['external_id'],
-                        'link' => $f['link'],
-                        'user_id' => $f['user_id'],
-                        'name' => $f['name'],
-                        'action' => $f['action'],
-                        'timestamp' => $feedTime->getUnixTimeStamp(),
                     );
                 }
 
