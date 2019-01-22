@@ -61,6 +61,11 @@ Data:
         {% if createRoute %}
             <a href="{{ createRoute }}" class="button">Create {{ locale.news }}</a>
         {% endif %}
+
+        {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') ~ '?f=' ~ folderId %}
+        {% if archiveRoute %}
+        <a href="{{ archiveRoute }}" class="button">View Archive</a>
+        {% endif %}
     </section>
 </div>
 {% endif %}
