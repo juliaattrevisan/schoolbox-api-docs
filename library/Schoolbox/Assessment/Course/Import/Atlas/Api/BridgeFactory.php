@@ -21,6 +21,12 @@ use Psr\Http\Message\ResponseInterface;
 class BridgeFactory
 {
     /**
+     * Max number of retries for a request to the Atlas API.
+     */
+    private const MAX_RETRIES = 5;
+
+
+    /**
      * @var string
      */
     private $token;
@@ -61,8 +67,8 @@ class BridgeFactory
                         return false;
                     }
 
-                    // Retry up to 5 times
-                    return $retries < 5;
+                    // Retry up to MAX_RETRIES times
+                    return $retries < self::MAX_RETRIES;
                 }
             )
         );
