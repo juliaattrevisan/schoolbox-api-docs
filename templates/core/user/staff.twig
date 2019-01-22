@@ -99,7 +99,6 @@
                         {% endif %}
 
                         {% if showButtons %}
-
                             {% block buttons_calendar %}
                                 <li>
                                     <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
@@ -113,13 +112,13 @@
                                        class="icon-timetable">Timetable</a>
                                 </li>
                             {% endblock buttons_timetable %}
-
-                            {% for button in customButtons %}
-                                <li>
-                                    <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }}" target="{{ button.target }}">{{ button.text }}</a>
-                                </li>
-                            {% endfor %}
                         {% endif %}
+
+                        {% for button in customButtons %}
+                            <li>
+                                <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }}" target="{{ button.target }}">{{ button.text }}</a>
+                            </li>
+                        {% endfor %}
                     {% endblock buttons %}
                 </ul>
             {% endblock buttons_island %}
