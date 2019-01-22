@@ -15,7 +15,6 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\ValidFiles;
 
@@ -34,29 +33,28 @@ class Connector
     /**
      * An int for a data struct that contains the percentage plagiarised
      */
-    const PLAGSCAN_MODE_SCORE = 0;
+    private const PLAGSCAN_MODE_SCORE = 0;
 
     /**
      * An int for a data struct that contains the old Mode 6 report
      */
-    const PLAGSCAN_MODE_REPORT = 6;
+    private const PLAGSCAN_MODE_REPORT = 6;
 
     /**
      * An int for a data struct that contains the new Mode 7 report
      */
-    const PLAGSCAN_MODE_INTERACTIVE = 7;
-
+    private const PLAGSCAN_MODE_INTERACTIVE = 7;
 
     /**
      * Maximum time that we allow plagscan to upload files
      */
-    const PLAGSCAN_TIMEOUT = 360;
+    private const PLAGSCAN_TIMEOUT = 360;
 
     /**
      * Maximum size of files allowed for submission: 100MB
      * @see http://blog.plagscan.com/plagscan-updates-possible-uploading-file-size/
      */
-    const PLAGSCAN_FILESIZE_LIMIT = 104857600;
+    private const PLAGSCAN_FILESIZE_LIMIT = 104857600;
 
     /**
      * Api url where stuff is sent
@@ -82,25 +80,15 @@ class Connector
     private $validFiles;
 
     /**
-     * A ConfigLoader instance
-     *
-     * @var IConfigLoader
-     */
-    private $configLoader;
-
-    /**
      * Connector constructor.
      *
-     * @param IConfigLoader $configLoader
-     * @param int           $plagscanClientId
-     * @param string        $plagscanApiKey
+     * @param int    $plagscanClientId
+     * @param string $plagscanApiKey
      */
-    public function __construct(IConfigLoader $configLoader, $plagscanClientId, $plagscanApiKey)
+    public function __construct(int $plagscanClientId, string $plagscanApiKey)
     {
-        $this->setConfigLoader($configLoader);
-        $this->setValidFiles(new ValidFiles());
-
-        $this->setAccessTokenGenerator(new AccessTokenGenerator($plagscanClientId, $plagscanApiKey));
+        $this->validFiles = new ValidFiles();
+        $this->accessTokenGenerator = new AccessTokenGenerator($plagscanClientId, $plagscanApiKey);
     }
 
     /**
@@ -113,12 +101,12 @@ class Connector
      * @throws \InvalidArgumentException if Plagscan changed their API on us
      * @throws \DomainException if some other unexpected thing went wrong
      */
-    public function transmit(SubmissionFile $submissionFile, $filename)
+    public function transmit(SubmissionFile $submissionFile, string $filename): int
     {
         /* Check valid extensions and die early if trying
          * to analyse an illegal file type
          */
-        if (!$this->getValidFiles()->isPlagscannable($submissionFile->getBasename())) {
+        if (!$this->validFiles->isPlagscannable($submissionFile->getBasename())) {
             throw new \DomainException('Invalid file type');
         }
 
@@ -139,7 +127,7 @@ class Connector
 
         try {
             $client = new Client([
-                "base_uri"    => $this->getApiUrl(),
+                "base_uri"    => $this->apiUrl,
                 "timeout"     => self::PLAGSCAN_TIMEOUT,
                 "http_errors" => false,
             ]);
@@ -147,8 +135,8 @@ class Connector
             throw new \RuntimeException('Error: Plagscan unavailable. Could not transmit file.');
         }
 
-        $response = $client->post("documents?access_token={$this->getAccessTokenGenerator()->generate()}", [
-            "multipart" => $postData,
+        $response = $client->post("documents?access_token={$this->accessTokenGenerator->generate()}", [
+            'multipart' => $postData,
         ]);
 
         /* What was the outcome?
@@ -177,7 +165,7 @@ class Connector
      * @param                $filename
      * @return string
      */
-    private function makeFileName(SubmissionFile $submissionFile, $filename)
+    private function makeFileName(SubmissionFile $submissionFile, string $filename): string
     {
         $documentName = $submissionFile->getStorage()->getFilename();
         $documentExt = $submissionFile->getStorage()->getExtension();
@@ -185,31 +173,32 @@ class Connector
         // Sanitise the file name to ensure valid characters and length
         $name = preg_replace('/[^A-Za-z0-9_\-\. ]/', '',$filename.'_'.$documentName);
         $name = mb_strcut($name, 0, 255 - ($documentExt ? \strlen($documentExt) + 1 : 0));
-        $fullName = $name.'.'.$documentExt;
 
-        return $fullName;
+        return "{$name}.{$documentExt}";
     }
+
 
     /**
      * Analyse a document that we sent to plag
      *
-     * @param int $plagscanId
-     * @return bool
-     * @throws \RuntimeException if Plagscan is unavailable
-     * @throws \DomainException if some unexpected thing went wrong
+     * @param int|null $plagscanId
+     * @return bool whether the report is ready or not
+     * @throws \DomainException  if some unexpected thing went wrong
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException  if Plagscan is unavailable
      */
-    public function analyse($plagscanId)
+    public function analyse(?int $plagscanId): bool
     {
         if (!$plagscanId) {
             throw new \DomainException('No plagscan document id - document has not been transmitted yet');
         }
 
         $postData = [
-            'access_token' => $this->getAccessTokenGenerator()->generate(),
+            'access_token' => $this->accessTokenGenerator->generate(),
         ];
 
         $client = new Client([
-            "base_uri"    => $this->getApiUrl(),
+            "base_uri"    => $this->apiUrl,
             "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
@@ -239,22 +228,31 @@ class Connector
              * Get the latest version of the report and cache it locally
              * Sadly must check error strings, because plagscan
              */
-            if ($content['error']['message'] == 'The document is already checked') {
-                return true;
+            switch ($content['error']['message']) {
+
+                /* pseudo-errors: nothing actually went wrong, plagscan puts notices here
+                 * for you to interpret
+                 */
+                case 'The document is already checked':
+                case 'This document has a report already':
+                    return true;
+
+                /* actual errors: something really went wrong and makes this plagscan record unscannable
+                 */
+                case 'The document has been deleted.':
+                case 'The document has failed during the upload/convertion process: Document without text or broken file - minimum length is 50 characters':
+                    throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
+
+                /* Otherwise document is one of the following and we don't need
+                 * to take any further action at the moment
+                 *
+                 * - in the queue to be checked
+                 * - currently being checked
+                 */
+                default:
+                    return false;
             }
-            if ($content['error']['message'] == 'This document has a report already') {
-                return true;
-            }
-            if ($content['error']['message'] == 'The document has been deleted.') {
-                throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
-            }
-            /* Otherwise document is one of the following and we don't need
-             * to take any further action at the moment
-             *
-             * - in the queue to be checked
-             * - currently being checked
-             */
-            return false;
+
         } elseif ($response->getStatusCode() == 404) {
 
             /* This document is getting checked; wait for plagscan to do its thing
@@ -281,7 +279,7 @@ class Connector
      * @throws \DomainException if some other unexpected thing went wrong
      * @throws \RuntimeException if Plagscan is unavailable
      */
-    public function fetchInteractiveReportUrl($plagscanId)
+    public function fetchInteractiveReportUrl(int $plagscanId): string
     {
         $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_INTERACTIVE);
 
@@ -304,6 +302,7 @@ class Connector
         throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
+
     /**
      * Fetch report contents
      *
@@ -312,8 +311,10 @@ class Connector
      * @param int $plagscanId
      * @return string
      * @throws \DomainException if some unexpected thing went wrong
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
-    public function fetchReport($plagscanId)
+    public function fetchReport(int $plagscanId): string
     {
         $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_REPORT);
 
@@ -331,15 +332,17 @@ class Connector
         throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
 
+
     /**
      * Have to get the score separately -_-
      *
-     * @param $plagscanId
+     * @param int $plagscanId
      * @return string
      * @throws \InvalidArgumentException if Plagscan changed their API on us
      * @throws \DomainException if some other unexpected thing went wrong
+     * @throws \RuntimeException
      */
-    public function fetchScore($plagscanId)
+    public function fetchScore(int $plagscanId): string
     {
         $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_SCORE);
 
@@ -361,6 +364,7 @@ class Connector
          */
         throw new \DomainException("Error {$content['error']['code']}: {$content['error']['message']}");
     }
+
 
     /**
      * Retrieve report data for $plagscanId in mode selection integer $mode
@@ -385,17 +389,19 @@ class Connector
      * @param int $plagscanId
      * @param int $mode
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      * @throws \RuntimeException if Plagscan is unavailable
      */
-    private function retrieve($plagscanId, $mode)
+    private function retrieve(int $plagscanId, int $mode): \Psr\Http\Message\ResponseInterface
     {
         $postData = [
-            'access_token' => $this->getAccessTokenGenerator()->generate(),
+            'access_token' => $this->accessTokenGenerator->generate(),
             'mode'         => $mode,
         ];
 
         $client = new Client([
-            "base_uri"    => $this->getApiUrl(),
+            "base_uri"    => $this->apiUrl,
             "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
@@ -411,24 +417,27 @@ class Connector
         return $response;
     }
 
+
     /**
      * Delete a document from the plagscan account
      *
      * This prevents it being used to compare against future documents
      * Used when resubmitting one's own file again
      *
-     * @param $plagscanId
+     * @param int $plagscanId
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      * @throws \RuntimeException if Plagscan is unavailable
      */
-    public function delete($plagscanId)
+    public function delete(int $plagscanId): \Psr\Http\Message\ResponseInterface
     {
         $postData = [
-            'access_token' => $this->getAccessTokenGenerator()->generate(),
+            'access_token' => $this->accessTokenGenerator->generate(),
         ];
 
         $client = new Client([
-            "base_uri"    => $this->getApiUrl(),
+            "base_uri"    => $this->apiUrl,
             "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
@@ -444,24 +453,27 @@ class Connector
         return $response;
     }
 
+
     /**
      * Privatise a document in the plagscan account
      *
      * This prevents it being used to compare against future documents
      * Used when resubmitting one's own file again
      *
-     * @param $plagscanId
+     * @param int $plagscanId
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      * @throws \RuntimeException if Plagscan is unavailable
      */
-    public function privatise($plagscanId)
+    public function privatise(int $plagscanId): \Psr\Http\Message\ResponseInterface
     {
         $postData = [
-            'access_token' => $this->getAccessTokenGenerator()->generate(),
+            'access_token' => $this->accessTokenGenerator->generate(),
         ];
 
         $client = new Client([
-            "base_uri"    => $this->getApiUrl(),
+            "base_uri"    => $this->apiUrl,
             "timeout"     => self::PLAGSCAN_TIMEOUT,
             "http_errors" => false,
         ]);
@@ -475,68 +487,5 @@ class Connector
         }
 
         return $response;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return IConfigLoader
-     */
-    private function getConfigLoader()
-    {
-        return $this->configLoader;
-    }
-
-    /**
-     * @param IConfigLoader $configLoader
-     */
-    private function setConfigLoader($configLoader)
-    {
-        $this->configLoader = $configLoader;
-    }
-
-    /**
-     * @return string
-     */
-    private function getApiUrl()
-    {
-        return $this->apiUrl;
-    }
-
-    /**
-     * @return ValidFiles
-     */
-    private function getValidFiles()
-    {
-        return $this->validFiles;
-    }
-
-    /**
-     * @param ValidFiles $validFiles
-     * @return $this
-     */
-    private function setValidFiles($validFiles)
-    {
-        $this->validFiles = $validFiles;
-        return $this;
-    }
-
-    /**
-     * @return AccessTokenGenerator
-     */
-    private function getAccessTokenGenerator()
-    {
-        return $this->accessTokenGenerator;
-    }
-
-    /**
-     * @param AccessTokenGenerator $accessTokenGenerator
-     * @return $this
-     */
-    private function setAccessTokenGenerator($accessTokenGenerator)
-    {
-        $this->accessTokenGenerator = $accessTokenGenerator;
-        return $this;
     }
 }
