@@ -82,15 +82,13 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
             return false;
         }
 
-        $this->setVar('SUBJ_HAS_GRADE', 'no-grade');
+        $this->setBlock($templateHandle, 'activity_item', 'activity_item_block');
 
-        $alist = new Activity_ListArray($this->feedList);
-        $alist->setShowAvatars(false);
-        $alist->setShowTrends(false);
-        $alist->setTarget($this->getSitePage(), 'ACTIVITY_LIST');
-
-        foreach ($alist as $a) {
-            $alist->renderItem($a);
+        foreach($this->feedList as $item) {
+            foreach ($item as $key => $value) {
+                $this->setVar('ACTLIST_' . strtoupper($key), $value);
+            }
+            $this->parse('activity_item_block','activity_item',true);
         }
 
         return true;
