@@ -872,7 +872,6 @@ class Controller extends Base
 
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
 
-
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
          */
@@ -890,7 +889,8 @@ class Controller extends Base
             'availableYearsAndMonths' => $availableYearsAndMonths,
             'year' => $year,
             'month' => $month,
-            'newsItems' => $partialData
+            'newsItems' => $partialData,
+            'folderId'  => $params->getFolderId(),
         ];
         $data = array_merge($data, $this->getSidebarVars());
 
