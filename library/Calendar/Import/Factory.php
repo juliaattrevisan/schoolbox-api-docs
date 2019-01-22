@@ -5,63 +5,63 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Calendar\Import;
 
 use Schoolbox\User;
 
-class Factory {
+class Factory
+{
 
-	/**
-	 * The person to whom these imported events are relevant
-	 *
-	 * @var User
-	 */
-	protected $user;
+    /**
+     * The person to whom these imported events are relevant
+     *
+     * @var User
+     */
+    protected $user;
 
-	/**
-	 * The person who spawned the event
-	 *
-	 * @var User
-	 */
-	protected $author;
+    /**
+     * The person who spawned the event
+     *
+     * @var User
+     */
+    protected $author;
 
-	/**
-	 * A list of selected event_category relations
-	 *
-	 * @var array
-	 */
-	protected $categoryList = [];
+    /**
+     * A list of selected event_category relations
+     *
+     * @var array
+     */
+    protected $categoryList = [];
 
-	/**
-	 * A list of selected event_group relations
-	 *
-	 * @var array
-	 */
-	protected $groupList = [];
+    /**
+     * A list of selected event_group relations
+     *
+     * @var array
+     */
+    protected $groupList = [];
 
-	/**
-	 * A list of selected event_campus relations
-	 *
-	 * @var array
-	 */
-	protected $campusList = [];
+    /**
+     * A list of selected event_campus relations
+     *
+     * @var array
+     */
+    protected $campusList = [];
 
-	/**
-	 * Access level for each event imported
-	 *
-	 * @var int
-	 */
-	protected $access = 0;
+    /**
+     * Access level for each event imported
+     *
+     * @var int
+     */
+    protected $access = 0;
 
-	/**
-	 * The source file from which to import
-	 *
-	 * @var string
-	 */
-	protected $file;
+    /**
+     * The source file from which to import
+     *
+     * @var string
+     */
+    protected $file;
 
     /**
      * Source of import
@@ -73,44 +73,45 @@ class Factory {
     /**
      * Factory constructor.
      *
-     * @param User        $user
-     * @param User        $author
-     * @param array       $categoryList
-     * @param array       $groupList
-     * @param array       $campusList
-     * @param int         $access
-     * @param string      $file
+     * @param User $user
+     * @param User $author
+     * @param array $categoryList
+     * @param array $groupList
+     * @param array $campusList
+     * @param int $access
+     * @param string $file
      * @param string|null $source
      */
-    public function __construct(User $user, User $author, array $categoryList, array $groupList, array $campusList, int $access, string $file, string $source = null) {
-		$this->setUser($user);
-		$this->setAuthor($author);
-		$this->setCategoryList($categoryList);
-		$this->setGroupList($groupList);
-		$this->setCampusList($campusList);
-		$this->setAccess($access);
-		$this->setFile($file);
-		$this->setSource($source);
+    public function __construct(User $user, User $author, array $categoryList, array $groupList, array $campusList, int $access, string $file, string $source = null)
+    {
+        $this->setUser($user);
+        $this->setAuthor($author);
+        $this->setCategoryList($categoryList);
+        $this->setGroupList($groupList);
+        $this->setCampusList($campusList);
+        $this->setAccess($access);
+        $this->setFile($file);
+        $this->setSource($source);
+    }
 
-	}
-
-	/**
-	 * Spawn strategy
-	 *
-	 * @return mixed
-	 */
-	public function build() {
+    /**
+     * Spawn strategy
+     *
+     * @return mixed
+     */
+    public function build()
+    {
         $classname = '\Calendar\Import\Csv';
 
-		if (stristr(file_get_contents($this->getFile(), null, null, 0, 20), 'BEGIN:VCALENDAR')) {
-			$classname = '\Calendar\Import\Vcal';
-		}
+        if (stristr(file_get_contents($this->getFile(), null, null, 0, 20), 'BEGIN:VCALENDAR')) {
+            $classname = '\Calendar\Import\Vcal';
+        }
 
-		return new $classname($this->getUser(), $this->getAuthor(), $this->getCategoryList(), $this->getGroupList(), $this->getCampusList(), $this->getAccess(), $this->getFile(), $this->getSource());
-	}
+        return new $classname($this->getUser(), $this->getAuthor(), $this->getCategoryList(), $this->getGroupList(), $this->getCampusList(), $this->getAccess(), $this->getFile(), $this->getSource());
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
     /**
      * Set author
