@@ -685,7 +685,7 @@ class SitePage extends Page
         $selected = is_array($selected) ? $selected : array();
         if ((is_array($data) && count($data) > 0) || $data instanceof Traversable) {
             foreach ($data as $row) {
-                if (is_array($row) || $row instanceof Traversable) {
+                if (is_iterable($row)) {
                     foreach ($row as $key => $value) {
                         $mapping[$key] ? $key = $mapping[$key] : '';
                         $this->setVar($key, Scrub::text($value));
@@ -734,7 +734,7 @@ class SitePage extends Page
         $selected = is_array($selected) ? $selected : array($selected);
         if ((is_array($data) && count($data) > 0) || $data instanceof Traversable) {
             foreach ($data as $row) {
-                if (is_array($row) || $row instanceof Traversable) {
+                if (is_iterable($row)) {
                     foreach ($row as $key => $value) {
                         $mapping[$key] ? $key = $mapping[$key] : '';
                         if (is_scalar($value) || is_null($value)) {
