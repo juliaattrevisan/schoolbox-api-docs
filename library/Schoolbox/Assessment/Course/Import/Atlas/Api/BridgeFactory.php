@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Import\Atlas\Api;
 
+use Alaress\Jitter\Jitter;
+use Alaress\Random\FloatGenerator;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -24,6 +26,12 @@ class BridgeFactory
      * Max number of retries for a request to the Atlas API.
      */
     private const MAX_RETRIES = 5;
+
+
+    /**
+     * Base timeout (in milliseconds) for the jitter algorithm.
+     */
+    private const BASE_TIMEOUT = 50;
 
 
     /**
@@ -58,7 +66,9 @@ class BridgeFactory
      */
     public function build(): Bridge
     {
-        $stack = HandlerStack::create();
+        // Need one extra retry to be able to generate a delay for attempts = MAX_RETRIES
+        $jitter = new Jitter(new FloatGenerator(), self::MAX_RETRIES + 1, self::BASE_TIMEOUT);
+        $stack  = HandlerStack::create();
         $stack->push(
             Middleware::retry(
                 function ($retries, RequestInterface $request, ResponseInterface $response) {
@@ -69,7 +79,8 @@ class BridgeFactory
 
                     // Retry up to MAX_RETRIES times
                     return $retries < self::MAX_RETRIES;
-                }
+                },
+                [$jitter, 'calculateJitter']
             )
         );
 
