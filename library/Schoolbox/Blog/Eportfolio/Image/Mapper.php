@@ -10,13 +10,17 @@
 
 namespace Schoolbox\Blog\Eportfolio\Image;
 
+use PDOStatement;
 use Schoolbox\Blog\Eportfolio\Image\Model as EportfolioBlogImageModel;
+use Schoolbox\Collection;
+use Schoolbox\File\Mimetype;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Storage\Model as Storage;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 class Mapper extends BaseMapper
 {
-   /**
+    /**
      * Setup mapper
      */
     protected function mapping()
@@ -25,9 +29,53 @@ class Mapper extends BaseMapper
         $this->hasModel(EportfolioBlogImageModel::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('blog_id', self::TYPE_INTEGER);
-        $this->uses('hash', self::TYPE_STRING);
+        $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('created_at', self::TYPE_DATETIME);
         $this->uses('updated_at', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('storage', 'f')},
+                {$this->getJoinColumnString('storage.allowedFileExtension', 'm')}
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('storage', '', 'f', true)}
+            LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'f', 'm', true)}
+        ";
+    }
+
+
+    /**
+     * Include storage object in selected result.
+     *
+     * @param PDOStatement $statement
+     * @return Collection|Model[]
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        /** @var Collection|Model[] $resultSet */
+        $resultSet = $this->createCollection();
+
+        foreach ($statement as $row) {
+            /** @var Model $result */
+            $result = $this->hydrate($row);
+
+            /**
+             * @var Storage      $storage
+             * @var Mimetype     $mime
+             */
+            $storage = $this->hydrateJoin($row, 'storage', 'f');
+            $mime    = $this->hydrateJoin($row, 'storage.allowedFileExtension', 'm');
+
+            $resultSet[$result->getId()] = $result->setStorage($storage->setMimetype($mime));
+        }
+        return $resultSet;
     }
 }
