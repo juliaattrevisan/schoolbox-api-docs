@@ -68,7 +68,7 @@ class EventPermissionMapper extends BaseMapper
         $query = "
 			SELECT `user_id`
 			FROM `{$this->table}` p
-			LEFT JOIN user ON p.user_id = user.id
+			JOIN user ON p.user_id = user.id AND user.deleted_at IS NULL
 			GROUP BY user_id
 			ORDER BY lastname
 		";
