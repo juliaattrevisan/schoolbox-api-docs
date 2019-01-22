@@ -319,7 +319,7 @@ class Controller extends BaseController
 
         // SHUP.
         /** @noinspection PhpUnhandledExceptionInspection */
-        $this->response->status->setCode($e->getCode() ?? 400);
+        $this->response->status->setCode($e->getCode() ?: 400);
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput('sub/mage-error.twig',
                 [
