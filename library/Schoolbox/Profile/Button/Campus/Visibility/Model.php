@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Schoolbox\Profile\Button\Campus;
+namespace Schoolbox\Profile\Button\Campus\Visibility;
 
 class Model
 {
@@ -18,7 +18,7 @@ class Model
      * @param int $id
      * @return self
      */
-    public function setId($id): self
+    public function setId(int $id): self
     {
         $this->id = $id;
         return $this;

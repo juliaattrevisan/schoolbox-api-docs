@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Schoolbox\Profile\Button\Campus;
+namespace Schoolbox\Profile\Button\Campus\Visibility;
 
 use Schoolbox\Mapper as BaseMapper;
 
@@ -12,7 +12,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('profile_button_campus');
+        $this->hasTable('profile_button_campus_visibility');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('profile_button_id', self::TYPE_INTEGER);

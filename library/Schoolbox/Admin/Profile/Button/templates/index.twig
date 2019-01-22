@@ -1,3 +1,23 @@
+{# checkboxString
+ # Renders a text string that describes the checkboxes you ticked
+ #
+ # @param Profile\Button\Model      item a profileButton instance
+ # @param Collection collection     a collection of checkbox item instances (e.g. all the role instances)
+ # @param array selectedCollection  an associative array of index=>true pairs
+ #}
+{% macro checkboxString(item, collection, selectedCollection) %}
+    {% set i = 1 %}
+    {% set n = selectedCollection[item.id] | length %}
+
+    {% for obj in collection %}
+        {% if selectedCollection[item.id][obj.id] %}
+            {{ obj.name }}{% if i < n %}, {% endif %}
+            {% set i = i+1 %}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+{% import _self as macro %}
+
 {# Shared navigation profile #}
 {{ renderAdminNavigation(pageCurrent) }}
 
@@ -32,24 +52,23 @@
                                 <div class="list-item">
                                     <div class="card small-12">
                                         <a>
-                                            <div class="icon-{{ item.icon }} size-32"></div>
+                                            <div class="icon-{{ item.icon }} size-64"></div>
                                             <h3>{{ item.text }}</h3>
                                         </a>
 
                                         <p class="meta">
-                                            Shown for:
-                                            {% for role in roles %}
-                                                {% if rolesSelected[item.id][role.id] %}
-                                                    {{ role.name }}{% if loop.index < (rolesSelected[item.id] | length) - 1 %}, {% elseif loop.index == (rolesSelected[item.id] | length) - 1 %} and {% endif %}
-                                                {% endif %}
-                                            {% endfor %}
+                                            Available on profiles for
+                                            <strong>{{ macro.checkboxString(item, roles, roleAvailabilitySelected) }}</strong> role(s)
+                                            within
+                                            <strong>{{ macro.checkboxString(item, campuses, campusAvailabilitySelected) }}</strong>
+                                            campus
+                                        </p>
 
-                                            in
-                                            {% for campus in campuses %}
-                                                {% if campusesSelected[item.id][campus.id] %}
-                                                    {{ campus.name }}{% if loop.index < (campusesSelected[item.id] | length) - 1 %}, {% elseif loop.index == (campusesSelected[item.id] | length) - 1 %} and {% endif %}
-                                                {% endif %}
-                                            {% endfor %}
+                                        <p class="meta">
+                                            Visible to viewers in
+                                            <strong>{{ macro.checkboxString(item, roles, roleVisibilitySelected) }}</strong> role(s)
+                                            within
+                                            <strong>{{ macro.checkboxString(item, campuses, campusVisibilitySelected) }}</strong>
                                             campus
                                         </p>
                                     </div>
