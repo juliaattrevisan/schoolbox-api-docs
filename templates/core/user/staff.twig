@@ -112,13 +112,13 @@
                                        class="icon-timetable">Timetable</a>
                                 </li>
                             {% endblock buttons_timetable %}
-                        {% endif %}
 
-                        {% for button in customButtons %}
-                            <li>
-                                <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }}" target="{{ button.target }}">{{ button.text }}</a>
-                            </li>
-                        {% endfor %}
+                            {% for button in customButtons %}
+                                <li>
+                                    <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }}" target="{{ button.target }}">{{ button.text }}</a>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
                     {% endblock buttons %}
                 </ul>
             {% endblock buttons_island %}
