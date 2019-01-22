@@ -299,14 +299,6 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param string $file
-     */
-    public function setJavascript($file)
-    {
-        $this->sitepage->setJavascript($file);
-    }
-
-    /**
      * Component Config facade ingredients
      *
      * This should really have been a separate class, but I'll probably do that another time

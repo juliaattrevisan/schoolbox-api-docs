@@ -8,7 +8,19 @@
             <h2 class="subheader">{COMPONENT_NAME}</h2>
             <section>
                 <ul class="information-list">
-                    {ACTIVITY_LIST}
+                    <!-- BEGIN activity_item -->
+                    <li>
+                        <div class="list-item">
+                            <div class="card small-12 wrap-down">
+                                <div class="{ACTLIST_ICON} size-32"></div>
+                                <p>
+                                    {ACTLIST_CONTENT}
+                                </p>
+                                <p class="meta"><time>{ACTLIST_TIME}</time></p>
+                            </div>
+                        </div>
+                    </li>
+                    <!-- END activity_item -->
                 </ul>
             </section>
         </div>

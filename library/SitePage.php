@@ -5,7 +5,6 @@ use Aura\Router\Router;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
 
@@ -16,21 +15,6 @@ class SitePage extends Page
      * @var string
      */
     public $site;
-
-
-    /**
-     * The following template paths render the skin's chrome
-     *
-     * The core version is always used if this school uses the skin builder.
-     *
-     * @var array|string[]
-     */
-    private $chromePaths = [
-        'common/*.html',
-        'feedback/*.html',
-        'include/*.html',
-        'policy/*.html',
-    ];
 
     /**
      * The dependency injection container, injected into SitePage!
@@ -49,12 +33,6 @@ class SitePage extends Page
 
     /** @var string $pageName */
     private $pageName;
-
-    /** @var array $jscript */
-    private $jscript;
-
-    /** @var array $css */
-    private $css;
 
     /** @var bool $ajax */
     private $ajax;
@@ -214,14 +192,6 @@ class SitePage extends Page
      */
     public function setSite()
     {
-        if ($this->config->get('site_detect') == 'domain') {
-            //Get site templates via domain name
-            if (preg_match('/([\w]+)\./', $_SERVER['HTTP_HOST'], $match)) {
-                $this->site = $match[1];
-                return true;
-            }
-        }
-
         $this->site = $this->config->get('site_location');
         return true;
     }
@@ -504,99 +474,6 @@ class SitePage extends Page
     }
 
     /**
-     *
-     */
-    public function renderInstantMessages()
-    {
-
-        /* Dock the sidenav
-         */
-        if ($this->user->getHideSidenav()) {
-            $this->setVar([
-                'HIDE_SIDENAV' => ''
-            ]);
-        } else {
-            $this->setVar([
-                'HIDE_SIDENAV' => 'left-open'
-            ]);
-        }
-
-
-        /* Docking the tray
-         */
-        if ($this->user->getHideNotificationsTray()) {
-            $this->setVar([
-                'HIDE_NOTIFICATIONS_TRAY' => ''
-            ]);
-        } else {
-            $this->setVar([
-                'HIDE_NOTIFICATIONS_TRAY' => 'right-open'
-            ]);
-        }
-
-        $this->setBlock(TEMPLATE_body, 'instantmessage_toggle', 'instantmessage_toggle_block');
-
-        if ($this->config->get('messaging_enabled')) {
-            $this->parse('instantmessage_toggle_block', 'instantmessage_toggle');
-        } else {
-            $this->setVar('instantmessage_toggle_block', '');
-        }
-
-        if ($this->config->get('messaging_enabled')) {
-            $this->parse('INSTANTMESSAGE_BLOCK', 'instantTpl');
-            $this->setVar('NOTIFICATION_CLASS', '');
-        } else {
-            $this->setVar('INSTANTMESSAGE_BLOCK', '');
-            $this->setVar('NOTIFICATION_CLASS', 'disableNotifications');
-        }
-    }
-
-    /**
-     *
-     */
-    public function renderScriptIncludes()
-    {
-        $this->setBlock('headerTpl', 'header_javascript', 'header_javascript_block');
-        $this->setBlock('headerTpl', 'header_css', 'header_css_block');
-
-        if (is_array($this->jscript)) {
-            foreach ($this->jscript as $scriptOutput) {
-                $this->setVar($scriptOutput);
-                $this->parse('header_javascript_block', 'header_javascript', true);
-            }
-        } else {
-            $this->setVar('header_javascript_block', '');
-        }
-
-        if (is_array($this->css)) {
-            foreach ($this->css as $cssOutput) {
-                $this->setVar($cssOutput);
-                $this->parse('header_css_block', 'header_css', true);
-            }
-        } else {
-            $this->setVar('header_css_block', '');
-        }
-
-    }
-
-    /**
-     * @param $file
-     */
-    public function setJavascript($file)
-    {
-        $this->jscript[] = array('HEADER_SCRIPT_LOCATION' => $file);
-    }
-
-    /**
-     * @param $file
-     * @param string $type
-     */
-    public function setCSS($file, $type = 'screen')
-    {
-        $this->css[] = array('HEADER_CSS_TYPE' => $type, 'HEADER_CSS_LOCATION' => $file);
-    }
-
-    /**
      * @param $handle
      * @param $file
      * @return bool
@@ -629,17 +506,6 @@ class SitePage extends Page
      */
     public function getTemplate($template)
     {
-        // Chrome/skin templates are always core if skin builder is on,
-        // except if the version in the skin is newer than 15.5 release date (this is determined if instant.html is included)
-        foreach ($this->chromePaths as $chromePath) {
-            if (fnmatch($chromePath, $template) &&
-                is_file($this->templateRoot . '/' . $this->site . '/include/instant.html')
-            ) {
-                return 'core/' . $template;
-            }
-        }
-
-        // common, feedback, include, policy
         if (is_file($this->templateRoot . '/' . $this->site . '/' . $template)) {
             return $this->site . '/' . $template;
         } else {
@@ -817,9 +683,9 @@ class SitePage extends Page
     {
         $this->setBlock($template, $handle, $handle . '_block');
         $selected = is_array($selected) ? $selected : array();
-        if (is_array($data) && count($data) > 0 || $data instanceof Traversable) {
+        if ((is_array($data) && count($data) > 0) || $data instanceof Traversable) {
             foreach ($data as $row) {
-                if (is_array($row) || $row instanceof Traversable) {
+                if (is_iterable($row)) {
                     foreach ($row as $key => $value) {
                         $mapping[$key] ? $key = $mapping[$key] : '';
                         $this->setVar($key, Scrub::text($value));
@@ -868,7 +734,7 @@ class SitePage extends Page
         $selected = is_array($selected) ? $selected : array($selected);
         if ((is_array($data) && count($data) > 0) || $data instanceof Traversable) {
             foreach ($data as $row) {
-                if (is_array($row) || $row instanceof Traversable) {
+                if (is_iterable($row)) {
                     foreach ($row as $key => $value) {
                         $mapping[$key] ? $key = $mapping[$key] : '';
                         if (is_scalar($value) || is_null($value)) {
@@ -905,24 +771,6 @@ class SitePage extends Page
         } else {
             $this->setVar($handle . '_block', '');
         }
-    }
-
-    /**
-     * @param $perm
-     * @return bool
-     */
-    public function canRead($perm)
-    {
-        return $perm >= UserAccess::ACCESS_READ ? true : false;
-    }
-
-    /**
-     * @param $perm
-     * @return bool
-     */
-    public function canWrite($perm)
-    {
-        return $perm >= UserAccess::ACCESS_WRITE ? true : false;
     }
 
     /**
@@ -972,24 +820,6 @@ class SitePage extends Page
             }
         }
         return false;
-    }
-
-    /**
-     * Attempt to (safely) parse $_SERVER for a URL component
-     *
-     * @param string $component
-     * @return mixed
-     */
-    protected static function parseRequestUrl($component = null)
-    {
-        foreach (array('HTTP_HOST', 'SCRIPT_URI') as $option) {
-            if (isset($_SERVER[$option])) {
-                if ($result = parse_url($_SERVER[$option], $component)) {
-                    return $result;
-                }
-            }
-        }
-        return 'localhost';
     }
 
     /**

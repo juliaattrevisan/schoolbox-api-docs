@@ -49,19 +49,6 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
                         'icon' => $f['type'],
                         'content' => $f['messageHTML'] . (empty($f['cat_name']) ? '' : ' in <a href="/homepage/' . $f['cat_id'] . '">' . $f['cat_name'] . '</a>'),
                         'time' => $feedTime->getRelativeTime(),
-                        'avatar' => $f['external_id'] != false ? '/portrait.php?userId=' . $f['external_id'] . '&size=square64' : '',
-                        'avatar_title' => $f['user_name'] != false ? $f['user_name'] : '',
-                        'has_grade' => 'no-grade',
-                        'gradeiant' => '',
-                        'grade' => '',
-                        'cat_id' => $f['cat_id'],
-                        'cat_name' => $f['cat_name'],
-                        'external_id' => $f['external_id'],
-                        'link' => $f['link'],
-                        'user_id' => $f['user_id'],
-                        'name' => $f['name'],
-                        'action' => $f['action'],
-                        'timestamp' => $feedTime->getUnixTimeStamp(),
                     );
                 }
 
@@ -82,15 +69,13 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
             return false;
         }
 
-        $this->setVar('SUBJ_HAS_GRADE', 'no-grade');
+        $this->setBlock($templateHandle, 'activity_item', 'activity_item_block');
 
-        $alist = new Activity_ListArray($this->feedList);
-        $alist->setShowAvatars(false);
-        $alist->setShowTrends(false);
-        $alist->setTarget($this->getSitePage(), 'ACTIVITY_LIST');
-
-        foreach ($alist as $a) {
-            $alist->renderItem($a);
+        foreach($this->feedList as $item) {
+            foreach ($item as $key => $value) {
+                $this->setVar('ACTLIST_' . strtoupper($key), $value);
+            }
+            $this->parse('activity_item_block','activity_item',true);
         }
 
         return true;
