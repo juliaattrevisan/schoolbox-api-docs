@@ -80,20 +80,36 @@
 
     {% if referrer == 'homepage' %}
         {% set createRoute = routeLookupIfAuthorized('commsNews.getCreateInFolder', {folderId: folderId}) %}
+        {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') ~ '?f=' ~ folderId %}
         <div class="empty-state no-margin">
             <i class="icon-news"></i>
-            <p>
-                {% if not createRoute %}
-                    There is no {{ locale.news }} to view at this time.
-                {% else %}
-                    {% set createNewsQuerystringParams = [
-                        'groupId=' ~ folderId,
-                        'type=folder'
-                    ]|join('&') %}
-
-                    <a href="{{ createRoute }}?{{ createNewsQuerystringParams }}">Post a {{ locale.news }} article</a> to share new information on this homepage.
+            {% if not createRoute %}
+                <p>There is no {{ locale.news }} to view at this time.</p>
+                {% if showArchiveNewsLink %}
+                    <p><a href="{{ archiveRoute }}">View the news archive.</a></p>
                 {% endif %}
-            </p>
+            {% else %}
+                {% set createNewsQuerystringParams = [
+                    'groupId=' ~ folderId,
+                    'type=folder'
+                ]|join('&') %}
+
+                {% set createRouteFullPath = createRoute ~ "?" ~ createNewsQuerystringParams %}
+
+                {% set emptyStateMessage = [
+                    '<a href="'~ createRouteFullPath ~ '">Post a ' ~ locale.news ~ ' article</a> to share new information on this homepage'
+                ] %}
+
+                {% if showArchiveNewsLink %}
+                    {% set emptyStateMessage = emptyStateMessage|merge([
+                        ' or <a href="'~ archiveRoute ~'">view the news archive</a>'
+                    ]) %}
+                {% endif %}
+
+                {% set emptyStateMessage = emptyStateMessage|join(',') ~ "." %}
+
+                <p>{{ emptyStateMessage|raw }}</p>
+            {% endif %}
         </div>
     {% else %}
         <div class="empty-state no-margin">

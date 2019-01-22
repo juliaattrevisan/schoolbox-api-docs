@@ -1095,6 +1095,7 @@ class Controller extends Base
      */
     private function generatePartialForHomepage(Querystring $params)
     {
+        $showArchiveNewsLink = false;
         $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
         $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
 
@@ -1113,11 +1114,16 @@ class Controller extends Base
             $this->getUser()
         );
 
+        if (\count($topicData['articles']) < 1) {
+            $showArchiveNewsLink = (new Archive())->findForHomePage((int) $params->getFolderId());
+        }
+
         return array_merge($topicData, [
             'hidePaginator' => true,
             'compactMode' => $params->getCompactMode(),
             'referrer' => $params->getReferrer(),
             'folderId' => $params->getFolderId(),
+            'showArchiveNewsLink' => $showArchiveNewsLink,
         ]);
     }
 
