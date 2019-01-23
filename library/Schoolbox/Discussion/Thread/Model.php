@@ -31,10 +31,10 @@ class Model implements ISoftDeletable
     private $open;
 
 
-    /**
-     * @var Context\Model|null
-     */
-    private $context;
+//    /**
+//     * @var Context\Model|null
+//     */
+//    private $context;
 
 
     /**
@@ -57,22 +57,22 @@ class Model implements ISoftDeletable
     }
 
 
-    /**
-     * @return Context\Model|null
-     */
-    public function getContext(): ?Context\Model
-    {
-        return $this->context;
-    }
-
-
-    /**
-     * @param Context\Model|null $context
-     * @return static
-     */
-    public function setContext(?Context\Model $context): self
-    {
-        $this->context = $context;
-        return $this;
-    }
+//    /**
+//     * @return Context\Model|null
+//     */
+//    public function getContext(): ?Context\Model
+//    {
+//        return $this->context;
+//    }
+//
+//
+//    /**
+//     * @param Context\Model|null $context
+//     * @return static
+//     */
+//    public function setContext(?Context\Model $context): self
+//    {
+//        $this->context = $context;
+//        return $this;
+//    }
 }
