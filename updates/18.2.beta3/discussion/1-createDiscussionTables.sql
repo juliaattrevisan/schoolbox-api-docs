@@ -26,7 +26,7 @@ CREATE TABLE discussion_thread_context (
     context_id INT(11) UNSIGNED NOT NULL,
     PRIMARY KEY (id),
     KEY fk_discussion_thread_context_discussion_thread_id (discussion_thread_id),
-    UNIQUE KEY fk_discussion_thread_context_identifier (context_type, context_id),
+    KEY fk_discussion_thread_context_identifier (context_type, context_id),
     CONSTRAINT fk_discussion_thread_context_discussion_thread_id
         FOREIGN KEY (discussion_thread_id) REFERENCES discussion_thread (id)
             ON DELETE NO ACTION

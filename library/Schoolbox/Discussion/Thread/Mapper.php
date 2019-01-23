@@ -87,7 +87,7 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Find a thread for a particular context.
+     * Find threads for a particular context.
      *
      * @param string $contextType
      * @param int    $contextId
