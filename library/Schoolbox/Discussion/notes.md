@@ -23,3 +23,14 @@ Migration notes
 We may need to make different features optional for different contexts:
 * Cut-down editors for some contexts?
   * e.g. news doesn't get nested threads, but socialstream does?
+
+----
+
+# Seeding
+
+How'm I going to put test data into the DB?
+
+* start from initial dataset?
+* clear out old comms articles
+* create demo data for them
+* create x comms articles, 0-n comments for each of them
