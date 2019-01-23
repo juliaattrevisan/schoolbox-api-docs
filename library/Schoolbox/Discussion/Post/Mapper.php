@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Post;
 
+use PDOStatement;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
