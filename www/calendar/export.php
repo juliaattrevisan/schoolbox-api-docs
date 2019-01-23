@@ -165,8 +165,7 @@ try {
             $message = "Requested period is {$requestedPeriodMonths} months, but permitted period is {$permittedPeriodMonths} months";
             \http_response_code(401);
 
-            $problem = new ApiProblem($message);
-            $problem->setTitle("You requested a period of time that is longer than permitted");
+            $problem = new ApiProblem('You requested a period of time that is longer than permitted');
             $problem->setDetail($message);
 
             $format = $_GET['format'] ?? '';
