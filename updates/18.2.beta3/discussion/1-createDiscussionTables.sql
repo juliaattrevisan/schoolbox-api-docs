@@ -7,6 +7,19 @@ CREATE TABLE discussion_thread (
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE discussion_thread_context (
+    id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+    discussion_thread_id INT(11) UNSIGNED NOT NULL,
+    context_type ENUM('news'),
+    context_id INT(11) UNSIGNED NOT NULL,
+    PRIMARY KEY (id),
+    KEY fk_discussion_thread_context_discussion_thread_id (discussion_thread_id),
+    CONSTRAINT fk_discussion_thread_context_discussion_thread_id
+        FOREIGN KEY (discussion_thread_id) REFERENCES discussion_thread (id)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE discussion_post (
     id INT(11) NOT NULL AUTO_INCREMENT,
     discussion_thread_id INT(11) UNSIGNED NOT NULL,
