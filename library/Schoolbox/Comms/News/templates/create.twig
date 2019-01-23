@@ -276,10 +276,20 @@
                 </fieldset>
 
                 <fieldset class="content">
-                    <div class="small-12 columns">
+                    <div class="small-12 medium-6 columns">
                         <label for="news-topics">Topics</label>
                         <p class="meta">You can assign multiple topics to this {{ locale.news }} to help identify its purpose.</p>
                         <select data-topics name="topics[]" id="news-topics" multiple></select>
+                    </div>
+
+                    <div class="small-12 medium-6 columns">
+                        <label for="commentsAllowed">Comments</label>
+                        <p class="meta">Is the article's audience allowed to comment on this article?</p>
+                        <input name="commentsAllowed"
+                               type="checkbox"
+                               id="commentsAllowed"
+                               {% if article.commentsAllowed %}checked{% endif %} />
+                        <label for="commentsAllowed" class="checkbox-label"></label>
                     </div>
                 </fieldset>
 
