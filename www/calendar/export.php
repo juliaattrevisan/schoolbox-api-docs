@@ -259,6 +259,8 @@ try {
             );
 
             $filename = 'timetable';
+            $start    = $_SERVER['REQUEST_TIME'];
+            $end      = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
         case 'timetabledays':
@@ -270,6 +272,8 @@ try {
             );
 
             $filename = 'timetabledays';
+            $start    = $_SERVER['REQUEST_TIME'];
+            $end      = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
         case 'resources':
