@@ -111,10 +111,10 @@ components:
       properties:
         type:
           description: |
-            The type of the context for a given thread. Currently, only news is
+            The type of the context for a given thread. Currently, only comms is
             supported.
           type: string
-          enum: [news]
+          enum: [comms]
         id:
           $ref: '#/components/schemas/id'
 

@@ -22,7 +22,7 @@ CREATE TABLE discussion_thread (
 CREATE TABLE discussion_thread_context (
     id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
     discussion_thread_id INT(11) UNSIGNED NOT NULL,
-    context_type ENUM('news'),
+    context_type ENUM('comms'),
     context_id INT(11) UNSIGNED NOT NULL,
     PRIMARY KEY (id),
     KEY fk_discussion_thread_context_discussion_thread_id (discussion_thread_id),

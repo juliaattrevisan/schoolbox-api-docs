@@ -24,7 +24,7 @@ object discussion_post {
 object discussion_thread_context {
     <<PK>> id: int
     discussion_thread_id: int
-    context_type: enum(news)
+    context_type: enum(comms)
     context_id: int
 }
 
