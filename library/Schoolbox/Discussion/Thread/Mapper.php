@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Thread;
 
 use PDOStatement;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
@@ -82,5 +83,26 @@ class Mapper extends BaseMapper
             $collection[$model->getId()] = $collection;
         }
         return $collection;
+    }
+
+
+    /**
+     * Find a thread for a particular context.
+     *
+     * @param string $contextType
+     * @param int    $contextId
+     * @param array  $options
+     * @return GenericCollection
+     * @throws BaseMapper\Exception
+     */
+    public function findForContext(string $contextType, int $contextId, array $options = []): GenericCollection
+    {
+        return $this->findByColumnList(
+            [
+                'c.context_type' => $contextType,
+                'c.context_id'   => $contextId,
+            ],
+            $options
+        );
     }
 }
