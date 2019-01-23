@@ -26,5 +26,6 @@ class Mapper extends BaseMapper
         $this->uses('created_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_SOFTDELETE);
+        $this->joinsReverseSingle('discussion_thread_id', Context\Mapper::class, 'context', 'context');
     }
 }

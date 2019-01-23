@@ -32,6 +32,12 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @var Context\Model|null
+     */
+    private $context;
+
+
+    /**
      * @return bool
      */
     public function getOpen(): ?bool
@@ -47,6 +53,26 @@ class Model implements ISoftDeletable
     public function setOpen(bool $open): self
     {
         $this->open = $open;
+        return $this;
+    }
+
+
+    /**
+     * @return Context\Model|null
+     */
+    public function getContext(): ?Context\Model
+    {
+        return $this->context;
+    }
+
+
+    /**
+     * @param Context\Model|null $context
+     * @return static
+     */
+    public function setContext(?Context\Model $context): self
+    {
+        $this->context = $context;
         return $this;
     }
 }
