@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Thread;
 
 use PDOStatement;
+use Schoolbox\Discussion\Post;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
@@ -30,7 +31,19 @@ class Mapper extends BaseMapper
         $this->uses('created_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_SOFTDELETE);
+        $this->joinsReverseMulti('discussion_thread_id', Post\Mapper::class, null, 'posts');
         $this->joinsReverseSingle('discussion_thread_id', Context\Mapper::class, 'context', 'context');
+    }
+
+
+    /**
+     * Post-delete for threads: delete all posts within as well.
+     *
+     * @param Model $model
+     */
+    public function deleteThreads(Model $model): void
+    {
+        $this->getJoinMapper('posts')->deleteByColumn('discussion_thread_id', $model->getId());
     }
 
 
