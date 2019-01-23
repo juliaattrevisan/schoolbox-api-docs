@@ -463,7 +463,7 @@
         {% if isAutoSavable %}
             // Init draft plugin
             $createForm.draft({
-                inputs: ['#news-title', '#audience-search', '#news-topics'],
+                inputs: ['#news-title', '#audience-search', '#news-topics', '#commentsAllowed'],
                 textareas: ['body', 'blurb'],
                 attachzones: ['#{{ featureImageZone.id }}-zone'],
                 datepickers: ['#publishAt', '#expiresAt'],
