@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread;
 
+use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
@@ -27,5 +28,59 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_SOFTDELETE);
         $this->joinsReverseSingle('discussion_thread_id', Context\Mapper::class, 'context', 'context');
+    }
+
+
+    /**
+     * Overridden to join on context.
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('context', 'c')}
+        ";
+    }
+
+
+    /**
+     * Overridden to join on context.
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('context', '', 'c')}
+        ";
+    }
+
+
+    /**
+     * Overridden to join on context.
+     *
+     * @param PDOStatement $statement
+     * @return \Schoolbox\GenericCollection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $collection = $this->createCollection();
+        foreach ($statement as $row) {
+            /** @var Model $model */
+            $model = $this->hydrate($row);
+
+            /** @var Context\Model|null $context */
+            $context = $this->hydrateJoin($row, 'context', 'c');
+            if ($context) {
+                $model->setContext($context);
+            }
+
+            $collection[$model->getId()] = $collection;
+        }
+        return $collection;
     }
 }
