@@ -263,7 +263,7 @@ class Controller extends Base
          *   - Must have a url
          *   - Must have chosen a campus and role for Availability and also for Visibility
          */
-        if (!(new ValidButton())->isSatisfiedBy($post)) {
+        if (!(new ValidButton())->isSatisfiedBy($post->getArrayCopy())) {
             throw new \InvalidArgumentException('Requires title, url, and at least one campus and one role for Availability and Visibility');
         }
 

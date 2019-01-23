@@ -17,13 +17,13 @@ class ValidButton
      *   - Must have a url
      *   - Must have chosen a campus and role for Availability and also for Visibility
 
-     * @param \Aura\Web\Request\Values $post
+     * @param array $post
      * @return bool
      */
-    public function isSatisfiedBy(\Aura\Web\Request\Values $post): bool
+    public function isSatisfiedBy(array $post): bool
     {
-        $hasTitle = \count($post['title']);
-        $hasUrl = \count($post['url']);
+        $hasTitle = \strlen(trim($post['title']));
+        $hasUrl = \strlen(trim($post['url']));
         $hasCampusAvailability = \is_array($post['campusAvailability']) && \count($post['campusAvailability']);
         $hasRoleAvailability = \is_array($post['roleAvailability']) && \count($post['roleAvailability']);
         $hasCampusVisibility = \is_array($post['campusVisibility']) && \count($post['campusVisibility']);
