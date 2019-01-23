@@ -125,6 +125,7 @@ class Controller extends Base
         ]);
     }
 
+
     /**
      * Display modification screen
      *
@@ -132,6 +133,7 @@ class Controller extends Base
      * @level 182
      *
      * @param int $id
+     * @throws \InvalidArgumentException
      * @throws MapperException
      * @throws MapperException\Deleted
      */
@@ -153,9 +155,9 @@ class Controller extends Base
 
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/modify.twig',
-            'data'     => [
+            'data' => [
                 'pageCurrent' => self::PAGE_CURRENT,
-                'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [], ['cache'=>false]),
+                'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [], [ 'cache' => false ]),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
@@ -254,6 +256,15 @@ class Controller extends Base
             } else {
                 $item->setSortOrder(1);
             }
+        }
+
+        /* Check whether you have all the pieces
+         *   - Must have a title
+         *   - Must have a url
+         *   - Must have chosen a campus and role for Availability and also for Visibility
+         */
+        if (!(new ValidButton())->isSatisfiedBy($post)) {
+            throw new \InvalidArgumentException('Requires title, url, and at least one campus and one role for Availability and Visibility');
         }
 
         $item->setTitle($post['title']);
