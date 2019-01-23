@@ -1,3 +1,8 @@
+/**
+ * Discussion threads.
+ *
+ * Related to a comms article via `discussion_thread_context` below.
+ */
 CREATE TABLE discussion_thread (
     id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
     open BOOL NOT NULL DEFAULT TRUE,
@@ -7,6 +12,13 @@ CREATE TABLE discussion_thread (
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+/**
+ * The context within which a discussion thread exists.
+ *
+ * It's anticipated that threads will exist in places other than on comms
+ * articles.
+ */
 CREATE TABLE discussion_thread_context (
     id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
     discussion_thread_id INT(11) UNSIGNED NOT NULL,
@@ -21,6 +33,10 @@ CREATE TABLE discussion_thread_context (
             ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+/**
+ * Posts on discussion threads.
+ */
 CREATE TABLE discussion_post (
     id INT(11) NOT NULL AUTO_INCREMENT,
     discussion_thread_id INT(11) UNSIGNED NOT NULL,
