@@ -158,8 +158,10 @@
             rules: {
                 'text': 'required',
                 'url': {required: true, isURL: true},
-                'campuses[]': 'required',
-                'roles[]': 'required'
+                'campusAvailability[]': 'required',
+                'roleAvailability[]': 'required',
+                'campusVisibility[]': 'required',
+                'roleVisibility[]': 'required'
             },
             messages: {
                 'text': {required: 'Please enter a name for the profile button.'},
