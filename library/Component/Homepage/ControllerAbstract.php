@@ -82,7 +82,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         $this->getSitePage()->setBlock('configTpl', 'titlebar_write', 'titlebar_write_block');
         $this->getSitePage()->setBlock('configTpl', 'titlebar_read', 'titlebar_read_block');
 
-        if ($this->hasWriteAccess()) {
+        if ($this->hasContextWriteAccess()) {
             $this->setVar([
                 'COMPONENT_ACTION_COUNT' => 3,
                 'titlebar_read_block' => '',
