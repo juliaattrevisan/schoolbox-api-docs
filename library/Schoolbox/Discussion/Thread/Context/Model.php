@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread\Context;
 
+use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
@@ -22,6 +23,12 @@ class Model
 
 
     /**
+     * @var Thread\Model
+     */
+    private $thread;
+
+
+    /**
      * @var string
      */
     private $contextType;
@@ -31,6 +38,26 @@ class Model
      * @var int
      */
     private $contextId;
+
+
+    /**
+     * @return Thread\Model
+     */
+    public function getThread(): ?Thread\Model
+    {
+        return $this->thread;
+    }
+
+
+    /**
+     * @param Thread\Model $thread
+     * @return static
+     */
+    public function setThread(Thread\Model $thread): self
+    {
+        $this->thread = $thread;
+        return $this;
+    }
 
 
     /**

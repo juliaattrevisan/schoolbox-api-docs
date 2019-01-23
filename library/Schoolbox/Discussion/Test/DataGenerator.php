@@ -11,6 +11,10 @@ namespace Schoolbox\Discussion\Test;
 use Alaress\Database\Connector\IConnector;
 use Faker;
 use Schoolbox\Comms\News;
+use Schoolbox\Discussion\Post;
+use Schoolbox\Discussion\Thread;
+use Schoolbox\Role;
+use Schoolbox\UserMapper;
 
 /**
  * Generate test data for testing discussion threads.
@@ -56,36 +60,59 @@ class DataGenerator
         }
 
 
+        // Mappers (TODO: inject)
+        $userMapper          = UserMapper::getInstance();
+        $articleMapper       = News\Mapper::getInstance();
+        $threadMapper        = Thread\Mapper::getInstance();
+        $threadContextMapper = Thread\Context\Mapper::getInstance();
+        $postMapper          = Post\Mapper::getInstance();
 
 
-        // Build comms articles
-        $articleMapper = News\Mapper::getInstance();
-        foreach (range(1, random_int(5, 15)) as $count) {
+        // Delete all the old threads and posts
+        $threadMapper->delete($threadMapper->findAll());
+        $postMapper->delete($postMapper->findAll());
 
-            $article = $articleMapper->createModel()
-                ->setTitle($this->faker->words(random_int(2, 5), true))
-                // randomHtml needs the content of its <body> tag stripped out
-                ->setBody($this->randomArticle())
-            ;
 
-            var_dump($article);
+
+        // What comms articles are available?
+        // Build thread + comments for, say, 75% of them
+        $articleIds = array_map('intval', $articleMapper->findAllIds());
+        $authors    = $userMapper->findAll()->getAll();
+//        $authors    = UserMapper::getInstance()->findByColumnList('g.group_type', Role::STAFF)->getAll();
+
+
+        $articleIdsForDiscussion = $this->faker->unique()->randomElements(
+            $articleIds,
+            max(1, (int)(count($articleIds) * 0.75))
+        );
+        sort($articleIdsForDiscussion);
+
+
+        foreach ($articleIdsForDiscussion as $articleId) {
+            // Build a single thread
+            $thread = $threadMapper->createModel()
+                ->setOpen(true)
+                ->setContext(
+                    (new Thread\Context\Model())
+                        ->setContextType(Thread\Context\Model::CONTEXT_COMMS)
+                        ->setContextId($articleId)
+                );
+
+            // Build a bunch of comments
+            // Need to be able to override created date for all of them though?
+            $posts        = $postMapper->createCollection();
+            foreach (range(1, $this->faker->numberBetween(1, 100)) as $_) {
+                $post = $postMapper->createModel()
+                    ->setAuthor($this->faker->randomElement($authors))
+                    ->setThread($thread)
+                    ->setContent($this->randomArticle($this->faker->numberBetween(1, 4)));
+                $posts->add($post);
+            }
+
+            $threadMapper->save($thread);
+            $threadContextMapper->save($thread->getContext());
+            $postMapper->save($posts);
         }
-
-
-
-
-        // Clear out all existing comms articles
-
-        // Clear out all existing users? No, just add some new ones
-
-        // Add some possible audiences for comms articles (and add users to them):
-        // * Campus
-        // * Classes/Groups
-        // * Roles
-        // * Houses
-        // * Year levels
-
-        // Create some comms articles, for a random audience each time
     }
 
 

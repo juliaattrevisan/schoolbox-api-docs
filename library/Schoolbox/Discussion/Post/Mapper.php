@@ -15,6 +15,8 @@ use Schoolbox\UserMapper;
 
 /**
  * Mapper for posts in discussion threads.
+ *
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {
