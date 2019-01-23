@@ -34,3 +34,11 @@ How'm I going to put test data into the DB?
 * clear out old comms articles
 * create demo data for them
 * create x comms articles, 0-n comments for each of them
+
+I'm going to be limited with the usefulness of the fake data I can create, as
+permissions can be based on non-fake data (e.g. Synergetic).
+
+Consider:
+* some fake data with non-fake parts (e.g. a class with a known class code)
+* using Schoolbox data, and faking ALL data
+  * likely best idea in long run
