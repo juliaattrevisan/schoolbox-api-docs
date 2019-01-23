@@ -31,6 +31,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/post'
+      parameters:
+        - $ref: '#/components/parameters/token'
 
   /posts/{id}:
     delete:
@@ -42,6 +44,7 @@ paths:
           $ref: '#/components/responses/problem'
       parameters:
         - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/token'
 
   /threads/context/{context_type}/id/{context_id}:
     get:
@@ -63,6 +66,7 @@ paths:
             $ref: '#/components/schemas/threadContext/properties/id'
         - $ref: '#/components/parameters/cursor'
         - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/token'
 
   /threads/{id}/posts:
     get:
@@ -77,6 +81,7 @@ paths:
         - $ref: '#/components/parameters/id'
         - $ref: '#/components/parameters/cursor'
         - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/token'
 
 
 components:
@@ -293,5 +298,13 @@ components:
       description: |
         Alternative to offset. A generated but decodable pointer to the first
         record to return.
+      schema:
+        type: string
+    token:
+      name:        token
+      in:          query
+      description: |
+        A token for user authentication.
+        This is temporary, and will be replaced with oAuth/JWT authentication.
       schema:
         type: string
