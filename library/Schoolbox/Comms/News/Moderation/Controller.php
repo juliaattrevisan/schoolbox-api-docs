@@ -209,7 +209,11 @@ class Controller extends Base
             // TODO. It's not for the controller to guess whether this route was invoked from a list, a component, a page etc.
             // TODO. THis should just return the outcome of the request, not a redirect.
             $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);
-            $this->getResponse()->redirect->to($route);
+            if ($this->isXhrRequest()) {
+                $this->buildAjaxResponse($httpCode, $errorCode, $message, $route);
+            } else {
+                $this->getResponse()->redirect->to($route);
+            }
         } else {
             $this->buildAjaxResponse($httpCode, $errorCode, $message);
         }
