@@ -1289,7 +1289,8 @@ class Controller extends Base
             ->setTitle($postData['title'])
             ->setBody($postData['body'])
             ->setBlurb($postData['blurb'])
-            ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics']));
+            ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics']))
+            ->setCommentsAllowed((bool)($postData['commentsAllowed'] ?? false));
 
         // Exception thrown when an invalid date is submitted; use last known value instead
         // This can occur with bad input; or when datepicker is still processing strtotime shuriken
