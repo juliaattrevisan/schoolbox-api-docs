@@ -22,7 +22,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('discussion_thread_context');
-        $this->uses('id', BaseMapper::COLUMN_IDENTIFIER);
+        $this->uses('id', self::TYPE_INTEGER, BaseMapper::COLUMN_IDENTIFIER);
         $this->joins('discussion_thread_id', Thread\Mapper::class, 'id', null, null, null, 'thread');
         $this->uses('context_type', BaseMapper::COLUMN_ENUM, null, [Model::CONTEXT_COMMS,]);
         $this->uses('context_id', BaseMapper::TYPE_INTEGER);
