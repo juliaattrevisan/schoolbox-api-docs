@@ -137,13 +137,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         LEFT JOIN     dbo.luPastoralCareCategory ON dbo.tPastoralCare.CategoryCode = dbo.luPastoralCareCategory.Code
         INNER JOIN    dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID 
         INNER JOIN    dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
-        INNER JOIN    dbo.vStudentsAll ON dbo.vStudentsAll.ID = dbo.tPastoralCare.ID
+        INNER JOIN    dbo.vStudents ON dbo.vStudents.ID = dbo.tPastoralCare.ID
         INNER JOIN    dbo.FileSemesters ON 
-                          dbo.FileSemesters.FileYear = dbo.vStudentsAll.FileYear AND
-                          dbo.FileSemesters.FileSemester = dbo.vStudentsAll.FileSemester AND
+                          dbo.FileSemesters.FileYear = dbo.vStudents.FileYear AND
+                          dbo.FileSemesters.FileSemester = dbo.vStudents.FileSemester AND
                           dbo.FileSemesters.SystemCurrentFlag = 1 AND 
-                          NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') 
-                                AND DATEDIFF(DAY, vStudentsAll.StudentLeavingDate, GETDATE()) > 0)
+                          NOT (vStudents.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') 
+                                AND DATEDIFF(DAY, vStudents.StudentLeavingDate, GETDATE()) > 0)
     ";
 
     /** @var Html2Text $htmlConverter */
@@ -245,12 +245,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $pastoralRecordsCreated = [];
 
             do {
-                $queryRecords =
-                    "
-                {$this->sqlPastoralSelect}
-                WHERE         PastoralCareSeq > {$highestPastoralSeq}
-                ORDER BY      dbo.tPastoralCare.PastoralCareSeq
-            ";
+                $queryRecords = "
+                    {$this->sqlPastoralSelect}
+                    WHERE         PastoralCareSeq > {$highestPastoralSeq}
+                    ORDER BY      dbo.tPastoralCare.PastoralCareSeq
+                ";
 
                 // Chunk the import without using the iterator, because its failing miserably for some reason
 
@@ -367,6 +366,58 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             $logRecord->setPastoralId($pastoralRecord->getId());
 
                             $pastoralRecordsCreated[] = $pastoralRecord;
+
+                            /* Only add attachments if the option is on,
+                             * and there's an externalId
+                             */
+                            if ($importAttachments && null !== $pastoralRecord->getExternalId() && \strlen($pastoralRecord->getExternalId())) {
+
+                                // Import attachments from Synergetic DocMan
+
+                                $queryDocuments = $this->connector->getQueryIterator("
+                                    SELECT ref.RelatedSeq as external_id,
+                                           doc.Description as [filename],
+                                           DocumentType as extension,
+                                           [Document] as [blob]
+                                    FROM   {$this->schemaMedia}.tDocuments doc
+                                    JOIN   {$this->schemaMedia}.tDocumentReferences ref on ref.tDocumentsSeq = doc.tDocumentsSeq
+                                    WHERE  RelatedSeqModuleCode = 'SPC'
+                                    AND ref.RelatedSeq = {$pastoralRecord->getExternalId()}
+                                ");
+
+                                foreach ($queryDocuments as $document) {
+                                    try {
+                                        $filename = tempnam(sys_get_temp_dir(), 'pastoral_attachment');
+                                        file_put_contents($filename, $document["blob"]);
+
+                                        /** @var StorageMapper $storageMapper */
+                                        $storageMapper = StorageMapper::getInstance();
+                                        $storageObject = $storageMapper->accept("{$document['filename']}.{$document['extension']}", $filename, false);
+
+                                        $pastoralAttachmentMapper = PastoralAttachmentMapper::getInstance();
+
+                                        $attachment = $pastoralAttachmentMapper->createModel();
+                                        $attachment->setPastoral($pastoralRecord);
+                                        $attachment->setStorage($storageObject);
+                                        $attachment->setPrivate(true);
+                                        $pastoralAttachmentMapper->save($attachment);
+
+                                        $log = $this->getPastoralLogMapper()->createModel();
+                                        $log->setImportId($importId);
+                                        $log->setUserId($user->getId());
+                                        $log->setPastoralId($pastoralRecord->getId());
+                                        $log->setCreatorName($pastoralRecord->getOwner()->getFullName());
+                                        $log->setStudentName($pastoralRecord->getStudent()->getFullName());
+                                        $log->setHeading("Imported Attachment '{$document["filename"]}'");
+                                        $log->setResult("OK");
+                                        $this->getPastoralLogMapper()->save($log);
+
+                                        unlink($filename);
+                                    } catch (MapperException $e) {
+                                        // Pastoral record for this attachment wasn't found?
+                                    }
+                                }
+                            }
                         } else {
                             // Skip blank records
 
@@ -387,12 +438,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             // Import audience members for each record we created
 
             foreach ($pastoralRecordsCreated as $pastoralRecord) {
-                $queryAudience = $this->connector->executeQuery(
-                    "
+                $queryAudience = $this->connector->executeQuery('
                     SELECT  ID 
                     FROM    PastoralCareContacts 
                     WHERE   PastoralCareSeq = :pastoralCareSeq
-                ",
+                ',
                     ['pastoralCareSeq' => $pastoralRecord->getExternalId()]
                 );
 
@@ -435,55 +485,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     }
 
                     $this->getPastoralLogMapper()->save($logAccess);
-                }
-            }
-        }
-
-        if ($importAttachments) {
-            // Import attachments from Synergetic DocMan
-
-            $queryDocuments = $this->connector->getQueryIterator("
-                SELECT ref.RelatedSeq as external_id,
-                       doc.Description as [filename],
-                       DocumentType as extension,
-                       [Document] as [blob]
-                FROM   {$this->schemaMedia}.tDocuments doc
-                JOIN   {$this->schemaMedia}.tDocumentReferences ref on ref.tDocumentsSeq = doc.tDocumentsSeq
-                WHERE  RelatedSeqModuleCode = 'SPC'
-            ");
-
-            foreach ($queryDocuments as $document) {
-                try {
-                    $record = $this->getPastoralMapper()->findOneByColumn('external_id', $document['external_id']);
-
-                    $filename = tempnam(sys_get_temp_dir(), 'pastoral_attachment');
-                    file_put_contents($filename, $document["blob"]);
-
-                    /** @var StorageMapper $storageMapper */
-                    $storageMapper = StorageMapper::getInstance();
-                    $storageObject = $storageMapper->accept("{$document['filename']}.{$document['extension']}", $filename, false);
-
-                    $pastoralAttachmentMapper = PastoralAttachmentMapper::getInstance();
-
-                    $attachment = $pastoralAttachmentMapper->createModel();
-                    $attachment->setPastoral($record);
-                    $attachment->setStorage($storageObject);
-                    $attachment->setPrivate(true);
-                    $pastoralAttachmentMapper->save($attachment);
-
-                    $log = $this->getPastoralLogMapper()->createModel();
-                    $log->setImportId($importId);
-                    $log->setUserId($user->getId());
-                    $log->setPastoralId($record->getId());
-                    $log->setCreatorName($record->getOwner()->getFullName());
-                    $log->setStudentName($record->getStudent()->getFullName());
-                    $log->setHeading("Imported Attachment '{$document["filename"]}'");
-                    $log->setResult("OK");
-                    $this->getPastoralLogMapper()->save($log);
-
-                    unlink($filename);
-                } catch (MapperException $e) {
-                    // Pastoral record for this attachment wasn't found?
                 }
             }
         }
