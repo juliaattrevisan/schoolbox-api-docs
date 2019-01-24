@@ -17,6 +17,18 @@ use Schoolbox\Discussion\Post;
 class Controller extends BaseController
 {
     /**
+     * The number of threads to return per request.
+     */
+    private const THREAD_RESULTS_PER_REQUEST = 10;
+
+
+    /**
+     * The number of posts to return per request.
+     */
+    private const POST_RESULTS_PER_REQUEST = 100;
+
+
+    /**
      * @var Mapper
      */
     private $threadMapper;
@@ -72,7 +84,7 @@ class Controller extends BaseController
         // Now actually get them
         $threads = $this->threadMapper->findByPredicates(
             $pb,
-            ['limit' => 10, 'order' => ['id' => 'asc']]
+            ['limit' => self::THREAD_RESULTS_PER_REQUEST, 'order' => ['id' => 'asc']]
         )->reindex();
         $this->response->content->set(
             $this->buildJsonOutput([
@@ -112,7 +124,7 @@ class Controller extends BaseController
 
         $posts = $this->postMapper->findByPredicates(
             $pb,
-            ['limit' => 10, 'order' => ['id' => 'asc']]
+            ['limit' => self::POST_RESULTS_PER_REQUEST, 'order' => ['id' => 'asc']]
         )->reindex();
         $this->response->content->set(
             $this->buildJsonOutput([
