@@ -44,14 +44,19 @@ class Controller extends BaseController
     /**
      * Get a list of threads by their context.
      *
+     * @api   GET /threads/context/{contextType}/id/{contextId}
+     * @level 190
+     *
      * @param string $contextType
      * @param int    $contextId
      */
     public function getThreadsByContext(string $contextType, int $contextId): void
     {
         $threads = $this->threadMapper->findForContext($contextType, $contextId);
-        $this->buildJsonOutput(
-            $threads->map(new JsonSerializer())
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $threads->map(new JsonSerializer())
+            )
         );
     }
 
@@ -59,13 +64,18 @@ class Controller extends BaseController
     /**
      * Get a list of posts in the given thread.
      *
+     * @api   GET /threads/{id}/posts
+     * @level 190
+     *
      * @param Model $thread
      */
     public function getPostsByThread(Model $thread): void
     {
         $posts = $this->postMapper->findByColumn('discussion_thread_id', $thread->getId());
-        $this->buildJsonOutput(
-            $posts->map(new Post\JsonSerializer())
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $posts->map(new Post\JsonSerializer())
+            )
         );
     }
 }

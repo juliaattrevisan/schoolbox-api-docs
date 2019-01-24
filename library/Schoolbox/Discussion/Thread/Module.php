@@ -35,9 +35,7 @@ class Module extends BaseModule
         $authorizer = new Rule\IsSuperuser();
 
 
-        // Routes:
-        // /threads/context/{context_type}/id/{context_id}
-        // /threads/{id}/posts
+        // Routes
         $this->register(
             'GET',
             '/context/{contextType}/id/{contextId}',
