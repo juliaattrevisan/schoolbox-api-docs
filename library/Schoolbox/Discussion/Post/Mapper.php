@@ -29,7 +29,7 @@ class Mapper extends BaseMapper
         $this->hasTable('discussion_post');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('discussion_thread_id', Thread\Mapper::class, 'id', null, null, null, 'thread');
+        $this->joins('discussion_thread_id', Thread\Mapper::class, 'id', null, null, 'thread', 'thread');
         $this->joins('author_id', UserMapper::class, 'id', null, null, null, 'author');
         $this->uses('content', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
