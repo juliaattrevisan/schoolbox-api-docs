@@ -109,7 +109,7 @@ class DataGenerator
             }
 
             $threadMapper->save($thread);
-            $threadContextMapper->save($thread->getContext());
+            $threadContextMapper->save($context);
             $postMapper->save($posts);
         }
     }
