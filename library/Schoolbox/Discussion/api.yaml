@@ -46,7 +46,7 @@ paths:
         - $ref: '#/components/parameters/id'
         - $ref: '#/components/parameters/token'
 
-  /threads/context/{context_type}/id/{context_id}:
+  /threads/context/{contextType}/id/{contextId}:
     get:
       operationId: getThreadsByContext
       summary: Returns threads by their context
@@ -56,11 +56,11 @@ paths:
         default:
           $ref: '#/components/responses/problem'
       parameters:
-        - name: context_type
+        - name: contextType
           in:   path
           schema:
             $ref: '#/components/schemas/threadContext/properties/type'
-        - name: context_id
+        - name: contextId
           in:   path
           schema:
             $ref: '#/components/schemas/threadContext/properties/id'
