@@ -27,11 +27,11 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('discussion_thread');
         $this->hasModel(Model::class);
-        $this->uses('id', self::TYPE_INTEGER, BaseMapper::COLUMN_IDENTIFIER);
-        $this->uses('open', BaseMapper::TYPE_BOOLEAN);
-        $this->uses('created_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('updated_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_SOFTDELETE);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('open', self::TYPE_BOOLEAN);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joinsReverseMulti('discussion_thread_id', Post\Mapper::class, null, 'posts');
         $this->joinsReverseMulti('discussion_thread_id', Context\Mapper::class, null, 'context');
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteThreads']);

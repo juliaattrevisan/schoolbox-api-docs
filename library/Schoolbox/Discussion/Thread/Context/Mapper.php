@@ -25,9 +25,9 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('discussion_thread_context');
         $this->hasModel(Model::class);
-        $this->uses('id', self::TYPE_INTEGER, BaseMapper::COLUMN_IDENTIFIER);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('discussion_thread_id', Thread\Mapper::class, 'id', null, null, null, 'thread');
-        $this->uses('context_type', BaseMapper::COLUMN_ENUM, null, [Model::CONTEXT_COMMS,]);
-        $this->uses('context_id', BaseMapper::TYPE_INTEGER);
+        $this->uses('context_type', self::COLUMN_ENUM, null, [Model::CONTEXT_COMMS,]);
+        $this->uses('context_id', self::TYPE_INTEGER);
     }
 }

@@ -28,13 +28,13 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('discussion_post');
         $this->hasModel(Model::class);
-        $this->uses('id', self::TYPE_INTEGER, BaseMapper::COLUMN_IDENTIFIER);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('discussion_thread_id', Thread\Mapper::class, 'id', null, null, null, 'thread');
         $this->joins('author_id', UserMapper::class, 'id', null, null, null, 'author');
-        $this->uses('content', BaseMapper::TYPE_STRING);
-        $this->uses('created_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('updated_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_SOFTDELETE);
+        $this->uses('content', self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
 
