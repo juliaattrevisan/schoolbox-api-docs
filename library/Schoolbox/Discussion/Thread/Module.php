@@ -10,8 +10,10 @@ namespace Schoolbox\Discussion\Thread;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Comms\News;
+use Schoolbox\Discussion\Post;
 
 /**
  * Module for discussion thread requests.
@@ -53,6 +55,19 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector): void
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector): void
+    {
+        /** @var Container $injector */
+        $injector->params[Controller::class] = [
+            'threadMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+            'postMapper'   => $this->getMapperFactory()->getLazy(Post\Mapper::class),
+        ];
     }
 
 

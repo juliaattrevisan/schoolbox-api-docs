@@ -8,20 +8,57 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread;
 
+use Schoolbox\Discussion\Post;
+
 /**
- * Class Controller
+ * Controller for thread-related API requests.
  */
 class Controller
 {
+    /**
+     * @var Mapper
+     */
+    private $threadMapper;
 
-    public function getThreadsByContext($context): void
+
+    /**
+     * @var Post\Mapper
+     */
+    private $postMapper;
+
+
+    /**
+     * Constructor
+     *
+     * @param Mapper      $threadMapper
+     * @param Post\Mapper $postMapper
+     */
+    public function __construct(Mapper $threadMapper, Post\Mapper $postMapper)
     {
-        //
+        $this->threadMapper = $threadMapper;
+        $this->postMapper   = $postMapper;
     }
 
 
+    /**
+     * Get a list of threads by their context.
+     *
+     * @param string $contextType
+     * @param int    $contextId
+     */
+    public function getThreadsByContext(string $contextType, int $contextId): void
+    {
+        $threads = $this->threadMapper->findForContext($contextType, $contextId);
+    }
+
+
+    /**
+     * Get a list of posts in the given thread.
+     *
+     * @param Model $thread
+     */
     public function getPostsByThread(Model $thread): void
     {
-        //
+        $posts = $this->postMapper->findByColumn('discussion_thread_id', $thread->getId());
     }
 }
