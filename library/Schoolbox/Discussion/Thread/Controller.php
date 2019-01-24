@@ -72,14 +72,14 @@ class Controller extends BaseController
         // Now actually get them
         $threads = $this->threadMapper->findByPredicates(
             $pb,
-            ['limit' => 10, 'order' => ['id' => 'desc']]
+            ['limit' => 10, 'order' => ['id' => 'asc']]
         )->reindex();
         $this->response->content->set(
             $this->buildJsonOutput([
                 'data'     => $threads->map(new JsonSerializer()),
                 'metadata' => [
                     'cursor' => [
-                        'next' => $threads->last() ? base64_encode($threads->last()->getId()) : null
+                        'next' => $threads->last() ? base64_encode((string)$threads->last()->getId()) : null
                     ],
                 ],
             ])
