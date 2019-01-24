@@ -55,7 +55,7 @@ class Controller extends BaseController
         $threads = $this->threadMapper->findForContext($contextType, $contextId);
         $this->response->content->set(
             $this->buildJsonOutput(
-                $threads->map(new JsonSerializer())
+                $threads->map(new JsonSerializer())->reindex()
             )
         );
     }
@@ -74,7 +74,7 @@ class Controller extends BaseController
         $posts = $this->postMapper->findByColumn('discussion_thread_id', $thread->getId());
         $this->response->content->set(
             $this->buildJsonOutput(
-                $posts->map(new Post\JsonSerializer())
+                $posts->map(new Post\JsonSerializer())->reindex()
             )
         );
     }
