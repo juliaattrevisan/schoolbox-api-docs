@@ -52,11 +52,37 @@ class Controller extends BaseController
      */
     public function getThreadsByContext(string $contextType, int $contextId): void
     {
-        $threads = $this->threadMapper->findForContext($contextType, $contextId);
+        // Cursoring:
+        // "get x records, starting after last record y"
+        // First, check there is a cursor:
+        $pb = $this->threadMapper->getPredicateBuilder()
+            ->equals('c.context_type', $contextType)
+            ->equals('c.context_id', $contextId);
+
+        $cursor = $this->request->query->get('cursor');
+        if (isset($cursor)) {
+            $lastId = filter_var(base64_decode($cursor), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+            if (isset($lastId) && $lastId > 0) {
+                // Which direction? Assume always ascending (oldest first) for now
+                $pb->greaterThan('id', $lastId);
+            }
+        }
+
+
+        // Now actually get them
+        $threads = $this->threadMapper->findByPredicates(
+            $pb,
+            ['limit' => 10, 'order' => ['id' => 'desc']]
+        )->reindex();
         $this->response->content->set(
-            $this->buildJsonOutput(
-                $threads->map(new JsonSerializer())->reindex()
-            )
+            $this->buildJsonOutput([
+                'data'     => $threads->map(new JsonSerializer()),
+                'metadata' => [
+                    'cursor' => [
+                        'next' => $threads->last() ? base64_encode($threads->last()->getId()) : null
+                    ],
+                ],
+            ])
         );
     }
 
@@ -73,9 +99,10 @@ class Controller extends BaseController
     {
         $posts = $this->postMapper->findByColumn('discussion_thread_id', $thread->getId());
         $this->response->content->set(
-            $this->buildJsonOutput(
-                $posts->map(new Post\JsonSerializer())->reindex()
-            )
+            $this->buildJsonOutput([
+                'data'     => $posts->map(new Post\JsonSerializer())->reindex(),
+                'metadata' => [],
+            ])
         );
     }
 }
