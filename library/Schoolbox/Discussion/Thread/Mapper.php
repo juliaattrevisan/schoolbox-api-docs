@@ -32,8 +32,22 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->joinsReverseMulti('discussion_thread_id', Post\Mapper::class, null, 'posts');
-        $this->joinsReverseMulti('discussion_thread_id', Context\Mapper::class, null, 'context');
+        $this->hasJoin(
+            'posts',
+            [
+                'mapper'    => Post\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'discussion_thread_id'
+            ]
+        );
+        $this->hasJoin(
+            'context',
+            [
+                'mapper'    => Context\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'discussion_thread_id'
+            ]
+        );
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteThreads']);
     }
 
