@@ -27,6 +27,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('discussion_post');
+        $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, BaseMapper::COLUMN_IDENTIFIER);
         $this->joins('discussion_thread_id', Thread\Mapper::class, 'id', null, null, null, 'thread');
         $this->joins('author_id', UserMapper::class, 'id', null, null, null, 'author');

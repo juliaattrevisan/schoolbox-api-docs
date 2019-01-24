@@ -26,6 +26,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('discussion_thread');
+        $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, BaseMapper::COLUMN_IDENTIFIER);
         $this->uses('open', BaseMapper::TYPE_BOOLEAN);
         $this->uses('created_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_CREATED_TIMESTAMP);
