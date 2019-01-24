@@ -70,7 +70,7 @@ Usage: php pastoralImport.php [--parent-access] [--add-records] [--add-attachmen
     --add-records:      import pastoral records
     --add-attachments:  import documents associated with pastoral records
     --user:             the user id of someone who should be associated with this import (typically a superuser)
-    --default-user:     the user id of someone who should be assigned as owner of pastoral records
+    --default-owner:    the user id of someone who should be assigned as owner of pastoral records
     
     
 HELP;
