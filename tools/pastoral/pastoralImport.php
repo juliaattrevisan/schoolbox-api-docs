@@ -64,6 +64,7 @@ $kernel->run(function (
 
     if (!$userId) {
         echo "{$colourRed}Invalid user id. Specify a user to whom the pastoral import is associated for logging purposes (typically a superuser)\n\n";
+        exit(0);
     }
 
     $userMapper = new \Schoolbox\UserMapper();
@@ -72,6 +73,7 @@ $kernel->run(function (
         $user = $userMapper->findById($userId);
     } catch (\Schoolbox\Mapper\Exception $e) {
         echo "{$colourRed}Invalid user id. User not found.\n\n";
+        exit(0);
     }
 
     /* The default owner of pastoral records
@@ -80,12 +82,14 @@ $kernel->run(function (
 
     if (!$defaultOwnerId) {
         echo "{$colourRed}Invalid default owner id. Specify a user to whom pastoral records are assigned.\n\n";
+        exit(0);
     }
 
     try {
         $defaultOwner = $userMapper->findById($defaultOwnerId);
     } catch (\Schoolbox\Mapper\Exception $e) {
         echo "{$colourRed}Invalid default owner id. User not found.\n\n";
+        exit(0);
     }
 
     /* Help
