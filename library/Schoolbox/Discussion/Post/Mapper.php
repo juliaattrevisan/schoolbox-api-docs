@@ -94,7 +94,7 @@ class Mapper extends BaseMapper
                 $model->setAuthor($author);
             }
 
-            $collection[$model->getId()] = $collection;
+            $collection[$model->getId()] = $model;
         }
         return $collection;
     }
