@@ -94,13 +94,14 @@ class Bridge
     /**
      * Get a single curriculum and all of its contents in a single request.
      *
-     * @param int $curriculumId
+     * @param int  $curriculumId
+     * @param bool $getAttachments Should attachments be retrieved?
      * @return Curriculum
      * @throws HttpException\ClientException for a 4xx error
      * @throws HttpException\ServerException for a 5xx error
      * @throws HttpException\RequestException for all other request errors
      */
-    public function getCurriculum(int $curriculumId): Curriculum
+    public function getCurriculum(int $curriculumId, bool $getAttachments): Curriculum
     {
         // Get all units, and their assessments/attachments in one shot
         $requests = [
@@ -117,7 +118,9 @@ class Bridge
         foreach ($units as $unit) {
             $unitId = $unit->getId();
             $requests['assessments:' . $unitId] = ['assessment/', ['query' => ['unit_id' => $unitId]]];
-            $requests['attachments:' . $unitId] = ['attachment/', ['query' => ['unit_id' => $unitId]]];
+            if ($getAttachments) {
+                $requests['attachments:' . $unitId] = ['attachment/', ['query' => ['unit_id' => $unitId]]];
+            }
         }
 
         // Put results into units

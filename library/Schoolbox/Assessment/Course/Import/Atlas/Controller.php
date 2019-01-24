@@ -107,7 +107,11 @@ class Controller extends BaseController
      */
     public function getCurriculum(int $curriculumId): void
     {
-        $this->getResponse()->content->set($this->buildJsonOutput($this->apiBridge->getCurriculum($curriculumId)));
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput(
+                $this->apiBridge->getCurriculum($curriculumId, Module::ENABLE_ATTACHMENT_IMPORT)
+            )
+        );
     }
 
 
@@ -152,7 +156,7 @@ class Controller extends BaseController
 
         // Get the curriculum if possible
         try {
-            $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId);
+            $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId, Module::ENABLE_ATTACHMENT_IMPORT);
         } catch (\Throwable $e) {
             $this->throwCurriculumPlanFetchError($e);
             return;
@@ -190,7 +194,7 @@ class Controller extends BaseController
 
         // Get the curriculum if possible
         try {
-            $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId);
+            $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId, Module::ENABLE_ATTACHMENT_IMPORT);
         } catch (\Throwable $e) {
             $this->throwCurriculumPlanFetchError($e);
             return;
@@ -227,7 +231,7 @@ class Controller extends BaseController
 
         // Get the curriculum if possible
         try {
-            $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId);
+            $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId, Module::ENABLE_ATTACHMENT_IMPORT);
         } catch (\Throwable $e) {
             $this->throwCurriculumPlanFetchError($e);
             return;
@@ -315,7 +319,7 @@ class Controller extends BaseController
 
         // SHUP.
         /** @noinspection PhpUnhandledExceptionInspection */
-        $this->response->status->setCode($e->getCode() ?? 400);
+        $this->response->status->setCode($e->getCode() ?: 400);
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput('sub/mage-error.twig',
                 [
