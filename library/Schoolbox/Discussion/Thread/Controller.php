@@ -97,11 +97,29 @@ class Controller extends BaseController
      */
     public function getPostsByThread(Model $thread): void
     {
-        $posts = $this->postMapper->findByColumn('discussion_thread_id', $thread->getId());
+        $pb = $this->postMapper->getPredicateBuilder()
+            ->equals('discussion_thread_id', $thread->getId());
+
+        $cursor = $this->request->query->get('cursor');
+        if (isset($cursor)) {
+            $lastId = filter_var(base64_decode($cursor), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+            if (isset($lastId) && $lastId > 0) {
+                // Which direction? Assume always ascending (oldest first) for now
+                $pb->greaterThan('id', $lastId);
+            }
+        }
+
+
+        $posts = $this->postMapper->findByPredicates(
+            $pb,
+            ['limit' => 10, 'order' => ['id' => 'asc']]
+        )->reindex();
         $this->response->content->set(
             $this->buildJsonOutput([
                 'data'     => $posts->map(new Post\JsonSerializer())->reindex(),
-                'metadata' => [],
+                'cursor' => [
+                    'next' => $posts->last() ? base64_encode((string)$posts->last()->getId()) : null
+                ],
             ])
         );
     }
