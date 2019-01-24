@@ -108,6 +108,7 @@ HELP;
 
     // Only process if pastoral docman writeback is actually enabled in config
     if (!$di->get('config')->get("external_pastoral")) {
+        echo "{$colourRed}Pastoral External is disabled, therefore this script is exiting.\n\n";
         $log->warning('Pastoral external is disabled, exiting...');
         exit;
     }
@@ -117,6 +118,7 @@ HELP;
     $lock = new Alaress_Lock('pastoral_import.' . INSTANCE_ID . '.lock');
 
     if (!$lock->acquire()) {
+        echo "{$colourRed}A Pastoral import is currently in progress, therefore this script is exiting.\n\n";
         $log->warning('A pastoral import is currently in progress, exiting...');
         exit;
     }
