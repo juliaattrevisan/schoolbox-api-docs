@@ -8,8 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Discussion\Post;
+use Schoolbox\GenericCollection;
 
 /**
  * Controller for thread-related API requests.
@@ -66,33 +68,25 @@ class Controller extends BaseController
     {
         // Cursoring:
         // "get x records, starting after last record y"
-        // First, check there is a cursor:
-        $pb = $this->threadMapper->getPredicateBuilder()
-            ->equals('c.context_type', $contextType)
-            ->equals('c.context_id', $contextId);
+        $pb = $this->applyCursor(
+            $this->threadMapper->getPredicateBuilder()
+                               ->equals('c.context_type', $contextType)
+                               ->equals('c.context_id', $contextId),
+            $this->request->query->get('cursor')
+        );
 
-        $cursor = $this->request->query->get('cursor');
-        if (isset($cursor)) {
-            $lastId = filter_var(base64_decode($cursor), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-            if (isset($lastId) && $lastId > 0) {
-                // Which direction? Assume always ascending (oldest first) for now
-                $pb->greaterThan('id', $lastId);
-            }
-        }
-
-
-        // Now actually get them
+        // Fetch results
         $threads = $this->threadMapper->findByPredicates(
             $pb,
             ['limit' => self::THREAD_RESULTS_PER_REQUEST, 'order' => ['id' => 'asc']]
         )->reindex();
+
+        // Output results
         $this->response->content->set(
             $this->buildJsonOutput([
                 'data'     => $threads->map(new JsonSerializer()),
                 'metadata' => [
-                    'cursor' => [
-                        'next' => $threads->last() ? base64_encode((string)$threads->last()->getId()) : null
-                    ],
+                    'cursor' => $this->buildCursor($threads),
                 ],
             ])
         );
@@ -109,30 +103,94 @@ class Controller extends BaseController
      */
     public function getPostsByThread(Model $thread): void
     {
-        $pb = $this->postMapper->getPredicateBuilder()
-            ->equals('discussion_thread_id', $thread->getId());
+        // Build cursor predicate builder
+        $pb = $this->applyCursor(
+            $this->postMapper->getPredicateBuilder()
+                             ->equals('discussion_thread_id', $thread->getId()),
+            $this->request->query->get('cursor')
+        );
 
-        $cursor = $this->request->query->get('cursor');
-        if (isset($cursor)) {
-            $lastId = filter_var(base64_decode($cursor), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-            if (isset($lastId) && $lastId > 0) {
-                // Which direction? Assume always ascending (oldest first) for now
-                $pb->greaterThan('id', $lastId);
-            }
-        }
-
-
+        // Fetch results
         $posts = $this->postMapper->findByPredicates(
             $pb,
             ['limit' => self::POST_RESULTS_PER_REQUEST, 'order' => ['id' => 'asc']]
         )->reindex();
+
+        // Output results
         $this->response->content->set(
             $this->buildJsonOutput([
-                'data'     => $posts->map(new Post\JsonSerializer())->reindex(),
-                'cursor' => [
-                    'next' => $posts->last() ? base64_encode((string)$posts->last()->getId()) : null
+                'data'     => $posts->map(new Post\JsonSerializer()),
+                'metadata' => [
+                    'cursor' => $this->buildCursor($posts),
                 ],
             ])
         );
+    }
+
+
+    /**
+     * Apply a cursor to the predicate builder.
+     *
+     * TODO look at extracting cursoring to its own class
+     *
+     * @param Builder     $builder
+     * @param string|null $cursor
+     * @return Builder
+     */
+    private function applyCursor(Builder $builder, ?string $cursor): Builder
+    {
+        if (isset($cursor)) {
+            $lastId = $this->decodeCursor($cursor);
+            if (isset($lastId) && $lastId > 0) {
+                // Which direction? Assume always ascending (oldest first) for now
+                $builder->greaterThan('id', $lastId);
+            }
+        }
+        return $builder;
+    }
+
+
+    /**
+     * Builds the cursor to be output in the response metadata.
+     *
+     * @param GenericCollection $records
+     * @return array
+     */
+    private function buildCursor(GenericCollection $records): array
+    {
+        $nextCursor = null;
+        $lastRecord = $records->last();
+        if ($lastRecord && method_exists($lastRecord, 'getId')) {
+            $nextCursor = $this->encodeCursor($lastRecord->getId());
+        }
+        // It's currently too awkward to generate a previous cursor.
+        // You don't need it, you already have the results from the last cursor!
+        return [
+            'next' => $nextCursor,
+        ];
+    }
+
+
+    /**
+     * Encode a cursor in a form which is passable in a query string.
+     *
+     * @param int|null $id
+     * @return string|null
+     */
+    private function encodeCursor(?int $id): ?string
+    {
+        return isset($id) ? base64_encode((string)$id) : null;
+    }
+
+
+    /**
+     * Decode a cursor that was passed in a query string.
+     *
+     * @param string|null $cursor
+     * @return int|null
+     */
+    private function decodeCursor(?string $cursor): ?int
+    {
+        return filter_var(base64_decode($cursor), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
     }
 }
