@@ -105,13 +105,13 @@ class Mapper extends BaseMapper
             /** @var Model $model */
             $model = $this->hydrate($row);
 
-            /** @var Context\Model|null $context */
-            $context = $this->hydrateJoin($row, 'context', 'c');
-            if ($context) {
-                $model->setContext($context);
-            }
+//            /** @var Context\Model|null $context */
+//            $context = $this->hydrateJoin($row, 'context', 'c');
+//            if ($context) {
+//                $model->setContext($context);
+//            }
 
-            $collection[$model->getId()] = $collection;
+            $collection[$model->getId()] = $model;
         }
         return $collection;
     }
