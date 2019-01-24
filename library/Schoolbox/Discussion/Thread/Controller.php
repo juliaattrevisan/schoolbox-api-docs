@@ -8,12 +8,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread;
 
+use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Discussion\Post;
 
 /**
  * Controller for thread-related API requests.
  */
-class Controller
+class Controller extends BaseController
 {
     /**
      * @var Mapper
@@ -49,6 +50,9 @@ class Controller
     public function getThreadsByContext(string $contextType, int $contextId): void
     {
         $threads = $this->threadMapper->findForContext($contextType, $contextId);
+        $this->buildJsonOutput(
+            $threads->map(new JsonSerializer())
+        );
     }
 
 
@@ -60,5 +64,8 @@ class Controller
     public function getPostsByThread(Model $thread): void
     {
         $posts = $this->postMapper->findByColumn('discussion_thread_id', $thread->getId());
+        $this->buildJsonOutput(
+            $posts->map(new Post\JsonSerializer())
+        );
     }
 }
