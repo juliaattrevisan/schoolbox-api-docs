@@ -55,6 +55,8 @@ $kernel->run(function (
     $importParentAccess = isset($opts['parent-access']);
     $importRecords      = isset($opts['add-records']);
     $importAttachments  = isset($opts['add-attachments']);
+    $defaultOwner       = null;
+    $user               = null;
 
     /* The user conducting the import (used in logging)
      */
@@ -119,11 +121,10 @@ HELP;
         exit;
     }
 
-
     $log->info("Beginning import of pastoral records...");
 
-//    $pastoralExternal = new External_Pastoral();
-//    $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments);
+    $pastoralExternal = new External_Pastoral();
+    $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments);
 
     $lock->release();
 });
