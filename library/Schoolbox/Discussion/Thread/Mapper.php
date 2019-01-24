@@ -34,6 +34,7 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', BaseMapper::TYPE_DATETIME, BaseMapper::COLUMN_SOFTDELETE);
         $this->joinsReverseMulti('discussion_thread_id', Post\Mapper::class, null, 'posts');
         $this->joinsReverseMulti('discussion_thread_id', Context\Mapper::class, null, 'context');
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteThreads']);
     }
 
 
