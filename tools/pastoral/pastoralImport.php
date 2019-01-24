@@ -58,6 +58,26 @@ $kernel->run(function (
     $defaultOwner       = null;
     $user               = null;
 
+    /* Help
+     */
+    if (isset($opts['help'])) {
+        echo <<<HELP
+
+Imports Pastoral records from external source. Primarily used if there are many records.
+
+Usage: php pastoralImport.php [--parent-access] [--add-records] [--add-attachments] [--user=1] [--default-user=1]
+    --parent-access:    give parents access to pastoral records
+    --add-records:      import pastoral records
+    --add-attachments:  import documents associated with pastoral records
+    --user:             the user id of someone who should be associated with this import (typically a superuser)
+    --default-user:     the user id of someone who should be assigned as owner of pastoral records
+    
+    
+HELP;
+
+        exit(0);
+    }
+
     /* The user conducting the import (used in logging)
      */
     $userId             = array_key_exists('user', $opts) ? (int)$opts['user'] : false;
@@ -89,24 +109,6 @@ $kernel->run(function (
         $defaultOwner = $userMapper->findById($defaultOwnerId);
     } catch (\Schoolbox\Mapper\Exception $e) {
         echo "{$colourRed}Invalid default owner id. User not found.\n\n";
-        exit(0);
-    }
-
-    /* Help
-     */
-    if (isset($opts['help'])) {
-        echo <<<HELP
-
-Imports Pastoral records from external source. Primarily used if there are many records.
-
-Usage: php pastoralImport.php [--parent-access] [--add-records] [--add-attachments] [--user=1] [--default-user=1]
-    --parent-access:    give parents access to pastoral records
-    --add-records:      import pastoral records
-    --add-attachments:  import documents associated with pastoral records
-    --user:             the user id of someone who should be associated with this import (typically a superuser)
-    --default-user:     the user id of someone who should be assigned as owner of pastoral recrods
-HELP;
-
         exit(0);
     }
 
