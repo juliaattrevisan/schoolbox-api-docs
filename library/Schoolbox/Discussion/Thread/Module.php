@@ -21,6 +21,12 @@ use Schoolbox\Discussion\Post;
 class Module extends BaseModule
 {
     /**
+     * @var string
+     */
+    protected $basename = 'discussionThreads';
+
+
+    /**
      * @inheritdoc
      */
     protected function registerRoutes(): void
@@ -78,7 +84,7 @@ class Module extends BaseModule
      * @return array
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function preloadContext(array $params): array
+    public function preloadContext(array $params): array
     {
         switch ($params['contextType']) {
             case Context\Model::CONTEXT_COMMS:
@@ -104,7 +110,7 @@ class Module extends BaseModule
      * @return array
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function preloadThread(array $params): array
+    public function preloadThread(array $params): array
     {
         return [
             'thread' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
