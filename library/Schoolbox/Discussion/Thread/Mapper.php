@@ -71,7 +71,7 @@ class Mapper extends BaseMapper
     protected function getSelectString()
     {
         return "
-            SELECT
+            SELECT DISTINCT
                 {$this->getColumnString()}
         ";
     }
