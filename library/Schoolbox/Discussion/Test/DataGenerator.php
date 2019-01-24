@@ -8,12 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Test;
 
-use Alaress\Database\Connector\IConnector;
 use Faker;
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Post;
 use Schoolbox\Discussion\Thread;
-use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 /**
@@ -62,8 +60,12 @@ class DataGenerator
     /**
      * Constructor
      *
-     * @param Faker\Generator $faker
-     * @param IConnector      $connector
+     * @param Faker\Generator       $faker
+     * @param UserMapper            $userMapper
+     * @param News\Mapper           $articleMapper
+     * @param Thread\Mapper         $threadMapper
+     * @param Thread\Context\Mapper $threadContextMapper
+     * @param Post\Mapper           $postMapper
      */
     public function __construct(
         Faker\Generator $faker,
@@ -73,12 +75,12 @@ class DataGenerator
         Thread\Context\Mapper $threadContextMapper,
         Post\Mapper $postMapper
     ) {
-        $this->faker     = $faker;
-        $this->userMapper = $userMapper;
-        $this->articleMapper = $articleMapper;
-        $this->threadMapper = $threadMapper;
+        $this->faker               = $faker;
+        $this->userMapper          = $userMapper;
+        $this->articleMapper       = $articleMapper;
+        $this->threadMapper        = $threadMapper;
         $this->threadContextMapper = $threadContextMapper;
-        $this->postMapper = $postMapper;
+        $this->postMapper          = $postMapper;
     }
 
 
@@ -86,6 +88,7 @@ class DataGenerator
      * Generate test data
      *
      * @param int|null $seed If provided, use this as the RNG seed
+     * @throws \Schoolbox\Mapper\Exception if something went wrong?
      */
     public function generateTestData(int $seed = null): void
     {
