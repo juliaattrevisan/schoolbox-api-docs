@@ -72,8 +72,7 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT
-                {$this->getColumnString()},
-                {$this->getJoinColumnString('context', 'c')}
+                {$this->getColumnString()}
         ";
     }
 
@@ -92,29 +91,29 @@ class Mapper extends BaseMapper
     }
 
 
-    /**
-     * Overridden to join on context.
-     *
-     * @param PDOStatement $statement
-     * @return \Schoolbox\GenericCollection
-     */
-    protected function hydrateSelect(PDOStatement $statement)
-    {
-        $collection = $this->createCollection();
-        foreach ($statement as $row) {
-            /** @var Model $model */
-            $model = $this->hydrate($row);
-
-//            /** @var Context\Model|null $context */
-//            $context = $this->hydrateJoin($row, 'context', 'c');
-//            if ($context) {
-//                $model->setContext($context);
-//            }
-
-            $collection[$model->getId()] = $model;
-        }
-        return $collection;
-    }
+//    /**
+//     * Overridden to join on context.
+//     *
+//     * @param PDOStatement $statement
+//     * @return \Schoolbox\GenericCollection
+//     */
+//    protected function hydrateSelect(PDOStatement $statement)
+//    {
+//        $collection = $this->createCollection();
+//        foreach ($statement as $row) {
+//            /** @var Model $model */
+//            $model = $this->hydrate($row);
+//
+////            /** @var Context\Model|null $context */
+////            $context = $this->hydrateJoin($row, 'context', 'c');
+////            if ($context) {
+////                $model->setContext($context);
+////            }
+//
+//            $collection[$model->getId()] = $model;
+//        }
+//        return $collection;
+//    }
 
 
     /**
