@@ -13,6 +13,8 @@ use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Mapper for discussion thread context.
+ *
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {

@@ -90,12 +90,12 @@ class DataGenerator
         foreach ($articleIdsForDiscussion as $articleId) {
             // Build a single thread
             $thread = $threadMapper->createModel()
-                ->setOpen(true)
-                ->setContext(
-                    (new Thread\Context\Model())
-                        ->setContextType(Thread\Context\Model::CONTEXT_COMMS)
-                        ->setContextId($articleId)
-                );
+                ->setOpen(true);
+
+            $context = $threadContextMapper->createModel()
+                ->setThread($thread)
+                ->setContextType(Thread\Context\Model::CONTEXT_COMMS)
+                ->setContextId($articleId);
 
             // Build a bunch of comments
             // Need to be able to override created date for all of them though?
