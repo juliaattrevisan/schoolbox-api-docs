@@ -70,7 +70,6 @@ class DataGenerator
 
         // Delete all the old threads and posts
         $threadMapper->delete($threadMapper->findAll());
-        $postMapper->delete($postMapper->findAll());
 
 
 
