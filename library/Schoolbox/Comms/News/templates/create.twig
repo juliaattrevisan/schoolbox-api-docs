@@ -377,7 +377,25 @@
                 dataType: 'json'
             },
             selectize: {
-                placeholder: 'Assign Topics'
+                placeholder: 'Assign Topics',
+                preload: true,
+                hideSelected: true,
+                load: function(query, callback) {
+                    // Load: get values from AJAX, and callback with result
+                    var ajaxSettings = {
+                        url: '{{ routeLookup('commsNews.getTopics') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { query: query }
+                    };
+                    $.ajax(ajaxSettings)
+                        .done(function(result) {
+                            callback(result)
+                        })
+                        .fail(function() {
+                            callback()
+                        })
+                }
             },
             value: [
                 {% for topic in article.topics %}
