@@ -105,11 +105,8 @@
         $('#component-lock-toggle').click(function (event) {
             var locked = this.checked;
             
-            $('nav[data-component-settings], [data-component-handle]').toggle(locked);
+            $('a[data-component-settings], [data-component-handle]').toggle(locked);
 
-            $('div[data-component-titlebar-container]').each(function() {
-                $(this).toggleClass('actions-small-' + $(this).data('action-count'), locked);
-            });
         });
 
         $('#component-lock-switch').trigger('editTourStart');

@@ -104,17 +104,14 @@
         // Lock all components on page load
         // This is done with JS, otherwise components that are added after page load will be locked,
         // and who can be bothered wrangling with phplib
-        $('nav[data-component-settings], [data-component-handle]').hide();
+        $('a[data-component-settings], [data-component-handle]').hide();
         
         // Toggle for homepage lock
         $('#component-lock-toggle').click(function (event) {
             var locked = this.checked;
             
-            $('nav[data-component-settings], [data-component-handle]').toggle(locked);
+            $('a[data-component-settings], [data-component-handle]').toggle(locked);
 
-            $('div[data-component-titlebar-container]').each(function() {
-                $(this).toggleClass('actions-small-' + $(this).data('action-count'), locked);
-            });
         });
 
         $('#component-lock-switch').trigger('editTourStart');
