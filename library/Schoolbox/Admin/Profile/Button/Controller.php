@@ -13,13 +13,16 @@ use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Schoolbox\Profile\Button\Model as ProfileButton;
 use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
-
+use Schoolbox\Error\Mapper as ErrorMapper;
 /**
  * @package Schoolbox\Admin\Profile\Button
  */
 class Controller extends Base
 {
     private const PAGE_CURRENT = 'profile-button';
+
+    /** @var ErrorMapper $errorMapper */
+    private $errorMapper;
 
     /** @var IconMapper $iconMapper */
     private $iconMapper;
@@ -47,6 +50,7 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     * @param ErrorMapper                $errorMapper
      * @param IconMapper                 $iconMapper
      * @param ProfileButtonMapper        $profileButtonMapper
      * @param RoleMapper                 $roleMapper
@@ -57,16 +61,18 @@ class Controller extends Base
      * @param Role\Visibility\Mapper     $roleVisibilityMapper
      */
     public function __construct(
-      IconMapper $iconMapper,
-      ProfileButtonMapper $profileButtonMapper,
-      RoleMapper $roleMapper,
-      CampusMapper $campusMapper,
-      Campus\Availability\Mapper $campusAvailabilityMapper,
-      Role\Availability\Mapper $roleAvailabilityMapper,
-      Campus\Visibility\Mapper $campusVisibilityMapper,
-      Role\Visibility\Mapper $roleVisibilityMapper
+        ErrorMapper $errorMapper,
+        IconMapper $iconMapper,
+        ProfileButtonMapper $profileButtonMapper,
+        RoleMapper $roleMapper,
+        CampusMapper $campusMapper,
+        Campus\Availability\Mapper $campusAvailabilityMapper,
+        Role\Availability\Mapper $roleAvailabilityMapper,
+        Campus\Visibility\Mapper $campusVisibilityMapper,
+        Role\Visibility\Mapper $roleVisibilityMapper
     )
     {
+        $this->errorMapper = $errorMapper;
         $this->iconMapper = $iconMapper;
         $this->profileButtonMapper = $profileButtonMapper;
         $this->roleMapper = $roleMapper;
@@ -264,7 +270,7 @@ class Controller extends Base
          *   - Must have chosen a campus and role for Availability and also for Visibility
          */
         if (!(new ValidButton())->isSatisfiedBy($post->getArrayCopy())) {
-            throw new \InvalidArgumentException('Requires title, url, and at least one campus and one role for Availability and Visibility');
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
         $item->setTitle($post['title']);

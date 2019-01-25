@@ -66,6 +66,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector): void
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class), [
+            'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
             'iconMapper'   => $this->getMapperFactory()->getLazy(IconMapper::class),
             'profileButtonMapper' => $this->getMapperFactory()->getLazy(ProfileButtonMapper::class),
             'roleAvailabilityMapper' => $this->getMapperFactory()->getLazy(Role\Availability\Mapper::class),
