@@ -14,6 +14,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
+use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\News\TopicMapper;
@@ -353,12 +354,13 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @param int|null $pageNum
      * @param int|null $year
      * @param int|null $month
+     * @param int|null $folderId
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      * @throws \DomainException
      */
-    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month): array
+    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
     {
         /* This user can't see any articles
          */
@@ -409,19 +411,23 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             $pb->equals('cnat.topic_id', $topicId);
         }
 
+        if (null !== $folderId) {
+            $join .= "INNER JOIN comms_news_audience cnau ON {$this->table}.id = cnau.comms_news_article_id 
+            AND cnau.entity_type = '". Folder::getEntityType() ."' AND cnau.entity_value = " . $folderId;
+        }
+
         $where = implode("\nAND ", $pb->getWhere());
 
         /* TODO: Sorting algorithm SA-7097
          */
         $query = "
-            SELECT id
+            SELECT {$this->table}.id
             FROM {$this->table}
             {$join}
             WHERE {$where}
             {$groupBy}
             ORDER BY publish_at DESC, created_at DESC
         ";
-
         /* Limits and offsets
          * Apply either the $limit provided, or use the system default
          *
@@ -505,5 +511,39 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
         return $searcher;
+    }
+
+    /**
+     * Performs a check whether the homepage has at least one archived news.
+     *
+     * @param int $folderId
+     *
+     * @return bool
+     */
+    public function checkArchiveForHomepage(int $folderId) :bool
+    {
+        $now = \Alaress_Date_Format::now()->getDatabase();
+
+        $pb = $this->getPredicateBuilder()
+            ->lessThan('expires_at', $now)
+            ->lessThan('publish_at', $now)
+            ->notNull('accepted_at')
+            ->isNull('deleted_at');
+
+        $where = implode("\nAND ", $pb->getWhere());
+
+        $query = "
+            SELECT COUNT({$this->table}.id)
+            FROM {$this->getTable()}
+            INNER JOIN comms_news_audience cnau ON {$this->table}.id = cnau.comms_news_article_id
+            AND cnau.entity_type = '". Folder::getEntityType() ."' AND cnau.entity_value = " . $folderId . "
+            WHERE {$where} LIMIT 1
+        ";
+
+        $statement = $this->database->prepare($query);
+
+        $statement->execute($pb->getParams());
+
+        return (boolean) $statement->fetch(\PDO::FETCH_COLUMN);
     }
 }

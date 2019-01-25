@@ -872,7 +872,6 @@ class Controller extends Base
 
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
 
-
         /* Merge a whole bunch of other settings too
          * Specifically applies to the index page which loads slightly differently than component variant
          */
@@ -890,7 +889,8 @@ class Controller extends Base
             'availableYearsAndMonths' => $availableYearsAndMonths,
             'year' => $year,
             'month' => $month,
-            'newsItems' => $partialData
+            'newsItems' => $partialData,
+            'folderId'  => $params->getFolderId(),
         ];
         $data = array_merge($data, $this->getSidebarVars());
 
@@ -1095,6 +1095,7 @@ class Controller extends Base
      */
     private function generatePartialForHomepage(Querystring $params)
     {
+        $showArchiveNewsLink = false;
         $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
         $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
 
@@ -1113,11 +1114,16 @@ class Controller extends Base
             $this->getUser()
         );
 
+        if (\count($topicData['articles']) < 1) {
+            $showArchiveNewsLink = $this->newsMapper->checkArchiveForHomepage((int) $params->getFolderId());
+        }
+
         return array_merge($topicData, [
             'hidePaginator' => true,
             'compactMode' => $params->getCompactMode(),
             'referrer' => $params->getReferrer(),
             'folderId' => $params->getFolderId(),
+            'showArchiveNewsLink' => $showArchiveNewsLink,
         ]);
     }
 
