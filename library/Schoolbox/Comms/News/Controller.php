@@ -1115,7 +1115,7 @@ class Controller extends Base
         );
 
         if (\count($topicData['articles']) < 1) {
-            $showArchiveNewsLink = (new Archive())->findForHomePage((int) $params->getFolderId());
+            $showArchiveNewsLink = $this->newsMapper->checkArchiveForHomepage((int) $params->getFolderId());
         }
 
         return array_merge($topicData, [

@@ -24,9 +24,9 @@ class Archive extends \Schoolbox\Mapper
      *
      * @param int $folderId
      *
-     * @return mixed
+     * @return bool
      */
-    public function findForHomePage(int $folderId)
+    public function findForHomepage(int $folderId) :bool
     {
         $now = \Alaress_Date_Format::now()->getDatabase();
 
