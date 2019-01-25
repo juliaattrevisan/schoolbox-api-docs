@@ -265,7 +265,7 @@ class Controller extends Base
         }
 
         /* Check whether you have all the pieces
-         *   - Must have a title
+         *   - Must have a button text
          *   - Must have a url
          *   - Must have chosen a campus and role for Availability and also for Visibility
          */
@@ -273,7 +273,6 @@ class Controller extends Base
             throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
-        $item->setTitle($post['title']);
         $item->setText($post['text']);
         $item->setIcon($post['icon']);
         $item->setUrl($post['url']);

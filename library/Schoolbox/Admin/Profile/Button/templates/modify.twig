@@ -153,28 +153,28 @@
 <script>
     $(function() {
         // Init validation
-        // $('#itemForm').alaressValidate({
-        //     ignore: ':disabled',
-        //     rules: {
-        //         'text': 'required',
-        //         'url': {required: true, isURL: true},
-        //         'campusAvailability[]': 'required',
-        //         'roleAvailability[]': 'required',
-        //         'campusVisibility[]': 'required',
-        //         'roleVisibility[]': 'required'
-        //     },
-        //     messages: {
-        //         'text': {required: 'Please enter a name for the profile button.'},
-        //         'url': {
-        //             required: 'Please enter a destination URL for the profile button.',
-        //             isURL: 'Please enter a valid URL for the profile button.'
-        //         },
-        //         'campusAvailability[]': {required: 'Please select at least one campus.'},
-        //         'roleAvailability[]': {required: 'Please select at least one role.'},
-        //         'campusVisibility[]': {required: 'Please select at least one campus.'},
-        //         'roleVisibility[]': {required: 'Please select at least one role.'}
-        //     }
-        // });
+        $('#itemForm').alaressValidate({
+            ignore: ':disabled',
+            rules: {
+                'text': 'required',
+                'url': {required: true, isURL: true},
+                'campusAvailability[]': 'required',
+                'roleAvailability[]': 'required',
+                'campusVisibility[]': 'required',
+                'roleVisibility[]': 'required'
+            },
+            messages: {
+                'text': {required: 'Please enter a name for the profile button.'},
+                'url': {
+                    required: 'Please enter a destination URL for the profile button.',
+                    isURL: 'Please enter a valid URL for the profile button.'
+                },
+                'campusAvailability[]': {required: 'Please select at least one campus.'},
+                'roleAvailability[]': {required: 'Please select at least one role.'},
+                'campusVisibility[]': {required: 'Please select at least one campus.'},
+                'roleVisibility[]': {required: 'Please select at least one role.'}
+            }
+        });
 
         // Resource browser
         $('a[data-role="openResourceBrowser"]').click(function(e) {
