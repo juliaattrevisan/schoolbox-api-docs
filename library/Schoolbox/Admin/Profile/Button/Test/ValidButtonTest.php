@@ -24,7 +24,7 @@ class ValidButtonTest extends TestCase
         return [
             'Valid 1' => [
                 [
-                    'title' => 'cat',
+                    'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [2,3,1],
                     'roleAvailability' => [1,7,5,6,4,8,3,2],
@@ -35,7 +35,7 @@ class ValidButtonTest extends TestCase
             ],
             'Valid 2' => [
                 [
-                    'title' => 'cat',
+                    'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [2],
                     'roleAvailability' => [1],
@@ -46,7 +46,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 1' => [
                 [
-                    'title' => null,
+                    'text' => null,
                     'url' => null,
                     'campusAvailability' => null,
                     'roleAvailability' => null,
@@ -57,7 +57,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 2' => [
                 [
-                    'title' => '',
+                    'text' => '',
                     'url' => '',
                     'campusAvailability' => '',
                     'roleAvailability' => '',
@@ -68,7 +68,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 3' => [
                 [
-                    'title' => '',
+                    'text' => '',
                     'url' => '',
                     'campusAvailability' => [],
                     'roleAvailability' => [],
@@ -79,7 +79,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 4' => [
                 [
-                    'title' => 'cat',
+                    'text' => 'cat',
                     'url' => '',
                     'campusAvailability' => [],
                     'roleAvailability' => [],
@@ -90,7 +90,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 5' => [
                 [
-                    'title' => 'cat',
+                    'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [],
                     'roleAvailability' => [],
@@ -101,7 +101,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 6' => [
                 [
-                    'title' => 'cat',
+                    'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [1],
                     'roleAvailability' => [],
@@ -112,7 +112,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 7' => [
                 [
-                    'title' => 'cat',
+                    'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [1],
                     'roleAvailability' => [2],
@@ -123,7 +123,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 8' => [
                 [
-                    'title' => 'cat',
+                    'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [1],
                     'roleAvailability' => [2],
@@ -134,7 +134,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 9' => [
                 [
-                    'title' => '',
+                    'text' => '',
                     'url' => '',
                     'campusAvailability' => [1],
                     'roleAvailability' => [2],
@@ -145,7 +145,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 10' => [
                 [
-                    'title' => 'cat',
+                    'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [],
                     'roleAvailability' => [2],
@@ -156,7 +156,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 11' => [
                 [
-                    'title' => 'cat',
+                    'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [],
                     'roleAvailability' => [],
@@ -167,7 +167,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 12' => [
                 [
-                    'title' => 'cat',
+                    'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [],
                     'roleAvailability' => [],
@@ -178,7 +178,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 13' => [
                 [
-                    'title' => 'cat',
+                    'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [],
                     'roleAvailability' => [],
@@ -189,7 +189,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 14' => [
                 [
-                    'title' => 'cat',
+                    'text' => 'cat',
                     'url' => '',
                     'campusAvailability' => [1],
                     'roleAvailability' => [2],
@@ -200,7 +200,7 @@ class ValidButtonTest extends TestCase
             ],
             'Invalid: missing all pieces 15' => [
                 [
-                    'title' => '',
+                    'text' => '',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [1],
                     'roleAvailability' => [2],

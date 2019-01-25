@@ -22,13 +22,13 @@ class ValidButton
      */
     public function isSatisfiedBy(array $post): bool
     {
-        $hasTitle = \strlen(trim($post['title']));
+        $hasText = \strlen(trim($post['text']));
         $hasUrl = \strlen(trim($post['url']));
         $hasCampusAvailability = \is_array($post['campusAvailability']) && \count($post['campusAvailability']);
         $hasRoleAvailability = \is_array($post['roleAvailability']) && \count($post['roleAvailability']);
         $hasCampusVisibility = \is_array($post['campusVisibility']) && \count($post['campusVisibility']);
         $hasRoleVisibility = \is_array($post['roleVisibility']) && \count($post['roleVisibility']);
 
-        return $hasTitle && $hasUrl && $hasCampusAvailability && $hasRoleAvailability && $hasCampusVisibility && $hasRoleVisibility;
+        return $hasText && $hasUrl && $hasCampusAvailability && $hasRoleAvailability && $hasCampusVisibility && $hasRoleVisibility;
     }
 }
