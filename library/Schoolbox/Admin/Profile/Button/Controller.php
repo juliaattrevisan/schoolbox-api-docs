@@ -13,13 +13,16 @@ use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Schoolbox\Profile\Button\Model as ProfileButton;
 use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
-
+use Schoolbox\Error\Mapper as ErrorMapper;
 /**
  * @package Schoolbox\Admin\Profile\Button
  */
 class Controller extends Base
 {
     private const PAGE_CURRENT = 'profile-button';
+
+    /** @var ErrorMapper $errorMapper */
+    private $errorMapper;
 
     /** @var IconMapper $iconMapper */
     private $iconMapper;
@@ -47,6 +50,7 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     * @param ErrorMapper                $errorMapper
      * @param IconMapper                 $iconMapper
      * @param ProfileButtonMapper        $profileButtonMapper
      * @param RoleMapper                 $roleMapper
@@ -57,16 +61,18 @@ class Controller extends Base
      * @param Role\Visibility\Mapper     $roleVisibilityMapper
      */
     public function __construct(
-      IconMapper $iconMapper,
-      ProfileButtonMapper $profileButtonMapper,
-      RoleMapper $roleMapper,
-      CampusMapper $campusMapper,
-      Campus\Availability\Mapper $campusAvailabilityMapper,
-      Role\Availability\Mapper $roleAvailabilityMapper,
-      Campus\Visibility\Mapper $campusVisibilityMapper,
-      Role\Visibility\Mapper $roleVisibilityMapper
+        ErrorMapper $errorMapper,
+        IconMapper $iconMapper,
+        ProfileButtonMapper $profileButtonMapper,
+        RoleMapper $roleMapper,
+        CampusMapper $campusMapper,
+        Campus\Availability\Mapper $campusAvailabilityMapper,
+        Role\Availability\Mapper $roleAvailabilityMapper,
+        Campus\Visibility\Mapper $campusVisibilityMapper,
+        Role\Visibility\Mapper $roleVisibilityMapper
     )
     {
+        $this->errorMapper = $errorMapper;
         $this->iconMapper = $iconMapper;
         $this->profileButtonMapper = $profileButtonMapper;
         $this->roleMapper = $roleMapper;
@@ -125,6 +131,7 @@ class Controller extends Base
         ]);
     }
 
+
     /**
      * Display modification screen
      *
@@ -132,6 +139,7 @@ class Controller extends Base
      * @level 182
      *
      * @param int $id
+     * @throws \InvalidArgumentException
      * @throws MapperException
      * @throws MapperException\Deleted
      */
@@ -153,9 +161,9 @@ class Controller extends Base
 
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/modify.twig',
-            'data'     => [
+            'data' => [
                 'pageCurrent' => self::PAGE_CURRENT,
-                'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [], ['cache'=>false]),
+                'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [], [ 'cache' => false ]),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
@@ -256,7 +264,15 @@ class Controller extends Base
             }
         }
 
-        $item->setTitle($post['title']);
+        /* Check whether you have all the pieces
+         *   - Must have a button text
+         *   - Must have a url
+         *   - Must have chosen a campus and role for Availability and also for Visibility
+         */
+        if (!(new ValidButton())->isSatisfiedBy($post->getArrayCopy())) {
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
+
         $item->setText($post['text']);
         $item->setIcon($post['icon']);
         $item->setUrl($post['url']);

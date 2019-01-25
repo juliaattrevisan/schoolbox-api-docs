@@ -24,7 +24,7 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="profile-button-title" class="required">Button Text</label>
-                        <input required type="text" id="profile-button-title" name='text' value="{{ item.text }}">
+                        <input type="text" id="profile-button-title" name='text' value="{{ item.text }}">
                     </div>
                     <div class="small-12 columns">
                         <label for="profile-button-desc">Hover Description</label>
@@ -48,7 +48,7 @@
                         <label for="profile-button-url" class="required">Destination URL</label>
                         <p class="meta">You can use [profileId], [profileFirstName], [profileLastName], [profileExternalId], [profileUsername], [profileEmail] in the URL, these will be replaced with details of the user being <b>viewed</b>.</p> <p class="meta">You can also use [id], [firstName], [lastName], [externalId], [username], [email], these will be replaced with details of the user <b>viewing</b> the page.</p>
                         <div class="input-group">
-                            <input name="url" id="profile-button-url" required type="text" value="{{ item.url }}">
+                            <input name="url" id="profile-button-url" type="text" value="{{ item.url }}">
                             <a href="#" class="button icon-folder" data-role="openResourceBrowser">Browse {{ locale.resource.properPlural }}</a>
                         </div>
                     </div>
@@ -158,8 +158,10 @@
             rules: {
                 'text': 'required',
                 'url': {required: true, isURL: true},
-                'campuses[]': 'required',
-                'roles[]': 'required'
+                'campusAvailability[]': 'required',
+                'roleAvailability[]': 'required',
+                'campusVisibility[]': 'required',
+                'roleVisibility[]': 'required'
             },
             messages: {
                 'text': {required: 'Please enter a name for the profile button.'},
