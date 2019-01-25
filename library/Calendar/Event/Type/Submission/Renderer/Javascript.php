@@ -39,7 +39,7 @@ class Javascript extends Base
         ];
 
 
-        return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
+        return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
 
 
@@ -94,7 +94,7 @@ class Javascript extends Base
      */
     protected function deriveMeta()
     {
-        $event = $this->getEvent();
+        $event      = $this->getEvent();
         $assessable = $event->getAssessment();
         $workType   = $assessable->getWorkType();
 

@@ -16,6 +16,7 @@ $kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 use Alaress\Application\Kernel;
 use Alaress\Database\Connector\IConnector;
 use Calendar\Event\Collection\CSVExporter;
+use Calendar\Event\Collection\JsonExporter;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Collection\VCalExporter;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -26,6 +27,7 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
+use Crell\ApiProblem\ApiProblem;
 
 /**
  * Returns the config id for the specified calendar connector.
@@ -144,9 +146,40 @@ try {
     $forward           = $forward ? abs($forward) : 12;
     $timetable_forward = $timetable_forward ? abs($timetable_forward) : 3;
 
+    // Enable override of start/end dates
+    if (isset($_GET['start'])) {
+        $start = \strtotime($_GET['start']);
+    }
+    if (isset($_GET['end'])) {
+        $end = \strtotime($_GET['end']);
+    }
     // Default start and end times
-    $start = strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
-    $end   = strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
+    $start = $start ?: \strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
+    $end   = $end ?: \strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
+
+    // Ensure the requested period is not greater than what is configured in the admin so students don't bring down server
+    if (isset($_GET['start']) || isset($_GET['end'])) {
+        $permittedPeriodMonths = $back + $forward;
+        $requestedPeriodMonths = (int)(($end - $start) / (3600 * 24 * 31));
+        if ($requestedPeriodMonths > $permittedPeriodMonths) {
+            $message = "Requested period is {$requestedPeriodMonths} months, but permitted period is {$permittedPeriodMonths} months";
+            \http_response_code(401);
+
+            $problem = new ApiProblem('You requested a period of time that is longer than permitted');
+            $problem->setDetail($message);
+
+            $format = $_GET['format'] ?? '';
+            switch (\strtolower($format)) {
+                case 'json':
+                    echo $problem->asJson();
+                    break;
+                case 'csv':
+                default:
+                    echo $message;
+            }
+            exit;
+        }
+    }
 
     // Report errors in this thing
     /** @var Raven_Client|null $sentry */
@@ -390,20 +423,25 @@ try {
     exit;
 }
 
+// Always output here
+switch($_GET['format'] ?? ''){
+    case 'csv':
+        $exporter = new CSVExporter();
+        break;
+    case 'json':
+        $exporter = new JsonExporter();
+        break;
+    default:
+        $exporter = new VCalExporter();
+}
+
 $renderer = new Renderer(
     $api,
     $start,
     $end,
     $user,
-    new SitePage(false),
+    (new SitePage(false))->setDi($kernel->getDependencyInjector()),
     $viewer
 );
 
-// Always output here
-if ($_GET['format'] === 'csv') {
-    $exporter = new CSVExporter();
-} else {
-    $exporter = new VCalExporter();
-}
-
-$exporter->renderAll($renderer, $filename);
+$exporter->export($renderer, $filename);

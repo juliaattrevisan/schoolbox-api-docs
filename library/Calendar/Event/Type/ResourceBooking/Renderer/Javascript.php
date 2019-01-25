@@ -193,6 +193,6 @@ class Javascript extends Base
             ),
         );
 
-        return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR) . ',';
+        return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
 }

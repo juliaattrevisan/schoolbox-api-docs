@@ -93,7 +93,7 @@ if (count($affectedIds) == 1) {
         $user     = $_SESSION['user'];
         $renderer = new Javascript(new SitePage(), $calendarEvent, $user, new \Group(), new \Calendar(), $user);
         $output   = $renderer->render();
-        echo substr($output,0,-1);
+        echo $output;
         break;
     }
 }

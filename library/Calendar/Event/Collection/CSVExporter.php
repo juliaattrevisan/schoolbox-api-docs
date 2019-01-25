@@ -9,7 +9,7 @@
 
 namespace Calendar\Event\Collection;
 
-class CSVExporter
+class CSVExporter implements IExporter
 {
 
     /**
@@ -19,7 +19,7 @@ class CSVExporter
      * @param string   $filename
      * @throws \Exception
      */
-    public function renderAll(Renderer $renderer, string $filename): void
+    public function export(Renderer $renderer, string $filename): void
     {
         header('Cache-Control: private');
         header('Content-Type: text/csv; charset=utf-8');

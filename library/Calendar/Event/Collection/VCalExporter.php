@@ -10,7 +10,7 @@ namespace Calendar\Event\Collection;
 use Sabre\VObject\Component\VCalendar;
 use Config;
 
-class VCalExporter
+class VCalExporter implements IExporter
 {
 
     /**
@@ -21,7 +21,7 @@ class VCalExporter
      * @throws \InvalidArgumentException
      * @throws \Exception
      */
-    public function renderAll(Renderer $renderer, string $filename): void
+    public function export(Renderer $renderer, string $filename): void
     {
         header('Cache-Control: private');
         header('Content-Type: text/calendar; charset=utf-8');

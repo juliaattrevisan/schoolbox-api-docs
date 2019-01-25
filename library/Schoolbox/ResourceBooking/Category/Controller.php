@@ -192,7 +192,7 @@ class Controller extends Base {
             $this->getDi()->get('sitePage'),
             $this->getUser()
         );
-        $output = json_decode('[' . $calendar->renderAll('javascript') . '{}]');
+        $output = json_decode('[' . \implode(',', $calendar->renderAll('javascript')) . ']');
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
