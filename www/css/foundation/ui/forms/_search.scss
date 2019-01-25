@@ -1,0 +1,122 @@
+.global-search {
+    background: $navigation-background;
+    margin: 0;
+    position: absolute;
+    right: $tabbar-icon-width;
+    top: 0;
+    width: $tabbar-height;
+    @include placeholder-color(transparent, $font-weight-normal);
+
+    input[type="text"] {
+        border: 0;
+        background-color: transparent;
+        color: $body-bg;
+        height: $tabbar-height;
+        width: $tabbar-height;
+        padding: $base-font-size;
+        margin: 0;
+        opacity: 0;
+        line-height: $tabbar-height / 2;
+    }
+    &:hover,
+    &.focus {
+        width: 100%;
+        padding-left: $tabbar-icon-width * 2;
+        @include placeholder-color($black, $font-weight-normal);
+    }
+
+    /* Search icon in its idle state
+     */
+    .icon-search {
+        @include absolute(0, auto, auto, 28px);
+        @include transition(all, 0.3s, ease-in);
+        line-height: inherit;
+        margin: 0;
+        z-index: 1;
+        &:before {
+            color: $navigation-foreground;
+        }
+    }
+
+    /* Input field when Search feature is activated
+     */
+    [type="text"]:focus,
+    [type="text"]:active,
+    &:hover [type="text"],
+    &:hover [type="text"]:focus {
+        background-color: $white;
+        border: 2px solid $navigation-hover;
+        color: $black;
+        font-size: $base-font-size;
+        width: 100%;
+        opacity: 1;
+    }
+
+    [type="text"]:focus + .icon-search,
+    [type="text"]:active + .icon-search,
+    &:hover .icon-search {
+        @include absolute(0, auto, auto, 16px);
+
+        /* Search icon when Search feature is activated
+        */
+        &:before {
+            color: $navigation-background;
+        }
+    }
+}
+
+// When notifications are disabled
+.disableNotifications .global-search {
+    right: 0;
+    padding-left: $tabbar-icon-width;
+}
+
+@media #{$allow-sidebar-stash} {
+    .inner-wrap:not(.left-open) .global-search {
+        &:hover,
+        &.focus {
+            padding-left: $tabbar-icon-width * 2;
+        }
+    }
+    .inner-wrap:not(.left-open):not(.right-open) .global-search {
+        right:  $tabbar-icon-width * 2;
+        &:hover,
+        &.focus {
+            padding-left: $tabbar-icon-width * 3;
+        }
+    }
+    // When notifications are disabled
+    .disableNotifications .global-search {
+        right: $tabbar-icon-width;
+    }
+    .disableNotifications .inner-wrap:not(.left-open) .global-search {
+        &:hover,
+        &.focus {
+            padding-left: $tabbar-icon-width * 2;
+        }
+    }
+}
+
+@media #{$allow-notification-stash} {
+    .inner-wrap.left-open .global-search,
+    .inner-wrap.right-open .global-search {
+        &:hover,
+        &.focus {
+            padding-left: $tabbar-icon-width * 2;
+        }
+    }
+    .inner-wrap.left-open .global-search {
+        right:  $tabbar-icon-width * 2;
+    }
+    .inner-wrap.right-open.left-open .global-search {
+        right:  $tabbar-icon-width;
+        &:hover,
+        &.focus {
+            padding-left: $tabbar-icon-width;
+        }
+    }
+    .right-off-canvas-menu.right-open + .global-search {
+        right: 0;
+        padding-left: 0;
+    }
+}
