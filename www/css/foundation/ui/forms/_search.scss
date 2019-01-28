@@ -78,7 +78,15 @@
             padding-left: $tabbar-icon-width * 2;
         }
     }
-    .inner-wrap:not(.left-open):not(.right-open) .global-search {
+    .inner-wrap.left-open .global-search {
+        right:  $tabbar-icon-width * 2;
+        &:hover,
+        &.focus {
+            padding-left: $tabbar-icon-width * 2;
+        }
+    }
+    .inner-wrap:not(.left-open):not(.right-open) .global-search,
+    .inner-wrap.right-open .global-search {
         right:  $tabbar-icon-width * 2;
         &:hover,
         &.focus {
@@ -89,7 +97,8 @@
     .disableNotifications .global-search {
         right: $tabbar-icon-width;
     }
-    .disableNotifications .inner-wrap:not(.left-open) .global-search {
+    .disableNotifications .inner-wrap:not(.left-open) .global-search,
+    .inner-wrap.left-open.right-open .global-search {
         &:hover,
         &.focus {
             padding-left: $tabbar-icon-width * 2;
@@ -107,6 +116,13 @@
     }
     .inner-wrap.left-open .global-search {
         right:  $tabbar-icon-width * 2;
+    }
+    .inner-wrap.right-open .global-search {
+        right:  $tabbar-icon-width;
+        &:hover,
+        &.focus {
+            padding-left: $tabbar-icon-width * 2;
+        }
     }
     .inner-wrap.right-open.left-open .global-search {
         right:  $tabbar-icon-width;
