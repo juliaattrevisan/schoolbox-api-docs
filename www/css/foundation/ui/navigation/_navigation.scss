@@ -190,73 +190,6 @@ $allow-sidebar-stash: $large-up;
     position: relative;
   }
 
-  .global-search {
-    background: $navigation-background;
-    margin: 0;
-    position: absolute;
-    right: $tabbar-icon-width;
-    top: 0;
-    width: $tabbar-height;
-    @include placeholder-color(transparent, $font-weight-normal);
-
-    input[type="text"] {
-      border: 0;
-      background-color: transparent;
-      color: $body-bg;
-      height: $tabbar-height;
-      width: $tabbar-height;
-      padding: $base-font-size;
-      margin: 0;
-      opacity: 0;
-      line-height: $tabbar-height / 2;
-    }
-    &:hover,
-    &.focus {
-      width: 100%;
-      padding-left: ($tabbar-icon-width * 2);
-      @include placeholder-color($black, $font-weight-normal);
-    }
-
-    /* Search icon in its idle state
-		 */
-    .icon-search {
-      @include absolute(0, auto, auto, 28px);
-      @include transition(all, 0.3s, ease-in);
-      line-height: inherit;
-      margin: 0;
-      z-index: 1;
-      &:before {
-        color: $navigation-foreground;
-      }
-    }
-
-    /* Input field when Search feature is activated
-		 */
-    [type="text"]:focus,
-    [type="text"]:active,
-    &:hover [type="text"],
-    &:hover [type="text"]:focus {
-      background-color: $white;
-      border: 2px solid $navigation-hover;
-      color: $black;
-      font-size: $base-font-size;
-      width: 100%;
-      opacity: 1;
-    }
-
-    [type="text"]:focus + .icon-search,
-    [type="text"]:active + .icon-search,
-    &:hover .icon-search {
-      @include absolute(0, auto, auto, 16px);
-
-      /* Search icon when Search feature is activated
-			 */
-      &:before {
-        color: $navigation-background;
-      }
-    }
-  }
-
   .top-menu {
     @include inline-list;
     margin: 0;
@@ -366,49 +299,12 @@ $allow-sidebar-stash: $large-up;
   }
 }
 
-// When notifications are disabled
-.disableNotifications .hybrid-bar {
-  .global-search {
-    right: 0;
-    padding-left: $tabbar-icon-width;
-  }
-}
-
 @media #{$allow-sidebar-stash} {
-  .inner-wrap:not(.left-open) .hybrid-bar .global-search {
-    &:hover,
-    &.focus {
-      padding-left: $tabbar-icon-width * 2;
-    }
-  }
-
-  .inner-wrap:not(.left-open):not(.right-open) .hybrid-bar .global-search {
-    &:hover,
-    &.focus {
-      padding-left: $tabbar-icon-width * 3;
-    }
-  }
-
-  .hybrid-bar .global-search {
-    right: $tabbar-icon-width * 2; // Adjust right offset for the account menu
-  }
-
   // When notifications are disabled
   .disableNotifications .hybrid-bar {
-    .global-search {
-      right: $tabbar-icon-width;
-    }
-
     .account-menu,
     .account-drop {
       right: 0;
-    }
-  }
-
-  .disableNotifications .inner-wrap:not(.left-open) .hybrid-bar .global-search {
-    &:hover,
-    &.focus {
-      padding-left: $tabbar-icon-width * 2;
     }
   }
 }
@@ -763,13 +659,6 @@ $allow-sidebar-stash: $large-up;
       position: relative;
       transform: none;
     }
-    .global-search {
-      right: $tabbar-height;
-      &:hover,
-      &.focus {
-        padding-left: $tabbar-icon-width * 2;
-      }
-    }
     #profile-drop {
       right: 0;
       z-index: 101;
@@ -777,22 +666,6 @@ $allow-sidebar-stash: $large-up;
     .account-drop {
       right: 0;
     }
-  }
-  .inner-wrap.left-open .global-search {
-    &:hover,
-    &.focus {
-      padding-left: $tabbar-icon-width * 2;
-    }
-  }
-  .inner-wrap.right-open.left-open .global-search {
-    &:hover,
-    &.focus {
-      padding-left: $tabbar-icon-width;
-    }
-  }
-  .right-off-canvas-menu.right-open + .global-search {
-    right: 0;
-    padding-left: 0;
   }
 }
 
