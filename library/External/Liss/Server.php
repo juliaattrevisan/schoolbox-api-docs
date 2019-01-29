@@ -68,15 +68,9 @@ class External_Liss_Server
      * External_Liss_Server constructor.
      *
      * @param IConnector|null $externalDb
-     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function __construct(IConnector $externalDb = null)
     {
-        if (null === $externalDb) {
-            $errorMapper = new \Schoolbox\Error\Mapper();
-            throw $errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_DATABASE_UNAVAILABLE);
-        }
-
         $this->externalDb = $externalDb;
 
         $logFile = fopen(Cfg::get('logs_dir') . '/liss.log', 'a');
@@ -85,7 +79,7 @@ class External_Liss_Server
     /**
      * Default logging message when attempting to use liss with a non-schoolbox connector
      */
-    private const WRONG_CONNECTOR_MESSAGE = 'Not using the schoolbox connector - exiting';
+    private const WRONG_CONNECTOR_MESSAGE = 'External Database must be activate and the selected connector must be schoolbox - exiting';
 
     /**
      * Log message when authentication fails
@@ -952,9 +946,16 @@ class External_Liss_Server
     private function isSchoolboxConnector(): bool
     {
         $config = new ConfigLoader();
-        $connector = $config->get('external_type');
 
-        return $connector == 'schoolbox';
+        /* External must be enabled
+         */
+        if (!(int)$config->get('external_enable')) {
+            return false;
+        }
+
+        /* External must also be schoolbox connector
+         */
+        return $config->get('external_type') == 'schoolbox';
     }
 
     /**
