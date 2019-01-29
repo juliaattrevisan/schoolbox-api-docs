@@ -52,13 +52,13 @@ class Connector
      * Constructor
      *
      * @param $databaseType
-     * @param IConnector $db
+     * @param null|IConnector $db
      */
-    public function __construct($databaseType, IConnector $db)
+    public function __construct($databaseType, IConnector $db = null)
     {
         /* Only set $db when external db supports what we're doing
          */
-        if (in_array($databaseType, $this->getAvailableConnectors())) {
+        if (null !== $db && \in_array($databaseType, $this->getAvailableConnectors(), false)) {
             $this->setDb($db);
         }
     }
