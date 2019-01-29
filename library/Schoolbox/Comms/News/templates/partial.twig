@@ -77,16 +77,19 @@
     {% endif %}
 
 {% else %} {# Empty States #}
-
     {% if referrer == 'homepage' %}
         {% set createRoute = routeLookupIfAuthorized('commsNews.getCreateInFolder', {folderId: folderId}) %}
-        {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') ~ '?f=' ~ folderId %}
+        {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') %}
+        {% set archiveRouteSuffix = [
+            'f=' ~ folderId,
+            'cid=' ~ componentId
+        ] |join('&') %}
         <div class="empty-state no-margin">
             <i class="icon-news"></i>
             {% if not createRoute %}
                 <p>There is no {{ locale.news }} to view at this time.</p>
-                {% if showArchiveNewsLink %}
-                    <p><a href="{{ archiveRoute }}">View the news archive.</a></p>
+                {% if archiveRoute and showArchiveNewsLink %}
+                    <p><a href="{{ archiveRoute ~ '?' ~archiveRouteSuffix }}">View the news archive.</a></p>
                 {% endif %}
             {% else %}
                 {% set createNewsQuerystringParams = [
@@ -100,9 +103,9 @@
                     '<a href="'~ createRouteFullPath ~ '">Post a ' ~ locale.news ~ ' article</a> to share new information on this homepage'
                 ] %}
 
-                {% if showArchiveNewsLink %}
+                {% if archiveRoute and showArchiveNewsLink %}
                     {% set emptyStateMessage = emptyStateMessage|merge([
-                        ' or <a href="'~ archiveRoute ~'">view the news archive</a>'
+                        ' or <a href="'~ archiveRoute ~ '?' ~ archiveRouteSuffix ~'">view the news archive</a>'
                     ]) %}
                 {% endif %}
 

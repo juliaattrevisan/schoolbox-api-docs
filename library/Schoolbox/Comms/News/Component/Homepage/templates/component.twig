@@ -18,7 +18,8 @@ Data:
         'l=' ~ limit,
         'f=' ~ folderId,
         'hp=1',
-        'ref=' ~ referrer
+        'ref=' ~ referrer,
+        'cid=' ~ componentInstanceId,
     ] |join('&') %}
 
     {% set getListHomePagePath = routeLookup('commsNews.getListForHomepage', {folderId: folderId}) %}
@@ -62,7 +63,12 @@ Data:
             <a href="{{ createRoute }}" class="button">Create {{ locale.news }}</a>
         {% endif %}
 
-        {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') ~ '?f=' ~ folderId %}
+        {% set archiveQuerystringParams = [
+            'f=' ~ folderId,
+            'cid=' ~ componentInstanceId
+        ] |join('&') %}
+
+        {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') ~ '?' ~ archiveQuerystringParams %}
         {% if archiveRoute %}
         <a href="{{ archiveRoute }}" class="button">View Archive</a>
         {% endif %}

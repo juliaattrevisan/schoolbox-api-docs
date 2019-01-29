@@ -847,6 +847,8 @@ class Controller extends Base
      */
     public function getArchive(int $year = null, int $month = null): void
     {
+        $pageTitle = 'News Archive';
+
         /* These referrers should be used, even when they're not explicitly provided in the url
          */
         $params = new Querystring($this->getRequest()->query);
@@ -890,17 +892,52 @@ class Controller extends Base
             'year' => $year,
             'month' => $month,
             'newsItems' => $partialData,
-            'folderId'  => $params->getFolderId(),
         ];
+
+        if ($params->getFolderId()) {
+            $folderBasicDetails = $this->getBasicFolderDetailsById((int) $params->getFolderId());
+
+            $metaDetails = [
+                'folderId'      => $folderBasicDetails['id'],
+                'folderName'    => $folderBasicDetails['name'],
+                'componentId'   => $params->getComponentId(),
+            ];
+
+            $data = array_merge($data, $metaDetails);
+
+            $pageTitle = $folderBasicDetails['name'];
+        }
+
         $data = array_merge($data, $this->getSidebarVars());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@commsNews/archive.twig', $data)
                 ->setTab('news')
-                ->setTitle('News Archive')
+                ->setTitle($pageTitle)
         );
     }
 
+    /**
+     * @param int $folderId
+     *
+     * @return array
+     */
+    private function getBasicFolderDetailsById(int $folderId) :?array
+    {
+        $errorMapper = \Schoolbox\Error\Mapper::getInstance();
+
+        try {
+            $folder = $this->folderMapper->findCheaplyById($folderId);
+
+            return [
+                'id'      => $folderId,
+                'name'    => $folder->getName(),
+            ];
+
+        } catch (MapperException $e) {
+            throw $errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
+        }
+    }
 
     /**
      * Get a list of articles audienced to you
@@ -1124,6 +1161,7 @@ class Controller extends Base
             'referrer' => $params->getReferrer(),
             'folderId' => $params->getFolderId(),
             'showArchiveNewsLink' => $showArchiveNewsLink,
+            'componentId' => $params->getComponentId(),
         ]);
     }
 

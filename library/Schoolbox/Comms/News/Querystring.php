@@ -75,6 +75,11 @@ class Querystring
     public const ENTITY_TYPE = 'type';
 
     /**
+     * Querystring param for component id
+     */
+    public const COMPONENT_ID = 'cid';
+
+    /**
      * An array of key/value pairs corresponding to GET params
      *
      * @var array
@@ -99,6 +104,7 @@ class Querystring
             self::STATUS => $data[self::STATUS],
             self::ENTITY_TYPE => $data[self::ENTITY_TYPE],
             self::RETURN_URL => $data[self::RETURN_URL],
+            self::COMPONENT_ID => $data[self::COMPONENT_ID],
         ];
     }
 
@@ -209,6 +215,14 @@ class Querystring
     }
 
     /**
+     * @return string|null
+     */
+    public function getComponentId(): ?string
+    {
+        return $this->querystring[self::COMPONENT_ID];
+    }
+
+    /**
      * @param null|string $referrer
      * @return $this
      */
@@ -246,6 +260,14 @@ class Querystring
     public function setReturnUrl(?string $returnUrl)
     {
         $this->querystring[self::RETURN_URL] = $returnUrl;
+    }
+
+    /**
+     * @param string|null $componentId
+     */
+    public function setComponentId(?string $componentId)
+    {
+        $this->querystring[self::COMPONENT_ID] = $componentId;
     }
 
     /**
