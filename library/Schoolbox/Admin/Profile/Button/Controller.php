@@ -274,6 +274,7 @@ class Controller extends Base
         }
 
         $item->setText($post['text']);
+        $item->setTitle($post['title']);
         $item->setIcon($post['icon']);
         $item->setUrl($post['url']);
         $item->setTarget($post['target']);
