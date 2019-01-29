@@ -16,14 +16,18 @@ class Award
     /** @var string */
     private $name;
 
-    /** @var string */
+    /** @var null|string */
     private $detail;
 
 
-    public function __construct(string $name, string $detail)
+    /**
+     * @param string      $name
+     * @param string|null $detail
+     */
+    public function __construct(string $name, ?string $detail)
     {
-        $this->name      = $name;
-        $this->detail    = $detail;
+        $this->name   = $name;
+        $this->detail = $detail;
     }
 
 
@@ -37,9 +41,9 @@ class Award
 
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getDetail(): string
+    public function getDetail(): ?string
     {
         return $this->detail;
     }
