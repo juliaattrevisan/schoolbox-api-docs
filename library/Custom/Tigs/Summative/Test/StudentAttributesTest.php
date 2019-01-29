@@ -163,14 +163,14 @@ class StudentAttributesTest extends TestCase
      * @param string $date
      * @param string $expected
      * @throws InvalidArgumentException
-     * @dataProvider providerReportStartNowOverride
+     * @dataProvider providerCurriculumSemesterStartNowOverride
      */
-    public function testReportStartNowOverride(string $yearLevel, string $date, string $expected): void
+    public function testReportCurriculumSemesterStartNowOverride(string $yearLevel, string $date, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
         $attributes = new StudentAttributes($user, null, $date);
 
-        $this->assertSame($expected, $attributes->getReportStart()->getDatabaseDate());
+        $this->assertSame($expected, $attributes->getCurriculumSemesterStart()->getDatabaseDate());
     }
 
 
@@ -179,14 +179,45 @@ class StudentAttributesTest extends TestCase
      * @param string $date
      * @param string $expected
      * @throws InvalidArgumentException
-     * @dataProvider providerReportFinishNowOverride
+     * @dataProvider providerCurriculumSemesterFinishNowOverride
      */
-    public function testReportFinishNowOverride(string $yearLevel, string $date, string $expected): void
+    public function testCurriculumSemesterFinishNowOverride(string $yearLevel, string $date, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
         $attributes = new StudentAttributes($user, null, $date);
 
-        $this->assertSame($expected, $attributes->getReportFinish()->getDatabaseDate());
+        $this->assertSame($expected, $attributes->getCurriculumSemesterFinish()->getDatabaseDate());
+    }
+
+    /**
+     * @param string $yearLevel
+     * @param string $date
+     * @param string $expected
+     * @throws InvalidArgumentException
+     * @dataProvider providerCurriculumYearStartNowOverride
+     */
+    public function testReportCurriculumYearStartNowOverride(string $yearLevel, string $date, string $expected): void
+    {
+        $user       = (new User())->setYear($yearLevel);
+        $attributes = new StudentAttributes($user, null, $date);
+
+        $this->assertSame($expected, $attributes->getCurriculumYearStart()->getDatabaseDate());
+    }
+
+
+    /**
+     * @param string $yearLevel
+     * @param string $date
+     * @param string $expected
+     * @throws InvalidArgumentException
+     * @dataProvider providerCurriculumYearFinishNowOverride
+     */
+    public function testCurriculumYearFinishNowOverride(string $yearLevel, string $date, string $expected): void
+    {
+        $user       = (new User())->setYear($yearLevel);
+        $attributes = new StudentAttributes($user, null, $date);
+
+        $this->assertSame($expected, $attributes->getCurriculumYearFinish()->getDatabaseDate());
     }
 
 
@@ -374,9 +405,9 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerReportStartNowOverride(): array
+    public function providerCurriculumSemesterStartNowOverride(): array
     {
-        // yearLevel, now, reportStart
+        // yearLevel, now, curriculumSemesterStart
         return [
             ['10', '2010-01-10', '2010-01-01'],  // Term 1
             ['10', '2010-04-10', '2010-01-01'],  // Term 2
@@ -397,9 +428,9 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerReportFinishNowOverride(): array
+    public function providerCurriculumSemesterFinishNowOverride(): array
     {
-        // yearLevel, now, reportEnd
+        // yearLevel, now, curriculumSemesterFinish
         return [
             ['10', '2010-01-10', '2010-06-30'],  // Term 1
             ['10', '2010-04-10', '2010-06-30'],  // Term 2
@@ -416,4 +447,49 @@ class StudentAttributesTest extends TestCase
         ];
     }
 
+
+    /**
+     * @return array
+     */
+    public function providerCurriculumYearStartNowOverride(): array
+    {
+        // yearLevel, now, curriculumYearStart
+        return [
+            ['10', '2010-01-10', '2010-01-01'],  // Term 1
+            ['10', '2010-04-10', '2010-01-01'],  // Term 2
+            ['10', '2010-07-10', '2010-01-01'],  // Term 3
+            ['10', '2010-10-10', '2010-01-01'],  // Term 4
+            ['11', '2010-01-10', '2010-01-01'],  // Term 1
+            ['11', '2010-04-10', '2010-01-01'],  // Term 2
+            ['11', '2010-07-10', '2010-01-01'],  // Term 3
+            ['11', '2010-10-10', '2010-10-01'],  // Term 4
+            ['12', '2010-01-10', '2009-10-01'],  // Term 1
+            ['12', '2010-04-10', '2010-04-01'],  // Term 2
+            ['12', '2010-07-10', '2010-04-01'],  // Term 3
+            ['12', '2010-10-10', '2010-04-01'],  // Term 4
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function providerCurriculumYearFinishNowOverride(): array
+    {
+        // yearLevel, now, curriculumYearFinish
+        return [
+            ['10', '2010-01-10', '2010-12-31'],  // Term 1
+            ['10', '2010-04-10', '2010-12-31'],  // Term 2
+            ['10', '2010-07-10', '2010-12-31'],  // Term 3
+            ['10', '2010-10-10', '2010-12-31'],  // Term 4
+            ['11', '2010-01-10', '2010-09-30'],  // Term 1
+            ['11', '2010-04-10', '2010-09-30'],  // Term 2
+            ['11', '2010-07-10', '2010-09-30'],  // Term 3
+            ['11', '2010-10-10', '2011-12-31'],  // Term 4
+            ['12', '2010-01-10', '2010-12-31'],  // Term 1
+            ['12', '2010-04-10', '2010-12-31'],  // Term 2
+            ['12', '2010-07-10', '2010-12-31'],  // Term 3
+            ['12', '2010-10-10', '2010-12-31'],  // Term 4
+        ];
+    }
 }

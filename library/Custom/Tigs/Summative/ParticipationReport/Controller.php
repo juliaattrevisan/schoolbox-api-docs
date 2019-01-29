@@ -187,14 +187,14 @@ class Controller extends Web\Controller\Base
 
         // TODO this is wrong for Semester 2 because the participation report, unlike the Subject Report, covers both Sem1 and Sem2
         // TODO Need to update getReportStart/Finish to be getCurriculumSemesterStart/Finish + getCurriculumYearStart/Finish
-        $start = $attributes->getReportStart();
+        $start = $attributes->getCurriculumSemesterStart();
         if ($attributes->getCurriculumSemester() === 2 && $attributes->getCurriculumYearLevel() !== 11) {
             // TODO Just a rough hack for now to move the start back by 6 months if we're in the second semester.
             // TODO We exclude Year 11 as their Sem2 only runs for a single Semester
             $start->addDays(-365 / 2);
         }
 
-        $finish = $attributes->getReportFinish();
+        $finish = $attributes->getCurriculumSemesterFinish();
         if ($attributes->getCurriculumSemester() === 1) {
             // TODO Just a rough hack for now to move the finish forward by 6 months if we're in the first semester.
             $finish->addDays(365 / 2);

@@ -39,10 +39,16 @@ class StudentAttributes
     private $curriculumSemester;
 
     /** @var Alaress_Date_Format */
-    private $reportStart;
+    private $curriculumSemesterStart;
 
     /** @var Alaress_Date_Format */
-    private $reportFinish;
+    private $curriculumSemesterFinish;
+
+    /** @var Alaress_Date_Format */
+    private $curriculumYearStart;
+
+    /** @var Alaress_Date_Format */
+    private $curriculumYearFinish;
 
 
     /**
@@ -60,13 +66,15 @@ class StudentAttributes
             ? new Alaress_Date_Format(\strtotime($nowOverride), Alaress_Date_Format::TIMESTAMP)
             : Alaress_Date_Format::now();
 
-        $this->yearLevel           = $this->deriveUserYearLevel($user);
-        $this->isIb                = (bool)$ibFlag; // If unknown (NULL), assume FALSE
-        $this->term                = $this->deriveTerm($now);
-        $this->curriculumYearLevel = ($this->yearLevel === 11 && $this->term === 4) ? 12 : $this->yearLevel;
-        $this->curriculumSemester  = $this->deriveCurriculumSemester($this->yearLevel, $this->term);
-        $this->reportStart         = $this->deriveReportStartDate($this->yearLevel, $this->term, $now);
-        $this->reportFinish        = $this->deriveReportFinishDate($this->yearLevel, $this->term, $now);
+        $this->yearLevel                = $this->deriveUserYearLevel($user);
+        $this->isIb                     = (bool)$ibFlag; // If unknown (NULL), assume FALSE
+        $this->term                     = $this->deriveTerm($now);
+        $this->curriculumYearLevel      = ($this->yearLevel === 11 && $this->term === 4) ? 12 : $this->yearLevel;
+        $this->curriculumSemester       = $this->deriveCurriculumSemester($this->yearLevel, $this->term);
+        $this->curriculumSemesterStart  = $this->deriveCurriculumSemesterStartDate($this->yearLevel, $this->term, $now);
+        $this->curriculumSemesterFinish = $this->deriveCurriculumSemesterFinishDate($this->yearLevel, $this->term, $now);
+        $this->curriculumYearStart      = $this->deriveCurriculumYearStartDate($this->yearLevel, $this->term, $now);
+        $this->curriculumYearFinish     = $this->deriveCurriculumYearFinishDate($this->yearLevel, $this->term, $now);
     }
 
 
@@ -170,7 +178,7 @@ class StudentAttributes
 
 
     /**
-     * Derive the date that the report logically starts at.
+     * Derive the date that the student's curriculum semester logically starts at.
      *
      * @param int                 $yearLevel
      * @param int                 $term
@@ -178,7 +186,7 @@ class StudentAttributes
      * @return Alaress_Date_Format
      * @throws InvalidArgumentException
      */
-    private function deriveReportStartDate(int $yearLevel, int $term, Alaress_Date_Format $now): Alaress_Date_Format
+    private function deriveCurriculumSemesterStartDate(int $yearLevel, int $term, Alaress_Date_Format $now): Alaress_Date_Format
     {
         $nowYear = (int)$now->getUsingFormat('Y');
 
@@ -203,7 +211,7 @@ class StudentAttributes
 
 
     /**
-     * Derive the date that the report logically finishes at.
+     * Derive the date that the student's curriculum semester logically finishes at.
      *
      * @param int                 $yearLevel
      * @param int                 $term
@@ -211,7 +219,7 @@ class StudentAttributes
      * @return Alaress_Date_Format
      * @throws InvalidArgumentException
      */
-    private function deriveReportFinishDate(int $yearLevel, int $term, Alaress_Date_Format $now): Alaress_Date_Format
+    private function deriveCurriculumSemesterFinishDate(int $yearLevel, int $term, Alaress_Date_Format $now): Alaress_Date_Format
     {
         $isYear11 = $yearLevel === 11;
         $isYear12 = $yearLevel === 12;
@@ -234,6 +242,73 @@ class StudentAttributes
         return (new Alaress_Date_Format(\strtotime($end), Alaress_Date_Format::TIMESTAMP))->addDays(-1)->endOfDay();
     }
 
+
+    /**
+     * Derive the date that the student's curriculum year logically starts at.
+     *
+     * @param int                 $yearLevel
+     * @param int                 $term
+     * @param Alaress_Date_Format $now
+     * @return Alaress_Date_Format
+     * @throws InvalidArgumentException
+     */
+    private function deriveCurriculumYearStartDate(int $yearLevel, int $term, Alaress_Date_Format $now): Alaress_Date_Format
+    {
+        $nowYear = (int)$now->getUsingFormat('Y');
+
+        if ($yearLevel === 10) {
+            $start = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+        } elseif ($yearLevel === 11) {
+            if ($term !== 4) {
+                $start = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+            } else {
+                $start = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
+            }
+        } elseif ($term === 1) {
+            $nowYear--;
+            $start = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
+        } else {
+            $start = self::FIRST_DAY_TERM2_RELATIVE . " $nowYear";
+        }
+
+        return new Alaress_Date_Format(\strtotime($start), Alaress_Date_Format::TIMESTAMP);
+    }
+
+
+    /**
+     * Derive the date that the student's curriculum year logically finishes at.
+     *
+     * @param int                 $yearLevel
+     * @param int                 $term
+     * @param Alaress_Date_Format $now
+     * @return Alaress_Date_Format
+     * @throws InvalidArgumentException
+     */
+    private function deriveCurriculumYearFinishDate(int $yearLevel, int $term, Alaress_Date_Format $now): Alaress_Date_Format
+    {
+        $nowYear = (int)$now->getUsingFormat('Y');
+
+        if ($yearLevel === 10) {
+            $nowYear++;
+            $end = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+        } elseif ($yearLevel === 11) {
+            if (4 !== $term) {
+                $end = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
+            } else {
+                $nowYear++;
+                $nowYear++;
+                $end = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+            }
+        } elseif (1 === $term) {
+            $nowYear++;
+            $end = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+        } else {
+            $nowYear++;
+            $end = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+        }
+
+        return (new Alaress_Date_Format(\strtotime($end), Alaress_Date_Format::TIMESTAMP))->addDays(-1)->endOfDay();
+    }
 
 
     // Getters
@@ -283,23 +358,47 @@ class StudentAttributes
         return $this->curriculumSemester;
     }
 
-    /**
-     * Returns the date that the report logically starts at.
-     *
-     * @return Alaress_Date_Format
-     */
-    public function getReportStart(): Alaress_Date_Format
-    {
-        return $this->reportStart;
-    }
 
     /**
-     * Returns the date that the report logically finishes at.
+     * Returns the date that the Subject Report logically starts at.
      *
      * @return Alaress_Date_Format
      */
-    public function getReportFinish(): Alaress_Date_Format
+    public function getCurriculumSemesterStart(): Alaress_Date_Format
     {
-        return $this->reportFinish;
+        return $this->curriculumSemesterStart;
+    }
+
+
+    /**
+     * Returns the date that the Subject Report logically finishes at.
+     *
+     * @return Alaress_Date_Format
+     */
+    public function getCurriculumSemesterFinish(): Alaress_Date_Format
+    {
+        return $this->curriculumSemesterFinish;
+    }
+
+
+    /**
+     * Returns the date that the Participation Report logically starts at.
+     *
+     * @return Alaress_Date_Format
+     */
+    public function getCurriculumYearStart(): Alaress_Date_Format
+    {
+        return $this->curriculumYearStart;
+    }
+
+
+    /**
+     * Returns the date that the Participation Report logically finishes at.
+     *
+     * @return Alaress_Date_Format
+     */
+    public function getCurriculumYearFinish(): Alaress_Date_Format
+    {
+        return $this->curriculumYearFinish;
     }
 }
