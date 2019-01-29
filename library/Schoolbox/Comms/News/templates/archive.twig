@@ -15,7 +15,19 @@
 
 {% block breadCrumbs %}
     {% import 'sub/breadcrumbs.twig' as bread %}
-    {{ bread.crumbs([locale.news.properPlural, routeLookup('commsNews.getIndex')], [locale.news.properPlural ~ ' Archive']) }}
+
+    {% if folderId %}
+        {{ bread.crumbs(
+            [locale.news.properPlural, routeLookup('commsNews.getIndex')],
+            [folderName, '/homepage/' ~ folderId],
+            [locale.news.properPlural ~ ' Archive'])
+        }}
+    {% else %}
+        {{ bread.crumbs(
+            [locale.news.properPlural, routeLookup('commsNews.getIndex')],
+            [locale.news.properPlural ~ ' Archive'])
+        }}
+    {% endif %}
 {% endblock %}
 
 {% block actionIcons %}
