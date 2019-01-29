@@ -12,6 +12,7 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
+use Schoolbox\GenericCollection;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters;
@@ -19,6 +20,7 @@ use External_UserInterface;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
 use External_User;
+use UnexpectedValueException;
 
 class Controller extends Web\Controller\Base
 {
@@ -55,6 +57,7 @@ class Controller extends Web\Controller\Base
      * @throws ServiceNotFound
      * @throws InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws UnexpectedValueException
      */
     public function getReport(User $user): void
     {
@@ -173,39 +176,34 @@ class Controller extends Web\Controller\Base
      *
      * @param User              $user
      * @param StudentAttributes $attributes
-     * @return array
+     * @return GenericCollection|Award[]
+     * @throws UnexpectedValueException
      */
-    private function getAwardsData(User $user, StudentAttributes $attributes): array
+    private function getAwardsData(User $user, StudentAttributes $attributes): GenericCollection
     {
         $sql = "
-            SELECT Award, Detail, GivenDate
+            SELECT Award, Detail
             FROM uvContinuousReportingAwards
             WHERE StudentID = :student_id
             AND GivenDate >= :start AND GivenDate < :finish
             ORDER BY GivenDate ASC
         ";
 
-        // TODO this is wrong for Semester 2 because the participation report, unlike the Subject Report, covers both Sem1 and Sem2
-        // TODO Need to update getReportStart/Finish to be getCurriculumSemesterStart/Finish + getCurriculumYearStart/Finish
-        $start = $attributes->getCurriculumSemesterStart();
-        if ($attributes->getCurriculumSemester() === 2 && $attributes->getCurriculumYearLevel() !== 11) {
-            // TODO Just a rough hack for now to move the start back by 6 months if we're in the second semester.
-            // TODO We exclude Year 11 as their Sem2 only runs for a single Semester
-            $start->addDays(-365 / 2);
-        }
-
-        $finish = $attributes->getCurriculumSemesterFinish();
-        if ($attributes->getCurriculumSemester() === 1) {
-            // TODO Just a rough hack for now to move the finish forward by 6 months if we're in the first semester.
-            $finish->addDays(365 / 2);
-        }
-
         $params = [
             'student_id' => $user->getExternalId(),
-            'start'      => $start->getDatabaseDate(),
-            'finish'     => $finish->getDatabaseDate(),
+            'start'      => $attributes->getCurriculumYearStart()->getDatabaseDate(),
+            'finish'     => $attributes->getCurriculumYearFinish()->getDatabaseDate(),
         ];
 
-        return $this->externalDatabase->executeQuery($sql, $params)->fetchAll();
+        $awards = new GenericCollection(Award::class);
+
+        $query = $this->externalDatabase->executeQuery($sql, $params);
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while($row = $query->fetch()){
+            $awards->add(new Award($row['Award'], $row['Detail']));
+        }
+
+        return $awards;
     }
 }

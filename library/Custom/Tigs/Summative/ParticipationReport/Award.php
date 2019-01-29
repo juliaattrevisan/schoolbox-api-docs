@@ -1,0 +1,46 @@
+<?php
+/**
+ * @copyright   Copyright 2019, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+declare(strict_types=1);
+
+namespace Custom\Tigs\Summative\ParticipationReport;
+
+/**
+ * Represents an award given to a student
+ */
+class Award
+{
+
+    /** @var string */
+    private $name;
+
+    /** @var string */
+    private $detail;
+
+
+    public function __construct(string $name, string $detail)
+    {
+        $this->name      = $name;
+        $this->detail    = $detail;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getDetail(): string
+    {
+        return $this->detail;
+    }
+}
