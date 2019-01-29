@@ -47,7 +47,6 @@ class Freedom implements IQueryHelper
             WHERE (A.RELATION_STAT = :relationStatus)
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
             AND (A.STUDENT_PREF = :contactLevel)
-            AND (givenname <> :fakeRecordName)
             ORDER BY I.MEMBER# ASC;
         ";
 
@@ -75,8 +74,7 @@ class Freedom implements IQueryHelper
             WHERE (I.MEMBER# = :externalId)
             AND (A.RELATION_STAT = :relationStatus)
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
-            AND (A.STUDENT_PREF = :contactLevel)
-            AND (givenname <> :fakeRecordName);
+            AND (A.STUDENT_PREF = :contactLevel);
         ";
 
         $params = [
@@ -106,7 +104,6 @@ class Freedom implements IQueryHelper
             WHERE (A.RELATION_STAT = :relationStatus)
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
             AND (A.STUDENT_PREF = :contactLevel)
-            AND (givenname <> :fakeRecordName)
         ";
 
         $params = [
@@ -153,7 +150,6 @@ class Freedom implements IQueryHelper
             WHERE (A.RELATION_STAT = :relationStatus)
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
             AND (A.STUDENT_PREF = :contactLevel)
-            AND (givenname <> :fakeRecordName)
             AND (S.STUDKEY = :studentId)
             ORDER BY I.MEMBER# ASC;
         ";
@@ -232,7 +228,6 @@ class Freedom implements IQueryHelper
               AND A.EMERGENCY_PREF = :contactLevel
               AND A.STUDENT_PREF = :contactLevel
               AND A.RELATION_STAT = :relationStatus
-              AND givenname <> :fakeRecordName
               AND (A.PARENT# <> A.FAMILY_HASH)
               AND EC.DECEASED = ' '
             WHERE S.STUDKEY = :studentId
