@@ -1161,6 +1161,7 @@ class Controller extends Base
             'referrer' => $params->getReferrer(),
             'folderId' => $params->getFolderId(),
             'showArchiveNewsLink' => $showArchiveNewsLink,
+            'componentId' => $params->getComponentId(),
         ]);
     }
 

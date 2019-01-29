@@ -18,7 +18,8 @@ Data:
         'l=' ~ limit,
         'f=' ~ folderId,
         'hp=1',
-        'ref=' ~ referrer
+        'ref=' ~ referrer,
+        'cid=' ~ componentInstanceId,
     ] |join('&') %}
 
     {% set getListHomePagePath = routeLookup('commsNews.getListForHomepage', {folderId: folderId}) %}
