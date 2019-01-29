@@ -1077,7 +1077,7 @@ abstract class AbstractBootstrap implements BootstrapInterface
                     $assessmentDataSource  = $di->get('assessmentDataSource');
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
-                    return new Calendar_Api_Factory($assessmentDataSource, new ModuleChecker($config), $databaseExternal, $config);
+                    return new Calendar_Api_Factory($assessmentDataSource, new ModuleChecker($config), $config, $databaseExternal);
                 }
             )
         );
