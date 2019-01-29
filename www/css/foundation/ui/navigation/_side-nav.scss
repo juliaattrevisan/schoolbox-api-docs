@@ -1,5 +1,8 @@
 $side-nav-font-weight-active: $font-weight-bold;
 $side-nav-padding: 0;
+$side-nav-link-color: $anchor-font-color;
+$side-nav-link-color-active: $side-nav-link-color;
+$side-nav-link-color-hover: $body-font-color;
 $side-nav-list-margin: 0;
 $side-nav-divider-style: dotted;
 
@@ -19,7 +22,7 @@ $border-bottom-width: 2px;
 
       &:hover {
         border-left: $border-bottom-width solid $content-ui-hover;
-        color: $body-font-color;
+        color: $side-nav-link-color-hover;
       }
     }
 
