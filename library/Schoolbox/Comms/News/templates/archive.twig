@@ -17,9 +17,11 @@
     {% import 'sub/breadcrumbs.twig' as bread %}
 
     {% if folderId %}
+        {% set componentParam = (componentId) ? '#component' ~ componentId : '' %}
+
         {{ bread.crumbs(
             [locale.news.properPlural, routeLookup('commsNews.getIndex')],
-            [folderName, '/homepage/' ~ folderId ~ '#component' ~ componentId],
+            [folderName, '/homepage/' ~ folderId ~ componentParam],
             [locale.news.properPlural ~ ' Archive'])
         }}
     {% else %}
