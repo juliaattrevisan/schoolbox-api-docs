@@ -19,20 +19,20 @@ class Connector
      * A value that exists in dbo.spsEventTypes
      * This is the "Type" dropdown in Synweb
      */
-    const DEFAULT_EVENT_TYPE_CODE = 'TESTTYPE';
+    private const DEFAULT_EVENT_TYPE_CODE = 'TESTTYPE';
 
     /**
      * One of the values in dbo.luEventStatus
      * This is the "Status" dropdown in Synweb
      */
-    const DEFAULT_STATUS = 'PLANNING';
+    private const DEFAULT_STATUS = 'PLANNING';
 
     /**
      * One of the options in lu.AttendeeType
      * This distinguishes staff from students in Synweb
      */
-    const ATTENDEE_STAFF = 'STAFF';
-    const ATTENDEE_STUDENT = 'ATTENDEE';
+    private const ATTENDEE_STAFF = 'STAFF';
+    private const ATTENDEE_STUDENT = 'ATTENDEE';
 
     /**
      * Connectors which can synchronise EOTC events to external db
@@ -58,10 +58,11 @@ class Connector
     {
         /* Only set $db when external db supports what we're doing
          */
-        if (null !== $db && \in_array($databaseType, $this->getAvailableConnectors(), false)) {
-            $this->setDb($db);
+        if (null !== $db && \in_array($databaseType, $this->availableConnectors, false)) {
+            $this->db = $db;
         }
     }
+
 
     /**
      * Facade method
@@ -69,12 +70,13 @@ class Connector
      * Ram $event data into synergetic in some way
      *
      * @param EOTCEvent $event
+     * @throws \DomainException
      */
-    public function sync(EOTCEvent $event)
+    public function sync(EOTCEvent $event): void
     {
         /* If the external db isn't supported, do nothing
          */
-        if ($this->getDb()) {
+        if ($this->db) {
 
             /* Set up base excursion details
              */
@@ -93,7 +95,7 @@ class Connector
      * @param int $eventId
      * @return string
      */
-    private function generateIdentifier($eventId)
+    private function generateIdentifier($eventId): string
     {
         return "EOTC_{$eventId}";
     }
@@ -105,7 +107,7 @@ class Connector
      * @return int
      * @throws \DomainException
      */
-    private function insertExcursion(EOTCEvent $event)
+    private function insertExcursion(EOTCEvent $event): int
     {
         $eventsSeq = null;
         $result = null;
@@ -148,7 +150,7 @@ class Connector
          * these $statement vars are placeholders for now, while we figure out what
          * kind of failures may occur
          */
-        $statement = $this->getDb()->executeStoredProcedure('spiExcursions', $inputs, $outputs);
+        $statement = $this->db->executeStoredProcedure('spiExcursions', $inputs, $outputs);
 
         if (!is_numeric($eventsSeq)) {
             throw new \DomainException('Could not save Excursion: maybe need a unique EventCode identifier?');
@@ -163,7 +165,7 @@ class Connector
      * @param EOTCEvent $event
      * @param int $eventsSeq
      */
-    private function updateDetails(EOTCEvent $event, $eventsSeq)
+    private function updateDetails(EOTCEvent $event, $eventsSeq): void
     {
         $inputs = [
             'EventSeq' => $eventsSeq,
@@ -204,7 +206,7 @@ class Connector
             'Comments' => '',
         ];
 
-        $statement = $this->getDb()->executeStoredProcedure('spuExcursionDetails', $inputs, $outputs);
+        $statement = $this->db->executeStoredProcedure('spuExcursionDetails', $inputs, $outputs);
     }
 
     /**
@@ -230,7 +232,7 @@ class Connector
      * @param User $currentAttendee
      * @param string $attendeeType
      */
-    private function insertAttendee(EOTCEvent $event, User $currentAttendee, $attendeeType)
+    private function insertAttendee(EOTCEvent $event, User $currentAttendee, $attendeeType): void
     {
         $newEventCurrentSeq = null;
         $message = null;
@@ -262,7 +264,7 @@ class Connector
             ]
         ];
 
-        $statement = $this->getDb()->executeStoredProcedure('spiCommunityEventsCurrent', $inputs, $outputs);
+        $statement = $this->db->executeStoredProcedure('spiCommunityEventsCurrent', $inputs, $outputs);
     }
 
 //    /**
@@ -307,33 +309,4 @@ class Connector
 //            $statement = $this->getDb()->executeStoredProcedure('spdEvents', $inputs, $outputs);
 //        }
 //    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return IConnector
-     */
-    private function getDb()
-    {
-        return $this->db;
-    }
-
-    /**
-     * @param IConnector $db
-     * @return $this
-     */
-    private function setDb(IConnector $db)
-    {
-        $this->db = $db;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    private function getAvailableConnectors()
-    {
-        return $this->availableConnectors;
-    }
 }
