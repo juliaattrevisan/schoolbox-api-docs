@@ -24,8 +24,8 @@ class JsonSerializer
         return [
             'id'      => $model->getId(),
             'open'    => $model->getOpen(),
-            'created' => $model->getCreatedAt()->getDatabase(),
-            'updated' => $model->getUpdatedAt()->getDatabase(),
+            'created' => $model->getCreatedAt()->toRfc3339String(),
+            'updated' => $model->getUpdatedAt()->toRfc3339String(),
         ];
     }
 }

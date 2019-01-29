@@ -21,8 +21,8 @@ class JsonSerializer
             // as a part of the thread.
             'author'  => $model->getAuthor(),
             'content' => $model->getContent(),
-            'created' => $model->getCreatedAt()->getDatabase(),
-            'updated' => $model->getUpdatedAt()->getDatabase(),
+            'created' => $model->getCreatedAt()->toRfc3339String(),
+            'updated' => $model->getUpdatedAt()->toRfc3339String(),
         ];
     }
 }
