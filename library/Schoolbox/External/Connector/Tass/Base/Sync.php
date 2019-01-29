@@ -9,9 +9,12 @@
 
 namespace Schoolbox\External\Connector\Tass\Base;
 
+use Alaress\Database\Connector\IConnector;
 use External_Tass_Helper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\ISync;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Sync\Iterator;
 
 class Sync extends Base implements ISync
@@ -25,9 +28,15 @@ class Sync extends Base implements ISync
     /**
      * @inheritdoc
      */
-    public function __construct($config, $databaseExternal)
+    public function __construct(IConfigLoader $config, ?IConnector $databaseExternal)
     {
         parent::__construct($config, $databaseExternal);
+
+        /* die if external db is disabled
+         */
+        if (null === $databaseExternal) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
+        }
 
         $this->databaseExternal->addPostProcessor([$this, 'trimWhitespace']);
 
