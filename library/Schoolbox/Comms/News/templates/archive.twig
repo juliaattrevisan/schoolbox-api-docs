@@ -51,12 +51,20 @@
             <ul class="news-archive-filter side-nav">
                 {% set folderParam = '' %}
                 {% if folderId %}
-                    {% set folderParam = '?f=' ~ folderId %}
+                    {% set folderParam = [
+                        'f=' ~ folderId,
+                    ] %}
+
+                    {% set folderParam = (componentId) ? folderParam|merge([
+                        'cid=' ~ componentId,
+                    ]) : folderParam|merge([]) %}
+
+                    {% set folderParam = folderParam |join('&') %}
                 {% endif %}
                 {% for availableYear, availableMonths in availableYearsAndMonths %}
 
                     <li class="{{ year == availableYear ? 'active' : '' }} {% if month %}has-month-selected{% endif %}" role="menuitem">
-                        <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear}) ~ folderParam }}">
+                        <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear}) ~ '?' ~ folderParam }}">
                             {{ availableYear }}
                         </a>
                         <ul class="months">
@@ -64,7 +72,7 @@
                                 {% set archiveDate = availableYear ~ '-' ~ availableMonth ~ '-01' %}
 
                                 <li class="{{ archiveDate == selectedDate ? 'active' : '' }}" role="menuitem">
-                                    <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear, month: availableMonth}) ~ folderParam }}">
+                                    <a href="{{ routeLookup('commsNews.getArchive', {year: availableYear, month: availableMonth}) ~ '?' ~folderParam }}">
                                         {{ archiveDate | date('F') }}
                                     </a>
                                 </li>
