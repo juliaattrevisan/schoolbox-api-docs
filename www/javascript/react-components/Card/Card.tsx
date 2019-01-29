@@ -37,7 +37,9 @@ const Card: React.SFC<ICard> = props => {
         </div>
       </div>
     );
-  } else if (loader) {
+  }
+
+  if (loader) {
     return <CardLoader />;
   }
 
@@ -70,7 +72,9 @@ const CardImage: React.SFC<ICard> = props => {
         <img src={image} />
       </a>
     );
-  } else if (image) {
+  }
+
+  if (image) {
     return <img src={image} />;
   }
 
@@ -79,13 +83,16 @@ const CardImage: React.SFC<ICard> = props => {
 
 const CardTitle: React.SFC<ICard> = props => {
   const { title, href } = props;
+
   if (title && href) {
     return (
       <h3>
         <a href={href}>{title}</a>
       </h3>
     );
-  } else if (title) {
+  }
+
+  if (title) {
     return <h3>{title}</h3>;
   }
 
@@ -94,6 +101,7 @@ const CardTitle: React.SFC<ICard> = props => {
 
 const CardMeta: React.SFC<ICard> = props => {
   const { meta } = props;
+
   if (meta && Array.isArray(meta)) {
     return (
       <>
@@ -102,7 +110,9 @@ const CardMeta: React.SFC<ICard> = props => {
         ))}
       </>
     );
-  } else if (meta) {
+  }
+
+  if (meta) {
     return <p className="meta">{meta}</p>;
   }
 

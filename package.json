@@ -35,6 +35,11 @@
     "react-styleguidist": "^8.0.6",
     "shelljs": "^0.2.6",
     "source-map-loader": "^0.2.4",
+    "tslint": "^5.12.1",
+    "tslint-config-airbnb": "^5.11.1",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-react": "^3.6.0",
+    "tslint-react-a11y": "^1.0.0",
     "typescript": "^3.2.2",
     "webpack": "^4.27.1"
   },
