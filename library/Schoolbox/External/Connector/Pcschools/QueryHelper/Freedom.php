@@ -45,7 +45,6 @@ class Freedom implements IQueryHelper
             INNER JOIN dbo.ALUMREL AS A ON A.PARENT# = I.MEMBER#
             INNER JOIN dbo.STUDENT AS S ON S.STUDENT# = A.CHILD#
             WHERE (A.RELATION_STAT = :relationStatus)
-            AND (S.CURRENT_YEAR BETWEEN ' 5' AND '12')
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
             AND (A.STUDENT_PREF = :contactLevel)
             AND (givenname <> :fakeRecordName)
@@ -75,7 +74,6 @@ class Freedom implements IQueryHelper
             INNER JOIN dbo.STUDENT AS S ON S.STUDENT# = A.CHILD#
             WHERE (I.MEMBER# = :externalId)
             AND (A.RELATION_STAT = :relationStatus)
-            AND (S.CURRENT_YEAR BETWEEN ' 5' AND '12')
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
             AND (A.STUDENT_PREF = :contactLevel)
             AND (givenname <> :fakeRecordName);
@@ -106,7 +104,6 @@ class Freedom implements IQueryHelper
             INNER JOIN dbo.ALUMREL AS A ON A.PARENT# = I.MEMBER#
             INNER JOIN dbo.STUDENT AS S ON S.STUDENT# = A.CHILD#
             WHERE (A.RELATION_STAT = :relationStatus)
-            AND (S.CURRENT_YEAR BETWEEN ' 5' AND '12')
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
             AND (A.STUDENT_PREF = :contactLevel)
             AND (givenname <> :fakeRecordName)
@@ -154,7 +151,6 @@ class Freedom implements IQueryHelper
             INNER JOIN dbo.ALUMREL AS A ON A.PARENT# = I.MEMBER#
             INNER JOIN dbo.STUDENT AS S ON S.STUDENT# = A.CHILD#
             WHERE (A.RELATION_STAT = :relationStatus)
-            AND (S.CURRENT_YEAR BETWEEN ' 5' AND '12')
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
             AND (A.STUDENT_PREF = :contactLevel)
             AND (givenname <> :fakeRecordName)
@@ -240,7 +236,6 @@ class Freedom implements IQueryHelper
               AND (A.PARENT# <> A.FAMILY_HASH)
               AND EC.DECEASED = ' '
             WHERE S.STUDKEY = :studentId
-            AND S.CURRENT_YEAR BETWEEN ' 5' AND '12'
             ORDER BY A.CAREGIVER_NO ASC
         ";
 
