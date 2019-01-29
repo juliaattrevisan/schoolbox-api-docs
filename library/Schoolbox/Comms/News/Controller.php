@@ -897,12 +897,13 @@ class Controller extends Base
         if ($params->getFolderId()) {
             $folderBasicDetails = $this->getBasicFolderDetailsById((int) $params->getFolderId());
 
-            $folder_details = [
-                'folderId' => $folderBasicDetails['id'],
-                'folderName' => $folderBasicDetails['name'],
+            $metaDetails = [
+                'folderId'      => $folderBasicDetails['id'],
+                'folderName'    => $folderBasicDetails['name'],
+                'componentId'   => $params->getComponentId(),
             ];
 
-            $data = array_merge($data, $folder_details);
+            $data = array_merge($data, $metaDetails);
 
             $pageTitle = $folderBasicDetails['name'];
         }

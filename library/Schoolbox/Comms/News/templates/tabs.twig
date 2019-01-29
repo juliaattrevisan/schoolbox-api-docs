@@ -32,6 +32,10 @@
     {% set params = params ~ '&ref=' ~ referrer %}
 {% endif %}
 
+{% if componentId %}
+    {% set params = params ~ '&cid=' ~ componentId %}
+{% endif %}
+
 {# The paginator is enabled by default
  # You can provide a param here to turn it off
  #}

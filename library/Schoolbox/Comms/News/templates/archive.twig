@@ -19,7 +19,7 @@
     {% if folderId %}
         {{ bread.crumbs(
             [locale.news.properPlural, routeLookup('commsNews.getIndex')],
-            [folderName, '/homepage/' ~ folderId],
+            [folderName, '/homepage/' ~ folderId ~ '#component' ~ componentId],
             [locale.news.properPlural ~ ' Archive'])
         }}
     {% else %}
@@ -108,7 +108,8 @@
                     compactMode: false,
                     limit: limit,
                     referrer: referrer,
-                    folderId: folderId
+                    folderId: folderId,
+                    componentId: componentId,
                 } %}
 
                 <div id="news-container">
