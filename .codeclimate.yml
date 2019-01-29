@@ -48,6 +48,9 @@ plugins:
     enabled: true
   sonar-php:
     enabled: true
+  tslint:
+    enabled: true
+    config: tslint.json
 exclude_patterns:
   - "vendor/"
   - "**/tests/**/*"
