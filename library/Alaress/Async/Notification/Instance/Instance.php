@@ -273,6 +273,10 @@ class Instance implements JsonSerializable
      */
     public static function jsonUnserialize($json, $topic = '')
     {
+        if (!is_string($json)) {
+            throw new InvalidArgumentException("Could not JSON decode given " . gettype($json));
+        }
+
         if (!($array = json_decode($json, true))) {
             throw new InvalidArgumentException("Could not JSON decode given " . gettype($json));
         }
