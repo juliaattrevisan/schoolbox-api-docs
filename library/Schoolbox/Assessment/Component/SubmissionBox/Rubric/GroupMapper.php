@@ -58,6 +58,7 @@ class GroupMapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
 
 //        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteCriteria']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteUsages']);
     }
 
 
@@ -120,6 +121,19 @@ class GroupMapper extends BaseMapper
         }
 
         return true;
+    }
+
+
+    /**
+     * Post-delete callback for this group.
+     *
+     * Soft-deleting a group (hard) deletes all of its usages.
+     *
+     * @param Group $group
+     */
+    public function deleteUsages(Group $group): void
+    {
+        GroupUsageMapper::getInstance()->deleteByColumn('rubric_group_id', $group->getId());
     }
 
 
