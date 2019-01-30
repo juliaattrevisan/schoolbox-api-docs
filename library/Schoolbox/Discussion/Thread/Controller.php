@@ -43,7 +43,7 @@ class Controller extends BaseController
      */
     public function getPostsByThread(Model $thread): void
     {
-        $cursor        = new Post\Cursor($this->postMapper, $thread);
+        $cursor        = new Post\Cursor($this->postMapper, $thread, Post\Cursor::ORDER_DESC);
         $encodedCursor = $this->request->query->get('cursor');
         $posts         = $cursor->retrieveResults($encodedCursor);
 

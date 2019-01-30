@@ -20,14 +20,14 @@ class Cursor
     /**
      * The number of posts to return per request.
      */
-    private const RESULTS_PER_REQUEST = 100;
+    private const RESULTS_PER_REQUEST = 10;
 
 
     /**
-     * The direction of results (ascending or descending)
+     * The order in which to retrieve results (ascending or descending)
      */
-    public const DIRECTION_ASC = 'asc';
-    public const DIRECTION_DESC = 'desc';
+    public const ORDER_ASC = 'asc';
+    public const ORDER_DESC = 'desc';
 
 
     /**
@@ -39,9 +39,19 @@ class Cursor
 
 
     /**
+     * The thread for which to retrieve posts.
+     *
      * @var Thread\Model
      */
     private $thread;
+
+
+    /**
+     * The order in which to retrieve posts.
+     *
+     * @var string
+     */
+    private $order;
 
 
     /**
@@ -49,11 +59,22 @@ class Cursor
      *
      * @param Mapper       $mapper
      * @param Thread\Model $thread
+     * @param string       $order
      */
-    public function __construct(Mapper $mapper, Thread\Model $thread)
+    public function __construct(Mapper $mapper, Thread\Model $thread, string $order = self::ORDER_ASC)
     {
         $this->mapper = $mapper;
         $this->thread = $thread;
+
+        if (!in_array($order, [self::ORDER_ASC, self::ORDER_DESC], true)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Order must be one of the %s::ORDER_* constants',
+                    get_class($this)
+                )
+            );
+        }
+        $this->order = $order;
     }
 
 
@@ -73,7 +94,7 @@ class Cursor
 
         return $this->mapper->findByPredicates(
             $pb,
-            ['limit' => self::RESULTS_PER_REQUEST, 'order' => ['id' => 'asc']]
+            ['limit' => self::RESULTS_PER_REQUEST, 'order' => ['id' => $this->order]]
         )->reindex();
     }
 
@@ -92,11 +113,19 @@ class Cursor
         $currentCursor = null;
         $firstRecord   = $collection->first();
         $getIdMethod   = $this->mapper->getGetIdentifierMethodName();
-        if ($firstRecord && method_exists($firstRecord, $getIdMethod)) {
-            $currentCursor = $this->encodeCursor($firstRecord->$getIdMethod() - 1);
-        }
 
-        // And return
+        // The current cursor points to one record before the first.
+        // Ascending:  id - 1
+        // Descending: id + 1
+        if ($firstRecord && method_exists($firstRecord, $getIdMethod)) {
+            $lastPageCursorId = $firstRecord->$getIdMethod();
+            if ($this->order === self::ORDER_ASC) {
+                $lastPageCursorId--;
+            } elseif ($this->order === self::ORDER_DESC) {
+                $lastPageCursorId++;
+            }
+            $currentCursor = $this->encodeCursor($lastPageCursorId);
+        }
         return $currentCursor;
     }
 
@@ -112,11 +141,11 @@ class Cursor
         $nextCursor  = null;
         $lastRecord  = $collection->last();
         $getIdMethod = $this->mapper->getGetIdentifierMethodName();
+
+        // The next cursor points to the last record.
         if ($lastRecord && method_exists($lastRecord, $getIdMethod)) {
             $nextCursor = $this->encodeCursor($lastRecord->$getIdMethod());
         }
-
-        // And return
         return $nextCursor;
 
     }
@@ -134,8 +163,13 @@ class Cursor
         if (isset($cursor)) {
             $lastId = $this->decodeCursor($cursor);
             if (isset($lastId) && $lastId > 0) {
-                // Which direction? Assume always ascending (oldest first) for now
-                $builder->greaterThan('id', $lastId);
+                if ($this->order === self::ORDER_ASC) {
+                    // Ascending: get only items greater than last ID
+                    $builder->greaterThan('id', $lastId);
+                } elseif ($this->order === self::ORDER_DESC) {
+                    // Descending: get only items less than last ID
+                    $builder->lessThan('id', $lastId);
+                }
             }
         }
         return $builder;
