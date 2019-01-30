@@ -28,6 +28,7 @@ use Schoolbox\Curriculum\Node;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Resource\AbstractFolderMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
@@ -388,8 +389,19 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function softDeleteAssessments(Model $folder)
     {
         $assessmentMapper = AssessmentMapper::getInstance();
-        $assessments = $assessmentMapper->findByColumn('v_f.folder_id', $folder->getId());
-        $assessmentMapper->delete($assessments);
+
+        // Silence notifications on assessments, as the cascading from folder
+        // to assessment causes way too many retractions to handle (SA-8034)
+        $oldPropagator    = $assessmentMapper->getEventPropagator();
+        $mockPropagator   = new MockPropagator();
+        $assessmentMapper->setEventPropagator($mockPropagator);
+
+        // Ensure the propagator is set back how it was after deleting
+        try {
+            $assessmentMapper->delete($assessmentMapper->findByColumn('v_f.folder_id', $folder->getId()));
+        } finally {
+            $assessmentMapper->setEventPropagator($oldPropagator);
+        }
         return true;
     }
 
