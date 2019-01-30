@@ -187,7 +187,7 @@ $(function() {
             <p>
                 {{ locale.rubricCriterion.properPlural }} are used as rows in a rubric.
                 These may be added while creating your rubric or initially setup via this screen.
-                {% if not isSpecFolder %}
+                {% if not allowModifyUsed %}
                 If you want to delete any {{ locale.rubricCriterion }} that has already been used on an {{ locale.assessment }},
                 you need to first remove it from the {{ locale.assessment }}, then you can delete it.
                 {% endif %}
@@ -237,7 +237,7 @@ $(function() {
                             <ul class="information-list">
                                 {% include '@rubricCriteria/sub/group.twig' with {
                                     group:                    group,
-                                    isSpecFolder:             isSpecFolder,
+                                    allowModifyUsed:          allowModifyUsed,
                                     curriculumTaggingEnabled: curriculumTaggingEnabled,
                                 } only %}
                             </ul>
@@ -251,7 +251,7 @@ $(function() {
                                     {% include '@rubricCriteria/sub/criterion.twig' with {
                                         group:                    group,
                                         criterion:                criterion,
-                                        isSpecFolder:             isSpecFolder,
+                                        allowModifyUsed:          allowModifyUsed,
                                         curriculumTaggingEnabled: curriculumTaggingEnabled,
                                     } only %}
                                 {% endfor %}
@@ -260,7 +260,7 @@ $(function() {
                                 {% include '@rubricCriteria/sub/criterion.twig' with {
                                     group:                    group,
                                     criterion:                null,
-                                    isSpecFolder:             isSpecFolder,
+                                    allowModifyUsed:          allowModifyUsed,
                                     curriculumTaggingEnabled: curriculumTaggingEnabled,
                                 } only %}
                             </ul>
@@ -275,7 +275,7 @@ $(function() {
                         <ul class="information-list">
                             {% include '@rubricCriteria/sub/group.twig' with {
                                 group:                    null,
-                                isSpecFolder:             isSpecFolder,
+                                allowModifyUsed:          allowModifyUsed,
                                 curriculumTaggingEnabled: curriculumTaggingEnabled,
                             } only %}
                         </ul>
@@ -287,7 +287,7 @@ $(function() {
                             {% include '@rubricCriteria/sub/criterion.twig' with {
                                 group:                    null,
                                 criterion:                null,
-                                isSpecFolder:             isSpecFolder,
+                                allowModifyUsed:          allowModifyUsed,
                                 curriculumTaggingEnabled: curriculumTaggingEnabled,
                             } only %}
                         </ul>
