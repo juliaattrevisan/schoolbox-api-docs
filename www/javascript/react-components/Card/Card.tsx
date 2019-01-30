@@ -106,8 +106,10 @@ const CardMeta: React.SFC<ICard> = props => {
   if (meta && Array.isArray(meta)) {
     return (
       <>
-        {meta.map(thisMeta => (
-          <p className="meta">{thisMeta}</p>
+        {meta.map((thisMeta, index) => (
+          <p key={index} className="meta">
+            {thisMeta}
+          </p>
         ))}
       </>
     );
