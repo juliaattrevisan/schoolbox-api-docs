@@ -40,14 +40,6 @@ class Mapper extends BaseMapper
                 'other_key' => 'discussion_thread_id'
             ]
         );
-        $this->hasJoin(
-            'context',
-            [
-                'mapper'    => Context\Mapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'discussion_thread_id'
-            ]
-        );
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteThreads']);
     }
 
@@ -61,59 +53,6 @@ class Mapper extends BaseMapper
     {
         $this->getJoinMapper('posts')->deleteByColumn('discussion_thread_id', $model->getId());
     }
-
-
-    /**
-     * Overridden to join on context.
-     *
-     * @return string
-     */
-    protected function getSelectString()
-    {
-        return "
-            SELECT DISTINCT
-                {$this->getColumnString()}
-        ";
-    }
-
-
-    /**
-     * Overridden to join on context.
-     *
-     * @return string
-     */
-    protected function getFromString()
-    {
-        return "
-            FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('context', '', 'c')}
-        ";
-    }
-
-
-//    /**
-//     * Overridden to join on context.
-//     *
-//     * @param PDOStatement $statement
-//     * @return \Schoolbox\GenericCollection
-//     */
-//    protected function hydrateSelect(PDOStatement $statement)
-//    {
-//        $collection = $this->createCollection();
-//        foreach ($statement as $row) {
-//            /** @var Model $model */
-//            $model = $this->hydrate($row);
-//
-////            /** @var Context\Model|null $context */
-////            $context = $this->hydrateJoin($row, 'context', 'c');
-////            if ($context) {
-////                $model->setContext($context);
-////            }
-//
-//            $collection[$model->getId()] = $model;
-//        }
-//        return $collection;
-//    }
 
 
     /**
