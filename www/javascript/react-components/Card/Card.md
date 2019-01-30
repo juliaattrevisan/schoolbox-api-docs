@@ -4,7 +4,7 @@
 <Card
   title="Basic card"
   meta="Meta information"
-  image="https://via.placeholder.com/64"
+  image={{ src: "https://via.placeholder.com/64", alt: "Some alt text" }}
 />
 ```
 
@@ -17,7 +17,7 @@ Add an `href` prop to add a link to the title and image on the card.
   title="Linked card"
   href="#"
   meta="Meta information"
-  image="https://via.placeholder.com/64"
+  image={{ src: "https://via.placeholder.com/64", alt: "Some alt text" }}
 />
 ```
 
@@ -29,7 +29,7 @@ If you need multiple meta lines, you can send these in an array like so. Please 
 <Card
   title="Multiple meta"
   meta={["Meta line one", "Meta line two"]}
-  image="https://via.placeholder.com/64"
+  image={{ src: "https://via.placeholder.com/64", alt: "Some alt text" }}
 />
 ```
 

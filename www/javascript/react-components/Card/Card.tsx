@@ -1,4 +1,5 @@
 import * as React from "react";
+import { IImage, Image } from "../Image/Image";
 
 interface ICard {
   /** Whether to show a loading skeleton or not when there's no content. */
@@ -14,7 +15,7 @@ interface ICard {
   href?: string;
 
   /** URL of the image to display on the card */
-  image?: string;
+  image?: IImage;
 }
 
 /**
@@ -69,13 +70,13 @@ const CardImage: React.SFC<ICard> = props => {
   if (image && href) {
     return (
       <a href={href}>
-        <img src={image} />
+        <Image src={image.src} alt={image.alt} />
       </a>
     );
   }
 
   if (image) {
-    return <img src={image} />;
+    return <Image src={image.src} alt={image.alt} />;
   }
 
   return null;
@@ -119,4 +120,4 @@ const CardMeta: React.SFC<ICard> = props => {
   return null;
 };
 
-export default Card;
+export { ICard, Card };
