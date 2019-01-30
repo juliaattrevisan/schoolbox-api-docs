@@ -12,4 +12,11 @@ const Meta: React.SFC<IMeta> = props => {
   return <p className="meta">{children}</p>;
 };
 
-export { IMeta, Meta };
+/**
+ * Empty element for creating a skeleton loader of meta text
+ */
+const LoadingMeta: React.SFC = props => {
+  return <p className="meta" />;
+};
+
+export { IMeta, Meta, LoadingMeta };

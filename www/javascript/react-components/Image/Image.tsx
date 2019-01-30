@@ -13,4 +13,11 @@ const Image: React.SFC<IImage> = props => {
   return <img src={src} alt={alt} />;
 };
 
-export { IImage, Image };
+/**
+ * Empty element for creating a skeleton loader of an image
+ */
+const LoadingImage: React.SFC = props => {
+  return <div className="img" />;
+};
+
+export { IImage, Image, LoadingImage };

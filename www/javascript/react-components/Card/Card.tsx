@@ -1,6 +1,6 @@
 import * as React from "react";
-import { IImage, Image } from "../Image/Image";
-import { IMeta, Meta } from "../Meta/Meta";
+import { IImage, Image, LoadingImage } from "../Image/Image";
+import { IMeta, LoadingMeta, Meta } from "../Meta/Meta";
 
 interface ICard {
   /** Whether to show a loading skeleton or not when there's no content. */
@@ -57,9 +57,9 @@ const CardLoader: React.SFC = () => {
     <>
       <div className="list-item">
         <div className="small-12 card skeleton">
-          <div className="img" />
+          <LoadingImage />
           <h3 />
-          <p className="meta" />
+          <LoadingMeta />
         </div>
       </div>
     </>
