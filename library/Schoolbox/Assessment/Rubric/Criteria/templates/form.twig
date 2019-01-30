@@ -187,8 +187,10 @@ $(function() {
             <p>
                 {{ locale.rubricCriterion.properPlural }} are used as rows in a rubric.
                 These may be added while creating your rubric or initially setup via this screen.
+                {% if not isSpecFolder %}
                 If you want to delete any {{ locale.rubricCriterion }} that has already been used on an {{ locale.assessment }},
                 you need to first remove it from the {{ locale.assessment }}, then you can delete it.
+                {% endif %}
                 If you remove all the {{ locale.rubricCriterion.plural}} from any {{ locale.rubricGroup }},
                 the {{ locale.rubricGroup }} will automatically be deleted.
                 <a href="#" data-interaction="show-example-criteria">See example {{ locale.rubricCriterion.plural }}</a>
