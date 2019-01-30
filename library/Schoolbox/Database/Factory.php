@@ -61,10 +61,10 @@ class Factory
      * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
      *
      * @deprecated
-     * @return IConnector
+     * @return null|IConnector
      * @throws DatabaseException
      */
-    public static function getInstanceExternal(): IConnector
+    public static function getInstanceExternal(): ?IConnector
     {
         if (!isset(self::$connectorExternal)) {
             self::$connectorExternal = self::getInstance()->getExternalDatabase(new Loader());
@@ -79,10 +79,10 @@ class Factory
      * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
      *
      * @deprecated
-     * @return IConnector
+     * @return null|IConnector
      * @throws DatabaseException
      */
-    public static function getInstanceInternal(): IConnector
+    public static function getInstanceInternal(): ?IConnector
     {
         if (!isset(self::$connectorInternal)) {
             self::$connectorInternal = self::getInstance()->getInternalDatabase();
