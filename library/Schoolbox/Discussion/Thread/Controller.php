@@ -19,21 +19,9 @@ use Schoolbox\GenericCollection;
 class Controller extends BaseController
 {
     /**
-     * The number of threads to return per request.
-     */
-    private const THREAD_RESULTS_PER_REQUEST = 10;
-
-
-    /**
      * The number of posts to return per request.
      */
     private const POST_RESULTS_PER_REQUEST = 100;
-
-
-    /**
-     * @var Mapper
-     */
-    private $threadMapper;
 
 
     /**
@@ -45,13 +33,11 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param Mapper      $threadMapper
      * @param Post\Mapper $postMapper
      */
-    public function __construct(Mapper $threadMapper, Post\Mapper $postMapper)
+    public function __construct(Post\Mapper $postMapper)
     {
-        $this->threadMapper = $threadMapper;
-        $this->postMapper   = $postMapper;
+        $this->postMapper = $postMapper;
     }
 
 

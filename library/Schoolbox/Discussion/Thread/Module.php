@@ -38,13 +38,6 @@ class Module extends BaseModule
         // Routes
         $this->register(
             'GET',
-            '/context/{contextType}/id/{contextId}',
-            'getThreadsByContext',
-            $authorizer,
-            [$this, 'preloadContext']
-        );
-        $this->register(
-            'GET',
             '/{id}/posts',
             'getPostsByThread',
             $authorizer,
@@ -69,34 +62,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'threadMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
-            'postMapper'   => $this->getMapperFactory()->getLazy(Post\Mapper::class),
-        ];
-    }
-
-
-    /**
-     * Preload the requested thread context.
-     *
-     * @param array $params
-     * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    public function preloadContext(array $params): array
-    {
-        switch ($params['contextType']) {
-            case Context\Model::CONTEXT_COMMS:
-                // Load the requested comms article
-                $context = $this->getMapperFactory()->get(News\Mapper::class)->findById($params['contextId']);
-                break;
-
-            default:
-                // throw something
-                throw new \UnexpectedValueException('contextType is not a known value');
-                break;
-        }
-        return [
-            'context' => $context,
+            'postMapper' => $this->getMapperFactory()->getLazy(Post\Mapper::class),
         ];
     }
 
