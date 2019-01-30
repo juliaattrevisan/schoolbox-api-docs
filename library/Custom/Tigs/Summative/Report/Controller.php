@@ -163,6 +163,7 @@ class Controller extends Web\Controller\Base
         $data   = [
             'user'          => $user,
             'folder'        => $folder,
+            'teachers'      => $folder->loadTeachers()->getTeachers(),
             'courseSpec'    => $courseSpec,
             'isEnabled'     => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
             'attributes'    => $attributes,

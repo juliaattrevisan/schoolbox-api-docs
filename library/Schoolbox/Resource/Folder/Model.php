@@ -333,6 +333,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         }
 
         // do we include staff included in this category internally as well? for now, no.
+        return $this;
     }
 
     /**
