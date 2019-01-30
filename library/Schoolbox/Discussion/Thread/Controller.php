@@ -43,10 +43,10 @@ class Controller extends BaseController
      */
     public function getPostsByThread(Model $thread): void
     {
-        $cursor = new Post\Cursor($this->postMapper);
+        $cursor = new Post\Cursor($this->postMapper, $thread);
         $this->response->content->set(
             $this->buildJsonOutput(
-                $cursor->retrieveResults($thread->getId(), $this->request->query->get('cursor'))
+                $cursor->retrieveResults($this->request->query->get('cursor'))
             )
         );
     }

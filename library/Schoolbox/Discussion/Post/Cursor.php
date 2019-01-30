@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Post;
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
 
 /**
@@ -23,6 +24,13 @@ class Cursor
 
 
     /**
+     * The direction of results (ascending or descending)
+     */
+    public const DIRECTION_ASC = 'asc';
+    public const DIRECTION_DESC = 'desc';
+
+
+    /**
      * The mapper class that this cursor is being built for.
      *
      * @var Mapper
@@ -31,29 +39,38 @@ class Cursor
 
 
     /**
+     * @var Thread\Model
+     */
+    private $thread;
+
+
+    /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param Mapper       $mapper
+     * @param Thread\Model $thread
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, Thread\Model $thread)
     {
         $this->mapper = $mapper;
+        $this->thread = $thread;
     }
 
 
     /**
-     * @param int         $threadId
+     * Retrieve the page of results that $currentCursor points to.
+     *
      * @param string|null $currentCursor The current encoded cursor, if there is one.
      * @return array
      */
-    public function retrieveResults(int $threadId, ?string $currentCursor): array
+    public function retrieveResults(?string $currentCursor): array
     {
         // Cursored result:
         // actual result set
         // metadata: current, next cursor
         $pb = $this->applyCursor(
             $this->mapper->getPredicateBuilder()
-                         ->equals('discussion_thread_id', $threadId),
+                         ->equals('discussion_thread_id', $this->thread->getId()),
             $currentCursor
         );
 
