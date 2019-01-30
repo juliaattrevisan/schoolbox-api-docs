@@ -11,6 +11,8 @@ interface ICard {
 
   /** Meta information to display below the title */
   meta?: string | string[];
+  // ^Ideally this would be Meta | Meta[] instead of string, but that would require us to send
+  // meta={{children: "Some meta" }} instead of just meta="Some meta", so I'm leaving this for now.
 
   /** Adds a link to the image and title of the card */
   href?: string;
