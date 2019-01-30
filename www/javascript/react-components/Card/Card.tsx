@@ -1,5 +1,6 @@
 import * as React from "react";
 import { IImage, Image } from "../Image/Image";
+import { IMeta, Meta } from "../Meta/Meta";
 
 interface ICard {
   /** Whether to show a loading skeleton or not when there's no content. */
@@ -107,16 +108,14 @@ const CardMeta: React.SFC<ICard> = props => {
     return (
       <>
         {meta.map((thisMeta, index) => (
-          <p key={index} className="meta">
-            {thisMeta}
-          </p>
+          <Meta key={index}>{thisMeta}</Meta>
         ))}
       </>
     );
   }
 
-  if (meta) {
-    return <p className="meta">{meta}</p>;
+  if (meta && !Array.isArray(meta)) {
+    return <Meta>{meta}</Meta>;
   }
 
   return null;
