@@ -1,35 +1,17 @@
 {
-    "compilerOptions": {
-        "outDir": "./dist/",
-        "sourceMap": true,
-        "noImplicitAny": true,
-        "skipLibCheck": true,
-        "module": "commonjs",
-        "target": "es5",
-        "jsx": "react",
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "baseUrl": ".",
-        "lib": [
-            "dom",
-            "es5",
-            "es2015"
-        ],
-        "paths": {
-            "schoolbox": [
-                "www/javascript/react-components/schoolbox.tsx"
-            ],
-            "schoolbox-news": [
-                "library/Schoolbox/Comms/News/components/schoolbox-news.tsx"
-            ]
-        }
-    },
-    "include": [
-        "./library/Schoolbox/**/*",
-        "./www/javascript/react-components"
-    ],
-    "awesomeTypescriptLoaderOptions": {
-        "useBabel": true,
-        "babelCore": "@babel/core",
-    }
+  "compilerOptions": {
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "target": "es5",
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "lib": ["dom", "es5"]
+  },
+  "include": ["./www/javascript/react-components"],
+  "awesomeTypescriptLoaderOptions": {
+    "useBabel": true,
+    "babelCore": "@babel/core"
+  }
 }
