@@ -276,24 +276,11 @@
                 </fieldset>
 
                 <fieldset class="content">
-                    <div class="small-12 {% if config.comms_comments_enabled %}medium-6{% endif %} columns">
+                    <div class="small-12 columns">
                         <label for="news-topics">Topics</label>
                         <p class="meta">You can assign multiple topics to this {{ locale.news }} to help identify its purpose.</p>
                         <select data-topics name="topics[]" id="news-topics" multiple></select>
                     </div>
-
-                    {% if config.comms_comments_enabled %}
-                    <div class="small-12 medium-6 columns">
-                        <label for="commentsAllowed">Comments</label>
-                        <p class="meta">Is the article's audience allowed to comment on this article?</p>
-                        <input name="commentsAllowed"
-                               type="checkbox"
-                               id="commentsAllowed"
-                               value="1"
-                               {% if article.commentsAllowed %}checked{% endif %} />
-                        <label for="commentsAllowed" class="checkbox-label"></label>
-                    </div>
-                    {% endif %}
                 </fieldset>
 
                 <fieldset class="content">
@@ -465,7 +452,7 @@
         {% if isAutoSavable %}
             // Init draft plugin
             $createForm.draft({
-                inputs: ['#news-title', '#audience-search', '#news-topics', '#commentsAllowed'],
+                inputs: ['#news-title', '#audience-search', '#news-topics'],
                 textareas: ['body', 'blurb'],
                 attachzones: ['#{{ featureImageZone.id }}-zone'],
                 datepickers: ['#publishAt', '#expiresAt'],
