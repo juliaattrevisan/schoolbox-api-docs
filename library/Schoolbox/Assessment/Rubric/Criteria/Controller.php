@@ -131,7 +131,12 @@ class Controller extends BaseController
             'maxGroupId'               => !empty($groupIds) ? max($groupIds) + 1 : 1,
             'maxCritId'                => !empty($critIds)  ? max($critIds)  + 1 : 1,
             'curriculumTaggingEnabled' => $this->isCurriculumTaggingEnabled(),
-            'isSpecFolder'             => $folder->isSpecFolder(),
+            // If the folder is a spec folder: capabilities and indicators that
+            // are in use are allowed to be modified.
+            // This is because spec folders can't/shouldn't contain marked
+            // assessments, and changing caps/inds in use would invalidate all
+            // marks given.
+            'allowModifyUsed'          => $folder->isSpecFolder(),
         ];
     }
 

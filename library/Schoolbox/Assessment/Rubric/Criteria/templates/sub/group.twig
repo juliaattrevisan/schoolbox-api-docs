@@ -1,12 +1,11 @@
 {##
  # Params:
  # * group:                    If null, this is an input for a new group
- # * isSpecFolder:             Is the folder this group is in a course or unit spec?
- #                             If so, the group name is never readonly.
+ # * allowModifyUsed:          If true, the group name is never readonly even if it's in use.
  # * curriculumTaggingEnabled: Are curriculum code inputs shown?
  #}
 
-{% set readonly  = not isSpecFolder and group is not null and group.usage|length > 0 %}
+{% set readonly  = not allowModifyUsed and group is not null and group.usage|length > 0 %}
 {% set new       = group is null %}
 <li class="actions-small-0">
     <div class="list-item">

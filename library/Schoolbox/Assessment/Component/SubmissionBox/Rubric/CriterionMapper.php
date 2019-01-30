@@ -58,6 +58,7 @@ class CriterionMapper extends BaseMapper {
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDescriptors']);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteGroup']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteUsages']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreGroup']);
     }
 
@@ -179,6 +180,20 @@ class CriterionMapper extends BaseMapper {
             $this->getJoinMapper('group')->restoreSoftDeleted($criterion->getGroup());
         }
         return true;
+    }
+
+
+    /**
+     * Post-delete callback for this criterion.
+     *
+     * Soft-deleting a criterion (hard) deletes all of its usages from any
+     * rubrics.
+     *
+     * @param Criterion $criterion
+     */
+    public function deleteUsages(Criterion $criterion): void
+    {
+        CriterionUsageMapper::getInstance()->deleteByColumn('criterion_id', $criterion->getId());
     }
 
 
