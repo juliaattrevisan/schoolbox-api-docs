@@ -1291,9 +1291,10 @@ class Controller extends Base
             ->setBlurb($postData['blurb'])
             ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics']));
 
-        // Only set comments allowed if the feature is enabled
-        if ($this->getConfigLoader()->get('comms_comments_enabled')) {
-            $article->setCommentsAllowed((bool)($postData['commentsAllowed'] ?? false));
+        // Only set comments allowed if the value is passed in the form,
+        // and the feature is enabled
+        if (isset($postData['commentsAllowed']) && $this->getConfigLoader()->get('comms_comments_enabled')) {
+            $article->setCommentsAllowed((bool)$postData['commentsAllowed']);
         }
 
         // Exception thrown when an invalid date is submitted; use last known value instead
