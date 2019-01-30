@@ -50,17 +50,16 @@ plugins:
     enabled: true
   tslint:
     enabled: true
-    config: tslint.json
 exclude_patterns:
   - "vendor/"
   - "**/tests/**/*"
   - "test/"
   - "**/Test/**/*"
-  - "javascript/components/"
   - "node_modules/"
   - "sql/"
   - "updates/"
   - "debian/"
   - "www/"
   - "!www/css/**/*"
+  - "!www/javascript/react-components"
   - "tools/"
