@@ -148,19 +148,19 @@ try {
 
     // Enable override of start/end dates
     if (isset($_GET['start'])) {
-        $start = \strtotime($_GET['start']);
+        $startTimestamp = \strtotime($_GET['start']);
     }
     if (isset($_GET['end'])) {
-        $end = \strtotime($_GET['end']);
+        $endTimestamp = \strtotime($_GET['end']);
     }
     // Default start and end times
-    $start = $start ?: \strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
-    $end   = $end ?: \strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
+    $startTimestamp = $startTimestamp ?: \strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
+    $endTimestamp   = $endTimestamp ?: \strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
 
     // Ensure the requested period is not greater than what is configured in the admin so students don't bring down server
     if (isset($_GET['start']) || isset($_GET['end'])) {
         $permittedPeriodMonths = $back + $forward;
-        $requestedPeriodMonths = (int)(($end - $start) / (3600 * 24 * 31));
+        $requestedPeriodMonths = (int)(($endTimestamp - $startTimestamp) / (3600 * 24 * 31));
         if ($requestedPeriodMonths > $permittedPeriodMonths) {
             $message = "Requested period is {$requestedPeriodMonths} months, but permitted period is {$permittedPeriodMonths} months";
             \http_response_code(401);
@@ -257,9 +257,9 @@ try {
                 $sentry
             );
 
-            $filename = 'timetable';
-            $start    = $_SERVER['REQUEST_TIME'];
-            $end      = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
+            $filename       = 'timetable';
+            $startTimestamp = $_SERVER['REQUEST_TIME'];
+            $endTimestamp   = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
         case 'timetabledays':
@@ -270,9 +270,9 @@ try {
                 $sentry
             );
 
-            $filename = 'timetabledays';
-            $start    = $_SERVER['REQUEST_TIME'];
-            $end      = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
+            $filename       = 'timetabledays';
+            $startTimestamp = $_SERVER['REQUEST_TIME'];
+            $endTimestamp   = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
         case 'resources':
@@ -437,8 +437,8 @@ switch($_GET['format'] ?? ''){
 
 $renderer = new Renderer(
     $api,
-    $start,
-    $end,
+    $startTimestamp,
+    $endTimestamp,
     $user,
     (new SitePage(false))->setDi($kernel->getDependencyInjector()),
     $viewer
