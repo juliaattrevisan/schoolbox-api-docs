@@ -1292,7 +1292,7 @@ class Controller extends Base
             ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics']));
 
         // Only set comments allowed if the feature is enabled
-        if ($this->getConfigLoader()->get('comms_comments_allowed')) {
+        if ($this->getConfigLoader()->get('comms_comments_enabled')) {
             $article->setCommentsAllowed((bool)($postData['commentsAllowed'] ?? false));
         }
 
