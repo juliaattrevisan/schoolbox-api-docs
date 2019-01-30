@@ -585,16 +585,16 @@ class Calendar extends DeprecatedModel
             // Start timestamp: don't get events which end before or on that time
             $adf              = Alaress_Date_Format::newFromTimestamp($startTimestamp);
             $dateQueryParts[] = sprintf(
-                "DATE(end_datetime) < '%s'",
-                $adf->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                "end_datetime < '%s'",
+                $adf->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT)
             );
         }
         if (isset($endTimestamp)) {
             // End timestamp: don't get events which start after that time
             $adf              = Alaress_Date_Format::newFromTimestamp($endTimestamp);
             $dateQueryParts[] = sprintf(
-                "DATE(start_datetime) >= '%s'",
-                $adf->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                "start_datetime >= '%s'",
+                $adf->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT)
             );
         }
         if (!empty($dateQueryParts)) {
