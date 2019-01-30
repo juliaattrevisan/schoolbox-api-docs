@@ -56,44 +56,6 @@ class Controller extends BaseController
 
 
     /**
-     * Get a list of threads by their context.
-     *
-     * @api   GET /threads/context/{contextType}/id/{contextId}
-     * @level 190
-     *
-     * @param string $contextType
-     * @param int    $contextId
-     */
-    public function getThreadsByContext(string $contextType, int $contextId): void
-    {
-        // Cursoring:
-        // "get x records, starting after last record y"
-        $pb = $this->applyCursor(
-            $this->threadMapper->getPredicateBuilder()
-                               ->equals('c.context_type', $contextType)
-                               ->equals('c.context_id', $contextId),
-            $this->request->query->get('cursor')
-        );
-
-        // Fetch results
-        $threads = $this->threadMapper->findByPredicates(
-            $pb,
-            ['limit' => self::THREAD_RESULTS_PER_REQUEST, 'order' => ['id' => 'asc']]
-        )->reindex();
-
-        // Output results
-        $this->response->content->set(
-            $this->buildJsonOutput([
-                'data'     => $threads->map(new JsonSerializer()),
-                'metadata' => [
-                    'cursor' => $this->buildCursor($threads),
-                ],
-            ])
-        );
-    }
-
-
-    /**
      * Get a list of posts in the given thread.
      *
      * @api   GET /threads/{id}/posts
