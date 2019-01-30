@@ -80,7 +80,7 @@ class Loader
      */
     private function generateHash($epoch)
     {
-        return hash('sha256', "{$this->getSchool()}{$this->getUser()->getUsername()}{$epoch}{$this->getPtoKey()}");
+        return hash('sha256', "{$this->getSchool()}$this->getPTOLogin(){$epoch}{$this->getPtoKey()}");
     }
 
     /**
