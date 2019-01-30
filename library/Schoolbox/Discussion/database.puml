@@ -11,6 +11,27 @@ object discussion_thread {
     deleted: datetime
 }
 
+note left
+discussion_thread is slated to be able to be
+related to these existing discussion types:
+• blog
+• forum
+• socialstream
+• grades
+
+and possibly new discussion types:
+• assessment
+
+These relation are expected to be via direct
+foreign key relations, as opposed to a context
+type and ID, as proposed earlier.
+
+Relations to arbitrary content could be handled
+by the revised `discussion_thread_context` table:
+instead of a context type and ID, a URL reference
+is stored.
+end note
+
 object discussion_post {
     <<PK>> id: int
     discussion_thread_id: int
@@ -21,27 +42,20 @@ object discussion_post {
     deleted: datetime
 }
 
-object discussion_thread_context {
+object comms_news_article {
     <<PK>> id: int
+    ...
     discussion_thread_id: int
-    context_type: enum(comms)
-    context_id: int
 }
 
-note right
-context_type is slated to include
-these existing discussion types:
-• blog
-• forum
-• socialstream
-• grades
-
-and possibly new discussion types:
-• assessment
-end note
+object discussion_thread_context <<proposed>> {
+    <<PK>> id: int
+    discussion_thread_id: int
+    url: url
+}
 
 object user {
-    id: int, PK
+    <<PK>> id: int
     username: varchar
     ...
 }
@@ -49,6 +63,8 @@ object user {
 discussion_thread -r-{ discussion_post : discussion_thread_id >
 
 discussion_post }-r- user : author_id <
+
+discussion_thread -d- comms_news_article : discussion_thread_id >
 
 discussion_thread -d-{ discussion_thread_context : discussion_thread_id >
 
