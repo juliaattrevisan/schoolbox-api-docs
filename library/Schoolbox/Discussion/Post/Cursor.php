@@ -61,30 +61,64 @@ class Cursor
      * Retrieve the page of results that $currentCursor points to.
      *
      * @param string|null $currentCursor The current encoded cursor, if there is one.
-     * @return array
+     * @return GenericCollection
      */
-    public function retrieveResults(?string $currentCursor): array
+    public function retrieveResults(?string $currentCursor): GenericCollection
     {
-        // Cursored result:
-        // actual result set
-        // metadata: current, next cursor
         $pb = $this->applyCursor(
             $this->mapper->getPredicateBuilder()
                          ->equals('discussion_thread_id', $this->thread->getId()),
             $currentCursor
         );
 
-        $posts = $this->mapper->findByPredicates(
+        return $this->mapper->findByPredicates(
             $pb,
             ['limit' => self::RESULTS_PER_REQUEST, 'order' => ['id' => 'asc']]
         )->reindex();
+    }
 
-        return [
-            'data'     => $posts->map(new JsonSerializer()),
-            'metadata' => [
-                'cursor' => $this->buildCursor($posts, $currentCursor),
-            ],
-        ];
+
+    /**
+     * Retrieve a cursor to the current collection.
+     *
+     * This may be useful when retrieving a result set without a cursor, in
+     * case the initial result set at this time needs to be fetched.
+     *
+     * @param GenericCollection $collection
+     * @return string|null
+     */
+    public function retrieveCurrentCursor(GenericCollection $collection): ?string
+    {
+        $currentCursor = null;
+        $firstRecord   = $collection->first();
+        $getIdMethod   = $this->mapper->getGetIdentifierMethodName();
+        if ($firstRecord && method_exists($firstRecord, $getIdMethod)) {
+            $currentCursor = $this->encodeCursor($firstRecord->$getIdMethod() - 1);
+        }
+
+        // And return
+        return $currentCursor;
+    }
+
+
+    /**
+     * Retrieves a cursor to the next collection.
+     *
+     * @param GenericCollection $collection
+     * @return string|null
+     */
+    public function retrieveNextCursor(GenericCollection $collection): ?string
+    {
+        $nextCursor  = null;
+        $lastRecord  = $collection->last();
+        $getIdMethod = $this->mapper->getGetIdentifierMethodName();
+        if ($lastRecord && method_exists($lastRecord, $getIdMethod)) {
+            $nextCursor = $this->encodeCursor($lastRecord->$getIdMethod());
+        }
+
+        // And return
+        return $nextCursor;
+
     }
 
 
@@ -105,38 +139,6 @@ class Cursor
             }
         }
         return $builder;
-    }
-
-
-    /**
-     * Builds the cursor to be output in the response metadata.
-     *
-     * @param GenericCollection $records
-     * @param string|null       $currentCursor The current encoded cursor, if there is one.
-     * @return array
-     */
-    private function buildCursor(GenericCollection $records, ?string $currentCursor): array
-    {
-        // Build current cursor, if required and possible
-        if (!isset($currentCursor)) {
-            $firstRecord = $records->first();
-            if ($firstRecord && method_exists($firstRecord, 'getId')) {
-                $currentCursor = $this->encodeCursor($firstRecord->getId() - 1);
-            }
-        }
-
-        // Build next cursor
-        $nextCursor = null;
-        $lastRecord = $records->last();
-        if ($lastRecord && method_exists($lastRecord, 'getId')) {
-            $nextCursor = $this->encodeCursor($lastRecord->getId());
-        }
-
-        // And return
-        return [
-            'current' => $currentCursor,
-            'next'    => $nextCursor,
-        ];
     }
 
 
