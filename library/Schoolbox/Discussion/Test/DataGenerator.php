@@ -46,12 +46,6 @@ class DataGenerator
 
 
     /**
-     * @var Thread\Context\Mapper
-     */
-    private $threadContextMapper;
-
-
-    /**
      * @var Post\Mapper
      */
     private $postMapper;
@@ -60,27 +54,24 @@ class DataGenerator
     /**
      * Constructor
      *
-     * @param Faker\Generator       $faker
-     * @param UserMapper            $userMapper
-     * @param News\Mapper           $articleMapper
-     * @param Thread\Mapper         $threadMapper
-     * @param Thread\Context\Mapper $threadContextMapper
-     * @param Post\Mapper           $postMapper
+     * @param Faker\Generator $faker
+     * @param UserMapper      $userMapper
+     * @param News\Mapper     $articleMapper
+     * @param Thread\Mapper   $threadMapper
+     * @param Post\Mapper     $postMapper
      */
     public function __construct(
         Faker\Generator $faker,
         UserMapper $userMapper,
         News\Mapper $articleMapper,
         Thread\Mapper $threadMapper,
-        Thread\Context\Mapper $threadContextMapper,
         Post\Mapper $postMapper
     ) {
-        $this->faker               = $faker;
-        $this->userMapper          = $userMapper;
-        $this->articleMapper       = $articleMapper;
-        $this->threadMapper        = $threadMapper;
-        $this->threadContextMapper = $threadContextMapper;
-        $this->postMapper          = $postMapper;
+        $this->faker         = $faker;
+        $this->userMapper    = $userMapper;
+        $this->articleMapper = $articleMapper;
+        $this->threadMapper  = $threadMapper;
+        $this->postMapper    = $postMapper;
     }
 
 
@@ -121,11 +112,6 @@ class DataGenerator
             $thread = $this->threadMapper->createModel()
                 ->setOpen(true);
 
-//            $context = $this->threadContextMapper->createModel()
-//                ->setThread($thread)
-//                ->setContextType(Thread\Context\Model::CONTEXT_COMMS)
-//                ->setContextId($articleId);
-
             // Build a bunch of comments
             // Need to be able to override created date for all of them though?
             $posts = $this->postMapper->createCollection();
@@ -138,7 +124,6 @@ class DataGenerator
             }
 
             $this->threadMapper->save($thread);
-//            $this->threadContextMapper->save($context);
             $this->postMapper->save($posts);
 
 
