@@ -32,13 +32,23 @@ class AuraLink implements Link
     private $user;
 
     /**
+     * If false, don't perform an auth check on this link.
+     *
+     * @var bool
+     */
+    private $doAuth;
+
+
+    /**
      * @param string $routeName
      * @param array  $routeArgs
+     * @param bool   $doAuth
      */
-    public function __construct(string $routeName, array $routeArgs = [])
+    public function __construct(string $routeName, array $routeArgs = [], bool $doAuth = true)
     {
-        $this->name = $routeName;
-        $this->args = $routeArgs;
+        $this->name   = $routeName;
+        $this->args   = $routeArgs;
+        $this->doAuth = $doAuth;
     }
 
 
@@ -77,6 +87,9 @@ class AuraLink implements Link
      */
     public function getAuth(): ?bool
     {
+        if (!$this->doAuth) {
+            return null;
+        }
         return $this->auth->isPathAuthorizedForUser($this->name, $this->args, $this->user);
     }
 

@@ -952,8 +952,9 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
      */
     public function getJsonApiLinks(): array
     {
+        // Set auth to FALSE on 'commsNews.getDetail' as unlikely we'll have fetched this instance if the user is unable to see it
         return [
-            'self'   => new AuraLink('commsNews.getDetail', [ 'article' => $this, 'articleId' => $this->getId() ]),
+            'self'   => new AuraLink('commsNews.getDetail', [ 'article' => $this, 'articleId' => $this->getId() ], false),
             'update' => new AuraLink('commsNews.getUpdate', [ 'article' => $this, 'articleId' => $this->getId() ]),
             'saveForLater' => new AuraLink('commsNewsSaveForLater.postAdd', [ 'article' => $this, 'articleId' => $this->getId() ]),
             'unsaveForLater' => new AuraLink('commsNewsSaveForLater.postRemove', [ 'article' => $this, 'articleId' => $this->getId() ])
