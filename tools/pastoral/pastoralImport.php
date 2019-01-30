@@ -46,8 +46,6 @@ $kernel->run(function (
     LoggerInterface $log,
     array $options
 ) {
-    $colourRed   = "\033[0;31m";
-    $colourWhite = "\033[0m";
 
     /* command-line options
      */
@@ -80,10 +78,10 @@ HELP;
 
     /* The user conducting the import (used in logging)
      */
-    $userId             = array_key_exists('user', $opts) ? (int)$opts['user'] : false;
+    $userId = array_key_exists('user', $opts) ? (int)$opts['user'] : false;
 
     if (!$userId) {
-        echo "{$colourRed}Invalid user id. Specify a user to whom the pastoral import is associated for logging purposes (typically a superuser)\n\n";
+        $log->critical('Invalid user id. Specify a user to whom the pastoral import is associated for logging purposes (typically a superuser)');
         exit(0);
     }
 
@@ -92,31 +90,30 @@ HELP;
     try {
         $user = $userMapper->findById($userId);
     } catch (\Schoolbox\Mapper\Exception $e) {
-        echo "{$colourRed}Invalid user id. User not found.\n\n";
+        $log->critical('Invalid user id. User not found.');
         exit(0);
     }
 
     /* The default owner of pastoral records
      */
-    $defaultOwnerId     = array_key_exists('default-owner', $opts) ? (int)$opts['default-owner'] : false;
+    $defaultOwnerId = array_key_exists('default-owner', $opts) ? (int)$opts['default-owner'] : false;
 
     if (!$defaultOwnerId) {
-        echo "{$colourRed}Invalid default owner id. Specify a user to whom pastoral records are assigned.\n\n";
+        $log->critical('Invalid default owner id. Specify a user to whom pastoral records are assigned.');
         exit(0);
     }
 
     try {
         $defaultOwner = $userMapper->findById($defaultOwnerId);
     } catch (\Schoolbox\Mapper\Exception $e) {
-        echo "{$colourRed}Invalid default owner id. User not found.\n\n";
+        $log->critical('Invalid default owner id. User not found');
         exit(0);
     }
 
     // Only process if pastoral docman writeback is actually enabled in config
     if (!$di->get('config')->get("external_pastoral")) {
-        echo "{$colourRed}Pastoral External is disabled, therefore this script is exiting.\n\n";
-        $log->warning('Pastoral external is disabled, exiting...');
-        exit;
+        $log->critical('Pastoral external is disabled, exiting...');
+        exit(0);
     }
 
     pcntl_signal(SIGCHLD, SIG_DFL);
@@ -124,9 +121,8 @@ HELP;
     $lock = new Alaress_Lock('pastoral_import.' . INSTANCE_ID . '.lock');
 
     if (!$lock->acquire()) {
-        echo "{$colourRed}A Pastoral import is currently in progress, therefore this script is exiting.\n\n";
-        $log->warning('A pastoral import is currently in progress, exiting...');
-        exit;
+        $log->critical('A pastoral import is currently in progress, exiting...');
+        exit(0);
     }
 
     $log->info("Beginning import of pastoral records...");
