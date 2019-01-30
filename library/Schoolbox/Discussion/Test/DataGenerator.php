@@ -107,24 +107,24 @@ class DataGenerator
 
         // What comms articles are available?
         // Build thread + comments for, say, 75% of them
-        $articleIds              = array_map('intval', $this->articleMapper->findAllIds());
-        $articleIdsForDiscussion = $this->faker->unique()->randomElements(
-            $articleIds,
-            max(1, (int)(count($articleIds) * 0.75))
+        $articles              = $this->articleMapper->findAll(['order' => ['id' => 'asc']]);
+        $articlesForDiscussion = $this->faker->unique()->randomElements(
+            $articles->getAll(),
+            max(1, (int)(count($articles) * 0.75))
         );
-        sort($articleIdsForDiscussion);
 
 
         // Build threads and posts for each article
-        foreach ($articleIdsForDiscussion as $articleId) {
+        /** @var News\Model[] $articlesForDiscussion */
+        foreach ($articlesForDiscussion as $article) {
             // Build a single thread
             $thread = $this->threadMapper->createModel()
                 ->setOpen(true);
 
-            $context = $this->threadContextMapper->createModel()
-                ->setThread($thread)
-                ->setContextType(Thread\Context\Model::CONTEXT_COMMS)
-                ->setContextId($articleId);
+//            $context = $this->threadContextMapper->createModel()
+//                ->setThread($thread)
+//                ->setContextType(Thread\Context\Model::CONTEXT_COMMS)
+//                ->setContextId($articleId);
 
             // Build a bunch of comments
             // Need to be able to override created date for all of them though?
@@ -138,8 +138,13 @@ class DataGenerator
             }
 
             $this->threadMapper->save($thread);
-            $this->threadContextMapper->save($context);
+//            $this->threadContextMapper->save($context);
             $this->postMapper->save($posts);
+
+
+            // And add the thread to the comms article
+            $article->setDiscussionThread($thread);
+            $this->articleMapper->save($article);
         }
     }
 
