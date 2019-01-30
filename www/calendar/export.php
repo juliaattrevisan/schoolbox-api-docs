@@ -153,7 +153,7 @@ try {
     if (isset($_GET['end'])) {
         $endTimestamp = \strtotime($_GET['end']);
         // Always assume end of day
-        $endTimestamp = (new Alaress_Date_Format($endTimestamp, Alaress_Date_Format::TIMESTAMP))->endOfDay()->getUnixTimeStamp();
+        $endTimestamp = Alaress_Date_Format::newFromTimestamp($endTimestamp)->endOfDay()->getUnixTimeStamp();
     }
     // Default start and end times
     $startTimestamp = $startTimestamp ?: \strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
