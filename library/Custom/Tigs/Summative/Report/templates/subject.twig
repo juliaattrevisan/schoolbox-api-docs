@@ -63,7 +63,7 @@ Data:
         </div>
     </div>
     <div class="column small-12 medium-6">
-        <h2 class="subheader">Teacher{% if teachers | length > 1 %}s{% endif %}</h2>
+        <h2 class="subheader">Class Teacher{% if teachers | length > 1 %}s{% endif %}</h2>
         {% for teacher in teachers %}
             <div class="card small-12">
                 <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="View Profile">
