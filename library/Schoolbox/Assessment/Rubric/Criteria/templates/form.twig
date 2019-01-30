@@ -437,7 +437,11 @@ $(function() {
 
 <!-- Hidden text for remove criterion -->
 <div class="hide" id="criterion-remove-text">
-    If you remove this {{ locale.rubricCriterion }}, it will not be available to add to future {{ locale.assessment.plural }}.
+    If you remove this {{ locale.rubricCriterion }}, it
+    {% if allowModifyUsed %}
+        will be removed from any assessments which already use it, and
+    {% endif %}
+    will not be available to add to future {{ locale.assessment.plural }}.
     Are you sure you want to do this?
     (Make sure you click save at the end of this form to save all changes you have made.)
 </div>
