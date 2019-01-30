@@ -46,28 +46,6 @@ paths:
         - $ref: '#/components/parameters/id'
         - $ref: '#/components/parameters/token'
 
-  /threads/context/{contextType}/id/{contextId}:
-    get:
-      operationId: getThreadsByContext
-      summary: Returns threads by their context
-      responses:
-        '200':
-          $ref: '#/components/responses/threadList'
-        default:
-          $ref: '#/components/responses/problem'
-      parameters:
-        - name: contextType
-          in:   path
-          schema:
-            $ref: '#/components/schemas/threadContext/properties/type'
-        - name: contextId
-          in:   path
-          schema:
-            $ref: '#/components/schemas/threadContext/properties/id'
-        - $ref: '#/components/parameters/cursor'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/token'
-
   /threads/{id}/posts:
     get:
       operationId: getPostsByThread
