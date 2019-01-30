@@ -53,25 +53,4 @@ class Mapper extends BaseMapper
     {
         $this->getJoinMapper('posts')->deleteByColumn('discussion_thread_id', $model->getId());
     }
-
-
-    /**
-     * Find threads for a particular context.
-     *
-     * @param string $contextType
-     * @param int    $contextId
-     * @param array  $options
-     * @return GenericCollection
-     * @throws BaseMapper\Exception
-     */
-    public function findForContext(string $contextType, int $contextId, array $options = []): GenericCollection
-    {
-        return $this->findByColumnList(
-            [
-                'c.context_type' => $contextType,
-                'c.context_id'   => $contextId,
-            ],
-            $options
-        );
-    }
 }
