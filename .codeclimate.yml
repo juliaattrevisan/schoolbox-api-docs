@@ -48,22 +48,16 @@ plugins:
     enabled: true
   sonar-php:
     enabled: true
-  tslint:
-    enabled: true
 exclude_patterns:
   - "vendor/"
   - "**/tests/**/*"
   - "test/"
   - "**/Test/**/*"
+  - "javascript/components/"
   - "node_modules/"
   - "sql/"
   - "updates/"
   - "debian/"
   - "www/"
   - "!www/css/**/*"
-  - "!www/javascript/react-components"
   - "tools/"
-prepare:
-  fetch:
-    - url: "https://raw.githubusercontent.com/joaovieira/tslint-react-a11y/master/tslint-react-a11y.js"
-      path: "node_modules/tslint-react-a11y/tslint-react-a11y.js"
