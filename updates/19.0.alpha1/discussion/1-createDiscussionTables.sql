@@ -1,7 +1,7 @@
 /**
  * Discussion threads.
  *
- * Related to a comms article via `discussion_thread_context` below.
+ * Related to a comms article via a FK on the article table.
  */
 CREATE TABLE discussion_thread (
     id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -10,27 +10,6 @@ CREATE TABLE discussion_thread (
     updated_at DATETIME NOT NULL,
     deleted_at DATETIME DEFAULT NULL,
     PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-
-/**
- * The context within which a discussion thread exists.
- *
- * It's anticipated that threads will exist in places other than on comms
- * articles.
- */
-CREATE TABLE discussion_thread_context (
-    id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-    discussion_thread_id INT(11) UNSIGNED NOT NULL,
-    context_type ENUM('comms'),
-    context_id INT(11) UNSIGNED NOT NULL,
-    PRIMARY KEY (id),
-    KEY fk_discussion_thread_context_discussion_thread_id (discussion_thread_id),
-    KEY fk_discussion_thread_context_identifier (context_type, context_id),
-    CONSTRAINT fk_discussion_thread_context_discussion_thread_id
-        FOREIGN KEY (discussion_thread_id) REFERENCES discussion_thread (id)
-            ON DELETE NO ACTION
-            ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -57,3 +36,16 @@ CREATE TABLE discussion_post (
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+/**
+ * Add the relation to the comms article table
+ */
+ALTER TABLE comms_news_article
+    ADD COLUMN discussion_thread_id INT(11) UNSIGNED NULL DEFAULT NULL AFTER feature_image_hash,
+    ADD INDEX fk_comms_news_article_discussion_thread_id (discussion_thread_id ASC);
+ALTER TABLE comms_news_article
+    ADD CONSTRAINT fk_comms_news_article_discussion_thread_id
+        FOREIGN KEY (discussion_thread_id) REFERENCES discussion_thread (id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION;
