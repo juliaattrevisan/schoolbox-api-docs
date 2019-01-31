@@ -48,7 +48,7 @@ class Module extends BaseModule
         // Routes
         $this->register(
             'GET',
-            '/{id}/posts',
+            '/{id:\d+}/posts',
             'getPostsByThread',
             $authorizer,
             [$this, 'preloadThread']
