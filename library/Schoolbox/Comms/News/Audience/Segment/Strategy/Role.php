@@ -33,7 +33,7 @@ class Role extends SimpleStrategy
      */
     public function getValidRelationshipModifiers(): array
     {
-        return [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF];
+        return [Model::RELATIONSHIP_SELF];
     }
 
 
