@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Post;
 
 use Alaress\Database\Predicate\Builder;
+use InvalidArgumentException;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
 
@@ -60,6 +61,7 @@ class Cursor
      * @param Mapper       $mapper
      * @param Thread\Model $thread
      * @param string       $order
+     * @throws InvalidArgumentException if $order isn't one of this class' ORDER_* constants
      */
     public function __construct(Mapper $mapper, Thread\Model $thread, string $order = self::ORDER_ASC)
     {
@@ -67,7 +69,7 @@ class Cursor
         $this->thread = $thread;
 
         if (!in_array($order, [self::ORDER_ASC, self::ORDER_DESC], true)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf(
                     'Order must be one of the %s::ORDER_* constants',
                     get_class($this)
