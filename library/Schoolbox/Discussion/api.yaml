@@ -84,22 +84,6 @@ components:
         updated:
           type: string
           format: date-time
-        context:
-          $ref: '#/components/schemas/threadContext'
-
-    threadContext:
-      title: Thread Context
-      description: The context for a thread
-      type: object
-      properties:
-        type:
-          description: |
-            The type of the context for a given thread. Currently, only comms is
-            supported.
-          type: string
-          enum: [comms]
-        id:
-          $ref: '#/components/schemas/id'
 
     post:
       title: Post
@@ -110,6 +94,8 @@ components:
           $ref: '#/components/schemas/id'
         thread:
           $ref: '#/components/schemas/thread'
+          # Usually a post will be retrieved within the context of a thread
+          required: false
         author:
           $ref: '#/components/schemas/user'
         content:
