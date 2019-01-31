@@ -5,15 +5,15 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Tigs\Summative\Report\Test;
+namespace Custom\Tigs\Summative\SubjectReport\Test;
 
-use Custom\Tigs\Summative\Report\StudentAttributes;
+use Custom\Tigs\Summative\StudentAttributes;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\User;
 use InvalidArgumentException;
 
 /**
- * @covers \Custom\Tigs\Summative\Report\StudentAttributes
+ * @covers \Custom\Tigs\Summative\StudentAttributes
  * @codeCoverageIgnore
  */
 class StudentAttributesTest extends TestCase

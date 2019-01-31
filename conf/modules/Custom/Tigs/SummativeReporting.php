@@ -36,6 +36,7 @@ class SummativeReporting extends ModuleLoader
 
         $this->loadModule($kernel, Summative\Admin\Module::class, "{$basePath}/admin");
         $this->loadModule($kernel, Summative\Comment\Module::class, "{$basePath}/comments");
-        $this->loadModule($kernel, Summative\Report\Module::class, $basePath);
+        $this->loadModule($kernel, Summative\SubjectReport\Module::class, "{$basePath}/subject");
+        $this->loadModule($kernel, Summative\ParticipationReport\Module::class, "{$basePath}/participation");
     }
 }

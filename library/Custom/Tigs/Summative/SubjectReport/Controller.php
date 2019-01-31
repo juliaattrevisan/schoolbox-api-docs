@@ -5,20 +5,21 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Tigs\Summative\Report;
+namespace Custom\Tigs\Summative\SubjectReport;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
-use Custom\Tigs\Summative\Report\Components\AcademicAchievementMatrix;
-use Custom\Tigs\Summative\Report\Components\AcademicAchievementSummary;
-use Custom\Tigs\Summative\Report\Components\FinalAchievementLevels;
-use Custom\Tigs\Summative\Report\Components\HscAssessmentRank;
-use Custom\Tigs\Summative\Report\Components\HscAssessmentTasks;
-use Custom\Tigs\Summative\Report\Components\InternationalBaccalaureateGraph;
-use Custom\Tigs\Summative\Report\Components\NesaScoreGraph;
+use Custom\Tigs\Summative\StudentAttributes;
+use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementMatrix;
+use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementSummary;
+use Custom\Tigs\Summative\SubjectReport\Components\FinalAchievementLevels;
+use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
+use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
+use Custom\Tigs\Summative\SubjectReport\Components\InternationalBaccalaureateGraph;
+use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraph;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -90,30 +91,10 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * Displays a student's participation report for current term
-     *
-     * @api   GET /modules/custom/tigs/summative/user/{userId}
-     * @level 18.1.0
-     * @param User $user
-     * @throws ServiceNotFound
-     * @todo Move to own controller
-     */
-    public function getParticipationReport(User $user): void
-    {
-        $data   = [
-            'user'      => $user,
-            'isEnabled' => $this->getConfigLoader()->get(Config::_TIGS_PARTICIPATION_REPORT_ENABLED),
-        ];
-        $output = $this->buildHtmlOutput('@tigsSummativeReport/participation.twig', $data, "Participation Report");
-
-        $this->getResponse()->content->set($output);
-    }
-
-
-    /**
      * Displays a student's subject report for specified folder and current term
      *
-     * @api   GET /modules/custom/tigs/summative/user/{userId}/folder/{folderId}?term=[1,2,3,4]
+     * @api   GET /modules/custom/tigs/summative/subject/user/{userId}/folder/{folderId}?now={time}
+     *            Where {time} is anything recognised by strtotime()
      * @level 18.1.0
      * @param User         $user
      * @param Folder\Model $folder
@@ -128,7 +109,7 @@ class Controller extends Web\Controller\Base
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \UnderflowException
      */
-    public function getSubjectReport(User $user, Folder\Model $folder): void
+    public function getReport(User $user, Folder\Model $folder): void
     {
         $attributes = $this->deriveStudentAttributes($user, $this->getRequest()->query);
 
@@ -145,6 +126,7 @@ class Controller extends Web\Controller\Base
             $error = \sprintf('There must be exactly 1 course imported to the class. Found %d.', $courseSpecs->count());
             $route = $this->getRouteIfAuthorized('courseImport.getManagement', ['folderId' => $folder->getId(), 'folder' => $folder]);
             if ($route) {
+                /** @noinspection HtmlUnknownTarget */
                 $error .= \sprintf(' <a href="%s">Manage Course imports</a>', $route);
             }
             $errors[]  = $error;
@@ -186,7 +168,7 @@ class Controller extends Web\Controller\Base
             'hscTaskMarks'  => $hscTaskMarks,
             'hscRankData'   => $hscRankData,
         ];
-        $output = $this->buildHtmlOutput('@tigsSummativeReport/subject.twig', $data, "Subject Report");
+        $output = $this->buildHtmlOutput('@tigsSubjectReport/subject.twig', $data, "Subject Report");
 
         $this->getResponse()->content->set($output);
     }
@@ -214,8 +196,6 @@ class Controller extends Web\Controller\Base
      * Returns all course implementations imported to the specified folder.
      *
      * Also loads units, assessments. and participation for all users
-     *
-     * @todo consider only loading participation of current student by default, load participation for all users for cohort components only.
      *
      * @param GenericCollection|CourseImpl\Model[] $courseImplsWithUnits
      * @throws \Alaress\Database\Predicate\InvalidColumnException
