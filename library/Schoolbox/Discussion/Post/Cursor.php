@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Post;
 
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
 use InvalidArgumentException;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
@@ -88,11 +89,17 @@ class Cursor
      */
     public function retrieveResults(?string $currentCursor): GenericCollection
     {
-        $pb = $this->applyCursor(
-            $this->mapper->getPredicateBuilder()
-                         ->equals('discussion_thread_id', $this->thread->getId()),
-            $currentCursor
-        );
+        $pb       = $this->mapper->getPredicateBuilder();
+        $threadId = $this->thread->getId();
+        try {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $pb = $pb->equals('discussion_thread_id', $threadId);
+        } catch (\TypeError $e) {
+            // $thread doesn't exist yet
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $pb = $pb->isNull('discussion_thread_id');
+        }
+        $pb = $this->applyCursor($pb, $currentCursor);
 
         return $this->mapper->findByPredicates(
             $pb,
@@ -159,6 +166,7 @@ class Cursor
      * @param Builder     $builder
      * @param string|null $cursor
      * @return Builder
+     * @throws InvalidColumnException if somehow the query built references a column that doesn't exist
      */
     private function applyCursor(Builder $builder, ?string $cursor): Builder
     {
@@ -167,9 +175,11 @@ class Cursor
             if (isset($lastId) && $lastId > 0) {
                 if ($this->order === self::ORDER_ASC) {
                     // Ascending: get only items greater than last ID
+                    /** @noinspection PhpUnhandledExceptionInspection */
                     $builder->greaterThan('id', $lastId);
                 } elseif ($this->order === self::ORDER_DESC) {
                     // Descending: get only items less than last ID
+                    /** @noinspection PhpUnhandledExceptionInspection */
                     $builder->lessThan('id', $lastId);
                 }
             }
