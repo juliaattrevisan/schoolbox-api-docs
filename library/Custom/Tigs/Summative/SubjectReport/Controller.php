@@ -93,7 +93,8 @@ class Controller extends Web\Controller\Base
     /**
      * Displays a student's subject report for specified folder and current term
      *
-     * @api   GET /modules/custom/tigs/summative/subject/user/{userId}/folder/{folderId}?now=2018-01-01
+     * @api   GET /modules/custom/tigs/summative/subject/user/{userId}/folder/{folderId}?now={time}
+     *            Where {time} is anything recognised by strtotime()
      * @level 18.1.0
      * @param User         $user
      * @param Folder\Model $folder
