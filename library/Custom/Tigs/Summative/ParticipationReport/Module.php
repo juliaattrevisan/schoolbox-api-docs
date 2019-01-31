@@ -44,9 +44,9 @@ class Module extends Alaress\Module\Module
             return $this->preloadUser($params);
         };
 
-        $canSeeParticipation = $this->buildRuleCanViewReport();
+        $canSeeParticipationReport = $this->buildRuleCanViewReport();
 
-        $this->register('GET', '/user/{userId}', 'getReport', $canSeeParticipation, $preloadUser);
+        $this->register('GET', '/user/{userId}', 'getReport', $canSeeParticipationReport, $preloadUser);
     }
 
 
