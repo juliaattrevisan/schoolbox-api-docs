@@ -16,8 +16,6 @@ class Freedom implements IQueryHelper
 
     private const RELATION_CHILD = 'C';
 
-    private const FAKE_RECORD_NAME = 'Second Email';
-
 
     /**
      * @return array
@@ -52,8 +50,7 @@ class Freedom implements IQueryHelper
 
         $params = [
             'relationStatus' => self::RELATION_CHILD,
-            'contactLevel'   => self::CONTACT_LEVEL_FULL,
-            'fakeRecordName' => self::FAKE_RECORD_NAME
+            'contactLevel'   => self::CONTACT_LEVEL_FULL
         ];
 
         return [ $sql, $params ];
@@ -80,8 +77,7 @@ class Freedom implements IQueryHelper
         $params = [
             'externalId'     => $externalUserId,
             'relationStatus' => self::RELATION_CHILD,
-            'contactLevel'   => self::CONTACT_LEVEL_FULL,
-            'fakeRecordName' => self::FAKE_RECORD_NAME
+            'contactLevel'   => self::CONTACT_LEVEL_FULL
         ];
 
         return [ $sql, $params ];
@@ -108,8 +104,7 @@ class Freedom implements IQueryHelper
 
         $params = [
             'relationStatus' => self::RELATION_CHILD,
-            'contactLevel'   => self::CONTACT_LEVEL_FULL,
-            'fakeRecordName' => self::FAKE_RECORD_NAME
+            'contactLevel'   => self::CONTACT_LEVEL_FULL
         ];
 
         return [ $sql, $params ];
@@ -157,7 +152,6 @@ class Freedom implements IQueryHelper
         $params = [
             'relationStatus' => self::RELATION_CHILD,
             'contactLevel'   => self::CONTACT_LEVEL_FULL,
-            'fakeRecordName' => self::FAKE_RECORD_NAME,
             'studentId'      => $studentExternalId
         ];
 
@@ -237,7 +231,6 @@ class Freedom implements IQueryHelper
         $params = [
             'relationStatus' => self::RELATION_CHILD,
             'contactLevel'   => self::CONTACT_LEVEL_FULL,
-            'fakeRecordName' => self::FAKE_RECORD_NAME,
             'studentId' => $studentExternalId
         ];
 
