@@ -118,22 +118,24 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/id'
-        external_id:
+        externalId:
           type: string
-        enabled:
-          type: bool
         title:
           type: string
-        first_name:
+        firstName:
           type: string
-        last_name:
+        lastName:
           type: string
-        full_name:
-          type: string
-        profile_image:
-          type: string
-          format: uri-reference
-          nullable: true
+        _links:
+          type: object
+          properties:
+            profile:
+              type: string
+              format: uri-reference
+            avatar:
+              type: string
+              format: uri-reference
+              nullable: true
 
     problem:
       title: Problem Details

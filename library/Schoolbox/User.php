@@ -1426,6 +1426,9 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
         if (!$this->isDeleted()) {
             return [
                 'profile' => new SitePageLink("/search/user/{$this->getId()}"),
+                'avatar'  => $this->getExternalId()
+                    ? sprintf('/portrait?userId=%s&size=square80', urlencode($this->getExternalId()))
+                    : null,
             ];
         }
         else {
