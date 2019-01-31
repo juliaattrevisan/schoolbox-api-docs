@@ -16,6 +16,10 @@ module.exports = {
   },
   sections: [
     {
+      name: "Introduction",
+      content: "docs/front-end/introduction.md"
+    },
+    {
       name: "Cards",
       sectionDepth: 1,
       components: "www/javascript/react-components/Cards/**/*.tsx",
