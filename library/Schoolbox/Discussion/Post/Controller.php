@@ -56,8 +56,16 @@ class Controller extends BaseController
      */
     public function createPost(): void
     {
-        // 404 for now I guess?
-        throw new NotFound();
+        // build object
+
+        // post data should be in content, not form data
+        $data   = $this->request->content->get();
+
+        // This shouldn't be a string, but the above says it is?
+        $thread = $this->threadMapper->findById($data['thread']['id'] ?? null);
+
+        $post = $this->mapper->createModel()
+                             ->setThread($this->threadMapper->findById($data));
     }
 
 
@@ -73,5 +81,7 @@ class Controller extends BaseController
     {
         // 404 for now I guess?
         throw new NotFound();
+//        $this->mapper->delete($post);
+//        $this->response->status->setCode(204);
     }
 }

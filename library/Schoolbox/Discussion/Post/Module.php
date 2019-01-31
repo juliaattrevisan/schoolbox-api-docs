@@ -36,6 +36,7 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
+        // TODO implement contextual authorizer
 
         // Routes
         $this->register(
@@ -48,13 +49,15 @@ class Module extends BaseModule
             'DELETE',
             '/{id:\d+}',
             'deletePost',
-            $authorizer
+            $authorizer,
+            [$this, 'preloadPost']
         );
         $this->register(
             'GET',
             '/{id:\d+}/posts',
             'getPostsByParent',
-            $authorizer
+            $authorizer,
+            [$this, 'preloadPost']
         );
     }
 
