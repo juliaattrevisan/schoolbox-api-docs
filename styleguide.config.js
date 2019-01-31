@@ -20,16 +20,17 @@ module.exports = {
       content: "docs/front-end/introduction.md"
     },
     {
-      name: "Cards",
-      sectionDepth: 1,
-      components: "www/javascript/react-components/Cards/**/*.tsx",
-      content: "www/javascript/react-components/Cards/Cards.md"
-    },
-    {
-      name: "General",
-      sectionDepth: 1,
+      name: "Components",
       components: "www/javascript/react-components/**/*.tsx",
-      ignore: "www/javascript/react-components/Cards/**/*.tsx"
+      ignore: "www/javascript/react-components/Cards/**/*.tsx",
+      sectionDepth: 1,
+      sections: [
+        {
+          name: "Cards",
+          components: "www/javascript/react-components/Cards/**/*.tsx",
+          content: "www/javascript/react-components/Cards/Cards.md"
+        }
+      ]
     }
   ]
 };

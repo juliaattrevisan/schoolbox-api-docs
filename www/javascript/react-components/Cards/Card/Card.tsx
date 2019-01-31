@@ -19,7 +19,7 @@ interface ICard {
 }
 
 /**
- * Standard card. Usually contains an image, title & meta.
+ * Standard size card. Usually contains an image, title & meta.
  */
 const Card: React.SFC<ICard> = props => {
   const { title, meta, image } = props;

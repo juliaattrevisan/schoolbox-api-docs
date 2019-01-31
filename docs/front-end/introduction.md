@@ -27,6 +27,7 @@ Most of the front-end code in Schoolbox is written with the technologies above.
 | [React](https://reactjs.org/)                                   |    Component based development    |
 | [TypeScript](https://www.typescriptlang.org/)                   |        Strict typing in JS        |
 | [Jest](https://jestjs.io/)                                      |            Testing JS             |
+| [Axios](https://github.com/axios/axios)                         |           XHR requests            |
 | [Webpack](https://webpack.js.org/)                              |             Bundling              |
 | [NPM](https://www.npmjs.com/)                                   | Package management & task running |
 | [React Styleguidist](https://react-styleguidist.js.org/)        |      Automated documentation      |
