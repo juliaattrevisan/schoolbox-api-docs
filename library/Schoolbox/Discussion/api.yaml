@@ -13,38 +13,38 @@ info:
     email: developers@schoolbox.com.au
 
 paths:
-  /posts:
-    post:
-      operationId: createPost
-      summary: Creates a new post
-      responses:
-        '201':
-          description: The post that was created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/post'
-        default:
-          $ref: '#/components/responses/problem'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/post'
-      parameters:
-        - $ref: '#/components/parameters/token'
-
-  /posts/{id}:
-    delete:
-      operationId: deletePost
-      summary: Deletes a post
-      responses:
-        '204':
-        default:
-          $ref: '#/components/responses/problem'
-      parameters:
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/token'
+#  /posts:
+#    post:
+#      operationId: createPost
+#      summary: Creates a new post
+#      responses:
+#        '201':
+#          description: The post that was created
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/post'
+#        default:
+#          $ref: '#/components/responses/problem'
+#      requestBody:
+#        content:
+#          application/json:
+#            schema:
+#              $ref: '#/components/schemas/post'
+#      parameters:
+#        - $ref: '#/components/parameters/token'
+#
+#  /posts/{id}:
+#    delete:
+#      operationId: deletePost
+#      summary: Deletes a post
+#      responses:
+#        '204':
+#        default:
+#          $ref: '#/components/responses/problem'
+#      parameters:
+#        - $ref: '#/components/parameters/id'
+#        - $ref: '#/components/parameters/token'
 
   /threads/{id}/posts:
     get:
