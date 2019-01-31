@@ -13,5 +13,18 @@ module.exports = {
         }
       ]
     }
-  }
+  },
+  sections: [
+    {
+      name: "Cards",
+      sectionDepth: 1,
+      components: "www/javascript/react-components/Card/**/*.tsx"
+    },
+    {
+      name: "Other",
+      sectionDepth: 1,
+      components: "www/javascript/react-components/**/*.tsx",
+      ignore: "www/javascript/react-components/Card/**/*.tsx"
+    }
+  ]
 };
