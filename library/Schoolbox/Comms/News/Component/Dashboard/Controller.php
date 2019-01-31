@@ -44,23 +44,13 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $this->newsMapper  = $this->getMapperFactory()->get(News\Mapper::class);
     }
 
-
     /**
-     * Get the data to put into the template
-     *
      * @return bool
      */
     public function execute(): bool
     {
-        /* Only render component if there's potentially content somewhere
-         * If there's any non-deleted articles for any of the topics
-         * maybe the user can see it with their async request
-         *
-         * Otherwise, hide the component (nothing to see)
-         */
-        return $this->newsMapper->countAll() > 0;
+        return true;
     }
-
 
     /**
      * Render the component's template
