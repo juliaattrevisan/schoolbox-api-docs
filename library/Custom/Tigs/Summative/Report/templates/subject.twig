@@ -10,6 +10,7 @@ Data:
     attributes:          StudentAttributes
     errors               string[]       - Any errors that affect the whole page
     unitSpecs            unitSpec\Model - All unit specs imported to this folder. (TODO filter to only unitSpecs that contain visible data, defferred till later)
+    courseDescription    null|string    - If present, the text from a specific textbox on the imported CourseSpec's homepage
     aasData              array          - Data to render the Academic Achievement Summary components
     aamData              array          - Data to render the Academic Achievement Matrix components
     hscTaskMarks         array          - Data to render the HSC Task Marks components
@@ -74,6 +75,17 @@ Data:
     </div>
 </div>
 <hr/>
+{% if courseDescription %}
+<div class="row">
+    <div class="island small-12">
+        <h2 class="subheader">Description</h2>
+        <section class="content">
+            <p>{{ courseDescription | raw }}</p>
+        </section>
+    </div>
+</div>
+{% endif %}
+
 <div class="row">
     <div class="column small-12 medium-6">
         {% if ibGraphData %}
