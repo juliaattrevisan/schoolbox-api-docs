@@ -16,8 +16,6 @@ class Freedom implements IQueryHelper
 
     private const RELATION_CHILD = 'C';
 
-    private const FAKE_RECORD_NAME = 'Second Email';
-
 
     /**
      * @return array
@@ -45,17 +43,14 @@ class Freedom implements IQueryHelper
             INNER JOIN dbo.ALUMREL AS A ON A.PARENT# = I.MEMBER#
             INNER JOIN dbo.STUDENT AS S ON S.STUDENT# = A.CHILD#
             WHERE (A.RELATION_STAT = :relationStatus)
-            AND (S.CURRENT_YEAR BETWEEN ' 5' AND '12')
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
             AND (A.STUDENT_PREF = :contactLevel)
-            AND (givenname <> :fakeRecordName)
             ORDER BY I.MEMBER# ASC;
         ";
 
         $params = [
             'relationStatus' => self::RELATION_CHILD,
-            'contactLevel'   => self::CONTACT_LEVEL_FULL,
-            'fakeRecordName' => self::FAKE_RECORD_NAME
+            'contactLevel'   => self::CONTACT_LEVEL_FULL
         ];
 
         return [ $sql, $params ];
@@ -75,17 +70,14 @@ class Freedom implements IQueryHelper
             INNER JOIN dbo.STUDENT AS S ON S.STUDENT# = A.CHILD#
             WHERE (I.MEMBER# = :externalId)
             AND (A.RELATION_STAT = :relationStatus)
-            AND (S.CURRENT_YEAR BETWEEN ' 5' AND '12')
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
-            AND (A.STUDENT_PREF = :contactLevel)
-            AND (givenname <> :fakeRecordName);
+            AND (A.STUDENT_PREF = :contactLevel);
         ";
 
         $params = [
             'externalId'     => $externalUserId,
             'relationStatus' => self::RELATION_CHILD,
-            'contactLevel'   => self::CONTACT_LEVEL_FULL,
-            'fakeRecordName' => self::FAKE_RECORD_NAME
+            'contactLevel'   => self::CONTACT_LEVEL_FULL
         ];
 
         return [ $sql, $params ];
@@ -106,16 +98,13 @@ class Freedom implements IQueryHelper
             INNER JOIN dbo.ALUMREL AS A ON A.PARENT# = I.MEMBER#
             INNER JOIN dbo.STUDENT AS S ON S.STUDENT# = A.CHILD#
             WHERE (A.RELATION_STAT = :relationStatus)
-            AND (S.CURRENT_YEAR BETWEEN ' 5' AND '12')
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
             AND (A.STUDENT_PREF = :contactLevel)
-            AND (givenname <> :fakeRecordName)
         ";
 
         $params = [
             'relationStatus' => self::RELATION_CHILD,
-            'contactLevel'   => self::CONTACT_LEVEL_FULL,
-            'fakeRecordName' => self::FAKE_RECORD_NAME
+            'contactLevel'   => self::CONTACT_LEVEL_FULL
         ];
 
         return [ $sql, $params ];
@@ -154,10 +143,8 @@ class Freedom implements IQueryHelper
             INNER JOIN dbo.ALUMREL AS A ON A.PARENT# = I.MEMBER#
             INNER JOIN dbo.STUDENT AS S ON S.STUDENT# = A.CHILD#
             WHERE (A.RELATION_STAT = :relationStatus)
-            AND (S.CURRENT_YEAR BETWEEN ' 5' AND '12')
             AND (A.PARENT# <> A.FAMILY_HASH) and (I.DECEASED = ' ')
             AND (A.STUDENT_PREF = :contactLevel)
-            AND (givenname <> :fakeRecordName)
             AND (S.STUDKEY = :studentId)
             ORDER BY I.MEMBER# ASC;
         ";
@@ -165,7 +152,6 @@ class Freedom implements IQueryHelper
         $params = [
             'relationStatus' => self::RELATION_CHILD,
             'contactLevel'   => self::CONTACT_LEVEL_FULL,
-            'fakeRecordName' => self::FAKE_RECORD_NAME,
             'studentId'      => $studentExternalId
         ];
 
@@ -236,18 +222,15 @@ class Freedom implements IQueryHelper
               AND A.EMERGENCY_PREF = :contactLevel
               AND A.STUDENT_PREF = :contactLevel
               AND A.RELATION_STAT = :relationStatus
-              AND givenname <> :fakeRecordName
               AND (A.PARENT# <> A.FAMILY_HASH)
               AND EC.DECEASED = ' '
             WHERE S.STUDKEY = :studentId
-            AND S.CURRENT_YEAR BETWEEN ' 5' AND '12'
             ORDER BY A.CAREGIVER_NO ASC
         ";
 
         $params = [
             'relationStatus' => self::RELATION_CHILD,
             'contactLevel'   => self::CONTACT_LEVEL_FULL,
-            'fakeRecordName' => self::FAKE_RECORD_NAME,
             'studentId' => $studentExternalId
         ];
 
