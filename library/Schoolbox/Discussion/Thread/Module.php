@@ -32,7 +32,17 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         // Permission for getting a thread or its contents:
-        $authorizer = new Rule\IsSuperuser();
+        // If it's a comms news item, it should be the same as the perms for
+        // viewing the comms item.
+        $authorizer = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\LazyCallback(function () {
+                return new Authorizer(
+                    $this->getInjector()->get('authorizer'),
+                    $this->getMapperFactory()->get(News\Mapper::class)
+                );
+            })
+        );
 
 
         // Routes
