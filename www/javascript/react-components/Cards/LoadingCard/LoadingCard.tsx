@@ -3,7 +3,7 @@ import { LoadingImage } from "../../Image/Image";
 import { LoadingMeta } from "../../Meta/Meta";
 
 /**
- * Skeleton loader for a card
+ * Skeleton loader for a card.
  */
 const LoadingCard: React.SFC = () => {
   return (

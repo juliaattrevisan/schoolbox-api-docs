@@ -1,6 +1,6 @@
 import * as React from "react";
-import { IImage, Image } from "../Image/Image";
-import { Meta } from "../Meta/Meta";
+import { IImage, Image } from "../../Image/Image";
+import { Meta } from "../../Meta/Meta";
 
 interface ICard {
   /** Title to display on the card */
@@ -19,7 +19,7 @@ interface ICard {
 }
 
 /**
- * Flexible container for small amounts of content, often displayed in a list.
+ * Standard card. Usually contains an image, title & meta.
  */
 const Card: React.SFC<ICard> = props => {
   const { title, meta, image } = props;

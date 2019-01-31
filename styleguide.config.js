@@ -18,13 +18,14 @@ module.exports = {
     {
       name: "Cards",
       sectionDepth: 1,
-      components: "www/javascript/react-components/Card/**/*.tsx"
+      components: "www/javascript/react-components/Cards/**/*.tsx",
+      content: "www/javascript/react-components/Cards/Cards.md"
     },
     {
-      name: "Other",
+      name: "General",
       sectionDepth: 1,
       components: "www/javascript/react-components/**/*.tsx",
-      ignore: "www/javascript/react-components/Card/**/*.tsx"
+      ignore: "www/javascript/react-components/Cards/**/*.tsx"
     }
   ]
 };

@@ -6,7 +6,7 @@ interface IImage {
 }
 
 /**
- * Just a basic image element
+ * Just a basic image element. Requires alt text for accessibility.
  */
 const Image: React.SFC<IImage> = props => {
   const { src, alt } = props;
@@ -14,10 +14,10 @@ const Image: React.SFC<IImage> = props => {
 };
 
 /**
- * Empty element for creating a skeleton loader of an image
+ * Empty container element for creating a skeleton loader of meta text.
  */
 const LoadingImage: React.SFC = props => {
   return <div className="img" />;
 };
 
-export { IImage, Image, LoadingImage };
+export { LoadingImage, IImage, Image };
