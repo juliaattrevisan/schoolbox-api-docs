@@ -174,6 +174,10 @@ class Module extends Alaress\Module\Module
                     if (!($params['user'] ?? null) instanceof User) {
                         throw new InvalidPath("No user found in route params");
                     }
+                    if (!($params['folder'] ?? null) instanceof Folder\Model) {
+                        throw new InvalidPath("No folder model found in route params");
+                    }
+
                     /** @var User $student */
                     $student = $params['user'];
                     // User must be a student
@@ -183,6 +187,20 @@ class Module extends Alaress\Module\Module
                     $userYear = $student->getYear();
                     if (!\is_numeric($userYear) || $userYear < 7 || $userYear > 12) {
                         throw new InvalidPath("User is not in years 7-12, found '$userYear'");
+                    }
+
+                    /** @var Folder\Model $folder */
+                    $folder = $params['folder'];
+                    // Folder must exist in SB (empty folder models are created for subjects in the SIS but not in SB)
+                    if (null === $folder->getId()) {
+                        throw new InvalidPath("Folder does not exist in SB");
+                    }
+
+                    // User must be enrolled in the specified folder
+                    /** @var User $user */
+                    $user = $params['user'];
+                    if (!$this->isUserEnrolledInFolder($user, $folder)) {
+                        throw new InvalidPath("User {$user->getId()} is not enrolled in folder {$folder->getId()}");
                     }
                 }),
                 new Rule\Any(
@@ -196,29 +214,7 @@ class Module extends Alaress\Module\Module
                         }),
                         new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
                     )
-                ),
-                new Rule\Callback(function (array $params) {
-                    // Because preload exceptions are not handled immediately, we can't fatal if the preload failed.
-                    if (!($params['folder'] ?? null) instanceof Folder\Model) {
-                        throw new InvalidPath("No folder model found in route params");
-                    }
-                    /** @var Folder\Model $folder */
-                    $folder = $params['folder'];
-                    // Folder must exist in SB (empty folder models are created for subjects in the SIS but not in SB)
-                    if (null === $folder->getId()) {
-                        throw new InvalidPath("Folder does not exist in SB");
-                    }
-                    // Student must be provided
-                    if (!($params['user'] ?? null) instanceof User) {
-                        throw new InvalidPath("No user found in route params");
-                    }
-                    // .. and enrolled in the specified folder
-                    /** @var User $user */
-                    $user = $params['user'];
-                    if (!$this->isUserEnrolledInFolder($user, $folder)) {
-                        throw new InvalidPath("User {$user->getId()} is not enrolled in folder {$folder->getId()}");
-                    }
-                })
+                )
             );
         });
     }
