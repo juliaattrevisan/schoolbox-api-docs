@@ -120,6 +120,8 @@ components:
           $ref: '#/components/schemas/id'
         external_id:
           type: string
+        enabled:
+          type: bool
         title:
           type: string
         first_name:
