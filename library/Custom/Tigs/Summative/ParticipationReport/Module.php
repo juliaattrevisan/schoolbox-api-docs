@@ -96,7 +96,7 @@ class Module extends Alaress\Module\Module
 
 
     /**
-     * Returns an auth rule for viewing the one of the Reports
+     * Returns an auth rule for viewing the participation report
      *
      * * Viewer must be logged in
      * * Viewee must be in years 7-12
