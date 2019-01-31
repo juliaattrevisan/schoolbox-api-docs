@@ -62,6 +62,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $this->uses('blurb', self::TYPE_STRING);
         $this->joins('feature_image_hash', Storage\Mapper::class, 'hash', null, null, 'featureImage', 'featureImage');
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
+        $this->uses('comments_allowed', self::TYPE_BOOLEAN);
         $this->joins('accepted_by', UserMapper::class, 'id', null, null, 'acceptedBy', 'moderator');
         $this->uses('accepted_at', self::TYPE_DATETIME);
         $this->joins('rejected_by', UserMapper::class, 'id', null, null, 'rejectedBy', 'rejector');
