@@ -86,9 +86,6 @@ class Retractor extends AbstractList
      */
     private function retractLike(Instance $instance): int
     {
-
-        return 0;
-        /*
         $ids = [];
         foreach (new Keyspace($this->redis, $this->getRedisMsgBaseKey($instance)) as $id) {
             $ids[] = $id;
@@ -99,7 +96,6 @@ class Retractor extends AbstractList
             $this->redis->del($ids);
         }
         return \count($ids);
-        */
     }
 
 
