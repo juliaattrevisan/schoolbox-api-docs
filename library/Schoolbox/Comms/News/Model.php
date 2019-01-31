@@ -749,7 +749,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
 
 
     /**
-     * @return bool
+     * @return null|bool
      */
     public function getCommentsAllowed(): ?bool
     {
