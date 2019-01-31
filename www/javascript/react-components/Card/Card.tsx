@@ -1,16 +1,13 @@
 import * as React from "react";
-import { IImage, Image, LoadingImage } from "../Image/Image";
-import { IMeta, LoadingMeta, Meta } from "../Meta/Meta";
+import { IImage, Image } from "../Image/Image";
+import { Meta } from "../Meta/Meta";
 
 interface ICard {
-  /** Whether to show a loading skeleton or not when there's no content. */
-  loader?: boolean;
-
   /** Title to display on the card */
-  title?: string;
+  title: string;
 
   /** Meta information to display below the title */
-  meta?: string | string[];
+  meta: string | string[];
   // ^Ideally this would be Meta | Meta[] instead of string, but that would require us to send
   // meta={{children: "Some meta" }} instead of just meta="Some meta", so I'm leaving this for now.
 
@@ -25,7 +22,7 @@ interface ICard {
  * Flexible container for small amounts of content, often displayed in a list.
  */
 const Card: React.SFC<ICard> = props => {
-  const { title, meta, image, loader } = props;
+  const { title, meta, image } = props;
 
   // Determine if the card has some sort of content
   // Used to decide whether to show loaders or not
@@ -43,29 +40,7 @@ const Card: React.SFC<ICard> = props => {
     );
   }
 
-  if (loader) {
-    return <CardLoader />;
-  }
-
   return null;
-};
-
-Card.defaultProps = {
-  loader: true
-};
-
-const CardLoader: React.SFC = () => {
-  return (
-    <>
-      <div className="list-item">
-        <div className="small-12 card skeleton">
-          <LoadingImage />
-          <h3 />
-          <LoadingMeta />
-        </div>
-      </div>
-    </>
-  );
 };
 
 const CardImage: React.SFC<ICard> = props => {

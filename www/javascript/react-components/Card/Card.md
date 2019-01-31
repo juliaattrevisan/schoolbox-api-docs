@@ -32,17 +32,3 @@ If you need multiple meta lines, you can send these in an array like so. Please 
   image={{ src: "https://via.placeholder.com/64", alt: "Some alt text" }}
 />
 ```
-
-### Loading card
-
-A loading card will show by default when there is no content sent to the card.
-
-```jsx
-<Card />
-```
-
-This can be disabled by sending `loader={false}` as a prop.
-
-```jsx
-<Card loader={false} />
-```
