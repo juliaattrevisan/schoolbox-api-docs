@@ -20,6 +20,29 @@ module.exports = {
       content: "docs/front-end/introduction.md"
     },
     {
+      name: "Prologue",
+      sections: [
+        {
+          name: "Stack",
+          content: "docs/front-end/prologue/stack.md"
+        }
+      ]
+    },
+    {
+      name: "Getting Started",
+      sectionDepth: 1,
+      sections: [
+        {
+          name: "Developing components",
+          content: "docs/front-end/getting-started/developing-components.md"
+        },
+        {
+          name: "Creating pages on Schoolbox",
+          content: "docs/front-end/getting-started/developing-in-sb.md"
+        }
+      ]
+    },
+    {
       name: "Components",
       components: "www/javascript/react-components/**/*.tsx",
       ignore: "www/javascript/react-components/Cards/**/*.tsx",
