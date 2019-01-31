@@ -211,18 +211,6 @@ components:
           schema:
             $ref: '#/components/schemas/problem'
 
-    threadList:
-      description: a list of threads
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/components/schemas/thread'
-              metadata:
-                $ref: '#/components/schemas/listMetadata'
-
     postList:
       description: a list of posts
       content:
