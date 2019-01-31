@@ -188,19 +188,24 @@ components:
         count:
           type: int
           required: false
-          description: If provided, the number of items in the collection
+          description: If provided, the number of items in the result set.
         cursor:
           type: object
           required: false
           properties:
-            prev:
+            current:
               type: string
-              required: false
-              description: If provided, a cursor to the previous page of results
+              nullable: true
+              required: true
+              description: |
+                If set, a cursor to the current page of results.
+                Seems redundant, but it does generate a cursor to a request
+                made without one.
             next:
               type: string
-              required: false
-              description: If provided, a cursor to the next page of results
+              nullable: true
+              required: true
+              description: If set, a cursor to the next page of results.
 
 
   responses:
