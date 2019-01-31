@@ -98,6 +98,7 @@ components:
           required: false
         author:
           $ref: '#/components/schemas/user'
+          nullable: true
         content:
           type: string
         created:
