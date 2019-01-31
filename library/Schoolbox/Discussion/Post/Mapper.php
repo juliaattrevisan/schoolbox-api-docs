@@ -39,7 +39,7 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Overridden to join on context.
+     * Overridden to join on thread and author.
      *
      * @return string
      */
@@ -55,7 +55,7 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Overridden to join on context.
+     * Overridden to join on thread and author.
      *
      * @return string
      */
@@ -70,7 +70,7 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Overridden to join on context.
+     * Overridden to join on thread and author.
      *
      * @param PDOStatement $statement
      * @return \Schoolbox\GenericCollection
