@@ -17,23 +17,23 @@ class Factory
 {
     // Types of external objects this thing can construct
 
-    const EXTERNAL_USER = 'User';
-    const EXTERNAL_TIMETABLE = 'Timetable';
-    const EXTERNAL_SYNC = 'Sync';
-    const EXTERNAL_EVENTS = 'ExternalEvents';
-    const EXTERNAL_COMMUNITY_PORTAL = 'CommunityPortal';
-    const EXTERNAL_DOCUMENT = 'Document';
+    public const EXTERNAL_USER = 'User';
+    public const EXTERNAL_TIMETABLE = 'Timetable';
+    public const EXTERNAL_SYNC = 'Sync';
+    public const EXTERNAL_EVENTS = 'ExternalEvents';
+    public const EXTERNAL_COMMUNITY_PORTAL = 'CommunityPortal';
+    public const EXTERNAL_DOCUMENT = 'Document';
 
     /**
      * Return the correct version of the requested external object
      *
      * @param IConfigLoader $config
-     * @param array|IConnector $databaseExternal External database connection(s)
+     * @param null|IConnector $databaseExternal External database connection(s)
      * @param string $type Type of external object we want (one of the constants above)
      * @return mixed
      * @throws UnexpectedValueException If nothing can be built
      */
-    public function build($config, $databaseExternal, $type)
+    public function build(IConfigLoader $config, ?IConnector $databaseExternal, string $type)
     {
         // Check if external DB is unavailable and return offline class if we can't access
         $classOffline = "\\Schoolbox\\External\\Connector\\Offline\\Base\\{$type}";

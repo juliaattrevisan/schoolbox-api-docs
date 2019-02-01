@@ -64,7 +64,12 @@ class External_Liss_Server
     /** @var Logger */
     private $log;
 
-    public function __construct(IConnector $externalDb)
+    /**
+     * External_Liss_Server constructor.
+     *
+     * @param IConnector|null $externalDb
+     */
+    public function __construct(IConnector $externalDb = null)
     {
         $this->externalDb = $externalDb;
 
@@ -74,31 +79,33 @@ class External_Liss_Server
     /**
      * Default logging message when attempting to use liss with a non-schoolbox connector
      */
-    const WRONG_CONNECTOR_MESSAGE = 'Not using the schoolbox connector - exiting';
+    private const WRONG_CONNECTOR_MESSAGE = 'External Database must be activate and the selected connector must be schoolbox - exiting';
 
     /**
      * Log message when authentication fails
      */
-    const AUTHENTICATION_FAILED = 'Authentication Failed';
+    private const AUTHENTICATION_FAILED = 'Authentication Failed';
 
     /**
      * Log message when owner can't be found
      */
-    const MISSING_CALENDAR_OWNER = 'External Liss Calendar Owner not found';
+    private const MISSING_CALENDAR_OWNER = 'External Liss Calendar Owner not found';
 
     /**
      * Log message when no event types can be found
      */
-    const NO_EVENT_TYPES = 'Cannot find a default event type';
+    private const NO_EVENT_TYPES = 'Cannot find a default event type';
 
     /**
      * Predefine a timetable_cycle record (this doesn't seem defined/accessible
      * via liss, for some reason - it might be in TimetableStructure ttStructure
      * which is not accessible to us)
      * @return object|\Schoolbox\External\TimetableCycle
-     * @throws PDOException
+     * @throws InvalidArgumentException
      * @throws MapperException
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws MapperException\Deleted
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     public function getCycle()
     {
@@ -223,7 +230,7 @@ class External_Liss_Server
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
      */
-    public function getRooms(xmlrpcmsg $message)
+    public function getRooms(xmlrpcmsg $message): \xmlrpcresp
     {
         $this->log()->info("getRooms: unable to process request, not implemented");
 
@@ -238,10 +245,8 @@ class External_Liss_Server
      * @return xmlrpcresp
      * @throws PDOException
      */
-    public function publishClassMemberships(xmlrpcmsg $message)
+    public function publishClassMemberships(xmlrpcmsg $message): \xmlrpcresp
     {
-
-
         /* Requires schoolbox connector
          */
         if (!$this->isSchoolboxConnector()) {
@@ -300,10 +305,8 @@ class External_Liss_Server
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
      */
-    public function publishTeachers(xmlrpcmsg $message)
+    public function publishTeachers(xmlrpcmsg $message): \xmlrpcresp
     {
-
-
         /* Requires schoolbox connector
          */
         if (!$this->isSchoolboxConnector()) {
@@ -334,10 +337,8 @@ class External_Liss_Server
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
      */
-    public function publishStudents(xmlrpcmsg $message)
+    public function publishStudents(xmlrpcmsg $message): \xmlrpcresp
     {
-
-
         /* Requires schoolbox connector
          */
         if (!$this->isSchoolboxConnector()) {
@@ -368,10 +369,8 @@ class External_Liss_Server
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
      */
-    public function publishCalendar(xmlrpcmsg $message)
+    public function publishCalendar(xmlrpcmsg $message): \xmlrpcresp
     {
-
-
         /* Requires schoolbox connector
          */
         if (!$this->isSchoolboxConnector()) {
@@ -439,11 +438,10 @@ class External_Liss_Server
      * @return xmlrpcresp
      * @throws MapperException
      * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    public function publishClasses(xmlrpcmsg $message)
+    public function publishClasses(xmlrpcmsg $message): \xmlrpcresp
     {
-
-
         /* Requires schoolbox connector
          */
         if (!$this->isSchoolboxConnector()) {
@@ -485,6 +483,7 @@ class External_Liss_Server
         return $this->generateResponse(self::AUTHENTICATION_FAILED);
     }
 
+
     /**
      * Publish timetable to the Schoolbox
      *
@@ -492,8 +491,9 @@ class External_Liss_Server
      * @return xmlrpcresp
      * @throws PDOException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws UnexpectedValueException
      */
-    public function publishTimetable(xmlrpcmsg $message)
+    public function publishTimetable(xmlrpcmsg $message): \xmlrpcresp
     {
 
 
@@ -562,15 +562,15 @@ class External_Liss_Server
                 } else {
 
                     /* These ones are broken */
-                    if ($allPeriods->count() == 0) {
+                    if ($allPeriods->count() === 0) {
                         $this->log()->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)$struct['DayNumber']->me['i4']), trim((string)$struct['Period']->me['string'])));
                     }
 
-                    if ($allClasses->count() == 0) {
+                    if ($allClasses->count() === 0) {
                         $this->log()->warning(sprintf("publishTimetable: Failed to find class %s", trim($struct['ClassCode']->me['string'])));
                     }
 
-                    if ($allTeachers->count() == 0) {
+                    if ($allTeachers->count() === 0) {
                         $this->log()->warning(sprintf("publishTimetable: Failed to find teacher %s", trim($struct['TeacherCode']->me['string'])));
                     }
                 }
@@ -590,14 +590,14 @@ class External_Liss_Server
      *
      * @param xmlrpcmsg $message
      * @return xmlrpcresp
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws MapperException\Deleted
      * @throws PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws UnexpectedValueException
      */
-    public function publishBellTimes(xmlrpcmsg $message)
+    public function publishBellTimes(xmlrpcmsg $message): \xmlrpcresp
     {
-
-
         /* Requires schoolbox connector
          */
         if (!$this->isSchoolboxConnector()) {
@@ -680,11 +680,10 @@ class External_Liss_Server
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    public function publishDailyData(xmlrpcmsg $message)
+    public function publishDailyData(xmlrpcmsg $message): \xmlrpcresp
     {
-
-
         $configLoader = new ConfigLoader();
         $helper = new PublishDailyDataHelper($configLoader);
         $eventMapper = EventMapper::getInstance();
@@ -785,7 +784,7 @@ class External_Liss_Server
 
                 /* Skip events that have a particular type
                  */
-                if (in_array($currentEvent['type'], $exclusions)) {
+                if (\in_array($currentEvent['type'], $exclusions, false)) {
                     $this->log()->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['guid']}\": has excluded type \"{$currentEvent['type']}\"");
 
                     if ($includePayloadInLogging) {
@@ -944,12 +943,19 @@ class External_Liss_Server
      *
      * @return bool
      */
-    private function isSchoolboxConnector()
+    private function isSchoolboxConnector(): bool
     {
         $config = new ConfigLoader();
-        $connector = $config->get('external_type');
 
-        return $connector == 'schoolbox';
+        /* External must be enabled
+         */
+        if (!$config->get('external_enable')) {
+            return false;
+        }
+
+        /* External must also be schoolbox connector
+         */
+        return $config->get('external_type') === 'schoolbox';
     }
 
     /**
@@ -958,7 +964,7 @@ class External_Liss_Server
      * @param $message
      * @return xmlrpcresp
      */
-    private function generateResponse($message)
+    private function generateResponse($message): \xmlrpcresp
     {
         return new xmlrpcresp(new xmlrpcval($message, 'string'));
     }

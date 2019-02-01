@@ -12,6 +12,7 @@ use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 
 /**
@@ -75,14 +76,24 @@ class MSSQL
     }
 
     /**
+     * MSSQL constructor.
+     *
      * @deprecated
      * @param bool $db
      * @param bool $optionalConfig
+     * @throws \Alaress\Database\Exception
+     * @throws \Schoolbox\Application\Exception\Exception
      */
-    function __construct($db = false, $optionalConfig = false)
+    public function __construct($db = false, $optionalConfig = false)
     {
-        $this->connector = $this->connector = DatabaseFactory::getInstanceExternal();
+        $this->connector = DatabaseFactory::getInstanceExternal();
         $this->config = ConfigMapper::getInstance();
+
+        /* If the external db is disabled, this is null
+         */
+        if (null === $this->connector) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
+        }
     }
 
     /**

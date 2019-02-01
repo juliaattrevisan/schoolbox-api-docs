@@ -46,7 +46,7 @@ class Factory
      * @deprecated
      * @return self
      */
-    private static function getInstance()
+    private static function getInstance(): Factory
     {
         if (!isset(self::$instance)) {
             self::$instance = new self(new DatabaseFactory());
@@ -55,14 +55,16 @@ class Factory
         return self::$instance;
     }
 
+
     /**
      * Retrieves static instance of external database connection (used in External connectors)
      * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
      *
      * @deprecated
-     * @return IConnector
+     * @return null|IConnector
+     * @throws DatabaseException
      */
-    public static function getInstanceExternal()
+    public static function getInstanceExternal(): ?IConnector
     {
         if (!isset(self::$connectorExternal)) {
             self::$connectorExternal = self::getInstance()->getExternalDatabase(new Loader());
@@ -71,14 +73,16 @@ class Factory
         return self::$connectorExternal;
     }
 
+
     /**
      * Retrieves static instance of internal database connection (used in Denbigh)
      * TODO: Once we've got DI accessible everywhere this is currently used this should no longer required
      *
      * @deprecated
-     * @return IConnector
+     * @return null|IConnector
+     * @throws DatabaseException
      */
-    public static function getInstanceInternal()
+    public static function getInstanceInternal(): ?IConnector
     {
         if (!isset(self::$connectorInternal)) {
             self::$connectorInternal = self::getInstance()->getInternalDatabase();
@@ -97,12 +101,14 @@ class Factory
         $this->factory = $factory;
     }
 
+
     /**
      * Retrieve a connection to Schoolbox database
      *
      * @return IConnector
+     * @throws DatabaseException
      */
-    public function getInternalDatabase()
+    public function getInternalDatabase(): IConnector
     {
         $connectorInternal = $this->factory->createMysql();
 
@@ -115,15 +121,21 @@ class Factory
         return $connectorInternal;
     }
 
+
     /**
      * Retrieve an appropriate external database connection based on the 'external_type' set in Schoolbox configuration
      *
      * @param IConfigLoader $config Schoolbox configuration
      *
-     * @return IConnector Return the external connector appropriate for the SIS
+     * @return null|IConnector Return the external connector appropriate for the SIS
+     * @throws DatabaseException
      */
-    public function getExternalDatabase(IConfigLoader $config)
+    public function getExternalDatabase(IConfigLoader $config): ?IConnector
     {
+        if (!$config->get('external_enable')) {
+            return null;
+        }
+
         switch ($config->get('external_type')) {
 
             // Schoolbox connector: just return internal DB
@@ -170,14 +182,16 @@ class Factory
         return $connectorExternal;
     }
 
+
     /**
      * Fetch the timezone from the database we are connecting to
      *
      * @param IConnector $connectorInternal
      *
      * @return string Timezone
+     * @throws DatabaseException
      */
-    private function fetchTimezone(IConnector $connectorInternal)
+    private function fetchTimezone(IConnector $connectorInternal): string
     {
         $statement = $connectorInternal->prepareQuery("SELECT `value` FROM `config` WHERE name LIKE 'date_timezone'");
         $statement->execute();

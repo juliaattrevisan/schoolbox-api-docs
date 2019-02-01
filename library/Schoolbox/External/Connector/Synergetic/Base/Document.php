@@ -33,9 +33,9 @@ class Document extends Base implements IDocument
      * based on database version.
      *
      * @param IConfigLoader    $config
-     * @param IConnector|array $databaseExternal
+     * @param null|IConnector $databaseExternal
      */
-    public function __construct(IConfigLoader $config, $databaseExternal)
+    public function __construct(IConfigLoader $config, ?IConnector $databaseExternal)
     {
         parent::__construct($config, $databaseExternal);
 

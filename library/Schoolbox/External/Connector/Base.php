@@ -14,7 +14,7 @@ use Schoolbox\IConfigLoader;
 
 abstract class Base
 {
-    /** @var IConnector */
+    /** @var null|IConnector */
     protected $databaseExternal;
 
     /** @var IConfigLoader */
@@ -24,9 +24,9 @@ abstract class Base
      * Constructor
      *
      * @param IConfigLoader $config
-     * @param array|IConnector $databaseExternal External database connector(s)
+     * @param null|IConnector $databaseExternal External database connector(s)
      */
-    public function __construct($config, $databaseExternal)
+    public function __construct(IConfigLoader $config, ?IConnector $databaseExternal)
     {
         $this->config = $config;
         $this->databaseExternal = $databaseExternal;

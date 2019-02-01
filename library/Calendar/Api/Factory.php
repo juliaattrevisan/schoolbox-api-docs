@@ -46,24 +46,23 @@ class Calendar_Api_Factory
     /** @var IConfigLoader */
     private $configLoader;
 
-
     /**
      * Constructor
      *
      * @param Assessment\MapperProxy $assessmentDataSource
      * @param ModuleChecker          $moduleChecker
-     * @param null|IConnector        $databaseExternal
      * @param IConfigLoader          $config
+     * @param null|IConnector        $databaseExternal
      */
     public function __construct(
         Assessment\MapperProxy $assessmentDataSource,
         ModuleChecker $moduleChecker,
-        IConnector $databaseExternal = null,
-        IConfigLoader $config
+        IConfigLoader $config,
+        IConnector $databaseExternal = null
     ) {
         $this->assessmentDataSource = $assessmentDataSource;
         $this->databaseExternal     = $databaseExternal;
-        $this->configLoader = $config;
+        $this->configLoader         = $config;
 
         $allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
 
@@ -71,7 +70,6 @@ class Calendar_Api_Factory
          * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
          */
         foreach ($allConfigRecords as $currentConfig) {
-
             $config = $currentConfig->decodeConfig();
 
             try {
