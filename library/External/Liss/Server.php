@@ -949,13 +949,13 @@ class External_Liss_Server
 
         /* External must be enabled
          */
-        if (!(int)$config->get('external_enable')) {
+        if (!$config->get('external_enable')) {
             return false;
         }
 
         /* External must also be schoolbox connector
          */
-        return $config->get('external_type') == 'schoolbox';
+        return $config->get('external_type') === 'schoolbox';
     }
 
     /**

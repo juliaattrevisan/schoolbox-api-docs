@@ -132,7 +132,7 @@ class Factory
      */
     public function getExternalDatabase(IConfigLoader $config): ?IConnector
     {
-        if (!(int)$config->get('external_enable')) {
+        if (!$config->get('external_enable')) {
             return null;
         }
 
