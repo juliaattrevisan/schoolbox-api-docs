@@ -21,10 +21,15 @@ module.exports = {
     },
     {
       name: "Prologue",
+      sectionDepth: 1,
       sections: [
         {
           name: "Stack",
           content: "docs/front-end/prologue/stack.md"
+        },
+        {
+          name: "Directory Structure",
+          content: "docs/front-end/prologue/directory-structure.md"
         }
       ]
     },
@@ -33,11 +38,11 @@ module.exports = {
       sectionDepth: 1,
       sections: [
         {
-          name: "Developing components",
+          name: "Developing Components",
           content: "docs/front-end/getting-started/developing-components.md"
         },
         {
-          name: "Creating pages on Schoolbox",
+          name: "Creating Pages",
           content: "docs/front-end/getting-started/developing-in-sb.md"
         }
       ]
