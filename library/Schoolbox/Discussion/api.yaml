@@ -46,6 +46,21 @@ paths:
 #        - $ref: '#/components/parameters/id'
 #        - $ref: '#/components/parameters/token'
 
+  /posts/{id}/posts:
+    get:
+      operationId: getPostsByParent
+      summary: Returns child posts for a parent post
+      responses:
+        '200':
+          $ref: '#/components/responses/postList'
+        default:
+          $ref: '#/components/responses/problem'
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/token'
+
   /threads/{id}/posts:
     get:
       operationId: getPostsByThread
