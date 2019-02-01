@@ -49,21 +49,27 @@ class Controller extends BaseController
         $encodedCursor = $this->request->query->get('cursor');
         $posts         = $cursor->retrieveResults($encodedCursor);
 
-
-        // I need to:
-        // * Output dates as RFC3339 format
+        // Set up decorators
         $linkDecorator = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
-        // The link decorator is required as an extra decorator:
-        // links need to be added to the author within the post
-        $jsonDecorator = new Decorator\PropertyDecorator(
-            null,
-            $linkDecorator
-        );
+        $jsonDecorator = new Decorator\PropertyDecorator(null, $linkDecorator);
 
+        // Convert decorated Alaress_Date_Format objects to RFC3309
+        // TODO make ADF always jsonSerialize as RFC3309, but that will affect other APIs
+        $adfDecorator =
+            new class implements Decorator\IDecorator {
+                public function decorate(array $json, $model): array
+                {
+                    if ($model instanceof Post\Model) {
+                        $json['createdAt'] = $model->getCreatedAt()->toRfc3339String();
+                        $json['updatedAt'] = $model->getUpdatedAt()->toRfc3339String();
+                    }
+                    return $json;
+                }
+            };
 
         $this->response->content->set(
             $this->buildJsonOutput([
-                'data'     => $posts->jsonSerialize($jsonDecorator, $linkDecorator),
+                'data'     => $posts->jsonSerialize($jsonDecorator, $linkDecorator, $adfDecorator),
                 'metadata' => [
                     'cursor' => [
                         'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
