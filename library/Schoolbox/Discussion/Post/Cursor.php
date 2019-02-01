@@ -103,7 +103,12 @@ class Cursor
 
         return $this->mapper->findByPredicates(
             $pb,
-            ['limit' => self::RESULTS_PER_REQUEST, 'order' => ['id' => $this->order]]
+            [
+                'limit' => self::RESULTS_PER_REQUEST,
+                'order' => [
+                    $this->mapper->getIdentifierColumn() => $this->order,
+                ],
+            ]
         )->reindex();
     }
 
