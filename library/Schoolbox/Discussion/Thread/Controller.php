@@ -55,17 +55,7 @@ class Controller extends BaseController
 
         // Convert decorated Alaress_Date_Format objects to RFC3309
         // TODO make ADF always jsonSerialize as RFC3309, but that will affect other APIs
-        $adfDecorator =
-            new class implements Decorator\IDecorator {
-                public function decorate(array $json, $model): array
-                {
-                    if ($model instanceof Post\Model) {
-                        $json['createdAt'] = $model->getCreatedAt()->toRfc3339String();
-                        $json['updatedAt'] = $model->getUpdatedAt()->toRfc3339String();
-                    }
-                    return $json;
-                }
-            };
+        $adfDecorator  = new Decorator\AlaressDateFormatDecorator();
 
         $this->response->content->set(
             $this->buildJsonOutput([
