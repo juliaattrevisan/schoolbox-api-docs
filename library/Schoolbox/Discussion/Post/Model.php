@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Post;
 
+use Alaress\Json;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -19,12 +20,13 @@ use Schoolbox\User;
 /**
  * Model for posts in discussion threads.
  */
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, Json\Serializable, Json\Linkable
 {
     use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+    use Json\SerializeTrait;
 
 
     /**
@@ -102,5 +104,33 @@ class Model implements ISoftDeletable
     {
         $this->content = $content;
         return $this;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        // note: datetimes should be RFC3339
+        $map = [
+            'id',
+            'content',
+            'createdAt',
+            'updatedAt',
+        ];
+        if ($this->author) {
+            $map['author'] = $this->author->getDefaultJsonMap();
+        }
+        return $map;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getJsonApiLinks(): array
+    {
+        return [];
     }
 }
