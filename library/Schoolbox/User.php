@@ -1423,17 +1423,16 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      */
     public function getJsonApiLinks(): array
     {
+        $links = [];
         if (!$this->isDeleted()) {
-            return [
-                'profile' => new SitePageLink("/search/user/{$this->getId()}"),
-                'avatar'  => $this->getExternalId()
-                    ? sprintf('/portrait?userId=%s&size=square80', urlencode($this->getExternalId()))
-                    : null,
-            ];
+            $links['profile'] = new SitePageLink("/search/user/{$this->getId()}");
+            if ($this->getExternalId()) {
+                $links['avatar'] = new SitePageLink(
+                    sprintf('/portrait?userId=%s&size=square80', urlencode($this->getExternalId()))
+                );
+            }
         }
-        else {
-            return [];
-        }
+        return $links;
     }
 
     /**
