@@ -101,6 +101,10 @@ components:
         updated:
           type: string
           format: date-time
+        children:
+          $ref: '#/components/schemas/postList'
+          description: A list of direct child posts of this thread
+          required: false
 
     post:
       title: Post
@@ -124,6 +128,16 @@ components:
         updated:
           type: string
           format: date-time
+        parent:
+          $ref: '#/components/schemas/post'
+          description: |
+            The direct parent of this post, if there is one.
+            If there is none, this post is a top-level comment within a thread.
+          nullable: true
+        children:
+          $ref: '#/components/schemas/postList'
+          description: A list of direct children of this post
+          required: false
       required:
         - thread
         - content
