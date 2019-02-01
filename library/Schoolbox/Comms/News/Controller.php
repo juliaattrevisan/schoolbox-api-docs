@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\All;
 use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Authorizer\Rule\LazyCallback;
@@ -852,6 +853,13 @@ class Controller extends Base
         /* These referrers should be used, even when they're not explicitly provided in the url
          */
         $params = new Querystring($this->getRequest()->query);
+
+        if ($params->getFolderId()) {
+            if (Access::getInstance()->getFolderAccess($this->getUser(), $params->getFolderId()) < UserAccess::ACCESS_READ) {
+                throw new Unauthorized();
+            }
+        }
+
         $params->setReferrer(Statistics\Mapper::REFERRER_ARCHIVE);
 
         $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
