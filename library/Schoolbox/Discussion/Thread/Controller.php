@@ -8,8 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread;
 
+use Alaress\Json\Decorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Discussion\Post;
+use Schoolbox\Json\Decorator\LinkDecorator;
 
 /**
  * Controller for thread-related API requests.
@@ -47,9 +49,21 @@ class Controller extends BaseController
         $encodedCursor = $this->request->query->get('cursor');
         $posts         = $cursor->retrieveResults($encodedCursor);
 
+
+        // I need to:
+        // * Output dates as RFC3339 format
+        $linkDecorator = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
+        // The link decorator is required as an extra decorator:
+        // links need to be added to the author within the post
+        $jsonDecorator = new Decorator\PropertyDecorator(
+            null,
+            $linkDecorator
+        );
+
+
         $this->response->content->set(
             $this->buildJsonOutput([
-                'data' => $posts->map(new Post\JsonSerializer()),
+                'data'     => $posts->jsonSerialize($jsonDecorator, $linkDecorator),
                 'metadata' => [
                     'cursor' => [
                         'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
