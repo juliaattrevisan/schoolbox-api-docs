@@ -147,8 +147,6 @@ class Lists
          */
         $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
-        /* Articles that were audienced to $user */
-        $articleIdsForUser = $this->articleResolver->findArticlesForUser($user);
 
         /* $articleIds:   Articles in $topicId that were audienced to $user
          * $availableIds: The total available articles that were audienced to user
@@ -156,7 +154,16 @@ class Lists
          * Component config can set "All" as its limit, filtered to the list of articles that can be seen
          */
         $folderId = $params->getFolderId();
+        if(!$folderId) {
+            /* Articles that were audienced to $user */
+            $articleIdsForUser = $this->articleResolver->findArticlesForUser($user);
+        }
+        else {
+            $articleIdsForUser = [];
+        }
+
         $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $params->getLimit(), $params->getPageNum(), $year, $month, $folderId);
+
         $availableIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, 0, 0, $year, $month, $folderId);
 
         $articles = $this->loadArticleByIds($articleIds, $params, $user);
