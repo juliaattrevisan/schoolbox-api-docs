@@ -60,6 +60,7 @@ paths:
         - $ref: '#/components/parameters/cursor'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/token'
+        - $ref: '#/components/parameters/depth'
 
   /threads/{id}/posts:
     get:
@@ -75,6 +76,7 @@ paths:
         - $ref: '#/components/parameters/cursor'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/token'
+        - $ref: '#/components/parameters/depth'
 
 
 components:
@@ -285,3 +287,14 @@ components:
         This is temporary, and will be replaced with oAuth/JWT authentication.
       schema:
         type: string
+    depth:
+      name:        depth
+      in:          query
+      description: |
+        Number of levels to descend when retrieving child posts.
+      schema:
+        type: int
+        default: 0
+        minimum: 0
+        maximum: 3
+        required: false
