@@ -239,6 +239,45 @@ class CollectionMethodsTest extends TestCase
         $this->assertEquals($beforeLimit, $input->getAll());
     }
 
+
+    /**
+     * Tests an ordinary numerically indexed collection
+     *
+     * @param Collection $input
+     * @param mixed      $expected
+     * @dataProvider provider_last_indexed
+     */
+    public function test_last_indexed(Collection $input, $expected): void
+    {
+        $this->assertSame($expected, $input->last());
+    }
+
+
+    /**
+     * Tests a sparse numerically indexed collection
+     *
+     * @param Collection $input
+     * @param mixed      $expected
+     * @dataProvider provider_last_indexed_sparse
+     */
+    public function test_last_indexed_sparse(Collection $input, $expected): void
+    {
+        $this->assertSame($expected, $input->last());
+    }
+
+
+    /**
+     * Tests an associative collection
+     *
+     * @param Collection $input
+     * @param mixed      $expected
+     * @dataProvider provider_last_associative
+     */
+    public function test_last_associative(Collection $input, $expected): void
+    {
+        $this->assertSame($expected, $input->last());
+    }
+
     // ============= Data Providers =============
 
     public function provider_limit()
@@ -438,5 +477,43 @@ class CollectionMethodsTest extends TestCase
             [4, PHP_INT_MAX],
         ];
         return $data;
+    }
+
+    public function provider_last_indexed(): array
+    {
+        return [
+            [new Collection(), null],
+            [new Collection([1,2,3]), 3],
+            [new Collection(['a','b','c']), 'c'],
+            [(new Collection())->add(1)->add(2)->add(3), 3],
+            [(new Collection())->add('a')->add('b')->add('c'), 'c'],
+        ];
+    }
+
+    public function provider_last_indexed_sparse(): array
+    {
+        $c1 = new Collection();
+        $c1[0] = 1;
+        $c1[2] = 2;
+
+        $c2 = new Collection();
+        $c2[2] = 2;
+        $c2[0] = 1;
+
+        return [
+            [$c1, 2],
+            [$c2, 1],
+        ];
+    }
+
+    public function provider_last_associative(): array
+    {
+        return [
+            [new Collection(), null],
+            [(new Collection())->setOffset(0, 0)->setOffset(2, 2), 2],
+            [(new Collection())->setOffset('key1', 'value1'), 'value1'],
+            [(new Collection())->setOffset('key1', 'value1')->setOffset('key2', 'value2'), 'value2'],
+            [(new Collection())->setOffset('key1', 'value1')->setOffset(0, 0), 0],
+        ];
     }
 }
