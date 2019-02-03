@@ -275,11 +275,10 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      */
     public function last()
     {
-        if ($this->count()) {
-            return $this->stack[count($this->stack) - 1];
+        if (!$this->count()) {
+            return null;
         }
-
-        return null;
+        return $this->stack[count($this->stack) - 1];
     }
 
     /**
