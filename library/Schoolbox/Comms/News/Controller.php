@@ -993,19 +993,13 @@ class Controller extends Base
      * Index of articles you've authored
      *
      * @api GET /news/me
-     *
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function getAuthored($status, $pageNum)
+    public function getAuthored()
     {
         $params = new Querystring($this->getRequest()->query);
         $pageNum = $params->getPageNum();
         $status = $params->getStatus();
-
-        if (!$pageNum) {
-            $pageNum = 1;
-        }
 
         if (!$status) {
             $status = 'All';
