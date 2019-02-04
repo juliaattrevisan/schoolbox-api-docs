@@ -138,6 +138,18 @@ components:
           $ref: '#/components/schemas/postList'
           description: A list of direct children of this post
           required: false
+        visibility:
+          description: |
+            Which role types may view this comment? If not set, assume all role
+            types may view it.
+            This is likely to be replaced with a more sophisticated visibility
+            system, which encompasses individual roles, role types, folders,
+            and who knows what else?
+          type: array
+          items:
+            type: string
+            enum: ['teacher', 'parent', 'student']
+          required: false
       required:
         - thread
         - content
