@@ -459,11 +459,11 @@
                 staller: $submitButton,
                 onSaveSuccess: function (response) {
                     // Update the form actions
-                    $createForm.attr('data-action-draft', response.updateRoute);
+                    $createForm.data('action-draft', response.updateRoute);
                     if (response.approveRoute) {
-                        $createForm.attr('data-action-submit', response.approveRoute);
+                        $createForm.data('action-submit', response.approveRoute);
                     } else {
-                        $createForm.attr('data-action-submit', response.submitRoute);
+                        $createForm.data('action-submit', response.submitRoute);
                     }
 
                     // Update the window history
@@ -585,7 +585,7 @@
             event.preventDefault();
 
             // Update the form's action based on what action was clicked
-            $createForm.attr('action', $createForm.data('action-' + event.data.action));
+            $createForm.prop('action', $createForm.data('action-' + event.data.action));
 
             // Submit the form
             $createForm.submit();
