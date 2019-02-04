@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
+use Schoolbox\Discussion\Post;
 use Schoolbox\Discussion\Thread;
 
 /**
@@ -24,7 +25,10 @@ class Discussion implements ModuleConfigInterface
      */
     public function configure($kernel): void
     {
-        $module = new Thread\Module($kernel->getDependencyInjector());
-        $module->init('/threads');
+        $postModule = new Post\Module($kernel->getDependencyInjector());
+        $postModule->init('/posts');
+
+        $threadModule = new Thread\Module($kernel->getDependencyInjector());
+        $threadModule->init('/threads');
     }
 }
