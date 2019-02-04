@@ -1141,7 +1141,7 @@ class Controller extends Base
      * @throws MapperException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    private function generatePartialForHomepage(Querystring $params)
+    private function generatePartialForHomepage(Querystring $params): array
     {
         $showArchiveNewsLink = false;
         $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
@@ -1427,7 +1427,7 @@ class Controller extends Base
                     $asyncUrls[] = $route;
                 }
             }
-            if (\in_array($previousUrl, $asyncUrls)) {
+            if (\in_array($previousUrl, $asyncUrls, false)) {
                 $previousUrl = $this->getSession()->getHistory(2);
             }
 
@@ -1451,7 +1451,7 @@ class Controller extends Base
 
         // If the url of the previous pages matches any of the comms list pages above or homepage, return the url
         // null otherwise.
-        if (\in_array($previousUrl, $commsListUrls)
+        if (\in_array($previousUrl, $commsListUrls, false)
             || \strpos($previousUrl, '/homepage') !== false) {
             return Querystring::encode($previousUrl);
         }
