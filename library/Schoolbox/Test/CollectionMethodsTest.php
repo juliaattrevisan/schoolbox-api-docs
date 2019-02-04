@@ -36,6 +36,7 @@ class CollectionMethodsTest extends TestCase
         $this->assertEquals($beforeSlice->getAll(), $input->getAll());
     }
 
+
     /**
      * @dataProvider provider_slice_once
      * @param Collection $input
@@ -43,6 +44,7 @@ class CollectionMethodsTest extends TestCase
      * @param int        $offset
      * @param int        $count
      * @param bool       $preserveKeys
+     * @throws \PHPUnit\Framework\SkippedTestError
      */
     public function test_slice_invert_key_preservation(
         Collection $input,
@@ -53,6 +55,7 @@ class CollectionMethodsTest extends TestCase
     ) {
         // Ignore 0 length arrays or arrays starting from first index (these do not give different keys)
         if (!$offset || !$count) {
+            $this->markTestSkipped();
             return;
         }
         $beforeSlice = new Collection($input->getAll());
