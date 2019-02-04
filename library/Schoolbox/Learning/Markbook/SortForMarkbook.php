@@ -69,6 +69,19 @@ class SortForMarkbook implements IAssessableComparator
 
 
     /**
+     * Compares assessments by Due Date
+     *
+     * @param IAssessable $left
+     * @param IAssessable $right
+     * @return int
+     */
+    protected function compareDueDates(IAssessable $left, IAssessable $right): int
+    {
+        return $left->getDueAt()->compare($right->getDueAt());
+    }
+
+
+    /**
      * Sort by base context folder id
      *
      * @param IAssessable $left
@@ -137,7 +150,7 @@ class SortForMarkbook implements IAssessableComparator
             return $baseLeft->getSequence() <=> $baseRight->getSequence();
         }
         // Both directly on same folder, compare by due-date
-        return $baseLeft->getDueAt()->compare($baseRight->getDueAt());
+        return $this->compareDueDates($baseLeft, $baseRight);
     }
 
 
