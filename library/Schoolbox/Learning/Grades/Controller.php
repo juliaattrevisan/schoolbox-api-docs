@@ -231,6 +231,7 @@ class Controller extends Base
         $markbooksFolders = [];
 
         // Keep a collection of all folders student has an assessment in for use in the dropdown
+        /** @var IAssessable[][]|GenericCollection[] $assessmentTasks */
         $assessmentTasks = [];
 
         $showOverallGrade = $this->getConfigLoader()->get('show_overall_grade');
@@ -259,13 +260,19 @@ class Controller extends Base
                     )
                 ) {
                     if (!isset($assessmentTasks[$folder->getId()])) {
-                        $assessmentTasks[$folder->getId()] = [];
+                        $assessmentTasks[$folder->getId()] = new GenericCollection(IAssessable::class);
                     }
-                    $assessmentTasks[$folder->getId()][] = $assessment;
+                    $assessmentTasks[$folder->getId()]->add($assessment);
                 }
 
                 $markbooksFolders[$folder->getId()]->add($assessment);
             }
+        }
+
+        // Sort the assessments
+        $assessmentComparator = new AssessmentComparator($viewee);
+        foreach ($assessmentTasks as $folderId => $assessments) {
+            $assessments->sortByCallback($assessmentComparator->getCallable());
         }
 
         foreach ($markbooksFolders as $folderId => $assessments) {
