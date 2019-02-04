@@ -1446,9 +1446,14 @@ class Controller extends Base
      */
     private function getSidebarVars(): array
     {
+        $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
+        $articlesNeedModeration = $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration());
+
         return [
+            'articles' => $articlesNeedModeration,
             'page' => $this->getRequest()->query['page'],
-            'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
+            'moderationRequired' => $moderationRequired,
+            'moderationCount' => $articlesNeedModeration->count(),
             'authoredCounts' => [
                 'Drafted' => [
                     'count'      => $this->newsMapper->countByPredicates(
@@ -1477,6 +1482,7 @@ class Controller extends Base
             ]
         ];
     }
+
 
     /**
      * @return \Alaress\Specification\ISpecification
