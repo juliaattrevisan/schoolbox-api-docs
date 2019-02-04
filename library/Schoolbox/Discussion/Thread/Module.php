@@ -37,7 +37,7 @@ class Module extends BaseModule
         $authorizer = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\LazyCallback(function () {
-                return new Authorizer(
+                return new Authorizer\CanReadThread(
                     $this->getInjector()->get('authorizer'),
                     $this->getMapperFactory()->get(News\Mapper::class)
                 );

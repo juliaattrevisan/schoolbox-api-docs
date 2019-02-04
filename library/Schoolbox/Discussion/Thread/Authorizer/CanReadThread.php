@@ -6,11 +6,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Thread;
+namespace Schoolbox\Discussion\Thread\Authorizer;
 
 use Alaress\Authorizer\Authorizer as BaseAuthorizer;
 use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
+use Schoolbox\Discussion\Thread\Model;
 use Schoolbox\Comms\News;
 use Schoolbox\User;
 
@@ -20,7 +21,7 @@ use Schoolbox\User;
  * This rule checks where the thread is in use, and verifies whether the
  * requesting user has permission to view that place.
  */
-class Authorizer implements IAuthorizationRule
+class CanReadThread implements IAuthorizationRule
 {
     /**
      * @var BaseAuthorizer
