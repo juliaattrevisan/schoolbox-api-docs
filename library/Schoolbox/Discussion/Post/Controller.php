@@ -62,10 +62,10 @@ class Controller extends BaseController
         $data   = $this->request->content->get();
 
         // This shouldn't be a string, but the above says it is?
-        $thread = $this->threadMapper->findById($data['thread']['id'] ?? null);
+        $thread = $this->mapper->findById($data['thread']['id'] ?? null);
 
         $post = $this->mapper->createModel()
-                             ->setThread($this->threadMapper->findById($data));
+                             ->setThread($this->mapper->findById($data));
     }
 
 
