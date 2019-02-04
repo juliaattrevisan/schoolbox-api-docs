@@ -260,6 +260,7 @@ class RecursiveUndeleter
         Discussion\Thread\Mapper::class => [
             Discussion\Post\Mapper::class => 'discussion_thread_id',
         ],
+        Discussion\Post\Mapper::class => [],
     ];
 
 
