@@ -278,7 +278,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
         if (!$this->count()) {
             return null;
         }
-        return $this->stack[count($this->stack) - 1];
+        return \end($this->stack);
     }
 
     /**
