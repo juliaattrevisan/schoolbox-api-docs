@@ -68,9 +68,9 @@ Data:
             'cid=' ~ componentInstanceId
         ] |join('&') %}
 
-        {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') ~ '?' ~ archiveQuerystringParams %}
+        {% set archiveRoute = routeLookupIfAuthorized('commsNews.getArchive') %}
         {% if archiveRoute %}
-        <a href="{{ archiveRoute }}" class="button">View Archive</a>
+        <a href="{{ archiveRoute }}?{{ archiveQuerystringParams }}" class="button">View Archive</a>
         {% endif %}
     </section>
 </div>
