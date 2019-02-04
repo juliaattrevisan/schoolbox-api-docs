@@ -36,9 +36,10 @@ if (isset($_POST['current_password'])) {
     }
 
     try {
-        /** @var Schoolbox\User $user */
-        $user                = $_SESSION['user'];
         $userMapper          = Schoolbox\UserMapper::getInstance();
+
+        /** @var Schoolbox\User $user */
+        $user                = $userMapper->findById($_SESSION['user']->getId());
         $passwordService     = new \Alaress\Password\Service();
         $passwordMailService = new \Schoolbox\User\Password\MailService(
             $configMapper,
