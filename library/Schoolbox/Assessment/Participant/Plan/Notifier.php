@@ -1015,6 +1015,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 }
 
                 $bob->unsetParam('oldname');
+                $bob->unsetParam('boxType');
             }
             unset($assessmentDiff['title']);
 
@@ -1069,6 +1070,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                     $bob->unsetParam('date');
                     $bob->unsetParam('verb');
+                    $bob->unsetParam('boxType');
                 }
             }
 
