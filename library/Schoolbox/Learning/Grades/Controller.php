@@ -462,7 +462,7 @@ class Controller extends Base
         $canSeeShowcaseButton = $this->getUser()->getRole()->isStaff() || $this->getUser()->getRole()->isStudent();
 
         // Let markbook calculate the statistics
-        $filteredMarkbook = (new Markbook($assessments, $this->defaultGradeGroup, $this->getUser()))->sortAssessables();
+        $filteredMarkbook = (new Markbook($assessments, $this->defaultGradeGroup, $this->getUser()))->sortAssessables(new AssessmentComparator($viewee));
 
         $graph = $canSeeGraph ? $this->buildGraph($filteredMarkbook, $viewee) : [];
 
