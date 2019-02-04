@@ -159,6 +159,7 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws InvalidArgumentException
      * @throws UnknownEntityTypeException
+     * @throws RouteNotFound
      */
     public function getCreate(): void
     {
@@ -234,13 +235,16 @@ class Controller extends Base
         ])->setTab('news')->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
+
     /**
      * Generate article's audience segments with audience filtering based on the account access permission.
      * If the logged in user is a member of a staff, filtering will be skipped.
      *
      * @param Model $article
-     * @param $filterAudiences
      * @return array
+     * @throws MapperException\InsufficientHydrationException
+     * @throws UnexpectedValueException
+     * @throws UnknownEntityTypeException
      */
     private function getAudienceSegments(Model $article) :array
     {
@@ -281,10 +285,12 @@ class Controller extends Base
         return $audienceSegments;
     }
 
+
     /**
      * @param Audience\Model $segment
-     * @param User $user
+     * @param User           $user
      * @return bool
+     * @throws MapperException\InsufficientHydrationException
      */
     private function isAudienceVisibleToUser(Audience\Model $segment, User $user): bool
     {
@@ -369,6 +375,7 @@ class Controller extends Base
      * @throws MapperException\InsufficientHydrationException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException
+     * @throws RouteNotFound
      */
     public function getUpdate(Model $article): void
     {
@@ -416,6 +423,7 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws \DomainException
      * @throws UnknownEntityTypeException
+     * @throws InvalidArgumentException
      */
     public function postUpdate(Model $article): void
     {
@@ -523,16 +531,16 @@ class Controller extends Base
     /**
      * Load a news article so you can read its contents (the detail screen)
      *
-     * @api GET /news/{articleId}
+     * @api   GET /news/{articleId}
      * @level 18.1
      *
      * @param Model $article
      * @throws MapperException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      * @throws \PDOException
      * @throws RouteNotFound
+     * @throws UnknownEntityTypeException
+     * @throws MapperException\InsufficientHydrationException
      */
     public function getDetail(Model $article): void
     {
@@ -624,14 +632,7 @@ class Controller extends Base
      *
      * @throws InvalidArgumentException
      * @throws MapperException
-     * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \DomainException
-     * @throws \OutOfRangeException
-     * @throws \PDOException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
      */
     public function getListForHomepage() :void
     {
@@ -662,11 +663,7 @@ class Controller extends Base
      *
      * @api GET /news/lists/feed
      *
-     * @throws InvalidArgumentException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DomainException
-     * @throws \OutOfRangeException
-     * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
@@ -830,7 +827,7 @@ class Controller extends Base
     /**
      * News Archive
      *
-     * @api GET /news/archive{/year,month}
+     * @api   GET /news/archive{/year,month}
      * @level 18.1
      *
      * @param int|null $year
@@ -845,6 +842,7 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @throws Exception
      */
     public function getArchive(int $year = null, int $month = null): void
     {
@@ -916,7 +914,9 @@ class Controller extends Base
             $pageTitle = $folderBasicDetails['name'];
         }
 
-        $data = array_merge($data, $this->getSidebarVars());
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+
+        $data = array_merge($data, $sidebar->generate());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@commsNews/archive.twig', $data)
@@ -925,10 +925,12 @@ class Controller extends Base
         );
     }
 
+
     /**
      * @param int $folderId
      *
      * @return array
+     * @throws Exception
      */
     private function getBasicFolderDetailsById(int $folderId) :?array
     {
@@ -953,16 +955,8 @@ class Controller extends Base
      * @api GET /news
      * @level 18.1
      *
-     * @throws InvalidArgumentException
-     * @throws MapperException
-     * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \DomainException
-     * @throws \OutOfRangeException
-     * @throws \PDOException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
      */
     public function getIndex(): void
     {
@@ -987,7 +981,10 @@ class Controller extends Base
              */
             'key' => $this->getUser()->getKey(),
         ];
-        $data = array_merge($data, $this->getSidebarVars());
+
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+
+        $data = array_merge($data, $sidebar->generate());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@commsNews/index.twig', $data)
@@ -1001,28 +998,25 @@ class Controller extends Base
      * Index of articles you've authored
      *
      * @api GET /news/me
-     *
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function getAuthored($status, $pageNum)
+    public function getAuthored()
     {
         $params = new Querystring($this->getRequest()->query);
         $pageNum = $params->getPageNum();
         $status = $params->getStatus();
 
-        if (!$pageNum) {
-            $pageNum = 1;
-        }
-
         if (!$status) {
             $status = 'All';
         }
 
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+
         $data = array_merge([
             'pageNum' => $pageNum,
             'status' => $status,
-        ], $this->getSidebarVars());
+        ], $sidebar->generate());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@commsNews/authored.twig', $data)
@@ -1131,14 +1125,17 @@ class Controller extends Base
         return $partialData;
     }
 
+
     /**
      * Generate a partial fragment containing articles for homepage
      *
      * @param Querystring $params
      * @return array
+     * @throws InvalidArgumentException
      * @throws MapperException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    private function generatePartialForHomepage(Querystring $params)
+    private function generatePartialForHomepage(Querystring $params): array
     {
         $showArchiveNewsLink = false;
         $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
@@ -1284,11 +1281,14 @@ class Controller extends Base
         return $entityTypes;
     }
 
+
     /**
      * Updates an article's attributes with post data payload
      *
      * @param Model $article
      * @param array $postData
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
      */
     private function updateArticleAttributes(Model $article, array $postData): void
@@ -1352,6 +1352,8 @@ class Controller extends Base
      * Validates a proposed article and audience
      *
      * @param Model $article
+     * @throws UnexpectedValueException
+     * @throws UnknownEntityTypeException
      * @throws UnsatisfiedException
      */
     private function validateArticleAndAudience(Model $article): void
@@ -1419,7 +1421,7 @@ class Controller extends Base
                     $asyncUrls[] = $route;
                 }
             }
-            if (\in_array($previousUrl, $asyncUrls)) {
+            if (\in_array($previousUrl, $asyncUrls, false)) {
                 $previousUrl = $this->getSession()->getHistory(2);
             }
 
@@ -1443,52 +1445,13 @@ class Controller extends Base
 
         // If the url of the previous pages matches any of the comms list pages above or homepage, return the url
         // null otherwise.
-        if (\in_array($previousUrl, $commsListUrls)
+        if (\in_array($previousUrl, $commsListUrls, false)
             || \strpos($previousUrl, '/homepage') !== false) {
             return Querystring::encode($previousUrl);
         }
         return null;
     }
 
-
-    /**
-     * Get the variables needed for the news sidebar
-     *
-     * @return array
-     */
-    private function getSidebarVars(): array
-    {
-        return [
-            'page' => $this->getRequest()->query['page'],
-            'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
-            'authoredCounts' => [
-                'Drafted' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateDraft()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'unsubmitted',
-                ],
-                'Awaiting Moderation' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateAwaitingModeration()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted',
-                ],
-                'Rejected' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateRejected()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted-late',
-                ],
-            ]
-        ];
-    }
 
     /**
      * @return \Alaress\Specification\ISpecification

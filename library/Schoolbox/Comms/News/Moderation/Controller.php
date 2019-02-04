@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Moderation;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Config\ConfigMapper;
@@ -74,53 +73,18 @@ class Controller extends Base
     public function getList(): void
     {
         $lists = new Lists($this->newsMapper);
-        $articlesNeedModeration = new Collection();
+        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
 
-        try {
-            $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
-            $articlesNeedModeration = $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration());
-        } catch (Mapper\Exception $e) {
-            $moderationRequired = false;
-        }
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', [
-            'articles' => $articlesNeedModeration,
+        $data = array_merge([
+            'articles' => $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
             'recentlyAcceptedArticles' => $lists->getRecentlyAccepted(),
             'recentlyRejectedArticles' => $lists->getRecentlyRejected(),
-            'moderationRequired' => $moderationRequired,
 
-            // Vars for the nav sidebar
-            'page' => $this->getRequest()->query['page'],
-            'moderationCount' => $articlesNeedModeration->count(),
-            'authoredCounts' => [
-                'Drafted' => [
-                    'count' => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateDraft()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'unsubmitted'
-                ],
-                'Awaiting Moderation' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateAwaitingModeration()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted',
-                ],
-                'Rejected' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateRejected()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted-late',
-                ],
-            ]
-        ])->setTitle('Requiring Moderation')->setTab('news'));
+        ], $sidebar->generate());
+
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', $data)->setTitle('Requiring Moderation')->setTab('news'));
     }
-
 
     /**
      * Set a flash message about submitting articles

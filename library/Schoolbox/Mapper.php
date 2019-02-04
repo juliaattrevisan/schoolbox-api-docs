@@ -2044,10 +2044,10 @@ abstract class Mapper implements IMapper, Serializable
      * @see $this->findByColumnList()
      * @return int
      */
-    public function countByPredicates(Builder $pb, array $options = [])
+    public function countByPredicates(Builder $pb, array $options = []): int
     {
         try {
-            $stmt = $this->selectScalarByPredicates('COUNT(*)', $pb, $options);
+            $stmt = $this->selectScalarByPredicates("COUNT(DISTINCT {$this->table}.{$this->getIdentifierColumn()})", $pb, $options);
             return intval($stmt->fetchColumn());
         } catch (UnderflowException $e) {
             return 0;

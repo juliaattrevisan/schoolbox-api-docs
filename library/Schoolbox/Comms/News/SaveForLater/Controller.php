@@ -62,41 +62,17 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', [
-            'articles' => $articles,
-            'referrer' => $params->getReferrer(),
+        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
 
-            // Vars for the nav sidebar
-            'page' => $this->getRequest()->query['page'],
-            'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
-            'authoredCounts' => [
-                'Drafted' => [
-                    'count' => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateDraft()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'unsubmitted'
-                ],
-                'Awaiting Moderation' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateAwaitingModeration()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted',
-                ],
-                'Rejected' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateRejected()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted-late',
-                ],
+        $data = array_merge(
+            [
+                'articles' => $articles,
+                'referrer' => $params->getReferrer(),
+                'readMore' => $this->getConfigLoader()->get(ConfigMapper::_READ_MORE)
             ],
-            'readMore' => $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
-        ])->setTitle('Saved For Later')->setTab('news'));
+            $sidebar->generate()
+        );
+        $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', $data)->setTitle('Saved For Later')->setTab('news'));
     }
 
 
