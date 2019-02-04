@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Config\Profile;
+namespace Config\Modules;
 
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
 use Schoolbox\Profile\Button\Module as ProfileButtonModule;
 
-class Menu extends ModuleLoader
+class Profile extends ModuleLoader
 {
     /**
      * Run configuration for the given module
