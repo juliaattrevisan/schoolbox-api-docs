@@ -11,6 +11,7 @@ namespace Schoolbox\Discussion\Post;
 use Alaress\Json;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Json\Api\AuraLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -131,6 +132,11 @@ class Model implements ISoftDeletable, Json\Serializable, Json\Linkable
      */
     public function getJsonApiLinks(): array
     {
-        return [];
+        return [
+            'delete' => new AuraLink(
+                'discussionPosts.deletePost',
+                ['id' => $this->id, 'post' => $this,]
+            )
+        ];
     }
 }
