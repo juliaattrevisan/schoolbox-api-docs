@@ -58,13 +58,10 @@ class Sidebar
      */
     public function generate(): array
     {
-        $articlesNeedModeration = $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration());
-
         return [
-            'articles' => $articlesNeedModeration,
             'page' => $this->page,
             'moderationRequired' => $this->moderationRequired,
-            'moderationCount' => $articlesNeedModeration->count(),
+            'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
             'authoredCounts' => [
                 'Drafted' => [
                     'count'      => $this->newsMapper->countByPredicates(

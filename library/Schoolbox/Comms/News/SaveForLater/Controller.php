@@ -64,15 +64,13 @@ class Controller extends Base
 
         $sidebar = new News\Sidebar($this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION), $this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
 
-        /* $articles is different here than in News\Sidebar.
-         */
         $data = array_merge(
-            $sidebar->generate(),
             [
                 'articles' => $articles,
                 'referrer' => $params->getReferrer(),
                 'readMore' => $this->getConfigLoader()->get(ConfigMapper::_READ_MORE)
-            ]
+            ],
+            $sidebar->generate()
         );
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsSaveForLater/index.twig', $data)->setTitle('Saved For Later')->setTab('news'));
     }

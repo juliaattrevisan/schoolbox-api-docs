@@ -76,11 +76,11 @@ class Controller extends Base
         $sidebar = new News\Sidebar($this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION), $this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
 
         $data = array_merge([
+            'articles' => $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
             'recentlyAcceptedArticles' => $lists->getRecentlyAccepted(),
             'recentlyRejectedArticles' => $lists->getRecentlyRejected(),
 
         ], $sidebar->generate());
-
 
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', $data)->setTitle('Requiring Moderation')->setTab('news'));
