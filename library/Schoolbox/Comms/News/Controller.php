@@ -535,8 +535,6 @@ class Controller extends Base
      *
      * @param Model $article
      * @throws MapperException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      * @throws \PDOException
      * @throws RouteNotFound
@@ -633,14 +631,7 @@ class Controller extends Base
      *
      * @throws InvalidArgumentException
      * @throws MapperException
-     * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \DomainException
-     * @throws \OutOfRangeException
-     * @throws \PDOException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
      */
     public function getListForHomepage() :void
     {
@@ -671,11 +662,7 @@ class Controller extends Base
      *
      * @api GET /news/lists/feed
      *
-     * @throws InvalidArgumentException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DomainException
-     * @throws \OutOfRangeException
-     * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
@@ -958,16 +945,8 @@ class Controller extends Base
      * @api GET /news
      * @level 18.1
      *
-     * @throws InvalidArgumentException
-     * @throws MapperException
-     * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \DomainException
-     * @throws \OutOfRangeException
-     * @throws \PDOException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
      */
     public function getIndex(): void
     {
