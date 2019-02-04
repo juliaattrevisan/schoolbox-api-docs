@@ -53,8 +53,8 @@ class Controller extends BaseController
         $linkDecorator = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
         $jsonDecorator = new Decorator\PropertyDecorator(null, $linkDecorator);
 
-        // Convert decorated Alaress_Date_Format objects to RFC3309
-        // TODO make ADF always jsonSerialize as RFC3309, but that will affect other APIs
+        // Convert decorated Alaress_Date_Format objects to RFC3339
+        // TODO make ADF always jsonSerialize as RFC3339, but that will affect other APIs
         $adfDecorator  = new Decorator\AlaressDateFormatDecorator();
 
         $this->response->content->set(
