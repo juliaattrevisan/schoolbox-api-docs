@@ -13,7 +13,10 @@ if (!\in_array($_POST['calendarView'], [ 'month', 'agendaWeek', 'agendaDay' ], t
     return;
 }
 
-$_SESSION['user']->setCalendarView($_POST['calendarView']);
-UserMapper::getInstance()->save($_SESSION['user']);
+$userMapper = UserMapper::getInstance();
+$user = $userMapper->findById($_SESSION['user']->getId());
+
+$user->setCalendarView($_POST['calendarView']);
+UserMapper::getInstance()->save($user);
 
 exit;
