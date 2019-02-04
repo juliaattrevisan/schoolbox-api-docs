@@ -906,7 +906,7 @@ class Controller extends Base
             $pageTitle = $folderBasicDetails['name'];
         }
 
-        $sidebar = new Sidebar($this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION), $this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
 
         $data = array_merge($data, $sidebar->generate());
 
@@ -974,7 +974,7 @@ class Controller extends Base
             'key' => $this->getUser()->getKey(),
         ];
 
-        $sidebar = new Sidebar($this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION), $this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
 
         $data = array_merge($data, $sidebar->generate());
 
@@ -1003,7 +1003,7 @@ class Controller extends Base
             $status = 'All';
         }
 
-        $sidebar = new Sidebar($this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION), $this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
 
         $data = array_merge([
             'pageNum' => $pageNum,

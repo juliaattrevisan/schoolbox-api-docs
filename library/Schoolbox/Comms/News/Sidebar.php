@@ -17,11 +17,6 @@ class Sidebar
 {
 
     /**
-     * @var bool
-     */
-    private $moderationRequired;
-
-    /**
      * @var Mapper
      */
     private $newsMapper;
@@ -39,13 +34,11 @@ class Sidebar
 
     /**
      * Sidebar constructor.
-     * @param bool        $moderationRequired
      * @param Mapper      $newsMapper
      * @param User        $user
      * @param string|null $page
      */
-    public function __construct(bool $moderationRequired, Mapper $newsMapper, User $user, ?string $page) {
-        $this->moderationRequired = $moderationRequired;
+    public function __construct(Mapper $newsMapper, User $user, ?string $page) {
         $this->newsMapper = $newsMapper;
         $this->user = $user;
         $this->page = $page;
@@ -60,7 +53,6 @@ class Sidebar
     {
         return [
             'page' => $this->page,
-            'moderationRequired' => $this->moderationRequired,
             'moderationCount' => $this->newsMapper->countByPredicates($this->newsMapper->getPredicateAwaitingModeration()),
             'authoredCounts' => [
                 'Drafted' => [
