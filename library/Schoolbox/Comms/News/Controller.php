@@ -398,7 +398,7 @@ class Controller extends Base
             'encodedSegments'        => $this->getAudienceSegments($article),
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'returnUrl'              => $this->getExplicitReturnUrl(),
-            'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(true),
+            'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
             'entityTypesData'        => $this->getEntityTypesData(),
         ])->setTab('news')->setTitle("Update {$article->getTitle()}"));
     }
