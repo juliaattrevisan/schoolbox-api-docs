@@ -906,7 +906,9 @@ class Controller extends Base
             $pageTitle = $folderBasicDetails['name'];
         }
 
-        $data = array_merge($data, $this->getSidebarVars());
+        $sidebar = new Sidebar($this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION), $this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+
+        $data = array_merge($data, $sidebar->generate());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@commsNews/archive.twig', $data)
@@ -971,7 +973,10 @@ class Controller extends Base
              */
             'key' => $this->getUser()->getKey(),
         ];
-        $data = array_merge($data, $this->getSidebarVars());
+
+        $sidebar = new Sidebar($this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION), $this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+
+        $data = array_merge($data, $sidebar->generate());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@commsNews/index.twig', $data)
@@ -998,10 +1003,12 @@ class Controller extends Base
             $status = 'All';
         }
 
+        $sidebar = new Sidebar($this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION), $this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+
         $data = array_merge([
             'pageNum' => $pageNum,
             'status' => $status,
-        ], $this->getSidebarVars());
+        ], $sidebar->generate());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@commsNews/authored.twig', $data)
@@ -1435,52 +1442,6 @@ class Controller extends Base
             return Querystring::encode($previousUrl);
         }
         return null;
-    }
-
-
-    /**
-     * Get the variables needed for the news sidebar
-     *
-     * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     */
-    private function getSidebarVars(): array
-    {
-        $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
-        $articlesNeedModeration = $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration());
-
-        return [
-            'articles' => $articlesNeedModeration,
-            'page' => $this->getRequest()->query['page'],
-            'moderationRequired' => $moderationRequired,
-            'moderationCount' => $articlesNeedModeration->count(),
-            'authoredCounts' => [
-                'Drafted' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateDraft()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'unsubmitted',
-                ],
-                'Awaiting Moderation' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateAwaitingModeration()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted',
-                ],
-                'Rejected' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateRejected()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted-late',
-                ],
-            ]
-        ];
     }
 
 

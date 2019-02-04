@@ -1,0 +1,96 @@
+<?php
+/**
+ * Sidebar
+ *
+ * Generates sidebar vars shared between submodules.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Comms\News;
+
+use Schoolbox\User;
+
+class Sidebar
+{
+
+    /**
+     * @var bool
+     */
+    private $moderationRequired;
+
+    /**
+     * @var Mapper
+     */
+    private $newsMapper;
+
+    /**
+     * @var User
+     */
+    private $user;
+
+    /**
+     * @var string|null
+     */
+    private $page;
+
+
+    /**
+     * Sidebar constructor.
+     * @param bool        $moderationRequired
+     * @param Mapper      $newsMapper
+     * @param User        $user
+     * @param string|null $page
+     */
+    public function __construct(bool $moderationRequired, Mapper $newsMapper, User $user, ?string $page) {
+        $this->moderationRequired = $moderationRequired;
+        $this->newsMapper = $newsMapper;
+        $this->user = $user;
+        $this->page = $page;
+    }
+
+
+    /**
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    public function generate(): array
+    {
+        $articlesNeedModeration = $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration());
+
+        return [
+            'articles' => $articlesNeedModeration,
+            'page' => $this->page,
+            'moderationRequired' => $this->moderationRequired,
+            'moderationCount' => $articlesNeedModeration->count(),
+            'authoredCounts' => [
+                'Drafted' => [
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateDraft()
+                            ->equals('author_id', $this->user->getId())
+                    ),
+                    'labelClass' => 'unsubmitted',
+                ],
+                'Awaiting Moderation' => [
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateAwaitingModeration()
+                            ->equals('author_id', $this->user->getId())
+                    ),
+                    'labelClass' => 'submitted',
+                ],
+                'Rejected' => [
+                    'count'      => $this->newsMapper->countByPredicates(
+                        $this->newsMapper
+                            ->getPredicateRejected()
+                            ->equals('author_id', $this->user->getId())
+                    ),
+                    'labelClass' => 'submitted-late',
+                ],
+            ]
+        ];
+    }
+}

@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Moderation;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Config\ConfigMapper;
@@ -74,59 +73,17 @@ class Controller extends Base
     public function getList(): void
     {
         $lists = new Lists($this->newsMapper);
+        $sidebar = new News\Sidebar($this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION), $this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
 
         $data = array_merge([
             'recentlyAcceptedArticles' => $lists->getRecentlyAccepted(),
             'recentlyRejectedArticles' => $lists->getRecentlyRejected(),
 
-        ], $this->getSidebarVars());
+        ], $sidebar->generate());
+
+
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsModeration/index.twig', $data)->setTitle('Requiring Moderation')->setTab('news'));
-    }
-
-    /**
-     * Get the variables needed for the news sidebar
-     *
-     * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     */
-    private function getSidebarVars(): array
-    {
-        $moderationRequired = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
-        $articlesNeedModeration = $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration());
-
-        return [
-            'articles' => $articlesNeedModeration,
-            'page' => $this->getRequest()->query['page'],
-            'moderationRequired' => $moderationRequired,
-            'moderationCount' => $articlesNeedModeration->count(),
-            'authoredCounts' => [
-                'Drafted' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateDraft()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'unsubmitted',
-                ],
-                'Awaiting Moderation' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateAwaitingModeration()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted',
-                ],
-                'Rejected' => [
-                    'count'      => $this->newsMapper->countByPredicates(
-                        $this->newsMapper
-                            ->getPredicateRejected()
-                            ->equals('author_id', $this->getUser()->getId())
-                    ),
-                    'labelClass' => 'submitted-late',
-                ],
-            ]
-        ];
     }
 
     /**
