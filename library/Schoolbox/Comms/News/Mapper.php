@@ -365,7 +365,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     {
         /* This user can't see any articles
          */
-        if (!\count($availableArticleIds)) {
+        if (!(\count($availableArticleIds) || $folderId)) {
             return [];
         }
 
@@ -385,9 +385,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $pb = $this->getPredicateBuilder()
             ->lessThan('publish_at', $now)
             ->notNull('accepted_at')
-            ->isNull('deleted_at')
-            ->in('id', $availableArticleIds);
+            ->isNull('deleted_at');
 
+        if(\count($availableArticleIds)) {
+            $pb->in('id', $availableArticleIds);
+        }
         if ($year || $month) {
             $paddedMonth = '';
 
@@ -414,7 +416,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
         if (null !== $folderId) {
             $join .= "INNER JOIN comms_news_audience cnau ON {$this->table}.id = cnau.comms_news_article_id 
-            AND cnau.entity_type = '". Folder::getEntityType() ."' AND cnau.entity_value = " . $folderId;
+            AND cnau.entity_type = :entityType AND cnau.entity_value = :folderId";
+
         }
 
         $where = implode("\nAND ", $pb->getWhere());
@@ -449,6 +452,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
          */
         foreach ($pb->getParams() as $key => $value) {
             $statement->bindValue($key, $value);
+        }
+
+        if($folderId) {
+            $statement->bindValue('folderId', $folderId);
+            $statement->bindValue('entityType', Folder::getEntityType());
         }
 
         /* Because pdo does some mickey mouse shenanigans
