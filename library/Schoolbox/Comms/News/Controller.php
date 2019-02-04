@@ -158,6 +158,7 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws InvalidArgumentException
      * @throws UnknownEntityTypeException
+     * @throws RouteNotFound
      */
     public function getCreate(): void
     {
@@ -233,13 +234,16 @@ class Controller extends Base
         ])->setTab('news')->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
+
     /**
      * Generate article's audience segments with audience filtering based on the account access permission.
      * If the logged in user is a member of a staff, filtering will be skipped.
      *
      * @param Model $article
-     * @param $filterAudiences
      * @return array
+     * @throws MapperException\InsufficientHydrationException
+     * @throws UnexpectedValueException
+     * @throws UnknownEntityTypeException
      */
     private function getAudienceSegments(Model $article) :array
     {
@@ -280,10 +284,12 @@ class Controller extends Base
         return $audienceSegments;
     }
 
+
     /**
      * @param Audience\Model $segment
-     * @param User $user
+     * @param User           $user
      * @return bool
+     * @throws MapperException\InsufficientHydrationException
      */
     private function isAudienceVisibleToUser(Audience\Model $segment, User $user): bool
     {
@@ -368,6 +374,7 @@ class Controller extends Base
      * @throws MapperException\InsufficientHydrationException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException
+     * @throws RouteNotFound
      */
     public function getUpdate(Model $article): void
     {
@@ -415,6 +422,7 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws \DomainException
      * @throws UnknownEntityTypeException
+     * @throws InvalidArgumentException
      */
     public function postUpdate(Model $article): void
     {
@@ -522,7 +530,7 @@ class Controller extends Base
     /**
      * Load a news article so you can read its contents (the detail screen)
      *
-     * @api GET /news/{articleId}
+     * @api   GET /news/{articleId}
      * @level 18.1
      *
      * @param Model $article
@@ -532,6 +540,8 @@ class Controller extends Base
      * @throws \UnexpectedValueException
      * @throws \PDOException
      * @throws RouteNotFound
+     * @throws UnknownEntityTypeException
+     * @throws MapperException\InsufficientHydrationException
      */
     public function getDetail(Model $article): void
     {
@@ -829,7 +839,7 @@ class Controller extends Base
     /**
      * News Archive
      *
-     * @api GET /news/archive{/year,month}
+     * @api   GET /news/archive{/year,month}
      * @level 18.1
      *
      * @param int|null $year
@@ -844,6 +854,7 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @throws Exception
      */
     public function getArchive(int $year = null, int $month = null): void
     {
@@ -917,10 +928,12 @@ class Controller extends Base
         );
     }
 
+
     /**
      * @param int $folderId
      *
      * @return array
+     * @throws Exception
      */
     private function getBasicFolderDetailsById(int $folderId) :?array
     {
@@ -994,6 +1007,7 @@ class Controller extends Base
      *
      * @api GET /news/me
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getAuthored()
     {
@@ -1117,12 +1131,15 @@ class Controller extends Base
         return $partialData;
     }
 
+
     /**
      * Generate a partial fragment containing articles for homepage
      *
      * @param Querystring $params
      * @return array
+     * @throws InvalidArgumentException
      * @throws MapperException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     private function generatePartialForHomepage(Querystring $params)
     {
@@ -1270,11 +1287,14 @@ class Controller extends Base
         return $entityTypes;
     }
 
+
     /**
      * Updates an article's attributes with post data payload
      *
      * @param Model $article
      * @param array $postData
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      * @throws \Schoolbox\Resource\Exception
      */
     private function updateArticleAttributes(Model $article, array $postData): void
@@ -1338,6 +1358,8 @@ class Controller extends Base
      * Validates a proposed article and audience
      *
      * @param Model $article
+     * @throws UnexpectedValueException
+     * @throws UnknownEntityTypeException
      * @throws UnsatisfiedException
      */
     private function validateArticleAndAudience(Model $article): void
@@ -1441,6 +1463,7 @@ class Controller extends Base
      * Get the variables needed for the news sidebar
      *
      * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     private function getSidebarVars(): array
     {
