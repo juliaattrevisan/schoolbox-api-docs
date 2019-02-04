@@ -128,17 +128,19 @@ class Cursor
         $firstRecord   = $collection->first();
         $getIdMethod   = $this->mapper->getGetIdentifierMethodName();
 
-        // The current cursor points to one record before the first.
+        // The current cursor points to one record before the first item in
+        // the record set.
+        // In other words, the next cursor for the previous record set.
         // Ascending:  id - 1
         // Descending: id + 1
         if ($firstRecord && method_exists($firstRecord, $getIdMethod)) {
-            $lastPageCursorId = $firstRecord->$getIdMethod();
+            $previousPageCursorId = $firstRecord->$getIdMethod();
             if ($this->order === self::ORDER_ASC) {
-                $lastPageCursorId--;
+                $previousPageCursorId--;
             } elseif ($this->order === self::ORDER_DESC) {
-                $lastPageCursorId++;
+                $previousPageCursorId++;
             }
-            $currentCursor = $this->encodeCursor($lastPageCursorId);
+            $currentCursor = $this->encodeCursor($previousPageCursorId);
         }
         return $currentCursor;
     }
