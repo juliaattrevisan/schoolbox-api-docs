@@ -65,8 +65,11 @@ class Tour implements IDataGenerator
     {
         $tour = [];
         if ($this->currentUser && $this->config->get('tours_enabled')) {
+            // parse_url fails when REQUEST_URI contains a colon. Don't tour when failed to parse_url.
             $request    = parse_url($this->serverVars['REQUEST_URI']);
-            $tour['data'] = $this->tourList->getTours($this->currentUser, $request['path']);
+            if ($request) {
+                $tour['data'] = $this->tourList->getTours($this->currentUser, $request['path']);
+            }
         }
         return $tour;
     }
