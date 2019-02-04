@@ -15,6 +15,13 @@ use Schoolbox\IConfigLoader;
 
 class Healthcheck
 {
+    /**
+     * Whether the external database is enabled
+     *
+     * @var bool
+     */
+    private $externalEnable;
+
     /** @var string $db External database connector type */
     private $externalType;
 
@@ -44,6 +51,7 @@ class Healthcheck
     {
         $this->connector = $databaseExternal;
         $this->configMapper = $configMapper;
+        $this->externalEnable = $configMapper->get('external_enable');
         $this->externalType = $configMapper->get('external_type');
     }
 
@@ -60,6 +68,11 @@ class Healthcheck
     public function run(): void
     {
         // Make sure all databases connected correctly
+        if (!$this->externalEnable) {
+            $this->log .= "ERROR: External database connectivity is disabled\n";
+            return;
+        }
+
         if ($this->connector === null) {
             $this->log .= "ERROR: Unable to connect to database '{$this->connector->getDatabase()}' (Hostname: {$this->connector->getHostname()})\n";
             return;
