@@ -107,7 +107,7 @@ class Controller extends Base
             if (!array_key_exists($sourceId, $returnList)) {
                 $returnList[$sourceId] = array(
                     'id'   => $sourceId,
-                    'name' => \Scrub::text($item->getSource()->getName()),
+                    'name' => $item->getSource()->getName(),
                     'list' => array(),
                 );
             }
