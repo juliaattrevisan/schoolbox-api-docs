@@ -359,7 +359,7 @@ class RubricMapper
                 // If we validate all capabilities indiscriminately, existing legacy data from before this validation
                 // may prevent users from modifying their rubric at all, so make sure we only validate new caps.
                 // If capability is newly added, it will have no ID.
-//                $isNewCapability = null === $courseCapability->getId();
+                $isNewCapability = null === $courseCapability->getId();
 
                 // If capability has no indicators, it will be deleted automatically, so we don't need to dedupe it.
                 $hasIndicators = false;
@@ -376,10 +376,9 @@ class RubricMapper
                 $courseCapabilityName = $courseCapability->getName();
                 $isDuplicate =  \in_array($courseCapabilityName, $unitCapabilityNames, false);
 
-//                if ($isNewCapability && $hasIndicators && $isDuplicate) {
-//                if ($hasIndicators && $isDuplicate) {
-//                    throw new \UnexpectedValueException("Cannot add capability " . $courseCapabilityName . " because it already exists in one or more units in this course");
-//                }
+                if ($isNewCapability && $hasIndicators && $isDuplicate) {
+                    throw new \UnexpectedValueException("Cannot add capability " . $courseCapabilityName . " because it already exists in one or more units in this course");
+                }
             }
         }
 
