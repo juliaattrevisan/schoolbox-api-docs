@@ -451,6 +451,9 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         // Put back to draft state
         $this->submittedAt = null;
 
+        // Note that we don't clear the rejection details so that author can still see why their article
+        // was rejected.
+
         // Clear approval details - so it will need to be re-approved if re-submitted
         $this->acceptedAt = null;
         $this->acceptedBy = null;
