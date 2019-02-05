@@ -90,6 +90,7 @@ class Controller extends BaseController
      * @level 181
      * @param FolderModel $folder
      * @throws \UnexpectedValueException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function postForm(FolderModel $folder): void
     {
@@ -99,19 +100,28 @@ class Controller extends BaseController
             $this->request->post->get('crits', [])
         );
 
-        $this->rubricMapper->persistRowSet($newRowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
-
         // Done: redirect back to homepage, or AJAX
         if ($this->request->isXhr()) {
-            $this->response->content->set(
-                $this->buildJsonOutput([
-                    'status'  => 200,
-                    'message' => 'Criteria updated',
-                ])
-            );
+            try {
+                $this->rubricMapper->persistRowSet($newRowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
 
-        } else {
-            $this->response->redirect->to('/homepage/' . $folder->getId());
+                $this->response->content->set(
+                    $this->buildJsonOutput([
+                        'status'  => 200,
+                        'message' => 'Criteria updated',
+                        'redirect' => '/homepage/' . $folder->getId()
+                    ])
+                );
+
+            }
+            catch (\UnexpectedValueException $e) {
+                $this->response->content->set(
+                    $this->buildJsonOutput([
+                        'status'  => 400,
+                        'message' => $e->getMessage()
+                    ])
+                );
+            }
         }
     }
 
