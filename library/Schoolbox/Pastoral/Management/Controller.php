@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
+use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Resource\Search\Results;
@@ -56,10 +57,15 @@ class Controller extends Base
      */
     public function getGroups()
     {
+        $groups = $this->pastoralGroupMapper->findAll();
+        $groups->sortByCallback(function (PastoralGroup $a, PastoralGroup $b) {
+            return strnatcasecmp($a->getName(), $b->getName());
+        });
+
         $this->getResponse()->content->set([
             'template' => '@pastoralManagement/groups.twig',
             'data'     => [
-                'groups' => $this->pastoralGroupMapper->findAll(),
+                'groups' => $groups,
             ],
             'title' => 'Pastoral Group Management',
         ]);
