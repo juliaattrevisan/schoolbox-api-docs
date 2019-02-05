@@ -13,7 +13,6 @@
 
 namespace Schoolbox\Comms\News\Moderation;
 
-use Alaress\Database\Predicate\Builder;
 use Schoolbox\Comms\News;
 use Schoolbox\GenericCollection;
 
@@ -54,10 +53,7 @@ class Lists
      */
     public function getRecentlyAccepted(): GenericCollection
     {
-        $builder = (new Builder($this->newsMapper->getDatabase(), 'comms_news_article'))
-            ->notNull('accepted_at');
-
-        return $this->newsMapper->findByPredicates($builder, [
+        return $this->newsMapper->findByPredicates($this->newsMapper->getPredicateApproved(), [
             'limit' => self::NUM_RECENTLY_ACCEPTED,
             'order' => [
                 'accepted_at' => 'desc'
@@ -75,10 +71,7 @@ class Lists
      */
     public function getRecentlyRejected(): GenericCollection
     {
-        $builder = (new Builder($this->newsMapper->getDatabase(), 'comms_news_article'))
-            ->notNull('rejected_at');
-
-        return $this->newsMapper->findByPredicates($builder, [
+        return $this->newsMapper->findByPredicates($this->newsMapper->getPredicateRejected(), [
             'limit' => self::NUM_RECENTLY_REJECTED,
             'order' => [
                 'rejected_at' => 'desc'

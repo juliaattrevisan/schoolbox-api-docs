@@ -445,11 +445,14 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         }
 
         if (!\in_array($currentState, self::VALID_STATES_TO_UN_SUBMIT, true)) {
-            throw new InvalidTransitionException($currentState, "Cannot un-submit a rejected article");
+            throw new InvalidTransitionException($currentState, "Cannot un-submit article");
         }
 
         // Put back to draft state
         $this->submittedAt = null;
+
+        // Note that we don't clear the rejection details so that author can still see why their article
+        // was rejected.
 
         // Clear approval details - so it will need to be re-approved if re-submitted
         $this->acceptedAt = null;

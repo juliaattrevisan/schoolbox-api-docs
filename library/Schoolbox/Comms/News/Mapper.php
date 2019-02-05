@@ -238,6 +238,19 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                     ->isNull('accepted_at');
     }
 
+    /**
+     * Returns a predicate for getting articles that are approved
+     *
+     * @return Builder
+     * @throws InvalidColumnException
+     * @see Model::getDiscreteState()
+     */
+    public function getPredicateApproved(): IBuilder
+    {
+        return $this->getPredicateBuilder()
+                    ->notNull('accepted_at');
+    }
+
 
     /**
      * Returns a predicate for getting articles that are awaiting moderation
