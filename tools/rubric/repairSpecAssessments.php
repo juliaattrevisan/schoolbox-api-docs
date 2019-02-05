@@ -19,6 +19,7 @@
 
 declare(strict_types=1);
 
+use Alaress\Database\Connector\IConnector;
 use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
@@ -149,6 +150,18 @@ $kernel->run(new class extends App
 
 
     /**
+     * @var IConnector
+     */
+    private $db;
+
+
+    /**
+     * @var Alaress_Date_Format
+     */
+    private $now;
+
+
+    /**
      * Run loop
      *
      * @param Di\Container  $di
@@ -158,8 +171,10 @@ $kernel->run(new class extends App
      */
     public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
     {
-        // Install logger
+        // Install logger and DB
         $this->log = $log;
+        $this->db  = $di->get('databaseInternal');
+        $this->now = Alaress_Date_Format::now();
 
 
         // Find each course
@@ -260,28 +275,39 @@ $kernel->run(new class extends App
             $matchingCourseIndicator = null;
             foreach ($courseCapability->getIndicators() as $courseIndicator) {
                 if ($courseIndicator->getName() === $unitIndicatorName) {
-                    $this->log->info(sprintf('Indicator "%s" exists in course and unit', $unitIndicatorName));
                     $matchingCourseIndicator = $courseIndicator;
                     break;
                 }
             }
 
-            // No matching indicator? make one
-            if (!$matchingCourseIndicator) {
-                $this->log->info(
-                    sprintf('Indicator "%s" exists in unit, but not course: creating', $unitIndicatorName)
-                );
-                $matchingCourseIndicator = (new Indicator())
-                    ->setName($unitIndicatorName);
-                $courseCapability->getIndicators()->add($matchingCourseIndicator);
-            }
 
-            // Migrate any usages of this indicator.
-            $this->repairIndicator($matchingCourseIndicator, $unitIndicator);
+            if ($matchingCourseIndicator) {
+                // Delete unit-level indicator
+                // Need to then migrate descriptors
+                $this->log->info(
+                    sprintf('Indicator "%s" exists in course and unit: migrating and repairing', $unitIndicatorName)
+                );
+                $this->db
+                    ->prepareQuery($this->deleteRubricIndicatorQuery)
+                    ->execute(['now' => $this->now, 'unitIndicatorId' => $unitIndicator->getId(),]);
+                $this->repairIndicator($matchingCourseIndicator, $unitIndicator);
+            } else {
+                // Move unit-level indicator
+                // No need to migrate anything
+                $this->log->info(
+                    sprintf('Indicator "%s" exists in unit, but not course: migrating', $unitIndicatorName)
+                );
+                $this->db
+                    ->prepareQuery($this->migrateRubricIndicatorQuery)
+                    ->execute(['courseCapabilityId' => $courseCapability->getId(), 'unitIndicatorId' => $unitIndicator->getId(),]);
+            }
         }
 
-//        // Now delete the unit capability
-//        GroupMapper::getInstance()->delete($unitCapability);
+
+        // Now repair the capability itself, by deleting the unit-level copy
+        $this->db
+            ->prepareQuery($this->deleteRubricCapabilityQuery)
+            ->execute(['now' => $this->now, 'unitCapabilityId' => $unitCapability->getId(),]);
     }
 
 
