@@ -89,8 +89,8 @@ class Controller extends BaseController
      * @api   POST /rubric/criteria/{folderId}
      * @level 181
      * @param FolderModel $folder
-     * @throws \UnexpectedValueException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postForm(FolderModel $folder): void
     {
