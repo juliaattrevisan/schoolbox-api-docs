@@ -238,6 +238,7 @@ class Notifier extends AbstractModuleNotifier
                     // future -> future .. detach + re-attach
                     // future -> past .. detach + re-attach
                     if ($previous->getPublishAt()->isFuture()) {
+                        // attaching posted will cancel existing trigger regardress
                         $bundle->detach(self::TRIGGER_POSTED);
                         $bundle->attach(self::TRIGGER_POSTED, $publishAt->getUnixTimeStamp());
                     } elseif ($publishAt->isFuture()) {
@@ -252,6 +253,7 @@ class Notifier extends AbstractModuleNotifier
                     // future -> future .. detach + re-attach
                     // future -> past .. detach
                     if ($expiresAt->isFuture()) {
+                        // attaching posted will cancel existing trigger regardress
                         $bundle->detach(self::TRIGGER_EXPIRED);
                         $bundle->attach(self::TRIGGER_EXPIRED, $expiresAt->getUnixTimeStamp());
                     } elseif ($previous->getExpiresAt()->isFuture()) {

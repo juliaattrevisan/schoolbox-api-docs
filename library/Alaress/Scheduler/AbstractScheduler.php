@@ -181,6 +181,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
         // firstly, remove any existing timer for this trigger
         if ($cancelPrevious) {
+            $this->log->debug("Clearing existing trigger for {$trigger->getIdString()}.");
             $this->unschedule($trigger);
         }
 
@@ -214,8 +215,14 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
         if ($this->hasTimer($model, $label)) {
             $timer = $this->getTimer($model, $label);
-            $this->log->info("Unscheduling trigger '{$trigger->getIdString()}'", array('char' => '-'));
-            $this->loop->cancelTimer($timer);
+            $this->log->info("Canceling existing timer for '{$trigger->getIdString()} - {$trigger->getLabel()}'", array('char' => '-'));
+
+            if ($timer instanceof TimerInterface) {
+                $this->loop->cancelTimer($timer);
+            } else {
+                $this->log->debug("Timer is not set properly for '{$trigger->getIdString()} - {$trigger->getLabel()}'", array('char' => '-'));
+            }
+            $this->removeTimer($model, $label);
             return true;
         }
 

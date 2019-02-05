@@ -301,6 +301,9 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      */
     public function scheduleNotification(TriggerInterface $trigger, $resolver = null)
     {
+        // This should come first to clear existing resolver for the trigger
+        parent::scheduleNotification($trigger);
+
         // if this is a cancel trigger, we're not going to even attempt attaching a resolver for it
         if (!$trigger instanceof CancelTrigger) {
 
@@ -314,7 +317,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             }
         }
 
-        parent::scheduleNotification($trigger);
     }
 
 

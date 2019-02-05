@@ -121,7 +121,8 @@ class RedisCache implements ICache
                 $zip  = gzcompress(serialize($trigger->getEvent()), 9);
                 $hash = sha1($zip); // this might not be...erm..good.
                 $size = strlen($zip);
-                $name = "{$trigger->getIdString()} as {$this->getNamespacedKey($hash)} [$size bytes]";
+                $timestamp = date('Y-m-d H:i:s', $trigger->getTimestamp());
+                $name = "{$trigger->getIdString()} ({$timestamp}) as {$this->getNamespacedKey($hash)} [$size bytes]";
 
                 // store this compressed data
                 $stored = $this->storeCache($hash, $zip);
