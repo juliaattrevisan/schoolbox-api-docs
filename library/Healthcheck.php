@@ -68,13 +68,8 @@ class Healthcheck
     public function run(): void
     {
         // Make sure all databases connected correctly
-        if (!$this->externalEnable) {
-            $this->log .= "ERROR: External database connectivity is disabled\n";
-            return;
-        }
-
         if ($this->connector === null) {
-            $this->log .= "ERROR: Unable to connect to database '{$this->connector->getDatabase()}' (Hostname: {$this->connector->getHostname()})\n";
+            $this->log .= "ERROR: Unable to connect to database: null connector\n";
             return;
         }
 
