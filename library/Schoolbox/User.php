@@ -230,8 +230,10 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      */
     private $children;
 
+
     /**
      * Build default empty objects so things don't explode
+     * @throws \UnexpectedValueException
      */
     public function __construct()
     {
@@ -242,6 +244,15 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
         $this->setRole(new Role());
         $this->children = new GenericCollection(self::class);
         $this->parents  = new GenericCollection(self::class);
+    }
+
+
+    /**
+     * Clones shouldn't share campusCollection
+     */
+    public function __clone()
+    {
+        $this->campusCollection = clone $this->campusCollection;
     }
 
     /**
