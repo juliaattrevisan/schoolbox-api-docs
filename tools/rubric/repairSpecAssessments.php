@@ -45,20 +45,6 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
 $kernel->run(new class extends App
 {
     /**
-     * Query for migrating a rubric capability from unit to a course folder.
-     *
-     * Called when the capability doesn't exist in the course.
-     *
-     * @var string
-     */
-    private $migrateRubricCapabilityQuery = '
-        UPDATE rubric_group
-        SET    parent_id = :courseFolderId
-        WHERE  id        = :unitCapabilityId
-    ';
-
-
-    /**
      * Query for migrating a rubric indicator from unit to a course folder.
      *
      * Called when the indicator doesn't exist in the course.
