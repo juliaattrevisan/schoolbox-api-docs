@@ -48,8 +48,8 @@
         datepickers: [],
 
         /* Activation element
-                 * The thing that gets disabled while saving
-                 */
+         * The thing that gets disabled while saving
+         */
         activator: element.find("button[type=submit]"),
 
         /**
@@ -139,7 +139,7 @@
       var formContents = $(config.element).serializeArray();
 
       /* Special treatment because ck reasons
-             */
+       */
       for (var i = 0; i < config.textareas.length; i++) {
         var key = config.textareas[i];
 
@@ -150,14 +150,14 @@
       }
 
       /* Send draft flag
-             */
+       */
       formContents.push({ name: "draft", value: true });
 
       /* Transact
-             */
+       */
       $.ajax({
         type: config.element.attr("method"),
-        url: config.element.attr("data-action-draft"),
+        url: config.element.data("action-draft"),
         data: formContents,
         dataType: "json"
       })
