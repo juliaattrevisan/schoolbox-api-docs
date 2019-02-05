@@ -153,7 +153,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                 'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
                     ? 'Local'
-                    : $this->getSource()->getName(),
+                    : Scrub::text($this->getSource()->getName()),
                 'FILES_CATEGORY_ID' => $this->getSource()->getId(),
             ]);
 

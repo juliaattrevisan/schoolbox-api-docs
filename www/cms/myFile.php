@@ -154,7 +154,7 @@ function renderTreeSelect($page, $tree, $selected = 0)
         foreach ($tree as $folder) {
             $output = array(
                 'FOLDER_ID' => $folder['id'],
-                'FOLDER_NAME' => $folder['name'],
+                'FOLDER_NAME' => Scrub::text($folder['name']),
                 'FOLDER_INDENT' => str_repeat('&nbsp;', ($folder['depth'] + 1) * 4),
                 'FOLDER_SELECTED' => $folder['id'] == $selected ? 'selected="selected"' : '',
             );

@@ -48,7 +48,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         foreach ($parentTree as $parent) {
             $output = array(
                 'PARENT_ID' => $parent['id'],
-                'PARENT_NAME' => $parent['name'],
+                'PARENT_NAME' => Scrub::text($parent['name']),
                 'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
                 'PARENT_SELECTED' => $parent['id'] == $folder->getParent() ? 'selected="selected"' : '',
             );
@@ -120,7 +120,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         foreach ($parentTree as $parent) {
             $output = array(
                 'PARENT_ID' => $parent['id'],
-                'PARENT_NAME' => $parent['name'],
+                'PARENT_NAME' => Scrub::text($parent['name']),
                 'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
                 'PARENT_SELECTED' => $parent['id'] == $this->arg[1] ? 'selected="selected"' : '',
             );

@@ -157,7 +157,7 @@ $.widget("ui.chat",  {
             name: $self.options.user_name,
             time: $time,
             type: 'user',
-            body: $self.options.body_el.val()
+            body: $($self.options.body_el.val()).text()
         };
 
         $($self).trigger('send', null, $message);
