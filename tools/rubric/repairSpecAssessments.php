@@ -23,7 +23,6 @@ use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\Indicator;
@@ -42,7 +41,106 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
     ]
 );
 
-$kernel->run(new class extends App {
+$kernel->run(new class extends App
+{
+    /**
+     * Query for migrating a rubric capability from unit to a course folder.
+     *
+     * Called when the capability doesn't exist in the course.
+     *
+     * @var string
+     */
+    private $migrateRubricCapabilityQuery = '
+        UPDATE rubric_group
+        SET    parent_id = :courseFolderId
+        WHERE  id        = :unitCapabilityId
+    ';
+
+
+    /**
+     * Query for migrating a rubric indicator from unit to a course folder.
+     *
+     * Called when the indicator doesn't exist in the course.
+     *
+     * @var string
+     */
+    private $migrateRubricIndicatorQuery = '
+        UPDATE rubric_criterion
+        SET    rubric_group_id = :courseCapabilityId
+        WHERE  id              = :unitIndicatorId
+    ';
+
+
+
+    /**
+     * Query for deleting a rubric capability from unit to a course folder.
+     *
+     * Called when the capability does exist in the course.
+     *
+     * @var string
+     */
+    private $deleteRubricCapabilityQuery = '
+        UPDATE rubric_group
+        SET    deleted_at = :now
+        WHERE  id         = :unitCapabilityId
+    ';
+
+
+    /**
+     * Query for deleting a rubric indicator from unit to a course folder.
+     *
+     * Called when the indicator does exist in the course.
+     *
+     * @var string
+     */
+    private $deleteRubricIndicatorQuery = '
+        UPDATE rubric_criterion
+        SET    deleted_at = :now
+        WHERE  id         = :unitIndicatorId
+    ';
+
+
+//    private $migrateRubricCapabilityUsageQuery = '
+//        UPDATE rubric_group_usage
+//        SET    rubric_group_id = :courseCapabilityId
+//        WHERE  rubric_group_id = :unitCapabilityId
+//    ';
+//
+//
+//    private $migrateRubricIndicatorUsageQuery = '
+//        UPDATE rubric_criterion_usage
+//        SET    criterion_id = :courseIndicatorId
+//        WHERE  criterion_id = :unitIndicatorId
+//    ';
+//
+//
+//    private $deleteDuplicateRubricDescriptorQuery = '
+//        UPDATE rubric_descriptor
+//        SET    deleted_at = :now
+//        WHERE  id         = :descriptorId
+//    ';
+//
+//
+//    private $migrateRubricDescriptorQuery = '
+//        UPDATE rubric_descriptor
+//        SET    criterion_id = :courseIndicatorId
+//        WHERE  id           = :descriptorId
+//    ';
+
+
+//    private $migrateRubricCapabilityMarkQuery = "
+//        UPDATE rubric_group_mark
+//        SET    rubric_group_id = :courseCapabilityId
+//        WHERE  rubric_group_id = :unitCapabilityId
+//    ";
+//
+//
+//    private $migrateRubricIndicatorMarkQuery = "
+//        UPDATE rubric_group_mark
+//        SET    rubric_group_id = :courseCapabilityId
+//        WHERE  rubric_group_id = :unitCapabilityId
+//    ";
+
 
     /**
      * @var Logger
@@ -87,7 +185,7 @@ $kernel->run(new class extends App {
             $units = Specification\Unit\Mapper::getInstance()->findAllByCourseFolderId($course->getFolder()->getId());
             foreach ($units as $unit) {
                 $log->debug(sprintf('Finding capabilities for unit "%s"...', $unit->getTitle()));
-                $unitRowSet = $rubricMapper->retrieveRowSet($unit->getFolder(), false);
+                $unitRowSet          = $rubricMapper->retrieveRowSet($unit->getFolder(), false);
                 $unitCapabilityCount = count($unitRowSet->getCapabilities());
 
                 if ($unitCapabilityCount === 0) {
