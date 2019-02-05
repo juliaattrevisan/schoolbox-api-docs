@@ -54,10 +54,7 @@ class Lists
      */
     public function getRecentlyAccepted(): GenericCollection
     {
-        $builder = (new Builder($this->newsMapper->getDatabase(), 'comms_news_article'))
-            ->notNull('accepted_at');
-
-        return $this->newsMapper->findByPredicates($builder, [
+        return $this->newsMapper->findByPredicates($this->newsMapper->getPredicateApproved(), [
             'limit' => self::NUM_RECENTLY_ACCEPTED,
             'order' => [
                 'accepted_at' => 'desc'
