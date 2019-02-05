@@ -75,10 +75,7 @@ class Lists
      */
     public function getRecentlyRejected(): GenericCollection
     {
-        $builder = (new Builder($this->newsMapper->getDatabase(), 'comms_news_article'))
-            ->notNull('rejected_at');
-
-        return $this->newsMapper->findByPredicates($builder, [
+        return $this->newsMapper->findByPredicates($this->newsMapper->getPredicateRejected(), [
             'limit' => self::NUM_RECENTLY_REJECTED,
             'order' => [
                 'rejected_at' => 'desc'
