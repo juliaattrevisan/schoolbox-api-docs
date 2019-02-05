@@ -23,6 +23,7 @@ use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\Indicator;
@@ -42,6 +43,13 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
 );
 
 $kernel->run(new class extends App {
+
+    /**
+     * @var Logger
+     */
+    private $log;
+
+
     /**
      * Run loop
      *
@@ -52,24 +60,28 @@ $kernel->run(new class extends App {
      */
     public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
     {
+        // Install logger
+        $this->log = $log;
+
+
         // Find each course
         // Retrieve its capabilities+indicators
         $rubricMapper = RubricMapper::getInstance();
         /** @var Specification\Model[] $courses */
         $courses = Specification\Mapper::getInstance()->findAll();
         foreach ($courses as $course) {
-            $log->debug(sprintf('Finding capabilities for course "%s"...', $course->getTitle()));
+            $log->info(sprintf('Finding capabilities for course "%s"...', $course->getTitle()));
             $courseRowSet = $rubricMapper->retrieveRowSet($course->getFolder(), false);
 
             // Don't go further if there's no capabilities in course
             $courseCapabilityCount = count($courseRowSet->getCapabilities());
             if ($courseCapabilityCount === 0) {
-                $log->debug('Course contains no capabilities: skipping');
+                $log->info('Course contains no capabilities: skipping');
                 continue;
             }
 
             // Do something now
-            $log->debug(sprintf('Course contains %d capabilities: checking units...', $courseCapabilityCount));
+            $log->info(sprintf('Course contains %d capabilities: checking units...', $courseCapabilityCount));
 
             /** @var Specification\Unit\Model[] $units */
             $units = Specification\Unit\Mapper::getInstance()->findAllByCourseFolderId($course->getFolder()->getId());
@@ -85,6 +97,7 @@ $kernel->run(new class extends App {
 
                 // Do something now
                 $log->debug(sprintf('Unit contains %d capabilities: checking compatibility', $unitCapabilityCount));
+                $this->repairRowset($courseRowSet, $unitRowSet);
             }
         }
     }
@@ -100,12 +113,38 @@ $kernel->run(new class extends App {
     private function repairRowset(RowSet $courseRowSet, RowSet $unitRowSet): void
     {
         foreach ($courseRowSet->getCapabilities() as $courseCapability) {
+            $courseCapabilityName = $courseCapability->getName();
+            $capabilityConflict   = false;
             foreach ($unitRowSet->getCapabilities() as $unitCapability) {
-                if ($courseCapability->getName() === $unitCapability->getName()) {
+                if ($courseCapabilityName === $unitCapability->getName()) {
+                    $capabilityConflict = true;
+                    $this->log->info(
+                        sprintf(
+                            'Capability "%s" exists in course and unit: resolving conflict',
+                            $courseCapabilityName
+                        )
+                    );
                     $this->repairCapability($courseCapability, $unitCapability);
+
+                    // TODO Remove capability from unit
+                    break;
                 }
             }
+
+            if (!$capabilityConflict) {
+                $this->log->info(
+                    sprintf(
+                        'Capability "%s" exists in course, but not in unit: skipping',
+                        $courseCapabilityName
+                    )
+                );
+            }
         }
+
+        // TODO persist rowsets
+
+//        RubricMapper::getInstance()->persistRowSet($courseRowSet);
+//        RubricMapper::getInstance()->persistRowSet($unitRowSet);
     }
 
 
@@ -119,9 +158,11 @@ $kernel->run(new class extends App {
     private function repairCapability(Capability $courseCapability, Capability $unitCapability): void
     {
         foreach ($unitCapability->getIndicators() as $unitIndicator) {
+            $unitIndicatorName       = $unitIndicator->getName();
             $matchingCourseIndicator = null;
             foreach ($courseCapability->getIndicators() as $courseIndicator) {
-                if ($courseIndicator->getName() === $unitIndicator->getName()) {
+                if ($courseIndicator->getName() === $unitIndicatorName) {
+                    $this->log->info(sprintf('Indicator "%s" exists in course and unit', $unitIndicatorName));
                     $matchingCourseIndicator = $courseIndicator;
                     break;
                 }
@@ -129,13 +170,20 @@ $kernel->run(new class extends App {
 
             // No matching indicator? make one
             if (!$matchingCourseIndicator) {
+                $this->log->info(
+                    sprintf('Indicator "%s" exists in unit, but not course: creating', $unitIndicatorName)
+                );
                 $matchingCourseIndicator = (new Indicator())
-                    ->setName($unitIndicator->getName());
+                    ->setName($unitIndicatorName);
                 $courseCapability->getIndicators()->add($matchingCourseIndicator);
             }
 
             // Migrate any usages of this indicator.
+            $this->repairIndicator($matchingCourseIndicator, $unitIndicator);
         }
+
+//        // Now delete the unit capability
+//        GroupMapper::getInstance()->delete($unitCapability);
     }
 
 
@@ -148,6 +196,20 @@ $kernel->run(new class extends App {
      */
     private function repairIndicator(Indicator $courseIndicator, Indicator $unitIndicator): void
     {
-        //
+        // What needs to be migrated?
+        // * move rubric_group_usage
+        // * move rubric_criterion_usage
+        // * move rubric_descriptor
+        // ** what to do if there's conflicting descriptors (in the same level)
+        // ** I guess preferentially use the unit version?
+
+
+        // The following should not exist at all. If they do that's an error,
+        // but move them anyway
+        // * move rubric_descriptor_mark
+        // * move rubric_group_mark
+
+
+        // Now delete the unit indicator
     }
 });
