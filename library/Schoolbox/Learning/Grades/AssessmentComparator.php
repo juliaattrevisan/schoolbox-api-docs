@@ -22,6 +22,9 @@ class AssessmentComparator extends SortForMarkbook
     private $student;
 
 
+    /**
+     * @param User $student
+     */
     public function __construct(User $student)
     {
         $this->student = $student;
