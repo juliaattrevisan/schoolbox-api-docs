@@ -253,7 +253,7 @@ $allPercentageComplete = $sectionHandler->sectionPercentageComplete($this->arg[1
 
 foreach ($allPercentageComplete as $currentPercentageComplete) {
     $this->setVar(array(
-        'SECTION_PERCENTAGE_COMPLETE_TITLE' => $currentPercentageComplete['title'],
+        'SECTION_PERCENTAGE_COMPLETE_TITLE' => Scrub::text($currentPercentageComplete['title']),
         'SECTION_PERCENTAGE_COMPLETE_SECTION_ID' => $currentPercentageComplete['section_id'],
         'SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE' => $currentPercentageComplete['percentageComplete'],
         'SECTION_SEQUENCE' => $currentPercentageComplete['sequence'],
