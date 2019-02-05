@@ -150,50 +150,51 @@ $allUserIds = $eventPermissionMapper->findUserIds();
 foreach ($allUserIds as $currentUserId) {
     try {
         $user = $userMapper->findById($currentUserId);
-
-        $allPermissions = $eventPermissionMapper->findByUser($user);
-        $allSubscriptions = $eventPermissionMapper->findSubscriptionsByUser($user);
-
-        /* Accumulate all the campus names and remove dupes
-         */
-        $campusNames = [];
-
-        foreach ($allPermissions as $currentPermission) {
-            $campusNames[$currentPermission->getCampus()->getName()] = '';
-        }
-        foreach ($allSubscriptions as $currentPermission) {
-            $campusNames[$currentPermission->getCampus()->getName()] = '';
-        }
-
-        $allCampuses = implode(', ', array_keys($campusNames));
-
-        /* Accumulate all the status names and remove dupes
-         */
-        $statusNames = [];
-
-        foreach ($allPermissions as $currentPermission) {
-            $statusNames[$currentPermission->getStatus()->getName()] = '';
-        }
-
-        $statusSubscriptionNames = [];
-
-        foreach ($allSubscriptions as $currentSubscription) {
-            $statusSubscriptionNames[$currentSubscription->getStatus()->getName()] = '';
-        }
-
-        $this->setVar(
-            [
-                'PERMISSION_USER_ID'              => $user->getId(),
-                'PERMISSION_USER_FIRSTNAME'       => $user->getFirstname(),
-                'PERMISSION_USER_LASTNAME'        => $user->getLastname(),
-                'PERMISSION_CAMPUS_NAMES'         => $allCampuses,
-                'PERMISSION_STATUS_NAMES'         => implode(', ', array_keys($statusNames)),
-                'PERMISSION_STATUS_SUBSCRIPTIONS' => implode(', ', array_keys($statusSubscriptionNames)),
-            ]
-        );
-
-        $this->parse('permission_block', 'permission', true);
     } catch (MapperException $e) {
         //Don't output permissions for a deleted user
+        continue;
     }
+
+    $allPermissions = $eventPermissionMapper->findByUser($user);
+    $allSubscriptions = $eventPermissionMapper->findSubscriptionsByUser($user);
+
+    /* Accumulate all the campus names and remove dupes
+     */
+    $campusNames = [];
+
+    foreach ($allPermissions as $currentPermission) {
+        $campusNames[$currentPermission->getCampus()->getName()] = '';
+    }
+    foreach ($allSubscriptions as $currentPermission) {
+        $campusNames[$currentPermission->getCampus()->getName()] = '';
+    }
+
+    $allCampuses = implode(', ', array_keys($campusNames));
+
+    /* Accumulate all the status names and remove dupes
+     */
+    $statusNames = [];
+
+    foreach ($allPermissions as $currentPermission) {
+        $statusNames[$currentPermission->getStatus()->getName()] = '';
+    }
+
+    $statusSubscriptionNames = [];
+
+    foreach ($allSubscriptions as $currentSubscription) {
+        $statusSubscriptionNames[$currentSubscription->getStatus()->getName()] = '';
+    }
+
+    $this->setVar(
+        [
+            'PERMISSION_USER_ID'              => $user->getId(),
+            'PERMISSION_USER_FIRSTNAME'       => $user->getFirstname(),
+            'PERMISSION_USER_LASTNAME'        => $user->getLastname(),
+            'PERMISSION_CAMPUS_NAMES'         => $allCampuses,
+            'PERMISSION_STATUS_NAMES'         => implode(', ', array_keys($statusNames)),
+            'PERMISSION_STATUS_SUBSCRIPTIONS' => implode(', ', array_keys($statusSubscriptionNames)),
+        ]
+    );
+
+    $this->parse('permission_block', 'permission', true);
 }
