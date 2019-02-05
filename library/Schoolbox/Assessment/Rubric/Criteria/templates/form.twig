@@ -144,6 +144,7 @@ $(function() {
             } else {
                 $button.val(originalButtonText);
                 $button.removeAttr("disabled");
+                $("#manage-caps-error").show().html(response.message);
             }
         });
 
@@ -311,6 +312,9 @@ $(function() {
                     </div>
                 </fieldset>
             </section>
+
+            <div id="manage-caps-error" style="display: none" data-alert="" class="alert-box alert">
+            </div>
 
             <div class="row">
                 <div class="small-12 columns">
