@@ -445,7 +445,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
         }
 
         if (!\in_array($currentState, self::VALID_STATES_TO_UN_SUBMIT, true)) {
-            throw new InvalidTransitionException($currentState, "Cannot un-submit a rejected article");
+            throw new InvalidTransitionException($currentState, "Cannot un-submit article");
         }
 
         // Put back to draft state
