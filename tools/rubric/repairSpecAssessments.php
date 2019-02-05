@@ -101,32 +101,52 @@ $kernel->run(new class extends App
     ';
 
 
-//    private $migrateRubricCapabilityUsageQuery = '
-//        UPDATE rubric_group_usage
-//        SET    rubric_group_id = :courseCapabilityId
-//        WHERE  rubric_group_id = :unitCapabilityId
-//    ';
-//
-//
-//    private $migrateRubricIndicatorUsageQuery = '
-//        UPDATE rubric_criterion_usage
-//        SET    criterion_id = :courseIndicatorId
-//        WHERE  criterion_id = :unitIndicatorId
-//    ';
-//
-//
-//    private $deleteDuplicateRubricDescriptorQuery = '
-//        UPDATE rubric_descriptor
-//        SET    deleted_at = :now
-//        WHERE  id         = :descriptorId
-//    ';
-//
-//
-//    private $migrateRubricDescriptorQuery = '
-//        UPDATE rubric_descriptor
-//        SET    criterion_id = :courseIndicatorId
-//        WHERE  id           = :descriptorId
-//    ';
+    /**
+     * Query for migrating the usages of a rubric capability from unit to a
+     * course folder.
+     *
+     * @var string
+     */
+    private $migrateRubricCapabilityUsageQuery = '
+        UPDATE rubric_group_usage
+        SET    rubric_group_id = :courseCapabilityId
+        WHERE  rubric_group_id = :unitCapabilityId
+    ';
+
+
+    /**
+     * Query for migrating the usages of a rubric indicator from unit to a
+     * course folder.
+     *
+     * @var string
+     */
+    private $migrateRubricIndicatorUsageQuery = '
+        UPDATE rubric_criterion_usage
+        SET    criterion_id = :courseIndicatorId
+        WHERE  criterion_id = :unitIndicatorId
+    ';
+
+
+    private $findRubricDescriptorQuery = '
+        SELECT level_id AS levelId,
+               id
+        FROM   rubric_descriptor
+        WHERE  criterion_id = :indicatorId
+    ';
+
+
+    private $deleteDuplicateRubricDescriptorQuery = '
+        UPDATE rubric_descriptor
+        SET    deleted_at = :now
+        WHERE  id         = :descriptorId
+    ';
+
+
+    private $migrateRubricDescriptorQuery = '
+        UPDATE rubric_descriptor
+        SET    criterion_id = :courseIndicatorId
+        WHERE  id           = :descriptorId
+    ';
 
 
 //    private $migrateRubricCapabilityMarkQuery = "
@@ -290,7 +310,16 @@ $kernel->run(new class extends App
                 $this->db
                     ->prepareQuery($this->deleteRubricIndicatorQuery)
                     ->execute(['now' => $this->now, 'unitIndicatorId' => $unitIndicator->getId(),]);
+
+                // * move rubric_group_usage
+                $this->db
+                    ->prepareQuery($this->migrateRubricCapabilityUsageQuery)
+                    ->execute([
+                        'courseCapabilityId' => $courseCapability->getId(),
+                        'unitCapabilityId'   => $unitCapability->getId(),
+                    ]);
                 $this->repairIndicator($matchingCourseIndicator, $unitIndicator);
+
             } else {
                 // Move unit-level indicator
                 // No need to migrate anything
@@ -320,9 +349,42 @@ $kernel->run(new class extends App
      */
     private function repairIndicator(Indicator $courseIndicator, Indicator $unitIndicator): void
     {
-        // What needs to be migrated?
-        // * move rubric_group_usage
         // * move rubric_criterion_usage
+        $this->db
+            ->prepareQuery($this->migrateRubricIndicatorQuery)
+            ->execute([
+                'courseIndicatorId' => $courseIndicator->getId(),
+                'unitIndicatorId'   => $unitIndicator->getId(),
+            ]);
+
+        // descriptors
+        $descriptorQuery = $this->db->prepareQuery($this->findRubricDescriptorQuery);
+        $descriptorQuery->execute(['indicatorId' => $courseIndicator->getId(),]);
+        $courseDescriptors = $descriptorQuery->fetchColumnArray('id', 'levelId');
+        $descriptorQuery->execute(['indicatorId' => $unitIndicator->getId(),]);
+        $unitDescriptors = $descriptorQuery->fetchColumnArray('id', 'levelId');
+
+
+        foreach ($unitDescriptors as $levelId => $unitDescriptorId) {
+            // Is this descriptor used in the course copy?
+            $courseDescriptorId = $courseDescriptors[$levelId] ?? null;
+            if (isset($courseDescriptorId)) {
+                // Conflicting descriptor: keep the course version?
+                $this->db
+                    ->prepareQuery($this->deleteDuplicateRubricDescriptorQuery)
+                    ->execute(['now' => $this->now, 'descriptorId' => $unitDescriptorId,]);
+            } else {
+                // No conflicting descriptor: migrate the unit descriptor to
+                // the course
+                $this->db
+                    ->prepareQuery($this->migrateRubricDescriptorQuery)
+                    ->execute([
+                        'courseIndicatorId' => $courseIndicator->getId(),
+                        'descriptorId'      => $unitDescriptorId,
+                    ]);
+            }
+        }
+
         // * move rubric_descriptor
         // ** what to do if there's conflicting descriptors (in the same level)
         // ** I guess preferentially use the unit version?
@@ -332,8 +394,5 @@ $kernel->run(new class extends App
         // but move them anyway
         // * move rubric_descriptor_mark
         // * move rubric_group_mark
-
-
-        // Now delete the unit indicator
     }
 });
