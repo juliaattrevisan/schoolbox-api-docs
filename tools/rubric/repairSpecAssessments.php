@@ -115,18 +115,10 @@ $kernel->run(new class extends App
 
 
     /**
-     * Query for migrating the usages of a rubric indicator from unit to a
-     * course folder.
+     * Query for finding usages of rubric descriptors for an indicator.
      *
      * @var string
      */
-    private $migrateRubricIndicatorUsageQuery = '
-        UPDATE rubric_criterion_usage
-        SET    criterion_id = :courseIndicatorId
-        WHERE  criterion_id = :unitIndicatorId
-    ';
-
-
     private $findRubricDescriptorQuery = '
         SELECT level_id AS levelId,
                id
@@ -135,6 +127,15 @@ $kernel->run(new class extends App
     ';
 
 
+    /**
+     * Query for deleting usages of rubric descriptors.
+     *
+     * Used when migrating descriptors, and there's a descriptor in the same
+     * level for both the course-level and unit-level indicator: the unit-level
+     * descriptor is removed.
+     *
+     * @var string
+     */
     private $deleteDuplicateRubricDescriptorQuery = '
         UPDATE rubric_descriptor
         SET    deleted_at = :now
@@ -142,25 +143,20 @@ $kernel->run(new class extends App
     ';
 
 
+    /**
+     * Query for migrating usages of rubric descriptors.
+     *
+     * Used when migrating descriptors, and the unit-level descriptor exists
+     * but the course-level does not: the unit-level descriptor is moved into
+     * the course-level.
+     *
+     * @var string
+     */
     private $migrateRubricDescriptorQuery = '
         UPDATE rubric_descriptor
         SET    criterion_id = :courseIndicatorId
         WHERE  id           = :descriptorId
     ';
-
-
-//    private $migrateRubricCapabilityMarkQuery = "
-//        UPDATE rubric_group_mark
-//        SET    rubric_group_id = :courseCapabilityId
-//        WHERE  rubric_group_id = :unitCapabilityId
-//    ";
-//
-//
-//    private $migrateRubricIndicatorMarkQuery = "
-//        UPDATE rubric_group_mark
-//        SET    rubric_group_id = :courseCapabilityId
-//        WHERE  rubric_group_id = :unitCapabilityId
-//    ";
 
 
     /**
