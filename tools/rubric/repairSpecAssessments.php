@@ -197,7 +197,7 @@ $kernel->run(new class extends App
 
 
     /**
-     * Run loop
+     * Set up the repair process, putting into a transaction.
      *
      * @param Di\Container  $di
      * @param LoopInterface $loop
@@ -213,19 +213,39 @@ $kernel->run(new class extends App
         $this->perform = $opts['perform'] ?? false;
 
 
+        // Wrap entire loop in a transaction
+        $this->db->beginTransaction();
+        try {
+            $this->repair();
+            if ($this->perform) {
+                $this->db->commit();
+            } else {
+                $this->db->rollBack();
+            }
+        } catch (\Throwable $e) {
+            $this->db->rollBack();
+        }
+    }
+
+
+    /**
+     * Run the repair process.
+     */
+    private function repair(): void
+    {
         // Find each course
         // Retrieve its capabilities+indicators
         $rubricMapper = RubricMapper::getInstance();
         /** @var Specification\Model[] $courses */
         $courses = Specification\Mapper::getInstance()->findAll();
         foreach ($courses as $course) {
-            $log->info(sprintf('Finding capabilities for course "%s"', $course->getTitle()));
+            $this->log->info(sprintf('Finding capabilities for course "%s"', $course->getTitle()));
             $courseRowSet = $rubricMapper->retrieveRowSet($course->getFolder(), false);
 
             // Don't go further if there's no capabilities in course
             $courseCapabilityCount = count($courseRowSet->getCapabilities());
             if ($courseCapabilityCount === 0) {
-                $log->debug(self::indent(1).'course contains no capabilities: no action required');
+                $this->log->debug(self::indent(1).'course contains no capabilities: no action required');
                 continue;
             }
 
@@ -233,7 +253,7 @@ $kernel->run(new class extends App
             /** @var Specification\Unit\Model[] $units */
             $units = Specification\Unit\Mapper::getInstance()->findAllByCourseFolderId($course->getFolder()->getId());
             foreach ($units as $unit) {
-                $log->info(sprintf(self::indent(1).'finding capabilities for unit "%s"', $unit->getTitle()));
+                $this->log->info(sprintf(self::indent(1).'finding capabilities for unit "%s"', $unit->getTitle()));
                 // Must re-fetch the course row set after every unit, because
                 // repairRowSet may change the course row set.
                 $courseRowSet        = $rubricMapper->retrieveRowSet($course->getFolder(), false);
@@ -241,7 +261,7 @@ $kernel->run(new class extends App
                 $unitCapabilityCount = count($unitRowSet->getCapabilities());
 
                 if ($unitCapabilityCount === 0) {
-                    $log->debug(self::indent(2).'unit contains no capabilities: no action required');
+                    $this->log->debug(self::indent(2).'unit contains no capabilities: no action required');
                     continue;
                 }
 
@@ -273,18 +293,7 @@ $kernel->run(new class extends App
                         )
                     );
 
-                    // Wrap in transaction after all
-                    $this->db->beginTransaction();
-                    try {
-                        $this->repairCapability($courseCapability, $unitCapability);
-                        if ($this->perform) {
-                            $this->db->commit();
-                        } else {
-                            $this->db->rollBack();
-                        }
-                    } catch (\Throwable $e) {
-                        $this->db->rollBack();
-                    }
+                    $this->repairCapability($courseCapability, $unitCapability);
                     break;
                 }
             }
