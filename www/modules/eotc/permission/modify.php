@@ -146,14 +146,9 @@ foreach ($statusMapper->findAll() as $currentStatus) {
 /* Render everything else
  */
 $allUserIds = $eventPermissionMapper->findUserIds();
+$availableUsers = $userMapper->findByColumn('id', $allUserIds)->indexBy('id');
 
-foreach ($allUserIds as $currentUserId) {
-    try {
-        $user = $userMapper->findById($currentUserId);
-    } catch (MapperException $e) {
-        //Don't output permissions for a deleted user
-        continue;
-    }
+foreach ($availableUsers as $user) {
 
     $allPermissions = $eventPermissionMapper->findByUser($user);
     $allSubscriptions = $eventPermissionMapper->findSubscriptionsByUser($user);
