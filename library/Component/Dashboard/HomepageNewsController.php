@@ -47,7 +47,7 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
                     $feedTime = new Alaress_Date_Format($f['date'], 'U');
                     $this->feedList[] = array(
                         'icon' => $f['type'],
-                        'content' => $f['messageHTML'] . (empty($f['cat_name']) ? '' : ' in <a href="/homepage/' . $f['cat_id'] . '">' . $f['cat_name'] . '</a>'),
+                        'content' => $f['messageHTML'] . (empty($f['cat_name']) ? '' : ' in <a href="/homepage/' . $f['cat_id'] . '">' . Scrub::text($f['cat_name']) . '</a>'),
                         'time' => $feedTime->getRelativeTime(),
                     );
                 }
