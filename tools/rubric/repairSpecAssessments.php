@@ -197,7 +197,11 @@ $kernel->run(new class extends App
 
 
     /**
-     * Set up the repair process, putting into a transaction.
+     * Set up and run the repair process.
+     *
+     * Install all instance vars, and wraps the repair process in a transaction
+     * for commit (if `--perform` is on) or rollback (if it's off, or an error
+     * is raised).
      *
      * @param Di\Container  $di
      * @param LoopInterface $loop
@@ -218,12 +222,16 @@ $kernel->run(new class extends App
         try {
             $this->repair();
             if ($this->perform) {
+                $this->log->notice('Repair complete: committing changes');
                 $this->db->commit();
             } else {
+                $this->log->notice('Repair dry run complete: rolling back changes');
                 $this->db->rollBack();
             }
         } catch (\Throwable $e) {
+            $this->log->error('Error occurred during repair: rolling back changes');
             $this->db->rollBack();
+            throw $e;
         }
     }
 
