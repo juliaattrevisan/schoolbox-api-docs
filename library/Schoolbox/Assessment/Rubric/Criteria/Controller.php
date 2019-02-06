@@ -108,7 +108,8 @@ class Controller extends BaseController
                 $this->response->status->setCode(200);
                 $this->response->content->set(
                     $this->buildJsonOutput([
-                        'message' => $this->rosettaStone->translate('rubricGroup', true, true) . ' updated',
+                        'status' => $this->response->status->getCode(),
+                        'detail' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' updated',
                         'redirect' => '/homepage/' . $folder->getId()
                     ])
                 );
@@ -118,7 +119,10 @@ class Controller extends BaseController
                 $this->response->status->setCode(400);
                 $this->response->content->set(
                     $this->buildJsonOutput([
-                        'message' => $e->getMessage()
+                        'title' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and/or ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' could not be saved',
+                        'status' => $this->response->status->getCode(),
+                        'detail' => $e->getMessage(),
+                        'instance' => $this->request->url
                     ])
                 );
             }

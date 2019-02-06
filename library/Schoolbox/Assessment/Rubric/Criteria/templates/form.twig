@@ -141,13 +141,13 @@ $(function() {
         // so it doesn't hang around after the user fixes the data
         $("#manage-caps-error").hide();
 
-        $.post($(this).attr('action'), $(this).serialize()).done(function(response) {
+        $.post($(this).attr('action'), $(this).serialize(), null, 'json').done(function(response) {
             // Redirect to the homepage we came form
             window.location.replace(response.redirect);
         }).fail(function(response) {
             $button.val(originalButtonText);
             $button.removeAttr("disabled");
-            $("#manage-caps-error").show().html(response.responseJSON.message);
+            $("#manage-caps-error").show().html(response.responseJSON.details);
         });
 
     });
