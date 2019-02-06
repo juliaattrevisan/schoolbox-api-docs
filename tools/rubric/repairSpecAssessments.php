@@ -30,6 +30,7 @@ use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Learning\Course\DataModel\Specification;
+use Zend\Uri\Uri;
 
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -213,6 +214,14 @@ $kernel->run(new class extends App
 
 
     /**
+     * The fully-qualified domain name for this instance.
+     *
+     * @var
+     */
+    private $fqdn;
+
+
+    /**
      * Significant events: read these, if nothing else.
      *
      * @var array|string[]
@@ -239,6 +248,8 @@ $kernel->run(new class extends App
         $this->db      = $di->get('databaseInternal');
         $this->now     = Alaress_Date_Format::now();
         $this->perform = $opts['perform'] ?? false;
+        $config        = $di->get('config');
+        $this->fqdn    = trim($config->get('site_hostname').".".$config->get('site_domain'), ';.');
 
 
         // Prepare queries
@@ -279,9 +290,13 @@ $kernel->run(new class extends App
 
 
         // Talk about significant events
-        $this->log->warning('Significant events:');
-        foreach ($this->significantEvents as $event) {
-            $this->log->warning($event);
+        if (!empty($this->significantEvents)) {
+            $this->log->warning('Assessments affected:');
+            foreach ($this->significantEvents as $event) {
+                $this->log->warning($event);
+            }
+        } else {
+            $this->log->warning('No assessments affected');
         }
     }
 
@@ -395,11 +410,6 @@ $kernel->run(new class extends App
                 'courseCapabilityId' => $courseCapability->getId(),
                 'unitCapabilityId'   => $unitCapability->getId(),
             ]);
-        $this->significantEvents[] = sprintf(
-            'moved %d usages for capability "%s" from unit to course',
-            $this->migrateRubricCapabilityUsageQuery->rowCount(),
-            $unitCapability->getName()
-        );
 
 
         foreach ($unitCapability->getIndicators() as $unitIndicator) {
@@ -425,11 +435,6 @@ $kernel->run(new class extends App
                 );
                 $this->deleteRubricIndicatorQuery
                     ->execute(['now' => $this->now, 'unitIndicatorId' => $unitIndicator->getId(),]);
-                $this->significantEvents[] = sprintf(
-                    'removed indicator "%s" in capability "%s" from unit',
-                    $unitIndicator->getName(),
-                    $unitCapability->getName()
-                );
 
 
                 $this->repairIndicator($matchingCourseIndicator, $unitIndicator);
@@ -445,10 +450,6 @@ $kernel->run(new class extends App
                 );
                 $this->migrateRubricIndicatorQuery
                     ->execute(['courseCapabilityId' => $courseCapability->getId(), 'unitIndicatorId' => $unitIndicator->getId(),]);
-                $this->significantEvents[] = sprintf(
-                    'moved indicator "%s" from unit to course',
-                    $unitIndicator->getName()
-                );
             }
         }
 
@@ -456,10 +457,6 @@ $kernel->run(new class extends App
         // Now repair the capability itself, by deleting the unit-level copy
         $this->deleteRubricCapabilityQuery
             ->execute(['now' => $this->now, 'unitCapabilityId' => $unitCapability->getId(),]);
-        $this->significantEvents[] = sprintf(
-            'removed capability "%s" from unit',
-            $unitCapability->getName()
-        );
     }
 
 
@@ -478,11 +475,6 @@ $kernel->run(new class extends App
                 'courseIndicatorId' => $courseIndicator->getId(),
                 'unitIndicatorId'   => $unitIndicator->getId(),
             ]);
-        $this->significantEvents[] = sprintf(
-            'moved %d usages for indicator "%s" from unit to course',
-            $this->migrateRubricIndicatorUsageQuery->rowCount(),
-            $unitIndicator->getName()
-        );
 
 
         // Find the descriptors for the course and unit
@@ -519,12 +511,19 @@ $kernel->run(new class extends App
                     $migratedDescriptorCount++;
                 }
             }
+
+
+            // Affected assessments are significant
+            $url = (new Uri())
+                ->setScheme('https')
+                ->setHost($this->fqdn)
+                ->setPath('/learning/assessments/'.$assessmentId);
             $this->significantEvents[] = sprintf(
-                'removed %d and migrated %d descriptors from indicator "%s" in assessment #%d',
+                '%s (removed %d and migrated %d descriptors from indicator "%s")',
+                $url->toString(),
                 $removedDescriptorCount,
                 $migratedDescriptorCount,
-                $unitIndicator->getName(),
-                $assessmentId
+                $unitIndicator->getName()
             );
         }
 
