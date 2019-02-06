@@ -68,9 +68,9 @@ $kernel->run(new class extends App
 
 
     /**
-     * Query for deleting a rubric capability from unit to a course folder.
+     * Query for deleting a rubric capability from a unit folder.
      *
-     * Called when the capability does exist in the course.
+     * Called when a capability of the same name exists in the course.
      *
      * @var string
      */
@@ -82,9 +82,10 @@ $kernel->run(new class extends App
 
 
     /**
-     * Query for deleting a rubric indicator from unit to a course folder.
+     * Query for deleting a rubric indicator from a unit folder.
      *
-     * Called when the indicator does exist in the course.
+     * Called when an indicator of the same name and capability exists in the
+     * course.
      *
      * @var string
      */
@@ -99,6 +100,9 @@ $kernel->run(new class extends App
      * Query for migrating the usages of a rubric capability from unit to a
      * course folder.
      *
+     * Called when a capability of the same name exists in the course, and the
+     * unit capability is used by one or more assessments.
+     *
      * @var string
      */
     private $migrateRubricCapabilityUsageQuery = '
@@ -112,6 +116,9 @@ $kernel->run(new class extends App
      * Query for migrating the usages of a rubric indicator from unit to a
      * course folder.
      *
+     * Called when an indicator of the same name and capability exists in the
+     * course, and the unit indicator is used by one or more assessments.
+     *
      * @var string
      */
     private $migrateRubricIndicatorUsageQuery = '
@@ -123,6 +130,10 @@ $kernel->run(new class extends App
 
     /**
      * Query for finding usages of rubric descriptors for an indicator.
+     *
+     * Called when an indicator of the same name and capability exists in the
+     * course and unit. It is used for finding if a descriptor is in the same
+     * level for both the course and unit indicator.
      *
      * @var string
      */
