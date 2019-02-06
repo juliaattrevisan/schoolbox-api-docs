@@ -495,16 +495,15 @@ class Session
 
                         try {
                             $childObject = $userMapper->findByExternalId($child['RelatedID']);
-                            $user->getChildren()[$childObject->getId()] = $childObject;
-                            $childObject->getParents()[$user->getId()] = $user;
-                            if(!$childObject->getHideTimetable()) {
-                                $subjectList = $synUser->getSubjectList($childObject);
-                            }
-                            else {
-                                $subjectList = false;
-                            }
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             continue;
+                        }
+                        $user->getChildren()[$childObject->getId()] = $childObject;
+                        $childObject->getParents()[$user->getId()]  = $user;
+                        if (!$childObject->getHideTimetable()) {
+                            $subjectList = $synUser->getSubjectList($childObject);
+                        } else {
+                            $subjectList = false;
                         }
 
                         $subjects = array();
