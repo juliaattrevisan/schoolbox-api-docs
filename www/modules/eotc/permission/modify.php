@@ -145,8 +145,11 @@ foreach ($statusMapper->findAll() as $currentStatus) {
 
 /* Render everything else
  */
+$availableUsers = [];
 $allUserIds = $eventPermissionMapper->findUserIds();
-$availableUsers = $userMapper->findByColumn('id', $allUserIds)->indexBy('id');
+if(count($allUserIds)) {
+    $availableUsers = $userMapper->findByColumn('id', $allUserIds)->indexBy('id');
+}
 
 foreach ($availableUsers as $user) {
 
