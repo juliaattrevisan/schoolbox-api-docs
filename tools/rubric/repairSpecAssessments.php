@@ -239,7 +239,13 @@ $kernel->run(new class extends App
         /** @var Specification\Model[] $courses */
         $courses = Specification\Mapper::getInstance()->findAll();
         foreach ($courses as $course) {
-            $this->log->info(sprintf('Finding capabilities for course "%s"', $course->getTitle()));
+            $this->log->info(
+                sprintf(
+                    'Finding capabilities for course #%d (%s)',
+                    $course->getFolder()->getId(),
+                    $course->getTitle()
+                )
+            );
             $courseRowSet = $rubricMapper->retrieveRowSet($course->getFolder(), false);
 
             // Don't go further if there's no capabilities in course
@@ -253,7 +259,13 @@ $kernel->run(new class extends App
             /** @var Specification\Unit\Model[] $units */
             $units = Specification\Unit\Mapper::getInstance()->findAllByCourseFolderId($course->getFolder()->getId());
             foreach ($units as $unit) {
-                $this->log->info(sprintf(self::indent(1).'finding capabilities for unit "%s"', $unit->getTitle()));
+                $this->log->info(
+                    sprintf(
+                        self::indent(1).'finding capabilities for unit #%d (%s)',
+                        $unit->getFolder()->getId(),
+                        $unit->getTitle()
+                    )
+                );
                 // Must re-fetch the course row set after every unit, because
                 // repairRowSet may change the course row set.
                 $courseRowSet        = $rubricMapper->retrieveRowSet($course->getFolder(), false);
