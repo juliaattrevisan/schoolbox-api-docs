@@ -597,6 +597,7 @@ class Session
                             if (!in_array($result->getId(), $catList)) {
                                 $subject['id'] = $result->getId();
                                 $subject['name'] = $result->getName();
+                                $subject['perm'] = $user->getRole()->isStaff() ? UserAccess::ACCESS_WRITE : UserAccess::ACCESS_READ;
                                 $subject['code'] = $homepageCode;
                                 $_SESSION['subjects'][] = $subject;
 
