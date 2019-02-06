@@ -132,10 +132,14 @@ $(function() {
         });
 
 
-        // Set loading text on button
+        // Set loading text on submit button
         var originalButtonText = $button.val();
         $button.attr("disabled", true);
         $button.val('Working...');
+
+        // If we are re-submitting after having got an error the first time, hide the error message on submit
+        // so it doesn't hang around after the user fixes the data
+        $("#manage-caps-error").hide();
 
         $.post($(this).attr('action'), $(this).serialize(), function(response) {
             if (response.status === 200) {
