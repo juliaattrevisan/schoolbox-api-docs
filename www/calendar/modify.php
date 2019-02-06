@@ -358,7 +358,7 @@ if(\count($allFolderList)) {
         $page->setVar(
             array(
                 'EVENT_GROUP_ID'          => $folderId,
-                'EVENT_GROUP_NAME'        => $currentFolder->getTitle(),
+                'EVENT_GROUP_NAME'        => Scrub::text($currentFolder->getTitle()),
                 'EVENT_GROUP_ID_SELECTED' => $selected
             )
         );
