@@ -63,7 +63,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             }
 
 
-            if (!($this->getConfigMapper()->get('site_location') == 'wenona' && $child['gid'] == 3)) {
+            if (!($this->getConfigMapper()->get('site_location') === 'wenona' && $child['gid'] == 3)) {
                 $i++;
 
                 $this->setVar("STUDENT_ID", $userChild->getId());
