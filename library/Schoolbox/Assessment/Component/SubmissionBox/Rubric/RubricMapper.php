@@ -341,20 +341,9 @@ class RubricMapper
         // Validate against duplicate capabilities between a course and unit
         // If we are modifying the rubric on a course...
         if ($folder->hasCourseSpecification()) {
-            // Find its units. Folder's units aren't hydrated here, so we have to use the mapper.
-            $unitsForCourse = UnitSpecificationMapper::getInstance()->findAllByCourseFolderId($folder->getId());
 
-            // Get the capabilities for each unit in this course
-            $unitCapabilities = [];
-            foreach ($unitsForCourse as $unit) {
-                $rowSetForUnit = $this->retrieveRowSet($unit->getFolder(), false);
-
-                foreach ($rowSetForUnit->getCapabilities() as $unitCapability) {
-                    $unitCapabilities[$unit->getFolder()->getId()] = $unitCapability->getName();
-                }
-            }
-
-            // Compare capabilities in the course to ones in the unit
+            // Remove capabilities from the list that we don't want to consider for deduping
+            $courseCapabilitiesForDeduping = [];
             foreach ($newCapabilityModels as $courseCapability) {
                 // If we validate all capabilities indiscriminately, existing legacy data from before this validation
                 // may prevent users from modifying their rubric at all, so make sure we only validate new caps.
@@ -364,21 +353,58 @@ class RubricMapper
                 // If capability has no indicators, it will be deleted automatically, so we don't need to dedupe it.
                 $hasIndicators = false;
                 foreach ($newIndicatorModels as $newIndicatorModel) {
-                    $indicatorId = $newIndicatorModel->getGroup()->getId();
-                    if ($indicatorId === $courseCapability->getId() && !\in_array($indicatorId, $deletedIndicatorIds, false)) {
+                    if ($newIndicatorModel->getGroup()->getId() === $courseCapability->getId() && !\in_array($newIndicatorModel->getId(), $deletedIndicatorIds, false)) {
                         $hasIndicators = true;
                         break;
                     }
                 }
 
-                // Does a capability with this name already exist in a unit?
-                $unitCapabilityNames = array_values($unitCapabilities);
-                $courseCapabilityName = $courseCapability->getName();
-                $isDuplicate =  \in_array($courseCapabilityName, $unitCapabilityNames, false);
-
-                if ($isNewCapability && $hasIndicators && $isDuplicate) {
-                    throw new \UnexpectedValueException("Cannot add capability " . $courseCapabilityName . " because it already exists in one or more units in this course");
+                if ($isNewCapability && $hasIndicators) {
+                    $courseCapabilitiesForDeduping[] = $courseCapability;
                 }
+            }
+
+
+            // Get just the names of the capabilities we want to dedupe
+            $mapCapabilityNames = function(Group $capability) {
+                return $capability->getName();
+            };
+            $courseCapabilityNames = array_map($mapCapabilityNames, $courseCapabilitiesForDeduping);
+
+
+            // Find units in this course. Folder's units aren't hydrated here, so we have to use the mapper.
+            $unitsForCourse = UnitSpecificationMapper::getInstance()->findAllByCourseFolderId($folder->getId());
+
+            // Get the capabilities for each unit in this course
+            $duplicateCapabilities = [];
+            foreach ($unitsForCourse as $unit) {
+                $rowSetForUnit = $this->retrieveRowSet($unit->getFolder(), false);
+
+                foreach ($rowSetForUnit->getCapabilities() as $unitCapability) {
+                    // Is this unit capability name in the list of course capability names?
+                    if (in_array($unitCapability->getName(), $courseCapabilityNames)) {
+                        // Add it to our list of culprits
+                        $duplicateCapabilities[$unitCapability->getName()][] = [
+                            'unitName' => $unit->getFolder()->getName(),
+                            'folderId' => $unit->getFolder()->getId(),
+                        ];
+                    }
+                }
+            }
+
+            // If anything is in here, we have an error state
+            if (!empty ($duplicateCapabilities)) {
+                $errorMessage = '';
+                foreach ($duplicateCapabilities as $capabilityName => $units) {
+                    $errorMessage .= "<p>Capability '$capabilityName' cannot be saved because a capability with the same name already exists in the following unit(s) in this course:<br/><ul>";
+                    foreach ($units as $unit) {
+                        $unitName = $unit['unitName'];
+                        $folderId = $unit['folderId'];
+                        $errorMessage .= "<li><a href='/rubric/criteria/$folderId'>$unitName</a></li>";
+                    }
+                    $errorMessage .= "</ul></p>";
+                }
+                throw new \UnexpectedValueException($errorMessage);
             }
         }
 
