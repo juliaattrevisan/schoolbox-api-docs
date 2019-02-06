@@ -213,6 +213,14 @@ $kernel->run(new class extends App
 
 
     /**
+     * Significant events: read these, if nothing else.
+     *
+     * @var array|string[]
+     */
+    private $significantEvents = [];
+
+
+    /**
      * Set up and run the repair process.
      *
      * Install all instance vars, and wraps the repair process in a transaction
@@ -267,6 +275,13 @@ $kernel->run(new class extends App
             $this->log->error('Error occurred during repair: rolling back changes');
             $this->db->rollBack();
             throw $e;
+        }
+
+
+        // Talk about significant events
+        $this->log->warning('Significant events:');
+        foreach ($this->significantEvents as $event) {
+            $this->log->warning($event);
         }
     }
 
@@ -380,6 +395,12 @@ $kernel->run(new class extends App
                 'courseCapabilityId' => $courseCapability->getId(),
                 'unitCapabilityId'   => $unitCapability->getId(),
             ]);
+        $this->significantEvents[] = sprintf(
+            'moved %d usages for capability "%s" from unit to course',
+            $this->migrateRubricCapabilityUsageQuery->rowCount(),
+            $unitCapability->getName()
+        );
+
 
         foreach ($unitCapability->getIndicators() as $unitIndicator) {
             $unitIndicatorName       = $unitIndicator->getName();
@@ -404,6 +425,13 @@ $kernel->run(new class extends App
                 );
                 $this->deleteRubricIndicatorQuery
                     ->execute(['now' => $this->now, 'unitIndicatorId' => $unitIndicator->getId(),]);
+                $this->significantEvents[] = sprintf(
+                    'removed indicator "%s" in capability "%s" from unit',
+                    $unitIndicator->getName(),
+                    $unitCapability->getName()
+                );
+
+
                 $this->repairIndicator($matchingCourseIndicator, $unitIndicator);
 
             } else {
@@ -417,6 +445,10 @@ $kernel->run(new class extends App
                 );
                 $this->migrateRubricIndicatorQuery
                     ->execute(['courseCapabilityId' => $courseCapability->getId(), 'unitIndicatorId' => $unitIndicator->getId(),]);
+                $this->significantEvents[] = sprintf(
+                    'moved indicator "%s" from unit to course',
+                    $unitIndicator->getName()
+                );
             }
         }
 
@@ -424,6 +456,10 @@ $kernel->run(new class extends App
         // Now repair the capability itself, by deleting the unit-level copy
         $this->deleteRubricCapabilityQuery
             ->execute(['now' => $this->now, 'unitCapabilityId' => $unitCapability->getId(),]);
+        $this->significantEvents[] = sprintf(
+            'removed capability "%s" from unit',
+            $unitCapability->getName()
+        );
     }
 
 
@@ -436,17 +472,25 @@ $kernel->run(new class extends App
      */
     private function repairIndicator(Indicator $courseIndicator, Indicator $unitIndicator): void
     {
-        // * move rubric_criterion_usage
+        // Indicator usages must be migrated from the unit to the course.
         $this->migrateRubricIndicatorUsageQuery
             ->execute([
                 'courseIndicatorId' => $courseIndicator->getId(),
                 'unitIndicatorId'   => $unitIndicator->getId(),
             ]);
+        $this->significantEvents[] = sprintf(
+            'moved %d usages for indicator "%s" from unit to course',
+            $this->migrateRubricIndicatorUsageQuery->rowCount(),
+            $unitIndicator->getName()
+        );
 
-        // descriptors
+
+        // Find the descriptors for the course and unit
         $courseDescriptors = $this->findDescriptors($courseIndicator);
         $unitDescriptors   = $this->findDescriptors($unitIndicator);
         foreach ($unitDescriptors as $assessmentId => $levels) {
+            $removedDescriptorCount  = 0;
+            $migratedDescriptorCount = 0;
 
             $this->log->notice(
                 sprintf(self::indent(4).'checking assessment #%d for conflicting usage', $assessmentId)
@@ -455,15 +499,15 @@ $kernel->run(new class extends App
             foreach ($levels as $levelId => $unitDescriptorId) {
                 $courseDescriptorId = $courseDescriptors[$assessmentId][$levelId] ?? null;
                 if (isset($courseDescriptorId)) {
-                    // Conflicting descriptor: keep the course version?
+                    // Conflict: keep the course descriptor, delete the unit one
                     $this->deleteDuplicateRubricDescriptorQuery
                         ->execute(['now' => $this->now, 'descriptorId' => $unitDescriptorId,]);
                     $this->log->warning(
                         sprintf(self::indent(5).'assessment has conflicts for level #%d', $levelId)
                     );
+                    $removedDescriptorCount++;
                 } else {
-                    // No conflicting descriptor: migrate the unit descriptor to
-                    // the course
+                    // No conflict: migrate the unit descriptor to the course
                     $this->migrateRubricDescriptorQuery
                         ->execute([
                             'courseIndicatorId' => $courseIndicator->getId(),
@@ -472,10 +516,16 @@ $kernel->run(new class extends App
                     $this->log->notice(
                         sprintf(self::indent(5).'assessment has no conflicts for level #%d', $levelId)
                     );
+                    $migratedDescriptorCount++;
                 }
             }
-
-            // Is this descriptor used in the course copy?
+            $this->significantEvents[] = sprintf(
+                'removed %d and migrated %d descriptors from indicator "%s" in assessment #%d',
+                $removedDescriptorCount,
+                $migratedDescriptorCount,
+                $unitIndicator->getName(),
+                $assessmentId
+            );
         }
 
 
