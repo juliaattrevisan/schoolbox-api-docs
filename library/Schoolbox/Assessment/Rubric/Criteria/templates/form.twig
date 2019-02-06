@@ -147,7 +147,7 @@ $(function() {
         }).fail(function(response) {
             $button.val(originalButtonText);
             $button.removeAttr("disabled");
-            $("#manage-caps-error").show().html(response.responseJSON.details);
+            $("#manage-caps-error").show().html(response.responseJSON.detail);
         });
 
     });
