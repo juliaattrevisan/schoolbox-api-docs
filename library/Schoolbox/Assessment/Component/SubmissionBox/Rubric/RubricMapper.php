@@ -256,7 +256,12 @@ class RubricMapper
                     $capabilityL10nArticle = $l10n->indefiniteArticle('rubricGroup', false, true);
                     $capabilityL10nCapitalised = $l10n->translate('rubricGroup', false, true);
                     $capabilityL10nLowercase = $l10n->translate('rubricGroup', false, false);
-                    throw new \UnexpectedValueException("$capabilityL10nCapitalised '" . $capability->getName() . "' cannot be saved because $capabilityL10nArticle $capabilityL10nLowercase with the same name already exists in this folder");
+
+                    if ($folder->hasUnitSpecification()) {
+                        throw new \UnexpectedValueException("$capabilityL10nCapitalised '" . $capability->getName() . "' cannot be saved because $capabilityL10nArticle $capabilityL10nLowercase with the same name already exists in this unit, or in the course this unit belongs to");
+                    } else {
+                        throw new \UnexpectedValueException("$capabilityL10nCapitalised '" . $capability->getName() . "' cannot be saved because $capabilityL10nArticle $capabilityL10nLowercase with the same name already exists in this folder");
+                    }
                 }
             } else {
                 $capabilityNamesUsed[$normalizedName] = $allowNameChange;
