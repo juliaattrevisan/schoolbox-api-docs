@@ -351,14 +351,12 @@ $kernel->run(new class extends App
     private function repairCapability(Capability $courseCapability, Capability $unitCapability): void
     {
         // Capability usages must be migrated from the unit to the course.
-        if ($this->perform) {
-            $this->db
-                ->prepareQuery($this->migrateRubricCapabilityUsageQuery)
-                ->execute([
-                    'courseCapabilityId' => $courseCapability->getId(),
-                    'unitCapabilityId'   => $unitCapability->getId(),
-                ]);
-        }
+        $this->db
+            ->prepareQuery($this->migrateRubricCapabilityUsageQuery)
+            ->execute([
+                'courseCapabilityId' => $courseCapability->getId(),
+                'unitCapabilityId'   => $unitCapability->getId(),
+            ]);
 
         foreach ($unitCapability->getIndicators() as $unitIndicator) {
             $unitIndicatorName       = $unitIndicator->getName();
