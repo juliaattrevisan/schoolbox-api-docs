@@ -383,8 +383,8 @@ $kernel->run(new class extends App
         }
 
         // descriptors
-        $courseDescriptors = $this->findLevelsGroupedByAssessment($courseIndicator);
-        $unitDescriptors   = $this->findLevelsGroupedByAssessment($unitIndicator);
+        $courseDescriptors = $this->findDescriptors($courseIndicator);
+        $unitDescriptors   = $this->findDescriptors($unitIndicator);
 
 
 //        var_dump($courseDescriptors, $unitDescriptors);
@@ -445,7 +445,7 @@ $kernel->run(new class extends App
      *                 Dimension 2: level ID
      *                 Key:         descriptor ID
      */
-    private function findLevelsGroupedByAssessment(Indicator $indicator): array
+    private function findDescriptors(Indicator $indicator): array
     {
         $assessments = [];
         $descriptorQuery = $this->db->prepareQuery($this->findRubricDescriptorQuery);
