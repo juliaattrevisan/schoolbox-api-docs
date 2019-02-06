@@ -396,6 +396,7 @@ class RubricMapper
             if (!empty ($duplicateCapabilities)) {
                 $errorMessage = '';
                 foreach ($duplicateCapabilities as $capabilityName => $units) {
+                    // TODO localise this
                     $errorMessage .= "<p>Capability '$capabilityName' cannot be saved because a capability with the same name already exists in the following unit(s) in this course:<br/><ul>";
                     foreach ($units as $unit) {
                         $unitName = $unit['unitName'];
