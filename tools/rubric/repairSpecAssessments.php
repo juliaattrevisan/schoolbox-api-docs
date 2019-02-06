@@ -179,6 +179,14 @@ $kernel->run(new class extends App
 
 
     /**
+     * Is this actually performing an update?
+     *
+     * @var bool
+     */
+    private $perform = false;
+
+
+    /**
      * Run loop
      *
      * @param Di\Container  $di
@@ -189,9 +197,10 @@ $kernel->run(new class extends App
     public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
     {
         // Install logger and DB
-        $this->log = $log;
-        $this->db  = $di->get('databaseInternal');
-        $this->now = Alaress_Date_Format::now();
+        $this->log     = $log;
+        $this->db      = $di->get('databaseInternal');
+        $this->now     = Alaress_Date_Format::now();
+        $this->perform = $opts['perform'] ?? false;
 
 
         // Find each course
@@ -206,27 +215,27 @@ $kernel->run(new class extends App
             // Don't go further if there's no capabilities in course
             $courseCapabilityCount = count($courseRowSet->getCapabilities());
             if ($courseCapabilityCount === 0) {
-                $log->debug('Course contains no capabilities: no action required');
+                $log->debug('    course contains no capabilities: no action required');
                 continue;
             }
 
             // Do something now
-            $log->info(sprintf('Course contains %d capabilities: checking units...', $courseCapabilityCount));
+            $log->info(sprintf('    course contains %d capabilities: checking units...', $courseCapabilityCount));
 
             /** @var Specification\Unit\Model[] $units */
             $units = Specification\Unit\Mapper::getInstance()->findAllByCourseFolderId($course->getFolder()->getId());
             foreach ($units as $unit) {
-                $log->debug(sprintf('Finding capabilities for unit "%s"...', $unit->getTitle()));
+                $log->debug(sprintf('    finding capabilities for unit "%s"...', $unit->getTitle()));
                 $unitRowSet          = $rubricMapper->retrieveRowSet($unit->getFolder(), false);
                 $unitCapabilityCount = count($unitRowSet->getCapabilities());
 
                 if ($unitCapabilityCount === 0) {
-                    $log->debug('Unit contains no capabilities: no action required');
+                    $log->debug('        unit contains no capabilities: no action required');
                     continue;
                 }
 
                 // Do something now
-                $log->debug(sprintf('Unit contains %d capabilities: checking compatibility', $unitCapabilityCount));
+                $log->debug(sprintf('        unit contains %d capabilities: checking compatibility', $unitCapabilityCount));
                 $this->repairRowset($courseRowSet, $unitRowSet);
             }
         }
@@ -250,7 +259,7 @@ $kernel->run(new class extends App
                     $capabilityConflict = true;
                     $this->log->info(
                         sprintf(
-                            'Capability "%s" exists in course and unit: resolving conflict',
+                            '        capability "%s" exists in course and unit: resolving conflict',
                             $courseCapabilityName
                         )
                     );
@@ -262,7 +271,7 @@ $kernel->run(new class extends App
             if (!$capabilityConflict) {
                 $this->log->debug(
                     sprintf(
-                        'Capability "%s" exists in course, but not in unit: no action required',
+                        '        capability "%s" exists in course, but not in unit: no action required',
                         $courseCapabilityName
                     )
                 );
@@ -280,6 +289,16 @@ $kernel->run(new class extends App
      */
     private function repairCapability(Capability $courseCapability, Capability $unitCapability): void
     {
+        // Capability usages must be migrated from the unit to the course.
+        if ($this->perform) {
+            $this->db
+                ->prepareQuery($this->migrateRubricCapabilityUsageQuery)
+                ->execute([
+                    'courseCapabilityId' => $courseCapability->getId(),
+                    'unitCapabilityId'   => $unitCapability->getId(),
+                ]);
+        }
+
         foreach ($unitCapability->getIndicators() as $unitIndicator) {
             $unitIndicatorName       = $unitIndicator->getName();
             $matchingCourseIndicator = null;
@@ -297,19 +316,15 @@ $kernel->run(new class extends App
                 // from the now-deleted unit into the course.
                 $this->log->info(
                     sprintf(
-                        'Indicator "%s" exists in course and unit: deleting from unit, then migrating to course',
+                        '            indicator "%s" exists in course and unit: deleting from unit, then migrating to course',
                         $unitIndicatorName
                     )
                 );
-                $this->db
-                    ->prepareQuery($this->deleteRubricIndicatorQuery)
-                    ->execute(['now' => $this->now, 'unitIndicatorId' => $unitIndicator->getId(),]);
-                $this->db
-                    ->prepareQuery($this->migrateRubricCapabilityUsageQuery)
-                    ->execute([
-                        'courseCapabilityId' => $courseCapability->getId(),
-                        'unitCapabilityId'   => $unitCapability->getId(),
-                    ]);
+                if ($this->perform) {
+                    $this->db
+                        ->prepareQuery($this->deleteRubricIndicatorQuery)
+                        ->execute(['now' => $this->now, 'unitIndicatorId' => $unitIndicator->getId(),]);
+                }
                 $this->repairIndicator($matchingCourseIndicator, $unitIndicator);
 
             } else {
@@ -317,21 +332,25 @@ $kernel->run(new class extends App
                 // Can just move the unit indicator into the course.
                 $this->log->info(
                     sprintf(
-                        'Indicator "%s" exists in unit, but not course: moving from course to unit',
+                        '            indicator "%s" exists in unit, but not course: moving from course to unit',
                         $unitIndicatorName
                     )
                 );
-                $this->db
-                    ->prepareQuery($this->migrateRubricIndicatorQuery)
-                    ->execute(['courseCapabilityId' => $courseCapability->getId(), 'unitIndicatorId' => $unitIndicator->getId(),]);
+                if ($this->perform) {
+                    $this->db
+                        ->prepareQuery($this->migrateRubricIndicatorQuery)
+                        ->execute(['courseCapabilityId' => $courseCapability->getId(), 'unitIndicatorId' => $unitIndicator->getId(),]);
+                }
             }
         }
 
 
         // Now repair the capability itself, by deleting the unit-level copy
-        $this->db
-            ->prepareQuery($this->deleteRubricCapabilityQuery)
-            ->execute(['now' => $this->now, 'unitCapabilityId' => $unitCapability->getId(),]);
+        if ($this->perform) {
+            $this->db
+                ->prepareQuery($this->deleteRubricCapabilityQuery)
+                ->execute(['now' => $this->now, 'unitCapabilityId' => $unitCapability->getId(),]);
+        }
     }
 
 
@@ -345,12 +364,14 @@ $kernel->run(new class extends App
     private function repairIndicator(Indicator $courseIndicator, Indicator $unitIndicator): void
     {
         // * move rubric_criterion_usage
-        $this->db
-            ->prepareQuery($this->migrateRubricIndicatorUsageQuery)
-            ->execute([
-                'courseIndicatorId' => $courseIndicator->getId(),
-                'unitIndicatorId'   => $unitIndicator->getId(),
-            ]);
+        if ($this->perform) {
+            $this->db
+                ->prepareQuery($this->migrateRubricIndicatorUsageQuery)
+                ->execute([
+                    'courseIndicatorId' => $courseIndicator->getId(),
+                    'unitIndicatorId'   => $unitIndicator->getId(),
+                ]);
+        }
 
         // descriptors
         $descriptorQuery = $this->db->prepareQuery($this->findRubricDescriptorQuery);
@@ -359,30 +380,32 @@ $kernel->run(new class extends App
         $descriptorQuery->execute(['indicatorId' => $unitIndicator->getId(),]);
         $unitDescriptors = $descriptorQuery->fetchColumnArray('id', 'levelId');
 
+//        var_dump($courseDescriptors, $unitDescriptors);
+
 
         foreach ($unitDescriptors as $levelId => $unitDescriptorId) {
             // Is this descriptor used in the course copy?
             $courseDescriptorId = $courseDescriptors[$levelId] ?? null;
             if (isset($courseDescriptorId)) {
                 // Conflicting descriptor: keep the course version?
-                $this->db
-                    ->prepareQuery($this->deleteDuplicateRubricDescriptorQuery)
-                    ->execute(['now' => $this->now, 'descriptorId' => $unitDescriptorId,]);
+                if ($this->perform) {
+                    $this->db
+                        ->prepareQuery($this->deleteDuplicateRubricDescriptorQuery)
+                        ->execute(['now' => $this->now, 'descriptorId' => $unitDescriptorId,]);
+                }
             } else {
                 // No conflicting descriptor: migrate the unit descriptor to
                 // the course
-                $this->db
-                    ->prepareQuery($this->migrateRubricDescriptorQuery)
-                    ->execute([
-                        'courseIndicatorId' => $courseIndicator->getId(),
-                        'descriptorId'      => $unitDescriptorId,
-                    ]);
+                if ($this->perform) {
+                    $this->db
+                        ->prepareQuery($this->migrateRubricDescriptorQuery)
+                        ->execute([
+                            'courseIndicatorId' => $courseIndicator->getId(),
+                            'descriptorId'      => $unitDescriptorId,
+                        ]);
+                }
             }
         }
-
-        // * move rubric_descriptor
-        // ** what to do if there's conflicting descriptors (in the same level)
-        // ** I guess preferentially use the unit version?
 
 
         // The following should not exist at all. If they do that's an error,
