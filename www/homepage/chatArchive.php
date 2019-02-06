@@ -38,6 +38,12 @@ $filter = array(
 // if the category doesn't exist, throw an error
 try {
     $folder = $folderMapper->findById($filter['folder']);
+
+    // Check if user has a permission to read this page
+    if ((new Group())->getPermission($folder->getId()) < READ_ACCESS) {
+        error(6);
+    }
+
 } catch (\Exception $e) {
     error(19);
 }
