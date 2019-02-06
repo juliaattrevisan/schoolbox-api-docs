@@ -519,7 +519,7 @@ class Session
                                     try {
                                         $cat = $folderMapper->findByCode($subject['campusCode'] . '/' . $subject['code']);
                                     } catch (\Exception $e) {
-                                        //Try to fetch witout campus code
+                                        //Try to fetch without campus code
                                         try {
                                             $cat = $folderMapper->findByCode($subject['code']);
                                         } catch (\Exception $e) {
