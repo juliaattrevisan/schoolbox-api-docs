@@ -78,26 +78,12 @@ $kernel->run(new class extends App
 
 
     /**
-     * @var IQuery
-     */
-    private $migrateRubricIndicatorQuery;
-
-
-    /**
-     * @var IQuery
-     */
-    private $deleteRubricCapabilityQuery;
-
-
-    /**
      * Query for deleting a rubric indicator from a unit folder.
      *
      * Called when an indicator of the same name and capability exists in the
      * course.
-     *
-     * @var string
      */
-    private $deleteRubricIndicatorQuery = '
+    private const DELETE_RUBRIC_INDICATOR_QUERY = '
         UPDATE rubric_criterion
         SET    deleted_at = :now
         WHERE  id         = :unitIndicatorId
@@ -110,10 +96,8 @@ $kernel->run(new class extends App
      *
      * Called when a capability of the same name exists in the course, and the
      * unit capability is used by one or more assessments.
-     *
-     * @var string
      */
-    private $migrateRubricCapabilityUsageQuery = '
+    private const MIGRATE_RUBRIC_CAPABILITY_USAGE_QUERY = '
         UPDATE rubric_group_usage
         SET    rubric_group_id = :courseCapabilityId
         WHERE  rubric_group_id = :unitCapabilityId
@@ -126,10 +110,8 @@ $kernel->run(new class extends App
      *
      * Called when an indicator of the same name and capability exists in the
      * course, and the unit indicator is used by one or more assessments.
-     *
-     * @var string
      */
-    private $migrateRubricIndicatorUsageQuery = '
+    private const MIGRATE_RUBRIC_INDICATOR_USAGE_QUERY = '
         UPDATE rubric_criterion_usage
         SET    criterion_id = :courseIndicatorId
         WHERE  criterion_id = :unitIndicatorId
@@ -142,10 +124,8 @@ $kernel->run(new class extends App
      * Called when an indicator of the same name and capability exists in the
      * course and unit. It is used for finding if a descriptor is in the same
      * level for both the course and unit indicator.
-     *
-     * @var string
      */
-    private $findRubricDescriptorQuery = '
+    private const FIND_RUBRIC_DESCRIPTOR_QUERY = '
         SELECT rl.id AS levelId,
                rd.id,
                a.id AS assessmentId
@@ -163,10 +143,8 @@ $kernel->run(new class extends App
      * Used when migrating descriptors, and there's a descriptor in the same
      * level for both the course-level and unit-level indicator: the unit-level
      * descriptor is removed.
-     *
-     * @var string
      */
-    private $deleteDuplicateRubricDescriptorQuery = '
+    private const DELETE_DUPLICATE_RUBRIC_DESCRIPTOR_QUERY = '
         UPDATE rubric_descriptor
         SET    deleted_at = :now
         WHERE  id         = :descriptorId
@@ -179,14 +157,60 @@ $kernel->run(new class extends App
      * Used when migrating descriptors, and the unit-level descriptor exists
      * but the course-level does not: the unit-level descriptor is moved into
      * the course-level.
-     *
-     * @var string
      */
-    private $migrateRubricDescriptorQuery = '
+    private const MIGRATE_RUBRIC_DESCRIPTOR_QUERY = '
         UPDATE rubric_descriptor
         SET    criterion_id = :courseIndicatorId
         WHERE  id           = :descriptorId
     ';
+
+
+    /**
+     * @var IQuery
+     */
+    private $migrateRubricIndicatorQuery;
+
+
+    /**
+     * @var IQuery
+     */
+    private $deleteRubricCapabilityQuery;
+
+
+    /**
+     * @var IQuery
+     */
+    private $deleteRubricIndicatorQuery;
+
+
+    /**
+     * @var IQuery
+     */
+    private $migrateRubricCapabilityUsageQuery;
+
+
+    /**
+     * @var IQuery
+     */
+    private $migrateRubricIndicatorUsageQuery;
+
+
+    /**
+     * @var IQuery
+     */
+    private $findRubricDescriptorQuery;
+
+
+    /**
+     * @var IQuery
+     */
+    private $deleteDuplicateRubricDescriptorQuery;
+
+
+    /**
+     * @var IQuery
+     */
+    private $migrateRubricDescriptorQuery;
 
 
     /**
@@ -237,8 +261,22 @@ $kernel->run(new class extends App
 
 
         // Prepare queries
-        $this->migrateRubricIndicatorQuery = $this->db->prepareQuery(self::MIGRATE_RUBRIC_INDICATOR_QUERY);
-        $this->deleteRubricCapabilityQuery = $this->db->prepareQuery(self::DELETE_RUBRIC_CAPABILITY_QUERY);
+        $this->migrateRubricIndicatorQuery
+            = $this->db->prepareQuery(self::MIGRATE_RUBRIC_INDICATOR_QUERY);
+        $this->deleteRubricCapabilityQuery
+            = $this->db->prepareQuery(self::DELETE_RUBRIC_CAPABILITY_QUERY);
+        $this->deleteRubricIndicatorQuery
+            = $this->db->prepareQuery(self::DELETE_RUBRIC_INDICATOR_QUERY);
+        $this->migrateRubricCapabilityUsageQuery
+            = $this->db->prepareQuery(self::MIGRATE_RUBRIC_CAPABILITY_USAGE_QUERY);
+        $this->migrateRubricIndicatorUsageQuery
+            = $this->db->prepareQuery(self::MIGRATE_RUBRIC_INDICATOR_USAGE_QUERY);
+        $this->findRubricDescriptorQuery
+            = $this->db->prepareQuery(self::FIND_RUBRIC_DESCRIPTOR_QUERY);
+        $this->deleteDuplicateRubricDescriptorQuery
+            = $this->db->prepareQuery(self::DELETE_DUPLICATE_RUBRIC_DESCRIPTOR_QUERY);
+        $this->migrateRubricDescriptorQuery
+            = $this->db->prepareQuery(self::MIGRATE_RUBRIC_DESCRIPTOR_QUERY);
 
 
         // Wrap entire loop in a transaction
@@ -364,8 +402,7 @@ $kernel->run(new class extends App
     private function repairCapability(Capability $courseCapability, Capability $unitCapability): void
     {
         // Capability usages must be migrated from the unit to the course.
-        $this->db
-            ->prepareQuery($this->migrateRubricCapabilityUsageQuery)
+        $this->migrateRubricCapabilityUsageQuery
             ->execute([
                 'courseCapabilityId' => $courseCapability->getId(),
                 'unitCapabilityId'   => $unitCapability->getId(),
@@ -392,8 +429,7 @@ $kernel->run(new class extends App
                         $unitIndicatorName
                     )
                 );
-                $this->db
-                    ->prepareQuery($this->deleteRubricIndicatorQuery)
+                $this->deleteRubricIndicatorQuery
                     ->execute(['now' => $this->now, 'unitIndicatorId' => $unitIndicator->getId(),]);
                 $this->repairIndicator($matchingCourseIndicator, $unitIndicator);
 
@@ -428,8 +464,7 @@ $kernel->run(new class extends App
     private function repairIndicator(Indicator $courseIndicator, Indicator $unitIndicator): void
     {
         // * move rubric_criterion_usage
-        $this->db
-            ->prepareQuery($this->migrateRubricIndicatorUsageQuery)
+        $this->migrateRubricIndicatorUsageQuery
             ->execute([
                 'courseIndicatorId' => $courseIndicator->getId(),
                 'unitIndicatorId'   => $unitIndicator->getId(),
@@ -448,8 +483,7 @@ $kernel->run(new class extends App
                 $courseDescriptorId = $courseDescriptors[$assessmentId][$levelId] ?? null;
                 if (isset($courseDescriptorId)) {
                     // Conflicting descriptor: keep the course version?
-                    $this->db
-                        ->prepareQuery($this->deleteDuplicateRubricDescriptorQuery)
+                    $this->deleteDuplicateRubricDescriptorQuery
                         ->execute(['now' => $this->now, 'descriptorId' => $unitDescriptorId,]);
                     $this->log->warning(
                         sprintf(self::indent(5).'assessment has conflicts for level #%d', $levelId)
@@ -457,8 +491,7 @@ $kernel->run(new class extends App
                 } else {
                     // No conflicting descriptor: migrate the unit descriptor to
                     // the course
-                    $this->db
-                        ->prepareQuery($this->migrateRubricDescriptorQuery)
+                    $this->migrateRubricDescriptorQuery
                         ->execute([
                             'courseIndicatorId' => $courseIndicator->getId(),
                             'descriptorId'      => $unitDescriptorId,
@@ -492,9 +525,8 @@ $kernel->run(new class extends App
     private function findDescriptors(Indicator $indicator): array
     {
         $assessments = [];
-        $descriptorQuery = $this->db->prepareQuery($this->findRubricDescriptorQuery);
-        $descriptorQuery->execute(['indicatorId' => $indicator->getId(),]);
-        foreach ($descriptorQuery->getIterator() as $row) {
+        $this->findRubricDescriptorQuery->execute(['indicatorId' => $indicator->getId(),]);
+        foreach ($this->findRubricDescriptorQuery->getIterator() as $row) {
             $assessments[$row['assessmentId']][$row['levelId']] = $row['id'];
         }
         return $assessments;
