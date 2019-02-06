@@ -105,9 +105,10 @@ class Controller extends BaseController
             try {
                 $this->rubricMapper->persistRowSet($newRowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
 
+                $this->response->status->setCode(200);
                 $this->response->content->set(
                     $this->buildJsonOutput([
-                        'status'  => 200,
+                        // TODO localise
                         'message' => 'Criteria updated',
                         'redirect' => '/homepage/' . $folder->getId()
                     ])
@@ -115,9 +116,9 @@ class Controller extends BaseController
 
             }
             catch (\Exception|\UnexpectedValueException $e) {
+                $this->response->status->setCode(400);
                 $this->response->content->set(
                     $this->buildJsonOutput([
-                        'status'  => 400,
                         'message' => $e->getMessage()
                     ])
                 );

@@ -141,15 +141,13 @@ $(function() {
         // so it doesn't hang around after the user fixes the data
         $("#manage-caps-error").hide();
 
-        $.post($(this).attr('action'), $(this).serialize(), function(response) {
-            if (response.status === 200) {
-                // Redirect to the homepage we came form
-                window.location.replace(response.redirect);
-            } else {
-                $button.val(originalButtonText);
-                $button.removeAttr("disabled");
-                $("#manage-caps-error").show().html(response.message);
-            }
+        $.post($(this).attr('action'), $(this).serialize()).done(function(response) {
+            // Redirect to the homepage we came form
+            window.location.replace(response.redirect);
+        }).fail(function(response) {
+            $button.val(originalButtonText);
+            $button.removeAttr("disabled");
+            $("#manage-caps-error").show().html(response.responseJSON.message);
         });
 
     });
