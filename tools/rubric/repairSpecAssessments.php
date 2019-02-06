@@ -479,10 +479,8 @@ $kernel->run(new class extends App
         }
 
 
-        // The following should not exist at all. If they do that's an error,
-        // but move them anyway
-        // * move rubric_descriptor_mark
-        // * move rubric_group_mark
+        // TODO consider moving rubric_descriptor_mark and rubric_group_mark
+        // Those should not exist at all for spec assessments, but may need a plan of action.
     }
 
 
