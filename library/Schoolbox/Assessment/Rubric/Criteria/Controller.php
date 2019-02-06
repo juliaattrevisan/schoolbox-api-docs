@@ -114,7 +114,7 @@ class Controller extends BaseController
                 );
 
             }
-            catch (\UnexpectedValueException $e) {
+            catch (\Exception|\UnexpectedValueException $e) {
                 $this->response->content->set(
                     $this->buildJsonOutput([
                         'status'  => 400,
