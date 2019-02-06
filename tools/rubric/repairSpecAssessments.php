@@ -209,7 +209,7 @@ $kernel->run(new class extends App
         /** @var Specification\Model[] $courses */
         $courses = Specification\Mapper::getInstance()->findAll();
         foreach ($courses as $course) {
-            $log->info(sprintf('Finding capabilities for course "%s"...', $course->getTitle()));
+            $log->info(sprintf('Finding capabilities for course "%s"', $course->getTitle()));
             $courseRowSet = $rubricMapper->retrieveRowSet($course->getFolder(), false);
 
             // Don't go further if there's no capabilities in course
@@ -219,13 +219,11 @@ $kernel->run(new class extends App
                 continue;
             }
 
-            // Do something now
-            $log->info(sprintf('    course contains %d capabilities: checking units...', $courseCapabilityCount));
 
             /** @var Specification\Unit\Model[] $units */
             $units = Specification\Unit\Mapper::getInstance()->findAllByCourseFolderId($course->getFolder()->getId());
             foreach ($units as $unit) {
-                $log->debug(sprintf('    finding capabilities for unit "%s"...', $unit->getTitle()));
+                $log->info(sprintf('    finding capabilities for unit "%s"', $unit->getTitle()));
                 $unitRowSet          = $rubricMapper->retrieveRowSet($unit->getFolder(), false);
                 $unitCapabilityCount = count($unitRowSet->getCapabilities());
 
@@ -234,9 +232,7 @@ $kernel->run(new class extends App
                     continue;
                 }
 
-                // Do something now
-                $log->debug(sprintf('        unit contains %d capabilities: checking compatibility', $unitCapabilityCount));
-                $this->repairRowset($courseRowSet, $unitRowSet);
+                $this->repairRowSet($courseRowSet, $unitRowSet);
             }
         }
     }
@@ -249,7 +245,7 @@ $kernel->run(new class extends App
      * @param RowSet $courseRowSet
      * @param RowSet $unitRowSet
      */
-    private function repairRowset(RowSet $courseRowSet, RowSet $unitRowSet): void
+    private function repairRowSet(RowSet $courseRowSet, RowSet $unitRowSet): void
     {
         foreach ($courseRowSet->getCapabilities() as $courseCapability) {
             $courseCapabilityName = $courseCapability->getName();
@@ -332,7 +328,7 @@ $kernel->run(new class extends App
                 // Can just move the unit indicator into the course.
                 $this->log->info(
                     sprintf(
-                        '            indicator "%s" exists in unit, but not course: moving from course to unit',
+                        '            indicator "%s" exists in unit, but not course: moving from unit to course',
                         $unitIndicatorName
                     )
                 );
