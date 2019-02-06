@@ -47,84 +47,32 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
 
 $kernel->run(new class extends App
 {
-    /**
-     * Helper for indenting log output for legibility.
-     */
     private const INDENT = '  ';
-
-
-    /**
-     * Query for migrating a rubric indicator from unit to a course folder.
-     *
-     * Called when the indicator doesn't exist in the course.
-     */
     private const MIGRATE_RUBRIC_INDICATOR_QUERY = '
         UPDATE rubric_criterion
         SET    rubric_group_id = :courseCapabilityId
         WHERE  id              = :unitIndicatorId
     ';
-
-
-    /**
-     * Query for deleting a rubric capability from a unit folder.
-     *
-     * Called when a capability of the same name exists in the course.
-     */
     private const DELETE_RUBRIC_CAPABILITY_QUERY = '
         UPDATE rubric_group
         SET    deleted_at = :now
         WHERE  id         = :unitCapabilityId
     ';
-
-
-    /**
-     * Query for deleting a rubric indicator from a unit folder.
-     *
-     * Called when an indicator of the same name and capability exists in the
-     * course.
-     */
     private const DELETE_RUBRIC_INDICATOR_QUERY = '
         UPDATE rubric_criterion
         SET    deleted_at = :now
         WHERE  id         = :unitIndicatorId
     ';
-
-
-    /**
-     * Query for migrating the usages of a rubric capability from unit to a
-     * course folder.
-     *
-     * Called when a capability of the same name exists in the course, and the
-     * unit capability is used by one or more assessments.
-     */
     private const MIGRATE_RUBRIC_CAPABILITY_USAGE_QUERY = '
         UPDATE rubric_group_usage
         SET    rubric_group_id = :courseCapabilityId
         WHERE  rubric_group_id = :unitCapabilityId
     ';
-
-
-    /**
-     * Query for migrating the usages of a rubric indicator from unit to a
-     * course folder.
-     *
-     * Called when an indicator of the same name and capability exists in the
-     * course, and the unit indicator is used by one or more assessments.
-     */
     private const MIGRATE_RUBRIC_INDICATOR_USAGE_QUERY = '
         UPDATE rubric_criterion_usage
         SET    criterion_id = :courseIndicatorId
         WHERE  criterion_id = :unitIndicatorId
     ';
-
-
-    /**
-     * Query for finding usages of rubric descriptors for an indicator.
-     *
-     * Called when an indicator of the same name and capability exists in the
-     * course and unit. It is used for finding if a descriptor is in the same
-     * level for both the course and unit indicator.
-     */
     private const FIND_RUBRIC_DESCRIPTOR_QUERY = '
         SELECT rl.id AS levelId,
                rd.id,
@@ -135,29 +83,11 @@ $kernel->run(new class extends App
         INNER JOIN assessment         a ON sb.assessment_id = a.id
         WHERE  criterion_id = :indicatorId
     ';
-
-
-    /**
-     * Query for deleting usages of rubric descriptors.
-     *
-     * Used when migrating descriptors, and there's a descriptor in the same
-     * level for both the course-level and unit-level indicator: the unit-level
-     * descriptor is removed.
-     */
     private const DELETE_DUPLICATE_RUBRIC_DESCRIPTOR_QUERY = '
         UPDATE rubric_descriptor
         SET    deleted_at = :now
         WHERE  id         = :descriptorId
     ';
-
-
-    /**
-     * Query for migrating usages of rubric descriptors.
-     *
-     * Used when migrating descriptors, and the unit-level descriptor exists
-     * but the course-level does not: the unit-level descriptor is moved into
-     * the course-level.
-     */
     private const MIGRATE_RUBRIC_DESCRIPTOR_QUERY = '
         UPDATE rubric_descriptor
         SET    criterion_id = :courseIndicatorId
@@ -166,48 +96,91 @@ $kernel->run(new class extends App
 
 
     /**
+     * Query for migrating a rubric indicator from unit to a course folder.
+     *
+     * Called when the indicator doesn't exist in the course.
+     *
      * @var IQuery
      */
     private $migrateRubricIndicatorQuery;
 
 
     /**
+     * Query for deleting a rubric capability from a unit folder.
+     *
+     * Called when a capability of the same name exists in the course.
+     *
      * @var IQuery
      */
     private $deleteRubricCapabilityQuery;
 
 
     /**
+     * Query for deleting a rubric indicator from a unit folder.
+     *
+     * Called when an indicator of the same name and capability exists in the
+     * course.
+     *
      * @var IQuery
      */
     private $deleteRubricIndicatorQuery;
 
 
     /**
+     * Query for migrating the usages of a rubric capability from unit to a
+     * course folder.
+     *
+     * Called when a capability of the same name exists in the course, and the
+     * unit capability is used by one or more assessments.
+     *
      * @var IQuery
      */
     private $migrateRubricCapabilityUsageQuery;
 
 
     /**
+     * Query for migrating the usages of a rubric indicator from unit to a
+     * course folder.
+     *
+     * Called when an indicator of the same name and capability exists in the
+     * course, and the unit indicator is used by one or more assessments.
+     *
      * @var IQuery
      */
     private $migrateRubricIndicatorUsageQuery;
 
 
     /**
+     * Query for finding usages of rubric descriptors for an indicator.
+     *
+     * Called when an indicator of the same name and capability exists in the
+     * course and unit. It is used for finding if a descriptor is in the same
+     * level for both the course and unit indicator.
+     *
      * @var IQuery
      */
     private $findRubricDescriptorQuery;
 
 
     /**
+     * Query for deleting usages of rubric descriptors.
+     *
+     * Used when migrating descriptors, and there's a descriptor in the same
+     * level for both the course-level and unit-level indicator: the unit-level
+     * descriptor is removed.
+     *
      * @var IQuery
      */
     private $deleteDuplicateRubricDescriptorQuery;
 
 
     /**
+     * Query for migrating usages of rubric descriptors.
+     *
+     * Used when migrating descriptors, and the unit-level descriptor exists
+     * but the course-level does not: the unit-level descriptor is moved into
+     * the course-level.
+     *
      * @var IQuery
      */
     private $migrateRubricDescriptorQuery;
