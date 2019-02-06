@@ -35,10 +35,12 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
+$opts   = getopt('vp', ['perform']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Rubric repair',
     [
-        'verbose' => [false, false, false],
+        'verbose' => $opts['v'] ?? [],
+        'perform' => isset($opts['p']) || isset($opts['perform']),
     ]
 );
 
