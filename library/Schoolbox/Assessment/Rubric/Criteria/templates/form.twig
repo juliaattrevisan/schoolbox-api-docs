@@ -139,7 +139,7 @@ $(function() {
 
         // If we are re-submitting after having got an error the first time, hide the error message on submit
         // so it doesn't hang around after the user fixes the data
-        $("#manage-caps-error").hide();
+        $("#manage-caps-error").slideUp();
 
         $.post($(this).attr('action'), $(this).serialize(), null, 'json').done(function(response) {
             // Redirect to the homepage we came form
@@ -147,7 +147,7 @@ $(function() {
         }).fail(function(response) {
             $button.val(originalButtonText);
             $button.removeAttr("disabled");
-            $("#manage-caps-error").show().html(response.responseJSON.detail);
+            $("#manage-caps-error").slideDown().html(response.responseJSON.detail);
         });
 
     });
