@@ -238,6 +238,13 @@ abstract class AbstractDefinition implements IDefinition
         // Get the role types that can access this page
         $roleTypes = Page\Model::getRoleTypesForPage($pageFilter->getPage());
 
+        // If a SU has accessed this filterable page, and their roleType does not normally have
+        // access to this page, then they won't have any role-defaults configured.
+        // In this case just insert the SU's roleType into those that can access the page.
+        if ($roleTypeFilter && !\in_array($roleTypeFilter, $roleTypes, true)) {
+            $roleTypes[] = $roleTypeFilter;
+        }
+
         /* Ensure all defaults are present in our model graph
          * If saved in DB, use that, else use system-initial values
          */
