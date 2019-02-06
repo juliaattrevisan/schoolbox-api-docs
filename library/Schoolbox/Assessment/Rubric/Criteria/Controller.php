@@ -108,8 +108,7 @@ class Controller extends BaseController
                 $this->response->status->setCode(200);
                 $this->response->content->set(
                     $this->buildJsonOutput([
-                        // TODO localise
-                        'message' => 'Criteria updated',
+                        'message' => $this->rosettaStone->translate('rubricGroup', true, true) . ' updated',
                         'redirect' => '/homepage/' . $folder->getId()
                     ])
                 );
