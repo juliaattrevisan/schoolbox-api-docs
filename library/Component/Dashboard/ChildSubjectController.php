@@ -26,9 +26,8 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         if (is_array($_SESSION['children'])) {
             $this->children = $_SESSION['children'];
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function renderTemplate($templateHandle)
