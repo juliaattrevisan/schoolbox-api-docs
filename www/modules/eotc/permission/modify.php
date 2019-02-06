@@ -145,12 +145,15 @@ foreach ($statusMapper->findAll() as $currentStatus) {
 
 /* Render everything else
  */
+$availableUsers = [];
 $allUserIds = $eventPermissionMapper->findUserIds();
+if(count($allUserIds)) {
+    $availableUsers = $userMapper->findByColumn('id', $allUserIds)->indexBy('id');
+}
 
-foreach ($allUserIds as $currentUserId) {
-    $user = $userMapper->findById($currentUserId);
+foreach ($availableUsers as $user) {
 
-    $allPermissions   = $eventPermissionMapper->findByUser($user);
+    $allPermissions = $eventPermissionMapper->findByUser($user);
     $allSubscriptions = $eventPermissionMapper->findSubscriptionsByUser($user);
 
     /* Accumulate all the campus names and remove dupes
@@ -180,14 +183,16 @@ foreach ($allUserIds as $currentUserId) {
         $statusSubscriptionNames[$currentSubscription->getStatus()->getName()] = '';
     }
 
-    $this->setVar([
-        'PERMISSION_USER_ID'              => $user->getId(),
-        'PERMISSION_USER_FIRSTNAME'       => $user->getFirstname(),
-        'PERMISSION_USER_LASTNAME'        => $user->getLastname(),
-        'PERMISSION_CAMPUS_NAMES'         => $allCampuses,
-        'PERMISSION_STATUS_NAMES'         => implode(', ', array_keys($statusNames)),
-        'PERMISSION_STATUS_SUBSCRIPTIONS' => implode(', ', array_keys($statusSubscriptionNames)),
-    ]);
+    $this->setVar(
+        [
+            'PERMISSION_USER_ID'              => $user->getId(),
+            'PERMISSION_USER_FIRSTNAME'       => $user->getFirstname(),
+            'PERMISSION_USER_LASTNAME'        => $user->getLastname(),
+            'PERMISSION_CAMPUS_NAMES'         => $allCampuses,
+            'PERMISSION_STATUS_NAMES'         => implode(', ', array_keys($statusNames)),
+            'PERMISSION_STATUS_SUBSCRIPTIONS' => implode(', ', array_keys($statusSubscriptionNames)),
+        ]
+    );
 
     $this->parse('permission_block', 'permission', true);
 }
