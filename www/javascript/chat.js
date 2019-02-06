@@ -146,6 +146,8 @@ $.widget("ui.chat",  {
 
         var $time = $hours + ':' + $minutes + ':' + $seconds + ' ' + $meridian;
 
+        var bodyValue = $self.options.body_el.val();
+
         var $message = {
             method: 'send',
             category_id: $self.options.category_id,
@@ -157,7 +159,7 @@ $.widget("ui.chat",  {
             name: $self.options.user_name,
             time: $time,
             type: 'user',
-            body: $($self.options.body_el.val()).text()
+            body: bodyValue.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
         };
 
         $($self).trigger('send', null, $message);
