@@ -47,6 +47,12 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
 $kernel->run(new class extends App
 {
     /**
+     * Helper for indenting log output for legibility.
+     */
+    private const INDENT = '  ';
+
+
+    /**
      * Query for migrating a rubric indicator from unit to a course folder.
      *
      * Called when the indicator doesn't exist in the course.
@@ -219,7 +225,7 @@ $kernel->run(new class extends App
             // Don't go further if there's no capabilities in course
             $courseCapabilityCount = count($courseRowSet->getCapabilities());
             if ($courseCapabilityCount === 0) {
-                $log->debug('    course contains no capabilities: no action required');
+                $log->debug(self::indent(1).'course contains no capabilities: no action required');
                 continue;
             }
 
@@ -227,7 +233,7 @@ $kernel->run(new class extends App
             /** @var Specification\Unit\Model[] $units */
             $units = Specification\Unit\Mapper::getInstance()->findAllByCourseFolderId($course->getFolder()->getId());
             foreach ($units as $unit) {
-                $log->info(sprintf('    finding capabilities for unit "%s"', $unit->getTitle()));
+                $log->info(sprintf(self::indent(1).'finding capabilities for unit "%s"', $unit->getTitle()));
                 // Must re-fetch the course row set after every unit, because
                 // repairRowSet may change the course row set.
                 $courseRowSet        = $rubricMapper->retrieveRowSet($course->getFolder(), false);
@@ -235,7 +241,7 @@ $kernel->run(new class extends App
                 $unitCapabilityCount = count($unitRowSet->getCapabilities());
 
                 if ($unitCapabilityCount === 0) {
-                    $log->debug('        unit contains no capabilities: no action required');
+                    $log->debug(self::indent(2).'unit contains no capabilities: no action required');
                     continue;
                 }
 
@@ -262,7 +268,7 @@ $kernel->run(new class extends App
                     $capabilityConflict = true;
                     $this->log->info(
                         sprintf(
-                            '        capability "%s" exists in course and unit: resolving conflict',
+                            self::indent(2).'capability "%s" exists in course and unit: resolving conflict',
                             $courseCapabilityName
                         )
                     );
@@ -274,7 +280,7 @@ $kernel->run(new class extends App
             if (!$capabilityConflict) {
                 $this->log->debug(
                     sprintf(
-                        '        capability "%s" exists in course, but not in unit: no action required',
+                        self::indent(2).'capability "%s" exists in course, but not in unit: no action required',
                         $courseCapabilityName
                     )
                 );
@@ -319,7 +325,7 @@ $kernel->run(new class extends App
                 // from the now-deleted unit into the course.
                 $this->log->info(
                     sprintf(
-                        '            indicator "%s" exists in course and unit: deleting from unit, then migrating to course',
+                        self::indent(3).'indicator "%s" exists in course and unit: deleting from unit, then migrating to course',
                         $unitIndicatorName
                     )
                 );
@@ -335,7 +341,7 @@ $kernel->run(new class extends App
                 // Can just move the unit indicator into the course.
                 $this->log->info(
                     sprintf(
-                        '            indicator "%s" exists in unit, but not course: moving from unit to course',
+                        self::indent(3).'indicator "%s" exists in unit, but not course: moving from unit to course',
                         $unitIndicatorName
                     )
                 );
@@ -387,7 +393,7 @@ $kernel->run(new class extends App
         foreach ($unitDescriptors as $assessmentId => $levels) {
 
             $this->log->notice(
-                sprintf('                checking assessment #%d for conflicting usage', $assessmentId)
+                sprintf(self::indent(4).'checking assessment #%d for conflicting usage', $assessmentId)
             );
 
             foreach ($levels as $levelId => $unitDescriptorId) {
@@ -400,7 +406,7 @@ $kernel->run(new class extends App
                             ->execute(['now' => $this->now, 'descriptorId' => $unitDescriptorId,]);
                     }
                     $this->log->warning(
-                        sprintf('                    assessment has conflicts for level #%d', $levelId)
+                        sprintf(self::indent(5).'assessment has conflicts for level #%d', $levelId)
                     );
                 } else {
                     // No conflicting descriptor: migrate the unit descriptor to
@@ -414,7 +420,7 @@ $kernel->run(new class extends App
                             ]);
                     }
                     $this->log->notice(
-                        sprintf('                    assessment has no conflicts for level #%d', $levelId)
+                        sprintf(self::indent(5).'assessment has no conflicts for level #%d', $levelId)
                     );
                 }
             }
@@ -430,6 +436,15 @@ $kernel->run(new class extends App
     }
 
 
+    /**
+     * Finds descriptors used by the indicator, grouped by assessment and then
+     * by level.
+     *
+     * @param Indicator $indicator
+     * @return array[] Dimension 1: assessment ID
+     *                 Dimension 2: level ID
+     *                 Key:         descriptor ID
+     */
     private function findLevelsGroupedByAssessment(Indicator $indicator): array
     {
         $assessments = [];
@@ -439,5 +454,17 @@ $kernel->run(new class extends App
             $assessments[$row['assessmentId']][$row['levelId']] = $row['id'];
         }
         return $assessments;
+    }
+
+
+    /**
+     * Helper method for indenting log output for legibility.
+     *
+     * @param int $depth The depth to indent by
+     * @return string
+     */
+    private static function indent(int $depth): string
+    {
+        return str_repeat(self::INDENT, $depth);
     }
 });
