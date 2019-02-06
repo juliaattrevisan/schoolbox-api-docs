@@ -412,7 +412,9 @@ $kernel->run(new class extends App
      */
     private function repairCapability(Capability $courseCapability, Capability $unitCapability): void
     {
-        // Capability usages must be migrated from the unit to the course.
+        // Capability usages must be migrated from the unit to the course,
+        // and deleted if there is a conflict.
+        // (This means that any mark-per-capability max values will be lost)
         $this->migrateRubricCapabilityUsageQuery
             ->execute([
                 'courseCapabilityId' => $courseCapability->getId(),
@@ -477,7 +479,8 @@ $kernel->run(new class extends App
      */
     private function repairIndicator(Indicator $courseIndicator, Indicator $unitIndicator): void
     {
-        // Indicator usages must be migrated from the unit to the course.
+        // Indicator usages must be migrated from the unit to the course,
+        // and deleted if there is a conflict.
         $this->migrateRubricIndicatorUsageQuery
             ->execute([
                 'courseIndicatorId' => $courseIndicator->getId(),
