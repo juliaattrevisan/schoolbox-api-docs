@@ -250,7 +250,8 @@ class RubricMapper
                 if ($capabilityNamesUsed[$normalizedName]) {
                     // this is used by a capability which is allowed to change:
                     // invalidate
-                    throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                    // TODO localise this
+                    throw new \UnexpectedValueException("Capability '" . $capability->getName() . "' cannot be saved because a capability with the same name already exists in this folder");
                 }
             } else {
                 $capabilityNamesUsed[$normalizedName] = $allowNameChange;
@@ -299,7 +300,8 @@ class RubricMapper
                     if ($indicatorNamesUsed[$normalizedName]) {
                         // this is used by a indicator which is allowed to
                         // change: invalidate
-                        throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                        // TODO localise this
+                        throw new \UnexpectedValueException("Indicator '" . $indicator->getName() . "' cannot be saved because an indicator with the same name already exists in the capability '" . $capability->getName() . "'");
                     }
                 } else {
                     $indicatorNamesUsed[$normalizedName] = $allowNameChange;
