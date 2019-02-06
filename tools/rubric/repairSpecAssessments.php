@@ -272,7 +272,19 @@ $kernel->run(new class extends App
                             $courseCapabilityName
                         )
                     );
-                    $this->repairCapability($courseCapability, $unitCapability);
+
+                    // Wrap in transaction after all
+                    $this->db->beginTransaction();
+                    try {
+                        $this->repairCapability($courseCapability, $unitCapability);
+                        if ($this->perform) {
+                            $this->db->commit();
+                        } else {
+                            $this->db->rollBack();
+                        }
+                    } catch (\Throwable $e) {
+                        $this->db->rollBack();
+                    }
                     break;
                 }
             }
@@ -329,11 +341,9 @@ $kernel->run(new class extends App
                         $unitIndicatorName
                     )
                 );
-                if ($this->perform) {
-                    $this->db
-                        ->prepareQuery($this->deleteRubricIndicatorQuery)
-                        ->execute(['now' => $this->now, 'unitIndicatorId' => $unitIndicator->getId(),]);
-                }
+                $this->db
+                    ->prepareQuery($this->deleteRubricIndicatorQuery)
+                    ->execute(['now' => $this->now, 'unitIndicatorId' => $unitIndicator->getId(),]);
                 $this->repairIndicator($matchingCourseIndicator, $unitIndicator);
 
             } else {
@@ -345,21 +355,17 @@ $kernel->run(new class extends App
                         $unitIndicatorName
                     )
                 );
-                if ($this->perform) {
-                    $this->db
-                        ->prepareQuery($this->migrateRubricIndicatorQuery)
-                        ->execute(['courseCapabilityId' => $courseCapability->getId(), 'unitIndicatorId' => $unitIndicator->getId(),]);
-                }
+                $this->db
+                    ->prepareQuery($this->migrateRubricIndicatorQuery)
+                    ->execute(['courseCapabilityId' => $courseCapability->getId(), 'unitIndicatorId' => $unitIndicator->getId(),]);
             }
         }
 
 
         // Now repair the capability itself, by deleting the unit-level copy
-        if ($this->perform) {
-            $this->db
-                ->prepareQuery($this->deleteRubricCapabilityQuery)
-                ->execute(['now' => $this->now, 'unitCapabilityId' => $unitCapability->getId(),]);
-        }
+        $this->db
+            ->prepareQuery($this->deleteRubricCapabilityQuery)
+            ->execute(['now' => $this->now, 'unitCapabilityId' => $unitCapability->getId(),]);
     }
 
 
@@ -373,23 +379,16 @@ $kernel->run(new class extends App
     private function repairIndicator(Indicator $courseIndicator, Indicator $unitIndicator): void
     {
         // * move rubric_criterion_usage
-        if ($this->perform) {
-            $this->db
-                ->prepareQuery($this->migrateRubricIndicatorUsageQuery)
-                ->execute([
-                    'courseIndicatorId' => $courseIndicator->getId(),
-                    'unitIndicatorId'   => $unitIndicator->getId(),
-                ]);
-        }
+        $this->db
+            ->prepareQuery($this->migrateRubricIndicatorUsageQuery)
+            ->execute([
+                'courseIndicatorId' => $courseIndicator->getId(),
+                'unitIndicatorId'   => $unitIndicator->getId(),
+            ]);
 
         // descriptors
         $courseDescriptors = $this->findDescriptors($courseIndicator);
         $unitDescriptors   = $this->findDescriptors($unitIndicator);
-
-
-//        var_dump($courseDescriptors, $unitDescriptors);
-
-
         foreach ($unitDescriptors as $assessmentId => $levels) {
 
             $this->log->notice(
@@ -400,25 +399,21 @@ $kernel->run(new class extends App
                 $courseDescriptorId = $courseDescriptors[$assessmentId][$levelId] ?? null;
                 if (isset($courseDescriptorId)) {
                     // Conflicting descriptor: keep the course version?
-                    if ($this->perform) {
-                        $this->db
-                            ->prepareQuery($this->deleteDuplicateRubricDescriptorQuery)
-                            ->execute(['now' => $this->now, 'descriptorId' => $unitDescriptorId,]);
-                    }
+                    $this->db
+                        ->prepareQuery($this->deleteDuplicateRubricDescriptorQuery)
+                        ->execute(['now' => $this->now, 'descriptorId' => $unitDescriptorId,]);
                     $this->log->warning(
                         sprintf(self::indent(5).'assessment has conflicts for level #%d', $levelId)
                     );
                 } else {
                     // No conflicting descriptor: migrate the unit descriptor to
                     // the course
-                    if ($this->perform) {
-                        $this->db
-                            ->prepareQuery($this->migrateRubricDescriptorQuery)
-                            ->execute([
-                                'courseIndicatorId' => $courseIndicator->getId(),
-                                'descriptorId'      => $unitDescriptorId,
-                            ]);
-                    }
+                    $this->db
+                        ->prepareQuery($this->migrateRubricDescriptorQuery)
+                        ->execute([
+                            'courseIndicatorId' => $courseIndicator->getId(),
+                            'descriptorId'      => $unitDescriptorId,
+                        ]);
                     $this->log->notice(
                         sprintf(self::indent(5).'assessment has no conflicts for level #%d', $levelId)
                     );
