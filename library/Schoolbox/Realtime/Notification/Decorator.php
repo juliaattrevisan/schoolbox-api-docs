@@ -332,13 +332,15 @@ class Decorator extends NotificationBundle
      */
     protected function param2html(ParameterInterface $param, $fqdn = '')
     {
+        $text = \Scrub::text($param->getText());
+
         if ($param->getHref()) {
-            return sprintf('<a href="%s%s">%s</a>', $fqdn, $param->getHref(), $param->getText());
+            return sprintf('<a href="%s%s">%s</a>', $fqdn, $param->getHref(), $text);
         }
         if ($param->getMode() === $param::STACKING_REPLACE_NO_DECORATION) {
-            return $param->getText();
+            return $text;
         }
-        return "<a>{$param->getText()}</a>";
+        return "<a>{$text}</a>";
     }
 
 

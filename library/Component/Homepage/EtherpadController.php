@@ -127,7 +127,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
                     $this->setVar([
                         'HOMEPAGE_ID' => $this->getInstance()->getIdentifier(),
                         'ETHERPAD_PAD_ID' => $currentPad->getId(),
-                        'ETHERPAD_NAME' => $currentPad->getDisplayName(),
+                        'ETHERPAD_NAME' => Scrub::text($currentPad->getDisplayName()),
                         'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
                     ]);
 

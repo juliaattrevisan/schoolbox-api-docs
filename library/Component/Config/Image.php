@@ -28,10 +28,11 @@ class Component_Config_Image extends Component_Config_Abstract
 
         if ($allImages->count()) {
             foreach ($allImages as $currentImage) {
+                $currentImageTitle = Scrub::text($currentImage->getTitle());
                 $page->setVar(
                     array(
-                        'COMPONENT_CONFIG_IMAGE'          => $currentImage->getTitle(),
-                        'COMPONENT_CONFIG_IMAGE_SELECTED' => $currentImage->getTitle() == $configValue
+                        'COMPONENT_CONFIG_IMAGE'          => $currentImageTitle,
+                        'COMPONENT_CONFIG_IMAGE_SELECTED' => $currentImageTitle === $configValue
                             ? ' selected="selected"'
                             : ''
                     )
