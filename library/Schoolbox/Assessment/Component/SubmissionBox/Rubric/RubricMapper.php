@@ -214,6 +214,8 @@ class RubricMapper
         // Track names used
         $capabilityNamesUsed      = [];
 
+        // Track names changed
+        $capabilityNamesChanged   = [];
 
         // Process capabilities+indicators into models
         foreach ($rowSet->getCapabilities() as $capability) {
@@ -243,6 +245,7 @@ class RubricMapper
             }
             if ($allowNameChange) {
                 $capabilityModel->setName($capability->getName());
+                $capabilityNamesChanged[] = $capability->getId();
             }
 
             // Validate if this name has already been used by a capability whose
@@ -361,9 +364,17 @@ class RubricMapper
             $courseCapabilitiesForDeduping = [];
             foreach ($newCapabilityModels as $courseCapability) {
                 // If we validate all capabilities indiscriminately, existing legacy data from before this validation
-                // may prevent users from modifying their rubric at all, so make sure we only validate new caps.
-                // If capability is newly added, it will have no ID.
-                $isNewCapability = null === $courseCapability->getId();
+                // may prevent users from modifying their rubric at all, so make sure we only validate:
+                // - new caps, OR
+                // - existing caps whose names have changed
+                $isNewCapability = false;
+                $nameChanged = false;
+                if ($courseCapability->getId() === null) {
+                    // If capability is newly added, it will have no ID.
+                    $isNewCapability = true;
+                } else {
+                    $nameChanged = in_array($courseCapability->getId(), $capabilityNamesChanged);
+                }
 
                 // If capability has no indicators, it will be deleted automatically, so we don't need to dedupe it.
                 $hasIndicators = false;
@@ -374,7 +385,7 @@ class RubricMapper
                     }
                 }
 
-                if ($isNewCapability && $hasIndicators) {
+                if (($isNewCapability || $nameChanged) && $hasIndicators) {
                     $courseCapabilitiesForDeduping[] = $courseCapability;
                 }
             }
