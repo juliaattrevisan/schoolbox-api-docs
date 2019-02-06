@@ -20,6 +20,7 @@
 declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Statement\Query\IQuery;
 use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
@@ -56,29 +57,36 @@ $kernel->run(new class extends App
      * Query for migrating a rubric indicator from unit to a course folder.
      *
      * Called when the indicator doesn't exist in the course.
-     *
-     * @var string
      */
-    private $migrateRubricIndicatorQuery = '
+    private const MIGRATE_RUBRIC_INDICATOR_QUERY = '
         UPDATE rubric_criterion
         SET    rubric_group_id = :courseCapabilityId
         WHERE  id              = :unitIndicatorId
     ';
 
 
-
     /**
      * Query for deleting a rubric capability from a unit folder.
      *
      * Called when a capability of the same name exists in the course.
-     *
-     * @var string
      */
-    private $deleteRubricCapabilityQuery = '
+    private const DELETE_RUBRIC_CAPABILITY_QUERY = '
         UPDATE rubric_group
         SET    deleted_at = :now
         WHERE  id         = :unitCapabilityId
     ';
+
+
+    /**
+     * @var IQuery
+     */
+    private $migrateRubricIndicatorQuery;
+
+
+    /**
+     * @var IQuery
+     */
+    private $deleteRubricCapabilityQuery;
 
 
     /**
@@ -226,6 +234,11 @@ $kernel->run(new class extends App
         $this->db      = $di->get('databaseInternal');
         $this->now     = Alaress_Date_Format::now();
         $this->perform = $opts['perform'] ?? false;
+
+
+        // Prepare queries
+        $this->migrateRubricIndicatorQuery = $this->db->prepareQuery(self::MIGRATE_RUBRIC_INDICATOR_QUERY);
+        $this->deleteRubricCapabilityQuery = $this->db->prepareQuery(self::DELETE_RUBRIC_CAPABILITY_QUERY);
 
 
         // Wrap entire loop in a transaction
@@ -393,16 +406,14 @@ $kernel->run(new class extends App
                         $unitIndicatorName
                     )
                 );
-                $this->db
-                    ->prepareQuery($this->migrateRubricIndicatorQuery)
+                $this->migrateRubricIndicatorQuery
                     ->execute(['courseCapabilityId' => $courseCapability->getId(), 'unitIndicatorId' => $unitIndicator->getId(),]);
             }
         }
 
 
         // Now repair the capability itself, by deleting the unit-level copy
-        $this->db
-            ->prepareQuery($this->deleteRubricCapabilityQuery)
+        $this->deleteRubricCapabilityQuery
             ->execute(['now' => $this->now, 'unitCapabilityId' => $unitCapability->getId(),]);
     }
 
