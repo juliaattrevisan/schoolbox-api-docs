@@ -103,6 +103,19 @@ $kernel->run(new class extends App
 
 
     /**
+     * Query for migrating the usages of a rubric indicator from unit to a
+     * course folder.
+     *
+     * @var string
+     */
+    private $migrateRubricIndicatorUsageQuery = '
+        UPDATE rubric_criterion_usage
+        SET    criterion_id = :courseIndicatorId
+        WHERE  criterion_id = :unitIndicatorId
+    ';
+
+
+    /**
      * Query for finding usages of rubric descriptors for an indicator.
      *
      * @var string
@@ -193,7 +206,7 @@ $kernel->run(new class extends App
             // Don't go further if there's no capabilities in course
             $courseCapabilityCount = count($courseRowSet->getCapabilities());
             if ($courseCapabilityCount === 0) {
-                $log->info('Course contains no capabilities: skipping');
+                $log->debug('Course contains no capabilities: no action required');
                 continue;
             }
 
@@ -208,7 +221,7 @@ $kernel->run(new class extends App
                 $unitCapabilityCount = count($unitRowSet->getCapabilities());
 
                 if ($unitCapabilityCount === 0) {
-                    $log->debug('Unit contains no capabilities: skipping');
+                    $log->debug('Unit contains no capabilities: no action required');
                     continue;
                 }
 
@@ -242,26 +255,19 @@ $kernel->run(new class extends App
                         )
                     );
                     $this->repairCapability($courseCapability, $unitCapability);
-
-                    // TODO Remove capability from unit
                     break;
                 }
             }
 
             if (!$capabilityConflict) {
-                $this->log->info(
+                $this->log->debug(
                     sprintf(
-                        'Capability "%s" exists in course, but not in unit: skipping',
+                        'Capability "%s" exists in course, but not in unit: no action required',
                         $courseCapabilityName
                     )
                 );
             }
         }
-
-        // TODO persist rowsets
-
-//        RubricMapper::getInstance()->persistRowSet($courseRowSet);
-//        RubricMapper::getInstance()->persistRowSet($unitRowSet);
     }
 
 
@@ -286,16 +292,18 @@ $kernel->run(new class extends App
 
 
             if ($matchingCourseIndicator) {
-                // Delete unit-level indicator
-                // Need to then migrate descriptors
+                // Indicator exists in course and unit.
+                // Need to delete the unit indicator, then migrate descriptors
+                // from the now-deleted unit into the course.
                 $this->log->info(
-                    sprintf('Indicator "%s" exists in course and unit: migrating and repairing', $unitIndicatorName)
+                    sprintf(
+                        'Indicator "%s" exists in course and unit: deleting from unit, then migrating to course',
+                        $unitIndicatorName
+                    )
                 );
                 $this->db
                     ->prepareQuery($this->deleteRubricIndicatorQuery)
                     ->execute(['now' => $this->now, 'unitIndicatorId' => $unitIndicator->getId(),]);
-
-                // * move rubric_group_usage
                 $this->db
                     ->prepareQuery($this->migrateRubricCapabilityUsageQuery)
                     ->execute([
@@ -305,10 +313,13 @@ $kernel->run(new class extends App
                 $this->repairIndicator($matchingCourseIndicator, $unitIndicator);
 
             } else {
-                // Move unit-level indicator
-                // No need to migrate anything
+                // Indicator exists in unit, but not course.
+                // Can just move the unit indicator into the course.
                 $this->log->info(
-                    sprintf('Indicator "%s" exists in unit, but not course: migrating', $unitIndicatorName)
+                    sprintf(
+                        'Indicator "%s" exists in unit, but not course: moving from course to unit',
+                        $unitIndicatorName
+                    )
                 );
                 $this->db
                     ->prepareQuery($this->migrateRubricIndicatorQuery)
@@ -335,7 +346,7 @@ $kernel->run(new class extends App
     {
         // * move rubric_criterion_usage
         $this->db
-            ->prepareQuery($this->migrateRubricIndicatorQuery)
+            ->prepareQuery($this->migrateRubricIndicatorUsageQuery)
             ->execute([
                 'courseIndicatorId' => $courseIndicator->getId(),
                 'unitIndicatorId'   => $unitIndicator->getId(),
