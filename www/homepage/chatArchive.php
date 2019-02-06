@@ -8,6 +8,9 @@
  */
 
 
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+
 $this->setFile(TEMPLATE_content, '/homepage/chatArchive.html');
 $this->setBlock(TEMPLATE_content, 'add_chat', 'add_chat_block');
 $this->setBlock(TEMPLATE_content, 'category_header', 'category_header_block');
@@ -40,7 +43,7 @@ try {
     $folder = $folderMapper->findById($filter['folder']);
 
     // Check if user has a permission to read this page
-    if ((new Group())->getPermission($folder->getId()) < READ_ACCESS) {
+    if (Access::getInstance()->getFolderAccess($_SESSION['user'], $folder->getId()) < UserAccess::ACCESS_READ) {
         error(6);
     }
 
