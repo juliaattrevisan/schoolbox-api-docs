@@ -54,7 +54,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
         foreach ($this->children as $child) {
 
-            // Check if the current childs timetable is viewable and hide if necessary
+            // Check if the current child's timetable is viewable and hide if necessary
             try {
                 $userChild = $userMapper->findById($child['id']);
                 $userChild->loadParents();
