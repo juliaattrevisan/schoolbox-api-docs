@@ -532,17 +532,12 @@ class Session
                                     }
                                 }
 
-                                if ($cat instanceof Folder) {
-                                    if (Access::getInstance()->getFolderAccess($_SESSION['user'],
-                                            $cat->getId()) >= UserAccess::ACCESS_READ
-                                    ) {
-                                        if (!in_array($cat->getId(), $subjectIDList)) {
-                                            $subject['id'] = $cat->getId();
-                                            $subject['name'] = $cat->getName();
-                                            $subjects[] = $subject;
-                                            $subjectIDList[] = $cat->getId(); //dont dupe ids in this list
-                                        }
-                                    }
+                                if ($cat instanceof Folder && !\in_array($cat->getId(), $subjectIDList, false)) {
+                                    $subject['id']   = $cat->getId();
+                                    $subject['name'] = $cat->getName();
+                                    $subject['perm'] = Access::getInstance()->getFolderAccess($_SESSION['user'], $cat->getId());
+                                    $subjects[]      = $subject;
+                                    $subjectIDList[] = $cat->getId(); //dont dupe ids in this list
                                 }
                             }
                         }
