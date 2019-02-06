@@ -159,12 +159,12 @@ $.widget("ui.chat",  {
             name: $self.options.user_name,
             time: $time,
             type: 'user',
-            body: bodyValue.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+            body: bodyValue
         };
 
         $($self).trigger('send', null, $message);
 
-        $self._append_message($message);
+        $self._append_message($message, true);
 
         $.ajax({
             type: 'POST',
@@ -208,7 +208,7 @@ $.widget("ui.chat",  {
 
     },
 
-    _append_message: function ($message) {
+    _append_message: function ($message, newMessage) {
 
         var last = this.options.log_el.find('li').last();
 
@@ -217,9 +217,22 @@ $.widget("ui.chat",  {
         var scrollTop = this.options.log_el.prop('scrollTop');
         var height    = this.options.log_el.prop('scrollHeight') - this.options.log_el.prop('offsetHeight');
         var scroll    = (Math.abs(scrollTop - height) === 0);
+        var newMessageFormat;
 
         if ($message.user_id == last.data('user')) {
-            last.find('.card').append('<p class="spaced">{0}</p>'.format($message.body));
+            // Cleanup string before appending into the body to prevent XSS attack
+            if (newMessage) {
+                newMessageFormat = $message.body
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
+
+            } else {
+                newMessageFormat = $message.body;
+            }
+
+            last.find('.card').append('<p class="spaced">{0}</p>'.format(newMessageFormat));
         } else {
 
             var $message_el = $('<li data-user="{0}" class="row"></li>'.format($message.user_id)).addClass('chat-message-' + $message.type);
