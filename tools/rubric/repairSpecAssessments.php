@@ -49,31 +49,37 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
 $kernel->run(new class extends App
 {
     private const INDENT = '  ';
+
     private const MIGRATE_RUBRIC_INDICATOR_QUERY = '
         UPDATE rubric_criterion
         SET    rubric_group_id = :courseCapabilityId
         WHERE  id              = :unitIndicatorId
     ';
+
     private const DELETE_RUBRIC_CAPABILITY_QUERY = '
         UPDATE rubric_group
         SET    deleted_at = :now
         WHERE  id         = :unitCapabilityId
     ';
+
     private const DELETE_RUBRIC_INDICATOR_QUERY = '
         UPDATE rubric_criterion
         SET    deleted_at = :now
         WHERE  id         = :unitIndicatorId
     ';
+
     private const MIGRATE_RUBRIC_CAPABILITY_USAGE_QUERY = '
         UPDATE rubric_group_usage
         SET    rubric_group_id = :courseCapabilityId
         WHERE  rubric_group_id = :unitCapabilityId
     ';
+
     private const MIGRATE_RUBRIC_INDICATOR_USAGE_QUERY = '
         UPDATE rubric_criterion_usage
         SET    criterion_id = :courseIndicatorId
         WHERE  criterion_id = :unitIndicatorId
     ';
+
     private const FIND_RUBRIC_DESCRIPTOR_QUERY = '
         SELECT rl.id AS levelId,
                rd.id,
@@ -84,11 +90,13 @@ $kernel->run(new class extends App
         INNER JOIN assessment         a ON sb.assessment_id = a.id
         WHERE  criterion_id = :indicatorId
     ';
+
     private const DELETE_DUPLICATE_RUBRIC_DESCRIPTOR_QUERY = '
         UPDATE rubric_descriptor
         SET    deleted_at = :now
         WHERE  id         = :descriptorId
     ';
+
     private const MIGRATE_RUBRIC_DESCRIPTOR_QUERY = '
         UPDATE rubric_descriptor
         SET    criterion_id = :courseIndicatorId
