@@ -121,9 +121,13 @@ $kernel->run(new class extends App
      * @var string
      */
     private $findRubricDescriptorQuery = '
-        SELECT level_id AS levelId,
-               id
-        FROM   rubric_descriptor
+        SELECT rl.id AS levelId,
+               rd.id,
+               a.id AS assessmentId
+        FROM       rubric_descriptor rd 
+        INNER JOIN rubric_level      rl ON rd.level_id = rl.id
+        INNER JOIN submission_box    sb ON rl.box_id = sb.id
+        INNER JOIN assessment         a ON sb.assessment_id = a.id
         WHERE  criterion_id = :indicatorId
     ';
 
@@ -224,6 +228,9 @@ $kernel->run(new class extends App
             $units = Specification\Unit\Mapper::getInstance()->findAllByCourseFolderId($course->getFolder()->getId());
             foreach ($units as $unit) {
                 $log->info(sprintf('    finding capabilities for unit "%s"', $unit->getTitle()));
+                // Must re-fetch the course row set after every unit, because
+                // repairRowSet may change the course row set.
+                $courseRowSet        = $rubricMapper->retrieveRowSet($course->getFolder(), false);
                 $unitRowSet          = $rubricMapper->retrieveRowSet($unit->getFolder(), false);
                 $unitCapabilityCount = count($unitRowSet->getCapabilities());
 
@@ -370,37 +377,49 @@ $kernel->run(new class extends App
         }
 
         // descriptors
-        $descriptorQuery = $this->db->prepareQuery($this->findRubricDescriptorQuery);
-        $descriptorQuery->execute(['indicatorId' => $courseIndicator->getId(),]);
-        $courseDescriptors = $descriptorQuery->fetchColumnArray('id', 'levelId');
-        $descriptorQuery->execute(['indicatorId' => $unitIndicator->getId(),]);
-        $unitDescriptors = $descriptorQuery->fetchColumnArray('id', 'levelId');
+        $courseDescriptors = $this->findLevelsGroupedByAssessment($courseIndicator);
+        $unitDescriptors   = $this->findLevelsGroupedByAssessment($unitIndicator);
+
 
 //        var_dump($courseDescriptors, $unitDescriptors);
 
 
-        foreach ($unitDescriptors as $levelId => $unitDescriptorId) {
-            // Is this descriptor used in the course copy?
-            $courseDescriptorId = $courseDescriptors[$levelId] ?? null;
-            if (isset($courseDescriptorId)) {
-                // Conflicting descriptor: keep the course version?
-                if ($this->perform) {
-                    $this->db
-                        ->prepareQuery($this->deleteDuplicateRubricDescriptorQuery)
-                        ->execute(['now' => $this->now, 'descriptorId' => $unitDescriptorId,]);
-                }
-            } else {
-                // No conflicting descriptor: migrate the unit descriptor to
-                // the course
-                if ($this->perform) {
-                    $this->db
-                        ->prepareQuery($this->migrateRubricDescriptorQuery)
-                        ->execute([
-                            'courseIndicatorId' => $courseIndicator->getId(),
-                            'descriptorId'      => $unitDescriptorId,
-                        ]);
+        foreach ($unitDescriptors as $assessmentId => $levels) {
+
+            $this->log->notice(
+                sprintf('                checking assessment #%d for conflicting usage', $assessmentId)
+            );
+
+            foreach ($levels as $levelId => $unitDescriptorId) {
+                $courseDescriptorId = $courseDescriptors[$assessmentId][$levelId] ?? null;
+                if (isset($courseDescriptorId)) {
+                    // Conflicting descriptor: keep the course version?
+                    if ($this->perform) {
+                        $this->db
+                            ->prepareQuery($this->deleteDuplicateRubricDescriptorQuery)
+                            ->execute(['now' => $this->now, 'descriptorId' => $unitDescriptorId,]);
+                    }
+                    $this->log->warning(
+                        sprintf('                    assessment has conflicts for level #%d', $levelId)
+                    );
+                } else {
+                    // No conflicting descriptor: migrate the unit descriptor to
+                    // the course
+                    if ($this->perform) {
+                        $this->db
+                            ->prepareQuery($this->migrateRubricDescriptorQuery)
+                            ->execute([
+                                'courseIndicatorId' => $courseIndicator->getId(),
+                                'descriptorId'      => $unitDescriptorId,
+                            ]);
+                    }
+                    $this->log->notice(
+                        sprintf('                    assessment has no conflicts for level #%d', $levelId)
+                    );
                 }
             }
+
+            // Is this descriptor used in the course copy?
         }
 
 
@@ -408,5 +427,17 @@ $kernel->run(new class extends App
         // but move them anyway
         // * move rubric_descriptor_mark
         // * move rubric_group_mark
+    }
+
+
+    private function findLevelsGroupedByAssessment(Indicator $indicator): array
+    {
+        $assessments = [];
+        $descriptorQuery = $this->db->prepareQuery($this->findRubricDescriptorQuery);
+        $descriptorQuery->execute(['indicatorId' => $indicator->getId(),]);
+        foreach ($descriptorQuery->getIterator() as $row) {
+            $assessments[$row['assessmentId']][$row['levelId']] = $row['id'];
+        }
+        return $assessments;
     }
 });
