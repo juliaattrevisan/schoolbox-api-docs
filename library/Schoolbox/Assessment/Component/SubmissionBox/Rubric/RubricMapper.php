@@ -250,8 +250,12 @@ class RubricMapper
                 if ($capabilityNamesUsed[$normalizedName]) {
                     // this is used by a capability which is allowed to change:
                     // invalidate
-                    // TODO localise this
-                    throw new \UnexpectedValueException("Capability '" . $capability->getName() . "' cannot be saved because a capability with the same name already exists in this folder");
+
+                    // forgive me for I have sinned
+                    $capabilityL10nArticle = \Schoolbox\Mapper::getDi()->get('l10n')->indefiniteArticle('rubricGroup', false, true);
+                    $capabilityL10nCapitalised = \Schoolbox\Mapper::getDi()->get('l10n')->translate('rubricGroup', false, true);
+                    $capabilityL10nLowercase = \Schoolbox\Mapper::getDi()->get('l10n')->translate('rubricGroup', false, false);
+                    throw new \UnexpectedValueException("$capabilityL10nCapitalised '" . $capability->getName() . "' cannot be saved because $capabilityL10nArticle $capabilityL10nLowercase with the same name already exists in this folder");
                 }
             } else {
                 $capabilityNamesUsed[$normalizedName] = $allowNameChange;
@@ -300,8 +304,13 @@ class RubricMapper
                     if ($indicatorNamesUsed[$normalizedName]) {
                         // this is used by a indicator which is allowed to
                         // change: invalidate
-                        // TODO localise this
-                        throw new \UnexpectedValueException("Indicator '" . $indicator->getName() . "' cannot be saved because an indicator with the same name already exists in the capability '" . $capability->getName() . "'");
+
+                        // forgive me for I have sinned
+                        $indicatorL10nArticle = \Schoolbox\Mapper::getDi()->get('l10n')->indefiniteArticle('rubricCriterion', false, true);
+                        $indicatorL10nCapitalised = \Schoolbox\Mapper::getDi()->get('l10n')->translate('rubricCriterion', false, true);
+                        $indicatorL10nLowercase = \Schoolbox\Mapper::getDi()->get('l10n')->translate('rubricCriterion', false, false);
+                        $capabilityL10nLowercase = \Schoolbox\Mapper::getDi()->get('l10n')->translate('rubricGroup', false, false);
+                        throw new \UnexpectedValueException("$indicatorL10nCapitalised '" . $indicator->getName() . "' cannot be saved because $indicatorL10nArticle $indicatorL10nLowercase with the same name already exists in the $capabilityL10nLowercase '" . $capability->getName() . "'");
                     }
                 } else {
                     $indicatorNamesUsed[$normalizedName] = $allowNameChange;
@@ -398,8 +407,11 @@ class RubricMapper
             if (!empty ($duplicateCapabilities)) {
                 $errorMessage = '';
                 foreach ($duplicateCapabilities as $capabilityName => $units) {
-                    // TODO localise this
-                    $errorMessage .= "<p>Capability '$capabilityName' cannot be saved because a capability with the same name already exists in the following unit(s) in this course:<br/><ul>";
+                    // forgive me for I have sinned
+                    $capabilityL10nArticle = \Schoolbox\Mapper::getDi()->get('l10n')->indefiniteArticle('rubricGroup', false, true);
+                    $capabilityL10nCapitalised = \Schoolbox\Mapper::getDi()->get('l10n')->translate('rubricGroup', false, true);
+                    $capabilityL10nLowercase = \Schoolbox\Mapper::getDi()->get('l10n')->translate('rubricGroup', false, false);
+                    $errorMessage .= "<p>$capabilityL10nCapitalised '$capabilityName' cannot be saved because $capabilityL10nArticle $capabilityL10nLowercase with the same name already exists in the following unit(s) in this course:<br/><ul>";
                     foreach ($units as $unit) {
                         $unitName = $unit['unitName'];
                         $folderId = $unit['folderId'];
