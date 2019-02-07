@@ -46,7 +46,6 @@ class LevelMapper extends Mapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateBoxIdNotChanged']);
-        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDescriptors']);
     }
 
 
@@ -59,19 +58,6 @@ class LevelMapper extends Mapper
     public function validateBoxIdNotChanged(Level $level): bool
     {
         $this->assertJoinedModelNotChanged($level, 'box', 'Rubric levels may not be transferred between due works');
-        return true;
-    }
-
-
-    /**
-     * Soft-delete callback to delete any descriptors for this level
-     *
-     * @param Level $level
-     * @return bool
-     */
-    public function softDeleteDescriptors(Level $level)
-    {
-        DescriptorMapper::getInstance()->deleteByColumn('level_id', $level->getId());
         return true;
     }
 

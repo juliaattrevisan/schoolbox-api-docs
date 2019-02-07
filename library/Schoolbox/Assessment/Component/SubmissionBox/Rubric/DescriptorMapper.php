@@ -47,8 +47,6 @@ class DescriptorMapper extends Schoolbox\Mapper {
 
     /**
      * @param Descriptor $descriptor
-     * @throws Schoolbox\Mapper\Exception
-     * @throws Schoolbox\Mapper\Exception\Deleted
      * @throws Schoolbox\Mapper\DefinitionException
      */
     public function deleteEmptyLevel(Descriptor $descriptor)
