@@ -325,7 +325,9 @@ $kernel->run(new class extends App
     /**
      * Significant events: read these, if nothing else.
      *
-     * @var array|string[]
+     * Indexed by assessment ID.
+     *
+     * @var array|string[][]
      */
     private $significantEvents = [];
 
@@ -410,9 +412,7 @@ $kernel->run(new class extends App
         // Talk about significant events
         if (!empty($this->significantEvents)) {
             $this->log->warning('Assessments affected:');
-            foreach ($this->significantEvents as $event) {
-                $this->log->warning($event);
-            }
+            $this->outputSignificantEvents();
         } else {
             $this->log->warning('No assessments affected');
         }
@@ -658,7 +658,7 @@ $kernel->run(new class extends App
                     // Conflict: keep the course descriptor, delete the unit one
                     $this->deleteDuplicateRubricDescriptorQuery
                         ->execute(['now' => $this->now, 'descriptorId' => $unitDescriptorId,]);
-                    $this->log->warning(
+                    $this->log->notice(
                         sprintf(self::indent(5).'assessment has conflicts for level #%d', $levelId)
                     );
                     $removedDescriptorCount++;
@@ -735,10 +735,24 @@ $kernel->run(new class extends App
      */
     private function logSignificantEvent(int $assessmentId, string $message): void
     {
-        $url = (new Uri())
-            ->setScheme('https')
-            ->setHost($this->fqdn)
-            ->setPath('/learning/assessments/'.$assessmentId);
-        $this->significantEvents[] = sprintf('%s (%s)', $url->toString(), $message);
+        $this->significantEvents[$assessmentId][] = $message;
+    }
+
+
+    /**
+     * Output significant events.
+     */
+    private function outputSignificantEvents(): void
+    {
+        foreach ($this->significantEvents as $assessmentId => $events) {
+            $url = (new Uri())
+                ->setScheme('https')
+                ->setHost($this->fqdn)
+                ->setPath('/learning/assessments/'.$assessmentId);
+            $this->log->warning(self::indent(1).$url->toString());
+            foreach ($events as $event) {
+                $this->log->warning(self::indent(2).$event);
+            }
+        }
     }
 });
