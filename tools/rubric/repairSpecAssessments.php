@@ -134,13 +134,13 @@ $kernel->run(new class extends App
     private const MIGRATE_RUBRIC_DESCRIPTOR_QUERY = '
         UPDATE rubric_descriptor
         SET    criterion_id = :courseIndicatorId
-        WHERE  id           = :descriptorId
+        WHERE  id           = :unitDescriptorId
     ';
 
     private const DELETE_DUPLICATE_RUBRIC_DESCRIPTOR_QUERY = '
         UPDATE rubric_descriptor
         SET    deleted_at = :now
-        WHERE  id         = :descriptorId
+        WHERE  id         = :unitDescriptorId
     ';
 
 
@@ -577,7 +577,10 @@ $kernel->run(new class extends App
                     )
                 );
                 $this->deleteRubricIndicatorQuery
-                    ->execute(['now' => $this->now, 'unitIndicatorId' => $unitIndicator->getId(),]);
+                    ->execute([
+                        'now'             => $this->now,
+                        'unitIndicatorId' => $unitIndicator->getId(),
+                    ]);
 
 
                 $this->repairIndicator($matchingCourseIndicator, $unitIndicator);
@@ -592,14 +595,20 @@ $kernel->run(new class extends App
                     )
                 );
                 $this->migrateRubricIndicatorQuery
-                    ->execute(['courseCapabilityId' => $courseCapability->getId(), 'unitIndicatorId' => $unitIndicator->getId(),]);
+                    ->execute([
+                        'courseCapabilityId' => $courseCapability->getId(),
+                        'unitIndicatorId'    => $unitIndicator->getId(),
+                    ]);
             }
         }
 
 
         // Now repair the capability itself, by deleting the unit-level copy
         $this->deleteRubricCapabilityQuery
-            ->execute(['now' => $this->now, 'unitCapabilityId' => $unitCapability->getId(),]);
+            ->execute([
+                'now'              => $this->now,
+                'unitCapabilityId' => $unitCapability->getId(),
+            ]);
     }
 
 
@@ -657,7 +666,10 @@ $kernel->run(new class extends App
                 if (isset($courseDescriptorId)) {
                     // Conflict: keep the course descriptor, delete the unit one
                     $this->deleteDuplicateRubricDescriptorQuery
-                        ->execute(['now' => $this->now, 'descriptorId' => $unitDescriptorId,]);
+                        ->execute([
+                            'now'              => $this->now,
+                            'unitDescriptorId' => $unitDescriptorId,
+                        ]);
                     $this->log->notice(
                         sprintf(self::indent(5).'assessment has conflicts for level #%d', $levelId)
                     );
@@ -667,7 +679,7 @@ $kernel->run(new class extends App
                     $this->migrateRubricDescriptorQuery
                         ->execute([
                             'courseIndicatorId' => $courseIndicator->getId(),
-                            'descriptorId'      => $unitDescriptorId,
+                            'unitDescriptorId'  => $unitDescriptorId,
                         ]);
                     $this->log->notice(
                         sprintf(self::indent(5).'assessment has no conflicts for level #%d', $levelId)
