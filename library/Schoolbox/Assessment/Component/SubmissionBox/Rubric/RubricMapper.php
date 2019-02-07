@@ -2054,13 +2054,8 @@ class RubricMapper
         /** @var Level[]|GenericCollection $srcLevels */
         $srcLevels = $levelMapper->findByColumn('box_id', $sourceBox->getId())->indexBy('id');
 
-        $numDescriptors = 0;
-        foreach($srcLevels as $level) {
-            $srcDescriptorsForLevel = $descriptorMapper->findByColumn('level_id', $level->getId())->indexBy('id');
-            $numDescriptors+= \count($srcDescriptorsForLevel);
-        }
-        // If no levels, the source box does not have a rubric. Bug out.
-        if (! $numDescriptors) {
+        if (! $sourceBox->getUseRubric()) {
+            // No rubric? Can't work with that - die.
             return false;
         }
 
