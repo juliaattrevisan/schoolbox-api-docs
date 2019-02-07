@@ -80,6 +80,12 @@ class UserAccess implements IModel
     public const SERVICE_SPORTS_ADMINISTRATOR = 10;
 
     /**
+     * Services that do not have have service identifiers (sid) use this value
+     * (This is enforced at the DB level by not permitted nulls, and defaulting to '0)
+     */
+    public const SID_NONE = 0;
+
+    /**
      * Status of your acceptance into the group
      * 0 awaiting authorisation
      * 1 you're in
