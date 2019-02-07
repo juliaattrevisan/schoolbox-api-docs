@@ -641,7 +641,7 @@ $kernel->run(new class extends App
                         $unitIndicatorName
                     )
                 );
-                $this->repairIndicator($matchingCourseIndicatorId, $unitIndicatorId);
+                $this->repairIndicator($matchingCourseIndicatorId, $unitIndicatorId, $unitIndicatorName);
 
             } else {
                 // Indicator exists in unit, but not course.
@@ -674,34 +674,36 @@ $kernel->run(new class extends App
      * Attempt to repair this unit indicator by migrating its usages into the
      * course indicator.
      *
-     * @param Indicator $courseIndicator
-     * @param Indicator $unitIndicator
+     * @param int    $courseIndicatorId the ID of the course-level indicator
+     * @param int    $unitIndicatorId   the ID of the unit-level indicator
+     * @param string $indicatorName     the indicator name (Logging only, and
+     *                                  the same for both course and unit)
      */
-    private function repairIndicator(Indicator $courseIndicator, Indicator $unitIndicator): void
+    private function repairIndicator(int $courseIndicatorId, int $unitIndicatorId, string $indicatorName): void
     {
         $this->findRubricIndicatorUsageQuery
-            ->execute(['unitIndicatorId' => $unitIndicator->getId(),]);
+            ->execute(['unitIndicatorId' => $unitIndicatorId,]);
         foreach ($this->findRubricIndicatorUsageQuery->fetchColumnArray('id') as $assessmentId) {
             // attempt to migrate
             try {
                 $this->migrateRubricIndicatorUsageQuery
                     ->execute([
-                        'courseIndicatorId' => $courseIndicator->getId(),
-                        'unitIndicatorId'   => $unitIndicator->getId(),
+                        'courseIndicatorId' => $courseIndicatorId,
+                        'unitIndicatorId'   => $unitIndicatorId,
                         'assessmentId'      => $assessmentId,
                     ]);
             } catch (Alaress\Database\Exception $e) {
                 // Foreign key error: delete (This is significant)
                 $this->deleteRubricIndicatorUsageQuery
                     ->execute([
-                        'unitIndicatorId' => $unitIndicator->getId(),
+                        'unitIndicatorId' => $unitIndicatorId,
                         'assessmentId'    => $assessmentId,
                     ]);
                 $this->logSignificantEvent(
                     (int)$assessmentId,
                     sprintf(
                         'removed usage record for indicator "%s"',
-                        $unitIndicator->getName()
+                        $indicatorName
                     )
                 );
             }
@@ -709,8 +711,8 @@ $kernel->run(new class extends App
 
 
         // Find the descriptors for the course and unit
-        $courseDescriptors = $this->findDescriptors($courseIndicator);
-        $unitDescriptors   = $this->findDescriptors($unitIndicator);
+        $courseDescriptors = $this->findDescriptors($courseIndicatorId);
+        $unitDescriptors   = $this->findDescriptors($unitIndicatorId);
         foreach ($unitDescriptors as $assessmentId => $levels) {
             $removedDescriptorCount  = 0;
             $migratedDescriptorCount = 0;
@@ -736,7 +738,7 @@ $kernel->run(new class extends App
                     // No conflict: migrate the unit descriptor to the course
                     $this->migrateRubricDescriptorQuery
                         ->execute([
-                            'courseIndicatorId' => $courseIndicator->getId(),
+                            'courseIndicatorId' => $courseIndicatorId,
                             'unitDescriptorId'  => $unitDescriptorId,
                         ]);
                     $this->log->notice(
@@ -754,7 +756,7 @@ $kernel->run(new class extends App
                     'removed %d and migrated %d descriptors from indicator "%s"',
                     $removedDescriptorCount,
                     $migratedDescriptorCount,
-                    $unitIndicator->getName()
+                    $indicatorName
                 )
             );
         }
@@ -764,7 +766,7 @@ $kernel->run(new class extends App
         $this->deleteRubricIndicatorQuery
             ->execute([
                 'now'             => $this->now,
-                'unitIndicatorId' => $unitIndicator->getId(),
+                'unitIndicatorId' => $unitIndicatorId,
             ]);
 
 
@@ -777,15 +779,15 @@ $kernel->run(new class extends App
      * Finds descriptors used by the indicator, grouped by assessment and then
      * by level.
      *
-     * @param Indicator $indicator
+     * @param int $indicatorId
      * @return array[] Dimension 1: assessment ID
      *                 Dimension 2: level ID
      *                 Key:         descriptor ID
      */
-    private function findDescriptors(Indicator $indicator): array
+    private function findDescriptors(int $indicatorId): array
     {
         $assessments = [];
-        $this->findRubricDescriptorQuery->execute(['indicatorId' => $indicator->getId(),]);
+        $this->findRubricDescriptorQuery->execute(['indicatorId' => $indicatorId,]);
         foreach ($this->findRubricDescriptorQuery->getIterator() as $row) {
             $assessments[$row['assessmentId']][$row['levelId']] = $row['id'];
         }
