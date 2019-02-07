@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News\Search;
 
 use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
 use Schoolbox\Resource\Search\Renderer\Base;
+use Scrub;
 
 class Renderer extends Base
 {
@@ -58,12 +59,12 @@ class Renderer extends Base
                 $this->getPage()->setVar(array(
                     'NEWS_ID' => $currentArticle->getId(),
                     'NEWS_LINK' => $this->getPage()->getDi()->get('router')->generate('commsNews.getDetail', ['articleId' => $currentArticle->getId()]),
-                    'NEWS_TITLE' => $currentArticle->getTitle(),
+                    'NEWS_TITLE' => \Scrub::text($currentArticle->getTitle()),
                     'NEWS_AUTHOR_ID' => $currentArticle->getAuthor()->getId(),
-                    'NEWS_AUTHOR_NAME' => $currentArticle->getAuthor()->getFullname(),
+                    'NEWS_AUTHOR_NAME' => \Scrub::text($currentArticle->getAuthor()->getFullname()),
                     'NEWS_PUBLISH_AT_LONG' => $currentArticle->getPublishAt()->getLong(),
                     'NEWS_PUBLISH_AT' => $currentArticle->getPublishAt()->getRelativeTime(),
-                    'NEWS_BLURB' => \TextFormatter::cutSentence(strip_tags($currentArticle->getBody()), 300)
+                    'NEWS_BLURB' => $currentArticle->getBlurb() ? \Scrub::html($currentArticle->getBlurb()) : \TextFormatter::cutSentence(Scrub::html2text($currentArticle->getBody()), 300),
                 ));
 
                 $this->getPage()->parse('news_block', 'news', true);
