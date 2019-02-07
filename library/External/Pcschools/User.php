@@ -794,9 +794,10 @@ class External_Pcschools_User implements External_UserInterface
         // Retrieve timetabled classes
 
         $period = $this->findPeriod();
-        
-        $classArray = $statement = $this->getDatabase()->getAll("
-            SELECT DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
+
+        if ($user->getRole()->isStudent()) {
+
+            $query = "SELECT DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
             FROM TIMEFILE tf
                         INNER JOIN SUB su ON tf.[YEAR] = su.[YEAR] AND tf.SUBJECT = su.SUBJECT_NO AND tf.CLASS = su.CLASS
                         INNER JOIN SUBJECT s ON tf.SUBJECT = s.NO
@@ -813,9 +814,26 @@ class External_Pcschools_User implements External_UserInterface
                             INNER JOIN SUBJECT s ON tf.SUBJECT = s.NO
                             INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
                 WHERE st.CURRENT_YEAR <> '99'
-                  AND (st.STUDKEY = '" . $this->getDatabase()->quote($externalId). "' AND tf.TIME_PERIOD = '" . $this->getDatabase()->quote($period['TIME_PERIOD']) . "');
+                  AND (st.STUDKEY = '" . $this->getDatabase()->quote($externalId) . "' AND tf.TIME_PERIOD = '" . $this->getDatabase()->quote($period['TIME_PERIOD']) . "');
 
-        ");
+        ";
+
+        } else if ($user->getRole()->isStaff()) {
+            $query = "SELECT  DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
+                          FROM dbo.TIMEFILE tf
+                          INNER JOIN dbo.SUB sub ON (tf.SUBJECT = sub.SUBJECT_NO AND tf.CLASS = sub.CLASS AND tf.[YEAR] = sub.[YEAR])
+                          INNER JOIN dbo.SUBJECT s ON s.NO = tf.SUBJECT
+                          WHERE  tf.TEACHER = '" . $this->getDatabase()->quote($externalId) . "'
+                                AND          tf.TIME_PERIOD = '" . $this->getDatabase()->quote($period['TIME_PERIOD']) . "'
+                                AND          sub.PERIOD_ID = '" . $this->getDatabase()->quote($period['SUB_PERIOD']) . "'
+                        ";
+
+        } else {
+            return [];
+        }
+
+        $classArray = $statement = $this->getDatabase()->getAll($query);
+
         foreach ($classArray as $class)
         {   
             $code = $period['TIME_PERIOD']. '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
