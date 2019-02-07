@@ -39,7 +39,7 @@ spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $opts   = getopt('vp', ['perform']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
-    'Rubric repair',
+    'Rubric Repair',
     [
         'verbose' => $opts['v'] ?? [],
         'perform' => isset($opts['p']) || isset($opts['perform']),
@@ -354,6 +354,26 @@ $kernel->run(new class extends App
         $this->perform = $opts['perform'] ?? false;
         $config        = $di->get('config');
         $this->fqdn    = trim($config->get('site_hostname').".".$config->get('site_domain'), ';.');
+
+
+        // log perform / dry run
+        if ($this->perform) {
+            $this->log->warning('Running in perform mode (-p): changes will be written to database');
+        } else {
+            $this->log->warning('Running in dry-run mode: use -p to write changes to database');
+        }
+
+        // log verbosity
+        $verbosity = count($opts['verbose'] ?? []);
+        if ($verbosity <= 0) {
+            $this->log->warning('Running in non-verbose mode: Use -v, -vv or -vvv for varying levels of verbosity');
+        } elseif ($verbosity === 1) {
+            $this->log->warning('Running in verbose mode (-v)');
+        } elseif ($verbosity === 2) {
+            $this->log->warning('Running in very verbose mode (-vv)');
+        } elseif ($verbosity >= 3) {
+            $this->log->warning('Running in very very verbose mode (-vvv)');
+        }
 
 
         // Capability and indicator (not usage) queries
