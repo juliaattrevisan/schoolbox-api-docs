@@ -143,7 +143,11 @@ if (is_numeric($this->arg[0])) {
     $email_object      = new Email();
 
     foreach ($memberList as $member) {
-        $memberAccess = $userAccessMapper->getAccess($member, $folder->getId());
+        $memberAccess = $userAccessMapper->findByColumnList([
+            'uid'     => $member->getId(),
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+            'sid'     => $folder->getId(),
+        ])->first();
         $memberMayOwn = $roleAccessMapper->roleMayOwnFolders($member->getRole());
 
         // Store member email for 'email group members' button
