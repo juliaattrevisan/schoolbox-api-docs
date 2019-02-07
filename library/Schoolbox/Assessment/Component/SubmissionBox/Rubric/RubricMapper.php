@@ -2035,6 +2035,8 @@ class RubricMapper
      * @param int $destinationAssessmentId
      *
      * @return bool Whether a new Rubric was created.
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     public function copyRubric($sourceAssessmentId, $destinationAssessmentId)
     {
