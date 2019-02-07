@@ -721,11 +721,6 @@ $rotate-span-width: 11rem;
         );
         color: $warning-color;
     }
-    @media #{$medium-only} {
-        &.submitted {
-            margin: 0;
-        }
-    }
     &.submitted-late {
         @include label(
                 $bg: tint($alert-color, 74%)
