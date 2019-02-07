@@ -50,6 +50,19 @@ $kernel->run(new class extends App
 {
     private const INDENT = '  ';
 
+    private const FIND_RUBRIC_CAPABILITY_QUERY = "
+        SELECT id, name
+        FROM   rubric_group
+        WHERE  parent_type = 'category'
+        AND    parent_id   = :folderId
+    ";
+
+    private const FIND_RUBRIC_INDICATOR_QUERY = "
+        SELECT id, name
+        FROM   rubric_criterion
+        WHERE  rubric_group_id = :capabilityId
+    ";
+
     private const MIGRATE_RUBRIC_INDICATOR_QUERY = '
         UPDATE rubric_criterion
         SET    rubric_group_id = :courseCapabilityId
@@ -143,6 +156,22 @@ $kernel->run(new class extends App
         SET    deleted_at = :now
         WHERE  id         = :unitDescriptorId
     ';
+
+
+    /**
+     * Query for finding rubric capabilities in a folder.
+     *
+     * @var IQuery
+     */
+    private $findRubricCapabilityQuery;
+
+
+    /**
+     * Query for finding rubric indicators in a capability.
+     *
+     * @var IQuery
+     */
+    private $findRubricIndicatorQuery;
 
 
     /**
@@ -377,6 +406,10 @@ $kernel->run(new class extends App
 
 
         // Capability and indicator (not usage) queries
+        $this->findRubricCapabilityQuery
+            = $this->db->prepareQuery(self::FIND_RUBRIC_CAPABILITY_QUERY);
+        $this->findRubricIndicatorQuery
+            = $this->db->prepareQuery(self::FIND_RUBRIC_INDICATOR_QUERY);
         $this->migrateRubricIndicatorQuery
             = $this->db->prepareQuery(self::MIGRATE_RUBRIC_INDICATOR_QUERY);
         $this->deleteRubricCapabilityQuery
@@ -458,11 +491,11 @@ $kernel->run(new class extends App
                     $course->getTitle()
                 )
             );
-            $courseRowSet = $rubricMapper->retrieveRowSet($course->getFolder(), false);
+
 
             // Don't go further if there's no capabilities in course
-            $courseCapabilityCount = count($courseRowSet->getCapabilities());
-            if ($courseCapabilityCount === 0) {
+            $this->findRubricCapabilityQuery->execute(['folderId' => $course->getFolder()->getId()]);
+            if ($this->findRubricCapabilityQuery->rowCount() === 0) {
                 $this->log->debug(self::indent(1).'course contains no capabilities: no action required');
                 continue;
             }
