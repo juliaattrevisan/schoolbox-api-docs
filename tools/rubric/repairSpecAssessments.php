@@ -68,10 +68,30 @@ $kernel->run(new class extends App
         WHERE  id         = :unitIndicatorId
     ';
 
+    private const FIND_RUBRIC_CAPABILITY_USAGE_QUERY = '
+        SELECT     a.id
+        FROM       rubric_group_usage rgu
+        INNER JOIN submission_box      sb ON rgu.submission_box_id = sb.id
+        INNER JOIN assessment           a ON sb.assessment_id = a.id
+        WHERE rgu.rubric_group_id = :unitCapabilityId
+    ';
+
     private const MIGRATE_RUBRIC_CAPABILITY_USAGE_QUERY = '
-        UPDATE rubric_group_usage
-        SET    rubric_group_id = :courseCapabilityId
-        WHERE  rubric_group_id = :unitCapabilityId
+        UPDATE     rubric_group_usage rgu
+        INNER JOIN submission_box      sb ON rgu.submission_box_id = sb.id
+        INNER JOIN assessment           a ON sb.assessment_id = a.id
+        SET    rgu.rubric_group_id = :courseCapabilityId
+        WHERE  rgu.rubric_group_id = :unitCapabilityId
+        AND    a.id                = :assessmentId
+    ';
+
+    private const DELETE_RUBRIC_CAPABILITY_USAGE_QUERY = '
+        DELETE rgu
+        FROM       rubric_group_usage rgu
+        INNER JOIN submission_box      sb ON rgu.submission_box_id = sb.id
+        INNER JOIN assessment           a ON sb.assessment_id = a.id
+        WHERE rgu.rubric_group_id = :unitCapabilityId
+        AND   a.id                = :assessmentId
     ';
 
     private const MIGRATE_RUBRIC_INDICATOR_USAGE_QUERY = '
@@ -136,15 +156,42 @@ $kernel->run(new class extends App
 
 
     /**
-     * Query for migrating the usages of a rubric capability from unit to a
-     * course folder.
+     * Query for finding the usages of a rubric capability, indexed by
+     * assessment.
      *
-     * Called when a capability of the same name exists in the course, and the
-     * unit capability is used by one or more assessments.
+     * Called when migrating capabilities: all usages of a unit capability must
+     * be moved to the course, and this must be done individually per assessment
+     * (because the assessment may or may not be using the course capability).
+     *
+     * @var IQuery
+     */
+    private $findRubricCapabilityUsageQuery;
+
+
+    /**
+     * Query for migrating the usage of a rubric capability from unit to a
+     * course folder for an assessment.
+     *
+     * Called when migrating capabilities: all usages of the unit capability
+     * must be migrated, and this attempts to simply move them from the unit to
+     * the course.
      *
      * @var IQuery
      */
     private $migrateRubricCapabilityUsageQuery;
+
+
+    /**
+     * Query for deleting the usages of a rubric capability from an assessment.
+     *
+     * Called when migrating capabilities: all usages of the unit capability
+     * must be migrated, and if moving them from the unit capability fails
+     * (@see $this->migrateRubricCapabilityUsageQuery), the usage is simply
+     * deleted.
+     *
+     * @var IQuery
+     */
+    private $deleteRubricCapabilityUsageQuery;
 
 
     /**
@@ -267,8 +314,15 @@ $kernel->run(new class extends App
             = $this->db->prepareQuery(self::DELETE_RUBRIC_CAPABILITY_QUERY);
         $this->deleteRubricIndicatorQuery
             = $this->db->prepareQuery(self::DELETE_RUBRIC_INDICATOR_QUERY);
+
+        // Rubric capability usage
+        $this->findRubricCapabilityUsageQuery
+            = $this->db->prepareQuery(self::FIND_RUBRIC_CAPABILITY_USAGE_QUERY);
         $this->migrateRubricCapabilityUsageQuery
             = $this->db->prepareQuery(self::MIGRATE_RUBRIC_CAPABILITY_USAGE_QUERY);
+        $this->deleteRubricCapabilityUsageQuery
+            = $this->db->prepareQuery(self::DELETE_RUBRIC_CAPABILITY_USAGE_QUERY);
+
         $this->migrateRubricIndicatorUsageQuery
             = $this->db->prepareQuery(self::MIGRATE_RUBRIC_INDICATOR_USAGE_QUERY);
         $this->findRubricDescriptorQuery
@@ -415,6 +469,35 @@ $kernel->run(new class extends App
         // Capability usages must be migrated from the unit to the course,
         // and deleted if there is a conflict.
         // (This means that any mark-per-capability max values will be lost)
+        $this->findRubricCapabilityUsageQuery
+             ->execute(['unitCapabilityId' => $unitCapability->getId(),]);
+        foreach ($this->findRubricCapabilityUsageQuery->fetchColumnArray('id') as $assessmentId) {
+            // attempt to migrate
+            try {
+                $this->migrateRubricCapabilityUsageQuery
+                    ->execute([
+                        'courseCapabilityId' => $courseCapability->getId(),
+                        'unitCapabilityId'   => $unitCapability->getId(),
+                        'assessmentId'       => $assessmentId,
+                    ]);
+            } catch (Alaress\Database\Exception $e) {
+                // Foreign key error: delete (This is significant)
+                $this->deleteRubricCapabilityUsageQuery
+                     ->execute([
+                         'unitCapabilityId'   => $unitCapability->getId(),
+                         'assessmentId'       => $assessmentId,
+                     ]);
+                $this->logSignificantEvent(
+                    (int)$assessmentId,
+                    sprintf(
+                        'removed usage record, including mark-per-capability, for capability "%s"',
+                        $unitCapability->getName()
+                    )
+                );
+            }
+        }
+
+
         $this->migrateRubricCapabilityUsageQuery
             ->execute([
                 'courseCapabilityId' => $courseCapability->getId(),
@@ -525,16 +608,14 @@ $kernel->run(new class extends App
 
 
             // Affected assessments are significant
-            $url = (new Uri())
-                ->setScheme('https')
-                ->setHost($this->fqdn)
-                ->setPath('/learning/assessments/'.$assessmentId);
-            $this->significantEvents[] = sprintf(
-                '%s (removed %d and migrated %d descriptors from indicator "%s")',
-                $url->toString(),
-                $removedDescriptorCount,
-                $migratedDescriptorCount,
-                $unitIndicator->getName()
+            $this->logSignificantEvent(
+                (int)$assessmentId,
+                sprintf(
+                    'removed %d and migrated %d descriptors from indicator "%s"',
+                    $removedDescriptorCount,
+                    $migratedDescriptorCount,
+                    $unitIndicator->getName()
+                )
             );
         }
 
@@ -573,5 +654,21 @@ $kernel->run(new class extends App
     private static function indent(int $depth): string
     {
         return str_repeat(self::INDENT, $depth);
+    }
+
+
+    /**
+     * Log a significant event regarding an assessment.
+     *
+     * @param int    $assessmentId
+     * @param string $message
+     */
+    private function logSignificantEvent(int $assessmentId, string $message): void
+    {
+        $url = (new Uri())
+            ->setScheme('https')
+            ->setHost($this->fqdn)
+            ->setPath('/learning/assessments/'.$assessmentId);
+        $this->significantEvents[] = sprintf('%s (%s)', $url->toString(), $message);
     }
 });
