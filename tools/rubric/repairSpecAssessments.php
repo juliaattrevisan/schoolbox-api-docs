@@ -55,12 +55,14 @@ $kernel->run(new class extends App
         FROM   rubric_group
         WHERE  parent_type = 'category'
         AND    parent_id   = :folderId
+        AND    deleted_at IS NULL
     ";
 
     private const FIND_RUBRIC_INDICATOR_QUERY = "
         SELECT id, name
         FROM   rubric_criterion
         WHERE  rubric_group_id = :capabilityId
+        AND    deleted_at IS NULL
     ";
 
     private const MIGRATE_RUBRIC_INDICATOR_QUERY = '
