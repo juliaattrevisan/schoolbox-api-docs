@@ -40,9 +40,33 @@ class DescriptorMapper extends Schoolbox\Mapper {
         $this->uses('description', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteEmptyLevel']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreRubricLevel']);
     }
 
+
+    /**
+     * @param Descriptor $descriptor
+     * @throws Schoolbox\Mapper\Exception
+     * @throws Schoolbox\Mapper\Exception\Deleted
+     * @throws Schoolbox\Mapper\DefinitionException
+     */
+    public function deleteEmptyLevel(Descriptor $descriptor)
+    {
+        /** @var LevelMapper $levelMapper */
+        $levelMapper = $this->getJoinMapper('level');
+
+        // Find all descriptors whose level ID is the same as the level ID of the current level
+        $currentLevelId = $descriptor->getLevel()->getId();
+        $descriptorsInLevel = $this->findByColumn('level_id', $currentLevelId);
+        $descriptorCount = $descriptorsInLevel->count();
+
+        if ($descriptorCount === 0) {
+            // No more descriptors exist in this level: delete the level
+            $currentLevel = $levelMapper->findById($currentLevelId);
+            $levelMapper->softDelete($currentLevel);
+        }
+    }
 
     /**
      * Ensure that if we restore a descriptor, its level does not remain deleted.
