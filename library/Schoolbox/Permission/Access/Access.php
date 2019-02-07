@@ -49,18 +49,23 @@ class Access
     /** @var UserAccessMapper */
     private $userAccessMapper;
 
+    /** @var RoleAccessMapper */
+    private $roleAccessMapper;
+
+
     /**
      * Retrieves the singleton instance of this class.
      *
-     * The UserAccessMapper *SHOULD* be injected, but not enforced to enable backwards compatibility
+     * The Mappers *SHOULD* be injected, but not enforced yet to enable backwards compatibility
      *
      * @param UserAccessMapper|null $userAccessMapper
+     * @param RoleAccessMapper|null $roleAccessMapper
      * @return static
      */
-    public static function getInstance(UserAccessMapper $userAccessMapper = null)
+    public static function getInstance(UserAccessMapper $userAccessMapper = null, RoleAccessMapper $roleAccessMapper = null)
     {
         if (!self::$instance) {
-            self::$instance = new static($userAccessMapper ?: UserAccessMapper::getInstance());
+            self::$instance = new static($userAccessMapper ?: UserAccessMapper::getInstance(), $roleAccessMapper ?: RoleAccessMapper::getInstance());
         }
         return self::$instance;
     }
@@ -70,10 +75,12 @@ class Access
      * Private constructor to enforce singleton pattern
      *
      * @param UserAccessMapper $userAccessMapper
+     * @param RoleAccessMapper $roleAccessMapper
      */
-    private function __construct(UserAccessMapper $userAccessMapper)
+    private function __construct(UserAccessMapper $userAccessMapper, RoleAccessMapper $roleAccessMapper)
     {
         $this->userAccessMapper = $userAccessMapper;
+        $this->roleAccessMapper = $roleAccessMapper;
     }
 
 
@@ -198,9 +205,8 @@ class Access
         }
 
         // Check role access level
-        $roleAccessMapper = RoleAccessMapper::getInstance();
         try {
-            $roleAccessLevel = $roleAccessMapper->getAccess($user, $folderId, $cache)->getType();
+            $roleAccessLevel = $this->roleAccessMapper->getAccess($user, $folderId, $cache)->getType();
             $accessLevels[] = $roleAccessLevel;
         } catch (Mapper\Exception $e) {
             $accessLevels[] = UserAccess::ACCESS_DENY;
