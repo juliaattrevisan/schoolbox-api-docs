@@ -1,5 +1,8 @@
 module.exports = {
   devtool: "source-map",
+  resolve: {
+    extensions: [".js", ".ts", ".tsx"],
+  },
   module: {
     rules: [
       {
@@ -9,6 +12,7 @@ module.exports = {
           loader: "babel-loader"
         }
       },
+      { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
       { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
     ]
   },

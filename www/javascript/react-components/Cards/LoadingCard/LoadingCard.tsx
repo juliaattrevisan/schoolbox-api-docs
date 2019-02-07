@@ -1,0 +1,22 @@
+import * as React from "react";
+import { LoadingImage } from "../../Image/Image";
+import { LoadingMeta } from "../../Meta/Meta";
+
+/**
+ * Skeleton loader for a card.
+ */
+const LoadingCard: React.SFC = () => {
+  return (
+    <>
+      <div className="list-item">
+        <div className="small-12 card skeleton">
+          <LoadingImage />
+          <h3 />
+          <LoadingMeta />
+        </div>
+      </div>
+    </>
+  );
+};
+
+export { LoadingCard };
