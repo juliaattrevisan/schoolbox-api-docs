@@ -552,7 +552,7 @@ $kernel->run(new class extends App
                         )
                     );
 
-                    $this->repairCapability($courseCapability, $unitCapability);
+                    $this->repairCapability($courseCapabilityId, $unitCapabilityId, $unitCapabilityName);
                     break;
                 }
             }
@@ -573,37 +573,39 @@ $kernel->run(new class extends App
      * Attempt to repair this unit capability by migrating its indicators, and
      * any usages therein, into the course capability.
      *
-     * @param Capability $courseCapability
-     * @param Capability $unitCapability
+     * @param int    $courseCapabilityId the ID of the course-level capability
+     * @param int    $unitCapabilityId   the ID of the unit-level capability
+     * @param string $capabilityName     the capability name (Logging only, and
+     *                                   the same for both course and unit)
      */
-    private function repairCapability(Capability $courseCapability, Capability $unitCapability): void
+    private function repairCapability(int $courseCapabilityId, int $unitCapabilityId, string $capabilityName): void
     {
         // Capability usages must be migrated from the unit to the course,
         // and deleted if there is a conflict.
         // (This means that any mark-per-capability max values will be lost)
         $this->findRubricCapabilityUsageQuery
-             ->execute(['unitCapabilityId' => $unitCapability->getId(),]);
+             ->execute(['unitCapabilityId' => $unitCapabilityId,]);
         foreach ($this->findRubricCapabilityUsageQuery->fetchColumnArray('id') as $assessmentId) {
             // attempt to migrate
             try {
                 $this->migrateRubricCapabilityUsageQuery
                     ->execute([
-                        'courseCapabilityId' => $courseCapability->getId(),
-                        'unitCapabilityId'   => $unitCapability->getId(),
+                        'courseCapabilityId' => $courseCapabilityId,
+                        'unitCapabilityId'   => $unitCapabilityId,
                         'assessmentId'       => $assessmentId,
                     ]);
             } catch (Alaress\Database\Exception $e) {
                 // Foreign key error: delete (This is significant)
                 $this->deleteRubricCapabilityUsageQuery
                      ->execute([
-                         'unitCapabilityId' => $unitCapability->getId(),
+                         'unitCapabilityId' => $unitCapabilityId,
                          'assessmentId'     => $assessmentId,
                      ]);
                 $this->logSignificantEvent(
                     (int)$assessmentId,
                     sprintf(
                         'removed usage record, including mark-per-capability, for capability "%s"',
-                        $unitCapability->getName()
+                        $capabilityName
                     )
                 );
             }
@@ -611,18 +613,25 @@ $kernel->run(new class extends App
 
 
         // Now clean up indicators
-        foreach ($unitCapability->getIndicators() as $unitIndicator) {
-            $unitIndicatorName       = $unitIndicator->getName();
-            $matchingCourseIndicator = null;
-            foreach ($courseCapability->getIndicators() as $courseIndicator) {
-                if ($courseIndicator->getName() === $unitIndicatorName) {
-                    $matchingCourseIndicator = $courseIndicator;
+        $this->findRubricIndicatorQuery->execute(['capabilityId' => $unitCapabilityId]);
+        $unitIndicators = $this->findRubricIndicatorQuery->fetchColumnArray('name', 'id');
+        foreach ($unitIndicators as $unitIndicatorId => $unitIndicatorName) {
+            $matchingCourseIndicatorId = null;
+
+            // Need to refetch course indicators each iteration, because this
+            // loop can change the indicators available.
+            $this->findRubricIndicatorQuery->execute(['capabilityId' => $courseCapabilityId]);
+            $courseIndicators = $this->findRubricIndicatorQuery->fetchColumnArray('name', 'id');
+
+            foreach ($courseIndicators as $courseIndicatorId => $courseIndicatorName) {
+                if ($courseIndicatorName === $unitIndicatorName) {
+                    $matchingCourseIndicatorId = $courseIndicatorId;
                     break;
                 }
             }
 
 
-            if ($matchingCourseIndicator) {
+            if ($matchingCourseIndicatorId) {
                 // Indicator exists in course and unit.
                 // Need to delete the unit indicator, then migrate descriptors
                 // from the now-deleted unit indicator into the course indicator.
@@ -632,7 +641,7 @@ $kernel->run(new class extends App
                         $unitIndicatorName
                     )
                 );
-                $this->repairIndicator($matchingCourseIndicator, $unitIndicator);
+                $this->repairIndicator($matchingCourseIndicatorId, $unitIndicatorId);
 
             } else {
                 // Indicator exists in unit, but not course.
@@ -645,8 +654,8 @@ $kernel->run(new class extends App
                 );
                 $this->migrateRubricIndicatorQuery
                     ->execute([
-                        'courseCapabilityId' => $courseCapability->getId(),
-                        'unitIndicatorId'    => $unitIndicator->getId(),
+                        'courseCapabilityId' => $courseCapabilityId,
+                        'unitIndicatorId'    => $unitIndicatorId,
                     ]);
             }
         }
@@ -656,7 +665,7 @@ $kernel->run(new class extends App
         $this->deleteRubricCapabilityQuery
             ->execute([
                 'now'              => $this->now,
-                'unitCapabilityId' => $unitCapability->getId(),
+                'unitCapabilityId' => $unitCapabilityId,
             ]);
     }
 
