@@ -569,7 +569,7 @@ $kernel->run(new class extends App
             if ($matchingCourseIndicator) {
                 // Indicator exists in course and unit.
                 // Need to delete the unit indicator, then migrate descriptors
-                // from the now-deleted unit into the course.
+                // from the now-deleted unit indicator into the course indicator.
                 $this->log->info(
                     sprintf(
                         self::indent(3).'indicator "%s" exists in course and unit: deleting from unit, then migrating to course',
@@ -649,7 +649,7 @@ $kernel->run(new class extends App
             $migratedDescriptorCount = 0;
 
             $this->log->notice(
-                sprintf(self::indent(4).'checking assessment #%d for conflicting usage', $assessmentId)
+                sprintf(self::indent(4).'checking assessment #%d for conflicting descriptors', $assessmentId)
             );
 
             foreach ($levels as $levelId => $unitDescriptorId) {
