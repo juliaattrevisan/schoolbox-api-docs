@@ -94,10 +94,30 @@ $kernel->run(new class extends App
         AND   a.id                = :assessmentId
     ';
 
+    private const FIND_RUBRIC_INDICATOR_USAGE_QUERY = '
+        SELECT     a.id
+        FROM       rubric_criterion_usage rcu
+        INNER JOIN submission_box          sb ON rcu.submission_box_id = sb.id
+        INNER JOIN assessment               a ON sb.assessment_id = a.id
+        WHERE rcu.criterion_id = :unitIndicatorId
+    ';
+
     private const MIGRATE_RUBRIC_INDICATOR_USAGE_QUERY = '
-        UPDATE rubric_criterion_usage
-        SET    criterion_id = :courseIndicatorId
-        WHERE  criterion_id = :unitIndicatorId
+        UPDATE rubric_criterion_usage rcu
+        INNER JOIN submission_box      sb ON rcu.submission_box_id = sb.id
+        INNER JOIN assessment           a ON sb.assessment_id = a.id
+        SET    rcu.criterion_id = :courseIndicatorId
+        WHERE  rcu.criterion_id = :unitIndicatorId
+        AND    a.id             = :assessmentId
+    ';
+
+    private const DELETE_RUBRIC_INDICATOR_USAGE_QUERY = '
+        DELETE rcu
+        FROM       rubric_criterion_usage rcu
+        INNER JOIN submission_box          sb ON rcu.submission_box_id = sb.id
+        INNER JOIN assessment               a ON sb.assessment_id = a.id
+        WHERE rcu.criterion_id = :unitIndicatorId
+        AND   a.id             = :assessmentId
     ';
 
     private const FIND_RUBRIC_DESCRIPTOR_QUERY = '
@@ -195,6 +215,19 @@ $kernel->run(new class extends App
 
 
     /**
+     * Query for finding the usages of a rubric indicator, indexed by
+     * assessment.
+     *
+     * Called when migrating indicators: all usages of a unit indicator must be
+     * moved to the course, and this must be done individually per assessment
+     * (because the assessment may or may not be using the course indicator).
+     *
+     * @var IQuery
+     */
+    private $findRubricIndicatorUsageQuery;
+
+
+    /**
      * Query for migrating the usages of a rubric indicator from unit to a
      * course folder.
      *
@@ -204,6 +237,19 @@ $kernel->run(new class extends App
      * @var IQuery
      */
     private $migrateRubricIndicatorUsageQuery;
+
+
+    /**
+     * Query for deleting the usages of a rubric indicator from an assessment.
+     *
+     * Called when migrating indicators: all usages of the unit indicator must
+     * be migrated, and if moving them from the unit indicator fails
+     * (@see $this->migrateRubricIndicatorUsageQuery), the usage is simply
+     * deleted.
+     *
+     * @var IQuery
+     */
+    private $deleteRubricIndicatorUsageQuery;
 
 
     /**
@@ -307,7 +353,7 @@ $kernel->run(new class extends App
         $this->fqdn    = trim($config->get('site_hostname').".".$config->get('site_domain'), ';.');
 
 
-        // Prepare queries
+        // Capability and indicator (not usage) queries
         $this->migrateRubricIndicatorQuery
             = $this->db->prepareQuery(self::MIGRATE_RUBRIC_INDICATOR_QUERY);
         $this->deleteRubricCapabilityQuery
@@ -315,7 +361,8 @@ $kernel->run(new class extends App
         $this->deleteRubricIndicatorQuery
             = $this->db->prepareQuery(self::DELETE_RUBRIC_INDICATOR_QUERY);
 
-        // Rubric capability usage
+
+        // Capability usage queries
         $this->findRubricCapabilityUsageQuery
             = $this->db->prepareQuery(self::FIND_RUBRIC_CAPABILITY_USAGE_QUERY);
         $this->migrateRubricCapabilityUsageQuery
@@ -323,8 +370,17 @@ $kernel->run(new class extends App
         $this->deleteRubricCapabilityUsageQuery
             = $this->db->prepareQuery(self::DELETE_RUBRIC_CAPABILITY_USAGE_QUERY);
 
+
+        // Indicator usage queries
+        $this->findRubricIndicatorUsageQuery
+            = $this->db->prepareQuery(self::FIND_RUBRIC_INDICATOR_USAGE_QUERY);
         $this->migrateRubricIndicatorUsageQuery
             = $this->db->prepareQuery(self::MIGRATE_RUBRIC_INDICATOR_USAGE_QUERY);
+        $this->deleteRubricIndicatorUsageQuery
+            = $this->db->prepareQuery(self::DELETE_RUBRIC_INDICATOR_USAGE_QUERY);
+
+
+        // Descriptor queries
         $this->findRubricDescriptorQuery
             = $this->db->prepareQuery(self::FIND_RUBRIC_DESCRIPTOR_QUERY);
         $this->migrateRubricDescriptorQuery
