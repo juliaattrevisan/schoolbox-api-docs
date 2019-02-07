@@ -146,6 +146,8 @@ $.widget("ui.chat",  {
 
         var $time = $hours + ':' + $minutes + ':' + $seconds + ' ' + $meridian;
 
+        var bodyValue = $self.options.body_el.val();
+
         var $message = {
             method: 'send',
             category_id: $self.options.category_id,
@@ -157,12 +159,12 @@ $.widget("ui.chat",  {
             name: $self.options.user_name,
             time: $time,
             type: 'user',
-            body: $($self.options.body_el.val()).text()
+            body: bodyValue
         };
 
         $($self).trigger('send', null, $message);
 
-        $self._append_message($message);
+        $self._append_message($message, true);
 
         $.ajax({
             type: 'POST',
@@ -194,7 +196,7 @@ $.widget("ui.chat",  {
                 var $log = $data.log;
 
                 for (var $i in $log) {
-                    $self._append_message($log[$i]);
+                    $self._append_message($log[$i], false);
                 }
 
                 /* Set last poll to now */
@@ -206,7 +208,7 @@ $.widget("ui.chat",  {
 
     },
 
-    _append_message: function ($message) {
+    _append_message: function ($message, newMessage) {
 
         var last = this.options.log_el.find('li').last();
 
@@ -215,9 +217,20 @@ $.widget("ui.chat",  {
         var scrollTop = this.options.log_el.prop('scrollTop');
         var height    = this.options.log_el.prop('scrollHeight') - this.options.log_el.prop('offsetHeight');
         var scroll    = (Math.abs(scrollTop - height) === 0);
+        var htmlEscapedMessage = $message.body;
+
+        // Cleanup string before appending into the body to prevent XSS attack
+        if (newMessage) {
+            htmlEscapedMessage = $message.body
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+
+        }
 
         if ($message.user_id == last.data('user')) {
-            last.find('.card').append('<p class="spaced">{0}</p>'.format($message.body));
+            last.find('.card').append('<p class="spaced">{0}</p>'.format(htmlEscapedMessage));
         } else {
 
             var $message_el = $('<li data-user="{0}" class="row"></li>'.format($message.user_id)).addClass('chat-message-' + $message.type);
@@ -238,7 +251,7 @@ $.widget("ui.chat",  {
                 //+ '</div>'
             ;
 
-            $message_el.html($tpl.format($message.name, $message.user_ext_id, $message.time, $message.body));
+            $message_el.html($tpl.format($message.name, $message.user_ext_id, $message.time, htmlEscapedMessage));
             this.options.log_el.append($message_el);
         }
         if (scroll) {
