@@ -540,8 +540,8 @@ $kernel->run(new class extends App
                 // Foreign key error: delete (This is significant)
                 $this->deleteRubricCapabilityUsageQuery
                      ->execute([
-                         'unitCapabilityId'   => $unitCapability->getId(),
-                         'assessmentId'       => $assessmentId,
+                         'unitCapabilityId' => $unitCapability->getId(),
+                         'assessmentId'     => $assessmentId,
                      ]);
                 $this->logSignificantEvent(
                     (int)$assessmentId,
@@ -612,13 +612,33 @@ $kernel->run(new class extends App
      */
     private function repairIndicator(Indicator $courseIndicator, Indicator $unitIndicator): void
     {
-        // Indicator usages must be migrated from the unit to the course,
-        // and deleted if there is a conflict.
-        $this->migrateRubricIndicatorUsageQuery
-            ->execute([
-                'courseIndicatorId' => $courseIndicator->getId(),
-                'unitIndicatorId'   => $unitIndicator->getId(),
-            ]);
+        $this->findRubricIndicatorUsageQuery
+            ->execute(['unitIndicatorId' => $unitIndicator->getId(),]);
+        foreach ($this->findRubricIndicatorUsageQuery->fetchColumnArray('id') as $assessmentId) {
+            // attempt to migrate
+            try {
+                $this->migrateRubricIndicatorUsageQuery
+                    ->execute([
+                        'courseIndicatorId' => $courseIndicator->getId(),
+                        'unitIndicatorId'   => $unitIndicator->getId(),
+                        'assessmentId'      => $assessmentId,
+                    ]);
+            } catch (Alaress\Database\Exception $e) {
+                // Foreign key error: delete (This is significant)
+                $this->deleteRubricIndicatorUsageQuery
+                    ->execute([
+                        'unitIndicatorId' => $unitIndicator->getId(),
+                        'assessmentId'    => $assessmentId,
+                    ]);
+                $this->logSignificantEvent(
+                    (int)$assessmentId,
+                    sprintf(
+                        'removed usage record for indicator "%s"',
+                        $unitIndicator->getName()
+                    )
+                );
+            }
+        }
 
 
         // Find the descriptors for the course and unit
