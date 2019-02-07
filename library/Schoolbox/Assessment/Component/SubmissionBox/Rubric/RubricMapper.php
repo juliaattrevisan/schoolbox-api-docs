@@ -2035,6 +2035,8 @@ class RubricMapper
      * @param int $destinationAssessmentId
      *
      * @return bool Whether a new Rubric was created.
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     public function copyRubric($sourceAssessmentId, $destinationAssessmentId)
     {
@@ -2054,8 +2056,8 @@ class RubricMapper
         /** @var Level[]|GenericCollection $srcLevels */
         $srcLevels = $levelMapper->findByColumn('box_id', $sourceBox->getId())->indexBy('id');
 
-        // If no levels, the source box does not have a rubric. Bug out.
-        if (!count($srcLevels)) {
+        if (! $sourceBox->getUseRubric()) {
+            // No rubric? Can't work with that - die.
             return false;
         }
 

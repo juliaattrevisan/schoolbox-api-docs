@@ -551,7 +551,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @deprecated mapper method
      * @return boolean
      */
     public function getUseRubric()

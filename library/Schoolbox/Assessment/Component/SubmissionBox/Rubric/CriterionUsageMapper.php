@@ -30,8 +30,25 @@ class CriterionUsageMapper extends Schoolbox\Mapper
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins('criterion_id', CriterionMapper::class, 'id', null, null, 'criterion', 'criterion');
         $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
+
+        // Criterion usages are hard-deleted, so we have to use CALLBACK_POSTDELETE not CALLBACK_POSTSOFTDELETE
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'toggleUseRubric']);
     }
 
+    /**
+     * @param CriterionUsage $indicatorUsage
+     */
+    public function toggleUseRubric(CriterionUsage $indicatorUsage)
+    {
+        $currentBoxId = $indicatorUsage->getSubmissionBox()->getId();
+        $indicatorUsagesForSubmissionBox = $this->findByColumn('submission_box_id', $currentBoxId);
+        if ($indicatorUsagesForSubmissionBox->count() === 0) {
+            // No more indicator usages on this box: turn off Use Rubric
+            $query = 'UPDATE submission_box SET use_rubric = 0 WHERE submission_box.id = ?';
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->execute([$currentBoxId]);
+        }
+    }
 
     /**
      * @inheritdoc
