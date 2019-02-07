@@ -111,16 +111,16 @@ $kernel->run(new class extends App
         WHERE  criterion_id = :indicatorId
     ';
 
-    private const DELETE_DUPLICATE_RUBRIC_DESCRIPTOR_QUERY = '
-        UPDATE rubric_descriptor
-        SET    deleted_at = :now
-        WHERE  id         = :descriptorId
-    ';
-
     private const MIGRATE_RUBRIC_DESCRIPTOR_QUERY = '
         UPDATE rubric_descriptor
         SET    criterion_id = :courseIndicatorId
         WHERE  id           = :descriptorId
+    ';
+
+    private const DELETE_DUPLICATE_RUBRIC_DESCRIPTOR_QUERY = '
+        UPDATE rubric_descriptor
+        SET    deleted_at = :now
+        WHERE  id         = :descriptorId
     ';
 
 
@@ -219,18 +219,6 @@ $kernel->run(new class extends App
 
 
     /**
-     * Query for deleting usages of rubric descriptors.
-     *
-     * Used when migrating descriptors, and there's a descriptor in the same
-     * level for both the course-level and unit-level indicator: the unit-level
-     * descriptor is removed.
-     *
-     * @var IQuery
-     */
-    private $deleteDuplicateRubricDescriptorQuery;
-
-
-    /**
      * Query for migrating usages of rubric descriptors.
      *
      * Used when migrating descriptors, and the unit-level descriptor exists
@@ -240,6 +228,18 @@ $kernel->run(new class extends App
      * @var IQuery
      */
     private $migrateRubricDescriptorQuery;
+
+
+    /**
+     * Query for deleting usages of rubric descriptors.
+     *
+     * Used when migrating descriptors, and there's a descriptor in the same
+     * level for both the course-level and unit-level indicator: the unit-level
+     * descriptor is removed.
+     *
+     * @var IQuery
+     */
+    private $deleteDuplicateRubricDescriptorQuery;
 
 
     /**
@@ -327,10 +327,10 @@ $kernel->run(new class extends App
             = $this->db->prepareQuery(self::MIGRATE_RUBRIC_INDICATOR_USAGE_QUERY);
         $this->findRubricDescriptorQuery
             = $this->db->prepareQuery(self::FIND_RUBRIC_DESCRIPTOR_QUERY);
-        $this->deleteDuplicateRubricDescriptorQuery
-            = $this->db->prepareQuery(self::DELETE_DUPLICATE_RUBRIC_DESCRIPTOR_QUERY);
         $this->migrateRubricDescriptorQuery
             = $this->db->prepareQuery(self::MIGRATE_RUBRIC_DESCRIPTOR_QUERY);
+        $this->deleteDuplicateRubricDescriptorQuery
+            = $this->db->prepareQuery(self::DELETE_DUPLICATE_RUBRIC_DESCRIPTOR_QUERY);
 
 
         // Wrap entire loop in a transaction
