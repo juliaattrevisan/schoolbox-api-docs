@@ -141,6 +141,53 @@ class UserAccess implements IModel
     }
 
 
+
+    /**
+     * Return all possible services
+     *
+     * @return int[]
+     */
+    public static function allServices(): array
+    {
+        return [
+            self::SERVICE_HOMEPAGE,
+            self::SERVICE_CALENDAR,
+            self::SERVICE_NEWS,
+            self::SERVICE_CMS,
+            self::SERVICE_HOUSEMASTER,
+            self::SERVICE_RESOURCE_BOOKING,
+            self::SERVICE_CURRICULUM,
+            self::SERVICE_PASTORAL,
+            self::SERVICE_SPORTS_ADMINISTRATOR,
+        ];
+    }
+
+
+    /**
+     * Returns the services that require an identifier
+     *
+     * @return int[]
+     */
+    public static function requiresServiceIdentifier(): array
+    {
+        return [
+            self::SERVICE_HOMEPAGE,
+            self::SERVICE_CALENDAR,
+            self::SERVICE_HOUSEMASTER,
+        ];
+    }
+
+
+    /**
+     * Returns the services that should not have an identifier
+     *
+     * @return int[]
+     */
+    public static function doesNotRequireServiceIdentifier(): array
+    {
+        return \array_diff(self::allServices(), self::requiresServiceIdentifier());
+    }
+
     /**
      * @param User $user
      * @return self
