@@ -13,6 +13,7 @@ namespace Schoolbox\Resource\Search\Renderer;
 use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Scrub;
 use SitePage;
 
 abstract class Base
@@ -182,10 +183,10 @@ abstract class Base
         $html = array();
 
         foreach ($allCrumbs as $currentCrumb) {
-            $html[] = "<a href=\"/homepage/{$currentCrumb->getId()}\">{Scrub::text($currentCrumb->getName())}</a>";
+            $html[] = "<a href=\"/homepage/{$currentCrumb->getId()}\">". Scrub::text($currentCrumb->getName())."</a>";
         }
 
-        $html[] = "<a href=\"/homepage/{$folder->getId()}\">{Scrub::text($folder->getName())}</a>";
+        $html[] = "<a href=\"/homepage/{$folder->getId()}\">". Scrub::text($folder->getName())."</a>";
 
         return implode(' > ', $html);
     }
