@@ -182,10 +182,10 @@ abstract class Base
         $html = array();
 
         foreach ($allCrumbs as $currentCrumb) {
-            $html[] = "<a href=\"/homepage/{$currentCrumb->getId()}\">{$currentCrumb->getName()}</a>";
+            $html[] = "<a href=\"/homepage/{$currentCrumb->getId()}\">{Scrub::text($currentCrumb->getName())}</a>";
         }
 
-        $html[] = "<a href=\"/homepage/{$folder->getId()}\">{$folder->getName()}</a>";
+        $html[] = "<a href=\"/homepage/{$folder->getId()}\">{Scrub::text($folder->getName())}</a>";
 
         return implode(' > ', $html);
     }
