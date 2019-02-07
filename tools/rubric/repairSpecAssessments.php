@@ -554,13 +554,7 @@ $kernel->run(new class extends App
         }
 
 
-        $this->migrateRubricCapabilityUsageQuery
-            ->execute([
-                'courseCapabilityId' => $courseCapability->getId(),
-                'unitCapabilityId'   => $unitCapability->getId(),
-            ]);
-
-
+        // Now clean up indicators
         foreach ($unitCapability->getIndicators() as $unitIndicator) {
             $unitIndicatorName       = $unitIndicator->getName();
             $matchingCourseIndicator = null;
