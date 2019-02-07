@@ -572,7 +572,7 @@ $kernel->run(new class extends App
                 // from the now-deleted unit indicator into the course indicator.
                 $this->log->info(
                     sprintf(
-                        self::indent(3).'indicator "%s" exists in course and unit: deleting from unit, then migrating to course',
+                        self::indent(3).'indicator "%s" exists in course and unit: deleting from unit, then migrating usage to course',
                         $unitIndicatorName
                     )
                 );
