@@ -576,13 +576,6 @@ $kernel->run(new class extends App
                         $unitIndicatorName
                     )
                 );
-                $this->deleteRubricIndicatorQuery
-                    ->execute([
-                        'now'             => $this->now,
-                        'unitIndicatorId' => $unitIndicator->getId(),
-                    ]);
-
-
                 $this->repairIndicator($matchingCourseIndicator, $unitIndicator);
 
             } else {
@@ -700,6 +693,14 @@ $kernel->run(new class extends App
                 )
             );
         }
+
+
+        // Now repair the indicator itself
+        $this->deleteRubricIndicatorQuery
+            ->execute([
+                'now'             => $this->now,
+                'unitIndicatorId' => $unitIndicator->getId(),
+            ]);
 
 
         // TODO consider moving rubric_descriptor_mark and rubric_group_mark
