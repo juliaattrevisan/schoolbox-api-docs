@@ -718,6 +718,21 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
+     * Gets the current semester for the user.
+     *
+     * @importance low - used everywhere, but if you can't get it from the DB,
+     *             Jan-Jun: 1, Jul-Dec: 2
+     *
+     * @param string $externalUserId
+     *
+     * @return string The current semester
+     */
+    public function getCurrentSemester($externalUserId = null)
+    {
+        return date('m') < 6 ? 1 : 2;
+    }
+
+    /**
      * Gets the current year for the user.
      * Needs a method because a user could be set on file as being on a
      * previous year.
