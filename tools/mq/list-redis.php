@@ -7,6 +7,7 @@ use Alaress\Redis;
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
 $redis = Redis::getClientInstance();
+
 $keys = $redis->keys('msg*');
 
 foreach ($keys as $idx => $key) {
@@ -19,7 +20,12 @@ foreach ($keys as $idx => $key) {
         $rawRedisData = $redis->get($key);
         $instance = unserialize(gzuncompress($rawRedisData));
     } catch (Exception $e) {
-        echo "Type of {$key} is {$keytype}\n";
+        if ($keytype->getPayload() === 'set') {
+            $setcount = \count($redis->smembers($key));
+            echo "{$setcount} messages exist.\n";
+        } else {
+            echo "Type of {$key} is {$keytype}\n";
+        }
         continue;
     }
 
@@ -27,8 +33,8 @@ foreach ($keys as $idx => $key) {
         echo "CompressedTrigger \n";
         $output = $instance->extractTrigger();
         echo date('Y-m-d H:i:s', $output->getTimestamp()) . "\n";
-        echo $output->getLabel() . ' ' . $output->getEvent()->getAction() . ' ' . $output->getEvent()->getObject()->getId() . "\n";
-
+        $classname = get_class($output->getEvent()->getObject());
+        echo "Notify {$output->getLabel()}. Object {$classname} with ID {$output->getEvent()->getObject()->getId()} {$output->getEvent()->getAction()} \n";
     } else if ($instance instanceof \Alaress\Scheduler\Trigger\CancelTrigger) {
         echo "CancelTrigger \n";
         $output = $instance->getTimestamp();
@@ -37,7 +43,24 @@ foreach ($keys as $idx => $key) {
     } else {
         $output = $instance->jsonSerialize();
         echo date('Y-m-d H:i:s', $output['time']) . "\n";
-        echo $output['title']['text'] . "\n";
+        foreach ($output['topics'] as $topic) {
+            echo $topic . "\n";
+        }
+        $message = $output['title']['text'];
+        foreach ($output['title']['params'] as $paramName => $paramData) {
+            /** @var \Alaress\Async\Notification\Parameter\ParameterInterface $paramData */
+            $message = str_replace(":{$paramName}", "[{$paramData->getText()}]", $message);
+        }
+        echo $message . "\n";
     }
 }
+
+echo "\n";
+echo "=====================================================================\n";
+echo "Cached messages\n";
+$rawRedisData = $redis->smembers('schedule:vagrantx:index');
+foreach ($rawRedisData as $rawmsg) {
+    echo $rawmsg . "\n";
+}
+
 exit;

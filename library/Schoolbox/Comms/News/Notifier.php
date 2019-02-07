@@ -238,8 +238,7 @@ class Notifier extends AbstractModuleNotifier
                     // future -> future .. detach + re-attach
                     // future -> past .. detach + re-attach
                     if ($previous->getPublishAt()->isFuture()) {
-                        // attaching posted will cancel existing trigger regardress
-                        $bundle->detach(self::TRIGGER_POSTED);
+                        // this will replace existing scheduled trigger
                         $bundle->attach(self::TRIGGER_POSTED, $publishAt->getUnixTimeStamp());
                     } elseif ($publishAt->isFuture()) {
                         $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
@@ -253,8 +252,7 @@ class Notifier extends AbstractModuleNotifier
                     // future -> future .. detach + re-attach
                     // future -> past .. detach
                     if ($expiresAt->isFuture()) {
-                        // attaching posted will cancel existing trigger regardress
-                        $bundle->detach(self::TRIGGER_EXPIRED);
+                        // this will replace existing scheduled trigger
                         $bundle->attach(self::TRIGGER_EXPIRED, $expiresAt->getUnixTimeStamp());
                     } elseif ($previous->getExpiresAt()->isFuture()) {
                         $bundle->detach(self::TRIGGER_EXPIRED);
@@ -553,6 +551,11 @@ class Notifier extends AbstractModuleNotifier
     private function notifyPosted(string $roleType, Article $article, User $effector): Envelope
     {
         $envelope = new Envelope();
+
+        if (!$article->isPublished()) {
+            $this->log->warning("Tried to send posted notification for an article {$article->getId()} which is not published.");
+            return $envelope;
+        }
 
         $recipientIds = $this->audienceResolver->findUsersForArticle($article, true);
 

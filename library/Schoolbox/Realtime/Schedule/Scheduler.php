@@ -299,7 +299,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      * @param IResolver        $resolver
      * @throws InvalidArgumentException
      */
-    public function scheduleNotification(TriggerInterface $trigger, $resolver = null)
+    public function scheduleNotification(TriggerInterface $trigger, $resolver = null): void
     {
         // This should come first to clear existing resolver for the trigger
         parent::scheduleNotification($trigger);
@@ -338,7 +338,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      * @param TriggerInterface $trigger
      * @return bool
      */
-    protected function unschedule(TriggerInterface $trigger)
+    protected function unschedule(TriggerInterface $trigger): bool
     {
         // if a trigger was legitimately unscheduled, also attempt to detach it from its resolver
         if (parent::unschedule($trigger)) {
@@ -414,7 +414,8 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
     protected function attachResolverTrigger(IResolver $resolver, $trigger)
     {
         $this->resolvers->attachTriggerToResolver($resolver, $trigger);
-        $this->log->debug("Attached trigger '{$trigger->getIdString()}' to resolver");
+        $resolverCount = count($this->resolvers->getAllResolvers());
+        $this->log->debug("Attached trigger '{$trigger->getIdString()}' to resolver [Resolver count {$resolverCount}]");
     }
 
 
@@ -439,7 +440,8 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
                     break;
             }
 
-            $this->log->debug("Trigger '{$trigger->getIdString()}' detached: $msg");
+            $resolverCount = count($this->resolvers->getAllResolvers());
+            $this->log->debug("Trigger '{$trigger->getIdString()}' detached: $msg [Resolver count {$resolverCount}]");
             return $count;
 
         } catch (OutOfBoundsException $e) {

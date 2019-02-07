@@ -4,7 +4,6 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Alaress\Scheduler\Trigger;
@@ -60,6 +59,25 @@ abstract class AbstractTrigger implements TriggerInterface {
     public function getHash()
     {
         return spl_object_hash($this);
+    }
+
+    /**
+     * Return a hash representation of attached event object
+     * This is using the same way as the key for AbstractScheduler->timers
+     *
+     * @return string
+     */
+    public function getEventObjectHash(): string
+    {
+        $object = $this->getEvent()->getObject();
+        $key = sprintf("%s:%s", get_class($object), $this->getLabel());
+        if (method_exists($object, 'getId')) {
+            $key .= sha1(sprintf("%s:%s", get_class($object), $object->getId()));
+        } else {
+            // fall back to using the SPL hash if there's no available ID
+            $key .= spl_object_hash($object);
+        }
+        return $key;
     }
 
 }

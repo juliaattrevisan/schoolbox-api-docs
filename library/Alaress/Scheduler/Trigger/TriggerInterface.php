@@ -67,4 +67,13 @@ interface TriggerInterface {
      * @return string
      */
     public function getHash();
-} 
+
+
+    /**
+     * Return a hash representation of attached event object
+     *
+     * @return string
+     */
+    public function getEventObjectHash(): string;
+
+}

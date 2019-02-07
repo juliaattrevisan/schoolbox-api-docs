@@ -4,7 +4,6 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Alaress\Scheduler;
@@ -85,16 +84,16 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @throws InvalidArgumentException
      * @return void
      */
-    protected function scheduleNotification(TriggerInterface $trigger)
+    protected function scheduleNotification(TriggerInterface $trigger): void
     {
         if ($trigger instanceof CancelTrigger) { // FIREFIGHT
-            $this->log->info('Unscheduling CancelTrigger '.$trigger->getIdString()); // FIREFIGHT
+            $this->log->info("Cancel Trigger received. Unscheduling {$trigger->getIdString()}"); // FIREFIGHT
             $this->unschedule($trigger);
             return;
         }
 
         if($trigger->getTimestamp() < 0) {
-            $this->log->info('Unscheduling negative timestamp '.$trigger->getIdString()); // FIREFIGHT
+            $this->log->info("Trigger with negative timestamp received. Unscheduling {$trigger->getIdString()}"); // FIREFIGHT
             $this->unschedule($trigger);
             return;
         }
@@ -208,7 +207,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @param TriggerInterface $trigger
      * @return bool
      */
-    protected function unschedule(TriggerInterface $trigger)
+    protected function unschedule(TriggerInterface $trigger): bool
     {
         $model = $trigger->getEvent()->getObject();
         $label = $trigger->getLabel();
