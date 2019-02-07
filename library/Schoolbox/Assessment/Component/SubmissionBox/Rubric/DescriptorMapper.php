@@ -63,7 +63,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
 
         if ($descriptorCount === 0) {
             // No more descriptors exist in this level: delete the level
-            $currentLevel = $levelMapper->findById($currentLevelId);
+            $currentLevel = $descriptor->getLevel();
             $levelMapper->softDelete($currentLevel);
         }
     }
