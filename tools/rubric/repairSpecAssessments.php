@@ -482,7 +482,6 @@ $kernel->run(new class extends App
     {
         // Find each course
         // Retrieve its capabilities+indicators
-        $rubricMapper = RubricMapper::getInstance();
         /** @var Specification\Model[] $courses */
         $courses = Specification\Mapper::getInstance()->findAll();
         foreach ($courses as $course) {
@@ -513,37 +512,38 @@ $kernel->run(new class extends App
                         $unit->getTitle()
                     )
                 );
-                // Must re-fetch the course row set after every unit, because
-                // repairRowSet may change the course row set.
-                $courseRowSet        = $rubricMapper->retrieveRowSet($course->getFolder(), false);
-                $unitRowSet          = $rubricMapper->retrieveRowSet($unit->getFolder(), false);
-                $unitCapabilityCount = count($unitRowSet->getCapabilities());
 
-                if ($unitCapabilityCount === 0) {
+                $this->findRubricCapabilityQuery->execute(['folderId' => $unit->getFolder()->getId()]);
+                $unitCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
+                if (count($unitCapabilities) === 0) {
                     $this->log->debug(self::indent(2).'unit contains no capabilities: no action required');
                     continue;
                 }
 
-                $this->repairRowSet($courseRowSet, $unitRowSet);
+                // Must re-fetch the course row set after every unit, because
+                // repairCapabilities may change the course's capabilities.
+                $this->findRubricCapabilityQuery->execute(['folderId' => $course->getFolder()->getId()]);
+                $courseCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
+
+                $this->repairCapabilities($courseCapabilities, $unitCapabilities);
             }
         }
     }
 
 
     /**
-     * Attempt to repair this unit rowset by migrating its conflicting
-     * capabilities (if any) into the course rowset.
+     * Attempt to repair this set of capabilities by migrating its conflicting
+     * capabilities (if any) into the course.
      *
-     * @param RowSet $courseRowSet
-     * @param RowSet $unitRowSet
+     * @param array $courseCapabilities key: capability ID, value: capability name
+     * @param array $unitCapabilities   key: capability ID, value: capability name
      */
-    private function repairRowSet(RowSet $courseRowSet, RowSet $unitRowSet): void
+    private function repairCapabilities(array $courseCapabilities, array $unitCapabilities): void
     {
-        foreach ($courseRowSet->getCapabilities() as $courseCapability) {
-            $courseCapabilityName = $courseCapability->getName();
-            $capabilityConflict   = false;
-            foreach ($unitRowSet->getCapabilities() as $unitCapability) {
-                if ($courseCapabilityName === $unitCapability->getName()) {
+        foreach ($courseCapabilities as $courseCapabilityId => $courseCapabilityName) {
+            $capabilityConflict = false;
+            foreach ($unitCapabilities as $unitCapabilityId => $unitCapabilityName) {
+                if ($courseCapabilityName === $unitCapabilityName) {
                     $capabilityConflict = true;
                     $this->log->info(
                         sprintf(
