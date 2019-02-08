@@ -42,6 +42,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
     ]
 );
 
+/** @noinspection PhpUnhandledExceptionInspection */
 $kernel->run(new class extends App
 {
     private const INDENT = '  ';
