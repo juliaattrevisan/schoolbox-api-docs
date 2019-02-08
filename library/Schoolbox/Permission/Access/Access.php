@@ -16,6 +16,7 @@ use Schoolbox\Resource\Folder;
 use InvalidArgumentException;
 use External_UserInterface;
 use External_User;
+use LogicException;
 
 /**
  * Responsible for the application of various permission (aka access level) business rules and concepts.
@@ -90,7 +91,7 @@ class Access
      * @param External_UserInterface|null $externalUser
      * @param IConfigLoader|null          $config
      * @return static
-     * @throws \Exception
+     * @throws LogicException If unable to build either an online or offline user connector
      */
     public static function getInstance(
         UserAccessMapper $userAccessMapper = null,

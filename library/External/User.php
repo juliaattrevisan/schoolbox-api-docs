@@ -13,6 +13,7 @@ use Schoolbox\Resource\Storage;
 class External_User extends CachingConnectorAbstract implements External_UserInterface
 {
 
+
     /**
      * Constructor
      *

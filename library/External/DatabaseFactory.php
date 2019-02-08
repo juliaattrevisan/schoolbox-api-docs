@@ -23,7 +23,7 @@ class External_DatabaseFactory
      *                             "offline" if it isn't enabled.
      *
      * @return External\IConnector
-     * @throws LogicException if even the offline class could be created.
+     * @throws LogicException if even the offline class could not be created.
      *                        (This probably means you passed an invalid value
      *                         for $databaseType.)
      */
@@ -117,6 +117,7 @@ class External_DatabaseFactory
     {
         return $this->buildConnector('Timetable', $databaseName);
     }
+
 
     /**
      * Builds a user connector.
