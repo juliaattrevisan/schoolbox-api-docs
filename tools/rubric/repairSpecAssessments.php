@@ -592,7 +592,11 @@ $kernel->run(new class extends App
                         'assessmentId'       => $assessmentId,
                     ]);
             } catch (Alaress\Database\Exception $e) {
-                // Foreign key error: delete (This is significant)
+                // Foreign key error:
+                // this happens when the assessment is already using the
+                // course-level capability.
+                // Delete the unit-level capability usage completely
+                // (This is significant)
                 $this->deleteRubricCapabilityUsageQuery
                     ->execute([
                         'unitCapabilityId' => $unitCapabilityId,
@@ -690,7 +694,11 @@ $kernel->run(new class extends App
                         'assessmentId'      => $assessmentId,
                     ]);
             } catch (Alaress\Database\Exception $e) {
-                // Foreign key error: delete (This is significant)
+                // Foreign key error:
+                // this happens when the assessment is already using the
+                // course-level indicator.
+                // Delete the unit-level indicator usage completely
+                // (This is significant)
                 $this->deleteRubricIndicatorUsageQuery
                     ->execute([
                         'unitIndicatorId' => $unitIndicatorId,
