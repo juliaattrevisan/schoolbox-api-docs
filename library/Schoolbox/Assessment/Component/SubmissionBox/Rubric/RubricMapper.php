@@ -260,11 +260,17 @@ class RubricMapper
                     $capabilityL10nCapitalised = $l10n->translate('rubricGroup', false, true);
                     $capabilityL10nLowercase = $l10n->translate('rubricGroup', false, false);
 
+                    $errorMessage = sprintf("%s %s cannot be saved because %s %s with the same name already exists in",
+                        $capabilityL10nCapitalised,
+                        $capability->getName(),
+                        $capabilityL10nArticle,
+                        $capabilityL10nLowercase
+                    );
+
                     if ($folder->hasUnitSpecification()) {
-                        throw new \UnexpectedValueException("$capabilityL10nCapitalised '" . $capability->getName() . "' cannot be saved because $capabilityL10nArticle $capabilityL10nLowercase with the same name already exists in this unit, or in the course this unit belongs to");
-                    } else {
-                        throw new \UnexpectedValueException("$capabilityL10nCapitalised '" . $capability->getName() . "' cannot be saved because $capabilityL10nArticle $capabilityL10nLowercase with the same name already exists in this folder");
+                        throw new \UnexpectedValueException($errorMessage . " this unit, or in the course this unit belongs to");
                     }
+                    throw new \UnexpectedValueException($errorMessage . " this folder");
                 }
             } else {
                 $capabilityNamesUsed[$normalizedName] = $allowNameChange;
@@ -317,7 +323,17 @@ class RubricMapper
                         $indicatorL10nCapitalised = $l10n->translate('rubricCriterion', false, true);
                         $indicatorL10nLowercase = $l10n->translate('rubricCriterion', false, false);
                         $capabilityL10nLowercase = $l10n->translate('rubricGroup', false, false);
-                        throw new \UnexpectedValueException("$indicatorL10nCapitalised '" . $indicator->getName() . "' cannot be saved because $indicatorL10nArticle $indicatorL10nLowercase with the same name already exists in the $capabilityL10nLowercase '" . $capability->getName() . "'");
+
+                        $errorMessage = sprintf("%s '%s' cannot be saved because %s %s with the same name already exists in the %s '%s'",
+                            $indicatorL10nCapitalised,
+                            $indicator->getName(),
+                            $indicatorL10nArticle,
+                            $indicatorL10nLowercase,
+                            $capabilityL10nLowercase,
+                            $capability->getName()
+                        );
+
+                        throw new \UnexpectedValueException($errorMessage);
                     }
                 } else {
                     $indicatorNamesUsed[$normalizedName] = $allowNameChange;
@@ -425,13 +441,21 @@ class RubricMapper
                     $capabilityL10nArticle = $l10n->indefiniteArticle('rubricGroup', false, true);
                     $capabilityL10nCapitalised = $l10n->translate('rubricGroup', false, true);
                     $capabilityL10nLowercase = $l10n->translate('rubricGroup', false, false);
-                    $errorMessage .= "<p>$capabilityL10nCapitalised '$capabilityName' cannot be saved because $capabilityL10nArticle $capabilityL10nLowercase with the same name already exists in the following unit(s) in this course:<br/><ul>";
+
+                    $errorMessage .= sprintf(
+                        "<p>%s '%s' cannot be saved because %s %s with the same name already exists in the following unit(s) in this course:<br/><ul>",
+                        $capabilityL10nCapitalised,
+                        $capabilityName,
+                        $capabilityL10nArticle,
+                        $capabilityL10nLowercase
+                    );
+
                     foreach ($units as $unit) {
                         $unitName = $unit['unitName'];
                         $folderId = $unit['folderId'];
                         $errorMessage .= "<li><a href='/rubric/criteria/$folderId'>$unitName</a></li>";
                     }
-                    $errorMessage .= "</ul></p>";
+                    $errorMessage .= '</ul></p>';
                 }
                 throw new \UnexpectedValueException($errorMessage);
             }
