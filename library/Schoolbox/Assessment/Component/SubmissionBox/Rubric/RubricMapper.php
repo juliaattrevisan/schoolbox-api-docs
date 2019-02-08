@@ -170,16 +170,18 @@ class RubricMapper
     /**
      * Saves this row set to the database.
      *
-     * @param RowSet           $rowSet
-     * @param bool             $persistCurriculum    Should curriculum nodes for groups and
+     * @param RowSet $rowSet
+     * @param bool $persistCurriculum Should curriculum nodes for groups and
      *                                               criteria be updated?
-     * @param bool             $allowModifyUsed      Should groups/criteria that are in use
+     * @param bool $allowModifyUsed Should groups/criteria that are in use
      *                                               be modifiable or deletable?
      * @param null|IAssessable $allowModifyExclusion If set and `$allowModifyUsed` is off, a
      *                                               group or criterion in `$rowSet` MAY be
      *                                               modified if it is used by no other
      *                                               assessment than this one.
      * @throws MapperException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \UnexpectedValueException
      */
     public function persistRowSet(
         RowSet $rowSet,
