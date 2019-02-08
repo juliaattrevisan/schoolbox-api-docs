@@ -192,6 +192,13 @@ class RubricMapper
         // Forgive me...
         $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
 
+        $capabilityL10nArticle = $l10n->indefiniteArticle('rubricGroup', false, true);
+        $capabilityL10nCapitalised = $l10n->translate('rubricGroup', false, true);
+        $capabilityL10nLowercase = $l10n->translate('rubricGroup', false, false);
+        $indicatorL10nArticle = $l10n->indefiniteArticle('rubricCriterion', false, true);
+        $indicatorL10nCapitalised = $l10n->translate('rubricCriterion', false, true);
+        $indicatorL10nLowercase = $l10n->translate('rubricCriterion', false, false);
+
         // Where does this go?
         $folder                   = $rowSet->getContext()->getBaseContext()->getFolder();
 
@@ -258,10 +265,6 @@ class RubricMapper
                 if ($capabilityNamesUsed[$normalizedName]) {
                     // this is used by a capability which is allowed to change:
                     // invalidate
-                    $capabilityL10nArticle = $l10n->indefiniteArticle('rubricGroup', false, true);
-                    $capabilityL10nCapitalised = $l10n->translate('rubricGroup', false, true);
-                    $capabilityL10nLowercase = $l10n->translate('rubricGroup', false, false);
-
                     $errorMessage = sprintf("%s %s cannot be saved because %s %s with the same name already exists in",
                         $capabilityL10nCapitalised,
                         $capability->getName(),
@@ -321,10 +324,6 @@ class RubricMapper
                     if ($indicatorNamesUsed[$normalizedName]) {
                         // this is used by a indicator which is allowed to
                         // change: invalidate
-                        $indicatorL10nArticle = $l10n->indefiniteArticle('rubricCriterion', false, true);
-                        $indicatorL10nCapitalised = $l10n->translate('rubricCriterion', false, true);
-                        $indicatorL10nLowercase = $l10n->translate('rubricCriterion', false, false);
-                        $capabilityL10nLowercase = $l10n->translate('rubricGroup', false, false);
 
                         $errorMessage = sprintf("%s '%s' cannot be saved because %s %s with the same name already exists in the %s '%s'",
                             $indicatorL10nCapitalised,
@@ -361,7 +360,11 @@ class RubricMapper
             foreach ($deletedCapabilityIds as $deletedCapabilityId) {
                 $existingCapability = $existingRowSet->retrieveCapability($deletedCapabilityId);
                 if ($existingCapability && $existingCapability->isInUse($allowModifyExclusion)) {
-                    throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                    $errorMessage = sprintf("Cannot delete %s '%s' because it is in use elsewhere",
+                        $capabilityL10nLowercase,
+                        $existingCapability->getName()
+                    );
+                    throw new \UnexpectedValueException($errorMessage);
                 }
             }
 
@@ -369,7 +372,11 @@ class RubricMapper
             foreach ($deletedIndicatorIds as $deletedIndicatorId) {
                 $existingIndicator = $existingRowSet->retrieveIndicator($deletedIndicatorId);
                 if ($existingIndicator && $existingIndicator->isInUse($allowModifyExclusion)) {
-                    throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                    $errorMessage = sprintf("Cannot delete %s '%s' because it is in use elsewhere",
+                        $indicatorL10nLowercase,
+                        $existingIndicator->getName()
+                    );
+                    throw new \UnexpectedValueException($errorMessage);
                 }
             }
         }
@@ -440,10 +447,6 @@ class RubricMapper
             if (!empty ($duplicateCapabilities)) {
                 $errorMessage = '';
                 foreach ($duplicateCapabilities as $capabilityName => $units) {
-                    $capabilityL10nArticle = $l10n->indefiniteArticle('rubricGroup', false, true);
-                    $capabilityL10nCapitalised = $l10n->translate('rubricGroup', false, true);
-                    $capabilityL10nLowercase = $l10n->translate('rubricGroup', false, false);
-
                     $errorMessage .= sprintf(
                         "<p>%s '%s' cannot be saved because %s %s with the same name already exists in the following unit(s) in this course:<br/><ul>",
                         $capabilityL10nCapitalised,
