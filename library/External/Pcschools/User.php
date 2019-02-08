@@ -816,10 +816,10 @@ class External_Pcschools_User implements External_UserInterface
             FROM TIMEFILE tf
                         INNER JOIN SUB su ON tf.[YEAR] = su.[YEAR] AND tf.SUBJECT = su.SUBJECT_NO AND tf.CLASS = su.CLASS
                         INNER JOIN SUBJECT s ON tf.SUBJECT = s.NO
-            WHERE su.STUDKEY = '" . $this->getDatabase()->quote($externalId) . "' 
-              AND tf.TIME_PERIOD = '" . $this->getDatabase()->quote($period['TIME_PERIOD']) . "'
-              AND su.PERIOD_ID =  '" . $this->getDatabase()->quote($period['SUB_PERIOD']) . "'
-              AND (tf.[STATUS] = '' OR tf.[STATUS] = 'S' OR (tf.[STATUS] = 'C' AND tf.TEACHER_REP = '" . $this->getDatabase()->quote($externalId) . "' ))
+            WHERE su.STUDKEY = :externalID
+              AND tf.TIME_PERIOD = :timePeriod
+              AND su.PERIOD_ID =  :subPeriod
+              AND (tf.[STATUS] = '' OR tf.[STATUS] = 'S' OR (tf.[STATUS] = 'C' AND tf.TEACHER_REP = :externalID
 
             UNION
 
@@ -829,7 +829,7 @@ class External_Pcschools_User implements External_UserInterface
                             INNER JOIN SUBJECT s ON tf.SUBJECT = s.NO
                             INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
                 WHERE st.CURRENT_YEAR <> '99'
-                  AND (st.STUDKEY = '" . $this->getDatabase()->quote($externalId) . "' AND tf.TIME_PERIOD = '" . $this->getDatabase()->quote($period['TIME_PERIOD']) . "');
+                  AND (st.STUDKEY = :externalID AND tf.TIME_PERIOD = :timePeriod;
 
         ";
 
@@ -838,16 +838,16 @@ class External_Pcschools_User implements External_UserInterface
                           FROM dbo.TIMEFILE tf
                           INNER JOIN dbo.SUB sub ON (tf.SUBJECT = sub.SUBJECT_NO AND tf.CLASS = sub.CLASS AND tf.[YEAR] = sub.[YEAR])
                           INNER JOIN dbo.SUBJECT s ON s.NO = tf.SUBJECT
-                          WHERE  tf.TEACHER = '" . $this->getDatabase()->quote($externalId) . "'
-                                AND          tf.TIME_PERIOD = '" . $this->getDatabase()->quote($period['TIME_PERIOD']) . "'
-                                AND          sub.PERIOD_ID = '" . $this->getDatabase()->quote($period['SUB_PERIOD']) . "'
+                          WHERE  tf.TEACHER = :externalID
+                                AND          tf.TIME_PERIOD = :timePeriod
+                                AND          sub.PERIOD_ID = :subPeriod
                         ";
 
         } else {
             return [];
         }
 
-        $classArray = $statement = $this->getDatabase()->getAll($query);
+        $classArray =$this->getDatabase()->getAll($query, ['externalID'=>$externalId, 'timePeriod'=>$period['TIME_PERIOD'], 'subPeriod'=>$period['SUB_PERIOD']]);
 
         foreach ($classArray as $class)
         {   
