@@ -372,6 +372,9 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
               });
             }
 
+            // Trigger a custom event. This is listened on draft.js to check for changes.
+            element.trigger("datepickerChange");
+
             // Sync dates if applicable
             adtp.syncDatesOnElement(element, options, "");
 
@@ -604,7 +607,10 @@ $.fn.alaressDateTimePicker = function(optionsOverride) {
   function massageDateValue(e, staller) {
     var t = e.target;
 
-    if ($.trim($(t).val()) != "" && $.trim($(t).val()) !== $(t).data('originalValue')) {
+    if (
+      $.trim($(t).val()) != "" &&
+      $.trim($(t).val()) !== $(t).data("originalValue")
+    ) {
       // set up params to guide server-side parsing
       var opts = adtp.getOptions($(t));
       var params = {
