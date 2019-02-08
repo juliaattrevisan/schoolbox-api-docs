@@ -767,6 +767,25 @@ class External_Pcschools_User implements External_UserInterface
         return date('Y');
     }
 
+    public function findPeriod() {
+        $query = "SELECT TIME_PERIOD, SUB_PERIOD FROM dbo.CALENDAR WHERE DATE = :now";
+        $period = $this->getDatabase()->getRow($query, [':now'=>date('ymd')]);
+        if ($period['TIME_PERIOD'] == 0 || $period['SUBJECT_PERIOD'] == 0) {
+            $query = "SELECT TIME_PERIOD, SUBJECT_PD FROM dbo.SYSFILE";
+            $altPeriod = $this->getDatabase()->getRow($query);
+            $period['TIME_PERIOD'] = $period['TIME_PERIOD'] ?: $altPeriod['TIME_PERIOD'];
+            $period['SUB_PERIOD'] = $period['TIME_PERIOD'] ?: $altPeriod['SUBJECT_PD'];
+        }
+
+        // Annoyingly the `time_period` gets retrieved by the PDO driver without the trailing zeros that are required. 
+        // The data type in MSSQL is defined as a DECIMAL (4,2) so to fudge around this I'm doing a number format
+
+        $period['TIME_PERIOD'] = number_format($period['TIME_PERIOD'], 2);
+        $period['SUB_PERIOD'] = number_format($period['SUB_PERIOD'], 2);
+
+        return $period;
+    }
+
     /**
      * Get a list of subjects for $externalUserId
      * $externalUserId and $userId are properties of the same person
@@ -788,7 +807,7 @@ class External_Pcschools_User implements External_UserInterface
      * @param User $user
      *
      * @return array
-     */
+     */    
     public function getSubjectList(User $user)
     {
         $externalId = $user->getExternalId();
@@ -797,59 +816,68 @@ class External_Pcschools_User implements External_UserInterface
             return [];
         }
 
-        $studentExternalId = '';
-        $teacherExternalId = '';
-        $timePeriods       = [];
-        $classes           = [];
-        $spec              = new External_Pcschools_ValidCampusSpec();
-        foreach ($user->getCampusCollection() as $campus) {
-            if ($spec->isSatisfiedBy($campus)) {
-                $timePeriods[$campus->getExtTimetableCode()] = $campus->getExtTimetableCode();
-            }
+        if (!$user->getRole()->isStaff() && !$user->getRole()->isStudent()) {
+            return [];
         }
-        foreach ($timePeriods as $timePeriod) {
-            if ($user->getRole()->isStudent()) {
-                $studentExternalId = $externalId;
-            } elseif ($user->getRole()->isStaff()) {
-                $teacherExternalId = $externalId;
-            } else {
-                return [];
-            }
 
-            // Ordering of result sets from spSelTimeTableSchoolBox:
-            // Day periods
-            // Day classes
-            // Home classes
-            // Week days
-            // Terms
-            $statement = $this->getDatabase()->prepareProcedure($this->timetableStoredProc);
-            $statement->bindInputs([
-                'DATE' => date('Ymd'),
-                'TIMEPERIOD' => $timePeriod,
-                'STUDKEY' => $studentExternalId,
-                'TEACHERCODE' => $teacherExternalId,
-            ]);
+        // Create return array
 
-            $statement->execute();
+        $classes = [];
 
-            // Need only day classes
-            $statement->nextRowset();
+        // Retrieve timetabled classes
 
-            // Add classes for each day into it
-            /** @noinspection PhpAssignmentInConditionInspection */
-            while ($dayClass = $statement->fetch()) {
-                if ($dayClass['SUPERDATE'] == null || $dayClass['SUPERDATE'] == date("Y-m-d") . " 00:00:00") {
-                    $code = $timePeriod . '/' . $dayClass['YEAR'] . $dayClass['ABBREV'] . $dayClass['CLASS'];
-                    $classes[$code] = [
-                        'code'       => $code,
-                        'name'       => $dayClass['DESC'],
-                        'classType'  => '',
-                        'campusCode' => $timePeriod,
-                    ];
-                }
-            }
-            $statement->close();
+        $period = $this->findPeriod();
+
+        if ($user->getRole()->isStudent()) {
+
+            $query = "SELECT DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
+            FROM TIMEFILE tf
+                        INNER JOIN SUB su ON tf.[YEAR] = su.[YEAR] AND tf.SUBJECT = su.SUBJECT_NO AND tf.CLASS = su.CLASS
+                        INNER JOIN SUBJECT s ON tf.SUBJECT = s.NO
+            WHERE su.STUDKEY = :externalID
+              AND tf.TIME_PERIOD = :timePeriod
+              AND su.PERIOD_ID =  :subPeriod
+              AND (tf.[STATUS] = '' OR tf.[STATUS] = 'S' OR (tf.[STATUS] = 'C' AND tf.TEACHER_REP = :externalID
+
+            UNION
+
+                SELECT DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
+                FROM TIMEFILE tf
+                            INNER JOIN SUB su ON tf.[YEAR] = su.[YEAR] AND tf.SUBJECT = su.SUBJECT_NO AND tf.CLASS = su.CLASS AND tf.TIME_PERIOD = su.PERIOD_ID
+                            INNER JOIN SUBJECT s ON tf.SUBJECT = s.NO
+                            INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
+                WHERE st.CURRENT_YEAR <> '99'
+                  AND (st.STUDKEY = :externalID AND tf.TIME_PERIOD = :timePeriod;
+
+        ";
+
+        } else if ($user->getRole()->isStaff()) {
+            $query = "SELECT  DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
+                          FROM dbo.TIMEFILE tf
+                          INNER JOIN dbo.SUB sub ON (tf.SUBJECT = sub.SUBJECT_NO AND tf.CLASS = sub.CLASS AND tf.[YEAR] = sub.[YEAR])
+                          INNER JOIN dbo.SUBJECT s ON s.NO = tf.SUBJECT
+                          WHERE  tf.TEACHER = :externalID
+                                AND          tf.TIME_PERIOD = :timePeriod
+                                AND          sub.PERIOD_ID = :subPeriod
+                        ";
+
+        } else {
+            return [];
         }
+
+        $classArray =$this->getDatabase()->getAll($query, ['externalID'=>$externalId, 'timePeriod'=>$period['TIME_PERIOD'], 'subPeriod'=>$period['SUB_PERIOD']]);
+
+        foreach ($classArray as $class)
+        {   
+            $code = $period['TIME_PERIOD']. '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
+            $classes[$code] = [ 
+                'code'       => $code,
+                'name'       => $class['DESC'],
+                'classType'  => '',
+                'campusCode' => $period['TIME_PERIOD'],
+            ];
+        }   
+        
         return array_values($classes);
     }
 
