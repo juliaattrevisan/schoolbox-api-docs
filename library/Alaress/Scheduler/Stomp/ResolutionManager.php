@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -18,19 +18,19 @@ use SplObjectStorage;
 class ResolutionManager
 {
 
-	/** @var SplObjectStorage|IResolver[] */
-	protected $resolvers;
+    /** @var SplObjectStorage|IResolver[] */
+    protected $resolvers;
 
     /** @var IResolver[] */
     protected $resolversIndexedByTriggerHash = [];
 
-	/**
-	 * Instantiate members
-	 */
-	public function __construct()
+    /**
+     * Instantiate members
+     */
+    public function __construct()
     {
-		$this->resolvers = new SplObjectStorage();
-	}
+        $this->resolvers = new SplObjectStorage();
+    }
 
 
     /**
@@ -97,46 +97,46 @@ class ResolutionManager
         return $this->resolvers->offsetGet($resolver);
     }
 
-	/**
-	 * Gets the data for the given resolver, implicitly attaching it first if necessary
-	 *
-	 * @param IResolver $resolver
-	 * @return SplObjectStorage|TriggerInterface[]
-	 */
-	protected function getData($resolver)
+    /**
+     * Gets the data for the given resolver, implicitly attaching it first if necessary
+     *
+     * @param IResolver $resolver
+     * @return SplObjectStorage|TriggerInterface[]
+     */
+    protected function getData($resolver)
     {
-		if (!$this->resolvers->contains($resolver)) {
-			$this->resolvers->attach($resolver, new SplObjectStorage());
-		}
+        if (!$this->resolvers->contains($resolver)) {
+            $this->resolvers->attach($resolver, new SplObjectStorage());
+        }
 
-		return $this->resolvers->offsetGet($resolver);
-	}
+        return $this->resolvers->offsetGet($resolver);
+    }
 
-	/**
-	 * @param IResolver $resolver
-	 * @param SplObjectStorage|TriggerInterface[] $triggers
+    /**
+     * @param IResolver $resolver
+     * @param SplObjectStorage|TriggerInterface[] $triggers
      * @return void
-	 */
-	protected function setData($resolver, $triggers)
+     */
+    protected function setData($resolver, $triggers)
     {
-		$this->resolvers->attach($resolver, $triggers);
-	}
+        $this->resolvers->attach($resolver, $triggers);
+    }
 
-	/**
-	 * Returns the number of triggers attached to the given resolver. Does NOT implicitly attach.
-	 * Will return -1 if the resolver given is NOT attached.
-	 *
-	 * @param IResolver $resolver
-	 * @return int
-	 */
-	public function getTriggerCount($resolver)
+    /**
+     * Returns the number of triggers attached to the given resolver. Does NOT implicitly attach.
+     * Will return -1 if the resolver given is NOT attached.
+     *
+     * @param IResolver $resolver
+     * @return int
+     */
+    public function getTriggerCount($resolver)
     {
-		if ($this->resolvers->contains($resolver)) {
-			return $this->getData($resolver)->count();
-		}
+        if ($this->resolvers->contains($resolver)) {
+            return $this->getData($resolver)->count();
+        }
 
-		return -1;
-	}
+        return -1;
+    }
 
 
     /**
