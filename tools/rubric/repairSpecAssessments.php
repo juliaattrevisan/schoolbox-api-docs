@@ -25,10 +25,6 @@ use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Rubric\RowSet\Capability;
-use Schoolbox\Assessment\Rubric\RowSet\Indicator;
-use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Zend\Uri\Uri;
 
@@ -384,7 +380,7 @@ $kernel->run(new class extends App
         $this->now     = Alaress_Date_Format::now();
         $this->perform = $opts['perform'] ?? false;
         $config        = $di->get('config');
-        $this->fqdn    = trim($config->get('site_hostname').".".$config->get('site_domain'), ';.');
+        $this->fqdn    = trim($config->get('site_hostname') . "." . $config->get('site_domain'), ';.');
 
 
         // log perform / dry run
@@ -497,7 +493,7 @@ $kernel->run(new class extends App
             // Don't go further if there's no capabilities in course
             $this->findRubricCapabilityQuery->execute(['folderId' => $course->getFolder()->getId()]);
             if ($this->findRubricCapabilityQuery->rowCount() === 0) {
-                $this->log->debug(self::indent(1).'course contains no capabilities: no action required');
+                $this->log->debug(self::indent(1) . 'course contains no capabilities: no action required');
                 continue;
             }
 
@@ -507,7 +503,7 @@ $kernel->run(new class extends App
             foreach ($units as $unit) {
                 $this->log->info(
                     sprintf(
-                        self::indent(1).'finding capabilities for unit #%d (%s)',
+                        self::indent(1) . 'finding capabilities for unit #%d (%s)',
                         $unit->getFolder()->getId(),
                         $unit->getTitle()
                     )
@@ -516,7 +512,7 @@ $kernel->run(new class extends App
                 $this->findRubricCapabilityQuery->execute(['folderId' => $unit->getFolder()->getId()]);
                 $unitCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
                 if (count($unitCapabilities) === 0) {
-                    $this->log->debug(self::indent(2).'unit contains no capabilities: no action required');
+                    $this->log->debug(self::indent(2) . 'unit contains no capabilities: no action required');
                     continue;
                 }
 
@@ -547,7 +543,7 @@ $kernel->run(new class extends App
                     $capabilityConflict = true;
                     $this->log->info(
                         sprintf(
-                            self::indent(2).'capability "%s" exists in course and unit: resolving conflict',
+                            self::indent(2) . 'capability "%s" exists in course and unit: resolving conflict',
                             $courseCapabilityName
                         )
                     );
@@ -560,7 +556,7 @@ $kernel->run(new class extends App
             if (!$capabilityConflict) {
                 $this->log->debug(
                     sprintf(
-                        self::indent(2).'capability "%s" exists in course, but not in unit: no action required',
+                        self::indent(2) . 'capability "%s" exists in course, but not in unit: no action required',
                         $courseCapabilityName
                     )
                 );
@@ -584,7 +580,7 @@ $kernel->run(new class extends App
         // and deleted if there is a conflict.
         // (This means that any mark-per-capability max values will be lost)
         $this->findRubricCapabilityUsageQuery
-             ->execute(['unitCapabilityId' => $unitCapabilityId,]);
+            ->execute(['unitCapabilityId' => $unitCapabilityId,]);
         foreach ($this->findRubricCapabilityUsageQuery->fetchColumnArray('id') as $assessmentId) {
             // attempt to migrate
             try {
@@ -597,10 +593,10 @@ $kernel->run(new class extends App
             } catch (Alaress\Database\Exception $e) {
                 // Foreign key error: delete (This is significant)
                 $this->deleteRubricCapabilityUsageQuery
-                     ->execute([
-                         'unitCapabilityId' => $unitCapabilityId,
-                         'assessmentId'     => $assessmentId,
-                     ]);
+                    ->execute([
+                        'unitCapabilityId' => $unitCapabilityId,
+                        'assessmentId'     => $assessmentId,
+                    ]);
                 $this->logSignificantEvent(
                     (int)$assessmentId,
                     sprintf(
@@ -637,7 +633,7 @@ $kernel->run(new class extends App
                 // from the now-deleted unit indicator into the course indicator.
                 $this->log->info(
                     sprintf(
-                        self::indent(3).'indicator "%s" exists in course and unit: deleting from unit, then migrating usage to course',
+                        self::indent(3) . 'indicator "%s" exists in course and unit: deleting from unit, then migrating usage to course',
                         $unitIndicatorName
                     )
                 );
@@ -648,7 +644,7 @@ $kernel->run(new class extends App
                 // Can just move the unit indicator into the course.
                 $this->log->info(
                     sprintf(
-                        self::indent(3).'indicator "%s" exists in unit, but not course: moving from unit to course',
+                        self::indent(3) . 'indicator "%s" exists in unit, but not course: moving from unit to course',
                         $unitIndicatorName
                     )
                 );
@@ -718,7 +714,7 @@ $kernel->run(new class extends App
             $migratedDescriptorCount = 0;
 
             $this->log->notice(
-                sprintf(self::indent(4).'checking assessment #%d for conflicting descriptors', $assessmentId)
+                sprintf(self::indent(4) . 'checking assessment #%d for conflicting descriptors', $assessmentId)
             );
 
             foreach ($levels as $levelId => $unitDescriptorId) {
@@ -731,7 +727,7 @@ $kernel->run(new class extends App
                             'unitDescriptorId' => $unitDescriptorId,
                         ]);
                     $this->log->notice(
-                        sprintf(self::indent(5).'assessment has conflicts for level #%d', $levelId)
+                        sprintf(self::indent(5) . 'assessment has conflicts for level #%d', $levelId)
                     );
                     $removedDescriptorCount++;
                 } else {
@@ -742,7 +738,7 @@ $kernel->run(new class extends App
                             'unitDescriptorId'  => $unitDescriptorId,
                         ]);
                     $this->log->notice(
-                        sprintf(self::indent(5).'assessment has no conflicts for level #%d', $levelId)
+                        sprintf(self::indent(5) . 'assessment has no conflicts for level #%d', $levelId)
                     );
                     $migratedDescriptorCount++;
                 }
@@ -828,10 +824,10 @@ $kernel->run(new class extends App
             $url = (new Uri())
                 ->setScheme('https')
                 ->setHost($this->fqdn)
-                ->setPath('/learning/assessments/'.$assessmentId);
-            $this->log->warning(self::indent(1).$url->toString());
+                ->setPath('/learning/assessments/' . $assessmentId);
+            $this->log->warning(self::indent(1) . $url->toString());
             foreach ($events as $event) {
-                $this->log->warning(self::indent(2).$event);
+                $this->log->warning(self::indent(2) . $event);
             }
         }
     }
