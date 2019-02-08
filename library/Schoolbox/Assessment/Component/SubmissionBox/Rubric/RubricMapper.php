@@ -265,7 +265,7 @@ class RubricMapper
                 if ($capabilityNamesUsed[$normalizedName]) {
                     // this is used by a capability which is allowed to change:
                     // invalidate
-                    $errorMessage = sprintf("%s %s cannot be saved because %s %s with the same name already exists in",
+                    $errorMessage = sprintf("%s '%s' cannot be saved because %s %s with the same name already exists in",
                         $capabilityL10nCapitalised,
                         $capability->getName(),
                         $capabilityL10nArticle,
