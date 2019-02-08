@@ -251,13 +251,7 @@ class Module extends BaseModule
             'userResolver'               => $injector->lazyGet('commsNewsUserResolver'),
             'strategyFactory'            => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
             'access'                     => $injector->lazy(function () {
-                /**
-                 * @var Access\UserAccessMapper $userAccessMapper
-                 * @var Access\RoleAccessMapper $roleAccessMapper
-                 */
-                $userAccessMapper = $this->getMapperFactory()->get(Access\UserAccessMapper::class);
-                $roleAccessMapper = $this->getMapperFactory()->get(Access\RoleAccessMapper::class);
-                return Access\Access::getInstance($userAccessMapper, $roleAccessMapper);
+                return Access\Access::getInstance();
             }),
             'threadMapper'               => $this->getMapperFactory()->getLazy(Thread\Mapper::class),
             'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
