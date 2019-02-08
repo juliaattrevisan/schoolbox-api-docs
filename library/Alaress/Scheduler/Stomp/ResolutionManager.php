@@ -1,10 +1,9 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Alaress\Scheduler\Stomp;
@@ -19,57 +18,58 @@ use SplObjectStorage;
 class ResolutionManager
 {
 
-	/** @var SplObjectStorage|IResolver[] */
-	protected $resolvers;
+    /** @var SplObjectStorage|IResolver[] */
+    protected $resolvers;
 
     /** @var IResolver[] */
     protected $resolversIndexedByTriggerHash = [];
 
-	/**
-	 * Instantiate members
-	 */
-	public function __construct()
+    /**
+     * Instantiate members
+     */
+    public function __construct()
     {
-		$this->resolvers = new SplObjectStorage();
-	}
-
-
-	/**
-	 * Attach the given trigger to the given resolver, adding the resolver first if necessary.
-	 *
-	 * @param IResolver $resolver
-	 * @param TriggerInterface $trigger
-	 * @return void
-	 */
-	public function attachTriggerToResolver($resolver, $trigger)
-    {
-		$data = $this->getData($resolver);
-		$data->attach($trigger);
-		$this->setData($resolver, $data);
-        $this->resolversIndexedByTriggerHash[$trigger->getHash()] = $resolver;
-	}
+        $this->resolvers = new SplObjectStorage();
+    }
 
 
     /**
-     * If the final trigger of a resolver is detached, the resolver will be ACK'd and unset
-     * Returns the resultant trigger count for the resolver to which it was attached (or -1 otherwise)
+     * Attach the given trigger to the given resolver, adding the resolver first if necessary.
+     *
+     * @param IResolver $resolver
+     * @param TriggerInterface $trigger
+     * @return void
+     */
+    public function attachTriggerToResolver(IResolver $resolver, TriggerInterface $trigger): void
+    {
+        $data = $this->getData($resolver);
+        $data->attach($trigger);
+        $this->setData($resolver, $data);
+        $this->resolversIndexedByTriggerHash[$trigger->getEventObjectHash()] = $resolver;
+    }
+
+
+    /**
+     * Detach an existing trigger (should be only one...) related to the event object & action of the given trigger
      *
      * @param TriggerInterface $trigger
      * @throws OutOfBoundsException
      * @return int
      */
-    public function detachTrigger($trigger)
+    public function detachTrigger(TriggerInterface $trigger): int
     {
+        // get resolver of the same object as the given trigger
         $resolver = $this->getResolverByTrigger($trigger);
+
+        // get an existing trigger (should be only one) from the resolver
+        // in case of rescheduling, the returned trigger will be the one to be canceled
         $triggers = $this->getTriggersByResolver($resolver);
 
-        if (!$triggers->contains($trigger)) {
-            throw new OutOfBoundsException('Given trigger is not attached to the expected resolver');
-        }
+        // clear the resolver from the list
+        unset($this->resolversIndexedByTriggerHash[$trigger->getEventObjectHash()]);
 
-        $this->resolversIndexedByTriggerHash[$trigger->getHash()] = null;
-
-        $triggers->detach($trigger);
+        // remove the attached trigger from the resolver.
+        $triggers->removeAll($triggers);
         $this->setData($resolver, $triggers);
 
         if ($this->getTriggerCount($resolver) === 0) {
@@ -83,6 +83,7 @@ class ResolutionManager
             }
         }
 
+        // this should return -1, which means that the resolver has been acknowledged
         return $this->getTriggerCount($resolver);
     }
 
@@ -96,46 +97,46 @@ class ResolutionManager
         return $this->resolvers->offsetGet($resolver);
     }
 
-	/**
-	 * Gets the data for the given resolver, implicitly attaching it first if necessary
-	 *
-	 * @param IResolver $resolver
-	 * @return SplObjectStorage|TriggerInterface[]
-	 */
-	protected function getData($resolver)
+    /**
+     * Gets the data for the given resolver, implicitly attaching it first if necessary
+     *
+     * @param IResolver $resolver
+     * @return SplObjectStorage|TriggerInterface[]
+     */
+    protected function getData($resolver)
     {
-		if (!$this->resolvers->contains($resolver)) {
-			$this->resolvers->attach($resolver, new SplObjectStorage());
-		}
+        if (!$this->resolvers->contains($resolver)) {
+            $this->resolvers->attach($resolver, new SplObjectStorage());
+        }
 
-		return $this->resolvers->offsetGet($resolver);
-	}
+        return $this->resolvers->offsetGet($resolver);
+    }
 
-	/**
-	 * @param IResolver $resolver
-	 * @param SplObjectStorage|TriggerInterface[] $triggers
+    /**
+     * @param IResolver $resolver
+     * @param SplObjectStorage|TriggerInterface[] $triggers
      * @return void
-	 */
-	protected function setData($resolver, $triggers)
+     */
+    protected function setData($resolver, $triggers)
     {
-		$this->resolvers->attach($resolver, $triggers);
-	}
+        $this->resolvers->attach($resolver, $triggers);
+    }
 
-	/**
-	 * Returns the number of triggers attached to the given resolver. Does NOT implicitly attach.
-	 * Will return -1 if the resolver given is NOT attached.
-	 *
-	 * @param IResolver $resolver
-	 * @return int
-	 */
-	public function getTriggerCount($resolver)
+    /**
+     * Returns the number of triggers attached to the given resolver. Does NOT implicitly attach.
+     * Will return -1 if the resolver given is NOT attached.
+     *
+     * @param IResolver $resolver
+     * @return int
+     */
+    public function getTriggerCount($resolver)
     {
-		if ($this->resolvers->contains($resolver)) {
-			return $this->getData($resolver)->count();
-		}
+        if ($this->resolvers->contains($resolver)) {
+            return $this->getData($resolver)->count();
+        }
 
-		return -1;
-	}
+        return -1;
+    }
 
 
     /**
@@ -143,19 +144,14 @@ class ResolutionManager
      * @throws OutOfBoundsException
      * @return IResolver
      */
-    public function getResolverByTrigger($trigger)
+    public function getResolverByTrigger(TriggerInterface $trigger): IResolver
     {
-        // see if this trigger is referenced
-        if (!array_key_exists($trigger->getHash(), $this->resolversIndexedByTriggerHash)) {
-            throw new OutOfBoundsException('Given trigger is not attached to any resolver');
+        // see if this event object & action of the trigger is referenced
+        if (!array_key_exists($trigger->getEventObjectHash(), $this->resolversIndexedByTriggerHash)) {
+            throw new OutOfBoundsException("Given trigger is not attached to any resolver: key {$trigger->getEventObjectHash()}");
         }
 
-        // we know this trigger existed once, but its resolver has already been acknowledged
-        if (null === $this->resolversIndexedByTriggerHash[$trigger->getHash()]) {
-            throw new OutOfBoundsException('Resolver for this trigger has already been acknowledged');
-        }
-
-        return $this->resolversIndexedByTriggerHash[$trigger->getHash()];
+        return $this->resolversIndexedByTriggerHash[$trigger->getEventObjectHash()];
     }
 
 

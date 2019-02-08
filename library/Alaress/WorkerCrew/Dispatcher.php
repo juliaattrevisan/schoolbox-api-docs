@@ -199,9 +199,6 @@ class Dispatcher implements DispatcherInterface
                 $this->q->dequeue();
                 $this->log->info("Internally handling '$cmd'");
                 $this->msgHandler->handleResponse($identifier, $cmd, (array)$data);
-            } catch(PDOException $e) {
-                // forcible rethrow PDO exceptions
-                throw $e;
             } catch(Exception $e) {
                 // we need to catch (almost) any and all exception here, lest we explode our reactor
                 $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), [ 'exception'=>$e ]);
