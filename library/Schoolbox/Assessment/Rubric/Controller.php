@@ -109,17 +109,15 @@ class Controller extends BaseController
 
         // Don't use just folder ID
         $folderId = $post->get('folderId');
-        $folder   = $this->folderMapper->findById($folderId);
         if (!$folderId){
             $this->sendJSONError('Must supply a folder Id');
             return;
         }
+        $folder = $this->folderMapper->findById($folderId);
 
 
         // Build a rubric grid
         $assessmentId = $post->getInt('rubricId', 0);
-
-        // Rubric grid needs to reflect state in form, not persisted state
         $rubricRowSet = $this->mapper->retrieveRowSet($folder, false);
         $rubricGrid   = new Grid((new DueWork())->setId($assessmentId), $rubricRowSet);
 
@@ -141,8 +139,12 @@ class Controller extends BaseController
                 return;
             }
 
-            // Was this a course-level or a unit-level capability?
+
+            // Find the capability model, so that the indicator may be saved
+            // into the capability (and its folder)
             $groupModel = $this->groupMapper->findById($groupId);
+
+
             // Surely this capability is in a folder?
             if ($groupModel->getParentType() !== Group::PARENT_TYPE_CATEGORY) {
                 $this->sendJSONError('May only create folder-level indicators');
