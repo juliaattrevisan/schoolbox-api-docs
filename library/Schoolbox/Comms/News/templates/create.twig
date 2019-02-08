@@ -196,10 +196,10 @@
 
                                     <fieldset class="checklist checklist-container" v-show="!showEmptyState">
                                         <div class="loader" v-show="showLoader"></div>
-                                        <template v-for="(audienceListItem, index) in audienceListItems">
+                                        <div class="checklist-wrapper" v-for="(audienceListItem, index) in audienceListItems">
                                             <input type="checkbox" :id="'audience-list-input-' + index" :value="index" v-model="audienceListChecked" />
                                             <label :for="'audience-list-input-' + index">${ audienceListItem }</label>
-                                        </template>
+                                        </div>
                                     </fieldset>
 
                                     <fieldset class="checklist border-none" v-show="showModifierCheckboxes">
