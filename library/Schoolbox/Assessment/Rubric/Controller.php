@@ -14,6 +14,7 @@ use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Rubric\Grid\Exporter\ArrayExporter;
@@ -106,18 +107,18 @@ class Controller extends BaseController
             'useMarkRange'      => $post->getBool('useMarkRange', false),
         ];
 
+        // Don't use just folder ID
         $folderId = $post->get('folderId');
-        if(!$folderId){
+        if (!$folderId){
             $this->sendJSONError('Must supply a folder Id');
             return;
         }
+        $folder = $this->folderMapper->findById($folderId);
 
 
         // Build a rubric grid
         $assessmentId = $post->getInt('rubricId', 0);
-
-        // Rubric grid needs to reflect state in form, not persisted state
-        $rubricRowSet = $this->mapper->retrieveRowSet((new FolderModel())->setId($folderId), false);
+        $rubricRowSet = $this->mapper->retrieveRowSet($folder, false);
         $rubricGrid   = new Grid((new DueWork())->setId($assessmentId), $rubricRowSet);
 
         // Fill in each level
@@ -128,8 +129,8 @@ class Controller extends BaseController
         $context['rubricGrid'] = $rubricGrid;
 
 
-        if ($post->get('type') == 'criterion') {
-
+        if ($post->get('type') === 'criterion') {
+            $groupId    = $post->get('groupId');
             $groupIndex = $post->get('groupIndex');
             $groupName  = $post->get('groupName');
             $critName   = $post->get('name');
@@ -138,12 +139,23 @@ class Controller extends BaseController
                 return;
             }
 
-            $criteria        = $this->criterionMapper->findForFolder($folderId);
+
+            // Find the capability model, so that the indicator may be saved
+            // into the capability (and its folder)
+            $groupModel = $this->groupMapper->findById($groupId);
+
+
+            // Surely this capability is in a folder?
+            if ($groupModel->getParentType() !== Group::PARENT_TYPE_CATEGORY) {
+                $this->sendJSONError('May only create folder-level indicators');
+            }
+
+            $criterionModels = $this->criterionMapper->findByColumn('rubric_group_id', $groupId);
             $proposedGroup   = $this->mapper->normaliseForComparison($groupName);
             $proposedName    = $this->mapper->normaliseForComparison($critName);
-            foreach ($criteria as $criterion){
-                $normGroup = $this->mapper->normaliseForComparison($criterion->getGroup()->getName());
-                $normName  = $this->mapper->normaliseForComparison($criterion->getName());
+            foreach ($criterionModels as $criterionModel) {
+                $normGroup = $this->mapper->normaliseForComparison($criterionModel->getGroup()->getName());
+                $normName  = $this->mapper->normaliseForComparison($criterionModel->getName());
                 if ($normGroup === $proposedGroup && $normName === $proposedName){
                     // TODO localise!!!!!
                     $this->sendJSONError("Indicator already exists in this Group");
@@ -151,7 +163,12 @@ class Controller extends BaseController
                 }
             }
 
-            $criterionModel = $this->criterionMapper->findOrCreateOneForFolderByKey($folderId, $critName, $groupName);
+            // This criterion needs to be created
+            $criterionModel = $this->criterionMapper->findOrCreateOneForFolderByKey(
+                $groupModel->getParentId(),
+                $critName,
+                $groupName
+            );
 
             $group = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
                 ->setId($criterionModel->getGroup()->getId())
@@ -170,7 +187,7 @@ class Controller extends BaseController
             $template = 'group-row-editable';
         }
 
-        elseif ($post->get('type') == 'group') {
+        elseif ($post->get('type') === 'group') {
 
             // Does the list of crits/groups really need to be saved now?
             // For some reason, groups aren't saved whilst criteria are?
