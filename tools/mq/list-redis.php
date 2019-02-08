@@ -4,7 +4,9 @@
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Redis;
 
-require_once __DIR__ . '/../../library/Bootstrap.php';
+$opts = require __DIR__ . '/../../conf/core/require-cli.php';
+spl_autoload_call('\\Schoolbox\\Application\\Daemon');
+new \Schoolbox\Application\Daemon\Kernel(__FILE__, $opts);
 
 $redis = Redis::getClientInstance();
 
