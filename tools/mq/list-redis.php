@@ -36,7 +36,15 @@ foreach ($keys as $idx => $key) {
         $output = $instance->extractTrigger();
         echo date('Y-m-d H:i:s', $output->getTimestamp()) . "\n";
         $classname = get_class($output->getEvent()->getObject());
-        echo "Notify {$output->getLabel()}. Object {$classname} with ID {$output->getEvent()->getObject()->getId()} {$output->getEvent()->getAction()} \n";
+        $object = $output->getEvent()->getObject();
+        $mapper = $instance->getModuleNotifier()->getMapper();
+        if ($mapper->getIdentifier()) {
+            $getIdMethod = $mapper->getGetIdentifierMethodName();
+            $withId      = "with ID {$object->$getIdMethod()}";
+        } else {
+            $withId = '(which does not have an identifier)';
+        }
+        echo "Notify {$output->getLabel()}. Object {$classname} {$withId} {$output->getEvent()->getAction()} \n";
     } else if ($instance instanceof \Alaress\Scheduler\Trigger\CancelTrigger) {
         echo "CancelTrigger \n";
         $output = $instance->getTimestamp();
