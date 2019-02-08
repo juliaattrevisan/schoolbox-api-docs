@@ -605,7 +605,7 @@ $kernel->run(new class extends App
                 $this->logSignificantEvent(
                     (int)$assessmentId,
                     sprintf(
-                        'removed and recreated usage record for capability "%s" (original mark-per-capability value not preserved)',
+                        'removed usage record for unit-level capability "%s", and replaced with equivalent course-level record (original mark-per-capability value not preserved)',
                         $capabilityName
                     )
                 );
@@ -707,7 +707,7 @@ $kernel->run(new class extends App
                 $this->logSignificantEvent(
                     (int)$assessmentId,
                     sprintf(
-                        'removed and recreated usage record for indicator "%s"',
+                        'removed and recreated usage record for indicator "%s", and replaced with equivalent course-level record ',
                         $indicatorName
                     )
                 );
