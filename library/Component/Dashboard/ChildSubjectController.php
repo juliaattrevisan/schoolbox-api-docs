@@ -1,12 +1,10 @@
 <?php
-
 /**
- *
- * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2017 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- *
  */
+
+use Schoolbox\Permission\Access\UserAccess;
 
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
@@ -26,9 +24,8 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         if (is_array($_SESSION['children'])) {
             $this->children = $_SESSION['children'];
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function renderTemplate($templateHandle)
@@ -55,7 +52,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
         foreach ($this->children as $child) {
 
-            // Check if the current childs timetable is viewable and hide if necessary
+            // Check if the current child's timetable is viewable and hide if necessary
             try {
                 $userChild = $userMapper->findById($child['id']);
                 $userChild->loadParents();
@@ -64,7 +61,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             }
 
 
-            if (!($this->getConfigMapper()->get('site_location') == 'wenona' && $child['gid'] == 3)) {
+            if (!($this->getConfigMapper()->get('site_location') === 'wenona' && $child['gid'] == 3)) {
                 $i++;
 
                 $this->setVar("STUDENT_ID", $userChild->getId());
@@ -81,11 +78,13 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                     $this->setVar('pastoral_block', '');
                 }
 
-                if (is_array($child['subjects'])) {
+                if (\is_array($child['subjects'])) {
                     foreach ($child['subjects'] as $subject) {
-                        $this->setVar("STUDENT_SUBJECT_NAME", Scrub::text($subject['name']));
-                        $this->setVar("STUDENT_SUBJECT_CODE", urlencode(urlencode($subject['code'])));
-                        $this->parse("subject_item", "subject_block", true);
+                        if ($subject['perm'] >= UserAccess::ACCESS_READ) {
+                            $this->setVar("STUDENT_SUBJECT_NAME", Scrub::text($subject['name']));
+                            $this->setVar("STUDENT_SUBJECT_CODE", urlencode(urlencode($subject['code'])));
+                            $this->parse("subject_item", "subject_block", true);
+                        }
                     }
                 }
 
@@ -146,7 +145,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                         'BUTTON_ICON' => $customButton->getIcon(),
                         'BUTTON_TARGET' => $customButton->getTarget(),
                     ]);
-        
+
                     $this->parse('custom_buttons_block', 'custom_buttons', true);
                 }
 

@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
@@ -9,6 +10,7 @@ use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredE
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
 
@@ -495,16 +497,15 @@ class Session
 
                         try {
                             $childObject = $userMapper->findByExternalId($child['RelatedID']);
-                            $user->getChildren()[$childObject->getId()] = $childObject;
-                            $childObject->getParents()[$user->getId()] = $user;
-                            if(!$childObject->getHideTimetable()) {
-                                $subjectList = $synUser->getSubjectList($childObject);
-                            }
-                            else {
-                                $subjectList = false;
-                            }
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             continue;
+                        }
+                        $user->getChildren()[$childObject->getId()] = $childObject;
+                        $childObject->getParents()[$user->getId()]  = $user;
+                        if (!$childObject->getHideTimetable()) {
+                            $subjectList = $synUser->getSubjectList($childObject);
+                        } else {
+                            $subjectList = false;
                         }
 
                         $subjects = array();
@@ -520,7 +521,7 @@ class Session
                                     try {
                                         $cat = $folderMapper->findByCode($subject['campusCode'] . '/' . $subject['code']);
                                     } catch (\Exception $e) {
-                                        //Try to fetch witout campus code
+                                        //Try to fetch without campus code
                                         try {
                                             $cat = $folderMapper->findByCode($subject['code']);
                                         } catch (\Exception $e) {
@@ -533,17 +534,12 @@ class Session
                                     }
                                 }
 
-                                if ($cat instanceof Folder) {
-                                    if (Access::getInstance()->getFolderAccess($_SESSION['user'],
-                                            $cat->getId()) >= UserAccess::ACCESS_READ
-                                    ) {
-                                        if (!in_array($cat->getId(), $subjectIDList)) {
-                                            $subject['id'] = $cat->getId();
-                                            $subject['name'] = $cat->getName();
-                                            $subjects[] = $subject;
-                                            $subjectIDList[] = $cat->getId(); //dont dupe ids in this list
-                                        }
-                                    }
+                                if ($cat instanceof Folder && !\in_array($cat->getId(), $subjectIDList, false)) {
+                                    $subject['id']   = $cat->getId();
+                                    $subject['name'] = $cat->getName();
+                                    $subject['perm'] = Access::getInstance()->getFolderAccess($_SESSION['user'], $cat->getId());
+                                    $subjects[]      = $subject;
+                                    $subjectIDList[] = $cat->getId(); //dont dupe ids in this list
                                 }
                             }
                         }
@@ -572,6 +568,7 @@ class Session
 
                     // declare the array
                     $_SESSION['subjects'] = [];
+                    $sisFolderAccess      = $this->getSisFolderAccess($user->getRole()->getType());
 
                     foreach ($subjectList as $subject) {
                         //check subject exists.. we cant link to subjects that dont exist its ugly
@@ -603,6 +600,7 @@ class Session
                             if (!in_array($result->getId(), $catList)) {
                                 $subject['id'] = $result->getId();
                                 $subject['name'] = $result->getName();
+                                $subject['perm'] = $sisFolderAccess;
                                 $subject['code'] = $homepageCode;
                                 $_SESSION['subjects'][] = $subject;
 
@@ -664,5 +662,25 @@ class Session
     private function getUseLoginLog()
     {
         return $this->useLoginLog;
+    }
+
+
+    /**
+     * Returns the level of access granted in Schoolbox when a roleType has SIS involvement
+     * with a folder.
+     *
+     * @param string $roleType
+     * @return int
+     * @deprecated This doesn't belong here. Please don't use this method.
+     */
+    private function getSisFolderAccess(string $roleType): int
+    {
+        if ($roleType === Role::STAFF) {
+            return UserAccess::ACCESS_WRITE;
+        }
+        if ($roleType === Role::STUDENT && ConfigMapper::getInstance()->get('allow_student_class_access')) {
+            return UserAccess::ACCESS_READ;
+        }
+        return UserAccess::ACCESS_DENY;
     }
 }
