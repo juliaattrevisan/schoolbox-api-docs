@@ -388,19 +388,6 @@ class RubricMapper
             // Remove capabilities from the list that we don't want to consider for deduping
             $courseCapabilitiesForDeduping = [];
             foreach ($newCapabilityModels as $courseCapability) {
-                // If we validate all capabilities indiscriminately, existing legacy data from before this validation
-                // may prevent users from modifying their rubric at all, so make sure we only validate:
-                // - new caps, OR
-                // - existing caps whose names have changed
-                $isNewCapability = false;
-                $nameChanged = false;
-                if ($courseCapability->getId() === null) {
-                    // If capability is newly added, it will have no ID.
-                    $isNewCapability = true;
-                } else {
-                    $nameChanged = in_array($courseCapability->getId(), $capabilityNamesChanged);
-                }
-
                 // If capability has no indicators, it will be deleted automatically, so we don't need to dedupe it.
                 $hasIndicators = false;
                 foreach ($newIndicatorModels as $newIndicatorModel) {
@@ -410,7 +397,7 @@ class RubricMapper
                     }
                 }
 
-                if (($isNewCapability || $nameChanged) && $hasIndicators) {
+                if ($hasIndicators) {
                     $courseCapabilitiesForDeduping[] = $courseCapability;
                 }
             }
