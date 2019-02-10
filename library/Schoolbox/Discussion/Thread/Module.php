@@ -53,6 +53,15 @@ class Module extends BaseModule
             $authorizer,
             [$this, 'preloadThread']
         );
+
+        // TODO consider create route perms as distinct from update routes
+        $this->register(
+            'POST',
+            '/{id:\d+}/posts',
+            'createPostInThread',
+            $authorizer,
+            [$this, 'preloadThread']
+        );
     }
 
 

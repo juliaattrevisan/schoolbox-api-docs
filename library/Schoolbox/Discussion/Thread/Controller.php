@@ -69,4 +69,26 @@ class Controller extends BaseController
             ])
         );
     }
+
+
+    /**
+     * Post to a thread.
+     *
+     * @api   POST /threads/{id}/posts
+     * @level 190
+     *
+     * @param Model $thread
+     */
+    public function createPostInThread(Model $thread): void
+    {
+        $data = json_decode($this->request->content->get());
+        $post = $this->postMapper->createModel()
+            ->setThread($thread)
+            ->setAuthor($this->getUser())
+            ->setContent($data['thread']['content']);
+
+        $this->postMapper->save($post);
+
+        $this->response->content->set($this->buildJsonOutput($post));
+    }
 }

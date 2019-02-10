@@ -47,6 +47,26 @@ paths:
         - $ref: '#/components/parameters/token'
 
   /posts/{id}/posts:
+    post:
+      operationId: createPostInThread
+      summary: Creates a new post
+      responses:
+        '201':
+          description: The post that was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/post'
+        default:
+          $ref: '#/components/responses/problem'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post'
+      parameters:
+        - $ref: '#/components/parameters/token'
+
     get:
       operationId: getPostsByParent
       summary: Returns child posts for a parent post
