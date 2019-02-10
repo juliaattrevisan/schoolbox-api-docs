@@ -449,10 +449,10 @@ class RubricMapper
                 foreach ($duplicateCapabilities as $capabilityName => $units) {
                     $errorMessage .= sprintf(
                         "<p>%s '%s' cannot be saved because %s %s with the same name already exists in the following unit(s) in this course:<br/><ul>",
-                        $capabilityL10nCapitalised,
-                        $capabilityName,
-                        $capabilityL10nArticle,
-                        $capabilityL10nLowercase
+                        \Scrub::text($capabilityL10nCapitalised),
+                        \Scrub::text($capabilityName),
+                        \Scrub::text($capabilityL10nArticle),
+                        \Scrub::text($capabilityL10nLowercase)
                     );
 
                     foreach ($units as $unit) {
