@@ -12,6 +12,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Discussion\Thread;
 
 /**
  * Module for discussion post requests.
@@ -78,7 +79,8 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'mapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+            'mapper'       => $this->getMapperFactory()->getLazy(Mapper::class),
+            'threadMapper' => $this->getMapperFactory()->getLazy(Thread\Mapper::class),
         ];
     }
 

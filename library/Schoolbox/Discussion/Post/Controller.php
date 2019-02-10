@@ -10,6 +10,7 @@ namespace Schoolbox\Discussion\Post;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Discussion\Thread;
 
 /**
  * Controller for post-related API requests.
@@ -23,13 +24,21 @@ class Controller extends BaseController
 
 
     /**
+     * @var Thread\Mapper
+     */
+    private $threadMapper;
+
+
+    /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param Mapper        $mapper
+     * @param Thread\Mapper $threadMapper
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, Thread\Mapper $threadMapper)
     {
-        $this->mapper = $mapper;
+        $this->mapper       = $mapper;
+        $this->threadMapper = $threadMapper;
     }
 
 
@@ -51,6 +60,8 @@ class Controller extends BaseController
     /**
      * Create a post.
      *
+     * @todo consider POST /threads/{threadId}/posts/ instead
+     *
      * @api   POST /posts
      * @level 190
      */
@@ -58,14 +69,20 @@ class Controller extends BaseController
     {
         // build object
 
-        // post data should be in content, not form data
-        $data   = $this->request->content->get();
+        // post data should be in application/json, not form data
+        $data = json_decode($this->request->content->get());
 
         // This shouldn't be a string, but the above says it is?
-        $thread = $this->mapper->findById($data['thread']['id'] ?? null);
+        $thread = $this->threadMapper->findById($data['thread']['id'] ?? null);
 
         $post = $this->mapper->createModel()
-                             ->setThread($this->mapper->findById($data));
+            ->setThread($thread)
+            ->setAuthor($this->getUser())
+            ->setContent($data['thread']['content']);
+
+        $this->mapper->save($post);
+
+        // Return something
     }
 
 
