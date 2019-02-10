@@ -391,7 +391,7 @@ class RubricMapper
                 // If capability has no indicators, it will be deleted automatically, so we don't need to dedupe it.
                 $hasIndicators = false;
                 foreach ($newIndicatorModels as $newIndicatorModel) {
-                    if ($newIndicatorModel->getGroup()->getId() === $courseCapability->getId() && !\in_array($newIndicatorModel->getId(), $deletedIndicatorIds, false)) {
+                    if (!\in_array($newIndicatorModel->getId(), $deletedIndicatorIds, false) && $newIndicatorModel->getGroup()->getId() === $courseCapability->getId()) {
                         $hasIndicators = true;
                         break;
                     }
