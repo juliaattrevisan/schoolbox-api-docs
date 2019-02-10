@@ -445,7 +445,10 @@ class RubricMapper
                     foreach ($units as $unit) {
                         $unitName = $unit['unitName'];
                         $folderId = $unit['folderId'];
-                        $errorMessage .= "<li><a href='/rubric/criteria/$folderId'>$unitName</a></li>";
+                        $errorMessage .= sprintf("<li><a href='/rubric/criteria/%s'>%s</a></li>",
+                            \Scrub::text($folderId),
+                            \Scrub::text($unitName)
+                        );
                     }
                     $errorMessage .= '</ul></p>';
                 }
