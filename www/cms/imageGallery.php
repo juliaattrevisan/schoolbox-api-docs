@@ -67,9 +67,12 @@ if (is_numeric($this->arg[0])) {
     /* Get the homepage from which you came, in case you are sharing
      * this image gallery in another homepage.
      */
-    if (isset($_GET['returnId']) && ((int)$_GET['returnId'] > 0)) {
+    if (isset($_GET['returnId'])) {
         try {
-            $folder = $folderMapper->findById((int)$_GET['returnId']);
+            $returnFolder = $folderMapper->findById((int)$_GET['returnId']);
+            if ($groupHandler->getPermission($returnFolder->getId()) >= READ_ACCESS) {
+                $folder = $returnFolder;
+            }
         } catch (\Exception $e) {
             // just use the original folder for breadcrumb, when returnId is invalid
         }
