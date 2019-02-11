@@ -2,17 +2,63 @@
 Displays a report for the selected user and current term.
 
 Data:
-    user:     User - a student in years 7-12
-    isEnabled bool - is the report enabled for the student and their parents to visit?
+    user:             User                - a student in years 7-12
+    isEnabled         bool                - is the report enabled for the student and their parents to visit?
+    attributes:       StudentAttributes
+    dean:             User|null
+    mentor:           User|null
 #}
 
 <div class="row">
     <div class="island small-12">
         <h1>Participation Report: {{ user.fullName }}</h1>
+        <p class="meta">Curriculum Year {{ attributes.curriculumYearLevel }}, Semester {{ attributes.curriculumSemester }}</p>
         {% if not isEnabled %}
             <div data-alert class="alert-box highlight">
                 This report is currently not visible to the student or their parents.
             </div>
         {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="column small-12">
+        <h2 class="subheader">Student</h2>
+        <div class="card small-12">
+            <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" alt="View Profile">
+            <h3><a href="/search/user/{{ user.id }}">{{ user.fullName }}</a></h3>
+            <p class="meta">{{ user.role.name }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="column small-12 medium-6">
+        <h2 class="subheader">Dean</h2>
+        <div class="card small-12">
+            <img src="/portrait.php?userId={{ dean.externalId }}&amp;size=square64" alt="View Profile">
+            <h3>
+                {%- if dean.id -%}
+                    <a href="/search/user/{{ dean.id }}">{{ dean.fullName }}</a>
+                {%- else -%}
+                    {{ dean.fullName }}
+                {%- endif -%}
+            </h3>
+            {% if dean.role.name %}<p class="meta">{{ dean.role.name }}</p>{% endif %}
+        </div>
+    </div>
+    <div class="column small-12 medium-6">
+        <h2 class="subheader">Student Mentor</h2>
+        <div class="card small-12">
+            <img src="/portrait.php?userId={{ mentor.externalId }}&amp;size=square64" alt="View Profile">
+            <h3>
+                {%- if mentor.id -%}
+                    <a href="/search/user/{{ mentor.id }}">{{ mentor.fullName }}</a>
+                {%- else -%}
+                    {{ mentor.fullName }}
+                {%- endif -%}
+            </h3>
+            {% if mentor.role.name %}<p class="meta">{{ mentor.role.name }}</p>{% endif %}
+        </div>
     </div>
 </div>

@@ -9,12 +9,11 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\External\UserRelation;
 use Schoolbox\User;
 
 class External_Schoolbox_User implements External_UserInterface
 {
-    /** User relationship types */
-    const RELATION_TYPE_PARENT = 1;
 
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
@@ -63,7 +62,7 @@ class External_Schoolbox_User implements External_UserInterface
             ",
             array_merge(
                 $predicate['bindings'],
-                ['relation_type' => self::RELATION_TYPE_PARENT]
+                ['relation_type' => UserRelation::RELATION_TYPE_PARENT]
             )
         );
 
@@ -191,7 +190,7 @@ class External_Schoolbox_User implements External_UserInterface
             ",
             [
                 'externalUserId' => $externalUserId,
-                'typeParent'     => External_Schoolbox_User::RELATION_TYPE_PARENT,
+                'typeParent'     => UserRelation::RELATION_TYPE_PARENT,
             ]
         );
 
@@ -300,7 +299,7 @@ class External_Schoolbox_User implements External_UserInterface
             ",
             [
                 'externalUserId' => $externalUserId,
-                'relationType'   => self::RELATION_TYPE_PARENT,
+                'relationType'   => UserRelation::RELATION_TYPE_PARENT,
             ]
         )->fetchAll();
     }

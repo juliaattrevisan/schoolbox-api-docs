@@ -10,6 +10,7 @@ namespace Custom\Tigs\Summative\ParticipationReport;
 use Alaress;
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Twig\Loader\IChainLoader;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
@@ -69,6 +70,20 @@ class Module extends Alaress\Module\Module
 
 
     /**
+     * @inheritdoc
+     * @param Container|ContainerInterface $injector The dependency injection container.
+     * @throws InvalidArgumentException
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector): void
+    {
+        $injector->params[Controller::class] = [
+            'externalUser' => $injector->lazyGet('externalUser'),
+            'userMapper'   => $this->getMapperFactory()->getLazy(UserMapper::class),
+        ];
+    }
+
+
+    /**
      * Preload a User instance
      *
      * @param array $params
@@ -115,7 +130,7 @@ class Module extends Alaress\Module\Module
                         throw new InvalidPath("No user found in route params");
                     }
                     /** @var User $student */
-                    $student  = $params['user'];
+                    $student = $params['user'];
                     // User must be a student
                     if (!$student->getRole()->isStudent()) {
                         throw new InvalidPath("User must be a student. Found '{$student->getRole()->getType()}'");
