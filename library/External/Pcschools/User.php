@@ -837,7 +837,7 @@ class External_Pcschools_User implements External_UserInterface
             WHERE su.STUDKEY = :externalID
               AND tf.TIME_PERIOD = :timePeriod
               AND su.PERIOD_ID =  :subPeriod
-              AND (tf.[STATUS] = '' OR tf.[STATUS] = 'S' OR (tf.[STATUS] = 'C' AND tf.TEACHER_REP = :externalID
+              AND (tf.[STATUS] = '' OR tf.[STATUS] = 'S' OR (tf.[STATUS] = 'C' AND tf.TEACHER_REP = :externalID))
 
             UNION
 
@@ -847,7 +847,7 @@ class External_Pcschools_User implements External_UserInterface
                             INNER JOIN SUBJECT s ON tf.SUBJECT = s.NO
                             INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
                 WHERE st.CURRENT_YEAR <> '99'
-                  AND (st.STUDKEY = :externalID AND tf.TIME_PERIOD = :timePeriod;
+                  AND (st.STUDKEY = :externalID AND tf.TIME_PERIOD = :timePeriod)
 
         ";
 
