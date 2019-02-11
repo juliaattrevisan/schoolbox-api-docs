@@ -73,7 +73,7 @@ if (is_numeric($this->arg[0])) {
             if ($groupHandler->getPermission($returnFolder->getId()) >= READ_ACCESS) {
                 $folder = $returnFolder;
             }
-        } catch (\Exception $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             // just use the original folder for breadcrumb, when returnId is invalid
         }
     }
