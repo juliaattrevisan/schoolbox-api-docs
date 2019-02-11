@@ -41,7 +41,8 @@
     "tslint-react": "^3.6.0",
     "tslint-react-a11y": "^1.0.0",
     "typescript": "^3.2.2",
-    "webpack": "^4.27.1"
+    "webpack": "^4.27.1",
+    "webpack-cli": "^3.2.3"
   },
   "license": "Commercial",
   "repository": {
@@ -49,7 +50,10 @@
     "url": "git://github.com/alaress/schoolbox.git"
   },
   "scripts": {
-    "styleguide": "npx styleguidist server"
+    "styleguide": "npx styleguidist server",
+    "build": "webpack --config webpack.config.js --mode development",
+    "watch": "webpack --config webpack.config.js --mode development --watch",
+    "publish": "webpack --config webpack.config.js --mode production"
   },
   "babel": {
     "presets": [
