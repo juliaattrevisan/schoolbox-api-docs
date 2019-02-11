@@ -170,16 +170,18 @@ class RubricMapper
     /**
      * Saves this row set to the database.
      *
-     * @param RowSet           $rowSet
-     * @param bool             $persistCurriculum    Should curriculum nodes for groups and
+     * @param RowSet $rowSet
+     * @param bool $persistCurriculum Should curriculum nodes for groups and
      *                                               criteria be updated?
-     * @param bool             $allowModifyUsed      Should groups/criteria that are in use
+     * @param bool $allowModifyUsed Should groups/criteria that are in use
      *                                               be modifiable or deletable?
      * @param null|IAssessable $allowModifyExclusion If set and `$allowModifyUsed` is off, a
      *                                               group or criterion in `$rowSet` MAY be
      *                                               modified if it is used by no other
      *                                               assessment than this one.
      * @throws MapperException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \UnexpectedValueException
      */
     public function persistRowSet(
         RowSet $rowSet,
@@ -187,6 +189,16 @@ class RubricMapper
         bool $allowModifyUsed,
         ?IAssessable $allowModifyExclusion = null
     ): void {
+        // Forgive me...
+        $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
+
+        $capabilityL10nArticle = $l10n->indefiniteArticle('rubricGroup', false, true);
+        $capabilityL10nCapitalised = $l10n->translate('rubricGroup', false, true);
+        $capabilityL10nLowercase = $l10n->translate('rubricGroup', false, false);
+        $indicatorL10nArticle = $l10n->indefiniteArticle('rubricCriterion', false, true);
+        $indicatorL10nCapitalised = $l10n->translate('rubricCriterion', false, true);
+        $indicatorL10nLowercase = $l10n->translate('rubricCriterion', false, false);
+
         // Where does this go?
         $folder                   = $rowSet->getContext()->getBaseContext()->getFolder();
 
@@ -211,6 +223,8 @@ class RubricMapper
         // Track names used
         $capabilityNamesUsed      = [];
 
+        // Track names changed
+        $capabilityNamesChanged   = [];
 
         // Process capabilities+indicators into models
         foreach ($rowSet->getCapabilities() as $capability) {
@@ -240,6 +254,7 @@ class RubricMapper
             }
             if ($allowNameChange) {
                 $capabilityModel->setName($capability->getName());
+                $capabilityNamesChanged[] = $capability->getId();
             }
 
             // Validate if this name has already been used by a capability whose
@@ -250,7 +265,17 @@ class RubricMapper
                 if ($capabilityNamesUsed[$normalizedName]) {
                     // this is used by a capability which is allowed to change:
                     // invalidate
-                    throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                    $errorMessage = sprintf("%s '%s' cannot be saved because %s %s with the same name already exists in",
+                        $capabilityL10nCapitalised,
+                        $capability->getName(),
+                        $capabilityL10nArticle,
+                        $capabilityL10nLowercase
+                    );
+
+                    if ($folder->hasUnitSpecification()) {
+                        throw new \UnexpectedValueException($errorMessage . " this unit, or in the course this unit belongs to");
+                    }
+                    throw new \UnexpectedValueException($errorMessage . " this folder");
                 }
             } else {
                 $capabilityNamesUsed[$normalizedName] = $allowNameChange;
@@ -299,7 +324,17 @@ class RubricMapper
                     if ($indicatorNamesUsed[$normalizedName]) {
                         // this is used by a indicator which is allowed to
                         // change: invalidate
-                        throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+
+                        $errorMessage = sprintf("%s '%s' cannot be saved because %s %s with the same name already exists in the %s '%s'",
+                            $indicatorL10nCapitalised,
+                            $indicator->getName(),
+                            $indicatorL10nArticle,
+                            $indicatorL10nLowercase,
+                            $capabilityL10nLowercase,
+                            $capability->getName()
+                        );
+
+                        throw new \UnexpectedValueException($errorMessage);
                     }
                 } else {
                     $indicatorNamesUsed[$normalizedName] = $allowNameChange;
@@ -325,7 +360,11 @@ class RubricMapper
             foreach ($deletedCapabilityIds as $deletedCapabilityId) {
                 $existingCapability = $existingRowSet->retrieveCapability($deletedCapabilityId);
                 if ($existingCapability && $existingCapability->isInUse($allowModifyExclusion)) {
-                    throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                    $errorMessage = sprintf("Cannot delete %s '%s' because it is in use elsewhere",
+                        $capabilityL10nLowercase,
+                        $existingCapability->getName()
+                    );
+                    throw new \UnexpectedValueException($errorMessage);
                 }
             }
 
@@ -333,11 +372,89 @@ class RubricMapper
             foreach ($deletedIndicatorIds as $deletedIndicatorId) {
                 $existingIndicator = $existingRowSet->retrieveIndicator($deletedIndicatorId);
                 if ($existingIndicator && $existingIndicator->isInUse($allowModifyExclusion)) {
-                    throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                    $errorMessage = sprintf("Cannot delete %s '%s' because it is in use elsewhere",
+                        $indicatorL10nLowercase,
+                        $existingIndicator->getName()
+                    );
+                    throw new \UnexpectedValueException($errorMessage);
                 }
             }
         }
 
+        // Validate against duplicate capabilities between a course and unit
+        // If we are modifying the rubric on a course...
+        if ($folder->hasCourseSpecification()) {
+
+            // Remove capabilities from the list that we don't want to consider for deduping
+            $courseCapabilitiesForDeduping = [];
+            foreach ($newCapabilityModels as $courseCapability) {
+                // If capability has no indicators, it will be deleted automatically, so we don't need to dedupe it.
+                $hasIndicators = false;
+                foreach ($newIndicatorModels as $newIndicatorModel) {
+                    if (!\in_array($newIndicatorModel->getId(), $deletedIndicatorIds, false) && $newIndicatorModel->getGroup()->getId() === $courseCapability->getId()) {
+                        $hasIndicators = true;
+                        break;
+                    }
+                }
+
+                if ($hasIndicators) {
+                    $courseCapabilitiesForDeduping[] = $courseCapability;
+                }
+            }
+
+
+            // Get just the names of the capabilities we want to dedupe
+            $mapCapabilityNames = function(Group $capability) {
+                return $capability->getName();
+            };
+            $courseCapabilityNames = array_map($mapCapabilityNames, $courseCapabilitiesForDeduping);
+
+
+            // Find units in this course. Folder's units aren't hydrated here, so we have to use the mapper.
+            $unitsForCourse = UnitSpecificationMapper::getInstance()->findAllByCourseFolderId($folder->getId());
+
+            // Get the capabilities for each unit in this course
+            $duplicateCapabilities = [];
+            foreach ($unitsForCourse as $unit) {
+                $rowSetForUnit = $this->retrieveRowSet($unit->getFolder(), false);
+
+                foreach ($rowSetForUnit->getCapabilities() as $unitCapability) {
+                    // Is this unit capability name in the list of course capability names?
+                    if (in_array($unitCapability->getName(), $courseCapabilityNames)) {
+                        // Add it to our list of culprits
+                        $duplicateCapabilities[$unitCapability->getName()][] = [
+                            'unitName' => $unit->getFolder()->getName(),
+                            'folderId' => $unit->getFolder()->getId(),
+                        ];
+                    }
+                }
+            }
+
+            // If anything is in here, we have an error state
+            if (!empty ($duplicateCapabilities)) {
+                $errorMessage = '';
+                foreach ($duplicateCapabilities as $capabilityName => $units) {
+                    $errorMessage .= sprintf(
+                        "<p>%s '%s' cannot be saved because %s %s with the same name already exists in the following unit(s) in this course:<br/><ul>",
+                        \Scrub::text($capabilityL10nCapitalised),
+                        \Scrub::text($capabilityName),
+                        \Scrub::text($capabilityL10nArticle),
+                        \Scrub::text($capabilityL10nLowercase)
+                    );
+
+                    foreach ($units as $unit) {
+                        $unitName = $unit['unitName'];
+                        $folderId = $unit['folderId'];
+                        $errorMessage .= sprintf("<li><a href='/rubric/criteria/%s'>%s</a></li>",
+                            \Scrub::text($folderId),
+                            \Scrub::text($unitName)
+                        );
+                    }
+                    $errorMessage .= '</ul></p>';
+                }
+                throw new \UnexpectedValueException($errorMessage);
+            }
+        }
 
         // Save new capabilities+indicators
         $capabilityMapper->save($newCapabilityModels);

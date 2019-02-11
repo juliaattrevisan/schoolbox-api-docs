@@ -89,15 +89,17 @@ class Controller extends BaseController
      * @api   POST /rubric/criteria/{folderId}
      * @level 181
      * @param FolderModel $folder
+     * @throws \UnexpectedValueException
      */
     public function postForm(FolderModel $folder): void
     {
         // Build a new rowset, and persist it
-        $rowSet = (new Factory($this->nodeMapper))->buildFromPostData(
+        $newRowSet = (new Factory($this->nodeMapper))->buildFromPostData(
             $folder,
             $this->request->post->get('crits', [])
         );
-        $this->rubricMapper->persistRowSet($rowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
+
+        $this->rubricMapper->persistRowSet($newRowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
 
         // Done: redirect back to homepage, or AJAX
         if ($this->request->isXhr()) {
