@@ -58,19 +58,6 @@ class Controller extends BaseController
 
 
     /**
-     * Create a post.
-     *
-     * @api   POST /posts
-     * @level 190
-     */
-    public function createPost(): void
-    {
-        // 404 for now I guess?
-        throw new NotFound();
-    }
-
-
-    /**
      * Delete a post.
      *
      * @api   DELETE /posts/{id}

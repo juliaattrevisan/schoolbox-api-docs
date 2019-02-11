@@ -41,12 +41,6 @@ class Module extends BaseModule
 
         // Routes
         $this->register(
-            'POST',
-            '',
-            'createPost',
-            $authorizer
-        );
-        $this->register(
             'DELETE',
             '/{id:\d+}',
             'deletePost',
