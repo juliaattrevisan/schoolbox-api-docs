@@ -108,7 +108,7 @@ $(function() {
     form.on('submit', function (e) {
         var $button = $("#manage-caps-submit");
 
-        event.preventDefault();
+        e.preventDefault();
         // reapply all indices to the indicator name attributes
         $('form[data-role=rubric-criteria-form]').find('fieldset').each(function () {
             var $capabilityFieldset = $(this);
@@ -142,8 +142,8 @@ $(function() {
         $("#manage-caps-error").slideUp();
 
         $.post($(this).attr('action'), $(this).serialize(), null, 'json').done(function(response) {
-            // Redirect to the homepage we came form
-            window.location.replace(response.redirect);
+            // Redirect to the homepage we came from
+            window.location.href = response.redirect;
         }).fail(function(response) {
             $button.val(originalButtonText);
             $button.removeAttr("disabled");
