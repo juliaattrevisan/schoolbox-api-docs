@@ -295,8 +295,7 @@ class StudentAttributes
             if (4 !== $term) {
                 $end = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
             } else {
-                $nowYear++;
-                $nowYear++;
+                $nowYear += 2;
                 $end = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
             }
         } elseif (1 === $term) {
