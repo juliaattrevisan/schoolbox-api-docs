@@ -89,6 +89,7 @@ class Controller extends BaseController
      * @api   POST /rubric/criteria/{folderId}
      * @level 181
      * @param FolderModel $folder
+     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
     public function postForm(FolderModel $folder): void
@@ -99,19 +100,32 @@ class Controller extends BaseController
             $this->request->post->get('crits', [])
         );
 
-        $this->rubricMapper->persistRowSet($newRowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
-
         // Done: redirect back to homepage, or AJAX
         if ($this->request->isXhr()) {
-            $this->response->content->set(
-                $this->buildJsonOutput([
-                    'status'  => 200,
-                    'message' => 'Criteria updated',
-                ])
-            );
+            try {
+                $this->rubricMapper->persistRowSet($newRowSet, $this->isCurriculumTaggingEnabled(), $folder->isSpecFolder());
 
-        } else {
-            $this->response->redirect->to('/homepage/' . $folder->getId());
+                $this->response->status->setCode(200);
+                $this->response->content->set(
+                    $this->buildJsonOutput([
+                        'status' => $this->response->status->getCode(),
+                        'detail' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' updated',
+                        'redirect' => '/homepage/' . $folder->getId()
+                    ])
+                );
+
+            }
+            catch (\Exception|\UnexpectedValueException $e) {
+                $this->response->status->setCode(400);
+                $this->response->content->set(
+                    $this->buildJsonOutput([
+                        'title' => $this->rosettaStone->translate('rubricGroup', true, true) . ' and/or ' . $this->rosettaStone->translate('rubricCriterion', true, true) . ' could not be saved',
+                        'status' => $this->response->status->getCode(),
+                        'detail' => $e->getMessage(),
+                        'instance' => $this->request->url
+                    ])
+                );
+            }
         }
     }
 

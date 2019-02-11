@@ -106,23 +106,23 @@ $(function() {
 
     // last-minute post-processing
     form.on('submit', function (e) {
+        var $button = $("#manage-caps-submit");
 
+        e.preventDefault();
         // reapply all indices to the indicator name attributes
         $('form[data-role=rubric-criteria-form]').find('fieldset').each(function () {
-
             var $capabilityFieldset = $(this);
             var $capabilityNameInput = $capabilityFieldset.find('input[name*="name"]');
-
             var capabilityFieldName = $capabilityNameInput.attr('name');
 
             // if this is a blank capability row, push it off the bottom of the list
             var capabilityId = -1;
+
             if (capabilityFieldName) {
                 capabilityId = $capabilityNameInput.attr('name').split(/[\[\]]/)[1];
             }
 
             $capabilityFieldset.find('input[name*="items"]').each(function () {
-
                 var $indicatorNameInput = $(this);
 
                 $indicatorNameInput.attr('name',
@@ -130,6 +130,26 @@ $(function() {
                 );
             });
         });
+
+
+        // Set loading text on submit button
+        var originalButtonText = $button.val();
+        $button.attr("disabled", true);
+        $button.val('Working...');
+
+        // If we are re-submitting after having got an error the first time, hide the error message on submit
+        // so it doesn't hang around after the user fixes the data
+        $("#manage-caps-error").slideUp();
+
+        $.post($(this).attr('action'), $(this).serialize(), null, 'json').done(function(response) {
+            // Redirect to the homepage we came from
+            window.location.href = response.redirect;
+        }).fail(function(response) {
+            $button.val(originalButtonText);
+            $button.removeAttr("disabled");
+            $("#manage-caps-error").slideDown().html(response.responseJSON.detail);
+        });
+
     });
 
     // logic for removing inputs
@@ -295,9 +315,12 @@ $(function() {
                 </fieldset>
             </section>
 
+            <div id="manage-caps-error" style="display: none" data-alert="" class="alert-box alert">
+            </div>
+
             <div class="row">
                 <div class="small-12 columns">
-                    <input type="submit" value="Save Changes" />
+                    <input id="manage-caps-submit" type="submit" value="Save Changes" />
                 </div>
             </div>
         </form>
