@@ -11,8 +11,10 @@ use \Schoolbox\Breadcrumbs;
  * Displays one image at large size and the rest as thumbnails.
  * Clicking the thumbnails makes them the larger images.
  * Clicking the large image makes it open in a new window at
- * its orginal size
+ * its original size
  */
+
+/** @var SitePage $this */
 
 if (is_numeric($this->arg[0])) {
     $groupHandler    = new Group;
@@ -65,14 +67,14 @@ if (is_numeric($this->arg[0])) {
     /* Get the homepage from which you came, in case you are sharing
      * this image gallery in another homepage.
      */
-    if (isset($this->arg[1])
-        && preg_match('/^returnTo:(?P<returnId>\\d+)$/', $this->arg[1], $matches)
-    ) {
+    if (isset($_GET['returnId'])) {
         try {
-            $folder = $folderMapper->findById($matches['returnId']);
-        }
-        catch (\Exception $e) {
-            error(2);
+            $returnFolder = $folderMapper->findById((int)$_GET['returnId']);
+            if ($groupHandler->getPermission($returnFolder->getId()) >= READ_ACCESS) {
+                $folder = $returnFolder;
+            }
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // just use the original folder for breadcrumb, when returnId is invalid
         }
     }
 
