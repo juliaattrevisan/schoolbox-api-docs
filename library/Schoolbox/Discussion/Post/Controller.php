@@ -60,29 +60,13 @@ class Controller extends BaseController
     /**
      * Create a post.
      *
-     * @todo consider POST /threads/{threadId}/posts/ instead
-     *
      * @api   POST /posts
      * @level 190
      */
     public function createPost(): void
     {
-        // build object
-
-        // post data should be in application/json, not form data
-        $data = json_decode($this->request->content->get());
-
-        // This shouldn't be a string, but the above says it is?
-        $thread = $this->threadMapper->findById($data['thread']['id'] ?? null);
-
-        $post = $this->mapper->createModel()
-            ->setThread($thread)
-            ->setAuthor($this->getUser())
-            ->setContent($data['thread']['content']);
-
-        $this->mapper->save($post);
-
-        // Return something
+        // 404 for now I guess?
+        throw new NotFound();
     }
 
 
