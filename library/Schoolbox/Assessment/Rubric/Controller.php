@@ -140,14 +140,17 @@ class Controller extends BaseController
             }
 
 
+            // Only if adding a criterion to an existing group:
             // Find the capability model, so that the indicator may be saved
             // into the capability (and its folder)
-            $groupModel = $this->groupMapper->findById($groupId);
-
-
-            // Surely this capability is in a folder?
-            if ($groupModel->getParentType() !== Group::PARENT_TYPE_CATEGORY) {
-                $this->sendJSONError('May only create folder-level indicators');
+            if ($groupId) {
+                $groupModel = $this->groupMapper->findById($groupId);
+                // Surely this capability is in a folder?
+                if ($groupModel->getParentType() !== Group::PARENT_TYPE_CATEGORY) {
+                    $this->sendJSONError('May only create folder-level indicators');
+                    return;
+                }
+                $folderId = $groupModel->getParentId();
             }
 
             $criterionModels = $this->criterionMapper->findByColumn('rubric_group_id', $groupId);
@@ -165,7 +168,7 @@ class Controller extends BaseController
 
             // This criterion needs to be created
             $criterionModel = $this->criterionMapper->findOrCreateOneForFolderByKey(
-                $groupModel->getParentId(),
+                $folderId,
                 $critName,
                 $groupName
             );
