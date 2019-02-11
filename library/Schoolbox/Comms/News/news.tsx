@@ -9,12 +9,13 @@ const element: HTMLElement = document.getElementById("Detail");
 if (element) {
   // Send element's attributes to the component
   const attributes: any = {};
-  Array.prototype.slice.call(element.attributes).forEach(function(item: any) {
-    const attributeKey = item.name.replace(/-([a-z])/g, function(
-      g: any
-    ): string {
-      return g[1].toUpperCase();
-    });
+  Array.prototype.slice.call(element.attributes).forEach((item: any) => {
+    const attributeKey = item.name.replace(
+      /-([a-z])/g,
+      (g: any): string => {
+        return g[1].toUpperCase();
+      }
+    );
     attributes[attributeKey] = item.value;
   });
   const reactElement = React.createElement(Detail, attributes);
