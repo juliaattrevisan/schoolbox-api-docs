@@ -71,14 +71,16 @@ class Controller extends Web\Controller\Base
 
         $deanAndMentor = $this->getDeanAndMentor($user, $externalStudent);
         $awards        = $this->getAwardsData($user, $attributes);
+        $houseEvents   = $this->getHouseEventsData($user, $attributes);
 
         $data   = [
-            'user'       => $user,
-            'isEnabled'  => $this->getConfigLoader()->get(Config::_TIGS_PARTICIPATION_REPORT_ENABLED),
-            'attributes' => $attributes,
-            'dean'       => $deanAndMentor['dean'],
-            'mentor'     => $deanAndMentor['mentor'],
-            'awards'     => $awards,
+            'user'        => $user,
+            'isEnabled'   => $this->getConfigLoader()->get(Config::_TIGS_PARTICIPATION_REPORT_ENABLED),
+            'attributes'  => $attributes,
+            'dean'        => $deanAndMentor['dean'],
+            'mentor'      => $deanAndMentor['mentor'],
+            'awards'      => $awards,
+            'houseEvents' => $houseEvents,
         ];
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
 
@@ -205,5 +207,42 @@ class Controller extends Web\Controller\Base
         }
 
         return $awards;
+    }
+
+
+    /**
+     * Returns awards data for the student given within the reports period
+     *
+     * @param User              $user
+     * @param StudentAttributes $attributes
+     * @return GenericCollection|Award[]
+     * @throws UnexpectedValueException
+     */
+    private function getHouseEventsData(User $user, StudentAttributes $attributes): GenericCollection
+    {
+        $sql = "
+            SELECT Event, Status
+            FROM uvContinuousReportingHouseParticipation
+            WHERE ID = :external_id
+            AND date >= :start AND date < :finish
+            ORDER BY date ASC
+        ";
+
+        $params = [
+            'external_id' => $user->getExternalId(),
+            'start'       => $attributes->getCurriculumYearStart()->getDatabaseDate(),
+            'finish'      => $attributes->getCurriculumYearFinish()->getDatabaseDate(),
+        ];
+
+        $houseEvents = new GenericCollection(HouseEvent::class);
+
+        $query = $this->externalDatabase->executeQuery($sql, $params);
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $query->fetch()) {
+            $houseEvents->add(new HouseEvent($row['Event'], $row['Status']));
+        }
+
+        return $houseEvents;
     }
 }
