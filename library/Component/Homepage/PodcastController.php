@@ -42,6 +42,8 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
         $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
         $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
 
+        $this->parseConfig();
+
         if ($emptyState) {
             $this->setVar([
                 'podcast_block' => '',
@@ -122,10 +124,6 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
 
             $this->parse('podcast_block', 'podcast');
         }
-
-        /* Need the podcast title injected here
-         */
-        $this->parseConfig();
 
         return true; // everything went according to plan
     }
