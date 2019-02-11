@@ -288,19 +288,13 @@ class StudentAttributes
     {
         $nowYear = (int)$now->getUsingFormat('Y');
 
-        if ($yearLevel === 10) {
-            $nowYear++;
-            $end = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
-        } elseif ($yearLevel === 11) {
+        if ($yearLevel === 11) {
             if (4 !== $term) {
                 $end = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
             } else {
                 $nowYear += 2;
                 $end = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
             }
-        } elseif (1 === $term) {
-            $nowYear++;
-            $end = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
         } else {
             $nowYear++;
             $end = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
