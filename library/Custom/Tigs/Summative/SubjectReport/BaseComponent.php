@@ -42,8 +42,8 @@ class BaseComponent
     protected function isDueWithinReportWindow(IAssessable $assessable): bool
     {
         $dueDate      = $assessable->getDueAt();
-        $reportStart  = $this->attributes->getReportStart();
-        $reportFinish = $this->attributes->getReportFinish();
+        $reportStart  = $this->attributes->getCurriculumSemesterStart();
+        $reportFinish = $this->attributes->getCurriculumSemesterFinish();
         return $dueDate->gte($reportStart) && $dueDate->lt($reportFinish);
     }
 

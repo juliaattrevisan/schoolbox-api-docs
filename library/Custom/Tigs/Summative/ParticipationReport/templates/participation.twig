@@ -2,11 +2,14 @@
 Displays a report for the selected user and current term.
 
 Data:
-    user:             User                - a student in years 7-12
-    isEnabled         bool                - is the report enabled for the student and their parents to visit?
-    attributes:       StudentAttributes
-    dean:             User|null
-    mentor:           User|null
+    user:               User                - a student in years 7-12
+    isEnabled           bool                - is the report enabled for the student and their parents to visit?
+    attributes:         StudentAttributes
+    dean:               User|null
+    mentor:             User|null
+    awards:             Award[]
+    awards[idx].name:   string
+    awards[idx].detail: string
 #}
 
 <div class="row">
@@ -60,5 +63,27 @@ Data:
             </h3>
             {% if mentor.role.name %}<p class="meta">{{ mentor.role.name }}</p>{% endif %}
         </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="column small-12">
+        <h2 class="subheader">Awards</h2>
+        <table>
+            <thead>
+                <tr>
+                    <td>Award</td>
+                    <td>Description</td>
+                </tr>
+            </thead>
+            <tbody>
+            {% for award in awards %}
+                <tr>
+                    <td>{{ award.name }}</td>
+                    <td>{{ award.detail }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>

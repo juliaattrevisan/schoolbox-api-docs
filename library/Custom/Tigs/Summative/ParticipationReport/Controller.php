@@ -7,10 +7,12 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
+use Schoolbox\GenericCollection;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters;
@@ -18,6 +20,7 @@ use External_UserInterface;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
 use External_User;
+use UnexpectedValueException;
 
 class Controller extends Web\Controller\Base
 {
@@ -28,15 +31,20 @@ class Controller extends Web\Controller\Base
     /** @var UserMapper */
     private $userMapper;
 
+    /** IConnector $externalDatabase */
+    private $externalDatabase;
+
 
     /**
      * @param External_UserInterface $externalUser
      * @param UserMapper             $userMapper
+     * @param IConnector             $externalDatabase
      */
-    public function __construct(External_UserInterface $externalUser, UserMapper $userMapper)
+    public function __construct(External_UserInterface $externalUser, UserMapper $userMapper, IConnector $externalDatabase)
     {
         $this->externalUser = $externalUser;
         $this->userMapper   = $userMapper;
+        $this->externalDatabase = $externalDatabase;
     }
 
 
@@ -49,6 +57,7 @@ class Controller extends Web\Controller\Base
      * @throws ServiceNotFound
      * @throws InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws UnexpectedValueException
      */
     public function getReport(User $user): void
     {
@@ -61,6 +70,7 @@ class Controller extends Web\Controller\Base
         );
 
         $deanAndMentor = $this->getDeanAndMentor($user, $externalStudent);
+        $awards        = $this->getAwardsData($user, $attributes);
 
         $data   = [
             'user'       => $user,
@@ -68,7 +78,7 @@ class Controller extends Web\Controller\Base
             'attributes' => $attributes,
             'dean'       => $deanAndMentor['dean'],
             'mentor'     => $deanAndMentor['mentor'],
-
+            'awards'     => $awards,
         ];
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
 
@@ -158,5 +168,42 @@ class Controller extends Web\Controller\Base
             'dean'   => $dean,
             'mentor' => $mentor,
         ];
+    }
+
+
+    /**
+     * Returns awards data for the student given within the reports period
+     *
+     * @param User              $user
+     * @param StudentAttributes $attributes
+     * @return GenericCollection|Award[]
+     * @throws UnexpectedValueException
+     */
+    private function getAwardsData(User $user, StudentAttributes $attributes): GenericCollection
+    {
+        $sql = "
+            SELECT Award, Detail
+            FROM uvContinuousReportingAwards
+            WHERE StudentID = :student_id
+            AND GivenDate >= :start AND GivenDate < :finish
+            ORDER BY GivenDate ASC
+        ";
+
+        $params = [
+            'student_id' => $user->getExternalId(),
+            'start'      => $attributes->getCurriculumYearStart()->getDatabaseDate(),
+            'finish'     => $attributes->getCurriculumYearFinish()->getDatabaseDate(),
+        ];
+
+        $awards = new GenericCollection(Award::class);
+
+        $query = $this->externalDatabase->executeQuery($sql, $params);
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while($row = $query->fetch()){
+            $awards->add(new Award($row['Award'], $row['Detail']));
+        }
+
+        return $awards;
     }
 }

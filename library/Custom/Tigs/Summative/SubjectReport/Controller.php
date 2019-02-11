@@ -755,7 +755,7 @@ class Controller extends Web\Controller\Base
             ->isNull('a.deleted_at')
             ->in('ui.id', $unitImpls->getPropertyValues('id'))
             ->equals('a.work_type_id', $workTypeId)
-            ->betweenDates('a.due_date', $attributes->getReportStart(), $attributes->getReportFinish());
+            ->betweenDates('a.due_date', $attributes->getCurriculumSemesterStart(), $attributes->getCurriculumSemesterFinish());
 
         $whereClause = \implode(' AND ', $pb->getWhere());
 
