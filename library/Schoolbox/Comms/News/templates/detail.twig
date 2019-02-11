@@ -302,12 +302,18 @@ Data:
     </div>
 </div>
 
+{# React container for this page.
+   Will temporarily hold just comments, but the above should be moved in as well
+ #}
+<div id="Detail"></div>
+
 <div class="toast" id="toast"></div>
 
 <div id="recipientsModal" class="reveal-modal" data-reveal>
     <a class="close-reveal-modal">&#215;</a>
 </div>
 
+<script src="/javascript/components/news.bundle.js"></script>
 <script src="/javascript/shared/comms/audience-bricks.js"></script>
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 {% autoescape 'js' %}
