@@ -657,7 +657,6 @@ class RubricMapper
             $capabilityModels[$capabilityId] = $capabilityModel;
 
             // Validate that a capability with the same name doesn't exist
-            // TODO Validation should be done on normalized names!
             $capabilityIndicatorModels = $indicatorMapper->createCollection();
             foreach ($capability->getIndicators() as $indicator) {
                 $indicatorId = $indicator->getId();
