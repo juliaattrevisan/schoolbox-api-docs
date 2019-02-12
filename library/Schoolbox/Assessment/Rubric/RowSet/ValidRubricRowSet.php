@@ -62,6 +62,13 @@ class ValidRubricRowSet extends Base
                     $this->translator->indefiniteArticle('rubricGroup'),
                     $this->translator->translate('rubricGroup')
                 );
+
+                // The actual error msg depends on where the rowset lives
+                if ($candidate->getContext()->getBaseContext()->getFolder()->hasUnitSpecification()) {
+                    $errorMessage .= " this unit, or in the course this unit belongs to";
+                } else {
+                    $errorMessage .= " this folder";
+                }
                 throw new UnexpectedValueException($errorMessage);
             }
             $capabilityNamesInUse[$normalizedCapabilityName] = true;
