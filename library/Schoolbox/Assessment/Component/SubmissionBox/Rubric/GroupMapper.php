@@ -11,7 +11,6 @@ use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use UnexpectedValueException;
 
 /**
  * Mapper for rubric groups.
@@ -94,8 +93,8 @@ class GroupMapper extends BaseMapper
 
 
     /**
-     * Pre-save callback - if a copy of this group already exists, then throw
-     * an `UnexpectedValueException`.
+     * Pre-save callback - if a copy of this group already exists, update it
+     * instead of saving a new one.
      *
      * This replaces the unique index on this table, which needs to be removed
      * because MySQL max index size doesn't allow more than about ~330 UTF-8
@@ -103,8 +102,6 @@ class GroupMapper extends BaseMapper
      *
      * @param  Group $object
      * @return bool  Always true
-     * @throws UnexpectedValueException if a group with the same name exists in
-     *                                  its context already
      */
     public function verifyUniqueness(Group $object): bool
     {
@@ -118,17 +115,9 @@ class GroupMapper extends BaseMapper
             'name'        => $object->getName(),
         ]);
 
-        // found something with a matching name:
-        // if it's not this object: raise an error
-        foreach ($existingIds as $existingId) {
-            if ((int)$existingId !== (int)$object->getId()) {
-                throw new UnexpectedValueException(
-                    sprintf(
-                        'Cannot save a group with name "%s": that name is already in use in its context',
-                        $object->getName()
-                    )
-                );
-            }
+        // found something? assign that ID if so
+        if ($existingIds) {
+            $object->setId(array_shift($existingIds));
         }
 
         return true;
