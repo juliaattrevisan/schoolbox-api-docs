@@ -92,6 +92,7 @@ class ValidRowSet extends Base
                     );
                     throw new UnexpectedValueException($errorMessage);
                 }
+                $indicatorNamesInUse[$normalizedIndicatorName] = true;
             }
         }
 
