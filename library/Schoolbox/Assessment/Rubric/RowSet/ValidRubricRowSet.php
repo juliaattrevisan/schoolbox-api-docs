@@ -7,12 +7,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\RowSet;
 
+use Alaress\Specification\Base;
 use Schoolbox\L10n\RosettaStone;
+use UnexpectedValueException;
 
 /**
  * Spec pattern for validating rubric row sets.
  */
-class ValidRubricRowSet extends \Alaress\Specification\Base
+class ValidRubricRowSet extends Base
 {
     /**
      * Translator, used for translating error messages
@@ -40,7 +42,7 @@ class ValidRubricRowSet extends \Alaress\Specification\Base
      *
      * @param RowSet $candidate
      * @return bool
-     * @throws \UnexpectedValueException if it isn't satisfied
+     * @throws UnexpectedValueException if it isn't satisfied
      */
     public function isSatisfiedBy($candidate) : bool
     {
@@ -60,7 +62,7 @@ class ValidRubricRowSet extends \Alaress\Specification\Base
                     $this->translator->indefiniteArticle('rubricGroup'),
                     $this->translator->translate('rubricGroup')
                 );
-                throw new \UnexpectedValueException($errorMessage);
+                throw new UnexpectedValueException($errorMessage);
             }
             $capabilityNamesInUse[$normalizedCapabilityName] = true;
 
@@ -79,7 +81,7 @@ class ValidRubricRowSet extends \Alaress\Specification\Base
                         $this->translator->translate('rubricGroup'),
                         $capability->getName()
                     );
-                    throw new \UnexpectedValueException($errorMessage);
+                    throw new UnexpectedValueException($errorMessage);
                 }
             }
         }
