@@ -12,6 +12,7 @@
     "promise-polyfill": "8.1.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
+    "react-habitat": "^1.0.1",
     "vue": "2.5.16",
     "vuejs-paginate": "2.0.1"
   },

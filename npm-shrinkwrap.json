@@ -7686,6 +7686,11 @@
         "prop-types": "^15.6.0"
       }
     },
+    "react-habitat": {
+      "version": "1.0.1",
+      "resolved": "https://registry.npmjs.org/react-habitat/-/react-habitat-1.0.1.tgz",
+      "integrity": "sha512-30jD2BiixWQTBhzNwZldU6NS4vSL/KcXGuLXXb15gZ+ozwGEh+YT6WiAguH7/AZhA1vDVp2U3HvpKuJfOxtN9Q=="
+    },
     "react-icon-base": {
       "version": "2.1.0",
       "resolved": "https://registry.npmjs.org/react-icon-base/-/react-icon-base-2.1.0.tgz",
