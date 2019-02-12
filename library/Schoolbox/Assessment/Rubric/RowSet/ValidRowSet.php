@@ -9,6 +9,7 @@ namespace Schoolbox\Assessment\Rubric\RowSet;
 
 use Alaress\Specification\Base;
 use Schoolbox\L10n\RosettaStone;
+use TypeError;
 use UnexpectedValueException;
 
 /**
@@ -41,13 +42,14 @@ class ValidRowSet extends Base
      * * no capabilities contain indicators with duplicate names
      *
      * @param RowSet $candidate
-     * @return bool
+     * @return bool always true if spec is satisfied
+     * @throws TypeError                if $candidate isn't a RowSet
      * @throws UnexpectedValueException if it isn't satisfied
      */
     public function isSatisfiedBy($candidate) : bool
     {
         if (!$candidate instanceof RowSet) {
-            return false;
+            throw new TypeError('$candidate must be a '.RowSet::class);
         }
 
 
