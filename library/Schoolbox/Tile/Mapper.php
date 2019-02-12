@@ -133,7 +133,7 @@ class Mapper extends BaseMapper
      */
     public function findForLayout($layoutId)
     {
-        return $this->findByColumn('tile_layout_id', $layoutId);
+        return $this->findByColumn('tile_layout_id', $layoutId, ['order' => ['order' => 'ASC']]);
     }
 
     /**
