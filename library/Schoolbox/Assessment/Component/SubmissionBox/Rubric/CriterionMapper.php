@@ -13,6 +13,7 @@ use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use UnexpectedValueException;
 
 /**
  * Class CriterionMapper
@@ -199,16 +200,18 @@ class CriterionMapper extends BaseMapper {
 
     /**
      * Pre-save callback - if a copy of this criterion already exists, then
-     * update it instead of saving a new one.
+     * throw an `UnexpectedValueException`.
      *
      * This replaces the unique index on this table, which needs to be removed
      * because MySQL max index size doesn't allow more than about ~330 UTF-8
      * characters.
      *
      * @param  Criterion $object
-     * @return bool      Always true
+     * @return bool      Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if a criterion with the same name
+     *                                  exists in its group already
      */
-    public function verifyUniqueness(Criterion $object)
+    public function verifyUniqueness(Criterion $object): bool
     {
         // remove any newlines and consecutive/leading/trailing spaces from input
         $object->setName(preg_replace('`\s+`', ' ', trim($object->getName())));
@@ -219,9 +222,17 @@ class CriterionMapper extends BaseMapper {
             'name'            => $object->getName(),
         ]);
 
-        // found something? assign that ID if so
-        if ($existingIds) {
-            $object->setId(array_shift($existingIds));
+        // found something with a matching name:
+        // if it's not this object: raise an error
+        foreach ($existingIds as $existingId) {
+            if ((int)$existingId !== (int)$object->getId()) {
+                throw new UnexpectedValueException(
+                    sprintf(
+                        'Cannot save a criterion with name "%s": that name is already in use in its group',
+                        $object->getName()
+                    )
+                );
+            }
         }
 
         return true;
