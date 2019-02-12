@@ -549,6 +549,13 @@ class RubricMapper
         }
 
 
+        // Can validate the grid's rowset the same way I would in persistRowset
+        // (Forgive me too for perpetuating this)
+        /** @var RosettaStone $l10n */
+        $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
+        (new ValidRowSet($l10n))->isSatisfiedBy($grid->getRowSet());
+
+
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
         $indicatorUsageMapper  = CriterionUsageMapper::getInstance();
         $capabilityUsageMapper = GroupUsageMapper::getInstance();
