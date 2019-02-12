@@ -108,8 +108,8 @@ class GroupMapper extends BaseMapper
      */
     public function verifyUniqueness(Group $object): bool
     {
-        // remove any newlines and consecutive/leading/trailing spaces from input
-        $object->setName(preg_replace('`\s+`', ' ', trim($object->getName())));
+        // normalize object's name for saving
+        $object->setName($object->retrieveNormalizedName());
 
         // Lookup existing IDs
         $existingIds = $this->findIdsByColumnList([
