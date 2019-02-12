@@ -348,12 +348,26 @@ class Connector
 
         $content = json_decode($response->getBody(), true);
 
-        if ($response->getStatusCode() == 200) {
+        if ($response->getStatusCode() === 200) {
+
+            /* json_decode failed for some reason, but it shouldn't have
+             * report back whatever was found
+             */
+            if (null === $content) {
+                $errorMessage = json_last_error_msg();
+
+                throw new \InvalidArgumentException("{$errorMessage} for {$plagscanId}: {$response->getBody()}");
+            }
+
+            /* json_decode succeeded, but has a different format than previously known
+             * check what the api is now returning, adapt accordingly
+             */
             if (!(array_key_exists('data', $content) && array_key_exists('plagLevel', $content['data']))) {
                 throw new \InvalidArgumentException(
                     "response[data][plagLevel] does not exist: PlagScan has changed their API again"
                 );
             }
+
             /* ...really - is a shame it's not synonymous with fetchReport()
              */
             return $content['data']['plagLevel'];
