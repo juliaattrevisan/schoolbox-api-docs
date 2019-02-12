@@ -12,7 +12,8 @@ use Alaress\Specification\Base;
 use Schoolbox\L10n\RosettaStone;
 
 /**
- * Class NoDuplicateCapabilitySpec
+ * Spec pattern for validating whether a set of capabilities is able to be
+ * saved.
  */
 class NoDuplicateCapabilitySpec extends Base
 {

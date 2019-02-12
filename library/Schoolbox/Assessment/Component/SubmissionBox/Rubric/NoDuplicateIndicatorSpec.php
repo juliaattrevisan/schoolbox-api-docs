@@ -12,7 +12,8 @@ use Alaress\Specification\Base;
 use Schoolbox\L10n\RosettaStone;
 
 /**
- * Class NoDuplicateIndicatorSpec
+ * Spec pattern for validating whether a set of indicators is able to be
+ * saved.
  */
 class NoDuplicateIndicatorSpec extends Base
 {
