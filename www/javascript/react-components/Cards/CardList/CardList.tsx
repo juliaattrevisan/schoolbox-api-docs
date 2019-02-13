@@ -7,7 +7,7 @@ interface ICardList {
 }
 
 /**
- * A list of cards
+ * A list of cards.
  */
 const CardList: React.SFC<ICardList> = props => {
     // Wrap the cards in InformationListItem's

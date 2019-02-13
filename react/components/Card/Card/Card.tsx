@@ -30,30 +30,18 @@ interface ICard {
  * Standard size card. Usually contains an image, title & meta.
  */
 const Card: React.SFC<ICard> = props => {
-  const { title, meta, image } = props;
-
-  // Determine if the card has some sort of content
-  // Used to decide whether to show loaders or not
-  const hasContent = title || meta || image;
-
-  if (hasContent) {
-    const content = (
-      <>
-        <div className="list-item">
-          <div className="small-12 card">
-            <CardImage {...props} />
-            <CardTitle {...props} />
-            <CardMeta {...props} />
-          </div>
+  return (
+    <>
+      <div className="list-item">
+        <div className="small-12 card">
+          <CardImage {...props} />
+          <CardTitle {...props} />
+          <CardMeta {...props} />
         </div>
-        <CardActions {...props} />
-      </>
-    );
-
-    return content;
-  }
-
-  return null;
+      </div>
+      <CardActions {...props} />
+    </>
+  );
 };
 
 const CardImage: React.SFC<ICard> = props => {
