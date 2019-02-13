@@ -34,7 +34,13 @@ class IsUser implements IAuthorizationRule
     }
 
     /**
-     * {@inheritdoc}
+     * Validate whether the user has the same user id as the given parameter.
+     * When 'participant' is passed as the parameter key, this validate the user against the participant object.
+     * @param  array $params Any parameters passed as part of the route.
+     * @param  User  $user   The user to authorize, if any. Null value assumes
+     *                       that no user is logged in.
+     * @return true If the request is authorized.
+     * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      */
     public function authorize(array $params = array(), User $user = null)
     {
