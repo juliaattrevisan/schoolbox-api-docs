@@ -15,7 +15,9 @@ namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
 use Schoolbox\Collection;
+use Schoolbox\L10n\RosettaStone;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
@@ -114,6 +116,13 @@ class Decorator implements DecoratorInterface
                 SubmissionBox\Rubric\RubricMapper::getInstance()->retrieveRowSet($assessment->getBaseContext(), true)
             );
             $newGrid = $gridFactory->buildFromPostData($existingGrid, $this->getRubricData());
+
+            // I _think_ this is the right place to validate the rubric?
+            // (Forgive me too for perpetuating this)
+            /** @var RosettaStone $l10n */
+            $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
+            (new ValidRowSet($l10n))->isSatisfiedBy($newGrid->getRowSet());
+
             $assessment->setRubricGrid($newGrid);
 
             // The max mark for a rubric-using assessment is always the same as
