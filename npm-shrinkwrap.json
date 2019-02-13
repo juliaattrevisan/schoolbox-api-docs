@@ -917,6 +917,14 @@
         "@types/react": "*"
       }
     },
+    "@types/react-paginate": {
+      "version": "6.2.1",
+      "resolved": "https://registry.npmjs.org/@types/react-paginate/-/react-paginate-6.2.1.tgz",
+      "integrity": "sha512-+q8k1N0WzbMyOCsIEH/p5D6/KQD8dXYLzfvSvriYn//94icd2sqhAL2rWXkgwGvqHGCSTU9AoHtsWCJxPfquUQ==",
+      "requires": {
+        "@types/react": "*"
+      }
+    },
     "@types/react-tabs": {
       "version": "2.3.1",
       "resolved": "https://registry.npmjs.org/@types/react-tabs/-/react-tabs-2.3.1.tgz",
@@ -7718,6 +7726,14 @@
       "resolved": "https://registry.npmjs.org/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz",
       "integrity": "sha1-TxonOv38jzSIqMUWv9p4+HI1I2I=",
       "dev": true
+    },
+    "react-paginate": {
+      "version": "6.2.1",
+      "resolved": "https://registry.npmjs.org/react-paginate/-/react-paginate-6.2.1.tgz",
+      "integrity": "sha512-7MaWiVi4SAFYq5tAGcMCaZE6AK4XxCDM0zEo6+ZthVkhYNnKy1LLkO6syYQu+dBvNfukJ7CurOIpGWnkydJiDQ==",
+      "requires": {
+        "prop-types": "^15.6.1"
+      }
     },
     "react-styleguidist": {
       "version": "8.0.6",
