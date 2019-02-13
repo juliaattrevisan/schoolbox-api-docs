@@ -4,7 +4,6 @@ import {
     Tab as ReactTab,
     TabList as ReactTabList
 } from "react-tabs";
-import { ITab } from './Tab/Tab'
 
 interface ITabs {
     /** Callback when a new tab is switched to. */
@@ -18,7 +17,7 @@ interface ITabs {
 }
 
 /**
- * Horizontal navigation tabs
+ * Horizontal navigation tabs.
  * Wraps an external package called [react-tabs](https://github.com/reactjs/react-tabs)
  */
 const Tabs: React.SFC<ITabs> = props => {
