@@ -50,7 +50,11 @@ module.exports = {
     {
       name: "Components",
       components: "www/javascript/react-components/**/*.tsx",
-      ignore: ["www/javascript/react-components/Card/**/*.tsx", "www/javascript/react-components/Tabs/**/*.tsx"],
+      ignore: [
+        "www/javascript/react-components/Card/**/*.tsx",
+        "www/javascript/react-components/Tabs/**/*.tsx",
+        "www/javascript/react-components/Actions/**/*.tsx"
+      ],
       sectionDepth: 1,
       sections: [
         {
@@ -64,6 +68,10 @@ module.exports = {
         {
           name: "Tabs",
           components: "www/javascript/react-components/Tabs/**/*.tsx"
+        },
+        {
+          name: "Actions",
+          components: "www/javascript/react-components/Actions/**/*.tsx"
         }
       ]
     }
