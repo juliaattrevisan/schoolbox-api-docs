@@ -40,6 +40,7 @@ const Card: React.SFC<ICard> = props => {
         </div>
       </div>
       <CardActions {...props} />
+      <CardContent {...props} />
     </>
   );
 };
@@ -106,6 +107,14 @@ const CardActions: React.SFC<ICard> = ({ actions }) => {
 
   const actionComponents = actions.map((action: IAction) => <Action key={action.id} {...action} />);
   return <Actions>{actionComponents}</Actions>;
+}
+
+const CardContent: React.SFC<ICard> = ({ children }) => {
+  if (!children) {
+    return null;
+  }
+
+  return <article>{children}</article>;
 }
 
 export { ICard, Card };
