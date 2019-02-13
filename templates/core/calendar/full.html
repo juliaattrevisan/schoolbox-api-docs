@@ -312,20 +312,14 @@
             $(this).find("[data-modal-submit]").prop('disabled', true);
         };
 
-        c.getForm('createEvent').find('input[name="title"]')
-            .on('change', toggleCreateButtonState)
-            .on('keyup', toggleCreateButtonState)
-        ;
-        c.getForm('createTask').find('input[name="title"]')
-            .on('change', toggleCreateButtonState)
-            .on('keyup', toggleCreateButtonState)
-        ;
-
-        // Prevent multiple form submissions
-        c.getForm('createEvent').on('submit', disableSubmitButton);
-        c.getForm('createTask').on('submit', disableSubmitButton);
-        c.getForm('editTask').on('submit', disableSubmitButton);
-
+        var forms = ['createEvent', 'createTask', 'editTask'];
+        forms.forEach(function (formId) {
+            c.getForm(formId).find('input[name="title"]')
+                .on('change', toggleCreateButtonState)
+                .on('keyup', toggleCreateButtonState)
+            ;
+            c.getForm(formId).on('submit', disableSubmitButton);
+        });
 
         /* When you switch panels, preserve some data
          */
