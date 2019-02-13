@@ -206,7 +206,7 @@ class DataSource
      * @param string $role
      * @return int
      */
-    public function getVisitorCount($folderId, $startDate, $endDate, $role = null)
+    public function getVisitorCount(int $folderId, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, string $role = null): int
     {
         $queryParams = [
             'folderId' => $folderId,
@@ -232,10 +232,8 @@ class DataSource
 
         $statement = $this->folderLogMapper->getDatabase()->prepare($query);
         $statement->execute($queryParams);
+        return $statement->fetchColumn();
 
-        foreach ($statement as $row) {
-            return $row['COUNT(user)'];
-        }
     }
 
 
@@ -405,7 +403,7 @@ class DataSource
      * @param string $role
      * @return int
      */
-    public function getYetToVisitCount($folderId, $startDate, $endDate, $role = null)
+    public function getYetToVisitCount(int $folderId, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, string $role = null): int
     {
         $queryParams = [
             'folderId' => $folderId,
@@ -441,10 +439,8 @@ class DataSource
 
         $statement = $this->userAccessMapper->getDatabase()->prepare($query);
         $statement->execute($queryParams);
+        return $statement->fetchColumn();
 
-        foreach ($statement as $row) {
-            return $row['COUNT(uid)'];
-        }
     }
 
 }
