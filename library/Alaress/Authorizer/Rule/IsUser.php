@@ -47,7 +47,7 @@ class IsUser implements IAuthorizationRule
         } elseif ($params[$this->paramsKey] instanceof Participant) {
             /** @var Participant $participant */
             $participant = $params[$this->paramsKey];
-            if ($participant->getUser() && $user->getId() === $participant->getUser()->getId()) {
+            if ($participant->getUser() && ($user->getId() === $participant->getUser()->getId())) {
                 return true;
             }
         }
