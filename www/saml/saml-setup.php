@@ -55,8 +55,11 @@ try {
  * Exports the private key for use as it is stored passphrase encoded
  */
 $privateKey = false;
+
 $privateKeyResource = openssl_pkey_get_private(Cfg::get('saml_private_cert'), sha1(strtolower(trim(Cfg::get('site_school_code')))));
-openssl_pkey_export($privateKeyResource, $privateKey);
+if( $privateKeyResource !== false ) {
+    openssl_pkey_export($privateKeyResource, $privateKey);
+}
 
 $settingsInfo['sp'] = [
         'entityId' => $spBaseUrl,
