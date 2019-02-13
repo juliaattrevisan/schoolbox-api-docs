@@ -4,6 +4,7 @@ import {
     Tab as ReactTab,
     TabList as ReactTabList
 } from "react-tabs";
+import { ITab, Tab } from './Tab/Tab';
 
 interface ITabs {
     /** Callback when a new tab is switched to. */
@@ -40,4 +41,4 @@ const Tabs: React.SFC<ITabs> = props => {
     );
 };
 
-export { Tabs, ITabs };
+export { Tabs, ITabs, Tab, ITab };

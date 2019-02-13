@@ -9,7 +9,7 @@ interface ITab {
     tab: string;
 
     /** Content for the tab */
-    children: React.ReactNode[] | string;
+    children: any;
 }
 
 /**
@@ -20,7 +20,7 @@ class Tab extends React.Component<ITab> {
 
     public render() {
         return (
-            <ReactTabPanel className="tabs-content no-margin" {...this.props}>{this.props.children}</ReactTabPanel>
+            <ReactTabPanel id="{this.props.id}" className="tabs-content no-margin" {...this.props}>{this.props.children}</ReactTabPanel>
         )
     }
 }

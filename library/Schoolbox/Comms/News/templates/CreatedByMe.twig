@@ -4,7 +4,15 @@
 
 {% block newsContent %}
     <div>
-        <div data-component="CreatedByMe"></div>
+        <div
+            data-component="CreatedByMe"
+            data-n-prop-initial-page="{{ pageNum }}"
+            data-prop-initial-tab="{{ status }}"
+            data-prop-get-authored-route="{{ routeLookup('commsNews.getAuthoredArticles') }}"
+            data-n-prop-articles-per-page="{{ config.search_type_limit }}"
+            data-prop-locale-news="{{ locale.news }}"
+            data-prop-locale-news-plural="{{ locale.news.plural }}"
+        ></div>
     </div>
 {% endblock %}
 

@@ -1004,7 +1004,7 @@ class Controller extends Base
     public function getAuthored()
     {
         $params = new Querystring($this->getRequest()->query);
-        $pageNum = $params->getPageNum();
+        $pageNum = $params->getPageNum() - 1;
         $status = $params->getStatus();
 
         if (!$status) {
