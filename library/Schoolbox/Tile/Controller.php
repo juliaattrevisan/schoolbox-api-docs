@@ -572,6 +572,9 @@ class Controller extends Base
      * @param Component_Instance $component
      * @return Layout\Model
      * @throws MapperException
+     * @throws \DomainException if the `tileSource` and `layoutId` configs
+     *                          don't exist on `$component`
+     *                          (this should not ever happen)
      */
     private function buildLayoutForComponent(Component_Instance $component): Layout\Model
     {
@@ -581,28 +584,29 @@ class Controller extends Base
         $model = $mapper->createModel();
         $mapper->save($model);
 
-        // Update the component's configuration.
-        // (Should this be done in postSave?)
-        $configMapper = $this->getComponentConfigMapper();
-        foreach ($component->getConfig() as $configDefinition) {
-            if ($configDefinition->getKey() == 'layoutId') {
-                /** @var Component_Config $confI */
-                $config = $configMapper->findByColumnList(
-                    [
-                        'component_config_definition_id' => $configDefinition->getId(),
-                        'component_instance_id'          => $component->getId()
-                    ]
-                )->first();
-                if (!($config instanceof Component_Config)) {
-                    $config = new Component_Config();
-                    $config->setConfigDefinitionId($configDefinition->getId());
-                    $config->setInstanceId($component->getId());
-                }
-                $config->setValue($model->getId());
-                $configMapper->save($config);
-                break;
-            }
+
+        // Does this component itself point to an alternate source?
+        // If so, create a layout for its alt-source instead.
+        $sourceComponentId = (int)$component->getConfigByKey('tileSource')->getValue();
+        if (!$sourceComponentId) {
+            $sourceComponentId = $component->getId();
         }
+
+
+        // And save the config setting for the layout.
+        $layoutConfigDefinition = $component->getConfigByKey('layoutId');
+        $configMapper           = $this->getComponentConfigMapper();
+        $config                 = $configMapper->findByColumnList([
+            'component_config_definition_id' => $layoutConfigDefinition->getId(),
+            'component_instance_id'          => $sourceComponentId
+        ])->first();
+        if (!($config instanceof Component_Config)) {
+            $config = new Component_Config();
+            $config->setConfigDefinitionId($layoutConfigDefinition->getId());
+            $config->setInstanceId($sourceComponentId);
+        }
+        $config->setValue($model->getId());
+        $configMapper->save($config);
         return $model;
     }
 }
