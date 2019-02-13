@@ -331,10 +331,9 @@ class Controller extends Base
     /**
      * Update action for tiles
      *
-     * @param Model              $item
-     * @param Component_Instance $component
+     * @param Model $item
      */
-    public function update(Model $item, Component_Instance $component)
+    public function update(Model $item)
     {
         $this->updateItemWithFormValues(
             $item,
@@ -345,7 +344,7 @@ class Controller extends Base
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'tile.layout',
-                array('componentId' => $component->getId())
+                ['layoutId' => $item->getTileLayout()->getId()]
             )
         );
     }
@@ -353,10 +352,9 @@ class Controller extends Base
     /**
      * Delete action for tiles
      *
-     * @param Model              $item
-     * @param Component_Instance $component
+     * @param Model $item
      */
-    public function delete(Model $item, Component_Instance $component)
+    public function delete(Model $item)
     {
         $code = 200;
         if (!$this->getMapper()->delete($item)) {
@@ -367,14 +365,14 @@ class Controller extends Base
             $this->getResponse()->content->set(
                 array(
                     'format' => 'json',
-                    'data'   => array(),
+                    'data'   => [],
                 )
             );
         } else {
             $this->getResponse()->redirect->afterPost(
                 $this->getRouter()->generate(
                     'tile.layout',
-                    array('componentId' => $component->getId())
+                    ['layoutId' => $item->getTileLayout()->getId()]
                 )
             );
         }
