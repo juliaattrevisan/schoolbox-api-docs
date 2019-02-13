@@ -23,7 +23,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Tile\Component\TileControllerInterface;
 use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Tile\Mapper as TileMapper;
