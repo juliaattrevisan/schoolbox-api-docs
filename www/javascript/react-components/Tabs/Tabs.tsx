@@ -13,7 +13,7 @@ interface ITabs {
     defaultIndex?: number;
 
     /** Set of tabs & content to show */
-    children: any; // TODO- figger out what type to put here
+    children: JSX.Element[];
 }
 
 /**
@@ -22,7 +22,7 @@ interface ITabs {
  */
 const Tabs: React.SFC<ITabs> = props => {
     const tabHeadings: React.ReactNode[] = [];
-    props.children.forEach((tab: any, index: number) => {
+    props.children.forEach(tab => {
         tabHeadings.push(
             <ReactTab key={tab.props.id} className="tab-title" selectedClassName="active">
                 <a>{tab.props.tab}</a>

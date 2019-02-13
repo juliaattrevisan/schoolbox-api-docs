@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 interface IActions {
-    children: any; // TODO: what type to use here
+    children: JSX.Element[];
 }
 
 /**

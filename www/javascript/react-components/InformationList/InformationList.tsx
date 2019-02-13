@@ -1,7 +1,7 @@
 import * as React from "react";
 
 interface IInformationList {
-    children: any;
+    children: JSX.Element[];
 }
 
 /**

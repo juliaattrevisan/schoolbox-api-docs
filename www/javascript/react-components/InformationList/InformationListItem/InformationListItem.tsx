@@ -1,7 +1,7 @@
 import * as React from "react";
 
 interface IInformationListItem {
-    children: any;
+    children: JSX.Element[];
 
     /** The amount of actions that will display on the top right of this item */
     actions?: number;

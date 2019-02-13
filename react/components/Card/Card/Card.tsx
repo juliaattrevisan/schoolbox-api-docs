@@ -23,7 +23,7 @@ interface ICard {
   image?: IImage;
 
   /** Actions to display on the top right of the card (will only work properly from inside an InformationList at this point) */
-  actions?: any;
+  actions?: IAction[];
 }
 
 /**
