@@ -1,7 +1,7 @@
 import * as React from "react";
 
 interface IMeta {
-  children: string;
+  children: string | JSX.Element;
 }
 
 /**
