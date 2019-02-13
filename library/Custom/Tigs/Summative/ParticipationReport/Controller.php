@@ -191,7 +191,7 @@ class Controller extends Web\Controller\Base
             SELECT Award, Detail
             FROM uvContinuousReportingAwards
             WHERE StudentID = :student_id
-            AND GivenDate >= :start AND GivenDate < :finish
+            AND GivenDate >= :start AND GivenDate <= :finish
             ORDER BY GivenDate ASC
         ";
 
@@ -228,7 +228,7 @@ class Controller extends Web\Controller\Base
             SELECT Event, Status
             FROM uvContinuousReportingHouseParticipation
             WHERE ID = :external_id
-            AND date >= :start AND date < :finish
+            AND date >= :start AND date <= :finish
             AND Status != :not_selected
             ORDER BY date ASC
         ";
