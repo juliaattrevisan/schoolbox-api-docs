@@ -2,7 +2,7 @@ import * as React from "react";
 
 interface IAction {
     /** Unique identifier for the action */
-    id: string;
+    id: string | number;
 
     /** Icon to display */
     icon: string;

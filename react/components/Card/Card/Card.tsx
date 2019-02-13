@@ -6,13 +6,13 @@ import { Action, IAction } from "@schoolbox/Actions/Action/Action";
 
 interface ICard {
   /** Unique identifier for the card */
-  id: string;
+  id: string | number;
 
   /** Title to display on the card */
   title: string;
 
   /** Meta information to display below the title */
-  meta: string | string[];
+  meta: string | string[] | JSX.Element;
   // ^Ideally this would be Meta | Meta[] instead of string, but that would require us to send
   // meta={{children: "Some meta" }} instead of just meta="Some meta", so I'm leaving this for now.
 
