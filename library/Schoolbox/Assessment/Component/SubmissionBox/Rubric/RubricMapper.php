@@ -24,6 +24,7 @@ use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Assessment\Rubric\RowSet\ValidCourseRowSet;
 use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
+use Schoolbox\Assessment\Rubric\RowSet\ValidRowSetChange;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
@@ -193,13 +194,6 @@ class RubricMapper
         bool $allowModifyUsed,
         ?IAssessable $allowModifyExclusion = null
     ): void {
-        // Forgive me...
-        /** @var RosettaStone $l10n */
-        $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
-
-        $capabilityL10nLowercase = $l10n->translate('rubricGroup');
-        $indicatorL10nLowercase  = $l10n->translate('rubricCriterion');
-
         // Where does this go?
         $folder                   = $rowSet->getContext()->getBaseContext()->getFolder();
 
@@ -219,10 +213,8 @@ class RubricMapper
         $newIndicatorIds          = $rowSet->retrieveIndicatorIds();
         $newCapabilityModels      = $capabilityMapper->createCollection();
         $newIndicatorModels       = $indicatorMapper->createCollection();
-
-
-        // Verify rowset contains no duplicates
-        (new ValidRowSet($l10n))->isSatisfiedBy($rowSet);
+        $deletedCapabilityIds     = array_diff($existingCapabilityIds, $newCapabilityIds);
+        $deletedIndicatorIds      = array_diff($existingIndicatorIds, $newIndicatorIds);
 
 
         // Process capabilities+indicators into models
@@ -300,35 +292,19 @@ class RubricMapper
         }
 
 
-        // Validate whether capabilities/indicators marked for deletion may
-        // actually be removed
-        $deletedCapabilityIds = array_diff($existingCapabilityIds, $newCapabilityIds);
-        $deletedIndicatorIds  = array_diff($existingIndicatorIds, $newIndicatorIds);
-        if (!$allowModifyUsed) {
-            // Validate deleted capabilities aren't in use
-            foreach ($deletedCapabilityIds as $deletedCapabilityId) {
-                $existingCapability = $existingRowSet->retrieveCapability($deletedCapabilityId);
-                if ($existingCapability && $existingCapability->isInUse($allowModifyExclusion)) {
-                    $errorMessage = sprintf("Cannot delete %s '%s' because it is in use elsewhere",
-                        $capabilityL10nLowercase,
-                        $existingCapability->getName()
-                    );
-                    throw new \UnexpectedValueException($errorMessage);
-                }
-            }
+        // Forgive me...
+        /** @var RosettaStone $l10n */
+        $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
 
-            // Validate deleted indicators aren't in use
-            foreach ($deletedIndicatorIds as $deletedIndicatorId) {
-                $existingIndicator = $existingRowSet->retrieveIndicator($deletedIndicatorId);
-                if ($existingIndicator && $existingIndicator->isInUse($allowModifyExclusion)) {
-                    $errorMessage = sprintf("Cannot delete %s '%s' because it is in use elsewhere",
-                        $indicatorL10nLowercase,
-                        $existingIndicator->getName()
-                    );
-                    throw new \UnexpectedValueException($errorMessage);
-                }
-            }
-        }
+
+        // Verify rowset contains no duplicates
+        (new ValidRowSet($l10n))->isSatisfiedBy($rowSet);
+
+
+        // Verify no changes that shouldn't be made have been made
+        (new ValidRowSetChange($l10n, $existingRowSet, $allowModifyUsed, $allowModifyExclusion))
+            ->isSatisfiedBy($rowSet);
+
 
         // Validate against duplicate capabilities between a course and unit
         // If we are modifying the rubric on a course...
