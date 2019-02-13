@@ -87,7 +87,7 @@ class Module extends BaseModule
             new Rule\Any(
                 $this->buildRuleHasWriteAccess(),
                 new Rule\All(
-                    new Rule\IsUser('studentId'),
+                    new Rule\IsUser('participant'),
                     new Rule\IsConfigOn('plagscan_allow_students_report_access', $this->getConfigLoader())
                 )
             ),

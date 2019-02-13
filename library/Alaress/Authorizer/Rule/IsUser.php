@@ -11,6 +11,7 @@ namespace Alaress\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Base;
 use Alaress\Authorizer\Failure\Unauthorized;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
 class IsUser implements IAuthorizationRule
@@ -43,7 +44,14 @@ class IsUser implements IAuthorizationRule
         }
         if ($user instanceof User && $user->getId() == $params[$this->paramsKey]) {
             return true;
+        } elseif ($params[$this->paramsKey] instanceof Participant) {
+            /** @var Participant $participant */
+            $participant = $params[$this->paramsKey];
+            if ($participant->getUser() && ($user->getId() === $participant->getUser()->getId())) {
+                return true;
+            }
         }
+
         throw new Unauthorized();
     }
 }
