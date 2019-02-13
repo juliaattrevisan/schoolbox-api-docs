@@ -98,7 +98,7 @@ if ($eventId = $calendarHandler->update($updatedEvent)) {
         // Only one event should ever be gotten here, so render that one only
         $renderer = new Javascript(new SitePage(), $calendarEvent, $_SESSION['user'], new \Group(), new \Calendar(), $_SESSION['user']);
         $output   = $renderer->render();
-        echo substr($output, 0, -1);
+        echo $output;
         break;
     }
 }
