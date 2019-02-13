@@ -1,14 +1,14 @@
 ### Single action
 
 ```jsx
-<Action icon="view" href="#" title="Preview" />
+<Action id="1" icon="view" href="#" title="Preview" />
 ```
 
 ### Collection of actions
 
 ```jsx
 <Actions>
-    <Action icon="modify" href="#" title="Modify article" />
-    <Action icon="delete" href="#" title="Delete article" />
+    <Action id="1" icon="modify" href="#" title="Modify article" />
+    <Action id="2" icon="delete" href="#" title="Delete article" />
 </Actions>
 ```

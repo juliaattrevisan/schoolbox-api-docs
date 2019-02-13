@@ -1,6 +1,9 @@
 import * as React from "react";
 
 interface IAction {
+    /** Unique identifier for the action */
+    id: string;
+
     /** Icon to display */
     icon: string;
 

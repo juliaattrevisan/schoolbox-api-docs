@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 interface IActions {
-    children: React.ReactNode[];
+    children: any; // TODO: what type to use here
 }
 
 /**
@@ -11,4 +11,4 @@ const Actions: React.SFC<IActions> = ({ children }) => (
     <nav>{children}</nav>
 )
 
-export { Actions }
+export { Actions, IActions }

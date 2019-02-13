@@ -1,0 +1,19 @@
+import * as React from "react";
+
+interface IInformationList {
+    children: any;
+}
+
+/**
+ * List of information.
+ * For the most part you will want to use CardList instead of this (which uses this).
+ */
+const InformationList: React.SFC<IInformationList> = props => {
+    return (
+        <ul className="information-list">
+            {props.children}
+        </ul>
+    );
+}
+
+export { IInformationList, InformationList };

@@ -1,8 +1,13 @@
 import * as React from "react";
 import { IImage, Image } from "@schoolbox/Image/Image";
 import { Meta } from "@schoolbox/Meta/Meta";
+import { Actions } from "@schoolbox/Actions/Actions";
+import { Action, IAction } from "@schoolbox/Actions/Action/Action";
 
 interface ICard {
+  /** Unique identifier for the card */
+  id: string;
+
   /** Title to display on the card */
   title: string;
 
@@ -16,6 +21,9 @@ interface ICard {
 
   /** URL of the image to display on the card */
   image?: IImage;
+
+  /** Actions to display on the top right of the card (will only work properly from inside an InformationList at this point) */
+  actions?: any;
 }
 
 /**
@@ -29,15 +37,20 @@ const Card: React.SFC<ICard> = props => {
   const hasContent = title || meta || image;
 
   if (hasContent) {
-    return (
-      <div className="list-item">
-        <div className="small-12 card">
-          <CardImage {...props} />
-          <CardTitle {...props} />
-          <CardMeta {...props} />
+    const content = (
+      <>
+        <div className="list-item">
+          <div className="small-12 card">
+            <CardImage {...props} />
+            <CardTitle {...props} />
+            <CardMeta {...props} />
+          </div>
         </div>
-      </div>
+        <CardActions {...props} />
+      </>
     );
+
+    return content;
   }
 
   return null;
@@ -97,5 +110,14 @@ const CardMeta: React.SFC<ICard> = props => {
 
   return null;
 };
+
+const CardActions: React.SFC<ICard> = ({ actions }) => {
+  if (!actions) {
+    return null;
+  }
+
+  const actionComponents = actions.map((action: IAction) => <Action key={action.id} {...action} />);
+  return <Actions>{actionComponents}</Actions>;
+}
 
 export { ICard, Card };
