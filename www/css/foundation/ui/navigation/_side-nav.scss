@@ -66,3 +66,13 @@ $border-bottom-width: 2px;
 .news-nav section {
   min-width: 210px;
 }
+
+.news-nav .side-nav li a {
+  padding-right: 0 !important;
+}
+
+@media #{$medium-only} {
+  .news-nav {
+    padding-left: 0;
+  }
+}
