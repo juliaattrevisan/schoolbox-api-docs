@@ -9,11 +9,8 @@
  */
 
 // merge values
-$f = [ 'porcelain', 'mem', 'truemem', 'pid', 'instance:' ];
-$fields = isset($fields) ? array_merge($fields, $f) : $f;
-unset ($f);
-
-$opts = getopt('v', $fields);
+$fields  = \array_merge($fields ?? [], ['porcelain', 'mem', 'truemem', 'pid', 'instance:']);
+$opts    = \getopt(($shortOpts ?? '') . 'v', $fields);
 
 if (isset($opts['instance'])) {
     // bind the instance ID as given
