@@ -13,11 +13,11 @@ use Alaress\Web\Controller\Base;
 use Component_Config;
 use Component_ConfigMapper;
 use Component_Instance;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Storage;
 
 class Controller extends Base
 {
@@ -41,6 +41,11 @@ class Controller extends Base
      */
     private $folderMapper;
 
+    /**
+     * @var ErrorMapper
+     */
+    private $errorMapper;
+
 
     /**
      * Constructor
@@ -49,17 +54,20 @@ class Controller extends Base
      * @param Layout\Mapper          $layoutMapper
      * @param Component_ConfigMapper $componentConfigMapper
      * @param Folder\Mapper          $folderMapper
+     * @param ErrorMapper            $errorMapper
      */
     public function __construct(
         Mapper $mapper,
         Layout\Mapper $layoutMapper,
         Component_ConfigMapper $componentConfigMapper,
-        Folder\Mapper $folderMapper
+        Folder\Mapper $folderMapper,
+        ErrorMapper $errorMapper
     ) {
         $this->mapper                = $mapper;
         $this->layoutMapper          = $layoutMapper;
         $this->componentConfigMapper = $componentConfigMapper;
         $this->folderMapper          = $folderMapper;
+        $this->errorMapper           = $errorMapper;
     }
 
 
@@ -447,8 +455,7 @@ class Controller extends Base
                 $image = $factory->build($post['attachment'])->getFirst();
                 $item->setBackgroundImage($image);
             } catch (\Schoolbox\Resource\Exception $e) {
-                error(43);
-                exit;
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
             }
         } else {
             $item->setBackgroundImage(null);

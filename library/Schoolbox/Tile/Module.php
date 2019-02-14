@@ -18,11 +18,11 @@ use Aura\Router\Router;
 use Component_Instance;
 use Component_InstanceMapper;
 use Component_ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Tile\Mapper as TileMapper;
@@ -183,6 +183,7 @@ class Module extends BaseModule
                     'layoutMapper'          => $this->getMapperFactory()->getLazy(TileLayoutMapper::class),
                     'componentConfigMapper' => $this->getMapperFactory()->getLazy(Component_ConfigMapper::class),
                     'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                    'errorMapper '          => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                 ]
             )
         );
