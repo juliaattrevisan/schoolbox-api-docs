@@ -24,10 +24,6 @@ use UnexpectedValueException;
 
 class Controller extends Web\Controller\Base
 {
-    /**
-     * Ignore any records whose Status field equals this value.
-     */
-    private const STATUS_NOT_SELECTED = 'Not Selected';
 
     /** @var External_UserInterface|External_User */
     private $externalUser;
@@ -229,7 +225,6 @@ class Controller extends Web\Controller\Base
             FROM uvContinuousReportingHouseParticipation
             WHERE ID = :external_id
             AND date >= :start AND date <= :finish
-            AND Status != :not_selected
             ORDER BY date ASC
         ";
 
@@ -237,7 +232,6 @@ class Controller extends Web\Controller\Base
             'external_id'  => $user->getExternalId(),
             'start'        => $attributes->getCurriculumYearStart()->getDatabaseDate(),
             'finish'       => $attributes->getCurriculumYearFinish()->getDatabaseDate(),
-            'not_selected' => self::STATUS_NOT_SELECTED,
         ];
 
         $houseEvents = new GenericCollection(HouseEvent::class);
