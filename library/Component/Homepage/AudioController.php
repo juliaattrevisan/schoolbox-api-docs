@@ -78,22 +78,23 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         // There's not (yet) any default for the audio player.
         // Just use the first in the list
 
-        /* Sort order
+        /* Sort order and list options
          */
-        $sortConfig = array(
+        $listConfig = array(
             'sort' => $this->getConfig('sort'),
             'sortdir' => $this->getConfig('sortdir'),
             'mime' => 'audio',
+            'getHidden' => $this->getContentPermission() >= UserAccess::ACCESS_WRITE
         );
 
         if ($this->getConfig('size') >= 1) {
             $this->outputList = $this->videoResourceMapper->findByCategory(
                 $this->getSource()->getId(),
-                $sortConfig,
+                $listConfig,
                 $this->getConfig('size')
             );
         } elseif ($this->getConfig('size') == 0) {
-            $this->outputList = $this->videoResourceMapper->findByCategory($this->getSource()->getId(), $sortConfig);
+            $this->outputList = $this->videoResourceMapper->findByCategory($this->getSource()->getId(), $listConfig);
         } else {
             $this->outputList = new \Schoolbox\Collection(array());
         }

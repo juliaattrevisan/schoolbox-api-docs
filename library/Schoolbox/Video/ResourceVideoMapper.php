@@ -57,13 +57,13 @@ class ResourceVideoMapper extends Mapper
      * Find videos for a particular category
      *
      * @param  int   $category The category to search
-     * @param  array $options  sort, sortdir, mime
+     * @param  array $options  sort, sortdir, mime, getHidden
      * @param  bool  $limit
      *
      * @return Collection|ResourceVideo[]
      * @throws MapperException
      */
-    public function findByCategory($category, $options, $limit = false)
+    public function findByCategory(int $category, array $options, bool $limit = false): Collection
     {
         $videoList  = $this->createCollection();
         $fileMapper = FileMapper::getInstance();
@@ -82,6 +82,11 @@ class ResourceVideoMapper extends Mapper
                       vq.status != 'failed' AND 
                       ft.mime like :mime
         ";
+
+        /* hide hidden */
+        if (isset($options['getHidden']) && !$options['getHidden']) {
+            $query .= " AND f.hidden = false ";
+        }
 
         /* Sort order
          */
