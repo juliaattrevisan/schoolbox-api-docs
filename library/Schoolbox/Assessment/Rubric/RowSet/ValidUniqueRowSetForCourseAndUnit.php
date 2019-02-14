@@ -17,9 +17,11 @@ use UnexpectedValueException;
 /**
  * Spec pattern for validating rubric row sets.
  *
- * Applied in addition to `ValidRowSet` for row sets which belong to a course.
+ * Only applies to row sets for a course specification: this validates that no
+ * capabilities within the row set have a name which conflicts with the name of
+ * a capability within any units of the course.
  */
-class ValidCourseRowSet extends Base
+class ValidUniqueRowSetForCourseAndUnit extends Base
 {
     /**
      * Translator, used for translating error messages

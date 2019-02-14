@@ -22,9 +22,9 @@ use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
-use Schoolbox\Assessment\Rubric\RowSet\ValidCourseRowSet;
-use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
-use Schoolbox\Assessment\Rubric\RowSet\ValidRowSetChange;
+use Schoolbox\Assessment\Rubric\RowSet\ValidUniqueRowSetForCourseAndUnit;
+use Schoolbox\Assessment\Rubric\RowSet\ValidUniqueRowSetForFolder;
+use Schoolbox\Assessment\Rubric\RowSet\ValidRowSetDeletion;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
@@ -298,17 +298,17 @@ class RubricMapper
 
 
         // Verify rowset contains no duplicates
-        (new ValidRowSet($l10n))->isSatisfiedBy($rowSet);
+        (new ValidUniqueRowSetForFolder($l10n))->isSatisfiedBy($rowSet);
 
 
         // Verify no changes that shouldn't be made have been made
-        (new ValidRowSetChange($l10n, $existingRowSet, $allowModifyUsed, $allowModifyExclusion))
+        (new ValidRowSetDeletion($l10n, $existingRowSet, $allowModifyUsed, $allowModifyExclusion))
             ->isSatisfiedBy($rowSet);
 
 
         // Validate against duplicate capabilities between a course and unit
         // If we are modifying the rubric on a course...
-        (new ValidCourseRowSet($l10n, UnitSpecificationMapper::getInstance(), $this))->isSatisfiedBy($rowSet);
+        (new ValidUniqueRowSetForCourseAndUnit($l10n, UnitSpecificationMapper::getInstance(), $this))->isSatisfiedBy($rowSet);
 
         // Save new capabilities+indicators
         $capabilityMapper->save($newCapabilityModels);
@@ -525,7 +525,7 @@ class RubricMapper
         // (Forgive me too for perpetuating this)
         /** @var RosettaStone $l10n */
         $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
-        (new ValidRowSet($l10n))->isSatisfiedBy($grid->getRowSet());
+        (new ValidUniqueRowSetForFolder($l10n))->isSatisfiedBy($grid->getRowSet());
 
 
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them

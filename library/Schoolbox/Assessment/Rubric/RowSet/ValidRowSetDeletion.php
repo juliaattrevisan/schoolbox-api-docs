@@ -17,7 +17,7 @@ use UnexpectedValueException;
  * Spec pattern for validating that the change between two rubric row sets is
  * valid.
  */
-class ValidRowSetChange extends Base
+class ValidRowSetDeletion extends Base
 {
     /**
      * Translator, used for translating error messages

@@ -15,7 +15,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
-use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
+use Schoolbox\Assessment\Rubric\RowSet\ValidUniqueRowSetForFolder;
 use Schoolbox\Collection;
 use Schoolbox\L10n\RosettaStone;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
@@ -121,7 +121,7 @@ class Decorator implements DecoratorInterface
             // (Forgive me too for perpetuating this)
             /** @var RosettaStone $l10n */
             $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
-            (new ValidRowSet($l10n))->isSatisfiedBy($newGrid->getRowSet());
+            (new ValidUniqueRowSetForFolder($l10n))->isSatisfiedBy($newGrid->getRowSet());
 
             $assessment->setRubricGrid($newGrid);
 

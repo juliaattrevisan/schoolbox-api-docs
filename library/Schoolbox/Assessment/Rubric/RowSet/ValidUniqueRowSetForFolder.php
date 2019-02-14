@@ -14,8 +14,11 @@ use UnexpectedValueException;
 
 /**
  * Spec pattern for validating rubric row sets.
+ *
+ * Validates that no capabilities or indicators within the row set have
+ * conflicting names.
  */
-class ValidRowSet extends Base
+class ValidUniqueRowSetForFolder extends Base
 {
     /**
      * Translator, used for translating error messages
