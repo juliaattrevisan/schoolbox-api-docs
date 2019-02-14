@@ -37,11 +37,6 @@ class Controller extends Base
     private $componentConfigMapper;
 
     /**
-     * @var Storage\Mapper
-     */
-    private $storageMapper;
-
-    /**
      * @var Folder\Mapper
      */
     private $folderMapper;
@@ -53,20 +48,17 @@ class Controller extends Base
      * @param Mapper                 $mapper
      * @param Layout\Mapper          $layoutMapper
      * @param Component_ConfigMapper $componentConfigMapper
-     * @param Storage\Mapper         $storageMapper
      * @param Folder\Mapper          $folderMapper
      */
     public function __construct(
         Mapper $mapper,
         Layout\Mapper $layoutMapper,
         Component_ConfigMapper $componentConfigMapper,
-        Storage\Mapper $storageMapper,
         Folder\Mapper $folderMapper
     ) {
         $this->mapper                = $mapper;
         $this->layoutMapper          = $layoutMapper;
         $this->componentConfigMapper = $componentConfigMapper;
-        $this->storageMapper         = $storageMapper;
         $this->folderMapper          = $folderMapper;
     }
 
