@@ -1,9 +1,9 @@
 import axios from "axios";
 import * as React from "react";
-import { Pagination } from "../../../../../www/javascript/react-components/Pagination/Pagination";
 
 import { Tab, Tabs } from "../../../../../www/javascript/react-components/Tabs/Tabs";
 import { LoadingCard } from "../../../../../www/javascript/react-components/Cards/LoadingCard/LoadingCard";
+import { Pagination } from "../../../../../www/javascript/react-components/Pagination/Pagination";
 import IArticle from "../react-components/IArticle/IArticle";
 import { NewsCardList } from "../react-components/NewsCardList/NewsCardList";
 
@@ -135,16 +135,40 @@ export default class CreatedByMe extends React.Component<
                     }
                 }
 
+                // Set the default tab
+                const defaultTabIndex = statuses.findIndex(
+                    status => status.name === this.props.initialTab
+                );
+
                 // Update the state with the statuses, articles & remove the loader.
                 this.setState({
                     articlesLoading: false,
                     allArticles: articles,
-                    statuses: statuses
+                    statuses: statuses,
+                    tabSelected: defaultTabIndex
                 });
             })
             .catch(function (error) {
                 console.log(error);
             });
+
+        // Listen for window state change
+        const self = this;
+        window.onpopstate = (event) => {
+            if (!event.state) {
+                // Return to defaults
+                self.changeTabState(0, true);
+            } else {
+                if (event.state.page !== undefined) {
+                    self.changePageState(event.state.page - 1);
+                }
+
+                if (event.state.tab !== undefined) {
+                    const tabIndex = self.state.statuses.findIndex(status => status.name === event.state.tab);
+                    self.changeTabState(tabIndex);
+                }
+            }
+        };
     }
 
     private showContent(): React.ReactNode {
@@ -182,12 +206,8 @@ export default class CreatedByMe extends React.Component<
                 }
             });
 
-            const defaultTabIndex = this.state.statuses.findIndex(
-                status => status.name === this.props.initialTab
-            );
-
             return (
-                <Tabs defaultIndex={defaultTabIndex} onSelect={this.onTabClick}>
+                <Tabs selectedIndex={this.state.tabSelected} onSelect={this.onTabClick}>
                     {tabs}
                 </Tabs>
             );
@@ -222,25 +242,68 @@ export default class CreatedByMe extends React.Component<
         return (
             <Pagination
                 pageCount={pageCount}
-                initialPage={this.state.pageSelected}
                 onPageChange={this.onPageClick}
+                forcePage={this.state.pageSelected}
             />
         );
     }
 
+    /**
+     * Changes page in React state & window history.
+     * Used on click on a page.
+     */
     private onPageClick = (data: any) => {
-        this.setState({
-            pageSelected: data.selected
-        });
+        const page = data.selected;
+        const tabName = this.state.statuses[this.state.tabSelected].name;
+
+        // Update React state
+        this.changePageState(page);
+
+        // Update window history
+        const params = (this.state.tabSelected === 0) ? `?p=${page}` : `?p=${page}&status=${tabName}`;
+        window.history.pushState({ page: page + 1, tab: tabName }, '', params);
     };
 
+    /**
+     * Changes tab in React state & window history.
+     * Used on click of a tab.
+     */
     private onTabClick = (tab: number) => {
-        this.setState({
-            // Reset the page back to page 1
-            pageSelected: 0,
+        const tabName = this.state.statuses[tab].name;
 
-            // Update tabSelected state
+        // Update React state
+        this.changeTabState(tab, true);
+
+        // Update the window history
+        window.history.pushState(
+            { tab: tabName, page: this.state.pageSelected + 1 },
+            '',
+            `?status=${tabName}`
+        );
+    }
+
+    /**
+     * Changes tab in React state only.
+     * Used when listening for window state history and adjusting tabs (doesn't want to update window history)
+     */
+    private changeTabState = (tab: number, resetPage: boolean = false) => {
+        const newState = {
             tabSelected: tab
-        });
+        };
+
+        if (resetPage) {
+            Object.assign(newState, { pageSelected: 0 });
+        }
+
+        this.setState(newState);
     };
+
+    /**
+     * Changes page in React state only.
+     */
+    private changePageState = (page: number) => {
+        this.setState({
+            pageSelected: page
+        });
+    }
 }

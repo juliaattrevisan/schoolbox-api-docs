@@ -10,6 +10,9 @@ interface ITabs {
     /** Callback when a new tab is switched to. */
     onSelect?: (index: number, last: number, event: Event) => boolean | void;
 
+    /** Selected tab. Switches Tabs to controlled mode (see react-tabs documentation) */
+    selectedIndex?: number;
+
     /** Default tab to show on render */
     defaultIndex?: number;
 

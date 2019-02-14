@@ -8,6 +8,8 @@ interface IPagination {
     // The initial page selected.
     initialPage?: number;
 
+    forcePage?: number;
+
     // The method to call when a page is clicked. Exposes the current page object as an argument.
     onPageChange?(selectedItem: { selected: number }): void;
 }
@@ -30,6 +32,8 @@ const Pagination: React.SFC<IPagination> = props => (
         nextLinkClassName="arrow"
         disabledClassName="unavailable"
         activeClassName="active"
+        disableInitialCallback={true}
+        forcePage={props.forcePage}
     />
 )
 
