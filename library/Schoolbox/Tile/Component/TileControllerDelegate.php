@@ -38,11 +38,10 @@ class TileControllerDelegate
      *
      * @param Component_ControllerAbstract $controller
      *
-     * @return Layout\Model
-     * @throws MapperException if the tile has an alternate source, but the
-     *                         component doesn't exist
+     * @return Layout\Model|null Null if the component has an alternate source,
+     *                           and that component doesn't exist
      */
-    public function fetchLayout(Component_ControllerAbstract $controller)
+    public function fetchLayout(Component_ControllerAbstract $controller): ?Layout\Model
     {
         // layoutId: the layout that was created when this component was
         // tileSource: the layout chosen for an alternate source
@@ -56,9 +55,7 @@ class TileControllerDelegate
                 $altConfig    = $altComponent->getConfigArray();
                 $layoutId     = $altConfig['layoutId']['value'];
             } else {
-                throw new MapperException(
-                    sprintf('Tile has alternate source #%d, but that component does not exist', $altSource)
-                );
+                return null;
             }
         }
 

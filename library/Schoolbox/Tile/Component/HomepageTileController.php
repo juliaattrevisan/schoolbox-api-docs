@@ -20,7 +20,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
 {
 
     /**
-     * @var Layout\Model
+     * @var Layout\Model|null
      */
     protected $layout;
 
@@ -28,14 +28,6 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
      * @var TileControllerDelegate
      */
     protected $delegate;
-
-
-    /**
-     * Does this have a missing layout?
-     *
-     * @var bool
-     */
-    private $layoutMissing = false;
 
     /**
      * Injectable constructor
@@ -66,13 +58,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
             return false;
         }
 
-        try {
-            $this->setLayout($this->delegate->fetchLayout($this));
-        } catch (MapperException $e) {
-            // A layout is pointed to, but doesn't exist:
-            // render an error
-            $this->layoutMissing = true;
-        }
+        $this->layout = $this->delegate->fetchLayout($this);
         return true;
     }
 
@@ -83,7 +69,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
      */
     public function renderTemplate($templateHandle)
     {
-        if ($this->layoutMissing || !$this->isSourceRenderable()) {
+        if (!$this->layout || !$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         } else {
             $twigTemplate = '@tile/component/tile.twig';
@@ -98,20 +84,12 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
     }
 
     /**
-     * @return Layout\Model
+     * Required so that Twig may access this component's layout.
+     *
+     * @return Layout\Model|null
      */
     public function getLayout()
     {
         return $this->layout;
-    }
-
-    /**
-     * @param  Layout\Model $layout
-     * @return $this
-     */
-    public function setLayout($layout)
-    {
-        $this->layout = $layout;
-        return $this;
     }
 }
