@@ -9,7 +9,7 @@
     "baseUrl": "./",
     "paths": {
       "@schoolbox/*": [
-        "./www/javascript/react-components/*"
+        "./react-components/*"
       ],
     },
     "lib": [
@@ -18,7 +18,7 @@
     ]
   },
   "include": [
-    "./www/javascript/react-components"
+    "./react-components"
   ],
   "awesomeTypescriptLoaderOptions": {
     "useBabel": true,

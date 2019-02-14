@@ -1,5 +1,5 @@
 module.exports = {
-  components: "www/javascript/react-components/**/*.tsx",
+  components: "react-components/**/*.tsx",
   serverPort: 8883,
   pagePerSection: true,
   assetsDir: "www",
@@ -49,14 +49,14 @@ module.exports = {
     },
     {
       name: "Components",
-      components: "www/javascript/react-components/**/*.tsx",
-      ignore: "www/javascript/react-components/Cards/**/*.tsx",
+      components: "react-components/**/*.tsx",
+      ignore: "react-components/Cards/**/*.tsx",
       sectionDepth: 1,
       sections: [
         {
           name: "Cards",
-          components: "www/javascript/react-components/Cards/**/*.tsx",
-          content: "www/javascript/react-components/Cards/Cards.md"
+          components: "react-components/Cards/**/*.tsx",
+          content: "react-components/Cards/Cards.md"
         }
       ]
     }

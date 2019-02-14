@@ -1,4 +1,4 @@
-### www/javascript/react-components
+### react-components
 
 This stores all the common Schoolbox components that can used across many modules.
 
