@@ -1,6 +1,6 @@
 import * as React from "react";
-import { IImage, Image } from "../../Image/Image";
-import { Meta } from "../../Meta/Meta";
+import { IImage, Image } from "@schoolbox/Image/Image";
+import { Meta } from "@schoolbox/Meta/Meta";
 
 interface ICard {
   /** Title to display on the card */

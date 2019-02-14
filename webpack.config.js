@@ -10,7 +10,13 @@ module.exports = {
   },
   devtool: "source-map",
   resolve: {
-    extensions: [".js", ".ts", ".tsx"]
+    extensions: [".js", ".ts", ".tsx"],
+    alias: {
+      '@schoolbox': path.resolve(
+        __dirname,
+        "www/javascript/react-components"
+      ),
+    }
   },
   module: {
     rules: [

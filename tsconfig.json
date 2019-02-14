@@ -6,10 +6,20 @@
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "baseUrl": ".",
-    "lib": ["dom", "es5"]
+    "baseUrl": "./",
+    "paths": {
+      "@schoolbox/*": [
+        "./www/javascript/react-components/*"
+      ],
+    },
+    "lib": [
+      "dom",
+      "es5"
+    ]
   },
-  "include": ["./www/javascript/react-components"],
+  "include": [
+    "./www/javascript/react-components"
+  ],
   "awesomeTypescriptLoaderOptions": {
     "useBabel": true,
     "babelCore": "@babel/core"
