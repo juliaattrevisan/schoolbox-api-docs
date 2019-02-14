@@ -73,6 +73,7 @@
         "onelogin/php-saml": "^2.12",
         "karriere/json-decoder": "^2.1.1",
         "crell/api-problem": "^3.0",
+        "knplabs/knp-snappy": "^1.1",
         "ext-redis": "*",
         "ext-readline": "*"
     },
