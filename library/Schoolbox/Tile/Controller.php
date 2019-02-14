@@ -46,6 +46,31 @@ class Controller extends Base
      */
     private $folderMapper;
 
+
+    /**
+     * Constructor
+     *
+     * @param Mapper                 $mapper
+     * @param Layout\Mapper          $layoutMapper
+     * @param Component_ConfigMapper $componentConfigMapper
+     * @param Storage\Mapper         $storageMapper
+     * @param Folder\Mapper          $folderMapper
+     */
+    public function __construct(
+        Mapper $mapper,
+        Layout\Mapper $layoutMapper,
+        Component_ConfigMapper $componentConfigMapper,
+        Storage\Mapper $storageMapper,
+        Folder\Mapper $folderMapper
+    ) {
+        $this->mapper                = $mapper;
+        $this->layoutMapper          = $layoutMapper;
+        $this->componentConfigMapper = $componentConfigMapper;
+        $this->storageMapper         = $storageMapper;
+        $this->folderMapper          = $folderMapper;
+    }
+
+
     /**
      * Displays a form for editing a tile layout.
      *
@@ -119,7 +144,7 @@ class Controller extends Base
                 break;
         }
 
-        if ($this->getLayoutMapper()->save($layout)) {
+        if ($this->layoutMapper->save($layout)) {
             // Rearrange tiles
             $tilesOrder = $this->getRequest()->post['tile'];
             if (!empty($tilesOrder)) {
@@ -129,7 +154,7 @@ class Controller extends Base
                         $tile->setOrder($order);
                     }
                 }
-                if (!$this->getMapper()->save($layout->getTileList())) {
+                if (!$this->mapper->save($layout->getTileList())) {
                     $code = 500;
                 }
             }
@@ -173,7 +198,7 @@ class Controller extends Base
     public function add(Layout\Model $layout, Component_Instance $component)
     {
         /** @var Model $model */
-        $model = $this->getMapper()->createModel();
+        $model = $this->mapper->createModel();
         $this->getResponse()->content->set(
             array(
                 'title'    => 'Add Tile',
@@ -217,7 +242,7 @@ class Controller extends Base
         }
 
         /** @var Model $model */
-        $model = $this->getMapper()->createModel();
+        $model = $this->mapper->createModel();
         $this->getResponse()->content->set(
             array(
                 'title'    => 'Add Tile',
@@ -247,7 +272,7 @@ class Controller extends Base
     public function create(Layout\Model $layout, Component_Instance $component)
     {
         /** @var Model $item */
-        $item = $this->getMapper()->createModel();
+        $item = $this->mapper->createModel();
         $this->updateItemWithFormValues(
             $item,
             $this->getRequest()->post
@@ -259,7 +284,7 @@ class Controller extends Base
         }
         $item->setTileLayout($layout);
 
-        $this->getMapper()->save($item);
+        $this->mapper->save($item);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'tile.layout',
@@ -278,7 +303,7 @@ class Controller extends Base
     public function createForComponent(Component_Instance $component)
     {
         /** @var Model $item */
-        $item = $this->getMapper()->createModel();
+        $item = $this->mapper->createModel();
         $this->updateItemWithFormValues(
             $item,
             $this->getRequest()->post
@@ -292,7 +317,7 @@ class Controller extends Base
         }
         $item->setTileLayout($layout);
 
-        $this->getMapper()->save($item);
+        $this->mapper->save($item);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'tile.layout',
@@ -340,7 +365,7 @@ class Controller extends Base
             $this->getRequest()->post
         );
 
-        $this->getMapper()->save($item);
+        $this->mapper->save($item);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'tile.layout',
@@ -357,7 +382,7 @@ class Controller extends Base
     public function delete(Model $item)
     {
         $code = 200;
-        if (!$this->getMapper()->delete($item)) {
+        if (!$this->mapper->delete($item)) {
             $code = 500;
         }
         if ($this->getRequest()->isXhr()) {
@@ -451,99 +476,7 @@ class Controller extends Base
     {
         $config   = $component->getConfigArray();
         $layoutId = $config['layoutId']['value'];
-        $mapper   = $this->getLayoutMapper();
-        return $mapper->findById($layoutId);
-    }
-
-    /**
-     * @param  Mapper $mapper
-     * @return $this
-     */
-    public function setMapper(Mapper $mapper)
-    {
-        $this->mapper = $mapper;
-        return $this;
-    }
-
-    /**
-     * @return Mapper
-     */
-    public function getMapper()
-    {
-        return $this->mapper;
-    }
-
-    /**
-     * @param  Layout\Mapper $layoutMapper
-     * @return $this
-     */
-    public function setLayoutMapper(Layout\Mapper $layoutMapper)
-    {
-        $this->layoutMapper = $layoutMapper;
-        return $this;
-    }
-
-    /**
-     * @return Layout\Mapper
-     */
-    public function getLayoutMapper()
-    {
-        return $this->layoutMapper;
-    }
-
-    /**
-     * @param  Component_ConfigMapper $componentConfigMapper
-     * @return static
-     */
-    public function setComponentConfigMapper(Component_ConfigMapper $componentConfigMapper)
-    {
-        $this->componentConfigMapper = $componentConfigMapper;
-        return $this;
-    }
-
-    /**
-     * @return Component_ConfigMapper
-     */
-    public function getComponentConfigMapper()
-    {
-        return $this->componentConfigMapper;
-    }
-
-    /**
-     * @param  Storage\Mapper $storageMapper
-     * @return $this
-     */
-    public function setStorageMapper($storageMapper)
-    {
-        $this->storageMapper = $storageMapper;
-        return $this;
-    }
-
-    /**
-     * @return Storage\Mapper
-     */
-    public function getStorageMapper()
-    {
-        return $this->storageMapper;
-    }
-
-    /**
-     * @return Folder\Mapper
-     */
-    public function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-    /**
-     * @param  Folder\Mapper $folderMapper
-     *
-     * @return $this
-     */
-    public function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-        return $this;
+        return $this->layoutMapper->findById($layoutId);
     }
 
     /**
@@ -559,9 +492,9 @@ class Controller extends Base
 
             // Support tile alt source to potentially soft-deleted homepage
             $folderId   = $component->getIdentifier();
-            $columnName = $this->getFolderMapper()->getIdentifier()['column'];
+            $columnName = $this->folderMapper->getIdentifier()['column'];
 
-            return $this->getFolderMapper()->findByColumn($columnName, $folderId, ['deleted' => true])->first();
+            return $this->folderMapper->findByColumn($columnName, $folderId, ['deleted' => true])->first();
         }
         return null;
     }
@@ -595,8 +528,7 @@ class Controller extends Base
 
         // And save the config setting for the layout.
         $layoutConfigDefinition = $component->getConfigByKey('layoutId');
-        $configMapper           = $this->getComponentConfigMapper();
-        $config                 = $configMapper->findByColumnList([
+        $config                 = $this->componentConfigMapper->findByColumnList([
             'component_config_definition_id' => $layoutConfigDefinition->getId(),
             'component_instance_id'          => $sourceComponentId
         ])->first();
@@ -606,7 +538,7 @@ class Controller extends Base
             $config->setInstanceId($sourceComponentId);
         }
         $config->setValue($model->getId());
-        $configMapper->save($config);
+        $this->componentConfigMapper->save($config);
         return $model;
     }
 }

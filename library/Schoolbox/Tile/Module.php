@@ -174,19 +174,18 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->setters[TileController::class]['setMapper']
-            = $this->getMapperFactory()->getLazy(TileMapper::class);
-        $injector->setters[TileController::class]['setLayoutMapper']
-            = $this->getMapperFactory()->getLazy(TileLayoutMapper::class);
-        $injector->setters[TileController::class]['setComponentConfigMapper']
-            = $this->getMapperFactory()->getLazy(Component_ConfigMapper::class);
-        $injector->setters[TileController::class]['setStorageMapper']
-            = $this->getMapperFactory()->getLazy(StorageMapper::class);
-        $injector->setters[TileController::class]['setFolderMapper']
-            = $this->getMapperFactory()->getLazy(FolderMapper::class);
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(TileController::class)
+            $injector->lazyNew(
+                TileController::class,
+                [
+                    'mapper'                => $this->getMapperFactory()->getLazy(TileMapper::class),
+                    'layoutMapper'          => $this->getMapperFactory()->getLazy(TileLayoutMapper::class),
+                    'componentConfigMapper' => $this->getMapperFactory()->getLazy(Component_ConfigMapper::class),
+                    'storageMapper'         => $this->getMapperFactory()->getLazy(StorageMapper::class),
+                    'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                ]
+            )
         );
     }
 
