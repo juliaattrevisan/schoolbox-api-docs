@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Cyberhound\Url;
 
+use Schoolbox\Config\ConfigMapper;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Zend\Uri\Uri;
 
@@ -57,9 +58,10 @@ class Translator
         $this->apiUrl       = $apiUrl;
         $this->apiSharedKey = $apiSharedKey;
 
-        $this->whitelist[]  = '192.168.0.0/16';
-        $this->whitelist[]  = '172.16.0.0/12';
-        $this->whitelist[]  = '10.0.0.0/8';
+        $config = ConfigMapper::getInstance();
+        $whitelist = $config->get('cyberhound_whitelist');
+
+        $this->whitelist = array_filter(explode("\n", $whitelist));
     }
 
     /**
