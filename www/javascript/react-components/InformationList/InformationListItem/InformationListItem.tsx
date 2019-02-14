@@ -10,7 +10,7 @@ interface IInformationListItem {
 /**
  * An information list item.
  */
-const InformationListItem: React.SFC<IInformationListItem> = props => {
+const InformationListItem: React.FunctionComponent<IInformationListItem> = props => {
     return (
         <li className={props.actions && `actions-small-${props.actions}`}>
             {props.children}

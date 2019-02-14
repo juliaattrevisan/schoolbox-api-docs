@@ -18,7 +18,7 @@ interface IAction {
  * A possible action to take on an item.
  * Generally used on the top right of a page, or a card
  */
-const Action: React.SFC<IAction> = ({ href, icon, title }) => {
+const Action: React.FunctionComponent<IAction> = ({ href, icon, title }) => {
     return <a href={href} className={`icon-${icon} no-text`} title={title} />;
 }
 

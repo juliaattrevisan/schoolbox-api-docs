@@ -29,7 +29,7 @@ interface ICard {
 /**
  * Standard size card. Usually contains an image, title & meta.
  */
-const Card: React.SFC<ICard> = props => {
+const Card: React.FunctionComponent<ICard> = props => {
   return (
     <>
       <div className="list-item">
@@ -45,7 +45,7 @@ const Card: React.SFC<ICard> = props => {
   );
 };
 
-const CardImage: React.SFC<ICard> = props => {
+const CardImage: React.FunctionComponent<ICard> = props => {
   const { image, href } = props;
   if (image && href) {
     return (
@@ -62,7 +62,7 @@ const CardImage: React.SFC<ICard> = props => {
   return null;
 };
 
-const CardTitle: React.SFC<ICard> = props => {
+const CardTitle: React.FunctionComponent<ICard> = props => {
   const { title, href } = props;
 
   if (title && href) {
@@ -80,7 +80,7 @@ const CardTitle: React.SFC<ICard> = props => {
   return null;
 };
 
-const CardMeta: React.SFC<ICard> = props => {
+const CardMeta: React.FunctionComponent<ICard> = props => {
   const { meta } = props;
 
   if (meta && Array.isArray(meta)) {
@@ -100,7 +100,7 @@ const CardMeta: React.SFC<ICard> = props => {
   return null;
 };
 
-const CardActions: React.SFC<ICard> = ({ actions }) => {
+const CardActions: React.FunctionComponent<ICard> = ({ actions }) => {
   if (!actions) {
     return null;
   }
@@ -109,7 +109,7 @@ const CardActions: React.SFC<ICard> = ({ actions }) => {
   return <Actions>{actionComponents}</Actions>;
 }
 
-const CardContent: React.SFC<ICard> = ({ children }) => {
+const CardContent: React.FunctionComponent<ICard> = ({ children }) => {
   if (!children) {
     return null;
   }

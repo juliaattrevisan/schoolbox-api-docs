@@ -18,7 +18,7 @@ interface IPagination {
  * Pagination.
  * Wraps an external package called [react-paginate](https://github.com/AdeleD/react-paginate)
  */
-const Pagination: React.SFC<IPagination> = props => (
+const Pagination: React.FunctionComponent<IPagination> = props => (
     <ReactPaginate
         pageCount={props.pageCount}
         onPageChange={props.onPageChange}

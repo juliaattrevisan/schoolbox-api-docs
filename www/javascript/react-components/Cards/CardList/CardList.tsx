@@ -9,7 +9,7 @@ interface ICardList {
 /**
  * A list of cards.
  */
-const CardList: React.SFC<ICardList> = props => {
+const CardList: React.FunctionComponent<ICardList> = props => {
     // Wrap the cards in InformationListItem's
     const cards = props.children.map((card: any) => { // TODO: work out what type to put in instead of 'any'
         return (

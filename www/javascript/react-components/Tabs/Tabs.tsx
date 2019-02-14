@@ -25,7 +25,7 @@ interface ITabs {
  * Horizontal navigation tabs.
  * Wraps an external package called [react-tabs](https://github.com/reactjs/react-tabs)
  */
-const Tabs: React.SFC<ITabs> = props => {
+const Tabs: React.FunctionComponent<ITabs> = props => {
     const tabHeadings: React.ReactNode[] = [];
     props.children.forEach(tab => {
         tabHeadings.push(

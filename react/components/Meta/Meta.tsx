@@ -7,7 +7,7 @@ interface IMeta {
 /**
  * Text that describes a particular item.
  */
-const Meta: React.SFC<IMeta> = props => {
+const Meta: React.FunctionComponent<IMeta> = props => {
   const { children } = props;
   return <p className="meta">{children}</p>;
 };
@@ -15,7 +15,7 @@ const Meta: React.SFC<IMeta> = props => {
 /**
  * Empty container element for creating a skeleton loader of meta text.
  */
-const LoadingMeta: React.SFC = props => {
+const LoadingMeta: React.FunctionComponent = props => {
   return <p className="meta" />;
 };
 

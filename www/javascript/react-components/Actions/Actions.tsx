@@ -7,7 +7,7 @@ interface IActions {
 /**
  * Container for a list of Action components.
  */
-const Actions: React.SFC<IActions> = ({ children }) => (
+const Actions: React.FunctionComponent<IActions> = ({ children }) => (
     <nav>{children}</nav>
 )
 
