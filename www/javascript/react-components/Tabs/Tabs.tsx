@@ -4,8 +4,6 @@ import {
     Tab as ReactTab,
     TabList as ReactTabList
 } from "react-tabs";
-import { ITab, Tab } from './Tab/Tab';
-import { LoadingTabs } from './LoadingTabs/LoadingTabs';
 
 interface ITabs {
     /** Callback when a new tab is switched to. */

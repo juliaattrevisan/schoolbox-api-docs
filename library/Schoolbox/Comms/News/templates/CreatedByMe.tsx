@@ -1,11 +1,11 @@
 import axios from "axios";
 import * as React from "react";
 
-import { Tabs } from "../../../../../www/javascript/react-components/Tabs/Tabs";
-import { Tab } from "../../../../../www/javascript/react-components/Tabs/Tab/Tab";
-import { LoadingTabs } from "../../../../../www/javascript/react-components/Tabs/LoadingTabs/LoadingTabs";
-import { LoadingCard } from "../../../../../www/javascript/react-components/Cards/LoadingCard/LoadingCard";
-import { Pagination } from "../../../../../www/javascript/react-components/Pagination/Pagination";
+import { Tabs } from "@schoolbox/Tabs/Tabs";
+import { Tab } from "@schoolbox/Tabs/Tab/Tab";
+import { LoadingTabs } from "@schoolbox/Tabs/LoadingTabs/LoadingTabs";
+import { LoadingCard } from "@schoolbox/Cards/LoadingCard/LoadingCard";
+import { Pagination } from "@schoolbox/Pagination/Pagination";
 import IArticle from "../react-components/IArticle/IArticle";
 import { NewsCardList } from "../react-components/NewsCardList/NewsCardList";
 

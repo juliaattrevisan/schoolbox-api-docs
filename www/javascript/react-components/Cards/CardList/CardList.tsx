@@ -1,6 +1,6 @@
 import * as React from "react";
-import { InformationList } from "../../InformationList/InformationList";
-import { InformationListItem } from "../../InformationList/InformationListItem/InformationListItem";
+import { InformationList } from "@schoolbox/InformationList/InformationList";
+import { InformationListItem } from "@schoolbox/InformationList/InformationListItem/InformationListItem";
 
 interface ICardList {
     children: JSX.Element[];
