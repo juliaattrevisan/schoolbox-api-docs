@@ -17,6 +17,9 @@ interface ICreatedByMe {
     /** Route for the API call for the list of articles */
     getAuthoredRoute: string;
 
+    /** Route for the create form */
+    createRoute: string;
+
     /** Amount of articles to show per page */
     articlesPerPage: number;
 
@@ -172,8 +175,18 @@ export default class CreatedByMe extends React.Component<
     }
 
     private showContent(): React.ReactNode {
-        if (!this.state.allArticles.length) {
+        if (this.state.articlesLoading) {
             return;
+        }
+
+        if (!this.state.allArticles) {
+            return (
+                <div className="empty-state no-margin">
+                    <i className="icon-news" />
+                    <p>You haven't authored any {this.props.localeNewsPlural}.</p>
+                    <p><a href={this.props.createRoute}>Create {this.props.localeNews}</a>.</p>
+                </div>
+            )
         }
 
         if (this.state.statuses.length) {
