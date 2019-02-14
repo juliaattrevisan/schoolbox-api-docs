@@ -5,7 +5,7 @@ $this->setBlock('REPORT_CONTENT', 'created_month_body', 'created_month_body_bloc
 $this->setBlock('REPORT_CONTENT', 'attempted_month_body', 'attempted_month_body_block' );
 
 
-$months = $start->diffInMonths($end);
+$months = $start->diffInMonths($end) + 1;
 
 /** @var Alaress_Date_Format $currentMonth   */
 $currentMonth = clone $start;

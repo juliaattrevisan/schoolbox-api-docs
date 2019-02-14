@@ -14,7 +14,7 @@ $this->setBlock('REPORT_CONTENT', 'poll_month_body', 'poll_month_body_block' );
 
 
 
-$months = $start->diffInMonths($end);
+$months = $start->diffInMonths($end) + 1;
 
 /** @var Alaress_Date_Format $currentMonth   */
 $currentMonth = clone $start;

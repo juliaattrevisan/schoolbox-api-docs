@@ -5,7 +5,7 @@ $this->setBlock('REPORT_CONTENT', 'mobile_user', 'mobile_user_block' );
 $this->setBlock('mobile_user', 'mobile_user_month', 'mobile_user_month_block' );
 
 
-$months = $start->diffInMonths($end);
+$months = $start->diffInMonths($end) + 1;
 
 /** @var Alaress_Date_Format $currentMonth   */
 $currentMonth = clone $start;

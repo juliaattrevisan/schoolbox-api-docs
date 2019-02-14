@@ -17,7 +17,7 @@ $this->setBlock('login_percentage', 'login_percentage_month', 'login_percentage_
  * @var Alaress_Date_Format $start
  * @var Alaress_Date_Format $end
  */
-$months = $start->diffInMonths($end);
+$months = $start->diffInMonths($end) + 1;
 
 /** @var Alaress_Date_Format $currentMonth   */
 $currentMonth = clone $start;

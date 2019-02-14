@@ -7,7 +7,7 @@ $this->setBlock('REPORT_CONTENT', 'viewed_user_role', 'viewed_user_role_block' )
 $this->setBlock('viewed_user_role', 'viewed_user_role_month', 'viewed_user_role_month_block' );
 
 
-$months = $start->diffInMonths($end);
+$months = $start->diffInMonths($end) + 1;
 
 /** @var Alaress_Date_Format $currentMonth   */
 $currentMonth = clone $start;
