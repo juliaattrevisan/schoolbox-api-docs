@@ -11,6 +11,7 @@ namespace Schoolbox\Tile\Component;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Tile\Layout;
 use Schoolbox\User;
 use SitePage;
@@ -27,6 +28,14 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
      * @var TileControllerDelegate
      */
     protected $delegate;
+
+
+    /**
+     * Does this have a missing layout?
+     *
+     * @var bool
+     */
+    private $layoutMissing = false;
 
     /**
      * Injectable constructor
@@ -57,7 +66,13 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
             return false;
         }
 
-        $this->setLayout($this->delegate->fetchLayout($this));
+        try {
+            $this->setLayout($this->delegate->fetchLayout($this));
+        } catch (MapperException $e) {
+            // A layout is pointed to, but doesn't exist:
+            // render an error
+            $this->layoutMissing = true;
+        }
         return true;
     }
 
@@ -68,7 +83,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
      */
     public function renderTemplate($templateHandle)
     {
-        if (!$this->isSourceRenderable()) {
+        if ($this->layoutMissing || !$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         } else {
             $twigTemplate = '@tile/component/tile.twig';
