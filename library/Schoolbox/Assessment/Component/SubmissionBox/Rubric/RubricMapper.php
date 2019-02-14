@@ -509,19 +509,15 @@ class RubricMapper
                 ->setName($capability->getName());
             $capabilityModels[$capabilityId] = $capabilityModel;
 
-            // Validate that a capability with the same name doesn't exist
-            $capabilityIndicatorModels = $indicatorMapper->createCollection();
             foreach ($capability->getIndicators() as $indicator) {
                 $indicatorId = $indicator->getId();
                 if (!$indicatorId) {
                     continue;
                 }
-                $indicatorModel = $indicatorMapper->findById($indicatorId)
+                $indicatorModel                = $indicatorMapper->findById($indicatorId)
                     ->setName($indicator->getName());
-                $capabilityIndicatorModels[$indicatorId] = $indicatorModel;
+                $indicatorModels[$indicatorId] = $indicatorModel;
             }
-
-            $indicatorModels = $indicatorModels->union($capabilityIndicatorModels);
         }
 
 
