@@ -45,4 +45,4 @@ const Tabs: React.SFC<ITabs> = props => {
     );
 };
 
-export { Tabs, ITabs, Tab, ITab, LoadingTabs };
+export { Tabs, ITabs };

@@ -1,7 +1,9 @@
 import axios from "axios";
 import * as React from "react";
 
-import { Tab, Tabs, LoadingTabs } from "../../../../../www/javascript/react-components/Tabs/Tabs";
+import { Tabs } from "../../../../../www/javascript/react-components/Tabs/Tabs";
+import { Tab } from "../../../../../www/javascript/react-components/Tabs/Tab/Tab";
+import { LoadingTabs } from "../../../../../www/javascript/react-components/Tabs/LoadingTabs/LoadingTabs";
 import { LoadingCard } from "../../../../../www/javascript/react-components/Cards/LoadingCard/LoadingCard";
 import { Pagination } from "../../../../../www/javascript/react-components/Pagination/Pagination";
 import IArticle from "../react-components/IArticle/IArticle";
