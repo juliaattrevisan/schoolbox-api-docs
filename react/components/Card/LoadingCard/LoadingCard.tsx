@@ -5,7 +5,7 @@ import { LoadingMeta } from "@schoolbox/Meta/Meta";
 /**
  * Skeleton loader for a card.
  */
-const LoadingCard: React.SFC = () => {
+const LoadingCard: React.FunctionComponent = () => {
   return (
     <>
       <div className="list-item">
