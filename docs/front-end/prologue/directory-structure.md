@@ -1,7 +1,5 @@
 ### react
 
-This folder will contain all the JS and any other assets that will be packaged up.
-
 #### react/components
 
 This stores all the common Schoolbox components that can used across many modules.
