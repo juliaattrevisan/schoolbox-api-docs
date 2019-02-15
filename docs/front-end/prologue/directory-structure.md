@@ -12,7 +12,11 @@ Examples:
 - Pagination
 - Toast
 
-### library/Schoolbox/[Module name]/src/components
+### library/Schoolbox/[Module name]/src
+
+This folder will hold any components, pages, and interfaces specific to the module. This folder will also contain an entry file for Webpack.
+
+#### library/Schoolbox/[Module name]/src/components
 
 This stores components that are _module specific_.
 
@@ -25,20 +29,27 @@ Examples:
 
 Before creating a component in here- please check if you're creating something that we could potentially use in other modules. Eg. SaveForLater is something that we made for News, but it may be useful in other components so we will put it into the common UI components directory.
 
-### library/Schoolbox/[Module name]/templates
+#### library/Schoolbox/[Module name]/src/pages
 
-This directory is contains Twig pages and fragments for the module, and React components that are acting as pages for the module.
+This stores components that are acting as pages/containers. These components will generally hold state, just be a container for components.
 
 Examples:
 
-- CreatedByMe.tsx - does an ajax request for articles created by the user, shows a NewsCardList, along with Pagination, etc.
-- CreatedByMe.twig - holds a container div for the above React code to attach to, as well as including the bundled JS file for the module, and sending through any data needed by React that's available on page load.
+- CreatedByMe - a page which imports NewsCardList, Pagination, Tabs, etc, does an XHR for articles and puts everything together.
+
+#### library/Schoolbox/[Module name]/templates
+
+This directory is contains Twig pages and fragments for the module.
+
+Examples:
+
+- created-by-me.twig - holds a container div for the above React code to attach to, as well as including the bundled JS file for the module, and sending through any data needed by React that's available on page load.
 
 ### www/javascript (legacy)
 
 Contains all our legacy JS/jQuery code.
 
-### www/javascript/components (legacy)
+#### www/javascript/components (legacy)
 
 This is the destination of packages installed via Bower package manager.
 
