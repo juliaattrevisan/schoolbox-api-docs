@@ -1,4 +1,8 @@
-### react-components
+### src
+
+This folder will contain all the JS and any other assets that will be packaged up.
+
+#### src/components
 
 This stores all the common Schoolbox components that can used across many modules.
 
@@ -8,7 +12,7 @@ Examples:
 - Pagination
 - Toast
 
-### library/Schoolbox/[Module name]/react-components
+### library/Schoolbox/[Module name]/src/components
 
 This stores components that are _module specific_.
 

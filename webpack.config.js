@@ -14,7 +14,7 @@ module.exports = {
     alias: {
       '@schoolbox': path.resolve(
         __dirname,
-        "react-components"
+        "src/components"
       ),
     }
   },
