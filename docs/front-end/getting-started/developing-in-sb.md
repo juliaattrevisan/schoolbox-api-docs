@@ -10,7 +10,7 @@ In order to start composing component-based pages you need to do the following:
 
 - Create a new route in PHP (see our MVC documentation in /docs/mvc/ for how to do this).
 - In the twig file for your new route- create a container element with an ID that you can attach JS to
-  - eg. `<div id="CreatedByMe"></div>`
+  - eg. `<div data-component="CreatedByMe"></div>`
   - Please use [PascalCase](http://wiki.c2.com/?PascalCase) for the ID in this case, as a pattern for us to recognise that this is attaching to React
   - If you need to send any data from PHP/Twig through to React- you can do that with `data-prop-*` attributes.
     - (eg. data-prop-article-title="Example title"), which can then be used as `props.articleTitle` in React.
