@@ -9,13 +9,42 @@
 
 class Component_Config_LayoutId extends Component_Config_Abstract
 {
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    /**
+     * @inheritdoc
+     */
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null): void
     {
-        // Which link gets displayed?
-        // If there's an alt source: show that, otherwise show the link for this item.
-        $page->setVar(
-            'TILE_COMPONENT_INSTANCE_ID',
-            $component->getConfig('tileSource') ?: $component->getInstance()->getId()
-        );
+        $page->setBlock($keyblock, 'link', 'link_block');
+        $page->setBlock($keyblock, 'no_link', 'no_link_block');
+
+
+        // does this component have an alternate tile source?
+        // If so, point the "add tile" and "modify layout" buttons to that
+        // component instead.
+        $tileComponentInstanceId = null;
+        if ($component) {
+            // Is there an alt tile source?
+            // Use it if it exists: otherwise don't show the buttons at all
+            $altTileSource = $component->getConfig('tileSource');
+            if ($altTileSource) {
+                $count = Component_InstanceMapper::getInstance()->countByColumn('id', $altTileSource);
+                if ($count >= 1) {
+                    $tileComponentInstanceId = $altTileSource;
+                }
+            } else {
+                $tileComponentInstanceId = $component->getInstance()->getId();
+            }
+        }
+
+
+        // Render something that isn't the buttons if there's nothing to point to
+        if ($tileComponentInstanceId) {
+            $page->setVar('TILE_COMPONENT_INSTANCE_ID', $tileComponentInstanceId);
+            $page->parse('link_block', 'link');
+            $page->setVar('no_link_block', '');
+        } else {
+            $page->setVar('link_block', '');
+            $page->parse('no_link_block', 'no_link');
+        }
     }
 }
