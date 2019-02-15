@@ -2,8 +2,6 @@
   "compilerOptions": {
     "sourceMap": true,
     "noImplicitAny": true,
-    "skipLibCheck": true,
-    "module": "commonjs",
     "target": "es5",
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
@@ -20,8 +18,7 @@
     ]
   },
   "include": [
-    "./library/Schoolbox/**/*",
-    "./src/components"
+    "./src/**/*"
   ],
   "awesomeTypescriptLoaderOptions": {
     "useBabel": true,
