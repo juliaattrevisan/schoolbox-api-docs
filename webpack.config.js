@@ -2,7 +2,7 @@ const path = require("path");
 
 module.exports = {
   entry: {
-    news: "./library/Schoolbox/Comms/News/news.tsx"
+    news: "./library/Schoolbox/Comms/News/src/News.tsx"
   },
   output: {
     path: path.resolve(__dirname, "www/javascript/components"),
