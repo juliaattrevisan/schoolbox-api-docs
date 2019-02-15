@@ -50,13 +50,16 @@ module.exports = {
     {
       name: "Components",
       components: "src/components/**/*.tsx",
-      ignore: "src/components/Cards/**/*.tsx",
+      ignore: "src/components/Card/**/*.tsx",
       sectionDepth: 1,
       sections: [
         {
           name: "Cards",
-          components: "src/components/Cards/**/*.tsx",
-          content: "src/components/Cards/Cards.md"
+          content: "src/components/Card/Cards.md",
+          components: [
+            "src/components/Card/Card/*.tsx",
+            "src/components/Card/LoadingCard/*.tsx"
+          ]
         }
       ]
     }

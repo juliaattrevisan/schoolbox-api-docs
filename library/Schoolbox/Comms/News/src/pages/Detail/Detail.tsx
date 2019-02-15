@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Card } from "@schoolbox/Cards/Card/Card"
+import { Card } from "@schoolbox/Card"
 
 interface IDetail {
   exampleProp: string;
