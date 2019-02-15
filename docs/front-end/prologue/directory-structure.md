@@ -39,7 +39,7 @@ Examples:
 
 #### library/Schoolbox/[Module name]/templates
 
-This directory is contains Twig pages and fragments for the module.
+This directory contains Twig pages and fragments for the module.
 
 Examples:
 
