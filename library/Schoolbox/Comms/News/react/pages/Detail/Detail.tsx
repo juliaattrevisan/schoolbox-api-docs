@@ -9,7 +9,7 @@ class Detail extends React.Component<IDetail> {
   public render() {
     return (
       <>
-        <Card title="Example imported component" meta={`Example prop: ${this.props.exampleProp}`} />
+        <Card id="1" title="Example imported component" meta={`Example prop: ${this.props.exampleProp}`} />
       </>
     );
   }

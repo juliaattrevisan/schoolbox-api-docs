@@ -1019,7 +1019,7 @@ class Controller extends Base
         ], $sidebar->generate());
 
         $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@commsNews/CreatedByMe.twig', $data)
+            $this->buildHtmlOutput('@commsNews/created-by-me.twig', $data)
                 ->setTab('news')
                 ->setTitle('My News'));
     }

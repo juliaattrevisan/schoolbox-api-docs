@@ -4,10 +4,10 @@ import * as React from "react";
 import { Tabs } from "@schoolbox/Tabs/Tabs";
 import { Tab } from "@schoolbox/Tabs/Tab/Tab";
 import { LoadingTabs } from "@schoolbox/Tabs/LoadingTabs/LoadingTabs";
-import { LoadingCard } from "@schoolbox/Cards/LoadingCard/LoadingCard";
+import { LoadingCard } from "@schoolbox/Card";
 import { Pagination } from "@schoolbox/Pagination/Pagination";
-import IArticle from "../react-components/IArticle/IArticle";
-import { NewsCardList } from "../react-components/NewsCardList/NewsCardList";
+import IArticle from "../../interfaces/IArticle/IArticle";
+import { NewsCardList } from "../../components/NewsCardList/NewsCardList";
 
 interface ICreatedByMe {
     /** Page to show on load */

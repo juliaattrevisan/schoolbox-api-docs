@@ -1,8 +1,7 @@
 import * as React from "react";
-import { CardList } from "@schoolbox/Cards/CardList/CardList";
-import { Card } from "@schoolbox/www/javascript/react-components/Cards/Card/Card";
+import { Card, CardList } from "@schoolbox/Card";
 import { IAction } from "@schoolbox/Actions/Action/Action";
-import IArticle from "../IArticle/IArticle";
+import IArticle from "../../interfaces/IArticle/IArticle";
 
 interface INewsCardList {
     articles: IArticle[];

@@ -1,8 +1,8 @@
 import * as ReactHabitat from "react-habitat";
 
 // Import page components for the bundle
-import Detail from "./templates/Detail";
-import CreatedByMe from "./templates/CreatedByMe";
+import Detail from "./pages/Detail/Detail";
+import CreatedByMe from "./pages/CreatedByMe/CreatedByMe";
 
 // Define your array of pages to include in the bundle
 const pages = [
