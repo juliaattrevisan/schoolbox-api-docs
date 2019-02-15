@@ -1,8 +1,8 @@
-### src
+### react
 
 This folder will contain all the JS and any other assets that will be packaged up.
 
-#### src/components
+#### react/components
 
 This stores all the common Schoolbox components that can used across many modules.
 
@@ -12,11 +12,11 @@ Examples:
 - Pagination
 - Toast
 
-### library/Schoolbox/[Module name]/src
+### library/Schoolbox/[Module name]/react
 
 This folder will hold any components, pages, and interfaces specific to the module. This folder will also contain an entry file for Webpack.
 
-#### library/Schoolbox/[Module name]/src/components
+#### library/Schoolbox/[Module name]/react/components
 
 This stores components that are _module specific_.
 
@@ -29,7 +29,7 @@ Examples:
 
 Before creating a component in here- please check if you're creating something that we could potentially use in other modules. Eg. SaveForLater is something that we made for News, but it may be useful in other components so we will put it into the common UI components directory.
 
-#### library/Schoolbox/[Module name]/src/pages
+#### library/Schoolbox/[Module name]/react/pages
 
 This stores components that are acting as pages/containers. These components will generally hold state, just be a container for components.
 

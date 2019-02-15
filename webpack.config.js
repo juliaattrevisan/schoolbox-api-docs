@@ -2,7 +2,7 @@ const path = require("path");
 
 module.exports = {
   entry: {
-    news: "./library/Schoolbox/Comms/News/src/News.tsx"
+    news: "./library/Schoolbox/Comms/News/react/News.tsx"
   },
   output: {
     path: path.resolve(__dirname, "www/javascript/components"),
@@ -14,7 +14,7 @@ module.exports = {
     alias: {
       '@schoolbox': path.resolve(
         __dirname,
-        "src/components"
+        "react/components"
       ),
     }
   },
