@@ -21,7 +21,7 @@ abstract class App
      * @param array         $opts
      * @return void
      */
-    abstract public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts);
+    abstract public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void;
 
 
     /**
@@ -31,7 +31,7 @@ abstract class App
      * @param array         $opts
      * @return void
      */
-    public function __invoke(Di\Container $di, LoopInterface $loop, Logger $log, array $opts)
+    public function __invoke(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
     {
         $this->run($di, $loop, $log, $opts);
     }
