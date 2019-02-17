@@ -895,6 +895,11 @@
       "integrity": "sha1-K1o6s/kYzKSKjHVMCBaOPwPrphs=",
       "dev": true
     },
+    "@types/classnames": {
+      "version": "2.2.7",
+      "resolved": "https://registry.npmjs.org/@types/classnames/-/classnames-2.2.7.tgz",
+      "integrity": "sha512-rzOhiQ55WzAiFgXRtitP/ZUT8iVNyllEpylJ5zHzR4vArUvMB39GTk+Zon/uAM0JxEFAWnwsxC2gH8s+tZ3Myg=="
+    },
     "@types/prop-types": {
       "version": "15.5.9",
       "resolved": "https://registry.npmjs.org/@types/prop-types/-/prop-types-15.5.9.tgz",
@@ -2135,7 +2140,7 @@
     "classnames": {
       "version": "2.2.6",
       "resolved": "https://registry.npmjs.org/classnames/-/classnames-2.2.6.tgz",
-      "integrity": "sha1-Q5Nb/90pHzJtrQogUwmzjQD2UM4="
+      "integrity": "sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q=="
     },
     "clean-webpack-plugin": {
       "version": "0.1.19",

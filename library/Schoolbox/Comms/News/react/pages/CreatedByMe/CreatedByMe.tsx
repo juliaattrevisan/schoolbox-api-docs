@@ -6,8 +6,10 @@ import { Tab } from "@schoolbox/Tabs/Tab/Tab";
 import { LoadingTabs } from "@schoolbox/Tabs/LoadingTabs/LoadingTabs";
 import { LoadingCard } from "@schoolbox/Card";
 import { Pagination } from "@schoolbox/Pagination/Pagination";
+import { EmptyState } from "@schoolbox/EmptyState/EmptyState"
 import IArticle from "../../interfaces/IArticle/IArticle";
 import { NewsCardList } from "../../components/NewsCardList/NewsCardList";
+
 
 interface ICreatedByMe {
     /** Page to show on load */
@@ -183,11 +185,10 @@ export default class CreatedByMe extends React.Component<
 
         if (!this.state.allArticles) {
             return (
-                <div className="empty-state no-margin">
-                    <i className="icon-news" />
+                <EmptyState icon="news" noMargin>
                     <p>You haven't authored any {this.props.localeNewsPlural}.</p>
                     <p><a href={this.props.createRoute}>Create {this.props.localeNews}</a>.</p>
-                </div>
+                </EmptyState>
             )
         }
 
