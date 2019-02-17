@@ -15,15 +15,15 @@ namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
 use Schoolbox\Assessment\Rubric\RowSet\ValidUniqueRowSetForFolder;
 use Schoolbox\Collection;
 use Schoolbox\L10n\RosettaStone;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use \Schoolbox\Assessment\Rubric\Factory as RubricFactory;
-use \Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric as DueWorkRubric;
 
 class Decorator implements DecoratorInterface
 {
@@ -110,18 +110,34 @@ class Decorator implements DecoratorInterface
 
 
         if ($this->getUseRubric()) {
+            $rubricMapper = SubmissionBox\Rubric\RubricMapper::getInstance();
             $gridFactory  = new GridFactory();
             $existingGrid = new Grid(
                 $assessment,
-                SubmissionBox\Rubric\RubricMapper::getInstance()->retrieveRowSet($assessment->getBaseContext(), true)
+                $rubricMapper->retrieveRowSet($assessment->getBaseContext(), true)
             );
             $newGrid = $gridFactory->buildFromPostData($existingGrid, $this->getRubricData());
 
             // I _think_ this is the right place to validate the rubric?
             // (Forgive me too for perpetuating this)
             /** @var RosettaStone $l10n */
+            // TODO this should be a part of buildFromPostData, but I don't feel like injecting all its dependencies
             $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
-            (new ValidUniqueRowSetForFolder($l10n))->isSatisfiedBy($newGrid->getRowSet());
+            $spec = new ValidRowSet(
+                $l10n,
+                UnitSpecificationMapper::getInstance(),
+                $rubricMapper,
+                $existingGrid->getRowSet(),
+                false,
+                $newGrid->getAssessment()
+            );
+
+            // `isSatisfiedBy` needs to raise an exception instead of just
+            // returning false.
+            // If it does just return false: that's a logic exception, fix it
+            if (!$spec->isSatisfiedBy($newGrid->getRowSet())) {
+                throw new \InvalidArgumentException("Save of row set failed for unknown reason");
+            }
 
             $assessment->setRubricGrid($newGrid);
 
