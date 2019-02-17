@@ -49,12 +49,12 @@ module.exports = {
     },
     {
       name: "Components",
-      components: "www/javascript/react-components/**/*.tsx",
+      components: "react/components/**/*.tsx",
       ignore: [
-        "www/javascript/react-components/Card/**/*.tsx",
-        "www/javascript/react-components/Tabs/**/*.tsx",
-        "www/javascript/react-components/Actions/**/*.tsx",
-        "www/javascript/react-components/InformationList/**/*.tsx"
+        "react/components/Card/**/*.tsx",
+        "react/components/Tabs/**/*.tsx",
+        "react/components/Actions/**/*.tsx",
+        "react/components/InformationList/**/*.tsx"
       ],
       sectionDepth: 1,
       sections: [
@@ -68,15 +68,15 @@ module.exports = {
         },
         {
           name: "Tabs",
-          components: "www/javascript/react-components/Tabs/**/*.tsx"
+          components: "react/components/Tabs/**/*.tsx"
         },
         {
           name: "Actions",
-          components: "www/javascript/react-components/Actions/**/*.tsx"
+          components: "react/components/Actions/**/*.tsx"
         },
         {
           name: "Information List",
-          components: "www/javascript/react-components/InformationList/**/*.tsx"
+          components: "react/components/InformationList/**/*.tsx"
         }
       ]
     }
