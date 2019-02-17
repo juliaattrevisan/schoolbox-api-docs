@@ -23,7 +23,6 @@ use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
-use Schoolbox\Assessment\Rubric\RowSet\ValidUniqueRowSetForFolder;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
@@ -463,7 +462,10 @@ class RubricMapper
      * @param Grid      $grid
      * @param null|Grid $originalGrid If set, this is the state of the
      *                                assessment's grid pre-save
-     * @throws MapperException if something happens in the mapper
+     * @throws \UnexpectedValueException If a duplicate indicator or capability exists in the folder
+     * @throws \UnexpectedValueException If course capability duplicates a unit capability
+     * @throws \UnexpectedValueException If a capability or indicator that should not be deleted has been
+     * @throws \InvalidArgumentException If an undocumented error occurred whilst persisting
      */
     public function persistGrid(Grid $grid, ?Grid $originalGrid): void
     {
@@ -528,7 +530,22 @@ class RubricMapper
         // (Forgive me too for perpetuating this)
         /** @var RosettaStone $l10n */
         $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
-        (new ValidUniqueRowSetForFolder($l10n))->isSatisfiedBy($grid->getRowSet());
+        $spec = new ValidRowSet(
+            $l10n,
+            UnitSpecificationMapper::getInstance(),
+            $this,
+            $originalGrid ? $originalGrid->getRowSet() : null,
+            false,
+            $grid->getAssessment()
+        );
+
+
+        // `isSatisfiedBy` needs to raise an exception instead of just
+        // returning false.
+        // If it does just return false: that's a logic exception, fix it
+        if (!$spec->isSatisfiedBy($grid->getRowSet())) {
+            throw new \InvalidArgumentException("Save of row set failed for unknown reason");
+        }
 
 
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
