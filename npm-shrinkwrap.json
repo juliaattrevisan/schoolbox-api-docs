@@ -896,23 +896,23 @@
       "dev": true
     },
     "@types/prop-types": {
-      "version": "15.5.8",
-      "resolved": "https://registry.npmjs.org/@types/prop-types/-/prop-types-15.5.8.tgz",
-      "integrity": "sha1-iuTg6iBf6Vw5AaWh339mSV46Vs4="
+      "version": "15.5.9",
+      "resolved": "https://registry.npmjs.org/@types/prop-types/-/prop-types-15.5.9.tgz",
+      "integrity": "sha512-Nha5b+jmBI271jdTMwrHiNXM+DvThjHOfyZtMX9kj/c/LUj2xiLHsG/1L3tJ8DjAoQN48cHwUwtqBotjyXaSdQ=="
     },
     "@types/react": {
-      "version": "16.7.22",
-      "resolved": "https://registry.npmjs.org/@types/react/-/react-16.7.22.tgz",
-      "integrity": "sha1-W8bRZtWsNLg1dW8Lc2x7GvAEPoE=",
+      "version": "16.8.3",
+      "resolved": "https://registry.npmjs.org/@types/react/-/react-16.8.3.tgz",
+      "integrity": "sha512-PjPocAxL9SNLjYMP4dfOShW/rj9FDBJGu3JFRt0zEYf77xfihB6fq8zfDpMrV6s82KnAi7F1OEe5OsQX25Ybdw==",
       "requires": {
         "@types/prop-types": "*",
         "csstype": "^2.2.0"
       }
     },
     "@types/react-dom": {
-      "version": "16.0.11",
-      "resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-16.0.11.tgz",
-      "integrity": "sha1-vRDMsNkmA0P0uaSdT3qDMKXB8IE=",
+      "version": "16.8.2",
+      "resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-16.8.2.tgz",
+      "integrity": "sha512-MX7n1wq3G/De15RGAAqnmidzhr2Y9O/ClxPxyqaNg96pGyeXUYPSvujgzEVpLo9oIP4Wn1UETl+rxTN02KEpBw==",
       "requires": {
         "@types/react": "*"
       }
@@ -2655,7 +2655,7 @@
     "csstype": {
       "version": "2.6.2",
       "resolved": "https://registry.npmjs.org/csstype/-/csstype-2.6.2.tgz",
-      "integrity": "sha1-MEPV4GVFRXmvx0eKGN5BkJyKLwE="
+      "integrity": "sha512-Rl7PvTae0pflc1YtxtKbiSqq20Ts6vpIYOD5WBafl4y123DyHUeLrRdQP66sQW8/6gmX8jrYJLXwNeMqYVJcow=="
     },
     "currently-unhandled": {
       "version": "0.4.1",
@@ -7441,14 +7441,14 @@
       }
     },
     "react": {
-      "version": "16.7.0",
-      "resolved": "https://registry.npmjs.org/react/-/react-16.7.0.tgz",
-      "integrity": "sha512-ZUj2lkUDLjwJaGu4WD0dYSvsfIyhQt2l/AJDlg4ij+rCDU3fSFKgHWanNovViUoaWHAxgrpft3KGFfvWPZH5LA==",
+      "version": "16.8.2",
+      "resolved": "https://registry.npmjs.org/react/-/react-16.8.2.tgz",
+      "integrity": "sha512-aB2ctx9uQ9vo09HVknqv3DGRpI7OIGJhCx3Bt0QqoRluEjHSaObJl+nG12GDdYH6sTgE7YiPJ6ZUyMx9kICdXw==",
       "requires": {
         "loose-envify": "^1.1.0",
         "object-assign": "^4.1.1",
         "prop-types": "^15.6.2",
-        "scheduler": "^0.12.0"
+        "scheduler": "^0.13.2"
       }
     },
     "react-codemirror2": {
@@ -7661,14 +7661,14 @@
       "dev": true
     },
     "react-dom": {
-      "version": "16.7.0",
-      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-16.7.0.tgz",
-      "integrity": "sha512-GfG8Vh/jMcnJKDpv7T6O1pS/WVqiocjPQ9o9cscW8bjR9W36DT3Xb4pDZT70t1xyVvX48/NrTQGz0H7I3fCLhQ==",
+      "version": "16.8.2",
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-16.8.2.tgz",
+      "integrity": "sha512-cPGfgFfwi+VCZjk73buu14pYkYBR1b/SRMSYqkLDdhSEHnSwcuYTPu6/Bh6ZphJFIk80XLvbSe2azfcRzNF+Xg==",
       "requires": {
         "loose-envify": "^1.1.0",
         "object-assign": "^4.1.1",
         "prop-types": "^15.6.2",
-        "scheduler": "^0.12.0"
+        "scheduler": "^0.13.2"
       }
     },
     "react-error-overlay": {
@@ -7689,7 +7689,7 @@
     "react-habitat": {
       "version": "1.0.1",
       "resolved": "https://registry.npmjs.org/react-habitat/-/react-habitat-1.0.1.tgz",
-      "integrity": "sha512-30jD2BiixWQTBhzNwZldU6NS4vSL/KcXGuLXXb15gZ+ozwGEh+YT6WiAguH7/AZhA1vDVp2U3HvpKuJfOxtN9Q=="
+      "integrity": "sha1-yA8YeJagYkc60+M1KWDbGsHCP4c="
     },
     "react-icon-base": {
       "version": "2.1.0",
@@ -8271,9 +8271,9 @@
       "dev": true
     },
     "scheduler": {
-      "version": "0.12.0",
-      "resolved": "https://registry.npmjs.org/scheduler/-/scheduler-0.12.0.tgz",
-      "integrity": "sha512-U+PqKfBcR39RFbJrlJPFwDXG2iLOZBGOPzNSWTAGUoOfTiL8qHTkemJeyV5CcL0UyaRgR8g3S469cNWFs/SHIw==",
+      "version": "0.13.2",
+      "resolved": "https://registry.npmjs.org/scheduler/-/scheduler-0.13.2.tgz",
+      "integrity": "sha512-qK5P8tHS7vdEMCW5IPyt8v9MJOHqTrOUgPXib7tqm9vh834ibBX5BNhwkplX/0iOzHW5sXyluehYfS9yrkz9+w==",
       "requires": {
         "loose-envify": "^1.1.0",
         "object-assign": "^4.1.1"
