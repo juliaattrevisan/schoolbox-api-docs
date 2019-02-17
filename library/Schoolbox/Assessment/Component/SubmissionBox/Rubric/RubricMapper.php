@@ -22,11 +22,9 @@ use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
-use Schoolbox\Assessment\Rubric\RowSet\ValidUniqueRowSetForCourseAndUnit;
+use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
 use Schoolbox\Assessment\Rubric\RowSet\ValidUniqueRowSetForFolder;
-use Schoolbox\Assessment\Rubric\RowSet\ValidRowSetDeletion;
 use Schoolbox\Collection;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\L10n\RosettaStone;
@@ -185,8 +183,10 @@ class RubricMapper
      *                                               assessment than this one.
      * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \UnexpectedValueException
+     * @throws \UnexpectedValueException             If a duplicate indicator or capability exists in the folder
      * @throws \UnexpectedValueException             If course capability duplicates a unit capability
+     * @throws \UnexpectedValueException             If a capability or indicator that should not be deleted has been
+     * @throws \InvalidArgumentException             If an undocumented error occurred whilst persisting
      */
     public function persistRowSet(
         RowSet $rowSet,
@@ -295,20 +295,23 @@ class RubricMapper
         // Forgive me...
         /** @var RosettaStone $l10n */
         $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
+        $spec = new ValidRowSet(
+            $l10n,
+            UnitSpecificationMapper::getInstance(),
+            $this,
+            $existingRowSet,
+            $allowModifyUsed,
+            $allowModifyExclusion
+        );
 
 
-        // Verify rowset contains no duplicates
-        (new ValidUniqueRowSetForFolder($l10n))->isSatisfiedBy($rowSet);
+        // `isSatisfiedBy` needs to raise an exception instead of just
+        // returning false.
+        // If it does just return false: that's a logic exception, fix it
+        if (!$spec->isSatisfiedBy($rowSet)) {
+            throw new \InvalidArgumentException("Save of row set failed for unknown reason");
+        }
 
-
-        // Verify no changes that shouldn't be made have been made
-        (new ValidRowSetDeletion($l10n, $existingRowSet, $allowModifyUsed, $allowModifyExclusion))
-            ->isSatisfiedBy($rowSet);
-
-
-        // Validate against duplicate capabilities between a course and unit
-        // If we are modifying the rubric on a course...
-        (new ValidUniqueRowSetForCourseAndUnit($l10n, UnitSpecificationMapper::getInstance(), $this))->isSatisfiedBy($rowSet);
 
         // Save new capabilities+indicators
         $capabilityMapper->save($newCapabilityModels);
