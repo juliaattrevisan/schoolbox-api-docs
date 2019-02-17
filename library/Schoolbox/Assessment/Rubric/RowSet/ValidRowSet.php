@@ -38,7 +38,7 @@ class ValidRowSet extends Base
      * @param RosettaStone            $translator
      * @param UnitSpecificationMapper $unitSpecMapper
      * @param RubricMapper            $rubricMapper
-     * @param RowSet                  $existingRowSet
+     * @param RowSet|null             $existingRowSet
      * @param bool                    $allowModifyUsed
      * @param IAssessable|null        $allowModifyExclusion
      */
@@ -46,7 +46,7 @@ class ValidRowSet extends Base
         RosettaStone $translator,
         UnitSpecificationMapper $unitSpecMapper,
         RubricMapper $rubricMapper,
-        RowSet $existingRowSet,
+        ?RowSet $existingRowSet,
         bool $allowModifyUsed,
         ?IAssessable $allowModifyExclusion
     ) {

@@ -30,7 +30,9 @@ class ValidRowSetDeletion extends Base
     /**
      * Rowset already in use
      *
-     * @var RowSet
+     * If null, no rowset exists
+     *
+     * @var RowSet|null
      */
     private $existingRowSet;
 
@@ -60,13 +62,13 @@ class ValidRowSetDeletion extends Base
      * Constructor
      *
      * @param RosettaStone     $translator
-     * @param RowSet           $existingRowSet
+     * @param RowSet|null      $existingRowSet
      * @param bool             $allowModifyUsed
      * @param IAssessable|null $allowModifyExclusion
      */
     public function __construct(
         RosettaStone $translator,
-        RowSet $existingRowSet,
+        ?RowSet $existingRowSet,
         bool $allowModifyUsed,
         ?IAssessable $allowModifyExclusion
     ) {
@@ -101,6 +103,12 @@ class ValidRowSetDeletion extends Base
         // Can I modify used capabilities and indicators?
         // Short-circuit everything
         if ($this->allowModifyUsed) {
+            return true;
+        }
+
+
+        // No existing rowset? nothing can have been deleted from it
+        if (!$this->existingRowSet) {
             return true;
         }
 
