@@ -10,6 +10,13 @@
   "jsRules": {},
   "rules": {
     // This rule is here for now because of https://github.com/palantir/tslint-react/issues/120
-    "variable-name": [true, "ban-keywords", "check-format", "allow-pascal-case"]
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-pascal-case"
+    ],
+    "jsx-boolean-value": false,
+    "ordered-imports": false
   }
 }

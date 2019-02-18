@@ -10,7 +10,6 @@ import { EmptyState } from "@schoolbox/EmptyState/EmptyState"
 import IArticle from "../../interfaces/IArticle/IArticle";
 import { NewsCardList } from "../../components/NewsCardList/NewsCardList";
 
-
 interface ICreatedByMe {
     /** Page to show on load */
     initialPage: number;
@@ -67,10 +66,10 @@ export default class CreatedByMe extends React.Component<
         super(props);
         this.state = {
             allArticles: [],
-            currentArticles: [],
             articlesLoading: true,
-            statuses: [],
+            currentArticles: [],
             pageSelected: this.props.initialPage,
+            statuses: [],
             tabSelected: 0
         };
     }
@@ -155,7 +154,7 @@ export default class CreatedByMe extends React.Component<
                     tabSelected: defaultTabIndex
                 });
             })
-            .catch(function (error) {
+            .catch((error) => {
                 console.log(error);
             });
 
