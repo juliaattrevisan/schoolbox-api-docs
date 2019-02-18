@@ -276,7 +276,7 @@ export default class CreatedByMe extends React.Component<
         this.changePageState(page);
 
         // Update window history
-        const params = (this.state.tabSelected === 0) ? `?p=${page}` : `?p=${page}&status=${tabName}`;
+        const params = (this.state.tabSelected === 0) ? `?p=${page + 1}` : `?p=${page + 1}&status=${tabName}`;
         window.history.pushState({ page: page + 1, tab: tabName }, '', params);
     };
 
