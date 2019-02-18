@@ -308,7 +308,7 @@ class RubricMapper
         // returning false.
         // If it does just return false: that's a logic exception, fix it
         if (!$spec->isSatisfiedBy($rowSet)) {
-            throw new \InvalidArgumentException("Save of row set failed for unknown reason");
+            throw new \InvalidArgumentException("Unable to save rubric for unknown reason");
         }
 
 
