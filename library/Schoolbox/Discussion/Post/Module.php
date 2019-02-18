@@ -8,10 +8,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Post;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Thread;
 
 /**
@@ -33,25 +35,36 @@ class Module extends BaseModule
         // Permission for getting a thread or its contents:
         // If it's a comms news item, it should be the same as the perms for
         // viewing the comms item.
-        $authorizer = new Rule\Any(
-            new Rule\IsSuperuser()
+        /** @var Authorizer $authorizer */
+        /** @var News\Mapper $newsMapper */
+        $authorizer       = $this->getInjector()->get('authorizer');
+        $newsMapper       = $this->getMapperFactory()->get(News\Mapper::class);
+        $deleteAuthorizer = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+                return new Thread\Authorizer\CanDeleteFromThread($authorizer, $newsMapper);
+            })
         );
-
-        // TODO implement contextual authorizer
+        $readAuthorizer = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+                return new Thread\Authorizer\CanGetFromThread($authorizer, $newsMapper);
+            })
+        );
 
         // Routes
         $this->register(
             'DELETE',
             '/{id:\d+}',
             'deletePost',
-            $authorizer,
+            $deleteAuthorizer,
             [$this, 'preloadPost']
         );
         $this->register(
             'GET',
             '/{id:\d+}/posts',
             'getPostsByParent',
-            $authorizer,
+            $readAuthorizer,
             [$this, 'preloadPost']
         );
     }
