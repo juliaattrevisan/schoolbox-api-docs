@@ -21,7 +21,7 @@ use Schoolbox\User;
  * This rule checks where the thread is in use, and verifies whether the
  * requesting user has permission to view that place.
  */
-class CanReadThread implements IAuthorizationRule
+class CanGetFromThread implements IAuthorizationRule
 {
     /**
      * @var BaseAuthorizer
