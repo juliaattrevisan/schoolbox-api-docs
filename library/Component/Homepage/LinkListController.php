@@ -145,7 +145,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                         'LINK_POSTED_BY_ID' => Scrub::text($currentLink->getOwner()->getId()),
                         'LINK_POSTED_DATE'  => Scrub::text($currentLink->getSubmitted()->getShort()),
                         'LINK_COMMENT'      => nl2br(Scrub::text($currentLink->getComment())),
-                        'HIDDEN'            => $currentLink->getHidden() ? 'hidden' : '',
+                        'HIDDEN'            => $currentLink->getHidden() ? 'translucent' : '',
                     ]);
 
                     // Owner name and optional link
