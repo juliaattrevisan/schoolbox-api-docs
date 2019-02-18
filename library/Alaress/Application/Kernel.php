@@ -1373,7 +1373,7 @@ abstract class Kernel
             );
 
             $this->callExceptionCallbacks($e);
-        } elseif (is_array($e)) {
+        } elseif (\is_array($e)) {
             $error = $e;
         } else {
             $error = error_get_last();
@@ -1413,7 +1413,7 @@ abstract class Kernel
 
                     // decide what to tell the user based on where this error came from
                     // use the document_root to get a Schoolbox-relative file in which the error occurred
-                    $cause = substr($error['file'], strlen($_SERVER['DOCUMENT_ROOT']) - 4);
+                    $cause = substr($error['file'], \strlen($_SERVER['DOCUMENT_ROOT']) - 4);
                     switch ($cause) {
                         // certain queries in the reports can return too much data to fit under the memory limit
                         case '/library/Report/Login.php':
@@ -1431,7 +1431,7 @@ abstract class Kernel
                     $e = $error;
                     $e['code'] = $code;
 
-                    if (is_array($stack)) {
+                    if (\is_array($stack)) {
                         array_shift($stack);
                         $e['trace'] = $stack;
                     }
