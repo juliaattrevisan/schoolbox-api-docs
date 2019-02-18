@@ -739,7 +739,7 @@ class Controller extends Assessment\Controller
 
         if ($rq->post['responseId']) {
             // Load an existing response to update
-            $response = $this->getDueWorkResponseMapper()->findById($rq->post['responseId']);
+            $response = $this->dueWorkResponseMapper->findById($rq->post['responseId']);
         } else {
             // Create a new response
             $response = $this->dueWorkResponseMapper->createModel()
@@ -835,7 +835,7 @@ class Controller extends Assessment\Controller
 
         /* Do the actual saving
          */
-        $this->getDueWorkResponseMapper()->save($response);
+        $this->dueWorkResponseMapper->save($response);
 
         // If not a draft, check if any files should be uploaded to Kami
         if ($isFinal) {
@@ -1138,13 +1138,13 @@ class Controller extends Assessment\Controller
         $rubricZone->setFileVar('rb_attach[]')->setAttachPrompt('Import a rubric');//->setMimeFilter('text/csv');
         $data['rubricAttachZone'] = $rubricZone->getTwigContext();
 
-        $resultSets = $this->getResultSetMapper()->findAll();
+        $resultSets = $this->resultSetMapper->findAll();
 
         $rs = new Collection();
 
         foreach ($resultSets as $result) {
             if (!$rs[$result->getResultSetId()] instanceof \ICollection) {
-                $rs[$result->getResultSetId()] = $this->getResultSetMapper()->createCollection();
+                $rs[$result->getResultSetId()] = $this->resultSetMapper->createCollection();
             }
             $rs[$result->getResultSetId()][$result->getValue()] = $result;
         }
@@ -1270,68 +1270,4 @@ class Controller extends Assessment\Controller
         }
         return $kamiModels;
     }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return Rubric\ResultMapper
-     */
-    protected function getResultSetMapper()
-    {
-        return $this->resultSetMapper;
-    }
-
-
-    /**
-     * @param Rubric\ResultMapper $resultSetMapper
-     * @return static
-     */
-    protected function setResultSetMapper($resultSetMapper)
-    {
-        $this->resultSetMapper = $resultSetMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return Rubric\RubricMapper
-     */
-    protected function getRubricMapper()
-    {
-        return $this->rubricMapper;
-    }
-
-
-    /**
-     * @param Rubric\RubricMapper $rubricMapper
-     * @return static
-     */
-    protected function setRubricMapper($rubricMapper)
-    {
-        $this->rubricMapper = $rubricMapper;
-        return $this;
-    }
-
-
-
-    /**
-     * @return DueWorkResponseMapper
-     */
-    protected function getDueWorkResponseMapper()
-    {
-        return $this->dueWorkResponseMapper;
-    }
-
-
-    /**
-     * @param DueWorkResponseMapper $dueWorkResponseMapper
-     * @return static
-     */
-    protected function setDueWorkResponseMapper($dueWorkResponseMapper)
-    {
-        $this->dueWorkResponseMapper = $dueWorkResponseMapper;
-        return $this;
-    }
-
 }

@@ -93,20 +93,21 @@ class GroupMapper extends BaseMapper
 
 
     /**
-     * Pre-save callback - if a copy of this group already exists, update it
-     * instead of saving a new one.
+     * Pre-save callback - if a group with the same name already exists in its
+     * parent, then set its ID to the existing one (thus updating the existing
+     * record) instead of saving a new one.
      *
-     * This replaces the unique index on this table, which needs to be removed
+     * This replaces the unique index on this table, which had to be removed
      * because MySQL max index size doesn't allow more than about ~330 UTF-8
      * characters.
      *
      * @param  Group $object
      * @return bool  Always true
      */
-    public function verifyUniqueness(Group $object)
+    public function verifyUniqueness(Group $object): bool
     {
-        // remove any newlines and consecutive/leading/trailing spaces from input
-        $object->setName(preg_replace('`\s+`', ' ', trim($object->getName())));
+        // normalize object's name for saving
+        $object->setName($object->retrieveNormalizedName());
 
         // Lookup existing IDs
         $existingIds = $this->findIdsByColumnList([

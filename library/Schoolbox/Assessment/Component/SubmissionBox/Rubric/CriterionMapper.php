@@ -198,20 +198,21 @@ class CriterionMapper extends BaseMapper {
 
 
     /**
-     * Pre-save callback - if a copy of this criterion already exists, then
-     * update it instead of saving a new one.
+     * Pre-save callback - if a criterion with the same name already exists in
+     * its group, then set its ID to the existing one (thus updating the
+     * existing record) instead of saving a new one.
      *
-     * This replaces the unique index on this table, which needs to be removed
+     * This replaces the unique index on this table, which had to be removed
      * because MySQL max index size doesn't allow more than about ~330 UTF-8
      * characters.
      *
      * @param  Criterion $object
      * @return bool      Always true
      */
-    public function verifyUniqueness(Criterion $object)
+    public function verifyUniqueness(Criterion $object): bool
     {
-        // remove any newlines and consecutive/leading/trailing spaces from input
-        $object->setName(preg_replace('`\s+`', ' ', trim($object->getName())));
+        // normalize object's name for saving
+        $object->setName($object->retrieveNormalizedName());
 
         // Lookup existing IDs
         $existingIds = $this->findIdsByColumnList([
