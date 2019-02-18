@@ -11,6 +11,7 @@ namespace Alaress\Application;
 
 use Aura\Di;
 use Autoloader;
+use Predis;
 use Throwable;
 use RuntimeException;
 use Alaress\Authorizer\Rule;
@@ -35,7 +36,6 @@ use External_ClassInterface;
 use External_UserInterface;
 use GuzzleHttp;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Predis\ClientInterface as RedisInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
 use Schoolbox\Collection;
@@ -436,7 +436,7 @@ abstract class Kernel
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
 
-                    /** @var Redis $redis */
+                    /** @var Predis\ClientInterface $redis */
                     $redis = $di->get('redis');
                     $factory = new Factory(
                         $_COOKIE,
@@ -667,7 +667,7 @@ abstract class Kernel
             /** @var IConfigLoader $config */
             /** @var Session $session */
             /** @var Router $router */
-            /** @var RedisInterface $redis */
+            /** @var Predis\ClientInterface $redis */
             /** @var TourMapper $tourMapper */
             /** @var StepMapper $tourStepMapper */
             /** @var Twig_Environment $templateEngine */
