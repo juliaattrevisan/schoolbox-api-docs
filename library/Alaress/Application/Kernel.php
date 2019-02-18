@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -8,13 +8,127 @@
  */
 
 namespace Alaress\Application;
-use Alaress\Application\Boot\BootstrapInterface;
-use Alaress\Web\Controller;
-use Alaress\Module\Module;
+
 use Aura\Di;
+use Autoloader;
 use Throwable;
-use OutOfBoundsException;
 use RuntimeException;
+use Alaress\Authorizer\Rule;
+use Alaress\Database\Exception as AlaressDatabaseException;
+use Alaress\Database\Factory as AlaressDatabaseFactory;
+use Alaress\Module\Loader as ModuleLoader;
+use Alaress\Redis;
+use Alaress\Session\Session;
+use Alaress\Twig\Loader\ChainLoader;
+use Alaress\Twig\Method as TwigMethod;
+use Alaress\Web\Request\IsJson;
+use Alaress\Web\Request\IsXhr;
+use Aura\Router\Router;
+use Calendar\Api\ModuleChecker;
+use Calendar_Api_Factory;
+use Alaress\Session\Factory;
+use Alaress\Web\Output;
+use Alaress\Web\Router\RouterFactory;
+use Alaress_Date_Locale_Config;
+use Crell\ApiProblem\ApiProblem;
+use External_ClassInterface;
+use External_UserInterface;
+use GuzzleHttp;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Predis\ClientInterface as RedisInterface;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\Bookmark\Mapper as BookmarkMapper;
+use Schoolbox\Collection;
+use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\External\Connector\CompositeSync;
+use Schoolbox\External\Connector\CustomSync;
+use Schoolbox\External\Connector\ICommunityPortal;
+use Schoolbox\Instance;
+use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStoneFactory;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
+use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Error;
+use Schoolbox\Mapper;
+use Schoolbox\MapperFactory;
+use Schoolbox\Menu\Side\Mapper as SideMenuMapper;
+use Schoolbox\Menu\Side\Section\Mapper as SideMenuSectionMapper;
+use Schoolbox\Menu\Top\Mapper as TopMenuMapper;
+use Schoolbox\Notif\MQ\Connector;
+use Schoolbox\Notif\Notifactory;
+use Schoolbox\Pastoral\DataSource as PastoralDataSource;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Revision\DataSource as PastoralRevisionDataSource;
+use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
+use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
+use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
+use Schoolbox\Tour\Mapper as TourMapper;
+use Schoolbox\Tour\Step\Mapper as StepMapper;
+use Schoolbox\Role;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+use SitePage;
+use Twig_Extension_Debug;
+use Twig_Extensions_Extension_Text;
+use Twig_Loader_Filesystem;
+use Twig_SimpleFilter;
+use Twig_SimpleFunction;
+use Alaress_Date_Format;
+use Alaress\Database\Connector\IConnector;
+use External_Class;
+use External_Timetable;
+use External_User;
+use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
+use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
+use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentDataModelTranslator;
+use Schoolbox\Learning\Assessment\DataModel\Translator\DueWork as DueWorkTranslator;
+use Schoolbox\Learning\Assessment\DataModel\Translator\Project as ProjectTranslator;
+use Schoolbox\Learning\Assessment\DataModel\Translator\Quiz as QuizTranslator;
+use Schoolbox\Learning\Assessment\DataModel\Translator\Task as TaskTranslator;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkSubmissionMapperProxy;
+use Schoolbox\Learning\Assessment\Feedback\DataSource as AssessmentFeedbackDataSource;
+use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as FeedbackSubSourceDueWork;
+use Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz as FeedbackSubSourceQuiz;
+use Schoolbox\Learning\Assessment\Feedback\SubSource\Task as FeedbackSubSourceTask;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy as QuizAttemptMapperProxy;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy as QuizFeedbackMapperProxy;
+use Schoolbox\Learning\Assessment\Response\DataSource as AssessmentResponseDataSource;
+use Schoolbox\Learning\Assessment\Response\SubSource\DueWork as ResponseSubSourceDueWork;
+use Schoolbox\Learning\Assessment\Response\SubSource\Quiz as ResponseSubSourceQuiz;
+use Schoolbox\Learning\Assessment\Response\SubSource\Task as ResponseSubSourceTask;
+use Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy as TaskFeedbackMapperProxy;
+use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseMapperProxy;
+use Schoolbox\Learning\Assessment\Transactor as LearningAssessmentTransactor;
+use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+use Schoolbox\Learning\Renderer as LearningRenderer;
+use Schoolbox\LTI\Provider\Mapper as LTIProviderMapper;
+use Schoolbox\Notif\StorefileLogger as NotifStorefileLogger;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Sync\Grammar\Factory as SyncGrammarFactory;
+use Schoolbox\Sync\Log\Mapper as SyncLogMapper;
+use Schoolbox\Sync\Provisioner\Provisioner;
+use Schoolbox\Sync\Provisioner\UserMapper as SyncUserMapper;
+use Schoolbox\Sync\Rule\Mapper as SyncRuleMapper;
+use Schoolbox\Sync\Ruleset\Factory as SyncRulesetFactory;
+use Twig_Environment;
+use Schoolbox\Learning\InlineGrader\Kami;
 
 /**
  * Class Kernel
@@ -22,11 +136,8 @@ use RuntimeException;
  *
  * @package Alaress\Application
  */
-abstract class Kernel {
-
-	/** @var BootstrapInterface */
-	private $boot;
-
+abstract class Kernel
+{
 	/** @var Di\Container */
 	protected $di;
 
@@ -39,42 +150,100 @@ abstract class Kernel {
 	 *
 	 * @var callable[]
 	 */
-	protected $exceptionCallbacks = [];
+    private $exceptionCallbacks = [];
+
+    /** @var bool $debugEnabled */
+    private $debugEnabled = false;
 
 
     /**
-     * Load the boot loader and run the launch sequence
-     *
-     * @param BootstrapInterface $boot
-     * @return bool
+     * @throws Di\Exception
+     * @throws Di\Exception\ContainerLocked
+     * @throws Di\Exception\ServiceNotFound
+     * @throws Di\Exception\ServiceNotObject
+     * @throws RuntimeException
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\External\Exception
      */
-	protected function boot(BootstrapInterface $boot): bool
+    public function __construct()
     {
-		$this->boot = $boot;
-
         // run the launch sequence
-        $this->boot->loadConfiguration();
-        $this->boot->setIncludePath();
-        $this->boot->registerAutoLoading();
-        $this->boot->initialiseExternalConnections();
-        $this->boot->initialiseDebugging();
-        $this->boot->registerErrorHandling();
-        $this->boot->registerExceptionHandling();
-        $this->boot->registerShutdownHandling();
-        $this->boot->installDependencies();
-        $this->boot->runMiddleware();
+        $this->loadConfiguration();
+        $this->setIncludePath();
+        $this->registerAutoLoading();
+        $this->initialiseExternalConnections();
+        $this->initialiseDebugging();
+        $this->registerErrorHandling();
+        $this->registerExceptionHandling();
+        $this->registerShutdownHandling();
+        $this->installDependencies();
+    }
 
-		return true;
-	}
+    /**
+     * Set the include path
+     *
+     * @return void
+     */
+    protected function setIncludePath(): void
+    {
+        set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . get_include_path());
+    }
+
+
+    /**
+     * Normal (ie non-Kernel) class loading
+     */
+    protected function registerAutoLoading(): void
+    {
+        require_once SITE_root . '/library/Autoloader.php';
+        Autoloader::initialise();
+    }
+
+    /**
+     * Initialise connections to databases, etc.
+     *
+     * @return void
+     * @throws \Schoolbox\External\Exception
+     */
+    abstract protected function initialiseExternalConnections(): void;
+
+    /**
+     * Initialise debugging
+     *
+     * @return void
+     */
+    abstract protected function initialiseDebugging(): void;
+
+    /**
+     * Register any error handling required
+     *
+     * @return void
+     */
+    abstract protected function registerErrorHandling(): void;
+
+    /**
+     * Register any out-the-top exception handling required
+     *
+     * @return void
+     */
+    abstract protected function registerExceptionHandling(): void;
+
+    /**
+     * Register any shutdown handling required
+     *
+     * @return void
+     */
+    abstract protected function registerShutdownHandling(): void;
 
 
 	/**
 	 * @param Di\Container $di
 	 * @throws RuntimeException
 	 */
-	public function setDependencyInjector($di) {
+	protected function setDependencyInjector(Di\Container $di): void
+    {
 		// only allow once
-		if(is_null($this->di)) {
+		if($this->di === null) {
 			$this->di = $di;
 		}
 		else {
@@ -111,43 +280,6 @@ abstract class Kernel {
     }
 
 
-    /**
-     * Returns the named controller from DI, initialising and configuring as required
-     *
-     * @param string $name
-     * @throws OutOfBoundsException if the named controller is not registered
-     * @return Controller\Base
-     */
-    public function getController($name)
-    {
-        try {
-            /** @var Module $module */
-            $module = $this->get("module:$name");
-
-            // initialise the controller into the DI
-            $module->initControllerDependencies();
-            $module->initControllers($this->getDependencyInjector());
-
-            // remove this reference, we don't need it anymore
-            unset($module);
-
-            // obtain and return the controller from DI now that it's been registered
-            return $this->get("controller:$name");
-
-        } catch (\Exception $e) {
-            throw new OutOfBoundsException("Could not load controller '$name': is the module registered?", 0, $e);
-        }
-    }
-
-
-    /**
-	 * Go. Do stuff.
-	 *
-	 * @return void
-	 */
-	public abstract function run();
-
-
 	/**
 	 * @param callable $callable
 	 */
@@ -171,10 +303,1281 @@ abstract class Kernel {
 	 *
 	 * @param Throwable $e
 	 */
-	public function callExceptionCallbacks($e)
+	protected function callExceptionCallbacks($e)
 	{
 		foreach ($this->exceptionCallbacks as $callback) {
 			call_user_func($callback, $e);
 		}
 	}
+
+
+    /**
+     * Load the core configuration file(s)
+     *
+     * @return void
+     */
+    private function loadConfiguration(): void
+    {
+        require_once __DIR__ . '/../../../www/conf/conf.php';
+        require_once SITE_root . '/www/include/stdfuncs.php';
+        require_once SITE_root . '/library/constants.php';
+    }
+
+
+    /**
+     * Install any internal dependencies into the kernel (routing, etc.)
+     *
+     * @return void
+     * @throws Di\Exception
+     * @throws Di\Exception\ContainerLocked
+     * @throws Di\Exception\ServiceNotFound
+     * @throws Di\Exception\ServiceNotObject
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    protected function installDependencies(): void
+    {
+        // Set up the dependency injector
+        $di = new Di\Container(new Di\Factory());
+
+        // Config loader
+        $di->set('config', $di->lazyNew(ConfigLoader::class));
+
+        Redis::getInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
+        $di->set('redis', Redis::getClientInstance());
+
+        $di->set('amqp', $di->lazy(function () {
+            return Connector::getInstance();
+        }));
+
+        $di->set('instance', $di->lazy(function () use ($di) {
+            /** @var IConfigLoader $conf */
+            $conf = $di->get('config');
+            return new Instance(
+                INSTANCE_ID,
+                $conf->get('site_location'),
+                $conf->get('site_hostname'),
+                $conf->get('site_domain'),
+                $conf->get('site_version'),
+                $conf->get('site_type'),
+                $conf->get('site_school_code')
+            );
+        }));
+
+        // install mapper DI
+        // (yes I know this is icky, but it will have to do until mapper construction is set up with DI properly)
+        Mapper::di($di);
+
+        // Set correct timezone
+        date_default_timezone_set($timezone = $di->get('config')->get('date_timezone'));
+
+        // Notification factory
+        $di->set('notif',
+            $di->lazy(
+                function() {
+                    // replace this with $di->lazyGetCall() once we upgrade Aura.Di
+                    return Notifactory::create();
+                }
+            )
+        );
+
+        // Database connection factory
+        $di->set(
+            'databaseFactory',
+            function () {
+                return new SchoolboxDatabaseFactory(
+                    new AlaressDatabaseFactory()
+                );
+            }
+        );
+
+        // Schoolbox internal database connection
+        $di->set(
+            'databaseInternal',
+            function() use ($di) {
+                /** @var SchoolboxDatabaseFactory $factory */
+                $factory = $di->get('databaseFactory');
+                return $factory->getInternalDatabase();
+            }
+        );
+
+        // External SIS database connection(s)
+        $di->set(
+            'databaseExternal',
+            $di->lazy(
+                function() use ($di) {
+                    /** @var SchoolboxDatabaseFactory $factory */
+                    $factory = $di->get('databaseFactory');
+
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+
+                    return $factory->getExternalDatabase($config);
+                }
+            )
+        );
+
+        // Web router
+        $di->set(
+            'router',
+            $di->lazy(
+                function () {
+                    $factory = new RouterFactory();
+                    return $factory->newInstance();
+                }
+            )
+        );
+
+        // Session
+        $di->set(
+            'session',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+
+                    /** @var Redis $redis */
+                    $redis = $di->get('redis');
+                    $factory = new Factory(
+                        $_COOKIE,
+                        $config,
+                        $redis,
+                        $_SERVER['REQUEST_TIME']
+                    );
+                    return $factory->build();
+                }
+            )
+        );
+
+        // User from session
+        $di->set(
+            'user',
+            $di->lazy(
+                function () use ($di) {
+                    $session = $di->get('session');
+                    return $session->getAuthUser();
+                }
+            )
+        );
+
+        $di->set(
+            'l10n',
+            $di->lazy(
+                function () use ($di) {
+                    $stoneFactory = new RosettaStoneFactory();
+                    return $stoneFactory->build($di->get('mapperFactory')->get(L10nMapper::class));
+                }
+            )
+        );
+
+        // Enable mappers to be injectable, but instantiated only when required
+        $mapperFactory = new MapperFactory($di);
+        $di->set('mapperFactory', $mapperFactory);
+
+        // Preload of route parameters, and its module loader
+        $di->params['Alaress\\Web\\Router\\PathMatcher']['moduleLoader'] = $di->lazyNew(
+            ModuleLoader::class,
+            ['injector' => $di, 'moduleRegex' => '/^(?P<module>[^\\.]+)\\./']
+        );
+        $di->set('preloader', $di->lazyNew('Alaress\\Web\\Router\\PathMatcher'));
+
+        // Authorization
+        $di->set('authorizer', $di->lazyNew('Alaress\\Authorizer\\Authorizer'));
+
+        // Web request/response factory
+        $di->params['Aura\\Web\\WebFactory'] = array('globals' => $GLOBALS);
+        $di->set('webFactory', $di->lazyNew('Aura\\Web\\WebFactory'));
+
+        // inject request and response into controller
+        // (I may need to mangle requests in pre-processing though)
+        $di->setters['Alaress\\Web\\Controller\\Base'] = array(
+            'setRequest'    => $di->lazy(
+                function () use ($di) {
+                    return $di->get('webFactory')->newRequest();
+                }
+            ),
+            'setResponse'   => $di->lazy(
+                function () use ($di) {
+                    return $di->get('webFactory')->newResponse();
+                }
+            ),
+            'setSession'    => $di->lazyGet('session'),
+            'setRouter'     => $di->lazyGet('router'),
+            'setAuthorizer' => $di->lazyGet('authorizer'),
+            'setDi'         => $di,
+            'setExceptionGenerator' => $di->get('mapperFactory')->getLazy(Error\Mapper::class),
+            'setSentry'     => $di->lazy(
+            // Use lazy function to insulate from service registration sequencing
+                function () use ($di) {
+                    return $di->has('sentry') ? $di->get('sentry') : null;
+                }
+            ),
+            'setIsJsonSpec' => $di->lazyNew(IsJson::class),
+            'setIsXhrSpec'  => $di->lazyNew(IsXhr::class)
+        );
+
+        // inject web params (yep, even Sitepage!)
+        $di->set('layoutEngine', $di->lazy(function() use ($di) {
+            return new SitePage(false, $di);
+        }));
+
+        $di->set('sitePage',     $di->lazy(function() use ($di) {
+            return new SitePage(true, $di);
+        }));
+
+
+        $di->set(
+            'commsNewsArticleResolver',
+            $di->lazy(
+                function () use ($di) {
+                    /**
+                     * @var IConnector                            $db
+                     * @var External_UserInterface                $externalUser
+                     * @var External_ClassInterface               $externalClass
+                     * @var News\Audience\Segment\StrategyFactory $strategyFactory
+                     * @var MapperFactory                         $mapperFactory
+                     * @var UserAccessMapper                      $userAccessMapper
+                     * @var Folder\Mapper                         $folderMapper
+                     * @var UserMapper                            $userMapper
+                     */
+                    $db               = $di->get('databaseInternal');
+                    $externalUser     = $di->get('externalUser');
+                    $externalClass    = $di->get('externalClass');
+                    $strategyFactory  = $di->get('commsNewsAudienceStrategyFactory');
+                    $mapperFactory    = $di->get('mapperFactory');
+                    $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
+                    $folderMapper     = $mapperFactory->get(Folder\Mapper::class);
+                    $userMapper       = $mapperFactory->get(UserMapper::class);
+                    $articleResolver  = new News\Audience\ArticleResolver(
+                        StrategyFactory::getValidNullEntities(),
+                        $strategyFactory->getValidRelationshipEntityMap(),
+                        $db,
+                        $folderMapper,
+                        new News\Audience\RelationshipFilterer(
+                            $db,
+                            $userMapper,
+                            $externalUser,
+                            $folderMapper,
+                            $externalClass,
+                            $userAccessMapper
+                        ),
+                        $strategyFactory->makeAllSimpleStrategies()
+                    );
+
+                    return $articleResolver;
+                }
+            )
+        );
+
+        $di->set(
+            'commsNewsUserResolver',
+            $di->lazy(
+                function() use ($di) {
+                    /**
+                     * @var IConnector              $db
+                     * @var External_UserInterface  $externalUser
+                     * @var External_ClassInterface $externalClass
+                     */
+                    $db              = $di->get('databaseInternal');
+                    $externalUser    = $di->get('externalUser');
+                    $externalClass   = $di->get('externalClass');
+                    $mapperFactory   = $di->get('mapperFactory');
+                    $folderMapper    = $mapperFactory->get(Folder\Mapper::class);
+                    $userResolver = new News\Audience\UserResolver(
+                        StrategyFactory::getValidNullEntities(),
+                        $db,
+                        $externalClass,
+                        new News\Audience\RelationshipFilterer(
+                            $db,
+                            $di->get('mapperFactory')->get(UserMapper::class),
+                            $externalUser,
+                            $di->get('mapperFactory')->get(Folder\Mapper::class),
+                            $externalClass,
+                            $di->get('mapperFactory')->get(UserAccessMapper::class)
+                        ),
+                        $di->get('mapperFactory')->get(News\Audience\Mapper::class),
+                        $folderMapper
+                    );
+
+                    return $userResolver;
+                }
+            )
+        );
+
+        $di->set(
+            'commsNewsAudienceStrategyFactory',
+            $di->lazy(
+                function () use ($di) {
+                    /**
+                     * @var MapperFactory          $mapperFactory
+                     * @var UserAccessMapper       $userAccessMapper
+                     * @var Folder\Mapper          $folderMapper
+                     * @var RoleAccessMapper       $roleAccessMapper
+                     * @var Access                 $access
+                     * @var IConfigLoader          $config
+                     * @var External_UserInterface $externalUser
+                     * @var IConnector             $db
+                     * @var Session                $session
+                     * @var User                   $user
+                     */
+                    $mapperFactory    = $di->get('mapperFactory');
+                    $userAccessMapper = $mapperFactory->get(UserAccessMapper::class);
+                    $folderMapper     = $mapperFactory->get(Folder\Mapper::class);
+                    $roleAccessMapper = $mapperFactory->get(RoleAccessMapper::class);
+                    $access           = $mapperFactory->get(Access::class);
+                    $config           = $di->get('config');
+                    $externalUser     = $di->get('externalUser');
+                    $db               = $di->get('databaseInternal');
+                    $session          = $di->get('session');
+                    $user             = $session->get('user');
+
+                    // Get known user-to-class mapping from the session and inject into factory
+                    $knownUserClasses = [];
+
+                    // Self case
+                    $subjects = $session->get('subjects');
+                    if ($subjects) {
+                        $knownUserClasses[$user->getId()] = $subjects;
+                    }
+                    // Parent case
+                    foreach ($session->get('children', []) as $childData) {
+                        $knownUserClasses[$childData['id']] = $childData['subjects'];
+                    }
+                    return new News\Audience\Segment\StrategyFactory(
+                        $userAccessMapper,
+                        $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS),
+                        $config->get(ConfigMapper::_GLOBAL_MODERATION),
+                        $config->get(ConfigMapper::_AUDIENCE_TO_FOLDER_TEACHERS),
+                        $folderMapper,
+                        $roleAccessMapper,
+                        $access,
+                        $externalUser,
+                        $db,
+                        $knownUserClasses
+                    );
+                }
+            )
+        );
+
+        // Web output class - currently uses Sitepage
+        $di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
+        $di->setters[Output\Stream::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
+        $di->set('webOutput:base', $di->lazyNew(Output\Base::class));
+        $di->set('webOutput:html', $di->lazy(function() use ($di, $mapperFactory) {
+            /** @var IConfigLoader $config */
+            /** @var Session $session */
+            /** @var Router $router */
+            /** @var RedisInterface $redis */
+            /** @var TourMapper $tourMapper */
+            /** @var StepMapper $tourStepMapper */
+            /** @var Twig_Environment $templateEngine */
+            /** @var TopMenuMapper $topMenuMapper */
+            /** @var SideMenuSectionMapper $sideMenuSectionMapper */
+            /** @var SideMenuMapper $sideMenuMapper */
+            /** @var BookmarkMapper $bookMarkMapper */
+            $config  = $di->get('config');
+            $session = $di->get('session');
+            $tourMapper = $mapperFactory->get(TourMapper::class);
+            $tourStepMapper = $mapperFactory->get(StepMapper::class);
+            $tourList = new \Schoolbox\Tour\Lists($tourMapper, $tourStepMapper);
+            $redis   = $di->get('redis');
+            $output  = new Output\ThemedHtml();
+            $templateEngine = $di->get('templateEngine');
+            $topMenuMapper = $mapperFactory->get(TopMenuMapper::class);
+            $sideMenuSectionMapper = $mapperFactory->get(SideMenuSectionMapper::class);
+            $sideMenuMapper = $mapperFactory->get(SideMenuMapper::class);
+            $bookMarkMapper = $mapperFactory->get(BookmarkMapper::class);
+            $output
+                ->setTemplateEngine($templateEngine)
+                ->addDataGenerator(
+                    'ws',
+                    new Output\DataGenerator\Websocket(
+                        $config,
+                        $session->getAuthUser(),
+                        new UnreadRetriever($redis),
+                        $_SERVER,
+                        INSTANCE_ID
+                    )
+                )
+                ->addDataGenerator(
+                    'tour',
+                    new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER)
+                )
+                ->addDataGenerator('user', new Output\DataGenerator\User($session->getAuthUser(), $session))
+                ->addDataGenerator(
+                    'topMenu',
+                    new Output\DataGenerator\TopMenu(
+                        $session->getAuthUser(),
+                        $topMenuMapper
+                    )
+                )
+                ->addDataGenerator(
+                    'sideMenu',
+                    new Output\DataGenerator\SideMenu(
+                        $config,
+                        $session->getAuthUser(),
+                        $session,
+                        $sideMenuSectionMapper,
+                        $sideMenuMapper,
+                        $bookMarkMapper
+                    )
+                )
+                ->addDataGenerator('scripts', new Output\DataGenerator\Scripts($config, $_SERVER));
+
+            if ($config->get('debug_mode')) {
+                $output->addDataGenerator(
+                    'debugBar',
+                    new Output\DataGenerator\DebugBar(\Alaress\DebugBar\Instance::getInstance(), '/debugbar/')
+                );
+            }
+
+            return $output;
+        }));
+        $di->set('webOutput:nochrome', $di->lazyNew(Output\Html::class));
+        $di->set('webOutput:json', $di->lazyNew(Output\Json::class));
+        $di->set('webOutput:file', $di->lazyNew(Output\File::class));
+        $di->set('webOutput:stream', $di->lazyNew(Output\Stream::class));
+        $di->set('webOutput:noContent', $di->lazyNew(Output\NoContent::class));
+        $di->set('webOutput:xml', $di->lazyNew(Output\Xml::class));
+
+        // Template engine and functions
+        // Template loader: sets up link to templates without a namespace.
+        $di->set(
+            'templateEngine:loader',
+            $di->lazy(
+                function () use ($di) {
+                    $config      = $di->get('config');
+                    $chainLoader = new ChainLoader(new ModuleLoader($di, '[^@(?P<module>[^/]+)/]'), new \Twig\Loader\ChainLoader());
+                    $baseLoader  = new Twig_Loader_Filesystem(array());
+                    // Paths: prefer templates/{site_location} over templates/core
+                    $basePath     = $config->get('siteRoot').'/templates/';
+                    $overridePath = $basePath.$config->get('site_location');
+                    $corePath     = $basePath.'core';
+                    if (is_dir($overridePath)) {
+                        $baseLoader->addPath($overridePath);
+                    }
+                    $baseLoader->addPath($corePath);
+                    // Core path: always uses templates/core, even if templates/{site_location} exists
+                    // Used as a base for default path templates to inherit from.
+                    $baseLoader->addPath($corePath, 'core');
+                    $chainLoader->addLoader($baseLoader);
+                    return $chainLoader;
+                }
+            )
+        );
+
+        $di->params[TwigMethod\RequireModule::class]['di'] = $di;
+        $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class));
+
+        $di->setters['Alaress\\Twig\\Method\\RouteLookup']['setRouter'] = $di->lazyGet('router');
+        $di->set('templateEngine:routeLookup', $di->lazyNew('Alaress\\Twig\\Method\\RouteLookup'));
+
+        $di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setRouter']     = $di->lazyGet('router');
+        $di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setAuthorizer'] = $di->lazyGet('authorizer');
+        $di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setSession']    = $di->lazyGet('session');
+        $di->set('templateEngine:isRouteAuthorized', $di->lazyNew('Alaress\\Twig\\Method\\IsRouteAuthorized'));
+
+        $di->params[TwigMethod\RouteLookupIfAuthorized::class]['routeLookup'] = $di->lazyGet('templateEngine:routeLookup');
+        $di->params[TwigMethod\RouteLookupIfAuthorized::class]['isRouteAuthorized'] = $di->lazyGet('templateEngine:isRouteAuthorized');
+        $di->set('templateEngine:routeLookupIfAuthorized', $di->lazyNew(TwigMethod\RouteLookupIfAuthorized::class));
+
+        $di->set(
+            'templateEngine',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+
+                    $options = [
+                        'debug' => $config->get('debug_templates'),
+                    ];
+
+                    // do not cache when in debug mode
+                    if (!$config->get('debug_mode')) {
+                        $options['cache'] = $config->get('stream_dir') . '/templates/';
+                    } else {
+                        if (class_exists('\Alaress\Web\Template\DebugTwig')) {
+                            $twigClass = '\Alaress\Web\Template\DebugTwig';
+                        } else {
+                            $twigClass = 'Twig_Template';
+                        }
+                        $options['base_template_class'] = $twigClass;
+                    }
+
+                    $twig = new Twig_Environment($di->get('templateEngine:loader'), $options);
+
+//                    if($this->debugEnabled) {
+//                        $twig = new TraceableTwigEnvironment($twig);
+//                        DebugBar::getInstance()->addCollector(new TwigCollector($twig));
+//                    }
+
+                    // HTML Purifier filter - known to output safe HTML
+
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'purify',
+                            array('Scrub', 'html'),
+                            array('is_safe' => array('html'))
+                        )
+                    );
+
+                    // HTML2Text filter
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'html2text',
+                            array('Scrub', 'html2text')
+                        )
+                    );
+
+                    // Cut sentence filter
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'cutSentence',
+                            array('TextFormatter', 'cutSentence')
+                        )
+                    );
+
+                    // Bytes to string filter
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'bytes',
+                            array('Alaress_Byte_Format', 'bytesToString')
+                        )
+                    );
+
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'column',
+                            [ Collection::class, 'array_column' ]
+                        )
+                    );
+
+                    // MomentJsFormat filter
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'momentJsFormat',
+                            [ \Alaress_Date_Format_Converter::class, 'toMomentJs' ]
+                        )
+                    );
+
+                    // Case insenstive replace function
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'ireplace',
+                            function($string, array $tokens = []) {
+                                return str_ireplace(array_keys($tokens), array_values($tokens), $string);
+                            }
+                        )
+                    );
+
+                    // Global access to config object and localisation
+                    // TODO capitalize globals
+                    $twig->addGlobal('config', $config);
+                    $twig->addGlobal('locale',  $di->get('l10n'));
+                    $dateFormats = new Alaress_Date_Locale_Config();
+                    $dateFormats->setConfig($config);
+                    $twig->addGlobal('dateFormats', $dateFormats);
+                    $twig->addGlobal('NOW', Alaress_Date_Format::now());
+                    $twig->addGlobal('USER', $_SESSION['user']);
+
+                    // Global access to returnUrl vars
+                    $encodedUrl = Redirect::encode($_GET["page"]);
+                    $twig->addGlobal(
+                        'RETURN_URL',
+                        [
+                            'name'     => Redirect::RETURN_URL,
+                            'current'  => $encodedUrl,
+                            'previous' => $_REQUEST[Redirect::RETURN_URL] ?? $encodedUrl,
+                        ]
+                    );
+
+                    // Define modules that are required by a template
+                    $twig->addFunction(
+                        new Twig_SimpleFunction('requireModule', $di->get('templateEngine:requireModule'))
+                    );
+
+                    // Add the route lookup and authorization methods
+                    $twig->addFunction(
+                        new Twig_SimpleFunction(
+                            'routeLookup',
+                            array($di->get('templateEngine:routeLookup'), 'execute')
+                        )
+                    );
+                    $twig->addFunction(
+                        new Twig_SimpleFunction(
+                            'isRouteAuthorized',
+                            array($di->get('templateEngine:isRouteAuthorized'), 'execute')
+                        )
+                    );
+
+                    $twig->addFunction(
+                        new Twig_SimpleFunction(
+                            'getGuid',
+                            function() {
+                                mt_srand((double)microtime() * 10000);
+                                return strtoupper(md5(uniqid((string)rand(), true)));
+                            }
+                        )
+                    );
+
+                    $twig->addFunction(new Twig_SimpleFunction('routeLookupIfAuthorized', $di->get('templateEngine:routeLookupIfAuthorized')));
+
+                    $twig->addFunction(
+                        new Twig_SimpleFunction(
+                            'generateHiddenInputs',
+                            new TwigMethod\GenerateHiddenInputs(),
+                            ['is_safe' => ['html']]
+                        )
+                    );
+
+                    // Add extensions after everything else.
+                    // According to https://twig.symfony.com/doc/1.x/deprecated.html#globals
+                    // globals must be loaded before extensions.
+                    $twig->addExtension(new Twig_Extension_Debug());
+                    $twig->addExtension(new Twig_Extensions_Extension_Text());
+                    $twig->addExtension(new AdminNavigationRenderer());
+                    $twig->addExtension(new LearningRenderer());
+
+                    return $twig;
+                }
+            )
+        );
+
+        // Paginator internal object
+        $di->setters['Alaress\\Paginator\\UrlPaginator']['setPaginator'] = $di->lazyNew('Alaress\\Paginator\\Paginator');
+
+        // Build a user provisioner
+        // TODO unify this definition and the one in Daemon\Bootstrap
+        $di->set('ups.logger',
+            $di->lazyNew(
+                NotifStorefileLogger::class,
+                [
+                    'receiver' => $di->lazyNew(StorageMapper::class),
+                    'filename' => $di->lazy(function () {
+                        return tempnam(sys_get_temp_dir(), 'sb-storefile-');
+                    }),
+                ]
+            )
+        );
+
+        // Build a user provisioner
+        $di->set(
+            'ups.provisioner',
+            $di->lazyNew(
+                Provisioner::class,
+                [
+                    'rulesetFactory' => $di->lazyNew(SyncRulesetFactory::class),
+                    'grammarFactory' => $di->lazyNew(
+                        SyncGrammarFactory::class,
+                        [
+                            'log'        => $di->lazyGet('ups.logger'),
+                            'userMapper' => $di->lazy(function () {
+                                $map = new SyncUserMapper();
+                                $map->setEventPropagator(new MockPropagator());
+                                return $map;
+                            }),
+                            'ruleMapper' => $di->lazyNew(SyncRuleMapper::class),
+                        ]
+                    ),
+                    'externalUserSource' => $di->lazy(function() use ($di) {
+                        /** @var IConfigLoader $config */
+                        $config = $di->get('config');
+
+                        /** @var array|IConnector $databaseExternal */
+                        $databaseExternal = $di->get('databaseExternal');
+
+                        $customSync = new CustomSync($config, $databaseExternal);
+
+                        $factory = new ExternalConnectorFactory();
+                        $defaultSync = $factory->build(
+                            $config,
+                            $databaseExternal,
+                            ExternalConnectorFactory::EXTERNAL_SYNC
+                        );
+
+                        return (new CompositeSync())
+                            ->addSubSync($customSync)
+                            ->addSubSync($defaultSync);
+                    }),
+                    'userMapper'     => $di->lazyNew(SyncUserMapper::class),
+                    'logger'         => $di->lazyGet('ups.logger'),
+                    'logMapper'      => $di->lazyNew(SyncLogMapper::class),
+                ]
+            )
+        );
+
+        // Register External_User service
+        $di->set('externalUser', $di->lazyNew(External_User::class));
+
+        // Register External_Timetable service
+        $di->set('externalTimetable', $di->lazyNew(External_Timetable::class));
+
+        $di->set('externalCommunityPortal', $di->lazy(function() use ($di) {
+            /** @var IConfigLoader $config */
+            $config = $di->get('config');
+
+            /** @var array|IConnector $databaseExternal */
+            $databaseExternal = $di->get('databaseExternal');
+
+            // Create the external connection to community portal
+
+            $factory = new ExternalConnectorFactory();
+
+            /** @var ICommunityPortal $communityPortal */
+            $communityPortal = $factory->build(
+                $config,
+                $databaseExternal,
+                ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL
+            );
+
+            // Load in the key and initialization vector that are required before it can be used
+
+            $webServicesKeyFile = '/etc/schoolbox-synergetic/config.json';
+
+            if (is_readable($webServicesKeyFile) && is_file($webServicesKeyFile)) {
+                $config = json_decode(file_get_contents($webServicesKeyFile), true);
+
+                $communityPortal->setSecrets(
+                    base64_decode($config['key']),
+                    base64_decode($config['iv'])
+                );
+            } else {
+                trigger_error('Cannot read community portal key - password will not be changed', E_USER_WARNING);
+            }
+
+            return $communityPortal;
+        }));
+
+        // Document Manager
+        $di->set('externalDocumentManager', $di->lazy(function () use ($di) {
+            /** @var IConfigLoader $config */
+            $config = $di->get('config');
+
+            /** @var array|IConnector $databaseExternal */
+            $databaseExternal = $di->get('databaseExternal');
+
+            // Create the external connection to docman
+            $factory = new ExternalConnectorFactory();
+            return $factory->build(
+                $config,
+                $databaseExternal,
+                ExternalConnectorFactory::EXTERNAL_DOCUMENT
+            );
+        }));
+
+        // Register external NDS object services
+
+        $di->set('externalNDSUser', $di->lazy(function () use ($di) {
+            /** @var IConfigLoader $config */
+            $config = $di->get('config');
+
+            /** @var array|IConnector $databaseExternal */
+            $databaseExternal = $di->get('databaseExternal');
+
+            $factory = new ExternalConnectorFactory();
+            return $factory->build(
+                $config,
+                $databaseExternal,
+                ExternalConnectorFactory::EXTERNAL_USER
+            );
+        }));
+
+        $di->set('externalNDSTimetable', $di->lazy(function () use ($di) {
+            /** @var IConfigLoader $config */
+            $config = $di->get('config');
+
+            /** @var array|IConnector $databaseExternal */
+            $databaseExternal = $di->get('databaseExternal');
+
+            $factory = new ExternalConnectorFactory();
+            return $factory->build(
+                $config,
+                $databaseExternal,
+                ExternalConnectorFactory::EXTERNAL_TIMETABLE
+            );
+        }));
+
+        // LTI Provider mapper
+        $di->set('providerMapper', $di->lazyNew(LTIProviderMapper::class));
+
+        // Register External_Class service
+        $di->set('externalClass', $di->lazyNew(External_Class::class));
+
+        // Register assessment data source
+        $di->set(
+            'assessmentTranslator',
+            $di->lazy(function () use ($di) {
+                $translator = new AssessmentDataModelTranslator(
+                    new MarkSchemeFactory(),
+                    $di->get('mapperFactory')->get(AssessmentMapper::class),
+                    AssessmentDataModelTranslator::MAX_PROJECT_LEVELS_DEFAULT
+                );
+                $translator
+                    ->addSubTranslator(new TaskTranslator())
+                    ->addSubTranslator(new DueWorkTranslator())
+                    ->addSubTranslator(new QuizTranslator())
+                    ->addSubTranslator(new ProjectTranslator($translator))
+                ;
+                return $translator;
+            })
+        );
+
+        // Register assessment data source
+        $di->params[AssessmentDataSource::class] = [
+            'baseMapper'            => $mapperFactory->getLazy(AssessmentMapper::class),
+            'translator'            => $di->lazyGet('assessmentTranslator'),
+            'participantDataSource' => $di->lazyGet('participantDataSource'),
+        ];
+        $di->set('assessmentDataSource', $di->lazyNew(AssessmentDataSource::class));
+
+        // Register participant data source (with responses and feedback)
+        $di->params[ParticipantDataSource::class] = [
+            'externalDb'         => $di->lazyGet('externalClass'),
+            'userAccessMapper'   => $mapperFactory->getLazy(UserAccessMapper::class),
+            'userMapper'         => $mapperFactory->getLazy(UserMapper::class),
+            'responseDataSource' => $di->lazyGet('responseDataSource'),
+            'feedbackDataSource' => $di->lazyGet('feedbackDataSource'),
+            'planMapper'         => $mapperFactory->getLazy(\Schoolbox\Assessment\Participant\Plan\Mapper::class)
+        ];
+        $di->set('participantDataSource', $di->lazyNew(ParticipantDataSource::class));
+
+
+        /* DUE WORK SOURCES */
+        $di->set('submissionDataSource', $di->lazyNew(DueWorkSubmissionMapperProxy::class));
+        $di->params[DueWorkSubmissionMapperProxy::class]['mapper'] = $mapperFactory->getLazy(SubmissionMapper::class);
+
+        $di->set('returnDataSource', $di->lazyNew(DueWorkFeedbackMapperProxy::class));
+        $di->params[DueWorkFeedbackMapperProxy::class]['mapper'] = $mapperFactory->getLazy(ReturnedWorkMapper::class);
+
+
+        /* QUIZ SOURCES */
+        $di->set('attemptDataSource', $di->lazyNew(QuizAttemptMapperProxy::class));
+        $di->params[QuizAttemptMapperProxy::class]['mapper'] = $mapperFactory->getLazy(QuizAttemptMapper::class);
+
+        $di->set('reviewDataSource', $di->lazyNew(QuizFeedbackMapperProxy::class));
+        $di->params[QuizFeedbackMapperProxy::class]['mapper'] = $mapperFactory->getLazy(QuizAttemptMapper::class);
+
+
+        /* TASK SOURCES */
+        $di->set('completionDataSource', $di->lazyNew(TaskResponseMapperProxy::class));
+        $di->params[TaskResponseMapperProxy::class]['mapper'] = $mapperFactory->getLazy(TaskCompletionMapper::class);
+
+        $di->set('ratificationDataSource', $di->lazyNew(TaskFeedbackMapperProxy::class));
+        $di->params[TaskFeedbackMapperProxy::class]['mapper'] = $mapperFactory->getLazy(TaskCompletionMapper::class);
+
+
+        // Register response data source
+        $di->set(
+            'responseDataSource',
+            $di->lazy(
+                function () use ($di) {
+
+                    /** @var DueWorkSubmissionMapperProxy $submissionDataSource  */
+                    $submissionDataSource = $di->get('submissionDataSource');
+
+                    /** @var TaskResponseMapperProxy $completionDataSource */
+                    $completionDataSource = $di->get('completionDataSource');
+
+                    /** @var QuizAttemptMapperProxy $attemptDataSource */
+                    $attemptDataSource = $di->get('attemptDataSource');
+
+                    return (new AssessmentResponseDataSource())
+                        ->addSubSource(new ResponseSubSourceDueWork($submissionDataSource))
+                        ->addSubSource(new ResponseSubSourceTask($completionDataSource))
+                        ->addSubSource(new ResponseSubSourceQuiz($attemptDataSource));
+                }
+            )
+        );
+
+        // Register feedback data source
+        $di->set(
+            'feedbackDataSource',
+            $di->lazy(
+                function () use ($di) {
+
+                    /** @var DueWorkFeedbackMapperProxy $returnDataSource */
+                    $returnDataSource = $di->get('returnDataSource');
+
+                    /** @var TaskFeedbackMapperProxy $ratificationDataSource */
+                    $ratificationDataSource = $di->get('ratificationDataSource');
+
+                    /** @var QuizFeedbackMapperProxy $reviewDataSource */
+                    $reviewDataSource = $di->get('reviewDataSource');
+
+                    return (new AssessmentFeedbackDataSource())
+                        ->addSubSource(new FeedbackSubSourceDueWork($returnDataSource))
+                        ->addSubSource(new FeedbackSubSourceTask($ratificationDataSource))
+                        ->addSubSource(new FeedbackSubSourceQuiz($reviewDataSource));
+                }
+            )
+        );
+
+        $di->params[LearningAssessmentTransactor::class] = [
+            'folderMapper'                  => $di->get('mapperFactory')->getLazy(Folder\Mapper::class),
+            'unitImplementationMapperProxy' => $di->lazyGet('unitImplementationDataSource'),
+            'unitSpecificationMapperProxy'  => $di->lazyGet('unitSpecificationDataSource'),
+            'assessmentMapperProxy'         => $di->lazyGet('assessmentDataSource'),
+            'router'                        => $di->lazyGet('router'),
+        ];
+
+        $di->set('transactor', $di->lazyNew(LearningAssessmentTransactor::class));
+
+        // Register default grade group
+        $di->set(
+            'defaultGradeGroup',
+            $di->lazy(
+                function () use ($di, $mapperFactory) {
+                    // A default group surely must be set up?
+                    return $mapperFactory->get(GradeGroupMapper::class)->findById(
+                        $di->get('config')->get('default_grade_group')
+                    );
+                }
+            )
+        );
+
+        $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
+            'client'         => $di->lazyNew(GuzzleHttp\Client::class),
+            'apiKey'         => $di->get('config')->get('kami_api_key'),
+            'siteSchoolCode' => $di->get('config')->get('site_school_code'),
+        ]));
+
+        // injectable module auth rules
+        $di->set('rule:isLoggedIn',  $di->lazyNew(Rule\IsLoggedIn::class));
+        $di->set('rule:isSuperuser', $di->lazyNew(Rule\IsSuperuser::class));
+        $di->set('rule:isStaff',     $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STAFF   ]));
+        $di->set('rule:isStudent',   $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STUDENT ]));
+        $di->set('rule:isParent',    $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::PARENT  ]));
+
+        // composite rules
+        $di->set('rule:isStaffOrSuper',   $di->lazy(function () use ($di) { return new Rule\Any($di->get('rule:isSuperuser'), $di->get('rule:isStaff')); }));
+        $di->set('rule:isStaffOrStudent', $di->lazy(function () use ($di) { return new Rule\Any($di->get('rule:isStaff'),     $di->get('rule:isStudent')); }));
+
+
+        // Calendar API factory - requires an assessment data source to build some types
+        $di->set(
+            'calendarApiFactory',
+            $di->lazy(
+                function () use ($di) {
+                    try {
+                        /** @var IConnector $databaseExternal */
+                        $databaseExternal = $di->get('databaseExternal');
+                    } catch (AlaressDatabaseException $e) {
+                        $databaseExternal = null;
+                    }
+
+                    /** @var AssessmentDataSource $assessmentDataSource */
+                    $assessmentDataSource  = $di->get('assessmentDataSource');
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+                    return new Calendar_Api_Factory($assessmentDataSource, new ModuleChecker($config), $config, $databaseExternal);
+                }
+            )
+        );
+
+        // Pastoral Care data source
+        // TODO consider moving into a module's dependencies?
+        $di->set(
+            'pastoralDataSource',
+            $di->lazyNew(
+                PastoralDataSource::class,
+                ['mapper' => $mapperFactory->getLazy(PastoralMapper::class)]
+            )
+        );
+        $di->set(
+            'pastoralRevisionDataSource',
+            $di->lazyNew(
+                PastoralRevisionDataSource::class,
+                ['mapper' => $mapperFactory->getLazy(PastoralRevisionMapper::class)]
+            )
+        );
+
+        // notificaton routing cache
+
+        $di->params[\Schoolbox\Notif\Queue\Bindings\Generator::class] = [
+            'xUserHandler'      => $di->lazyGet('externalUser'),
+            'userMapper'        => $mapperFactory->getLazy(UserMapper::class),
+            'roleMapper'        => $mapperFactory->getLazy(\Schoolbox\RoleMapper::class),
+            'userAccessMapper'  => $mapperFactory->getLazy(UserAccessMapper::class),
+            'categoryMapper'    => $mapperFactory->getLazy(Folder\Mapper::class)
+        ];
+
+        $di->params[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
+            'redis' => $di->lazyGet('redis'),
+            'log'   => $di->lazyValue('logger')
+        ];
+
+        $di->setters[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
+            'setUserMapper' => $mapperFactory->getLazy(UserMapper::class),
+            'setGenerator'  => $di->lazyNew(\Schoolbox\Notif\Queue\Bindings\Generator::class)
+        ];
+
+        $di->set('subscriptionCache', $di->lazyNew(WriteCache::class, [
+            'redis' => $di->lazyGet('redis'),
+            'log'   => $di->lazyValue('logger'),
+            'loaderFactory' => $di->lazyNew(\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class)
+        ]));
+
+
+
+        // install sentry
+        $sentryToken = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
+        $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
+        $sentryClient = null;
+        if (\strlen($sentryToken) && \strlen($sentryProject)) {
+            try {
+                /** @var \Schoolbox\Instance $sb */
+                $sb = $di->get('instance');
+                // fall back to site_location if site_school_code not set
+                $options = [
+                    'environment' => $sb->getType(),
+                    'tags' => [
+                        'php_version' => PHP_VERSION,
+                        'site_version' => $sb->getVersion(),
+                        'site_school_code' => $sb->getSchoolCode() ?: $sb->getLocation()
+                    ]
+                ];
+                $sentryClient = new \Raven_Client("https://{$sentryToken}@sentry.io/{$sentryProject}", $options);
+                $sentryClient->install();
+            } catch (\Raven_Exception $e) {
+                // do nothing; sentry is not installed
+            } catch (Di\Exception\ServiceNotFound $e) {
+                // do nothing; sentry is not installed
+            }
+
+            // add sentry to the DI
+            $di->set('sentry', $sentryClient);
+        }
+
+        // load dependencies into the kernel itself
+        $this->setDependencyInjector($di);
+    }
+
+
+    /**
+     * Shutdown handler for either exceptions or fatal errors
+     *
+     * @param \Exception|array $e
+     * @param array $stack
+     */
+    public function shutdownSafely($e = null, $stack = null): void
+    {
+        $isException = false;
+        if ($e instanceof \Throwable) {
+            $isException = true;
+
+            $error = array(
+                'file'    => $e->getFile(),
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+                'type'    => $e->getCode(),
+            );
+
+            $this->callExceptionCallbacks($e);
+        } elseif (is_array($e)) {
+            $error = $e;
+        } else {
+            $error = error_get_last();
+        }
+
+        // it's almost a guarantee that some kind of minor error will have occurred at some point
+        if ($error !== null) {
+
+            // if it was a fatal error or exception that triggered our sudden but inevitable demise...
+            if ( $isException
+                || (intval($error['type']) & (E_ERROR | E_CORE_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR))
+            ) {
+                // RedisException extends RuntimeException: occurs when Redis
+                // session management isn't working for whatever reason.
+                $code    = 400;
+                $info    = 'If the problem persists, please contact your System Administrator including the following information:';
+
+                if (isset($_SERVER['HTTP_HOST'])) {
+                    $url = 'http'.(getenv("SERVER_PORT") == 443 ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+                } else {
+                    $url = '';
+                }
+
+                if ($e instanceof SchoolboxException) {
+                    $code    = $e->getHttpStatusCode();
+                    $message = $e->getMessage();
+                    $info    = '';
+                    $url     = '';
+                } elseif ($e instanceof \PDOException) {
+                    $code    = 500;
+                    $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
+                } elseif ($e instanceof \RuntimeException) {
+                    $code    = 500;
+                    $message = 'Schoolbox is currently down due to an internal service being inactive.';
+                } else {
+                    $message = 'Schoolbox has encountered a fatal error.';
+
+                    // decide what to tell the user based on where this error came from
+                    // use the document_root to get a Schoolbox-relative file in which the error occurred
+                    $cause = substr($error['file'], strlen($_SERVER['DOCUMENT_ROOT']) - 4);
+                    switch ($cause) {
+                        // certain queries in the reports can return too much data to fit under the memory limit
+                        case '/library/Report/Login.php':
+                        case '/library/Report/Activity.php':
+                            $info = "The report you tried to run has returned too much data. Please press 'Back' and refine your report filter parameters.";
+                            break;
+                        // if it's not somewhere we expect to find an error, just be generic about it
+                        default:
+                            break;
+                    }
+                }
+
+                // explain that something went cataclysmically wrong.
+                if (!$isException) {
+                    $e = $error;
+                    $e['code'] = $code;
+
+                    if (is_array($stack)) {
+                        array_shift($stack);
+                        $e['trace'] = $stack;
+                    }
+                }
+                $this->outputError($e, $message, $info, $url, $error, $code);
+            }
+        }
+    }
+
+
+    /**
+     * @return bool
+     */
+    protected function isDebugEnabled(): bool
+    {
+        return $this->debugEnabled;
+    }
+
+
+    /**
+     * @param bool $debugEnabled
+     */
+    protected function setDebugEnabled(bool $debugEnabled): void
+    {
+        $this->debugEnabled = $debugEnabled;
+    }
+
+
+    /**
+     * Output an error. The format depends on the request type (JSON or HTML).
+     *
+     * @param array|\Throwable $e       The throwable that led us here, or the
+     *                                  stack trace in array form.
+     * @param string           $message A human-friendly message to output.
+     * @param string           $info    More descriptive description of what
+     *                                  happened.
+     * @param string           $url     The URL from which this error occurred
+     * @param array            $error   An array-format stack trace
+     * @param int              $code    A HTTP status code
+     */
+    private function outputError(
+        $e,
+        string $message,
+        string $info,
+        string $url,
+        $error,
+        int $code
+    ): void {
+        /* Use structured information for rendering
+         */
+        $args = [
+            'message'        => $message,
+            'info'           => $info,
+            'url'            => $url,
+            'error'          => $error,
+            'date'           => \Alaress_Date_Format::now(),
+            'stackTrace'     => $e,
+            'exceptionClass' => \is_object($e) ? \get_class($e) : 'Error',
+        ];
+
+        /* Pass $data straight in for twig rendering
+         */
+        $di = $this->getDependencyInjector();
+        if ($di instanceof Di\Container) {
+            // Is it JSON or not?
+            try {
+                /** @var IConfigLoader $config */
+                $config                   = $di->get('config');
+                $args['outputStackTrace'] = $config->get('debug_show_stack_trace');
+
+                $request = $di->get('webFactory')->newRequest();
+                if ((new IsJson())->isSatisfiedBy($request)) {
+                    $problem = (new ApiProblem($message))
+                        ->setStatus($code)
+                        ->setDetail($info)
+                        ->setInstance($url);
+
+                    $problem['message'] = $message;
+                    if ($args['outputStackTrace']) {
+                        $problem['trace'] = array_merge(
+                            [$error],
+                            $e instanceof \Throwable ? $e->getTrace() : $e['trace']
+                        );
+                    }
+
+                    /** @var Output\Json $output */
+                    $output = $di->get('webOutput:json');
+                    $output->setData($problem->asArray());
+                } else {
+                    /** @var Output\ThemedHtml $output */
+                    $output = $di->get('webOutput:html');
+                    $output
+                        ->setTitle('Error Encountered')
+                        ->setData($args)
+                        ->setTemplate($code === 404
+                            ? 'common/error/404.twig'
+                            : 'common/error/general.twig'
+                        );
+                }
+
+                // Finagle a response?
+                $response = $di->get('webFactory')->newResponse();
+                $response->status->setCode($code);
+                $output->output($response);
+                return;
+
+            } catch (Di\Exception\ServiceNotFound $e) {
+                // noop: fall thru to outputRawHtmlError
+            }
+        }
+
+        // There was no DI, or I couldn't find a renderer.
+        // Just output raw HTML
+        $this->outputRawHtmlError($code, $args);
+    }
+
+
+    /**
+     * Outputs an error without using a Twig or JSON renderer.
+     *
+     * This is a fallback that is used when none of those renderers are found.
+     *
+     * @param int   $code
+     * @param array $args
+     */
+    private function outputRawHtmlError(int $code, array $args): void
+    {
+        /* Just dump it out in raw form
+         * TODO: Make synonymous with twig output
+         */
+        $output =
+            "<p><b>{$args['message']} {$args['info']}</b></p>" .
+            '<ul>' .
+            "<li>Datetime: {$args['date']->getLong()}</li>" .
+            "<li>URL: {$args['url']}" .
+            '</li>';
+
+        if ($args['outputStackTrace']) {
+            $output .= "<li>Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}.</li>";
+        } else {
+            $output .= "<li>Error: {$args['error']['message']}. (Further details have been logged.)</li>";
+        }
+
+        $output .= '</ul>';
+
+        http_response_code($code);
+        echo $output;
+    }
 }

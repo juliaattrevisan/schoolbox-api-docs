@@ -6,7 +6,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
-
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class SitePage extends Page
 {
@@ -466,7 +466,7 @@ class SitePage extends Page
      *                        null: outputs whatever's in $message as error
      * @param string $message Replaces '%MESSAGE%' in $ec
      * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
-     * @throws Exception
+     * @throws SchoolboxException
      */
     public function error($ec, $message = '', $code = 400)
     {
