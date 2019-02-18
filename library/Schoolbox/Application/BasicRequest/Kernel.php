@@ -21,30 +21,6 @@ class Kernel extends \Alaress\Application\Kernel
         $this->boot();
     }
 
-    /**
-     * Load the boot loader, returning success or failure
-     *
-     * @return bool
-     */
-    public function boot() {
-        // if it's not a bootstrap, don't bother trying
-        if(!$this->boot instanceof Bootstrap) {
-            return false;
-        }
-
-        // run the launch sequence
-        $this->boot->loadConfiguration();
-        $this->boot->setIncludePath();
-        $this->boot->registerAutoLoading();
-        $this->boot->initialiseExternalConnections();
-        $this->boot->initialiseDebugging();
-        $this->boot->registerErrorHandling();
-        $this->boot->registerExceptionHandling();
-        $this->boot->registerShutdownHandling();
-        $this->boot->installDependencies();
-
-        return true;
-    }
 
     /**
     * Execute the main script
