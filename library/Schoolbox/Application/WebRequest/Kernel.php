@@ -21,12 +21,15 @@ use Monolog\Logger;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Application\WebKernel;
 use Schoolbox\Mapper\Exception\Deleted;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
-
-class Kernel extends \Alaress\Application\Kernel
+/**
+ * Designed for full web requests, including rendering a full UI
+ */
+class Kernel extends WebKernel
 {
 
     /** @var bool */
