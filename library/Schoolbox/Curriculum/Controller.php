@@ -129,13 +129,13 @@ class Controller extends Base
     {
         $nodeId = (int)$node->getId();
         $name   = $node->getName();
-        $isCode = strlen($node->getCode()) > 0;
+        $isCode = \strlen($node->getCode()) > 0;
         if ($isCode) {
             $name = sprintf('[%s] %s', $node->getCode(), $name);
         }
         return array(
             'id'     => $nodeId,
-            'parent' => is_object($node->getParent()) ? (int)$node->getParent()->getId() : '#',
+            'parent' => \is_object($node->getParent()) && $node->getParent()->getId() !== null ? (int)$node->getParent()->getId() : '#',
             'text'   => $name,
             'a_attr' => array(
                 'href' => $this->getRouter()->generate(
