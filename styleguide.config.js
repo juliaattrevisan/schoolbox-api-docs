@@ -64,12 +64,16 @@ module.exports = {
           components: [
             "react/components/Card/Card/*.tsx",
             "react/components/Card/LoadingCard/*.tsx",
-            "react/components/Card/CardList/*.tsx",
+            "react/components/Card/CardList/*.tsx"
           ]
         },
         {
           name: "Tabs",
-          components: "react/components/Tabs/**/*.tsx"
+          components: [
+            "react/components/Tabs/Tabs/*.tsx",
+            "react/components/Tabs/LoadingTabs/*.tsx",
+            "react/components/Tabs/Tab/*.tsx"
+          ]
         },
         {
           name: "Actions",

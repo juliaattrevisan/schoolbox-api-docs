@@ -1,9 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 
-import { Tabs } from "@schoolbox/Tabs/Tabs";
-import { Tab } from "@schoolbox/Tabs/Tab/Tab";
-import { LoadingTabs } from "@schoolbox/Tabs/LoadingTabs/LoadingTabs";
+import { Tabs, Tab, LoadingTabs } from "@schoolbox/Tabs";
 import { LoadingCard } from "@schoolbox/Card";
 import { Pagination } from "@schoolbox/Pagination/Pagination";
 import { EmptyState } from "@schoolbox/EmptyState/EmptyState";
