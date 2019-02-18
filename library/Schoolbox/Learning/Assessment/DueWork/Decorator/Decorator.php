@@ -118,7 +118,6 @@ class Decorator implements DecoratorInterface
             );
             $newGrid = $gridFactory->buildFromPostData($existingGrid, $this->getRubricData());
 
-            // I _think_ this is the right place to validate the rubric?
             // (Forgive me too for perpetuating this)
             /** @var RosettaStone $l10n */
             // TODO this should be a part of buildFromPostData, but I don't feel like injecting all its dependencies
