@@ -1,0 +1,486 @@
+{#
+Data:
+    article                 News\Model
+    moderationEnabled       bool
+    isSavedForLater         bool
+    availableEntityTypes    string[]         The set of entity types that can be audienced by the current user
+    entityTypesData         array
+#}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@commsNews/macro/layout.twig' as layout %}
+{% import '@commsNews/macro/indicator.twig' as indicator %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{# Modify article #}
+{% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {article: article, articleId: article.id}) %}
+
+{# Delete article #}
+{% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {article: article, articleId: article.id}) %}
+
+{% set isAuthor = USER.id == article.author.id %}
+{% if article.isPublished or article.isExpired %}
+    {% set rejectVerb = 'Unpublish' %}
+{% else %}
+    {% set rejectVerb = 'Reject' %}
+{% endif %}
+{% set returnUrlQueryString = returnUrl ? '?' ~ RETURN_URL.name ~ '=' ~ returnUrl : '' %}
+
+<script type="text/javascript">
+    $(function() {
+        history.replaceState({}, '', '{{ article.id }}');
+    });
+</script>
+
+{{ bread.crumbs([locale.news.properPlural, routeLookup('commsNews.getIndex')], [article.title |default("(untitled)")]) }}
+
+{% if flashMessage|length %}
+    <script>
+        $(function() {
+            $('#flash').on('click', '.close', function(event) {
+                event.preventDefault();
+
+                $('#flash').remove();
+            });
+        });
+    </script>
+    <div class="small-12 columns">
+        <div id="flash" class="alert-box success">
+            {{ flashMessage }}
+            <a class="close">×</a>
+        </div>
+    </div>
+{% endif %}
+
+<div class="small-12 columns">
+    <div class="actions-small-2 row">
+        <div class="list-item">
+            <h1>{{ article.title |default("(untitled)") }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
+            <ul class="meta">{{ indicator.byLine(article) }}
+                {# Topics #}
+                {% if article.topics|length %}
+                    <li class="icon-breadcrumbs">Topics:
+                        {% for topic in article.topics %}
+                            <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </li>
+                {% endif %}
+
+                <li class="icon-eye" id="audience-container" v-if="audienceBricks.length > 0">
+                        <span v-if="audienceBricks.length > 1">Audiences: </span>
+                        <span v-else>Audience: </span>
+                        <template v-show="audienceBricks.length" v-for="(audienceBrick, index) in audienceBricks">
+                            <span v-if="audienceBrick.isComposite()">
+                                <a href="#" title="Click to view composite audience" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel }</a>
+                            </span>
+                            {# has to be on one line or you get weird whitespace #}
+                            <span v-else>${ audienceBrick.modifierLabel.length > 0 ? audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel : audienceBrick.nameLabel }</span><template v-if="index+1 < audienceBricks.length">, </template>
+                        </template>
+
+                        {# modal #}
+                        <div data-reveal id="audience-composite" class="reveal-modal">
+                            <h2>Complex Audience</h2>
+                            <a class="close-reveal-modal" aria-label="Close">×</a>
+                    <p class="meta" v-if="selectedCompositeBrick.modalData">
+                        This audience segment includes users who are in both one or more of the selected
+                        ${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() } and one or more of the selected
+                        ${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }.
+                    </p>
+                    <div class="audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
+                        <div><b>${ dimensionData.typeLabel.plural }:</b></div>
+                        <div>
+                            <template v-for="(label, index) in dimensionData.valueLabels">
+                                ${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template>
+                            </template>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        {% if deleteRoute %}
+            <script>
+                $(function() {
+                    $('#header-options').on('click', 'a[data-delete]', function(event) {
+                        event.preventDefault();
+
+                        var $element = $(this);
+                        var $toast = $('#toast');
+                        var title = $element.attr('data-delete');
+
+                        $element.confirmDialog({
+                            text: 'Are you sure you want to delete ' + title + '?',
+                            confirmEvent: function() {
+                                $toast.toastActivate({
+                                    text: 'Deleting ' + title
+                                });
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: $element.attr('href'),
+                                    data: {articleId: {{ article.id }}},
+                                    dataType: 'json'
+                                }).success(function (response) {
+                                    $toast.toastTimeout({
+                                        text: title + ' was deleted',
+                                        css: 'success'
+                                    });
+
+                                    window.location.href = response.redirect;
+                                }).error(function (response) {
+                                    var temp = $.parseJSON(response.responseText);
+
+                                    $toast.toastTimeout({
+                                        text: 'Error: ' + temp.message,
+                                        css: 'alert'
+                                    });
+                                });
+                            }
+                        });
+                    });
+                });
+            </script>
+        {% endif %}
+
+        {# Unpublish article (just a reject renamed to unpublish when the article is published or archived) #}
+        {% if article.canBeRejected %}
+            {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
+        {% endif %}
+
+        {# Statistics link: must be author or comms officer and article must be published #}
+        {#{% set statisticsRoute = routeLookupIfAuthorized('commsNewsStatistics.getOverview', {article: article, articleId: article.id}) %}#}
+
+        {#{% set hasDropDownRoutes = modifyRoute or deleteRoute or rejectRoute or statisticsRoute %}#}
+        {% set hasDropDownRoutes = modifyRoute or deleteRoute or rejectRoute %}
+
+        <nav>
+            {# Save For Later #}
+            <script src="/javascript/shared/comms/saveforlater.js"></script>
+            <script>
+                $(function() {
+                    $('#saveforlater-container').saveForLater();
+                });
+            </script>
+
+            {% if config.save_for_later %}
+            <span id="saveforlater-container">
+                {% include '@commsNewsSaveForLater/activator.twig' with {
+                    article: article,
+                    isSaved: isSavedForLater
+                } only %}
+            </span>
+            {% endif %}
+
+            {% if hasDropDownRoutes %}
+                <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+            {% endif %}
+        </nav>
+
+        {% if hasDropDownRoutes %}
+        <ul id="header-options" class="f-dropdown" data-dropdown-content>
+
+            {% if modifyRoute %}
+                <li><a class="icon-modify" href="{{ modifyRoute }}">Modify</a></li>
+            {% endif %}
+
+            {% if deleteRoute %}
+                <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString }}" data-delete="{{ article.title }}">Delete</a></li>
+            {% endif %}
+
+            {# 'Unpublish' action
+             # Only show this after the article is approved because...
+             # 'Reject' appears as a button when the article is awaiting moderation, and..
+             # anything before awaiting moderation doesn't need a reject/unpublish button
+             #}
+            {% if rejectRoute and article.isApproved %}
+                <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}{{ returnUrlQueryString }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
+            {% endif %}
+
+            {#{% if statisticsRoute %}#}
+                {#<li><a class="icon-progress" href="{{ statisticsRoute }}">Statistics</a></li>#}
+            {#{% endif %}#}
+        </ul>
+        {% endif %}
+    </div>
+</div>
+
+{# Display body when either there's text content, or an image #}
+{% if article.body|length or article.featureImage.hash %}
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="row">
+                {% if article.featureImage.hash %}
+                    {{ layout.standard(article) }}
+                {% else %}
+                    {{ layout.textonly(article) }}
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endif %}
+
+{# Rejection details, if applicable #}
+{% if article.isRejected %}
+<div class="row">
+    <div class="small-12 island">
+        <section class="no-pad no-margin">
+            <p class="content no-margin"><span class="icon-info"></span>
+                This {{ locale.news }} was <strong>rejected</strong>
+                by <a href="/search/user/{{ article.rejectedBy.id }}" title="View Profile">{{ article.rejectedBy.fullname }}</a>
+                on {{ article.rejectedAt.local }}
+
+                {% if article.rejectedReason|length %}
+                    for the following reason:
+                {% else %}
+                    but no reason was given.
+                {% endif %}
+            </p>
+        </section>
+
+        {% if article.rejectedReason|length %}
+        <blockquote>{{ article.rejectedReason|nl2br }}</blockquote>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+
+{# Social Features and assorted functionality #}
+{#{% include '@commsNews/social.twig' with {#}
+    {#saveForLaterEnabled: saveForLaterEnabled,#}
+    {#article: article,#}
+    {#states: {#}
+        {#'save_for_later': isSavedForLater#}
+    {#}#}
+{#} only %}#}
+
+{# If you have permission to submit and implicitly approve your own articles, do that, otherwise submit for moderation #}
+{% if article.canBeApproved %}
+    {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
+{% endif %}
+{% if article.canBeSubmitted %}
+    {% set submitRoute  = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
+{% endif %}
+{% if (approveRoute or submitRoute) and not isPublishable %}
+<div class="small-12 columns" id="unpublishable-box">
+    <div id="flash" class="alert-box highlight">
+        <span id="error-message">
+            This isn't quite ready for publishing, please <a href="{{ modifyRoute }}">modify this {{ locale.news }}</a> and complete the required fields.
+        </span>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <ul class="flex-list buttons" id="actionButtons">
+            {# Reject this news article #}
+            {% if article.canBeRejected and rejectRoute and not article.isApproved %}
+                <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
+            {% endif %}
+
+            {% if isPublishable and (approveRoute or submitRoute) %}
+                {% if approveRoute %}
+                    {% set buttonText = 'Publish ' ~ locale.news %}
+                {% elseif article.isRejected %}
+                    {% set buttonText = 'Resubmit for moderation' %}
+                {% else %}
+                    {% set buttonText = 'Submit for moderation' %}
+                {% endif %}
+                <li>
+                    <form action="{{ approveRoute ?: submitRoute }}" method="post" id="article-form">
+                        {% if returnUrl|length %}
+                            <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}"/>
+                        {% endif %}
+                        <input type="submit" value="{{ buttonText }}" id="article-submit"/>
+                    </form>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
+{# React container for this page.
+   Will temporarily hold just comments, but the above should be moved in as well
+ #}
+<div data-component="Detail" data-prop-example-prop="{{ article.title }}"></div>
+
+<div class="toast" id="toast"></div>
+
+<div id="recipientsModal" class="reveal-modal" data-reveal>
+    <a class="close-reveal-modal">&#215;</a>
+</div>
+
+<script src="/javascript/components/news.bundle.js"></script>
+<script src="/javascript/shared/comms/audience-bricks.js"></script>
+<script src="/javascript/components/schoolbox-vue.min.js"></script>
+{% autoescape 'js' %}
+<script>
+    /**
+     * Encapsulates information about a type of audience, eg 'folder' or 'campus'
+     *
+     * @param {string}  entityType
+     * @param {string}  name
+     * @param {string}  namePlural
+     * @constructor
+     */
+    var AudienceOption = function(entityType, name, namePlural){
+        this.entityType     = entityType;
+        this.name           = name;
+        this.namePlural     = namePlural;
+    };
+
+    /** @var {AudienceOption[]|Object} audienceOptions */
+    var audienceOptions = {};
+    {% for entityType in availableEntityTypes %}
+    {% set data = entityTypesData[entityType] %}
+    {% if data %}
+    audienceOptions['{{ entityType }}'] = new AudienceOption(
+        '{{ entityType }}',
+        '{{ data.name }}',
+        '{{ data.namePlural | raw }}'
+    );
+    {% endif %}
+    {% endfor %}
+
+    // Bricks need to render various human-friendly labels, so inject the entityType labels
+    // into the BrickManager so it can supply it to Bricks that it creates.
+    var entityTypeLabelMap = {
+        composite: { // -_-
+            singular: 'Complex Audience',
+            plural: 'Complex Audience'
+        }
+    };
+    for (var entityType in audienceOptions) {
+        entityTypeLabelMap[entityType] = {
+            singular: audienceOptions[entityType].name,
+            plural: audienceOptions[entityType].namePlural
+        };
+    }
+
+    var brickManager;
+    var codec = new Codec();
+
+    var app = new Vue({
+        el: '#audience-container',
+        delimiters: ['${', '}'],
+        mounted: function() {
+            var vue          = this;
+            brickManager = new BrickManager(vue, codec, entityTypeLabelMap);
+
+            var audienceSegments = {{ encodedSegments|json_encode|raw }};
+
+            for(key in audienceSegments) {
+                var segment = audienceSegments[key];
+                brickManager.onAddSegment(null, vue.audienceBricks, segment.key, segment.name, segment, segment.labels);
+            }
+        },
+        data: {
+            audienceBricks: [],
+            selectedCompositeBrick: {}
+        },
+        methods: {
+            showCompositeInfo: function(audienceBrick) {
+                this.selectedCompositeBrick = audienceBrick;
+                // Show modal
+                $('#audience-composite').foundation('reveal', 'open');
+            }
+        }
+    });
+</script>
+{% endautoescape %}
+
+{% if article.canBeRejected and rejectRoute %}
+<script>
+    $(function() {
+        $(document).on('click', '#reject-article, #unpublish-article', function(event) {
+            event.preventDefault();
+
+            var $element = $(this);
+            var $toast = $('#toast');
+            var title = $element.attr('data-reject');
+
+            $element.confirmDialog({
+                header: '{{ rejectVerb }} ' + title,
+                format: 'html',
+                text: 'Provide brief feedback for {{ rejectVerb|lower }}ing this article to help the author improve their content. <textarea id="rejectedReason" rows="5"></textarea>',
+                confirmLabel: '{{ rejectVerb }}',
+                cancelLabel: 'Cancel',
+                confirmEvent: function() {
+                    $toast.toastActivate({
+                        text: '{{ rejectVerb }}ing ' + title
+                    });
+
+                    $.ajax({
+                        type: 'POST',
+                        url: $element.attr('href'),
+                        data: {articleId: {{ article.id }}, rejectedReason: $('#rejectedReason').val()},
+                        dataType: 'json'
+                    }).success(function (response) {
+                        $toast.toastTimeout({
+                            text: title + ' was {{ rejectVerb|lower }}ed',
+                            css: 'success'
+                        });
+
+                        window.location.href = response.redirect;
+                    }).error(function (response) {
+                        var temp = $.parseJSON(response.responseText);
+
+                        $toast.toastTimeout({
+                            text: 'Error: ' + temp.message,
+                            css: 'alert'
+                        });
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endif %}
+
+{# Publish news asynchronous #}
+{% if (isPublishable) and (approveRoute or submitRoute) %}
+    {% autoescape 'js' %}
+    <script>
+        $(function() {
+
+            var form = $('#article-form');
+            var articleSubmitButton = $('#article-submit');
+            var buttonOriginalValue = articleSubmitButton.val();
+
+            form.submit(function( event ) {
+                event.preventDefault();
+                var $toast     = $('#toast');
+
+                // Prevent clickjacking and update button text...
+                articleSubmitButton.prop('disabled', true).attr('value','Working...');
+
+                $.ajax({
+                    type: 'POST',
+                    url: form.attr('action'),
+                    data: {articleId: {{ article.id }}},
+                    dataType: 'json'
+                }).success(function (response) {
+                    window.location.href = response.redirect;
+                }).error(function (response) {
+
+                    $toast.toastActivate({
+                        text: 'Error: ' + response.responseJSON.message,
+                        css: 'alert',
+                    });
+
+                    // Revert text to its original value and enable the button back
+                    articleSubmitButton.prop('disabled', false).attr('value',buttonOriginalValue);
+
+                    $toast.toastTimeout({
+                        text: 'Error: ' + response.responseJSON.message,
+                        duration: 3000
+                    });
+                });
+            });
+        });
+    </script>
+    {% endautoescape %}
+{% endif %}
