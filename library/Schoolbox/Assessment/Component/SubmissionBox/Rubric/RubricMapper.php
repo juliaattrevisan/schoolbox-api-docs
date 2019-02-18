@@ -182,9 +182,9 @@ class RubricMapper
      *                                               assessment than this one.
      * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \UnexpectedValueException             If a duplicate indicator or capability exists in the folder
-     * @throws \UnexpectedValueException             If course capability duplicates a unit capability
-     * @throws \UnexpectedValueException             If a capability or indicator that should not be deleted has been
+     * @throws \UnexpectedValueException             - If a duplicate indicator or capability exists in the folder
+     *                                               - If course capability duplicates a unit capability
+     *                                               - If a capability or indicator that should not be deleted has been
      * @throws \InvalidArgumentException             If an undocumented error occurred whilst persisting
      */
     public function persistRowSet(
