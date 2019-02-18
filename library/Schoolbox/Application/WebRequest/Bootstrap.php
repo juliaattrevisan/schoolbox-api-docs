@@ -22,19 +22,8 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 
 
-class Bootstrap extends AbstractBootstrap {
-
-    /**
-     * Load the core configuration file(s)
-     *
-     * @return void
-     */
-    public function loadConfiguration() {
-        require_once __DIR__ . '/../../../../www/conf/conf.php';
-        require_once SITE_root . '/www/include/stdfuncs.php';
-        require_once SITE_root . '/library/constants.php';
-    }
-
+class Bootstrap extends AbstractBootstrap
+{
 
     /**
      * Set the include path

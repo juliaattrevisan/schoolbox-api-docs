@@ -144,6 +144,18 @@ abstract class AbstractBootstrap implements BootstrapInterface
         $this->kernel = $kernel;
     }
 
+    /**
+     * Load the core configuration file(s)
+     *
+     * @return void
+     */
+    public function loadConfiguration(): void
+    {
+        require_once __DIR__ . '/../../../www/conf/conf.php';
+        require_once SITE_root . '/www/include/stdfuncs.php';
+        require_once SITE_root . '/library/constants.php';
+    }
+
 
     /**
      * Install any internal dependencies into the kernel (routing, etc.)

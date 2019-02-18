@@ -27,7 +27,7 @@ interface BootstrapInterface {
 	 *
 	 * @return void
 	 */
-	public function loadConfiguration();
+	public function loadConfiguration(): void;
 
 
 	/**

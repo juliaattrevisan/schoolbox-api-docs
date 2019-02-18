@@ -22,21 +22,10 @@ use Schoolbox\Config\ConfigMapper;
  * @package Schoolbox\Application\Daemon
  * @method Kernel getKernel()
  */
-class Bootstrap extends AbstractBootstrap {
+class Bootstrap extends AbstractBootstrap
+{
 
-	/**
-	 * Load the core configuration file(s)
-	 *
-	 * @return void
-	 */
-	public function loadConfiguration() {
-		require_once __DIR__ . '/../../../../www/conf/conf.php';
-		require_once SITE_root . '/www/include/stdfuncs.php';
-		require_once SITE_root . '/library/constants.php';
-	}
-
-
-	/**
+    /**
 	 * Set the include path
 	 *
 	 * @return void
