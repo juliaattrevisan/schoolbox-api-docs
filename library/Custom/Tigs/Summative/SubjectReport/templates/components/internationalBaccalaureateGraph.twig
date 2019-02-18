@@ -39,7 +39,7 @@ Data:
                     continue;
                 }
                 var column = {
-                    x: Number(key),
+                    x: 8 - Number(key), // Reverse order, highest value first
                     y: rawData[key],
                     name: rawData[key]
                 };
@@ -67,6 +67,14 @@ Data:
                 xAxis: {
                     title: {
                         text: null
+                    },
+                    min: 0.5,
+                    tickInterval: 1,
+                    max: 7.5,
+                    labels: {
+                        formatter: function() {
+                            return 8 - this.pos;
+                        }
                     }
                 },
                 yAxis: {
