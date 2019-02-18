@@ -17,6 +17,8 @@
       "allow-pascal-case"
     ],
     "jsx-boolean-value": false,
-    "ordered-imports": false
+    "ordered-imports": false,
+    "import-name": false,
+    "object-literal-sort-keys": false
   }
 }
