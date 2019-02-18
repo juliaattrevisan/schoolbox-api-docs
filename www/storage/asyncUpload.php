@@ -11,7 +11,6 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
  */
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('Schoolbox\\Application\\BasicRequest');
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 // Force session usage due to flash audio recorder.

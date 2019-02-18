@@ -21,7 +21,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Monolog\Logger;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Update missing Rubric Level Sequences', [
     'verbose' => [ false, false, false ],

@@ -10,8 +10,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Monolog\Logger;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
-
 $kernel = new Schoolbox\Application\Daemon\Kernel('Soft-Delete Confirmation of Submissions', [
     'verbose' => [false, false, false],
     'errors'  => E_ALL,

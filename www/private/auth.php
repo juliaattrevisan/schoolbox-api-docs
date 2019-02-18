@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('Schoolbox\\Application\\BasicRequest');
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 if (!isset($_SESSION['user'])) {

@@ -10,7 +10,6 @@
 
 //includes
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('Schoolbox\\Application\\BasicRequest');
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 if (is_numeric($_GET['id']) && Cfg::get('webdav_enable')) {

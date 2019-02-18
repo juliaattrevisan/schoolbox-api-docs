@@ -4,7 +4,6 @@ use Alaress\IDatabase;
 use Psr\Log\LoggerInterface;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 /**
  * Gets merged setttings from current settings for posted and published notifications

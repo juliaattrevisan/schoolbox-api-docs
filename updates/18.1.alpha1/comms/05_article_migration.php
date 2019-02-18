@@ -6,7 +6,6 @@ use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\EntityType;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 /* A default datetime value that is easily identifiable
  * Only really corrupt articles should result in having this date at the end of migration

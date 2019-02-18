@@ -23,7 +23,6 @@ use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
 use Schoolbox\Pastoral\UploadQueue\Model as PastoralUploadQueueModel;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $opts   = getopt('v');
 $kernel = new Schoolbox\Application\Daemon\Kernel(

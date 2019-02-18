@@ -11,7 +11,6 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Convert Task Instances', [
     'verbose' => [ false, false, false ],

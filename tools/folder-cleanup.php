@@ -6,7 +6,6 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 $folderName = "Lost & Found";
 
 require_once __DIR__ . '/../conf/core/require.php';
-spl_autoload_call('Schoolbox\\Application\\Daemon');
 new \Schoolbox\Application\Daemon\Kernel("Orphaned Folder Cleanup");
 
 $db      = Database::getInstance();

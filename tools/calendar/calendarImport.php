@@ -15,7 +15,6 @@ use React\EventLoop\LoopInterface;
 
 $fields = ['help', 'campus:', 'role:', 'file:', 'owner:', 'source::'];
 $opts = require __DIR__ . '/../../conf/core/require-cli.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Calendar CSV Import', [

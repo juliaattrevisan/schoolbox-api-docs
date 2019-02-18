@@ -4,7 +4,6 @@
 use Aura\Di;
 
 require_once __DIR__ . '/../../conf/core/require-cli.php';
-spl_autoload_call('Schoolbox\\Application\\Daemon');
 
 // Setup kernel
 

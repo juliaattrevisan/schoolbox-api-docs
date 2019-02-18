@@ -20,7 +20,6 @@ $mail = isset($opts['mail']);
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('Schoolbox\\Application\\Daemon');
 
 $threshold = 0;
 if(isset($opts['v'])) {

@@ -21,8 +21,6 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
 
 $opts = require __DIR__ . '/../../conf/core/require-cli.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
-
 $kernel = new Schoolbox\Application\Daemon\Kernel("'Soft-Delete erroneous DueWork draft feedbacks'", [
     'verbose' => $opts['v'] ?? null,
     'errors'  => E_ALL,

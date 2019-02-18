@@ -18,7 +18,6 @@ use React\EventLoop\LoopInterface;
 
 $flags = implode(' ', array_slice($argv, 1));
 $opts = require __DIR__ . '/../../conf/core/require-cli.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Notification Data Reserlializer', [
     'verbose' => [ false, false ,false ], // always full volume

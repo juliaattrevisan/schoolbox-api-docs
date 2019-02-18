@@ -16,7 +16,6 @@ use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as Plags
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('Schoolbox\\Application\\Daemon');
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', ['level' => 200]);
 $log = $kernel->logger();
 

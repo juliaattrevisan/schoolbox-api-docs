@@ -22,7 +22,6 @@ use Alaress\Random;
 use Schoolbox\MapperFactory;
 
 $opts = require __DIR__ . '/../../conf/core/require-cli.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel("'Re-queue kami conversion errors'", [
     'verbose' => $opts['v'] ?? [1, 2, 3],

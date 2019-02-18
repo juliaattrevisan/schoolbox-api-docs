@@ -28,7 +28,6 @@ use Schoolbox\Realtime\Routing\Subscription;
 
 $flags = implode(' ', array_slice($argv, 1));
 $opts = require __DIR__ . '/../../../conf/core/require-cli.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Routing', [
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
