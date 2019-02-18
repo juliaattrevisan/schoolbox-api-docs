@@ -270,8 +270,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     /**
      * Get the last item in the collection
      *
-     * @throws \Exception
-     * @return mixed
+     * @return mixed|null
      */
     public function last()
     {

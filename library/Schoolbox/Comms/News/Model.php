@@ -12,6 +12,7 @@ use Alaress\Json\SerializeTrait;
 use DomainException;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Exceptions\InvalidTransitionException;
+use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Json\Api\AuraLink;
@@ -93,6 +94,11 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
      * @var Storage\Model|null
      */
     private $featureImage;
+
+    /**
+     * @var Thread\Model|null
+     */
+    private $discussionThread;
 
     /**
      * @var Alaress_Date_Format|null
@@ -827,6 +833,26 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     public function setFeatureImage(?Storage\Model $featureImage): self
     {
         $this->featureImage = $featureImage;
+        return $this;
+    }
+
+
+    /**
+     * @return Thread\Model|null
+     */
+    public function getDiscussionThread(): ?Thread\Model
+    {
+        return $this->discussionThread;
+    }
+
+
+    /**
+     * @param Thread\Model|null $discussionThread
+     * @return static
+     */
+    public function setDiscussionThread(?Thread\Model $discussionThread): self
+    {
+        $this->discussionThread = $discussionThread;
         return $this;
     }
 

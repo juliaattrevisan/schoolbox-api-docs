@@ -1,0 +1,326 @@
+openapi: 3.0.2
+
+info:
+  title:       Schoolbox Discussion Threads API
+  description: |
+    Schoolbox Discussion Threads API
+  x-api-id:    7786c5c6-5fc9-4613-827e-f4170f9ffe27
+  x-audience:  external-partner
+  version:     1.0.0
+  contact:
+    name:  Schoolbox Team
+    url:   https://schoolbox.com.au
+    email: developers@schoolbox.com.au
+
+paths:
+  /posts:
+    post:
+      operationId: createPost
+      summary: Creates a new post
+      responses:
+        '201':
+          description: The post that was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/post'
+        default:
+          $ref: '#/components/responses/problem'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/post'
+      parameters:
+        - $ref: '#/components/parameters/token'
+
+  /posts/{id}:
+    delete:
+      operationId: deletePost
+      summary: Deletes a post
+      responses:
+        '204':
+        default:
+          $ref: '#/components/responses/problem'
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/token'
+
+  /posts/{id}/posts:
+    get:
+      operationId: getPostsByParent
+      summary: Returns child posts for a parent post
+      responses:
+        '200':
+          $ref: '#/components/responses/postList'
+        default:
+          $ref: '#/components/responses/problem'
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/token'
+        - $ref: '#/components/parameters/depth'
+
+  /threads/{id}/posts:
+    get:
+      operationId: getPostsByThread
+      summary: Returns posts for a thread
+      responses:
+        '200':
+          $ref: '#/components/responses/postList'
+        default:
+          $ref: '#/components/responses/problem'
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/token'
+        - $ref: '#/components/parameters/depth'
+
+
+components:
+  schemas:
+    id:
+      type: integer
+      format: int32
+
+    thread:
+      title: Thread
+      description: Common fields for discussion threads
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/id'
+        open:
+          type: boolean
+          description: Is the thread open for further comments?
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        children:
+          $ref: '#/components/schemas/postList'
+          description: A list of direct child posts of this thread
+          required: false
+
+    post:
+      title: Post
+      description: Common fields for discussion posts
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/id'
+        thread:
+          $ref: '#/components/schemas/thread'
+          # Usually a post will be retrieved within the context of a thread
+          required: false
+        author:
+          $ref: '#/components/schemas/user'
+          nullable: true
+        content:
+          type: string
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        parent:
+          $ref: '#/components/schemas/post'
+          description: |
+            The direct parent of this post, if there is one.
+            If there is none, this post is a top-level comment within a thread.
+          nullable: true
+        children:
+          $ref: '#/components/schemas/postList'
+          description: A list of direct children of this post
+          required: false
+        visibility:
+          description: |
+            Which role types may view this comment? If not set, assume all role
+            types may view it.
+            This is likely to be replaced with a more sophisticated visibility
+            system, which encompasses individual roles, role types, folders,
+            and who knows what else?
+          type: array
+          items:
+            type: string
+            enum: ['teacher', 'parent', 'student']
+          required: false
+      required:
+        - thread
+        - content
+
+    user:
+      title: User
+      description: Common fields for users
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/id'
+        externalId:
+          type: string
+        title:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        _links:
+          type: object
+          properties:
+            profile:
+              type: string
+              format: uri-reference
+            avatar:
+              type: string
+              format: uri-reference
+              nullable: true
+
+    problem:
+      title: Problem Details
+      description: Schema for RFC 7807 (Problem Details for HTTP APIs)
+      readOnly: true
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          required: true
+          description: A URI reference that identifies the problem type
+          default: 'about:blank'
+        title:
+          type: string
+          required: true
+          description: A short human-readable summary of the problem type
+        status:
+          type: integer
+          format: int32
+          required: true
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+          example: 503
+          description: The HTTP status code
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem
+        instance:
+          type: string
+          format: uri
+          description: A URI reference that identifies the specific occurrence of the problem
+
+    listMetadata:
+      title: List metadata
+      description: Metadata for lists of items retrieved
+      readOnly: true
+      type: object
+      properties:
+        count:
+          type: int
+          required: false
+          description: If provided, the number of items in the result set.
+        cursor:
+          type: object
+          required: false
+          properties:
+            current:
+              type: string
+              nullable: true
+              required: true
+              description: |
+                If set, a cursor to the current page of results.
+                Seems redundant, but it does generate a cursor to a request
+                made without one.
+            next:
+              type: string
+              nullable: true
+              required: true
+              description: If set, a cursor to the next page of results.
+
+
+  responses:
+    problem:
+      description: RFC 7807 Problem Details
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/problem'
+
+    postList:
+      description: a list of posts
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/post'
+              metadata:
+                $ref: '#/components/schemas/listMetadata'
+
+
+  parameters:
+    id:
+      name:        id
+      in:          path
+      description: ID of an item to use
+      required:    true
+      schema:
+        type: int
+        minimum: 1
+#    q:
+#      name:        q
+#      in:          query
+#      description: Query (search) parameter
+#    sort:
+#      name:        sort
+#      in:          query
+#      description: Sort parameter
+#    fields:
+#      name:        fields
+#      in:          query
+#      description: Fields parameter. Use this to request a subset of a record's fields.
+    limit:
+      name:        sort
+      in:          query
+      description: Maximum number of records to return
+      schema:
+        type: int
+        minimum: 1
+        maximum: 100
+        default: 20
+#    offset:
+#      name:        offset
+#      in:          query
+#      description: The offset of the first record to return
+    cursor:
+      name:        cursor
+      in:          query
+      description: |
+        Alternative to offset. A generated but decodable pointer to the first
+        record to return.
+      schema:
+        type: string
+    token:
+      name:        token
+      in:          query
+      description: |
+        A token for user authentication.
+        This is temporary, and will be replaced with oAuth/JWT authentication.
+      schema:
+        type: string
+    depth:
+      name:        depth
+      in:          query
+      description: |
+        Number of levels to descend when retrieving child posts.
+      schema:
+        type: int
+        default: 0
+        minimum: 0
+        maximum: 3
+        required: false

@@ -1,0 +1,71 @@
+@startuml
+
+hide empty fields
+hide empty methods
+
+object discussion_thread {
+    <<PK>> id: int
+    open: bool
+    created: datetime
+    updated: datetime
+    deleted: datetime
+}
+
+note left
+discussion_thread is slated to be able to be
+related to these existing discussion types:
+• blog
+• forum
+• socialstream
+• grades
+
+and possibly new discussion types:
+• assessment
+
+These relation are expected to be via direct
+foreign key relations, as opposed to a context
+type and ID, as proposed earlier.
+
+Relations to arbitrary content could be handled
+by the revised `discussion_thread_context` table:
+instead of a context type and ID, a URL reference
+is stored.
+end note
+
+object discussion_post {
+    <<PK>> id: int
+    discussion_thread_id: int
+    author_id: int
+    content: text
+    created: datetime
+    updated: datetime
+    deleted: datetime
+}
+
+object comms_news_article {
+    <<PK>> id: int
+    ...
+    discussion_thread_id: int
+}
+
+object discussion_thread_context <<proposed>> {
+    <<PK>> id: int
+    discussion_thread_id: int
+    url: url
+}
+
+object user {
+    <<PK>> id: int
+    username: varchar
+    ...
+}
+
+discussion_thread -r-{ discussion_post : discussion_thread_id >
+
+discussion_post }-r- user : author_id <
+
+discussion_thread -d- comms_news_article : discussion_thread_id >
+
+discussion_thread -d-{ discussion_thread_context : discussion_thread_id >
+
+@enduml

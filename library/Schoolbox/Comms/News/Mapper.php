@@ -15,6 +15,7 @@ use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
+use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\News\TopicMapper;
@@ -62,6 +63,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $this->uses('blurb', self::TYPE_STRING);
         $this->joins('feature_image_hash', Storage\Mapper::class, 'hash', null, null, 'featureImage', 'featureImage');
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
+        $this->joins('discussion_thread_id', Thread\Mapper::class, 'id', null, null, 'discussionThread', 'discussionThread');
         $this->uses('comments_allowed', self::TYPE_BOOLEAN);
         $this->joins('accepted_by', UserMapper::class, 'id', null, null, 'acceptedBy', 'moderator');
         $this->uses('accepted_at', self::TYPE_DATETIME);
@@ -104,7 +106,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 {$this->getJoinColumnString('moderator', 'm')},
                 {$this->getJoinColumnString('rejector', 'r')},
                 {$this->getJoinColumnString('featureImage', 'fi')},
-                {$this->getJoinColumnString('featureImage.allowedFileExtension', 'afe')}
+                {$this->getJoinColumnString('featureImage.allowedFileExtension', 'afe')},
+                {$this->getJoinColumnString('discussionThread', 'dt')}
         ";
     }
 
@@ -125,6 +128,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             LEFT JOIN {$this->getJoinSql('rejector', null, 'r', true)}
             LEFT JOIN {$this->getJoinSql('featureImage', null, 'fi')}
             LEFT JOIN {$this->getJoinSql('featureImage.allowedFileExtension', 'fi', 'afe', true)}
+            LEFT JOIN {$this->getJoinSql('discussionThread', null, 'dt', true)}
         ";
     }
 
@@ -178,6 +182,12 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
                 if ($featureImage) {
                     $article->setFeatureImage($featureImage->setMimetype($mime));
+                }
+
+                /** @var Thread\Model|null $discussionThread */
+                $discussionThread = $this->hydrateJoin($row, 'discussionThread', 'dt');
+                if ($discussionThread) {
+                    $article->setDiscussionThread($discussionThread);
                 }
             }
 

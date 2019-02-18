@@ -28,6 +28,7 @@ use Alaress\Lumberjack\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Collection;
+use Schoolbox\Discussion;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\ISoftDeletable;
@@ -256,6 +257,10 @@ class RecursiveUndeleter
         Pastoral\Access\Mapper::class   => [],
         Pastoral\Audience\Mapper::class => [],
         Pastoral\Group\Member\Mapper::class => [],
+        Discussion\Thread\Mapper::class => [
+            Discussion\Post\Mapper::class => 'discussion_thread_id',
+        ],
+        Discussion\Post\Mapper::class => [],
     ];
 
 
