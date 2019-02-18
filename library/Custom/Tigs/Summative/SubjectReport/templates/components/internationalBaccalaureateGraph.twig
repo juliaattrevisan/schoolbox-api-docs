@@ -39,7 +39,7 @@ Data:
                     continue;
                 }
                 var column = {
-                    x: 8 - Number(key), // Reverse order, highest value first
+                    x: Object.keys(rawData).length + 1 - Number(key), // Reverse order, highest value first
                     y: rawData[key],
                     name: rawData[key]
                 };
@@ -73,7 +73,7 @@ Data:
                     max: 7.5,
                     labels: {
                         formatter: function() {
-                            return 8 - this.pos;
+                            return Object.keys(rawData).length + 1 - this.pos;
                         }
                     }
                 },
