@@ -8,8 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Post;
 
-use Alaress\Authorizer\Authorizer;
-use Alaress\Authorizer\Rule;
+use Alaress\Authorizer as Auth;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
@@ -32,22 +31,19 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        // Permission for getting a thread or its contents:
-        // If it's a comms news item, it should be the same as the perms for
-        // viewing the comms item.
-        /** @var Authorizer $authorizer */
-        /** @var News\Mapper $newsMapper */
+        /** @var Auth\Authorizer $authorizer */
+        /** @var News\Mapper     $newsMapper */
         $authorizer       = $this->getInjector()->get('authorizer');
         $newsMapper       = $this->getMapperFactory()->get(News\Mapper::class);
-        $deleteAuthorizer = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+        $deleteAuthorizer = new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
                 return new Thread\Authorizer\CanDeleteFromThread($authorizer, $newsMapper);
             })
         );
-        $readAuthorizer = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+        $getAuthorizer    = new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
                 return new Thread\Authorizer\CanGetFromThread($authorizer, $newsMapper);
             })
         );
@@ -64,7 +60,7 @@ class Module extends BaseModule
             'GET',
             '/{id:\d+}/posts',
             'getPostsByParent',
-            $readAuthorizer,
+            $getAuthorizer,
             [$this, 'preloadPost']
         );
     }
