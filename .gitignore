@@ -46,3 +46,4 @@ browscap.ini
 !Gemfile.lock
 version.json
 codeception.yml
+v8-compile-cache-0/

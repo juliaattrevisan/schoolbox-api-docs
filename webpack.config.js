@@ -1,7 +1,22 @@
+const path = require("path");
+
 module.exports = {
+  entry: {
+    news: "./library/Schoolbox/Comms/News/react/News.tsx"
+  },
+  output: {
+    path: path.resolve(__dirname, "www/javascript/components"),
+    filename: "[name].bundle.js"
+  },
   devtool: "source-map",
   resolve: {
     extensions: [".js", ".ts", ".tsx"],
+    alias: {
+      '@schoolbox': path.resolve(
+        __dirname,
+        "react/components"
+      ),
+    }
   },
   module: {
     rules: [

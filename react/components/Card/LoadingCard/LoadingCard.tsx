@@ -1,6 +1,6 @@
 import * as React from "react";
-import { LoadingImage } from "../../Image/Image";
-import { LoadingMeta } from "../../Meta/Meta";
+import { LoadingImage } from "@schoolbox/Image/Image";
+import { LoadingMeta } from "@schoolbox/Meta/Meta";
 
 /**
  * Skeleton loader for a card.

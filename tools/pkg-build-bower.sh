@@ -14,19 +14,29 @@ fi
 echo "Installing Bower submodules";
 grunt bower;
 check=$?;
-if [ $? -ne 0 ];
+if [ $check -ne 0 ];
 then
 	echo "An error occurred";
 	exit $check;
 fi
 
-echo "Building JS files via UglifyJS";
+echo "Building JS files (Grunt)";
 grunt build.js;
 check=$?;
-if [ $? -ne 0 ];
+if [ $check -ne 0 ];
 then
 	echo "An error occurred";
 	exit $check;
 fi
+
+echo "Building JS files (Webpack)";
+npm run publish;
+check=$?;
+if [ $check -ne 0 ];
+then
+	echo "An error occurred";
+	exit $check;
+fi
+
 
 sha1sum bower.json > www/javascript/components/bower.checksum;
