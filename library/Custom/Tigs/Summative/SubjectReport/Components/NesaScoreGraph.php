@@ -29,11 +29,11 @@ class NesaScoreGraph extends BaseComponent
 
     // Sort left-to-right for highcharts performance. @see https://www.highcharts.com/errors/15/
     private const BASE_MARKS = [
-        'E' => 0,
-        'D' => 0,
-        'C' => 0,
-        'B' => 0,
         'A' => 0,
+        'B' => 0,
+        'C' => 0,
+        'D' => 0,
+        'E' => 0,
     ];
 
     /** @var GenericCollection|UnitImpl\Model[] */
