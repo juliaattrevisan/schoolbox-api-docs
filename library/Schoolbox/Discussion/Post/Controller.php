@@ -67,9 +67,7 @@ class Controller extends BaseController
      */
     public function deletePost(Model $post): void
     {
-        // 404 for now I guess?
-        throw new NotFound();
-//        $this->mapper->delete($post);
-//        $this->response->status->setCode(204);
+        $this->mapper->delete($post);
+        $this->response->status->setCode(204);
     }
 }
