@@ -48,8 +48,12 @@ $event->setOwner($owner)
 	->setDetail($_POST['detail'])
 	->setPublishDateTime(null)
 	->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
+
+/* Give all-day events a time, so that update.php can calculate the minuteDelta appropriately
+ * without adding a 12-hour offset
+ */
 if ($_POST['allDay']) {
-    $dateObj = new Alaress_Date_Format($_POST['date'], 'd-m-Y');
+    $dateObj = new Alaress_Date_Format($_POST['date'] . ' 00:00', 'd-m-Y H:i');
     $event
         ->setStartDateTime($dateObj)
         ->setEndDateTime($dateObj)
