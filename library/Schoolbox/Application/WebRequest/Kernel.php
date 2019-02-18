@@ -38,8 +38,7 @@ class Kernel extends \Alaress\Application\Kernel
     */
     public function __construct()
     {
-        $this->boot = new Bootstrap($this);
-        $this->boot();
+        $this->boot(new Bootstrap($this));
     }
 
 

@@ -64,8 +64,7 @@ class Kernel extends \Alaress\Application\Kernel
     public function __construct($name, $opts = [])
     {
         $this->setOpts($opts);
-        $this->boot = new Bootstrap($this);
-        $this->boot();
+        $this->boot(new Bootstrap($this));
 
         pcntl_signal(SIGCHLD, SIG_IGN);
         error_reporting(isset($opts['errors']) ? $opts['errors'] : E_ALL ^ E_NOTICE);

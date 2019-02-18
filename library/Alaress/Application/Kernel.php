@@ -25,7 +25,7 @@ use RuntimeException;
 abstract class Kernel {
 
 	/** @var BootstrapInterface */
-	protected $boot;
+	private $boot;
 
 	/** @var Di\Container */
 	protected $di;
@@ -41,16 +41,16 @@ abstract class Kernel {
 	 */
 	protected $exceptionCallbacks = [];
 
-	/**
-	 * Load the boot loader, returning success or failure
-	 *
-	 * @return bool
-	 */
-	public function boot() {
-		// if it's not a bootstrap, don't bother trying
-		if(!$this->boot instanceof BootstrapInterface) {
-			return false;
-		}
+
+    /**
+     * Load the boot loader and run the launch sequence
+     *
+     * @param BootstrapInterface $boot
+     * @return bool
+     */
+	protected function boot(BootstrapInterface $boot): bool
+    {
+		$this->boot = $boot;
 
         // run the launch sequence
         $this->boot->loadConfiguration();
