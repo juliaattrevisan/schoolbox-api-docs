@@ -115,15 +115,6 @@ class Kernel extends CliKernelAbstract
 
 
     /**
-     * @return LoopInterface
-     */
-    private function getLoop()
-    {
-        return $this->loop;
-    }
-
-
-    /**
      * Check that all kernel options are valid
      *
      * @param array $options
@@ -229,7 +220,7 @@ EOL;
         }
 
         try {
-            $this->getLoop()->run();
+            $this->loop->run();
             $this->logger()->notice($this->name . " daemon loop ended; preparing to terminate");
         } catch (PDOException $e) {
             $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
