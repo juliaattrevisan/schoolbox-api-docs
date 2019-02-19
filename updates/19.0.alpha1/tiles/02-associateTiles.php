@@ -68,6 +68,36 @@ $app = new class extends App
         )
     ";
 
+    private const ATTACH_TO_FOLDER_QUERY = "
+        INSERT INTO tile_layout_for_folder (
+            tile_layout_id,
+            folder_id
+        ) VALUES (
+            :tileLayoutId,
+            :identifier
+        )
+    ";
+
+    private const ATTACH_TO_DASHBOARD_QUERY = "
+        INSERT INTO tile_layout_for_dashboard (
+            tile_layout_id,
+            role_id
+        ) VALUES (
+            :tileLayoutId,
+            :identifier
+        )
+    ";
+
+    private const ATTACH_TO_HOMEPAGE_TEMPLATE_QUERY = "
+        INSERT INTO tile_layout_for_homepage_template (
+            tile_layout_id,
+            homepage_template_id
+        ) VALUES (
+            :tileLayoutId,
+            :identifier
+        )
+    ";
+
     public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts)
     {
         // Find component config values
@@ -83,6 +113,10 @@ $app = new class extends App
 
 
         $attachLayoutQuery = $db->prepareQuery(self::ATTACH_LAYOUT_ID_QUERY);
+
+        $attachToFolderQuery           = $db->prepareQuery(self::ATTACH_TO_FOLDER_QUERY);
+        $attachToDashboardQuery        = $db->prepareQuery(self::ATTACH_TO_DASHBOARD_QUERY);
+        $attachToHomepageTemplateQuery = $db->prepareQuery(self::ATTACH_TO_HOMEPAGE_TEMPLATE_QUERY);
 
 
         // Collate them together
@@ -162,7 +196,32 @@ $app = new class extends App
                         $component['layoutId']
                     )
                 );
-                // TODO: connect layout ID-based components to their source
+
+
+                $params = [
+                    'tileLayoutId' => $component['layoutId'],
+                    'identifier'   => $component['component']['identifier'],
+                ];
+                switch ($component['component']['module']) {
+                    case 'homepage':
+                        $log->info(self::INDENT . sprintf('attaching layout to folder #%d', $params['identifier']));
+                        $attachToFolderQuery->execute($params);
+                        break;
+
+                    case 'homepage_template':
+                        $log->info(self::INDENT . sprintf('attaching layout to homepage template #%d', $params['identifier']));
+                        $attachToHomepageTemplateQuery->execute($params);
+                        break;
+
+                    case 'dashboard':
+                        $log->info(self::INDENT . sprintf('attaching layout to dashboard for role #%d', $params['identifier']));
+                        $attachToDashboardQuery->execute($params);
+                        break;
+
+                    default:
+                        $log->info(self::INDENT . sprintf('unknown module "%s": skipping', $component['component']['module']));
+                        break;
+                }
             } else {
                 $log->info(self::indent(1) . 'component has neither a tile source nor layout ID: leaving as is');
             }
