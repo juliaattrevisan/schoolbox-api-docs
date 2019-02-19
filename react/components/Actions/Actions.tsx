@@ -1,14 +1,14 @@
-import * as React from 'react';
+import * as React from "react";
 
 interface IActions {
-    children: JSX.Element[];
+  children: JSX.Element[];
 }
 
 /**
  * Container for a list of Action components.
  */
 const Actions: React.FunctionComponent<IActions> = ({ children }) => (
-    <nav>{children}</nav>
-)
+  <nav>{children}</nav>
+);
 
-export { Actions, IActions }
+export { Actions, IActions };

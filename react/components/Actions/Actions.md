@@ -8,7 +8,7 @@
 
 ```jsx
 <Actions>
-    <Action id="1" icon="modify" href="#" title="Modify article" />
-    <Action id="2" icon="delete" href="#" title="Delete article" />
+  <Action id="1" icon="modify" href="#" title="Modify article" />
+  <Action id="2" icon="delete" href="#" title="Delete article" />
 </Actions>
 ```

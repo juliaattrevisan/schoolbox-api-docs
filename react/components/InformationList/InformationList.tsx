@@ -1,7 +1,7 @@
 import * as React from "react";
 
 interface IInformationList {
-    children: JSX.Element[];
+  children: JSX.Element[];
 }
 
 /**
@@ -9,11 +9,7 @@ interface IInformationList {
  * For the most part you will want to use CardList instead of this (which uses this).
  */
 const InformationList: React.FunctionComponent<IInformationList> = props => {
-    return (
-        <ul className="information-list">
-            {props.children}
-        </ul>
-    );
-}
+  return <ul className="information-list">{props.children}</ul>;
+};
 
 export { IInformationList, InformationList };

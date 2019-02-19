@@ -1,6 +1,6 @@
 ```jsx
 <InformationList>
-    <InformationListItem>Something</InformationListItem>
-    <InformationListItem>Something else</InformationListItem>
+  <InformationListItem>Something</InformationListItem>
+  <InformationListItem>Something else</InformationListItem>
 </InformationList>
 ```

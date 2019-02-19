@@ -1,4 +1,4 @@
-Empty states are used to show users that something could or will be in a certain space, usually with a link to get the user where they need to go to create something. 
+Empty states are used to show users that something could or will be in a certain space, usually with a link to get the user where they need to go to create something.
 
 ## Write access wording
 
@@ -6,7 +6,10 @@ Empty states are used to show users that something could or will be in a certain
 
 ```jsx
 <EmptyState icon="news">
-    <p><a href="#">Post a news article</a> to share new information on this homepage..</p>
+  <p>
+    <a href="#">Post a news article</a> to share new information on this
+    homepage..
+  </p>
 </EmptyState>
 ```
 
@@ -16,6 +19,6 @@ Empty states are used to show users that something could or will be in a certain
 
 ```jsx
 <EmptyState icon="blog">
-    <p>There are no blog posts to view at this time.</p>
+  <p>There are no blog posts to view at this time.</p>
 </EmptyState>
 ```

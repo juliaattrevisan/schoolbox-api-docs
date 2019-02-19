@@ -105,9 +105,11 @@ const CardActions: React.FunctionComponent<ICard> = ({ actions }) => {
     return null;
   }
 
-  const actionComponents = actions.map((action: IAction) => <Action key={action.id} {...action} />);
+  const actionComponents = actions.map((action: IAction) => (
+    <Action key={action.id} {...action} />
+  ));
   return <Actions>{actionComponents}</Actions>;
-}
+};
 
 const CardContent: React.FunctionComponent<ICard> = ({ children }) => {
   if (!children) {
@@ -115,6 +117,6 @@ const CardContent: React.FunctionComponent<ICard> = ({ children }) => {
   }
 
   return <article>{children}</article>;
-}
+};
 
 export { ICard, Card };
