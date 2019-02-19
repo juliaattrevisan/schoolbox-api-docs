@@ -184,10 +184,10 @@ $app = new class extends App
             // If this has a layout ID: join this layout to this component.
             // If this has a tileSource instead: figure out which component this belongs to
             // If I can't do that: this component is useless, delete it
-            $log->notice(sprintf('Checking tile component #%d', $componentId));
+            $this->log->notice(sprintf('Checking tile component #%d', $componentId));
 
             if ($component['tileSource']) {
-                $log->info(
+                $this->log->info(
                     self::INDENT . sprintf(
                         'component has alternate tile source #%d: connecting to a layout ID',
                         $component['tileSource']
@@ -199,7 +199,7 @@ $app = new class extends App
                 // (this will happen by removing the tileSource config)
 
                 if ($component['layoutId']) {
-                    $log->warning(
+                    $this->log->warning(
                         self::indent(1) . sprintf(
                             'component also has layout ID #%d: ignoring, and using tile source',
                             $component['layoutId']
@@ -210,9 +210,9 @@ $app = new class extends App
                 // Figure out which layout ID this falls back to
                 $baseLayoutId = $this->findBaseLayoutId($component['tileSource'], $components);
                 if ($baseLayoutId) {
-                    $log->notice(self::INDENT . sprintf('found layout ID #%d: attaching', $baseLayoutId));
+                    $this->log->notice(self::INDENT . sprintf('found layout ID #%d: attaching', $baseLayoutId));
                 } else {
-                    $log->warning(self::INDENT . 'no base layout found: this tile component will be empty');
+                    $this->log->warning(self::INDENT . 'no base layout found: this tile component will be empty');
                 }
 
                 // Now attach the layout ID
@@ -223,7 +223,7 @@ $app = new class extends App
                 ]);
 
             } elseif ($component['layoutId']) {
-                $log->info(
+                $this->log->info(
                     self::indent(1) . sprintf(
                         'component has layout ID #%d: attaching layout to a location',
                         $component['layoutId']
@@ -237,26 +237,26 @@ $app = new class extends App
                 ];
                 switch ($component['component']['module']) {
                     case 'homepage':
-                        $log->notice(self::INDENT . sprintf('attaching layout to folder #%d', $params['identifier']));
+                        $this->log->notice(self::INDENT . sprintf('attaching layout to folder #%d', $params['identifier']));
                         $this->attachToFolderQuery->execute($params);
                         break;
 
                     case 'homepage_template':
-                        $log->notice(self::INDENT . sprintf('attaching layout to homepage template #%d', $params['identifier']));
+                        $this->log->notice(self::INDENT . sprintf('attaching layout to homepage template #%d', $params['identifier']));
                         $this->attachToHomepageTemplateQuery->execute($params);
                         break;
 
                     case 'dashboard':
-                        $log->notice(self::INDENT . sprintf('attaching layout to dashboard for role #%d', $params['identifier']));
+                        $this->log->notice(self::INDENT . sprintf('attaching layout to dashboard for role #%d', $params['identifier']));
                         $this->attachToDashboardQuery->execute($params);
                         break;
 
                     default:
-                        $log->warning(self::INDENT . sprintf('unknown module "%s": skipping', $component['component']['module']));
+                        $this->log->warning(self::INDENT . sprintf('unknown module "%s": skipping', $component['component']['module']));
                         break;
                 }
             } else {
-                $log->notice(self::indent(1) . 'component has neither a tile source nor layout ID: leaving as is');
+                $this->log->notice(self::indent(1) . 'component has neither a tile source nor layout ID: leaving as is');
             }
         }
 
