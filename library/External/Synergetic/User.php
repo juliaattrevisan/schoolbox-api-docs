@@ -55,10 +55,10 @@ class External_Synergetic_User implements External_UserInterface
 
         if ($photo = $queryPhoto->fetch()) {
 
-            /* If this $user doesn't have an image, shank one down and save it into brownhole
+            /* If this $user doesn't have an image, or if the SIS picture is more recent than the one we
+             * currently have, shank it down and save it into brownhole
              *
-             * Or, if the SIS picture is more recent than the one we currently have,
-             * download it and cache it into brownhole
+             * (the latter occurs when the sis gets updated with a new picture and we need to update our storage)
              */
             if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(new \Alaress_Date_Format(strtotime($photo['ModifiedDate']), 'U'))) {
 
@@ -73,9 +73,6 @@ class External_Synergetic_User implements External_UserInterface
                 );
 
                 $photo = $queryPhoto->fetch();
-
-                /* The cache has expired; overwrite it with the one from the SIS
-                 * This occurs when the sis gets updated with a new picture
 
                 /* Save it into brownhole
                  */
