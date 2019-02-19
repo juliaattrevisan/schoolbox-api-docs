@@ -8,15 +8,16 @@
  * @link        http://www.alaress.com.au/
  */
 
-// merge values
-$fields  = \array_merge($fields ?? [], ['porcelain', 'mem', 'truemem', 'pid', 'instance:']);
-$opts    = \getopt(($shortOpts ?? '') . 'v', $fields);
+use Alaress\Lumberjack\Logger;
 
-if (isset($opts['instance'])) {
+// Was an instance id specified as a CLI option? Check this before calling core require.
+$instanceOpt = \getopt('', ['instance:']);
+if (isset($instanceOpt['instance'])) {
     // bind the instance ID as given
-    define('INSTANCE_ID', $opts['instance']);
+    define('INSTANCE_ID', $instanceOpt['instance']);
 }
 
 require __DIR__ . '/require.php';
 
-return $opts;
+$fields = \array_merge($fields ?? [], [Logger::FIELD_PORCELAIN, Logger::FIELD_MEM, Logger::FIELD_TRUE_MEM, Logger::FIELD_PID]);
+return \getopt(($shortOpts ?? '') . 'v', $fields);
