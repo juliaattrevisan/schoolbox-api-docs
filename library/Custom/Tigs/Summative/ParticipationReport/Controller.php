@@ -254,6 +254,43 @@ class Controller extends Web\Controller\Base
         return $houseEvents;
     }
 
+
+    /**
+     * Returns absence data for the student given within the reports period
+     *
+     * @param User              $user
+     * @param StudentAttributes $attributes
+     * @return array
+     * @throws UnexpectedValueException
+     */
+    private function getAbsenceData(User $user, StudentAttributes $attributes): array
+    {
+
+        $semesters = $attributes->getCurriculumSemesters();
+
+        $sql = "
+            SELECT count(1)
+            FROM uvContinuousReportingAbsences
+            WHERE ID = :student_id
+            AND `date` >= :start AND `date` <= :finish
+        ";
+
+        $absenceCounts = [];
+        foreach ($semesters as $semester => $dates) {
+            $params = [
+                'student_id' => $user->getExternalId(),
+                'start'      => $dates['start']->getDatabaseDate(),
+                'finish'     => $dates['finish']->getDatabaseDate(),
+            ];
+
+            $query = $this->externalDatabase->executeQuery($sql, $params);
+            $absenceCounts[$semester] = (int)$query->fetchColumn();
+        }
+
+        return $absenceCounts;
+
+    }
+
     /**
      * Returns general comment of pastoral records of given attributes.
      * @param User $user
