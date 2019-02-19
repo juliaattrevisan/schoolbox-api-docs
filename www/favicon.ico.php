@@ -9,7 +9,7 @@
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-require_once dirname(__FILE__) . '/../conf/core/require-web.php';
+require_once __DIR__ . '/../conf/core/require-web.php';
 
 $page = new SitePage(false);
 

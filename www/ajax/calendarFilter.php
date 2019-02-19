@@ -14,7 +14,7 @@ if(!isset($_POST['fList'])) {
 }
 
 // this is just to properly initialise the sessions so changes will take hold
-require_once dirname(__FILE__) . '/../../conf/core/require-web.php';
+require_once __DIR__ . '/../../conf/core/require-web.php';
 $page = new SitePage();
 
 foreach($_POST['fList'] as $filter) {

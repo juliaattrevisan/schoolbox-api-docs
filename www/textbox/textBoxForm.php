@@ -6,7 +6,7 @@ if (isset($this)) {
     $this->pageNotFound();
 }
 
-require_once(dirname(__FILE__) . '/../../conf/core/require-web.php');
+require_once __DIR__ . '/../../conf/core/require-web.php';
 
 $page         = new SitePage();
 $groupHandler = new Group();

@@ -5,7 +5,7 @@
  */
 
 /** @var Kernel $kernel */
-$kernel = require_once dirname(__FILE__) . '/../../conf/core/require-web.php';
+$kernel = require_once __DIR__ . '/../../conf/core/require-web.php';
 
 /** @var SitePage $page */
 $page = $kernel->getDependencyInjector()->get('sitePage');

@@ -10,7 +10,7 @@
 
 namespace SocialStream;
 
-require_once dirname(__FILE__) . '/../../../conf/core/require-web.php';
+require_once __DIR__ . '/../../../conf/core/require-web.php';
 
 $instanceId = intval($_GET['instanceId']);
 $homepageId = intval($_GET['homepageId']);

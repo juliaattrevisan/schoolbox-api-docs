@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/../../conf/core/require-web.php');
+require_once __DIR__ . '/../../conf/core/require-web.php';
 
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Forum\PostMapper;

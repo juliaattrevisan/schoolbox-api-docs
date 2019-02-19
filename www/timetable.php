@@ -7,7 +7,7 @@
 //timetable object that displays the users timetable
 
 if (!isset($this)) {
-    require_once dirname(__FILE__) . '/../conf/core/require-web.php';
+    require_once __DIR__ . '/../conf/core/require-web.php';
     SitePage::localRedir('/timetable/');
 }
 

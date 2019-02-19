@@ -2,7 +2,7 @@
 
 header('Content-Type: text/html; charset=utf-8');
 
-require_once(dirname(__FILE__) . '/../conf/core/require-web.php');
+require_once(__DIR__ . '/../conf/core/require-web.php');
 
 use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
