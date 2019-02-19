@@ -277,7 +277,8 @@ class UserMapper extends Mapper
                 {$this->getJoinColumnString('schoolHouse', 'h')},
                 {$this->getColumnString('lu')},
                 {$this->getJoinColumnString('role', 'lur')},
-                {$this->getJoinColumnString('portrait', 'portrait')}
+                {$this->getJoinColumnString('portrait', 'portrait')},
+                {$this->getJoinColumnString('portrait.allowedFileExtension', 'afe')}
             FROM `user`
             LEFT JOIN superusers su ON su.id = user.id
             LEFT JOIN {$this->getJoinSql('role', '', 'g')}
@@ -286,6 +287,7 @@ class UserMapper extends Mapper
             LEFT JOIN {$this->getJoinSql('role', 'lu', 'lur')}
             LEFT JOIN {$this->getJoinSql('schoolHouse', '', 'h')}
             LEFT JOIN {$this->getJoinSql('portrait', '', 'portrait')}
+            LEFT JOIN {$this->getJoinSql('portrait.allowedFileExtension', 'portrait', 'afe', true)}
         ";
     }
 
@@ -334,6 +336,19 @@ class UserMapper extends Mapper
                 $users[$userId]->getLinkedUser()->setOffset($linkedUser->getId(), $linkedUser);
             }
 
+            /* Portrait Image
+             */
+
+            /** @var Storage\Model $portrait */
+            $portrait = $this->hydrateJoin($row, 'portrait', 'portrait');
+
+            if ($portrait) {
+                /** @var \Schoolbox\File\Mimetype $mime */
+                $mime = $this->hydrateJoin($row, 'portrait.allowedFileExtension', 'afe');
+
+                $portrait->setMimetype($mime);
+                $users[$userId]->setPortrait($portrait);
+            }
         }
 
         return $this->createCollection(array_values($users));
