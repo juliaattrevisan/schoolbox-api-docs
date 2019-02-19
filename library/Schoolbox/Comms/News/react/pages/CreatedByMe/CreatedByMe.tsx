@@ -240,19 +240,12 @@ const showContent = (
       }
     });
 
+    const onSelect = (tab: number) => {
+      onTabClick(tab, statuses, pageSelected, setTabSelected, setPageSelected);
+    };
+
     return (
-      <Tabs
-        selectedIndex={tabSelected}
-        onSelect={(tab: number) => {
-          onTabClick(
-            tab,
-            statuses,
-            pageSelected,
-            setTabSelected,
-            setPageSelected
-          );
-        }}
-      >
+      <Tabs selectedIndex={tabSelected} onSelect={onSelect}>
         {tabs}
       </Tabs>
     );
@@ -291,12 +284,14 @@ const showPagination = (
     return;
   }
 
+  const onPageChange = (data: any) => {
+    onPageClick(data.selected, statuses, tabSelected, setPageSelected);
+  };
+
   return (
     <Pagination
       pageCount={pageCount}
-      onPageChange={(data: any) => {
-        onPageClick(data.selected, statuses, tabSelected, setPageSelected);
-      }}
+      onPageChange={onPageChange}
       forcePage={pageSelected}
     />
   );
