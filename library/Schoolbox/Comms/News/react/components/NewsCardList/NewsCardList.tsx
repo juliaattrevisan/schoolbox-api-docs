@@ -48,8 +48,7 @@ const generateCardActions = (article: IArticle): IAction[] | null => {
 const generateMeta = (article: IArticle): JSX.Element => {
   return (
     <>
-      <b>{article.status}</b>
-      &nbsp;
+      <b>{article.status}</b>{" "}
       <time title={article.statusDate.long}>
         {article.statusDate.relativeTime}
       </time>
