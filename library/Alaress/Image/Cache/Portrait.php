@@ -21,15 +21,14 @@ use Schoolbox\UserMapper;
 class Portrait extends Storage
 {
 
+    /** @var IConfigLoader */
+    private $config;
+
     /** @var UserMapper */
     private $userMapper;
 
     /** @var User */
     private $sessionUser;
-
-    /** @var IConfigLoader */
-    private $config;
-
 
     /**
      * Portrait constructor.
@@ -42,7 +41,7 @@ class Portrait extends Storage
      */
     public function __construct(User $user, string $key, User $sessionUser)
     {
-        $this->config    = new Loader();
+        $this->config      = new Loader();
         $this->sessionUser = $sessionUser;
         $this->userMapper  = UserMapper::getInstance();
 
@@ -90,7 +89,7 @@ class Portrait extends Storage
         $group = new Group();
 
         /* Staff members can always see all portraits
-           */
+         */
         if ($this->sessionUser->getRole()->isStaff()) {
             return true;
         }
@@ -101,9 +100,11 @@ class Portrait extends Storage
         $userList = $this->userMapper->findByColumn('synergy_id', $externalId);
 
         foreach ($userList as $user) {
+
             /* Everyone can always see their own face
              */
             $userId = $user->getId();
+
             if ($this->sessionUser->getId() === $userId) {
                 return true;
             }

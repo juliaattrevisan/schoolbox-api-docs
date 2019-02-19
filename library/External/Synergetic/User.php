@@ -19,7 +19,7 @@ class External_Synergetic_User implements External_UserInterface
      * This identifies the CONVERT/CAST format for ISO8601 date
      * yyyy-mm-ddThh:mi:ss.mmm
      */
-    const FORMAT_ISO8601 = 126;
+    private const FORMAT_ISO8601 = 126;
 
     /**
      * Constructor
@@ -31,8 +31,15 @@ class External_Synergetic_User implements External_UserInterface
         $this->setupDatabase();
     }
 
+
     /**
      * @inheritdoc
+     * @param User $user
+     * @return Storage\Model|null
+     * @throws InvalidArgumentException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getPortrait(User $user): ?Storage\Model
     {
@@ -52,7 +59,6 @@ class External_Synergetic_User implements External_UserInterface
         );
 
         // Check if we found a photo in the SIS
-
         if ($photo = $queryPhoto->fetch()) {
 
             /* If this $user doesn't have an image, or if the SIS picture is more recent than the one we
