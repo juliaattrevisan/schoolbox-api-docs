@@ -26,4 +26,9 @@ class Config
     public const _TIGS_WORK_TYPE_HSC_ASSESSMENT_RANK = self::PREFIX_TIGS_CRP . 'work_type_hsc_assessment_rank';
     public const _TEXTBOX_HEADING = self::PREFIX_TIGS_CRP . 'course_description_textbox_heading';
     public const _TIGS_PASTORAL_TYPE= self::PREFIX_TIGS_CRP . 'pastoral_type';
+    public const _TIGS_GRADES_INFO_YEAR_7_10 = self::PREFIX_TIGS_CRP . 'grades_info_year_7-10';
+    public const _TIGS_GRADES_INFO_YEAR_11_IB = self::PREFIX_TIGS_CRP . 'grades_info_year_11_ib';
+    public const _TIGS_GRADES_INFO_YEAR_11_HSC = self::PREFIX_TIGS_CRP . 'grades_info_year_11_hsc';
+    public const _TIGS_GRADES_INFO_YEAR_12_IB = self::PREFIX_TIGS_CRP . 'grades_info_year_12_ib';
+    public const _TIGS_GRADES_INFO_YEAR_12_HSC = self::PREFIX_TIGS_CRP . 'grades_info_year_12_hsc';
 }
