@@ -73,9 +73,8 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
                 $templateHandle,
                 '@tile/component/tile.twig',
                 array(
-                    'component'                  => $this,
-                    'showButtons'                => false,
-                    'tile_component_instance_id' => $this->getConfig('tileSource') ?: $this->getInstance()->getId(),
+                    'component'   => $this,
+                    'showButtons' => false,
                 ),
                 !$this->getConfig('compactMode'),
                 false

@@ -74,9 +74,8 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
         } else {
             $twigTemplate = '@tile/component/tile.twig';
             $twigData = array(
-                'component' => $this,
+                'component'   => $this,
                 'writeAccess' => $this->hasWriteAccess(),
-                'tile_component_instance_id' => $this->getConfig('tileSource') ?: $this->getInstance()->getId(),
             );
             $renderHeader = !$this->getConfig('compactMode') || $this->hasContextWriteAccess();
             return $this->renderTwigTemplate($templateHandle, $twigTemplate, $twigData, $renderHeader);
