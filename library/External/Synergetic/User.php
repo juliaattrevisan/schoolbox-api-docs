@@ -74,16 +74,18 @@ class External_Synergetic_User implements External_UserInterface
 
                 $photo = $queryPhoto->fetch();
 
-                // The cache has expired, overwrite it with the one from the SIS
+                /* The cache has expired; overwrite it with the one from the SIS
+                 * This occurs when the sis gets updated with a new picture
 
-                /* TODO: Save it into brownhole
-                 * TODO: Update user with latest version
-                 * TODO: Return latest version
+                /* Save it into brownhole
                  */
+                $portrait = Storage\Mapper::getInstance()->acceptStream($user->getExternalId() . '.jpg', $photo['Photo']);
 
-//                $photoHandle = fopen($photoPath, "w");
-//                fwrite($photoHandle, $photo['Photo']);
-//                fclose($photoHandle);
+                /* Update user with latest version
+                 */
+                $user->setPortrait($portrait);
+
+                \Schoolbox\UserMapper::getInstance()->save($user);
             }
 
             /* Then return the latest Storage\Model instance
