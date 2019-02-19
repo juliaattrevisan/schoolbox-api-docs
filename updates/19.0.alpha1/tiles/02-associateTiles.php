@@ -95,7 +95,7 @@ $app = new class extends App
     ";
 
     private const ATTACH_TO_FOLDER_QUERY = "
-        INSERT INTO tile_layout_for_folder (
+        INSERT IGNORE INTO tile_layout_for_folder (
             tile_layout_id,
             folder_id
         ) VALUES (
@@ -105,7 +105,7 @@ $app = new class extends App
     ";
 
     private const ATTACH_TO_DASHBOARD_QUERY = "
-        INSERT INTO tile_layout_for_dashboard (
+        INSERT IGNORE INTO tile_layout_for_dashboard (
             tile_layout_id,
             role_id
         ) VALUES (
@@ -115,7 +115,7 @@ $app = new class extends App
     ";
 
     private const ATTACH_TO_HOMEPAGE_TEMPLATE_QUERY = "
-        INSERT INTO tile_layout_for_homepage_template (
+        INSERT IGNORE INTO tile_layout_for_homepage_template (
             tile_layout_id,
             homepage_template_id
         ) VALUES (
