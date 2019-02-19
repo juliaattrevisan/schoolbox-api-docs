@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Statement\Query\IQuery;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -30,6 +31,31 @@ $app = new class extends App
      * @var LoggerInterface
      */
     private $log;
+
+    /**
+     * @var IConnector
+     */
+    private $db;
+
+    /**
+     * @var IQuery
+     */
+    private $attachLayoutQuery;
+
+    /**
+     * @var IQuery
+     */
+    private $attachToFolderQuery;
+
+    /**
+     * @var IQuery
+     */
+    private $attachToDashboardQuery;
+
+    /**
+     * @var IQuery
+     */
+    private $attachToHomepageTemplateQuery;
 
     private const INDENT = '  ';
 
@@ -111,8 +137,8 @@ $app = new class extends App
         // Find component config values
         /** @var IConnector $db */
         $this->log   = $log;
-        $db          = $di->get('databaseInternal');
-        $configQuery = $db->prepareQuery(self::FIND_COMPONENT_CONFIG_QUERY);
+        $this->db    = $di->get('databaseInternal');
+        $configQuery = $this->db->prepareQuery(self::FIND_COMPONENT_CONFIG_QUERY);
         $params      = [
             'dashboardTile' => DashboardTileController::class,
             'homepageTile'  => HomepageTileController::class,
@@ -120,17 +146,17 @@ $app = new class extends App
         $configQuery->execute($params);
 
 
-        $attachLayoutQuery = $db->prepareQuery(self::ATTACH_LAYOUT_ID_QUERY);
+        $this->attachLayoutQuery = $this->db->prepareQuery(self::ATTACH_LAYOUT_ID_QUERY);
 
-        $attachToFolderQuery           = $db->prepareQuery(self::ATTACH_TO_FOLDER_QUERY);
-        $attachToDashboardQuery        = $db->prepareQuery(self::ATTACH_TO_DASHBOARD_QUERY);
-        $attachToHomepageTemplateQuery = $db->prepareQuery(self::ATTACH_TO_HOMEPAGE_TEMPLATE_QUERY);
+        $this->attachToFolderQuery           = $this->db->prepareQuery(self::ATTACH_TO_FOLDER_QUERY);
+        $this->attachToDashboardQuery        = $this->db->prepareQuery(self::ATTACH_TO_DASHBOARD_QUERY);
+        $this->attachToHomepageTemplateQuery = $this->db->prepareQuery(self::ATTACH_TO_HOMEPAGE_TEMPLATE_QUERY);
 
 
         // Collate them together
         $components = [];
 
-        $db->beginTransaction();
+        $this->db->beginTransaction();
 
         foreach ($configQuery->getIterator() as $row) {
             $id    = (int)$row['id'];
@@ -187,11 +213,10 @@ $app = new class extends App
                     $log->notice(self::INDENT . sprintf('found layout ID #%d: attaching', $baseLayoutId));
                 } else {
                     $log->warning(self::INDENT . 'no base layout found: this tile component will be empty');
-                    continue;
                 }
 
                 // Now attach the layout ID
-                $attachLayoutQuery->execute([
+                $this->attachLayoutQuery->execute([
                     'class'       => $component['component']['class'],
                     'componentId' => $componentId,
                     'layoutId'    => $baseLayoutId,
@@ -213,17 +238,17 @@ $app = new class extends App
                 switch ($component['component']['module']) {
                     case 'homepage':
                         $log->notice(self::INDENT . sprintf('attaching layout to folder #%d', $params['identifier']));
-                        $attachToFolderQuery->execute($params);
+                        $this->attachToFolderQuery->execute($params);
                         break;
 
                     case 'homepage_template':
                         $log->notice(self::INDENT . sprintf('attaching layout to homepage template #%d', $params['identifier']));
-                        $attachToHomepageTemplateQuery->execute($params);
+                        $this->attachToHomepageTemplateQuery->execute($params);
                         break;
 
                     case 'dashboard':
                         $log->notice(self::INDENT . sprintf('attaching layout to dashboard for role #%d', $params['identifier']));
-                        $attachToDashboardQuery->execute($params);
+                        $this->attachToDashboardQuery->execute($params);
                         break;
 
                     default:
@@ -236,7 +261,7 @@ $app = new class extends App
         }
 
 
-        $db->commit();
+        $this->db->commit();
     }
 
 
