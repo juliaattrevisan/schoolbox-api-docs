@@ -51,10 +51,10 @@ class Kernel extends CliKernelAbstract
     const RLIMIT_TOTAL_MEMORY = 'totalmem';
 
     /** @var string */
-    protected $name;
+    private $name;
 
     /** @var LoopInterface */
-    protected $loop;
+    private $loop;
 
     /**
      * All command line options relevant to this kernel, app, and logger
@@ -63,7 +63,7 @@ class Kernel extends CliKernelAbstract
     private $opts;
 
     /** @var LoggerInterface */
-    protected $log;
+    private $log;
 
     /**
      * Was this kernel invoked at a specific log level?
@@ -77,7 +77,7 @@ class Kernel extends CliKernelAbstract
      *
      * @var string[][]
      */
-    protected $limits;
+    private $limits;
 
 
     /**
