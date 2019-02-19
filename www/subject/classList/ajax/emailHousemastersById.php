@@ -10,7 +10,7 @@
 
 use Alaress\Mail\AbstractMailer;
 
-require_once __DIR__ . '/../../../../library/Bootstrap.php';
+require_once __DIR__ . '/../../../../conf/core/require-web.php';
 
 // Bedankt voor het bellen van Alaress. Uw oproep is erg belangrijk voor ons...
 

@@ -13,7 +13,7 @@ use Schoolbox\Calendar\Event\Access;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 
-require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../conf/core/require-web.php');
 
 $groupHandler    = new Group();
 $calendarHandler = new Calendar();

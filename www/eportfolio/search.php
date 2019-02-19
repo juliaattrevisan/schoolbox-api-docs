@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
+require_once dirname(__FILE__) . '/../../conf/core/require-web.php';
 
 $return = array();
 if (isset($_GET['query']) && strlen($_GET['query']) && isset($_GET['groupID']) && strlen($_GET['groupID'])) {

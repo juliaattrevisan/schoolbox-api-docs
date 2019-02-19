@@ -24,7 +24,7 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../../../conf/core/require-web.php');
 
 $page = new SitePage();
 

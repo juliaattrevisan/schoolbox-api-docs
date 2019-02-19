@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>
  */
-require_once(dirname(__FILE__) . '/../../../library/Bootstrap.php');
+require_once __DIR__ . '/../../../conf/core/require-web.php';
 
 /*
  *

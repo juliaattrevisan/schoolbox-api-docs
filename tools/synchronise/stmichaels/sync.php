@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once(dirname(__FILE__) . '/../../../library/Bootstrap.php');
+require_once __DIR__ . '/../../../conf/core/require-web.php';
 
 /* If you want to actually perform the DB update, use:
  * $sync->setPerformUpdate(true);

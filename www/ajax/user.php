@@ -9,7 +9,7 @@
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
-require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
+require_once dirname(__FILE__) . '/../../conf/core/require-web.php';
 require_once SITE_root . '/www/include/stdfuncs.php';
 
 $userHandler = new User();

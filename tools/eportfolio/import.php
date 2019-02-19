@@ -16,7 +16,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-require_once __DIR__ . '/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require-cli.php';
 
 $options = getopt('u:r::U::p::', ['skip-duplicates', 'enable-eportfolio', 'dry-run']);
 $kernel = new Schoolbox\Application\Daemon\Kernel('Routing', [

@@ -10,7 +10,7 @@
 
 use Alaress\Mail\AbstractMailer;
 
-require_once('../../../../library/Bootstrap.php');
+require_once('../../../../conf/core/require-web.php');
 
 /* avviare la sessione con il solito sitepage
  */

@@ -15,7 +15,7 @@
 //use Schoolbox\Permission\Access\UserAccess;
 //use Schoolbox\Error;
 
-require_once __DIR__ . '/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require-web.php';
 
 // This page no longer exists
 SitePage::localRedir('/', null, 410);

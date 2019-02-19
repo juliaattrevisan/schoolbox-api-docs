@@ -8,7 +8,7 @@
  */
 
 if (empty($this)) {
-    require_once __DIR__ . '/../../../../library/Bootstrap.php';
+    require_once __DIR__ . '/../../../../conf/core/require-web.php';
     SitePage::localRedir('/resources');
 }
 

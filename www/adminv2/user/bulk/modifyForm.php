@@ -14,7 +14,7 @@ use Schoolbox\Realtime\Routing\Cache\WritableCache;
 
 
 if (empty($this)) {
-    require_once __DIR__ . '/../../../../library/Bootstrap.php';
+    require_once __DIR__ . '/../../../../conf/core/require-web.php';
     // go away
     error(2);
 }

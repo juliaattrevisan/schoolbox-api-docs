@@ -10,7 +10,7 @@ use Alaress\Mail\AttachmentStream;
 ************************************************************/
 //outputs form to get users mail details and processes the information
 
-require_once __DIR__."/../../library/Bootstrap.php";
+require_once __DIR__ . "/../../conf/core/require-web.php";
 use Schoolbox\Error\Mapper as ErrorMapper;
 
 $page = new SitePage();

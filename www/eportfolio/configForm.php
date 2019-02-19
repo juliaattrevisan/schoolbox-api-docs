@@ -8,7 +8,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 
-$kernel = require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
+$kernel = require_once dirname(__FILE__) . '/../../conf/core/require-web.php';
 
 $page = new SitePage();
 $page->setDi($kernel->getDependencyInjector());

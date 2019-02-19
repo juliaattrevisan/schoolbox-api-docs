@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../conf/core/require-web.php');
 
 use \Schoolbox\Breadcrumbs;
 use \Schoolbox\Mapper\Exception\Deleted as DeletedException;

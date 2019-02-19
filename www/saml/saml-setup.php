@@ -1,7 +1,7 @@
 <?php
 
 use BrowscapPHP\Browscap;
-require_once __DIR__.'/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require-web.php';
 
 
 $spBaseUrl = 'https://'.Config::get('site_hostname').'.'.Config::get('site_domain');

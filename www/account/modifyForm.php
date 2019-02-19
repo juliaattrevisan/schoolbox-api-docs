@@ -4,7 +4,7 @@
  */
 
 /** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
-$kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
+$kernel = require_once(dirname(__FILE__) . '/../../conf/core/require-web.php');
 
 use Psr\Log\NullLogger;
 use Schoolbox\Config\ConfigMapper;

@@ -12,7 +12,7 @@
 // require SitePage context
 /** @var SitePage $this */
 if (!isset($this)) {
-    require_once('../../../library/Bootstrap.php');
+    require_once('../../../conf/core/require-web.php');
     httpError(400, 101); // resource not available
 }
 

@@ -4,7 +4,7 @@
  * Teacher username saver - internal use only
  */
 
-require_once(__DIR__ . '/../../../library/Bootstrap.php');
+require_once __DIR__ . '/../../../conf/core/require-cli.php';
 
 use Alaress\Lumberjack\Logger;
 

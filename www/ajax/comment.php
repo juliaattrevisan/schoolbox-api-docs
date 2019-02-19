@@ -20,7 +20,7 @@ if (isset($this)) {
     exit;
 }
 
-require_once('../../library/Bootstrap.php');
+require_once('../../conf/core/require-web.php');
 
 // do sessiony things
 new SitePage();

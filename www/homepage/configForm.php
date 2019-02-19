@@ -5,7 +5,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 // If you inject the dependency injection engine into Sitepage,
 // it can use Twig to generate component content.
 /** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
-$kernel = require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
+$kernel = require_once dirname(__FILE__) . '/../../conf/core/require-web.php';
 
 $page = new SitePage();
 $page->setDi($kernel->getDependencyInjector());

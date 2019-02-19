@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-require_once __DIR__ . '/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require-web.php';
 
 /* Convert all answers from alpha index to numerical index
  */

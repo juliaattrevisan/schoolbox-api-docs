@@ -1,6 +1,6 @@
 <?php
 
-require_once SITE_root . '/library/Bootstrap.php';
+require_once SITE_root . '/conf/core/require-web.php';
 
 use \Schoolbox\Breadcrumbs;
 

@@ -10,7 +10,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-require_once('../../../library/Bootstrap.php');
+require_once('../../../conf/core/require-web.php');
 
 $page = new SitePage();
 $groupHandler = new Group();

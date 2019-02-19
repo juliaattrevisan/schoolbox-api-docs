@@ -10,5 +10,5 @@
  *
  */
 
-require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../conf/core/require-web.php');
 SitePage::localRedir('/', null, 410);

@@ -2,7 +2,7 @@
 <?php
 
 /** @var Kernel $kernel */
-$kernel = require_once __DIR__ . '/../library/Bootstrap.php';
+$kernel = require_once __DIR__ . '/../conf/core/require-cli.php';
 
 use Alaress\Application\Kernel;
 use \Schoolbox\Mapper\Exception as MapperException;

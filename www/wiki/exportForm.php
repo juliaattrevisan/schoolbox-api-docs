@@ -4,7 +4,7 @@
 
 use Alaress\Application\Kernel;
 
-$kernel = require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
+$kernel = require_once __DIR__. '/../../conf/core/require-web.php';
 
 $page         = $kernel->getDependencyInjector()->get('layoutEngine');
 $wikiHandler  = new Wiki;

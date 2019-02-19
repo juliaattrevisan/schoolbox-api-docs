@@ -1,6 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../conf/core/require-web.php';
 $page = new SitePage;
 
 

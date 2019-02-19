@@ -13,7 +13,7 @@ if (isset($this)) {
      */
 
     /** @var Alaress\Application\Kernel $kernel */
-    $kernel = require_once(__DIR__ . '/../../library/Bootstrap.php');
+    $kernel = require_once __DIR__ . '/../../conf/core/require-web.php';
 
     /** @var SitePage $page */
     $page = $kernel->getDependencyInjector()->get('sitePage');

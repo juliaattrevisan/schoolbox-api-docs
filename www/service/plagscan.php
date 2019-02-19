@@ -8,7 +8,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-require_once '../../library/Bootstrap.php';
+require_once '../../conf/core/require-web.php';
 
 use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Callback as PlagscanCallback;
 

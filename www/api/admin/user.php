@@ -9,7 +9,7 @@ use Schoolbox\UserMapper;
 
 header("Content-Type: text/xml");
 
-require_once(dirname(__FILE__) . '/../../../library/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../../conf/core/require-web.php');
 
 $userMapper = UserMapper::getInstance();
 $campusMapper = CampusMapper::getInstance();

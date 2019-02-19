@@ -4,7 +4,7 @@ use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
-require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../conf/core/require-web.php');
 
 $categoryId = $_REQUEST['categoryID'];
 $groupHandler = new Group(HOMEPAGE_SERVICE);

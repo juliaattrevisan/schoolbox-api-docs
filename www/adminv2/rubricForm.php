@@ -12,7 +12,7 @@ if(isset($this)) {
     $this->localRedir('/adminv2/rubricresults');
 }
 
-require_once(dirname(__FILE__).'/../../library/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../conf/core/require-web.php');
 
 if(!isset($_POST['action'])) {
     httpError(400, 2);

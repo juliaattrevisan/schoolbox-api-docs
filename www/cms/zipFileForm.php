@@ -1,6 +1,6 @@
 <?php
 /** @var Alaress\Application\Kernel $kernel */
-$kernel = require_once __DIR__ . '/../../library/Bootstrap.php';
+$kernel = require_once __DIR__ . '/../../conf/core/require-web.php';
 
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage;

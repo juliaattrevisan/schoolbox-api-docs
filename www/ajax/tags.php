@@ -14,7 +14,7 @@ use Schoolbox\Fixtures\Position\Mapper as PositionMapper;
 use Schoolbox\UserMapper;
 
 if(!isset($this)) {
-    require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
+    require_once(dirname(__FILE__) . '/../../conf/core/require-web.php');
     error(2);
 }
 /** @var SitePage $this */

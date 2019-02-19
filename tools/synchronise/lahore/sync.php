@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-require_once __DIR__ . '/../../../library/Bootstrap.php';
+require_once __DIR__ . '/../../../conf/core/require-web.php';
 
 $options = getopt("v", array('perform-update'));
 

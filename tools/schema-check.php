@@ -22,7 +22,7 @@ if (isset($this)) {
     exit;
 }
 
-require_once __DIR__ . '/../library/Bootstrap.php';
+require_once __DIR__ . '/../conf/core/require-web.php';
 
 
 if (isset($_GET['path']) && strlen(trim($_GET['path']))) {

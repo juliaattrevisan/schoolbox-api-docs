@@ -9,7 +9,7 @@ use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\Group;
 
-require_once('../../library/Bootstrap.php');
+require_once('../../conf/core/require-web.php');
 
 $page = new SitePage();
 $groupMapper = GroupMapper::getInstance();

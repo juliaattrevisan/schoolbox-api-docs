@@ -33,7 +33,7 @@ if($argc < 3) {
 	die($helptext);
 }
 
-require_once(__DIR__ . '/../../library/Bootstrap.php');
+require_once __DIR__ . '/../../conf/core/require-cli.php';
 
 $levels = Monolog\Logger::getLevels();
 

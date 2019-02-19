@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
+require_once dirname(__FILE__) . '/../../conf/core/require-web.php';
 
 if (isset($_GET['recaptcha_answer'])) {
 	if (ReCaptcha::checkResponse($_GET['recaptcha_answer'], $_GET['recaptcha_challenge']))

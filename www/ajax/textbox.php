@@ -2,7 +2,7 @@
 use Schoolbox\Application\WebRequest\Kernel;
 
 /** @var Kernel $kernel */
-$kernel = require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
+$kernel = require_once dirname(__FILE__) . '/../../conf/core/require-web.php';
 
 $page          = new SitePage;
 $textboxMapper = new \Schoolbox\Resource\Textbox\Mapper();

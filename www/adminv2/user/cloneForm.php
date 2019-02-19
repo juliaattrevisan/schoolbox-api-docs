@@ -16,7 +16,7 @@ if (isset($this)) {
     error(2);
 }
 
-require_once __DIR__ . '/../../../library/Bootstrap.php';
+require_once __DIR__ . '/../../../conf/core/require-web.php';
 
 new SitePage();
 

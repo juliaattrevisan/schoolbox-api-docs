@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../conf/core/require-web.php');
 
 include dirname(__FILE__) . "/../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc.inc";     // from http://phpxmlrpc.sourceforge.net/
 include dirname(__FILE__) . "/../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpcs.inc";    // from http://phpxmlrpc.sourceforge.net/

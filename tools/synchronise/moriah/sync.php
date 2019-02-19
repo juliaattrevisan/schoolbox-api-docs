@@ -10,8 +10,8 @@
 
 $options = getopt("v", array('perform-update', 'diagnostic'));
 
-require_once(dirname(__FILE__) . '/../../../library/Bootstrap.php');
-require_once(dirname(__FILE__) . '/../abstract/SynchroniseAbstract.php');
+require_once __DIR__ . '/../../../conf/core/require-cli.php';
+require_once __DIR__ . '/../abstract/SynchroniseAbstract.php';
 
 $sync = new SynchroniseAbstract('Moriah', isset($options['v']), isset($options['perform-update']));
 

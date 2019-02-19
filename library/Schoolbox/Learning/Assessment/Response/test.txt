@@ -3,7 +3,7 @@
 header('Content-Type: text/html; charset=utf-8');
 
 /** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
-$kernel = require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
+$kernel = require_once(dirname(__FILE__) . '/../conf/core/require-web.php');
 
 /** @var \Schoolbox\Learning\Assessment\Participant\DataSource $participantDataSource */
 $participantDataSource = $kernel->getDependencyInjector()->get('participantDataSource');

@@ -2,7 +2,7 @@
 <?php
 
 /** @var WebRequest\Kernel $kernel */
-$kernel = require __DIR__ . '/../../../library/Bootstrap.php';
+$kernel = require __DIR__ . '/../../../conf/core/require-cli.php';
 
 use Alaress\Csv\Reader;
 use Alaress\Lumberjack\Logger;

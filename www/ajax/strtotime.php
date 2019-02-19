@@ -17,7 +17,7 @@ if (empty($naturalLanguage)) {
     die(json_encode([ 'time' => null ]));
 }
 
-require_once __DIR__ . '/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require-web.php';
 
 try {
     $adf = Alaress_Date_Format::newNaturalDate($naturalLanguage);

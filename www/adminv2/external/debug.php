@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-//$kernel = require_once '../../../library/Bootstrap.php';
+$kernel = require_once '../../../conf/core/require-web.php';
 //
 //$di = $kernel->getDependencyInjector();
 //
