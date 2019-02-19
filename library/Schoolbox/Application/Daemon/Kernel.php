@@ -60,7 +60,12 @@ class Kernel extends CliKernelAbstract
     private $loop;
 
     /**
-     * All command line options relevant to this kernel, app, and logger
+     * All options injected into this Daemon kernel.
+     *
+     * Used for:
+     * 1. Controlling logging behaviour
+     * 2. Passed back into the run() function for function/App-specific config
+     *
      * @var array
      */
     private $opts;
@@ -266,6 +271,7 @@ EOL;
      * @throws PDOException
      * @throws RangeException
      * @throws RuntimeException
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function onError($errNum, $errStr, $errFile, $errLine): ?bool
     {
@@ -315,6 +321,7 @@ EOL;
      * @throws PDOException
      * @throws RangeException
      * @throws RuntimeException
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     private function onWarning($errNum, $errStr, $errFile, $errLine): void
     {
@@ -389,6 +396,7 @@ EOL;
 
     /**
      * @param Exception $e
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function onException($e): void
     {
@@ -404,6 +412,8 @@ EOL;
 
     /**
      * Check if it was a fatal error that shut us down, and if it was, advise as such
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function onShutdown(): void
     {
