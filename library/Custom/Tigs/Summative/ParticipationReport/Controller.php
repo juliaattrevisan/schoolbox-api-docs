@@ -13,9 +13,12 @@ use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters;
+use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use External_UserInterface;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
@@ -34,17 +37,21 @@ class Controller extends Web\Controller\Base
     /** IConnector $externalDatabase */
     private $externalDatabase;
 
+    /** @var PastoralDataSource $pastoralDataSource */
+    protected $pastoralDataSource;
 
     /**
      * @param External_UserInterface $externalUser
      * @param UserMapper             $userMapper
      * @param IConnector             $externalDatabase
+     * @param PastoralDataSource $pastoralDataSource
      */
-    public function __construct(External_UserInterface $externalUser, UserMapper $userMapper, IConnector $externalDatabase)
+    public function __construct(External_UserInterface $externalUser, UserMapper $userMapper, IConnector $externalDatabase, PastoralDataSource $pastoralDataSource)
     {
         $this->externalUser = $externalUser;
         $this->userMapper   = $userMapper;
         $this->externalDatabase = $externalDatabase;
+        $this->pastoralDataSource = $pastoralDataSource;
     }
 
 
@@ -72,6 +79,7 @@ class Controller extends Web\Controller\Base
         $deanAndMentor = $this->getDeanAndMentor($user, $externalStudent);
         $awards        = $this->getAwardsData($user, $attributes);
         $houseEvents   = $this->getHouseEventsData($user, $attributes);
+        $deansComments = $this->getDeansComment($user, $attributes);
 
         $data   = [
             'user'        => $user,
@@ -81,6 +89,7 @@ class Controller extends Web\Controller\Base
             'mentor'      => $deanAndMentor['mentor'],
             'awards'      => $awards,
             'houseEvents' => $houseEvents,
+            'deansComments' => $deansComments,
         ];
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
 
@@ -244,5 +253,56 @@ class Controller extends Web\Controller\Base
         }
 
         return $houseEvents;
+    }
+
+    /**
+     * Returns general comment of pastoral records of given attributes.
+     * @param User $user
+     * @param StudentAttributes $attributes
+     * @return array semester numbers -> comments
+     */
+    private function getDeansComment(User $user, StudentAttributes $attributes): array
+    {
+        $semesters = $attributes->getCurriculumSemesters();
+
+        // initialise
+        $deansComment = [];
+        foreach (\array_keys($semesters) as $semester) {
+            $deansComment[$semester] = '';
+        }
+
+        $pastoralType = $this->getConfigLoader()->get(Config::_TIGS_PASTORAL_TAG);
+        if (!$pastoralType) {
+            // no pastoral type configured
+            return $deansComment;
+        }
+
+        foreach ($semesters as $semester => $dates) {
+            try {
+                /** @var \Alaress_Date_Format $start */
+                $start = $dates['start'];
+                /** @var \Alaress_Date_Format $finish */
+                $finish = $dates['finish'];
+
+                $records = $this->pastoralDataSource->findByColumnList(
+                    $this->getUser(),
+                    [
+                        'student_id' => $user->getId(),
+                        'type_id' => $pastoralType,
+                    ]
+                )->filter(
+                    function ($record) use ($start, $finish) {
+                        /** @var Pastoral $record */
+                        return $record->getCreatedAt()->gte($start) && $record->getCreatedAt()->lte($finish);
+                    }
+                )->sortBy('createdAt', 'desc');
+            } catch (Exception $e) {
+                continue;
+            }
+            if ($records->count() > 0) {
+                $deansComment[$semester] = $records->first()->getBodyPublic();
+            }
+        }
+        return $deansComment;
     }
 }
