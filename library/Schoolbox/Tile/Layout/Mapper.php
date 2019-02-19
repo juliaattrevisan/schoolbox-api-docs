@@ -10,6 +10,7 @@
 namespace Schoolbox\Tile\Layout;
 
 use PDOStatement;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -169,5 +170,80 @@ class Mapper extends BaseMapper
         $tileMapper = $this->getJoinMapper('tile');
         $model->setTileList($tileMapper->findForLayout($model->getId()));
         return $model;
+    }
+
+
+    /**
+     * Find tile layouts for this component's context (homepage, dashboard,
+     * homepage template).
+     *
+     * (Apologies for the component-related logic which arguably doesn't belong
+     *  in this class.)
+     *
+     * @param int $componentId
+     * @return GenericCollection
+     */
+    public function findForComponentContext(int $componentId): GenericCollection
+    {
+        // First find the component
+        $instance = \Component_InstanceMapper::getInstance()->findByInstanceId($componentId);
+        if ($instance) {
+            // is it an alt-source?
+            $altSource = $instance->getConfigArray()['src']['value'] ?? null;
+            if ($altSource) {
+                return $this->findForFolder((int)$altSource);
+            }
+
+            $identifier = (int)$instance->getIdentifier();
+            switch ($instance->getModule()) {
+                case 'homepage':
+                    return $this->findForFolder($identifier);
+
+                case 'dashboard':
+                    return $this->findForDashboard($identifier);
+
+                case 'homepage_template':
+                    return $this->findForHomepageTemplate($identifier);
+            }
+        }
+
+
+        return $this->createCollection();
+    }
+
+
+    /**
+     * Find tile layouts for this folder.
+     *
+     * @param int $folderId
+     * @return GenericCollection|Model[]
+     */
+    public function findForFolder(int $folderId): GenericCollection
+    {
+        return $this->findByColumn('f.id', $folderId);
+    }
+
+
+    /**
+     * Find tile layouts for this role's dashboard.
+     *
+     * @param int $roleId
+     * @return GenericCollection|Model[]
+     */
+    public function findForDashboard(int $roleId): GenericCollection
+    {
+        return $this->findByColumn('r.id', $roleId);
+    }
+
+
+    /**
+     * Find tile layouts for this homepage template.
+     *
+     * @param int $homepageTemplateId
+     * @return GenericCollection|Model[]
+     */
+    public function findForHomepageTemplate(int $homepageTemplateId): GenericCollection
+    {
+        return $this->findByColumn('h.id', $homepageTemplateId);
     }
 }
