@@ -117,7 +117,7 @@ class Kernel extends CliKernelAbstract
     /**
      * @return LoopInterface
      */
-    public function getLoop()
+    private function getLoop()
     {
         return $this->loop;
     }
@@ -164,7 +164,7 @@ class Kernel extends CliKernelAbstract
      * @param string $name
      * @return mixed
      */
-    public function getOpt($name)
+    private function getOpt($name)
     {
         return isset($this->opts[$name]) ? $this->opts[$name] : null;
     }
@@ -295,7 +295,7 @@ EOL;
      * @param int    $errLine
      * @throws Exception
      */
-    protected function onWarning($errNum, $errStr, $errFile, $errLine)
+    private function onWarning($errNum, $errStr, $errFile, $errLine)
     {
         if (strpos($errStr, 'stream_select') === 0) {
             // this is fine to be let through
@@ -425,7 +425,7 @@ EOL;
      *
      * @return int
      */
-    public function getLoggingLevel(): int
+    private function getLoggingLevel(): int
     {
         $v = $this->getOpt(self::OPT_VERBOSITY);
 
