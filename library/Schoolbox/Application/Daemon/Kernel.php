@@ -259,7 +259,7 @@ EOL;
      * @return bool
      * @throws ErrorException
      */
-    public function onError($errNum, $errStr, $errFile, $errLine)
+    public function onError($errNum, $errStr, $errFile, $errLine): ?bool
     {
         if (!(error_reporting() & $errNum)) {
             // This error code is not included in error_reporting
@@ -304,7 +304,7 @@ EOL;
      * @param int    $errLine
      * @throws Exception
      */
-    private function onWarning($errNum, $errStr, $errFile, $errLine)
+    private function onWarning($errNum, $errStr, $errFile, $errLine): void
     {
         if (strpos($errStr, 'stream_select') === 0) {
             // this is fine to be let through
@@ -378,7 +378,7 @@ EOL;
     /**
      * @param Exception $e
      */
-    public function onException($e)
+    public function onException($e): void
     {
         $this->callExceptionCallbacks($e);
         try {
@@ -393,7 +393,7 @@ EOL;
     /**
      * Check if it was a fatal error that shut us down, and if it was, advise as such
      */
-    public function onShutdown()
+    public function onShutdown(): void
     {
         $error = error_get_last();
 
