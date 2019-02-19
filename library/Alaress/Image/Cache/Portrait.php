@@ -41,14 +41,13 @@ class Portrait extends BrokenFS
     /**
      * Portrait constructor.
      *
-     * @param string $externalId
+     * @param User   $user
      * @param string $key
      * @param User   $sessionUser
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
-     * @throws \Exception
      */
-    public function __construct(string $externalId, string $key, User $sessionUser)
+    public function __construct(User $user, string $key, User $sessionUser)
     {
         /* A value for $externalId would be useful
          */
