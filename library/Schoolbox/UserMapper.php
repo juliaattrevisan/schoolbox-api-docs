@@ -18,7 +18,9 @@ use Schoolbox;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Search\Results;
+use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
+
 
 /**
  * Class UserMapper
@@ -104,6 +106,7 @@ class UserMapper extends Mapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->joins('portrait_hash', Storage\Mapper::class, 'hash', null, null, 'portrait', 'portrait');
         $this->joins('house', HouseMapper::class, 'id', null, null, 'schoolHouse', 'schoolHouse');
         $this->joins('residential_house_id', HouseResidentialMapper::class, 'id', null, null, 'residentialHouse', 'residentialHouse');
         $this->joins('group_id', RoleMapper::class, 'id', null, null, 'role', 'role');
@@ -259,18 +262,22 @@ class UserMapper extends Mapper
         return $this->hydrateSelect($statement);
     }
 
+
     /**
      * @return string
+     * @throws Mapper\DefinitionException
      */
-    protected function getSelectString()
+    protected function getSelectString(): string
     {
         return "
-            SELECT {$this->getColumnString()}, IF(su.id, 1, 0) as `superuser`,
-                    {$this->getJoinColumnString('role', 'g')},
-                    {$this->getJoinColumnString('userCampus', 'c')},
-                    {$this->getJoinColumnString('schoolHouse', 'h')},
-                    {$this->getColumnString('lu')},
-                    {$this->getJoinColumnString('role', 'lur')}
+            SELECT 
+                {$this->getColumnString()}, IF(su.id, 1, 0) as `superuser`,
+                {$this->getJoinColumnString('role', 'g')},
+                {$this->getJoinColumnString('userCampus', 'c')},
+                {$this->getJoinColumnString('schoolHouse', 'h')},
+                {$this->getColumnString('lu')},
+                {$this->getJoinColumnString('role', 'lur')},
+                {$this->getJoinColumnString('portrait', 'portrait')}
             FROM `user`
             LEFT JOIN superusers su ON su.id = user.id
             LEFT JOIN {$this->getJoinSql('role', '', 'g')}
@@ -278,7 +285,7 @@ class UserMapper extends Mapper
             LEFT JOIN {$this->getJoinSql('user_link', '', 'lu')}
             LEFT JOIN {$this->getJoinSql('role', 'lu', 'lur')}
             LEFT JOIN {$this->getJoinSql('schoolHouse', '', 'h')}
-
+            LEFT JOIN {$this->getJoinSql('portrait', '', 'portrait')}
         ";
     }
 
