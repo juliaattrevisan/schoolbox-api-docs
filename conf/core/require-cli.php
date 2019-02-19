@@ -19,5 +19,8 @@ if (isset($instanceOpt['instance'])) {
 
 require __DIR__ . '/require.php';
 
+// TODO - for now we need to ensure $fields and $opts are in scope when this returns for backwards compatibility.
+// TODO clean this up so that callers use the required values, not the returned value (It's bad practice to return values from requires.)
 $fields = \array_merge($fields ?? [], [Logger::FIELD_PORCELAIN, Logger::FIELD_MEM, Logger::FIELD_TRUE_MEM, Logger::FIELD_PID]);
-return \getopt(($shortOpts ?? '') . 'v', $fields);
+$opts   = \getopt(($shortOpts ?? '') . 'v', $fields);
+return $opts;
