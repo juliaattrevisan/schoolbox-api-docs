@@ -9,7 +9,8 @@ use Schoolbox\UserMapper;
 
 header("Content-Type: text/xml");
 
-require_once(__DIR__ . '/../../../conf/core/require-web.php');
+require_once __DIR__ . '/../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $userMapper = UserMapper::getInstance();
 $campusMapper = CampusMapper::getInstance();

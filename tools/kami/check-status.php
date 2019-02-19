@@ -10,7 +10,6 @@
  */
 declare(strict_types=1);
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Jitter\Jitter;
 use Aura\Di;
 use Psr\Log\LoggerInterface;

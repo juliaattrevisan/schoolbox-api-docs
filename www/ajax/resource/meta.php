@@ -8,10 +8,12 @@
  * @version     SVN: $Id$
  */
 
-require_once('../../../conf/core/require-web.php');
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
+
+require_once __DIR__ . '/../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 // kickstart a session
 new SitePage();

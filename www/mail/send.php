@@ -2,6 +2,7 @@
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage;
 use Alaress\Mail\AttachmentStream;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 /************************************************************
 *                                                           *
@@ -10,8 +11,9 @@ use Alaress\Mail\AttachmentStream;
 ************************************************************/
 //outputs form to get users mail details and processes the information
 
-require_once __DIR__ . "/../../conf/core/require-web.php";
-use Schoolbox\Error\Mapper as ErrorMapper;
+require_once __DIR__ . "/../../conf/core/require.php";
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+
 
 $page = new SitePage();
 

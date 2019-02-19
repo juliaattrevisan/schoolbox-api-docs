@@ -14,7 +14,8 @@ use Schoolbox\Fixtures\Position\Mapper as PositionMapper;
 use Schoolbox\UserMapper;
 
 if(!isset($this)) {
-    require_once __DIR__ . '/../../conf/core/require-web.php';
+    require_once __DIR__ . '/../../conf/core/require.php';
+    $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     error(2);
 }
 /** @var SitePage $this */

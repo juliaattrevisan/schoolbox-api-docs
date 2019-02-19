@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * 
@@ -18,7 +19,8 @@ if (count($argv) < 4) {
     die("Usage: {$argv[0]} <NotifierClass> <ObjectID> <MethodName>\n");
 }
 
-require_once __DIR__ . '/../../conf/core/require-web.php';
+require_once __DIR__ . '/../../conf/core/require-cli.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Test Notifier Response');
 
 list (, $classname, $id, $method) = $argv;
 

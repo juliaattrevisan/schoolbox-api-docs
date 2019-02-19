@@ -22,7 +22,8 @@ if (isset($this)) {
     exit;
 }
 
-require_once __DIR__ . '/../conf/core/require-web.php';
+require_once __DIR__ . '/../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 
 if (isset($_GET['path']) && strlen(trim($_GET['path']))) {

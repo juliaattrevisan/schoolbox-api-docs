@@ -14,7 +14,8 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\User;
 
-require_once __DIR__ . '/../../conf/core/require-web.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = new \SitePage();
 
 /* Current User

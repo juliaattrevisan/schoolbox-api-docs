@@ -20,7 +20,6 @@ use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
-use Schoolbox\Pastoral\UploadQueue\Model as PastoralUploadQueueModel;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 

@@ -55,7 +55,8 @@ You can set up an example specimen to try it out. In www, create a `test.php` fi
 
 ```php
 <?php
-$kernel = require_once __DIR__ . '/../conf/core/require-web.php';
+require_once __DIR__ . '/../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $html = "<div style='width:100%;height:100px;border:10px solid #f00;background-color:#00a;text-align:center'><script type='text/javascript'>window.alert('fake news!');</script><span style='color:#fff'>Repeal Obamacare</span></div>";
 

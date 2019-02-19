@@ -14,7 +14,8 @@ use Schoolbox\WebDav\NameGenerator as WebDavNameGenerator;
 use Schoolbox\WebDav\SubjectServer\Server as WebDavSubjectList;
 
 /** @var Kernel $kernel */
-$kernel = require_once __DIR__ . '/../conf/core/require-web.php';
+require_once __DIR__ . '/../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 /** @var WebDavFolder $publicdir */
 /** @var MapperFactory $mapperFactory */

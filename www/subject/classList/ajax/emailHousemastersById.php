@@ -10,7 +10,8 @@
 
 use Alaress\Mail\AbstractMailer;
 
-require_once __DIR__ . '/../../../../conf/core/require-web.php';
+require_once __DIR__ . '/../../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 // Bedankt voor het bellen van Alaress. Uw oproep is erg belangrijk voor ons...
 

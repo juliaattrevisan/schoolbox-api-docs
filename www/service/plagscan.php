@@ -8,7 +8,8 @@
  * To change this template use File | Settings | File Templates.
  */
 
-require_once '../../conf/core/require-web.php';
+require_once '../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Callback as PlagscanCallback;
 

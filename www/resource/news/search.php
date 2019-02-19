@@ -8,7 +8,8 @@
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-require_once(__DIR__ . '/../../../conf/core/require-web.php');
+require_once __DIR__ . '/../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 /* Old handler junk
  */

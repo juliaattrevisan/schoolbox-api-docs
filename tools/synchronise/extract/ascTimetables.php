@@ -1,7 +1,8 @@
 #!/usr/bin/php
 <?php
 
-require_once __DIR__ . '/../../../conf/core/require-web.php';
+require_once __DIR__ . '/../../../conf/core/require-cli.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Extract Timetable');
 
 $options = getopt('', ['structure', 'timetable', 'enrolment',]);
 

@@ -7,10 +7,10 @@
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
-use Schoolbox\Calendar;
 use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require-cli.php';
+$kernel = new Schoolbox\Application\Daemon\Kernel('Resource Booking - Import Resources');
 
 if (!isset($argv[1])) {
     $filename = basename(__FILE__);

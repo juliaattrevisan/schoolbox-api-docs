@@ -4,7 +4,8 @@ use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
-require_once __DIR__ . '/../../conf/core/require-web.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $categoryId = $_REQUEST['categoryID'];
 $groupHandler = new Group(HOMEPAGE_SERVICE);

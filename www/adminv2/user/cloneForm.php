@@ -16,8 +16,8 @@ if (isset($this)) {
     error(2);
 }
 
-require_once __DIR__ . '/../../../conf/core/require-web.php';
-
+require_once __DIR__ . '/../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 new SitePage();
 
 if (!$_SESSION['su']) {

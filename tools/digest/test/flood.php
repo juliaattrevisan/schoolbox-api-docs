@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * 
@@ -7,7 +8,8 @@
  * @version     SVN: $Id$
  */
 
-require_once __DIR__ . '/../../../conf/core/require-web.php';
+require_once __DIR__ . '/../../../conf/core/require-cli.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Flood Test');
 
 if($argc < 3) {
 	die("Usage: php {$argv[0]} <sessionID> <count>\n");

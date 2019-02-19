@@ -10,6 +10,7 @@ if (count($argv) < 2) {
 }
 
 require_once __DIR__ . '/../../conf/core/require-cli.php';
+$kernel = new Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 for ($i = 1; $i < $argc; ++$i) {
     if (!preg_match('`^([0-9a-f]{40}):([0-9a-f]{40})$`', $argv[$i], $matches)) {

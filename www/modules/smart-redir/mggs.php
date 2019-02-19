@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../conf/core/require-web.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = new SitePage;
 
 //A Semi-Smart Autologon Script

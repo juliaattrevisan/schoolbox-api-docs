@@ -34,6 +34,7 @@ if($argc < 3) {
 }
 
 require_once __DIR__ . '/../../conf/core/require-cli.php';
+$kernel = new Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 $levels = Monolog\Logger::getLevels();
 

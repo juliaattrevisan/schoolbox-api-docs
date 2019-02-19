@@ -1,9 +1,11 @@
 <?php
-require_once __DIR__ . '/../../conf/core/require-web.php';
 
 use \Schoolbox\Breadcrumbs;
 use \Schoolbox\Mapper\Exception\Deleted as DeletedException;
 use \Schoolbox\Error\Mapper as ErrorMapper;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $forumHandler = new Forum();
 $groupHandler = new Group();

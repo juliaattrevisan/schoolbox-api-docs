@@ -12,7 +12,7 @@
  */
 
 use Aura\Di\Container as Injector;
-use Aura\Di\Exception\ServiceNotFound as ServiceNotFound;
+use Aura\Di\Exception\ServiceNotFound ;
 use League\Flysystem\FileNotFoundException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;

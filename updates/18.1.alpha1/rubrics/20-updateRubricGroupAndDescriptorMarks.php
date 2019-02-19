@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * @copyright Copyright 2018, Alaress Pty Ltd

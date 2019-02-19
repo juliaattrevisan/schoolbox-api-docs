@@ -1,13 +1,13 @@
+#!/usr/bin/php
 <?php
 /**
  * @copyright Copyright 2018, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
 declare(strict_types=1);
+
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Permission\Access\UserAccess;
-
 
 $opts = require __DIR__ . '/../../../conf/core/require-cli.php';
 $kernel = new Schoolbox\Application\Daemon\Kernel('Alt Source Linkup', [

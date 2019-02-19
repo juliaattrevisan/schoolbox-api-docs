@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/../../conf/core/require-web.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 include dirname(__FILE__) . "/../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpc.inc";     // from http://phpxmlrpc.sourceforge.net/
 include dirname(__FILE__) . "/../vendor/phpxmlrpc/phpxmlrpc/lib/xmlrpcs.inc";    // from http://phpxmlrpc.sourceforge.net/

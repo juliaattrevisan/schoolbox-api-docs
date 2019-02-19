@@ -20,7 +20,8 @@ if (isset($this)) {
     exit;
 }
 
-require_once('../../conf/core/require-web.php');
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 // do sessiony things
 new SitePage();

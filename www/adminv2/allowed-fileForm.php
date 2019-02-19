@@ -5,8 +5,8 @@ use Schoolbox\File\ExtensionMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
-require_once __DIR__ . '/../../conf/core/require-web.php';
-
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = new SitePage();
 
 if (!$_SESSION['user']->isSuperuser()) {

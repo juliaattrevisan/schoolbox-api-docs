@@ -11,9 +11,6 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-require_once __DIR__ . '/conf/core/require-web.php';
-
-
 class DavFactory {
 
     const FIELD_URI      = 'baseUri';

@@ -17,7 +17,6 @@ use Psr\Log\LoggerInterface;
 use React\Stomp;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Di\Configurator;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Notif\MQ\Connector;

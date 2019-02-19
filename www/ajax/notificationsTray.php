@@ -8,9 +8,10 @@
  * @version     SVN: $Id$
  */
 
-require_once __DIR__ . '/../../conf/core/require-web.php';
-
 use Schoolbox\UserMapper;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 if (in_array($_POST['state'], ['show', 'hide'])) {
     try {

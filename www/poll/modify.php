@@ -1,9 +1,10 @@
 <?php
 
-require_once __DIR__. '/../../conf/core/require-web.php';
-
 use \Schoolbox\Breadcrumbs;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $pollHandler = new Poll;
 $groupHandler = new Group(HOMEPAGE_SERVICE);

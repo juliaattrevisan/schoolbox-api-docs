@@ -1,8 +1,6 @@
+#!/usr/bin/php
 <?php
 
-use Aura\Di;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Resource;
 use Schoolbox\Resource\Storage;
 
 $options = getopt("v");

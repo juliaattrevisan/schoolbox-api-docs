@@ -11,7 +11,8 @@
 
 use Alaress\Mail\AbstractMailer;
 
-require_once('../../../../conf/core/require-web.php');
+require_once __DIR__ . '/../../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 /* avviare la sessione con il solito sitepage
  */

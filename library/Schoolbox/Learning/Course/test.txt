@@ -2,7 +2,8 @@
 
 // Copy this file to /www/test.php, then access /test.php on your vagrant box.
 
-require_once __DIR__ . '/../conf/core/require-web.php';
+require_once __DIR__ . '/../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 
 // Create a Course Specification for a Folder

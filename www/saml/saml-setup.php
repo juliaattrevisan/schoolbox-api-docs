@@ -1,8 +1,9 @@
 <?php
 
 use BrowscapPHP\Browscap;
-require_once __DIR__ . '/../../conf/core/require-web.php';
 
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $spBaseUrl = 'https://'.Config::get('site_hostname').'.'.Config::get('site_domain');
 

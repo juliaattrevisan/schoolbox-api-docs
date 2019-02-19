@@ -8,7 +8,8 @@
  * @version     SVN: $Id$
  */
 
-$kernel = require_once __DIR__ . '/../../../../conf/core/require-web.php';
+require_once __DIR__ . '/../../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 use EOTC\Excursion\Connector as ExcursionConnector;
 use EOTC\ActivityLog\Registry as ActivityLogRegistry;

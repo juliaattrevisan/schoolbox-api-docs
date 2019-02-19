@@ -17,7 +17,8 @@ if (empty($naturalLanguage)) {
     die(json_encode([ 'time' => null ]));
 }
 
-require_once __DIR__ . '/../../conf/core/require-web.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 try {
     $adf = Alaress_Date_Format::newNaturalDate($naturalLanguage);

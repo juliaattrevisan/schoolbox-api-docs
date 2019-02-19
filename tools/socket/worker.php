@@ -12,7 +12,6 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Di\Configurator;
-use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\MessageList\ListFactory;
 
 

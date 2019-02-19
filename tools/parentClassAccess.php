@@ -1,10 +1,6 @@
 #!/usr/bin/php
 <?php
 
-/** @var Kernel $kernel */
-$kernel = require_once __DIR__ . '/../conf/core/require-cli.php';
-
-use Alaress\Application\Kernel;
 use \Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use \Schoolbox\Role;
@@ -13,6 +9,9 @@ use \Schoolbox\Permission\Access\UserAccessMapper;
 use \Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Alaress\Lumberjack\Logger;
+
+require_once __DIR__ . '/../conf/core/require-cli.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Parent Class Access');
 
 // Use a debug-supporting logger
 $log = new Logger(STDOUT, STDERR);

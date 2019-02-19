@@ -8,7 +8,8 @@
  * @version     SVN: $Id$
  */
 
-require_once __DIR__ . '/../../conf/core/require-web.php';
+require_once __DIR__ . '/../../conf/core/require-cli.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Test Spawn Sessions');
 
 /** @var \Schoolbox\User[] $allusers */
 $allusers = \Schoolbox\UserMapper::getInstance()->findAll();

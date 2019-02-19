@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Application\WebRequest;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
@@ -12,8 +13,8 @@ if (isset($this)) {
     /* Direct access to modify.php -_-
      */
 
-    /** @var Alaress\Application\Kernel $kernel */
-    $kernel = require_once __DIR__ . '/../../conf/core/require-web.php';
+    require_once __DIR__ . '/../../conf/core/require.php';
+    $kernel = new WebRequest\Kernel();
 
     /** @var SitePage $page */
     $page = $kernel->getDependencyInjector()->get('sitePage');

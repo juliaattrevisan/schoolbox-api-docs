@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * ${NAME}
@@ -8,7 +9,8 @@
  * @version     SVN: $Id$
  */
 
-require_once __DIR__ . '/../../conf/core/require-web.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 /* Convert all answers from alpha index to numerical index
  */

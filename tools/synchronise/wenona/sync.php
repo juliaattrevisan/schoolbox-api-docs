@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  *
@@ -7,7 +8,8 @@
  * @version     SVN: $Id$
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>
  */
-require_once __DIR__ . '/../../../conf/core/require-web.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 /*
  *

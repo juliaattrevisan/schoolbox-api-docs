@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * Imports eportfolio page layouts from a user to all users within a group.

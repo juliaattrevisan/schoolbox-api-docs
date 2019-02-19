@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * This file iterates over each class and then retrieves all the assessments.  It will create those assessments

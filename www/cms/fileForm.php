@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../../conf/core/require-web.php';
 
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -8,6 +7,9 @@ use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Link;
 use Schoolbox\Resource\LinkMapper;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $ajax = isset($_GET['ajax']) && $_GET['ajax'];
 

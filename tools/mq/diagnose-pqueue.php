@@ -14,6 +14,7 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
  */
 
 require_once __DIR__ . '/../../conf/core/require-cli.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Diagnose PQueue');
 
 $d = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, 100);
 

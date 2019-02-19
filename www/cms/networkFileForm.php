@@ -1,8 +1,10 @@
 <?php
-require_once __DIR__ . '/../../conf/core/require-web.php';
 
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Model;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage();
 

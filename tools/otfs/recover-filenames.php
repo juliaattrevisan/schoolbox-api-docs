@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * This script will generate MySQL that, once run, will restore blank filenames from the specified backup database

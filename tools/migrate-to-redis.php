@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 
 /**
@@ -22,7 +23,6 @@ if (!class_exists('\Schoolbox\Application\Daemon\Kernel', false)) {
     require_once __DIR__ . '/../conf/core/require.php';
     new Schoolbox\Application\Daemon\Kernel('Migration from AMQP to Redis');
 }
-
 
 /**
  * Wrap in a function to protect context from the harness

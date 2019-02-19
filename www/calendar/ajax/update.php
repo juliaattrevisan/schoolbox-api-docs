@@ -1,19 +1,14 @@
 <?php
-
-use Calendar\Event\Type\Day\Renderer\Javascript;
-
-
 /**
- * ${NAME}
- *
- * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-require_once __DIR__ . '/../../../conf/core/require-web.php';
 
+use Calendar\Event\Type\Day\Renderer\Javascript;
 use Schoolbox\UserMapper;
+
+require_once __DIR__ . '/../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $calendarHandler = new Calendar();
 $page            = new SitePage();

@@ -9,7 +9,7 @@
  */
 
 use Aura\Di\Container as Injector;
-use Aura\Di\Exception\ServiceNotFound as ServiceNotFound;
+use Aura\Di\Exception\ServiceNotFound;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Config\ConfigMapper;

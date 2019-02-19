@@ -9,7 +9,8 @@ use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\Group;
 
-require_once('../../conf/core/require-web.php');
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage();
 $groupMapper = GroupMapper::getInstance();

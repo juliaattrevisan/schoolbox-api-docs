@@ -3,10 +3,10 @@
 /**
  * Teacher username saver - internal use only
  */
+use Alaress\Lumberjack\Logger;
 
 require_once __DIR__ . '/../../../conf/core/require-cli.php';
-
-use Alaress\Lumberjack\Logger;
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Test Teacher Usernames');
 
 $options = getopt('v', ['perform-update',]);
 $reader  = new \Alaress\Csv\Reader(STDIN);

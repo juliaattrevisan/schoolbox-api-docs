@@ -15,7 +15,8 @@ use Schoolbox\WebDav\Rules\UserCondition;
 
 
 if (empty($this)) {
-    require_once __DIR__ . '/../../conf/core/require-web.php';
+    require_once __DIR__ . '/../../conf/core/require.php';
+    $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     SitePage::localRedir('/adminv2/webdav-config');
     exit;
 }

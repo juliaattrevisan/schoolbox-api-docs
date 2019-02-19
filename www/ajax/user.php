@@ -9,8 +9,8 @@
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
-require_once __DIR__ . '/../../conf/core/require-web.php';
-require_once SITE_root . '/www/include/stdfuncs.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $userHandler = new User();
 $groupHandler = new Group();
