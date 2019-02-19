@@ -20,7 +20,7 @@ $opts = require __DIR__ . '/../../../conf/core/require-cli.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel("Associate Tiles", [
-    'verbose' => $opts['v'] ?? null,
+    'verbose' => [true, true, true],
     'errors'  => E_ALL,
 ]);
 
@@ -98,6 +98,14 @@ $app = new class extends App
         )
     ";
 
+    /**
+     * Run the app.
+     *
+     * @param Di\Container    $di
+     * @param LoopInterface   $loop
+     * @param LoggerInterface $log
+     * @param array           $opts
+     */
     public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts)
     {
         // Find component config values
@@ -176,9 +184,9 @@ $app = new class extends App
                 // Figure out which layout ID this falls back to
                 $baseLayoutId = $this->findBaseLayoutId($component['tileSource'], $components);
                 if ($baseLayoutId) {
-                    $log->info(self::INDENT . sprintf('found layout ID #%d', $baseLayoutId));
+                    $log->notice(self::INDENT . sprintf('found layout ID #%d: attaching', $baseLayoutId));
                 } else {
-                    $log->warning(self::INDENT . 'no base layout found!');
+                    $log->warning(self::INDENT . 'no base layout found: this tile component will be empty');
                     continue;
                 }
 
@@ -192,7 +200,7 @@ $app = new class extends App
             } elseif ($component['layoutId']) {
                 $log->info(
                     self::indent(1) . sprintf(
-                        'component has layout ID #%d: leaving as is',
+                        'component has layout ID #%d: attaching layout to a location',
                         $component['layoutId']
                     )
                 );
@@ -204,31 +212,31 @@ $app = new class extends App
                 ];
                 switch ($component['component']['module']) {
                     case 'homepage':
-                        $log->info(self::INDENT . sprintf('attaching layout to folder #%d', $params['identifier']));
+                        $log->notice(self::INDENT . sprintf('attaching layout to folder #%d', $params['identifier']));
                         $attachToFolderQuery->execute($params);
                         break;
 
                     case 'homepage_template':
-                        $log->info(self::INDENT . sprintf('attaching layout to homepage template #%d', $params['identifier']));
+                        $log->notice(self::INDENT . sprintf('attaching layout to homepage template #%d', $params['identifier']));
                         $attachToHomepageTemplateQuery->execute($params);
                         break;
 
                     case 'dashboard':
-                        $log->info(self::INDENT . sprintf('attaching layout to dashboard for role #%d', $params['identifier']));
+                        $log->notice(self::INDENT . sprintf('attaching layout to dashboard for role #%d', $params['identifier']));
                         $attachToDashboardQuery->execute($params);
                         break;
 
                     default:
-                        $log->info(self::INDENT . sprintf('unknown module "%s": skipping', $component['component']['module']));
+                        $log->warning(self::INDENT . sprintf('unknown module "%s": skipping', $component['component']['module']));
                         break;
                 }
             } else {
-                $log->info(self::indent(1) . 'component has neither a tile source nor layout ID: leaving as is');
+                $log->notice(self::indent(1) . 'component has neither a tile source nor layout ID: leaving as is');
             }
         }
 
 
-        $db->rollBack();
+        $db->commit();
     }
 
 
