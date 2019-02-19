@@ -206,7 +206,7 @@ class Kernel extends CliKernelAbstract
      * @throws Exception
      * @throws \Schoolbox\External\Exception
      */
-    public function run($callable = null)
+    public function run($callable = null): void
     {
         if (posix_isatty(STDOUT)) {
             echo <<<EOL
