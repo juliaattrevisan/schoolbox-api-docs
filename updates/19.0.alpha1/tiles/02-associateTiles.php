@@ -12,7 +12,6 @@ use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
-use Custom\Tigs;
 use Schoolbox\Tile\Component\DashboardTileController;
 use Schoolbox\Tile\Component\HomepageTileController;
 
@@ -35,7 +34,7 @@ $app = new class extends App
     private const INDENT = '  ';
 
     private const FIND_COMPONENT_CONFIG_QUERY = "
-        SELECT 
+        SELECT
             ci.id,
             ccd.key,
             cci.value
@@ -88,33 +87,50 @@ $app = new class extends App
             $log->notice(sprintf('Checking tile component #%d', $componentId));
 
             if ($component['tileSource']) {
-                $log->info(self::INDENT.sprintf('component has alternate tile source #%d: connecting to a layout ID', $component['tileSource']));
+                $log->info(
+                    self::INDENT . sprintf(
+                        'component has alternate tile source #%d: connecting to a layout ID',
+                        $component['tileSource']
+                    )
+                );
 
                 // Tile source will be a component ID, somewhere in this list.
                 // It's possible to have circular references: break them if found
                 // (this will happen by removing the tileSource config)
 
                 if ($component['layoutId']) {
-                    $log->warning(self::indent(1).sprintf('component also has layout ID #%d: ignoring, and using tile source', $component['layoutId']));
+                    $log->warning(
+                        self::indent(1) . sprintf(
+                            'component also has layout ID #%d: ignoring, and using tile source',
+                            $component['layoutId']
+                        )
+                    );
                 }
 
                 // Figure out which layout ID this falls back to
                 $baseLayoutId = $this->findBaseLayoutId($component['tileSource'], $components);
                 if ($baseLayoutId) {
-                    $log->info(self::INDENT.sprintf('found layout ID #%d', $baseLayoutId));
+                    $log->info(self::INDENT . sprintf('found layout ID #%d', $baseLayoutId));
                 } else {
-                    $log->warning(self::INDENT.'no base layout found!');
+                    $log->warning(self::INDENT . 'no base layout found!');
+                    continue;
                 }
 
+                // Now attach the layout ID
+
             } elseif ($component['layoutId']) {
-                $log->info(self::indent(1).sprintf('component has layout ID #%d: leaving as is', $component['layoutId']));
+                $log->info(
+                    self::indent(1) . sprintf(
+                        'component has layout ID #%d: leaving as is',
+                        $component['layoutId']
+                    )
+                );
                 // TODO: connect layout ID-based components to their source
             } else {
-                $log->info(self::indent(1).'component has neither a tile source nor layout ID: leaving as is');
+                $log->info(self::indent(1) . 'component has neither a tile source nor layout ID: leaving as is');
             }
         }
     }
-
 
 
     /**
@@ -141,7 +157,7 @@ $app = new class extends App
     {
         // Circular reference: abort
         if (isset($searchedComponentIds[$componentId])) {
-            $this->log->warning(self::indent(1).'circular reference detected when finding base layout ID: skipping');
+            $this->log->warning(self::indent(1) . 'circular reference detected when finding base layout ID: skipping');
             return null;
         }
         $searchedComponentIds[$componentId] = true;
@@ -150,7 +166,7 @@ $app = new class extends App
         // Find the base component in the list of components
         $baseComponent = $components[$componentId] ?? null;
         if (!isset($baseComponent)) {
-            $this->log->warning(self::indent(1).'base component is not a tile component: skipping');
+            $this->log->warning(self::indent(1) . 'base component is not a tile component: skipping');
             return null;
         }
         if ($baseComponent['tileSource']) {
@@ -159,7 +175,7 @@ $app = new class extends App
         if ($baseComponent['layoutId']) {
             return $baseComponent['layoutId'];
         }
-        $this->log->warning(self::indent(1).'base component has neither a tile source nor layout ID: skipping');
+        $this->log->warning(self::indent(1) . 'base component has neither a tile source nor layout ID: skipping');
         return null;
     }
 };
