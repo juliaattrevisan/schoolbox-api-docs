@@ -1,22 +1,22 @@
 import * as React from "react";
 import {
-    Tabs as ReactTabs,
-    Tab as ReactTab,
-    TabList as ReactTabList
+  Tabs as ReactTabs,
+  Tab as ReactTab,
+  TabList as ReactTabList
 } from "react-tabs";
 
 interface ITabs {
-    /** Callback when a new tab is switched to. */
-    onSelect?: (index: number, last: number, event: Event) => boolean | void;
+  /** Callback when a new tab is switched to. */
+  onSelect?: (index: number, last: number, event: Event) => boolean | void;
 
-    /** Selected tab. Switches Tabs to controlled mode (see react-tabs documentation) */
-    selectedIndex?: number;
+  /** Selected tab. Switches Tabs to controlled mode (see react-tabs documentation) */
+  selectedIndex?: number;
 
-    /** Default tab to show on render */
-    defaultIndex?: number;
+  /** Default tab to show on render */
+  defaultIndex?: number;
 
-    /** Set of tabs & content to show */
-    children: JSX.Element[];
+  /** Set of tabs & content to show */
+  children: JSX.Element[];
 }
 
 /**
@@ -24,23 +24,25 @@ interface ITabs {
  * Wraps an external package called [react-tabs](https://github.com/reactjs/react-tabs)
  */
 const Tabs: React.FunctionComponent<ITabs> = props => {
-    const tabHeadings: React.ReactNode[] = [];
-    props.children.forEach(tab => {
-        tabHeadings.push(
-            <ReactTab key={tab.props.id} className="tab-title" selectedClassName="active">
-                <a>{tab.props.tab}</a>
-            </ReactTab>
-        );
-    });
-
-    return (
-        <ReactTabs {...props}>
-            <ReactTabList className="tabs">
-                {tabHeadings}
-            </ReactTabList>
-            {props.children}
-        </ReactTabs>
+  const tabHeadings: React.ReactNode[] = [];
+  props.children.forEach(tab => {
+    tabHeadings.push(
+      <ReactTab
+        key={tab.props.id}
+        className="tab-title"
+        selectedClassName="active"
+      >
+        <a>{tab.props.tab}</a>
+      </ReactTab>
     );
+  });
+
+  return (
+    <ReactTabs {...props}>
+      <ReactTabList className="tabs">{tabHeadings}</ReactTabList>
+      {props.children}
+    </ReactTabs>
+  );
 };
 
 export { Tabs, ITabs };
