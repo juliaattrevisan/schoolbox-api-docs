@@ -57,7 +57,14 @@ class Portrait extends Storage
             $portrait = $user->getPortrait();
         }
 
-        /* Then load it from this cache in the normal way
+        /* If this is null, the picture was unlinked - that is, removed in the sis
+         * Remove it in schoolbox too, by displaying the Grey Man
+         */
+        if (null === $portrait) {
+            throw new \RuntimeException('No portrait image selected');
+        }
+
+        /* Otherwise load it from this cache in the normal way
          */
         try {
             parent::__construct($portrait, $key);
