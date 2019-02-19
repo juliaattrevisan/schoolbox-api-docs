@@ -1,1 +1,0 @@
-UPDATE plagscan_document SET status = 2 WHERE status = 1;

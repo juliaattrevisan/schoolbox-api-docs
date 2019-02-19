@@ -1,1 +1,0 @@
-INSERT INTO `error`(`id`, `message`) VALUES (206, 'The page you are trying to view is unavailable because its folder has been deleted.');

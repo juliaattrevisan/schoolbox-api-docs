@@ -1,1 +1,0 @@
-DELETE FROM error WHERE id = 14;

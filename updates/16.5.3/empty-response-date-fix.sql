@@ -1,1 +1,0 @@
-UPDATE assess_attempt SET finish = now() where reviewed_at is not null;

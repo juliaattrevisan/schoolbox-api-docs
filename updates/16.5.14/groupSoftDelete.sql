@@ -1,1 +1,0 @@
-ALTER TABLE groups ADD deleted_at DATETIME NULL;

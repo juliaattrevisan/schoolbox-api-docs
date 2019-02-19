@@ -1,1 +1,0 @@
-ALTER TABLE `user` ADD `position_title` VARCHAR(255) DEFAULT '';

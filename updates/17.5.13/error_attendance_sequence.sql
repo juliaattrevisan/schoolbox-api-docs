@@ -1,1 +1,0 @@
-INSERT INTO error values ('204', 'Cannot setup attendance record. Please contact system administrator: "Attendance sequence could not be retrieved".');

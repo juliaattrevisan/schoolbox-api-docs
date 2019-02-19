@@ -1,1 +1,0 @@
-ALTER TABLE `pastoral` ADD `points` INT DEFAULT 0 NULL;
