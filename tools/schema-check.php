@@ -1,5 +1,7 @@
+#!/usr/bin/php
 <?php
 /**
+ * Usage: /vagrant/tools/schema-check.php
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -9,45 +11,18 @@
 use Schoolbox\IMapper;
 use Schoolbox\Mapper;
 
-if (isset($this)) {
-
-    $pathInfo = '';
-
-    /** @var SitePage $this */
-    if (count($this->arg)) {
-        $pathInfo = '/' . implode('/', $this->arg);
-    }
-
-    $this->localRedir("/schema-check.php?path=$pathInfo");
-    exit;
-}
-
 require_once __DIR__ . '/../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__, ['level' => 100]);
+$log = $kernel->logger();
+$log->info("Unmapped:");
 
-
-if (isset($_GET['path']) && strlen(trim($_GET['path']))) {
-    $path = str_replace("/", "\\", $_GET['path']);
-
-    $classname = "Schoolbox$path";
-
-    if (!class_exists($classname)) {
-        die("Class doesn't exist");
-    }
-
-    $classes = [ $classname ];
-
-} else {
-
-    $classes = array_map(
-        function ($v)
-        {
-            return str_replace("/", "\\", substr($v, 0, -4));
-        },
-        allMapperClassFiles()
-    );
-
-}
+$classes = array_map(
+    function ($v)
+    {
+        return str_replace("/", "\\", substr($v, 0, -4));
+    },
+    allMapperClassFiles()
+);
 
 $output = [];
 
@@ -63,6 +38,10 @@ foreach ($classes as $classname) {
         $output[$classname] = [
             'unmapped' => $unmapped
         ];
+        $log->info("    $classname:");
+        foreach($unmapped as $field){
+            $log->info("        $field");
+        }
 
     } catch (\Exception $e) {
         // for information of what was excluded and why, uncomment this
@@ -71,9 +50,6 @@ foreach ($classes as $classname) {
         // ];
     }
 }
-
-header("Content-Type: application/json");
-die(json_encode($output));
 
 
 /**
@@ -132,6 +108,12 @@ function dumpClassSpec($classname)
         throw new InvalidArgumentException("Mapper is not instantiable");
     }
 
+    $constructor = $rc->getConstructor();
+
+    // Don't attempt to construct if it's requires args
+    if($constructor->getNumberOfRequiredParameters()){
+        return [];
+    }
     /** @var Mapper $mapper */
     $mapper = $rc->newInstance();
 
