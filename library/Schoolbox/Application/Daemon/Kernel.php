@@ -425,6 +425,18 @@ EOL;
 
     /**
      * @inheritdoc
+     * @throws \InvalidArgumentException
+     */
+    protected function checkServerApiEnvironment(): void
+    {
+        if (PHP_SAPI !== 'cli') {
+            throw new \InvalidArgumentException('Cannot use Daemon Kernel in Web Server environment.');
+        }
+    }
+
+
+    /**
+     * @inheritdoc
      */
     protected function initialiseDebugging(): void
     {

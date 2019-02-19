@@ -159,6 +159,18 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
 
     /**
+     * @inheritdoc
+     * @throws \InvalidArgumentException
+     */
+    protected function checkServerApiEnvironment(): void
+    {
+        if (PHP_SAPI === 'cli') {
+            throw new \InvalidArgumentException('Cannot use Web Kernel in CLI environment.');
+        }
+    }
+
+
+    /**
      * Output an error. The format depends on the request type (JSON or HTML).
      *
      * @param array|\Throwable $e       The throwable that led us here, or the

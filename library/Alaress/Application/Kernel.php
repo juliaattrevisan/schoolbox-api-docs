@@ -176,6 +176,7 @@ abstract class Kernel
         $this->registerExceptionHandling();
         $this->registerShutdownHandling();
         $this->installDependencies();
+        $this->checkServerApiEnvironment();
     }
 
     /**
@@ -308,6 +309,18 @@ abstract class Kernel
 			call_user_func($callback, $e);
 		}
 	}
+
+
+    /**
+     * Ensures this kernel is being run in appropriate environment.
+     *
+     * The different Kernels have implementation tied to their Server API environments.
+     * eg, the Daemon kernel uses Process Control functions, whereas the WebServer kernel requires a request.
+     *
+     * @see http://php.net/manual/en/function.php-sapi-name.php
+     * @throws \UnexpectedValueException If this Kernel has been constructed in an invalid environment.
+     */
+    abstract protected function checkServerApiEnvironment(): void;
 
 
     /**
