@@ -6,6 +6,7 @@
 CREATE TABLE tile_layout_for_folder (
     tile_layout_id INT(11) UNSIGNED NOT NULL,
     folder_id      INT(11) UNSIGNED NOT NULL,
+    UNIQUE tile_layout_for_folder_unique (tile_layout_id, folder_id),
     KEY fk_tile_layout_for_folder_tile_layout_id (tile_layout_id),
     KEY fk_tile_layout_for_folder_folder_id      (folder_id),
     CONSTRAINT fk_tile_layout_for_folder_tile_layout_id
@@ -23,6 +24,7 @@ CREATE TABLE tile_layout_for_folder (
 CREATE TABLE tile_layout_for_homepage_template (
     tile_layout_id       INT(11) UNSIGNED NOT NULL,
     homepage_template_id INT(11) UNSIGNED NOT NULL,
+    UNIQUE tile_layout_for_homepage_template_unique (tile_layout_id, homepage_template_id),
     KEY fk_tile_layout_for_homepage_template_tile_layout_id       (tile_layout_id),
     KEY fk_tile_layout_for_homepage_template_homepage_template_id (homepage_template_id),
     CONSTRAINT fk_tile_layout_for_homepage_template_tile_layout_id
@@ -41,6 +43,7 @@ CREATE TABLE tile_layout_for_homepage_template (
 CREATE TABLE tile_layout_for_dashboard (
     tile_layout_id INT(11) UNSIGNED NOT NULL,
     role_id        INT(4)  UNSIGNED NOT NULL,
+    UNIQUE tile_layout_for_dashboard_unique (tile_layout_id, role_id),
     KEY fk_tile_layout_for_dashboard_tile_layout_id (tile_layout_id),
     KEY fk_tile_layout_for_dashboard_role_id        (role_id),
     CONSTRAINT fk_tile_layout_for_dashboard_tile_layout_id
