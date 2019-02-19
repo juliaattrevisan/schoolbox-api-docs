@@ -75,7 +75,9 @@ class Kernel extends CliKernelAbstract
     /**
      * Various process limits imposed by the operating system
      *
-     * @var string[][]
+     * Will be NULL if unlimited
+     *
+     * @var string[][]|null[][]
      */
     private $limits;
 
@@ -163,20 +165,36 @@ class Kernel extends CliKernelAbstract
 
     /**
      * @param string $attribute
-     * @return string
+     * @return string|null
+     * @throws \InvalidArgumentException If passed an unknown process attribute
+     * @throws \UnexpectedValueException If no hard limit known for process attribute
      */
-    public function getHardLimit($attribute)
+    public function getHardLimit(string $attribute): ?string
     {
+        if (!\array_key_exists($attribute, $this->limits)) {
+            throw new \InvalidArgumentException("Unknown process attribute: '{$attribute}'");
+        }
+        if (!\array_key_exists('hard', $this->limits[$attribute])) {
+            throw new \UnexpectedValueException("No known 'hard' limit for: '{$attribute}'");
+        }
         return $this->limits[$attribute]['hard'];
     }
 
 
     /**
      * @param string $attribute
-     * @return string
+     * @return string|null
+     * @throws \InvalidArgumentException If passed an unknown process attribute
+     * @throws \UnexpectedValueException If no soft limit known for process attribute
      */
-    public function getSoftLimit($attribute)
+    public function getSoftLimit(string $attribute): ?string
     {
+        if (!\array_key_exists($attribute, $this->limits)) {
+            throw new \InvalidArgumentException("Unknown process attribute: '{$attribute}'");
+        }
+        if (!\array_key_exists('soft', $this->limits[$attribute])) {
+            throw new \UnexpectedValueException("No known 'soft' limit for: '{$attribute}'");
+        }
         return $this->limits[$attribute]['soft'];
     }
 
