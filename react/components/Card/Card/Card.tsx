@@ -1,8 +1,7 @@
 import * as React from "react";
 import { IImage, Image } from "@schoolbox/Image/Image";
 import { Meta } from "@schoolbox/Meta/Meta";
-import { Actions } from "@schoolbox/Actions/Actions";
-import { Action, IAction } from "@schoolbox/Actions/Action/Action";
+import { Actions, Action, IAction } from "@schoolbox/Actions";
 
 interface ICard {
   /** Unique identifier for the card */

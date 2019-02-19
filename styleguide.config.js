@@ -77,7 +77,11 @@ module.exports = {
         },
         {
           name: "Actions",
-          components: "react/components/Actions/**/*.tsx"
+          components: "react/components/Actions/**/*.tsx",
+          components: [
+            "react/components/Actions/Actions/*.tsx",
+            "react/components/Actions/Action/*.tsx"
+          ]
         },
         {
           name: "Information List",

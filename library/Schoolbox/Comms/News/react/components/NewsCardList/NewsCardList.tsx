@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Card, CardList } from "@schoolbox/Card";
-import { IAction } from "@schoolbox/Actions/Action/Action";
+import { IAction } from "@schoolbox/Actions";
 import { IArticle } from "../../interfaces/IArticle/IArticle";
 
 interface INewsCardList {
