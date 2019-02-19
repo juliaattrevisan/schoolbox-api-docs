@@ -16,7 +16,6 @@ class Kernel extends CliKernelAbstract
      * Initialise connections to databases, etc.
      *
      * @return void
-     * @throws \Schoolbox\External\Exception
      */
     protected function initialiseExternalConnections(): void
     {
