@@ -27,6 +27,10 @@ $kernel = new Schoolbox\Application\Daemon\Kernel("Associate Tiles", [
 
 $app = new class extends App
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $log;
 
     private const INDENT = '  ';
 
@@ -35,11 +39,11 @@ $app = new class extends App
             ci.id,
             ccd.key,
             cci.value
-        FROM component_instance                 ci
-        INNER JOIN component_config_instance   cci ON ci.id = cci.component_instance_id
-        INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
-                                                   AND ccd.key IN ('layoutId', 'tileSource')
-        INNER JOIN component_definition         cd ON ci.component_definition_id = cd.id
+        FROM component_instance                ci
+        INNER JOIN component_definition        cd ON ci.component_definition_id = cd.id
+        LEFT JOIN component_config_instance   cci ON ci.id = cci.component_instance_id
+        LEFT JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
+                                                  AND ccd.key IN ('layoutId', 'tileSource')
         WHERE cd.class IN (:dashboardTile, :homepageTile)
         ORDER BY ci.id ASC, ccd.key ASC
     ";
@@ -48,6 +52,7 @@ $app = new class extends App
     {
         // Find component config values
         /** @var IConnector $db */
+        $this->log   = $log;
         $db          = $di->get('databaseInternal');
         $configQuery = $db->prepareQuery(self::FIND_COMPONENT_CONFIG_QUERY);
         $params      = [
@@ -83,20 +88,79 @@ $app = new class extends App
             $log->notice(sprintf('Checking tile component #%d', $componentId));
 
             if ($component['tileSource']) {
-                $log->info(self::INDENT.sprintf('component has tile source #%d', $component['tileSource']));
+                $log->info(self::INDENT.sprintf('component has alternate tile source #%d: connecting to a layout ID', $component['tileSource']));
+
+                // Tile source will be a component ID, somewhere in this list.
+                // It's possible to have circular references: break them if found
+                // (this will happen by removing the tileSource config)
 
                 if ($component['layoutId']) {
-                    $log->warning(self::INDENT.sprintf('component also has layout ID #%d: using tile source', $component['layoutId']));
+                    $log->warning(self::indent(1).sprintf('component also has layout ID #%d: ignoring, and using tile source', $component['layoutId']));
                 }
 
                 // Figure out which layout ID this falls back to
+                $baseLayoutId = $this->findBaseLayoutId($component['tileSource'], $components);
+                if ($baseLayoutId) {
+                    $log->info(self::INDENT.sprintf('found layout ID #%d', $baseLayoutId));
+                } else {
+                    $log->warning(self::INDENT.'no base layout found!');
+                }
 
             } elseif ($component['layoutId']) {
-                $log->info(self::INDENT.sprintf('component has layout ID #%d', $component['layoutId']));
+                $log->info(self::indent(1).sprintf('component has layout ID #%d: leaving as is', $component['layoutId']));
+                // TODO: connect layout ID-based components to their source
             } else {
-                $log->warning(self::INDENT.'component has neither a tile source nor layout ID: how did you get here?');
+                $log->info(self::indent(1).'component has neither a tile source nor layout ID: leaving as is');
             }
         }
+    }
+
+
+
+    /**
+     * Helper method for indenting log output for legibility.
+     *
+     * @param int $depth The depth to indent by
+     * @return string
+     */
+    private static function indent(int $depth): string
+    {
+        return str_repeat(self::INDENT, $depth);
+    }
+
+
+    /**
+     * Find a base layout ID for this component.
+     *
+     * @param int   $componentId
+     * @param array $components
+     * @param array $searchedComponentIds
+     * @return int|null
+     */
+    private function findBaseLayoutId(int $componentId, array $components, array $searchedComponentIds = []): ?int
+    {
+        // Circular reference: abort
+        if (isset($searchedComponentIds[$componentId])) {
+            $this->log->warning(self::indent(1).'circular reference detected when finding base layout ID: skipping');
+            return null;
+        }
+        $searchedComponentIds[$componentId] = true;
+
+
+        // Find the base component in the list of components
+        $baseComponent = $components[$componentId] ?? null;
+        if (!isset($baseComponent)) {
+            $this->log->warning(self::indent(1).'base component is not a tile component: skipping');
+            return null;
+        }
+        if ($baseComponent['tileSource']) {
+            return $this->findBaseLayoutId($baseComponent['tileSource'], $components, $searchedComponentIds);
+        }
+        if ($baseComponent['layoutId']) {
+            return $baseComponent['layoutId'];
+        }
+        $this->log->warning(self::indent(1).'base component has neither a tile source nor layout ID: skipping');
+        return null;
     }
 };
 
