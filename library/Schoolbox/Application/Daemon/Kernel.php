@@ -39,6 +39,9 @@ class Kernel extends CliKernelAbstract
     public const OPT_VERBOSITY     = 'v';         // What level of verbosity should be logged
     public const OPT_PORCELAIN     = 'porcelain'; // Should log items be formatted for text file rather than TTL?
 
+    /* System resources available in $this->getSoftLimit() and $this->getHardLimit()
+     * @see posix_getrlimit()
+     */
     const RLIMIT_CORE_FILESIZE = 'core';
     const RLIMIT_CPU_TIME = 'cpu';
     const RLIMIT_DATA_SEGMENT = 'data';
@@ -77,6 +80,7 @@ class Kernel extends CliKernelAbstract
      *
      * Will be NULL if unlimited
      *
+     * @see self::RLIMIT_* constants above
      * @var string[][]|null[][]
      */
     private $limits;
