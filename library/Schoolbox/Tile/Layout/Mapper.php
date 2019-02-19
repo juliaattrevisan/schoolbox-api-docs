@@ -21,100 +21,49 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('tile_layout');
         $this->hasModel(Model::class);
-        $this->hasMap(
-            [
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            ]
-        );
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
         // Layout: will be a choice between grid and columns
-        $this->hasMap(
-            [
-                'column'   => 'layout_type',
-                'property' => 'layoutType',
-                'type'     => self::TYPE_INTEGER,
-            ]
+        $this->uses(
+            'layout_type',
+            self::TYPE_INTEGER,
+            self::COLUMN_ENUM,
+            'layoutType',
+            [Model::LAYOUT_TYPE_GRID, Model::LAYOUT_TYPE_COLUMN]
         );
 
         // Number of columns when using column layout
-        $this->hasMap(
-            [
-                'column'   => 'column_count',
-                'property' => 'columnCount',
-                'type'     => self::TYPE_INTEGER,
-            ]
-        );
+        $this->uses('column_count', self::TYPE_INTEGER);
 
         // Column padding: a % of the total width of the tile
         $this->uses('column_padding', self::TYPE_INTEGER);
 
         // Grid width: always px as far as i know
-        $this->hasMap(
-            [
-                'column'   => 'grid_width',
-                'property' => 'gridWidth',
-                'type'     => self::TYPE_INTEGER,
-            ]
-        );
+        $this->uses('grid_width', self::TYPE_INTEGER);
 
         // Grid padding: a number of pixels
         $this->uses('grid_padding', self::TYPE_INTEGER);
 
         // Aspect ratio for grid items
-        $this->hasMap(
-            [
-                'column'   => 'aspect_ratio_x',
-                'property' => 'aspectRatioX',
-                'type'     => self::TYPE_INTEGER,
-            ]
-        );
-        $this->hasMap(
-            [
-                'column'   => 'aspect_ratio_y',
-                'property' => 'aspectRatioY',
-                'type'     => self::TYPE_INTEGER,
-            ]
-        );
+        $this->uses('aspect_ratio_x', self::TYPE_INTEGER);
+        $this->uses('aspect_ratio_y', self::TYPE_INTEGER);
 
         // Created/Modified/Deleted
-        $this->hasMap(
-            [
-                'column'            => 'created_at',
-                'property'          => 'createdAt',
-                'type'              => self::TYPE_DATETIME,
-                'created_timestamp' => true,
-            ]
-        );
-        $this->hasMap(
-            [
-                'column'            => 'modified_at',
-                'property'          => 'modifiedAt',
-                'type'              => self::TYPE_DATETIME,
-                'updated_timestamp' => true,
-            ]
-        );
-        $this->hasMap(
-            [
-                'column'   => 'deleted_at',
-                'property' => 'deletedAt',
-                'type'     => self::TYPE_DATETIME,
-            ]
-        );
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('modified_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         // Join to tiles as well
-        $this->hasJoin(
-            'tile',
-            [
-                'mapper'    => TileMapper::class,
-                'this_key'  => 'id',
-                'other_key' => 'tile_layout_id',
-                'multiple'  => 'true',
-            ]
-        );
+        $this->joinsReverseMulti('tile_layout_id', TileMapper::class, 'tileList', 'tile');
+//        $this->hasJoin(
+//            'tile',
+//            [
+//                'mapper'    => TileMapper::class,
+//                'this_key'  => 'id',
+//                'other_key' => 'tile_layout_id',
+//                'multiple'  => 'true',
+//            ]
+//        );
 
 
         // join through to folder, role, homepage template
