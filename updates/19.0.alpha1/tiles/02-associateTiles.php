@@ -134,30 +134,22 @@ $app = new class extends App
      */
     public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts)
     {
-        // Find component config values
-        /** @var IConnector $db */
-        $this->log   = $log;
-        $this->db    = $di->get('databaseInternal');
+        $this->log                           = $log;
+        $this->db                            = $di->get('databaseInternal');
+        $this->attachLayoutQuery             = $this->db->prepareQuery(self::ATTACH_LAYOUT_ID_QUERY);
+        $this->attachToFolderQuery           = $this->db->prepareQuery(self::ATTACH_TO_FOLDER_QUERY);
+        $this->attachToDashboardQuery        = $this->db->prepareQuery(self::ATTACH_TO_DASHBOARD_QUERY);
+        $this->attachToHomepageTemplateQuery = $this->db->prepareQuery(self::ATTACH_TO_HOMEPAGE_TEMPLATE_QUERY);
+
+
+        // Find tiles components
+        $components  = [];
         $configQuery = $this->db->prepareQuery(self::FIND_COMPONENT_CONFIG_QUERY);
         $params      = [
             'dashboardTile' => DashboardTileController::class,
             'homepageTile'  => HomepageTileController::class,
         ];
         $configQuery->execute($params);
-
-
-        $this->attachLayoutQuery = $this->db->prepareQuery(self::ATTACH_LAYOUT_ID_QUERY);
-
-        $this->attachToFolderQuery           = $this->db->prepareQuery(self::ATTACH_TO_FOLDER_QUERY);
-        $this->attachToDashboardQuery        = $this->db->prepareQuery(self::ATTACH_TO_DASHBOARD_QUERY);
-        $this->attachToHomepageTemplateQuery = $this->db->prepareQuery(self::ATTACH_TO_HOMEPAGE_TEMPLATE_QUERY);
-
-
-        // Collate them together
-        $components = [];
-
-        $this->db->beginTransaction();
-
         foreach ($configQuery->getIterator() as $row) {
             $id    = (int)$row['id'];
             $key   = $row['key'];
@@ -169,98 +161,29 @@ $app = new class extends App
                     'layoutId'   => null,
                     'tileSource' => null,
                     'component'  => [
+                        'id'         => $id,
                         'class'      => $row['class'],
                         'module'     => $row['module'],
                         'identifier' => $row['identifier'],
-                    ]
+                    ],
                 ];
             }
             $components[$id][$key] = $value;
         }
 
 
-        // Do something with them
+        // Go
+        $this->db->beginTransaction();
         foreach ($components as $componentId => $component) {
-            // If this has a layout ID: join this layout to this component.
-            // If this has a tileSource instead: figure out which component this belongs to
-            // If I can't do that: this component is useless, delete it
             $this->log->notice(sprintf('Checking tile component #%d', $componentId));
-
             if ($component['tileSource']) {
-                $this->log->info(
-                    self::INDENT . sprintf(
-                        'component has alternate tile source #%d: connecting to a layout ID',
-                        $component['tileSource']
-                    )
-                );
-
-                // Tile source will be a component ID, somewhere in this list.
-                // It's possible to have circular references: break them if found
-                // (this will happen by removing the tileSource config)
-
-                if ($component['layoutId']) {
-                    $this->log->warning(
-                        self::indent(1) . sprintf(
-                            'component also has layout ID #%d: ignoring, and using tile source',
-                            $component['layoutId']
-                        )
-                    );
-                }
-
-                // Figure out which layout ID this falls back to
-                $baseLayoutId = $this->findBaseLayoutId($component['tileSource'], $components);
-                if ($baseLayoutId) {
-                    $this->log->notice(self::INDENT . sprintf('found layout ID #%d: attaching', $baseLayoutId));
-                } else {
-                    $this->log->warning(self::INDENT . 'no base layout found: this tile component will be empty');
-                }
-
-                // Now attach the layout ID
-                $this->attachLayoutQuery->execute([
-                    'class'       => $component['component']['class'],
-                    'componentId' => $componentId,
-                    'layoutId'    => $baseLayoutId,
-                ]);
-
+                $this->attachLayoutToComponent($component, $components);
             } elseif ($component['layoutId']) {
-                $this->log->info(
-                    self::indent(1) . sprintf(
-                        'component has layout ID #%d: attaching layout to a location',
-                        $component['layoutId']
-                    )
-                );
-
-
-                $params = [
-                    'tileLayoutId' => $component['layoutId'],
-                    'identifier'   => $component['component']['identifier'],
-                ];
-                switch ($component['component']['module']) {
-                    case 'homepage':
-                        $this->log->notice(self::INDENT . sprintf('attaching layout to folder #%d', $params['identifier']));
-                        $this->attachToFolderQuery->execute($params);
-                        break;
-
-                    case 'homepage_template':
-                        $this->log->notice(self::INDENT . sprintf('attaching layout to homepage template #%d', $params['identifier']));
-                        $this->attachToHomepageTemplateQuery->execute($params);
-                        break;
-
-                    case 'dashboard':
-                        $this->log->notice(self::INDENT . sprintf('attaching layout to dashboard for role #%d', $params['identifier']));
-                        $this->attachToDashboardQuery->execute($params);
-                        break;
-
-                    default:
-                        $this->log->warning(self::INDENT . sprintf('unknown module "%s": skipping', $component['component']['module']));
-                        break;
-                }
+                $this->attachLayoutToLocation($component);
             } else {
                 $this->log->notice(self::indent(1) . 'component has neither a tile source nor layout ID: leaving as is');
             }
         }
-
-
         $this->db->commit();
     }
 
@@ -280,6 +203,11 @@ $app = new class extends App
     /**
      * Find a base layout ID for this component.
      *
+     * Returns the layout ID for `$components[$componentId]`: if that component
+     * has a tile source instead, then call this recursively with that value.
+     *
+     * If no layout ID was found, or a circular reference was found: return null.
+     *
      * @param int   $componentId
      * @param array $components
      * @param array $searchedComponentIds
@@ -293,6 +221,13 @@ $app = new class extends App
             return null;
         }
         $searchedComponentIds[$componentId] = true;
+
+
+        // Recursion protection: let's say 50 levels
+        if (count($searchedComponentIds) > 50) {
+            $this->log->warning(self::indent(1) . 'no base layout found after 50 traversals: skipping');
+            return null;
+        }
 
 
         // Find the base component in the list of components
@@ -309,6 +244,111 @@ $app = new class extends App
         }
         $this->log->warning(self::indent(1) . 'base component has neither a tile source nor layout ID: skipping');
         return null;
+    }
+
+
+    /**
+     * For tile components with an alternate source selected (tileSource):
+     * figure out which layout is actually shown in the component, and attach
+     * it directly.
+     *
+     * @param array $component
+     * @param array $components
+     */
+    private function attachLayoutToComponent(array $component, array $components): void
+    {
+        $this->log->info(
+            self::INDENT . sprintf(
+                'component has alternate tile source #%d: connecting to a layout ID',
+                $component['tileSource']
+            )
+        );
+
+        // Due to various bugs, a component may have both a tile source and a
+        // layout ID.
+        // Use the tile source instead.
+        if ($component['layoutId']) {
+            $this->log->warning(
+                self::indent(1) . sprintf(
+                    'component also has layout ID #%d: ignoring, and using tile source',
+                    $component['layoutId']
+                )
+            );
+        }
+
+        // Figure out which layout ID this falls back to
+        $baseLayoutId = $this->findBaseLayoutId($component['tileSource'], $components);
+        if ($baseLayoutId) {
+            $this->log->notice(self::INDENT . sprintf('found layout ID #%d: attaching', $baseLayoutId));
+        } else {
+            $this->log->warning(self::INDENT . 'no base layout found: this tile component will be empty');
+            return;
+        }
+
+        // Now attach the layout ID
+        $this->attachLayoutQuery->execute([
+            'class'       => $component['component']['class'],
+            'componentId' => $component['component']['id'],
+            'layoutId'    => $baseLayoutId,
+        ]);
+    }
+
+
+    /**
+     * For tile components with a layout selected, but no alternate source:
+     * Relate the tile source directly to the tile's component.
+     *
+     * @param array $component
+     */
+    private function attachLayoutToLocation(array $component): void
+    {
+        $this->log->info(
+            self::indent(1) . sprintf(
+                'component has layout ID #%d: attaching layout to a location',
+                $component['layoutId']
+            )
+        );
+
+
+        $params = [
+            'tileLayoutId' => $component['layoutId'],
+            'identifier'   => $component['component']['identifier'],
+        ];
+        switch ($component['component']['module']) {
+            case 'homepage':
+                $this->log->notice(self::INDENT . sprintf('attaching layout to folder #%d', $params['identifier']));
+                $this->attachToFolderQuery->execute($params);
+                break;
+
+            case 'homepage_template':
+                $this->log->notice(
+                    self::INDENT . sprintf(
+                        'attaching layout to homepage template #%d',
+                        $params['identifier']
+                    )
+                );
+                $this->attachToHomepageTemplateQuery->execute($params);
+                break;
+
+            case 'dashboard':
+                $this->log->notice(
+                    self::INDENT . sprintf(
+                        'attaching layout to dashboard for role #%d',
+                        $params['identifier']
+                    )
+                );
+                $this->attachToDashboardQuery->execute($params);
+                break;
+
+            default:
+                $this->log->warning(
+                    self::INDENT . sprintf(
+                        'unknown module "%s": skipping',
+                        $component['component']['module']
+                    )
+                );
+                break;
+        }
     }
 };
 
