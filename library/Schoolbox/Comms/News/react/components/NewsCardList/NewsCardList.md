@@ -7,5 +7,5 @@ const articles = [
     statusDate: "2019-01-01"
   }
 ];
- <NewsCardList articles={articles} />;
+<NewsCardList articles={articles} />;
 ```
