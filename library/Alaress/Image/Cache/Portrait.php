@@ -52,7 +52,7 @@ class Portrait extends Storage
          * Otherwise try to use the one assigned to user, which lives in storage
          */
         if ($this->config->get('photo_sis_import')) {
-            $portrait = $externalHandler->getPortrait($user->getExternalId());
+            $portrait = $externalHandler->getPortrait($user);
         } else {
             $portrait = $user->getPortrait();
         }

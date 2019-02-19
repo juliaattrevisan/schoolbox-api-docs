@@ -6,6 +6,7 @@
  */
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class External_Synergetic_User implements External_UserInterface
@@ -33,95 +34,69 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getPortrait($externalUserId)
+    public function getPortrait(User $user): ?Storage\Model
     {
         // Make sure a valid external ID was passed
 
-        if (!$this->isExternalIdValid($externalUserId)) {
-            return false;
-        }
-
-        // Get path on Schoolbox server to cached photos. These stupidly have a .JPG extension regardless of what
-        // they really are- so don't pay much attention that the type
-
-        $photoPath = realpath($this->config->get('portrait_dir')) . "/{$externalUserId}.jpg";
-
-        // Check if the configuration options have SIS photo imporing disabled
-
-        if ($this->config->get('photo_sis_import') == 0) {
-
-            // Not allowed to import photos. If one exists locally we can use it, otherwise we will just fail
-
-            if (file_exists($photoPath)) {
-                return $photoPath;
-            } else {
-                return false;
-            }
+        if (!$this->isExternalIdValid($user->getExternalId())) {
+            return null;
         }
 
         // Do a query to get the photos modification date in the SIS. We don't pull the actual photo at this time
 
         $queryPhoto = $this->getConnector()->executeQuery(
-            "SELECT vPhotos.ModifiedDate FROM dbo.vPhotos vPhotos WHERE vPhotos.ID = :externalId",
-            ['externalId' => $externalUserId]
+            'SELECT vPhotos.ModifiedDate 
+            FROM dbo.vPhotos vPhotos 
+            WHERE vPhotos.ID = :externalId',
+            ['externalId' => $user->getExternalId()]
         );
 
         // Check if we found a photo in the SIS
 
         if ($photo = $queryPhoto->fetch()) {
 
-            // Check we can read the file
+            /* If this $user doesn't have an image, shank one down and save it into brownhole
+             *
+             * Or, if the SIS picture is more recent than the one we currently have,
+             * download it and cache it into brownhole
+             */
+            if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(new \Alaress_Date_Format(strtotime($photo['ModifiedDate']), 'U'))) {
 
-            if (is_readable($photoPath)) {
-
-                // If the file is empty, or does not contain a valid image we want to replace it regardless of its date
-
-                if (filesize($photoPath) == 0 || !exif_imagetype($photoPath)) {
-
-                    $downloadImage = true;
-
-                } else {
-
-                    // File on disk was a valid image- check the modification date to see if we want to redownload
-
-                    $downloadImage = filemtime($photoPath) < strtotime($photo['ModifiedDate']);
-                }
-            } else {
-
-                // File was not readable
-
-                $downloadImage = true;
-            }
-
-            if ($downloadImage) {
-
-                // Do a query to retrieve the actual photo from the database
+                // Do a query to retrieve the actual photo data from the database
                 unset($queryPhoto);
+
                 $queryPhoto = $this->getConnector()->executeQuery(
-                    "SELECT vPhotos.Photo FROM dbo.vPhotos vPhotos WHERE vPhotos.ID = :externalId",
-                    ['externalId' => $externalUserId]
+                    'SELECT vPhotos.Photo 
+                    FROM dbo.vPhotos vPhotos 
+                    WHERE vPhotos.ID = :externalId',
+                    ['externalId' => $user->getExternalId()]
                 );
 
                 $photo = $queryPhoto->fetch();
 
                 // The cache has expired, overwrite it with the one from the SIS
 
-                $photoHandle = fopen($photoPath, "w");
-                fwrite($photoHandle, $photo['Photo']);
-                fclose($photoHandle);
+                /* TODO: Save it into brownhole
+                 * TODO: Update user with latest version
+                 * TODO: Return latest version
+                 */
+
+//                $photoHandle = fopen($photoPath, "w");
+//                fwrite($photoHandle, $photo['Photo']);
+//                fclose($photoHandle);
             }
 
-            return $photoPath;
+            /* Then return the latest Storage\Model instance
+             */
+            return $user->getPortrait();
         }
 
         // There was no photo in the SIS, so we don't want to display the cached image either- delete it from
         // disk so it doesn't magically appear later after they'd specifically deleted it from Synergetic
 
-        if (file_exists($photoPath)) {
-            unlink($photoPath);
-        }
-
-        return false;
+        /* TODO: Unlink from user
+         */
+        return null;
     }
 
     /**

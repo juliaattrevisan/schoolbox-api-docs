@@ -8,6 +8,7 @@
 use Alaress\Redis;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
+use Schoolbox\Resource\Storage;
 
 class External_User implements External_UserInterface
 {
@@ -41,10 +42,10 @@ class External_User implements External_UserInterface
     /**
      * @inheritdoc
      *
-     * @param Integer $externalUserId
-     * @return String
+     * @param User $user
+     * @return string
      */
-    public function getPortrait($externalUserId)
+    public function getPortrait(User $user): ?Storage\Model
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
