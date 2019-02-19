@@ -108,7 +108,7 @@ class Kernel extends CliKernelAbstract
         $this->loop = $this->di->values['react.loop'] = Factory::create();
 
         foreach (posix_getrlimit() as $key => $value) {
-            list ($strength, $attr) = explode(' ', $key);
+            [$strength, $attr] = explode(' ', $key);
             $this->limits[$attr][$strength] = $value === 'unlimited' ? null : $value;
         }
     }
@@ -166,7 +166,7 @@ class Kernel extends CliKernelAbstract
      */
     private function getOpt($name)
     {
-        return isset($this->opts[$name]) ? $this->opts[$name] : null;
+        return $this->opts[$name] ?? null;
     }
 
 
@@ -211,7 +211,7 @@ EOL;
         }
 
         // not much point going on if we've got nothing to do
-        if (!is_callable($callable)) {
+        if (!\is_callable($callable)) {
             $this->logger()->critical("No daemon to launch, aborting");
             return;
         }
@@ -236,7 +236,7 @@ EOL;
         } catch (\Schoolbox\External\Exception $e) {
             $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
         } catch (Exception $e) {
-            $this->logger()->critical(sprintf("%s daemon received %s: %s", $this->name, get_class($e),
+            $this->logger()->critical(sprintf("%s daemon received %s: %s", $this->name, \get_class($e),
                 $e->getMessage()), ['exception'=>$e]);
         }
     }
@@ -373,7 +373,7 @@ EOL;
     {
         $this->callExceptionCallbacks($e);
         try {
-            $this->logger()->alert('FATAL ' . get_class($e) . ': ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile(), ['exception'=>$e]);
+            $this->logger()->alert('FATAL ' . \get_class($e) . ': ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile(), ['exception'=>$e]);
         } catch (IOException $e) {
             // can't do anything, STDOUT has been closed
         }
@@ -396,8 +396,8 @@ EOL;
             E_COMPILE_ERROR => 'Compilation',
         ];
 
-        if (is_callable($this->shutdown)) {
-            call_user_func($this->shutdown);
+        if (\is_callable($this->shutdown)) {
+            \call_user_func($this->shutdown);
         }
 
         // don't report anything
@@ -430,10 +430,10 @@ EOL;
         $v = $this->getOpt(self::OPT_VERBOSITY);
 
         $threshold = 0;
-        if (isset($v)) {
+        if ($v !== null) {
             $threshold = 1;
-            if (is_array($v)) {
-                $threshold = min(3, count($v));
+            if (\is_array($v)) {
+                $threshold = min(3, \count($v));
             }
         }
 
