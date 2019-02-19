@@ -258,6 +258,10 @@ EOL;
      * @param int    $errLine
      * @return bool
      * @throws ErrorException
+     * @throws IOException
+     * @throws PDOException
+     * @throws RangeException
+     * @throws RuntimeException
      */
     public function onError($errNum, $errStr, $errFile, $errLine): ?bool
     {
@@ -302,7 +306,11 @@ EOL;
      * @param string $errStr
      * @param string $errFile
      * @param int    $errLine
-     * @throws Exception
+     * @throws ErrorException
+     * @throws IOException
+     * @throws PDOException
+     * @throws RangeException
+     * @throws RuntimeException
      */
     private function onWarning($errNum, $errStr, $errFile, $errLine): void
     {
