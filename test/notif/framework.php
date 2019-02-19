@@ -10,6 +10,7 @@ use Alaress\Async\Test\Framework;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Application\Daemon;
 
 // require root
 if (posix_getuid() !== 0) {
@@ -23,10 +24,10 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 $opts = getopt('v', ['env:', 'logdir:', 'testcase:']);
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Notification Test Framework', [
-    'verbose' => isset($opts['v']) ? $opts['v'] : [ false, false, false ],
-    'errors'  => E_ALL,
-    'flags'   => $opts
+$kernel = new Daemon\Kernel('Notification Test Framework', [
+    Daemon\Kernel::OPT_VERBOSE => isset($opts['v']) ? $opts['v'] : [false, false, false],
+    Daemon\Kernel::OPT_ERRORS  => E_ALL,
+    'flags'                    => $opts,
 ]);
 
 $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {

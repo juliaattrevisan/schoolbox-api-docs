@@ -27,6 +27,11 @@ use React\Stomp;
 
 class Kernel extends \Alaress\Application\Kernel
 {
+    // Construction options
+    public const OPT_ERRORS = 'errors';
+    public const OPT_VERBOSE = 'verbose';
+    public const OPT_LEVEL = 'level';
+
     const RLIMIT_CORE_FILESIZE = 'core';
     const RLIMIT_CPU_TIME = 'cpu';
     const RLIMIT_DATA_SEGMENT = 'data';
@@ -77,7 +82,7 @@ class Kernel extends \Alaress\Application\Kernel
         parent::__construct();
 
         pcntl_signal(SIGCHLD, SIG_IGN);
-        error_reporting(isset($opts['errors']) ? $opts['errors'] : E_ALL ^ E_NOTICE);
+        error_reporting($opts[self::OPT_ERRORS] ?? E_ALL ^ E_NOTICE);
         $this->name = $name;
 
         $this->loop = $this->di->values['react.loop'] = Factory::create();
@@ -105,8 +110,8 @@ class Kernel extends \Alaress\Application\Kernel
     {
         $this->opts = $opts;
         // If level not set, logging level determined by verbose
-        if (!isset($this->opts['level'])) {
-            $this->opts['level'] = $this->getLoggingLevel();
+        if (!isset($this->opts[self::OPT_LEVEL])) {
+            $this->opts[self::OPT_LEVEL] = $this->getLoggingLevel();
         }
     }
 
@@ -149,7 +154,7 @@ class Kernel extends \Alaress\Application\Kernel
      */
     public function run($callable = null)
     {
-        if (posix_isatty(STDOUT) && !is_null($this->getOpt('verbose'))) {
+        if (posix_isatty(STDOUT) && $this->getOpt(self::OPT_VERBOSE) !== null) {
             echo <<<EOL
 
  ||
@@ -375,7 +380,7 @@ EOL;
      */
     public function getLoggingLevel()
     {
-        $v = $this->getOpt('verbose');
+        $v = $this->getOpt(self::OPT_VERBOSE);
 
         $threshold = 0;
         if (isset($v)) {
@@ -402,9 +407,9 @@ EOL;
     {
         if (!$this->log instanceof LoggerInterface) {
             // if verbose output is on
-            $level     = $this->getOpt('level');
-            $fields    = $this->getOpt('fields') ?: [];
-            $porcelain = in_array('porcelain', $fields);
+            $level     = $this->getOpt(self::OPT_LEVEL);
+            $fields    = $this->getOpt(Logger::LOG_FIELDS) ?: [];
+            $porcelain = \in_array(Logger::FIELD_PORCELAIN, $fields, true);
             $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
             // Add Sentry handler into logging system if possible

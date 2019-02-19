@@ -21,11 +21,13 @@ use Psr\Log\LoggerInterface;
 
 class Logger implements LoggerInterface {
 
-    const FIELD_MEM       = 'mem';
-    const FIELD_TRUE_MEM  = 'truemem';
-    const FIELD_PID       = 'pid';
-    const FIELD_LEVEL     = 'level';
-    const FIELD_PORCELAIN = 'porcelain';
+    // Used to identify Daemon kernel construction args that are ultimately used to configure this logger
+    public const LOG_FIELDS      = 'fields';
+    public const FIELD_MEM       = 'mem';
+    public const FIELD_TRUE_MEM  = 'truemem';
+    public const FIELD_PID       = 'pid';
+    public const FIELD_LEVEL     = 'level';
+    public const FIELD_PORCELAIN = 'porcelain';
 
     /**
      * @return array

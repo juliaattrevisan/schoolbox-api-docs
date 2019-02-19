@@ -10,9 +10,12 @@
 
 use Schoolbox\IMapper;
 use Schoolbox\Mapper;
+use Alaress\Lumberjack\Logger;
 
 require_once __DIR__ . '/../conf/core/require.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__, ['level' => 100]);
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__, [
+    Logger::FIELD_LEVEL => Monolog\Logger::DEBUG,
+]);
 $log = $kernel->logger();
 $log->info("Unmapped:");
 
