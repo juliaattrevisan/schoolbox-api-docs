@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Application\BasicRequest;
 
-use Schoolbox\Application\WebKernel;
+use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
 use Psr\Log\NullLogger;
 use Schoolbox\Collection;
@@ -41,7 +41,7 @@ use Predis;
  * This kernel is a stripped down version of the full web request kernel.  It is designed for use when there is
  * no user interface to display.  For example streaming files, images and videos.
  */
-class Kernel extends WebKernel
+class Kernel extends WebKernelAbstract
 {
 
     /**

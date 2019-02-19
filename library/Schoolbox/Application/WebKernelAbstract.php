@@ -19,7 +19,7 @@ use Alaress\Web\Output;
 /**
  * Common ancestor for all Web Requests
  */
-abstract class WebKernel extends \Alaress\Application\Kernel
+abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 {
 
     /**

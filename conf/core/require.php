@@ -32,7 +32,7 @@ function kernel_load(string $className)
 
     // Are we loading a web kernel of some sort?
     if (\in_array($className, [$kernelWebFull, $kernelWebBasic], true)) {
-        require_once __DIR__ . '/../../library/Schoolbox/Application/WebKernel.php';
+        require_once __DIR__ . '/../../library/Schoolbox/Application/WebKernelAbstract.php';
     }
 
     // Load concrete kernel file

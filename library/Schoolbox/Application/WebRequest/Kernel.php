@@ -20,7 +20,7 @@ use Aura\Router\Route;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Application\WebKernel;
+use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -36,7 +36,7 @@ use Schoolbox\IConfigLoader;
 /**
  * Designed for full web requests, including rendering a full UI
  */
-class Kernel extends WebKernel
+class Kernel extends WebKernelAbstract
 {
 
     /** @var bool */
