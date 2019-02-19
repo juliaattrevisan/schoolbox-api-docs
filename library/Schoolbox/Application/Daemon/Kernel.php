@@ -25,8 +25,9 @@ use Monolog;
 use Raven_Client;
 use Database;
 use React\Stomp;
+use Schoolbox\Application\CliKernelAbstract;
 
-class Kernel extends \Alaress\Application\Kernel
+class Kernel extends CliKernelAbstract
 {
     // Options keys for $options passed to this Kernel's constructor
     public const OPTION_LEVEL          = 'level';        // What log level should be reported? Falls back to 'v' if not specified.
