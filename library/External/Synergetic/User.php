@@ -96,8 +96,12 @@ class External_Synergetic_User implements External_UserInterface
         // There was no photo in the SIS, so we don't want to display the cached image either- delete it from
         // disk so it doesn't magically appear later after they'd specifically deleted it from Synergetic
 
-        /* TODO: Unlink from user
+        /* Unlink from user
          */
+        $user->setPortrait(null);
+
+        \Schoolbox\UserMapper::getInstance()->save($user);
+
         return null;
     }
 
