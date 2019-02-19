@@ -5,7 +5,7 @@ import { Tabs, Tab, LoadingTabs } from "@schoolbox/Tabs";
 import { LoadingCard } from "@schoolbox/Card";
 import { Pagination } from "@schoolbox/Pagination/Pagination";
 import { EmptyState } from "@schoolbox/EmptyState/EmptyState";
-import IArticle from "../../interfaces/IArticle/IArticle";
+import { IArticle } from "../../interfaces/IArticle/IArticle";
 import { NewsCardList } from "../../components/NewsCardList/NewsCardList";
 
 interface ICreatedByMe {

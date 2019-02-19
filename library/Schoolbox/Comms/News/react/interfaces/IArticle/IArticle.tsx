@@ -1,29 +1,29 @@
 interface IArticleLinks {
-    update: ILink;
-    self: ILink;
+  update: ILink;
+  self: ILink;
 }
 
 interface IImage {
-    _links: ILink;
+  _links: ILink;
 }
 
 interface IArticle {
-    id: number;
-    title: string;
-    featureImage: IImage;
-    status: string;
-    statusDate: IDate;
-    _links: IArticleLinks;
+  id: number;
+  title: string;
+  featureImage: IImage;
+  status: string;
+  statusDate: IDate;
+  _links: IArticleLinks;
 }
 
 interface ILink {
-    href: string;
-    image: ILink;
+  href: string;
+  image: ILink;
 }
 
 interface IDate {
-    long: string;
-    relativeTime: string;
+  long: string;
+  relativeTime: string;
 }
 
-export default IArticle;
+export { IArticle };
