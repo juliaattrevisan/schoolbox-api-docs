@@ -37,7 +37,10 @@ $app = new class extends App
         SELECT
             ci.id,
             ccd.key,
-            cci.value
+            cci.value,
+            ci.module,
+            ci.identifier,
+            cd.class
         FROM component_instance                ci
         INNER JOIN component_definition        cd ON ci.component_definition_id = cd.id
         LEFT JOIN component_config_instance   cci ON ci.id = cci.component_instance_id
@@ -45,6 +48,24 @@ $app = new class extends App
                                                   AND ccd.key IN ('layoutId', 'tileSource')
         WHERE cd.class IN (:dashboardTile, :homepageTile)
         ORDER BY ci.id ASC, ccd.key ASC
+    ";
+
+    private const ATTACH_LAYOUT_ID_QUERY = "
+        REPLACE INTO component_config_instance (
+            component_config_definition_id,
+            component_instance_id,
+            value
+        ) VALUES (
+            (
+                SELECT ccd.id
+                FROM component_config_definition ccd
+                INNER JOIN component_definition cd ON ccd.component_definition_id = cd.id
+                WHERE cd.class = :class
+                AND   ccd.key  = 'layoutId'
+            ),
+            :componentId,
+            :layoutId
+        )
     ";
 
     public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts)
@@ -61,8 +82,14 @@ $app = new class extends App
         $configQuery->execute($params);
 
 
+        $attachLayoutQuery = $db->prepareQuery(self::ATTACH_LAYOUT_ID_QUERY);
+
+
         // Collate them together
         $components = [];
+
+        $db->beginTransaction();
+
         foreach ($configQuery->getIterator() as $row) {
             $id    = (int)$row['id'];
             $key   = $row['key'];
@@ -73,6 +100,11 @@ $app = new class extends App
                 $components[$id] = [
                     'layoutId'   => null,
                     'tileSource' => null,
+                    'component'  => [
+                        'class'      => $row['class'],
+                        'module'     => $row['module'],
+                        'identifier' => $row['identifier'],
+                    ]
                 ];
             }
             $components[$id][$key] = $value;
@@ -117,6 +149,11 @@ $app = new class extends App
                 }
 
                 // Now attach the layout ID
+                $attachLayoutQuery->execute([
+                    'class'       => $component['component']['class'],
+                    'componentId' => $componentId,
+                    'layoutId'    => $baseLayoutId,
+                ]);
 
             } elseif ($component['layoutId']) {
                 $log->info(
@@ -130,6 +167,9 @@ $app = new class extends App
                 $log->info(self::indent(1) . 'component has neither a tile source nor layout ID: leaving as is');
             }
         }
+
+
+        $db->rollBack();
     }
 
 
