@@ -10,6 +10,9 @@
 namespace Schoolbox\Tile\Layout;
 
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\RoleMapper;
 use Schoolbox\Tile\Mapper as TileMapper;
 
 /**
@@ -55,18 +58,41 @@ class Mapper extends BaseMapper
 
         // Join to tiles as well
         $this->joinsReverseMulti('tile_layout_id', TileMapper::class, 'tileList', 'tile');
-//        $this->hasJoin(
-//            'tile',
-//            [
-//                'mapper'    => TileMapper::class,
-//                'this_key'  => 'id',
-//                'other_key' => 'tile_layout_id',
-//                'multiple'  => 'true',
-//            ]
-//        );
-
 
         // join through to folder, role, homepage template
+        $this->joinsVia(
+            'tile_layout_for_folder',
+            FolderMapper::class,
+            'id',
+            'folder_id',
+            'tile_layout_id',
+            'id',
+            self::TYPE_MODEL,
+            null,
+            'folder'
+        );
+        $this->joinsVia(
+            'tile_layout_for_dashboard',
+            RoleMapper::class,
+            'id',
+            'role_id',
+            'tile_layout_id',
+            'id',
+            self::TYPE_MODEL,
+            null,
+            'dashboardRole'
+        );
+        $this->joinsVia(
+            'tile_layout_for_homepage_template',
+            HomepageTemplateMapper::class,
+            'id',
+            'homepage_template_id',
+            'tile_layout_id',
+            'id',
+            self::TYPE_MODEL,
+            null,
+            'homepageTemplate'
+        );
     }
 
     /**
