@@ -1,6 +1,6 @@
 <?php
 
-$kernel = require_once $_SERVER['DOCUMENT_ROOT'] . '/../conf/core/require-web.php';
+$kernel = require_once __DIR__ . '/../../conf/core/require-web.php';
 
 // trim in case the leading slash is captured in the URI
 $page = trim($_GET['page'], '/');

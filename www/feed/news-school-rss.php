@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-$kernel = require_once $_SERVER['DOCUMENT_ROOT'] . '/../conf/core/require-web.php';
+$kernel = require_once __DIR__ . '/../../conf/core/require-web.php';
 
 use Schoolbox\News\TopicMapper;
 
