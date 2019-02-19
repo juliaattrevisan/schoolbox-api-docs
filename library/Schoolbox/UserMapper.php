@@ -291,11 +291,14 @@ class UserMapper extends Mapper
         ";
     }
 
+
     /**
      * @param PDOStatement $statement
      * @return Collection
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
      */
-    protected function hydrateSelect(PDOStatement $statement)
+    protected function hydrateSelect(PDOStatement $statement): Collection
     {
         /** @var User[] $users */
         $users = [];
