@@ -10,7 +10,6 @@
 namespace Alaress\Application;
 
 use Aura\Di;
-use Autoloader;
 use Predis;
 use Throwable;
 use RuntimeException;
@@ -167,9 +166,6 @@ abstract class Kernel
     public function __construct()
     {
         // run the launch sequence
-        $this->loadConfiguration();
-        $this->setIncludePath();
-        $this->registerAutoLoading();
         $this->initialiseExternalConnections();
         $this->initialiseDebugging();
         $this->registerErrorHandling();
@@ -179,25 +175,6 @@ abstract class Kernel
         $this->checkServerApiEnvironment();
     }
 
-    /**
-     * Set the include path
-     *
-     * @return void
-     */
-    protected function setIncludePath(): void
-    {
-        set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . get_include_path());
-    }
-
-
-    /**
-     * Normal (ie non-Kernel) class loading
-     */
-    protected function registerAutoLoading(): void
-    {
-        require_once SITE_root . '/library/Autoloader.php';
-        Autoloader::initialise();
-    }
 
     /**
      * Initialise connections to databases, etc.
@@ -321,19 +298,6 @@ abstract class Kernel
      * @throws \UnexpectedValueException If this Kernel has been constructed in an invalid environment.
      */
     abstract protected function checkServerApiEnvironment(): void;
-
-
-    /**
-     * Load the core configuration file(s)
-     *
-     * @return void
-     */
-    private function loadConfiguration(): void
-    {
-        require_once __DIR__ . '/../../../www/conf/conf.php';
-        require_once SITE_root . '/www/include/stdfuncs.php';
-        require_once SITE_root . '/library/constants.php';
-    }
 
 
     /**
