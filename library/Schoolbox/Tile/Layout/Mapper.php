@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Tile\Layout;
 
+use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -94,6 +95,63 @@ class Mapper extends BaseMapper
             'homepageTemplate'
         );
     }
+
+
+    /**
+     * Select contexts (folder, dashboard, homepage template)
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('tile_layout_for_folder', 'f')},
+                {$this->getJoinColumnString('tile_layout_for_dashboard', 'r')},
+                {$this->getJoinColumnString('tile_layout_for_homepage_template', 'h')}
+        ";
+    }
+
+
+    /**
+     * Join on to contexts (folder, dashboard, homepage template)
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('tile_layout_for_folder', '', 'f', true)}
+            LEFT JOIN {$this->getJoinSql('tile_layout_for_dashboard', '', 'r', true)}
+            LEFT JOIN {$this->getJoinSql('tile_layout_for_homepage_template', '', 'h', true)}
+        ";
+    }
+
+
+    /**
+     * Hydrate contexts (folder, dashboard, homepage template)
+     *
+     * @param PDOStatement $statement
+     * @return \Schoolbox\GenericCollection
+     * @throws BaseMapper\Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $collection = $this->createCollection();
+        foreach ($statement as $row) {
+            /** @var Model $model */
+            $model = $this->hydrate($row);
+            $model
+                ->setFolder($this->hydrateJoin($row, 'tile_layout_for_folder', 'f'))
+                ->setDashboardRole($this->hydrateJoin($row, 'tile_layout_for_dashboard', 'r'))
+                ->setHomepageTemplate($this->hydrateJoin($row, 'tile_layout_for_homepage_template', 'h'));
+            $collection[$model->getId()] = $model;
+        }
+        return $collection;
+    }
+
 
     /**
      * Gets the tile layout, and fetches any tiles that are a part of it.
