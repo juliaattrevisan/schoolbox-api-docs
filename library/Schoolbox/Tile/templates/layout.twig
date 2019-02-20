@@ -212,6 +212,10 @@
                         Layout
                         <span class='hint has-tip tip-top' data-tooltip title="Arrange tiles in either a fixed-width grid or spanned across a number of columns.">?</span>
                     </legend>
+                    <div class="small-12 columns">
+                        <label for="heading" class="required">Heading</label>
+                        <input name="heading" id="heading" type="text" maxlength="100" value="{{ item.heading }}" required />
+                    </div>
                     <div class="small-12 large-6 columns">
                         <label for="layout_type">Type</label>
                         <select id="layout_type" name="layout_type" data-function="update-layout">
