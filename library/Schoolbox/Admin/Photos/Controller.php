@@ -107,19 +107,22 @@ class Controller extends Base
             unlink($destination);
     }
 
+
     /**
      * Upload any JPG files into the portrait cache folder overwriting whatever was previously there
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
      */
     public function postUpload()
     {
         $post = $this->getRequest()->post;
         
         /** @var \Schoolbox\Config\Loader $config */
-        $config = $this->getDi()->get("config");
+        $config = $this->getDi()->get('config');
 
-        if (is_array($post['attachment'])) {
+        if (\is_array($post['attachment'])) {
             $portraits = (new CollectorFactory())->build($post['attachment'])->getAll();
 
             /** @var \Schoolbox\Resource\Storage\Model $storageObject */
@@ -146,7 +149,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->redirect->afterPost("/adminv2/photos");
+        $this->getResponse()->redirect->afterPost('/adminv2/photos');
     }
 
     /**
