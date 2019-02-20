@@ -10,7 +10,9 @@ use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\External\UserRelation;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+
 
 class External_Schoolbox_User implements External_UserInterface
 {
@@ -325,19 +327,13 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @param int $externalUserId
      *
-     * @return bool|string
+     * @param User $user
+     * @return Storage\Model|null
      */
-    public function getPortrait($externalUserId)
+    public function getPortrait(User $user): ?Storage\Model
     {
-        $portraitPath = realpath($this->configMapper->get('portrait_dir')) . "/{$externalUserId}.jpg";
-
-        if (is_readable($portraitPath)) {
-            return $portraitPath;
-        }
-
-        return false;
+        return $user->getPortrait();
     }
 
     /**
