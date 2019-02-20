@@ -60,7 +60,11 @@ class Component_Config_LayoutId extends Component_Config_Abstract
         $page->setVar('buttons_for_component_block', '');
         $page->setVar('no_buttons_deleted_layout_block', '');
         $page->setVar('no_buttons_permission_denied_block', '');
-        if ($layoutId) {
+
+        if (!$component->hasWriteAccess()) {
+            // (or not, if the current user can't view them)
+            $page->parse('no_buttons_permission_denied_block', 'no_buttons_permission_denied');
+        } elseif ($layoutId) {
             // Does the layout exist? If not, don't render buttons
             $layoutExists = $tileLayoutMapper->countByColumn('id', $layoutId);
             if ($layoutExists) {
