@@ -62,9 +62,8 @@ module.exports = {
           name: "Cards",
           content: "react/components/Card/Cards.md",
           components: [
-            "react/components/Card/Card/*.tsx",
-            "react/components/Card/LoadingCard/*.tsx",
-            "react/components/Card/CardList/*.tsx"
+            "react/components/Card/Card/**/*.tsx",
+            "react/components/Card/CardList/**/*.tsx"
           ]
         },
         {

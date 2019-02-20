@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 
 import { Tabs, Tab, LoadingTabs } from "@schoolbox/Tabs";
-import { LoadingCard } from "@schoolbox/Card";
+import { LoadingCardList } from "@schoolbox/Card";
 import { Pagination } from "@schoolbox/Pagination/Pagination";
 import { EmptyState } from "@schoolbox/EmptyState/EmptyState";
 import { IArticle } from "../../interfaces/IArticle/IArticle";
@@ -260,9 +260,7 @@ const showLoaders = (articlesLoading: boolean) => {
   return (
     <>
       <LoadingTabs />
-      <LoadingCard />
-      <LoadingCard />
-      <LoadingCard />
+      <LoadingCardList />
     </>
   );
 };
