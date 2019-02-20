@@ -50,16 +50,40 @@ module.exports = {
     {
       name: "Components",
       components: "react/components/**/*.tsx",
-      ignore: "react/components/Card/**/*.tsx",
+      ignore: [
+        "react/components/Card/**/*.tsx",
+        "react/components/Tabs/**/*.tsx",
+        "react/components/Actions/**/*.tsx",
+        "react/components/InformationList/**/*.tsx"
+      ],
       sectionDepth: 1,
       sections: [
         {
           name: "Cards",
           content: "react/components/Card/Cards.md",
           components: [
-            "react/components/Card/Card/*.tsx",
-            "react/components/Card/LoadingCard/*.tsx"
+            "react/components/Card/Card/**/*.tsx",
+            "react/components/Card/CardList/**/*.tsx"
           ]
+        },
+        {
+          name: "Tabs",
+          components: [
+            "react/components/Tabs/Tabs/*.tsx",
+            "react/components/Tabs/LoadingTabs/*.tsx",
+            "react/components/Tabs/Tab/*.tsx"
+          ]
+        },
+        {
+          name: "Actions",
+          components: [
+            "react/components/Actions/Actions/*.tsx",
+            "react/components/Actions/Action/*.tsx"
+          ]
+        },
+        {
+          name: "Information List",
+          components: "react/components/InformationList/**/*.tsx"
         }
       ]
     }

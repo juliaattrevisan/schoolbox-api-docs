@@ -8,7 +8,7 @@ interface IImage {
 /**
  * Just a basic image element. Requires alt text for accessibility.
  */
-const Image: React.SFC<IImage> = props => {
+const Image: React.FunctionComponent<IImage> = props => {
   const { src, alt } = props;
   return <img src={src} alt={alt} />;
 };
@@ -16,7 +16,7 @@ const Image: React.SFC<IImage> = props => {
 /**
  * Empty container element for creating a skeleton loader of meta text.
  */
-const LoadingImage: React.SFC = props => {
+const LoadingImage: React.FunctionComponent = props => {
   return <div className="img" />;
 };
 

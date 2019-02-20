@@ -23,7 +23,10 @@ $pagination-link-active-bg: $content-ui-selected;
 // We use these for disabled anchor links
 // $pagination-link-unavailable-cursor: default;
 // $pagination-link-unavailable-font-color: $aluminum;
-$pagination-link-unavailable-bg-active: scale-color($content-ui-background, $lightness: -10%);
+$pagination-link-unavailable-bg-active: scale-color(
+  $content-ui-background,
+  $lightness: -10%
+);
 
 // We use these for currently selected anchor links
 $pagination-link-current-background: $content-ui-selected;
@@ -36,26 +39,29 @@ $pagination-link-current-active-bg: $content-ui-selected;
 
 // Pagination
 ul.pagination {
-    li {
-        margin-right: 1px;
-        margin-bottom: 1px;
+  li {
+    margin-right: 1px;
+    margin-bottom: 1px;
 
-        /* Allow pagination elements to wrap under itself
-         */
-        height: auto;
+    // Allow pagination elements to wrap under itself
+    height: auto;
 
-        a, button {
-            @include button-dimensions();
-            background-color: $content-ui-background;
-            border-radius: 0px;
-        }
-
-        &.active a {
-            @include button-dimensions();
-            background-color: $pagination-link-current-background;
-            color: $pagination-link-current-font-color;
-            font-weight: $font-weight-bold;
-        }
+    a,
+    button {
+      @include button-dimensions();
+      background-color: $content-ui-background;
+      border-radius: 0px;
     }
-}
 
+    a:focus {
+      background: $content-ui-background;
+    }
+
+    &.active a {
+      @include button-dimensions();
+      background-color: $pagination-link-current-background;
+      color: $pagination-link-current-font-color;
+      font-weight: $font-weight-bold;
+    }
+  }
+}

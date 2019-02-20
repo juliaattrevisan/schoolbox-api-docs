@@ -895,6 +895,11 @@
       "integrity": "sha1-K1o6s/kYzKSKjHVMCBaOPwPrphs=",
       "dev": true
     },
+    "@types/classnames": {
+      "version": "2.2.7",
+      "resolved": "https://registry.npmjs.org/@types/classnames/-/classnames-2.2.7.tgz",
+      "integrity": "sha512-rzOhiQ55WzAiFgXRtitP/ZUT8iVNyllEpylJ5zHzR4vArUvMB39GTk+Zon/uAM0JxEFAWnwsxC2gH8s+tZ3Myg=="
+    },
     "@types/prop-types": {
       "version": "15.5.9",
       "resolved": "https://registry.npmjs.org/@types/prop-types/-/prop-types-15.5.9.tgz",
@@ -913,6 +918,22 @@
       "version": "16.8.2",
       "resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-16.8.2.tgz",
       "integrity": "sha512-MX7n1wq3G/De15RGAAqnmidzhr2Y9O/ClxPxyqaNg96pGyeXUYPSvujgzEVpLo9oIP4Wn1UETl+rxTN02KEpBw==",
+      "requires": {
+        "@types/react": "*"
+      }
+    },
+    "@types/react-paginate": {
+      "version": "6.2.1",
+      "resolved": "https://registry.npmjs.org/@types/react-paginate/-/react-paginate-6.2.1.tgz",
+      "integrity": "sha512-+q8k1N0WzbMyOCsIEH/p5D6/KQD8dXYLzfvSvriYn//94icd2sqhAL2rWXkgwGvqHGCSTU9AoHtsWCJxPfquUQ==",
+      "requires": {
+        "@types/react": "*"
+      }
+    },
+    "@types/react-tabs": {
+      "version": "2.3.1",
+      "resolved": "https://registry.npmjs.org/@types/react-tabs/-/react-tabs-2.3.1.tgz",
+      "integrity": "sha512-4SZXSF8ibQAtHUqqfoYLO+8Rn4F7Hj/IX3CJf1712dWeFvRxYY1HjjwSoN4MgUB0SB0dY4GrdlZwNhhIKuRoNQ==",
       "requires": {
         "@types/react": "*"
       }
@@ -2119,8 +2140,7 @@
     "classnames": {
       "version": "2.2.6",
       "resolved": "https://registry.npmjs.org/classnames/-/classnames-2.2.6.tgz",
-      "integrity": "sha1-Q5Nb/90pHzJtrQogUwmzjQD2UM4=",
-      "dev": true
+      "integrity": "sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q=="
     },
     "clean-webpack-plugin": {
       "version": "0.1.19",
@@ -7712,6 +7732,14 @@
       "integrity": "sha1-TxonOv38jzSIqMUWv9p4+HI1I2I=",
       "dev": true
     },
+    "react-paginate": {
+      "version": "6.2.1",
+      "resolved": "https://registry.npmjs.org/react-paginate/-/react-paginate-6.2.1.tgz",
+      "integrity": "sha512-7MaWiVi4SAFYq5tAGcMCaZE6AK4XxCDM0zEo6+ZthVkhYNnKy1LLkO6syYQu+dBvNfukJ7CurOIpGWnkydJiDQ==",
+      "requires": {
+        "prop-types": "^15.6.1"
+      }
+    },
     "react-styleguidist": {
       "version": "8.0.6",
       "resolved": "https://registry.npmjs.org/react-styleguidist/-/react-styleguidist-8.0.6.tgz",
@@ -7794,6 +7822,15 @@
             "path-is-absolute": "^1.0.0"
           }
         }
+      }
+    },
+    "react-tabs": {
+      "version": "3.0.0",
+      "resolved": "https://registry.npmjs.org/react-tabs/-/react-tabs-3.0.0.tgz",
+      "integrity": "sha512-z90cDIb+5V7MzjXFHq1VLxYiMH7dDQWan7mXSw6BWQtw+9pYAnq/fEDvsPaXNyevYitvLetdW87C61uu27JVMA==",
+      "requires": {
+        "classnames": "^2.2.0",
+        "prop-types": "^15.5.0"
       }
     },
     "read-pkg": {

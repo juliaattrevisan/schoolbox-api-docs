@@ -1,13 +1,17 @@
 import * as React from "react";
 import { IImage, Image } from "@schoolbox/Image/Image";
 import { Meta } from "@schoolbox/Meta/Meta";
+import { Actions, Action, IAction } from "@schoolbox/Actions";
 
 interface ICard {
+  /** Unique identifier for the card */
+  id: string | number;
+
   /** Title to display on the card */
   title: string;
 
   /** Meta information to display below the title */
-  meta: string | string[];
+  meta: string | string[] | JSX.Element;
   // ^Ideally this would be Meta | Meta[] instead of string, but that would require us to send
   // meta={{children: "Some meta" }} instead of just meta="Some meta", so I'm leaving this for now.
 
@@ -16,20 +20,17 @@ interface ICard {
 
   /** URL of the image to display on the card */
   image?: IImage;
+
+  /** Actions to display on the top right of the card (will only work properly from inside an InformationList at this point) */
+  actions?: IAction[];
 }
 
 /**
  * Standard size card. Usually contains an image, title & meta.
  */
-const Card: React.SFC<ICard> = props => {
-  const { title, meta, image } = props;
-
-  // Determine if the card has some sort of content
-  // Used to decide whether to show loaders or not
-  const hasContent = title || meta || image;
-
-  if (hasContent) {
-    return (
+const Card: React.FunctionComponent<ICard> = props => {
+  return (
+    <>
       <div className="list-item">
         <div className="small-12 card">
           <CardImage {...props} />
@@ -37,13 +38,13 @@ const Card: React.SFC<ICard> = props => {
           <CardMeta {...props} />
         </div>
       </div>
-    );
-  }
-
-  return null;
+      <CardActions {...props} />
+      <CardContent {...props} />
+    </>
+  );
 };
 
-const CardImage: React.SFC<ICard> = props => {
+const CardImage: React.FunctionComponent<ICard> = props => {
   const { image, href } = props;
   if (image && href) {
     return (
@@ -60,7 +61,7 @@ const CardImage: React.SFC<ICard> = props => {
   return null;
 };
 
-const CardTitle: React.SFC<ICard> = props => {
+const CardTitle: React.FunctionComponent<ICard> = props => {
   const { title, href } = props;
 
   if (title && href) {
@@ -78,7 +79,7 @@ const CardTitle: React.SFC<ICard> = props => {
   return null;
 };
 
-const CardMeta: React.SFC<ICard> = props => {
+const CardMeta: React.FunctionComponent<ICard> = props => {
   const { meta } = props;
 
   if (meta && Array.isArray(meta)) {
@@ -96,6 +97,25 @@ const CardMeta: React.SFC<ICard> = props => {
   }
 
   return null;
+};
+
+const CardActions: React.FunctionComponent<ICard> = ({ actions }) => {
+  if (!actions) {
+    return null;
+  }
+
+  const actionComponents = actions.map((action: IAction) => (
+    <Action key={action.id} {...action} />
+  ));
+  return <Actions>{actionComponents}</Actions>;
+};
+
+const CardContent: React.FunctionComponent<ICard> = ({ children }) => {
+  if (!children) {
+    return null;
+  }
+
+  return <article>{children}</article>;
 };
 
 export { ICard, Card };
