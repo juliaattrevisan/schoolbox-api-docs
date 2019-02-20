@@ -10,15 +10,17 @@
 
 ## Setting an initial page
 
-Use the `forcePage` prop to set an initial page
+Use the `activePage` prop to set an initial page
 
 ```jsx
-<Pagination pageCount={10} forcePage={4} />
+const page = 5;
+
+<Pagination pageCount={10} activePage={page} />;
 ```
 
 ## Mangaging page with state
 
-You can use the `forcePage` and `onPageChange` props to manage the selected page with state.
+You can use the `activePage` and `onPageChange` props to manage the selected page with state.
 
 ```jsx
 let page = 5; // Note this would most likely be a state property in React.
@@ -28,5 +30,5 @@ const onPageChange = selectedItem => {
   page = selectedItem.selected;
 };
 
-<Pagination pageCount={10} forcePage={page} onPageChange={onPageChange} />;
+<Pagination pageCount={10} activePage={page} onPageChange={onPageChange} />;
 ```

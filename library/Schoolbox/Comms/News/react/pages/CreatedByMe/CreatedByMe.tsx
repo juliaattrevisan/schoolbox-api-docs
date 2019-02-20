@@ -290,7 +290,7 @@ const showPagination = (
     <Pagination
       pageCount={pageCount}
       onPageChange={onPageChange}
-      forcePage={pageSelected}
+      activePage={pageSelected}
     />
   );
 };

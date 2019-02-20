@@ -6,7 +6,7 @@ interface IPagination {
   pageCount: number;
 
   // Selected page
-  forcePage?: number;
+  activePage?: number;
 
   // The method to call when a page is clicked. Exposes the current page object as an argument.
   onPageChange: (pageSelected: number) => void;
@@ -19,12 +19,12 @@ interface IPagination {
 const Pagination: React.FunctionComponent<IPagination> = ({
   pageCount,
   onPageChange,
-  forcePage
+  activePage
 }) => {
-  // Take the forcePage prop sent and convert it back to 0 index for the react-paginate plugin
+  // Take the activePage prop sent and convert it back to 0 index for the react-paginate plugin
   let pageZeroIndexed;
-  if (forcePage) {
-    pageZeroIndexed = forcePage - 1;
+  if (activePage) {
+    pageZeroIndexed = activePage - 1;
   }
 
   // Adjust the page change callback- add one to make the data 1 indexed.
