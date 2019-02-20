@@ -43,8 +43,7 @@ ul.pagination {
     margin-right: 1px;
     margin-bottom: 1px;
 
-    /* Allow pagination elements to wrap under itself
-         */
+    // Allow pagination elements to wrap under itself
     height: auto;
 
     a,
@@ -52,6 +51,10 @@ ul.pagination {
       @include button-dimensions();
       background-color: $content-ui-background;
       border-radius: 0px;
+    }
+
+    a:focus {
+      background: $content-ui-background;
     }
 
     &.active a {
