@@ -7,6 +7,7 @@
 *                                                           *
 ************************************************************/
 
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class External_Tass_User implements External_UserInterface
@@ -16,7 +17,7 @@ class External_Tass_User implements External_UserInterface
      * This identifies the CONVERT/CAST format for ISO8601 date
      * yyyy-mm-ddThh:mi:ss.mmm
      */
-    const FORMAT_ISO8601 = 126;
+    protected const FORMAT_ISO8601 = 126;
 
     /**
      * @var MSSQL
@@ -522,26 +523,14 @@ class External_Tass_User implements External_UserInterface
     }
 
     /**
-     * Returns a local path to the user's portrait
+     * {@inheritDoc}
      *
-     * @param Integer $externalUserId
-     * @return Bool|String
+     * @param User $user
+     * @return Storage\Model|null
      */
-    public function getPortrait($externalUserId)
+    public function getPortrait(User $user): ?Storage\Model
     {
-
-        /* Try several different combinations it has to be one of these */
-        $portraitPathList = array( realpath( Config::get('portrait_dir') ) .'/'.$externalUserId.".jpg",
-                                   realpath( Config::get('portrait_dir') ) .'/'.strtolower($externalUserId).".jpg",
-                                   realpath( Config::get('portrait_dir') ) .'/'.strtoupper($externalUserId).".jpg",
-        );
-
-        foreach($portraitPathList as $portraitPath) {
-            if (is_readable($portraitPath)) {
-                return $portraitPath;
-            }
-        }
-        return false;
+        return $user->getPortrait();
     }
 
     public function getEmail($id)
