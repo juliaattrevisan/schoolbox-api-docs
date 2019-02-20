@@ -10,10 +10,8 @@
 namespace Schoolbox\Admin\Photos;
 
 use Alaress\Web\Controller\Base;
-use Guzzle\Common\Collection;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\User;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
@@ -35,10 +33,13 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     *
+     * @param StorageMapper $storageMapper
+     * @param UserMapper    $userMapper
      */
-    public function __construct() {
-        $this->storageMapper = StorageMapper::getInstance();
-        $this->userMapper = UserMapper::getInstance();
+    public function __construct(Storage\Mapper $storageMapper, UserMapper $userMapper) {
+        $this->storageMapper = $storageMapper;
+        $this->userMapper = $userMapper;
     }
 
 
