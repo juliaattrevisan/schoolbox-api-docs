@@ -69,13 +69,16 @@ class Controller extends Base
      */
     public function postDelete()
     {
-        /** @var \Schoolbox\Config\Loader $config */
-        $config = $this->getDi()->get("config");
+        try {
+            $user = $this->userMapper->findByExternalId($this->getRequest()->post['id']);
+            $user->setPortrait(null);
 
-        $destination = realpath($config->get("portrait_dir")) . "/" . $this->getRequest()->post["id"] . ".jpg";
+            $this->userMapper->save($user);
+        } catch (\Schoolbox\Mapper\Exception $e) {
 
-        if (file_exists($destination))
-            unlink($destination);
+            /* User doesn't exist; noop
+             */
+        }
     }
 
 

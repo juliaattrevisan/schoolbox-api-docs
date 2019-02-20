@@ -6,7 +6,7 @@
             event.preventDefault();
 
             $(this).confirmDialog({
-                text: 'Are you sure you want to remove this users photo?',
+                text: 'Are you sure you want to remove this user\'s photo?',
                 confirmEvent: function() {
                     $.post('/adminv2/photos/delete', {
                         id: $(event.target).attr('data-delete')
