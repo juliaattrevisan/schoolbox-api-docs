@@ -223,7 +223,7 @@ class Mapper extends BaseMapper
     public function createForComponent(Component_Instance $component): Model
     {
         $model = $this->createModel();
-        $model->setHeading($component->getConfigByKey('componentname') ?: 'Tiles');
+        $model->setHeading($component->getConfigByKey('componentname')->getValue() ?: 'Tiles');
 
         $identifier = (int)$component->getIdentifier();
         switch ($component->getModule()) {
