@@ -303,6 +303,8 @@
   }
 
   &.skeleton {
+    margin-top: 1px; // Ideally this would be applied to :not(:first-child) but each card is inside a .list-item and we don't have access to thaqt parent from here :(
+
     > .img {
       width: 4rem;
       height: 4rem;
