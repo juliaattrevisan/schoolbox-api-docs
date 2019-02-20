@@ -20,10 +20,21 @@ const actions = [
     id="1"
     title="Card with actions"
     meta="Card with actions"
+    image={{ src: "https://via.placeholder.com/64", alt: "Some alt text" }}
     actions={actions}
   />
-  <Card id="2" title="Card with no actions" meta="Card with no actions" />
-  <Card id="3" title="Card with content" meta="Card with content">
+  <Card
+    id="2"
+    title="Card with no actions"
+    meta="Card with no actions"
+    image={{ src: "https://via.placeholder.com/64", alt: "Some alt text" }}
+  />
+  <Card
+    id="3"
+    title="Card with content"
+    meta="Card with content"
+    image={{ src: "https://via.placeholder.com/64", alt: "Some alt text" }}
+  >
     <p>Some content</p>
   </Card>
 </CardList>;
