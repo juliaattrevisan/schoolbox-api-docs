@@ -161,11 +161,18 @@ $app = new class extends App
         ];
         $configQuery->execute($params);
         foreach ($configQuery->getIterator() as $row) {
-            $id    = (int)$row['id'];
-            $key   = $row['key'];
-            $value = !empty($row['value'])
-                ? $row['value']
-                : null;
+            $id  = (int)$row['id'];
+            $key = $row['key'];
+
+            // Tile source and layout ID are ints: component name is a string
+            if ($key === 'layoutId' || $key === 'tileSource') {
+                $value = !empty($row['value'])
+                    ? (int)$row['value']
+                    : null;
+            } else {
+                $value = $row['value'];
+            }
+
             if (!isset($components[$id])) {
                 $components[$id] = [
                     'layoutId'      => null,
@@ -187,8 +194,6 @@ $app = new class extends App
         $this->db->beginTransaction();
         foreach ($components as $componentId => $component) {
             // Ensure layout ID and tile source are ints
-            $component['tileSource'] = (int)$component['tileSource'];
-            $component['layoutId']   = (int)$component['layoutId'];
             $this->log->notice(sprintf('Checking tile component #%d', $componentId));
             if ($component['tileSource']) {
                 $this->attachLayoutToComponent($component, $components);
@@ -316,13 +321,13 @@ $app = new class extends App
      */
     private function updateTileLayoutHeading(array $component): void
     {
-        $heading = $component['componentname'] ?: 'Tiles';
-        $this->log->notice(
-            self::INDENT . sprintf(
-                'setting heading for layout to "%s"',
-                $heading
-            )
-        );
+        $heading = trim($component['componentname']);
+        if ($heading === '') {
+            $heading = 'Tiles';
+            $this->log->notice(self::INDENT . sprintf('layout has no heading: setting to "%s"', $heading));
+        } else {
+            $this->log->notice(self::INDENT . sprintf('setting heading for layout to "%s"', $heading));
+        }
         $this->updateTitleLayoutHeadingQuery->execute([
             'tileLayoutId' => $component['layoutId'],
             'heading'      => $heading,
