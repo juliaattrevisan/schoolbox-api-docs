@@ -111,40 +111,37 @@ class Controller extends Base
     /**
      * Upload any JPG files into the portrait cache folder overwriting whatever was previously there
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
+     * @throws \PDOException
      */
     public function postUpload()
     {
         $post = $this->getRequest()->post;
-        
-        /** @var \Schoolbox\Config\Loader $config */
-        $config = $this->getDi()->get('config');
 
         if (\is_array($post['attachment'])) {
-            $portraits = (new CollectorFactory())->build($post['attachment'])->getAll();
 
-            /** @var \Schoolbox\Resource\Storage\Model $storageObject */
-            foreach ($portraits as $storageObject) {
-                if ($storageObject->getMimetype()->isImage()) {
+            /* Remove any bad data SA-8244
+             */
+            $attachments = array_filter($post['attachment']);
 
-                    // Has to have a JPG extension for it to be found by external class, however image format is
-                    // completely irrelevant
+            if (\count($attachments)) {
+                $portraits = (new CollectorFactory())->build($attachments)->getAll();
 
-                    $destination = realpath($config->get("portrait_dir")) . "/" . $storageObject->getFilename() . ".jpg";
+                /** @var \Schoolbox\Resource\Storage\Model $portrait */
+                foreach ($portraits as $portrait) {
+                    if ($portrait->getMimetype()->isImage()) {
+                        try {
+                            $user = $this->userMapper->findByExternalId($portrait->getFilename());
+                            $user->setPortrait($portrait);
+                            $this->userMapper->save($user);
+                        } catch (\Schoolbox\Mapper\Exception $e) {
 
-                    // Remove any existing image
-
-                    if (file_exists($destination)) {
-                        unlink($destination);
+                            /* User doesn't exist; noop
+                             * TODO: Log it somewhere meaningful?
+                             */
+                        }
                     }
-
-                    // And save the image into the portrait folder
-
-                    $fp = fopen($destination, 'wb');
-                    stream_copy_to_stream($storageObject->readStream(), $fp);
-                    fclose($fp);
                 }
             }
         }
