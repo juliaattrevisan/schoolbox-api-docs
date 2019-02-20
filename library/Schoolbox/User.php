@@ -12,6 +12,7 @@ namespace Schoolbox;
 
 use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
+use DomainException;
 use House;
 use HouseResidential;
 use Schoolbox\Config\Loader as ConfigLoader;
@@ -23,7 +24,8 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use DomainException;
+use Schoolbox\Resource\Storage;
+
 
 class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 {
@@ -95,6 +97,13 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      * @var string
      */
     private $hash = '';
+
+    /**
+     * Portrait images are stored in storage now
+     *
+     * @var Storage\Model|null
+     */
+    private $portrait;
 
     /**
      * Publicly available unique identifier, used in export functions
@@ -574,6 +583,26 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     public function getHash()
     {
         return $this->hash;
+    }
+
+
+    /**
+     * @return Storage\Model|null
+     */
+    public function getPortrait(): ?Storage\Model
+    {
+        return $this->portrait;
+    }
+
+
+    /**
+     * @param Storage\Model|null $portrait
+     * @return self
+     */
+    public function setPortrait(?Storage\Model $portrait): User
+    {
+        $this->portrait = $portrait;
+        return $this;
     }
 
 
