@@ -71,13 +71,15 @@ class Component_Config_LayoutId extends Component_Config_Abstract
 
 
         // Render something that isn't the buttons if there's nothing to point to
-        if ($tileComponentInstanceId) {
-            $page->setVar('TILE_COMPONENT_INSTANCE_ID', $tileComponentInstanceId);
-            $page->parse('link_block', 'link');
-            $page->setVar('no_link_block', '');
-        } else {
-            $page->setVar('link_block', '');
-            $page->parse('no_link_block', 'no_link');
-        }
+        $page->setVar('TILE_COMPONENT_INSTANCE_ID', $component->getInstance()->getId());
+        $page->parse('link_block', 'link');
+        $page->setVar('no_link_block', '');
+//        if ($tileComponentInstanceId) {
+//            $page->parse('link_block', 'link');
+//            $page->setVar('no_link_block', '');
+//        } else {
+//            $page->setVar('link_block', '');
+//            $page->parse('no_link_block', 'no_link');
+//        }
     }
 }
