@@ -163,7 +163,7 @@ const listenForWindow = (
   setPageSelected: (page: number) => void
 ) => {
   window.onpopstate = event => {
-    if (!event.state) {
+    if (event.state === null) {
       // Return to defaults
       setTabSelected(0);
       setPageSelected(1);
