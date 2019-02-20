@@ -24,6 +24,7 @@ class Component_Config_LayoutId extends Component_Config_Abstract
         $page->setBlock($keyblock, 'tile_select', 'tile_select_block');
         $page->setBlock('tile_select', 'tile_option', 'tile_option_block');
         $page->setBlock($keyblock, 'link', 'link_block');
+        $page->setBlock($keyblock, 'component_link', 'component_link_block');
         $page->setBlock($keyblock, 'no_link', 'no_link_block');
 
 
@@ -40,11 +41,12 @@ class Component_Config_LayoutId extends Component_Config_Abstract
 
         // Build a PHPLib list
         $page->setVar('tile_option_block', '');
+        $layoutId = (int)$configValue;
         foreach ($layouts as $layout) {
             $page->setVar([
                 'COMPONENT_CONFIG_LAYOUTID_NAME'     => Scrub::text($layout->getHeading()),
                 'COMPONENT_CONFIG_LAYOUTID_VALUE'    => Scrub::text($layout->getId()),
-                'COMPONENT_CONFIG_LAYOUTID_SELECTED' => (int)$layout->getId() === (int)$configValue ? 'selected' : '',
+                'COMPONENT_CONFIG_LAYOUTID_SELECTED' => (int)$layout->getId() === $layoutId ? 'selected' : '',
             ]);
             $page->parse('tile_option_block', 'tile_option', true);
         }
@@ -54,7 +56,7 @@ class Component_Config_LayoutId extends Component_Config_Abstract
         // does this component have an alternate tile source?
         // If so, point the "add tile" and "modify layout" buttons to that
         // component instead.
-        $tileComponentInstanceId = null;
+//        $tileComponentInstanceId = null;
 //        if ($component) {
 //            // Is there an alt tile source?
 //            // Use it if it exists: otherwise don't show the buttons at all
@@ -71,8 +73,15 @@ class Component_Config_LayoutId extends Component_Config_Abstract
 
 
         // Render something that isn't the buttons if there's nothing to point to
-        $page->setVar('TILE_COMPONENT_INSTANCE_ID', $component->getInstance()->getId());
-        $page->parse('link_block', 'link');
+        $page->setVar('COMPONENT_CONFIG_LAYOUTID', $layoutId);
+        if ($layoutId) {
+            $page->parse('link_block', 'link');
+            $page->setVar('component_link_block', '');
+        } else {
+            $page->setVar('TILE_COMPONENT_INSTANCE_ID', $component->getInstance()->getId());
+            $page->parse('component_link_block', 'component_link');
+            $page->setVar('link_block', '');
+        }
         $page->setVar('no_link_block', '');
 //        if ($tileComponentInstanceId) {
 //            $page->parse('link_block', 'link');

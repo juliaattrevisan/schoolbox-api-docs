@@ -9,10 +9,17 @@
 
 <!-- BEGIN link -->
 <ul class="flex-list buttons">
+    <li><a href="/tile/add/{COMPONENT_CONFIG_LAYOUTID}" class="button icon-add">Add Tile</a></li>
+    <li><a href="/tile/layout/{COMPONENT_CONFIG_LAYOUTID}" class="button icon-modify">Modify Layout</a></li>
+</ul>
+<!-- END link -->
+
+<!-- BEGIN component_link -->
+<ul class="flex-list buttons">
     <li><a href="/tile/add/component/{TILE_COMPONENT_INSTANCE_ID}" class="button icon-add">Add Tile</a></li>
     <li><a href="/tile/layout/component/{TILE_COMPONENT_INSTANCE_ID}" class="button icon-modify">Modify Layout</a></li>
 </ul>
-<!-- END link -->
+<!-- END component_link -->
 
 <!-- BEGIN no_link -->
 <p class="meta">This component may not have tiles added to it, because its component data cannot be displayed.</p>
