@@ -53,42 +53,22 @@ class Component_Config_LayoutId extends Component_Config_Abstract
         $page->parse('tile_select_block', 'tile_select');
 
 
-        // does this component have an alternate tile source?
-        // If so, point the "add tile" and "modify layout" buttons to that
-        // component instead.
-//        $tileComponentInstanceId = null;
-//        if ($component) {
-//            // Is there an alt tile source?
-//            // Use it if it exists: otherwise don't show the buttons at all
-//            $altTileSource = $component->getConfig('tileSource');
-//            if ($altTileSource) {
-//                $count = Component_InstanceMapper::getInstance()->countByColumn('id', $altTileSource);
-//                if ($count >= 1) {
-//                    $tileComponentInstanceId = $altTileSource;
-//                }
-//            } else {
-//                $tileComponentInstanceId = $component->getInstance()->getId();
-//            }
-//        }
-
-
-        // Render something that isn't the buttons if there's nothing to point to
+        // Render the buttons
         $page->setVar('COMPONENT_CONFIG_LAYOUTID', $layoutId);
+        $page->setVar('link_block', '');
+        $page->setVar('component_link_block', '');
+        $page->setVar('no_link_block', '');
         if ($layoutId) {
-            $page->parse('link_block', 'link');
-            $page->setVar('component_link_block', '');
+            // Does the layout exist? If not, don't render buttons
+            $layoutExists = $tileLayoutMapper->countByColumn('id', $layoutId);
+            if ($layoutExists) {
+                $page->parse('link_block', 'link');
+            } else {
+                $page->parse('no_link_block', 'no_link');
+            }
         } else {
             $page->setVar('TILE_COMPONENT_INSTANCE_ID', $component->getInstance()->getId());
             $page->parse('component_link_block', 'component_link');
-            $page->setVar('link_block', '');
         }
-        $page->setVar('no_link_block', '');
-//        if ($tileComponentInstanceId) {
-//            $page->parse('link_block', 'link');
-//            $page->setVar('no_link_block', '');
-//        } else {
-//            $page->setVar('link_block', '');
-//            $page->parse('no_link_block', 'no_link');
-//        }
     }
 }
