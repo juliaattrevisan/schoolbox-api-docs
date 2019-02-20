@@ -7,9 +7,9 @@ import { LoadingCard, CardList } from "@schoolbox/Card";
 const LoadingCardList: React.FunctionComponent = () => {
   return (
     <CardList>
-      <LoadingCard />
-      <LoadingCard />
-      <LoadingCard />
+      <LoadingCard id="0" />
+      <LoadingCard id="1" />
+      <LoadingCard id="2" />
     </CardList>
   );
 };
