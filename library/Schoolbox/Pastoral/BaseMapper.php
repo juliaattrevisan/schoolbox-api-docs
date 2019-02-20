@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral;
 
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as SchoolboxMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
@@ -19,6 +20,7 @@ use Schoolbox\User;
  * Class BaseMapper
  *
  * @package Schoolbox\Pastoral
+ * @method GenericCollection|Model[] createCollection($contents = [])
  */
 abstract class BaseMapper extends SchoolboxMapper
 {
@@ -101,7 +103,6 @@ abstract class BaseMapper extends SchoolboxMapper
     {
         $collection = $this->createCollection();
 
-        /** @var Model $record */
         foreach ($records as $record) {
             $filteredRecord = $this->filterRecordForUser($record, $user);
             if ($filteredRecord !== null) {
