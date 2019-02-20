@@ -504,9 +504,8 @@ class Controller extends Base
      * @param Component_Instance $component
      * @return Layout\Model
      * @throws MapperException
-     * @throws \DomainException if the `tileSource` and `layoutId` configs
-     *                          don't exist on `$component`
-     *                          (this should not ever happen)
+     * @throws \DomainException if the `layoutId` config doesn't exist on
+     *                          `$component` (this should not ever happen)
      */
     private function buildLayoutForComponent(Component_Instance $component): Layout\Model
     {
@@ -517,24 +516,16 @@ class Controller extends Base
         $mapper->save($model);
 
 
-        // Does this component itself point to an alternate source?
-        // If so, create a layout for its alt-source instead.
-        $sourceComponentId = (int)$component->getConfigByKey('tileSource')->getValue();
-        if (!$sourceComponentId) {
-            $sourceComponentId = $component->getId();
-        }
-
-
-        // And save the config setting for the layout.
+        // Save the config setting for the layout.
         $layoutConfigDefinition = $component->getConfigByKey('layoutId');
         $config                 = $this->componentConfigMapper->findByColumnList([
             'component_config_definition_id' => $layoutConfigDefinition->getId(),
-            'component_instance_id'          => $sourceComponentId
+            'component_instance_id'          => $component->getId()
         ])->first();
         if (!($config instanceof Component_Config)) {
             $config = new Component_Config();
             $config->setConfigDefinitionId($layoutConfigDefinition->getId());
-            $config->setInstanceId($sourceComponentId);
+            $config->setInstanceId($component->getId());
         }
         $config->setValue($model->getId());
         $this->componentConfigMapper->save($config);
