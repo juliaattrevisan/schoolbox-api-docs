@@ -1,16 +1,16 @@
 import * as React from "react";
-import { LoadingCard } from "@schoolbox/Card";
+import { LoadingCard, CardList } from "@schoolbox/Card";
 
 /**
  * Skeleton loader for a card list
  */
 const LoadingCardList: React.FunctionComponent = () => {
   return (
-    <>
+    <CardList>
       <LoadingCard />
       <LoadingCard />
       <LoadingCard />
-    </>
+    </CardList>
   );
 };
 
