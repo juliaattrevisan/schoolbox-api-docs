@@ -211,6 +211,41 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Create a new tile layout for this component.
+     * * sets the heading to the component's heading
+     * * ensures the tile layout gets attached to the component's context
+     *
+     * The object has not yet been persisted.
+     *
+     * @param Component_Instance $component
+     * @return Model
+     */
+    public function createForComponent(Component_Instance $component): Model
+    {
+        $model = $this->createModel();
+        $model->setHeading($component->getConfigByKey('componentname') ?: 'Tiles');
+
+        $identifier = (int)$component->getIdentifier();
+        switch ($component->getModule()) {
+            case 'homepage':
+                $model->setFolder($this->getJoinMapper('tile_layout_for_folder')->findById($identifier));
+                break;
+
+            case 'dashboard':
+                $model->setDashboardRole($this->getJoinMapper('tile_layout_for_dashboard')->findById($identifier));
+                break;
+
+            case 'homepage_template':
+                $model->setHomepageTemplate(
+                    $this->getJoinMapper('tile_layout_for_homepage_template')->findById($identifier)
+                );
+                break;
+        }
+        return $model;
+    }
+
+
+    /**
      * Find tile layouts for this folder.
      *
      * @param int $folderId
