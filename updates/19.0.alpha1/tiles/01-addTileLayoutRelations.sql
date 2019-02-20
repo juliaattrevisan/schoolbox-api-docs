@@ -55,3 +55,7 @@ CREATE TABLE tile_layout_for_dashboard (
             ON DELETE CASCADE
             ON UPDATE CASCADE
 );
+
+
+-- Tile layouts now need headings, so that their name can show in dropdowns.
+ALTER TABLE tile_layout ADD COLUMN heading VARCHAR(100) NOT NULL AFTER id;

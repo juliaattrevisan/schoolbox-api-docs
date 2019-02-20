@@ -40,6 +40,11 @@ $app = new class extends App
     /**
      * @var IQuery
      */
+    private $updateTitleLayoutHeadingQuery;
+
+    /**
+     * @var IQuery
+     */
     private $attachLayoutQuery;
 
     /**
@@ -59,6 +64,10 @@ $app = new class extends App
 
     private const INDENT = '  ';
 
+    private const UPDATE_TILE_LAYOUT_HEADING_QUERY = "
+        UPDATE tile_layout SET heading = :heading WHERE id = :tileLayoutId
+    ";
+
     private const FIND_COMPONENT_CONFIG_QUERY = "
         SELECT
             ci.id,
@@ -71,7 +80,7 @@ $app = new class extends App
         INNER JOIN component_definition        cd ON ci.component_definition_id = cd.id
         LEFT JOIN component_config_instance   cci ON ci.id = cci.component_instance_id
         LEFT JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
-                                                  AND ccd.key IN ('layoutId', 'tileSource')
+                                                  AND ccd.key IN ('layoutId', 'tileSource', 'componentname')
         WHERE cd.class IN (:dashboardTile, :homepageTile)
         ORDER BY ci.id ASC, ccd.key ASC
     ";
@@ -136,6 +145,7 @@ $app = new class extends App
     {
         $this->log                           = $log;
         $this->db                            = $di->get('databaseInternal');
+        $this->updateTitleLayoutHeadingQuery = $this->db->prepareQuery(self::UPDATE_TILE_LAYOUT_HEADING_QUERY);
         $this->attachLayoutQuery             = $this->db->prepareQuery(self::ATTACH_LAYOUT_ID_QUERY);
         $this->attachToFolderQuery           = $this->db->prepareQuery(self::ATTACH_TO_FOLDER_QUERY);
         $this->attachToDashboardQuery        = $this->db->prepareQuery(self::ATTACH_TO_DASHBOARD_QUERY);
@@ -154,13 +164,14 @@ $app = new class extends App
             $id    = (int)$row['id'];
             $key   = $row['key'];
             $value = !empty($row['value'])
-                ? (int)$row['value']
+                ? $row['value']
                 : null;
             if (!isset($components[$id])) {
                 $components[$id] = [
-                    'layoutId'   => null,
-                    'tileSource' => null,
-                    'component'  => [
+                    'layoutId'      => null,
+                    'tileSource'    => null,
+                    'componentname' => '',
+                    'component'     => [
                         'id'         => $id,
                         'class'      => $row['class'],
                         'module'     => $row['module'],
@@ -175,11 +186,15 @@ $app = new class extends App
         // Go
         $this->db->beginTransaction();
         foreach ($components as $componentId => $component) {
+            // Ensure layout ID and tile source are ints
+            $component['tileSource'] = (int)$component['tileSource'];
+            $component['layoutId']   = (int)$component['layoutId'];
             $this->log->notice(sprintf('Checking tile component #%d', $componentId));
             if ($component['tileSource']) {
                 $this->attachLayoutToComponent($component, $components);
             } elseif ($component['layoutId']) {
                 $this->attachLayoutToLocation($component);
+                $this->updateTileLayoutHeading($component);
             } else {
                 $this->log->notice(self::indent(1) . 'component has neither a tile source nor layout ID: leaving as is');
             }
@@ -290,6 +305,27 @@ $app = new class extends App
             'class'       => $component['component']['class'],
             'componentId' => $component['component']['id'],
             'layoutId'    => $baseLayoutId,
+        ]);
+    }
+
+
+    /**
+     * Set the heading of the tile component referenced here.
+     *
+     * @param array $component
+     */
+    private function updateTileLayoutHeading(array $component): void
+    {
+        $heading = $component['componentname'] ?: 'Tiles';
+        $this->log->notice(
+            self::INDENT . sprintf(
+                'setting heading for layout to "%s"',
+                $heading
+            )
+        );
+        $this->updateTitleLayoutHeadingQuery->execute([
+            'tileLayoutId' => $component['layoutId'],
+            'heading'      => $heading,
         ]);
     }
 
