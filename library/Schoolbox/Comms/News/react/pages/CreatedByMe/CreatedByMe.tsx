@@ -7,6 +7,7 @@ import { Pagination } from "@schoolbox/Pagination/Pagination";
 import { EmptyState } from "@schoolbox/EmptyState/EmptyState";
 import { IArticle } from "../../interfaces/IArticle/IArticle";
 import { NewsCardList } from "../../components/NewsCardList/NewsCardList";
+import { object } from "prop-types";
 
 interface ICreatedByMe {
   /** Page to show on load */
@@ -163,13 +164,13 @@ const listenForWindow = (
   setPageSelected: (page: number) => void
 ) => {
   window.onpopstate = event => {
-    if (event.state === null) {
-      // Return to defaults
-      setTabSelected(0);
-      setPageSelected(1);
-    } else {
+    /** This will store whether a previous page or tab was found in the window state we're moving to */
+    let stateFound: boolean = false;
+
+    if (event.state !== null) {
       if (event.state.page !== undefined) {
         setPageSelected(event.state.page);
+        stateFound = true;
       }
 
       if (event.state.tab !== undefined) {
@@ -177,7 +178,14 @@ const listenForWindow = (
           status => status.name === event.state.tab
         );
         setTabSelected(tabIndex);
+        stateFound = true;
       }
+    }
+
+    if (!stateFound) {
+      // Return to defaults
+      setTabSelected(0);
+      setPageSelected(1);
     }
   };
 };
