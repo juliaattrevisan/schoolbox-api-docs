@@ -16,7 +16,7 @@ const NewsCardList: React.FunctionComponent<INewsCardList> = ({ articles }) => {
           id={article.id}
           title={article.title}
           meta={generateMeta(article)}
-          href={article._links && article._links.self.href}
+          href={article._links.self.href}
           actions={generateCardActions(article)}
           image={{
             src:
