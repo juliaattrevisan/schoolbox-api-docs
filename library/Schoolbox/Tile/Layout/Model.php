@@ -41,6 +41,13 @@ class Model implements ISoftDeletable, \JsonSerializable
     protected $id;
 
     /**
+     * The heading of this tile layout.
+     *
+     * @var string
+     */
+    private $heading;
+
+    /**
      * The list of tiles that belong to this layout.
      *
      * @var Collection|TileModel[]
@@ -270,6 +277,24 @@ class Model implements ISoftDeletable, \JsonSerializable
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHeading(): string
+    {
+        return $this->heading;
+    }
+
+    /**
+     * @param string $heading
+     * @return static
+     */
+    public function setHeading(string $heading): self
+    {
+        $this->heading = $heading;
+        return $this;
     }
 
     /**

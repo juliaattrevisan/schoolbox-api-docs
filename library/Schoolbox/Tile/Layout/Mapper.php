@@ -27,6 +27,7 @@ class Mapper extends BaseMapper
         $this->hasTable('tile_layout');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('heading', self::TYPE_STRING);
 
         // Layout: will be a choice between grid and columns
         $this->uses(
