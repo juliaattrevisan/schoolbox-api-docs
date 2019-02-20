@@ -145,32 +145,27 @@ class Controller extends Base
      */
     public function getView()
     {
-        if ($this->getRequest()->query["surname"] == null)
-            $surname = "a";
-        else
-            $surname = $this->getRequest()->query["surname"];
+        $surname = $this->getRequest()->query['surname'] ?? 'a';
 
+        /* Find all the people who have portraits - needs external id and portrait hash
+         */
         $pb = $this->userMapper->getPredicateBuilder();
         $pb->notNull('synergy_id');
-        $options = ['order' => [
-            'lastname'  => 'asc',
-            'firstname' => 'asc'
-        ] ];
-        $allUsers = $this->userMapper->findByPredicates($pb, $options);
+        $pb->notNull('portrait_hash');
+
+        $allUsers = $this->userMapper->findByPredicates($pb, [
+            'order' => [
+                'lastname'  => 'asc',
+                'firstname' => 'asc'
+            ]
+        ]);
 
         $users = [];
 
-        /** @var \Schoolbox\Config\Loader $config */
-        $config = $this->getDi()->get("config");
-
         /** @var \Schoolbox\User $user */
         foreach ($allUsers as $user) {
-
-            if (strtolower(substr($user->getLastname(), 0, 1)) == $surname) {
-                $destination = realpath($config->get("portrait_dir")) . "/" . $user->getExternalId() . ".jpg";
-
-                if (file_exists($destination))
-                    $users[] = $user;
+            if (0 === stripos($user->getLastname(), $surname)) {
+                $users[] = $user;
             }
         }
 
