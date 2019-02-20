@@ -14,11 +14,13 @@
 
 namespace Schoolbox\External\Normalise\User;
 use Schoolbox\Collection;
+use Schoolbox\Resource\Storage;
+use Schoolbox\User;
 
 /* Interface usage disabled while the repopulation takes place
  * because it'll bleat at me until I implement all methods
  */
-class Adapter  implements \External_UserInterface {
+class Adapter implements \External_UserInterface {
 
     /**
      * Crappy alex handler
@@ -36,14 +38,16 @@ class Adapter  implements \External_UserInterface {
         $this->setHandler($handler);
     }
 
+
     /**
      * Get portrait
      *
-     * @param $externalUserId
-     * @return String
+     * @param User $user
+     * @return Storage\Model|null
      */
-    public function getPortrait($externalUserId) {
-        return $this->getHandler()->getPortrait($externalUserId);
+    public function getPortrait(User $user): ?Storage\Model
+    {
+        return $this->getHandler()->getPortrait($user);
     }
 
     /* Parents
