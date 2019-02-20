@@ -7,13 +7,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
+
 require_once('../../../library/Bootstrap.php');
 
 /* Start a session
  */
-$page = new SitePage();
+$page         = new SitePage();
 $groupHandler = new Group();
-$allElements = array();
+$allElements  = [];
 
 /* Check permissions
  */
@@ -31,14 +34,15 @@ if (is_numeric($_GET['categoryId'])) {
                     /** @var \Schoolbox\Video\ResourceVideo $video */
                     // I know that this is a file from the resource browser
                     /** @var \Schoolbox\Resource\AbstractFile $file */
-                    $file    = $video->getFile();
-                    $element = array(
+                    $file          = $video->getFile();
+                    $element       = [
                         'name'  => $file->getTitle(),
                         'value' => $file->getId(),
-                    );
+                    ];
                     $allElements[] = $element;
                 }
                 break;
+
             case 'tileSource':
                 // Get all components that are a part of this page.
                 /** @var Component_Instance[]|\Schoolbox\GenericCollection $components */
@@ -49,22 +53,35 @@ if (is_numeric($_GET['categoryId'])) {
                 );
                 foreach ($components as $component) {
                     $config        = $component->getConfigArray();
-                    $allElements[] = array(
+                    $allElements[] = [
                         'name'  => $config['componentname']['value'],
                         'value' => $component->getId(),
-                    );
+                    ];
                 }
                 break;
+
+            case 'layoutId':
+                // Get all layouts that are a part of this page.
+                /** @var Component_Instance[]|\Schoolbox\GenericCollection $components */
+                $layouts = TileLayoutMapper::getInstance()->findForFolder($_GET['categoryId']);
+                foreach ($layouts as $layout) {
+                    $allElements[] = [
+                        'name'  => $layout->getHeading(),
+                        'value' => $layout->getId(),
+                    ];
+                }
+                break;
+
             case 'textbox':
             default:
                 $textboxMapper = new \Schoolbox\Resource\Textbox\Mapper();
-                $allTextboxes = $textboxMapper->findByColumn('categoryID', $_GET['categoryId']);
+                $allTextboxes  = $textboxMapper->findByColumn('categoryID', $_GET['categoryId']);
 
                 foreach ($allTextboxes as $currentTextbox) {
-                    $element = array(
+                    $element = [
                         'name'  => $currentTextbox->getHeading(),
                         'value' => $currentTextbox->getId(),
-                    );
+                    ];
 
                     $allElements[] = $element;
                 }
