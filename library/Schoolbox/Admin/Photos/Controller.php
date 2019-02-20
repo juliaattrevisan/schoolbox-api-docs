@@ -145,32 +145,36 @@ class Controller extends Base
      */
     public function getView()
     {
-        $surname = $this->getRequest()->query['surname'] ?? 'a';
+        $surname = $this->getRequest()->query['surname'];
+
+        /* If a letter was requested in the url, sanitise it
+         */
+        if ('' !== $surname) {
+            $surname = preg_replace('/[^A-Za-z]/', '', $surname)[0];
+        }
+
+        /* Default to everyone whose surnames start with 'a' if the query param was bad
+         */
+        if ('' === $surname) {
+            $surname = 'a';
+        }
 
         /* Find all the people who have portraits - needs external id and portrait hash
+         * Do a match on first letter to minimise hydrations that we throw out
          */
         $pb = $this->userMapper->getPredicateBuilder();
         $pb->notNull('synergy_id');
         $pb->notNull('portrait_hash');
+        $pb->like('lastname', "{$surname}%");
 
-        $allUsers = $this->userMapper->findByPredicates($pb, [
+        $users = $this->userMapper->findByPredicates($pb, [
             'order' => [
                 'lastname'  => 'asc',
                 'firstname' => 'asc'
             ]
         ]);
 
-        $users = [];
-
-        /** @var \Schoolbox\User $user */
-        foreach ($allUsers as $user) {
-            if (0 === stripos($user->getLastname(), $surname)) {
-                $users[] = $user;
-            }
-        }
-
         // Render this thing out
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@adminPhotos/view.twig',
