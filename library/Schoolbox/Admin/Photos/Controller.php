@@ -29,54 +29,24 @@ class Controller extends Base
     protected $storageMapper;
 
     /**
-     * @return StorageMapper
-     */
-    public function getStorageMapper() {
-        return $this->storageMapper;
-    }
-
-    /**
-     * @param StorageMapper $storageMapper
-     * @return $this
-     */
-    public function setStorageMapper($storageMapper) {
-        $this->storageMapper = $storageMapper;
-        return $this;
-    }
-
-    /**
      * @var UserMapper $userMapper
      */
     protected $userMapper;
 
     /**
-     * @return UserMapper
-     */
-    public function getUserMapper() {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param UserMapper $userMapper
-     * @return $this
-     */
-    public function setUserMapper($userMapper) {
-        $this->userMapper = $userMapper;
-        return $this;
-    }
-
-    /**
      * Controller constructor.
      */
     public function __construct() {
-        $this->setStorageMapper(StorageMapper::getInstance());
-        $this->setUserMapper(UserMapper::getInstance());
+        $this->storageMapper = StorageMapper::getInstance();
+        $this->userMapper = UserMapper::getInstance();
     }
+
 
     /**
      * Insert an attach zone into the template
      *
      * @return array
+     * @throws \UnexpectedValueException
      */
     private function getAttachZone()
     {
@@ -179,13 +149,13 @@ class Controller extends Base
         else
             $surname = $this->getRequest()->query["surname"];
 
-        $pb = $this->getUserMapper()->getPredicateBuilder();
+        $pb = $this->userMapper->getPredicateBuilder();
         $pb->notNull('synergy_id');
         $options = ['order' => [
             'lastname'  => 'asc',
             'firstname' => 'asc'
         ] ];
-        $allUsers = $this->getUserMapper()->findByPredicates($pb, $options);
+        $allUsers = $this->userMapper->findByPredicates($pb, $options);
 
         $users = [];
 
