@@ -21,8 +21,8 @@ class Component_Config_LayoutId extends Component_Config_Abstract
         $configValue,
         Component_ControllerAbstract $component = null
     ): void {
-        $page->setBlock($keyblock, 'tile_select', 'tile_select_block');
-        $page->setBlock('tile_select', 'tile_option', 'tile_option_block');
+        $page->setBlock($keyblock, 'tile_select', 'layout_select_block');
+        $page->setBlock('layout_select', 'layout_option', 'layout_option_block');
         $page->setBlock($keyblock, 'link', 'link_block');
         $page->setBlock($keyblock, 'component_link', 'component_link_block');
         $page->setBlock($keyblock, 'no_link', 'no_link_block');
@@ -40,7 +40,7 @@ class Component_Config_LayoutId extends Component_Config_Abstract
 
 
         // Build a PHPLib list
-        $page->setVar('tile_option_block', '');
+        $page->setVar('layout_option_block', '');
         $layoutId = (int)$configValue;
         foreach ($layouts as $layout) {
             $page->setVar([
@@ -48,9 +48,9 @@ class Component_Config_LayoutId extends Component_Config_Abstract
                 'COMPONENT_CONFIG_LAYOUTID_VALUE'    => Scrub::text($layout->getId()),
                 'COMPONENT_CONFIG_LAYOUTID_SELECTED' => (int)$layout->getId() === $layoutId ? 'selected' : '',
             ]);
-            $page->parse('tile_option_block', 'tile_option', true);
+            $page->parse('layout_option_block', 'layout_option', true);
         }
-        $page->parse('tile_select_block', 'tile_select');
+        $page->parse('layout_select_block', 'layout_select');
 
 
         // Render the buttons
