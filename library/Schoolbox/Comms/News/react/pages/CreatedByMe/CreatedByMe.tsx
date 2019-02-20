@@ -166,10 +166,10 @@ const listenForWindow = (
     if (!event.state) {
       // Return to defaults
       setTabSelected(0);
-      setPageSelected(0);
+      setPageSelected(1);
     } else {
       if (event.state.page !== undefined) {
-        setPageSelected(event.state.page - 1);
+        setPageSelected(event.state.page);
       }
 
       if (event.state.tab !== undefined) {
@@ -228,7 +228,7 @@ const showContent = (
 
         // Store all the articles for the selected status and page
         const limit = articlesPerPage;
-        const offset = pageSelected * limit;
+        const offset = (pageSelected - 1) * limit;
         const total = offset + limit;
         const pageArticles = statusArticles.slice(offset, total);
 
@@ -284,8 +284,8 @@ const showPagination = (
     return;
   }
 
-  const onPageChange = (data: any) => {
-    onPageClick(data.selected, statuses, tabSelected, setPageSelected);
+  const onPageChange = (page: number) => {
+    onPageClick(page, statuses, tabSelected, setPageSelected);
   };
 
   return (
@@ -314,9 +314,9 @@ const onPageClick = (
 
   // Update window history
   const params =
-    tabSelected === 0 ? `?p=${page + 1}` : `?p=${page + 1}&status=${tabName}`;
+    tabSelected === 0 ? `?p=${page}` : `?p=${page}&status=${tabName}`;
 
-  window.history.pushState({ page: page + 1, tab: tabName }, "", params);
+  window.history.pushState({ page, tab: tabName }, "", params);
 };
 
 /**
@@ -334,11 +334,11 @@ const onTabClick = (
 
   // Update tabSelected in React state (and reset page)
   setTabSelected(tab);
-  setPageSelected(0);
+  setPageSelected(1);
 
   // Update the window history
   window.history.pushState(
-    { tab: tabName, page: pageSelected + 1 },
+    { tab: tabName, page: pageSelected },
     "",
     `?status=${tabName}`
   );
