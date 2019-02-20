@@ -182,7 +182,7 @@ class Mapper extends BaseMapper
      *  in this class.)
      *
      * @param int $componentId
-     * @return GenericCollection
+     * @return GenericCollection|Model[]
      */
     public function findForComponentContext(int $componentId): GenericCollection
     {
