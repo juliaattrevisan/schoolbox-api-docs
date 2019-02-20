@@ -128,6 +128,7 @@ class Controller extends Base
     {
         $code   = 200;
         $layout
+            ->setHeading($this->request->post->get('heading', ''))
             ->setGridWidth(intval($this->getRequest()->post['grid_width']))
             ->setGridPadding(intval($this->getRequest()->post['grid_padding']))
             ->setColumnCount(intval($this->getRequest()->post['column_count']))
