@@ -103,9 +103,9 @@ abstract class BaseMapper extends SchoolboxMapper
 
         /** @var Model $record */
         foreach ($records as $record) {
-            $record = $this->filterRecordForUser($record, $user);
-            if ($record !== null) {
-                $collection->add($record);
+            $filteredRecord = $this->filterRecordForUser($record, $user);
+            if ($filteredRecord !== null) {
+                $collection->add($filteredRecord);
             }
         }
 
