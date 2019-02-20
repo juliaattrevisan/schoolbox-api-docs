@@ -406,13 +406,11 @@ class StudentAttributes
         if ($this->getCurriculumSemester() === 1) {
             $semesters[1]['start'] = $this->getCurriculumSemesterStart();
             $semesters[1]['finish'] = $this->getCurriculumSemesterFinish();
-            $semesters[2]['start'] = clone $this->getCurriculumSemesterFinish();
-            $semesters[2]['start']->addDays(1);
+            $semesters[2]['start'] = (clone $this->getCurriculumSemesterFinish())->addDays(1)->startOfDay();
             $semesters[2]['finish'] = $this->getCurriculumYearFinish();
         } else {
             $semesters[1]['start'] = $this->getCurriculumYearStart();
-            $semesters[1]['finish'] = clone $this->getCurriculumSemesterStart();
-            $semesters[1]['finish']->addDays(-1);
+            $semesters[1]['finish'] = (clone $this->getCurriculumSemesterStart())->addDays(-1)->endOfDay();
             $semesters[2]['start'] = $this->getCurriculumSemesterStart();
             $semesters[2]['finish'] = $this->getCurriculumSemesterFinish();
         }

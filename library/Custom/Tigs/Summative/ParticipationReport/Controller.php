@@ -13,12 +13,11 @@ use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters;
-use Schoolbox\Pastoral\DataSource as PastoralDataSource;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use External_UserInterface;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
@@ -37,21 +36,21 @@ class Controller extends Web\Controller\Base
     /** IConnector $externalDatabase */
     private $externalDatabase;
 
-    /** @var PastoralDataSource $pastoralDataSource */
-    protected $pastoralDataSource;
+    /** @var PastoralMapper $pastoralMapper */
+    protected $pastoralMapper;
 
     /**
      * @param External_UserInterface $externalUser
      * @param UserMapper             $userMapper
      * @param IConnector             $externalDatabase
-     * @param PastoralDataSource $pastoralDataSource
+     * @param PastoralMapper         $pastoralMapper
      */
-    public function __construct(External_UserInterface $externalUser, UserMapper $userMapper, IConnector $externalDatabase, PastoralDataSource $pastoralDataSource)
+    public function __construct(External_UserInterface $externalUser, UserMapper $userMapper, IConnector $externalDatabase, PastoralMapper $pastoralMapper)
     {
-        $this->externalUser = $externalUser;
-        $this->userMapper   = $userMapper;
+        $this->externalUser     = $externalUser;
+        $this->userMapper       = $userMapper;
         $this->externalDatabase = $externalDatabase;
-        $this->pastoralDataSource = $pastoralDataSource;
+        $this->pastoralMapper   = $pastoralMapper;
     }
 
 
@@ -271,36 +270,39 @@ class Controller extends Web\Controller\Base
             $deansComment[$semester] = '';
         }
 
-        $pastoralType = $this->getConfigLoader()->get(Config::_TIGS_PASTORAL_TAG);
+        $pastoralType = $this->getConfigLoader()->get(Config::_TIGS_PASTORAL_TYPE);
         if (!$pastoralType) {
             // no pastoral type configured
             return $deansComment;
         }
 
-        foreach ($semesters as $semester => $dates) {
-            try {
-                /** @var \Alaress_Date_Format $start */
-                $start = $dates['start'];
-                /** @var \Alaress_Date_Format $finish */
-                $finish = $dates['finish'];
+        // get records in the curriculum year
+        $pb = $this->pastoralMapper->getPredicateBuilder()
+            ->equals('student_id', $user->getId())
+            ->equals('type_id', $pastoralType)
+            ->greaterThanOrEqualTo('created_at', $attributes->getCurriculumYearStart()->getDatabase())
+            ->lessThanOrEqualTo('created_at', $attributes->getCurriculumYearFinish()->getDatabase());
+        $records = $this->pastoralMapper->findByPredicates($pb, ['order' => ['created_at' => 'desc']]);
 
-                $records = $this->pastoralDataSource->findByColumnList(
-                    $this->getUser(),
-                    [
-                        'student_id' => $user->getId(),
-                        'type_id' => $pastoralType,
-                    ]
-                )->filter(
-                    function ($record) use ($start, $finish) {
-                        /** @var Pastoral $record */
-                        return $record->getCreatedAt()->gte($start) && $record->getCreatedAt()->lte($finish);
-                    }
-                )->sortBy('createdAt', 'desc');
-            } catch (Exception $e) {
-                continue;
-            }
-            if ($records->count() > 0) {
-                $deansComment[$semester] = $records->first()->getBodyPublic();
+        // filter not accessible records, if viewer is not the student
+        if ($this->getUser()->getId() !== $user->getId()) {
+            $records = $this->pastoralMapper->filterRecordsForUser($records, $this->getUser());
+        }
+
+        // get latest record in each semester
+        foreach ($semesters as $semester => $dates) {
+            /** @var \Alaress_Date_Format $start */
+            $start = $dates['start'];
+            /** @var \Alaress_Date_Format $finish */
+            $finish = $dates['finish'];
+
+            $firstRecord = $records->filter(
+                function (Pastoral $record) use ($start, $finish) {
+                    return $record->getCreatedAt()->gte($start) && $record->getCreatedAt()->lte($finish);
+                }
+            )->first();
+            if ($firstRecord) {
+                $deansComment[$semester] = $firstRecord->getBodyPublic();
             }
         }
         return $deansComment;

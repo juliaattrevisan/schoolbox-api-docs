@@ -84,7 +84,7 @@ $app = new class extends App
     private function execute(): void
     {
         $this->insertConfig(
-            Tigs\Summative\Config::_TIGS_PASTORAL_TAG,
+            Tigs\Summative\Config::_TIGS_PASTORAL_TYPE,
             '',
             'Pastoral Record Type',
             "Identifies pastoral records as Dean's comments to display on Participation Report",

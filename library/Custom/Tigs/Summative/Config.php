@@ -25,5 +25,5 @@ class Config
     public const _TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK = self::PREFIX_TIGS_CRP . 'work_type_hsc_assessment_task';
     public const _TIGS_WORK_TYPE_HSC_ASSESSMENT_RANK = self::PREFIX_TIGS_CRP . 'work_type_hsc_assessment_rank';
     public const _TEXTBOX_HEADING = self::PREFIX_TIGS_CRP . 'course_description_textbox_heading';
-    public const _TIGS_PASTORAL_TAG = self::PREFIX_TIGS_CRP . 'pastoral_tag';
+    public const _TIGS_PASTORAL_TYPE= self::PREFIX_TIGS_CRP . 'pastoral_type';
 }
