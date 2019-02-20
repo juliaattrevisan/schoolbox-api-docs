@@ -14,10 +14,8 @@
 namespace Schoolbox\Tile\Component;
 
 use Component_ControllerAbstract;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Tile\Layout;
 use Schoolbox\Mapper\Exception as MapperException;
-use SitePage;
+use Schoolbox\Tile\Layout;
 use Twig_Environment;
 
 class TileControllerDelegate
@@ -38,26 +36,13 @@ class TileControllerDelegate
      *
      * @param Component_ControllerAbstract $controller
      *
-     * @return Layout\Model|null Null if the component has an alternate source,
-     *                           and that component doesn't exist
+     * @return Layout\Model|null Null if the layout no longer exists.
+     *                           (If no layout ID is defined, an empty one is
+     *                            returned)
      */
     public function fetchLayout(Component_ControllerAbstract $controller): ?Layout\Model
     {
-        // layoutId: the layout that was created when this component was
-        // tileSource: the layout chosen for an alternate source
-        $altSource = $controller->getConfig('tileSource');
-        $layoutId  = $controller->getConfig('layoutId');
-        if ($altSource) {
-            // Get this component, and get its layout ID.
-            // If the alt-source component doesn't exist: that is an error
-            $altComponent = \Component_InstanceMapper::getInstance()->findByInstanceId($altSource);
-            if ($altComponent) {
-                $altConfig    = $altComponent->getConfigArray();
-                $layoutId     = $altConfig['layoutId']['value'];
-            } else {
-                return null;
-            }
-        }
+        $layoutId = $controller->getConfig('layoutId');
 
         // empty layout by default
         $mapper = Layout\Mapper::getInstance();
@@ -68,10 +53,10 @@ class TileControllerDelegate
                 // This load should include each tile.
                 $layout = $mapper->findById(
                     $layoutId,
-                    array('joins' => array('tile'),)
+                    ['joins' => ['tile'],]
                 );
             } catch (MapperException $e) {
-                // if it wasn't, use the empty layout
+                return null;
             }
         }
         return $layout;
