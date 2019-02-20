@@ -509,11 +509,10 @@ class Controller extends Base
      */
     private function buildLayoutForComponent(Component_Instance $component): Layout\Model
     {
-        $mapper = $this->layoutMapper;
-
-        /** @var Layout\Model $model */
-        $model = $mapper->createModel();
-        $mapper->save($model);
+        // Default heading: "Tiles"
+        $model = $this->layoutMapper->createModel()
+            ->setHeading('Tiles');
+        $this->layoutMapper->save($model);
 
 
         // Save the config setting for the layout.

@@ -19,6 +19,8 @@ use Schoolbox\Tile\Mapper as TileMapper;
 
 /**
  * Mapper for tile layouts.
+ *
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {
