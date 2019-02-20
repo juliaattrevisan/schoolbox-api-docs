@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class External_Schoolpro_User implements External_UserInterface
@@ -445,27 +446,23 @@ class External_Schoolpro_User implements External_UserInterface
         return false;
     }
 
+
     /**
      * Returns a local path to the user's portrait
      *
      * This indicates that Cedar needs to upload the pics manually to portrait_dir
      *
-     * @param Integer $externalUserId
-     * @return Bool|String
+     * @param User $user
+     * @return Storage\Model|null
+     * @throws InvalidArgumentException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function getPortrait($externalUserId)
+    public function getPortrait(User $user): ?Storage\Model
     {
-        if (!is_numeric($externalUserId)) {
-            return false;
-        }
-
-        $photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
-
-        if (Config::get('photo_sis_import') == 0) {
-            if (file_exists($photoPath))
-                return $photoPath;
-            else
-                return false;
+        if (!is_numeric($user->getExternalId())) {
+            return null;
         }
 
         $vars = [
@@ -473,64 +470,66 @@ class External_Schoolpro_User implements External_UserInterface
             [
                 'pUserName' => 'alaress',
                 'pUserPass' => 'alaress',
-                'pSchoolNum' => $externalUserId,
+                'pSchoolNum' => $user->getExternalId(),
             ]
         ];
 
-        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
+        $photo = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
 
         /* Find the last updated datetime
          */
-        if ($result) {
-            $photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
+        if ($photo) {
 
-            //TODO: delete photos on rollover
+            // TODO: delete photos on rollover
 
-            /* If the cached file doesn't exist, or the synergetic image is more recent than our
-             * last known cached version, regenerate cached version.
+            /* If this $user doesn't have an image, or if the SIS picture is more recent than the one we
+             * currently have, shank it down and save it into brownhole
              *
-             * Separate the queries out, fetching the photo data only if it's newer than the cached
-             * version, or if the cache version doesn't already exist.
+             * (the latter occurs when the sis gets updated with a new picture and we need to update our storage)
              */
-            $cacheTime    = @filemtime($photoPath);
-            $modifiedTime = strtotime($result['CaptureDate']);
-
-            if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
+            if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(new \Alaress_Date_Format(strtotime($photo['CaptureDate']), 'U'))) {
                 $vars = [
                     'sbGetPortraitFile',
                     [
                         'pUserName' => 'alaress',
                         'pUserPass' => 'alaress',
-                        'pSchoolNum' => $externalUserId,
+                        'pSchoolNum' => $user->getExternalId(),
                     ]
                 ];
 
-                $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
+                $photo = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
 
                 /* Get the binary data and dump it into a file
                  */
-                if ($result) {
+                if ($photo) {
 
-                    /* Purge all previously transformed copies
+                    /* Save it into brownhole
                      */
-                    $pattern = Config::get('stream_dir') . "/portrait/" . $externalUserId . '-*.dat';
+                    $portrait = Storage\Mapper::getInstance()->acceptStream($user->getExternalId() . '.jpg', $photo['RawData']);
 
-                    foreach (glob($pattern) as $oldCacheFile) {
-                        unlink($oldCacheFile);
-                    }
-
-                    /* Save the image
+                    /* Update user with latest version
                      */
-                    $photoHandle = fopen($photoPath, "wb");
-                    fwrite($photoHandle, $result['RawData']);
-                    fclose($photoHandle);
+                    $user->setPortrait($portrait);
+
+                    \Schoolbox\UserMapper::getInstance()->save($user);
                 }
             }
 
-            return $photoPath;
+            /* Then return the latest Storage\Model instance
+             */
+            return $user->getPortrait();
         }
 
-        return false;
+        // There was no photo in the SIS, so we don't want to display the cached image either- delete it from
+        // disk so it doesn't magically appear later after they'd specifically deleted it
+
+        /* Unlink from user
+         */
+        $user->setPortrait(null);
+
+        \Schoolbox\UserMapper::getInstance()->save($user);
+
+        return null;
     }
 
     /**
