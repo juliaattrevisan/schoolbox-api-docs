@@ -510,9 +510,7 @@ class Controller extends Base
      */
     private function buildLayoutForComponent(Component_Instance $component): Layout\Model
     {
-        // Default heading: whatever the component's name is
-        $model = $this->layoutMapper->createModel()
-            ->setHeading($component->getConfigByKey('componentname') ?: 'Tiles');
+        $model = $this->layoutMapper->createForComponent($component);
         $this->layoutMapper->save($model);
 
 
