@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Tile\Layout;
 
+use Component_Instance;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -183,34 +184,28 @@ class Mapper extends BaseMapper
      * (Apologies for the component-related logic which arguably doesn't belong
      *  in this class.)
      *
-     * @param int $componentId
+     * @param Component_Instance $component
      * @return GenericCollection|Model[]
      */
-    public function findForComponentContext(int $componentId): GenericCollection
+    public function findForComponentContext(Component_Instance $component): GenericCollection
     {
-        // First find the component
-        $instance = \Component_InstanceMapper::getInstance()->findByInstanceId($componentId);
-        if ($instance) {
-            // is it an alt-source?
-            $altSource = $instance->getConfigArray()['src']['value'] ?? null;
-            if ($altSource) {
-                return $this->findForFolder((int)$altSource);
-            }
-
-            $identifier = (int)$instance->getIdentifier();
-            switch ($instance->getModule()) {
-                case 'homepage':
-                    return $this->findForFolder($identifier);
-
-                case 'dashboard':
-                    return $this->findForDashboard($identifier);
-
-                case 'homepage_template':
-                    return $this->findForHomepageTemplate($identifier);
-            }
+        // is the component an alt-source? Find the layouts in the alt folder
+        $altSource = $component->getConfigArray()['src']['value'] ?? null;
+        if ($altSource) {
+            return $this->findForFolder((int)$altSource);
         }
 
+        $identifier = (int)$component->getIdentifier();
+        switch ($component->getModule()) {
+            case 'homepage':
+                return $this->findForFolder($identifier);
 
+            case 'dashboard':
+                return $this->findForDashboard($identifier);
+
+            case 'homepage_template':
+                return $this->findForHomepageTemplate($identifier);
+        }
         return $this->createCollection();
     }
 

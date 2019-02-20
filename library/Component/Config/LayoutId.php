@@ -35,7 +35,7 @@ class Component_Config_LayoutId extends Component_Config_Abstract
         $layouts          = [];
         $tileLayoutMapper = TileLayoutMapper::getInstance();
         if ($component) {
-            $layouts = $tileLayoutMapper->findForComponentContext($component->getInstance()->getId());
+            $layouts = $tileLayoutMapper->findForComponentContext($component->getInstance());
         }
 
 
