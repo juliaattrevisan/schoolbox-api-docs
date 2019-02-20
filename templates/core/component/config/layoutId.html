@@ -7,24 +7,24 @@
 </select>
 <!-- END layout_select -->
 
-<!-- BEGIN link -->
+<!-- BEGIN buttons_for_layout -->
 <ul class="flex-list buttons">
     <li><a href="/tile/add/{COMPONENT_CONFIG_LAYOUTID}" class="button icon-add">Add Tile</a></li>
     <li><a href="/tile/layout/{COMPONENT_CONFIG_LAYOUTID}" class="button icon-modify">Modify Layout</a></li>
 </ul>
-<!-- END link -->
+<!-- END buttons_for_layout -->
 
-<!-- BEGIN component_link -->
+<!-- BEGIN buttons_for_component -->
 <ul class="flex-list buttons">
     <li><a href="/tile/add/component/{TILE_COMPONENT_INSTANCE_ID}" class="button icon-add">Add Tile</a></li>
     <li><a href="/tile/layout/component/{TILE_COMPONENT_INSTANCE_ID}" class="button icon-modify">Modify Layout</a></li>
 </ul>
-<!-- END component_link -->
+<!-- END buttons_for_component -->
 
-<!-- BEGIN no_link -->
+<!-- BEGIN no_buttons_deleted_layout -->
 <p class="meta">You cannot add tiles to this layout, because the layout has been deleted.</p>
-<!-- END no_link -->
+<!-- END no_buttons_deleted_layout -->
 
-<!-- BEGIN permission_denied -->
+<!-- BEGIN no_buttons_permission_denied -->
 <p class="meta">You don't have permission to modify this layout, or to add tiles to it.</p>
-<!-- END permission_denied -->
+<!-- END no_buttons_permission_denied -->

@@ -21,11 +21,12 @@ class Component_Config_LayoutId extends Component_Config_Abstract
         $configValue,
         Component_ControllerAbstract $component = null
     ): void {
-        $page->setBlock($keyblock, 'tile_select', 'layout_select_block');
+        $page->setBlock($keyblock, 'layout_select', 'layout_select_block');
         $page->setBlock('layout_select', 'layout_option', 'layout_option_block');
-        $page->setBlock($keyblock, 'link', 'link_block');
-        $page->setBlock($keyblock, 'component_link', 'component_link_block');
-        $page->setBlock($keyblock, 'no_link', 'no_link_block');
+        $page->setBlock($keyblock, 'buttons_for_layout', 'buttons_for_layout_block');
+        $page->setBlock($keyblock, 'buttons_for_component', 'buttons_for_component_block');
+        $page->setBlock($keyblock, 'no_buttons_deleted_layout', 'no_buttons_deleted_layout_block');
+        $page->setBlock($keyblock, 'no_buttons_permission_denied', 'no_buttons_permission_denied_block');
 
 
         // Show the list of layouts here
@@ -55,20 +56,21 @@ class Component_Config_LayoutId extends Component_Config_Abstract
 
         // Render the buttons
         $page->setVar('COMPONENT_CONFIG_LAYOUTID', $layoutId);
-        $page->setVar('link_block', '');
-        $page->setVar('component_link_block', '');
-        $page->setVar('no_link_block', '');
+        $page->setVar('buttons_for_layout_block', '');
+        $page->setVar('buttons_for_component_block', '');
+        $page->setVar('no_buttons_deleted_layout_block', '');
+        $page->setVar('no_buttons_permission_denied_block', '');
         if ($layoutId) {
             // Does the layout exist? If not, don't render buttons
             $layoutExists = $tileLayoutMapper->countByColumn('id', $layoutId);
             if ($layoutExists) {
-                $page->parse('link_block', 'link');
+                $page->parse('buttons_for_layout_block', 'buttons_for_layout');
             } else {
-                $page->parse('no_link_block', 'no_link');
+                $page->parse('no_buttons_deleted_layout_block', 'no_buttons_deleted_layout');
             }
         } else {
             $page->setVar('TILE_COMPONENT_INSTANCE_ID', $component->getInstance()->getId());
-            $page->parse('component_link_block', 'component_link');
+            $page->parse('buttons_for_component_block', 'buttons_for_component');
         }
     }
 }
