@@ -18,7 +18,7 @@ const page = 5;
 <Pagination pageCount={10} activePage={page} />;
 ```
 
-## Mangaging page with state
+## Managing page with state
 
 You can use the `activePage` and `onPageChange` props to manage the selected page with state.
 
