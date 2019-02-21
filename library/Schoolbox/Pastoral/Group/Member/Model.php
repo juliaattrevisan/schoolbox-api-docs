@@ -7,6 +7,8 @@
 
 namespace Schoolbox\Pastoral\Group\Member;
 
+use Schoolbox\BaseModel;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -14,7 +16,10 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Pastoral\Group\Model as Group;
 use Schoolbox\User;
 
-class Model implements ISoftDeletable
+/**
+ * @method static GenericCollection|Model[] createCollection()
+ */
+class Model extends BaseModel implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
