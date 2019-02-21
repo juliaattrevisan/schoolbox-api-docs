@@ -8,7 +8,7 @@ ALTER TABLE `comms_news_saveforlater` CHARACTER SET = utf8mb4 ;
 ALTER TABLE `comms_news_article`
   CHANGE COLUMN `title` `title` VARCHAR(255) NOT NULL ,
   CHANGE COLUMN `body` `body` MEDIUMTEXT NULL DEFAULT NULL ,
-  CHANGE COLUMN `blurb` `blurb` MEDIUMTEXT NULL DEFAULT NULL,
+  CHANGE COLUMN `blurb` `blurb` TEXT NULL DEFAULT NULL,
   CHANGE COLUMN `rejected_reason` `rejected_reason` TEXT NULL DEFAULT NULL ;
 
 ALTER TABLE `comms_news_audience`

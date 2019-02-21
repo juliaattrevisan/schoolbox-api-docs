@@ -4,7 +4,7 @@ CREATE TABLE `comms_news_article` (
   `id`                 int(11)       PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `title`              VARCHAR(255)  NOT NULL,
   `body`               MEDIUMTEXT,
-  `blurb`              MEDIUMTEXT,
+  `blurb`              TEXT,
   `author_id`          int(11)       UNSIGNED NOT NULL,
   `feature_image_hash` VARCHAR(100)  CHARACTER SET ascii COLLATE ascii_general_ci,
   `submitted_at`       DATETIME,
