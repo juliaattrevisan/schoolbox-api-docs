@@ -13,6 +13,11 @@ the smaller size.
 The original homepage and school news data still exists, and is linked to the
 new data: therefore, it's possible to copy the old data back over to the new.
 
+> The old data will only be copied if the script determines that the new data
+> has not been changed since the original migration. (that is, the new data is
+> identical to the old data, if the old data was truncated to the length of the
+> new.)
+
 Usage:
 
     # perform a dry run: no changes will be made,
