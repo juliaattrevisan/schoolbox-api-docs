@@ -190,7 +190,7 @@ $kernel->run(new class extends App
 
         $truncatedOld = substr($old, 0, strlen($new));
         if ($truncatedOld === $new) {
-            $this->log->notice(self::indent(2) . 'new is a substring of old: migrating');
+            $this->log->warning(self::indent(2) . 'new is a substring of old: migrating');
             return true;
         }
 
