@@ -1,1 +1,0 @@
-INSERT INTO eotc_config (name, value) VALUES ('external_filetype_blacklist', null);

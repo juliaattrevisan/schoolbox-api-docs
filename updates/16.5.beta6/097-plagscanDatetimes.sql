@@ -1,1 +1,0 @@
-ALTER TABLE `plagscan_document` ADD COLUMN `created_at` DATETIME NULL AFTER `html`, ADD COLUMN `updated_at` DATETIME NULL AFTER `created_at`;

@@ -1,1 +1,0 @@
-UPDATE `user` SET `alt_email` = null WHERE TRIM(`alt_email`) = '';

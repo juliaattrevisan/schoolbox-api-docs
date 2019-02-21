@@ -1,1 +1,0 @@
-DROP TABLE `pastoral_tags_deprecated`;
