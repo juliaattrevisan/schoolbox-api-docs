@@ -1,0 +1,247 @@
+#!/usr/bin/php
+<?php
+/**
+ * Repair script for repairing articles that were truncated in the migration
+ * from homepage and school news to comms articles.
+ *
+ * Until now, comms articles have been stored as TEXT (2^16 bytes, ~16KB) when
+ * the old tables were MEDIUMTEXT (2^24 bytes, ~16MB): this means that the new
+ * comms articles will have been truncated.
+ *
+ * Fortunately the old tables and their data still exist, so their article
+ * content can be migrated.
+ *
+ * @copyright Copyright 2019, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+declare(strict_types=1);
+
+use Alaress\Database\Connector\IConnector;
+use Aura\Di;
+use Psr\Log\LoggerInterface as Logger;
+use React\EventLoop\LoopInterface;
+use Schoolbox\Application\Daemon\App;
+
+
+require_once __DIR__ . '/../../conf/core/require.php';
+
+spl_autoload_call('\\Schoolbox\\Application\\Daemon');
+
+$opts   = getopt('vp', ['perform']);
+$kernel = new Schoolbox\Application\Daemon\Kernel(
+    'Rubric Repair',
+    [
+        'verbose' => $opts['v'] ?? [],
+        'perform' => isset($opts['p']) || isset($opts['perform']),
+    ]
+);
+
+/** @noinspection PhpUnhandledExceptionInspection */
+$kernel->run(new class extends App
+{
+    private const INDENT = '  ';
+
+    private const FIND_MIGRATED_NEWS_QUERY = "
+        SELECT
+            ca.id                  AS new_id,
+            sn.id                  AS old_id,
+            'homepage'             AS old_type,
+            COALESCE(sn.body, '')  AS old_body,
+            COALESCE(ca.body, '')  AS new_body,
+            COALESCE(ca.blurb, '') AS old_blurb,
+            COALESCE(ca.blurb, '') AS new_blurb
+        FROM       subject_news       sn
+        INNER JOIN comms_news_article ca ON sn.migration_id = ca.id
+
+        UNION
+
+        SELECT
+            ca.id                       AS new_id,
+            ni.item_id                  AS old_id,
+            'school'                    AS old_type,
+            COALESCE(ni.item_body, '')  AS old_body,
+            COALESCE(ca.body, '')       AS new_body,
+            COALESCE(ni.item_blurb, '') AS old_blurb,
+            COALESCE(ca.blurb, '')      AS new_blurb
+        FROM       news_items         ni
+        INNER JOIN comms_news_article ca ON ni.item_id = ca.id
+
+        ORDER BY new_id ASC
+    ";
+
+    private const UPDATE_COMMS_ARTICLE_BODY_QUERY = "
+        UPDATE comms_news_article SET body = :body WHERE id = :id
+    ";
+
+    private const UPDATE_COMMS_ARTICLE_BLURB_QUERY = "
+        UPDATE comms_news_article SET blurb = :blurb WHERE id = :id
+    ";
+
+
+    /**
+     * @var Logger
+     */
+    private $log;
+
+
+    /**
+     * @var IConnector
+     */
+    private $db;
+
+
+    /**
+     * @var Alaress_Date_Format
+     */
+    private $now;
+
+
+    /**
+     * Is this actually performing an update?
+     *
+     * @var bool
+     */
+    private $perform = false;
+
+
+    /**
+     * Set up and run the repair process.
+     *
+     * Install all instance vars, and wraps the repair process in a transaction
+     * for commit (if `--perform` is on) or rollback (if it's off, or an error
+     * is raised).
+     *
+     * @param Di\Container  $di
+     * @param LoopInterface $loop
+     * @param Logger        $log
+     * @param array         $opts
+     */
+    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
+    {
+        // Install logger and DB
+        $this->log     = $log;
+        $this->db      = $di->get('databaseInternal');
+        $this->now     = Alaress_Date_Format::now();
+        $this->perform = $opts['perform'] ?? false;
+
+
+        // log perform / dry run
+        if ($this->perform) {
+            $this->log->warning('Running in perform mode (-p): changes will be written to database');
+        } else {
+            $this->log->warning('Running in dry-run mode: use -p to write changes to database');
+        }
+
+        // log verbosity
+        $verbosity = count($opts['verbose'] ?? []);
+        if ($verbosity <= 0) {
+            $this->log->warning('Running in non-verbose mode: Use -v, -vv or -vvv for varying levels of verbosity');
+        } elseif ($verbosity === 1) {
+            $this->log->warning('Running in verbose mode (-v)');
+        } elseif ($verbosity === 2) {
+            $this->log->warning('Running in very verbose mode (-vv)');
+        } elseif ($verbosity >= 3) {
+            $this->log->warning('Running in very very verbose mode (-vvv)');
+        }
+
+
+        $updateBodyQuery  = $this->db->prepareQuery(self::UPDATE_COMMS_ARTICLE_BODY_QUERY);
+        $updateBlurbQuery = $this->db->prepareQuery(self::UPDATE_COMMS_ARTICLE_BLURB_QUERY);
+
+
+        // Find the list of migrated articles
+        $this->db->beginTransaction();
+        $updatedArticles   = [];
+        $untouchedArticles = [];
+        $migratedArticles  = $this->db->executeQuery(self::FIND_MIGRATED_NEWS_QUERY);
+        foreach ($migratedArticles->getIterator() as $row) {
+            $articleId = $row['new_id'];
+            $this->log->notice(
+                sprintf('Checking comms article #%d (%s article #%d)', $articleId, $row['old_type'], $row['old_id'])
+            );
+
+            $updated = false;
+            $this->log->notice(self::indent(1) . 'checking body...');
+            if ($this->isMigrationRequired($row['old_body'], $row['new_body'])) {
+                $updateBodyQuery->execute([
+                    'id'   => $articleId,
+                    'body' => $row['old_body'],
+                ]);
+                $updated = true;
+            }
+
+            $this->log->notice(self::indent(1) . 'checking blurb...');
+            if ($this->isMigrationRequired($row['old_blurb'], $row['new_blurb'])) {
+                $updateBlurbQuery->execute([
+                    'id'    => $articleId,
+                    'blurb' => $row['old_blurb'],
+                ]);
+                $updated = true;
+            }
+
+            if ($updated) {
+                $updatedArticles[$articleId] = true;
+            } else {
+                $untouchedArticles[$articleId] = true;
+            }
+        }
+
+
+        if ($this->perform) {
+            $this->db->commit();
+        } else {
+            $this->db->rollBack();
+        }
+
+
+        // output a summary
+        $this->log->notice(
+            sprintf(
+                '%d articles updated, %d not updated',
+                count($updatedArticles),
+                count($untouchedArticles)
+            )
+        );
+    }
+
+
+    /**
+     * Is migration required?
+     *
+     * @param  string $old
+     * @param  string $new
+     * @return bool
+     */
+    private function isMigrationRequired(string $old, string $new): bool
+    {
+        if ($old === $new) {
+            $this->log->notice(self::indent(2) . 'new and old are the same: no migrate required');
+            return false;
+        }
+
+        // Check substring:
+        // migrate only if new is substring of old.
+        // (if it's not, then we have to assume that the school changed it)
+        $truncatedOld = substr($old, 0, strlen($new));
+        if ($truncatedOld === $new) {
+            $this->log->notice(self::indent(2) . 'new is a substring of old: migrating');
+            return true;
+        }
+
+        $this->log->notice(self::indent(2) . 'new has been changed from old: not migrating');
+        return false;
+    }
+
+
+    /**
+     * Helper method for indenting log output for legibility.
+     *
+     * @param int $depth The depth to indent by
+     * @return string
+     */
+    private static function indent(int $depth): string
+    {
+        return str_repeat(self::INDENT, $depth);
+    }
+});
