@@ -4,7 +4,7 @@
  * Repair script for repairing articles that were truncated in the migration
  * from homepage and school news to comms articles.
  *
- * Until now, comms articles have been stored as TEXT (2^16 bytes, ~16KB) when
+ * Until now, comms articles have been stored as TEXT (2^16 bytes, ~64KB) when
  * the old tables were MEDIUMTEXT (2^24 bytes, ~16MB): this means that the new
  * comms articles will have been truncated.
  *
@@ -30,7 +30,7 @@ spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $opts   = getopt('p', ['perform']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
-    'Rubric Repair',
+    'Repair Truncated Articles',
     [
         'verbose' => [true, true, true],
         'perform' => isset($opts['p']) || isset($opts['perform']),
