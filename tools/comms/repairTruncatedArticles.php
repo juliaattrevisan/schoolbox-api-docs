@@ -92,12 +92,6 @@ $kernel->run(new class extends App
 
 
     /**
-     * @var Alaress_Date_Format
-     */
-    private $now;
-
-
-    /**
      * Is this actually performing an update?
      *
      * @var bool
@@ -122,7 +116,6 @@ $kernel->run(new class extends App
         // Install logger and DB
         $this->log     = $log;
         $this->db      = $di->get('databaseInternal');
-        $this->now     = Alaress_Date_Format::now();
         $this->perform = $opts['perform'] ?? false;
 
 
