@@ -72,7 +72,7 @@ class DataSource
                          ->findByColumn('pastoral_id', $model->getId())
         );
 
-        $model = $this->mapper->filterRecordForUser($model, $currentUser);
+        $model = $this->mapper->filterRecordsForUser($this->mapper->createCollection([$model]), $currentUser)->first();
 
         if (!$model instanceof Model) {
             throw new MapperException\NotFound();

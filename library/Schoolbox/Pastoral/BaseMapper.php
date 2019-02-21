@@ -33,7 +33,7 @@ abstract class BaseMapper extends SchoolboxMapper
      *
      * @return Model|null
      */
-    public function filterRecordForUser(Model $record, User $user): ?Model
+    private function filterRecordForUser(Model $record, User $user): ?Model
     {
         if (!$record instanceof Model) {
             return null;
