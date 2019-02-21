@@ -255,14 +255,21 @@ class Controller extends Base
         $this->houseMapper = $houseMapper;
     }
 
+
     /**
      * Modify user screen
      * @param User $user
+     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnderflowException
      */
     public function getModify($user)
     {
         // Check for non-existent user
-        if ($user->getId() == NULL) {
+        if ($user->getId() === null) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
