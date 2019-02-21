@@ -116,9 +116,9 @@ Data:
 
 {% for i in 1..2 %}
     <div class="row">
-        <div class="column small-12">
+        <div class="small-12 island">
             <h2 class="subheader">Dean's Comment - Semester {{ i }}</h2>
-            <section>
+            <section class="content">
                 {{ deansComments[i] | purify }}
             </section>
         </div>
@@ -126,9 +126,9 @@ Data:
 {% endfor %}
 
 <div class="row">
-    <div class="column small-12">
+    <div class="small-12 island">
         <h2 class="subheader">Explanation of Grades</h2>
-        <section>
+        <section class="content">
             {{ explanation | purify }}
         </section>
     </div>
