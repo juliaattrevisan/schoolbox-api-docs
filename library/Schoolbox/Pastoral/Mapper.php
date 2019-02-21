@@ -371,22 +371,20 @@ class Mapper extends BaseMapper
     /**
      * Display the most recent records that are tagged for display on dashboard based on their severity
      *
-     * @param User $user
      * @param int  $limit
      * @return Collection|Model[]
      * @throws MapperException
      */
-    public function findRecentDashboard(User $user, $limit = 5)
+    public function findRecentDashboard($limit = 5)
     {
-        return $this->filterRecordsForUser(
+        return
             $this->findByColumnList([
                 'sv.dashboard' => 1,
             ], [
-                'order' => ['created_at' => 'DESC'], 'limit' => $limit
-            ]
-            ),
-            $user
-        );
+                    'order' => ['created_at' => 'DESC'],
+                    'limit' => $limit,
+                ]
+            );
     }
 
     /**
