@@ -1,9 +1,5 @@
 <?php
 /**
- * Pastoral care access control
- *
- * This allows the user to audience a pastoral care record to individual users, roles and user defined pastoral groups
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -12,18 +8,18 @@
 namespace Schoolbox\Pastoral\Access;
 
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
+use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Group\Model as Group;
-use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Role;
 use Schoolbox\User;
 
 /**
- * Class Model
+ * Pastoral care access control
+ *
+ * This allows the user to audience a pastoral care record to individual users, roles and user defined pastoral groups
  *
  * @package Schoolbox\Pastoral\Access
  */
@@ -33,7 +29,7 @@ class Model implements ISoftDeletable
     use CreatedAtDate;
     use DeletedAtDate;
 
-    /** @var Pastoral $pastoral */
+    /** @var Pastoral\Model $pastoral */
     protected $pastoral;
 
     /** @var null|Role $role */
@@ -48,81 +44,109 @@ class Model implements ISoftDeletable
     /** @var int $access */
     protected $access;
 
-    /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
-    private $pastoralGroupMemberMapper;
-
-    /** @var array $accessCache This is a cache of the permission level for the page load cycle */
-    private $accessCache;
-
-    /**
-     * Model constructor
-     */
-    public function __construct()
-    {
-        $this->pastoralGroupMemberMapper = PastoralGroupMemberMapper::getInstance();
-    }
 
     /**
      * Return the access level granted to the user via this access record
      *
-     * @param User $user
+     * Returns NULL if this record is not relevant for the specified user
      *
-     * @return int
+     * @param User $user Must have Role and PastoralGroupMembership relations hydrated
+     *
+     * @return null|int
      */
-    public function getAccessLevel(User $user)
+    public function getAccessLevel(User $user): ?int
     {
-        $userId = $user->getId();
-        
-        // User any previously cached record of the permissions for the page cycle
-
-        if (isset($this->accessCache[$userId])) {
-            return $this->accessCache[$userId];
+        if ($this->getUser() instanceof User) {
+            return $this->getUserAccessLevel($user);
         }
-
-        if ($this->getUser() instanceof User && $userId == $this->getUser()->getId()) {
-            // If this is an individual user permission record, just match user ID
-
-            $this->accessCache[$userId] = $this->getAccess();
-        } elseif ($this->getRole() instanceof Role && $user->getRole()->getId() == $this->getRole()->getId()) {
-            // If this is a role access record, check group permissions
-            // Parents do not get role access to records unless they're
-            // actually parents of the record's user
-
-            if (!$user->getRole()->isParent() || $user->isParentOf($this->getPastoral()->getStudent())) {
-                $this->accessCache[$userId] = $this->getAccess();
-            }
-        } elseif ($this->getGroup() instanceof Group) {
-            // If this is a group access record, check group permissions
-
-            try {
-                // Make sure the user was in the group
-                $this->pastoralGroupMemberMapper->findOneByColumnList([
-                    'user_id' => $userId,
-                    'group_id' => $this->getGroup()->getId(),
-                ]);
-                $this->accessCache[$userId] = $this->getAccess();
-
-                return $this->accessCache[$userId];
-            } catch (MapperException $e) {
-            }
+        if ($this->getRole() instanceof Role) {
+            return $this->getRoleAccessLevel($user);
         }
-
-        if (!isset($this->accessCache[$userId])) {
-            // If we get here this record doesn't give them any permissions to the pastoral record-
-            // this doesn't necessarily mean they were denied access (they might just not have been in the group/role)
-
-            $this->accessCache[$userId] = null;
+        if ($this->getGroup() instanceof Group) {
+            return $this->getPastoralGroupAccessLevel($user);
         }
-        
-        return $this->accessCache[$userId];
+        // This will only happen if this model is a stub. Treat this as unknown
+        return null;
     }
 
+
     /**
-     * @param Pastoral $pastoral
+     * Returns the accessLevel granted by this record to the specified user via 'User' access
+     *
+     * @param User $user
+     * @return int|null
+     */
+    private function getUserAccessLevel(User $user): ?int
+    {
+        $thisUser = $this->getUser();
+        if ($thisUser && (int)$thisUser->getId() === (int)$user->getId()) {
+            return $this->access;
+        }
+        return null;
+    }
+
+
+    /**
+     * Returns the accessLevel granted by this record to the specified user via 'User' access
+     *
+     * @param User $user
+     * @return int|null
+     */
+    private function getRoleAccessLevel(User $user): ?int
+    {
+        $thisRole = $this->getRole();
+
+        // Not a role-based rule, or for a different role?
+        if (!$thisRole || (int)$user->getRole()->getId() !== (int)$thisRole->getId()) {
+            // Does not apply
+            return null;
+        }
+
+        // Is this a parent rule?
+        if ($user->getRole()->isParent()) {
+            // Rule only applies if user is actually a parent of the student.
+            if ($user->isParentOf($this->getPastoral()->getStudent())) {
+                return $this->access;
+            }
+            return null;
+        }
+
+        // Roles match, and roleType is not parent
+        return $this->access;
+    }
+
+
+    /**
+     * Returns the accessLevel granted by this record to the specified user via 'User' access
+     *
+     * @param User $user
+     * @return int|null
+     */
+    private function getPastoralGroupAccessLevel(User $user): ?int
+    {
+        $thisGroup = $this->getGroup();
+        if (!$thisGroup) {
+            return null;
+        }
+
+        $maxAccess = null;
+        foreach ($user->getPastoralGroupsMemberships() as $groupsMembership) {
+            if ((int)$thisGroup->getId() === (int)$groupsMembership->getGroup()->getId()) {
+                return $this->access;
+            }
+        }
+
+        return null;
+    }
+
+    // Plain getters/setters
+
+    /**
+     * @param Pastoral\Model $pastoral
      *
      * @return self
      */
-    public function setPastoral(Pastoral $pastoral)
+    public function setPastoral(Pastoral\Model $pastoral)
     {
         $this->pastoral = $pastoral;
 
@@ -130,7 +154,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Pastoral
+     * @return Pastoral\Model
      */
     public function getPastoral()
     {
