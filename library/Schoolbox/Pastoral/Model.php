@@ -523,19 +523,23 @@ class Model implements ISoftDeletable
     /**
      * Return the specified user's access level to this record
      *
-     * @param User $user
+     * Order of preference:
+     * 1. Pastoral Moderators and the record owner always have PRIVATE access
+     * 2. If any access rule applies DENY access, then access level is DENY
+     * 3. If no rules apply, then access level is DENY
+     * 4. Rules apply, and none apply DENY, return  max access level
+     *
+     * @param User $user Must have services, role, and pastoral group memberships hydrated
      * @return int
      */
     public function getAccessLevel(User $user): int
     {
         // Owners and moderators get private access regardless of any other permission set
-
         if ($this->isUserInPastoralService($user) || (int)$user->getId() === (int)$this->getOwner()->getId()) {
             return PastoralAccessMapper::ACCESS_PRIVATE;
         }
 
         // Otherwise start with deny access, and work our way up the permission levels
-
         $accessLevel = PastoralAccessMapper::ACCESS_DENY;
 
         foreach ($this->getAccess() as $access) {
@@ -552,7 +556,6 @@ class Model implements ISoftDeletable
             }
 
             // We want the highest access level
-
             $accessLevel = max($accessLevel, $accessLevelCurrent);
         }
 
