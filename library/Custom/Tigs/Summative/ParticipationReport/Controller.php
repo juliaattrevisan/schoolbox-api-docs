@@ -17,6 +17,7 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Model as Pastoral;
 use External_UserInterface;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
@@ -90,8 +91,8 @@ class Controller extends Web\Controller\Base
             'awards'        => $awards,
             'houseEvents'   => $houseEvents,
             'absences'      => $absences,
-            'explanation'   => $explanation,
             'deansComments' => $deansComments,
+            'explanation'   => $explanation,
         ];
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
 
@@ -382,5 +383,4 @@ class Controller extends Web\Controller\Base
                 return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_7_10);
         }
     }
-
 }
