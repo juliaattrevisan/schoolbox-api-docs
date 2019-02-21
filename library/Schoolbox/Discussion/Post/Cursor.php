@@ -183,11 +183,11 @@ class Cursor
                 if ($this->order === self::ORDER_ASC) {
                     // Ascending: get only items greater than last ID
                     /** @noinspection PhpUnhandledExceptionInspection */
-                    $builder->greaterThan('id', $lastId);
+                    $builder->greaterThan($this->mapper->getIdentifierColumn(), $lastId);
                 } elseif ($this->order === self::ORDER_DESC) {
                     // Descending: get only items less than last ID
                     /** @noinspection PhpUnhandledExceptionInspection */
-                    $builder->lessThan('id', $lastId);
+                    $builder->lessThan($this->mapper->getIdentifierColumn(), $lastId);
                 }
             }
         }

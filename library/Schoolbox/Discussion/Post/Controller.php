@@ -10,6 +10,7 @@ namespace Schoolbox\Discussion\Post;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Discussion\Thread;
 
 /**
  * Controller for post-related API requests.
@@ -23,13 +24,21 @@ class Controller extends BaseController
 
 
     /**
+     * @var Thread\Mapper
+     */
+    private $threadMapper;
+
+
+    /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param Mapper        $mapper
+     * @param Thread\Mapper $threadMapper
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, Thread\Mapper $threadMapper)
     {
-        $this->mapper = $mapper;
+        $this->mapper       = $mapper;
+        $this->threadMapper = $threadMapper;
     }
 
 
@@ -49,19 +58,6 @@ class Controller extends BaseController
 
 
     /**
-     * Create a post.
-     *
-     * @api   POST /posts
-     * @level 190
-     */
-    public function createPost(): void
-    {
-        // 404 for now I guess?
-        throw new NotFound();
-    }
-
-
-    /**
      * Delete a post.
      *
      * @api   DELETE /posts/{id}
@@ -73,5 +69,7 @@ class Controller extends BaseController
     {
         // 404 for now I guess?
         throw new NotFound();
+//        $this->mapper->delete($post);
+//        $this->response->status->setCode(204);
     }
 }

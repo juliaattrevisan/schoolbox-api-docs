@@ -12,6 +12,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Discussion\Thread;
 
 /**
  * Module for discussion post requests.
@@ -36,25 +37,22 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
+        // TODO implement contextual authorizer
 
         // Routes
-        $this->register(
-            'POST',
-            '',
-            'createPost',
-            $authorizer
-        );
         $this->register(
             'DELETE',
             '/{id:\d+}',
             'deletePost',
-            $authorizer
+            $authorizer,
+            [$this, 'preloadPost']
         );
         $this->register(
             'GET',
             '/{id:\d+}/posts',
             'getPostsByParent',
-            $authorizer
+            $authorizer,
+            [$this, 'preloadPost']
         );
     }
 
@@ -75,7 +73,8 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'mapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+            'mapper'       => $this->getMapperFactory()->getLazy(Mapper::class),
+            'threadMapper' => $this->getMapperFactory()->getLazy(Thread\Mapper::class),
         ];
     }
 
