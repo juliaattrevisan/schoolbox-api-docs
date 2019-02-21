@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
 
-use Alaress\Async\Queue\RedisQueue;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
