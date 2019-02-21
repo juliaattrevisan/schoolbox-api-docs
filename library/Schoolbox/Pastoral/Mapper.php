@@ -28,7 +28,6 @@ use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
-use Schoolbox\Pastoral\Revision\Model as PastoralRevision;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
