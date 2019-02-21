@@ -28,11 +28,11 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$opts   = getopt('vp', ['perform']);
+$opts   = getopt('p', ['perform']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Rubric Repair',
     [
-        'verbose' => $opts['v'] ?? [],
+        'verbose' => [true, true, true],
         'perform' => isset($opts['p']) || isset($opts['perform']),
     ]
 );
@@ -133,19 +133,8 @@ $kernel->run(new class extends App
             $this->log->warning('Running in dry-run mode: use -p to write changes to database');
         }
 
-        // log verbosity
-        $verbosity = count($opts['verbose'] ?? []);
-        if ($verbosity <= 0) {
-            $this->log->warning('Running in non-verbose mode: Use -v, -vv or -vvv for varying levels of verbosity');
-        } elseif ($verbosity === 1) {
-            $this->log->warning('Running in verbose mode (-v)');
-        } elseif ($verbosity === 2) {
-            $this->log->warning('Running in very verbose mode (-vv)');
-        } elseif ($verbosity >= 3) {
-            $this->log->warning('Running in very very verbose mode (-vvv)');
-        }
 
-
+        // Update queries
         $updateBodyQuery  = $this->db->prepareQuery(self::UPDATE_COMMS_ARTICLE_BODY_QUERY);
         $updateBlurbQuery = $this->db->prepareQuery(self::UPDATE_COMMS_ARTICLE_BLURB_QUERY);
 
