@@ -20,6 +20,7 @@ use InvalidArgumentException;
 use UnexpectedValueException;
 use Schoolbox\Mapper;
 use Schoolbox\User;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 
 class Module extends Alaress\Module\Module
 {
@@ -77,9 +78,10 @@ class Module extends Alaress\Module\Module
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         $injector->params[Controller::class] = [
-            'externalUser' => $injector->lazyGet('externalUser'),
-            'userMapper'   => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'externalDatabase'   => $injector->lazyGet('databaseExternal'),
+            'externalUser'     => $injector->lazyGet('externalUser'),
+            'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'pastoralMapper'   => $this->getMapperFactory()->getLazy(PastoralMapper::class),
+            'externalDatabase' => $injector->lazyGet('databaseExternal'),
         ];
     }
 

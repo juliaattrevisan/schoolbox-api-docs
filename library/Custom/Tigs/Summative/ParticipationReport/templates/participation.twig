@@ -112,3 +112,14 @@ Data:
         </table>
     </div>
 </div>
+
+{% for i in 1..2 %}
+    <div class="row">
+        <div class="column small-12">
+            <h2 class="subheader">Dean's Comment - Semester {{ i }}</h2>
+            <section>
+                {{ deansComments[i] | purify }}
+            </section>
+        </div>
+    </div>
+{% endfor %}
