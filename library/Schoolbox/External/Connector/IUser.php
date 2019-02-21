@@ -15,17 +15,19 @@ use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Tutor;
 use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Storage;
+use Schoolbox\User;
 
 interface IUser
 {
     /**
-     * Retrieves path on disk to user photo if one exists. If no images exists
-     * or the file is not accessible by the server this will return false.
+     * Retrieves the Storage\Model that contains a $user's profile picture
+     * Returns null if one doesn't exist
      *
-     * @param int|string $externalId The external SIS ID of the user whose photo we want
-     * @return false|string
+     * @param User $user The user instance whose photo we want
+     * @return null|Storage\Model the file that represents them, from Storage
      */
-    function getPortrait($externalId);
+    public function getPortrait(User $user): ?Storage\Model;
 
     /**
      * Retrieve the contact information of one or more student guardians
@@ -34,7 +36,7 @@ interface IUser
      * @param bool $hydrateStudents If set, any students linked to the guardian records will also be retrieved and hydrated
      * @return GenericCollection|Guardian[]
      */
-    function getGuardians($externalIds, $hydrateStudents = false);
+    public function getGuardians($externalIds, $hydrateStudents = false);
 
     /**
      * Retrieve all information required to render the guardian directory, unlike the name suggests this is actually a
@@ -43,7 +45,7 @@ interface IUser
      * @param array $filter
      * @return GenericCollection|Student[]
      */
-    function getGuardianDirectory($filter = []);
+    public function getGuardianDirectory(array $filter = []);
 
     /**
      * Retrieve one or more student records from the SIS
@@ -52,7 +54,7 @@ interface IUser
      * @param bool $hydrateGuardians If set, any guardians linked to the student records will also be retrieved and hydrated
      * @return GenericCollection|Student[]
      */
-    function getStudents($externalIds, $hydrateGuardians = false);
+    public function getStudents($externalIds, $hydrateGuardians = false);
 
     /**
      * Get an array of students whose details should be accessible inside Schoolbox to
@@ -61,7 +63,7 @@ interface IUser
      * @param int|string $externalId This is the external ID of the guardian
      * @return GenericCollection|Student[]
      */
-    function getStudentsAccessible($externalId);
+    public function getStudentsAccessible($externalId);
 
     /**
      * Retrieve staff records from the SIS
@@ -69,7 +71,7 @@ interface IUser
      * @param int|string|int[]|string[] $externalIds The external SIS ID of the staff member/members to retrieve
      * @return GenericCollection|Staff[]
      */
-    function getStaff($externalIds);
+    public function getStaff($externalIds);
 
     /**
      * Retrieve all information required to render the staff directory
@@ -77,7 +79,7 @@ interface IUser
      * @param array $filter
      * @return GenericCollection|Staff[]
      */
-    function getStaffDirectory($filter = []);
+    public function getStaffDirectory(array $filter = []);
 
     /**
      * Retrieve one or more tutor records from the SIS
@@ -85,7 +87,7 @@ interface IUser
      * @param int|string|int[]|string[] $externalIds The external SIS ID of the tutors
      * @return GenericCollection|Tutor[]
      */
-    function getTutors($externalIds);
+    public function getTutors($externalIds);
 
     /**
      * Get a list of valid sanitized email addresses for the specified user(s)
@@ -100,7 +102,7 @@ interface IUser
      * @param int|string|int[]|string[] $externalIds Array or string containing the external ID of one or more students
      * @return array An array containing the guardians email addresses
      */
-    function getEmails($externalIds);
+    public function getEmails($externalIds): array;
 
     /**
      * Retrieves the list of campuses that the specified users are involved in based on their
@@ -109,5 +111,5 @@ interface IUser
      * @param int|string|int[]|string[] $externalIds Array or string containing the external ID of one or more users
      * @return GenericCollection|Campus[]
      */
-    function getCampusInvolvement($externalIds);
+    public function getCampusInvolvement($externalIds);
 }
