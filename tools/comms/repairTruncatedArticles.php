@@ -198,8 +198,14 @@ $kernel->run(new class extends App
     /**
      * Is migration required?
      *
-     * @param  string $old
-     * @param  string $new
+     * Migration is only required if:
+     * * `$old` and `$new` are not equal
+     * * `$new` is a truncated form of `$old`; if it's not, we must assume the
+     *    user has modified the article, and thus we can't assume they still
+     *    want the old version
+     *
+     * @param  string $old The old field value
+     * @param  string $new The new field value
      * @return bool
      */
     private function isMigrationRequired(string $old, string $new): bool
@@ -209,9 +215,6 @@ $kernel->run(new class extends App
             return false;
         }
 
-        // Check substring:
-        // migrate only if new is substring of old.
-        // (if it's not, then we have to assume that the school changed it)
         $truncatedOld = substr($old, 0, strlen($new));
         if ($truncatedOld === $new) {
             $this->log->notice(self::indent(2) . 'new is a substring of old: migrating');
