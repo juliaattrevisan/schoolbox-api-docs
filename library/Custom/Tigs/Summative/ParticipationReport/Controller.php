@@ -37,7 +37,7 @@ class Controller extends Web\Controller\Base
     private $externalDatabase;
 
     /** @var PastoralMapper $pastoralMapper */
-    protected $pastoralMapper;
+    private $pastoralMapper;
 
     /**
      * @param External_UserInterface $externalUser
