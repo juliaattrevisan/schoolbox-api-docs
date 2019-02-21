@@ -455,9 +455,10 @@ interface External_UserInterface {
 
     /**
      * Get the portrait for a particular user
-     * Returns a local file path to the user's portrait
+     * Returns a Storage object for the user's portrait
      *
-     * @importance low - most schools manually upload portraits to `config.portrait_dir`.
+     * @importance low - most schools manually uploaded portraits to `config.portrait_dir`
+     *             but now will be saved into Storage to facilitate cloud
      *
      * @param User $user
      * @return Storage\Model|null
