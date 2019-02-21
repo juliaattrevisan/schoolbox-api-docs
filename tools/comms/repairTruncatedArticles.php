@@ -46,9 +46,7 @@ $kernel->run(new class extends App
             sn.id                  AS old_id,
             'homepage'             AS old_type,
             COALESCE(sn.body, '')  AS old_body,
-            COALESCE(ca.body, '')  AS new_body,
-            COALESCE(ca.blurb, '') AS old_blurb,
-            COALESCE(ca.blurb, '') AS new_blurb
+            COALESCE(ca.body, '')  AS new_body
         FROM       subject_news       sn
         INNER JOIN comms_news_article ca ON sn.migration_id = ca.id
 
@@ -59,9 +57,7 @@ $kernel->run(new class extends App
             ni.item_id                  AS old_id,
             'school'                    AS old_type,
             COALESCE(ni.item_body, '')  AS old_body,
-            COALESCE(ca.body, '')       AS new_body,
-            COALESCE(ni.item_blurb, '') AS old_blurb,
-            COALESCE(ca.blurb, '')      AS new_blurb
+            COALESCE(ca.body, '')       AS new_body
         FROM       news_items         ni
         INNER JOIN comms_news_article ca ON ni.item_id = ca.id
 
@@ -70,10 +66,6 @@ $kernel->run(new class extends App
 
     private const UPDATE_COMMS_ARTICLE_BODY_QUERY = "
         UPDATE comms_news_article SET body = :body WHERE id = :id
-    ";
-
-    private const UPDATE_COMMS_ARTICLE_BLURB_QUERY = "
-        UPDATE comms_news_article SET blurb = :blurb WHERE id = :id
     ";
 
 
@@ -126,8 +118,7 @@ $kernel->run(new class extends App
 
 
         // Update queries
-        $updateBodyQuery  = $this->db->prepareQuery(self::UPDATE_COMMS_ARTICLE_BODY_QUERY);
-        $updateBlurbQuery = $this->db->prepareQuery(self::UPDATE_COMMS_ARTICLE_BLURB_QUERY);
+        $updateBodyQuery = $this->db->prepareQuery(self::UPDATE_COMMS_ARTICLE_BODY_QUERY);
 
 
         // Find the list of migrated articles
@@ -147,15 +138,6 @@ $kernel->run(new class extends App
                 $updateBodyQuery->execute([
                     'id'   => $articleId,
                     'body' => $row['old_body'],
-                ]);
-                $updated = true;
-            }
-
-            $this->log->notice(self::indent(1) . 'checking blurb...');
-            if ($this->isMigrationRequired($row['old_blurb'], $row['new_blurb'])) {
-                $updateBlurbQuery->execute([
-                    'id'    => $articleId,
-                    'blurb' => $row['old_blurb'],
                 ]);
                 $updated = true;
             }
