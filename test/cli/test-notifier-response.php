@@ -20,7 +20,7 @@ if (count($argv) < 4) {
 }
 
 require_once __DIR__ . '/../../conf/core/require-cli.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Test Notifier Response');
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 list (, $classname, $id, $method) = $argv;
 

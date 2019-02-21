@@ -6,7 +6,7 @@
 use Alaress\Lumberjack\Logger;
 
 require_once __DIR__ . '/../../../conf/core/require-cli.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Test Teacher Usernames');
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 $options = getopt('v', ['perform-update',]);
 $reader  = new \Alaress\Csv\Reader(STDIN);

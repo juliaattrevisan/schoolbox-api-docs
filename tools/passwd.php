@@ -9,7 +9,7 @@
  */
 
 require_once __DIR__ . '/../conf/core/require-cli.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Parent Class Access');
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 if (!isset($argv[1])) {
     fwrite(STDERR, "A username must be provided.\n");

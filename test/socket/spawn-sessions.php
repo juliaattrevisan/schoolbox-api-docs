@@ -9,7 +9,7 @@
  */
 
 require_once __DIR__ . '/../../conf/core/require-cli.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Test Spawn Sessions');
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 /** @var \Schoolbox\User[] $allusers */
 $allusers = \Schoolbox\UserMapper::getInstance()->findAll();

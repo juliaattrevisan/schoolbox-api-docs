@@ -9,7 +9,7 @@
  */
 
 require_once __DIR__ . '/../../../conf/core/require-cli.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Flood Test');
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 if($argc < 3) {
 	die("Usage: php {$argv[0]} <sessionID> <count>\n");

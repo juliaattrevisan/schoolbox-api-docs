@@ -11,7 +11,7 @@ use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Alaress\Lumberjack\Logger;
 
 require_once __DIR__ . '/../conf/core/require-cli.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Parent Class Access');
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 // Use a debug-supporting logger
 $log = new Logger(STDOUT, STDERR);
