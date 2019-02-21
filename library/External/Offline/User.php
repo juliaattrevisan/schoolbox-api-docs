@@ -5,6 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class External_Offline_User implements External_UserInterface
@@ -108,9 +109,9 @@ class External_Offline_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getPortrait($externalUserId)
+    public function getPortrait(User $user): ?Storage\Model
     {
-        // Return nothing
+        return null;
     }
 
     /**

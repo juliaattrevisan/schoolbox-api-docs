@@ -14,19 +14,15 @@ namespace Alaress\Image\Cache;
 use External_User;
 use Group;
 use Schoolbox\Config\Loader;
-use Schoolbox\File\Exception;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class Portrait extends BrokenFS
+class Portrait extends Storage
 {
 
-    /** @var int */
-    private $externalUserId = -1;
-
-    /** @var External_User */
-    private $externalHandler;
+    /** @var IConfigLoader */
+    private $config;
 
     /** @var UserMapper */
     private $userMapper;
@@ -34,89 +30,82 @@ class Portrait extends BrokenFS
     /** @var User */
     private $sessionUser;
 
-    /** @var IConfigLoader */
-    private $conf;
-
-
     /**
      * Portrait constructor.
      *
-     * @param string $externalId
+     * @param User   $user
      * @param string $key
      * @param User   $sessionUser
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
-     * @throws \Exception
      */
-    public function __construct(string $externalId, string $key, User $sessionUser)
+    public function __construct(User $user, string $key, User $sessionUser)
     {
-        /* A value for $externalId would be useful
-         */
-        $trimmedExternalId = trim($externalId);
+        $this->config      = new Loader();
+        $this->sessionUser = $sessionUser;
+        $this->userMapper  = UserMapper::getInstance();
 
-        if ('' === $trimmedExternalId) {
-            throw new \InvalidArgumentException('Portrait not found');
+        $externalHandler = new External_User();
+
+        /* If Load Photos From SIS is on, yank down the latest version, then cache it in brownhole
+         * Otherwise try to use the one assigned to user, which lives in storage
+         */
+        if ($this->config->get('photo_sis_import')) {
+            $portrait = $externalHandler->getPortrait($user);
+        } else {
+            $portrait = $user->getPortrait();
         }
 
-        /* See if a path can be generated for this user
+        /* If this is null, the picture was unlinked - that is, removed in the sis
+         * Remove it in schoolbox too, by displaying the Grey Man
          */
-        $this->setExternalHandler(new External_User());
-        $this->setExternalUserId($trimmedExternalId);
-
-        $portraitPath = $this->getExternalHandler()->getPortrait($this->getExternalUserId());
-
-        if (!$portraitPath) {
-            throw new \InvalidArgumentException('Portrait not found');
+        if (null === $portrait) {
+            throw new \RuntimeException('No portrait image selected');
         }
 
-        /* Continue trying to render image
+        /* Otherwise load it from this cache in the normal way
          */
-        $this->setConfig(new Loader());
-        $this->setSessionUser($sessionUser);
-        $this->setUserMapper(UserMapper::getInstance());
-
-        $portraitDir = realpath($this->getConfig()->get('portrait_dir'));
-
-        // truncate the dir for Flysystem
-        $portraitPath = str_replace($portraitDir, '', $portraitPath);
-
         try {
-            parent::__construct($portraitDir, $portraitPath, $key);
-        } catch (Exception $e) {
+            parent::__construct($portrait, $key);
+        } catch (\League\Flysystem\FilesystemNotFoundException $e) {
             throw new \InvalidArgumentException('Portrait not found');
         }
 
-        if (!$this->canViewImage()) {
+        if (!$this->canViewImage($user->getExternalId())) {
             throw new \RuntimeException('Cannot view image');
         }
     }
 
+
     /**
      * Determine whether a portrait can be seen or not
      *
+     * @param string $externalId
      * @return bool
      */
-    private function canViewImage()
+    private function canViewImage(string $externalId): bool
     {
         // TODO kill it! kill it with fire!
         $group = new Group();
 
         /* Staff members can always see all portraits
-           */
-        if ($this->getSessionUser()->getRole()->isStaff()) {
+         */
+        if ($this->sessionUser->getRole()->isStaff()) {
             return true;
         }
 
         // Get all users with a synergy ID, and test them against policy.
 
         /** @var User[] $userList */
-        $userList = $this->getUserMapper()->findByColumn('synergy_id', $this->getExternalUserId());
+        $userList = $this->userMapper->findByColumn('synergy_id', $externalId);
 
         foreach ($userList as $user) {
+
             /* Everyone can always see their own face
              */
             $userId = $user->getId();
-            if ($this->getSessionUser()->getId() == $userId) {
+
+            if ($this->sessionUser->getId() === $userId) {
                 return true;
             }
 
@@ -126,12 +115,9 @@ class Portrait extends BrokenFS
             if ($group->isParentOfChild($userId)) {
                 return true;
             }
-            if ($group->isStudent($userId)) {
-                if (!$this->getConfig()->get('protect_student_photo')
-                    && $this->getSessionUser()->getRole()->isStudent()
-                ) {
-                    return true;
-                }
+
+            if ($group->isStudent($userId) && !$this->config->get('protect_student_photo') && $this->sessionUser->getRole()->isStudent()) {
+                return true;
             }
 
             // Staff photos:
@@ -144,23 +130,13 @@ class Portrait extends BrokenFS
                  *  1 => No one can see photo
                  *  2 => Staff and Parents can see photo
                  */
-                switch($this->getConfig()->get('protect_teacher_photo')) {
+                switch ($this->config->get('protect_teacher_photo')) {
                     case 0:
-                        if($this->getSessionUser()->getRole()->isStudent() || $this->getSessionUser()->getRole()->isParent()) {
-                            return true;
-                        } else {
-                            return false;
-                        }
+                        return $this->sessionUser->getRole()->isStudent() || $this->sessionUser->getRole()->isParent();
                     case 1:
                         return false;
                     case 2:
-                        if($this->getSessionUser()->getRole()->isParent()) {
-                            return true;
-                        }
-                        else {
-                            return false;
-                        }
-
+                        return $this->sessionUser->getRole()->isParent();
                     default:
                         return false;
                 }
@@ -168,104 +144,5 @@ class Portrait extends BrokenFS
         }
 
         return false;
-    }
-
-    /**
-     * Set external handler
-     *
-     * @param External_User $externalHandler
-     */
-    private function setExternalHandler($externalHandler)
-    {
-        $this->externalHandler = $externalHandler;
-    }
-
-    /**
-     * Get external handler
-     *
-     * @return External_User
-     */
-    private function getExternalHandler()
-    {
-        return $this->externalHandler;
-    }
-
-
-    /**
-     * @return UserMapper
-     */
-    private function getUserMapper()
-    {
-        return $this->userMapper;
-    }
-
-
-    /**
-     * @param UserMapper $userMapper
-     * @return self
-     */
-    private function setUserMapper($userMapper)
-    {
-        $this->userMapper = $userMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return User
-     */
-    private function getSessionUser()
-    {
-        return $this->sessionUser;
-    }
-
-
-    /**
-     * @param User $sessionUser
-     * @return self
-     */
-    private function setSessionUser($sessionUser)
-    {
-        $this->sessionUser = $sessionUser;
-        return $this;
-    }
-
-
-    /**
-     * @return IConfigLoader
-     */
-    private function getConfig()
-    {
-        return $this->conf;
-    }
-
-    /**
-     * @param IConfigLoader $conf
-     * @return self
-     */
-    private function setConfig($conf)
-    {
-        $this->conf = $conf;
-        return $this;
-    }
-
-    /**
-     * Get external id
-     *
-     * @return mixed
-     */
-    private function getExternalUserId()
-    {
-        return $this->externalUserId;
-    }
-
-    /**
-     * Set external user id
-     *
-     * @param $externalUserId
-     */
-    private function setExternalUserId($externalUserId)
-    {
-        $this->externalUserId = $externalUserId;
     }
 }

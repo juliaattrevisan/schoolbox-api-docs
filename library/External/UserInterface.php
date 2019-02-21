@@ -5,6 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 interface External_UserInterface {
@@ -451,16 +452,17 @@ interface External_UserInterface {
      */
     public function getEmail($externalUserId);
 
+
     /**
      * Get the portrait for a particular user
      * Returns a local file path to the user's portrait
      *
      * @importance low - most schools manually upload portraits to `config.portrait_dir`.
      *
-     * @param $externalUserId
-     * @return string
+     * @param User $user
+     * @return Storage\Model|null
      */
-    public function getPortrait($externalUserId);
+    public function getPortrait(User $user): ?Storage\Model;
 
     /**
      * Determine whether someone is a day boarder or not

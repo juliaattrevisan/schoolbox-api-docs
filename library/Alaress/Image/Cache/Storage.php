@@ -22,12 +22,14 @@ class Storage extends Flysystem
     /** @var \League\Flysystem\MountManager */
     protected $mgr;
 
+
     /**
      * Constructor
      * Remembers what image you are trying to load from cache
      *
      * @param Resource\Storage\Model $resource
-     * @param string         $key
+     * @param string                 $key
+     * @throws \League\Flysystem\FilesystemNotFoundException
      */
     public function __construct(Resource\Storage\Model $resource, $key)
     {
