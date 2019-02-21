@@ -9,7 +9,6 @@
 
 namespace Schoolbox\External\Connector\Schoolbox\Base;
 
-use Group;
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\IUser;
@@ -20,7 +19,9 @@ use Schoolbox\External\Normalise\User\Guardian;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\UserRelation;
+use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
+use Schoolbox\User as SchoolboxUser;
 
 class User extends Base implements IUser
 {
@@ -49,19 +50,9 @@ class User extends Base implements IUser
     /**
      * @inheritdoc
      */
-    public function getPortrait($externalId)
+    public function getPortrait(SchoolboxUser $user): ?Storage\Model
     {
-        // Create path to locally cached portrait
-
-        $portraitPath = realpath($this->config->get('portrait_dir')) . "/{$externalId}.jpg";
-
-        // Ensure that the file is accessible before returning the path
-
-        if (is_readable($portraitPath)) {
-            return $portraitPath;
-        } else {
-            return false;
-        }
+        return $user->getPortrait();
     }
 
     /**
@@ -164,7 +155,7 @@ class User extends Base implements IUser
     /**
      * @inheritdoc
      */
-    public function getGuardianDirectory($filter = [])
+    public function getGuardianDirectory(array $filter = [])
     {
         // Create SQL and bindings for any filters
 
@@ -575,7 +566,7 @@ class User extends Base implements IUser
     /**
      * @inheritdoc
      */
-    public function getStaffDirectory($filter = [])
+    public function getStaffDirectory(array $filter = [])
     {
         $staffIterator = $this->databaseExternal->getQueryIterator('
 
@@ -646,7 +637,7 @@ class User extends Base implements IUser
     /**
      * @inheritdoc
      */
-    public function getEmails($externalIds)
+    public function getEmails($externalIds): array
     {
         // Get all email addresses from the specified external IDs
 
