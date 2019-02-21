@@ -29,14 +29,24 @@ class DataSource
      */
     private $mapper;
 
+    /** @var AccessLevelFilterer */
+    private $accessLevelFilterer;
+
+    /** @var Audit\Mapper */
+    private $pastoralAuditMapper;
+
+
     /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param Mapper              $mapper
+     * @param AccessLevelFilterer $accessLevelFilterer
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, AccessLevelFilterer $accessLevelFilterer)
     {
-        $this->mapper = $mapper;
+        $this->mapper              = $mapper;
+        $this->accessLevelFilterer = $accessLevelFilterer;
+        $this->pastoralAuditMapper = Audit\Mapper::getInstance(); //TODO inject
     }
 
     /**
@@ -72,7 +82,7 @@ class DataSource
                          ->findByColumn('pastoral_id', $model->getId())
         );
 
-        $model = $this->mapper->filterRecordsForUser($this->mapper->createCollection([$model]), $currentUser)->first();
+        $model = $this->accessLevelFilterer->filterRecordsForUser($this->mapper->createCollection([$model]), $currentUser)->first();
 
         if (!$model instanceof Model) {
             throw new MapperException\NotFound();
@@ -93,7 +103,7 @@ class DataSource
      */
     public function findByColumn(User $currentUser, $columnName, $columnValue, $options = []): Collection
     {
-        return $this->mapper->filterRecordsForUser(
+        return $this->accessLevelFilterer->filterRecordsForUser(
             $this->mapper->findByColumn($columnName, $columnValue, $options),
             $currentUser
         );
@@ -111,7 +121,7 @@ class DataSource
      */
     public function findByColumnList(User $currentUser, $columnList, $options = []): Collection
     {
-        return $this->mapper->filterRecordsForUser($this->mapper->findByColumnList($columnList, $options),
+        return $this->accessLevelFilterer->filterRecordsForUser($this->mapper->findByColumnList($columnList, $options),
             $currentUser);
     }
 
@@ -125,7 +135,7 @@ class DataSource
      */
     public function findByTag(User $currentUser, PastoralTag $tag): Collection
     {
-        return $this->mapper->filterRecordsForUser($this->mapper->findByTag($tag), $currentUser);
+        return $this->accessLevelFilterer->filterRecordsForUser($this->mapper->findByTag($tag), $currentUser);
     }
 
     /**
@@ -165,7 +175,7 @@ class DataSource
     {
         // The mapper method is user-sensitive,
         // but filter anyway as it's better to be explicit than implicit.
-        return $this->mapper->filterRecordsForUser(
+        return $this->accessLevelFilterer->filterRecordsForUser(
             $this->mapper->getReportData(
                 $currentUser,
                 $before_date,
@@ -211,11 +221,12 @@ class DataSource
      */
     public function findLinked(User $currentUser, User $student, User $linkedStudent, $typeId = null): Collection
     {
-        return $this->mapper->filterRecordsForUser(
+        return $this->accessLevelFilterer->filterRecordsForUser(
             $this->mapper->findLinked($student, $linkedStudent, $typeId),
             $currentUser
         );
     }
+
 
     /**
      * User-sensitive wrapper for `Mapper::getSearchResults`.
@@ -227,10 +238,29 @@ class DataSource
      */
     public function getSearchResults(User $currentUser, $search): Collection
     {
-        return $this->mapper->filterRecordsForUser(
+        $filteredRecords = $this->accessLevelFilterer->filterRecordsForUser(
             $this->mapper->getSearchResults($search, $currentUser),
             $currentUser
         );
+
+        // --------------------------------------------------------------------------------------------------------
+        // Keep a record of all searches performed by users, and what results were displayed
+        // --------------------------------------------------------------------------------------------------------
+
+        $searchResults = [];
+        foreach ($filteredRecords as $filteredRecord) {
+            $searchResults[] = $filteredRecord->getId();
+        }
+
+        // Record the search results that were returned by the search by imploding their IDs down into CSV
+        if (\count($searchResults)) {
+            $auditRecord = $this->pastoralAuditMapper->createModel()
+                                                     ->setUser($currentUser)
+                                                     ->setSearch($search)
+                                                     ->setSearchResult(implode(',', $searchResults));
+            $this->pastoralAuditMapper->save($auditRecord);
+        }
+        return $filteredRecords;
     }
 
     /**
@@ -247,7 +277,7 @@ class DataSource
         // The mapper method is user-sensitive,
         // but filter anyway as it's better to be explicit than implicit.
 
-        return $this->mapper->filterRecordsForUser($this->mapper->findRecentDashboard($currentUser, $count), $currentUser)
+        return $this->accessLevelFilterer->filterRecordsForUser($this->mapper->findRecentDashboard($currentUser, $count), $currentUser)
                             ->sortBy('updatedAtDisplay', 'desc');
     }
 
