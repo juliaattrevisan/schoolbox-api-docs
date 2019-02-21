@@ -34,6 +34,7 @@ Data:
             <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" alt="View Profile">
             <h3><a href="/search/user/{{ user.id }}">{{ user.fullName }}</a></h3>
             <p class="meta">{{ user.role.name }}</p>
+            <p class="meta">Unapproved absences: Semester 1 <span class="label neutral">{{ absences[1] }}</span> Semester 2 <span class="label neutral">{{ absences[2] }}</span></p>
         </div>
     </div>
 </div>

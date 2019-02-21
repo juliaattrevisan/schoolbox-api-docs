@@ -78,6 +78,7 @@ class Controller extends Web\Controller\Base
         $deanAndMentor = $this->getDeanAndMentor($user, $externalStudent);
         $awards        = $this->getAwardsData($user, $attributes);
         $houseEvents   = $this->getHouseEventsData($user, $attributes);
+        $absences      = $this->getAbsenceData($user, $attributes);
         $deansComments = $this->getDeansComment($user, $attributes);
 
         $data   = [
@@ -88,6 +89,7 @@ class Controller extends Web\Controller\Base
             'mentor'      => $deanAndMentor['mentor'],
             'awards'      => $awards,
             'houseEvents' => $houseEvents,
+            'absences'    => $absences,
             'deansComments' => $deansComments,
         ];
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
@@ -253,6 +255,59 @@ class Controller extends Web\Controller\Base
 
         return $houseEvents;
     }
+
+
+    /**
+     * Returns absence data for the student given within the reports period
+     *
+     * @param User              $user
+     * @param StudentAttributes $attributes
+     * @return array
+     * @throws UnexpectedValueException
+     */
+    private function getAbsenceData(User $user, StudentAttributes $attributes): array
+    {
+
+        $semesters = $attributes->getCurriculumSemesters();
+        /** @var \Alaress_Date_Format $start1 */
+        $start1 = $semesters[1]['start'];
+        /** @var \Alaress_Date_Format $finish1 */
+        $finish1 = $semesters[1]['finish'];
+        /** @var \Alaress_Date_Format $start2 */
+        $start2 = $semesters[2]['start'];
+        /** @var \Alaress_Date_Format $finish2 */
+        $finish2 = $semesters[2]['finish'];
+
+        $sql = "
+            SELECT 1 AS s, count(1) AS c
+            FROM uvContinuousReportingAbsences
+            WHERE ID = :student_id
+            AND `date` >= :start1 AND `date` <= :finish1
+            UNION
+            SELECT 2 AS s, count(1) AS c
+            FROM uvContinuousReportingAbsences
+            WHERE ID = :student_id
+            AND `date` >= :start2 AND `date` <= :finish2
+        ";
+
+        $params = [
+            'student_id' => $user->getExternalId(),
+            'start1' => $start1->getDatabaseDate(),
+            'finish1' => $finish1->getDatabaseDate(),
+            'start2' => $start2->getDatabaseDate(),
+            'finish2' => $finish2->getDatabaseDate(),
+        ];
+
+        $rows = $this->externalDatabase->executeQuery($sql, $params)->fetchAll();
+        $absenceCounts = [];
+        foreach ($rows as $row) {
+            $absenceCounts[$row['s']] = (int)$row['c'];
+        }
+
+        return $absenceCounts;
+
+    }
+
 
     /**
      * Returns general comment of pastoral records of given attributes.
