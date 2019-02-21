@@ -284,11 +284,6 @@ class Controller extends Web\Controller\Base
             ->lessThanOrEqualTo('created_at', $attributes->getCurriculumYearFinish()->getDatabase());
         $records = $this->pastoralMapper->findByPredicates($pb, ['order' => ['created_at' => 'desc']]);
 
-        // filter not accessible records, if viewer is not the student
-        if ($this->getUser()->getId() !== $user->getId()) {
-            $records = $this->pastoralMapper->filterRecordsForUser($records, $this->getUser());
-        }
-
         // get latest record in each semester
         foreach ($semesters as $semester => $dates) {
             /** @var \Alaress_Date_Format $start */
