@@ -99,6 +99,7 @@ class Model implements ISoftDeletable
      */
     public function __construct()
     {
+        // TODO tighten collection types
         $this->access = new Collection();
         $this->comments = new Collection();
         $this->attachments = new Collection();
@@ -520,16 +521,16 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * Return the specified users access level to this record
+     * Return the specified user's access level to this record
      *
      * @param User $user
      * @return int
      */
-    public function getAccessLevel(User $user)
+    public function getAccessLevel(User $user): int
     {
         // Owners and moderators get private access regardless of any other permission set
 
-        if ($this->isUserInPastoralService($user) || $user->getId() == $this->getOwner()->getId()) {
+        if ($this->isUserInPastoralService($user) || (int)$user->getId() === (int)$this->getOwner()->getId()) {
             return PastoralAccessMapper::ACCESS_PRIVATE;
         }
 
@@ -546,7 +547,7 @@ class Model implements ISoftDeletable
                 continue;
             }
 
-            if ($accessLevelCurrent == PastoralAccessMapper::ACCESS_DENY) {
+            if ($accessLevelCurrent === PastoralAccessMapper::ACCESS_DENY) {
                 return PastoralAccessMapper::ACCESS_DENY;
             }
 
