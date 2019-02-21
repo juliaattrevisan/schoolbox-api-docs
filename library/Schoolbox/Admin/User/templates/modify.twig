@@ -114,6 +114,10 @@
                     </div>
 
                     <div class="small-12 medium-6 island">
+
+                        <label>Portrait Image</label>
+                        {% include 'sub/attachzone.twig' with { attachzone: portraitZone } %}
+
                         <label for="username">Username</label>
                         <input id="username" type="text" class="required" name="modusername" value="{{ user.username }}"/>
 

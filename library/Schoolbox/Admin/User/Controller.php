@@ -14,26 +14,27 @@ use Alaress\Web\Controller\Base;
 use HouseMapper;
 use HouseResidentialMapper;
 use Monolog\Logger;
+use Scrub;
+use UnexpectedValueException;
 use Schoolbox\Application\Exception\NotFound as ExceptionNotFound;
 use Schoolbox\Campus;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Alert\RedisPublisher;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\User\Title\Mapper as UserTitleMapper;
-use Schoolbox\RoleMapper;
-use Schoolbox\CampusMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
-use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
-use Scrub;
-use UnexpectedValueException;
+use Schoolbox\User\Title\Mapper as UserTitleMapper;
 
 /**
  * Controller for managing school users through the admin section.
@@ -285,6 +286,13 @@ class Controller extends Base
             return UserAccess::SERVICE_HOMEPAGE !== $access->getService();
         });
 
+        /* Attachzone for profile picture
+         */
+        $portraitZone = (new Zone('portrait'))
+            ->setMulti(false)
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('add a portrait image');
+
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
@@ -314,17 +322,28 @@ class Controller extends Base
                 'cmsLog' => $this->cmsLogMapper->findByColumn('user', $user->getId(), [
                     'order' => ['time' => 'desc'],
                     'limit' => 10
-                ])
+                ]),
+                'portraitZone' => $portraitZone->getTwigContext()
             ],
             'title' => 'Admin - Users'
         ]);
     }
 
+
     /**
      * Insert user screen
+     * @throws UnexpectedValueException
+     * @throws MapperException
      */
     public function getInsert()
     {
+        /* Attachzone for profile picture
+         */
+        $portraitZone = (new Zone('portrait'))
+            ->setMulti(false)
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('add a portrait image');
+
         $user = $this->userMapper->createModel()
             ->setDisplayGradeGraph($this->getConfigLoader()->get('display_grade_graph'));
         $this->getResponse()->content->set([
@@ -339,6 +358,7 @@ class Controller extends Base
                 'residentialHouses' => $this->houseResidentialMapper->findAll(),
                 'houses' => $this->houseMapper->findAll(),
                 'titles' => $this->userTitleMapper->findAll(),
+                'portraitZone' => $portraitZone->getTwigContext()
             ],
             'title' => 'Admin - Users'
         ]);
