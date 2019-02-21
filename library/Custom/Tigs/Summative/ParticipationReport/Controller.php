@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
 
+use Alaress\Async\Queue\RedisQueue;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
@@ -78,6 +79,7 @@ class Controller extends Web\Controller\Base
         $deanAndMentor = $this->getDeanAndMentor($user, $externalStudent);
         $awards        = $this->getAwardsData($user, $attributes);
         $houseEvents   = $this->getHouseEventsData($user, $attributes);
+        $absences      = $this->getAbsenceData($user, $attributes);
         $deansComments = $this->getDeansComment($user, $attributes);
 
         $data   = [
@@ -88,6 +90,7 @@ class Controller extends Web\Controller\Base
             'mentor'      => $deanAndMentor['mentor'],
             'awards'      => $awards,
             'houseEvents' => $houseEvents,
+            'absences'    => $absences,
             'deansComments' => $deansComments,
         ];
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
@@ -267,29 +270,45 @@ class Controller extends Web\Controller\Base
     {
 
         $semesters = $attributes->getCurriculumSemesters();
+        /** @var \Alaress_Date_Format $start1 */
+        $start1 = $semesters[1]['start'];
+        /** @var \Alaress_Date_Format $finish1 */
+        $finish1 = $semesters[1]['finish'];
+        /** @var \Alaress_Date_Format $start2 */
+        $start2 = $semesters[2]['start'];
+        /** @var \Alaress_Date_Format $finish2 */
+        $finish2 = $semesters[2]['finish'];
 
         $sql = "
-            SELECT count(1)
+            SELECT 1 AS s, count(1) AS c
             FROM uvContinuousReportingAbsences
             WHERE ID = :student_id
-            AND `date` >= :start AND `date` <= :finish
+            AND `date` >= :start1 AND `date` <= :finish1
+            UNION
+            SELECT 2 AS s, count(1) AS c
+            FROM uvContinuousReportingAbsences
+            WHERE ID = :student_id
+            AND `date` >= :start2 AND `date` <= :finish2
         ";
 
-        $absenceCounts = [];
-        foreach ($semesters as $semester => $dates) {
-            $params = [
-                'student_id' => $user->getExternalId(),
-                'start'      => $dates['start']->getDatabaseDate(),
-                'finish'     => $dates['finish']->getDatabaseDate(),
-            ];
+        $params = [
+            'student_id' => $user->getExternalId(),
+            'start1' => $start1->getDatabaseDate(),
+            'finish1' => $finish1->getDatabaseDate(),
+            'start2' => $start2->getDatabaseDate(),
+            'finish2' => $finish2->getDatabaseDate(),
+        ];
 
-            $query = $this->externalDatabase->executeQuery($sql, $params);
-            $absenceCounts[$semester] = (int)$query->fetchColumn();
+        $rows = $this->externalDatabase->executeQuery($sql, $params)->fetchAll();
+        $absenceCounts = [];
+        foreach ($rows as $row) {
+            $absenceCounts[$row['s']] = (int)$row['c'];
         }
 
         return $absenceCounts;
 
     }
+
 
     /**
      * Returns general comment of pastoral records of given attributes.
