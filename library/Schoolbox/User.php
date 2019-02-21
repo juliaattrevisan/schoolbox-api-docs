@@ -24,7 +24,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage;
-
+use Schoolbox\Pastoral;
 
 class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 {
@@ -231,6 +231,9 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      * @var GenericCollection|User[]
      */
     private $children;
+
+    /** @var GenericCollection|Pastoral\Group\Member\Model[] */
+    private $pastoralGroupsMemberships;
 
 
     public function __construct()
@@ -1400,4 +1403,24 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
         return '"' . $this->formatName() . '" <' . $this->getEmail() . '>';
     }
 
+
+    /**
+     * @return GenericCollection|Pastoral\Group\Member\Model[]
+     */
+    public function getPastoralGroupsMemberships(): GenericCollection
+    {
+        return $this->pastoralGroupsMemberships;
+    }
+
+
+    /**
+     * @param Collection|Pastoral\Group\Member\Model[] $pastoralGroupsMemberships
+     * @return $this
+     * @throws DomainException
+     */
+    public function setPastoralGroupsMemberships(Collection $pastoralGroupsMemberships): self
+    {
+        $this->pastoralGroupsMemberships->replaceWith($pastoralGroupsMemberships);
+        return $this;
+    }
 }
