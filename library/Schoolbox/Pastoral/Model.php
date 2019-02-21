@@ -93,15 +93,6 @@ class Model implements ISoftDeletable
     /** @var Collection|PastoralRevision[] */
     private $revisions;
 
-    /**
-     * Has this record already been filtered? If so, it should not be filtered
-     * again.
-     *
-     * (This is an unmapped property.)
-     *
-     * @var bool
-     */
-    private $filtered = false;
 
     /**
      * Model constructor
@@ -565,24 +556,6 @@ class Model implements ISoftDeletable
         }
 
         return $accessLevel;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isFiltered(): bool
-    {
-        return $this->filtered;
-    }
-
-    /**
-     * @param bool $filtered
-     * @return static
-     */
-    public function setFiltered($filtered)
-    {
-        $this->filtered = $filtered;
-        return $this;
     }
 
 
