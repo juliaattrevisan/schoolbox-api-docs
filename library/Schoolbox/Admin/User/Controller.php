@@ -14,6 +14,8 @@ use Alaress\Web\Controller\Base;
 use HouseMapper;
 use HouseResidentialMapper;
 use Monolog\Logger;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Storage\IStorage;
 use Scrub;
 use UnexpectedValueException;
 use Schoolbox\Application\Exception\NotFound as ExceptionNotFound;
@@ -298,7 +300,8 @@ class Controller extends Base
         $portraitZone = (new Zone('portrait'))
             ->setMulti(false)
             ->setAttachmentsLabel('')
-            ->setAttachPrompt('add a portrait image');
+            ->setAttachPrompt('add a portrait image')
+            ->attachFiles([$user->getPortrait()]);
 
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
@@ -344,6 +347,9 @@ class Controller extends Base
      */
     public function getInsert()
     {
+        $user = $this->userMapper->createModel()
+            ->setDisplayGradeGraph($this->getConfigLoader()->get('display_grade_graph'));
+
         /* Attachzone for profile picture
          */
         $portraitZone = (new Zone('portrait'))
@@ -351,8 +357,6 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setAttachPrompt('add a portrait image');
 
-        $user = $this->userMapper->createModel()
-            ->setDisplayGradeGraph($this->getConfigLoader()->get('display_grade_graph'));
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
@@ -617,6 +621,34 @@ class Controller extends Base
                 $user->getCampusCollection()->add($campus);
             }
         }
+
+        $factory = new CollectorFactory();
+
+        $attachments = [];
+
+        /* Remove bad data SA-8244
+         */
+        if (\is_array($this->getRequest()->post['attachment'])) {
+            $attachments = array_filter($this->getRequest()->post['attachment']);
+        }
+
+        if (\count($attachments)) {
+
+            // Validate attachment list can actually be built
+            try {
+                /** @var IStorage[] $attachments */
+                $attachments = $factory->build($this->getRequest()->post['attachment'])->getAll();
+            } catch (\InvalidArgumentException $e) {
+
+                /* Bad data; noop
+                 */
+            }
+
+            foreach ($attachments as $portrait) {
+                $user->setPortrait($portrait);
+            }
+        }
+
 
         // Save the user
         try {
