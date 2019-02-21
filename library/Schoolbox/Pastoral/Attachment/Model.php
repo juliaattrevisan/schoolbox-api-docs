@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral\Attachment;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
@@ -32,6 +33,36 @@ class Model implements IStorage, ISoftDeletable
 
     /** @var bool $private */
     private $private;
+
+
+    /**
+     * Returns whether this is a public attachment
+     *
+     * @return bool
+     * @throws InsufficientHydrationException
+     */
+    public function isPublic(): bool
+    {
+        if ($this->private === null) {
+            throw new InsufficientHydrationException("Expected bool, found null");
+        }
+        return !$this->private;
+    }
+
+
+    /**
+     * Returns whether this is a private attachment
+     *
+     * @return bool
+     * @throws InsufficientHydrationException
+     */
+    public function isPrivate(): bool
+    {
+        if ($this->private === null) {
+            throw new InsufficientHydrationException("Expected bool, found null");
+        }
+        return !$this->private;
+    }
 
     /**
      * @param Pastoral $pastoral

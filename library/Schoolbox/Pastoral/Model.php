@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral;
 
 use Alaress_Date_Format;
+use Schoolbox\BaseModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
@@ -23,7 +24,10 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 
-class Model implements ISoftDeletable
+/**
+ * @method static GenericCollection|Model[] createCollection()
+ */
+class Model extends BaseModel implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;

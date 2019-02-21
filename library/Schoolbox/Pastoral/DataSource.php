@@ -29,8 +29,8 @@ class DataSource
      */
     private $mapper;
 
-    /** @var AccessLevelFilterer */
-    private $accessLevelFilterer;
+    /** @var AccessLevelCensor */
+    private $accessLevelCensor;
 
     /** @var Audit\Mapper */
     private $pastoralAuditMapper;
@@ -39,15 +39,16 @@ class DataSource
     /**
      * Constructor
      *
-     * @param Mapper              $mapper
-     * @param AccessLevelFilterer $accessLevelFilterer
+     * @param Mapper            $mapper
+     * @param AccessLevelCensor $accessLevelCensor
      */
-    public function __construct(Mapper $mapper, AccessLevelFilterer $accessLevelFilterer)
+    public function __construct(Mapper $mapper, AccessLevelCensor $accessLevelCensor)
     {
         $this->mapper              = $mapper;
-        $this->accessLevelFilterer = $accessLevelFilterer;
+        $this->accessLevelCensor   = $accessLevelCensor;
         $this->pastoralAuditMapper = Audit\Mapper::getInstance(); //TODO inject
     }
+
 
     /**
      * Wrapper for `Mapper::createModel`.
@@ -57,11 +58,13 @@ class DataSource
      * @param int $id
      *
      * @return Model
+     * @throws MapperException
      */
     public function createModel($id = null): Model
     {
         return $this->mapper->createModel($id);
     }
+
 
     /**
      * User-sensitive wrapper for `Mapper::findById`.
@@ -71,6 +74,9 @@ class DataSource
      *
      * @return Model
      * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws MapperException\InsufficientHydrationException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function findById(User $currentUser, $id): Model
     {
@@ -82,7 +88,7 @@ class DataSource
                          ->findByColumn('pastoral_id', $model->getId())
         );
 
-        $model = $this->accessLevelFilterer->filterRecordsForUser($this->mapper->createCollection([$model]), $currentUser)->first();
+        $model = $this->accessLevelCensor->filterRecordsForUser($this->mapper->createCollection([$model]), $currentUser)->first();
 
         if (!$model instanceof Model) {
             throw new MapperException\NotFound();
@@ -90,6 +96,7 @@ class DataSource
 
         return $model;
     }
+
 
     /**
      * User-sensitive wrapper for `Mapper::findByColumn`.
@@ -100,14 +107,16 @@ class DataSource
      * @param array  $options
      *
      * @return Collection
+     * @throws MapperException\InsufficientHydrationException
      */
-    public function findByColumn(User $currentUser, $columnName, $columnValue, $options = []): Collection
+    public function findByColumn(User $currentUser, $columnName, $columnValue, array $options = []): Collection
     {
-        return $this->accessLevelFilterer->filterRecordsForUser(
+        return $this->accessLevelCensor->filterRecordsForUser(
             $this->mapper->findByColumn($columnName, $columnValue, $options),
             $currentUser
         );
     }
+
 
     /**
      * User-sensitive wrapper for `Mapper::findByColumnList`.
@@ -118,12 +127,14 @@ class DataSource
      *
      * @return Collection
      * @throws MapperException
+     * @throws MapperException\InsufficientHydrationException
      */
-    public function findByColumnList(User $currentUser, $columnList, $options = []): Collection
+    public function findByColumnList(User $currentUser, $columnList, array $options = []): Collection
     {
-        return $this->accessLevelFilterer->filterRecordsForUser($this->mapper->findByColumnList($columnList, $options),
+        return $this->accessLevelCensor->filterRecordsForUser($this->mapper->findByColumnList($columnList, $options),
             $currentUser);
     }
+
 
     /**
      * User-sensitive wrapper for `Mapper::findByTag`.
@@ -132,12 +143,14 @@ class DataSource
      * @param PastoralTag $tag
      *
      * @return Collection|Model[]
+     * @throws MapperException\InsufficientHydrationException
      */
     public function findByTag(User $currentUser, PastoralTag $tag): Collection
     {
-        return $this->accessLevelFilterer->filterRecordsForUser($this->mapper->findByTag($tag), $currentUser);
+        return $this->accessLevelCensor->filterRecordsForUser($this->mapper->findByTag($tag), $currentUser);
     }
 
+    /** @noinspection MoreThanThreeArgumentsInspection */
     /**
      * User-sensitive wrapper for `Mapper::getReportData`.
      *
@@ -156,6 +169,7 @@ class DataSource
      * @param Collection            $houses
      *
      * @return Collection
+     * @throws MapperException\InsufficientHydrationException
      */
     public function getReportData(
         User $currentUser,
@@ -175,7 +189,7 @@ class DataSource
     {
         // The mapper method is user-sensitive,
         // but filter anyway as it's better to be explicit than implicit.
-        return $this->accessLevelFilterer->filterRecordsForUser(
+        return $this->accessLevelCensor->filterRecordsForUser(
             $this->mapper->getReportData(
                 $currentUser,
                 $before_date,
@@ -209,6 +223,7 @@ class DataSource
         return $this->mapper->getLinkedStudents($student);
     }
 
+
     /**
      * User-sensitive wrapper for `Mapper::findLinked`.
      *
@@ -218,10 +233,11 @@ class DataSource
      * @param int  $typeId
      *
      * @return Collection|Model[]
+     * @throws MapperException\InsufficientHydrationException
      */
     public function findLinked(User $currentUser, User $student, User $linkedStudent, $typeId = null): Collection
     {
-        return $this->accessLevelFilterer->filterRecordsForUser(
+        return $this->accessLevelCensor->filterRecordsForUser(
             $this->mapper->findLinked($student, $linkedStudent, $typeId),
             $currentUser
         );
@@ -235,10 +251,15 @@ class DataSource
      * @param string $search
      *
      * @return Collection
+     * @throws MapperException
+     * @throws MapperException\InsufficientHydrationException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function getSearchResults(User $currentUser, $search): Collection
     {
-        $filteredRecords = $this->accessLevelFilterer->filterRecordsForUser(
+        $filteredRecords = $this->accessLevelCensor->filterRecordsForUser(
             $this->mapper->getSearchResults($search, $currentUser),
             $currentUser
         );
@@ -263,6 +284,7 @@ class DataSource
         return $filteredRecords;
     }
 
+
     /**
      * User-sensitive wrapper for `Mapper::findRecentDashboard`.
      *
@@ -271,15 +293,17 @@ class DataSource
      *
      * @return Collection|Model[]
      * @throws MapperException
+     * @throws MapperException\InsufficientHydrationException
      */
     public function findRecentDashboard(User $currentUser, $count = 5): Collection
     {
         // The mapper method is user-sensitive,
         // but filter anyway as it's better to be explicit than implicit.
 
-        return $this->accessLevelFilterer->filterRecordsForUser($this->mapper->findRecentDashboard($currentUser, $count), $currentUser)
-                            ->sortBy('updatedAtDisplay', 'desc');
+        return $this->accessLevelCensor->filterRecordsForUser($this->mapper->findRecentDashboard($count), $currentUser)
+                                       ->sortBy('updatedAtDisplay', 'desc');
     }
+
 
     /**
      * Wrapper for `Mapper::save`.
@@ -287,11 +311,15 @@ class DataSource
      * Not user-sensitive, but must be exposed to web request code.
      *
      * @param Model $model
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
-    public function save(Model $model)
+    public function save(Model $model): void
     {
         $this->mapper->save($model);
     }
+
 
     /**
      * Wrapper for `Mapper::delete`.
@@ -301,6 +329,7 @@ class DataSource
      * @param Model $model
      *
      * @return bool
+     * @throws MapperException
      */
     public function delete(Model $model): bool
     {
