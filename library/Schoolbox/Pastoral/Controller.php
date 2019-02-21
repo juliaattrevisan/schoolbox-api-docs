@@ -199,25 +199,26 @@ class Controller extends Base
      *
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws MapperException
+     * @throws \DomainException
      */
     public function getIndex(): void
     {
-        $groups = $this->pastoralGroupMemberMapper->findByColumn(
-            'user_id',
-            $this->getUser()->getId()
-        );
-        $groups->sortByCallback(function (PastoralGroupMember $a, PastoralGroupMember $b) {
+        $user              = $this->getUser();
+        $groupsMemberships = $this->pastoralGroupMemberMapper->findByColumn('user_id', $user->getId());
+        $groupsMemberships->sortByCallback(function (PastoralGroupMember $a, PastoralGroupMember $b) {
             return strnatcasecmp($a->getGroup()->getName(), $b->getGroup()->getName());
         });
+
+        $user->setPastoralGroupsMemberships($groupsMemberships);
 
         $this->getResponse()->content->set([
             'template' => '@pastoral/index.twig',
             'data'     => [
-                'user'             => $this->getUser(),
-                'recentStudents'   => $this->pastoralAuditMapper->findRecentlyViewedStudentsForUser($this->getUser()),
-                'recentDashboard'  => $this->pastoralDataSource->findRecentDashboard($this->getUser()),
-                'reportsDashboard' => $this->pastoralReportMapper->findForUserDashboard($this->getUser()),
-                'groups'           => $groups,
+                'user'             => $user,
+                'recentStudents'   => $this->pastoralAuditMapper->findRecentlyViewedStudentsForUser($user),
+                'recentDashboard'  => $this->pastoralDataSource->findRecentDashboard($user),
+                'reportsDashboard' => $this->pastoralReportMapper->findForUserDashboard($user),
+                'groups'           => $groupsMemberships,
             ],
             'title' => 'Dashboard',
         ]);
@@ -378,6 +379,7 @@ class Controller extends Base
     /**
      * Display a single pastoral care record
      *
+     * @api /pastoral/student/{studentId:\d+}/record/{recordId:\d+}
      * @param Model $record
      * @param User  $student
      *
