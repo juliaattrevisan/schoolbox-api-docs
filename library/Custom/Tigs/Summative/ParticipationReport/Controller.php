@@ -13,11 +13,11 @@ use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use Schoolbox\GenericCollection;
-use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Model as Pastoral;
 use External_UserInterface;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
@@ -80,17 +80,19 @@ class Controller extends Web\Controller\Base
         $houseEvents   = $this->getHouseEventsData($user, $attributes);
         $absences      = $this->getAbsenceData($user, $attributes);
         $deansComments = $this->getDeansComment($user, $attributes);
+        $explanation   = $this->getExplanation($attributes);
 
         $data   = [
-            'user'        => $user,
-            'isEnabled'   => $this->getConfigLoader()->get(Config::_TIGS_PARTICIPATION_REPORT_ENABLED),
-            'attributes'  => $attributes,
-            'dean'        => $deanAndMentor['dean'],
-            'mentor'      => $deanAndMentor['mentor'],
-            'awards'      => $awards,
-            'houseEvents' => $houseEvents,
-            'absences'    => $absences,
+            'user'          => $user,
+            'isEnabled'     => $this->getConfigLoader()->get(Config::_TIGS_PARTICIPATION_REPORT_ENABLED),
+            'attributes'    => $attributes,
+            'dean'          => $deanAndMentor['dean'],
+            'mentor'        => $deanAndMentor['mentor'],
+            'awards'        => $awards,
+            'houseEvents'   => $houseEvents,
+            'absences'      => $absences,
             'deansComments' => $deansComments,
+            'explanation'   => $explanation,
         ];
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
 
@@ -356,5 +358,29 @@ class Controller extends Web\Controller\Base
             }
         }
         return $deansComment;
+    }
+
+
+    /**
+     * Returns explanation of grade which matches the given attribute
+     * @param StudentAttributes $attributes
+     * @return string
+     */
+    private function getExplanation(StudentAttributes $attributes): string
+    {
+        switch ($attributes->getYearLevel()) {
+            case 12:
+                if ($attributes->isHsc()) {
+                    return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_12_HSC);
+                }
+                return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_12_IB);
+            case 11:
+                if ($attributes->isHsc()) {
+                    return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_11_HSC);
+                }
+                return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_11_IB);
+            default:
+                return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_7_10);
+        }
     }
 }
