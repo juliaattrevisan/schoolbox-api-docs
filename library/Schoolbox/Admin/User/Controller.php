@@ -632,6 +632,10 @@ class Controller extends Base
             $attachments = array_filter($this->getRequest()->post['attachment']);
         }
 
+        /* If you didn't provide a picture, empty it
+         */
+        $user->setPortrait(null);
+
         if (\count($attachments)) {
 
             // Validate attachment list can actually be built
@@ -648,7 +652,6 @@ class Controller extends Base
                 $user->setPortrait($portrait);
             }
         }
-
 
         // Save the user
         try {
