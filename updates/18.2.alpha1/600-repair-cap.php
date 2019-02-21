@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
 use Alaress\Database;
 
 $opts = require __DIR__ . '/../../conf/core/require-cli.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Daemon\Kernel("Repair 'Custom Assessment Participation' (CAP)", [
     'verbose' => $opts['v'] ?? [1, 2, 3],

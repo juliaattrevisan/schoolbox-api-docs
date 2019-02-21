@@ -23,7 +23,6 @@ use Schoolbox\Realtime\Routing\Cache\WritableCache;
 
 $opts = require __DIR__ . '/../../../conf/core/require-cli.php';
 
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 $kernel = new Schoolbox\Application\Daemon\Kernel('Flush Cache Users Queue', [
     'verbose'  => isset($opts['v']) ? $opts['v'] : null,
     'instance' => isset($opts['instance']) ? $opts['instance'] : null,

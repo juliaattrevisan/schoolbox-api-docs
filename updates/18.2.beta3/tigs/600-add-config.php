@@ -18,7 +18,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\WorkType;
 
 $opts = require __DIR__ . '/../../../conf/core/require-cli.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel("'Insert TIGS config'", [
     'verbose' => $opts['v'] ?? null,

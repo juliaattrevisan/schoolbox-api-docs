@@ -22,8 +22,6 @@ use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\User;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('Schoolbox\\Application\\Daemon');
-
 // Setup kernel
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Enable Markbook External Sync');

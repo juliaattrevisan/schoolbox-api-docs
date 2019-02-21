@@ -11,8 +11,8 @@
  */
 
 namespace Alaress\Session;
-use Alaress\Redis;
 use Aura\Session as SessionLibrary;
+use Predis;
 
 class Factory {
 
@@ -32,7 +32,7 @@ class Factory {
 
     /**
      * Sessions are stored in redis so this is the connection
-     * @var Redis
+     * @var Predis\ClientInterface
      */
     protected $redis;
 
@@ -41,7 +41,7 @@ class Factory {
      *
      * @param array $cookies Cookies, often from $_COOKIE but not always.
      * @param \Schoolbox\IConfigLoader $config
-     * @param Redis $redis
+     * @param Predis\ClientInterface $redis
      * @param int $requestTime Unix timestamp, usually from $_SERVER['REQUEST_TIME'].
      */
     public function __construct($cookies, \Schoolbox\IConfigLoader $config, $redis, $requestTime) {

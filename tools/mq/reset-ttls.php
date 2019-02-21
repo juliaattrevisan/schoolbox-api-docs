@@ -23,8 +23,6 @@ foreach($fields as $k => $name) {
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-spl_autoload_call('Schoolbox\\Application\\Daemon');
-
 $k = new \Schoolbox\Application\Daemon\Kernel('TTL Reset', [
     'verbose' => [true, true],
     'errors'  => E_ALL,

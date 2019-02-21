@@ -12,7 +12,6 @@ use Alaress\Image\Cache\BrokenFS;
 use Alaress\Image\Processor\Freeform;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('Schoolbox\\Application\\BasicRequest');
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 $path = '/images/core/icons/activity-icons-64x64px.png';

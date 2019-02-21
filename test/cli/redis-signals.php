@@ -26,8 +26,6 @@ EOL;
 }
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
-
 $daemon = isset($opts['channel']) ? $opts['channel'] : (readline('Daemon name [test]: ') ?: 'test');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Redis pubsub signal test', [

@@ -20,8 +20,6 @@ use Schoolbox\Notif\UserQueue\UserQueueFactory;
 // check if we're in the harness or not
 if (!class_exists('\Schoolbox\Application\Daemon\Kernel', false)) {
     require_once __DIR__ . '/../conf/core/require.php';
-
-    spl_autoload_call('\\Schoolbox\\Application\\Daemon');
     new Schoolbox\Application\Daemon\Kernel('Migration from AMQP to Redis');
 }
 

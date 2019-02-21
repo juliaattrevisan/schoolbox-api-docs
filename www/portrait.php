@@ -15,7 +15,6 @@ use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
 
 require_once __DIR__ . '/../conf/core/require.php';
-spl_autoload_call('Schoolbox\\Application\\BasicRequest');
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 // Alaress_Image_Cache_Portrait needs to know if someone is logged in.

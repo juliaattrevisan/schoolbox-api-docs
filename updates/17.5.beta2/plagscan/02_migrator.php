@@ -21,7 +21,6 @@ const RESULT_SUCCESS     = 1;
 const RESULT_FAILED_SIZE = 2;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $options = getopt("v::r::", ['verbose::', 'retry::']);
 

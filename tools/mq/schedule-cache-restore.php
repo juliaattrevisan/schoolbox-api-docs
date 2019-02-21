@@ -34,7 +34,6 @@ foreach($fields as $k => $name) {
 }
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('Schoolbox\\Application\\Daemon');
 $k = new \Schoolbox\Application\Daemon\Kernel('Schedule Reload-from-Cache', [
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'errors'  => E_ALL,

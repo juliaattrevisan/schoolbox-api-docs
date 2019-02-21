@@ -40,8 +40,6 @@ $flags = implode(' ', array_slice($argv, 1));
 
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
-
 $kernel = new Schoolbox\Application\Daemon\Kernel('Socket', [
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'port'    => empty($opts['p']) ? 9081 : $opts['p'],

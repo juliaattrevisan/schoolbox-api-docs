@@ -13,7 +13,6 @@ if ($argc != 2) {
 }
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 $k = new Schoolbox\Application\Daemon\Kernel('File Recovery', [
     'verbose' => [1,1,1]
 ]);

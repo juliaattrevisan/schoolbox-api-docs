@@ -23,8 +23,6 @@ use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 
 $options = require_once __DIR__ . '/../../conf/core/require-cli.php';
-
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Crocodoc Archive Migrator',
     [

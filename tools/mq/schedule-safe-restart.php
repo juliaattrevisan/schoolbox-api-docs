@@ -31,7 +31,6 @@ use Schoolbox\Realtime\Schedule\Trigger\Propagator;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('Schoolbox\\Application\\Daemon');
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Schedule Safe Restart');
 pcntl_signal(SIGCHLD, SIG_DFL);
 error_reporting(E_ALL);

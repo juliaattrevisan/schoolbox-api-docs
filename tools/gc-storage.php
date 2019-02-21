@@ -28,7 +28,6 @@ $perform = isset($opts['p']);
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/../conf/core/require.php';
-spl_autoload_call('Schoolbox\\Application\\Daemon');
 new Daemon\Kernel('Storage Garbage Collection');
 
 $pdo = Database::getInstance();

@@ -22,7 +22,6 @@ use Schoolbox\Realtime\MessageList\Unread;
 
 
 $opts = require __DIR__ . '/../../../conf/core/require-cli.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('ToSort Queue Removal', [
     'verbose' => isset($opts['v']) ? $opts['v'] : [ false, false, false ],

@@ -32,7 +32,6 @@ foreach ($fields as $k => $name) {
 }
 
 require_once __DIR__ . '/../../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Route Worker', [
     'errors' => E_ALL,

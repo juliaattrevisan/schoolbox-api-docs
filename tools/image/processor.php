@@ -14,7 +14,6 @@ use Schoolbox\Resource\Storage;
 use Alaress\Image\Transformation;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('Schoolbox\\Application\\Daemon');
 
 define('LOG_LEVEL', 200); // default log level to INFO
 define('MAX_WORKERS', 4); // default maximum number of workers

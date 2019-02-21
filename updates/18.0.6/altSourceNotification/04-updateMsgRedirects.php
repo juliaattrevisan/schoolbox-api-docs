@@ -10,9 +10,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 
 $opts = require __DIR__ . '/../../../conf/core/require-cli.php';
-
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
-
 $kernel = new Schoolbox\Application\Daemon\Kernel('Alt Source Linkup', [
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'errors'  => E_ALL,

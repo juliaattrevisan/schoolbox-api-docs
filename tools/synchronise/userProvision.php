@@ -20,8 +20,6 @@ use Schoolbox\Sync\Provisioner\Provisioner;
 $options = getopt("vr:", array('perform-update', 'instance::'));
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
-
 $kernel = new Schoolbox\Application\Daemon\Kernel('UPS', [
     'verbose'  => isset($options['v']) ? $options['v'] : null,
     'perform'  => isset($options['perform-update']),

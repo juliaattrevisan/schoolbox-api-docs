@@ -8,7 +8,6 @@ use Psr\Log\LoggerInterface;
 
 
 $opts = require  __DIR__ . '/../../../conf/core/require-cli.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Change name of timetable calendar connector', [
     'verbose' => [false, false, false],

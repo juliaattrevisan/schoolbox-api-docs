@@ -17,16 +17,26 @@ use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\OutputInterface;
 use Aura\Router\Route;
-use Monolog\Logger;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Alaress\Csrf\HeaderCheck;
+use Alaress\DebugBar\DataCollector\TidewaysCollector;
+use Alaress\DebugBar\DataCollector\XhprofCollector;
+use Config;
+use Database;
+use Psr\Log\NullLogger;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\IConfigLoader;
 
-
-class Kernel extends \Alaress\Application\Kernel
+/**
+ * Designed for full web requests, including rendering a full UI
+ */
+class Kernel extends WebKernelAbstract
 {
 
     /** @var bool */
@@ -34,12 +44,20 @@ class Kernel extends \Alaress\Application\Kernel
 
 
     /**
-    * Initialise
-    */
+     * @throws RuntimeException
+     * @throws SchoolboxException
+     * @throws \Aura\Di\Exception
+     * @throws \Aura\Di\Exception\ContainerLocked
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Di\Exception\ServiceNotObject
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\External\Exception
+     */
     public function __construct()
     {
-        $this->boot = new Bootstrap($this);
-        $this->boot();
+        parent::__construct();
+
+        $this->runMiddleware();
     }
 
 
@@ -68,8 +86,14 @@ class Kernel extends \Alaress\Application\Kernel
 
 
     /**
-    * Execute the main script
-    */
+     * Execute the main script
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Web\Exception\InvalidStatusCode
+     * @throws \DebugBar\DebugBarException
+     * @throws \ReflectionException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     */
     public function run()
     {
         // Run router with requested path (trim trailing /)
@@ -104,6 +128,8 @@ class Kernel extends \Alaress\Application\Kernel
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Exception
      */
     private function outputAuraContent(Route $route, string $path): void
     {
@@ -162,7 +188,7 @@ class Kernel extends \Alaress\Application\Kernel
             $controller = $this->di->get('controller:' . $controllerName);
 
             // Authorize, throwing whatever exceptions might be thrown.
-            /** @var \Alaress\Authorizer\Authorizer $authorizer */
+            /** @var \Alaress\Authorizer\Authorizer $auth */
             $auth = $this->di->get('authorizer');
 
             try {
@@ -329,5 +355,167 @@ class Kernel extends \Alaress\Application\Kernel
         $sitePage = $this->di->get('sitePage');
         $sitePage->loadContent($pageName);
         $sitePage->outputPage();
+    }
+
+
+    /**
+     * Initialise debugging
+     *
+     * @return void
+     * @throws \DebugBar\DebugBarException
+     * @throws \Schoolbox\External\Exception
+     */
+    protected function initialiseDebugging():void
+    {
+        // Set up the debug bar, and add listeners for various parts of the debug bar
+        // (database calls, XHProf)
+        // Should go in a DI container instead of a static class.
+        $this->setDebugEnabled(DebugBar::isEnabled());
+        if($this->isDebugEnabled()) {
+            DebugBar::init();
+        }
+
+        // Install into database
+        if($this->isDebugEnabled()) {
+            $debug_bar = DebugBar::getInstance();
+
+            // Throw away existing connection and reconnect with persistence off
+            $database = Database::getInstance();
+            $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true,]);
+            $debug_bar->addCollector($database->getCollector());
+        }
+
+        // XHProf on the debug bar.
+        if ($this->isDebugEnabled() && Config::get('debug_xhprof')) {
+            if (extension_loaded('xhprof')) {
+                DebugBar::getInstance()->addCollector(new XhprofCollector());
+            } elseif (extension_loaded('tideways')) {
+                DebugBar::getInstance()->addCollector(new TidewaysCollector());
+            }
+        }
+    }
+
+
+    /**
+     * Install any internal dependencies into the kernel (routing, etc.)
+     *
+     * @return void
+     * @throws RuntimeException
+     * @throws \Aura\Di\Exception
+     * @throws \Aura\Di\Exception\ContainerLocked
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Di\Exception\ServiceNotObject
+     * @throws \InvalidArgumentException
+     */
+    protected function installDependencies(): void
+    {
+        parent::installDependencies();
+
+        $di = $this->getDependencyInjector();
+
+        // register an empty logger to maintain interfaces as required
+        $di->values['logger'] = new NullLogger();
+
+        // Mapper notifications:
+        // They rely upon the session being injected into them, so do that.
+        $di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(function() use($di) {
+            /** @var \Alaress\Session\Session $session */
+            $session = $di->get('session');
+            $session->start();
+            return isset($_SESSION) ? $_SESSION : array();
+        });
+
+        // initialise session
+        $di->get('session')->start();
+
+        // Initialise module configuration
+        require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
+        require_once SITE_root . '/conf/ModuleLoader.php';
+
+        $customModuleLocation = sprintf(
+            '/conf/modules/Custom/%s/',
+            ucfirst($this->getDependencyInjector()->get('config')->get('site_location'))
+        );
+        $modulePaths = array_merge(
+            glob(SITE_root . '/conf/modules/*.php'),
+            glob(SITE_root . $customModuleLocation . '*.php')
+        );
+
+        foreach ($modulePaths as $routePath) {
+            require_once $routePath;
+
+            // Get a route name out of this path
+            $path = preg_replace('/^'.preg_quote(SITE_root.'/conf/modules/', '/').'/', '', $routePath);
+            $path = preg_replace('/\\.php$/', '', $path);
+            $path = preg_replace('/\\//', '\\', $path);
+
+            $class = 'Config\\Modules\\' . $path;
+
+            if(class_exists($class, false)) {
+                /** @var Config\Modules\ModuleConfigInterface $obj */
+                $obj = new $class();
+                $obj->configure($this);
+            }
+        }
+    }
+
+
+    /**
+     * Web requests require CSRF protection: that belongs in middleware.
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws SchoolboxException
+     */
+    protected function runMiddleware(): void
+    {
+        // Ghetto CSRF middleware. Reject request if:
+        // * It's not a GET or HEAD request
+        // ** Disregard X-Http-Method-Override, as that can be set by client
+        // * It's not a deliberately allowed request, API endpoint or vhost
+        // ** In general: any request that authenticates via token instead of
+        //    via session should be allowed
+        // * Its headers don't match
+        // Accept request if it somehow doesn't have a REQUEST_METHOD at all;
+        // AFAIK this isn't fakeable, and this gets called by some CLI scripts
+        // despite it being the WebRequest bootstrap. (Go figure.)
+
+        $scriptWhitelist = [ '*/dav/index.php' ];
+        foreach ($scriptWhitelist as $path) {
+            if (fnmatch($path, $_SERVER['SCRIPT_FILENAME'])) {
+                return;
+            }
+        }
+
+        if (isset($_SERVER['REQUEST_METHOD']) && !\in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'], true)) {
+
+            // Check against whitelist first
+            $whitelist = [
+                '/saml/consume.php*',
+                '/api/*',
+                '/loginForm.php*',
+                '/liss/liss.php',
+                '/lti-consumer/*',
+            ];
+
+            foreach ($whitelist as $path) {
+                if (fnmatch($path, $_SERVER['REQUEST_URI'])) {
+                    return;
+                }
+            }
+
+            // Then verify request origin
+            /** @var IConfigLoader $config */
+            $di        = $this->getDependencyInjector();
+            $config    = $di->get('config');
+            $fqdn      = trim($config->get('site_hostname').".".$config->get('site_domain'), ';.');
+            $csrfCheck = new HeaderCheck($_SERVER, $fqdn);
+            if (!$csrfCheck->verifyRequestOrigin()) {
+                // Let's just say 403 Forbidden for now
+                // TODO replace the call to Sitepage::error() method
+                /** @var \SitePage $page */
+                $page = $di->get('layoutEngine');
+                $page->error(ErrorMapper::ERROR_FORM_SUBMIT, 'Invalid Request Origin', 403);
+            }
+        }
     }
 }

@@ -45,8 +45,6 @@ foreach($fields as $k => $name) {
 $flags = implode(' ', array_slice($argv, 1));
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
-
 $kernel = new Schoolbox\Application\Daemon\Kernel('Schedule', [
 	'verbose' => isset($opts['v']) ? $opts['v'] : null,
 	'errors'  => E_ALL,

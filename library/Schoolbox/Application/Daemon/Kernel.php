@@ -20,8 +20,10 @@ use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Monolog\Handler\RavenHandler;
-use Monolog\Logger as Monologger;
+use Monolog;
 use Raven_Client;
+use Database;
+use React\Stomp;
 
 class Kernel extends \Alaress\Application\Kernel
 {
@@ -55,17 +57,24 @@ class Kernel extends \Alaress\Application\Kernel
      */
     protected $limits;
 
+
     /**
      * Initialise
      *
      * @param string $name
      * @param array  $opts
+     * @throws RuntimeException
+     * @throws \Aura\Di\Exception
+     * @throws \Aura\Di\Exception\ContainerLocked
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Di\Exception\ServiceNotObject
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\External\Exception
      */
     public function __construct($name, $opts = [])
     {
         $this->setOpts($opts);
-        $this->boot = new Bootstrap($this);
-        $this->boot();
+        parent::__construct();
 
         pcntl_signal(SIGCHLD, SIG_IGN);
         error_reporting(isset($opts['errors']) ? $opts['errors'] : E_ALL ^ E_NOTICE);
@@ -402,14 +411,109 @@ EOL;
             if ($this->getDependencyInjector()->has('sentry')) {
                 /** @var Raven_Client $ravenClient */
                 $ravenClient  = $this->getDependencyInjector()->get('sentry');
-                $ravenHandler = new RavenHandler($ravenClient, Monologger::CRITICAL);
-                $ravenHandler->getFormatter()->includeStackTraces(true);
+                $ravenHandler = new RavenHandler($ravenClient, Monolog\Logger::CRITICAL);
+                /** @var Monolog\Formatter\LineFormatter $formatter */
+                $formatter = $ravenHandler->getFormatter();
+                $formatter->includeStacktraces(true);
                 $this->log->pushHandler($ravenHandler);
             }
         }
 
-
         return $this->log;
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    protected function initialiseDebugging(): void
+    {
+        // no debugging
+    }
+
+
+    /**
+     * Register any error handling required
+     *
+     * @return void
+     */
+    protected function registerErrorHandling(): void
+    {
+        set_error_handler([$this, 'onError']);
+    }
+
+
+    /**
+     * Register any out-the-top exception handling required
+     *
+     * @return void
+     */
+    protected function registerExceptionHandling(): void
+    {
+        set_exception_handler([$this, 'onException']);
+    }
+
+
+    /**
+     * Register any shutdown handling required
+     *
+     * @return void
+     */
+    protected function registerShutdownHandling(): void
+    {
+        register_shutdown_function([$this, 'onShutdown']);
+    }
+
+
+    /**
+     * Initialise connections to databases, etc.
+     *
+     * @return void
+     * @throws \Schoolbox\External\Exception
+     */
+    protected function initialiseExternalConnections(): void
+    {
+        // MySQL connection configuration
+        Database::getInstance()->connect(SQL_dsn, SQL_user, SQL_passwd, array('throw' => true));
+    }
+
+
+    /**
+     * Install any internal dependencies into the kernel (routing, etc.)
+     *
+     * @return void
+     * @throws RuntimeException
+     * @throws \Aura\Di\Exception
+     * @throws \Aura\Di\Exception\ContainerLocked
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Di\Exception\ServiceNotObject
+     * @throws \InvalidArgumentException
+     */
+    protected function installDependencies(): void
+    {
+        parent::installDependencies();
+
+        $di = $this->getDependencyInjector();
+
+        $di->set('stomp.factory', $di->lazyNew(
+            Stomp\Factory::class, [
+            'loop' => $di->lazyValue('react.loop')
+        ]));
+
+        $di->set('stomp', $di->lazy(function () use ($di) {
+            $conf = $di->get('config');
+
+            return $di->get('stomp.factory')->createClient(
+                [
+                    'host'     => $conf->get('amqp_host'),
+                    'port'     => $conf->get('amqp_stomp_port'),
+                    'vhost'    => $conf->get('amqp_vhost'),
+                    'login'    => $conf->get('amqp_user'),
+                    'passcode' => $conf->get('amqp_pass'),
+                ]
+            );
+        }));
+
+        $di->values['logger'] = $this->logger();
+    }
 }

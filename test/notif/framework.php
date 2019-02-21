@@ -20,7 +20,6 @@ if (posix_getuid() !== 0) {
 unset($_SERVER['REQUEST_TIME']);
 
 require_once __DIR__ . '/../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $opts = getopt('v', ['env:', 'logdir:', 'testcase:']);
 
