@@ -24,6 +24,7 @@ use Schoolbox\User;
  */
 abstract class BaseMapper extends SchoolboxMapper
 {
+
     /**
      * Filter records from the collection if the current user doesn't have access to them.
      * If the user is not in the audience and is not the owner, they can't see the record.
@@ -32,6 +33,7 @@ abstract class BaseMapper extends SchoolboxMapper
      * @param User  $user   The user who is trying to view them
      *
      * @return Model|null
+     * @throws SchoolboxMapper\DefinitionException
      */
     private function filterRecordForUser(Model $record, User $user): ?Model
     {
@@ -56,13 +58,13 @@ abstract class BaseMapper extends SchoolboxMapper
         // We ignore pastoral moderators and the record owner get ignored by this, otherwise they'll never get able to
         // update an erroneous Deny access level added to a record
 
-        if ($accessLevel == PastoralAccessMapper::ACCESS_DENY) {
+        if ($accessLevel === PastoralAccessMapper::ACCESS_DENY) {
             return null;
         }
 
         // Only has public access? Strip the private body and files
 
-        if ($accessLevel == PastoralAccessMapper::ACCESS_PUBLIC) {
+        if ($accessLevel === PastoralAccessMapper::ACCESS_PUBLIC) {
             // Pastoral moderators and Record owner ignored
             $record->setBodyPrivate("");
             $record->setAttachments($record->getAttachments()->filterBy('private', false));
