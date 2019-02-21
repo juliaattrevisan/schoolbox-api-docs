@@ -1,11 +1,5 @@
 <?php
 /**
- * Please don't use this mapper directly in web requests!
- *
- * Use `\Schoolbox\Pastoral\DataSource` instead; it wraps this mapper with
- * calls that automatically filter and censor records and fields that a user
- * does not have permission to view.
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -39,6 +33,12 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
+ * Please don't use this mapper directly in web requests!
+ *
+ * Use `\Schoolbox\Pastoral\DataSource` instead; it wraps this mapper with
+ * calls that automatically filter and censor records and fields that a user
+ * does not have permission to view.
+ *
  * @method Model createModel($idValue = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findById($identifierValue)
