@@ -9,7 +9,7 @@
  */
 
 require_once __DIR__ . '/../../conf/core/require-cli.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('CLI Levels Test');
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 date_default_timezone_set('Australia/Melbourne');
 
