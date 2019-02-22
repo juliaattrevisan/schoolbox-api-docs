@@ -172,7 +172,7 @@ $kernel->run(new class extends App
      * Is migration required?
      *
      * Migration is only required if:
-     * * `$old` and `$new` are not equal
+     * * `$old` is more than 2^16 bytes in size
      * * `$new` is a truncated form of `$old`; if it's not, we must assume the
      *    user has modified the article, and thus we can't assume they still
      *    want the old version
@@ -183,8 +183,8 @@ $kernel->run(new class extends App
      */
     private function isMigrationRequired(string $old, string $new): bool
     {
-        if ($old === $new) {
-            $this->log->notice(self::indent(2) . 'new and old are the same: no migrate required');
+        if (strlen($old) <= 2^16) {
+            $this->log->notice(self::indent(2) . 'old is less than the maximum size of new: no migrate required');
             return false;
         }
 
