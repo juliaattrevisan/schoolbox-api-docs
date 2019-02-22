@@ -9,6 +9,7 @@
  * HumanEdge implementation of user retrieve methods.
  */
 
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class External_Humanedge_User implements External_UserInterface
@@ -32,7 +33,7 @@ class External_Humanedge_User implements External_UserInterface
      * This identifies the CONVERT/CAST format for ISO8601 date
      * yyyy-mm-ddThh:mi:ss.mmm
      */
-    const FORMAT_ISO8601 = 126;
+    protected const FORMAT_ISO8601 = 126;
 
     /**
      * Constructor
@@ -506,19 +507,18 @@ class External_Humanedge_User implements External_UserInterface
         return '';
     }
 
+
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @param User $user
+     * @return Storage\Model|null
      */
-    public function getPortrait($externalUserId)
+    public function getPortrait(User $user): ?Storage\Model
     {
-        // Copied from External_Schoolbox_User strategy
-        $portraitPath = realpath( Config::get('portrait_dir') ) . "/$externalUserId.jpg";
-        if ( is_readable($portraitPath) ) {
-            return $portraitPath;
-        } else {
-            return false;
-        }
+        return $user->getPortrait();
     }
+
 
     /**
      * @inheritDoc

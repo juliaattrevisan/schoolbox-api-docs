@@ -10,6 +10,7 @@
 use Schoolbox\External\Connector\Pcschools\QueryHelper;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\Freedom;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\IQueryHelper;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class External_Pcschools_User implements External_UserInterface
@@ -914,26 +915,18 @@ class External_Pcschools_User implements External_UserInterface
         return '';
     }
 
+
     /**
-     * Get the portrait for a particular user
-     * Returns a local file path to the user's portrait
+     * {@inheritDoc}
      *
-     * @importance low - most schools manually upload portraits to `config.portrait_dir`.
-     *
-     * @param $externalUserId
-     *
-     * @return string
+     * @param User $user
+     * @return Storage\Model|null
      */
-    public function getPortrait($externalUserId)
+    public function getPortrait(User $user): ?Storage\Model
     {
-        // Copied from External_Schoolbox_User strategy
-        $portraitPath = realpath(Config::get('portrait_dir')) . "/$externalUserId.jpg";
-        if (is_readable($portraitPath)) {
-            return $portraitPath;
-        } else {
-            return false;
-        }
+        return $user->getPortrait();
     }
+
 
     /**
      * Determine whether someone is a day boarder or not

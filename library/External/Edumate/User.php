@@ -8,6 +8,7 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class External_Edumate_User extends External_Edumate_Connection implements External_UserInterface
@@ -361,20 +362,18 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         return array_values($children);
     }
 
+
     /**
-     * @inheritdoc
+     * {@inheritDoc}
+     *
+     * @param User $user
+     * @return Storage\Model|null
      */
-    public function getPortrait($externalUserId)
+    public function getPortrait(User $user): ?Storage\Model
     {
-
-        $portraitPath = realpath(Config::get('portrait_dir')) . "/$externalUserId.jpg";
-
-        if (is_readable($portraitPath)) {
-            return $portraitPath;
-        } else {
-            return false;
-        }
+        return $user->getPortrait();
     }
+
 
     /**
      * @inheritdoc

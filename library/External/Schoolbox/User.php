@@ -13,6 +13,7 @@ use Schoolbox\External\UserRelation;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
+
 class External_Schoolbox_User implements External_UserInterface
 {
 

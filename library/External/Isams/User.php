@@ -19,6 +19,7 @@
  *    '{_}`
  */
 
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class External_Isams_User implements External_UserInterface
@@ -31,7 +32,7 @@ class External_Isams_User implements External_UserInterface
      * This identifies the CONVERT/CAST format for ISO8601 date
      * yyyy-mm-ddThh:mi:ss.mmm
      */
-    const FORMAT_ISO8601 = 126;
+    protected const FORMAT_ISO8601 = 126;
 
     /** @var Group $groupHandler */
     private $groupHandler;
@@ -43,24 +44,18 @@ class External_Isams_User implements External_UserInterface
         $this->setGroup(new Group());
     }
 
+
     /**
-     * Retrieves the user's image
+     * {@inheritDoc}
      *
-     * @param Integer $externalUserId
-     * @return Bool|String
+     * @param User $user
+     * @return Storage\Model|null
      */
-    public function getPortrait($externalUserId)
+    public function getPortrait(User $user): ?Storage\Model
     {
-        $photoPath = realpath($this->config->get('portrait_dir')) . '/' . $externalUserId . '.jpg';
-
-        if ($this->config->get('photo_sis_import') == 0) {
-            if (file_exists($photoPath)) {
-                return $photoPath;
-            }
-        }
-
-        return false;
+        return $user->getPortrait();
     }
+
 
     /**
      * Gets the parents of student

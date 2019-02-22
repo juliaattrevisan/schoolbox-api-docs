@@ -9,6 +9,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 /** @noinspection PhpUndefinedClassInspection */
@@ -499,22 +500,18 @@ class External_Denbigh_User implements External_UserInterface
         )->fetchAll();
     }
 
+
     /**
      * {@inheritDoc}
-     * @param int $externalId
      *
-     * @return bool|string
+     * @param User $user
+     * @return Storage\Model|null
      */
-    public function getPortrait($externalId)
+    public function getPortrait(User $user): ?Storage\Model
     {
-        $portraitPath = realpath($this->configMapper->get('portrait_dir')) . "/{$externalId}.jpg";
-
-        if (is_readable($portraitPath)) {
-            return $portraitPath;
-        }
-
-        return false;
+        return $user->getPortrait();
     }
+
 
     /**
      * {@inheritDoc}
