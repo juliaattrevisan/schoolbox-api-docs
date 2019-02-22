@@ -125,7 +125,8 @@
                         {% endif %}
 
                         {# If you can change the picture manually, show attachzone
-                         # This depends on the
+                         # This depends on the config setting "Load From SIS"
+                         # If it's on, you -cannot- change pictures manually
                          #}
                         {% if portraitZone %}
                             {% include 'sub/attachzone.twig' with { attachzone: portraitZone } %}
