@@ -15,6 +15,7 @@
  *        `-----"
  */
 
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class External_Doublefirst_User implements External_UserInterface
@@ -24,7 +25,7 @@ class External_Doublefirst_User implements External_UserInterface
      * This identifies the CONVERT/CAST format for ISO8601 date
      * yyyy-mm-ddThh:mi:ss.mmm
      */
-    const FORMAT_ISO8601 = 126;
+    protected const FORMAT_ISO8601 = 126;
 
     /**
      * @var MSSQL
@@ -46,95 +47,115 @@ class External_Doublefirst_User implements External_UserInterface
         $this->helper = new External_Doublefirst_Helper();
     }
 
+
     /**
      * Retrieves the user's Doublefirst image
      *
-     * @param Integer $externalUserId
-     * @return Bool|String
+     * @param User $user
+     * @return Storage\Model|null
+     * @throws InvalidArgumentException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function getPortrait($externalUserId)
+    public function getPortrait(User $user): ?Storage\Model
     {
         // Start by searching for a student photo
 
-        $query =
-            "
+        $query = "
             SELECT  LastUpdated
             FROM    PupilPhoto
-            WHERE   PupilID = '" . $this->getDatabase()->quote($externalUserId) . "'
+            WHERE   PupilID = '{$this->getDatabase()->quote($user->getExternalId())}'
         ";
 
         if ($photo = $this->getDatabase()->getRow($query)) {
-            $photoPath = $this->helper->getPhotoPath($externalUserId);
 
             // TODO: Delete photos on rollover
 
-            /* If the cached file doesn't exist, or the synergetic image is more recent than our
-             * last known cached version, regenerate cached version.
+            /* If this $user doesn't have an image, or if the SIS picture is more recent than the one we
+             * currently have, shank it down and save it into brownhole
              *
-             * Separate the queries out, fetching the photo data only if it's newer than the cached
-             * version, or if the cache version doesn't already exist.
+             * (the latter occurs when the sis gets updated with a new picture and we need to update our storage)
              */
-
-            $cacheTime = @filemtime($photoPath);
-            $modifiedTime = strtotime($photo['LastUpdated']);
-
-            if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
-                $query = "
+            if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(new \Alaress_Date_Format(strtotime($photo['LastUpdated']), 'U'))) {
+                $queryPhoto = "
                     SELECT  Photo
                     FROM    PupilPhoto
-                    WHERE   PupilID = '" . $this->getDatabase()->quote($externalUserId) . "'
+                    WHERE   PupilID = '{$this->getDatabase()->quote($user->getExternalId())}'
                 ";
-                $photo = $this->getDatabase()->getRow($query);
 
-                $photoHandle = fopen($photoPath, "wb");
-                fwrite($photoHandle, $photo['Photo']);
-                fclose($photoHandle);
+                $photo = $this->getDatabase()->getRow($queryPhoto);
+
+                /* Save it into brownhole
+                 */
+                $portrait = Storage\Mapper::getInstance()->acceptStream($user->getExternalId() . '.jpg', $photo['Photo']);
+
+                /* Update user with latest version
+                 */
+                $user->setPortrait($portrait);
+
+                \Schoolbox\UserMapper::getInstance()->save($user);
             }
 
-            return $photoPath;
+            /* Then return the latest Storage\Model instance
+             */
+            return $user->getPortrait();
         } else {
+
             // Couldn't find student photo, try staff
 
             $query =
                 "
                 SELECT  LastUpdated
                 FROM    StaffPersonalDetails
-                WHERE   StaffID = '" . $this->getDatabase()->quote($externalUserId) . "'
+                WHERE   StaffID = '{$this->getDatabase()->quote($user->getExternalId())}'
             ";
 
             if ($photo = $this->getDatabase()->getRow($query)) {
-                $photoPath = $this->helper->getPhotoPath($externalUserId);
 
                 // TODO: Delete photos on rollover
 
-                /* If the cached file doesn't exist, or the synergetic image is more recent than our
-                 * last known cached version, regenerate cached version.
+                /* If this $user doesn't have an image, or if the SIS picture is more recent than the one we
+                 * currently have, shank it down and save it into brownhole
                  *
-                 * Separate the queries out, fetching the photo data only if it's newer than the cached
-                 * version, or if the cache version doesn't already exist.
+                 * (the latter occurs when the sis gets updated with a new picture and we need to update our storage)
                  */
+                if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(new \Alaress_Date_Format(strtotime($photo['LastUpdated']), 'U'))) {
+                    $queryPhoto = "
+                        SELECT  StaffPhoto AS Photo
+                        FROM    StaffPersonalDetails
+                        WHERE   StaffID = '{$this->getDatabase()->quote($user->getExternalId())}'
+                    ";
 
-                $cacheTime = @filemtime($photoPath);
-                $modifiedTime = strtotime($photo['LastUpdated']);
+                    $photo = $this->getDatabase()->getRow($queryPhoto);
 
-                if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
-                    $query = "
-                    SELECT  StaffPhoto AS Photo
-                    FROM    StaffPersonalDetails
-                    WHERE   StaffID = '" . $this->getDatabase()->quote($externalUserId) . "'
-                ";
-                    $photo = $this->getDatabase()->getRow($query);
+                    /* Save it into brownhole
+                     */
+                    $portrait = Storage\Mapper::getInstance()->acceptStream($user->getExternalId() . '.jpg', $photo['Photo']);
 
-                    $photoHandle = fopen($photoPath, "wb");
-                    fwrite($photoHandle, $photo['Photo']);
-                    fclose($photoHandle);
+                    /* Update user with latest version
+                     */
+                    $user->setPortrait($portrait);
+
+                    \Schoolbox\UserMapper::getInstance()->save($user);
                 }
 
-                return $photoPath;
+                /* Then return the latest Storage\Model instance
+                 */
+                return $user->getPortrait();
             }
-
         }
-        return false;
+
+        // There was no photo in the SIS, so we don't want to display the cached image either- delete it from
+        // disk so it doesn't magically appear later after they'd specifically deleted it
+
+        /* Unlink from user
+         */
+        $user->setPortrait(null);
+
+        \Schoolbox\UserMapper::getInstance()->save($user);
+
+        return null;
     }
 
     /**

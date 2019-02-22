@@ -7,6 +7,7 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
 class External_Maze_User implements External_UserInterface
@@ -825,103 +826,102 @@ class External_Maze_User implements External_UserInterface
          */
     }
 
-	/**
-	 * Returns a local path to the user's portrait
-	 *
-	 * @param string $externalUserId
-	 * @return Bool|String
-	 */
-	public function getPortrait($externalUserId)
-	{
-		$photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
 
-        if (Config::get('photo_sis_import') == 0) {
-            if (file_exists($photoPath)) {
-                return $photoPath;
-            } else {
-                return false;
-            }
-        }
-
-        $userMapper = new \Schoolbox\UserMapper();
-        try {
-            $user = $userMapper->findByExternalId($externalUserId);
-        } catch (Schoolbox\Mapper\Exception $e) {
-            /* User not found */
-            return false;
-        }
+    /**
+     * Returns a local path to the user's portrait
+     *
+     * @param User $user
+     * @return Storage\Model|null
+     * @throws InvalidArgumentException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function getPortrait(User $user): ?Storage\Model
+    {
 
         /* Students and staff store their pics in different places
          */
         if ($this->getGroup()->isStudent($user->getId())) {
             $query = "
-				SELECT
-					CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
-				FROM ST
-				WHERE ST.STKEY = '{$externalUserId}'
-			";
-        }
-        elseif ($this->getGroup()->isStaff($user->getId())) {
+                SELECT
+                    CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
+                FROM ST
+                WHERE ST.STKEY = '{$user->getExternalId()}'
+            ";
+        } elseif ($this->getGroup()->isStaff($user->getId())) {
             $query = "
                 SELECT
                     CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
                 FROM SF
-                WHERE SF.SFKEY = '{$externalUserId}'
+                WHERE SF.SFKEY = '{$user->getExternalId()}'
             ";
+        } else {
+
+            /* Unknown user roletype: can't definitively fetch picture
+             * I guess they get what we last knew
+             */
+            return $user->getPortrait();
         }
 
         if ($photo = $this->getDb()->getRow($query)) {
 
-            //TODO: delete photos on rollover
+            // TODO: delete photos on rollover
 
-            /* If the cached file doesn't exist, or the synergetic image is more recent than our
-             * last known cached version, regenerate cached version.
+            /* If this $user doesn't have an image, or if the SIS picture is more recent than the one we
+             * currently have, shank it down and save it into brownhole
              *
-             * Separate the queries out, fetching the photo data only if it's newer than the cached
-             * version, or if the cache version doesn't already exist.
+             * (the latter occurs when the sis gets updated with a new picture and we need to update our storage)
              */
-            $cacheTime = @filemtime($photoPath);
-            $modifiedTime = strtotime($photo['ModifiedDate']);
+            if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(new \Alaress_Date_Format(strtotime($photo['ModifiedDate']), 'U'))) {
+                $queryPhoto = false;
 
-            if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
                 if ($this->getGroup()->isStudent($user->getId())) {
-                    $query = "
-						SELECT
-							STUDENT_PIC AS Photo
-						FROM ST
-						WHERE ST.STKEY = '{$externalUserId}'
-					";
-                }
-                elseif ($this->getGroup()->isStaff($user->getId())) {
-                    $query = "
-                    SELECT
-                        STAFF_PIC AS Photo
-                    FROM SF
-                    WHERE SF.SFKEY = '{$externalUserId}'
-                ";
-                }
-
-                $photo = $this->getDb()->getRow($query);
-
-                /* Purge all previously transformed copies
-                 */
-                $pattern = Config::get('stream_dir') . "/portrait/" . $externalUserId . '-*.dat';
-
-                foreach (glob($pattern) as $oldCacheFile) {
-                    unlink($oldCacheFile);
+                    $queryPhoto = "
+                        SELECT
+                            STUDENT_PIC AS Photo
+                        FROM ST
+                        WHERE ST.STKEY = '{$user->getExternalId()}'
+                    ";
+                } elseif ($this->getGroup()->isStaff($user->getId())) {
+                    $queryPhoto = "
+                        SELECT
+                            STAFF_PIC AS Photo
+                        FROM SF
+                        WHERE SF.SFKEY = '{$user->getExternalId()}'
+                    ";
                 }
 
-                /* Save the image
-                 */
-                $photoHandle = fopen($photoPath, "w");
-                fwrite($photoHandle, $photo['Photo']);
-                fclose($photoHandle);
+                if ($queryPhoto) {
+                    $photo = $this->getDb()->getRow($queryPhoto);
+
+                    /* Save it into brownhole
+                     */
+                    $portrait = Storage\Mapper::getInstance()->acceptStream($user->getExternalId() . '.jpg', $photo['Photo']);
+
+                    /* Update user with latest version
+                     */
+                    $user->setPortrait($portrait);
+
+                    \Schoolbox\UserMapper::getInstance()->save($user);
+                }
             }
 
-            return $photoPath;
+            /* Then return the latest Storage\Model instance
+             */
+            return $user->getPortrait();
         }
 
-        return false;
+        // There was no photo in the SIS, so we don't want to display the cached image either- delete it from
+        // disk so it doesn't magically appear later after they'd specifically deleted it
+
+        /* Unlink from user
+         */
+        $user->setPortrait(null);
+
+        \Schoolbox\UserMapper::getInstance()->save($user);
+
+        return null;
     }
 
     /**
