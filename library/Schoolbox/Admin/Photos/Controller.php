@@ -10,10 +10,8 @@
 namespace Schoolbox\Admin\Photos;
 
 use Alaress\Web\Controller\Base;
-use Guzzle\Common\Collection;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\User;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\UserMapper;
@@ -29,54 +27,27 @@ class Controller extends Base
     protected $storageMapper;
 
     /**
-     * @return StorageMapper
-     */
-    public function getStorageMapper() {
-        return $this->storageMapper;
-    }
-
-    /**
-     * @param StorageMapper $storageMapper
-     * @return $this
-     */
-    public function setStorageMapper($storageMapper) {
-        $this->storageMapper = $storageMapper;
-        return $this;
-    }
-
-    /**
      * @var UserMapper $userMapper
      */
     protected $userMapper;
 
     /**
-     * @return UserMapper
-     */
-    public function getUserMapper() {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param UserMapper $userMapper
-     * @return $this
-     */
-    public function setUserMapper($userMapper) {
-        $this->userMapper = $userMapper;
-        return $this;
-    }
-
-    /**
      * Controller constructor.
+     *
+     * @param StorageMapper $storageMapper
+     * @param UserMapper    $userMapper
      */
-    public function __construct() {
-        $this->setStorageMapper(StorageMapper::getInstance());
-        $this->setUserMapper(UserMapper::getInstance());
+    public function __construct(Storage\Mapper $storageMapper, UserMapper $userMapper) {
+        $this->storageMapper = $storageMapper;
+        $this->userMapper = $userMapper;
     }
+
 
     /**
      * Insert an attach zone into the template
      *
      * @return array
+     * @throws \UnexpectedValueException
      */
     private function getAttachZone()
     {
@@ -98,55 +69,58 @@ class Controller extends Base
      */
     public function postDelete()
     {
-        /** @var \Schoolbox\Config\Loader $config */
-        $config = $this->getDi()->get("config");
+        try {
+            $user = $this->userMapper->findByExternalId($this->getRequest()->post['id']);
+            $user->setPortrait(null);
 
-        $destination = realpath($config->get("portrait_dir")) . "/" . $this->getRequest()->post["id"] . ".jpg";
+            $this->userMapper->save($user);
+        } catch (\Schoolbox\Mapper\Exception $e) {
 
-        if (file_exists($destination))
-            unlink($destination);
+            /* User doesn't exist; noop
+             */
+        }
     }
+
 
     /**
      * Upload any JPG files into the portrait cache folder overwriting whatever was previously there
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
+     * @throws \PDOException
      */
     public function postUpload()
     {
         $post = $this->getRequest()->post;
-        
-        /** @var \Schoolbox\Config\Loader $config */
-        $config = $this->getDi()->get("config");
 
-        if (is_array($post['attachment'])) {
-            $portraits = (new CollectorFactory())->build($post['attachment'])->getAll();
+        if (\is_array($post['attachment'])) {
 
-            /** @var \Schoolbox\Resource\Storage\Model $storageObject */
-            foreach ($portraits as $storageObject) {
-                if ($storageObject->getMimetype()->isImage()) {
+            /* Remove any bad data SA-8244
+             */
+            $attachments = array_filter($post['attachment']);
 
-                    // Has to have a JPG extension for it to be found by external class, however image format is
-                    // completely irrelevant
+            if (\count($attachments)) {
+                $portraits = (new CollectorFactory())->build($attachments)->getAll();
 
-                    $destination = realpath($config->get("portrait_dir")) . "/" . $storageObject->getFilename() . ".jpg";
+                /** @var \Schoolbox\Resource\Storage\Model $portrait */
+                foreach ($portraits as $portrait) {
+                    if ($portrait->getMimetype()->isImage()) {
+                        try {
+                            $user = $this->userMapper->findByExternalId($portrait->getFilename());
+                            $user->setPortrait($portrait);
+                            $this->userMapper->save($user);
+                        } catch (\Schoolbox\Mapper\Exception $e) {
 
-                    // Remove any existing image
-
-                    if (file_exists($destination)) {
-                        unlink($destination);
+                            /* User doesn't exist; noop
+                             * TODO: Log it somewhere meaningful?
+                             */
+                        }
                     }
-
-                    // And save the image into the portrait folder
-
-                    $fp = fopen($destination, 'wb');
-                    stream_copy_to_stream($storageObject->readStream(), $fp);
-                    fclose($fp);
                 }
             }
         }
 
-        $this->getResponse()->redirect->afterPost("/adminv2/photos");
+        $this->getResponse()->redirect->afterPost('/adminv2/photos');
     }
 
     /**
@@ -174,37 +148,36 @@ class Controller extends Base
      */
     public function getView()
     {
-        if ($this->getRequest()->query["surname"] == null)
-            $surname = "a";
-        else
-            $surname = $this->getRequest()->query["surname"];
+        $surname = $this->getRequest()->query['surname'];
 
-        $pb = $this->getUserMapper()->getPredicateBuilder();
-        $pb->notNull('synergy_id');
-        $options = ['order' => [
-            'lastname'  => 'asc',
-            'firstname' => 'asc'
-        ] ];
-        $allUsers = $this->getUserMapper()->findByPredicates($pb, $options);
-
-        $users = [];
-
-        /** @var \Schoolbox\Config\Loader $config */
-        $config = $this->getDi()->get("config");
-
-        /** @var \Schoolbox\User $user */
-        foreach ($allUsers as $user) {
-
-            if (strtolower(substr($user->getLastname(), 0, 1)) == $surname) {
-                $destination = realpath($config->get("portrait_dir")) . "/" . $user->getExternalId() . ".jpg";
-
-                if (file_exists($destination))
-                    $users[] = $user;
-            }
+        /* If a letter was requested in the url, sanitise it
+         */
+        if ('' !== $surname) {
+            $surname = preg_replace('/[^A-Za-z]/', '', $surname)[0];
         }
 
-        // Render this thing out
+        /* Default to everyone whose surnames start with 'a' if the query param was bad
+         */
+        if ('' === $surname) {
+            $surname = 'a';
+        }
 
+        /* Find all the people who have portraits - needs external id and portrait hash
+         * Do a match on first letter to minimise hydrations that we throw out
+         */
+        $pb = $this->userMapper->getPredicateBuilder();
+        $pb->notNull('synergy_id');
+        $pb->notNull('portrait_hash');
+        $pb->like('lastname', "{$surname}%");
+
+        $users = $this->userMapper->findByPredicates($pb, [
+            'order' => [
+                'lastname'  => 'asc',
+                'firstname' => 'asc'
+            ]
+        ]);
+
+        // Render this thing out
         $this->getResponse()->content->set(
             array(
                 'template' => '@adminPhotos/view.twig',
