@@ -25,7 +25,7 @@ class Adapter implements \External_UserInterface {
     /**
      * Crappy alex handler
      *
-     * @var null
+     * @var \External_User
      */
     private $handler;
 
