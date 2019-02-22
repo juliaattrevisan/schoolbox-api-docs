@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread\Authorizer;
 
-use Alaress\Authorizer\Authorizer as BaseAuthorizer;
 use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Comms\News;
@@ -37,7 +36,7 @@ abstract class CanActUponThread implements IAuthorizationRule
      */
     public function __construct(News\Mapper $articleMapper)
     {
-        $this->articleMapper  = $articleMapper;
+        $this->articleMapper = $articleMapper;
     }
 
 
@@ -52,6 +51,9 @@ abstract class CanActUponThread implements IAuthorizationRule
             $post = $params['post'] ?? null;
             if (!$post instanceof Post\Model) {
                 throw new \InvalidArgumentException('Could not find thread in either "thread" or "post" param');
+            }
+            if ($this->validateAgainstPost($post, $user)) {
+                return true;
             }
             $thread = $post->getThread();
         }
@@ -69,6 +71,16 @@ abstract class CanActUponThread implements IAuthorizationRule
 
         throw new Failure\Unauthorized();
     }
+
+
+    /**
+     * Is this thread action allowed for this particular post?
+     *
+     * @param Post\Model $post
+     * @param User|null  $user
+     * @return bool
+     */
+    abstract protected function validateAgainstPost(Post\Model $post, ?User $user): bool;
 
 
     /**

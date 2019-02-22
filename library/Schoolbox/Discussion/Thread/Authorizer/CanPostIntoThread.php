@@ -10,6 +10,7 @@ namespace Schoolbox\Discussion\Thread\Authorizer;
 
 use Alaress\Authorizer\Authorizer as BaseAuthorizer;
 use Schoolbox\Comms\News;
+use Schoolbox\Discussion\Post;
 use Schoolbox\User;
 
 /**
@@ -36,6 +37,19 @@ class CanPostIntoThread extends CanActUponThread
     {
         parent::__construct($articleMapper);
         $this->baseAuthorizer = $baseAuthorizer;
+    }
+
+
+    /**
+     * No create post routes currently accept a post as a parameter.
+     *
+     * @param Post\Model $post
+     * @param User|null  $user
+     * @return bool
+     */
+    protected function validateAgainstPost(Post\Model $post, ?User $user): bool
+    {
+        return false;
     }
 
 

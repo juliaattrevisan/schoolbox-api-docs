@@ -10,6 +10,7 @@ namespace Schoolbox\Discussion\Thread\Authorizer;
 
 use Alaress\Authorizer\Authorizer as BaseAuthorizer;
 use Schoolbox\Comms\News;
+use Schoolbox\Discussion\Post;
 use Schoolbox\User;
 
 /**
@@ -36,6 +37,20 @@ class CanGetFromThread extends CanActUponThread
     {
         parent::__construct($articleMapper);
         $this->baseAuthorizer = $baseAuthorizer;
+    }
+
+
+    /**
+     * If I am the author of a post, I may view it.
+     *
+     * @param Post\Model $post
+     * @param User|null  $user
+     * @return bool
+     */
+    protected function validateAgainstPost(Post\Model $post, ?User $user): bool
+    {
+        $author = $post->getAuthor();
+        return $user && $author && $user->getId() === $author->getId();
     }
 
 
