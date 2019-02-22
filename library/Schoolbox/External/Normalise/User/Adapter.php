@@ -20,7 +20,7 @@ use Schoolbox\User;
 /* Interface usage disabled while the repopulation takes place
  * because it'll bleat at me until I implement all methods
  */
-class Adapter implements \External_UserInterface {
+class Adapter {
 
     /**
      * Crappy alex handler
