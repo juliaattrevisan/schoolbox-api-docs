@@ -31,7 +31,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Repair Truncated Articles',
     [
         'verbose' => [true, true, true],
-        'perform' => isset($opts['p']) || isset($opts['perform']),
+        'perform' => true,
     ]
 );
 
