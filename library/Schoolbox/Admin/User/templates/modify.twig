@@ -131,6 +131,15 @@
                             {% include 'sub/attachzone.twig' with { attachzone: portraitZone } %}
                         {% endif %}
 
+                        {# If user never had a picture and you can't add one manually because of config setting
+                         # then display a generic empty state thing explaining what's going on
+                         #}
+                        {% if not user.portrait and not portraitZone %}
+                            <div class="empty-state">
+                                <p>Profile images are automatically generated from the SIS.</p>
+                            </div>
+                        {% endif %}
+
                         <label for="username">Username</label>
                         <input id="username" type="text" class="required" name="modusername" value="{{ user.username }}"/>
 
