@@ -296,12 +296,18 @@ class Controller extends Base
         });
 
         /* Attachzone for profile picture
+         * If Load From SIS is on, then you cannot change the picture manually (automatically obtained)
          */
-        $portraitZone = (new Zone('portrait'))
-            ->setMulti(false)
-            ->setAttachmentsLabel('')
-            ->setAttachPrompt('add a portrait image')
-            ->attachFiles([$user->getPortrait()]);
+        $portraitZone = null;
+
+        if (!$this->getConfigLoader()->get('photo_sis_import')) {
+            $portraitZone = (new Zone('portrait'))
+                ->setMulti(false)
+                ->setAttachmentsLabel('')
+                ->setAttachPrompt('add a portrait image')
+                ->attachFiles([$user->getPortrait()])->getTwigContext();
+        }
+
 
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
@@ -333,7 +339,7 @@ class Controller extends Base
                     'order' => ['time' => 'desc'],
                     'limit' => 10
                 ]),
-                'portraitZone' => $portraitZone->getTwigContext()
+                'portraitZone' => $portraitZone
             ],
             'title' => 'Admin - Users'
         ]);

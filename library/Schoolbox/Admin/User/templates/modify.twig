@@ -114,9 +114,22 @@
                     </div>
 
                     <div class="small-12 medium-6 island">
-
                         <label>Portrait Image</label>
-                        {% include 'sub/attachzone.twig' with { attachzone: portraitZone } %}
+
+                        {# If the user has a picture, show it
+                         #}
+                        {% if user.portrait %}
+                            <div>
+                                <img src="/portrait.php?id={{ user.id }}&size=constrain200" />
+                            </div>
+                        {% endif %}
+
+                        {# If you can change the picture manually, show attachzone
+                         # This depends on the
+                         #}
+                        {% if portraitZone %}
+                            {% include 'sub/attachzone.twig' with { attachzone: portraitZone } %}
+                        {% endif %}
 
                         <label for="username">Username</label>
                         <input id="username" type="text" class="required" name="modusername" value="{{ user.username }}"/>

@@ -30,7 +30,7 @@ if(! ($_SESSION['user'] instanceof Schoolbox\User)) {
 $userMapper = \Schoolbox\UserMapper::getInstance();
 
 try {
-    if (is_int($_GET['id'])) {
+    if (isset($_GET['id']) && (int)$_GET['id']) {
         $user = $userMapper->findById($_GET['id']);
     } else {
         $user = $userMapper->findByExternalId($_GET['userId']);
