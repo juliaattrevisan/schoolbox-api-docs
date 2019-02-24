@@ -241,6 +241,43 @@ components:
               required: true
               description: If set, a cursor to the next page of results.
 
+    alaressDate:
+      title: Alaress Date Format
+      description: |
+        A JSON representation of an Alaress date format object.
+        Will be deprecated and replaced with standard JSON Schema date-time
+        objects, eventually: this has been implemented for compatibility with
+        existing API endpoints.
+      type: object
+      properties:
+        database:
+          type: string
+          required: false
+          description: |
+            A database representation of the date. Please use the "json"
+            property instead.
+        unixTimestamp:
+          type: int
+          required: false
+          description: |
+            The date as a Unix timestamp. Please use the "json" property
+            instead.
+        local:
+          type: string
+          required: false
+          description: |
+            A string representation of the date, localized to the Schoolbox
+            instance's settings.
+            Please use the "json" property instead, and perform localization
+            using libraries on the client instead.
+        json:
+          type: string
+          format: date-time
+          required: true
+          description: |
+            The date as a RFC3339 string. Until such time as this is replaced
+            by a single date-time string, please use this as the one true
+            representation of the date, for both input and output.
 
   responses:
     problem:
