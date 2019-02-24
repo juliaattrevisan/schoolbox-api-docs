@@ -96,11 +96,9 @@ components:
           type: boolean
           description: Is the thread open for further comments?
         created:
-          type: string
-          format: date-time
+          $ref: '#/components/schemas/alaressDate'
         updated:
-          type: string
-          format: date-time
+          $ref: '#/components/schemas/alaressDate'
         children:
           $ref: '#/components/schemas/postList'
           description: A list of direct child posts of this thread
@@ -123,11 +121,9 @@ components:
         content:
           type: string
         created:
-          type: string
-          format: date-time
+          $ref: '#/components/schemas/alaressDate'
         updated:
-          type: string
-          format: date-time
+          $ref: '#/components/schemas/alaressDate'
         parent:
           $ref: '#/components/schemas/post'
           description: |
