@@ -96,9 +96,9 @@ components:
           type: boolean
           description: Is the thread open for further comments?
         created:
-          $ref: '#/components/schemas/alaressDate'
+          $ref: '#/components/schemas/dateTime'
         updated:
-          $ref: '#/components/schemas/alaressDate'
+          $ref: '#/components/schemas/dateTime'
         children:
           $ref: '#/components/schemas/postList'
           description: A list of direct child posts of this thread
@@ -121,9 +121,9 @@ components:
         content:
           type: string
         created:
-          $ref: '#/components/schemas/alaressDate'
+          $ref: '#/components/schemas/dateTime'
         updated:
-          $ref: '#/components/schemas/alaressDate'
+          $ref: '#/components/schemas/dateTime'
         parent:
           $ref: '#/components/schemas/post'
           description: |
@@ -237,10 +237,13 @@ components:
               required: true
               description: If set, a cursor to the next page of results.
 
-    alaressDate:
-      title: Alaress Date Format
+    dateTime:
+      title: Datetime
       description: |
-        A JSON representation of an Alaress date format object.
+        A JSON representation of a datetime.
+        For compatibility with existing code, can be defined as either:
+        * a RFC3339 string
+        * an object, which contains a datetime in several formats
       oneOf:
         - type: string
           format: date-time
