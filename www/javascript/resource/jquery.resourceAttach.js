@@ -69,7 +69,8 @@ if(typeof window.location.origin == 'undefined') {
             multi: false,
 
             // callbacks
-            onSelect: noop
+            onSelect: noop,
+            onDetach: noop
         };
 
 
@@ -97,6 +98,8 @@ if(typeof window.location.origin == 'undefined') {
             var li = $(this).closest(opt.attachmentTag);
             self.detach(li);
             e.preventDefault();
+
+            opt.onDetach();
         });
 
         if (opt.dictDefaultMessage) {

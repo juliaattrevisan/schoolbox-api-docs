@@ -67,7 +67,7 @@
                         {# If the user has a picture, show it
                          #}
                         {% if user.portrait %}
-                            <div>
+                            <div id="portraitImage">
                                 <img src="/portrait.php?id={{ user.id }}&size=profile&cb={{ date().timestamp }}" />
                             </div>
                         {% endif %}
@@ -77,7 +77,12 @@
                          # If it's on, you -cannot- change pictures manually
                          #}
                         {% if portraitZone %}
-                            {% include 'sub/attachzone.twig' with { attachzone: portraitZone } %}
+                            {% include 'sub/attachzone.twig' with {
+                                attachzone: portraitZone,
+                                onDetach: "function() {
+                                    $('#portraitImage').fadeOut();
+                                }"
+                            } %}
                         {% endif %}
 
                         {# If user never had a picture and you can't add one manually because of config setting
@@ -92,7 +97,6 @@
                     </div>
 
                     <div class="small-12 medium-4 island">
-
                         <label for="title">Title</label>
                         <select id="title" name="title">
                             {% for title in titles %}
