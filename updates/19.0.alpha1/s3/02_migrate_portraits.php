@@ -95,8 +95,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
                 /* Remove file when done
                  */
-//            unlink($path);
-
+                unlink($path);
             } else {
 
                 /* User not found; noop
