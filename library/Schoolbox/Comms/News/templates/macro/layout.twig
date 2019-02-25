@@ -4,16 +4,16 @@
  # @param News\Model article
  #}
 {% macro standard(article) %}
-    <div class="small-12 medium-3 island">
-        <section class="content">
+    <div class="small-12 medium-3 columns">
+        <article class="content">
             <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=constrain200" />
-        </section>
+        </article>
     </div>
 
-    <div class="small-12 medium-9 island">
-        <section class="content">
+    <div class="small-12 medium-9 columns">
+        <article class="content">
             {{ article.body|purify }}
-        </section>
+        </article>
     </div>
 {% endmacro %}
 
@@ -22,16 +22,16 @@
  # Shown in two columns; one for image, one for text
  #}
 {% macro standardReversed(article) %}
-    <div class="small-12 medium-9 island">
-        <section class="content">
+    <div class="small-12 medium-9 columns">
+        <article class="content">
             {{ article.body|purify }}
-        </section>
+        </article>
     </div>
 
-    <div class="small-12 medium-3 island">
-        <section class="content">
+    <div class="small-12 medium-3 columns">
+        <article class="content">
             <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=constrain200" />
-        </section>
+        </article>
     </div>
 {% endmacro %}
 
@@ -40,10 +40,10 @@
  # Used when there isn't a feature image to shows
  #}
 {% macro textonly(article) %}
-    <div class="small-12 island">
-        <section class="content">
+    <div class="small-12 columns">
+        <article class="content">
             {{ article.body|purify }}
-        </section>
+        </article>
     </div>
 {% endmacro %}
 
