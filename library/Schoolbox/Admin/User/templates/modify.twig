@@ -55,15 +55,43 @@
 <div class="row">
     <form method="POST" action="{{ routeLookup('adminUser.postDetails', {userId: user.id}) }}" data-validatable-as="userDetails" data-modify-user-form>
     <div class="small-12 island">
-        <section class="content">
+        <section>
             <fieldset>
-
-                <div class="row">
+                <div class="row content">
                     <input type="hidden" name="type" value="modify"/>
                     <input type="hidden" name="userID" value="{{ user.id }}"/>
 
-                    <div class="small-12 medium-6 island">
+                    <div class="small-12 medium-4 island">
+                        <label>Portrait Image</label>
 
+                        {# If the user has a picture, show it
+                         #}
+                        {% if user.portrait %}
+                            <div>
+                                <img src="/portrait.php?id={{ user.id }}&size=profile&cb={{ date().timestamp }}" />
+                            </div>
+                        {% endif %}
+
+                        {# If you can change the picture manually, show attachzone
+                         # This depends on the config setting "Load From SIS"
+                         # If it's on, you -cannot- change pictures manually
+                         #}
+                        {% if portraitZone %}
+                            {% include 'sub/attachzone.twig' with { attachzone: portraitZone } %}
+                        {% endif %}
+
+                        {# If user never had a picture and you can't add one manually because of config setting
+                         # then display a generic empty state thing explaining what's going on
+                         #}
+                        {% if not user.portrait and not portraitZone %}
+                            <div class="empty-state">
+                                <p>Profile images are automatically generated from the SIS.</p>
+                                <p>You can <a href="/adminv2/setting/External+DB">change this setting here</a></p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="small-12 medium-4 island">
                         <label for="title">Title</label>
                         <select id="title" name="title">
                             {% for title in titles %}
@@ -113,35 +141,7 @@
                         </fieldset>
                     </div>
 
-                    <div class="small-12 medium-6 island">
-                        <label>Portrait Image</label>
-
-                        {# If the user has a picture, show it
-                         #}
-                        {% if user.portrait %}
-                            <div>
-                                <img src="/portrait.php?id={{ user.id }}&size=profile&cb={{ date().timestamp }}" />
-                            </div>
-                        {% endif %}
-
-                        {# If you can change the picture manually, show attachzone
-                         # This depends on the config setting "Load From SIS"
-                         # If it's on, you -cannot- change pictures manually
-                         #}
-                        {% if portraitZone %}
-                            {% include 'sub/attachzone.twig' with { attachzone: portraitZone } %}
-                        {% endif %}
-
-                        {# If user never had a picture and you can't add one manually because of config setting
-                         # then display a generic empty state thing explaining what's going on
-                         #}
-                        {% if not user.portrait and not portraitZone %}
-                            <div class="empty-state">
-                                <p>Profile images are automatically generated from the SIS.</p>
-                                <p>You can <a href="/adminv2/setting/External+DB">change this setting here</a></p>
-                            </div>
-                        {% endif %}
-
+                    <div class="small-12 medium-4 island">
                         <label for="username">Username</label>
                         <input id="username" type="text" class="required" name="modusername" value="{{ user.username }}"/>
 
@@ -170,7 +170,14 @@
                                         {% if user.residentialHouse.id == residentialHouse.id %}selected{% endif %}>{{ residentialHouse.house }}</option>
                             {% endfor %}
                         </select>
+                    </div>
+                </div>
+            </fieldset>
 
+            <fieldset>
+                <legend>Options</legend>
+                <div class="row content">
+                    <div class="small-12 medium-4 columns">
                         <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {% if user.eportfolioEnable %}checked{% endif %} />
                         <label for="eportfolio" class="checkbox-label">E-Portfolio</label>
 
@@ -179,7 +186,8 @@
 
                         <input id="hide_timetable" type="checkbox" name="hide_timetable" value="1" {% if user.hideTimetable %}checked{% endif %} />
                         <label for="hide_timetable" class="checkbox-label">Hide Timetable</label>
-
+                    </div>
+                    <div class="small-12 medium-4 columns">
                         <input id="local_email" type="checkbox" name="local_email" value="1" {% if user.localEmail %}checked{% endif %} />
                         <label for="local_email" class="checkbox-label">Email Address from Username</label>
 
@@ -188,7 +196,9 @@
 
                         <input id="webmail" type="checkbox" name="webmail" value="1" {% if user.webMail %}checked{% endif %} />
                         <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
+                    </div>
 
+                    <div class="small-12 medium-4 columns">
                         <input id="display_grade_graph" type="checkbox" name="display_grade_graph" value="1" {% if user.displayGradeGraph %}checked{% endif %} />
                         <label for="display_grade_graph" class="checkbox-label">Display Graph on Student Grade Card</label>
 
@@ -202,7 +212,6 @@
                             <label for="account_enabled" class="checkbox-label">Account Enabled</label>
                         {% endif %}
                     </div>
-
                 </div>
             </fieldset>
         </section>
