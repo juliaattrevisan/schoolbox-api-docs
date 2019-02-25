@@ -3,7 +3,7 @@
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Calendar\Event\Collection;
-use Calendar\Event\Type\Day\Event;
+use Calendar\Event\Type\Timetable\Event;
 use Schoolbox\User;
 
 /**
