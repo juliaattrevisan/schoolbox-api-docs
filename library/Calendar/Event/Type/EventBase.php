@@ -130,6 +130,10 @@ abstract class EventBase implements EventInterface
      */
     protected $seriesId = null;
 
+    /**
+     * @var string
+     */
+    protected $location = '';
 
     /**
      * Find out if the currently logged in user is the owner (creator)
@@ -625,6 +629,13 @@ abstract class EventBase implements EventInterface
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getLocation() :string
+    {
+        return $this->location;
+    }
 
     /**
      * Returns the available Render Classes for this event

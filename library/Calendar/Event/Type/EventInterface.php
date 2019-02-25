@@ -220,4 +220,11 @@ interface EventInterface
      * @return mixed
      */
     public function getFilterClasses();
+
+    /**
+     * Get location
+     *
+     * @return mixed
+     */
+    public function getLocation();
 }
