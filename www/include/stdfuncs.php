@@ -15,8 +15,8 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  * @deprecated 17.5
  * @see Schoolbox\Error\Mapper::generateException()
  *
- * @param mixed  $ec      int:  retrieves error text from code from database
- *                        null: outputs whatever's in $message as error
+ * @param mixed  $ec      int:    retrieves error text from code from database
+ *                        null|0: outputs whatever's in $message as error
  * @param string $message Replaces '%MESSAGE%' in $ec
  * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
  * @throws Exception

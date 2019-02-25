@@ -219,7 +219,7 @@ class Mapper extends BaseMapper implements IExceptionGenerator
         string $additionalInfo = '',
         int $httpStatusCode = 400
     ): \Exception {
-        if (null === $errorCode) {
+        if (0 === $errorCode || null === $errorCode) {
             $msg = $additionalInfo;
         } else {
             $msg = str_replace("%MESSAGE%", $additionalInfo, $this->getMessageById($errorCode));
