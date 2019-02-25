@@ -23,7 +23,6 @@ use RuntimeException;
 use Monolog\Handler\RavenHandler;
 use Monolog;
 use Raven_Client;
-use Database;
 use React\Stomp;
 use Schoolbox\Application\CliKernelAbstract;
 
@@ -70,8 +69,6 @@ class Kernel extends CliKernelAbstract
      */
     private $opts;
 
-    /** @var LoggerInterface */
-    private $log;
 
     /**
      * Was this kernel invoked at a specific log level?
@@ -261,55 +258,6 @@ EOL;
 
 
     /**
-     * @param int    $errNum
-     * @param string $errStr
-     * @param string $errFile
-     * @param int    $errLine
-     * @return bool
-     * @throws ErrorException
-     * @throws IOException
-     * @throws PDOException
-     * @throws RangeException
-     * @throws RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    public function onError($errNum, $errStr, $errFile, $errLine): ?bool
-    {
-        if (!(error_reporting() & $errNum)) {
-            // This error code is not included in error_reporting
-            return true;
-        }
-
-
-        switch ($errNum) {
-            case E_RECOVERABLE_ERROR:
-                // for any of these errors, we want an exception we can catch
-                $this->logger()->info("$errStr - $errFile::$errLine", ['char' => 'e']);
-                throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
-
-            case E_NOTICE:
-            case E_USER_NOTICE:
-            case E_WARNING:
-            case E_USER_WARNING:
-                // this will throw an exception if it needs to
-                $this->onWarning($errNum, $errStr, $errFile, $errLine);
-                return true;
-
-            case E_STRICT:
-            case E_DEPRECATED:
-            case E_USER_DEPRECATED:
-                $this->logger()->warning("Warning: $errStr in $errFile:$errLine");
-                return true;
-
-            default:
-                // we don't know how to deal with this, so let the stock error handler deal with it
-                $this->logger()->error("Don't know how to handle $errStr");
-                return false;
-        }
-    }
-
-
-    /**
      * Handle specific kinds of warnings differently
      *
      * @param int    $errNum
@@ -323,7 +271,7 @@ EOL;
      * @throws RuntimeException
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    private function onWarning($errNum, $errStr, $errFile, $errLine): void
+    protected function onWarning($errNum, $errStr, $errFile, $errLine): void
     {
         if (strpos($errStr, 'stream_select') === 0) {
             // this is fine to be let through
@@ -482,38 +430,34 @@ EOL;
      * @return LoggerInterface
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function logger(): LoggerInterface
+    protected function createDefaultLogger(): LoggerInterface
     {
-        if (!$this->log instanceof LoggerInterface) {
-            // Derive log verbosity
-            $level = $this->logLevel ?? $this->getLoggingLevel();
+        // Derive log verbosity
+        $level = $this->logLevel ?? $this->getLoggingLevel();
 
-            // Derive the list of fields to prepend to log items
-            $fields = Logger::getAvailableFields();
-            foreach ($fields as $key => $field) {
-                if (!isset($opts[$field])) {
-                    unset($fields[$key]);
-                }
-            }
-
-            $porcelain = \array_key_exists(self::OPT_PORCELAIN, $this->opts);
-            $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
-
-            // Add Sentry handler into logging system if possible
-            if ($this->getDependencyInjector()->has('sentry')) {
-                /** @var Raven_Client $ravenClient */
-                $ravenClient  = $this->getDependencyInjector()->get('sentry');
-                $ravenHandler = new RavenHandler($ravenClient, Monolog\Logger::CRITICAL);
-                /** @var Monolog\Formatter\LineFormatter $formatter */
-                $formatter = $ravenHandler->getFormatter();
-                $formatter->includeStacktraces(true);
-                $this->log->pushHandler($ravenHandler);
+        // Derive the list of fields to prepend to log items
+        $fields = Logger::getAvailableFields();
+        foreach ($fields as $key => $field) {
+            if (!isset($this->opts[$field])) {
+                unset($fields[$key]);
             }
         }
 
-        return $this->log;
-    }
+        $porcelain = \array_key_exists(self::OPT_PORCELAIN, $this->opts);
+        $logger = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
+        // Add Sentry handler into logging system if possible
+        if ($this->getDependencyInjector()->has('sentry')) {
+            /** @var Raven_Client $ravenClient */
+            $ravenClient  = $this->getDependencyInjector()->get('sentry');
+            $ravenHandler = new RavenHandler($ravenClient, Monolog\Logger::CRITICAL);
+            /** @var Monolog\Formatter\LineFormatter $formatter */
+            $formatter = $ravenHandler->getFormatter();
+            $formatter->includeStacktraces(true);
+            $logger->pushHandler($ravenHandler);
+        }
+        return $logger;
+    }
 
     /**
      * @inheritdoc
@@ -524,39 +468,6 @@ EOL;
         if (PHP_SAPI !== 'cli') {
             throw new WrongSapiException('Cannot use Daemon Kernel in Web Server environment.');
         }
-    }
-
-
-    /**
-     * Register any error handling required
-     *
-     * @return void
-     */
-    protected function registerErrorHandling(): void
-    {
-        set_error_handler([$this, 'onError']);
-    }
-
-
-    /**
-     * Register any out-the-top exception handling required
-     *
-     * @return void
-     */
-    protected function registerExceptionHandling(): void
-    {
-        set_exception_handler([$this, 'onException']);
-    }
-
-
-    /**
-     * Register any shutdown handling required
-     *
-     * @return void
-     */
-    protected function registerShutdownHandling(): void
-    {
-        register_shutdown_function([$this, 'onShutdown']);
     }
 
 

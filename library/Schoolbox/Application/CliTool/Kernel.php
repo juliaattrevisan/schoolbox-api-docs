@@ -7,40 +7,43 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application\CliTool;
 
+use ErrorException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
 
+/**
+ * This Kernel is designed for running CLI scripts/tools that are one-offs, for example:
+ * * migration/update scripts
+ * * jobs/tasks
+ *
+ * By default, it will write output to STDOUT, and append logs to STDERR
+ */
 class Kernel extends CliKernelAbstract
 {
 
     /**
-     * Register any error handling required
+     * Handle specific kinds of warnings differently
      *
-     * @return void
+     * @param int    $errNum
+     * @param string $errStr
+     * @param string $errFile
+     * @param int    $errLine
+     * @throws ErrorException
      */
-    protected function registerErrorHandling(): void
+    protected function onWarning($errNum, $errStr, $errFile, $errLine): void
     {
-        // TODO: Implement registerErrorHandling() method.
+        throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
     }
 
 
     /**
-     * Register any out-the-top exception handling required
+     * Creates a default logger, suitable for this Kernel
      *
-     * @return void
+     * @return LoggerInterface
      */
-    protected function registerExceptionHandling(): void
+    protected function createDefaultLogger(): LoggerInterface
     {
-        // TODO: Implement registerExceptionHandling() method.
-    }
-
-
-    /**
-     * Register any shutdown handling required
-     *
-     * @return void
-     */
-    protected function registerShutdownHandling(): void
-    {
-        // TODO: Implement registerShutdownHandling() method.
+        // TODO: Implement createDefaultLogger() method.
+        return null;
     }
 }
