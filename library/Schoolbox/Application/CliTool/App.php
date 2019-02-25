@@ -29,6 +29,7 @@ abstract class App
      * Helper to fetch a CLI option value.
      *
      * Supports options that are still have colon chars suffixed to indicate required/optional status
+     * eg 'c', 'c:', 'c::' will all resolve to 'c'
      *
      * @param string $optName
      * @param array  $appOptions
