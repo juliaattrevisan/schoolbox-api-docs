@@ -561,19 +561,6 @@ EOL;
 
 
     /**
-     * Initialise connections to databases, etc.
-     *
-     * @return void
-     * @throws \Schoolbox\External\Exception
-     */
-    protected function initialiseExternalConnections(): void
-    {
-        // MySQL connection configuration
-        Database::getInstance()->connect(SQL_dsn, SQL_user, SQL_passwd, array('throw' => true));
-    }
-
-
-    /**
      * Install any internal dependencies into the kernel (routing, etc.)
      *
      * @return void

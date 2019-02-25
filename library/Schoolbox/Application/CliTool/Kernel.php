@@ -13,20 +13,6 @@ class Kernel extends CliKernelAbstract
 {
 
     /**
-     * Initialise connections to databases, etc.
-     *
-     * @return void
-     */
-    protected function initialiseExternalConnections(): void
-    {
-        // TODO: Implement initialiseExternalConnections() method.
-    }
-
-
-
-
-
-    /**
      * Register any error handling required
      *
      * @return void
