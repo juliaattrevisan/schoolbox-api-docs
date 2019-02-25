@@ -60,7 +60,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             $this->logger()->alert("FATAL $class: {$e->getMessage()} on line {$e->getLine()} in {$e->getFile()}", ['exception' => $e]);
         } /** @noinspection PhpRedundantCatchClauseInspection */
         catch (IOException $e) {
-            // can't do anything, STDOUT has been closed
+            // can't do anything, logging stream has been closed
         }
         exit;
     }
@@ -98,7 +98,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             $this->logger()->alert($message);
         } /** @noinspection PhpRedundantCatchClauseInspection */
         catch (IOException $e) {
-            // can't do anything, STDOUT has been closed
+            // can't do anything, logging stream has been closed
         }
 
         exit(1);
