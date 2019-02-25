@@ -13,13 +13,31 @@ use Psr\Log\LoggerInterface;
 /**
  * An App is a job/task/application that can be run by the CLI Kernel
  */
-interface App
+abstract class App
 {
 
     /**
      * @param Di\Container    $di
+     * @param resource        $outStream
      * @param LoggerInterface $logger
      * @param string[]        $appOptions
      */
-    public function run(Di\Container $di, LoggerInterface $logger, array $appOptions): void;
+    abstract public function run(Di\Container $di, $outStream, LoggerInterface $logger, array $appOptions): void;
+
+
+    /**
+     * Helper to fetch a CLI option value.
+     *
+     * Supports options that are still have colon chars suffixed to indicate required/optional status
+     *
+     * @param string $optName
+     * @param array  $appOptions
+     * @param mixed  $default
+     * @return mixed
+     */
+    protected function getOpt(string $optName, array $appOptions, $default = null)
+    {
+        $trimmed = \rtrim($optName, ':');
+        return \array_key_exists($trimmed, $appOptions) ? $appOptions[$trimmed] : $default;
+    }
 }

@@ -25,6 +25,7 @@ class Kernel extends CliKernelAbstract
 {
 
     // Command line options recognised by this kernel
+    private const OPT_OUT_STREAM = 'o:'; // CLI option to allow output to be written to a file, rather than STDOUT
     private const OPT_ERR_STREAM = 'l:'; // CLI option to allow logs to be written to a file, rather than STDERR
     private const OPT_VERBOSITY  = 'v';  // CLI option that verbosity, unless overridden by Lumberjack\Logger::FIELD_LEVEL
 
@@ -33,6 +34,9 @@ class Kernel extends CliKernelAbstract
 
     // These are passed back to the CLI app
     private $appOptions;
+
+    // The stream to which the App will be instructed to write output to
+    private $outStream;
 
 
     /**
@@ -45,14 +49,17 @@ class Kernel extends CliKernelAbstract
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Schoolbox\External\Exception
+     * @todo the apps's options should be passed into runApp(), not here.
      */
     public function __construct(array $appShortOpts = [], array $appLongOpts = [])
     {
-        parent::__construct();
-
         $this->parseCommandLineOptions($appShortOpts, $appLongOpts);
         $this->setErrorReporting();
+
+        parent::__construct();
+
         $this->checkServerApiEnvironment();
+        $this->outStream = $this->getOutputStream();
     }
 
 
@@ -61,10 +68,42 @@ class Kernel extends CliKernelAbstract
      *
      * @param App $app
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @todo pass in the app's CLI options here, using $argv to parse. Fail noisily if invalid args detected.
      */
     public function runApp(App $app): void
     {
-        $app->run($this->getDependencyInjector(), $this->logger(), $this->appOptions);
+        $app->run($this->getDependencyInjector(), $this->outStream, $this->logger(), $this->appOptions);
+    }
+
+
+    /**
+     * Load the core configuration file(s)
+     *
+     * @return void
+     */
+    protected function loadConfiguration(): void
+    {
+        // TODO remove this once SA-8248 is merged
+    }
+
+
+    /**
+     * Set the include path
+     *
+     * @return void
+     */
+    protected function setIncludePath(): void
+    {
+        // TODO remove this once SA-8248 is merged
+    }
+
+
+    /**
+     * Normal (ie non-Kernel) class loading
+     */
+    protected function registerAutoLoading(): void
+    {
+        // TODO remove this once SA-8248 is merged
     }
 
 
@@ -103,12 +142,33 @@ class Kernel extends CliKernelAbstract
             $outStream = STDERR;
         }
 
-        $level     = $this->getKernelOpt(Lumberjack\Logger::FIELD_LEVEL);
-        $porcelain = \in_array(Lumberjack\Logger::FIELD_PORCELAIN, $this->kernelOptions, true);
-        $logger    = new Lumberjack\Logger($outStream, null, $level, $this->kernelOptions, $porcelain);
+        $level     = (int)$this->getKernelOpt(Lumberjack\Logger::FIELD_LEVEL, $this->getLoggingLevelFromVerbosity());
+        $fields    = \array_keys($this->kernelOptions);
+        $porcelain = \array_key_exists(Lumberjack\Logger::FIELD_PORCELAIN, $this->kernelOptions);
+        $logger    = new Lumberjack\Logger($outStream, null, $level, $fields, $porcelain);
         $this->addRavenHandler($logger);
 
         return $logger;
+    }
+
+
+    /**
+     * Detects whether the App should be instructed to write its output to a file or STDOUT
+     *
+     * @return resource
+     * @throws InvalidArgumentException
+     */
+    private function getOutputStream()
+    {
+        $outfile = $this->getKernelOpt(self::OPT_OUT_STREAM);
+        if (!$outfile) {
+            return STDOUT;
+        }
+        $outStream = \fopen($outfile, 'wb');
+        if (!$outStream) {
+            throw new InvalidArgumentException("Unable to write output to file: '$outfile'");
+        }
+        return $outStream;
     }
 
 
@@ -160,12 +220,13 @@ class Kernel extends CliKernelAbstract
     private function parseCommandLineOptions(array $appShortOpts, array $appLongOpts): void
     {
         // Kernel uses these
-        $kernelShortOpts = [self::OPT_ERRORS, self::OPT_ERR_STREAM, self::OPT_VERBOSITY,];
+        $kernelShortOpts = [self::OPT_OUT_STREAM, self::OPT_ERR_STREAM, self::OPT_VERBOSITY,];
         $kernelLongOpts  = [
+            self::OPT_ERRORS,
             Lumberjack\Logger::FIELD_MEM,
             Lumberjack\Logger::FIELD_TRUE_MEM,
             Lumberjack\Logger::FIELD_PID,
-            Lumberjack\Logger::FIELD_LEVEL,
+            Lumberjack\Logger::FIELD_LEVEL . ':',
             Lumberjack\Logger::FIELD_PORCELAIN,
         ];
 
@@ -174,25 +235,26 @@ class Kernel extends CliKernelAbstract
         $this->assertValidAppOptions($appLongOpts, $kernelLongOpts, false);
 
         // Get all opts from command line
-        $allOpts = \getopt($appShortOpts . $kernelShortOpts, \array_merge($appLongOpts, $kernelLongOpts));
+        $allOpts = \getopt(
+            \implode('', \array_merge($appShortOpts, $kernelShortOpts)),
+            \array_merge($appLongOpts, $kernelLongOpts)
+        );
 
         // Extract the kernel options
         $this->kernelOptions = [];
-        foreach (\array_merge($kernelShortOpts, $kernelLongOpts) as $key => $val) {
-            if (\array_key_exists(\rtrim($key, ':'), $allOpts)) {
-                $this->kernelOptions[$key] = $val;
+        foreach (\array_merge($kernelShortOpts, $kernelLongOpts) as $kernelOption) {
+            $trimmedKernelOption = \rtrim($kernelOption, ':');
+            if (\array_key_exists($trimmedKernelOption, $allOpts)) {
+                $this->kernelOptions[$trimmedKernelOption] = $allOpts[$trimmedKernelOption];
             }
-        }
-        // If an exact logging level was not specified, derive one from the verbosity
-        if (!\array_key_exists(Lumberjack\Logger::FIELD_LEVEL, $this->kernelOptions)) {
-            $this->kernelOptions[Lumberjack\Logger::FIELD_LEVEL] = $this->getLoggingLevelFromVerbosity();
         }
 
         // Extract the app options
         $this->appOptions = [];
-        foreach (\array_merge($appShortOpts, $appLongOpts) as $key => $val) {
-            if (\array_key_exists(\rtrim($key, ':'), $allOpts)) {
-                $this->appOptions[$key] = $val;
+        foreach (\array_merge($appShortOpts, $appLongOpts) as $appOption) {
+            $trimmedAppOption = \rtrim($appOption, ':');
+            if (\array_key_exists($trimmedAppOption, $allOpts)) {
+                $this->appOptions[$trimmedAppOption] = $allOpts[$trimmedAppOption];
             }
         }
     }

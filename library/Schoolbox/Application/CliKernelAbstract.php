@@ -44,7 +44,64 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             $this->logger = $this->createDefaultLogger();
         }
 
-        return $this->logger();
+        return $this->logger;
+    }
+
+
+    /**
+     * @param \Exception $e
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function onException($e): void
+    {
+        $this->callExceptionCallbacks($e);
+        try {
+            $class = \get_class($e);
+            $this->logger()->alert("FATAL $class: {$e->getMessage()} on line {$e->getLine()} in {$e->getFile()}", ['exception' => $e]);
+        } /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (IOException $e) {
+            // can't do anything, STDOUT has been closed
+        }
+        exit;
+    }
+
+
+    /**
+     * Check if it was a fatal error that shut us down, and if it was, advise as such
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function onShutdown(): void
+    {
+        $error = error_get_last();
+
+        // only report if the last error was one of these
+        $cases = [
+            E_ERROR         => 'Fatal',
+            E_CORE_ERROR    => 'Core',
+            E_USER_ERROR    => 'Fatal user',
+            E_COMPILE_ERROR => 'Compilation',
+        ];
+
+        if (\is_callable($this->shutdown)) {
+            \call_user_func($this->shutdown);
+        }
+
+        // don't report anything
+        if (!isset($cases[$error['type']])) {
+            exit(0);
+        }
+
+        // report
+        $message = sprintf('%s error: %s in %s:%s', $cases[$error['type']], $error['message'], $error['file'], $error['line']);
+        try {
+            $this->logger()->alert($message);
+        } /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (IOException $e) {
+            // can't do anything, STDOUT has been closed
+        }
+
+        exit(1);
     }
 
 

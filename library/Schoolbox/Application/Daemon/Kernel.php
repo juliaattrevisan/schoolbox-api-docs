@@ -342,61 +342,6 @@ EOL;
 
 
     /**
-     * @param Exception $e
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    public function onException($e): void
-    {
-        $this->callExceptionCallbacks($e);
-        try {
-            $this->logger()->alert('FATAL ' . \get_class($e) . ': ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile(), ['exception'=>$e]);
-        } catch (IOException $e) {
-            // can't do anything, STDOUT has been closed
-        }
-        exit;
-    }
-
-
-    /**
-     * Check if it was a fatal error that shut us down, and if it was, advise as such
-     *
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    public function onShutdown(): void
-    {
-        $error = error_get_last();
-
-        // only report if the last error was one of these
-        $cases = [
-            E_ERROR         => 'Fatal',
-            E_CORE_ERROR    => 'Core',
-            E_USER_ERROR    => 'Fatal user',
-            E_COMPILE_ERROR => 'Compilation',
-        ];
-
-        if (\is_callable($this->shutdown)) {
-            \call_user_func($this->shutdown);
-        }
-
-        // don't report anything
-        if (!isset($cases[$error['type']])) {
-            exit(0);
-        }
-
-        // report
-        $message = sprintf('%s error: %s in %s:%s', $cases[$error['type']], $error['message'], $error['file'],
-            $error['line']);
-        try {
-            $this->logger()->alert($message);
-        } catch (IOException $e) {
-            // can't do anything, STDOUT has been closed
-        }
-
-        exit(1);
-    }
-
-
-    /**
      * Determine logging level via verbose setting
      * verbose is set by -vvv.  Each v represents a value in an array.
      * So -v is level 1, -vv is level 2, -vvv is level 3
