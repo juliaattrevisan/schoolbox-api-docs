@@ -311,6 +311,9 @@ class Controller extends BaseController
         if ($assessmentSpec instanceof Project) {
             /** @var Project $assessmentImpl */
             foreach ($assessmentSpec->getAssessables() as $subAssessmentSpec) {
+                if ($subAssessmentSpec->isDeleted()) {
+                    continue;
+                }
                 $subAssessmentImpl = $this->exportToNewContext($subAssessmentSpec, $assessmentImpl);
                 $assessmentImpl->getAssessables()->add($subAssessmentImpl);
             }
