@@ -2044,9 +2044,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Always serialize dates as RFC3339 strings.
      *
-     * @return string
+     * @return string|null Only `Alaress_Date_NullDate` serializes as null.
      */
-    public function jsonSerialize(): string
+    public function jsonSerialize(): ?string
     {
         return $this->toRfc3339String();
     }
