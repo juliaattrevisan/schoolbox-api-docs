@@ -357,8 +357,13 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      */
     private function isAssessmentSpecification(SubmissionBox $box)
     {
-        /** @var Schoolbox\Learning\Assessment\DataModel\Model $assessment */
-        $assessment = $this->getJoinMapper('assessmentModel')->findById($box->getAssessmentId());
+        try {
+            /** @var Schoolbox\Learning\Assessment\DataModel\Model $assessment */
+            $assessment = $this->getJoinMapper('assessmentModel')->findById($box->getAssessmentId());
+        } catch (Schoolbox\Mapper\Exception\Deleted $e) {
+            $assessment = $e->getDeletedObject();
+        }
+
         return $assessment->getAssessmentContext()->isSpecificationContext();
     }
 
