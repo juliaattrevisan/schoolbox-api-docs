@@ -34,6 +34,8 @@ class Kernel extends CliKernelAbstract
     // Command line options recognised by this Daemon kernel
     public const OPT_VERBOSITY     = 'v';         // What level of verbosity should be logged
     public const OPT_PORCELAIN     = 'porcelain'; // Should log items be formatted for text file rather than TTL?
+                                                  // If set, causes field name to be prefixed to field value to enable logs to be parsable by scripts
+                                                  // eg '[!][2019-02-26 00:29:22.72907][13746]' would become '[!][@550][2019-02-26 00:29:22.72907][pid:13746]'
 
     /* System resources available in $this->getSoftLimit() and $this->getHardLimit()
      * @see posix_getrlimit()
