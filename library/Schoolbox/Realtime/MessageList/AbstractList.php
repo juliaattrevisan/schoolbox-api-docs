@@ -37,15 +37,6 @@ abstract class AbstractList extends RedisQueue
 
 
     /**
-     * @return int
-     */
-    protected function getMessageExpiry()
-    {
-        return static::TTL;
-    }
-
-
-    /**
      * Returns the overall namespace for this queue's data
      *
      * @return string

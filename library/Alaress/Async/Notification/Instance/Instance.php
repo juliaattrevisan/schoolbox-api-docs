@@ -35,6 +35,11 @@ class Instance implements JsonSerializable
     const MAX_FIELD_SIZE = 512;
 
     /**
+     * Default life time of this instance in seconds.
+     */
+    const DEFAULT_TTL = 1209600; // 2 weeks
+
+    /**
      * A type of action for this instance, as used by `$this->get/setAction`.
      *
      * This instance's notification is sent.
@@ -156,6 +161,11 @@ class Instance implements JsonSerializable
      * Folder id of this message, if this needs to be muted by the homepage based message settings
      */
     protected $folderId;
+
+    /**
+     * TTL of this message.
+     */
+    protected $ttl;
 
     /**
      * @param string               $text
@@ -544,4 +554,27 @@ class Instance implements JsonSerializable
     {
         return $this->folderId;
     }
+
+    /**
+     * Sets ttl
+     * @param int $ttl
+     */
+    public function setTTL(int $ttl): void
+    {
+        $this->ttl = $ttl;
+    }
+
+    /**
+     * Gets ttl
+     * @return int ttl
+     */
+    public function getTTL(): int
+    {
+        if (isset($this->ttl)) {
+            return $this->ttl;
+        }
+        // TODO: how this work for future???
+        return self::DEFAULT_TTL;
+    }
+
 }

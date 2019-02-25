@@ -159,19 +159,19 @@ if (isset($_REQUEST['reject'])) {
 }
 
 /* Add user */
-if(isset($_POST['userID'])) {
-	$ua->setServiceIdentifier($categoryId);
-	/** @var Collection|User[] $userList */
-	$userList = $userMapper->findByColumn('id', $_POST['userID']);
+if (isset($_POST['userID'])) {
+    $ua->setServiceIdentifier($categoryId);
+    /** @var Collection|User[] $userList */
+    $userList = $userMapper->findByColumn('id', $_POST['userID']);
+    $memberList = $uaMapper->findUsersInCategory($folder);
 
-	foreach ($userList as $userObject) {
-        /* Do not demote existing owner */
-        if(!$uaMapper->isFolderOwner($userObject, $folder)) {
-            $ua->setUser($userObject)
-               ->setAccessLevel(UserAccess::ACCESS_READ);
-            $uaMapper->save($ua);
-        }
-	}
+    // Do not attempt to add existing members
+    $newMemberList = $userList->diff($memberList);
+    foreach ($newMemberList as $userObject) {
+        $ua->setUser($userObject)
+            ->setAccessLevel(UserAccess::ACCESS_READ);
+        $uaMapper->save($ua);
+    }
 }
 
 // Change membership parameters

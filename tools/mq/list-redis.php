@@ -13,7 +13,8 @@ $keys = $redis->keys('msg*');
 
 foreach ($keys as $idx => $key) {
     echo "=====================================================================\n";
-    echo "[$idx] $key \n";
+    $readableTTL = secondsToTime($redis->ttl($key));
+    echo "[$idx] $key : ({$redis->ttl($key)}{$readableTTL}) \n";
 
     /** @var Instance $instance */
     try {
@@ -24,11 +25,29 @@ foreach ($keys as $idx => $key) {
         if ($keytype->getPayload() === 'set') {
             $setcount = \count($redis->smembers($key));
             echo "{$setcount} messages exist.\n";
+            foreach ($redis->smembers($key) as $skey) {
+                $sreadableTTL = secondsToTime($redis->ttl($skey));
+                echo "       $skey : ({$redis->ttl($skey)}{$sreadableTTL}) \n";
+                $sRawRedisData = $redis->get($skey);
+                $sInstance = unserialize(gzuncompress($sRawRedisData));
+                extractInstance($sInstance);
+            }
         } else {
             echo "Type of {$key} is {$keytype}\n";
         }
         continue;
     }
+    extractInstance($instance);
+
+}
+
+
+function extractInstance($instance)
+{
+    if (!$instance) {
+        return;
+    }
+    $userMapper = \Schoolbox\UserMapper::getInstance();
 
     if ($instance instanceof \Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger) {
         echo "CompressedTrigger \n";
@@ -62,6 +81,15 @@ foreach ($keys as $idx => $key) {
         }
         echo $message . "\n";
     }
+}
+
+function secondsToTime($seconds) {
+    if (!$seconds || $seconds < 1) {
+        return '';
+    }
+    $dtF = new \DateTime('@0');
+    $dtT = new \DateTime("@$seconds");
+    return $dtF->diff($dtT)->format(': %a days, %h hours, %i minutes and %s seconds');
 }
 
 echo "\n";

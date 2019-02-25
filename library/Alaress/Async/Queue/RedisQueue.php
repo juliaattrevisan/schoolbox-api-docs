@@ -22,7 +22,6 @@ use Predis\Transaction\MultiExec;
 abstract class RedisQueue implements QueueInterface
 {
 
-    const TTL = 1209600; // 2 weeks
 
     /** @var ClientInterface */
     protected $redis;
@@ -85,8 +84,6 @@ abstract class RedisQueue implements QueueInterface
         $this->redis->transaction(function (MultiExec $tx) use ($id, $data) {
             // insert the msg payload ONLY if it doesn't already exist
             $tx->setnx($id, $data)
-                // set the expiry; if the key already existed, this has the effect of resetting the TTL
-               ->expire($id, $this->getMessageExpiry())
                 // insert the msg reference into this 'queue'
                ->sadd($this->getRedisSetKey(), [ $id ]);
         });
@@ -258,12 +255,5 @@ abstract class RedisQueue implements QueueInterface
      */
     protected abstract function getMessageKeyPattern();
 
-
-    /**
-     * Return, in seconds, the TTL of any message held by this set
-     *
-     * @return int
-     */
-    protected abstract function getMessageExpiry();
 
 }

@@ -65,7 +65,7 @@ class Postman
 
             try {
                 $topic = "INFO.$routeKey";
-                $this->broker->publish(Instance::jsonUnserialize($json, $topic), [ $topic ]);
+                $this->broker->publish(Instance::jsonUnserialize($json, $topic), [ $topic ], $instance->getTTL());
             } catch (\InvalidArgumentException $e) {
                 $this->log->notice('Broken message, was unable to json_decode', ['char' => '?']);
             }

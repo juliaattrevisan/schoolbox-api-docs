@@ -115,9 +115,10 @@ abstract class Broker implements IBroker
     /**
      * @param mixed $serializable anything that can be serialized
      * @param array $context
+     * @param int $ttl
      * @return void
      */
-    public function publish($serializable, array $context = null)
+    public function publish($serializable, array $context = null, int $ttl = null)
     {
         $serial = serialize($serializable);
         $gzip   = gzcompress($serial, 9);
@@ -128,7 +129,11 @@ abstract class Broker implements IBroker
         $exchange   = $this->getExchangeName();
 
         // drop the data into redis...
-        $this->redis->set($storageKey, $gzip);
+        if ($ttl) {
+            $this->redis->setex($storageKey, $ttl, $gzip);
+        } else {
+            $this->redis->set($storageKey, $gzip);
+        }
 
         $amqpPayload = $context ? json_encode([ $storageKey, $context ]) : $storageKey;
 

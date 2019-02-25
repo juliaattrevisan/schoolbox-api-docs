@@ -7,14 +7,11 @@ use Schoolbox\Resource\Folder;
 require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 require_once SITE_root . '/www/include/stdfuncs.php';
 
-/**
- * @var MapperFactory $mapperFactory
- * @var RoleMapper    $roleMapper
- * @var Folder\Mapper $folderMapper
- */
-$mapperFactory = $kernel->getDependencyInjector()->get('mapperFactory');
-$roleMapper    = $mapperFactory->get(RoleMapper::class);
-$folderMapper  = $mapperFactory->get(Folder\Mapper::class);
+/** @var RoleMapper $roleMapper */
+$roleMapper = RoleMapper::getInstance();
+/** @var Folder\Mapper $folderMapper */
+$folderMapper = Folder\Mapper::getInstance();
+
 $return        = [];
 
 if ($_GET['type'] === 'system') {

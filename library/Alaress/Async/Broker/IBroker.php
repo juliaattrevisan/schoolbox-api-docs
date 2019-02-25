@@ -36,8 +36,9 @@ interface IBroker
      *
      * @param mixed  $serializable
      * @param array  $context
+     * @param int?   $ttl
      * @return void
      */
-    public function publish($serializable, array $context = []);
+    public function publish($serializable, array $context = [], int $ttl = null);
 
 }
