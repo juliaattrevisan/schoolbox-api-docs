@@ -10,17 +10,23 @@ namespace Schoolbox\Application;
 use Database;
 use Alaress\Exception\IO\IOException;
 use ErrorException;
+use Monolog\Handler\RavenHandler;
 use PDOException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use RangeException;
+use Raven_Client;
 use RuntimeException;
+use Monolog;
+use Alaress\Lumberjack;
 
 /**
  * Common implementation for all Cli Kernels
  */
 abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements LoggerAwareInterface
 {
+
+    public const OPT_ERRORS = 'errors';      // What errors should PHP report
 
     /** @var LoggerInterface */
     private $logger;
@@ -91,6 +97,15 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
+
+
+    /**
      * Creates a default logger, suitable for this Kernel
      *
      * @return LoggerInterface
@@ -100,11 +115,19 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
-     * @param LoggerInterface $logger
+     * Ensures this kernel is being run in appropriate environment.
+     *
+     * The different Kernels have implementation tied to their Server API environments.
+     * eg, the Daemon kernel uses Process Control functions, whereas the WebServer kernel requires a request.
+     *
+     * @see http://php.net/manual/en/function.php-sapi-name.php
+     * @throws \UnexpectedValueException If this Kernel has been constructed in an invalid environment.
      */
-    public function setLogger(LoggerInterface $logger): void
+    protected function checkServerApiEnvironment(): void
     {
-        $this->logger = $logger;
+        if (PHP_SAPI !== 'cli') {
+            throw new \UnexpectedValueException('Cannot use Cli Kernel in Web Server environment.');
+        }
     }
 
 
@@ -178,4 +201,31 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     abstract protected function onWarning($errNum, $errStr, $errFile, $errLine): void;
+
+
+    /**
+     * Add Sentry handler into logging system if possible
+     *
+     * Returns whether the Sentry handler is added
+     *
+     * @param Lumberjack\Logger $logger
+     * @return bool
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    protected function addRavenHandler(Lumberjack\Logger $logger): bool
+    {
+        if (!$this->getDependencyInjector()->has('sentry')) {
+            // If Sentry is not available, don't attempt to log to it
+            return false;
+        }
+
+        /** @var Raven_Client $ravenClient */
+        $ravenClient  = $this->getDependencyInjector()->get('sentry');
+        $ravenHandler = new RavenHandler($ravenClient, Monolog\Logger::CRITICAL);
+        /** @var Monolog\Formatter\LineFormatter $formatter */
+        $formatter = $ravenHandler->getFormatter();
+        $formatter->includeStacktraces(true);
+        $logger->pushHandler($ravenHandler);
+        return true;
+    }
 }

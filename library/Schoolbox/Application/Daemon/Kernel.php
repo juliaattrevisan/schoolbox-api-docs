@@ -20,9 +20,6 @@ use RangeException;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
-use Monolog\Handler\RavenHandler;
-use Monolog;
-use Raven_Client;
 use React\Stomp;
 use Schoolbox\Application\CliKernelAbstract;
 
@@ -446,16 +443,8 @@ EOL;
         $porcelain = \array_key_exists(self::OPT_PORCELAIN, $this->opts);
         $logger = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
-        // Add Sentry handler into logging system if possible
-        if ($this->getDependencyInjector()->has('sentry')) {
-            /** @var Raven_Client $ravenClient */
-            $ravenClient  = $this->getDependencyInjector()->get('sentry');
-            $ravenHandler = new RavenHandler($ravenClient, Monolog\Logger::CRITICAL);
-            /** @var Monolog\Formatter\LineFormatter $formatter */
-            $formatter = $ravenHandler->getFormatter();
-            $formatter->includeStacktraces(true);
-            $logger->pushHandler($ravenHandler);
-        }
+        $this->addRavenHandler($logger);
+
         return $logger;
     }
 
