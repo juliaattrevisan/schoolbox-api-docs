@@ -114,16 +114,13 @@
                             <input id="userId" type="text" disabled value="{{ user.id }}"/>
                         {% endif %}
 
-                        <label for="group">Role</label>
-                        <select id="group" name="group">
-                            {% for role in roles %}
-                                <option value="{{ role.id }}" {% if user.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
-                            {% endfor %}
-                        </select>
+                        <label for="username">Username</label>
+                        <input id="username" type="text" class="required" name="modusername" value="{{ user.username }}"/>
 
-                        <label for="position_title">Position Title</label>
-                        <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
-                        
+                        <label for="password">Password</label>
+                        <input id="password" type="password" name="modpassword" class="password" value="donotchange"/>
+
+
                         <fieldset class="checklist">
                             <label>Campus Involvement</label>
                             {% for campus in campuses %}
@@ -142,11 +139,15 @@
                     </div>
 
                     <div class="small-12 medium-4 island">
-                        <label for="username">Username</label>
-                        <input id="username" type="text" class="required" name="modusername" value="{{ user.username }}"/>
+                        <label for="group">Role</label>
+                        <select id="group" name="group">
+                            {% for role in roles %}
+                                <option value="{{ role.id }}" {% if user.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
+                            {% endfor %}
+                        </select>
 
-                        <label for="password">Password</label>
-                        <input id="password" type="password" name="modpassword" class="password" value="donotchange"/>
+                        <label for="position_title">Position Title</label>
+                        <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
 
                         <label for="alt_email">Alternate Email</label>
                         <input id="alt_email" type="email" name="alt_email" value="{{ user.altEmail }}"/>
