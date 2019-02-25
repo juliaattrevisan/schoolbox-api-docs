@@ -873,7 +873,7 @@ class External_Maze_User implements External_UserInterface
              *
              * (the latter occurs when the sis gets updated with a new picture and we need to update our storage)
              */
-            if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(new \Alaress_Date_Format(strtotime($photo['ModifiedDate']), 'U'))) {
+            if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(\Alaress_Date_Format::newFromTimestamp(strtotime($photo['ModifiedDate'])))) {
                 $queryPhoto = false;
 
                 if ($this->getGroup()->isStudent($user->getId())) {
