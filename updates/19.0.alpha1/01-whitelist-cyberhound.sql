@@ -8,7 +8,7 @@ VALUES (
   '', 
   2, 
   '', 
-  1, 
+  (SELECT id from lu_config_type WHERE name like '3rd Party Services'),
   'true', 
   'false', 
   'false', 
