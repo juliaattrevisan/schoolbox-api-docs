@@ -11,7 +11,7 @@ $this->setBlock('REPORT_CONTENT', 'visibility', 'visibility_block' );
 $this->setBlock('visibility', 'visibility_month', 'visibility_month_block' );
 
 
-$months = $start->diffInMonths($end);
+$months = $start->diffInMonths($end) + 1;
 
 /** @var Alaress_Date_Format $currentMonth   */
 $currentMonth = clone $start;

@@ -7,7 +7,7 @@ $this->setBlock('REPORT_CONTENT', 'image_user_role', 'image_user_role_block' );
 $this->setBlock('image_user_role', 'image_user_role_month', 'image_user_role_month_block' );
 
 
-$months = $start->diffInMonths($end);
+$months = $start->diffInMonths($end) + 1;
 
 /** @var Alaress_Date_Format $currentMonth   */
 $currentMonth = clone $start;

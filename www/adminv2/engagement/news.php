@@ -7,7 +7,7 @@ $this->setBlock('REPORT_CONTENT', 'month_head', 'month_head_block' );
 $this->setBlock('REPORT_CONTENT', 'school_month_body', 'school_month_body_block' );
 $this->setBlock('REPORT_CONTENT', 'group_month_body', 'group_month_body_block' );
 
-$months = $start->diffInMonths($end);
+$months = $start->diffInMonths($end) + 1;
 
 /** @var Alaress_Date_Format $currentMonth   */
 $currentMonth = clone $start;
