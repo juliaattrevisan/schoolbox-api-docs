@@ -23,15 +23,7 @@ class Kernel extends CliKernelAbstract
     }
 
 
-    /**
-     * Initialise debugging
-     *
-     * @return void
-     */
-    protected function initialiseDebugging(): void
-    {
-        // TODO: Implement initialiseDebugging() method.
-    }
+
 
 
     /**

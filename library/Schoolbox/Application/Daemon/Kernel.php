@@ -528,15 +528,6 @@ EOL;
 
 
     /**
-     * @inheritdoc
-     */
-    protected function initialiseDebugging(): void
-    {
-        // no debugging
-    }
-
-
-    /**
      * Register any error handling required
      *
      * @return void

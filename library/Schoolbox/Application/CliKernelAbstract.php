@@ -13,4 +13,11 @@ namespace Schoolbox\Application;
 abstract class CliKernelAbstract extends \Alaress\Application\Kernel
 {
 
+    /**
+     * @inheritdoc
+     */
+    protected function initialiseDebugging(): void
+    {
+        // no debugging
+    }
 }
