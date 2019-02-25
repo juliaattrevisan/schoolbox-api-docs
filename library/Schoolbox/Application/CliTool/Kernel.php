@@ -177,7 +177,7 @@ class Kernel extends CliKernelAbstract
      */
     private function setErrorReporting(): void
     {
-        \error_reporting($this->getKernelOpt(self::OPT_ERRORS, E_ALL ^ E_NOTICE));
+        \error_reporting((int)$this->getKernelOpt(self::OPT_ERRORS, E_ALL ^ E_NOTICE));
     }
 
 

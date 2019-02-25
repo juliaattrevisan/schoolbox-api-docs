@@ -26,7 +26,7 @@ use Alaress\Lumberjack;
 abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements LoggerAwareInterface
 {
 
-    public const OPT_ERRORS = 'errors';      // What errors should PHP report
+    public const OPT_ERRORS = 'errors:';      // What errors should PHP report
 
     /** @var LoggerInterface */
     private $logger;
