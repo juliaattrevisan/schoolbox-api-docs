@@ -20,12 +20,31 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Migrate portraits from filesy
 ]);
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
-    $userMapper = \Schoolbox\UserMapper::getInstance();
+    $db = Database::getInstance();
     $storageMapper = \Schoolbox\Resource\Storage\Mapper::getInstance();
 
     /** @var IConfigLoader $conf */
     $conf  = $di->get('config');
 
+    /* Prepared statements
+     */
+    $selectResult = $db->prepare('
+        SELECT id, synergy_id, firstname, lastname
+        FROM `user`
+        WHERE synergy_id = :externalId
+        LIMIT 1
+    ');
+
+    $updateResult = $db->prepare('
+        UPDATE `user`
+        SET portrait_hash = :hash
+        WHERE id = :id
+    ');
+
+    /* Schools upload pictures to this directory periodically
+     * This tool shoves them into storage
+     * This tool can be run repeatedly in cron to preserve schools' existing workflows
+     */
     $portraitPath = $conf->get('portrait_dir');
 
     $dirhandle = opendir($portraitPath);
@@ -43,31 +62,42 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
          */
         $externalId = $info['filename'];
 
-        try {
-            $user = $userMapper->findByExternalId($externalId);
+        /* Find them classically
+         */
+        $selectResult->execute([
+            'externalId' => $externalId,
+        ]);
+
+        $user = $selectResult->fetch(\PDO::FETCH_ASSOC);
+
+        /* If a user was found, try to assign image
+         */
+        if ($user) {
 
             $path = "{$portraitPath}/{$file}";
 
             /* Save it into brownhole
              */
-            $portrait = $storageMapper->acceptStream($user->getExternalId() . '.jpg', file_get_contents($path));
+            $portrait = $storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
 
             /* Update user with latest version
              */
-            $user->setPortrait($portrait);
+            $updateResult->execute([
+                'hash' => $portrait->getHash(),
+                'id' => $user['id']
+            ]);
 
-            $userMapper->save($user);
-
-            $log->info("{$user->getFullName()} now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
+            $log->info("{$user['firstname']} {$user['lastname']} now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
 
             /* Remove file when done
              */
-            unlink($path);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+//            unlink($path);
+
+        } else {
 
             /* User not found; noop
              */
-            $log->warning("External id {$externalId} not found");
+            $log->warning("External id {$externalId} not found; skipped");
         }
     }
 });
