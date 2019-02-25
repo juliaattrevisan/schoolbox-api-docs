@@ -126,14 +126,12 @@
                         <label for="password">Password</label>
                         <input id="password" type="password" name="modpassword" class="password" value="donotchange"/>
 
-
                         <label for="group">Role</label>
                         <select id="group" name="group">
                             {% for role in roles %}
                                 <option value="{{ role.id }}" {% if user.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
                             {% endfor %}
                         </select>
-
 
                         <label for="alt_email">Alternate Email</label>
                         <input id="alt_email" type="email" name="alt_email" value="{{ user.altEmail }}"/>
@@ -161,26 +159,40 @@
                 </div>
             </fieldset>
 
+            {# Render roughly-equal column lengths #}
             <fieldset>
                 <legend>Campus Involvement</legend>
                 <div class="row content">
-                    <div class="small-12 medium-4 columns">
-                        {% for campus in campuses %}
-                            {# Work out if the user is in this campus- really need to write a collection.contains() method #}
+                    {% set numPerColumn = (campuses|length/3)|round(0, 'ceil') %}
 
-                            {% set campusChecked = false %}
-                            {% for userCampus in user.campusCollection %}
-                                {% if userCampus.id == campus.id %}
-                                    {% set campusChecked = true %}
-                                {% endif %}
-                            {% endfor %}
-                            <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
-                            <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
+                    {# Work out if the user is in this campus- really need to write a collection.contains() method #}
+                    {% for campus in campuses %}
+                        {% if numPerColumn == 1 or loop.index % numPerColumn == 1 %}
+                        <div class="small-12 medium-4 columns">
+                        {% endif %}
+
+                        {% set campusChecked = false %}
+                        {% for userCampus in user.campusCollection %}
+                            {% if userCampus.id == campus.id %}
+                                {% set campusChecked = true %}
+                            {% endif %}
                         {% endfor %}
-                    </div>
+                        <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
+                        <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
+
+                        {% if loop.last or loop.index % numPerColumn == 0 %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    {# Special case for two campuses
+                     # Render an empty nbsp; div otherwise it looks like a 2-column layout
+                     #}
+                    {% if campuses|length == 2 %}
+                        <div class="small-12 medium-4 columns">&nbsp;</div>
+                    {% endif %}
                 </div>
             </fieldset>
-
             <fieldset>
                 <legend>Options</legend>
                 <div class="row content">
