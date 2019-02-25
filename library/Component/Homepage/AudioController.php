@@ -172,7 +172,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                             ? gmdate('H:i:s', $audio->getDuration())
                             : gmdate('i:s', $audio->getDuration()),
                         'AUDIO_LIST_COMMENT' => Scrub::text($file->getDescription()),
-                        'AUDIO_LIST_HIDDEN' => $file->isHidden() ? 'hidden' : '',
+                        'AUDIO_LIST_HIDDEN' => $file->isHidden() ? 'translucent' : '',
                         'AUDIO_LIST_POSTER_ID' => $file->getOwner()->getId(),
                         'AUDIO_LIST_POSTER' => $file->getOwner()->getFullName(),
                     ]);
