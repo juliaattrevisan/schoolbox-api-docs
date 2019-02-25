@@ -12,7 +12,6 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Migrate portraits from filesystem into Storage', [
     'verbose' => [false, false, false],
