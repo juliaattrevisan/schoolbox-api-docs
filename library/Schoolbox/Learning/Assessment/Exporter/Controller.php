@@ -171,7 +171,6 @@ class Controller extends BaseController
 
         foreach ($assessmentImpls as $assessmentImpl) {
             // But only if the implementation was ticked by the user
-
             if (array_key_exists($assessmentImpl->getBaseContext()->getId(), $importedImplementations)) {
                 $folderId = $assessmentImpl->getContext()->getFolder()->getId();
                 if (!$folderWritePerms[$folderId]) {
@@ -312,6 +311,9 @@ class Controller extends BaseController
         if ($assessmentSpec instanceof Project) {
             /** @var Project $assessmentImpl */
             foreach ($assessmentSpec->getAssessables() as $subAssessmentSpec) {
+                if ($subAssessmentSpec->isDeleted()) {
+                    continue;
+                }
                 $subAssessmentImpl = $this->exportToNewContext($subAssessmentSpec, $assessmentImpl);
                 $assessmentImpl->getAssessables()->add($subAssessmentImpl);
             }
