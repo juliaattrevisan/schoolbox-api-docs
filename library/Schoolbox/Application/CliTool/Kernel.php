@@ -68,7 +68,7 @@ class Kernel extends CliKernelAbstract
      *
      * @param App $app
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @todo pass in the app's CLI options here, using $argv to parse. Fail noisily if invalid args detected.
+     * @todo pass in the app's CLI options here, using $argv to parse. Trigger errors if invalid args detected.
      */
     public function runApp(App $app): void
     {
