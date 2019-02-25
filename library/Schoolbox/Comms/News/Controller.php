@@ -821,11 +821,7 @@ class Controller extends Base
             'author' => [
                 'fullname'
             ],
-            'publishAt' => [
-                'long',
-                'relativeTime',
-                'json',
-            ],
+            'publishAt',
             'viewedAt' => [
                 'long',
                 'relativeTime',
@@ -1181,21 +1177,13 @@ class Controller extends Base
             'title',
             'blurb',
             'featureImage',
-            'publishAt' => [
-                'long',
-                'relativeTime',
-                'json',
-            ],
+            'publishAt',
             'topics' => [
                 'name',
                 'slug',
             ],
             'status',
-            'statusDate' => [
-                'long',
-                'relativeTime',
-                'json',
-            ]
+            'statusDate',
         ];
 
         $this->hydrateArticleAudiences($articles);
