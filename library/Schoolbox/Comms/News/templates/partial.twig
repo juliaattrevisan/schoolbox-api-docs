@@ -62,7 +62,15 @@
                 {% set textToDisplay = compactMode ? macro.newsBlurb(article, readMore) : article.body %}
 
                 {% if textToDisplay|trim|length %}
-                    <article>{{ textToDisplay|raw }}</article>
+                    {% spaceless %}
+                        <article>
+                            {% if compactMode %}
+                                {{ textToDisplay }}
+                            {% else %}
+                                {{ textToDisplay|purify }}
+                            {% endif %}
+                        </article>
+                    {% endspaceless %}
                 {% endif %}
             </li>
         {% endfor %}
