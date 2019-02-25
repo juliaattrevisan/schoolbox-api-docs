@@ -117,22 +117,6 @@
 
                         <label for="database">{{ externalDatabase }} ID</label>
                         <input id="database" type="text" name="database_id" value="{{ user.externalId }}"/>
-
-                        <fieldset class="checklist">
-                            <label>Campus Involvement</label>
-                            {% for campus in campuses %}
-                                {# Work out if the user is in this campus- really need to write a collection.contains() method #}
-
-                                {% set campusChecked = false %}
-                                {% for userCampus in user.campusCollection %}
-                                    {% if userCampus.id == campus.id %}
-                                        {% set campusChecked = true %}
-                                    {% endif %}
-                                {% endfor %}
-                                <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
-                                <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
-                            {% endfor %}
-                        </fieldset>
                     </div>
 
                     <div class="small-12 medium-4 island">
@@ -173,6 +157,26 @@
                                         {% if user.residentialHouse.id == residentialHouse.id %}selected{% endif %}>{{ residentialHouse.house }}</option>
                             {% endfor %}
                         </select>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Campus Involvement</legend>
+                <div class="row content">
+                    <div class="small-12 medium-4 columns">
+                        {% for campus in campuses %}
+                            {# Work out if the user is in this campus- really need to write a collection.contains() method #}
+
+                            {% set campusChecked = false %}
+                            {% for userCampus in user.campusCollection %}
+                                {% if userCampus.id == campus.id %}
+                                    {% set campusChecked = true %}
+                                {% endif %}
+                            {% endfor %}
+                            <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
+                            <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
+                        {% endfor %}
                     </div>
                 </div>
             </fieldset>
