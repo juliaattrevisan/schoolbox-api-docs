@@ -305,6 +305,7 @@ class Controller extends Base
                 ->setMulti(false)
                 ->setAttachmentsLabel('')
                 ->setAttachPrompt('add a portrait image')
+                ->setMimeFilter('image/*')
                 ->attachFiles([$user->getPortrait()])->getTwigContext();
         }
 
