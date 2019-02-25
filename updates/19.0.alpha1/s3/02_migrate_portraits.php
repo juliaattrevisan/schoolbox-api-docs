@@ -26,78 +26,85 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     /** @var IConfigLoader $conf */
     $conf  = $di->get('config');
 
-    /* Prepared statements
+    /* Only import photos if the config option lets you
      */
-    $selectResult = $db->prepare('
-        SELECT id, synergy_id, firstname, lastname
-        FROM `user`
-        WHERE synergy_id = :externalId
-        LIMIT 1
-    ');
+    if ($conf->get('photo_sis_import')) {
 
-    $updateResult = $db->prepare('
-        UPDATE `user`
-        SET portrait_hash = :hash
-        WHERE id = :id
-    ');
-
-    /* Schools upload pictures to this directory periodically
-     * This tool shoves them into storage
-     * This tool can be run repeatedly in cron to preserve schools' existing workflows
-     */
-    $portraitPath = $conf->get('portrait_dir');
-
-    $dirhandle = opendir($portraitPath);
-
-    while ($file = readdir($dirhandle)) {
-        if (('.' === $file) || ('..' === $file)) {
-            continue;
-        }
-
-        /* If it's an actual file, send it in
+        /* Prepared statements
          */
-        $info = pathinfo($file);
+        $selectResult = $db->prepare('
+            SELECT id, synergy_id, firstname, lastname
+            FROM `user`
+            WHERE synergy_id = :externalId
+            LIMIT 1
+        ');
 
-        /* Naming convention in schoolbox instructions suggests this as the externalId
+        $updateResult = $db->prepare('
+            UPDATE `user`
+            SET portrait_hash = :hash
+            WHERE id = :id
+        ');
+
+        /* Schools upload pictures to this directory periodically
+         * This tool shoves them into storage
+         * This tool can be run repeatedly in cron to preserve schools' existing workflows
          */
-        $externalId = $info['filename'];
+        $portraitPath = $conf->get('portrait_dir');
 
-        /* Find them classically
-         */
-        $selectResult->execute([
-            'externalId' => $externalId,
-        ]);
+        $dirhandle = opendir($portraitPath);
 
-        $user = $selectResult->fetch(\PDO::FETCH_ASSOC);
+        while ($file = readdir($dirhandle)) {
+            if (('.' === $file) || ('..' === $file)) {
+                continue;
+            }
 
-        /* If a user was found, try to assign image
-         */
-        if ($user) {
-
-            $path = "{$portraitPath}/{$file}";
-
-            /* Save it into brownhole
+            /* If it's an actual file, send it in
              */
-            $portrait = $storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
+            $info = pathinfo($file);
 
-            /* Update user with latest version
+            /* Naming convention in schoolbox instructions suggests this as the externalId
              */
-            $updateResult->execute([
-                'hash' => $portrait->getHash(),
-                'id' => $user['id']
+            $externalId = $info['filename'];
+
+            /* Find them classically
+             */
+            $selectResult->execute([
+                'externalId' => $externalId,
             ]);
 
-            $log->info("{$user['firstname']} {$user['lastname']} now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
+            $user = $selectResult->fetch(\PDO::FETCH_ASSOC);
 
-            /* Remove file when done
+            /* If a user was found, try to assign image
              */
+            if ($user) {
+
+                $path = "{$portraitPath}/{$file}";
+
+                /* Save it into brownhole
+                 */
+                $portrait = $storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
+
+                /* Update user with latest version
+                 */
+                $updateResult->execute([
+                    'hash' => $portrait->getHash(),
+                    'id' => $user['id']
+                ]);
+
+                $log->info("{$user['firstname']} {$user['lastname']} now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
+
+                /* Remove file when done
+                 */
 //            unlink($path);
 
-        } else {
+            } else {
 
-            /* User not found; noop
-             */
-            $log->warning("External id {$externalId} not found; skipped");
+                /* User not found; noop
+                 */
+                $log->warning("External id {$externalId} not found; skipped");
+            }
         }
+    } else {
+        $log->warning('"Load Photos From SIS" is off, therefore nothing will be imported.');
     }
 });
