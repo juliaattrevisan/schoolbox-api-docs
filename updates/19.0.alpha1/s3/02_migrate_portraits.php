@@ -78,24 +78,31 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
              */
             if ($user) {
 
-                $path = "{$portraitPath}/{$file}";
+                try {
+                    $path = "{$portraitPath}/{$file}";
 
-                /* Save it into brownhole
-                 */
-                $portrait = $storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
+                    /* Save it into brownhole
+                     */
+                    $portrait = $storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
 
-                /* Update user with latest version
-                 */
-                $updateResult->execute([
-                    'hash' => $portrait->getHash(),
-                    'id' => $user['id']
-                ]);
+                    /* Update user with latest version
+                     */
+                    $updateResult->execute([
+                        'hash' => $portrait->getHash(),
+                        'id' => $user['id']
+                    ]);
 
-                $log->info("{$user['firstname']} {$user['lastname']} now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
+                    $log->info("{$user['firstname']} {$user['lastname']} now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
 
-                /* Remove file when done
-                 */
-                unlink($path);
+                    /* Remove file when done
+                     */
+                    unlink($path);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+
+                    /* Something died in storage
+                     */
+                    $log->critical("External id {$externalId} not saved; Storage error");
+                }
             } else {
 
                 /* User not found; noop
