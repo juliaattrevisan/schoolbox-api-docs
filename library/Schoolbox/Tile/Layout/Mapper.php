@@ -225,20 +225,16 @@ class Mapper extends BaseMapper
         $model->setHeading($component->getConfigByKey('componentname')->getValue() ?: 'Tiles');
 
         $identifier = (int)$component->getIdentifier();
-        switch ($component->getModule()) {
-            case 'homepage':
-                $model->setFolder($this->getJoinMapper('tile_layout_for_folder')->findById($identifier));
-                break;
-
-            case 'dashboard':
-                $model->setDashboardRole($this->getJoinMapper('tile_layout_for_dashboard')->findById($identifier));
-                break;
-
-            case 'homepage_template':
-                $model->setHomepageTemplate(
-                    $this->getJoinMapper('tile_layout_for_homepage_template')->findById($identifier)
-                );
-                break;
+        if ($component->isHomepage()) {
+            $model->setFolder($this->getJoinMapper('tile_layout_for_folder')->findById($identifier));
+        }
+        if ($component->isDashboard()) {
+            $model->setDashboardRole($this->getJoinMapper('tile_layout_for_dashboard')->findById($identifier));
+        }
+        if ($component->isHomepageTemplate()) {
+            $model->setHomepageTemplate(
+                $this->getJoinMapper('tile_layout_for_homepage_template')->findById($identifier)
+            );
         }
         return $model;
     }
