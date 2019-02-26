@@ -2005,20 +2005,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         $this->datetime = clone $this->datetime;
     }
 
-
-    /**
-     * @return array
-     */
-    public function getDefaultJsonMap(): array
-    {
-        return [
-            'database',
-            'unixTimestamp',
-            'local',
-            'json',
-        ];
-    }
-
     /**
      * Attempts to change time to the specified time (expecting H:i format)
      * @param string|null $timeString
