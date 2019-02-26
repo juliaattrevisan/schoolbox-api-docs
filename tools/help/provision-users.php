@@ -124,7 +124,7 @@ $kernel->run(new class extends App {
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts)
+    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
     {
         $this->setup($di, $log, $opts);
 

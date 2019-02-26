@@ -75,7 +75,7 @@ try {
          * @return void
          * @throws Di\Exception\ServiceNotFound
          */
-        public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts)
+        public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
         {
             $this->log   = $log;
             $this->redis = $di->get('redis');

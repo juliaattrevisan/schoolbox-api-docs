@@ -45,7 +45,7 @@ try {
          * @param array         $opts
          * @return void
          */
-        public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts)
+        public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
         {
             /** @var ClientInterface $redis */
             $redis = $di->get('redis');
