@@ -18,7 +18,6 @@ use Schoolbox\Tile\Component\HomepageTileController;
 
 
 $opts = require __DIR__ . '/../../../conf/core/require-cli.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel("Associate Tiles", [
     'verbose' => [true, true, true],
@@ -141,7 +140,7 @@ $app = new class extends App
      * @param LoggerInterface $log
      * @param array           $opts
      */
-    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts)
+    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
     {
         $this->log                           = $log;
         $this->db                            = $di->get('databaseInternal');
