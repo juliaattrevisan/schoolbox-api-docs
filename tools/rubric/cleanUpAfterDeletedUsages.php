@@ -23,6 +23,9 @@
  * - TODO ??? deleting a level if it no longer contains any descriptors
  *
  * The script ONLY affects due work specifications, not implementations.
+ * It should never be necessary to repair this data on implementations,
+ * because specs with this kind of invalid data cannot be imported to classes (this is the symptom our schools have
+ * been observing).
  *
  * @copyright Copyright 2019, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -59,6 +62,7 @@ $kernel->run(new class extends App
     private const FIND_ASSESSMENTS_WITHOUT_RUBRIC_USAGES_QUERY = "
         SELECT
         sb.id,
+        sb.assessment_id,
         sb.category,
         COUNT(DISTINCT rgu.rubric_group_id) AS capability_usage_count,
         COUNT(DISTINCT rcu.criterion_id)    AS indicator_usage_count,
@@ -76,7 +80,7 @@ $kernel->run(new class extends App
         UPDATE submission_box sb
         SET   sb.use_rubric = FALSE
         WHERE sb.use_rubric IS TRUE
-        AND sb.id = :assessmentId
+        AND sb.assessment_id = :assessmentId
     ";
 
 
@@ -264,13 +268,20 @@ $kernel->run(new class extends App
         $this->findAssessmentsWithoutRubricUsagesQuery->execute(['folderId' => $unitId]);
 
         $hasBrokenData = false;
-        foreach ($this->findAssessmentsWithoutRubricUsagesQuery->fetchColumnArray('id') as $assessmentId) {
+        foreach ($this->findAssessmentsWithoutRubricUsagesQuery->fetchColumnArray('assessment_id') as $assessmentId) {
             $hasBrokenData = true;
+
+            $this->log->warning(
+                sprintf(
+                    'Assessment #%d has no capability or indicator usages, but has Use Rubric enabled: toggling off Use Rubric',
+                    $assessmentId
+                )
+            );
 
             $this->logSignificantEvent(
                 (int)$assessmentId,
                 sprintf(
-                    'Toggling off "Use Rubric" for assessment #%d',
+                    'Toggled off "Use Rubric" for assessment #%d',
                     $assessmentId
                 )
             );
