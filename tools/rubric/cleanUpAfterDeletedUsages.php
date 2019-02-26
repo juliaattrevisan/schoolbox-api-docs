@@ -281,7 +281,7 @@ $kernel->run(new class extends App
         if (! $hasBrokenData) {
             $this->log->info(
                 sprintf(
-                    self::indent(1) . 'No assessments with invalid rubric usages found in unit %s',
+                    self::indent(2) . 'No assessments with invalid rubric usages found in unit #%s',
                     $unitId
                 )
             );
