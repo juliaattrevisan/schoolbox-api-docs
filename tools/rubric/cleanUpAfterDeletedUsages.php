@@ -2,6 +2,7 @@
 <?php
 /**
  * Repair script for cleaning up rubric data on spec due works after deletion of capability and indicator usages.
+ * See SA-8261.
  *
  * Business rules:
  * - It is LEGAL to delete indicators from a course or unit spec if they are used on due works in the spec
@@ -15,17 +16,16 @@
  * to get their due work specs into an invalid state, they may still experience errors trying to import
  * courses where indicators were deleted before the fix from SA-8158 rolled out.
  *
- * This script cleans up the existing broken data by:
- * - toggling off Use Rubric if a due work spec has no capability or indicator usages
- *    - Because we cannot enforce at a schema level that an indicator usage always has a capability usage attached,
- *      I have chosen to only repair assessments that have both 0 capability usages AND 0 indicator usages;
- *      otherwise we run the risk of trying to "fix" data that is already broken in a different way
- * - TODO ??? deleting a level if it no longer contains any descriptors
+ * This script cleans up the existing broken data by toggling off Use Rubric if a due work spec has
+ * no capability or indicator usages.
+ * Because we cannot enforce at a schema level that an indicator usage always has a capability usage attached,
+ * I have chosen to only repair assessments that have both 0 capability usages AND 0 indicator usages;
+ * otherwise we run the risk of trying to "fix" data that is already broken in a different way.
  *
  * The script ONLY affects due work specifications, not implementations.
  * It should never be necessary to repair this data on implementations,
- * because specs with this kind of invalid data cannot be imported to classes (this is the symptom our schools have
- * been observing).
+ * because specs with this kind of invalid data cannot be imported to classes
+ * (this is the symptom our schools have been observing).
  *
  * @copyright Copyright 2019, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
