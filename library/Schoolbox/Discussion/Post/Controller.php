@@ -11,6 +11,7 @@ namespace Schoolbox\Discussion\Post;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Discussion\Thread;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Controller for post-related API requests.
@@ -67,7 +68,12 @@ class Controller extends BaseController
      */
     public function deletePost(Model $post): void
     {
-        $this->mapper->delete($post);
+        // Deletes are idempotent
+        try {
+            $this->mapper->delete($post);
+        } catch (MapperException $e) {
+            // noop
+        }
         $this->response->status->setCode(204);
     }
 }
