@@ -173,6 +173,8 @@ $kernel->run(new class extends App
      *
      * Migration is only required if:
      * * `$old` cannot fit within `$new` column (it is 2^16 bytes or larger)
+     * * `$new` is 2^16 bytes or more (if it's not, it can't be a truncation of
+     *    `$old`)
      * * `$new` is a truncated form of `$old`; if it's not, we must assume the
      *    user has modified the article, and thus we can't assume they still
      *    want the old version
@@ -183,12 +185,20 @@ $kernel->run(new class extends App
      */
     private function isMigrationRequired(string $old, string $new): bool
     {
-        if (strlen($old) < (2 ** 16)) {
+        $truncatedLength = 2 ** 16;
+        $oldLength       = strlen($old);
+        $newLength       = strlen($new);
+        if ($oldLength < $truncatedLength) {
             $this->log->notice(self::indent(2) . 'old content fits within new content: no migrate required');
             return false;
         }
 
-        $truncatedOld = substr($old, 0, strlen($new));
+        if ($newLength < $truncatedLength) {
+            $this->log->notice(self::indent(2) . 'new content fits within max size: no migrate required');
+            return false;
+        }
+
+        $truncatedOld = substr($old, 0, $newLength);
         if ($truncatedOld === $new) {
             $this->log->warning(self::indent(2) . 'new is a substring of old: migrating');
             return true;
