@@ -9,6 +9,16 @@ use Schoolbox\Collection;
 
 class Component_Instance
 {
+    public const MODULE_HOMEPAGE = 'homepage';
+
+    public const MODULE_HOMEPAGE_TEMPLATE = 'homepage_template';
+
+    public const MODULE_DASHBOARD = 'dashboard';
+
+    public const MODULE_EPORTFOLIO = 'eportfolio';
+
+    public const MODULE_EPORTFOLIO_TEMPLATE = 'eportfolio_template';
+
     /** @var int $id */
     protected $id;
 
