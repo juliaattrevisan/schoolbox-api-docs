@@ -183,7 +183,7 @@ $kernel->run(new class extends App
      */
     private function isMigrationRequired(string $old, string $new): bool
     {
-        if (strlen($old) < 2^16) {
+        if (strlen($old) < (2 ** 16)) {
             $this->log->notice(self::indent(2) . 'old content fits within new content: no migrate required');
             return false;
         }
