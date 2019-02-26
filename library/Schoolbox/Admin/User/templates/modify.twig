@@ -108,75 +108,100 @@
                     </div>
 
                     <div class="small-12 medium-4 island">
-                        <label for="title">Title</label>
-                        <select id="title" name="title">
-                            {% for title in titles %}
-                                <option value="{{ title.title }}" {% if user.title == title.title %}selected{% endif %}>{{ title.title }}</option>
-                            {% endfor %}
-                        </select>
+                        <div>
+                            <label for="title">Title</label>
+                            <select id="title" name="title">
+                                {% for title in titles %}
+                                    <option value="{{ title.title }}" {% if user.title == title.title %}selected{% endif %}>{{ title.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                        <label for="firstname">First Name</label>
-                        <input id="firstname" type="text" name="firstname" value="{{ user.firstName }}"/>
-
-                        <label for="lastname">Surname</label>
-                        <input id="lastname" type="text" name="lastname" value="{{ user.lastName }}"/>
-
-                        <label for="position_title">Position Title</label>
-                        <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
+                        <div>
+                            <label for="firstname" class="required">First Name</label>
+                            <input id="firstname" type="text" name="firstname" value="{{ user.firstName }}"/>
+                        </div>
+                        <div>
+                            <label for="lastname">Surname</label>
+                            <input id="lastname" type="text" name="lastname" value="{{ user.lastName }}"/>
+                        </div>
+                        <div>
+                            <label for="position_title">Position Title</label>
+                            <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
+                        </div>
 
                         {% if user %}
-                            {# Can't display a schoolbox user ID on insert screen #}
-                            <label for="userId">Schoolbox User ID</label>
-                            <input id="userId" type="text" disabled value="{{ user.id }}"/>
+                            <div>
+                                {# Can't display a schoolbox user ID on insert screen #}
+                                <label for="userId">Schoolbox User ID</label>
+                                <input id="userId" type="text" disabled value="{{ user.id }}"/>
+                            </div>
                         {% endif %}
 
-                        <label for="database">{{ externalDatabase }} ID</label>
-                        <input id="database" type="text" name="database_id" value="{{ user.externalId }}"/>
+                        <div>
+                            <label for="database">{{ externalDatabase }} ID</label>
+                            <input id="database" type="text" name="database_id" value="{{ user.externalId }}"/>
+                        </div>
                     </div>
 
                     <div class="small-12 medium-4 island">
-                        <label for="username">Username</label>
-                        <input id="username" type="text" class="required" name="modusername" value="{{ user.username }}"/>
+                        <div>
+                            <label for="username" class="required">Username</label>
+                            <input id="username" type="text" class="required" name="modusername" value="{{ user.username }}"/>
+                        </div>
 
-                        <label for="password">Password</label>
-                        <input id="password" type="password" name="modpassword" class="password" value="donotchange"/>
+                        <div>
+                            <label for="password">Password</label>
+                            <input id="password" type="password" name="modpassword" class="password" value="donotchange"/>
+                        </div>
 
-                        <label for="group">Role</label>
-                        <select id="group" name="group">
-                            {% for role in roles %}
-                                <option value="{{ role.id }}" {% if user.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
-                            {% endfor %}
-                        </select>
+                        <div>
+                            <label for="group">Role</label>
+                            <select id="group" name="group">
+                                {% for role in roles %}
+                                    <option value="{{ role.id }}" {% if user.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                        <label for="alt_email">Alternate Email</label>
-                        <input id="alt_email" type="email" name="alt_email" value="{{ user.altEmail }}"/>
+                        <div>
+                            <label for="alt_email">Alternate Email</label>
+                            <input id="alt_email" type="email" name="alt_email" value="{{ user.altEmail }}"/>
+                        </div>
 
-                        <label for="year">Year</label>
-                        <input id="year" type="text" name="year" value="{{ user.year }}"/>
+                        <div>
+                            <label for="year">Year</label>
+                            <input id="year" type="text" name="year" value="{{ user.year }}"/>
+                        </div>
 
-                        <label for="house">House</label>
-                        <select id="house" name="house">
-                            <option value="">Not Set</option>
-                            {% for house in houses %}
-                                <option value="{{ house.id }}" {% if user.schoolHouse.id == house.id %}selected{% endif %}>{{ house.house }}</option>
-                            {% endfor %}
-                        </select>
+                        <div>
+                            <label for="house">House</label>
+                            <select id="house" name="house">
+                                <option value="">Not Set</option>
+                                {% for house in houses %}
+                                    <option value="{{ house.id }}" {% if user.schoolHouse.id == house.id %}selected{% endif %}>{{ house.house }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                        <label for="residential_house">Residential House</label>
-                        <select id="residential_house" name="residential_house">
-                            <option value="">Not Set</option>
-                            {% for residentialHouse in residentialHouses %}
-                                <option value="{{ residentialHouse.id }}"
-                                        {% if user.residentialHouse.id == residentialHouse.id %}selected{% endif %}>{{ residentialHouse.house }}</option>
-                            {% endfor %}
-                        </select>
+                        <div>
+                            <label for="residential_house">Residential House</label>
+                            <select id="residential_house" name="residential_house">
+                                <option value="">Not Set</option>
+                                {% for residentialHouse in residentialHouses %}
+                                    <option value="{{ residentialHouse.id }}"
+                                            {% if user.residentialHouse.id == residentialHouse.id %}selected{% endif %}>{{ residentialHouse.house }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
                 </div>
             </fieldset>
 
             {# Render roughly-equal column lengths #}
             <fieldset>
-                <legend>Campus Involvement</legend>
+                <label class="content required">Campus Involvement</label>
+
                 <div class="row content">
                     {% set numPerColumn = (campuses|length/3)|round(0, 'ceil') %}
 
@@ -209,7 +234,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>Options</legend>
+                <label class="content">Options</label>
                 <div class="row content">
                     <div class="small-12 medium-4 columns">
                         <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {% if user.eportfolioEnable %}checked{% endif %} />
