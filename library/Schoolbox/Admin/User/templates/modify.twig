@@ -83,6 +83,17 @@
                                     $('#portraitImage').fadeOut();
                                 }"
                             } %}
+
+                            {# Cachebuster
+                             # Get the latest version for instant gratification while on this screen
+                             #}
+                            <script>
+                                $(function() {
+                                    var img = $('#profile-drop').find('img');
+
+                                    img.attr('src', img.attr('src') + '&cb={{ date().timestamp }}');
+                                });
+                            </script>
                         {% endif %}
 
                         {# If user never had a picture and you can't add one manually because of config setting
