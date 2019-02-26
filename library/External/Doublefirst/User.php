@@ -25,7 +25,7 @@ class External_Doublefirst_User implements External_UserInterface
      * This identifies the CONVERT/CAST format for ISO8601 date
      * yyyy-mm-ddThh:mi:ss.mmm
      */
-    protected const FORMAT_ISO8601 = 126;
+    private const FORMAT_ISO8601 = 126;
 
     /**
      * @var MSSQL
@@ -39,7 +39,9 @@ class External_Doublefirst_User implements External_UserInterface
     private $helper;
 
 
-    /** Constructor */
+    /**
+     * External_Doublefirst_User constructor.
+     */
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
@@ -120,7 +122,7 @@ class External_Doublefirst_User implements External_UserInterface
                  *
                  * (the latter occurs when the sis gets updated with a new picture and we need to update our storage)
                  */
-                if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(new \Alaress_Date_Format(strtotime($photo['LastUpdated']), 'U'))) {
+                if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(\Alaress_Date_Format::newFromTimestamp(strtotime($photo['LastUpdated'])))) {
                     $queryPhoto = "
                         SELECT  StaffPhoto AS Photo
                         FROM    StaffPersonalDetails

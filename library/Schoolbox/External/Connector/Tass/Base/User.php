@@ -12,29 +12,24 @@ namespace Schoolbox\External\Connector\Tass\Base;
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\IUser;
+use Schoolbox\Resource\Storage;
+use Schoolbox\User as SchoolboxUser;
 
 class User extends Base implements IUser
 {
     /**
      * @inheritdoc
      */
-    function getPortrait($externalId)
+    public function getPortrait(SchoolboxUser $user): ?Storage\Model
     {
-        return false;
+        return null;
     }
+
 
     /**
      * @inheritdoc
      */
-    function getGuardians($externalIds, $hydrateStudents = false)
-    {
-        return new Collection();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    function getGuardianDirectory($filter = [])
+    public function getGuardians($externalIds, $hydrateStudents = false)
     {
         return new Collection();
     }
@@ -42,7 +37,7 @@ class User extends Base implements IUser
     /**
      * @inheritdoc
      */
-    function getStudents($externalIds, $hydrateGuardians = false)
+    public function getGuardianDirectory(array $filter = [])
     {
         return new Collection();
     }
@@ -50,7 +45,7 @@ class User extends Base implements IUser
     /**
      * @inheritdoc
      */
-    function getStudentsAccessible($externalID)
+    public function getStudents($externalIds, $hydrateGuardians = false)
     {
         return new Collection();
     }
@@ -58,7 +53,7 @@ class User extends Base implements IUser
     /**
      * @inheritdoc
      */
-    function getStaff($externalId)
+    public function getStudentsAccessible($externalID)
     {
         return new Collection();
     }
@@ -66,7 +61,7 @@ class User extends Base implements IUser
     /**
      * @inheritdoc
      */
-    function getStaffDirectory($filter = [])
+    public function getStaff($externalId)
     {
         return new Collection();
     }
@@ -74,7 +69,7 @@ class User extends Base implements IUser
     /**
      * @inheritdoc
      */
-    function getTutors($externalIds)
+    public function getStaffDirectory(array $filter = [])
     {
         return new Collection();
     }
@@ -82,7 +77,15 @@ class User extends Base implements IUser
     /**
      * @inheritdoc
      */
-    function getEmails($externalIds)
+    public function getTutors($externalIds)
+    {
+        return new Collection();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEmails($externalIds): array
     {
         return [];
     }
@@ -90,7 +93,7 @@ class User extends Base implements IUser
     /**
      * @inheritdoc
      */
-    function getCampusInvolvement($externalId)
+    public function getCampusInvolvement($externalId)
     {
         return new Collection();
     }

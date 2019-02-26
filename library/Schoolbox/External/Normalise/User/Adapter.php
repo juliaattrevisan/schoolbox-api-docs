@@ -14,18 +14,20 @@
 
 namespace Schoolbox\External\Normalise\User;
 use Schoolbox\Collection;
+use Schoolbox\Resource\Storage;
+use Schoolbox\User;
 
 /* Interface usage disabled while the repopulation takes place
  * because it'll bleat at me until I implement all methods
  */
-class Adapter  implements \External_UserInterface {
+class Adapter {
 
     /**
      * Crappy alex handler
      *
-     * @var null
+     * @var \External_User
      */
-    private $handler = null;
+    private $handler;
 
     /**
      * Accepts an External_User
@@ -33,17 +35,19 @@ class Adapter  implements \External_UserInterface {
      * @param \External_User $handler
      */
     public function __construct(\External_User $handler) {
-        $this->setHandler($handler);
+        $this->handler = $handler;
     }
+
 
     /**
      * Get portrait
      *
-     * @param $externalUserId
-     * @return String
+     * @param User $user
+     * @return Storage\Model|null
      */
-    public function getPortrait($externalUserId) {
-        return $this->getHandler()->getPortrait($externalUserId);
+    public function getPortrait(User $user): ?Storage\Model
+    {
+        return $this->handler->getPortrait($user);
     }
 
     /* Parents
@@ -55,8 +59,9 @@ class Adapter  implements \External_UserInterface {
      * @param $externalUserId
      * @return Collection
      */
-    public function getParent($externalUserId) {
-        $currentResult = $this->getHandler()->getParent($externalUserId);
+    public function getParent($externalUserId): Collection
+    {
+        $currentResult = $this->handler->getParent($externalUserId);
 
         /* Assemble first guardian
          */
@@ -119,13 +124,14 @@ class Adapter  implements \External_UserInterface {
      * @param $externalUserId
      * @return Collection
      */
-    public function getParentSync($externalUserId) {
+    public function getParentSync($externalUserId): Collection
+    {
         $collection = new Collection();
 
-        $allResults = $this->getHandler()->getParentSync($externalUserId);
+        $allResults = $this->handler->getParentSync($externalUserId);
 
-        if (is_array($externalUserId)) {
-            if (is_array($allResults) && count($allResults)) {
+        if (\is_array($externalUserId)) {
+            if (\is_array($allResults) && \count($allResults)) {
                 foreach ($allResults as $currentResult) {
                     $guardianEmail = new Common\Email();
                     $guardianEmail
@@ -174,12 +180,13 @@ class Adapter  implements \External_UserInterface {
      * @param array $externalUserId
      * @return Collection
      */
-    public function getParentEmails($externalUserId) {
+    public function getParentEmails($externalUserId): Collection
+    {
         $allGuardians = array();
 
-        $allResults = $this->getHandler()->getParentEmails($externalUserId);
+        $allResults = $this->handler->getParentEmails($externalUserId);
 
-        if (is_array($allResults) && count($allResults)) {
+        if (\is_array($allResults) && \count($allResults)) {
 
             /* Samuel made array keys in the format 131-0, 131-1
              * to allow multiple email addresses from a connector
@@ -230,9 +237,9 @@ class Adapter  implements \External_UserInterface {
     public function getParentUserAccountInfo() {
         $allGuardians = array();
 
-        $allResults = $this->getHandler()->getParentUserAccountInfo();
+        $allResults = $this->handler->getParentUserAccountInfo();
 
-        if (is_array($allResults) && count($allResults)) {
+        if (\is_array($allResults) && \count($allResults)) {
             foreach ($allResults as $currentResult) {
 
                 /* Campus
@@ -377,8 +384,9 @@ class Adapter  implements \External_UserInterface {
      * @param $externalUserId
      * @return Student
      */
-    public function getStudent($externalUserId) {
-        $currentResult = $this->getHandler()->getStudent($externalUserId);
+    public function getStudent($externalUserId): Student
+    {
+        $currentResult = $this->handler->getStudent($externalUserId);
 
         /* Guardian 1
          */
@@ -509,12 +517,13 @@ class Adapter  implements \External_UserInterface {
      *
      * @return Collection
      */
-    public function getStudentContactList($externalUserId) {
+    public function getStudentContactList($externalUserId): Collection
+    {
         $collection = new Collection();
 
-        $allResults = $this->getHandler()->getStudentContactList($externalUserId);
+        $allResults = $this->handler->getStudentContactList($externalUserId);
 
-        if (is_array($allResults) && count($allResults)) {
+        if (\is_array($allResults) && \count($allResults)) {
             foreach ($allResults as $currentResult) {
 
                 /* Guardian 1
@@ -634,12 +643,13 @@ class Adapter  implements \External_UserInterface {
      *
      * @return Collection
      */
-    public function getStudentBoarderContactListExtended() {
+    public function getStudentBoarderContactListExtended(): Collection
+    {
         $collection = new Collection();
 
-        $allResults = $this->getHandler()->getStudentBoarderContactListExtended();
+        $allResults = $this->handler->getStudentBoarderContactListExtended();
 
-        if (is_array($allResults) && count($allResults)) {
+        if (\is_array($allResults) && \count($allResults)) {
             foreach($allResults as $currentResult) {
 
                 /* Guardian 1
@@ -817,12 +827,13 @@ class Adapter  implements \External_UserInterface {
      *
      * @return Collection
      */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form): Collection
+    {
         $collection = new Collection();
 
-        $allResults = $this->getHandler()->getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form);
+        $allResults = $this->handler->getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form);
 
-        if (is_array($allResults) && count($allResults)) {
+        if (\is_array($allResults) && \count($allResults)) {
             foreach($allResults as $currentResult) {
 
                 /* Guardian 1
@@ -1005,9 +1016,9 @@ class Adapter  implements \External_UserInterface {
     public function getStudentUserAccountInfo() {
         $collection = new Collection();
 
-        $allResults = $this->getHandler()->getStudentUserAccountInfo();
+        $allResults = $this->handler->getStudentUserAccountInfo();
 
-        if (is_array($allResults) && count($allResults)) {
+        if (\is_array($allResults) && \count($allResults)) {
             foreach ($allResults as $currentResult) {
                 $student = new Student();
                 $student
@@ -1085,8 +1096,9 @@ class Adapter  implements \External_UserInterface {
      * @param $externalUserId
      * @return Staff
      */
-    public function getStaff($externalUserId) {
-        $currentResult = $this->getHandler()->getStaff($externalUserId);
+    public function getStaff($externalUserId): Staff
+    {
+        $currentResult = $this->handler->getStaff($externalUserId);
 
         $staff = new Staff();
         $staff
@@ -1127,6 +1139,7 @@ class Adapter  implements \External_UserInterface {
         return $staff;
     }
 
+
     /**
      * Contact list for staff directory
      * Exclude people who aren't active.
@@ -1135,13 +1148,15 @@ class Adapter  implements \External_UserInterface {
      * TODO: This is a variation of getStaff()
      *
      * @return Collection
+     * @throws \InvalidArgumentException
      */
-    public function getStaffContactListExtended() {
+    public function getStaffContactListExtended(): Collection
+    {
         $collection = new Collection();
 
-        $allResults = $this->getHandler()->getStaffContactListExtended();
+        $allResults = $this->handler->getStaffContactListExtended();
 
-        if (is_array($allResults) && count($allResults)) {
+        if (\is_array($allResults) && \count($allResults)) {
             foreach ($allResults as $currentResult) {
                 $staff = new Staff();
 
@@ -1212,9 +1227,9 @@ class Adapter  implements \External_UserInterface {
     public function getStaffUserAccountInfo() {
         $collection = new Collection();
 
-        $allResults = $this->getHandler()->getStaffUserAccountInfo();
+        $allResults = $this->handler->getStaffUserAccountInfo();
 
-        if (is_array($allResults) && count($allResults)) {
+        if (\is_array($allResults) && \count($allResults)) {
             foreach ($allResults as $currentResult) {
                 $staff = new Staff();
                 $staff
@@ -1285,12 +1300,13 @@ class Adapter  implements \External_UserInterface {
      * @param $externalUserId
      * @return \Schoolbox\Collection
      */
-    public function getEnrolledStudents($externalUserId) {
+    public function getEnrolledStudents($externalUserId): Collection
+    {
         $collection = new Collection();
 
-        $allResults = $this->getHandler()->getEnrolledStudents($externalUserId);
+        $allResults = $this->handler->getEnrolledStudents($externalUserId);
 
-        if (is_array($allResults) && count($allResults)) {
+        if (\is_array($allResults) && \count($allResults)) {
             foreach ($allResults as $currentResult) {
                 $student = new Student();
                 $student
@@ -1313,8 +1329,9 @@ class Adapter  implements \External_UserInterface {
      * @param $externalUserId
      * @return Common\Email
      */
-    public function getEmail($externalUserId) {
-        $currentResult = $this->getHandler()->getEmail($externalUserId);
+    public function getEmail($externalUserId): Common\Email
+    {
+        $currentResult = $this->handler->getEmail($externalUserId);
 
         $email = new Common\Email();
         $email->setAddress($currentResult);
@@ -1328,8 +1345,9 @@ class Adapter  implements \External_UserInterface {
      * @param null $externalUserId
      * @return int
      */
-    public function getCurrentSemester($externalUserId = null) {
-        return $this->getHandler()->getCurrentSemester($externalUserId);
+    public function getCurrentSemester($externalUserId = null): int
+    {
+        return $this->handler->getCurrentSemester($externalUserId);
     }
 
     /**
@@ -1338,25 +1356,25 @@ class Adapter  implements \External_UserInterface {
      * @param null $externalUserId
      * @return int
      */
-    public function getCurrentYear($externalUserId = null) {
-        return $this->getHandler()->getCurrentYear($externalUserId);
+    public function getCurrentYear($externalUserId = null): int
+    {
+        return $this->handler->getCurrentYear($externalUserId);
     }
+
 
     /**
      * Get a list of subjects and their types
      *
-     * @param $externalUserId
-     * @param $userId
-     *
+     * @param User $user
      * @return Collection
      */
-    public function getSubjectList(\Schoolbox\User $user) {
-
+    public function getSubjectList(User $user): Collection
+    {
         $collection = new Collection();
 
-        $allResults = $this->getHandler()->getSubjectList($user);
+        $allResults = $this->handler->getSubjectList($user);
 
-        if (is_array($allResults) && count($allResults)) {
+        if (\is_array($allResults) && \count($allResults)) {
             foreach ($allResults as $currentResult) {
                 $campus = new Common\Campus();
                 $campus
@@ -1386,8 +1404,9 @@ class Adapter  implements \External_UserInterface {
      * @param $houseId
      * @return Staff
      */
-    public function getHousemasterByHouseId($houseId) {
-        $currentResult = $this->getHandler()->getHousemasterByHouseId($houseId);
+    public function getHousemasterByHouseId($houseId): Staff
+    {
+        $currentResult = $this->handler->getHousemasterByHouseId($houseId);
 
         $staff = new Staff();
         $staff->setId($currentResult);
@@ -1402,8 +1421,9 @@ class Adapter  implements \External_UserInterface {
      * @param $boarderValue
      * @return string
      */
-    public function determineBoarderType($boarderValue) {
-        return $this->getHandler()->determineBoarderType($boarderValue);
+    public function determineBoarderType($boarderValue): string
+    {
+        return $this->handler->determineBoarderType($boarderValue);
     }
 
     /**
@@ -1414,7 +1434,7 @@ class Adapter  implements \External_UserInterface {
      */
     public function getCampusFromTimetable($staffID)
     {
-        return $this->getHandler()->getCampusFromTimetable($staffID);
+        return $this->handler->getCampusFromTimetable($staffID);
     }
 
     /**
@@ -1423,31 +1443,9 @@ class Adapter  implements \External_UserInterface {
      *
      * @return array
      */
-    public function getStudentForms() {
-        return $this->getHandler()->getStudentForms();
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set handler
-     *
-     * @param \External_User $handler
-     */
-    private function setHandler($handler)
+    public function getStudentForms(): array
     {
-        $this->handler = $handler;
-    }
-
-    /**
-     * Get handler
-     *
-     * @return \External_User
-     */
-    private function getHandler()
-    {
-        return $this->handler;
+        return $this->handler->getStudentForms();
     }
 }
 

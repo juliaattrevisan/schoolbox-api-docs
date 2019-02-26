@@ -18,7 +18,7 @@ class External_Maze_User implements External_UserInterface
      *
      * @var MSSQL $db
      */
-    protected $db = null;
+    protected $db;
 
     /**
      * A Handler of Groups
@@ -32,7 +32,7 @@ class External_Maze_User implements External_UserInterface
      *
      * @var External_Maze_Helper $helper
      */
-    protected $helper = null;
+    protected $helper;
 
     /**
      * Constructor
@@ -840,6 +840,8 @@ class External_Maze_User implements External_UserInterface
     public function getPortrait(User $user): ?Storage\Model
     {
 
+        $externalId = $this->getDb()->smartQuote($user->getExternalId());
+
         /* Students and staff store their pics in different places
          */
         if ($this->getGroup()->isStudent($user->getId())) {
@@ -847,14 +849,14 @@ class External_Maze_User implements External_UserInterface
                 SELECT
                     CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
                 FROM ST
-                WHERE ST.STKEY = '{$user->getExternalId()}'
+                WHERE ST.STKEY = {$externalId}
             ";
         } elseif ($this->getGroup()->isStaff($user->getId())) {
             $query = "
                 SELECT
                     CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
                 FROM SF
-                WHERE SF.SFKEY = '{$user->getExternalId()}'
+                WHERE SF.SFKEY = {$externalId}
             ";
         } else {
 
@@ -873,7 +875,7 @@ class External_Maze_User implements External_UserInterface
              *
              * (the latter occurs when the sis gets updated with a new picture and we need to update our storage)
              */
-            if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(new \Alaress_Date_Format(strtotime($photo['ModifiedDate']), 'U'))) {
+            if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(\Alaress_Date_Format::newFromTimestamp(strtotime($photo['ModifiedDate'])))) {
                 $queryPhoto = false;
 
                 if ($this->getGroup()->isStudent($user->getId())) {
@@ -881,14 +883,14 @@ class External_Maze_User implements External_UserInterface
                         SELECT
                             STUDENT_PIC AS Photo
                         FROM ST
-                        WHERE ST.STKEY = '{$user->getExternalId()}'
+                        WHERE ST.STKEY = {$externalId}
                     ";
                 } elseif ($this->getGroup()->isStaff($user->getId())) {
                     $queryPhoto = "
                         SELECT
                             STAFF_PIC AS Photo
                         FROM SF
-                        WHERE SF.SFKEY = '{$user->getExternalId()}'
+                        WHERE SF.SFKEY = {$externalId}
                     ";
                 }
 
@@ -1102,7 +1104,7 @@ class External_Maze_User implements External_UserInterface
     /**
      * Set db
      *
-     * @param null $db
+     * @param MSSQL $db
      */
     protected function setDb($db)
     {
@@ -1112,7 +1114,7 @@ class External_Maze_User implements External_UserInterface
     /**
      * Get db
      *
-     * @return null
+     * @return MSSQL
      */
     protected function getDb()
     {
