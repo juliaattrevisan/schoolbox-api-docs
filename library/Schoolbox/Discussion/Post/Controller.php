@@ -68,11 +68,8 @@ class Controller extends BaseController
      */
     public function deletePost(Model $post): void
     {
-        // Deletes are idempotent
-        try {
+        if (!$post->isDeleted()) {
             $this->mapper->delete($post);
-        } catch (MapperException $e) {
-            // noop
         }
         $this->response->status->setCode(204);
     }

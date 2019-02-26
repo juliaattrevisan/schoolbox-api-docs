@@ -14,6 +14,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Thread;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Module for discussion post requests.
@@ -54,7 +55,7 @@ class Module extends BaseModule
             '/{id:\d+}',
             'deletePost',
             $deleteAuthorizer,
-            [$this, 'preloadPost']
+            [$this, 'preloadPostAllowDeleted']
         );
         $this->register(
             'GET',
@@ -93,12 +94,31 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException         if the post never existed
+     * @throws MapperException\Deleted if the post has been deleted
      */
     public function preloadPost(array $params): array
     {
         return [
             'post' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
         ];
+    }
+
+
+    /**
+     * Preload the requested post. If the post was deleted, it is still
+     * preloaded.
+     *
+     * @param array $params
+     * @return array
+     * @throws MapperException if the post never existed
+     */
+    public function preloadPostAllowDeleted(array $params): array
+    {
+        try {
+            return $this->preloadPost($params);
+        } catch (MapperException\Deleted $e) {
+            return ['post' => $e->getDeletedObject(),];
+        }
     }
 }
