@@ -50,7 +50,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Rubric Usage Cleanup',
     [
         'verbose' => $opts['v'] ?? [],
-        'perform' => isset($opts['p']) || isset($opts['perform']),
+        'perform' => true,
     ]
 );
 
