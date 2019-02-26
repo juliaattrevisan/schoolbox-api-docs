@@ -114,6 +114,34 @@
                     </div>
 
                     <div class="small-12 medium-6 island">
+                        <label>Portrait Image</label>
+
+                        {# If the user has a picture, show it
+                         #}
+                        {% if user.portrait %}
+                            <div>
+                                <img src="/portrait.php?id={{ user.id }}&size=profile&cb={{ date().timestamp }}" />
+                            </div>
+                        {% endif %}
+
+                        {# If you can change the picture manually, show attachzone
+                         # This depends on the config setting "Load From SIS"
+                         # If it's on, you -cannot- change pictures manually
+                         #}
+                        {% if portraitZone %}
+                            {% include 'sub/attachzone.twig' with { attachzone: portraitZone } %}
+                        {% endif %}
+
+                        {# If user never had a picture and you can't add one manually because of config setting
+                         # then display a generic empty state thing explaining what's going on
+                         #}
+                        {% if not user.portrait and not portraitZone %}
+                            <div class="empty-state">
+                                <p>Profile images are automatically generated from the SIS.</p>
+                                <p>You can <a href="/adminv2/setting/External+DB">change this setting here</a></p>
+                            </div>
+                        {% endif %}
+
                         <label for="username">Username</label>
                         <input id="username" type="text" class="required" name="modusername" value="{{ user.username }}"/>
 

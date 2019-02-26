@@ -14,26 +14,29 @@ use Alaress\Web\Controller\Base;
 use HouseMapper;
 use HouseResidentialMapper;
 use Monolog\Logger;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Storage\IStorage;
+use Scrub;
+use UnexpectedValueException;
 use Schoolbox\Application\Exception\NotFound as ExceptionNotFound;
 use Schoolbox\Campus;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Alert\RedisPublisher;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\User\Title\Mapper as UserTitleMapper;
-use Schoolbox\RoleMapper;
-use Schoolbox\CampusMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
-use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
-use Scrub;
-use UnexpectedValueException;
+use Schoolbox\User\Title\Mapper as UserTitleMapper;
 
 /**
  * Controller for managing school users through the admin section.
@@ -254,14 +257,21 @@ class Controller extends Base
         $this->houseMapper = $houseMapper;
     }
 
+
     /**
      * Modify user screen
      * @param User $user
+     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnderflowException
      */
     public function getModify($user)
     {
         // Check for non-existent user
-        if ($user->getId() == NULL) {
+        if ($user->getId() === null) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
@@ -284,6 +294,20 @@ class Controller extends Base
         $userPermissions  = $allPermissions->filter(function (UserAccess $access) {
             return UserAccess::SERVICE_HOMEPAGE !== $access->getService();
         });
+
+        /* Attachzone for profile picture
+         * If Load From SIS is on, then you cannot change the picture manually (automatically obtained)
+         */
+        $portraitZone = null;
+
+        if (!$this->getConfigLoader()->get('photo_sis_import')) {
+            $portraitZone = (new Zone('portrait'))
+                ->setMulti(false)
+                ->setAttachmentsLabel('')
+                ->setAttachPrompt('add a portrait image')
+                ->attachFiles([$user->getPortrait()])->getTwigContext();
+        }
+
 
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
@@ -314,19 +338,31 @@ class Controller extends Base
                 'cmsLog' => $this->cmsLogMapper->findByColumn('user', $user->getId(), [
                     'order' => ['time' => 'desc'],
                     'limit' => 10
-                ])
+                ]),
+                'portraitZone' => $portraitZone
             ],
             'title' => 'Admin - Users'
         ]);
     }
 
+
     /**
      * Insert user screen
+     * @throws UnexpectedValueException
+     * @throws MapperException
      */
     public function getInsert()
     {
         $user = $this->userMapper->createModel()
             ->setDisplayGradeGraph($this->getConfigLoader()->get('display_grade_graph'));
+
+        /* Attachzone for profile picture
+         */
+        $portraitZone = (new Zone('portrait'))
+            ->setMulti(false)
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('add a portrait image');
+
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
@@ -339,6 +375,7 @@ class Controller extends Base
                 'residentialHouses' => $this->houseResidentialMapper->findAll(),
                 'houses' => $this->houseMapper->findAll(),
                 'titles' => $this->userTitleMapper->findAll(),
+                'portraitZone' => $portraitZone->getTwigContext()
             ],
             'title' => 'Admin - Users'
         ]);
@@ -588,6 +625,37 @@ class Controller extends Base
                 $campus = new Campus();
                 $campus->setId($campusId);
                 $user->getCampusCollection()->add($campus);
+            }
+        }
+
+        $factory = new CollectorFactory();
+
+        $attachments = [];
+
+        /* Remove bad data SA-8244
+         */
+        if (\is_array($this->getRequest()->post['attachment'])) {
+            $attachments = array_filter($this->getRequest()->post['attachment']);
+        }
+
+        /* If you didn't provide a picture, empty it
+         */
+        $user->setPortrait(null);
+
+        if (\count($attachments)) {
+
+            // Validate attachment list can actually be built
+            try {
+                /** @var IStorage[] $attachments */
+                $attachments = $factory->build($this->getRequest()->post['attachment'])->getAll();
+            } catch (\InvalidArgumentException $e) {
+
+                /* Bad data; noop
+                 */
+            }
+
+            foreach ($attachments as $portrait) {
+                $user->setPortrait($portrait);
             }
         }
 

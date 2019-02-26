@@ -71,7 +71,7 @@ class Portrait extends Storage
             throw new \InvalidArgumentException('Portrait not found');
         }
 
-        if (!$this->canViewImage($user->getExternalId())) {
+        if (!$this->canViewImage($user)) {
             throw new \RuntimeException('Cannot view image');
         }
     }
@@ -80,11 +80,13 @@ class Portrait extends Storage
     /**
      * Determine whether a portrait can be seen or not
      *
-     * @param string $externalId
+     * @param User $user
      * @return bool
      */
-    private function canViewImage(string $externalId): bool
+    private function canViewImage(User $user): bool
     {
+        $externalId = $user->getExternalId();
+
         // TODO kill it! kill it with fire!
         $group = new Group();
 
@@ -97,13 +99,13 @@ class Portrait extends Storage
         // Get all users with a synergy ID, and test them against policy.
 
         /** @var User[] $userList */
-        $userList = $this->userMapper->findByColumn('synergy_id', $externalId);
+        $users = $this->userMapper->findByColumn('synergy_id', $externalId);
 
-        foreach ($userList as $user) {
+        foreach ($users as $currentUser) {
 
             /* Everyone can always see their own face
              */
-            $userId = $user->getId();
+            $userId = $currentUser->getId();
 
             if ($this->sessionUser->getId() === $userId) {
                 return true;

@@ -64,32 +64,15 @@
         <section class="content">
             <h3>Filter By Surname</h3>
             <dl class="sub-nav no-margin">
-                <dd {% if surname == 'a' %}class="active"{% endif %}><a href="?surname=a">A</a></dd>
-                <dd {% if surname == 'b' %}class="active"{% endif %}><a href="?surname=b">B</a></dd>
-                <dd {% if surname == 'c' %}class="active"{% endif %}><a href="?surname=c">C</a></dd>
-                <dd {% if surname == 'd' %}class="active"{% endif %}><a href="?surname=d">D</a></dd>
-                <dd {% if surname == 'e' %}class="active"{% endif %}><a href="?surname=e">E</a></dd>
-                <dd {% if surname == 'f' %}class="active"{% endif %}><a href="?surname=f">F</a></dd>
-                <dd {% if surname == 'g' %}class="active"{% endif %}><a href="?surname=g">G</a></dd>
-                <dd {% if surname == 'h' %}class="active"{% endif %}><a href="?surname=h">H</a></dd>
-                <dd {% if surname == 'i' %}class="active"{% endif %}><a href="?surname=i">I</a></dd>
-                <dd {% if surname == 'j' %}class="active"{% endif %}><a href="?surname=j">J</a></dd>
-                <dd {% if surname == 'k' %}class="active"{% endif %}><a href="?surname=k">K</a></dd>
-                <dd {% if surname == 'l' %}class="active"{% endif %}><a href="?surname=l">L</a></dd>
-                <dd {% if surname == 'm' %}class="active"{% endif %}><a href="?surname=m">M</a></dd>
-                <dd {% if surname == 'n' %}class="active"{% endif %}><a href="?surname=n">N</a></dd>
-                <dd {% if surname == 'o' %}class="active"{% endif %}><a href="?surname=o">O</a></dd>
-                <dd {% if surname == 'p' %}class="active"{% endif %}><a href="?surname=p">P</a></dd>
-                <dd {% if surname == 'q' %}class="active"{% endif %}><a href="?surname=q">Q</a></dd>
-                <dd {% if surname == 'r' %}class="active"{% endif %}><a href="?surname=r">R</a></dd>
-                <dd {% if surname == 's' %}class="active"{% endif %}><a href="?surname=s">S</a></dd>
-                <dd {% if surname == 't' %}class="active"{% endif %}><a href="?surname=t">T</a></dd>
-                <dd {% if surname == 'u' %}class="active"{% endif %}><a href="?surname=u">U</a></dd>
-                <dd {% if surname == 'v' %}class="active"{% endif %}><a href="?surname=v">V</a></dd>
-                <dd {% if surname == 'w' %}class="active"{% endif %}><a href="?surname=w">W</a></dd>
-                <dd {% if surname == 'x' %}class="active"{% endif %}><a href="?surname=x">X</a></dd>
-                <dd {% if surname == 'y' %}class="active"{% endif %}><a href="?surname=y">Y</a></dd>
-                <dd {% if surname == 'z' %}class="active"{% endif %}><a href="?surname=z">Z</a></dd>
+                {% for letter in 'a'..'z' %}
+                    {% set css = '' %}
+
+                    {% if surname == letter %}
+                        {% set css = 'class="active"' %}
+                    {% endif %}
+
+                    <dd {{ css|raw }}><a href="?surname={{ letter }}">{{ letter|upper }}</a></dd>
+                {% endfor %}
             </dl>
         </section>
     </div>
@@ -117,7 +100,7 @@
                         <li class="actions-small-1">
                             <div class="card small-12">
                                 <a href="/search/user/{{ user.getId }}" title="View Profile">
-                                    <img src='/portrait.php?userId={{ user.getExternalId }}&size=square64' alt="View Profile" />
+                                    <img src='/portrait.php?userId={{ user.getExternalId }}&size=square64&cb={{ date().timestamp }}' alt="View Profile" />
                                     <p>{{ user.getFirstName }} {{ user.getLastName }}</p>
                                 </a>
                                 <p class="meta">{{ user.getRole.getName }}</p>
