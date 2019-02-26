@@ -114,7 +114,7 @@ class Module extends BaseModule
                 $extraParams = [];
                 if ($component instanceof Component_Instance) {
                     $extraParams['component'] = $component;
-                    if ($component->getModule() === 'homepage') {
+                    if ($component->isHomepage()) {
                         $extraParams['homepage'] = $this->getFolderMapper()->findByIdWithFallback(
                             $component->getIdentifier()
                         );

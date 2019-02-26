@@ -196,15 +196,14 @@ class Mapper extends BaseMapper
         }
 
         $identifier = (int)$component->getIdentifier();
-        switch ($component->getModule()) {
-            case 'homepage':
-                return $this->findForFolder($identifier);
-
-            case 'dashboard':
-                return $this->findForDashboard($identifier);
-
-            case 'homepage_template':
-                return $this->findForHomepageTemplate($identifier);
+        if ($component->isHomepage()) {
+            return $this->findForFolder($identifier);
+        }
+        if ($component->isDashboard()) {
+            return $this->findForDashboard($identifier);
+        }
+        if ($component->isHomepageTemplate()) {
+            return $this->findForHomepageTemplate($identifier);
         }
         return $this->createCollection();
     }

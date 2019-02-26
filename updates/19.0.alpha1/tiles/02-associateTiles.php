@@ -356,12 +356,12 @@ $app = new class extends App
             'identifier'   => $component['component']['identifier'],
         ];
         switch ($component['component']['module']) {
-            case 'homepage':
+            case Component_Instance::MODULE_HOMEPAGE:
                 $this->log->notice(self::INDENT . sprintf('attaching layout to folder #%d', $params['identifier']));
                 $this->attachToFolderQuery->execute($params);
                 break;
 
-            case 'homepage_template':
+            case Component_Instance::MODULE_HOMEPAGE_TEMPLATE:
                 $this->log->notice(
                     self::INDENT . sprintf(
                         'attaching layout to homepage template #%d',
@@ -371,7 +371,7 @@ $app = new class extends App
                 $this->attachToHomepageTemplateQuery->execute($params);
                 break;
 
-            case 'dashboard':
+            case Component_Instance::MODULE_DASHBOARD:
                 $this->log->notice(
                     self::INDENT . sprintf(
                         'attaching layout to dashboard for role #%d',
@@ -381,6 +381,8 @@ $app = new class extends App
                 $this->attachToDashboardQuery->execute($params);
                 break;
 
+            case Component_Instance::MODULE_EPORTFOLIO:
+            case Component_Instance::MODULE_EPORTFOLIO_TEMPLATE:
             default:
                 $this->log->warning(
                     self::INDENT . sprintf(
