@@ -860,6 +860,7 @@ class External_Pcschools_User implements External_UserInterface
                           WHERE  tf.TEACHER = :externalID
                                 AND          tf.TIME_PERIOD = :timePeriod
                                 AND          sub.PERIOD_ID = :subPeriod
+                                AND          (tf.[STATUS] != 'S' OR tf.SUPERDATE = CONVERT(date, GETDATE()))
                         ";
 
         } else {
