@@ -27,32 +27,83 @@ class Kernel extends CliKernelAbstract
     // Command line options recognised by this kernel
     private const OPT_OUT_STREAM = 'o:'; // CLI option to allow output to be written to a file, rather than STDOUT
     private const OPT_ERR_STREAM = 'l:'; // CLI option to allow logs to be written to a file, rather than STDERR
-    private const OPT_VERBOSITY  = 'v';  // CLI option that verbosity, unless overridden by Lumberjack\Logger::FIELD_LEVEL
+    private const OPT_VERBOSITY  = 'v';  // CLI option that verbosity, unless overridden. @see Lumberjack\Logger::FIELD_LEVEL
 
-    // These control the kernel and default logger
+    // Command-line option to control what errors PHP should report
+    public const OPT_ERRORS  = 'errors:';
+
+    // By default, all apps run in 'dry-run' mode, unless either:
+    // 1. this option is supplied on the command line, or
+    // 2. the kernel is constructed from a script that instructs the kernel to 'forcePerform'
+    public const OPT_PERFORM = 'perform';
+
+    /**
+     * These control the kernel and default logger
+     *
+     * Array values will be:
+     * * bool   - if option does not accept a value
+     * * string - if option does accept a value
+     * * array  - if option is specified multiple times
+     *
+     * @var bool[]|string[]|array[]
+     */
     private $kernelOptions;
 
-    // These are passed back to the CLI app
+    /**
+     * These are passed back to the CLI app
+     *
+     * Array values will be:
+     * * bool   - if option does not accept a value
+     * * string - if option does accept a value
+     * * array  - if option is specified multiple times
+     *
+     * @var array
+     */
     private $appOptions;
 
-    // The stream to which the App will be instructed to write output to
+    /**
+     * The resource to which the App should stream output
+     *
+     * @var resource
+     */
     private $outStream;
+
+    /** @var bool */
+    private $forcePerform;
+
+    /** @var null|int */
+    private $logLevelOverride;
+
+    /** @var null|int */
+    private $errorLevelOverride;
 
 
     /**
-     * @param string[] $appShortOpts
-     * @param string[] $appLongOpts
+     * @param string[]  $appShortOpts
+     * @param string[]  $appLongOpts
+     * @param null|bool $forcePerform     Allow invoking script to force the App to run in 'perform' mode
+     * @param int|null  $logLevelOverride Allow invoking script to force the App to log at a specific logging level
+     * @param int|null  $errorLevelOverride
+     * @throws InvalidArgumentException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Di\Exception\ServiceNotObject
-     * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Schoolbox\External\Exception
-     * @todo the apps's options should be passed into runApp(), not here.
+     * @throws \UnexpectedValueException
+     * @todo the apps's options should be passed into runApp(), not here. But that requires manual parsing of $argv
      */
-    public function __construct(array $appShortOpts = [], array $appLongOpts = [])
-    {
+    public function __construct(
+        array $appShortOpts = [],
+        array $appLongOpts = [],
+        ?bool $forcePerform = false,
+        int $logLevelOverride = null,
+        int $errorLevelOverride = null
+    ) {
+        $this->forcePerform       = $forcePerform;
+        $this->logLevelOverride   = $logLevelOverride;
+        $this->errorLevelOverride = $errorLevelOverride;
         $this->parseCommandLineOptions($appShortOpts, $appLongOpts);
         $this->setErrorReporting();
 
@@ -72,7 +123,9 @@ class Kernel extends CliKernelAbstract
      */
     public function runApp(App $app): void
     {
-        $app->setup($this->getDependencyInjector(), $this->outStream, $this->logger());
+        $perform = $this->forcePerform || $this->getKernelOpt(self::OPT_PERFORM);
+
+        $app->setup($this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
         $app->run($this->appOptions);
     }
 
@@ -134,7 +187,7 @@ class Kernel extends CliKernelAbstract
     {
         // Where should we send logs?
         $outFile = $this->getKernelOpt(self::OPT_ERR_STREAM);
-        if ($outFile) {
+        if (null !== $outFile) {
             $outStream = \fopen($outFile, 'ab');
             if (!$outStream) {
                 throw new \UnexpectedValueException("Unable to write logs to '$outFile'");
@@ -143,9 +196,21 @@ class Kernel extends CliKernelAbstract
             $outStream = STDERR;
         }
 
-        $level     = (int)$this->getKernelOpt(Lumberjack\Logger::FIELD_LEVEL, $this->getLoggingLevelFromVerbosity());
+        // At what level should we log? Order of preference:
+        // 1. Kernel construction
+        // 2. Log level command line option
+        // 3. Verbosity command line option
+        if ($this->logLevelOverride) {
+            $level = $this->logLevelOverride;
+        } else {
+            $commandLineLevel = $this->getKernelOpt(Lumberjack\Logger::FIELD_LEVEL);
+            $level            = $commandLineLevel !== null
+                ? (int)$commandLineLevel
+                : $this->getLoggingLevelFromVerbosity();
+        }
+
         $fields    = \array_keys($this->kernelOptions);
-        $porcelain = \array_key_exists(Lumberjack\Logger::FIELD_PORCELAIN, $this->kernelOptions);
+        $porcelain = $this->getKernelOpt(Lumberjack\Logger::FIELD_PORCELAIN);
         $logger    = new Lumberjack\Logger($outStream, null, $level, $fields, $porcelain);
         $this->addRavenHandler($logger);
 
@@ -154,15 +219,18 @@ class Kernel extends CliKernelAbstract
 
 
     /**
-     * Detects whether the App should be instructed to write its output to a file or STDOUT
+     * Returns the resource to which the App should stream its output
      *
      * @return resource
      * @throws InvalidArgumentException
      */
     private function getOutputStream()
     {
+        // Order of preference:
+        // 1. Command line option specifying a file to write to
+        // 2. STDOUT
         $outfile = $this->getKernelOpt(self::OPT_OUT_STREAM);
-        if (!$outfile) {
+        if (null === $outfile) {
             return STDOUT;
         }
         $outStream = \fopen($outfile, 'wb');
@@ -178,7 +246,19 @@ class Kernel extends CliKernelAbstract
      */
     private function setErrorReporting(): void
     {
-        \error_reporting((int)$this->getKernelOpt(self::OPT_ERRORS, E_ALL ^ E_NOTICE));
+        // Order of preference:
+        // 1. Kernel construction
+        // 2. Command line option
+        // 3. Default
+        if (null !== $this->errorLevelOverride) {
+            $errorLevel = $this->errorLevelOverride;
+        } else {
+            $commandLineErrorLevel = $this->getKernelOpt(self::OPT_ERRORS);
+            $errorLevel            = $commandLineErrorLevel !== null
+                ? (int)$commandLineErrorLevel
+                : E_ALL ^ E_NOTICE;
+        }
+        \error_reporting($errorLevel);
     }
 
 
@@ -195,7 +275,7 @@ class Kernel extends CliKernelAbstract
     {
         $v = $this->getKernelOpt(self::OPT_VERBOSITY);
 
-        if ($v === null) {
+        if (!$v) {
             $threshold = 0;
         } elseif (!\is_array($v)) {
             $threshold = 1;
@@ -214,8 +294,10 @@ class Kernel extends CliKernelAbstract
 
 
     /**
-     * @param string[] $appShortOpts
-     * @param string[] $appLongOpts
+     * Parses the command line options, and splits into distinct sets to be used by the Kernel and App respectively.
+     *
+     * @param string[]  $appShortOpts
+     * @param string[]  $appLongOpts
      * @throws InvalidArgumentException
      */
     private function parseCommandLineOptions(array $appShortOpts, array $appLongOpts): void
@@ -224,6 +306,7 @@ class Kernel extends CliKernelAbstract
         $kernelShortOpts = [self::OPT_OUT_STREAM, self::OPT_ERR_STREAM, self::OPT_VERBOSITY,];
         $kernelLongOpts  = [
             self::OPT_ERRORS,
+            self::OPT_PERFORM,
             Lumberjack\Logger::FIELD_MEM,
             Lumberjack\Logger::FIELD_TRUE_MEM,
             Lumberjack\Logger::FIELD_PID,
@@ -281,17 +364,33 @@ class Kernel extends CliKernelAbstract
 
 
     /**
-     * Returns a kernel option's value, or $default if not defined
+     * Returns a kernel's command line option's value
      *
-     * Right trims any colon chars so we can re-use the constants with required/optional decoration still appended.
+     * If option does accept values:
+     *     returns that value, or NULL if not specified
+     * If option does not accept values:
+     *     if a long option:
+     *         returns a bool indicating whether the option was specified at least once.
+     *     else a short option
+     *         returns true if specified once, or array if specified multiple times
      *
-     * @param string $name
-     * @param null   $default
+     * @param string $name Must have colon chars required/optional decoration still appended.
      * @return mixed
      */
-    private function getKernelOpt(string $name, $default = null)
+    private function getKernelOpt(string $name)
     {
-        $trimmedName = \rtrim($name, ':');
-        return \array_key_exists($trimmedName, $this->kernelOptions) ? $this->kernelOptions[$trimmedName] : $default;
+        // Does this option accept values?
+        if (\preg_match('/:$/', $name)) {
+            // return the value
+            return $this->kernelOptions[\rtrim($name, ':')] ?? null;
+        }
+
+        // Does not accept values, and not specified
+        if(!\array_key_exists($name, $this->kernelOptions)){
+            return false;
+        }
+
+        // Does not accept values, was specified at least once.
+        return \is_array($this->kernelOptions[$name]) ? $this->kernelOptions[$name] : true;
     }
 }

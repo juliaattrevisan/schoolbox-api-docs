@@ -27,14 +27,12 @@ use Alaress\Lumberjack;
 //abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements \Psr\Log\LoggerAwareInterface
 abstract class CliKernelAbstract extends \Alaress\Application\Kernel
 {
+
     // Exit Statuses.
     // Apps may use custom exit statuses so long as they don't collide with these
     public const EXIT_STATUS_OK           = 0;   // The requested action was successfully performed.
     public const EXIT_STATUS_KERNEL_ERROR = 1;   // Problem in kernel, may have been caused by App
     public const EXIT_STATUS_APP_ERROR    = 2;   // Problem in App
-
-    // Command-line option to control what errors PHP should report
-    public const OPT_ERRORS = 'errors:';
 
     /** @var LoggerInterface */
     private $logger;

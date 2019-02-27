@@ -25,6 +25,13 @@ abstract class App
     /** @var LoggerInterface */
     private $logger;
 
+    /**
+     * Whether this App should persist changes, as opposed to just simulating them
+     *
+     * @var bool
+     */
+    private $perform;
+
 
     /**
      * Common app setup implementation
@@ -32,12 +39,14 @@ abstract class App
      * @param Di\Container    $di
      * @param resource        $outStream
      * @param LoggerInterface $logger
+     * @param bool            $perform
      */
-    public function setup(Di\Container $di, $outStream, LoggerInterface $logger): void
+    public function setup(Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): void
     {
         $this->di        = $di;
         $this->outStream = $outStream;
         $this->logger    = $logger;
+        $this->perform   = $perform;
     }
 
 
@@ -53,18 +62,54 @@ abstract class App
      * Supports options that are still have colon chars suffixed to indicate required/optional status
      * eg 'c', 'c:', 'c::' will all resolve to 'c'
      *
-     * @see getopt()
+     * If option DOES accept values:
+     *     returns that value, or NULL if not specified
+     * If option does NOT accept values:
+     *     if a long option:
+     *         returns a bool indicating whether the option was specified at least once.
+     *     else a short option
+     *         returns true if specified once, or array if specified multiple times
      *
-     * @param string $optName
+     * @param string $name
      * @param array  $appOptions
-     * @param mixed  $default
      * @return mixed
      */
-    protected function getOpt(string $optName, array $appOptions, $default = null)
+    protected function getOpt(string $name, array $appOptions)
     {
-        $trimmed = \rtrim($optName, ':');
-        return \array_key_exists($trimmed, $appOptions) ? $appOptions[$trimmed] : $default;
+        // Does this option accept values?
+        if (\preg_match('/:$/', $name)) {
+            // return the value
+            return $appOptions[\rtrim($name, ':')] ?? null;
+        }
+
+        // Does not accept values, and not specified
+        if(!\array_key_exists($name, $appOptions)){
+            return false;
+        }
+
+        // Does not accept values, was specified at least once.
+        return \is_array($appOptions[$name]) ? $appOptions[$name] : true;
     }
+
+    /**
+     * Returns a kernel's command line option's value
+     *
+     * If option does accept values:
+     *     returns that value, or NULL if not specified
+     * If option does not accept values:
+     *     if a long option:
+     *         returns a bool indicating whether the option was specified at least once.
+     *     else a short option
+     *         returns true if specified once, or array if specified multiple times
+     *
+     * @param string $name Must have colon chars required/optional decoration still appended.
+     * @return mixed
+     */
+    private function getKernelOpt(string $name)
+    {
+
+    }
+
 
 
     /**
@@ -91,5 +136,13 @@ abstract class App
     protected function getLogger(): LoggerInterface
     {
         return $this->logger;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function perform(): bool
+    {
+        return $this->perform;
     }
 }
