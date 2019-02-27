@@ -5,10 +5,10 @@ VALUES (
 172.16.0.0/12
 10.0.0.0/8', 
   'Cyberhound Whitelist', 
-  '', 
+  'List of subnets that will be forwarded to Cyberhound Whitelist API. These should be only networks that are behind your firewall.  The Cyberhound API will not work for external users.',
   2, 
   '', 
-  (SELECT id from lu_config_type WHERE name like '3rd Party Services'),
+  (SELECT id from lu_config_type WHERE type like '3rd Party Services'),
   'true', 
   'false', 
   'false', 
