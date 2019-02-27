@@ -11,7 +11,7 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../../conf/core/require-cli.php';
 
-// TODO - START - Delete this once SA-8248 is merged. It will be handled by the require above.
+// TODO - START - Delete this once SA-8248 is merged. It will be handled by the require above
 require_once __DIR__ . '/../../../www/conf/conf.php';
 require_once SITE_root . '/www/include/stdfuncs.php';
 require_once SITE_root . '/library/constants.php';
@@ -31,7 +31,7 @@ const OPT_LONG_CURRICULUM  = 'curriculum:';  // curriculum
 const OPT_LONG_NOW         = 'now:';         // to simulate time
 
 $shortOpts = [OPT_SHORT_HELP];
-$longOpts  = [OPT_LONG_HASH, OPT_LONG_USERNAME, OPT_LONG_STUDENT_ID, OPT_LONG_YEAR_LEVEL, OPT_LONG_CURRICULUM, OPT_LONG_NOW,];
+$longOpts  = [OPT_LONG_HELP, OPT_LONG_HASH, OPT_LONG_USERNAME, OPT_LONG_STUDENT_ID, OPT_LONG_YEAR_LEVEL, OPT_LONG_CURRICULUM, OPT_LONG_NOW,];
 $kernel    = new Schoolbox\Application\CliTool\Kernel($shortOpts, $longOpts);
 
 $app = new class() extends CliTool\App{
@@ -59,18 +59,18 @@ $app = new class() extends CliTool\App{
 
 
     /**
-     * @param string[] $appOptions
+     * @inheritdoc
      */
-    public function run(array $appOptions): void
+    public function run(): void
     {
         // Did user request help?
-        if (\array_key_exists(OPT_SHORT_HELP, $appOptions) || \array_key_exists(OPT_LONG_HELP, $appOptions)) {
+        if ($this->getOpt(OPT_SHORT_HELP) || $this->getOpt(OPT_LONG_HELP)) {
             $this->printHelp();
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
         // Parse command-line options. If invalid options detected, then print help and exit.
-        if (!$this->parseAppOptions($appOptions)) {
+        if (!$this->parseAppOptions()) {
             $this->printHelp();
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
@@ -82,18 +82,17 @@ $app = new class() extends CliTool\App{
     /**
      * Parses options and returns whether all options are valid
      *
-     * @param array $appOptions
      * @return bool
      */
-    private function parseAppOptions(array $appOptions): bool
+    private function parseAppOptions(): bool
     {
         $valid             = true;
-        $this->sessionHash = $this->getOpt(OPT_LONG_HASH, $appOptions);
-        $this->username    = $this->getOpt(OPT_LONG_USERNAME, $appOptions);
-        $this->studentId   = $this->getOpt(OPT_LONG_STUDENT_ID, $appOptions);
-        $this->yearLevel   = $this->getOpt(OPT_LONG_YEAR_LEVEL, $appOptions);
-        $this->curriculum  = $this->getOpt(OPT_LONG_CURRICULUM, $appOptions);
-        $this->now         = $this->getOpt(OPT_LONG_NOW, $appOptions);
+        $this->sessionHash = $this->getOpt(OPT_LONG_HASH);
+        $this->username    = $this->getOpt(OPT_LONG_USERNAME);
+        $this->studentId   = $this->getOpt(OPT_LONG_STUDENT_ID);
+        $this->yearLevel   = $this->getOpt(OPT_LONG_YEAR_LEVEL);
+        $this->curriculum  = $this->getOpt(OPT_LONG_CURRICULUM);
+        $this->now         = $this->getOpt(OPT_LONG_NOW);
 
         if ($this->curriculum && !\in_array($this->curriculum, [self::CURRICULUM_IB, self::CURRICULUM_HSC], true)) {
             $this->getLogger()->alert("Invalid 'curriculum' option: '$this->curriculum'");
@@ -105,6 +104,21 @@ $app = new class() extends CliTool\App{
             $valid = false;
         }
         return $valid;
+    }
+
+    /**
+     * Start doing the work.
+     */
+    private function execute(): void
+    {
+        $this->getLogger()->emergency('emergency');
+        $this->getLogger()->alert('alert');
+        $this->getLogger()->critical('critical');
+        $this->getLogger()->error('error');
+        $this->getLogger()->warning('warning');
+        $this->getLogger()->notice('notice');
+        $this->getLogger()->info('info');
+        $this->getLogger()->debug('debug');
     }
 
 
@@ -129,22 +143,6 @@ This can be changed by providing an output and/or log file. If provided, tool wi
       ./export.php -l export.log -o archive.zip\n";
 
         \fwrite(STDOUT, $help);
-    }
-
-
-    /**
-     * Start doing the work.
-     */
-    private function execute(): void
-    {
-        $this->getLogger()->emergency('emergency');
-        $this->getLogger()->alert('alert');
-        $this->getLogger()->critical('critical');
-        $this->getLogger()->error('error');
-        $this->getLogger()->warning('warning');
-        $this->getLogger()->notice('notice');
-        $this->getLogger()->info('info');
-        $this->getLogger()->debug('debug');
     }
 };
 

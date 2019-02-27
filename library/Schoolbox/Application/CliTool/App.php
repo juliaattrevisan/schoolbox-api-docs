@@ -16,6 +16,9 @@ use Psr\Log\LoggerInterface;
 abstract class App
 {
 
+    /** @var array */
+    private $appOptions;
+
     /** @var Di\Container */
     private $di;
 
@@ -36,24 +39,29 @@ abstract class App
     /**
      * Common app setup implementation
      *
+     * @param array           $appOptions
      * @param Di\Container    $di
      * @param resource        $outStream
      * @param LoggerInterface $logger
      * @param bool            $perform
+     * @return $this
      */
-    public function setup(Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): void
+    public function setup(array $appOptions, Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): self
     {
+        $this->appOptions = $appOptions;
         $this->di        = $di;
         $this->outStream = $outStream;
         $this->logger    = $logger;
         $this->perform   = $perform;
+
+        return $this;
     }
 
 
     /**
-     * @param string[] $appOptions
+     * Hands off execution over to the App
      */
-    abstract public function run(array $appOptions): void;
+    abstract public function run(): void;
 
 
     /**
@@ -65,51 +73,27 @@ abstract class App
      * If option DOES accept values:
      *     returns that value, or NULL if not specified
      * If option does NOT accept values:
-     *     if a long option:
-     *         returns a bool indicating whether the option was specified at least once.
-     *     else a short option
-     *         returns true if specified once, or array if specified multiple times
+     *     returns true if specified once, or array if specified multiple times
      *
-     * @param string $name
-     * @param array  $appOptions
+     * @param string $name Must have colon chars still suffixed for proper handling
      * @return mixed
      */
-    protected function getOpt(string $name, array $appOptions)
+    protected function getOpt(string $name)
     {
         // Does this option accept values?
         if (\preg_match('/:$/', $name)) {
             // return the value
-            return $appOptions[\rtrim($name, ':')] ?? null;
+            return $this->appOptions[\rtrim($name, ':')] ?? null;
         }
 
         // Does not accept values, and not specified
-        if(!\array_key_exists($name, $appOptions)){
+        if (!\array_key_exists($name, $this->appOptions)) {
             return false;
         }
 
-        // Does not accept values, was specified at least once.
-        return \is_array($appOptions[$name]) ? $appOptions[$name] : true;
+        // Does not accept values, but specified at least once.
+        return \is_array($this->appOptions[$name]) ? $this->appOptions[$name] : true;
     }
-
-    /**
-     * Returns a kernel's command line option's value
-     *
-     * If option does accept values:
-     *     returns that value, or NULL if not specified
-     * If option does not accept values:
-     *     if a long option:
-     *         returns a bool indicating whether the option was specified at least once.
-     *     else a short option
-     *         returns true if specified once, or array if specified multiple times
-     *
-     * @param string $name Must have colon chars required/optional decoration still appended.
-     * @return mixed
-     */
-    private function getKernelOpt(string $name)
-    {
-
-    }
-
 
 
     /**

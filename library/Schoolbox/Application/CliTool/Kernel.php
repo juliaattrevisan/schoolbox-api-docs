@@ -119,14 +119,13 @@ class Kernel extends CliKernelAbstract
      *
      * @param App $app
      * @throws \Aura\Di\Exception\ServiceNotFound
-     * @todo pass in the app's CLI options here, using $argv to parse. Trigger errors if invalid args detected.
+     * @todo accept the app's CLI options here, using $argv to parse, and throw exception if invalid args detected, kernel will catch them.
      */
     public function runApp(App $app): void
     {
         $perform = $this->forcePerform || $this->getKernelOpt(self::OPT_PERFORM);
 
-        $app->setup($this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
-        $app->run($this->appOptions);
+        $app->setup($this->appOptions, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform)->run();
     }
 
 
@@ -369,10 +368,7 @@ class Kernel extends CliKernelAbstract
      * If option does accept values:
      *     returns that value, or NULL if not specified
      * If option does not accept values:
-     *     if a long option:
-     *         returns a bool indicating whether the option was specified at least once.
-     *     else a short option
-     *         returns true if specified once, or array if specified multiple times
+     *     returns true if specified once, or array if specified multiple times
      *
      * @param string $name Must have colon chars required/optional decoration still appended.
      * @return mixed
@@ -390,7 +386,7 @@ class Kernel extends CliKernelAbstract
             return false;
         }
 
-        // Does not accept values, was specified at least once.
+        // Does not accept values, but specified at least once.
         return \is_array($this->kernelOptions[$name]) ? $this->kernelOptions[$name] : true;
     }
 }
