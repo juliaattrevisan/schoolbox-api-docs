@@ -129,13 +129,13 @@ class Controller extends Base
     {
         $nodeId = (int)$node->getId();
         $name   = $node->getName();
-        $isCode = strlen($node->getCode()) > 0;
+        $isCode = \strlen($node->getCode()) > 0;
         if ($isCode) {
             $name = sprintf('[%s] %s', $node->getCode(), $name);
         }
         return array(
             'id'     => $nodeId,
-            'parent' => is_object($node->getParent()) ? (int)$node->getParent()->getId() : '#',
+            'parent' => $node->getParent() !== null ? (int)$node->getParent()->getId() : '#',
             'text'   => $name,
             'a_attr' => array(
                 'href' => $this->getRouter()->generate(
@@ -199,14 +199,12 @@ class Controller extends Base
         // set this node's area and level to its parents,
         // if it has parent.
         // (Do this in preSave?)
+        $parent = null;
         if ($post['parent']) {
             $parent = $this->nodeMapper->findById($post['parent']);
-            $item
-                ->setParent($parent);
-        } else {
-            $item
-                ->setParent($this->nodeMapper->createModel());
         }
+        $item
+            ->setParent($parent);
 
         // Save the item
         if (!$this->nodeMapper->save($item)) {

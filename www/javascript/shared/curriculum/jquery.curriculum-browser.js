@@ -264,9 +264,11 @@
                         self.tree.rename_node(data.item.id, data.tree.text);
                     } else {
                         self.tree.create_node(data.tree.parent, data.tree);
-                        self.tree.deselect_all(true);
-                        self.tree.select_node(data.tree.id);
                     }
+                    
+                    // Close the editor panel after saving
+                    self.tree.deselect_all(true);
+                    self.tree.select_node(data.tree.id);
                 })
                 .fail(function() {
                     viewPanels.addClass('failed');
