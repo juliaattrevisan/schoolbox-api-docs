@@ -381,7 +381,7 @@ class Controller extends Base
             if (!\is_array($options)) {
                 // This will be an empty string when no concrete options are available. eg no READ-level folders.
                 // @see Codec::convertRequestToSelections()
-                return false;
+                continue;
             }
             foreach ($options as $option) {
                 if ($option) {
