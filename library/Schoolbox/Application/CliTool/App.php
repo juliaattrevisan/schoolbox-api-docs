@@ -30,6 +30,7 @@ abstract class App
      *
      * Supports options that are still have colon chars suffixed to indicate required/optional status
      * eg 'c', 'c:', 'c::' will all resolve to 'c'
+     * @see getopt()
      *
      * @param string $optName
      * @param array  $appOptions
