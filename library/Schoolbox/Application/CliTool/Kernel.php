@@ -72,7 +72,8 @@ class Kernel extends CliKernelAbstract
      */
     public function runApp(App $app): void
     {
-        $app->run($this->getDependencyInjector(), $this->outStream, $this->logger(), $this->appOptions);
+        $app->setup($this->getDependencyInjector(), $this->outStream, $this->logger());
+        $app->run($this->appOptions);
     }
 
 

@@ -6,8 +6,6 @@
  */
 declare(strict_types=1);
 
-use Aura\Di;
-use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 
@@ -40,12 +38,6 @@ $app = new class() extends CliTool\App{
     private const CURRICULUM_IB  = 'ib';
     private const CURRICULUM_HSC = 'hsc';
 
-    /** @var resource */
-    private $outStream;
-
-    /** @var LoggerInterface */
-    private $logger;
-
     /** @var string|null */
     private $sessionHash;
 
@@ -63,16 +55,10 @@ $app = new class() extends CliTool\App{
 
 
     /**
-     * @param Di\Container    $di
-     * @param resource        $outStream
-     * @param LoggerInterface $logger
-     * @param string[]        $appOptions
+     * @param string[] $appOptions
      */
-    public function run(Di\Container $di, $outStream, LoggerInterface $logger, array $appOptions): void
+    public function run(array $appOptions): void
     {
-        $this->outStream = $outStream;
-        $this->logger    = $logger;
-
         // Did user request help?
         if (\array_key_exists(OPT_SHORT_HELP, $appOptions) || \array_key_exists(OPT_LONG_HELP, $appOptions)) {
             $this->printHelp();
@@ -104,7 +90,7 @@ $app = new class() extends CliTool\App{
         $this->yearLevel   = $this->getOpt(OPT_LONG_YEAR_LEVEL, $appOptions);
         $this->curriculum  = $this->getOpt(OPT_LONG_CURRICULUM, $appOptions);
         if ($this->curriculum && !\in_array($this->curriculum, [self::CURRICULUM_IB, self::CURRICULUM_HSC], true)) {
-            $this->logger->alert("Invalid curriculum: '$this->curriculum'");
+            $this->getLogger()->alert("Invalid curriculum: '$this->curriculum'");
             $valid = false;
         }
         return $valid;
@@ -140,14 +126,14 @@ This can be changed by providing an output and/or log file. If provided, tool wi
      */
     private function execute(): void
     {
-        $this->logger->emergency('emergency');
-        $this->logger->alert('alert');
-        $this->logger->critical('critical');
-        $this->logger->error('error');
-        $this->logger->warning('warning');
-        $this->logger->notice('notice');
-        $this->logger->info('info');
-        $this->logger->debug('debug');
+        $this->getLogger()->emergency('emergency');
+        $this->getLogger()->alert('alert');
+        $this->getLogger()->critical('critical');
+        $this->getLogger()->error('error');
+        $this->getLogger()->warning('warning');
+        $this->getLogger()->notice('notice');
+        $this->getLogger()->info('info');
+        $this->getLogger()->debug('debug');
     }
 };
 

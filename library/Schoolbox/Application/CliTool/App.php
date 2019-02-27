@@ -16,13 +16,35 @@ use Psr\Log\LoggerInterface;
 abstract class App
 {
 
+    /** @var Di\Container */
+    private $di;
+
+    /** @var resource */
+    private $outStream;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+
     /**
+     * Common app setup implementation
+     *
      * @param Di\Container    $di
      * @param resource        $outStream
      * @param LoggerInterface $logger
-     * @param string[]        $appOptions
      */
-    abstract public function run(Di\Container $di, $outStream, LoggerInterface $logger, array $appOptions): void;
+    public function setup(Di\Container $di, $outStream, LoggerInterface $logger): void
+    {
+        $this->di        = $di;
+        $this->outStream = $outStream;
+        $this->logger    = $logger;
+    }
+
+
+    /**
+     * @param string[] $appOptions
+     */
+    abstract public function run(array $appOptions): void;
 
 
     /**
@@ -30,6 +52,7 @@ abstract class App
      *
      * Supports options that are still have colon chars suffixed to indicate required/optional status
      * eg 'c', 'c:', 'c::' will all resolve to 'c'
+     *
      * @see getopt()
      *
      * @param string $optName
@@ -41,5 +64,32 @@ abstract class App
     {
         $trimmed = \rtrim($optName, ':');
         return \array_key_exists($trimmed, $appOptions) ? $appOptions[$trimmed] : $default;
+    }
+
+
+    /**
+     * @return Di\Container
+     */
+    protected function getDi(): Di\Container
+    {
+        return $this->di;
+    }
+
+
+    /**
+     * @return resource
+     */
+    protected function getOutStream()
+    {
+        return $this->outStream;
+    }
+
+
+    /**
+     * @return LoggerInterface
+     */
+    protected function getLogger(): LoggerInterface
+    {
+        return $this->logger;
     }
 }
