@@ -33,10 +33,11 @@ class Component_Config_LayoutId extends Component_Config_Abstract
         // First, whereabouts am I?
         // Alt-source: show its layouts
         // No alt-source: show this context's layouts
-        $layouts          = [];
         $tileLayoutMapper = TileLayoutMapper::getInstance();
         if ($component) {
             $layouts = $tileLayoutMapper->findForComponentContext($component->getInstance());
+        } else {
+            $layouts = $tileLayoutMapper->createCollection();
         }
 
 
@@ -66,8 +67,8 @@ class Component_Config_LayoutId extends Component_Config_Abstract
             $page->parse('no_buttons_permission_denied_block', 'no_buttons_permission_denied');
         } elseif ($layoutId) {
             // Does the layout exist? If not, don't render buttons
-            $layoutExists = $tileLayoutMapper->countByColumn('id', $layoutId);
-            if ($layoutExists) {
+            $layoutInUse = $layouts->getBy('id', $layoutId);
+            if ($layoutInUse) {
                 $page->parse('buttons_for_layout_block', 'buttons_for_layout');
             } else {
                 $page->parse('no_buttons_deleted_layout_block', 'no_buttons_deleted_layout');
