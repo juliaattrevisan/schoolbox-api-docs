@@ -185,23 +185,25 @@ $kernel->run(new class extends App
      */
     private function isMigrationRequired(string $old, string $new): bool
     {
-        $truncatedLength = 2 ** 16;
+        $truncatedLength = 2 ** 16 - 1;
         $oldLength       = strlen($old);
         $newLength       = strlen($new);
-        if ($oldLength < $truncatedLength) {
+        if ($oldLength <= $truncatedLength) {
             $this->log->notice(self::indent(2) . 'old content fits within new content: no migrate required');
-            return false;
-        }
-
-        if ($newLength < $truncatedLength) {
-            $this->log->notice(self::indent(2) . 'new content fits within max size: no migrate required');
             return false;
         }
 
         $truncatedOld = substr($old, 0, $newLength);
         if ($truncatedOld === $new) {
-            $this->log->warning(self::indent(2) . 'new is a substring of old: migrating');
-            return true;
+            $this->log->notice(self::indent(2) . 'new is a substring of old: checking for truncation');
+
+            if ($newLength === $truncatedLength) {
+                $this->log->warning(self::indent(2) . 'new content is exactly the truncation length: migrating');
+                return true;
+            }
+
+            $this->log->notice(self::indent(2) . 'new content is not exactly the truncation length: not migrating');
+            return false;
         }
 
         $this->log->notice(self::indent(2) . 'new has been changed from old: not migrating');
