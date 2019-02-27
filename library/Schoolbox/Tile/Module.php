@@ -183,7 +183,7 @@ class Module extends BaseModule
                     'layoutMapper'          => $this->getMapperFactory()->getLazy(TileLayoutMapper::class),
                     'componentConfigMapper' => $this->getMapperFactory()->getLazy(Component_ConfigMapper::class),
                     'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                    'errorMapper '          => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                    'errorMapper'           => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                 ]
             )
         );
