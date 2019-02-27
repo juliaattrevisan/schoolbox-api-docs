@@ -230,6 +230,8 @@ class UserAccessNotifier extends AbstractModuleNotifier
                 'moderator' => new UserParam($user),
                 'groupname' => new CategoryParam($cat, Param::STACKING_REPLACE)
             ])
+            // Adding information of the target user, so that it won't stack the same messages to the different members.
+            ->putMeta('member', $userAccess->getUser()->getId())
             ->addTopic("group.{$cat->getId()}.".self::TRIGGER_APPROVED)
         ;
 
@@ -374,6 +376,8 @@ class UserAccessNotifier extends AbstractModuleNotifier
                 'moderator' => new UserParam($user, Param::STACKING_REPLACE),
                 'groupname' => new CategoryParam($cat)
             ])
+            // Adding information of the target user, so that it won't stack the same messages to the different members.
+            ->putMeta('member', $userAccess->getUser()->getId())
             ->addTopic("group.{$cat->getId()}.approved")
         ;
 

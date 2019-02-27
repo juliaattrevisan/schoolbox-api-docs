@@ -9,6 +9,7 @@
 namespace Schoolbox\Realtime\Schedule\Trigger;
 
 use Alaress\Async\Broker\IBroker;
+use Alaress\Async\Notification\Instance\Instance;
 use JsonSerializable;
 use Predis\ClientInterface;
 use Schoolbox\Mapper;
@@ -73,7 +74,8 @@ class Propagator implements IPropagator
      * Take a CRUD event and propagate triggers. Returns the key used to store the event in Redis.
      *
      * @param CrudEventInterface $event
-     * @return null
+     * @return string|null
+     * @throws \Aura\Di\Exception\ReflectionFailure
      */
     public function propagateEvent(CrudEventInterface $event)
     {
@@ -81,9 +83,10 @@ class Propagator implements IPropagator
 
         // drop event serial into redis (commented out because this will eat all the memory)
         //$redisKey = $this->toRedis($event, "{$namespace}e");
-
         foreach ($this->splitter->generateTriggers($event) as $trigger) {
-            $this->broker->publish($trigger, [ $namespace ]);
+            $diff = \Alaress_Date_Format::now()->diffInSeconds(new \Alaress_Date_Format($trigger->getTimestamp(), 'U'));
+            $ttl = ($diff < 0) ? Instance::DEFAULT_TTL : ($diff + Instance::DEFAULT_TTL);
+            $this->broker->publish($trigger, [$namespace], $ttl);
         }
 
         return null;
