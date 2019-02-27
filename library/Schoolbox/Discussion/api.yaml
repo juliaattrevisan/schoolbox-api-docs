@@ -96,11 +96,9 @@ components:
           type: boolean
           description: Is the thread open for further comments?
         created:
-          type: string
-          format: date-time
+          $ref: '#/components/schemas/dateTime'
         updated:
-          type: string
-          format: date-time
+          $ref: '#/components/schemas/dateTime'
         children:
           $ref: '#/components/schemas/postList'
           description: A list of direct child posts of this thread
@@ -123,11 +121,9 @@ components:
         content:
           type: string
         created:
-          type: string
-          format: date-time
+          $ref: '#/components/schemas/dateTime'
         updated:
-          type: string
-          format: date-time
+          $ref: '#/components/schemas/dateTime'
         parent:
           $ref: '#/components/schemas/post'
           description: |
@@ -241,6 +237,49 @@ components:
               required: true
               description: If set, a cursor to the next page of results.
 
+    dateTime:
+      title: Datetime
+      description: |
+        A JSON representation of a datetime.
+        For compatibility with existing code, can be defined as either:
+        * a RFC3339 string
+        * an object, which contains a datetime in several formats
+      oneOf:
+        - type: string
+          format: date-time
+        - type: object
+          readOnly: true
+          deprecated: true
+          description: |
+            This read-only object representation will be deprecated eventually:
+            it exists only for compatibility with existing API endpoints.
+          properties:
+            database:
+              type: string
+              required: false
+              description: |
+                A database representation of the date. Please use the "json"
+                property instead.
+            unixTimestamp:
+              type: int
+              required: false
+              description: |
+                The date as a Unix timestamp. Please use the "json" property
+                instead.
+            local:
+              type: string
+              required: false
+              description: |
+                A string representation of the date, localized to the Schoolbox
+                instance's settings.
+                Please use the "json" property instead, and perform localization
+                using libraries on the client.
+            json:
+              type: string
+              format: date-time
+              required: true
+              description: |
+                The date as a RFC3339 string.
 
   responses:
     problem:

@@ -1164,6 +1164,16 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
+     * Transform the datetime into a JSON schema date-time (RFC3339) string.
+     *
+     * @return string
+     */
+    public function getJson(): string
+    {
+        return $this->toRfc3339String();
+    }
+
+    /**
      * Transform the datetime into a unix timestamp
      *
      * @return int
@@ -1932,7 +1942,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         return [
             'database',
             'unixTimestamp',
-            'local'
+            'local',
+            'json',
         ];
     }
 

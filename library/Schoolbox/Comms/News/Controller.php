@@ -684,7 +684,8 @@ class Controller extends Base
             ],
             'publishAt' => [
                 'long',
-                'relativeTime'
+                'relativeTime',
+                'json',
             ],
             'topics' => [
                 'name',
@@ -1047,7 +1048,8 @@ class Controller extends Base
             'featureImage',
             'publishAt' => [
                 'long',
-                'relativeTime'
+                'relativeTime',
+                'json',
             ],
             'topics' => [
                 'name',
@@ -1056,7 +1058,8 @@ class Controller extends Base
             'status',
             'statusDate' => [
                 'long',
-                'relativeTime'
+                'relativeTime',
+                'json',
             ]
         ];
 
