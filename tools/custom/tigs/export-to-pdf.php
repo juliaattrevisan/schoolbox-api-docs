@@ -28,9 +28,10 @@ const OPT_LONG_USERNAME    = 'username:';    // username
 const OPT_LONG_STUDENT_ID  = 'student-id:';  // student-id
 const OPT_LONG_YEAR_LEVEL  = 'year-level:';  // year-level
 const OPT_LONG_CURRICULUM  = 'curriculum:';  // curriculum
+const OPT_LONG_NOW         = 'now:';         // to simulate time
 
 $shortOpts = [OPT_SHORT_HELP];
-$longOpts  = [OPT_LONG_HASH, OPT_LONG_USERNAME, OPT_LONG_STUDENT_ID, OPT_LONG_YEAR_LEVEL, OPT_LONG_CURRICULUM,];
+$longOpts  = [OPT_LONG_HASH, OPT_LONG_USERNAME, OPT_LONG_STUDENT_ID, OPT_LONG_YEAR_LEVEL, OPT_LONG_CURRICULUM, OPT_LONG_NOW,];
 $kernel    = new Schoolbox\Application\CliTool\Kernel($shortOpts, $longOpts);
 
 $app = new class() extends CliTool\App{
@@ -52,6 +53,9 @@ $app = new class() extends CliTool\App{
 
     /** @var string|null */
     private $curriculum;
+
+    /** @var null|string */
+    private $now;
 
 
     /**
@@ -89,8 +93,15 @@ $app = new class() extends CliTool\App{
         $this->studentId   = $this->getOpt(OPT_LONG_STUDENT_ID, $appOptions);
         $this->yearLevel   = $this->getOpt(OPT_LONG_YEAR_LEVEL, $appOptions);
         $this->curriculum  = $this->getOpt(OPT_LONG_CURRICULUM, $appOptions);
+        $this->now         = $this->getOpt(OPT_LONG_NOW, $appOptions);
+
         if ($this->curriculum && !\in_array($this->curriculum, [self::CURRICULUM_IB, self::CURRICULUM_HSC], true)) {
-            $this->getLogger()->alert("Invalid curriculum: '$this->curriculum'");
+            $this->getLogger()->alert("Invalid 'curriculum' option: '$this->curriculum'");
+            $valid = false;
+        }
+
+        if ($this->now && false === strtotime($this->now)) {
+            $this->getLogger()->alert("Invalid 'now' option: '$this->now'");
             $valid = false;
         }
         return $valid;
