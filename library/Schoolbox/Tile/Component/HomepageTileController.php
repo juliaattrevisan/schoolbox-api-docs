@@ -11,6 +11,7 @@ namespace Schoolbox\Tile\Component;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Tile\Layout;
 use Schoolbox\User;
 use SitePage;
@@ -19,7 +20,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
 {
 
     /**
-     * @var Layout\Model
+     * @var Layout\Model|null
      */
     protected $layout;
 
@@ -57,7 +58,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
             return false;
         }
 
-        $this->setLayout($this->delegate->fetchLayout($this));
+        $this->layout = $this->delegate->fetchLayout($this);
         return true;
     }
 
@@ -68,14 +69,13 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
      */
     public function renderTemplate($templateHandle)
     {
-        if (!$this->isSourceRenderable()) {
+        if (!$this->layout || !$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         } else {
             $twigTemplate = '@tile/component/tile.twig';
             $twigData = array(
-                'component' => $this,
+                'component'   => $this,
                 'writeAccess' => $this->hasWriteAccess(),
-                'tile_component_instance_id' => $this->getConfig('tileSource') ?: $this->getInstance()->getId(),
             );
             $renderHeader = !$this->getConfig('compactMode') || $this->hasContextWriteAccess();
             return $this->renderTwigTemplate($templateHandle, $twigTemplate, $twigData, $renderHeader);
@@ -83,20 +83,12 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
     }
 
     /**
-     * @return Layout\Model
+     * Required so that Twig may access this component's layout.
+     *
+     * @return Layout\Model|null
      */
     public function getLayout()
     {
         return $this->layout;
-    }
-
-    /**
-     * @param  Layout\Model $layout
-     * @return $this
-     */
-    public function setLayout($layout)
-    {
-        $this->layout = $layout;
-        return $this;
     }
 }

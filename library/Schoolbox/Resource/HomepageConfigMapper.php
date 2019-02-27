@@ -159,7 +159,11 @@ class HomepageConfigMapper extends Mapper
                         $tileMapper   = \Schoolbox\Tile\Mapper::getInstance();
                         try {
                             $layout = $layoutMapper->findById($c->getValue());
-                            $layout->setId(null);
+                            $layout
+                                ->setId(null)
+                                ->setDashboardRole(null)
+                                ->setHomepageTemplate(null)
+                                ->setFolder($homepage->getCategory());
                             $layoutMapper->save($layout);
                             $value = $layout->getId();
                             foreach ($layout->getTileList() as $tile) {

@@ -18,12 +18,11 @@ use Aura\Router\Router;
 use Component_Instance;
 use Component_InstanceMapper;
 use Component_ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Tile\Component\TileControllerInterface;
 use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Tile\Mapper as TileMapper;
@@ -39,13 +38,22 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'layout', $basePath, '/layout/{componentId}');
-        $this->addPostRoute($router, 'layoutForm', $basePath , '/layout/{componentId}');
-        // Attach standard REST routes
+        $this->addGetRoute($router, 'layout', $basePath, '/layout/{layoutId}');
+        $this->addPostRoute($router, 'layoutForm', $basePath , '/layout/{layoutId}');
+
+        // Attach standard REST routes...
         $this->attachResourceRoutes($router, $basePath);
-        // but have separate add tile paths
-        $this->addGetRoute($router, 'add', $basePath, '/add/{componentId}');
-        $this->addPostRoute($router, 'create', $basePath, '/add/{componentId}');
+
+        // but have separate add tile paths...
+        $this->addGetRoute($router, 'add', $basePath, '/add/{layoutId}');
+        $this->addPostRoute($router, 'create', $basePath, '/add/{layoutId}');
+
+        // also have separate paths for adding a tile to a component (will create a new layout)
+        $this->addGetRoute($router, 'addToComponent', $basePath, '/add/component/{componentId}');
+        $this->addPostRoute($router, 'createForComponent', $basePath , '/add/component/{componentId}');
+
+        // also have separate paths for layouts for component
+        $this->addGetRoute($router, 'layoutForComponent', $basePath , '/layout/component/{componentId}');
     }
 
     /**
@@ -63,47 +71,23 @@ class Module extends BaseModule
                     $params['id'],
                     array('joins' => array('backgroundImage',),)
                 );
-                $component = $this->getComponentInstanceMapper()->findComponentByConfigValue(
-                    'layoutId',
-                    $item->getTileLayout()->getId()
-                )->first();
-                if (!($component instanceof Component_Instance)) {
-                    throw new \RuntimeException('Component does not exist');
-                }
-                return array(
-                    'item'      => $item,
-                    'component' => $component,
-                );
+
+                $layout = $this->getTileLayoutMapper()->findById($item->getTileLayout()->getId());
+                return [
+                    'item'   => $item,
+                    'layout' => $layout,
+                ];
             }
         );
 
-        // Routes that take a component ID: look up component from it
+        // Routes that take a layout ID: look up layout from it
         $this->addRoutePreload(
             $matcher,
             '(?:add|create|layout|layoutForm)',
             function ($params) {
-                $component = $this->getComponentInstanceMapper()->findByInstanceId($params['componentId']);
-
-                // Component must actually exist.
-                // This should cause an error that is recorded, but doesn't
-                // prevent a login check.
-                if (!($component instanceof Component_Instance)) {
-                    throw new \RuntimeException('Component does not exist');
-                }
-
-                // Also, this component needs to be a tile grid.
-                if (!is_a(
-                    $component->getDefinition()->getClass(),
-                    TileControllerInterface::class,
-                    true
-                )) {
-                    throw new \RuntimeException('Component exists, but is not a tile layout');
-                }
-
-                // augment params with component
-                return array(
-                    'component' => $component,
-                );
+                return [
+                    'layout' => $this->getTileLayoutMapper()->findById($params['layoutId']),
+                ];
             }
         );
 
@@ -111,20 +95,32 @@ class Module extends BaseModule
         // (if this component belongs to the homepage!)
         $this->addRoutePreload(
             $matcher,
-            "(?:add|create|layout|layoutForm|edit|update|update:post|delete|delete:post)",
+            '.*',
             function ($params) {
-                // augment params with homepage from category
-                if ($params['component']->getModule() == 'homepage') {
+                // Load component first
+                $component = null;
+                if ($params['componentId']) {
+                    $component = $this->getComponentInstanceMapper()->findByInstanceId($params['componentId']);
 
-                    // Support tile alt source to potentially soft-deleted homepage
-                    $folderId   = $params['component']->getIdentifier();
-                    $columnName = $this->getFolderMapper()->getIdentifier()['column'];
-
-                    return array(
-                        'homepage' => $this->getFolderMapper()->findByColumn($columnName, $folderId, ['deleted' => true])->first(),
-                    );
+                } elseif ($params['layout'] instanceof Layout\Model) {
+                    $layoutId  = $params['layout']->getId();
+                    $component = $this->getComponentInstanceMapper()->findComponentByConfigValue(
+                        'layoutId',
+                        $layoutId
+                    )->first();
                 }
-                return array();
+
+                // Load homepage from component
+                $extraParams = [];
+                if ($component instanceof Component_Instance) {
+                    $extraParams['component'] = $component;
+                    if ($component->isHomepage()) {
+                        $extraParams['homepage'] = $this->getFolderMapper()->findByIdWithFallback(
+                            $component->getIdentifier()
+                        );
+                    }
+                }
+                return $extraParams;
             }
         );
     }
@@ -178,19 +174,18 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->setters[TileController::class]['setMapper']
-            = $this->getMapperFactory()->getLazy(TileMapper::class);
-        $injector->setters[TileController::class]['setLayoutMapper']
-            = $this->getMapperFactory()->getLazy(TileLayoutMapper::class);
-        $injector->setters[TileController::class]['setComponentConfigMapper']
-            = $this->getMapperFactory()->getLazy(Component_ConfigMapper::class);
-        $injector->setters[TileController::class]['setStorageMapper']
-            = $this->getMapperFactory()->getLazy(StorageMapper::class);
-        $injector->setters[TileController::class]['setFolderMapper']
-            = $this->getMapperFactory()->getLazy(FolderMapper::class);
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(TileController::class)
+            $injector->lazyNew(
+                TileController::class,
+                [
+                    'mapper'                => $this->getMapperFactory()->getLazy(TileMapper::class),
+                    'layoutMapper'          => $this->getMapperFactory()->getLazy(TileLayoutMapper::class),
+                    'componentConfigMapper' => $this->getMapperFactory()->getLazy(Component_ConfigMapper::class),
+                    'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                    'errorMapper'           => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                ]
+            )
         );
     }
 
@@ -239,4 +234,13 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(Mapper::class);
     }
 
+    /**
+     * Required for fetching the tile layout mapper.
+     *
+     * @return Layout\Mapper
+     */
+    public function getTileLayoutMapper()
+    {
+        return $this->getMapperFactory()->get(Layout\Mapper::class);
+    }
 }

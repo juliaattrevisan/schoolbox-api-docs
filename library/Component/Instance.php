@@ -9,6 +9,16 @@ use Schoolbox\Collection;
 
 class Component_Instance
 {
+    public const MODULE_HOMEPAGE = 'homepage';
+
+    public const MODULE_HOMEPAGE_TEMPLATE = 'homepage_template';
+
+    public const MODULE_DASHBOARD = 'dashboard';
+
+    public const MODULE_EPORTFOLIO = 'eportfolio';
+
+    public const MODULE_EPORTFOLIO_TEMPLATE = 'eportfolio_template';
+
     /** @var int $id */
     protected $id;
 
@@ -143,6 +153,63 @@ class Component_Instance
 
         return $key;
     }
+
+
+    /**
+     * Is this component on a homepage?
+     *
+     * @return bool
+     */
+    public function isHomepage(): bool
+    {
+        return $this->module === self::MODULE_HOMEPAGE;
+    }
+
+
+    /**
+     * Is this component on a homepage template?
+     *
+     * @return bool
+     */
+    public function isHomepageTemplate(): bool
+    {
+        return $this->module === self::MODULE_HOMEPAGE_TEMPLATE;
+    }
+
+
+    /**
+     * Is this component on an eportfolio?
+     *
+     * @return bool
+     */
+    public function isEportfolio(): bool
+    {
+        return $this->module === self::MODULE_EPORTFOLIO;
+    }
+
+
+    /**
+     * Is this component on an eportfolio template?
+     *
+     * @return bool
+     */
+    public function isEportfolioTemplate(): bool
+    {
+        return $this->module === self::MODULE_EPORTFOLIO_TEMPLATE;
+    }
+
+
+    /**
+     * Is this component on a dashboard?
+     *
+     * @return bool
+     */
+    public function isDashboard(): bool
+    {
+        return $this->module === self::MODULE_DASHBOARD;
+    }
+
+
 
     // Getters & Setters
 

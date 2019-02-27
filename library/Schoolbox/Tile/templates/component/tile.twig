@@ -1,10 +1,20 @@
+
+{% set routeParams = {
+    layoutId:    component.layout.id,
+    layout:      component.layout,
+    component:   component.instance,
+    componentId: component.instance.id,
+    homepage:    component.context,
+} %}
+
 {% if component.layout.tileList is empty %}
 
     <div class="empty-state">
         <i class="icon-tiles"></i>
 
-        {% if writeAccess %}
-            <p><a href="/tile/add/{{ tile_component_instance_id }}">Add a tile</a> to create buttons or banners that link to other pages.</p>
+        {% set addTileUrl = routeLookupIfAuthorized("tile.addToComponent", routeParams) %}
+        {% if writeAccess and addTileUrl %}
+            <p><a href="{{ addTileUrl }}">Add a tile</a> to create buttons or banners that link to other pages.</p>
         {% else %}
             <p>There are no tiles available at this time.</p>
         {% endif %}
@@ -22,12 +32,16 @@
     %}
 
     {% if writeAccess %}
+        {% set addTileUrl = routeLookupIfAuthorized("tile.add", routeParams) %}
+        {% set modifyUrl = routeLookupIfAuthorized("tile.layout", routeParams) %}
+        {% if addTileUrl or modifyUrl %}
         <div class="component-action">
             <section>
-                <a href="/tile/add/{{ tile_component_instance_id }}" class="button">Add Tile</a>
-                <a href="/tile/layout/{{ tile_component_instance_id }}" class="button">Modify</a>
+                {% if addTileUrl %}<a href="{{ addTileUrl }}" class="button">Add Tile</a>{% endif %}
+                {% if modifyUrl %}<a href="{{ modifyUrl }}" class="button">Modify</a>{% endif %}
             </section>
         </div>
+        {% endif %}
     {% endif %}
 
 {% endif %}

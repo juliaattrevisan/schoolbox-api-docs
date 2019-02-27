@@ -12,6 +12,9 @@ namespace Schoolbox\Tile\Layout;
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\HomepageTemplate;
+use Schoolbox\Role;
 use Schoolbox\Tile\Model as TileModel;
 
 class Model implements ISoftDeletable, \JsonSerializable
@@ -36,6 +39,13 @@ class Model implements ISoftDeletable, \JsonSerializable
      * @var int
      */
     protected $id;
+
+    /**
+     * The heading of this tile layout.
+     *
+     * @var string
+     */
+    private $heading;
 
     /**
      * The list of tiles that belong to this layout.
@@ -107,6 +117,32 @@ class Model implements ISoftDeletable, \JsonSerializable
      * @var Alaress_Date_Format
      */
     protected $deletedAt;
+
+
+    /**
+     * The folder this tile layout is associated with, if any.
+     *
+     * @var FolderModel|null
+     */
+    private $folder;
+
+
+    /**
+     * The role that this tile layout is associated with, if any.
+     * (This means the layout belongs to the dashboard for that role.)
+     *
+     * @var Role|null
+     */
+    private $dashboardRole;
+
+
+    /**
+     * The homepage template this tile layout is associated with, if any.
+     *
+     * @var HomepageTemplate|null
+     */
+    private $homepageTemplate;
+
 
     /**
      * Constructor: creates this layout with an empty tile list
@@ -241,6 +277,24 @@ class Model implements ISoftDeletable, \JsonSerializable
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHeading(): string
+    {
+        return $this->heading;
+    }
+
+    /**
+     * @param string $heading
+     * @return static
+     */
+    public function setHeading(string $heading): self
+    {
+        $this->heading = $heading;
+        return $this;
     }
 
     /**
@@ -467,5 +521,59 @@ class Model implements ISoftDeletable, \JsonSerializable
             'id'       => $this->getId(),
             'tileList' => $this->getTileList(),
         );
+    }
+
+    /**
+     * @return FolderModel|null
+     */
+    public function getFolder(): ?FolderModel
+    {
+        return $this->folder;
+    }
+
+    /**
+     * @param FolderModel|null $folder
+     * @return static
+     */
+    public function setFolder(?FolderModel $folder): self
+    {
+        $this->folder = $folder;
+        return $this;
+    }
+
+    /**
+     * @return Role|null
+     */
+    public function getDashboardRole(): ?Role
+    {
+        return $this->dashboardRole;
+    }
+
+    /**
+     * @param Role|null $dashboardRole
+     * @return static
+     */
+    public function setDashboardRole(?Role $dashboardRole): self
+    {
+        $this->dashboardRole = $dashboardRole;
+        return $this;
+    }
+
+    /**
+     * @return HomepageTemplate|null
+     */
+    public function getHomepageTemplate(): ?HomepageTemplate
+    {
+        return $this->homepageTemplate;
+    }
+
+    /**
+     * @param HomepageTemplate|null $homepageTemplate
+     * @return static
+     */
+    public function setHomepageTemplate(?HomepageTemplate $homepageTemplate): self
+    {
+        $this->homepageTemplate = $homepageTemplate;
+        return $this;
     }
 }

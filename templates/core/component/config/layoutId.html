@@ -1,4 +1,30 @@
+<!-- BEGIN layout_select -->
+<select name="layoutId" data-uses-source>
+    <option value="">(none)</option>
+    <!-- BEGIN layout_option -->
+    <option value="{COMPONENT_CONFIG_LAYOUTID_VALUE}"{COMPONENT_CONFIG_LAYOUTID_SELECTED}>{COMPONENT_CONFIG_LAYOUTID_NAME}</option>
+    <!-- END layout_option -->
+</select>
+<!-- END layout_select -->
+
+<!-- BEGIN buttons_for_layout -->
 <ul class="flex-list buttons">
-    <li><a href="/tile/add/{TILE_COMPONENT_INSTANCE_ID}" class="button icon-add">Add Tile</a></li>
-    <li><a href="/tile/layout/{TILE_COMPONENT_INSTANCE_ID}" class="button icon-modify">Modify Layout</a></li>
+    <li><a href="/tile/add/{COMPONENT_CONFIG_LAYOUTID}" class="button icon-add">Add Tile</a></li>
+    <li><a href="/tile/layout/{COMPONENT_CONFIG_LAYOUTID}" class="button icon-modify">Modify Layout</a></li>
 </ul>
+<!-- END buttons_for_layout -->
+
+<!-- BEGIN buttons_for_component -->
+<ul class="flex-list buttons">
+    <li><a href="/tile/add/component/{TILE_COMPONENT_INSTANCE_ID}" class="button icon-add">Add Tile</a></li>
+    <li><a href="/tile/layout/component/{TILE_COMPONENT_INSTANCE_ID}" class="button icon-modify">Modify Layout</a></li>
+</ul>
+<!-- END buttons_for_component -->
+
+<!-- BEGIN no_buttons_deleted_layout -->
+<p class="meta">You cannot add tiles to this layout, because the layout has been deleted.</p>
+<!-- END no_buttons_deleted_layout -->
+
+<!-- BEGIN no_buttons_permission_denied -->
+<p class="meta">You don't have permission to modify this layout, or to add tiles to it.</p>
+<!-- END no_buttons_permission_denied -->

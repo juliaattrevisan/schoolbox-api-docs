@@ -53,7 +53,19 @@ class Component_InstanceMapper extends BaseMapper
         $this->hasModel(Component_Instance::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('component_definition_id', self::TYPE_INTEGER, null, 'definitionId');
-        $this->uses('module', self::TYPE_STRING);
+        $this->uses(
+            'module',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            'module',
+            [
+                Component_Instance::MODULE_HOMEPAGE,
+                Component_Instance::MODULE_HOMEPAGE_TEMPLATE,
+                Component_Instance::MODULE_DASHBOARD,
+                Component_Instance::MODULE_EPORTFOLIO,
+                Component_Instance::MODULE_EPORTFOLIO_TEMPLATE,
+            ]
+        );
         $this->uses('identifier', self::TYPE_INTEGER);
         $this->uses('position', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
