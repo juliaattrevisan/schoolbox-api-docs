@@ -494,7 +494,7 @@ class Controller extends Base
 
             // Support tile alt source to potentially soft-deleted homepage
             $folderId   = $component->getIdentifier();
-            $columnName = $this->folderMapper->getIdentifier()['column'];
+            $columnName = $this->folderMapper->getIdentifierColumn();
 
             return $this->folderMapper->findByColumn($columnName, $folderId, ['deleted' => true])->first();
         }
