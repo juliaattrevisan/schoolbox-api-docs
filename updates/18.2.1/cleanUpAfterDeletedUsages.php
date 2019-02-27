@@ -49,7 +49,7 @@ $opts   = getopt('vp', ['perform']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Rubric Usage Cleanup',
     [
-        'verbose' => $opts['v'] ?? [],
+        'verbose' => [true, true, true],
         'perform' => true,
     ]
 );
