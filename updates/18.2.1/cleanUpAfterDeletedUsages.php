@@ -45,12 +45,11 @@ use Zend\Uri\Uri;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$opts   = getopt('vp', ['perform']);
+$opts   = getopt('vp');
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Rubric Usage Cleanup',
     [
-        'verbose' => [true, true, true],
-        'perform' => true,
+        'verbose' => [true, true, true]
     ]
 );
 
@@ -122,14 +121,6 @@ $kernel->run(new class extends App
 
 
     /**
-     * Is this actually performing an update?
-     *
-     * @var bool
-     */
-    private $perform = false;
-
-
-    /**
      * The fully-qualified domain name for this instance.
      *
      * @var
@@ -151,8 +142,7 @@ $kernel->run(new class extends App
      * Set up and run the repair process.
      *
      * Install all instance vars, and wraps the repair process in a transaction
-     * for commit (if `--perform` is on) or rollback (if it's off, or an error
-     * is raised).
+     * for commit, or rollback (if an error is raised).
      *
      * @param Di\Container  $di
      * @param LoopInterface $loop
@@ -165,31 +155,10 @@ $kernel->run(new class extends App
         $this->log     = $log;
         $this->db      = $di->get('databaseInternal');
         $this->now     = Alaress_Date_Format::now();
-        $this->perform = $opts['perform'] ?? false;
         $config        = $di->get('config');
         $this->fqdn    = trim($config->get('site_hostname') . "." . $config->get('site_domain'), ';.');
 
-
-        // log perform / dry run
-        if ($this->perform) {
-            $this->log->warning('Running in perform mode (-p): changes will be written to database');
-        } else {
-            $this->log->warning('Running in dry-run mode: use -p to write changes to database');
-        }
-
-        // log verbosity
-        $verbosity = count($opts['verbose'] ?? []);
-        if ($verbosity <= 0) {
-            $this->log->warning('Running in non-verbose mode: Use -v, -vv or -vvv for varying levels of verbosity');
-        } elseif ($verbosity === 1) {
-            $this->log->warning('Running in verbose mode (-v)');
-        } elseif ($verbosity === 2) {
-            $this->log->warning('Running in very verbose mode (-vv)');
-        } elseif ($verbosity >= 3) {
-            $this->log->warning('Running in very very verbose mode (-vvv)');
-        }
-
-        // Capability and indicator (not usage) queries
+        // Prepare queries
         $this->findAssessmentsWithoutRubricUsagesQuery
             = $this->db->prepareQuery(self::FIND_ASSESSMENTS_WITHOUT_RUBRIC_USAGES_QUERY);
         $this->disableUseRubricQuery
@@ -199,13 +168,8 @@ $kernel->run(new class extends App
         $this->db->beginTransaction();
         try {
             $this->repair();
-            if ($this->perform) {
-                $this->log->notice('Repair complete: committing changes');
-                $this->db->commit();
-            } else {
-                $this->log->notice('Repair dry run complete: rolling back changes');
-                $this->db->rollBack();
-            }
+            $this->log->notice('Repair complete: committing changes');
+            $this->db->commit();
         } catch (\Throwable $e) {
             $this->log->error('Error occurred during repair: rolling back changes');
             $this->db->rollBack();
