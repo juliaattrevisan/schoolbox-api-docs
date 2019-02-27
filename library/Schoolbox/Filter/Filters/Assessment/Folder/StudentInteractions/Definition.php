@@ -56,6 +56,26 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
+    protected function unsetInvalidOptions(Page\Model $pageFilter)
+    {
+        $options = parent::unsetInvalidOptions($pageFilter);
+
+        // Upcoming Due Work Page doesn't support these options, so remove them
+        if ($pageFilter->getPage() === Page\Model::PAGE_UPCOMING_ASSESSMENTS) {
+            $notApplicable = [self::KEY_RESPONSE, self::KEY_FEEDBACK];
+            foreach ($options as $idx => $option) {
+                if (\in_array($option->getKey(), $notApplicable, true)) {
+                    $options->offsetUnset($idx);
+                }
+            }
+        }
+        return $options;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/Folder/StudentInteractions/templates';

@@ -378,6 +378,11 @@ class Controller extends Base
     {
         foreach ($request as $options) {
             $countSelected = 0;
+            if (!\is_array($options)) {
+                // This will be an empty string when no concrete options are available. eg no READ-level folders.
+                // @see Codec::convertRequestToSelections()
+                continue;
+            }
             foreach ($options as $option) {
                 if ($option) {
                     $countSelected++;

@@ -20,8 +20,8 @@
     {# Are any options available? #}
     {% if 0 == roleSelections | length %}
         {# By default, no available concrete options would mean no entities ever match #}
+        {# This intentionally sends an empty string, not an empty array. @see Codec::convertRequestToSelections() #}
         <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
-
         {% if isUserConfigurable %}
             <div class="empty-state">
                 <i class="icon-info"></i>

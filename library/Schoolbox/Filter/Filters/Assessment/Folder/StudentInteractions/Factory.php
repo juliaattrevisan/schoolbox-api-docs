@@ -62,21 +62,21 @@ class Factory extends FolderFilter\Factory
             throw new \InvalidArgumentException('$viewee cannot be null for StudentInteraction filter');
         }
 
-        $getClasses = $options[Definition::KEY_CLASSES]->getAvailable();
+        $getClasses = $options[Definition::KEY_CLASSES]->getAvailable() && $viewee->getRole()->isStudent();
         $getGroups  = $options[Definition::KEY_GROUPS]->getAvailable();
 
         if ($getClasses || $getGroups) {
             // Note: '4' is a hack to mean 'INVALID', to force no group folders to be matched.
             $groupAccessLevel = $getGroups ? UserAccess::ACCESS_READ : UserAccess::ACCESS_FULL + 1;
-            $folders          = $this->getFolderMapper()->findForUser($viewee, $getClasses, $groupAccessLevel, false)->indexBy('id');
+            $folders          = $this->getFolderMapper()->findForUser($viewee, $getClasses, $groupAccessLevel, true)->indexBy('id');
         } else {
             $folders = $this->getFolderMapper()->createCollection();
         }
 
-        if ($options[Definition::KEY_RESPONSE]->getAvailable()) {
+        if ($options->keyExists(Definition::KEY_RESPONSE) && $options[Definition::KEY_RESPONSE]->getAvailable()) {
             $folders = $folders->mergeUnique($this->getFolderMapper()->findFoldersWithResponses($viewee), 'id');
         }
-        if ($options[Definition::KEY_FEEDBACK]->getAvailable()) {
+        if ($options->keyExists(Definition::KEY_FEEDBACK) && $options[Definition::KEY_FEEDBACK]->getAvailable()) {
             $folders = $folders->mergeUnique($this->getFolderMapper()->findFoldersWithFeedbackToStudent($viewee), 'id');
         }
 
