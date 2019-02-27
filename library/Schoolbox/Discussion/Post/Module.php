@@ -8,11 +8,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Post;
 
-use Alaress\Authorizer\Rule;
+use Alaress\Authorizer as Auth;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Thread;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Module for discussion post requests.
@@ -30,28 +32,36 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        // Permission for getting a thread or its contents:
-        // If it's a comms news item, it should be the same as the perms for
-        // viewing the comms item.
-        $authorizer = new Rule\Any(
-            new Rule\IsSuperuser()
+        /** @var Auth\Authorizer $authorizer */
+        /** @var News\Mapper     $newsMapper */
+        $authorizer       = $this->getInjector()->get('authorizer');
+        $newsMapper       = $this->getMapperFactory()->get(News\Mapper::class);
+        $deleteAuthorizer = new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+                return new Thread\Authorizer\CanDeleteFromThread($authorizer, $newsMapper);
+            })
         );
-
-        // TODO implement contextual authorizer
+        $getAuthorizer    = new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+                return new Thread\Authorizer\CanGetFromThread($authorizer, $newsMapper);
+            })
+        );
 
         // Routes
         $this->register(
             'DELETE',
             '/{id:\d+}',
             'deletePost',
-            $authorizer,
-            [$this, 'preloadPost']
+            $deleteAuthorizer,
+            [$this, 'preloadPostAllowDeleted']
         );
         $this->register(
             'GET',
             '/{id:\d+}/posts',
             'getPostsByParent',
-            $authorizer,
+            $getAuthorizer,
             [$this, 'preloadPost']
         );
     }
@@ -84,12 +94,31 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException         if the post never existed
+     * @throws MapperException\Deleted if the post has been deleted
      */
     public function preloadPost(array $params): array
     {
         return [
             'post' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
         ];
+    }
+
+
+    /**
+     * Preload the requested post. If the post was deleted, it is still
+     * preloaded.
+     *
+     * @param array $params
+     * @return array
+     * @throws MapperException if the post never existed
+     */
+    public function preloadPostAllowDeleted(array $params): array
+    {
+        try {
+            return $this->preloadPost($params);
+        } catch (MapperException\Deleted $e) {
+            return ['post' => $e->getDeletedObject(),];
+        }
     }
 }

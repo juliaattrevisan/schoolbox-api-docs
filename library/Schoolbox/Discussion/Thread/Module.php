@@ -8,12 +8,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread;
 
-use Alaress\Authorizer\Rule;
+use Alaress\Authorizer as Auth;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Post;
+use Schoolbox\Discussion\Thread\Authorizer\CanGetFromThread;
+use Schoolbox\Discussion\Thread\Authorizer\CanPostIntoThread;
 
 /**
  * Module for discussion thread requests.
@@ -31,16 +33,20 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        // Permission for getting a thread or its contents:
-        // If it's a comms news item, it should be the same as the perms for
-        // viewing the comms item.
-        $authorizer = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\LazyCallback(function () {
-                return new Authorizer\CanReadThread(
-                    $this->getInjector()->get('authorizer'),
-                    $this->getMapperFactory()->get(News\Mapper::class)
-                );
+        /** @var Auth\Authorizer $authorizer */
+        /** @var News\Mapper     $newsMapper */
+        $authorizer       = $this->getInjector()->get('authorizer');
+        $newsMapper       = $this->getMapperFactory()->get(News\Mapper::class);
+        $getAuthorizer    = new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+                return new CanGetFromThread($authorizer, $newsMapper);
+            })
+        );
+        $postAuthorizer   = new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+                return new CanPostIntoThread($authorizer, $newsMapper);
             })
         );
 
@@ -50,16 +56,14 @@ class Module extends BaseModule
             'GET',
             '/{id:\d+}/posts',
             'getPostsByThread',
-            $authorizer,
+            $getAuthorizer,
             [$this, 'preloadThread']
         );
-
-        // TODO consider create route perms as distinct from update routes
         $this->register(
             'POST',
             '/{id:\d+}/posts',
             'createPostInThread',
-            $authorizer,
+            $postAuthorizer,
             [$this, 'preloadThread']
         );
     }
