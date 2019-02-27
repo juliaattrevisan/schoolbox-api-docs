@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Tile;
 
+use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base;
 use Component_Config;
 use Component_ConfigMapper;
@@ -436,19 +437,20 @@ class Controller extends Base
      */
     protected function updateItemWithFormValues(Model $item, $post)
     {
+        $colorFactory = new ColorFactory();
         $item
             ->setTitleText($post['title_text'])
             ->setTitleTextMinSize($post['title_text_min_size'])
             ->setTitleTextMaxSize($post['title_text_max_size'])
-            ->setTitleColor($post['title_color'] ?: '00000000')
-            ->setTitleBackgroundColor($post['title_background_color'] ?: '00000000')
+            ->setTitleColor($colorFactory->build($post['title_color'] ?: '00000000'))
+            ->setTitleBackgroundColor($colorFactory->build($post['title_background_color'] ?: '00000000'))
             ->setTitlePosition($post['title_position'])
             ->setLink($post['link'])
             ->setLinkTarget($post['link_target'])
-            ->setBackgroundColor($post['background_color'] ?: '00000000')
+            ->setBackgroundColor($colorFactory->build($post['background_color'] ?: '00000000'))
             ->setBackgroundImageContained(!empty($post['background_image_contained']))
             ->setBackgroundPosition($post['background_position'])
-            ->setHoverColor($post['hover_color'] ?: '00000000');
+            ->setHoverColor($colorFactory->build($post['hover_color'] ?: '00000000'));
 
         if (is_array($post['attachment'])) {
             try {
