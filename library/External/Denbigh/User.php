@@ -65,7 +65,7 @@ class External_Denbigh_User implements External_UserInterface
         foreach ($parentIterator as $parent) {
             $emailList = array_merge(
                 $emailList,
-                array_map('trim', preg_split('/[;,]/', $parent['email']))
+                array_map('trim', preg_split('/[;,\s\r\n]/', $parent['email']))
             );
         }
 
