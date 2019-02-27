@@ -629,34 +629,40 @@ class Controller extends Base
             }
         }
 
-        $factory = new CollectorFactory();
 
-        $attachments = [];
-
-        /* Remove bad data SA-8244
+        /* If the config allows you to post images yourself, then
+         * deal with the files you threw up into the attachzone
          */
-        if (\is_array($this->getRequest()->post['attachment'])) {
-            $attachments = array_filter($this->getRequest()->post['attachment']);
-        }
+        if (!$this->getConfigLoader()->get('photo_sis_import')) {
+            $factory = new CollectorFactory();
 
-        /* If you didn't provide a picture, empty it
-         */
-        $user->setPortrait(null);
+            $attachments = [];
 
-        if (\count($attachments)) {
-
-            // Validate attachment list can actually be built
-            try {
-                /** @var IStorage[] $attachments */
-                $attachments = $factory->build($this->getRequest()->post['attachment'])->getAll();
-            } catch (\InvalidArgumentException $e) {
-
-                /* Bad data; noop
-                 */
+            /* Remove bad data SA-8244
+             */
+            if (\is_array($this->getRequest()->post['attachment'])) {
+                $attachments = array_filter($this->getRequest()->post['attachment']);
             }
 
-            foreach ($attachments as $portrait) {
-                $user->setPortrait($portrait);
+            /* If you didn't provide a picture, empty it
+             */
+            $user->setPortrait(null);
+
+            if (\count($attachments)) {
+
+                // Validate attachment list can actually be built
+                try {
+                    /** @var IStorage[] $attachments */
+                    $attachments = $factory->build($this->getRequest()->post['attachment'])->getAll();
+                } catch (\InvalidArgumentException $e) {
+
+                    /* Bad data; noop
+                     */
+                }
+
+                foreach ($attachments as $portrait) {
+                    $user->setPortrait($portrait);
+                }
             }
         }
 
