@@ -226,7 +226,7 @@ class Kernel extends CliKernelAbstract
             Lumberjack\Logger::FIELD_MEM,
             Lumberjack\Logger::FIELD_TRUE_MEM,
             Lumberjack\Logger::FIELD_PID,
-            Lumberjack\Logger::FIELD_LEVEL . ':',
+            Lumberjack\Logger::FIELD_LEVEL,
             Lumberjack\Logger::FIELD_PORCELAIN,
         ];
 
