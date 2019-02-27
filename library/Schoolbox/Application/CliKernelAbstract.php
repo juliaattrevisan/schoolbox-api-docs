@@ -25,8 +25,14 @@ use Alaress\Lumberjack;
  */
 abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements LoggerAwareInterface
 {
+    // Exit Statuses.
+    // Apps may use custom exit statuses so long as they don't collide with these
+    public const EXIT_STATUS_OK           = 0;   // The requested action was successfully performed.
+    public const EXIT_STATUS_KERNEL_ERROR = 1;   // Problem in kernel, may have been caused by App
+    public const EXIT_STATUS_APP_ERROR    = 2;   // Problem in App
 
-    public const OPT_ERRORS = 'errors:';      // What errors should PHP report
+    // Command-line option to control what errors PHP should report
+    public const OPT_ERRORS = 'errors:';
 
     /** @var LoggerInterface */
     private $logger;
@@ -62,7 +68,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
         catch (IOException $e) {
             // can't do anything, logging stream has been closed
         }
-        exit;
+        exit(self::EXIT_STATUS_KERNEL_ERROR);
     }
 
 
@@ -89,7 +95,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
         // don't report anything
         if (!isset($cases[$error['type']])) {
-            exit(0);
+            exit(self::EXIT_STATUS_OK);
         }
 
         // report
@@ -101,7 +107,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             // can't do anything, logging stream has been closed
         }
 
-        exit(1);
+        exit(self::EXIT_STATUS_KERNEL_ERROR);
     }
 
 
