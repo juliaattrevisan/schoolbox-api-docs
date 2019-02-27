@@ -83,9 +83,9 @@ class Propagator implements IPropagator
 
         // drop event serial into redis (commented out because this will eat all the memory)
         //$redisKey = $this->toRedis($event, "{$namespace}e");
-
         foreach ($this->splitter->generateTriggers($event) as $trigger) {
-            $ttl = (($trigger->getTimestamp() - time()) < 0) ? Instance::DEFAULT_TTL : ($trigger->getTimestamp() - time() + Instance::DEFAULT_TTL);
+            $diff = \Alaress_Date_Format::now()->diffInSeconds(new \Alaress_Date_Format($trigger->getTimestamp(), 'U'));
+            $ttl = ($diff < 0) ? Instance::DEFAULT_TTL : ($diff + Instance::DEFAULT_TTL);
             $this->broker->publish($trigger, [$namespace], $ttl);
         }
 

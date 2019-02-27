@@ -14,7 +14,8 @@ $keys = $redis->keys('msg*');
 foreach ($keys as $idx => $key) {
     echo "=====================================================================\n";
     $readableTTL = secondsToTime($redis->ttl($key));
-    echo "[$idx] $key : ({$redis->ttl($key)}{$readableTTL}) \n";
+    $expiryTime = ttlToDate($redis->ttl($key));
+    echo "[$idx] $key : ({$redis->ttl($key)}{$readableTTL} : {$expiryTime}) \n";
 
     /** @var Instance $instance */
     try {
@@ -27,7 +28,8 @@ foreach ($keys as $idx => $key) {
             echo "{$setcount} messages exist.\n";
             foreach ($redis->smembers($key) as $skey) {
                 $sreadableTTL = secondsToTime($redis->ttl($skey));
-                echo "       $skey : ({$redis->ttl($skey)}{$sreadableTTL}) \n";
+                $sexpiryTime = ttlToDate($redis->ttl($skey));
+                echo "       $skey : ({$redis->ttl($skey)}{$sreadableTTL} : {$sexpiryTime}) \n";
                 $sRawRedisData = $redis->get($skey);
                 $sInstance = unserialize(gzuncompress($sRawRedisData));
                 extractInstance($sInstance);
@@ -83,13 +85,26 @@ function extractInstance($instance)
     }
 }
 
-function secondsToTime($seconds) {
+function secondsToTime($seconds)
+{
     if (!$seconds || $seconds < 1) {
         return '';
     }
     $dtF = new \DateTime('@0');
     $dtT = new \DateTime("@$seconds");
     return $dtF->diff($dtT)->format(': %a days, %h hours, %i minutes and %s seconds');
+}
+
+function ttlToDate($ttl)
+{
+    switch ($ttl) {
+        case -1:
+            return "no exp";
+        case -2:
+            return "expired";
+        default:
+            return date('Y-m-d H:i:s', time() + $ttl);
+    }
 }
 
 echo "\n";

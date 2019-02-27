@@ -165,7 +165,7 @@ class Instance implements JsonSerializable
     /**
      * TTL of this message.
      */
-    protected $ttl;
+    protected $ttl = self::DEFAULT_TTL;
 
     /**
      * @param string               $text
@@ -570,11 +570,7 @@ class Instance implements JsonSerializable
      */
     public function getTTL(): int
     {
-        if (isset($this->ttl)) {
-            return $this->ttl;
-        }
-        // TODO: how this work for future???
-        return self::DEFAULT_TTL;
+        return $this->ttl;
     }
 
 }
