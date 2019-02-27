@@ -1,8 +1,6 @@
 {# Shared navigation menu #}
 
-<div class="row">
-    {{ renderAdminNavigation(pageCurrent) }}
-</div>
+{{ renderAdminNavigation(pageCurrent) }}
 
 {# Display header #}
 
@@ -14,7 +12,6 @@
         <div class="list-item">
             <div class="small-12 columns">
                 <h2 class="subheader">{{ user.fullName }}</h2>
-                <h3 class="subheader">User Detail</h3>
             </div>
         </div>
         <nav>
@@ -43,7 +40,6 @@
         <div class="list-item">
             <div class="small-12 columns">
                 <h2 class="subheader">Create New User</h2>
-                <h3 class="subheader">User Detail</h3>
             </div>
         </div>
     </div>
@@ -55,71 +51,19 @@
 <div class="row">
     <form method="POST" action="{{ routeLookup('adminUser.postDetails', {userId: user.id}) }}" data-validatable-as="userDetails" data-modify-user-form>
     <div class="small-12 island">
-        <section class="content">
+        <section>
             <fieldset>
-
-                <div class="row">
+                <div class="row content">
                     <input type="hidden" name="type" value="modify"/>
                     <input type="hidden" name="userID" value="{{ user.id }}"/>
 
-                    <div class="small-12 medium-6 island">
-
-                        <label for="title">Title</label>
-                        <select id="title" name="title">
-                            {% for title in titles %}
-                                <option value="{{ title.title }}" {% if user.title == title.title %}selected{% endif %}>{{ title.title }}</option>
-                            {% endfor %}
-                        </select>
-
-                        <label for="firstname">First Name</label>
-                        <input id="firstname" type="text" name="firstname" value="{{ user.firstName }}"/>
-
-                        <label for="lastname">Surname</label>
-                        <input id="lastname" type="text" name="lastname" value="{{ user.lastName }}"/>
-
-                        <label for="database">{{ externalDatabase }} ID</label>
-                        <input id="database" type="text" name="database_id" value="{{ user.externalId }}"/>
-
-                        {% if user %}
-                            {# Can't display a schoolbox user ID on insert screen #}
-                            <label for="userId">Schoolbox User ID</label>
-                            <input id="userId" type="text" disabled value="{{ user.id }}"/>
-                        {% endif %}
-
-                        <label for="group">Role</label>
-                        <select id="group" name="group">
-                            {% for role in roles %}
-                                <option value="{{ role.id }}" {% if user.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
-                            {% endfor %}
-                        </select>
-
-                        <label for="position_title">Position Title</label>
-                        <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
-                        
-                        <fieldset class="checklist">
-                            <label>Campus Involvement</label>
-                            {% for campus in campuses %}
-                                {# Work out if the user is in this campus- really need to write a collection.contains() method #}
-
-                                {% set campusChecked = false %}
-                                {% for userCampus in user.campusCollection %}
-                                    {% if userCampus.id == campus.id %}
-                                        {% set campusChecked = true %}
-                                    {% endif %}
-                                {% endfor %}
-                                <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
-                                <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
-                            {% endfor %}
-                        </fieldset>
-                    </div>
-
-                    <div class="small-12 medium-6 island">
+                    <div class="small-12 medium-4 island">
                         <label>Portrait Image</label>
 
                         {# If the user has a picture, show it
                          #}
                         {% if user.portrait %}
-                            <div>
+                            <div id="portraitImage">
                                 <img src="/portrait.php?id={{ user.id }}&size=profile&cb={{ date().timestamp }}" />
                             </div>
                         {% endif %}
@@ -129,7 +73,23 @@
                          # If it's on, you -cannot- change pictures manually
                          #}
                         {% if portraitZone %}
-                            {% include 'sub/attachzone.twig' with { attachzone: portraitZone } %}
+                            {% include 'sub/attachzone.twig' with {
+                                attachzone: portraitZone,
+                                onDetach: "function() {
+                                    $('#portraitImage').fadeOut();
+                                }"
+                            } %}
+
+                            {# Cachebuster
+                             # Get the latest version for instant gratification while on this screen
+                             #}
+                            <script>
+                                $(function() {
+                                    var img = $('#profile-drop').find('img');
+
+                                    img.attr('src', img.attr('src') + '&cb={{ date().timestamp }}');
+                                });
+                            </script>
                         {% endif %}
 
                         {# If user never had a picture and you can't add one manually because of config setting
@@ -141,36 +101,138 @@
                                 <p>You can <a href="/adminv2/setting/External+DB">change this setting here</a></p>
                             </div>
                         {% endif %}
+                    </div>
 
-                        <label for="username">Username</label>
-                        <input id="username" type="text" class="required" name="modusername" value="{{ user.username }}"/>
+                    <div class="small-12 medium-4 island">
+                        <div>
+                            <label for="title">Title</label>
+                            <select id="title" name="title">
+                                {% for title in titles %}
+                                    <option value="{{ title.title }}" {% if user.title == title.title %}selected{% endif %}>{{ title.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                        <label for="password">Password</label>
-                        <input id="password" type="password" name="modpassword" class="password" value="donotchange"/>
+                        <div>
+                            <label for="firstname" class="required">First Name</label>
+                            <input id="firstname" type="text" name="firstname" value="{{ user.firstName }}"/>
+                        </div>
+                        <div>
+                            <label for="lastname">Surname</label>
+                            <input id="lastname" type="text" name="lastname" value="{{ user.lastName }}"/>
+                        </div>
+                        <div>
+                            <label for="position_title">Position Title</label>
+                            <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
+                        </div>
 
-                        <label for="alt_email">Alternate Email</label>
-                        <input id="alt_email" type="email" name="alt_email" value="{{ user.altEmail }}"/>
+                        {% if user %}
+                            <div>
+                                {# Can't display a schoolbox user ID on insert screen #}
+                                <label for="userId">Schoolbox User ID</label>
+                                <input id="userId" type="text" disabled value="{{ user.id }}"/>
+                            </div>
+                        {% endif %}
 
-                        <label for="year">Year</label>
-                        <input id="year" type="text" name="year" value="{{ user.year }}"/>
+                        <div>
+                            <label for="database">{{ externalDatabase }} ID</label>
+                            <input id="database" type="text" name="database_id" value="{{ user.externalId }}"/>
+                        </div>
+                    </div>
 
-                        <label for="house">House</label>
-                        <select id="house" name="house">
-                            <option value="">Not Set</option>
-                            {% for house in houses %}
-                                <option value="{{ house.id }}" {% if user.schoolHouse.id == house.id %}selected{% endif %}>{{ house.house }}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="small-12 medium-4 island">
+                        <div>
+                            <label for="username" class="required">Username</label>
+                            <input id="username" type="text" class="required" name="modusername" value="{{ user.username }}"/>
+                        </div>
 
-                        <label for="residential_house">Residential House</label>
-                        <select id="residential_house" name="residential_house">
-                            <option value="">Not Set</option>
-                            {% for residentialHouse in residentialHouses %}
-                                <option value="{{ residentialHouse.id }}"
-                                        {% if user.residentialHouse.id == residentialHouse.id %}selected{% endif %}>{{ residentialHouse.house }}</option>
-                            {% endfor %}
-                        </select>
+                        <div>
+                            <label for="password">Password</label>
+                            <input id="password" type="password" name="modpassword" class="password" value="donotchange"/>
+                        </div>
 
+                        <div>
+                            <label for="group">Role</label>
+                            <select id="group" name="group">
+                                {% for role in roles %}
+                                    <option value="{{ role.id }}" {% if user.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="alt_email">Alternate Email</label>
+                            <input id="alt_email" type="email" name="alt_email" value="{{ user.altEmail }}"/>
+                        </div>
+
+                        <div>
+                            <label for="year">Year</label>
+                            <input id="year" type="text" name="year" value="{{ user.year }}"/>
+                        </div>
+
+                        <div>
+                            <label for="house">House</label>
+                            <select id="house" name="house">
+                                <option value="">Not Set</option>
+                                {% for house in houses %}
+                                    <option value="{{ house.id }}" {% if user.schoolHouse.id == house.id %}selected{% endif %}>{{ house.house }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="residential_house">Residential House</label>
+                            <select id="residential_house" name="residential_house">
+                                <option value="">Not Set</option>
+                                {% for residentialHouse in residentialHouses %}
+                                    <option value="{{ residentialHouse.id }}"
+                                            {% if user.residentialHouse.id == residentialHouse.id %}selected{% endif %}>{{ residentialHouse.house }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            {# Render roughly-equal column lengths #}
+            <fieldset>
+                <label class="content required">Campus Involvement</label>
+
+                <div class="row content">
+                    {% set numPerColumn = (campuses|length/3)|round(0, 'ceil') %}
+
+                    {# Work out if the user is in this campus- really need to write a collection.contains() method #}
+                    {% for campus in campuses %}
+                        {% if numPerColumn == 1 or loop.index % numPerColumn == 1 %}
+                        <div class="small-12 medium-4 columns">
+                        {% endif %}
+
+                        {% set campusChecked = false %}
+                        {% for userCampus in user.campusCollection %}
+                            {% if userCampus.id == campus.id %}
+                                {% set campusChecked = true %}
+                            {% endif %}
+                        {% endfor %}
+                        <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
+                        <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
+
+                        {% if loop.last or loop.index % numPerColumn == 0 %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    {# Special case for two campuses
+                     # Render an empty nbsp; div otherwise it looks like a 2-column layout
+                     #}
+                    {% if campuses|length == 2 %}
+                        <div class="small-12 medium-4 columns">&nbsp;</div>
+                    {% endif %}
+                </div>
+            </fieldset>
+            <fieldset>
+                <label class="content">Options</label>
+                <div class="row content">
+                    <div class="small-12 medium-4 columns">
                         <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {% if user.eportfolioEnable %}checked{% endif %} />
                         <label for="eportfolio" class="checkbox-label">E-Portfolio</label>
 
@@ -179,7 +241,8 @@
 
                         <input id="hide_timetable" type="checkbox" name="hide_timetable" value="1" {% if user.hideTimetable %}checked{% endif %} />
                         <label for="hide_timetable" class="checkbox-label">Hide Timetable</label>
-
+                    </div>
+                    <div class="small-12 medium-4 columns">
                         <input id="local_email" type="checkbox" name="local_email" value="1" {% if user.localEmail %}checked{% endif %} />
                         <label for="local_email" class="checkbox-label">Email Address from Username</label>
 
@@ -188,7 +251,9 @@
 
                         <input id="webmail" type="checkbox" name="webmail" value="1" {% if user.webMail %}checked{% endif %} />
                         <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
+                    </div>
 
+                    <div class="small-12 medium-4 columns">
                         <input id="display_grade_graph" type="checkbox" name="display_grade_graph" value="1" {% if user.displayGradeGraph %}checked{% endif %} />
                         <label for="display_grade_graph" class="checkbox-label">Display Graph on Student Grade Card</label>
 
@@ -202,7 +267,6 @@
                             <label for="account_enabled" class="checkbox-label">Account Enabled</label>
                         {% endif %}
                     </div>
-
                 </div>
             </fieldset>
         </section>
