@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 use Aura\Di;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../../conf/core/require-cli.php';
@@ -75,13 +76,13 @@ $app = new class() extends CliTool\App{
         // Did user request help?
         if (\array_key_exists(OPT_SHORT_HELP, $appOptions) || \array_key_exists(OPT_LONG_HELP, $appOptions)) {
             $this->printHelp();
-            exit(0);
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
-        // Were any invalid options detected?
+        // Parse command-line options. If invalid options detected, then print help and exit.
         if (!$this->parseAppOptions($appOptions)) {
             $this->printHelp();
-            exit(1);
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
         $this->execute();
