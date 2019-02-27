@@ -227,11 +227,9 @@ class Mapper extends BaseMapper
         $identifier = (int)$component->getIdentifier();
         if ($component->isHomepage()) {
             $model->setFolder($this->getJoinMapper('tile_layout_for_folder')->findById($identifier));
-        }
-        if ($component->isDashboard()) {
+        } elseif ($component->isDashboard()) {
             $model->setDashboardRole($this->getJoinMapper('tile_layout_for_dashboard')->findById($identifier));
-        }
-        if ($component->isHomepageTemplate()) {
+        } elseif ($component->isHomepageTemplate()) {
             $model->setHomepageTemplate(
                 $this->getJoinMapper('tile_layout_for_homepage_template')->findById($identifier)
             );
