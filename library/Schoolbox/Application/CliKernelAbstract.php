@@ -12,7 +12,7 @@ use Alaress\Exception\IO\IOException;
 use ErrorException;
 use Monolog\Handler\RavenHandler;
 use PDOException;
-use Psr\Log\LoggerAwareInterface;
+//use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use RangeException;
 use Raven_Client;
@@ -22,8 +22,10 @@ use Alaress\Lumberjack;
 
 /**
  * Common implementation for all Cli Kernels
+ * @todo develop version should use the interfaced method. But that requires SA-8248
  */
-abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements LoggerAwareInterface
+//abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements \Psr\Log\LoggerAwareInterface
+abstract class CliKernelAbstract extends \Alaress\Application\Kernel
 {
     // Exit Statuses.
     // Apps may use custom exit statuses so long as they don't collide with these
