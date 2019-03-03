@@ -1,0 +1,2 @@
+ALTER TABLE `comms_news_article`
+  CHANGE COLUMN `body` `body` MEDIUMTEXT NULL DEFAULT NULL;
