@@ -97,8 +97,9 @@
                          #}
                         {% if not user.portrait and not portraitZone %}
                             <div class="empty-state">
-                                <p>Profile images are automatically generated from the SIS.</p>
-                                <p>You can <a href="/adminv2/setting/External+DB">change this setting here</a></p>
+                                <img src="/portrait.php?id={{ user.id }}&size=profile">
+                                <p>We were unable to find a portrait for this user in {{ config.external_type|capitalize }}.</p>
+                                <p>You can disable auto loading portraits <a href="/adminv2/setting/External+DB#photo_sis_import">via this setting.</a></p>
                             </div>
                         {% endif %}
                     </div>
