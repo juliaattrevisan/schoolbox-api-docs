@@ -98,7 +98,6 @@
                         {% if not user.portrait and not portraitZone %}
                             <div class="empty-state">
                                 <img src="/portrait.php?id={{ user.id }}&size=profile">
-                                {{ user.portrait }}
                                 <p>We were unable to find a portrait for this user in {{ config.external_type|capitalize }}.</p>
                                 <p>You can disable auto loading portraits <a href="/adminv2/setting/External+DB#photo_sis_import">via this setting.</a></p>
                             </div>
