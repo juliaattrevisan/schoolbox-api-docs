@@ -307,6 +307,19 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/problem'
+          examples:
+            badRequestUpdate:
+              $ref: '#/components/examples/problemBadRequestUpdate'
+            badRequestDelete:
+              $ref: '#/components/examples/problemBadRequestDelete'
+            unauthorized:
+              $ref: '#/components/examples/problemUnauthorized'
+            forbidden:
+              $ref: '#/components/examples/problemForbidden'
+            notFound:
+              $ref: '#/components/examples/problemNotFound'
+            internalServerError:
+              $ref: '#/components/examples/problemInternalServerError'
 
     postList:
       description: a list of posts
@@ -513,3 +526,45 @@ components:
           cursor:
             current: xxx
             next: yyy
+
+    problemBadRequestUpdate:
+      value:
+        type:   about:blank
+        title:  Bad Request
+        status: 400
+        detail: This resource may not have its created at time modified.
+
+    problemBadRequestDelete:
+      value:
+        type:   about:blank
+        title:  Bad Request
+        status: 400
+        detail: This resource may not be deleted.
+
+    problemUnauthorized:
+      value:
+        type:   about:blank
+        title:  Unauthorized Access
+        status: 401
+        detail: Authorization is required to access resource with ID=1.
+
+    problemForbidden:
+      value:
+        type:   about:blank
+        title:  Forbidden
+        status: 403
+        detail: You do not have permission to access resource with ID=1.
+
+    problemNotFound:
+      value:
+        type:   about:blank
+        title:  Not Found
+        status: 404
+        detail: The resource with ID=1 was not found.
+
+    problemInternalServerError:
+      value:
+        type:   about:blank
+        title:  Internal Server Error
+        status: 500
+        detail: An unexpected error occured when accessing resource with ID=1. This error has been logged.
