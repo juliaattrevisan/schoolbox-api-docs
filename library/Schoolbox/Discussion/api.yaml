@@ -220,7 +220,8 @@ components:
       type: object
       properties:
         count:
-          type: int
+          type: integer
+          format: int32
           description: If provided, the number of items in the result set.
         cursor:
           type: object
