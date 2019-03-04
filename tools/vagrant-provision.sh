@@ -592,6 +592,11 @@ then
     fi
     ln -s /etc/php/7.1/mods-available/xdebug.ini /etc/php/7.1/cli/conf.d/20-xdebug.ini >/dev/null 2>&1;
     ln -s /etc/php/7.1/mods-available/tideways.ini /etc/php/7.1/cli/conf.d/20-tideways.ini >/dev/null 2>&1;
+    # If not configured, add this to the 'vagrant' user's .profile
+    if [[ -z `grep -E '^export\s+XDEBUG_CONFIG\s*=\s*"idekey=[^"]+"' /home/vagrant/.profile` ]];
+    then
+        echo "export XDEBUG_CONFIG=\"idekey=PHPSTORM\"" >> /home/vagrant/.profile
+    fi
 else
     echo "[SB][`date +%Y-%m-%d\ %X`] Disabling xdebug";
     rm -f /etc/php/7.1/apache2/conf.d/20-xdebug.ini;
