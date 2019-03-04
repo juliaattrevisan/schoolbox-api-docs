@@ -253,22 +253,21 @@ components:
           description: |
             This read-only object representation will be deprecated eventually:
             it exists only for compatibility with existing API endpoints.
+          required:
+            - json
           properties:
             database:
               type: string
-              required: false
               description: |
                 A database representation of the date. Please use the "json"
                 property instead.
             unixTimestamp:
               type: int
-              required: false
               description: |
                 The date as a Unix timestamp. Please use the "json" property
                 instead.
             local:
               type: string
-              required: false
               description: |
                 A string representation of the date, localized to the Schoolbox
                 instance's settings.
@@ -277,7 +276,6 @@ components:
             json:
               type: string
               format: date-time
-              required: true
               description: |
                 The date as a RFC3339 string.
 
@@ -311,18 +309,7 @@ components:
       schema:
         type: int
         minimum: 1
-#    q:
-#      name:        q
-#      in:          query
-#      description: Query (search) parameter
-#    sort:
-#      name:        sort
-#      in:          query
-#      description: Sort parameter
-#    fields:
-#      name:        fields
-#      in:          query
-#      description: Fields parameter. Use this to request a subset of a record's fields.
+
     limit:
       name:        sort
       in:          query
@@ -332,10 +319,7 @@ components:
         minimum: 1
         maximum: 100
         default: 20
-#    offset:
-#      name:        offset
-#      in:          query
-#      description: The offset of the first record to return
+
     cursor:
       name:        cursor
       in:          query
@@ -344,6 +328,7 @@ components:
         record to return.
       schema:
         type: string
+
     token:
       name:        token
       in:          query
@@ -352,14 +337,15 @@ components:
         This is temporary, and will be replaced with oAuth/JWT authentication.
       schema:
         type: string
+
     depth:
       name:        depth
       in:          query
       description: |
         Number of levels to descend when retrieving child posts.
+      required: false
       schema:
         type: int
         default: 0
         minimum: 0
         maximum: 3
-        required: false
