@@ -102,7 +102,9 @@ components:
         children:
           $ref: '#/components/schemas/postList'
           description: A list of direct child posts of this thread
-          required: false
+      required:
+        - id
+        - open
 
     post:
       title: Post
@@ -114,7 +116,6 @@ components:
         thread:
           $ref: '#/components/schemas/thread'
           # Usually a post will be retrieved within the context of a thread
-          required: false
         author:
           $ref: '#/components/schemas/user'
           nullable: true
@@ -133,7 +134,6 @@ components:
         children:
           $ref: '#/components/schemas/postList'
           description: A list of direct children of this post
-          required: false
         visibility:
           description: |
             Which role types may view this comment? If not set, assume all role
@@ -145,8 +145,8 @@ components:
           items:
             type: string
             enum: ['teacher', 'parent', 'student']
-          required: false
       required:
+        - id
         - thread
         - content
 
@@ -175,6 +175,8 @@ components:
               type: string
               format: uri-reference
               nullable: true
+      required:
+        - id
 
     problem:
       title: Problem Details
@@ -185,17 +187,14 @@ components:
         type:
           type: string
           format: uri
-          required: true
           description: A URI reference that identifies the problem type
           default: 'about:blank'
         title:
           type: string
-          required: true
           description: A short human-readable summary of the problem type
         status:
           type: integer
           format: int32
-          required: true
           minimum: 100
           maximum: 600
           exclusiveMaximum: true
@@ -208,6 +207,10 @@ components:
           type: string
           format: uri
           description: A URI reference that identifies the specific occurrence of the problem
+      required:
+        - type
+        - title
+        - status
 
     listMetadata:
       title: List metadata
@@ -217,16 +220,13 @@ components:
       properties:
         count:
           type: int
-          required: false
           description: If provided, the number of items in the result set.
         cursor:
           type: object
-          required: false
           properties:
             current:
               type: string
               nullable: true
-              required: true
               description: |
                 If set, a cursor to the current page of results.
                 Seems redundant, but it does generate a cursor to a request
@@ -234,8 +234,10 @@ components:
             next:
               type: string
               nullable: true
-              required: true
               description: If set, a cursor to the next page of results.
+          required:
+            - current
+            - next
 
     dateTime:
       title: Datetime
