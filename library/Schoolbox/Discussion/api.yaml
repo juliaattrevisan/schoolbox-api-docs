@@ -239,6 +239,19 @@ components:
             - current
             - next
 
+    postList:
+      title: Post list
+      description: A list of posts
+      readOnly: true
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/post'
+        metadata:
+          $ref: '#/components/schemas/listMetadata'
+
     dateTime:
       title: Datetime
       description: |
@@ -296,10 +309,8 @@ components:
           schema:
             type: object
             properties:
-              data:
-                $ref: '#/components/schemas/post'
-              metadata:
-                $ref: '#/components/schemas/listMetadata'
+              schema:
+                $ref: '#/components/schemas/postList'
 
 
   parameters:
