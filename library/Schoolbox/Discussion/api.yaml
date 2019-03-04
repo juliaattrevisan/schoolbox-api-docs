@@ -310,10 +310,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              schema:
-                $ref: '#/components/schemas/postList'
+            $ref: '#/components/schemas/postList'
 
 
   parameters:
