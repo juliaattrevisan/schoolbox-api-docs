@@ -145,7 +145,10 @@ components:
           type: array
           items:
             type: string
-            enum: ['teacher', 'parent', 'student']
+            enum:
+              - staff
+              - parent
+              - student
       required:
         - id
         - thread
