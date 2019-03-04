@@ -20,6 +20,7 @@ paths:
       summary: Deletes a post
       responses:
         '204':
+          description: The resource was deleted successfully.
         default:
           $ref: '#/components/responses/problem'
       parameters:
@@ -320,7 +321,8 @@ components:
       description: ID of an item to use
       required:    true
       schema:
-        type: int
+        type: integer
+        format: int32
         minimum: 1
 
     limit:
@@ -328,7 +330,8 @@ components:
       in:          query
       description: Maximum number of records to return
       schema:
-        type: int
+        type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -358,7 +361,8 @@ components:
         Number of levels to descend when retrieving child posts.
       required: false
       schema:
-        type: int
+        type: integer
+        format: int32
         default: 0
         minimum: 0
         maximum: 3
