@@ -47,12 +47,16 @@ $(document).ready(function() {
     // Initialise validator - have to do this here, as the only other place it happens is in the mage on submit
     $("#assessmentForm").alaressValidate();
 
-    // Attach on-load rules -
-    // we can't pass these as options to alaressValidate because we need to loop through elements applying rules
-    attachValidationRules();
+    // Don't attach rubric validation unless Use Rubric is on
+    if ($("#useRubric").is(":checked")) {
+        // Attach on-load rules -
+        // we can't pass these as options to alaressValidate because we need to loop through elements applying rules
+        attachValidationRules();
 
-    // Attach MutationObservers and on-change listeners
-    initDynamicValidationTriggers();
+        // Attach MutationObservers and on-change listeners
+        initDynamicValidationTriggers();
+    }
+
 });
 
 
@@ -167,8 +171,10 @@ var beforeAttemptingSubmit = function() {
         closeVisible = closeDate.is(':visible');
 
     // have to do this again since its not in validateOptions and the plugin clears+reapplys rules on submit
-    attachValidationRules();
-    initDynamicValidationTriggers();
+    if ($("#useRubric").is(":checked")) {
+        attachValidationRules();
+        initDynamicValidationTriggers();
+    }
 
     if (openVisible && closeVisible) {
 
