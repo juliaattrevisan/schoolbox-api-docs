@@ -16,7 +16,6 @@ use Alaress\DebugBar\Instance as DebugBar;
 
 class Alaress_Submarine {
 
-
     /**
      * Alaress_SilentProbe constructor.
      * @param null $_
@@ -30,16 +29,11 @@ class Alaress_Submarine {
                 DebugBar::getInstance()->getCollector('messages')->addMessage(func_get_arg($i));
             }
         } else {
-            $width = floor(100/$numArgs);
-
             echo '<div style="display:none;">';
-            echo "<div style='width:100%;height:0px;clear:both;'></div>";
+            echo "\n";
 
             for ($i = 0; $i < $numArgs; $i++) {
                 $contents = func_get_arg($i);
-
-                echo "<div style='width:{$width}%;float:left;display:block;overflow:auto;'>";
-                echo '<pre>';
 
                 /* Also accommodate bools/nulls
                  */
@@ -51,13 +45,10 @@ class Alaress_Submarine {
                 }
 
                 print_r($contents);
-
-                echo '</pre>';
-                echo '</div>';
+                echo "\n";
             }
 
-            echo "<div style='width:100%;height:0px;clear:both;'></div>";
-            echo '</div>';
+            echo "</div>\n\n";
         }
     }
 }
