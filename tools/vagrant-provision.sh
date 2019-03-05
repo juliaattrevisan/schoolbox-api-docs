@@ -594,19 +594,17 @@ then
     ln -s /etc/php/7.1/mods-available/tideways.ini /etc/php/7.1/cli/conf.d/20-tideways.ini >/dev/null 2>&1;
 
     # If not yet configured, add environment vars for 'vagrant' and 'root' users
-    # Vagrant user has a login shell, requires XDEBUG_CONFIG to be specified
-    if [[ -z `grep -E '^export\s+XDEBUG_CONFIG\s*=\s*"idekey=[^"]+"' /home/vagrant/.profile` ]];
+    # Vagrant and Root users require XDEBUG_CONFIG to be specified
+    if [[ -z `grep -E '^export\s+XDEBUG_CONFIG\s*=\s*"idekey=[^"]+"' /home/vagrant/.bashrc` ]];
     then
-        echo "export XDEBUG_CONFIG=\"idekey=PHPSTORM\"" >> /home/vagrant/.profile;
+        echo "export XDEBUG_CONFIG=\"idekey=PHPSTORM\"" >> /home/vagrant/.bashrc;
     fi
-
-    # Root does not have a login shell, requires XDEBUG_CONFIG to be specified
     if [[ -z `grep -E '^export\s+XDEBUG_CONFIG\s*=\s*"idekey=[^"]+"' /root/.bashrc` ]];
     then
         echo "export XDEBUG_CONFIG=\"idekey=PHPSTORM\"" >> /root/.bashrc;
     fi
 
-    # Root does not have login shell, also requires PHP_IDE_CONFIG to be specified
+    # Root also requires PHP_IDE_CONFIG to be specified
     if [[ -z `grep -E '^export\s+PHP_IDE_CONFIG\s*=\s*"serverName=[^"]+"' /root/.bashrc` ]];
     then
         # Requires PHPStorm to have a server configured with Name: "10.0.2.15" (this is the default)
