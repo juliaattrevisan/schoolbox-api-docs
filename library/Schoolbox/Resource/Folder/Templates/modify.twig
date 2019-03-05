@@ -51,6 +51,8 @@
                 },
             },
             submitHandler: function(form) {
+                $(form).find("input[type='submit']").attr("disabled", true);
+
                 var hasDefaultPerms = $("input[name='group[{{ user.getRole().getId() }}]']:checked").val();
                 var individualPerms = $('input[name=groupcheck]').is(':checked');
                 if ((hasDefaultPerms < writePermission) && !individualPerms && !$('[data-checkbox-inherit]').prop('checked')) {
@@ -58,6 +60,10 @@
                         text: 'You do not currently have write access to this folder. Do you wish to continue?',
                         confirmEvent: function() {
                             form.submit();
+                        },
+                        cancelEvent: function() {
+                            // Allow user to resubmit the form if they cancel out of the dialog
+                            $(form).find("input[type='submit']").removeAttr("disabled");
                         }
                     });
                 } else {
