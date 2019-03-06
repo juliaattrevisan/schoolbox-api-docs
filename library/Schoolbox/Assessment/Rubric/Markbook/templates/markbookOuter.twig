@@ -1,11 +1,10 @@
-<h1>I am going to be a rubric markbook one day</h1>
-{#<script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>#}
-{#<script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>#}
-{#<script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>#}
+<h1>Rubric Markbook for {{ folder.name }}</h1>
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>
 
-{#{% import 'sub/breadcrumbs.twig' as bread %}#}
-{# Crumbz: Class > Markbook #}
-{#{{ bread.crumbs(['Learning', '/learning/classes'], ['Markbook']) }}#}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(['Learning', '/learning/classes'], ['Markbook']) }}
 
 {#{% set reportContentId = 'report_content' %}#}
 
