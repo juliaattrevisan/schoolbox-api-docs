@@ -37,12 +37,12 @@ INNER JOIN user              marker  ON sr.marker = marker.id
 -- Join through rubric_criterion_usage as I only care about indicators actually in use
 INNER JOIN rubric_group_usage     rgu ON  sb.id               = rgu.submission_box_id
 INNER JOIN rubric_group           rg  ON  rgu.rubric_group_id = rg.id
-LEFT  JOIN rubric_group_mark      rgm ON  rg.id               = rgm.rubric_group_id
+INNER JOIN rubric_group_mark      rgm ON  rg.id               = rgm.rubric_group_id
                                       AND sr.id               = rgm.return_id
 INNER JOIN rubric_criterion_usage rcu ON  sb.id               = rcu.submission_box_id
 INNER JOIN rubric_criterion       rc  ON  rcu.criterion_id    = rc.id
 INNER JOIN rubric_descriptor      rd  ON  rc.id               = rd.criterion_id
-LEFT  JOIN rubric_descriptor_mark rdm ON  rd.id               = rdm.descriptor_id
+INNER JOIN rubric_descriptor_mark rdm ON  rd.id               = rdm.descriptor_id
                                       AND rgm.id              = rdm.rubric_group_mark_id
 
 ORDER BY
