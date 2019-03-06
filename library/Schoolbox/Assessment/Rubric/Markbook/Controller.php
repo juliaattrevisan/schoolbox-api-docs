@@ -23,7 +23,6 @@ class Controller extends Base
      */
     public function getMarkbook(Folder $classFolder = null): void
     {
-        // If viewee not specified, then display current user's markbook.
         if (null === $classFolder) {
             throw new \UnexpectedValueException('Cannot render rubric markbook - folder not found');
         }

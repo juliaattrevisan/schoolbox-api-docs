@@ -7,6 +7,7 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
@@ -62,6 +63,14 @@ class Module extends BaseModule
         $this->register('GET',  '{/folderId:\d+}', 'getMarkbook', $canViewPage, $preloadFolder);
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function initControllers(ContainerInterface $injector)
+    {
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+    }
 
     /**
      * @inheritdoc
