@@ -4,6 +4,9 @@
  * * its course spec, if any
  * * its course implementation, if any
  * * the project it's contained within, if any
+ *
+ * Note this cares nothing about whether an assessment, folder or anything is
+ * soft-deleted.
  */
 CREATE OR REPLACE VIEW v_assessment_relation AS
 
