@@ -4,7 +4,7 @@
 
 SELECT
     'submission_return' AS feedback_table,
-    sr1.id              AS feedback_id,
+    MAX(sr1.id)         AS feedback_id,
     sb.assessment_id,
     sr1.owner,
     sr1.review_route,
@@ -27,7 +27,10 @@ LEFT  JOIN submission_return sr2 ON (
 )
 
 -- Filter out any unpublished returns, and any which have an earlier published time.
-WHERE
-    sr1.published_at IS NOT NULL
-AND
-    sr2.id IS NULL
+WHERE sr1.published_at IS NOT NULL
+AND   sr2.id           IS NULL
+
+GROUP BY sb.assessment_id,
+         sr1.owner,
+         sr1.review_route,
+         sr1.published_at
