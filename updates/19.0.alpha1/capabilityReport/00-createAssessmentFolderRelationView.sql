@@ -1,3 +1,13 @@
+/**
+ * Create a view for retrieving an assessment's relation to:
+ * * its folder
+ * * its course spec, if any
+ * * its course implementation, if any
+ * * the project it's contained within, if any
+ */
+CREATE OR REPLACE VIEW v_assessment_relation AS
+
+
 -- 1: Assessments that live directly within a folder
 SELECT
     a.id AS assessment_id,
