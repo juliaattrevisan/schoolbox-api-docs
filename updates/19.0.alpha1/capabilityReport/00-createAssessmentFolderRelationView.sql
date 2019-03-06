@@ -3,7 +3,9 @@ SELECT
     a.id AS assessment_id,
     f.id AS folder_id,
     NULL AS project_assessment_id,
+    NULL AS course_implementation_id,
     NULL AS course_unit_implementation_id,
+    NULL AS course_specification_id,
     NULL AS course_unit_specification_id
 FROM       assessment        a
 INNER JOIN assessment_folder af ON a.id         = af.assessment_id
@@ -16,7 +18,9 @@ SELECT
     a.id   AS assessment_id,
     f.id   AS folder_id,
     NULL   AS project_assessment_id,
+    ci.id  AS course_implementation_id,
     cui.id AS course_unit_implementation_id,
+    NULL   AS course_specification_id,
     NULL   AS course_unit_specification_id
 FROM       assessment                            a
 INNER JOIN assessment_course_unit_implementation acui ON a.id                               = acui.assessment_id
@@ -32,7 +36,9 @@ SELECT
     a.id   AS assessment_id,
     f.id   AS folder_id,
     NULL   AS project_assessment_id,
+    NULL   AS course_implementation_id,
     NULL   AS course_unit_implementation_id,
+    cs.id  AS course_specification_id,
     cus.id AS course_unit_specification_id
 FROM       assessment                           a
 INNER JOIN assessment_course_unit_specification acus ON a.id                              = acus.assessment_id
@@ -47,7 +53,9 @@ SELECT
     a.id AS assessment_id,
     f.id AS folder_id,
     p.id AS project_assessment_id,
+    NULL AS course_implementation_id,
     NULL AS course_unit_implementation_id,
+    NULL AS course_specification_id,
     NULL AS course_unit_specification_id
 FROM       assessment         a
 INNER JOIN project_assessment pa ON a.id            = pa.assessment_id
@@ -62,7 +70,9 @@ SELECT
     a.id   AS assessment_id,
     f.id   AS folder_id,
     p.id   AS project_assessment_id,
+    ci.id  AS course_implementation_id,
     cui.id AS course_unit_implementation_id,
+    NULL   AS course_specification_id,
     NULL   AS course_unit_specification_id
 FROM       assessment                            a
 INNER JOIN project_assessment                    pa   ON a.id                               = pa.assessment_id
@@ -79,7 +89,9 @@ SELECT
     a.id   AS assessment_id,
     f.id   AS folder_id,
     p.id   AS project_assessment_id,
+    NULL   AS course_implementation_id,
     NULL   AS course_unit_implementation_id,
+    cs.id  AS course_specification_id,
     cus.id AS course_unit_specification_id
 FROM       assessment                           a
 INNER JOIN project_assessment                   pa   ON a.id                              = pa.assessment_id
