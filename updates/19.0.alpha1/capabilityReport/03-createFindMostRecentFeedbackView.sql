@@ -1,5 +1,6 @@
--- Specific views for capability and indicator marks only.
-# CREATE OR REPLACE VIEW v_most_recent_feedback AS
+-- Add a view for attempting to find the most recent published feedback
+CREATE OR REPLACE VIEW v_most_recent_feedback AS
+
 
 -- Due work attempt feedback
 SELECT
@@ -71,5 +72,42 @@ GROUP BY ass.assessment_id,
          aa1.reviewed_at
 
 
-ORDER BY assessment_id ASC, student_id ASC
-;
+-- Task attempt feedback
+-- I could consider self-assessed tasks as a kind of feedback
+-- (review_route: 'self-grading'?), but haven't done so here.
+UNION
+SELECT
+    t.assessment_id,
+    'task_completion'   AS feedback_table,
+    MAX(tc1.id)         AS feedback_id,
+    tc1.student_id,
+    'instructor'        AS review_route,
+    tc1.completion_date AS published_at
+FROM       task_completion tc1
+INNER JOIN task            t   ON tc1.task_id = t.id
+
+-- Join onto any return for the same group (assessment/user)
+-- that was reviewed before this one.
+LEFT  JOIN task_completion tc2 ON (
+    tc1.task_id = tc2.task_id
+    AND
+    tc1.student_id = tc2.student_id
+    AND
+    tc1.completion_status = tc2.completion_status
+    AND
+    tc1.completion_date < tc2.completion_date
+)
+
+-- Filter out any non-teacher completions (completion_status = 3),
+-- and any which have an earlier published time.
+WHERE tc1.completion_date   IS NOT NULL
+AND   tc2.id                IS NULL
+AND   tc1.completion_status = 3
+
+GROUP BY t.assessment_id,
+         tc1.student_id,
+         tc1.completion_date
+
+
+
+ORDER BY assessment_id ASC, student_id ASC;
