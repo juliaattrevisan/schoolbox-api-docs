@@ -8,7 +8,7 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
-use Schoolbox\WebDav\FileServer\Folder;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class Controller extends Base
 {
@@ -17,20 +17,20 @@ class Controller extends Base
      *
      * @api   GET /learning/rubricMarkbook/{folderId}
      * @level 190
-     * @param Folder $classFolder                    Folder for this class
+     * @param Folder $folder                    Folder for this class
      * @throws ServiceNotFound                       If unable to locate HTML web Output
      * @throws \UnexpectedValueException             If folder not provided or could not be found
      */
-    public function getMarkbook(Folder $classFolder = null): void
+    public function getMarkbook(Folder $folder = null): void
     {
-        if (null === $classFolder) {
+        if (null === $folder) {
             throw new \UnexpectedValueException('Cannot render rubric markbook - folder not found');
         }
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@rubricMarkbook/markbookOuter.twig', [
-                'folder'      => $classFolder
-            ])->setTab('submission')->setTitle('Rubric Markbook for ' . $classFolder->getName())
+                'folder'      => $folder
+            ])->setTab('submission')->setTitle('Rubric Markbook for ' . $folder->getName())
         );
     }
 }
