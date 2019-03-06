@@ -319,7 +319,7 @@ class Decorator extends NotificationBundle
     public function renderTitleAsPlaintext($notification)
     {
         // this might be considered cheating
-        return strip_tags(html_entity_decode($this->renderTitleAsHtml($notification)));
+        return html_entity_decode(strip_tags($this->renderTitleAsHtml($notification)));
     }
 
 
