@@ -1,43 +1,37 @@
 CREATE OR REPLACE VIEW v_rubric_mark AS
 
 SELECT
-    -- Assessment relation fields
-    var.assessment_id                 AS assessment_id,
-    var.folder_id                     AS folder_id,
-    var.project_assessment_id         AS project_assessment_id,
-    var.course_implementation_id      AS course_implementation_id,
-    var.course_unit_implementation_id AS course_unit_implementation_id,
-    var.course_specification_id       AS course_specification_id,
-    var.course_unit_specification_id  AS course_unit_specification_id,
+    -- Assessment fields
+    a.id            AS assessment_id,
 
     -- Feedback fields
-    student.id                        AS student_id,
-    marker.id                         AS marker_id,
-    sr.id                             AS feedback_id,
-    sr.published_at                   AS feedback_date,
-    sr.review_route                   AS feedback_type,
+    student.id      AS student_id,
+    marker.id       AS marker_id,
+    sr.id           AS feedback_id,
+    sr.published_at AS feedback_date,
+    sr.review_route AS feedback_type,
 
     -- Rubric capability fields
-    rg.id                             AS capability_id,
-    rg.name                           AS capability_name,
-    rgm.value                         AS capability_mark,
+    rg.id           AS capability_id,
+    rg.name         AS capability_name,
+    rgm.value       AS capability_mark,
 
     -- Rubric indicator fields
-    rc.id                             AS indicator_id,
-    rc.name                           AS indicator_name,
-    rdm.value                         AS indicator_mark,
+    rc.id           AS indicator_id,
+    rc.name         AS indicator_name,
+    rdm.value       AS indicator_mark,
 
     -- Rubric descriptor fields
-    rd.id                             AS descriptor_id,
-    rd.description                    AS descriptor_name,
-    rd.max_value                      AS descriptor_max_value
-FROM v_assessment_relation var
+    rd.id           AS descriptor_id,
+    rd.description  AS descriptor_name,
+    rd.max_value    AS descriptor_max_value
+FROM assessment a
 
 -- Feedback joins
-INNER JOIN submission_box    sb      ON var.assessment_id = sb.assessment_id
-INNER JOIN submission_return sr      ON sb.id             = sr.box_id
-INNER JOIN user              student ON sr.owner          = student.id
-INNER JOIN user              marker  ON sr.marker         = marker.id
+INNER JOIN submission_box    sb      ON a.id      = sb.assessment_id
+INNER JOIN submission_return sr      ON sb.id     = sr.box_id
+INNER JOIN user              student ON sr.owner  = student.id
+INNER JOIN user              marker  ON sr.marker = marker.id
 
 -- Rubric indicator, descriptor joins
 -- Join through rubric_criterion_usage as I only care about indicators actually in use
@@ -52,9 +46,9 @@ LEFT  JOIN rubric_descriptor_mark rdm ON  rd.id               = rdm.descriptor_i
                                       AND rgm.id              = rdm.rubric_group_mark_id
 
 ORDER BY
-    var.assessment_id ASC,
-    student.id        ASC,
-    sr.published_at   ASC,
-    rgu.sequence      ASC,
-    rcu.sequence      ASC
+    a.id            ASC,
+    student.id      ASC,
+    sr.published_at ASC,
+    rgu.sequence    ASC,
+    rcu.sequence    ASC
 ;
