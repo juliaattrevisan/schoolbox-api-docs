@@ -265,11 +265,9 @@ class Controller extends Web\Controller\Base
      * @param User              $user
      * @param StudentAttributes $attributes
      * @return array
-     * @throws UnexpectedValueException
      */
     private function getAbsenceData(User $user, StudentAttributes $attributes): array
     {
-
         $semesters = $attributes->getCurriculumSemesters();
         /** @var \Alaress_Date_Format $start1 */
         $start1 = $semesters[1]['start'];
@@ -280,27 +278,29 @@ class Controller extends Web\Controller\Base
         /** @var \Alaress_Date_Format $finish2 */
         $finish2 = $semesters[2]['finish'];
 
-        $sql = "
-            SELECT 1 AS s, count(1) AS c
-            FROM uvContinuousReportingAbsences
-            WHERE ID = :student_id
-            AND `date` >= :start1 AND `date` <= :finish1
-            UNION
-            SELECT 2 AS s, count(1) AS c
-            FROM uvContinuousReportingAbsences
-            WHERE ID = :student_id
-            AND `date` >= :start2 AND `date` <= :finish2
+        $pb1 = $this->externalDatabase->buildPredicateBuilder('t1');
+        $pb1->equals('t1.ID', $user->getExternalId())
+            ->greaterThanOrEqualTo('t1.date', $start1->getDatabaseDate())
+            ->lessThanOrEqualTo('t1.date', $finish1->getDatabaseDate());
+
+        $pb2 = $this->externalDatabase->buildPredicateBuilder('t2');
+        $pb2->equals('t2.ID', $user->getExternalId())
+            ->greaterThanOrEqualTo('t2.date', $start2->getDatabaseDate())
+            ->lessThanOrEqualTo('t2.date', $finish2->getDatabaseDate());
+
+        $whereClause1 = \implode(' AND ', $pb1->getWhere());
+        $whereClause2 = \implode(' AND ', $pb2->getWhere());
+        $sql          = "
+            SELECT 1 AS s, COUNT(*) AS c
+            FROM uvContinuousReportingAbsences AS t1
+            WHERE {$whereClause1}
+              UNION
+            SELECT 2 AS s, COUNT(*) AS c
+            FROM uvContinuousReportingAbsences AS t2
+            WHERE {$whereClause2}
         ";
 
-        $params = [
-            'student_id' => $user->getExternalId(),
-            'start1' => $start1->getDatabaseDate(),
-            'finish1' => $finish1->getDatabaseDate(),
-            'start2' => $start2->getDatabaseDate(),
-            'finish2' => $finish2->getDatabaseDate(),
-        ];
-
-        $rows = $this->externalDatabase->executeQuery($sql, $params)->fetchAll();
+        $rows = $this->externalDatabase->executeQuery($sql, \array_merge($pb1->getParams(), $pb2->getParams()))->fetchAll();
         $absenceCounts = [];
         foreach ($rows as $row) {
             $absenceCounts[$row['s']] = (int)$row['c'];
