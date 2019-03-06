@@ -99,6 +99,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'student_grades', 'student_grades_block');
         $this->setBlock($templateHandle, 'class_list', 'class_list_block');
         $this->setBlock($templateHandle, 'markbook_link', 'markbook_link_block');
+        $this->setBlock($templateHandle, 'rubric_markbook_link', 'rubric_markbook_link_block');
         $this->setBlock($templateHandle, 'course_markbook_link', 'course_markbook_link_block');
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
         $this->setBlock($templateHandle, 'course_link', 'course_link_block');
@@ -114,6 +115,17 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $hasClassActions = true;
         } else {
             $this->setVar('markbook_link_block');
+        }
+
+        // Show rubric markbook link to staff on class or group pages
+        // TODO $isStaffOrSuper checks different permissions to the auth rules for rubric markbook
+        // TODO this is not putting the folder ID into the route for some reason
+        if ($isStaffOrSuper && ($isGroupPage || $isClassPage || $wasClassPage)) {
+            $this->setVar('RUBRIC_MARKBOOK_LINK', $this->getRouter()->generate('rubricMarkbook.getMarkbook', [$this->getContext()->getId()]));
+            $this->parse('rubric_markbook_link_block', 'rubric_markbook_link');
+            $hasClassActions = true;
+        } else {
+            $this->setVar('rubric_markbook_link_block');
         }
 
         // Show course markbook link to staff on unit or course pages (if feature enabled)
@@ -199,7 +211,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $classAndTermArgs = array_merge($classArg, ['termCode' => $currentTerm->getCode()]);
         return $this->getRouter()->generate('learningMarkbook.getMarkbookForClassAndTerm', $classAndTermArgs);
     }
-
 
     /**
      * If homepage was a class, don't filter markbook by term, else filter to just the current term.
