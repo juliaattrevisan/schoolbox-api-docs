@@ -1,0 +1,171 @@
+{#
+    Filtered markbook report
+
+    Usage:
+        markbook      Markbook                - the markbook to render
+        viewee        User                    - whose markbook are we looking at
+        writable      bool[]                  - which assessments are writable? indexed by assessment.id
+        pendingLabel  string                  - the default label for new submissions, pulled from DB
+        queryArgs     string                  - the filters used to generate this report, so we can export the exact same report
+#}
+
+{% import '@learning/macro/urgency.twig' as urgency %}
+
+{# If the markbook has more than this number of participants reduce functionality to improve browser performance#}
+{% set functionDegradeLimit = 80 %}
+{% set studentCount = markbook.students|length %}
+
+<div id="report_actions" class="actions-small-1 row">
+    {% if studentCount >= functionDegradeLimit %}
+    <div class="small-12 column list-item">
+        <ul class="meta">
+            <li class="icon-alert">This markbook is showing a large number of students; for performance reasons, student portraits and marking of tasks have been disabled.</li>
+        </ul>
+    </div>
+    {% endif %}
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li class="separator">Report</li>
+        <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport', {userId: viewee.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if markbook.assessments|length > 0 %}
+        <table class="marksheet" data-mark-sheet>
+            <thead>
+                <tr class="rotate-headers" data-headers data-hidable-columns>
+                    <th>&nbsp;</th>
+                    <th>
+                        <div>
+                            <span>Student Average</span>
+                        </div>
+                    </th>
+                    {% for assessment in markbook.assessments %}
+                    <th data-assessment="{{ assessment.id }}">
+                        <div>
+                            {# A teacher clicking an assessment from the markbook is most likely interested in seeing more granular results #}
+                            {% set href = routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) %}
+                            <span>
+                                <a href="{{ href }}" title="{{ assessment.title }}">{{ assessment.title }}</a><br/>
+                                <span class="meta">{{ assessment.typeName }}</span>
+                            </span>
+                        </div>
+                    </th>
+                    {% endfor %}
+                </tr>
+
+                <tr data-hidable-columns>
+                    <th style="min-width: 200px;width: 200px;">
+                        <a href="#" class='icon-down-arrow' title="Show additional metrics" data-toggle-averages></a>
+                        Class Average
+                    </th>
+                    {% set weightedMean = markbook.weightedMean %}
+                    <th class="{{ urgency.marks(markbook.normalisedMean) }}-bg">
+                            {{ weightedMean | default('–') }}
+                    </th>
+                    {% for assessment in markbook.assessments %}
+                        {% set stats = markbook.assessmentStatistics[assessment.id] %}
+                        <th class="{{ urgency.marks(stats.meanNormalized) }}-bg" data-assessment="{{ assessment.id }}">
+                                {{ stats.mean | default('–') }}
+                        </th>
+                    {% endfor %}
+                </tr>
+
+            </thead>
+
+            <tbody>
+                {# Statistics: weight, visibility, mean, SD, min, max, submitted, returned #}
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight', key: 'weight'} %}
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Weight in ' ~ locale.project.proper, key: 'weightInProject'} %}
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: '% Total Weight', key: 'weightPercent', round: 2} %}
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: '% Total Weight in  ' ~ locale.project.proper, key: 'projectWeightPercent', round: 2} %}
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Mean', key: 'mean'} %}
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Standard Deviation', key: 'sd'} %}
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Min', key: 'min'} %}
+                {% include '@learningMarkbook/fragments/markbook/statisticRow.twig' with {markbook: markbook, label: 'Max', key: 'max'} %}
+                {# Need all students that ever participated in any assessments #}
+                {% spaceless %}
+                {% for student in markbook.students %}
+                <tr data-student="{{ student.id }}">
+                    <td class="no-pad">
+                        <div class="compact card no-pad small-12">
+                            <a href="/search/user/{{ student.id }}" title="View Profile">
+                                {% if studentCount < functionDegradeLimit %}
+                                <img src="/portrait.php?userId={{ student.externalId }}&size=square64" alt="View Profile" />
+                                {% endif %}
+                                <p>{{ student.lastname }}, {{ student.firstname }}</p>
+                            </a>
+                        </div>
+                    </td>
+
+                    {% set studentMean = markbook.studentStatistics[student.id].weightedMean %}
+                    {% set meanNormalised = markbook.studentStatistics[student.id].meanNormalised %}
+                    <td class="{{ urgency.marks(meanNormalised) }}-bg">
+                        {# Regardless of which term is being filtered to, link to default term grades page (ie empty termCode) #}
+                        <a class="{{ urgency.marks(meanNormalised) }}-bg"
+                           href="{{ routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) }}" title="View students {{ locale.grades.plural }}">
+                            {{ studentMean | default('–') }}
+                        </a>
+                    </td>
+
+                    {% for assessment in markbook.assessments %}
+                        {% set participant = assessment.getParticipantIfExtant(student) %}
+                        <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %}" data-assessment="{{ assessment.id }}">
+                            {% if participant and not participant.isExcluded %}
+                                {% if assessment is task %}
+                                   {# An icon that shows if the student has attempted the task or not #}
+                                    {% if studentCount < functionDegradeLimit %}
+                                   {% include '@learningAssessment/fragments/progressTick.twig' with {
+                                        assessment: assessment,
+                                        student: participant.user
+                                    } only %}
+                                    {% else %}
+                                        {% if participant.isResponseRequired %}
+                                            <div
+                                               class="no-text progress-tick readonly"
+                                               title="Incomplete"
+                                               data-progress-tick-status="incomplete"></div>
+                                        {% elseif participant.isFeedbackRequired %}
+                                            <div
+                                               class="no-text progress-tick pending"
+                                               title="Self-assessed"
+                                               data-progress-tick-status="selfAssessed"></div>
+                                        {% elseif participant.isReviewComplete %}
+                                            <div
+                                               class="no-text progress-tick reviewed"
+                                               title="Completed"
+                                               data-progress-tick-status="teacherAssessed"></div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% else %}
+                                    {% set normalisedMark = participant.normalisedMark(true) %}
+                                    {% set label = participant.hasSubmittedResponse and not participant.hasPublishedFeedback
+                                        ? "Pending" : participant.humanReadableMark(true) | default('–')
+                                    %}
+                                    <a class="{{ urgency.marks(normalisedMark) }}"
+                                       href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
+                                       title="{{ participant.authoritativeFeedback(true).comment }}">{{ label }}</a>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                {% endspaceless %}
+            </tbody>
+            </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="icon-curriculum"></i>
+            <p>
+                There are no activities that match the selected filters.  Try altering the filters to broaden your search.
+            </p>
+        </div>
+        {% endif %}
+        <div class="toast" data-alert data-save-progress-state></div>
+    </div>
+</div>
