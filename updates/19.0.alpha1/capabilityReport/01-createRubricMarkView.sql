@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW v_rubric_marks AS
+CREATE OR REPLACE VIEW v_rubric_mark AS
 
 SELECT
     -- Assessment relation fields
