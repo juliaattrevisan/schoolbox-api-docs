@@ -1,24 +1,29 @@
 SELECT
-    -- Assessment fields
-    var.assessment_id AS assessment_id,
-    var.folder_id     AS folder_id,
+    -- Assessment relation fields
+    var.assessment_id                 AS assessment_id,
+    var.folder_id                     AS folder_id,
+    var.project_assessment_id         AS project_assessment_id,
+    var.course_implementation_id      AS course_implementation_id,
+    var.course_unit_implementation_id AS course_unit_implementation_id,
+    var.course_specification_id       AS course_specification_id,
+    var.course_unit_specification_id  AS course_unit_specification_id,
 
     -- Feedback fields
-    student.id        AS student_id,
-    marker.id         AS marker_id,
-    sr.id             AS feedback_id,
-    sr.published_at   AS feedback_date,
-    sr.review_route   AS feedback_type,
+    student.id                        AS student_id,
+    marker.id                         AS marker_id,
+    sr.id                             AS feedback_id,
+    sr.published_at                   AS feedback_date,
+    sr.review_route                   AS feedback_type,
 
     -- Rubric indicator fields
-    rc.id             AS indicator_id,
-    rc.name           AS indicator_name,
-    rdm.value         AS indicator_mark,
+    rc.id                             AS indicator_id,
+    rc.name                           AS indicator_name,
+    rdm.value                         AS indicator_mark,
 
     -- Rubric descriptor fields
-    rd.id             AS descriptor_id,
-    rd.description    AS descriptor_name,
-    rd.max_value      AS descriptor_max_value
+    rd.id                             AS descriptor_id,
+    rd.description                    AS descriptor_name,
+    rd.max_value                      AS descriptor_max_value
 FROM v_assessment_relation var
 
 -- Feedback joins
