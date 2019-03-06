@@ -1,3 +1,5 @@
+CREATE OR REPLACE VIEW v_rubric_indicator_marks AS
+
 SELECT
     -- Assessment relation fields
     var.assessment_id                 AS assessment_id,
@@ -27,10 +29,10 @@ SELECT
 FROM v_assessment_relation var
 
 -- Feedback joins
-INNER JOIN submission_box    sb      ON var.assessment_id      = sb.assessment_id
-INNER JOIN submission_return sr      ON sb.id     = sr.box_id
-INNER JOIN user              student ON sr.owner  = student.id
-INNER JOIN user              marker  ON sr.marker = marker.id
+INNER JOIN submission_box    sb      ON var.assessment_id = sb.assessment_id
+INNER JOIN submission_return sr      ON sb.id             = sr.box_id
+INNER JOIN user              student ON sr.owner          = student.id
+INNER JOIN user              marker  ON sr.marker         = marker.id
 
 -- Rubric capability, indicator, descriptor joins
 INNER JOIN rubric_group_mark      rgm ON sr.id             = rgm.return_id
@@ -38,4 +40,4 @@ LEFT  JOIN rubric_descriptor_mark rdm ON rgm.id            = rdm.rubric_group_ma
 LEFT  JOIN rubric_descriptor      rd  ON rdm.descriptor_id = rd.id
 LEFT  JOIN rubric_criterion       rc  ON rd.criterion_id   = rc.id
 
-ORDER BY assessment_id ASC, student_id ASC, sr.published_at ASC;
+ORDER BY var.assessment_id ASC, student.id ASC, sr.published_at ASC;
