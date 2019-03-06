@@ -275,16 +275,16 @@ abstract class Alaress_Cache_Abstract
 
         /* Difference between now and when file was created
          */
-        $difference = $now - filectime($file);
+        $difference = $now - filemtime($file);
 
         /* How much time is remaining
          */
         $remaining = $duration - $difference;
 
         //$this->notifyObservers(get_class($this) . ' file expires in ' . $remaining . ' seconds.');
-        //$this->notifyObservers('[' . $difference . '] ' . $now . ' - ' . filectime($file));
+        //$this->notifyObservers('[' . $difference . '] ' . $now . ' - ' . filemtime($file));
 
-        if (filectime($file) < ($now - $duration)) {
+        if (filemtime($file) < ($now - $duration)) {
             //$this->notifyObservers($file . ' expired.');
             return true;
         }
