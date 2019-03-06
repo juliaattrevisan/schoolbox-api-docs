@@ -403,9 +403,10 @@ class Controller extends Web\Controller\Base
      */
     private function getExternalSubjectList(User $user, StudentAttributes $attributes): array
     {
-        /** Synergetic with provided semester */
-        $sql =
-            "
+        if ($this->getConfigLoader()->get('external_type') == 'synergetic') {
+            /** Synergetic with provided semester */
+            $sql =
+                "
                 SELECT            StudentClasses.ClassCode as code,
                                   SubjectClasses.ClassCampus as campusCode,
                                   SubjectClasses.Description as name
@@ -429,19 +430,21 @@ class Controller extends Web\Controller\Base
 --                                  (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
             ";
 
-        $params = [
-            'externalId' => $user->getExternalId(),
-            'fileSemester' => $attributes->getCurriculumSemester(),
-            'fileYear' => $attributes->getCurriculumYear()
-        ];
+            $params = [
+                'externalId' => $user->getExternalId(),
+                'fileSemester' => $attributes->getCurriculumSemester(),
+                'fileYear' => $attributes->getCurriculumYear()
+            ];
 
-        try {
-            $subjectListExternal = $this->externalDatabase->executeQuery($sql, $params)->fetchAll();
-            return $subjectListExternal;
-        } catch (\Alaress\Database\Exception $e) {
-            // means testing without Synergetic
+            try {
+                $subjectListExternal = $this->externalDatabase->executeQuery($sql, $params)->fetchAll();
+                return $subjectListExternal;
+            } catch (\Alaress\Database\Exception $e) {
+                // means testing without Synergetic
+            }
         }
 
+        // If failed to run the query above, use general external method. This is more for testing purpose.
         return $this->externalUser->getSubjectList($user);
     }
 
@@ -483,6 +486,7 @@ class Controller extends Web\Controller\Base
             }
         }
 
+        // If failed to run the query above, use general external method. This is more for testing purpose.
         return $this->externalClass->getTeacherName($codeString);
     }
 
