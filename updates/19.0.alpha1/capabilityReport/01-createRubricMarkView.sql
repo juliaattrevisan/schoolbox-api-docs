@@ -14,11 +14,13 @@ SELECT
     -- Rubric capability fields
     rg.id           AS capability_id,
     rg.name         AS capability_name,
+    rgu.sequence    AS capability_sequence,
     rgm.value       AS capability_mark,
 
     -- Rubric indicator fields
     rc.id           AS indicator_id,
     rc.name         AS indicator_name,
+    rcu.sequence    AS indicator_sequence,
     rdm.value       AS indicator_mark,
 
     -- Rubric descriptor fields
@@ -50,5 +52,7 @@ ORDER BY
     student.id      ASC,
     sr.published_at ASC,
     rgu.sequence    ASC,
-    rcu.sequence    ASC
+    rg.id           ASC,
+    rcu.sequence    ASC,
+    rc.id           ASC
 ;
