@@ -38,7 +38,7 @@ class External_Synergetic_Class implements External_ClassInterface
      *
      * @return string
      */
-    protected function getClassCodeQuery($subCode)
+    public function getClassCodeQuery($subCode)
     {
         $classQuery   = '(';
         $subCodeArray = explode(',', $subCode);

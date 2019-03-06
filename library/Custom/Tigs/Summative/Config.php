@@ -31,4 +31,5 @@ class Config
     public const _TIGS_GRADES_INFO_YEAR_11_HSC = self::PREFIX_TIGS_CRP . 'grades_info_year_11_hsc';
     public const _TIGS_GRADES_INFO_YEAR_12_IB = self::PREFIX_TIGS_CRP . 'grades_info_year_12_ib';
     public const _TIGS_GRADES_INFO_YEAR_12_HSC = self::PREFIX_TIGS_CRP . 'grades_info_year_12_hsc';
+    public const _TIGS_EXCLUDED_CLASS_CODES = self::PREFIX_TIGS_CRP . 'excluded_class_codes';
 }

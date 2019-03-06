@@ -113,6 +113,45 @@ Data:
         </table>
     </div>
 </div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Subject List</h2>
+        <section>
+            {% for subject in subjectList %}
+                <ul class="subject-list group">
+                    <li class="subject-group">
+                        <a href="https://vagrant.dev.schoolbox.cloud/modules/custom/tigs/summative/subject/{{ user.id }}/folder/{{ subject.folderId }}"
+                           class="link-row" title="Subject Report">
+                            <div class="small-12 content sibling">
+                                <h3 class="no-margin">
+                                    {{ subject.name }}
+                                    <span class="meta">
+                                    {% for code in subject.codes %}
+                                        ({{ code }}){% if not loop.last %},{% endif %}
+                                    {% endfor %}
+                                </span>
+                                </h3>
+                            </div>
+                        </a>
+                    </li>
+                    {% for teacher in subject.teachers %}
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="compact card small-12">
+                                    <a href="/search/user/{{ teacher.id }}" title="">
+                                        <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64"
+                                             alt="{{ teacher.fullName }}"/>
+                                        <p>{{ teacher.fullName }} <span class="pipe meta">Teacher</span></p>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        </section>
+    </div>
+</div>
 
 {% for i in 1..2 %}
     <div class="row">

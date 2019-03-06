@@ -13,12 +13,15 @@ use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
 use External_UserInterface;
+use External_ClassInterface;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
 use External_User;
@@ -30,6 +33,9 @@ class Controller extends Web\Controller\Base
     /** @var External_UserInterface|External_User */
     private $externalUser;
 
+    /** @var \External_ClassInterface|\External_Class */
+    private $externalClass;
+
     /** @var UserMapper */
     private $userMapper;
 
@@ -39,18 +45,31 @@ class Controller extends Web\Controller\Base
     /** @var PastoralMapper $pastoralMapper */
     private $pastoralMapper;
 
+    /** @var FolderMapper $folderMapper */
+    private $folderMapper;
+
     /**
      * @param External_UserInterface $externalUser
+     * @param External_ClassInterface $externalClass
      * @param UserMapper             $userMapper
      * @param IConnector             $externalDatabase
      * @param PastoralMapper         $pastoralMapper
+     * @param FolderMapper           $folderMapper
      */
-    public function __construct(External_UserInterface $externalUser, UserMapper $userMapper, IConnector $externalDatabase, PastoralMapper $pastoralMapper)
-    {
+    public function __construct(
+        External_UserInterface $externalUser,
+        External_ClassInterface $externalClass,
+        UserMapper $userMapper,
+        IConnector $externalDatabase,
+        PastoralMapper $pastoralMapper,
+        FolderMapper $folderMapper
+    ) {
         $this->externalUser     = $externalUser;
+        $this->externalClass    = $externalClass;
         $this->userMapper       = $userMapper;
         $this->externalDatabase = $externalDatabase;
         $this->pastoralMapper   = $pastoralMapper;
+        $this->folderMapper     = $folderMapper;
     }
 
 
@@ -79,6 +98,7 @@ class Controller extends Web\Controller\Base
         $awards        = $this->getAwardsData($user, $attributes);
         $houseEvents   = $this->getHouseEventsData($user, $attributes);
         $absences      = $this->getAbsenceData($user, $attributes);
+        $subjectList   = $this->getSubjectList($user, $attributes);
         $deansComments = $this->getDeansComment($user, $attributes);
         $explanation   = $this->getExplanation($attributes);
 
@@ -91,6 +111,7 @@ class Controller extends Web\Controller\Base
             'awards'        => $awards,
             'houseEvents'   => $houseEvents,
             'absences'      => $absences,
+            'subjectList'   => $subjectList,
             'deansComments' => $deansComments,
             'explanation'   => $explanation,
         ];
@@ -211,7 +232,11 @@ class Controller extends Web\Controller\Base
 
         $awards = new GenericCollection(Award::class);
 
-        $query = $this->externalDatabase->executeQuery($sql, $params);
+        try {
+            $query = $this->externalDatabase->executeQuery($sql, $params);
+        } catch (\Alaress\Database\Exception $e) {
+            return $awards;
+        }
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while($row = $query->fetch()){
@@ -248,7 +273,11 @@ class Controller extends Web\Controller\Base
 
         $houseEvents = new GenericCollection(HouseEvent::class);
 
-        $query = $this->externalDatabase->executeQuery($sql, $params);
+        try {
+            $query = $this->externalDatabase->executeQuery($sql, $params);
+        } catch (\Alaress\Database\Exception $e) {
+            return $houseEvents;
+        }
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $query->fetch()) {
@@ -310,6 +339,152 @@ class Controller extends Web\Controller\Base
 
     }
 
+
+    /**
+     * Returns subject list for report
+     * @param User $user
+     * @param StudentAttributes $attributes
+     * @return array
+     * @throws Exception
+     */
+    private function getSubjectList(User $user, StudentAttributes $attributes): array
+    {
+        $externalSubjectList = $this->getExternalSubjectList($user, $attributes);
+        if (!is_array($externalSubjectList)) {
+            return [];
+        }
+        usort($externalSubjectList, function ($a, $b) {
+            return strnatcmp($a['name'], $b['name']);
+        });
+
+        $subjects = [];
+        // Codes to exclude
+        $excluded = explode(',', $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
+
+        foreach ($externalSubjectList as $subjectExternal) {
+            $subject = ['name' => $subjectExternal['name']];
+            // Load a bunch of category and teacher info too
+            try {
+                $folder = $this->folderMapper->findByCode($subjectExternal['code']);
+                $codes = array_diff($folder->getCodes()->keys(), $excluded);
+                if (empty($codes)) {
+                    // All the codes are excluded.
+                    continue;
+                }
+                $subject['codes'] = $codes;
+                $subject['folderId'] = $folder->getId();
+            } catch (Exception $e) {
+                // This subject doesn't have a corresponding folder in Schoolbox
+                continue;
+            }
+
+            $externalTeacherName = $this->getExternalTeacherName(
+                $folder->getCodeString() ?: $subjectExternal['code'], $attributes);
+
+            if (is_array($externalTeacherName) && count($externalTeacherName) > 0) {
+                $subject['teachers'] = $this->userMapper->findByColumnList([
+                    'synergy_id' => $externalTeacherName,
+                ]);
+            } else {
+                $subject['teachers'] = [];
+            }
+            $subjects[] = $subject;
+        }
+        return $subjects;
+    }
+
+
+    /**
+     * Returns raw subject list from external DB.
+     * Separated for testing purpose.
+     * @param User $user
+     * @param StudentAttributes $attributes
+     * @return array
+     */
+    private function getExternalSubjectList(User $user, StudentAttributes $attributes): array
+    {
+        /** Synergetic with provided semester */
+        $sql =
+            "
+                SELECT            StudentClasses.ClassCode as code,
+                                  SubjectClasses.ClassCampus as campusCode,
+                                  SubjectClasses.Description as name
+                                  luFileType.Description as classType
+                FROM              StudentClasses
+                INNER JOIN        SubjectClasses ON
+                                  StudentClasses.FileType = SubjectClasses.FileType AND
+                                  StudentClasses.FileYear = SubjectClasses.FileYear AND
+                                  StudentClasses.FileSemester = SubjectClasses.FileSemester AND
+                                  StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
+                                  StudentClasses.ClassCode = SubjectClasses.ClassCode AND
+                                  StudentClasses.ID = :externalId
+                JOIN              FileSemesters Semester ON
+                                      Semester.FileSemester = StudentClasses.FileSemester AND
+                                      Semester.FileYear = StudentClasses.FileYear
+--                                    Semester.SystemCurrentFlag = 1
+                LEFT JOIN         luFileType ON StudentClasses.FileType = luFileType.Code
+                  WHERE             StudentClasses.FileSemester = :fileSemester AND
+                                    StudentClasses.FileYear = :fileYear
+--                                  StudentClasses.StartDate <= getdate() AND
+--                                  (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+            ";
+
+        $params = [
+            'externalId' => $user->getExternalId(),
+            'fileSemester' => $attributes->getCurriculumSemester(),
+            'fileYear' => $attributes->getCurriculumYear()
+        ];
+
+        try {
+            $subjectListExternal = $this->externalDatabase->executeQuery($sql, $params)->fetchAll();
+            return $subjectListExternal;
+        } catch (\Alaress\Database\Exception $e) {
+            // means testing without Synergetic
+        }
+
+        return $this->externalUser->getSubjectList($user);
+    }
+
+
+    /**
+     * Returns raw staff id from external DB.
+     * @param string $codeString
+     * @param StudentAttributes $attributes
+     * @return array|mixed|string[]
+     */
+    function getExternalTeacherName(string $codeString, StudentAttributes $attributes)
+    {
+        if ($this->getConfigLoader()->get('external_type') == 'synergetic') {
+            /** @var \External_Synergetic_Class $synergeticClass */
+            $synergeticClass = $this->externalClass;
+            $codeQuery = $synergeticClass->getClassCodeQuery($codeString);
+            $sql = "
+                SELECT DISTINCT StaffID, StaffSeq FROM vSubjectClassesStaff
+                    WHERE {$codeQuery}
+                    AND FileYear = :fileYear
+                    AND FileSemester = :fileSemester
+                    ORDER BY StaffSeq
+           ";
+            $params = [
+                'fileSemester' => $attributes->getCurriculumSemester(),
+                'fileYear' => $attributes->getCurriculumYear()
+            ];
+            try {
+                $teachers = [];
+                $statement = $this->externalDatabase->executeQuery($sql, $params);
+                while ($synrow = $statement->fetch()) {
+                    if (is_numeric($synrow['StaffID'])) {
+                        $teachers[] = $synrow['StaffID'];
+                    }
+                }
+                return array_unique($teachers);
+            } catch (\Alaress\Database\Exception $e) {
+                // means testing without Synergetic
+            }
+        }
+
+        return $this->externalClass->getTeacherName($codeString);
+    }
 
     /**
      * Returns general comment of pastoral records of given attributes.
