@@ -23,6 +23,7 @@ INNER JOIN folder            f  ON af.folder_id = f.id
 
 
 -- 2: Assessments that live within a course implementation
+-- TODO consider including course/unit spec here as well
 UNION
 SELECT
     a.id   AS assessment_id,
@@ -75,6 +76,7 @@ INNER JOIN folder             f  ON af.folder_id    = f.id
 
 
 -- 5: Assessments that live within a project, which lives within a course implementation
+-- TODO consider including course/unit spec here as well
 UNION
 SELECT
     a.id   AS assessment_id,
