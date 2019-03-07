@@ -25,6 +25,15 @@ SELECT
     rc.id           AS indicator_id,
     rc.name         AS indicator_name,
     rcu.sequence    AS indicator_sequence,
+    -- Indicator max: must be derived unfortunately.
+    -- Can anyone think of a more efficient way to do this?
+    (
+        SELECT MAX(rd2.max_value)
+        FROM       rubric_descriptor rd2
+        INNER JOIN rubric_level      rl2 ON rd2.level_id = rl2.id
+        WHERE      rl2.box_id       = sb.id
+        AND        rd2.criterion_id = rc.id
+    )               AS indicator_max_value,
     rdm.value       AS indicator_mark,
 
     -- Rubric descriptor fields
