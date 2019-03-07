@@ -61,13 +61,13 @@ class Calendar_Api_Cache extends Alaress_Cache_Abstract {
      * @return mixed|void
      */
     protected function setup() {
-        $this->setCachedTime(Cfg::get('calendar_api_caching'));
+        $this->cachedTime = Cfg::get('calendar_api_caching');
 
         /* By default, set the lockTime to be a multiple of cachedTime
          *
          * You can still override this derivation after instantiation
          * as described above
          */
-        $this->setLockTime($this->getLockTimeMultiplier() * $this->getCachedTime());
+        $this->lockTime = $this->lockTimeMultiplier * $this->cachedTime;
     }
 }

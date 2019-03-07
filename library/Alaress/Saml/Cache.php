@@ -23,7 +23,7 @@ class Alaress_Saml_Cache extends Alaress_Cache_Abstract
      */
     protected function setup()
     {
-        $this->setCachedTime(3600);
-        $this->setLockTime($this->getLockTimeMultiplier() * $this->getCachedTime());
+        $this->cachedTime = 3600;
+        $this->lockTime = $this->lockTimeMultiplier * $this->cachedTime;
     }
 }

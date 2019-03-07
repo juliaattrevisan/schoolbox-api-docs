@@ -29,8 +29,8 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
      * @return mixed|void
      */
     protected function setup() {
-        $this->setCachedTime(Cfg::get('twitter_api_caching'));
-        $this->setLockTime($this->getLockTimeMultiplier() * $this->getCachedTime());
+        $this->cachedTime = Cfg::get('twitter_api_caching');
+        $this->lockTime = $this->lockTimeMultiplier * $this->cachedTime;
     }
 
 
@@ -49,7 +49,7 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
     /**
      * Overwrites native cache stream saver with OAuth fetch system
      */
-    protected function saveStreamContents(): \bool {
+    protected function saveStreamContents(): bool {
         $twitterCon = new Alaress_Twitter_Loader_OAuth(
             Cfg::get('twitter_api_consumer_key'),
             Cfg::get('twitter_api_consumer_secret'),
@@ -57,8 +57,8 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
             Cfg::get('twitter_api_oauth_token_secret')
         );
 
-        $result = $twitterCon->load($this->getUrl(), $this->getParameters());
-        file_put_contents($this->getCachedFile(), serialize($result));
+        $result = $twitterCon->load($this->url, $this->getParameters());
+        file_put_contents($this->cachedFile, serialize($result));
 
         return true;
     }
@@ -80,7 +80,7 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
      */
     protected function generateCachedFilename(): string
     {
-        return Cfg::get('stream_dir') . '/' . $this->getCacheFilePrefix() . '_' . $this->encode($this->getUrl().serialize($this->getParameters())) . '.txt';
+        return Cfg::get('stream_dir') . '/' . $this->cacheFilePrefix . '_' . $this->encode($this->url.serialize($this->getParameters())) . '.txt';
     }
 
     /**
@@ -90,7 +90,7 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
      */
     protected function generateLockFilename(): string
     {
-        return Cfg::get('stream_dir') . '/' . $this->getCacheFilePrefix() . '_' . $this->encode($this->getUrl().serialize($this->getParameters())) . '_lock.txt';
+        return Cfg::get('stream_dir') . '/' . $this->cacheFilePrefix . '_' . $this->encode($this->url.serialize($this->getParameters())) . '_lock.txt';
     }
 
     /**

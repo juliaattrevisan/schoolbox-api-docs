@@ -24,8 +24,8 @@ class Alaress_Rss_Cache extends Alaress_Cache_Abstract
      */
     protected function setup()
     {
-        $this->setCachedTime(Cfg::get('xml_cache_timeout'));
-        $this->setLockTime($this->getLockTimeMultiplier() * $this->getCachedTime());
+        $this->cachedTime = Cfg::get('xml_cache_timeout');
+        $this->lockTime = $this->lockTimeMultiplier * $this->cachedTime;
     }
 
 
@@ -37,6 +37,6 @@ class Alaress_Rss_Cache extends Alaress_Cache_Abstract
     public function load()
     {
         libxml_use_internal_errors(true);
-        return new SimpleXMLElement($this->getCachedFile(), null, true);
+        return new SimpleXMLElement($this->cachedFile, null, true);
     }
 }

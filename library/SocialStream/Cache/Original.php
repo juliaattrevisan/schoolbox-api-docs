@@ -40,8 +40,8 @@ class Original extends \Alaress_Cache_Abstract
      */
     protected function setup()
     {
-        $this->setCachedTime(\Cfg::get('xml_cache_timeout'));
-        $this->setLockTime($this->getLockTimeMultiplier() * $this->getCachedTime());
+        $this->cachedTime = \Cfg::get('xml_cache_timeout');
+        $this->lockTime = $this->lockTimeMultiplier * $this->cachedTime;
     }
 
 
@@ -51,13 +51,13 @@ class Original extends \Alaress_Cache_Abstract
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function initPost(SocialStream_Post_Abstract $post)
+    public function initPost(SocialStream_Post_Abstract $post): Original
     {
-        $this->setUrl($post->getThumbnail());
+        $this->url = $post->getThumbnail();
 
         $this->post = $post;
 
-        $this->setLockFile($this->generateLockFilename());
+        $this->lockFile = $this->generateLockFilename();
 
         /* Retrieve stream contents
         */
@@ -73,7 +73,7 @@ class Original extends \Alaress_Cache_Abstract
      */
     protected function generateCachedFilename(): string
     {
-        $urlDetection = new \SocialStream\UrlDetection($this->getUrl());
+        $urlDetection = new \SocialStream\UrlDetection($this->url);
 
         /* Find what the file was called
          *
@@ -85,7 +85,7 @@ class Original extends \Alaress_Cache_Abstract
             return \Cfg::get('file_dir') . '/' . $urlDetection->getId() . '.dat';
         }
 
-        return \Cfg::get('stream_dir') . '/socialstream/' . $this->getCacheFilePrefix() . '_' . $this->encode($this->getUrl());
+        return \Cfg::get('stream_dir') . '/socialstream/' . $this->cacheFilePrefix . '_' . $this->encode($this->url);
     }
 
 
@@ -99,7 +99,7 @@ class Original extends \Alaress_Cache_Abstract
         // run cache detection
         if ($this->post->getCacheHash()) {
             $file = Storage\Mapper::getInstance()->findByHash($this->post->getCacheHash());
-            $this->setCachedFile($file);
+            $this->cachedFile = $file;
 
         } else {
             $this->newCacheUpdate();
@@ -117,16 +117,16 @@ class Original extends \Alaress_Cache_Abstract
      */
     protected function saveStreamContents(): bool
     {
-        $urlDetection = new \SocialStream\UrlDetection($this->getUrl());
+        $urlDetection = new \SocialStream\UrlDetection($this->url);
 
         if ($urlDetection->isLocalUrl()) {
 
             if ($urlDetection->isStorageUrl()) {
                 // it's in storage - just grab the hash and be done with it
-                $this->setCachedFile(Storage\Mapper::getInstance()->findByHash($urlDetection->getHash()));
+                $this->cachedFile = Storage\Mapper::getInstance()->findByHash($urlDetection->getHash());
             }
         } else {
-            $url = $this->getUrl();
+            $url = $this->url;
             $this->setResult($this->processUrl($url));
         }
 
@@ -158,7 +158,7 @@ class Original extends \Alaress_Cache_Abstract
                 PostMapper::getInstance()->save($this->post);
             }
 
-            $this->setCachedFile($storage);
+            $this->cachedFile = $storage;
 
             return true;
         }
@@ -171,7 +171,7 @@ class Original extends \Alaress_Cache_Abstract
      */
     public function hasThumbnail()
     {
-        return $this->getResult() || $this->getCachedFile() instanceof Storage\Model;
+        return $this->getResult() || $this->cachedFile instanceof Storage\Model;
     }
 
     /* Getters/Setters
