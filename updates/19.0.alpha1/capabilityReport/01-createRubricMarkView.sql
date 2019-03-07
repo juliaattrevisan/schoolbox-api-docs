@@ -63,6 +63,9 @@ INNER JOIN rubric_descriptor      rd  ON  rc.id               = rd.criterion_id
 INNER JOIN rubric_descriptor_mark rdm ON  rd.id               = rdm.descriptor_id
                                       AND rgm.id              = rdm.rubric_group_mark_id
 
+-- Only valid rubric marks
+WHERE (rgm.valid IS TRUE OR rdm.valid IS TRUE)
+
 ORDER BY
     a.id            ASC,
     student.id      ASC,
