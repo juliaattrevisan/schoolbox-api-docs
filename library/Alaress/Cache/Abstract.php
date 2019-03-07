@@ -67,7 +67,7 @@ abstract class Alaress_Cache_Abstract
     protected $lockFile = '';
 
     /**
-     * A cached version of the url stream
+     * Path to a cached version of the url stream
      *
      * @var string
      */
