@@ -1,6 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
+$kernel = require_once __DIR__ . '/../../library/Bootstrap.php';
 
 // trim in case the leading slash is captured in the URI
 $page = trim($_GET['page'], '/');

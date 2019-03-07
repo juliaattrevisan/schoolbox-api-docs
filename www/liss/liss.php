@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
+$kernel = require_once __DIR__ . '/../../library/Bootstrap.php';
 
 /** @var Schoolbox\Application\WebRequest\Kernel $kernel */
 $externalDb = $kernel->get('databaseExternal');
