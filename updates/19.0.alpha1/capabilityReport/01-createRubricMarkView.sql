@@ -15,16 +15,16 @@ SELECT
     sr.review_route AS feedback_type,
 
     -- Rubric capability fields
-    rg.id           AS capability_id,
-    rg.name         AS capability_name,
-    rgu.sequence    AS capability_sequence,
-    rgu.max_value   AS capability_max_value,
-    rgm.value       AS capability_mark,
+    rg.id                           AS capability_id,
+    rg.name                         AS capability_name,
+    rgu.sequence                    AS capability_sequence,
+    rgu.max_value                   AS capability_max_value,
+    IF (rgm.valid, rgm.value, NULL) AS capability_mark,
 
     -- Rubric indicator fields
-    rc.id           AS indicator_id,
-    rc.name         AS indicator_name,
-    rcu.sequence    AS indicator_sequence,
+    rc.id        AS indicator_id,
+    rc.name      AS indicator_name,
+    rcu.sequence AS indicator_sequence,
     -- Indicator max: must be derived unfortunately.
     -- Can anyone think of a more efficient way to do this?
     (
@@ -33,17 +33,18 @@ SELECT
         INNER JOIN rubric_level      rl2 ON rd2.level_id = rl2.id
         WHERE      rl2.box_id       = sb.id
         AND        rd2.criterion_id = rc.id
-    )               AS indicator_max_value,
-    rdm.value       AS indicator_mark,
+    )                               AS indicator_max_value,
+    IF (rdm.valid, rdm.value, NULL) AS indicator_mark,
 
     -- Rubric descriptor fields
-    rd.id           AS descriptor_id,
-    rd.description  AS descriptor_name,
-    rd.max_value    AS descriptor_max_value
+    -- (Not a valid descriptor mark? Don't select it)
+    IF (rdm.valid, rd.id,          NULL) AS descriptor_id,
+    IF (rdm.valid, rd.description, NULL) AS descriptor_name,
+    IF (rdm.valid, rd.max_value,   NULL) AS descriptor_max_value
 FROM assessment a
 
 -- Due work joins
-INNER JOIN submission_box    sb      ON a.id      = sb.assessment_id
+INNER JOIN submission_box sb ON a.id = sb.assessment_id
 
 -- Feedback joins
 INNER JOIN submission_return sr      ON sb.id     = sr.box_id
