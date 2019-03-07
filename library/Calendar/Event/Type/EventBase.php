@@ -630,9 +630,9 @@ abstract class EventBase implements EventInterface
     }
 
     /**
-     * @return string
+     * @return mixed|string
      */
-    public function getLocation() :string
+    public function getLocation()
     {
         return $this->location;
     }
