@@ -64,7 +64,7 @@
                                 },
                                 sending: function (file, xhr, formData) {
                                     formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                    formData.append('category', $(file.previewElement).data('node'));
+                                    formData.append('category', {FILE_CAT_ID});
                                     formData.append('comment', '');
                                     formData.append('hidden', 0);
                                 },
@@ -176,7 +176,7 @@
                                         else {
                                             formData.append('description', file.name);
                                         }
-                                        formData.append('category', $(file.previewElement).data('node'));
+                                        formData.append('category', {FILE_CAT_ID});
                                         formData.append('comment', '');
                                         formData.append('hidden', 0);
                                     },
