@@ -2,7 +2,10 @@ CREATE OR REPLACE VIEW v_rubric_mark AS
 
 SELECT
     -- Assessment fields
-    a.id            AS assessment_id,
+    a.id                         AS assessment_id,
+    sb.mark_type                 AS assessment_mark_type,
+    sb.max_mark                  AS assessment_max_mark,
+    sb.submission_grade_group_id AS assessment_grade_group_id,
 
     -- Feedback fields
     student.id      AS student_id,
@@ -15,6 +18,7 @@ SELECT
     rg.id           AS capability_id,
     rg.name         AS capability_name,
     rgu.sequence    AS capability_sequence,
+    rgu.max_value   AS capability_max_value,
     rgm.value       AS capability_mark,
 
     -- Rubric indicator fields
@@ -29,8 +33,10 @@ SELECT
     rd.max_value    AS descriptor_max_value
 FROM assessment a
 
--- Feedback joins
+-- Due work joins
 INNER JOIN submission_box    sb      ON a.id      = sb.assessment_id
+
+-- Feedback joins
 INNER JOIN submission_return sr      ON sb.id     = sr.box_id
 INNER JOIN user              student ON sr.owner  = student.id
 INNER JOIN user              marker  ON sr.marker = marker.id
