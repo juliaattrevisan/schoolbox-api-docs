@@ -38,10 +38,10 @@ class Display extends AbstractFactory {
     /**
      * Produce an instance of SocialStream_Post_Abstract subclass
      *
-     * @param mixed $data
+     * @param array $data
      * @return \SocialStream_Post_Abstract
      */
-    public function produce($data = null): \SocialStream_Post_Abstract
+    public function produce(array $data = null): \SocialStream_Post_Abstract
     {
         switch ($this->type) {
             case self::SOCIALSTREAM_POST_IMAGE:
