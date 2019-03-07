@@ -18,7 +18,7 @@ $groupHandler = new Group();
 $class = $externalClass->getClass($_POST['classCode'], $_SESSION['user']);
 
 if (!$class) {
-    error(ErrorMapper::ERROR_DATE_FORMAT);
+    error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }
 
 if (!strlen($_POST['attendanceDate'])) {
