@@ -10,6 +10,11 @@
 
 class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 
+    /**
+     * @var string
+     */
+    protected $type = 'video';
+
 	/**
 	 * Never render metadata for videos
 	 *

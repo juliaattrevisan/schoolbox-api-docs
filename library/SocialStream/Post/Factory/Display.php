@@ -11,38 +11,53 @@ namespace SocialStream\Post\Factory;
 
 class Display extends AbstractFactory {
 
-	/**
-	 * Constructor
-	 *
-	 * @param $url
-	 */
-	public function __construct($type) {
-		$this->setUrl(trim($type));
-	}
+    /**
+     * Const for socialstream posts of type Image, String, Url, Video
+     */
+    public const SOCIALSTREAM_POST_IMAGE = 'image';
+    public const SOCIALSTREAM_POST_STRING = 'string';
+    public const SOCIALSTREAM_POST_URL = 'url';
+    public const SOCIALSTREAM_POST_VIDEO = 'video';
 
-	/**
-	 * Produce an instance of SocialStream_Post_Abstract subclass
-	 *
-	 * @param null $data
-	 * @return mixed|\SocialStream_Post_Url|\SocialStream_Post_Video
-	 */
-	public function produce($data = null) {
+    /**
+     * The type of SocialStream Post to manufacture
+     *
+     * @var string
+     */
+    private $type;
 
-        $type = $this->getUrl();
+    /**
+     * Constructor
+     *
+     * @param $type
+     */
+    public function __construct(string $type) {
+        $this->type = trim($type);
+    }
 
-        $objectName = '\SocialStream_Post_'.ucwords($type);
-        if(class_exists($objectName)) {
-            $object = new $objectName();
-            $object->setType($type);
-            return $object;
+    /**
+     * Produce an instance of SocialStream_Post_Abstract subclass
+     *
+     * @param mixed $data
+     * @return \SocialStream_Post_Abstract
+     */
+    public function produce($data = null): \SocialStream_Post_Abstract
+    {
+        switch ($this->type) {
+            case self::SOCIALSTREAM_POST_IMAGE:
+                return new \SocialStream_Post_Image();
+
+            case self::SOCIALSTREAM_POST_URL:
+                return new \SocialStream_Post_Url();
+
+            case self::SOCIALSTREAM_POST_VIDEO:
+                return new \SocialStream_Post_Video();
+
+            /* If it was not a video, link to the internet, then assume it's
+             * just a plain old text message
+             */
+            default:
+                return new \SocialStream_Post_String();
         }
-
-		/* If it was not a video, link to the internet, then assume it's
-		 * just a plain old text message
-		 */
-		$object = new \SocialStream_Post_String();
-		$object->setType('string');
-
-		return $object;
-	}
+    }
 }
