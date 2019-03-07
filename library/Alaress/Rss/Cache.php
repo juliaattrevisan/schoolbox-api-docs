@@ -39,5 +39,4 @@ class Alaress_Rss_Cache extends Alaress_Cache_Abstract
         libxml_use_internal_errors(true);
         return new SimpleXMLElement($this->getCachedFile(), null, true);
     }
-
 }

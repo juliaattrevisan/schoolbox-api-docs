@@ -18,106 +18,68 @@
  *
  * To change the API resource, use $twitter->getLoader()->setResource('statuses/mentions');
  */
-class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
+class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface
+{
 
-	/* REST API method. Defaults to statuses/user_timeline
-	 * See https://dev.twitter.com/docs/api
-	 */
-	private $resource = 'statuses/user_timeline';
+    /**
+     * REST API method. Defaults to statuses/user_timeline
+     * See https://dev.twitter.com/docs/api
+     *
+     * @var string
+     */
+    private $resource = 'statuses/user_timeline';
 
-	/**
-	 * Load required classes, instantiate a new connection using the four
-	 * variables we obtained by running connect.php
-	 */
-	public function __construct($consumer_key, $consumer_secret, $oauth_token = null, $oauth_secret = null) {
-		require_once('oauth/twitteroauth.php');
-		$this->setConnection(new TwitterOAuth($consumer_key, $consumer_secret, $oauth_token, $oauth_secret));
-	}
+    /**
+     * An array of params passed to the twitter connection,
+     * typically the search params
+     *
+     * @var array
+     */
+    private $params;
 
-	/**
-	 * Load results. Preprocess them to get rid of unwanted data and to format
-	 * the return value in a uniform structure.
-	 *
-	 * @return array
-	 */
-	public function load($resource = null, $params = null) {
-		if (!isset($resource)) {
-			$resource = $this->getResource();
-		}
-		if (!isset($params)) {
-			$params = $this->getParams();
-		}
-		$result = $this->getConnection()->get($resource, $params);
-		$code   = intval($this->getConnection()->http_code);
-		if ($code >= 400) {
-			//
-			// Log errors somewhere, and return an empty array?
-			return array();
-		}
-		return $result->statuses;
-	}
+    /**
+     * @var TwitterOAuth
+     */
+    private $connection;
 
-	/* Getters/Setters
-	 */
 
-	/**
-	 * Set an OAuth connection object
-	 *
-	 * @param  $connection
-	 * @return void
-	 */
-	private function setConnection($connection) {
-		$this->connection = $connection;
-	}
+    /**
+     * Load required classes, instantiate a new connection using the four
+     * variables we obtained by running connect.php
+     * @param string      $consumer_key
+     * @param string      $consumer_secret
+     * @param string|null $oauth_token
+     * @param string|null $oauth_secret
+     */
+    public function __construct(string $consumer_key, string $consumer_secret, ?string $oauth_token, ?string $oauth_secret)
+    {
+        require_once 'oauth/twitteroauth.php';
+        $this->connection = new TwitterOAuth($consumer_key, $consumer_secret, $oauth_token, $oauth_secret);
+    }
 
-	/**
-	 * Get an OAuth connection object
-	 *
-	 * @return
-	 */
-	private function getConnection() {
-		return $this->connection;
-	}
-
-	/**
-	 * Set resource
-	 *
-	 * Support chained methods
-	 *
-	 * @param $resource
-	 * @return \Alaress_Twitter_Loader_OAuth
-	 */
-	public function setResource($resource) {
-		$this->resource = $resource;
-
-		return $this;
-	}
-
-	/**
-	 * Get resource
-	 *
-	 * @return string
-	 */
-	private function getResource() {
-		return $this->resource;
-	}
-
-	/**
-	 * Gets URL parameters that will be sent to Twitter interface.
-	 *
-	 * @return mixed
-	 */
-	public function getParams() {
-		return $this->params;
-	}
-
-	/**
-	 * Sets URL parameters that are sent to Twitter interface.
-	 *
-	 * @return $this
-	 */
-	public function setParams($params) {
-		$this->params = $params;
-		return $this;
-	}
+    /**
+     * Load results. Preprocess them to get rid of unwanted data and to format
+     * the return value in a uniform structure.
+     *
+     * @param null|string $resource
+     * @param null|array  $params
+     * @return array
+     */
+    public function load(?string $resource, ?array $params = null): array
+    {
+        if (null === $resource) {
+            $resource = $this->resource;
+        }
+        if (null === $params) {
+            $params = $this->params;
+        }
+        $result = $this->connection->get($resource, $params);
+        $code   = (int)$this->connection->http_code;
+        if ($code >= 400) {
+            //
+            // Log errors somewhere, and return an empty array?
+            return [];
+        }
+        return $result->statuses;
+    }
 }

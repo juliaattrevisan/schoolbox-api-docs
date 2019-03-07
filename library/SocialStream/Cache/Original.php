@@ -48,6 +48,8 @@ class Original extends \Alaress_Cache_Abstract
     /**
      * @param SocialStream_Post_Abstract $post
      * @return self
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function initPost(SocialStream_Post_Abstract $post)
     {
@@ -69,7 +71,7 @@ class Original extends \Alaress_Cache_Abstract
      *
      * @return string
      */
-    protected function generateCachedFilename()
+    protected function generateCachedFilename(): string
     {
         $urlDetection = new \SocialStream\UrlDetection($this->getUrl());
 
@@ -89,8 +91,10 @@ class Original extends \Alaress_Cache_Abstract
 
     /**
      * @return void
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
      */
-    protected function retrieveStreamContents()
+    protected function retrieveStreamContents(): void
     {
         // run cache detection
         if ($this->post->getCacheHash()) {
@@ -102,12 +106,16 @@ class Original extends \Alaress_Cache_Abstract
         }
     }
 
+
     /**
      * Save stream contents from the url
      *
-     * @return bool|void
+     * @return bool
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    protected function saveStreamContents()
+    protected function saveStreamContents(): bool
     {
         $urlDetection = new \SocialStream\UrlDetection($this->getUrl());
 
@@ -121,13 +129,19 @@ class Original extends \Alaress_Cache_Abstract
             $url = $this->getUrl();
             $this->setResult($this->processUrl($url));
         }
+
+        return true;
     }
+
 
     /**
      * Process url using fopen in the usual way
      *
      * @param $url
      * @return bool
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     private function processUrl($url)
     {
@@ -147,9 +161,9 @@ class Original extends \Alaress_Cache_Abstract
             $this->setCachedFile($storage);
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
