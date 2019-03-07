@@ -34,6 +34,16 @@ class Original extends \Alaress_Cache_Abstract
     protected $cacheFilePrefix = 'socialstream_thumbnail';
 
     /**
+     * A Storage instance for a thumbnail image
+     *
+     * These aren't stored in the filesystem like other cached items
+     * such as tweeter streams, etc. they're stored in brownhole
+     *
+     * @var Storage\IStorage
+     */
+    private $file;
+
+    /**
      * Hook method
      *
      * @return mixed|void
@@ -98,8 +108,7 @@ class Original extends \Alaress_Cache_Abstract
     {
         // run cache detection
         if ($this->post->getCacheHash()) {
-            $file = Storage\Mapper::getInstance()->findByHash($this->post->getCacheHash());
-            $this->cachedFile = $file;
+            $this->file = Storage\Mapper::getInstance()->findByHash($this->post->getCacheHash());
 
         } else {
             $this->newCacheUpdate();
@@ -123,11 +132,11 @@ class Original extends \Alaress_Cache_Abstract
 
             if ($urlDetection->isStorageUrl()) {
                 // it's in storage - just grab the hash and be done with it
-                $this->cachedFile = Storage\Mapper::getInstance()->findByHash($urlDetection->getHash());
+                $this->file = Storage\Mapper::getInstance()->findByHash($urlDetection->getHash());
             }
         } else {
             $url = $this->url;
-            $this->setResult($this->processUrl($url));
+            $this->result = $this->processUrl($url);
         }
 
         return true;
@@ -143,7 +152,7 @@ class Original extends \Alaress_Cache_Abstract
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processUrl($url)
+    private function processUrl($url): bool
     {
         $streamHandle = @fopen($url, 'r');
 
@@ -158,7 +167,7 @@ class Original extends \Alaress_Cache_Abstract
                 PostMapper::getInstance()->save($this->post);
             }
 
-            $this->cachedFile = $storage;
+            $this->file = $storage;
 
             return true;
         }
@@ -166,34 +175,22 @@ class Original extends \Alaress_Cache_Abstract
         return false;
     }
 
+
+    /**
+     * Get the storage instance representing this file
+     *
+     * @return Storage\IStorage
+     */
+    public function getFile(): Storage\IStorage
+    {
+        return $this->file;
+    }
+
     /**
      * Has thumbnail is either when file has successfully downloaded or the cache file already exists
      */
     public function hasThumbnail()
     {
-        return $this->getResult() || $this->cachedFile instanceof Storage\Model;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set result
-     *
-     * @param boolean $result
-     */
-    protected function setResult($result)
-    {
-        $this->result = $result;
-    }
-
-    /**
-     * Get result
-     *
-     * @return boolean
-     */
-    protected function getResult()
-    {
-        return $this->result;
+        return $this->result || $this->file instanceof Storage\Model;
     }
 }

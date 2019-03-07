@@ -44,7 +44,7 @@ if ($urlDetect->isStorageUrl()) {
     $storage = Storage\Mapper::getInstance()->findByHash($hash);
 
 } else {
-    $storage = $cache->getCachedFile();
+    $storage = $cache->getFile();
 }
 
 try {
