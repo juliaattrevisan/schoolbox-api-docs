@@ -241,6 +241,8 @@ abstract class Alaress_Cache_Abstract
 
     /**
      * Create an empty file to indicate that a stream retrieval is in progress
+     *
+     * @return void
      */
     private function createLockFile(): void
     {
@@ -327,8 +329,9 @@ abstract class Alaress_Cache_Abstract
      * Add an observer
      *
      * @param $observer
+     * @return Alaress_Cache_Abstract
      */
-    private function registerObserver($observer)
+    private function registerObserver($observer): Alaress_Cache_Abstract
     {
         $this->observerRegistry[$observer] = new $observer($this->getVerbose());
     }
@@ -337,8 +340,9 @@ abstract class Alaress_Cache_Abstract
      * Remove an observer
      *
      * @param $observer
+     * @return void
      */
-    private function unregisterObserver($observer)
+    private function unregisterObserver($observer): void
     {
         unset($this->observerRegistry[$observer]);
     }
@@ -461,6 +465,7 @@ abstract class Alaress_Cache_Abstract
      * Clear cache file, if you dont like it and you would like it to be refetched,
      * be careful as this could endlessly request the file
      *
+     * @return void
      */
     public function invalidateCache(): void
     {
