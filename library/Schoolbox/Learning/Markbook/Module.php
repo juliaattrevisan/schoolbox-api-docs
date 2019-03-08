@@ -13,6 +13,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Role;
@@ -62,10 +63,25 @@ class Module extends BaseModule
             return $args;
         };
 
+        $classMarkbookPerm = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\All(
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, function (array $params): int {
+                        return (int)$params['folderId'];
+                    }, Access::getInstance())
+                ),
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function (array $params): int {
+                    return (int)$params['folderId'];
+                }, Access::getInstance())
+            )
+        );
         // TODO - add 'getMarkbookForUnitImportSpec' to be used in 'outline/unit.twig' to jump to specific unit import
 
-        $this->register('GET',  '/class/{folderId:\d+}{/userId}',                 'getMarkbookForClass',        $isStaffOrSuper, $preload);
-        $this->register('GET',  '/class/{folderId:\d+}/term/{termCode}{/userId}', 'getMarkbookForClassAndTerm', $isStaffOrSuper, $termAndViewee);
+        $this->register('GET',  '/class/{folderId:\d+}{/userId}',                 'getMarkbookForClass',        $classMarkbookPerm, $preload);
+        $this->register('GET',  '/class/{folderId:\d+}/term/{termCode}{/userId}', 'getMarkbookForClassAndTerm', $classMarkbookPerm, $termAndViewee);
 
         $this->register('GET',  '/export/{userId:\d+}', 'getMarkbookExport', $isStaffOrSuper, $preload);
 
