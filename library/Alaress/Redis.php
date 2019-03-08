@@ -75,6 +75,15 @@ class Redis
      */
     public function connect($parameters = null, $options = null, $instanceId = '')
     {
+        // tcp://127.0.0.1:6379
+        $parameters = [
+            'scheme' => 'tcp',
+            'host' => '127.0.0.1',
+            'port' => 6379,
+//    'database' => 15
+            'persistent' => true
+        ];
+
         $this->setClient(new AutoRefreshClient($parameters, $options));
         $this->instanceId = $instanceId;
         return $this;

@@ -15,6 +15,7 @@ use Alaress\Async\Broker\IBrokerException;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\IResolver;
 use Alaress\Async\Broker\PayloadMissingException;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\Async\Notification\Postman;
 use Alaress\Date\IClock;
@@ -392,8 +393,10 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             return;
         }
 
+        $this->log->debug(" =============== GOT OBJECT ID : " . $trigger->getEventObjectId());
         $count = $this->postman->deliver($bundle, [
-            'user' => $trigger->getEvent()->getEffector()->getId()
+            'user' => $trigger->getEvent()->getEffector()->getId(),
+            Instance::EVENT_OBJECT_ID => $trigger->getEventObjectId()
         ]);
 
         if ($count === 0) {

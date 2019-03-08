@@ -9,12 +9,10 @@
 namespace Schoolbox\Realtime\Routing;
 
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Queue\QueueInterface;
 use Alaress\WorkerCrew\Transaction\ITransaction;
 use Alaress\WorkerCrew\TXRX;
 use BadMethodCallException;
 use InvalidArgumentException;
-use PDOException;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\UserMapper;
 
@@ -94,16 +92,12 @@ class RouteTXRX implements TXRX
         if (null === $this->listFactory) {
             throw new BadMethodCallException('Attempting to send using the receiver variant of RouteTXRX');
         }
+        /** @var Instance $instance */
+        $key = $instance->getBaseHash() . $instance->getParamHash();
 
         // Is a retract single: retract it
-        if ($instance->isActionRetractSingle()) {
-            $this->listFactory->retract()->push($instance);
-            return;
-        }
-
-        // Is a retract all: find all like it, then retract them
-        if ($instance->isActionRetractAll()) {
-            $this->listFactory->retractLike()->push($instance);
+        if ($instance->isActionRetractSingle() || $instance->isActionRetractAll()) {
+            $tx->put("{$key}-retract", [$instance, null, 'retract']);
             return;
         }
 
@@ -113,13 +107,15 @@ class RouteTXRX implements TXRX
                 throw new InvalidArgumentException('Payload must be an array of user IDs');
             }
 
-            $key = $instance->getBaseHash().$instance->getParamHash();
+            if (!empty($instance->getEventObjectId())) {
+                $tx->put("{$key}-object", [$instance, null, 'object']);
+            }
 
             // rather than dump everyone in together, allow the transaction to batch the users
             // the implication of this is that if the user count exceeds the limit placed on the transaction,
             // users will be batched through multiple transactions
             foreach ($userIds as $userId) {
-                $tx->put("$key-$userId", [ $instance, (int)$userId ]);
+                $tx->put("$key-$userId", [$instance, (int)$userId, 'user']);
             }
             return;
         }
@@ -145,10 +141,27 @@ class RouteTXRX implements TXRX
 
         $count = 0;
 
-        foreach ($args as list($instance, $userId)) {
-            // this is the payload from $tx->put() above
-            $user   = $this->mapper->findById($userId);
-            $count += $this->sorter->process($user, $instance) ? 1 : 0;
+        /**
+         * @var  Instance $instance
+         * @var  int $userId
+         * @var  string $type
+         */
+        foreach ($args as list($instance, $userId, $type)) {
+            $count = 0;
+            switch ($type) {
+                case 'user' :
+                    // this is the payload from $tx->put() above
+                    $user = $this->mapper->findById($userId);
+                    $count += $this->sorter->process($user, $instance) ? 1 : 0;
+                    break;
+                case 'retract' :
+                    $this->sorter->processRetract($instance);
+                    break;
+                case 'object' :
+                    $this->sorter->processEventObjectList($instance);
+                    break;
+                default:
+            }
         }
 
         return $count;

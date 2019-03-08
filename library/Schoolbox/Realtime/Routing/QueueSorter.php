@@ -20,6 +20,7 @@ use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
 use Schoolbox\Realtime\Routing\Filter\FilterException;
 use Schoolbox\Realtime\Routing\Filter\FilterInterface;
+use Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Swift_RfcComplianceException;
@@ -143,6 +144,31 @@ class QueueSorter implements FilterInterface
         // exceptions get thrown if it fails a given filter
         $this->filter->validate($message, $user);
 	}
+
+
+	public function processRetract(Instance $instance):bool
+    {
+        if ($instance->isActionRetractSingle()) {
+            $this->log->debug("[QueueSorter] retracting single " .  $this->listFactory->retract()->getRedisMsgKey($instance));
+            $this->listFactory->retract()->push($instance);
+        } elseif ($instance->isActionRetractAll()) {
+            $this->log->debug("[QueueSorter] retracting all " .  $this->listFactory->retract()->getRedisMsgBaseKey($instance));
+            if (!empty($instance->getEventObjectId())) {
+                $this->listFactory->eventObjectList($instance->getEventObjectId())->retract($instance);
+            } else {
+                $this->listFactory->retractLike()->push($instance);
+            }
+        }
+        return true;
+    }
+
+
+    public function processEventObjectList(Instance $instance):bool
+    {
+        $this->log->debug('[QUEUE SORTER] === ' . $instance->getEventObjectId());
+        $this->listFactory->eventObjectList($instance->getEventObjectId())->push($instance);
+        return true;
+    }
 
 
 	/**

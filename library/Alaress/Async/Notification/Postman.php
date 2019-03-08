@@ -38,24 +38,28 @@ class Postman
     }
 
 
-	/**
-	 * Delivers the contents of the given bundle, according to the notifier given
-	 *
-	 * @param InstanceBundle $bundle
-	 * @param array          $appendContext
-	 * @return int
-	 */
-	public function deliver(InstanceBundle $bundle, array $appendContext = [])
+    /**
+     * Delivers the contents of the given bundle, according to the notifier given
+     *
+     * @param InstanceBundle $bundle
+     * @param array $appendContext
+     * @return int
+     */
+    public function deliver(InstanceBundle $bundle, array $appendContext = []): int
     {
-		$i = 0;
+        $i = 0;
 
-		foreach ($bundle->getAll() as $routeKey => $instance) {
+        $eventObjectId = isset($appendContext[Instance::EVENT_OBJECT_ID]) ? $appendContext[Instance::EVENT_OBJECT_ID] : '';
+
+        $this->log->info('========== PASSED: ' . $eventObjectId);
+        foreach ($bundle->getAll() as $routeKey => $instance) {
+            $instance->setEventObjectId($eventObjectId);
             $array = $instance->jsonSerialize();
 
             // merge the context appendation
             $array['context'] = array_merge($array['context'], $appendContext);
 
-		    $json = json_encode($array);
+            $json = json_encode($array);
 
             if ($json === '') {
                 // message could not be serialized, therefore cannot be delivered
@@ -65,7 +69,7 @@ class Postman
 
             try {
                 $topic = "INFO.$routeKey";
-                $this->broker->publish(Instance::jsonUnserialize($json, $topic), [ $topic ], $instance->getTTL());
+                $this->broker->publish(Instance::jsonUnserialize($json, $topic), [$topic], $instance->getTTL());
             } catch (\InvalidArgumentException $e) {
                 $this->log->notice('Broken message, was unable to json_decode', ['char' => '?']);
             }
@@ -78,10 +82,10 @@ class Postman
                 // assume send
                 $this->log->info("Broadcasting a message to '$routeKey'", ['char' => '<']);
             }
-			++$i;
-		}
+            ++$i;
+        }
 
-		return $i;
-	}
+        return $i;
+    }
 
 }

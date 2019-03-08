@@ -61,6 +61,12 @@ class Instance implements JsonSerializable
      */
     public const ACTION_RETRACT_ALL = 'retract-all';
 
+
+    /**
+     * Array key to find event object identifier.
+     */
+    public const EVENT_OBJECT_ID = 'eventObjectId';
+
     /**
      * The :tokenised string that forms the base template of the message
      *
@@ -166,6 +172,8 @@ class Instance implements JsonSerializable
      * TTL of this message.
      */
     protected $ttl = self::DEFAULT_TTL;
+
+    protected $eventObjectId = '';
 
     /**
      * @param string               $text
@@ -324,6 +332,11 @@ class Instance implements JsonSerializable
 
         $instance = new self($messageString, $namespace, $icon, $href, $params, $severity, $topics, $folderId, $time, $meta, $context);
         $instance->setAction($action);
+
+        if (\array_key_exists(self::EVENT_OBJECT_ID, $array)) {
+            $instance->setEventObjectId($array[self::EVENT_OBJECT_ID]);
+        }
+
         return $instance;
     }
 
@@ -373,6 +386,7 @@ class Instance implements JsonSerializable
             'context'   => $this->context,
             'action'    => $this->action,
             'folderId'  => $this->folderId,
+            self::EVENT_OBJECT_ID => $this->eventObjectId,
         );
     }
 
@@ -571,6 +585,26 @@ class Instance implements JsonSerializable
     public function getTTL(): int
     {
         return $this->ttl;
+    }
+
+
+    /**
+     * Sets event object identifier
+     * @param string $eventObjectId
+     */
+    public function setEventObjectId(string $eventObjectId): void
+    {
+        $this->eventObjectId = $eventObjectId;
+    }
+
+
+    /**
+     * Gets event object identifier
+     * @return string
+     */
+    public function getEventObjectId(): string
+    {
+        return $this->eventObjectId;
     }
 
 }

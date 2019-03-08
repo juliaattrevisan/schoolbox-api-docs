@@ -124,6 +124,22 @@ class CompressedTrigger implements InstantTriggerInterface {
         return spl_object_hash($this);
     }
 
+
+    /**
+     * Return an identifier of attached event object, if available
+     *
+     * @return string
+     */
+    public function getEventObjectId(): string
+    {
+        $object = $this->getEvent()->getObject();
+        if (method_exists($object, 'getId')) {
+            return sprintf("%s:%s", get_class($object), $object->getId());
+        }
+        return '';
+    }
+
+
     /**
      * Return a hash representation of attached event object
      * This is using the same way as the key for AbstractScheduler->timers
@@ -143,4 +159,4 @@ class CompressedTrigger implements InstantTriggerInterface {
         return $key;
     }
 
-} 
+}

@@ -1480,6 +1480,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     ->setHref($href)
                     ->addTopic("$topicStub.$key.$userId"); // needs to be identical
                 $envelope->retractAllLike($bob->build());
+                // just doing once
+                break 2;
             }
         }
 

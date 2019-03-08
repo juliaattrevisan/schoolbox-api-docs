@@ -57,4 +57,7 @@ interface IListFactory
      * @return QueueInterface
      */
     public function retractLike(): QueueInterface;
+
+
+    public function eventObjectList($eventObjectId): QueueInterface;
 }

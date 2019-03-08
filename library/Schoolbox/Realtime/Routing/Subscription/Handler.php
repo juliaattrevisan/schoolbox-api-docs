@@ -74,6 +74,7 @@ class Handler implements IConsumer, EventListener
     public function onMessage($instance, IResolver $resolver, ?array $context)
     {
         try {
+            $this->log->debug(' =============== RECEIVED : ' . $instance->getEventObjectId());
             $this->handleMessage($instance, $context);
             $resolver->acknowledge();
             return;

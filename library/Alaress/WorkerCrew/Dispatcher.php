@@ -107,6 +107,15 @@ class Dispatcher implements DispatcherInterface
         $this->strat->penqueue($identifier, $command, [ $data ]);
 
         // store the element locally
+//        $trigger,
+//                $this->getMethod(),
+//                serialize([
+//                    $callback,
+//                    $event->getObject(),
+//                    $event->getEffector(),
+//                    $event->getDiff()
+//                ])
+
         $this->q->enqueue([ $identifier, $command, $data ]);
         $this->log->info("Enqueued '$command': queue length is " . $this->q->count());
 
