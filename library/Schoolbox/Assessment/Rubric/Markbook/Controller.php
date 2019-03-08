@@ -23,10 +23,6 @@ class Controller extends Base
      */
     public function getMarkbook(Folder $folder): void
     {
-        if (null === $folder) {
-            throw new \UnexpectedValueException('Cannot render rubric markbook - folder not found');
-        }
-
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@rubricMarkbook/markbookOuter.twig', [
                 'folder'      => $folder
