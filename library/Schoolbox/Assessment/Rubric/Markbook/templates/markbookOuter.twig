@@ -6,6 +6,21 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Learning', '/learning/classes'], ['Rubric Markbook']) }}
 
+<style>
+    .rubric-marksheet tr.capability th {
+        border-right: 1px solid #ededed;
+    }
+    .rubric-marksheet tr.indicator th {
+        padding-left: 2rem;
+        border-right: 1px solid #ededed;
+        font-weight: normal;
+    }
+
+    .rubric-marksheet tr.assessment th {
+        border-right: 1px solid #ededed;
+    }
+</style>
+
 <div class="row">
     <div class="small-12 island">
         <table class="rubric-marksheet marksheet" data-mark-sheet>
@@ -24,7 +39,7 @@
                     {% endfor %}
                 </tr>
             </thead>
-            
+
             <tbody>
                 {% for assessmentId, assessment in assessments %}
                     {# Set up the rowspan for the assessment #}
@@ -65,9 +80,9 @@
                         {# Render indicators #}
                         {% for indicatorId, indicator in capability.indicators %}
                             <tr class="indicator">
-                                <td style="min-width: 200px;width: 200px;">
+                                <th style="min-width: 200px;width: 200px;">
                                     {{ indicator.name }}
-                                </td>
+                                </th>
 
                                 {% for student in students %}
                                     {% set indicator = student[assessmentId].capabilities[capabilityId].indicators[indicatorId] %}
