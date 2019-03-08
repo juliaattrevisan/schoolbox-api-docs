@@ -15,6 +15,9 @@ CREATE PROCEDURE addColumn()
     )
     THEN
       ALTER TABLE `submission_box_file` ADD COLUMN `realname` VARCHAR(255) NULL AFTER `box_id`;
+      UPDATE     submission_box_file sbf
+        INNER JOIN storage             s   ON sbf.storage_id = s.hash
+      SET        sbf.realname = s.filename;
     END IF;
   END $$
 
