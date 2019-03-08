@@ -3,6 +3,8 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+declare(strict_types=1);
+
 namespace Schoolbox\Assessment\Rubric\Markbook;
 
 use Alaress\Authorizer\Rule;
@@ -46,13 +48,13 @@ class Module extends BaseModule
                 // Allow staff with read+ access to the folder
                 new Rule\All(
                     new Rule\HasRole(Role::STAFF),
-                    new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, function ($params) {
-                        return $params['folderId'];
+                    new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, function (array $params) : int {
+                        return (int)$params['folderId'];
                     }, Access::getInstance())
                 ),
                 // Allow instructors (anyone with write+ access to folder)
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
-                    return $params['folderId'];
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function (array $params) : int {
+                    return (int)$params['folderId'];
                 }, Access::getInstance())
             )
         );
