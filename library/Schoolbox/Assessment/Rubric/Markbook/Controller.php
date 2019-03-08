@@ -39,12 +39,102 @@ class Controller extends Base
         return [
             0 => [
                 'name' => 'Assessment 1 - marking capabilities only',
+                'capabilities' => [
+                    0 => [
+                        'name' => 'Capability A',
+                        'maxMark' => 15,
+                        'indicators' => [
+                            0 => [
+                                'name' => 'Indicator 1',
+                                'maxMark' => null,
+                            ],
+                            1 => [
+                                'name' => 'Indicator 2',
+                                'maxMark' => null,
+                            ],
+                        ]
+                    ],
+                    1 => [
+                        'name' => 'Capability B',
+                        'maxMark' => 15,
+                        'indicators' => [
+                            0 => [
+                                'name' => 'Indicator 1',
+                                'maxMark' => null,
+                            ],
+                            1 => [
+                                'name' => 'Indicator 2',
+                                'maxMark' => null,
+                            ],
+                        ]
+                    ]
+                ]
             ],
             1 => [
                 'name' => 'Assessment 2 - marking indicators only',
+                'capabilities' => [
+                    0 => [
+                        'name' => 'Capability A',
+                        'maxMark' => null,
+                        'indicators' => [
+                            0 => [
+                                'name' => 'Indicator 1',
+                                'maxMark' => 5,
+                            ],
+                            1 => [
+                                'name' => 'Indicator 2',
+                                'maxMark' => 10,
+                            ],
+                        ]
+                    ],
+                    1 => [
+                        'name' => 'Capability B',
+                        'maxMark' => null,
+                        'indicators' => [
+                            0 => [
+                                'name' => 'Indicator 1',
+                                'maxMark' => 5,
+                            ],
+                            1 => [
+                                'name' => 'Indicator 2',
+                                'maxMark' => 10,
+                            ],
+                        ]
+                    ]
+                ]
             ],
             2 => [
                 'name' => 'Assessment 3 - marking both',
+                'capabilities' => [
+                    0 => [
+                        'name' => 'Capability A',
+                        'maxMark' => 15,
+                        'indicators' => [
+                            0 => [
+                                'name' => 'Indicator 1',
+                                'maxMark' => 5,
+                            ],
+                            1 => [
+                                'name' => 'Indicator 2',
+                                'maxMark' => 10,
+                            ],
+                        ]
+                    ],
+                    1 => [
+                        'name' => 'Capability B',
+                        'maxMark' => 15,
+                        'indicators' => [
+                            0 => [
+                                'name' => 'Indicator 1',
+                                'maxMark' => 5,
+                            ],
+                            1 => [
+                                'name' => 'Indicator 2',
+                                'maxMark' => 10,
+                            ],
+                        ]
+                    ]
+                ]
             ]
         ];
     }

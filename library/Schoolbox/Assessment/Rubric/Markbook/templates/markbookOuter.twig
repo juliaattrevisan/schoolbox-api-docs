@@ -5,3 +5,150 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Learning', '/learning/classes'], ['Rubric Markbook']) }}
+
+<div id="report_actions" class="actions-small-1 row">
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li class="separator">Report</li>
+        <li><a href='{{ routeLookup('learningMarkbook.getMarkbookExport', {userId: viewee.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <table class="rubric-marksheet marksheet" data-mark-sheet>
+            <thead>
+            <tr class="rotate-headers" data-headers data-hidable-columns>
+                <th>&nbsp;</th>
+                <th>
+                    <div>
+                        <span>Student Average</span>
+                    </div>
+                </th>
+                {% for assessment in markbook.assessments %}
+                    <th data-assessment="{{ assessment.id }}">
+                        <div>
+                            {# A teacher clicking an assessment from the markbook is most likely interested in seeing more granular results #}
+                            {% set href = routeLookup('learningAssessment.getStatus', {assessmentId: assessment.id}) %}
+                            <span>
+                            <a href="{{ href }}" title="{{ assessment.title }}">{{ assessment.title }}</a><br/>
+                            <span class="meta">{{ assessment.typeName }}</span>
+                        </span>
+                        </div>
+                    </th>
+                {% endfor %}
+            </tr>
+
+            {% for assessment in assessments %}
+                {# Set up the rowspan for the assessment #}
+                {% set capCount = assessment.capabilities|length %}
+                {% set rowspan = capCount %}
+
+                {% for capability in assessment.capabilities %}
+                    {% set indCount = capability.indicators|length %}
+                    {% set rowspan = rowspan + indCount %}
+                {% endfor %}
+
+                <tr class="assessment">
+                    <th rowspan="{{ rowspan+1 }}" style="min-width: 200px;width: 200px;">
+                        {{ assessment.name }}
+                    </th>
+                </tr>
+
+                {% for capability in assessment.capabilities %}
+                    <tr class="capability">
+                        <th>
+                            {{ capability.name }}
+                        </th>
+                    </tr>
+
+                    {% for indicator in capability.indicators %}
+                        <tr class="indicator">
+                            <td>
+                                {{ indicator.name }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+
+            {% endfor %}
+
+            </thead>
+
+            <tbody>
+            {# Need all students that ever participated in any assessments #}
+            {% spaceless %}
+                {% for student in markbook.students %}
+                    <tr data-student="{{ student.id }}">
+                        <td class="no-pad">
+                            <div class="compact card no-pad small-12">
+                                <a href="/search/user/{{ student.id }}" title="View Profile">
+                                    {% if studentCount < functionDegradeLimit %}
+                                        <img src="/portrait.php?userId={{ student.externalId }}&size=square64" alt="View Profile" />
+                                    {% endif %}
+                                    <p>{{ student.lastname }}, {{ student.firstname }}</p>
+                                </a>
+                            </div>
+                        </td>
+
+                        {% set studentMean = markbook.studentStatistics[student.id].weightedMean %}
+                        {% set meanNormalised = markbook.studentStatistics[student.id].meanNormalised %}
+                        <td class="{{ urgency.marks(meanNormalised) }}-bg">
+                            {# Regardless of which term is being filtered to, link to default term grades page (ie empty termCode) #}
+                            <a class="{{ urgency.marks(meanNormalised) }}-bg"
+                               href="{{ routeLookup('learningGrades.getGrades', {viewee: student, userId: student.id, termCode: ''}) }}" title="View students {{ locale.grades.plural }}">
+                                {{ studentMean | default('–') }}
+                            </a>
+                        </td>
+
+                        {% for assessment in markbook.assessments %}
+                            {% set participant = assessment.getParticipantIfExtant(student) %}
+                            <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %}" data-assessment="{{ assessment.id }}">
+                                {% if participant and not participant.isExcluded %}
+                                    {% if assessment is task %}
+                                        {# An icon that shows if the student has attempted the task or not #}
+                                        {% if studentCount < functionDegradeLimit %}
+                                            {% include '@learningAssessment/fragments/progressTick.twig' with {
+                                                assessment: assessment,
+                                                student: participant.user
+                                            } only %}
+                                        {% else %}
+                                            {% if participant.isResponseRequired %}
+                                                <div
+                                                        class="no-text progress-tick readonly"
+                                                        title="Incomplete"
+                                                        data-progress-tick-status="incomplete"></div>
+                                            {% elseif participant.isFeedbackRequired %}
+                                                <div
+                                                        class="no-text progress-tick pending"
+                                                        title="Self-assessed"
+                                                        data-progress-tick-status="selfAssessed"></div>
+                                            {% elseif participant.isReviewComplete %}
+                                                <div
+                                                        class="no-text progress-tick reviewed"
+                                                        title="Completed"
+                                                        data-progress-tick-status="teacherAssessed"></div>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% else %}
+                                        {% set normalisedMark = participant.normalisedMark(true) %}
+                                        {% set label = participant.hasSubmittedResponse and not participant.hasPublishedFeedback
+                                            ? "Pending" : participant.humanReadableMark(true) | default('–')
+                                        %}
+                                        <a class="{{ urgency.marks(normalisedMark) }}"
+                                           href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
+                                           title="{{ participant.authoritativeFeedback(true).comment }}">{{ label }}</a>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            {% endspaceless %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
