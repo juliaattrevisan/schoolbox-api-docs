@@ -24,9 +24,424 @@ class Controller extends Base
     public function getMarkbook(Folder\Model $folder): void
     {
         $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@rubricMarkbook/markbookOuter.twig', [
-                'folder'      => $folder
-            ])->setTab('submission')->setTitle('Rubric Markbook for ' . $folder->getName())
+            $this->buildHtmlOutput(
+                '@rubricMarkbook/markbookOuter.twig',
+                $this->generateMockData()
+            )->setTab('submission')->setTitle('Rubric Markbook for ' . $folder->getName())
         );
     }
+
+    private function generateMockData() : array
+    {
+        $studentMarks = [
+            230 => [
+                'name' => 'David Rhodes',
+                0 => [
+                    'name' => 'Assessment 1 - marking capabilities only',
+                    'markScheme' => 1,
+                    'capabilities' => [
+                        0 => [
+                            'name' => 'Capability A',
+                            'maxMark' => 15,
+                            'normalisedMark' => 10,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => null,
+                                    'normalisedMark' => null,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => null,
+                                    'normalisedMark' => null,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ],
+                        1 => [
+                            'name' => 'Capability B',
+                            'maxMark' => 15,
+                            'normalisedMark' => 10,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => null,
+                                    'normalisedMark' => null,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => null,
+                                    'normalisedMark' => null,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ]
+                    ]
+                ],
+                1 => [
+                    'name' => 'Assessment 2 - marking indicators only',
+                    'markScheme' => 1,
+                    'capabilities' => [
+                        0 => [
+                            'name' => 'Capability A',
+                            'maxMark' => null,
+                            'normalisedMark' => null,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => 5,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => 10,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ],
+                        1 => [
+                            'name' => 'Capability B',
+                            'maxMark' => null,
+                            'normalisedMark' => null,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => 5,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => 10,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ]
+                    ]
+                ],
+                2 => [
+                    'name' => 'Assessment 3 - marking both',
+                    'markScheme' => 1,
+                    'capabilities' => [
+                        0 => [
+                            'name' => 'Capability A',
+                            'maxMark' => 15,
+                            'normalisedMark' => 10,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => 5,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => 10,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ],
+                        1 => [
+                            'name' => 'Capability B',
+                            'maxMark' => 15,
+                            'normalisedMark' => 10,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => 5,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => 10,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            229 => [
+                'name' => 'Rachel Rhodes',
+                0 => [
+                    'name' => 'Assessment 1 - marking capabilities only',
+                    'markScheme' => 1,
+                    'capabilities' => [
+                        0 => [
+                            'name' => 'Capability A',
+                            'maxMark' => 15,
+                            'normalisedMark' => 10,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => null,
+                                    'normalisedMark' => null,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => null,
+                                    'normalisedMark' => null,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ],
+                        1 => [
+                            'name' => 'Capability B',
+                            'maxMark' => 15,
+                            'normalisedMark' => 10,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => null,
+                                    'normalisedMark' => null,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => null,
+                                    'normalisedMark' => null,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ]
+                    ]
+                ],
+                1 => [
+                    'name' => 'Assessment 2 - marking indicators only',
+                    'markScheme' => 1,
+                    'capabilities' => [
+                        0 => [
+                            'name' => 'Capability A',
+                            'maxMark' => null,
+                            'normalisedMark' => null,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => 5,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => 10,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ],
+                        1 => [
+                            'name' => 'Capability B',
+                            'maxMark' => null,
+                            'normalisedMark' => null,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => 5,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => 10,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ]
+                    ]
+                ],
+                2 => [
+                    'name' => 'Assessment 3 - marking both',
+                    'markScheme' => 1,
+                    'capabilities' => [
+                        0 => [
+                            'name' => 'Capability A',
+                            'maxMark' => 15,
+                            'normalisedMark' => 10,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => 5,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => 10,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ],
+                        1 => [
+                            'name' => 'Capability B',
+                            'maxMark' => 15,
+                            'normalisedMark' => 10,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => 5,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => 10,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            206 => [
+                'name' => 'Maddison Rhodes',
+                0 => [
+                    'name' => 'Assessment 1 - marking capabilities only',
+                    'markScheme' => 1,
+                    'capabilities' => [
+                        0 => [
+                            'name' => 'Capability A',
+                            'maxMark' => 15,
+                            'normalisedMark' => 10,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => null,
+                                    'normalisedMark' => null,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => null,
+                                    'normalisedMark' => null,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ],
+                        1 => [
+                            'name' => 'Capability B',
+                            'maxMark' => 15,
+                            'normalisedMark' => 10,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => null,
+                                    'normalisedMark' => null,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => null,
+                                    'normalisedMark' => null,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ]
+                    ]
+                ],
+                1 => [
+                    'name' => 'Assessment 2 - marking indicators only',
+                    'markScheme' => 1,
+                    'capabilities' => [
+                        0 => [
+                            'name' => 'Capability A',
+                            'maxMark' => null,
+                            'normalisedMark' => null,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => 5,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => 10,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ],
+                        1 => [
+                            'name' => 'Capability B',
+                            'maxMark' => null,
+                            'normalisedMark' => null,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => 5,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => 10,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ]
+                    ]
+                ],
+                2 => [
+                    'name' => 'Assessment 3 - marking both',
+                    'markScheme' => 1,
+                    'capabilities' => [
+                        0 => [
+                            'name' => 'Capability A',
+                            'maxMark' => 15,
+                            'normalisedMark' => 10,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => 5,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => 10,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ],
+                        1 => [
+                            'name' => 'Capability B',
+                            'maxMark' => 15,
+                            'normalisedMark' => 10,
+                            'indicators' => [
+                                0 => [
+                                    'name' => 'Indicator 1',
+                                    'maxMark' => 5,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                ],
+                                1 => [
+                                    'name' => 'Indicator 2',
+                                    'maxMark' => 10,
+                                    'normalisedMark' => 5,
+                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                ],
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        return $studentMarks;
+    }
+
 }
