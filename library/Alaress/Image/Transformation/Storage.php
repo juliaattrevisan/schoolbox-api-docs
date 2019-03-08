@@ -74,7 +74,7 @@ class Storage extends BaseTransformation
                 ]
             ]
         ],
-        /* The huge cover photo on the ePortfolio Profile page
+        /* The cover photo on the News article page
 		 */
         'coverPhoto' => [
             [
