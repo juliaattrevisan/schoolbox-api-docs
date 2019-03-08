@@ -35,16 +35,17 @@ class External_Synergetic_Class implements External_ClassInterface
      * Gets the class code part of a query.
      *
      * @param  string $subCode
+     * @param bool $convertibleToArray
      *
      * @return string
      */
-    protected function getClassCodeQuery($subCode)
+    protected function getClassCodeQuery($subCode, $convertibleToArray = true)
     {
         $classQuery   = '(';
         $subCodeArray = explode(',', $subCode);
         foreach ($subCodeArray as $code) {
-            if (strpos($code, '/') !== false) {
-                $codeArray  = explode('/', $code, 2);
+            if ($convertibleToArray && strpos($code, '/') !== false) {
+                $codeArray  = explode('/', $code);
                 $classQuery .= "( ClassCode = '{$this->database->quote($codeArray[1])}' AND ClassCampus = '{$this->database->quote($codeArray[0])}' ) OR ";
             } else {
                 $classQuery .= "ClassCode = '{$this->database->quote($code)}' OR ";
@@ -91,7 +92,7 @@ class External_Synergetic_Class implements External_ClassInterface
             return [];
         }
 
-        $classQuery = $this->getClassCodeQuery($classCode);
+        $classQuery = $this->getClassCodeQuery($classCode, false);
 
         // TODO: Inject $_SESSION['user'], short term to get this working without arch changes
         /** @var Schoolbox\User $sessionUser */
