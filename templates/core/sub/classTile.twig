@@ -38,6 +38,7 @@
             </ul>
         {% endif %}
 
+        {% block studentGradesLink %}
         {% set gradesRoute = routeLookupIfAuthorized('learningGrades.getGradesForSubject', { viewee: USER, userId: USER.id, term: term, termCode: term.code, subject: class, subjectId: class.id }) %}
         {% if USER.getRole.isStudent == true and gradesRoute %}
             <nav>
@@ -47,6 +48,7 @@
                 <li><a href="{{ gradesRoute }}" class="icon-approve">Grades</a></li>
             </ul>
         {% endif %}
+        {% endblock %}
     </div>
 </div>
 
