@@ -41,7 +41,7 @@
  #}
 {% macro textonly(article) %}
     <div class="small-12 columns">
-        <article class="content">
+        <article class="article content">
             {{ article.body|purify }}
         </article>
     </div>
@@ -53,8 +53,53 @@
  #}
 {% macro banner(article) %}
     <div class="small-12 island">
-        <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=maxsize" />
-        <section class="content">
+        <section class="banner content">
+            <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=eportfolioCoverPhoto" />
+        </section>
+        <section class="article content">
+            <h1>{{ article.title |default("(untitled)") }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
+            <p class="meta">{{ indicator.byLine(article) }}
+                {# Topics #}
+                <span>By {{ article.author.fullName }}</span>
+                <span> &mdash; {{ article.publishAt.short }}</span>
+                {% if article.topics|length %}
+                    <span>in
+                        {% for topic in article.topics %}
+                            <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </span>
+                {% endif %}
+
+                <span id="audience-container" v-if="audienceBricks.length > 0">
+                    <span> | </span>
+                    <template v-show="audienceBricks.length" v-for="(audienceBrick, index) in audienceBricks">
+                            <span v-if="audienceBrick.isComposite()">
+                                <a href="#" title="Click to view composite audience" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel }</a>
+                            </span>
+                        {# has to be on one line or you get weird whitespace #}
+                        <span v-else>${ audienceBrick.modifierLabel.length > 0 ? audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel : audienceBrick.nameLabel }</span><template v-if="index+1 < audienceBricks.length">, </template>
+                    </template>
+
+                    {# modal #}
+                    <div data-reveal id="audience-composite" class="reveal-modal">
+                        <h2>Complex Audience</h2>
+                        <a class="close-reveal-modal" aria-label="Close">×</a>
+                        <p class="meta" v-if="selectedCompositeBrick.modalData">
+                            This audience segment includes users who are in both one or more of the selected
+                            ${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() } and one or more of the selected
+                            ${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }.
+                        </p>
+                        <div class="audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
+                            <div><b>${ dimensionData.typeLabel.plural }:</b></div>
+                            <div>
+                                <template v-for="(label, index) in dimensionData.valueLabels">
+                                    ${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+            </p>
             {{ article.body|purify }}
         </section>
     </div>

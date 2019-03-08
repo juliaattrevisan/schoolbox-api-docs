@@ -54,49 +54,7 @@ Data:
 
 <div class="small-12 columns">
     <div class="actions-small-2 row">
-        <div class="list-item">
-            <h1>{{ article.title |default("(untitled)") }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
-            <ul class="meta">{{ indicator.byLine(article) }}
-                {# Topics #}
-                {% if article.topics|length %}
-                    <li class="icon-breadcrumbs">Topics:
-                        {% for topic in article.topics %}
-                            <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
-                        {% endfor %}
-                    </li>
-                {% endif %}
-
-                <li class="icon-eye" id="audience-container" v-if="audienceBricks.length > 0">
-                        <span v-if="audienceBricks.length > 1">Audiences: </span>
-                        <span v-else>Audience: </span>
-                        <template v-show="audienceBricks.length" v-for="(audienceBrick, index) in audienceBricks">
-                            <span v-if="audienceBrick.isComposite()">
-                                <a href="#" title="Click to view composite audience" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel }</a>
-                            </span>
-                            {# has to be on one line or you get weird whitespace #}
-                            <span v-else>${ audienceBrick.modifierLabel.length > 0 ? audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel : audienceBrick.nameLabel }</span><template v-if="index+1 < audienceBricks.length">, </template>
-                        </template>
-
-                        {# modal #}
-                        <div data-reveal id="audience-composite" class="reveal-modal">
-                            <h2>Complex Audience</h2>
-                            <a class="close-reveal-modal" aria-label="Close">×</a>
-                    <p class="meta" v-if="selectedCompositeBrick.modalData">
-                        This audience segment includes users who are in both one or more of the selected
-                        ${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() } and one or more of the selected
-                        ${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }.
-                    </p>
-                    <div class="audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
-                        <div><b>${ dimensionData.typeLabel.plural }:</b></div>
-                        <div>
-                            <template v-for="(label, index) in dimensionData.valueLabels">
-                                ${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template>
-                            </template>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </div>
+        <div class="list-item"></div>
 
         {% if deleteRoute %}
             <script>
@@ -206,12 +164,12 @@ Data:
 
 {# Display body when either there's text content, or an image #}
 {% if article.body|length or article.featureImage.hash %}
-<div class="row">
+<div class="news-article row">
     <div class="small-12 island">
         <section>
             <div class="row">
                 {% if article.featureImage.hash %}
-                    {{ layout.standard(article) }}
+                    {{ layout.banner(article) }}
                 {% else %}
                     {{ layout.textonly(article) }}
                 {% endif %}

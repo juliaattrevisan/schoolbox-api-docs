@@ -1,0 +1,54 @@
+.news-article {
+    .banner {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 0;
+    }
+    .article {
+        margin: 0 auto;
+        max-width: 45rem;
+
+        p.meta {
+            border-bottom: 1px solid #9a9a9a;
+            margin: 0 0 2rem 0;
+            padding-bottom: 0.5rem;
+        }
+    }
+}
+
+.audience-grid {
+    margin-bottom: 1rem;
+
+    > li {
+        background: $accent-background;
+        min-height: 80px;
+        border: 0;
+        border-right: 2px solid $white;
+        border-bottom: 2px solid $white;
+    }
+}
+
+.audience-composite-row {
+    margin-bottom: 0.25rem;
+    font-size: $paragraph-font-size;
+}
+
+.infographic {
+    text-align: center;
+
+    .title {
+        clear: both;
+        display: block;
+    }
+
+    .value {
+        font-size: 2.25rem;
+        font-weight:bold;
+    }
+}
+
+.ico {
+    td, th {
+        text-align: center;
+    }
+}
