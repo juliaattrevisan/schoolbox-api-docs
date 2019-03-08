@@ -23,7 +23,9 @@
                         </th>
                     {% endfor %}
                 </tr>
-
+            </thead>
+            
+            <tbody>
                 {% for assessmentId, assessment in assessments %}
                     {# Set up the rowspan for the assessment #}
                     {% set capCount = assessment.capabilities|length %}
@@ -82,7 +84,7 @@
                     {% endfor %}
 
                 {% endfor %}
-            </thead>
+            </tbody>
         </table>
 
     </div>
