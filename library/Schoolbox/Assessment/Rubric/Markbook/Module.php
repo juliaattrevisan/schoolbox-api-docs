@@ -60,7 +60,7 @@ class Module extends BaseModule
             )
         );
 
-        $this->register('GET',  '{/folderId:\d+}', 'getMarkbook', $canViewPage, $preloadFolder);
+        $this->register('GET',  '/{folderId:\d+}', 'getMarkbook', $canViewPage, $preloadFolder);
     }
 
 
