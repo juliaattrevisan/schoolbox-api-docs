@@ -84,7 +84,7 @@ class Module extends BaseModule
      * @return Mapper|Folder\Mapper
      * @throws \InvalidArgumentException If class not found
      */
-    protected function getFolderMapper()
+    private function getFolderMapper()
     {
         return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
