@@ -47,6 +47,17 @@
                             <th style="min-width: 200px;width: 200px;">
                                 {{ capability.name }}
                             </th>
+
+                            {% for student in students %}
+                                {% set capability = student[assessmentId].capabilities[capabilityId] %}
+                                {% set capabilityMark = '-' %}
+                                {% if capability.maxMark and capability.normalisedMark %}
+                                    {% set capabilityMark = capability.normalisedMark ~ '/' ~ capability.maxMark %}
+                                {% endif %}
+                                <td>
+                                    {{ capabilityMark }}
+                                </td>
+                            {% endfor %}
                         </tr>
 
                         {# Render indicators #}
