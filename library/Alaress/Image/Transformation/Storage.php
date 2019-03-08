@@ -76,6 +76,17 @@ class Storage extends BaseTransformation
         ],
         /* The huge cover photo on the ePortfolio Profile page
 		 */
+        'coverPhoto' => [
+            [
+                'method' => 'Constrain',
+                'args' => [
+                    'width' => 2000,
+                    'height' => 450
+                ]
+            ]
+        ],
+        /* The huge cover photo on the ePortfolio Profile page
+		 */
         'eportfolioCoverPhoto' => [
             [
                 'method' => 'Constrain',
