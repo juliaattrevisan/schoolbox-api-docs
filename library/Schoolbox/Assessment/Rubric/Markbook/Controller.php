@@ -21,7 +21,7 @@ class Controller extends Base
      * @throws ServiceNotFound                       If unable to locate HTML web Output
      * @throws \UnexpectedValueException             If folder not provided or could not be found
      */
-    public function getMarkbook(Folder $folder = null): void
+    public function getMarkbook(Folder $folder): void
     {
         if (null === $folder) {
             throw new \UnexpectedValueException('Cannot render rubric markbook - folder not found');
