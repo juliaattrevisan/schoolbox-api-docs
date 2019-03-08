@@ -28,14 +28,11 @@ class Module extends BaseModule
     public function registerRoutes()
     {
         $preloadFolder = function ($params) {
-            if(null !== $params['folderId']){
-                try{
-                    return ['folder' => $this->getFolderMapper()->findById($params['folderId'])];
-                } catch (Mapper\Exception $e){
-                    throw new NotFound("No folder found for id: {$params['folderId']}");
-                }
+            try{
+                return ['folder' => $this->getFolderMapper()->findById($params['folderId'])];
+            } catch (Mapper\Exception $e){
+                throw new NotFound("No folder found for id: {$params['folderId']}");
             }
-            return [];
         };
 
         // Page should be visible to:
