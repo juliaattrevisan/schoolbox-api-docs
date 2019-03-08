@@ -26,13 +26,32 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@rubricMarkbook/markbookOuter.twig',
-                $this->generateMockData()
+                [
+                    'students' => $this->generateMockMarksPerStudent(),
+                    'assessments' => $this->generateMockAssessments()
+                ]
             )->setTab('submission')->setTitle('Rubric Markbook for ' . $folder->getName())
         );
     }
 
-    private function generateMockData() : array
+    private function generateMockAssessments() : array
     {
+        return [
+            0 => [
+                'name' => 'Assessment 1 - marking capabilities only',
+            ],
+            1 => [
+                'name' => 'Assessment 2 - marking indicators only',
+            ],
+            2 => [
+                'name' => 'Assessment 3 - marking both',
+            ]
+        ];
+    }
+
+    private function generateMockMarksPerStudent() : array
+    {
+        // TODO sort me alphabetically
         $studentMarks = [
             230 => [
                 'name' => 'David Rhodes',
