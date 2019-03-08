@@ -217,10 +217,11 @@ class Leave_Controller extends Controller
                 } else {
                     $totalPending++;
                 }
-                if ($request->getStart()->getDatabaseDate() == $today->getDatabaseDate()) {
+
+                if ($request->isApproved() && \Alaress_Date_Format::newLocal($request->getStart()) >= $today) {
                     $leavingToday++;
                 }
-                if ($request->getFinish()->getDatabaseDate() == $today->getDatabaseDate()) {
+                if ($request->isApproved() && \Alaress_Date_Format::newLocal($request->getFinish()) >= $today) {
                     $returningToday++;
                 }
             }
