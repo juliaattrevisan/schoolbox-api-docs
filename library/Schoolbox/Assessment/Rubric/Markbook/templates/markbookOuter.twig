@@ -73,7 +73,7 @@
                                     {% if indicator.maxMark and indicator.normalisedMark %}
                                         {% set indicatorMark = indicator.normalisedMark ~ '/' ~ indicator.maxMark %}
                                     {% endif %}
-                                    <td>
+                                    <td title="{{ indicator.selectedDescriptorText }}">
                                         {{ indicatorMark }}
                                     </td>
                                 {% endfor %}

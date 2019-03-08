@@ -159,13 +159,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => null,
                                     'normalisedMark' => null,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => null,
                                     'normalisedMark' => null,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
@@ -178,13 +178,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => null,
                                     'normalisedMark' => null,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => null,
                                     'normalisedMark' => null,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ]
@@ -203,13 +203,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => 5,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => 10,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
@@ -222,13 +222,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => 5,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => 10,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ]
@@ -247,13 +247,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => 5,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => 10,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
@@ -266,13 +266,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => 5,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => 10,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ]
@@ -294,13 +294,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => null,
                                     'normalisedMark' => null,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => null,
                                     'normalisedMark' => null,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
@@ -313,13 +313,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => null,
                                     'normalisedMark' => null,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => null,
                                     'normalisedMark' => null,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ]
@@ -338,13 +338,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => 5,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => 10,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
@@ -357,13 +357,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => 5,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => 10,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ]
@@ -382,13 +382,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => 5,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => 10,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
@@ -401,13 +401,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => 5,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => 10,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ]
@@ -429,13 +429,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => null,
                                     'normalisedMark' => null,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => null,
                                     'normalisedMark' => null,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
@@ -448,13 +448,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => null,
                                     'normalisedMark' => null,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => null,
                                     'normalisedMark' => null,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ]
@@ -473,13 +473,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => 5,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => 10,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
@@ -492,13 +492,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => 5,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => 10,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ]
@@ -517,13 +517,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => 5,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => 10,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
@@ -536,13 +536,13 @@ class Controller extends Base
                                     'name' => 'Indicator 1',
                                     'maxMark' => 5,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 1'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
                                     'name' => 'Indicator 2',
                                     'maxMark' => 10,
                                     'normalisedMark' => 5,
-                                    'selectedDescriptorContents' => 'I am some descriptor text for Indicator 2'
+                                    'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ]
