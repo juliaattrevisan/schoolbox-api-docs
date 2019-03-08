@@ -28,7 +28,8 @@ class Controller extends Base
                 '@rubricMarkbook/markbookOuter.twig',
                 [
                     'students' => $this->generateMockMarksPerStudent(),
-                    'assessments' => $this->generateMockAssessments()
+                    'assessments' => $this->generateMockAssessments(),
+                    'folder' => $folder
                 ]
             )->setTab('submission')->setTitle('Rubric Markbook for ' . $folder->getName())
         );
