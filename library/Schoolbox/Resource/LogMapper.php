@@ -125,9 +125,9 @@ class LogMapper extends Mapper {
 
 		$stmt = $this->database->prepare
 		("
-			(SELECT `date` occurred, login, ip, title, firstname, lastname FROM login_log LEFT JOIN `user` ON `user`.`id`=login_log.uid ORDER BY DATE DESC LIMIT 0,40)
+			(SELECT `date` occurred, login, ip, title, firstname, lastname FROM login_log LEFT JOIN `user` ON `user`.`username`=login_log.username AND `user`.`deleted_at` IS NULL ORDER BY DATE DESC LIMIT 0,40)
 			UNION
-			(SELECT `time` occurred, `action`, object, title, firstname, lastname FROM cmsLog LEFT JOIN `user` ON `user`.id=`cmsLog`.`user` ORDER BY `time` DESC LIMIT 0,40)
+			(SELECT `time` occurred, `action`, object, title, firstname, lastname FROM cmsLog LEFT JOIN `user` ON `user`.id=`cmsLog`.`user` AND `user`.`deleted_at` IS NULL ORDER BY `time` DESC LIMIT 0,40)
 			ORDER BY occurred DESC LIMIT 0,{$limit}
 		");
 
