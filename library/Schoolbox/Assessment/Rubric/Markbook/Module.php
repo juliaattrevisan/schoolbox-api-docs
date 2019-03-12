@@ -27,9 +27,9 @@ class Module extends BaseModule
      * @throws \InvalidArgumentException
      * @throws NotFound If a class was specified but it does not exist
      */
-    public function registerRoutes()
+    public function registerRoutes() : void
     {
-        $preloadFolder = function ($params) {
+        $preloadFolder = function (array $params) {
             try {
                 return ['folder' => $this->getMapperFactory()->get(Folder\Mapper::class)->findById($params['folderId'])];
             } catch (Mapper\Exception $e) {
@@ -66,7 +66,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector) : void
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
@@ -74,7 +74,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initTemplatePaths(IChainLoader $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader) : void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
