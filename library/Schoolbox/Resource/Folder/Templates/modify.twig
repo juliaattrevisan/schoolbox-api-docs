@@ -51,7 +51,7 @@
                 },
             },
             submitHandler: function(form) {
-                $(form).find("input[type='submit']").attr("disabled", true);
+                $(form).find("input[type='submit']").prop('disabled', true);
 
                 var hasDefaultPerms = $("input[name='group[{{ user.getRole().getId() }}]']:checked").val();
                 var individualPerms = $('input[name=groupcheck]').is(':checked');
@@ -63,7 +63,7 @@
                         },
                         cancelEvent: function() {
                             // Allow user to resubmit the form if they cancel out of the dialog
-                            $(form).find("input[type='submit']").removeAttr("disabled");
+                            $(form).find("input[type='submit']").prop('disabled', false);
                         }
                     });
                 } else {

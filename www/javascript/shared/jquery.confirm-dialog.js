@@ -124,7 +124,7 @@
         modal
             .foundation('reveal', 'reflow')
             .foundation('reveal', 'open')
-            .on('close.fndtn.reveal', function() {
+            .on('close.fndtn.reveal.cancel', function() {
                 settings.cancelEvent(element);
             });
     }
