@@ -297,7 +297,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	 * Only show the most recent fortnight's worth of requests
 	 *
 	 * @param $houseId
-	 * @return \Schoolbox\Collection
+	 * @return \Schoolbox\Collection|Leave_Request[]
 	 */
 	public function findAllByHouseId($houseId) {
 
