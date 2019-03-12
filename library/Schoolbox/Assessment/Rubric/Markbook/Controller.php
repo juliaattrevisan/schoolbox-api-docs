@@ -8,10 +8,27 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Resource\Folder;
 
 class Controller extends Base
 {
+
+    /**
+     * @var IConnector
+     */
+    private $database;
+
+    /**
+     * Constructor
+     *
+     * @param IConnector $database
+     */
+    public function __construct(IConnector $database)
+    {
+        $this->database = $database;
+    }
+
     /**
      * Displays a list of rubric marks for students in the specified class
      *
@@ -22,6 +39,8 @@ class Controller extends Base
      */
     public function getMarkbook(Folder\Model $folder): void
     {
+        $this->getRawMarkbookData($folder->getId());
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@rubricMarkbook/markbookOuter.twig',
@@ -407,6 +426,33 @@ class Controller extends Base
         ];
 
         return $studentMarks;
+    }
+
+    private function getRawMarkbookData(int $folderId) : array
+    {
+        $data = [];
+        $getAllAssessmentsInFolderQuery = $this->database->prepareQuery("SELECT var.assessment_id,
+                    vrm.student_id,
+                    vrm.capability_id,
+                    vrm.capability_name,
+                    vrm.capability_mark,
+                    vrm.indicator_id,
+                    vrm.indicator_name,
+                    vrm.indicator_mark,
+                    vrm.descriptor_id,
+                    vrm.descriptor_name,
+                    vrm.descriptor_max_value
+                    FROM       v_rubric_mark vrm
+                    INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
+                    INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id
+                    WHERE      var.folder_id=:folderId and vrm.feedback_type='instructor'");
+
+        $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
+
+        foreach ($getAllAssessmentsInFolderQuery->getIterator() as $i => $row) {
+            var_dump($row);
+        }
+        return $data;
     }
 
 }

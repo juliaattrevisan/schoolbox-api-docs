@@ -17,6 +17,8 @@ use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
+use Aura\Di\Container;
+use InvalidArgumentException;
 
 class Module extends BaseModule
 {
@@ -64,6 +66,17 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector) : void
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+    }
+
+    /**
+     * @param Container|ContainerInterface $injector The dependency injection container.
+     * @throws InvalidArgumentException
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector): void
+    {
+        $injector->params[Controller::class] = [
+            'database' => $injector->lazyGet('databaseInternal'),
+        ];
     }
 
     /**
