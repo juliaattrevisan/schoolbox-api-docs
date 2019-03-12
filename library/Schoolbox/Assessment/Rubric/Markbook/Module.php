@@ -31,7 +31,7 @@ class Module extends BaseModule
     {
         $preloadFolder = function ($params) {
             try {
-                return ['folder' => $this->getFolderMapper()->findById($params['folderId'])];
+                return ['folder' => $this->getMapperFactory()->get(Folder\Mapper::class)->findById($params['folderId'])];
             } catch (Mapper\Exception $e) {
                 throw new NotFound("No folder found for id: {$params['folderId']}");
             }
@@ -77,15 +77,5 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-
-    /**
-     * @return Mapper|Folder\Mapper
-     * @throws \InvalidArgumentException If class not found
-     */
-    private function getFolderMapper()
-    {
-        return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
 }
