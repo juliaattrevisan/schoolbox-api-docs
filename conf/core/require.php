@@ -23,5 +23,5 @@ require_once __DIR__ . '/../../library/Autoloader.php';
 Autoloader::initialise();
 
 // Global functions and constants
-require_once SITE_root . '/www/include/stdfuncs.php';
-require_once SITE_root . '/library/constants.php';
+require_once __DIR__ . '/../../www/include/stdfuncs.php';
+require_once __DIR__ . '/../../library/constants.php';
