@@ -12,7 +12,6 @@
 use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Application\Daemon\App;
 use Schoolbox\Application\Daemon;
 
 echo "[".date('Y-m-d H:i:s')."] Running sync script\n";
@@ -25,7 +24,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$app = new class extends App{
+$app = new class extends Daemon\App{
     /**
      * @inheritdoc
      */
