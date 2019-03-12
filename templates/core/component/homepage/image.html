@@ -43,14 +43,10 @@
                             addedfile: function (file) {
                             },
                             sending: function (file, xhr, formData) {
-                                $(file.previewElement)
-                                        .addClass('category-{ID}')
-                                        .data('node', {ID});
-
                                 $('#empty-state{COMPONENT_INSTANCE_ID}').hide();
 
                                 formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                formData.append('category', $(file.previewElement).data('node'));
+                                formData.append('category', {ID});
                                 formData.append('comment', '');
                                 formData.append('hidden', 0);
                             },
@@ -131,17 +127,11 @@
                         acceptedFiles: 'image/*',
                         refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                         refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
-                        addedfile: function (file) {
-                        },
                         sending: function (file, xhr, formData) {
-                            $(file.previewElement)
-                                .addClass('category-{ID}')
-                                .data('node', {ID});
-
                             $('#img{COMPONENT_INSTANCE_ID}').remove();
 
                             formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                            formData.append('category', $(file.previewElement).data('node'));
+                            formData.append('category', {ID});
                             formData.append('comment', '');
                             formData.append('hidden', 0);
                         },
