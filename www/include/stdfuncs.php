@@ -27,20 +27,6 @@ function error($ec, $message="", $code = 400)
 }
 
 /**
- * Uses superglobals to ascertain whether or not a file was attempted upload, but failed
- * @deprecated 17.5
- * 
- * @return bool
- */
-function upload_failed() {
-    return $_SERVER['REQUEST_METHOD'] == 'POST'
-        && $_SERVER['CONTENT_LENGTH'] > 0
-        && empty($_POST)
-        && empty($_FILES);
-}
-
-
-/**
  * An HTTP-sensitive way to send a plaintext failure response.
  * @deprecated 17.5
  *
