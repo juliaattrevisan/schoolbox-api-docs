@@ -30,9 +30,9 @@ class Module extends BaseModule
     public function registerRoutes()
     {
         $preloadFolder = function ($params) {
-            try{
+            try {
                 return ['folder' => $this->getFolderMapper()->findById($params['folderId'])];
-            } catch (Mapper\Exception $e){
+            } catch (Mapper\Exception $e) {
                 throw new NotFound("No folder found for id: {$params['folderId']}");
             }
         };
@@ -59,7 +59,7 @@ class Module extends BaseModule
             )
         );
 
-        $this->register('GET',  '/{folderId:\d+}', 'getMarkbook', $canViewPage, $preloadFolder);
+        $this->register('GET', '/{folderId:\d+}', 'getMarkbook', $canViewPage, $preloadFolder);
     }
 
 
