@@ -29,7 +29,7 @@ $app = new class extends App{
     /**
      * @inheritdoc
      */
-    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $options, array $flags): void
+    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $options, string $flags): void
     {
         if (!Cfg::get('external_sync_data')) {
             die("Data synchronisation is not enabled.\n");

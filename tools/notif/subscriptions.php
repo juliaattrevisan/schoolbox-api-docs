@@ -66,7 +66,7 @@ try {
         /**
          * @inheritdoc
          */
-        public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags): void
+        public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
         {
             $this->log   = $log;
             $this->redis = $di->get('redis');

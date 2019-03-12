@@ -394,7 +394,7 @@ EOL;
      */
     public function getLoggingLevel()
     {
-        $v = $this->opts[self::OPT_VERBOSITY] ?? null;
+        $v = $this->getOpt(self::OPT_VERBOSITY);
 
         $threshold = 0;
         if (isset($v)) {
@@ -421,7 +421,7 @@ EOL;
     {
         if (!$this->log instanceof LoggerInterface) {
             // Derive log verbosity
-            $level = $this->opts[self::OPTION_LEVEL] ?? $this->getLoggingLevel();
+            $level = $this->getOpt(self::OPTION_LEVEL) ?? $this->getLoggingLevel();
 
             // Derive the list of fields to prepend to log items
             $fields = Logger::getAvailableFields();

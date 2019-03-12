@@ -366,13 +366,9 @@ $kernel->run(new class extends App
      * for commit (if `--perform` is on) or rollback (if it's off, or an error
      * is raised).
      *
-     * @param Di\Container  $di
-     * @param LoopInterface $loop
-     * @param Logger        $log
-     * @param array         $opts
-     * @param array         $flags
+     * @inheritdoc
      */
-    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, array $flags): void
+    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void
     {
         // Install logger and DB
         $this->log     = $log;

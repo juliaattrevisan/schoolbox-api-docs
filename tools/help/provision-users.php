@@ -112,14 +112,14 @@ $kernel->run(new class extends App {
      * @param LoopInterface $loop
      * @param Logger        $log
      * @param array         $opts
-     * @param array         $flags
+     * @param string        $flags
      * @throws Di\Exception\ServiceNotFound
      * @throws RuntimeException
      * @return void
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, array $flags): void
+    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void
     {
         $this->setup($di, $log, $opts);
 

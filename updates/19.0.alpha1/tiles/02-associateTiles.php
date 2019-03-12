@@ -138,13 +138,9 @@ $app = new class extends App
     /**
      * Run the app.
      *
-     * @param Di\Container    $di
-     * @param LoopInterface   $loop
-     * @param LoggerInterface $log
-     * @param array           $opts
-     * @param array           $flags
+     * @inheritdoc
      */
-    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags): void
+    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
     {
         $this->log                           = $log;
         $this->db                            = $di->get('databaseInternal');

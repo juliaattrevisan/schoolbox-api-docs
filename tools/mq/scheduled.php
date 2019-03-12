@@ -47,7 +47,7 @@ $kernel->registerCustomShutdown(function() use (&$sched) {
 });
 
 // CREATE SCHEDULER APP
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags) use (&$scheduler) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use (&$scheduler) {
 
     /** @var Notif $notif */
     $notif = $di->get('notif');

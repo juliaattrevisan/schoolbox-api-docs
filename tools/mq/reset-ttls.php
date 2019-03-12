@@ -34,14 +34,9 @@ try {
         private const NOT_EXIST  = 'DOES NOT EXIST';
 
         /**
-         * @param Di\Container  $di
-         * @param LoopInterface $loop
-         * @param Logger        $log
-         * @param array         $opts
-         * @param array         $flags
-         * @return void
+         * @inheritdoc
          */
-        public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, array $flags): void
+        public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void
         {
             /** @var ClientInterface $redis */
             $redis = $di->get('redis');

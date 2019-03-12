@@ -43,16 +43,11 @@ $backfiller = new class extends App
 
 
     /**
-     * @param Di\Container    $di
-     * @param LoopInterface   $loop
-     * @param LoggerInterface $log
-     * @param array           $opts
-     * @param array           $flags
-     * @return void
+     * @inheritdoc
      * @throws Di\Exception\ServiceNotFound
      * @throws PDOException
      */
-    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags): void
+    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
     {
         $this->log      = $log;
         $this->database = $di->get('databaseInternal');

@@ -20,10 +20,10 @@ abstract class App
      * @param LoopInterface $loop
      * @param Logger        $log
      * @param array         $opts
-     * @param array         $flags
+     * @param string        $flags Space-separated list of command line options that were passed to the php script that invoked this app
      * @return void
      */
-    abstract public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, array $flags): void;
+    abstract public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void;
 
 
     /**

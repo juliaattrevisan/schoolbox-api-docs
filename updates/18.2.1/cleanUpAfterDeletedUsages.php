@@ -144,13 +144,9 @@ $kernel->run(new class extends App
      * Install all instance vars, and wraps the repair process in a transaction
      * for commit, or rollback (if an error is raised).
      *
-     * @param Di\Container  $di
-     * @param LoopInterface $loop
-     * @param Logger        $log
-     * @param array         $opts
-     * @param array         $flags
+     * @inheritdoc
      */
-    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, array $flags): void
+    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void
     {
         // Install logger and DB
         $this->log     = $log;

@@ -34,16 +34,9 @@ $reQueue = new class() extends App
 {
 
     /**
-     * Quasi-constructor and execution entry-point
-     *
-     * @param Di\Container    $di
-     * @param LoopInterface   $loop
-     * @param LoggerInterface $log
-     * @param array           $opts
-     * @param array           $flags
-     * @return void
+     * @inheritdoc
      */
-    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags): void
+    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
     {
         /**
          * @var MapperFactory  $mapperFactory

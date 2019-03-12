@@ -36,7 +36,7 @@ $kernel = new Daemon\Kernel(
 );
 
 // CREATE DIGEST APP
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
 
     $instance      = INSTANCE_ID;
     $topic         = "digestd.$instance.*";
