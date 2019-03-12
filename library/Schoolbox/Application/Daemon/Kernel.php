@@ -28,9 +28,11 @@ use React\Stomp;
 class Kernel extends \Alaress\Application\Kernel
 {
     // Construction options
-    public const OPT_ERRORS = 'errors';
-    public const OPT_VERBOSE = 'verbose';
-    public const OPT_LEVEL = 'level';
+    public const OPT_ERRORS = 'errors';   // What level of PHP errors should be reported?
+    public const OPT_VERBOSE = 'verbose'; // What log verbosity should be reported?
+    public const OPT_LEVEL = 'level';     // What level of logs should be reported?
+    public const OPT_FIELDS = 'fields';   // What extra fields should be prepended to each log entry?
+    public const OPT_PORCELAIN = 'porcelain';   // Should log items be formatted for text file rather than TTL?
 
     const RLIMIT_CORE_FILESIZE = 'core';
     const RLIMIT_CPU_TIME = 'cpu';
@@ -408,8 +410,8 @@ EOL;
         if (!$this->log instanceof LoggerInterface) {
             // if verbose output is on
             $level     = $this->getOpt(self::OPT_LEVEL);
-            $fields    = $this->getOpt(Logger::LOG_FIELDS) ?: [];
-            $porcelain = \in_array(Logger::FIELD_PORCELAIN, $fields, true);
+            $fields    = $this->getOpt(self::OPT_FIELDS);
+            $porcelain = \array_key_exists(self::OPT_PORCELAIN, $this->opts);
             $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
             // Add Sentry handler into logging system if possible
