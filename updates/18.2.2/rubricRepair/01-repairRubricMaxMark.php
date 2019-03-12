@@ -36,7 +36,14 @@ $kernel->run(new class extends App
 {
     private const INDENT = '  ';
 
-    private const FIND_INCONSISTENT_MAX_MARKS_QUERY = "
+    private const COUNT_POSSIBLY_INCONSISTENT_DUE_WORKS_QUERY = "
+        SELECT COUNT(*)
+        FROM submission_box sb
+        WHERE sb.use_rubric IS TRUE
+        AND   sb.mark_type  != 6 # Mark type none
+    ";
+
+    private const FIND_INCONSISTENT_DUE_WORKS_QUERY = "
         SELECT
             sb.assessment_id,
             sb.max_mark            AS actual_max_mark,
@@ -57,7 +64,7 @@ $kernel->run(new class extends App
 
         WHERE sb.use_rubric         IS TRUE
         AND   sb.rubric_group_marks IS FALSE
-        AND   sb.mark_type          != 6 # Mark type: none
+        AND   sb.mark_type          != 6 # Mark type none
         GROUP BY sb.assessment_id
         HAVING actual_max_mark != expected_max_mark
 
@@ -72,7 +79,7 @@ $kernel->run(new class extends App
         WHERE sb.use_rubric         IS TRUE
         AND   sb.rubric_group_marks IS TRUE
         AND   rg.deleted_at         IS NULL
-        AND   sb.mark_type          != 6 # Mark type: none
+        AND   sb.mark_type          != 6 # Mark type none
         GROUP BY sb.assessment_id
         HAVING actual_max_mark != expected_max_mark
 
@@ -128,15 +135,22 @@ $kernel->run(new class extends App
         $updateBodyQuery = $this->db->prepareQuery(self::UPDATE_RUBRIC_MAX_MARK_QUERY);
 
 
-        // Find the list of migrated articles
+        // Find the list of inconsistent due works
         $this->db->beginTransaction();
-        $inconsistentDueWorks = $this->db->executeQuery(self::FIND_INCONSISTENT_MAX_MARKS_QUERY);
-        $this->log->notice(sprintf('%d assessments with inconsistent max marks found', $inconsistentDueWorks->rowCount()));
+        $inconsistentDueWorks = $this->db->executeQuery(self::FIND_INCONSISTENT_DUE_WORKS_QUERY);
+        $allDueWorksCount     = $this->db->executeQuery(self::COUNT_POSSIBLY_INCONSISTENT_DUE_WORKS_QUERY)->fetchColumn();
+        $this->log->notice(
+            sprintf(
+                '%d due works with inconsistent max marks found, out of %d',
+                $inconsistentDueWorks->rowCount(),
+                $allDueWorksCount
+            )
+        );
         foreach ($inconsistentDueWorks->getIterator() as $row) {
             $expectedMaxMark = $row['expected_max_mark'];
             $actualMaxMark   = $row['actual_max_mark'];
             $assessmentId    = $row['assessment_id'];
-            $this->log->notice(sprintf('Updating assessment #%d',$assessmentId));
+            $this->log->notice(sprintf('Updating due work #%d', $assessmentId));
             $this->log->notice(self::indent(1).sprintf('Expected: %12.2f', $expectedMaxMark));
             $this->log->notice(self::indent(1).sprintf('Actual:   %12.2f', $actualMaxMark));
             $updateBodyQuery->execute([
