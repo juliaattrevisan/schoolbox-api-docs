@@ -67,13 +67,9 @@
                             </th>
 
                             {% for student in students %}
-                                {% set capabilityMarkData = student[assessmentId].capabilities[capabilityId] %}
-                                {% set capabilityMark = '-' %}
-                                {% if capability.maxMark and capabilityMarkData.normalisedMark %}
-                                    {% set capabilityMark = capabilityMarkData.normalisedMark ~ '/' ~ capability.maxMark %}
-                                {% endif %}
+                                {% set capabilityMark = student[assessmentId].capabilities[capabilityId].mark %}
                                 <td>
-                                    {{ capabilityMark }}
+                                    {{ capabilityMark|default('-') }}
                                 </td>
                             {% endfor %}
                         </tr>
@@ -86,13 +82,10 @@
                                 </th>
 
                                 {% for student in students %}
-                                    {% set indicatorMarkData = student[assessmentId].capabilities[capabilityId].indicators[indicatorId] %}
-                                    {% set indicatorMark = '-' %}
-                                    {% if indicator.maxMark and indicatorMarkData.normalisedMark %}
-                                        {% set indicatorMark = indicatorMarkData.normalisedMark ~ '/' ~ indicator.maxMark %}
-                                    {% endif %}
-                                    <td title="{{ indicatorMarkData.selectedDescriptorText }}">
-                                        {{ indicatorMark }}
+                                    {% set indicatorMark = student[assessmentId].capabilities[capabilityId].indicators[indicatorId].mark %}
+                                    {% set descriptorText = student[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
+                                    <td title="{{ descriptorText|default('-No descriptor text-') }}">
+                                        {{ indicatorMark|default('-') }}
                                     </td>
                                 {% endfor %}
                             </tr>

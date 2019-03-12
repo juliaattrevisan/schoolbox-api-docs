@@ -40,33 +40,26 @@ class Controller extends Base
         return [
             0 => [
                 'name' => 'Assessment 1 - marking capabilities only',
-                'markScheme' => 1,
                 'capabilities' => [
                     0 => [
                         'name' => 'Capability A',
-                        'maxMark' => 15,
                         'indicators' => [
                             0 => [
                                 'name' => 'Indicator 1',
-                                'maxMark' => null,
                             ],
                             1 => [
                                 'name' => 'Indicator 2',
-                                'maxMark' => null,
                             ],
                         ]
                     ],
                     1 => [
                         'name' => 'Capability B',
-                        'maxMark' => 15,
                         'indicators' => [
                             0 => [
                                 'name' => 'Indicator 1',
-                                'maxMark' => null,
                             ],
                             1 => [
                                 'name' => 'Indicator 2',
-                                'maxMark' => null,
                             ],
                         ]
                     ]
@@ -74,33 +67,26 @@ class Controller extends Base
             ],
             1 => [
                 'name' => 'Assessment 2 - marking indicators only',
-                'markScheme' => 2,
                 'capabilities' => [
                     0 => [
                         'name' => 'Capability A',
-                        'maxMark' => null,
                         'indicators' => [
                             0 => [
                                 'name' => 'Indicator 1',
-                                'maxMark' => 5,
                             ],
                             1 => [
                                 'name' => 'Indicator 2',
-                                'maxMark' => 10,
                             ],
                         ]
                     ],
                     1 => [
                         'name' => 'Capability B',
-                        'maxMark' => null,
                         'indicators' => [
                             0 => [
                                 'name' => 'Indicator 1',
-                                'maxMark' => 5,
                             ],
                             1 => [
                                 'name' => 'Indicator 2',
-                                'maxMark' => 10,
                             ],
                         ]
                     ]
@@ -108,33 +94,26 @@ class Controller extends Base
             ],
             2 => [
                 'name' => 'Assessment 3 - marking both',
-                'markScheme' => 3,
                 'capabilities' => [
                     0 => [
                         'name' => 'Capability A',
-                        'maxMark' => 15,
                         'indicators' => [
                             0 => [
                                 'name' => 'Indicator 1',
-                                'maxMark' => 5,
                             ],
                             1 => [
                                 'name' => 'Indicator 2',
-                                'maxMark' => 10,
                             ],
                         ]
                     ],
                     1 => [
                         'name' => 'Capability B',
-                        'maxMark' => 15,
                         'indicators' => [
                             0 => [
                                 'name' => 'Indicator 1',
-                                'maxMark' => 5,
                             ],
                             1 => [
                                 'name' => 'Indicator 2',
-                                'maxMark' => 10,
                             ],
                         ]
                     ]
@@ -152,27 +131,27 @@ class Controller extends Base
                 0 => [
                     'capabilities' => [
                         0 => [
-                            'normalisedMark' => 10,
+                            'mark' => '10/10',
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => null,
+                                    'mark' => null,
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => null,
+                                    'mark' => null,
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
                         1 => [
-                            'normalisedMark' => 10,
+                            'mark' => '10/15',
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => null,
+                                    'mark' => null,
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => null,
+                                    'mark' => null,
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
@@ -182,14 +161,14 @@ class Controller extends Base
                 1 => [
                     'capabilities' => [
                         0 => [
-                            'normalisedMark' => null,
+                            'mark' => null,
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => 'A+',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => 'B+',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
@@ -198,11 +177,11 @@ class Controller extends Base
                             'normalisedMark' => null,
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => 'D',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => 'C-',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
@@ -212,27 +191,27 @@ class Controller extends Base
                 2 => [
                     'capabilities' => [
                         0 => [
-                            'normalisedMark' => 10,
+                            'mark' => '95%',
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '100%',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '100%',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
                         1 => [
-                            'normalisedMark' => 10,
+                            'mark' => '55%',
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '50%',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '60%',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
@@ -245,27 +224,27 @@ class Controller extends Base
                 0 => [
                     'capabilities' => [
                         0 => [
-                            'normalisedMark' => 10,
+                            'mark' => '7/10',
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => null,
+                                    'mark' => null,
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => null,
+                                    'mark' => null,
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
                         1 => [
-                            'normalisedMark' => 10,
+                            'mark' => '5/15',
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => null,
+                                    'mark' => null,
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => null,
+                                    'mark' => null,
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
@@ -275,27 +254,27 @@ class Controller extends Base
                 1 => [
                     'capabilities' => [
                         0 => [
-                            'normalisedMark' => null,
+                            'mark' => null,
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '5/15',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '5/5',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
                         1 => [
-                            'normalisedMark' => null,
+                            'mark' => null,
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '8/10',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '4/10',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
@@ -305,27 +284,27 @@ class Controller extends Base
                 2 => [
                     'capabilities' => [
                         0 => [
-                            'normalisedMark' => 10,
+                            'mark' => '50%',
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '4/8',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '4/8',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
                         1 => [
-                            'normalisedMark' => 10,
+                            'mark' => '100%',
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '8/8',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '8/8',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
@@ -338,27 +317,27 @@ class Controller extends Base
                 0 => [
                     'capabilities' => [
                         0 => [
-                            'normalisedMark' => 10,
+                            'mark' => '5/10',
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => null,
+                                    'mark' => null,
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => null,
+                                    'mark' => null,
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
                         1 => [
-                            'normalisedMark' => 10,
+                            'mark' => '10/15',
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => null,
+                                    'mark' => null,
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => null,
+                                    'mark' => null,
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
@@ -368,27 +347,27 @@ class Controller extends Base
                 1 => [
                     'capabilities' => [
                         0 => [
-                            'normalisedMark' => null,
+                            'mark' => null,
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '8/8',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '5/8',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
                         1 => [
-                            'normalisedMark' => null,
+                            'mark' => null,
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '1/8',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => '2/8',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
@@ -398,27 +377,27 @@ class Controller extends Base
                 2 => [
                     'capabilities' => [
                         0 => [
-                            'normalisedMark' => 10,
+                            'mark' => 'A+',
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => 'A+',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => 'A+',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
                         ],
                         1 => [
-                            'normalisedMark' => 10,
+                            'mark' => 'C',
                             'indicators' => [
                                 0 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => 'B',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 1'
                                 ],
                                 1 => [
-                                    'normalisedMark' => 5,
+                                    'mark' => 'D',
                                     'selectedDescriptorText' => 'I am some descriptor text for Indicator 2'
                                 ],
                             ]
