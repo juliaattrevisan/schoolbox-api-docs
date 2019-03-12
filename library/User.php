@@ -259,6 +259,18 @@ class User extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
+
+    /**
+     * Search for exact matches, e.g. "zane" rather than LIKE
+     *
+     * @param        $keyword
+     * @param int    $offset
+     * @param int    $limit
+     * @param null   $count
+     * @param string $sort_by
+     * @param string $sort_dir
+     * @return array|bool
+     */
     public function searchExact(
         $keyword,
         $offset = 0,
