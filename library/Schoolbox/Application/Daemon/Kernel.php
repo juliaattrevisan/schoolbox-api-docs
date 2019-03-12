@@ -58,7 +58,7 @@ class Kernel extends \Alaress\Application\Kernel
      * All command line options relevant to this kernel, app, and logger
      * @var array
      */
-    private $commandLineOpts;
+    private $opts;
 
     /** @var LoggerInterface */
     protected $log;
@@ -122,9 +122,9 @@ class Kernel extends \Alaress\Application\Kernel
         $appShortOpts = $options[self::OPTION_APP_SHORT_OPTS] ?? '';
         $appLongOpts  = $options[self::OPTION_APP_LONG_OPTS] ?? [];
 
-        $shortOpts             = $appShortOpts . self::OPT_VERBOSITY;
-        $longOpts              = \array_merge($appLongOpts, [Logger::OPT_PORCELAIN], Logger::getAvailableFields());
-        $this->commandLineOpts = \getopt($shortOpts, $longOpts);
+        $shortOpts  = $appShortOpts . self::OPT_VERBOSITY;
+        $longOpts   = \array_merge($appLongOpts, [Logger::OPT_PORCELAIN], Logger::getAvailableFields());
+        $this->opts = \getopt($shortOpts, $longOpts);
     }
 
     /**
@@ -133,7 +133,7 @@ class Kernel extends \Alaress\Application\Kernel
      */
     public function getOpt($name)
     {
-        return isset($this->commandLineOpts[$name]) ? $this->commandLineOpts[$name] : null;
+        return isset($this->opts[$name]) ? $this->opts[$name] : null;
     }
 
 
@@ -186,7 +186,7 @@ EOL;
         try {
             global $argv;
             $flags = implode(' ', array_slice($argv, 1));
-            $callable($this->di, $this->loop, $this->logger(), $this->commandLineOpts, $flags);
+            $callable($this->di, $this->loop, $this->logger(), $this->opts, $flags);
         } catch (\Schoolbox\External\Exception $e) {
             $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
             throw $e;
@@ -394,7 +394,7 @@ EOL;
      */
     public function getLoggingLevel()
     {
-        $v = $this->commandLineOpts[self::OPT_VERBOSITY] ?? null;
+        $v = $this->opts[self::OPT_VERBOSITY] ?? null;
 
         $threshold = 0;
         if (isset($v)) {
@@ -421,7 +421,7 @@ EOL;
     {
         if (!$this->log instanceof LoggerInterface) {
             // Derive log verbosity
-            $level = $this->commandLineOpts[self::OPTION_LEVEL] ?? $this->getLoggingLevel();
+            $level = $this->opts[self::OPTION_LEVEL] ?? $this->getLoggingLevel();
 
             // Derive the list of fields to prepend to log items
             $fields = Logger::getAvailableFields();
@@ -431,7 +431,7 @@ EOL;
                 }
             }
 
-            $porcelain = \array_key_exists(Logger::OPT_PORCELAIN, $this->commandLineOpts);
+            $porcelain = \array_key_exists(Logger::OPT_PORCELAIN, $this->opts);
             $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
             // Add Sentry handler into logging system if possible

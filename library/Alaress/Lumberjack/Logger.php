@@ -22,10 +22,10 @@ use Psr\Log\LoggerInterface;
 class Logger implements LoggerInterface {
 
     // Command line options
-    public const OPT_PORCELAIN      = 'porcelain';  // Should log items be formatted for text file rather than TTL?
-    public const OPT_FIELD_MEM      = 'mem';        // Prepend a memory usage field to each log item
-    public const OPT_FIELD_TRUE_MEM = 'truemem';    // Prepend a true memory usage field to each log item
-    public const OPT_FIELD_PID      = 'pid';        // Prepend a PID field to each log item
+    public const OPT_PORCELAIN  = 'porcelain';  // Should log items be formatted for text file rather than TTL?
+    public const FIELD_MEM      = 'mem';        // Prepend a memory usage field to each log item
+    public const FIELD_TRUE_MEM = 'truemem';    // Prepend a true memory usage field to each log item
+    public const FIELD_PID      = 'pid';        // Prepend a PID field to each log item
 
 
     /**
@@ -36,9 +36,9 @@ class Logger implements LoggerInterface {
     public static function getAvailableFields(): array
     {
         return [
-            self::OPT_FIELD_PID,
-            self::OPT_FIELD_MEM,
-            self::OPT_FIELD_TRUE_MEM,
+            self::FIELD_PID,
+            self::FIELD_MEM,
+            self::FIELD_TRUE_MEM,
         ];
     }
 
@@ -75,17 +75,17 @@ class Logger implements LoggerInterface {
 
         $processors = array(new MicrotimeProcessor());
 
-        if(in_array(self::OPT_FIELD_MEM, $fields)) {
+        if(in_array(self::FIELD_MEM, $fields)) {
             $processors[] = new MemoryUsageProcessor(false);
             $processors[] = new MemoryPeakUsageProcessor(false);
         }
 
-        if(in_array(self::OPT_FIELD_TRUE_MEM, $fields)) {
+        if(in_array(self::FIELD_TRUE_MEM, $fields)) {
             $processors[] = new MemoryUsageProcessor(true);
             $processors[] = new MemoryPeakUsageProcessor(true);
         }
 
-        if(in_array(self::OPT_FIELD_PID, $fields)) {
+        if(in_array(self::FIELD_PID, $fields)) {
             $processors[] = new ProcessIdProcessor();
         }
 

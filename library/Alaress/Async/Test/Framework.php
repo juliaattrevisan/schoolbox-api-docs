@@ -47,7 +47,7 @@ class Framework
      * @param LoggerInterface $log
      * @param string|null     $env
      * @param string|null     $logDir
-     * @param bool|string     $rootDir
+     * @param string          $rootDir
      */
     public function __construct($di, $loop, $log, string $env = null, string $logDir = null, $rootDir = SITE_root)
     {
