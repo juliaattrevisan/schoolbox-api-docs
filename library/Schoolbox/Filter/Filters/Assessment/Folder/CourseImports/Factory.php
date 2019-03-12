@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder\CourseImports;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Filters\Assessment\Folder\KeyConverter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -102,8 +103,8 @@ class Factory extends FolderFilter\Factory
             $extraFolders = $this->getFolderMapper()->findByColumn($this->getFolderMapper()->getIdentifierColumn(), $folderIds);
 
             foreach ($extraFolders as $extraFolder) {
-                // Ensure user has READ perm to the requested folder (this will also be enforced via key-converter)
-                if ($this->getAccess()->getFolderAccess($user, $extraFolder->getId()) >= UserAccess::ACCESS_READ) {
+                // Ensure user is Staff or has WRITE+ perm to the requested folder (this will also be enforced via key-converter)
+                if ($user->getRole()->isStaff() || $this->getAccess()->getFolderAccess($user, $extraFolder->getId()) >= UserAccess::ACCESS_WRITE) {
                     $folders[$extraFolder->getId()] = $extraFolder;
                 }
             }
@@ -181,8 +182,8 @@ class Factory extends FolderFilter\Factory
 
         foreach ($unitImpls as $unitImpl) {
             $folderId = $unitImpl->getFolder()->getId();
-            // Ensure user has READ perm to the requested folder (this will also be enforced via key-converter)
-            if ($this->getAccess()->getFolderAccess($user, $folderId) < UserAccess::ACCESS_READ) {
+            // Ensure user is STAFF or has WRITE perm to the requested folder (this will also be enforced via key-converter)
+            if (!$user->getRole()->isStaff() && $this->getAccess()->getFolderAccess($user, $folderId) < UserAccess::ACCESS_WRITE) {
                 continue;
             }
 
