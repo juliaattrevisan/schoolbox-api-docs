@@ -550,7 +550,10 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 				((SELECT COUNT(*) FROM `user` WHERE `user`.residential_house_id = houseId AND `user`.deleted_at IS NULL) - COALESCE(SUM(leave_request.id AND ((`start` < :dinnerStart) AND (`finish` > :dinnerEnd))),0)) AS present_night
 			FROM luResidentialHouse
 			INNER JOIN `user` ON `user`.residential_house_id = luResidentialHouse.id AND `user`.deleted_at IS NULL
-			LEFT JOIN leave_request ON leave_request.user_id = `user`.id AND leave_request.authorisation_datetime IS NOT NULL AND leave_request.status != :deleted
+            LEFT JOIN leave_request
+                ON leave_request.user_id = `user`.id
+                AND leave_request.authorisation_datetime IS NOT NULL
+                AND leave_request.status NOT IN (:deleted, :rejected)
 			GROUP BY residential_house_id
 			ORDER BY luResidentialHouse.name
 		"
@@ -560,12 +563,12 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 			array(
 				':breakfastStart' => $breakfastStart->getDatabase(),
 				':breakfastEnd' => $breakfastEnd->getDatabase(),
-				':breakfastEnd' => $breakfastEnd->getDatabase(),
 				':lunchStart' => $lunchStart->getDatabase(),
 				':lunchEnd' => $lunchEnd->getDatabase(),
 				':dinnerStart' => $dinnerStart->getDatabase(),
 				':dinnerEnd' => $dinnerEnd->getDatabase(),
-				':deleted' => Leave_Request::STATUS_DELETED,
+                ':deleted' => Leave_Request::STATUS_DELETED,
+                ':rejected' => Leave_Request::STATUS_REJECTED,
 			)
 		);
 
