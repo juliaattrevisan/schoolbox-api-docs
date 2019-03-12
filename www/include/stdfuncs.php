@@ -58,39 +58,6 @@ if(PHP_SAPI !== 'cli') {
     }
 }
 
-if (PHP_SAPI === 'cli') {
-    /**
-     * Convenience helper to get CLI options suitable for the Daemon Kernel which uses the Lumberjack logger
-     *
-     * @param string[] $longOpts
-     * @param string   $shortOpts
-     * @return string[]|bool[]|string[][]|bool[][]
-     * @todo Daemon kernel should know how to read options from command line
-     */
-    function sb_getDaemonOpt(array $longOpts = [], string $shortOpts = ''): array
-    {
-        return \getopt($shortOpts . 'v', \array_merge($longOpts, [Logger::OPT_PORCELAIN], Logger::getAvailableFields()));
-    }
-
-    /**
-     * Uses the set of command line options to return the set of fields to prepend to each log item
-     *
-     * @param array $opts - Indexed by command line option name
-     * @return array
-     * @todo Daemon kernel should know how to read fields from command line
-     */
-    function sb_getDaemonLoggerFields(array $opts): array
-    {
-        $fields = Logger::getAvailableFields();
-        foreach ($fields as $key => $name) {
-            if (!isset($opts[$name])) {
-                unset($fields[$key]);
-            }
-        }
-        return $fields;
-    }
-}
-
 /**
  * @param $camel
  * @param string $delim
