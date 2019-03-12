@@ -27,12 +27,12 @@ use React\Stomp;
 
 class Kernel extends \Alaress\Application\Kernel
 {
-    // Construction options
-    public const OPT_ERRORS = 'errors';   // What level of PHP errors should be reported?
-    public const OPT_VERBOSE = 'verbose'; // What log verbosity should be reported?
-    public const OPT_LEVEL = 'level';     // What level of logs should be reported?
-    public const OPT_FIELDS = 'fields';   // What extra fields should be prepended to each log entry?
-    public const OPT_PORCELAIN = 'porcelain';   // Should log items be formatted for text file rather than TTL?
+    // Command line options for this Daemon kernel
+    public const OPT_ERRORS    = 'errors';    // What level of PHP errors should be reported?
+    public const OPT_VERBOSE   = 'verbose';   // What log verbosity should be reported?
+    public const OPT_LEVEL     = 'level';     // What level of logs should be reported?
+    public const OPT_FIELDS    = 'fields';    // What extra fields should be prepended to each log entry?
+    public const OPT_PORCELAIN = 'porcelain'; // Should log items be formatted for text file rather than TTL?
 
     const RLIMIT_CORE_FILESIZE = 'core';
     const RLIMIT_CPU_TIME = 'cpu';
@@ -67,6 +67,11 @@ class Kernel extends \Alaress\Application\Kernel
 
     /**
      * Initialise
+     *
+     * $opts contains command line options. These may be recognised/used by:
+     * * This Kernel,
+     * * The App run by this Kernel
+     * * The Logger created by this Kernel
      *
      * @param string $name
      * @param array  $opts

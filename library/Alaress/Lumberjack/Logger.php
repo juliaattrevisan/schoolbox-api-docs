@@ -25,15 +25,12 @@ class Logger implements LoggerInterface {
     public const FIELD_MEM       = 'mem';
     public const FIELD_TRUE_MEM  = 'truemem';
     public const FIELD_PID       = 'pid';
-    public const FIELD_LEVEL     = 'level';  // TODO
-    public const FIELD_PORCELAIN = 'porcelain';
 
     /**
      * @return array
      */
     public static function getAvailableFields() {
         return array(
-            self::FIELD_LEVEL,
             self::FIELD_PID,
             self::FIELD_MEM,
             self::FIELD_TRUE_MEM,
