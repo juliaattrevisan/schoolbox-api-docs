@@ -1,5 +1,8 @@
 <?php
 
+use Leave\HostTypeMapper;
+use Schoolbox\UserMapper;
+
 class Leave_RequestMapper extends Schoolbox\Mapper {
 	protected $userMapper;
 	protected $limit = null;
@@ -67,7 +70,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 				'type' => self::TYPE_MODEL,
 				'join' => 'host_type',
 				'join_def' => array(
-					'mapper'    => '\\Leave\\HostTypeMapper',
+					'mapper'    => HostTypeMapper::class,
 					'other_key' => 'id',
 				),
 			)
@@ -206,7 +209,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		$this->hasJoin(
 			'authorisationUser',
 			array(
-				'mapper'    => '\\Schoolbox\\UserMapper',
+				'mapper'    => UserMapper::class,
 				'this_key'  => 'authorisation_user_id',
 				'other_key' => 'id',
 			)
@@ -214,7 +217,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		$this->hasJoin(
 			'user',
 			array(
-				'mapper'    => '\\Schoolbox\\UserMapper',
+				'mapper'    => UserMapper::class,
 				'this_key'  => 'user_id',
 				'other_key' => 'id',
 			)
@@ -222,7 +225,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		$this->hasJoin(
 			'author',
 			array(
-				'mapper'    => '\\Schoolbox\\UserMapper',
+				'mapper'    => UserMapper::class,
 				'this_key'  => 'author_id',
 				'other_key' => 'id',
 			)
@@ -230,7 +233,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 		$this->hasJoin(
 			'travelType',
 			array(
-				'mapper'    => 'Leave_Request_TravelTypeMapper',
+				'mapper'    => Leave_Request_TravelTypeMapper::class,
 				'this_key'  => 'travel_type_id',
 				'other_key' => 'id',
 			)
