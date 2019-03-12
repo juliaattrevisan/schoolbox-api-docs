@@ -276,6 +276,12 @@ class User extends DeprecatedModel
             $wherePart .= ' AND '.$searchFilter;
         }
 
+        /* Show disabled users only if ticked (hide when unticked)
+         */
+        if (!ConfigMapper::getInstance()->get('show_disabled_users')) {
+            $wherePart .= ' AND `user`.enabled = 1';
+        }
+
         // retrieve results
         $query = "SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
                     FROM `user`
