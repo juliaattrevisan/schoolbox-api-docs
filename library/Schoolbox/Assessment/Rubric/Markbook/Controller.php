@@ -461,11 +461,9 @@ class Controller extends Base
                 'capabilities' => [
                     $row['capability_id'] => [
                         $row['capability_name'],
-                        $row['capability_max_mark'],
                         'indicators' => [
                             $row['indicator_id'] => [
-                                $row['indicator_name'],
-                                $row['indicator_max_mark']
+                                $row['indicator_name']
                             ]
                         ]
                     ]
@@ -473,9 +471,26 @@ class Controller extends Base
             ];
 
             // Stuff everything about the students marks into an array
-            // TODO wip
+
+            // TODO calculate this using mark scheme
+            $capabilityMark = '1/10';
+            $indicatorMark = '1/10';
+
             $studentMarks[$row['student_id']] = [
                 'name' => $row['student_name'],
+                $row['assessment_id'] => [
+                    'capabilities' => [
+                        $row['capability_id'] => [
+                            'mark' => $capabilityMark,
+                            'indicators' => [
+                                $row['indicator_id'] => [
+                                    'mark' => $indicatorMark,
+                                    'selectedDescriptorText' => $row['descriptor_name']
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ];
         }
 
