@@ -26,6 +26,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\User;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -35,8 +36,8 @@ $options = getopt('vp::h::help', array('start::', 'end::', 'year::', 'semester::
 
 // Setup kernel
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Schoolbox Markbook Sync Script', [
-    'verbose' => isset($options['v']) ? $options['v'] : null,
+$kernel = new Daemon\Kernel('Schoolbox Markbook Sync Script', [
+    Daemon\Kernel::OPT_VERBOSE => isset($options['v']) ? $options['v'] : null,
     'help' => isset($options['h']) || isset($options['help']) ? true : false,
     'parentId' => isset($options['p']) ? $options['p'] : 0,
     'year'     => $options['year'] ?? null,

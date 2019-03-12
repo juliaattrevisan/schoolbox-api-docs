@@ -13,6 +13,8 @@ use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
 
+require_once __DIR__ . '/../../conf/core/require.php';
+
 $fields = array('porcelain', 'mem', 'truemem', 'pid');
 
 foreach($fields as $k => $name) {
@@ -20,8 +22,6 @@ foreach($fields as $k => $name) {
         unset($fields[$k]);
     }
 }
-
-require_once __DIR__ . '/../../conf/core/require.php';
 
 $k = new \Schoolbox\Application\Daemon\Kernel('TTL Reset', [
     'verbose' => [true, true],

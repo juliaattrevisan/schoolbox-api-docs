@@ -20,12 +20,14 @@ use Schoolbox\Application\Daemon\App;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Alaress\Random;
 use Schoolbox\MapperFactory;
+use Schoolbox\Application\Daemon;
 
-$opts = require __DIR__ . '/../../conf/core/require.php';
+require __DIR__ . '/../../conf/core/require.php';
+$opts = sb_getDaemonOpt();
 
-$kernel = new Schoolbox\Application\Daemon\Kernel("'Re-queue kami conversion errors'", [
-    'verbose' => $opts['v'] ?? [1, 2, 3],
-    'errors'  => E_ALL,
+$kernel = new Daemon\Kernel("'Re-queue kami conversion errors'", [
+    Daemon\Kernel::OPT_VERBOSE => $opts['v'] ?? [1, 2, 3],
+    Daemon\Kernel::OPT_ERRORS  => E_ALL,
 ]);
 
 

@@ -16,7 +16,7 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
-$d = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, 100);
+$d = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, Monolog\Logger::DEBUG);
 
 $stmt = Database::getInstance()->prepare("
 	SELECT *

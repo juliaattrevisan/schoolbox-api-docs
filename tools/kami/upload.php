@@ -20,6 +20,9 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Resource\Storage;
 use Alaress\Random;
+use Schoolbox\Application\Daemon;
+
+require __DIR__ . '/../../conf/core/require.php';
 
 const DEFAULT_BATCH_SIZE           = 100;
 const DEFAULT_MAX_ATTEMPTS         = 3;
@@ -27,7 +30,7 @@ const DEFAULT_MAX_SKIPS            = 3;
 const DEFAULT_BASE_JITTER_BACK_OFF = 500;
 const DEFAULT_TIMEOUT              = 300;
 
-$fields  = [
+$appOpts = [
     'help',
     'dry-run',
     'perform',
@@ -39,21 +42,21 @@ $fields  = [
     'timeout:',
     'failure-rate:',
 ];
-$options = require __DIR__ . '/../../conf/core/require.php';
+$options = sb_getDaemonOpt($appOpts);
 
-$kernel = new Schoolbox\Application\Daemon\Kernel(
+$kernel = new Daemon\Kernel(
     'Kami Uploader',
     [
-        'verbose'     => $options['v'] ?? null,
-        'errors'      => E_ALL,
-        'dryRun'      => isset($options['dry-run']),
-        'retryFailed' => isset($options['retry-failed']),
-        'batchSize'   => isset($options['batch-size']) ? (int)$options['batch-size'] : DEFAULT_BATCH_SIZE,
-        'maxAttempts' => isset($options['max-attempts']) ? (int)$options['max-attempts'] : DEFAULT_MAX_ATTEMPTS,
-        'maxSkips'    => isset($options['max-skips']) ? (int)$options['max-skips'] : DEFAULT_MAX_SKIPS,
-        'baseBackOff' => isset($options['base-back-off']) ? (int)$options['base-back-off'] : DEFAULT_BASE_JITTER_BACK_OFF,
-        'timeout'     => isset($options['timeout']) ? (int)$options['timeout'] : DEFAULT_TIMEOUT,
-        'failureRate' => isset($options['failure-rate']) ? (float)$options['failure-rate'] : 0.0,
+        Daemon\Kernel::OPT_VERBOSE => $options['v'] ?? null,
+        Daemon\Kernel::OPT_ERRORS  => E_ALL,
+        'dryRun'                   => isset($options['dry-run']),
+        'retryFailed'              => isset($options['retry-failed']),
+        'batchSize'                => isset($options['batch-size']) ? (int)$options['batch-size'] : DEFAULT_BATCH_SIZE,
+        'maxAttempts'              => isset($options['max-attempts']) ? (int)$options['max-attempts'] : DEFAULT_MAX_ATTEMPTS,
+        'maxSkips'                 => isset($options['max-skips']) ? (int)$options['max-skips'] : DEFAULT_MAX_SKIPS,
+        'baseBackOff'              => isset($options['base-back-off']) ? (int)$options['base-back-off'] : DEFAULT_BASE_JITTER_BACK_OFF,
+        'timeout'                  => isset($options['timeout']) ? (int)$options['timeout'] : DEFAULT_TIMEOUT,
+        'failureRate'              => isset($options['failure-rate']) ? (float)$options['failure-rate'] : 0.0,
     ]
 );
 

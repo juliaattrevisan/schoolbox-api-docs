@@ -25,24 +25,23 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\ProfessionalDevelopment;
 use Schoolbox\UserMapper;
+use Schoolbox\Application\Daemon;
 
+require __DIR__ . '/../../conf/core/require.php';
 
-$fields = [ 'schoolCode:', 'host:' ];
-$opts = require __DIR__ . '/../../conf/core/require.php';
+$opts   = sb_getDaemonOpt(['schoolCode:', 'host:']);
+$fields = sb_getDaemonLoggerFields($opts);
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Help User Provision', [
-    'verbose'    => $opts['v'] ?? null,
-    'errors'     => E_ALL,
-    'fields'     => array_keys($opts),
-    'schoolCode' => $opts['schoolCode'] ?? null,
-    'host'       => $opts['host'] ?? null,
+$kernel = new Daemon\Kernel('Help User Provision', [
+    Daemon\Kernel::OPT_VERBOSE => $opts['v'] ?? null,
+    Daemon\Kernel::OPT_ERRORS  => E_ALL,
+    Daemon\Kernel::OPT_FIELDS  => $fields,
+    'schoolCode'               => $opts['schoolCode'] ?? null,
+    'host'                     => $opts['host'] ?? null,
 ]);
 
 // ensure the help routes are registered, so we can do route lookups
 // will explode if you're actually on Help (thank goodness)
-require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
-require_once SITE_root . '/conf/ModuleLoader.php';
-require_once SITE_root . '/conf/modules/Custom/Help/API.php';
 (new API())->configure($kernel);
 
 

@@ -39,10 +39,11 @@ $flags  = implode(' ', array_slice($argv, 1));
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel('Schedule', [
-    Daemon\Kernel::OPT_VERBOSE => isset($opts['v']) ? $opts['v'] : null,
-    Daemon\Kernel::OPT_ERRORS  => E_ALL,
-    Daemon\Kernel::OPT_FIELDS  => $fields,
-    'flags'                    => $flags
+    Daemon\Kernel::OPT_VERBOSE    => isset($opts['v']) ? $opts['v'] : null,
+    Daemon\Kernel::OPT_ERRORS     => E_ALL,
+    Daemon\Kernel::OPT_FIELDS     => $fields,
+    Daemon\Kernel::OPT_PORCELAIN  => $fields,
+    'flags'                       => $flags
 ]);
 
 $sched = null;

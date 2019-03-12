@@ -3,9 +3,14 @@
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Redis;
+use Schoolbox\Application\Daemon;
 
-$opts = require __DIR__ . '/../../conf/core/require.php';
-new \Schoolbox\Application\Daemon\Kernel(__FILE__, $opts);
+require __DIR__ . '/../../conf/core/require.php';
+
+$opts = sb_getDaemonOpt();
+new Daemon\Kernel(__FILE__, [
+    Daemon\Kernel::OPT_VERBOSE => $opts['v'] ?? null,
+]);
 
 $redis = Redis::getClientInstance();
 

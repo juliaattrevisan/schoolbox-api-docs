@@ -16,20 +16,21 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $options = getopt('u:r::U::p::', ['skip-duplicates', 'enable-eportfolio', 'dry-run']);
-$kernel = new Schoolbox\Application\Daemon\Kernel('Routing', [
-    'verbose'          => isset($options['v']) ? $options['v'] : null,
-    'errors'           => E_ALL,
-    'userId'           => isset($options['u']) ? $options['u'] : null,
-    'toUserId'         => isset($options['U']) ? $options['U'] : null,
-    'roleId'           => isset($options['r']) ? $options['r'] : null,
-    'importPageId'     => isset($options['p']) ? $options['p'] : null,
-    'skipDuplicates'   => isset($options['skip-duplicates']),
-    'enableEportfolio' => isset($options['enable-eportfolio']),
-    'dryRun'           => isset($options['dry-run']),
+$kernel = new Daemon\Kernel('Routing', [
+    Daemon\Kernel::OPT_VERBOSE => isset($options['v']) ? $options['v'] : null,
+    Daemon\Kernel::OPT_ERRORS  => E_ALL,
+    'userId'                   => isset($options['u']) ? $options['u'] : null,
+    'toUserId'                 => isset($options['U']) ? $options['U'] : null,
+    'roleId'                   => isset($options['r']) ? $options['r'] : null,
+    'importPageId'             => isset($options['p']) ? $options['p'] : null,
+    'skipDuplicates'           => isset($options['skip-duplicates']),
+    'enableEportfolio'         => isset($options['enable-eportfolio']),
+    'dryRun'                   => isset($options['dry-run']),
 ]);
 
 // ROUTING APP
