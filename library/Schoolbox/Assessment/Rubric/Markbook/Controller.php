@@ -449,9 +449,36 @@ class Controller extends Base
 
         $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
 
+        $assessments = [];
+        $studentMarks = [];
+
         foreach ($getAllAssessmentsInFolderQuery->getIterator() as $i => $row) {
-            var_dump($row);
+
+            // Stuff everything about the assessment into an array
+            // TODO assessment name is not currently provided by the view; add it
+            $assessments[$row['assessment_id']] = [
+                'name' => $row['assessment_name'],
+                'capabilities' => [
+                    $row['capability_id'] => [
+                        $row['capability_name'],
+                        $row['capability_max_mark'],
+                        'indicators' => [
+                            $row['indicator_id'] => [
+                                $row['indicator_name'],
+                                $row['indicator_max_mark']
+                            ]
+                        ]
+                    ]
+                ]
+            ];
+
+            // Stuff everything about the students marks into an array
+            // TODO wip
+            $studentMarks[$row['student_id']] = [
+                'name' => $row['student_name'],
+            ];
         }
+
         return $data;
     }
 
