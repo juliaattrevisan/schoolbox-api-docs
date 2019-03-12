@@ -31,10 +31,10 @@ abstract class App
      * @param LoopInterface $loop
      * @param Logger        $log
      * @param array         $opts
-     * @param array         $flags
+     * @param string        $flags
      * @return void
      */
-    public function __invoke(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, array $flags): void
+    public function __invoke(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void
     {
         $this->run($di, $loop, $log, $opts, $flags);
     }
