@@ -14,12 +14,17 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
 use Custom\Tigs;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Application\Daemon;
 
+require __DIR__ . '/../../../conf/core/require.php';
 
-$opts = require __DIR__ . '/../../../conf/core/require.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
-
-$kernel = new Schoolbox\Application\Daemon\Kernel("'Insert TIGS config'", '', [], Monolog\Logger::DEBUG, E_ALL);
+$kernel = new Daemon\Kernel(
+    "'Insert TIGS config'",
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 $app = new class extends App
 {
@@ -39,10 +44,11 @@ $app = new class extends App
      * @param LoopInterface   $loop
      * @param LoggerInterface $log
      * @param array           $opts
+     * @param array           $flags
      * @throws PDOException
      * @throws Di\Exception\ServiceNotFound
      */
-    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
+    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags): void
     {
         $this->log      = $log;
         $this->database = $di->get('databaseInternal');

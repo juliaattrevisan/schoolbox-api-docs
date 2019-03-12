@@ -22,9 +22,10 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Video\Queue;
 use Schoolbox\Video\QueueMapper;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('Media Transcode', '', [], Monolog\Logger::DEBUG);
+$kernel = new Daemon\Kernel('Media Transcode', [Daemon\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]);
 
 $kernel->run(function ($di, $loop, $log, $opts) {
     /**

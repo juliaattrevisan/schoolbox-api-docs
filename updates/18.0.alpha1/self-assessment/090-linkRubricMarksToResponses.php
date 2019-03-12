@@ -88,14 +88,15 @@ use Alaress\Database\Connector\IConnector;
 use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Link Rubric Marks to Responses',
-    '',
-    [],
-    Monolog\Logger::DEBUG,
-    E_ALL
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
 );
 
 $kernel->run(

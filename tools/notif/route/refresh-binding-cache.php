@@ -17,10 +17,16 @@ use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
+use Schoolbox\Application\Daemon;
 
-$opts = require __DIR__ . '/../../../conf/core/require.php';
+require __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Binding Calculator', '', ['userId:', 'instance:']);
+$kernel = new Daemon\Kernel(
+    'Binding Calculator',
+    [
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['userId:', 'instance:'],
+    ]
+);
 
 $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 

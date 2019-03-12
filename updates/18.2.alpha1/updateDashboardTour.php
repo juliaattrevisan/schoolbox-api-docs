@@ -6,10 +6,17 @@
  */
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Update dashboard feature tour', '', [], Monolog\Logger::DEBUG, E_ALL);
+$kernel = new Daemon\Kernel(
+    'Update dashboard feature tour',
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 

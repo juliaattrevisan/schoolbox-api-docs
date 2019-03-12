@@ -12,15 +12,17 @@
 use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel(
+$kernel = new Daemon\Kernel(
     'Calendar CSV Import',
-    '',
-    ['help', 'campus:', 'role:', 'file:', 'owner:', 'source::'],
-    Monolog\Logger::INFO,
-    E_ALL
+    [
+        Daemon\Kernel::OPTION_LEVEL         => Monolog\Logger::INFO,
+        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['help', 'campus:', 'role:', 'file:', 'owner:', 'source::'],
+    ]
 );
 
 

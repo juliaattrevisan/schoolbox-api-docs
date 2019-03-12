@@ -32,7 +32,13 @@ $appOpts = [
     'timeout:',
 ];
 
-$kernel = new Daemon\Kernel('Kami Status Checker', '', $appOpts, null, E_ALL);
+$kernel = new Daemon\Kernel(
+    'Kami Status Checker',
+    [
+        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => $appOpts,
+    ]
+);
 
 /** @noinspection PhpUnhandledExceptionInspection */
 $kernel->run(function (

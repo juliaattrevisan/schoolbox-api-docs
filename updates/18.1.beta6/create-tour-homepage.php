@@ -4,10 +4,17 @@
  */
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Create Feature Tour', '', [], Monolog\Logger::DEBUG, E_ALL);
+$kernel = new Daemon\Kernel(
+    'Create Feature Tour',
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 

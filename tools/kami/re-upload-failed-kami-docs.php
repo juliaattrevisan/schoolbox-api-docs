@@ -20,9 +20,15 @@ use Schoolbox\Application\Daemon\App;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Alaress\Random;
 use Schoolbox\MapperFactory;
+use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel("'Re-queue kami conversion errors'", '', [], null, E_ALL);
+$kernel = new Daemon\Kernel(
+    "'Re-queue kami conversion errors'",
+    [
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 $reQueue = new class() extends App
 {

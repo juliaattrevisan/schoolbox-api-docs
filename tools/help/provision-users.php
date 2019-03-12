@@ -25,9 +25,16 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\ProfessionalDevelopment;
 use Schoolbox\UserMapper;
+use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('Help User Provision', '', ['schoolCode:', 'host:'], null, E_ALL);
+$kernel = new Daemon\Kernel(
+    'Help User Provision',
+    [
+        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['schoolCode:', 'host:'],
+    ]
+);
 
 // ensure the help routes are registered, so we can do route lookups
 // will explode if you're actually on Help (thank goodness)
@@ -105,13 +112,14 @@ $kernel->run(new class extends App {
      * @param LoopInterface $loop
      * @param Logger        $log
      * @param array         $opts
+     * @param array         $flags
      * @throws Di\Exception\ServiceNotFound
      * @throws RuntimeException
      * @return void
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
+    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, array $flags): void
     {
         $this->setup($di, $log, $opts);
 

@@ -27,10 +27,18 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Zend\Uri\Uri;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel( 'Rubric Repair', 'p', ['perform'], Monolog\Logger::CRITICAL);
+$kernel = new Daemon\Kernel(
+    'Rubric Repair',
+    [
+        Daemon\Kernel::OPTION_LEVEL          => Monolog\Logger::CRITICAL,
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'p',
+        Daemon\Kernel::OPTION_APP_LONG_OPTS  => ['perform'],
+    ]
+);
 
 /** @noinspection PhpUnhandledExceptionInspection */
 $kernel->run(new class extends App

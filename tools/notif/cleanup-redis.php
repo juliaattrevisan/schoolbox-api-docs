@@ -14,10 +14,17 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Filter;
+use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Redis Notif Cleanup', '', ['perform'], null, E_ALL);
+$kernel = new Daemon\Kernel(
+    'Redis Notif Cleanup',
+    [
+        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['perform'],
+    ]
+);
 
 $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
     $perform = \array_key_exists('perform', $opts);

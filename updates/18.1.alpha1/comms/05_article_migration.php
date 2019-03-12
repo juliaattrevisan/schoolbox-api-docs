@@ -3,7 +3,7 @@
 use Alaress\IDatabase;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Comms\News\Audience\Model;
-use Schoolbox\Comms\News\Audience\Segment\EntityType;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -436,7 +436,13 @@ function createHomepageNewsAudience(IDatabase $db, int $oldId, int $articleId, L
 }
 
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Migrate elderly School News to Comms', '', [], Monolog\Logger::DEBUG, E_ALL);
+$kernel = new Daemon\Kernel(
+    'Migrate elderly School News to Comms',
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();

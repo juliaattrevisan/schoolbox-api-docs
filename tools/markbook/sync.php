@@ -30,23 +30,13 @@ use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-// Get command line options
-
-$options = getopt('vp::h::help', array('start::', 'end::', 'year::', 'semester::', 'update-only', 'dry-run'));
-
-// Setup kernel
-
-$kernel = new Daemon\Kernel('Schoolbox Markbook Sync Script', [
-    Daemon\Kernel::OPT_VERBOSE => isset($options['v']) ? $options['v'] : null,
-    'help' => isset($options['h']) || isset($options['help']) ? true : false,
-    'parentId' => isset($options['p']) ? $options['p'] : 0,
-    'year'     => $options['year'] ?? null,
-    'semester' => $options['semester'] ?? null,
-    'start' => isset($options['start']) ? $options['start'] : false,
-    'end' => isset($options['end']) ? $options['end'] : false,
-    'updateOnly' => isset($options['update-only']),
-    'dryRun' => isset($options['dry-run'])
-]);
+$kernel = new Daemon\Kernel(
+    'Schoolbox Markbook Sync Script',
+    [
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'vp::h::',
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['help', 'start::', 'end::', 'year::', 'semester::', 'update-only', 'dry-run'],
+    ]
+);
 
 /**
  * Recursive function that retrieves the children of a folder that have class codes attached.
@@ -82,7 +72,7 @@ function help($configMapper)
 
     // Synergetic receives some additional options around FileYear/FileSemester
 
-    if ($configMapper->get('external_type') == 'synergetic') {
+    if ($configMapper->get('external_type') === 'synergetic') {
         $additionalParameters .= "    --year=yyyy          Synergetic FileYear into which to export the markbook and student marks, format --year=2016 (must be used with semester parameter)\n";
         $additionalParameters .= "    --semester=s         Synergetic FileSemester into which to export the markbook and student marks, --semester=1 (must be used with year parameter)\n";
         $addParamsShort = "[--year=yyyy] [--semester=s] ";
@@ -110,27 +100,26 @@ HELP;
 
 }
 
-// Get this kernel started
+$kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
-$kernel->run(function ($di, $loop, $log, $opts) {
-
-    /**
-     * @var Injector $di
-     * @var LoopInterface $loop
-     * @var LoggerInterface $log
-     * @var array $opts
-     */
+    $help       = isset($opts['h']) || isset($opts['help']);
+    $parentId   = $opts['p'] ?? 0;
+    $year       = $opts['year'] ?? null;
+    $semester   = $opts['semester'] ?? null;
+    $start      = $opts['start'] ?? false;
+    $end        = $opts['end'] ?? false;
+    $updateOnly = isset($opts['update-only']);
+    $dryRun     = isset($opts['dry-run']);
 
     // Make sure markbook sync is actually enabled
-
     $configMapper = ConfigMapper::getInstance();
 
-    if ($configMapper->get('external_markbook') == 0) {
+    if (!$configMapper->get('external_markbook')) {
         $log->error("ERROR: External markbook synchronisation is not enabled in Schoolbox. Please enable in your Schoolbox administrator settings and try again.");
         exit(1);
     }
 
-    if ($opts['help']) {
+    if ($help) {
         help($configMapper);
         exit(0);
     }
@@ -148,7 +137,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     // Synergetic Markbook uses FileYear/FileSemester and exposes command line parameters not available to other connectors.
     if ($configMapper->get('external_type') === 'synergetic') {
         try {
-            $markbookExternal = new External_Synergetic_Markbook($opts['year'], $opts['semester']);
+            $markbookExternal = new External_Synergetic_Markbook($year, $semester);
         } catch (InvalidArgumentException $e) {
             $log->error("ERROR: {$e->getMessage()}");
             help($configMapper);
@@ -163,14 +152,14 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     $startTime = new Alaress_Date_Format;
     $endTime = new Alaress_Date_Format;
 
-    if ($opts['start'] && $opts['end']) {
+    if ($start && $end) {
 
         // Start and end range passed on commandline, use supplied dates
 
         try {
 
-            $startTime->setFromFormat($opts['start'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-            $endTime->setFromFormat($opts['end'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $startTime->setFromFormat($start, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $endTime->setFromFormat($end, Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
             // Hardcode the time to start/end of the day
 
@@ -210,11 +199,11 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
     // If we aren't starting at the root folder, include the actual root folder
 
-    if ($opts['parentId'] != 0) {
-        $folderList[$opts['parentId']] = $folderMapper->findById($opts['parentId']);
+    if ($parentId) {
+        $folderList[$parentId] = $folderMapper->findById($parentId);
     }
 
-    $folderList = $folderList + traverse($opts['parentId'], $folderMapper);
+    $folderList = $folderList + traverse($parentId, $folderMapper);
 
     // Make sure we got a result
 
@@ -269,14 +258,14 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
                 // Check if we are allowed to create new markbook entries
 
-                if (!$opts['updateOnly']) {
+                if (!$updateOnly) {
 
                     // Creation allowed
 
                     $action = str_pad("Action:", 30, " ");
                     $log->info("    {$action}Create/Update");
 
-                    if (!$opts['dryRun']) {
+                    if (!$dryRun) {
                         if (!$markbookExternal->hasAssessment($submissionBox)) {
                             $markbookExternal->createAssessment($submissionBox);
                         } else {
@@ -291,7 +280,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                     $action = str_pad("Action:", 30, " ");
                     $log->info("    {$action}Update Only");
 
-                    if (!$opts['dryRun']) {
+                    if (!$dryRun) {
                         if ($markbookExternal->hasAssessment($submissionBox)) {
                             $markbookExternal->updateAssessment($submissionBox);
                         }
@@ -342,7 +331,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                         $name = str_pad("{$student['firstname']} {$student['lastname']} ({$student['synergy_id']}):", 26, " ");
                         $log->info("        {$name}{$mark}");
 
-                        if (!$opts['dryRun']) {
+                        if (!$dryRun) {
                             $markbookExternal->setMark($return);
 
                         }
@@ -382,17 +371,17 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
                     $log->info("    {$action}{$activity->getName()}");
 
-                    if (!$opts['dryRun']) {
+                    if (!$dryRun) {
                         $markbookExternal->updateAssessment($activity);
                     }
 
-                } elseif (!$opts['updateOnly']) {
+                } elseif (!$updateOnly) {
 
                     $action = str_pad("Creating assessment:", 30, " ");
 
                     $log->info("    {$action}{$activity->getName()}");
 
-                    if (!$opts['dryRun']) {
+                    if (!$dryRun) {
                         $markbookExternal->createAssessment($activity);
                     }
 
@@ -420,7 +409,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                         $return->setUser(new User);
                         $return->getUser()->setId($studentID);
 
-                        if (!$opts['dryRun']) {
+                        if (!$dryRun) {
                             $markbookExternal->setMark($return);
                         }
                     }

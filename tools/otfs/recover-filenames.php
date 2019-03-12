@@ -9,12 +9,14 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Application\Daemon;
+
 if ($argc != 2) {
     die ("Usage: php {$argv[0]} {backup_database_name}\n");
 }
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$k = new Schoolbox\Application\Daemon\Kernel('File Recovery', '', [], Monolog\Logger::DEBUG);
+$k = new Daemon\Kernel('File Recovery', [Daemon\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]);
 
 // database name: you get alphanum and underscore, nothing else
 $backupDatabase = preg_replace('`[^a-z0-9_]`i', '', trim($argv[1]));

@@ -2,6 +2,7 @@
 
 use Alaress\IDatabase;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -202,7 +203,13 @@ WHERE posted.msg_source_id = :posted and published.msg_source_id = :published;
 }
 
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Merge notification settings for school news and homepage news', '', [], Monolog\Logger::DEBUG, E_ALL);
+$kernel = new Daemon\Kernel(
+    'Merge notification settings for school news and homepage news',
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();

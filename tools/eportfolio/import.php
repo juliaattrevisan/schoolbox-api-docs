@@ -20,8 +20,14 @@ use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$options = getopt('u:r::U::p::', ['skip-duplicates', 'enable-eportfolio', 'dry-run']);
-$kernel = new Daemon\Kernel('Routing', 'u:r::U::p::', ['skip-duplicates', 'enable-eportfolio', 'dry-run'], null, E_ALL);
+$kernel = new Daemon\Kernel(
+    'Routing',
+    [
+        Daemon\Kernel::OPTION_ERRORS         => E_ALL,
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'u:U::r::p::',
+        Daemon\Kernel::OPTION_APP_LONG_OPTS  => ['skip-duplicates', 'enable-eportfolio', 'dry-run'],
+    ]
+);
 
 $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $options) {
     $userId           = $options['u'] ?? null;

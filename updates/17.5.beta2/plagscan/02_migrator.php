@@ -13,8 +13,10 @@ use Alaress\Database\Connector\IConnector;
 use Aura\Di\Container as Injector;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Application\Daemon;
 
 const RESULT_FAILED      = 0;
 const RESULT_SUCCESS     = 1;
@@ -22,7 +24,14 @@ const RESULT_FAILED_SIZE = 2;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Plagscan Document Migration', 'r::', ['retry::'], Monolog\Logger::DEBUG);
+$kernel = new Daemon\Kernel(
+    'Plagscan Document Migration',
+    [
+        Daemon\Kernel::OPTION_LEVEL          => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'r::',
+        Daemon\Kernel::OPTION_APP_LONG_OPTS  => ['retry::'],
+    ]
+);
 
 try {
     /** @var IConfigLoader $config */
@@ -35,7 +44,7 @@ try {
 
     $kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, array $opts) use ($lock, $database) {
 
-        $retry = isset($options['r']) || isset($options['retry']);
+        $retry = isset($opts['r']) || isset($opts['retry']);
 
         // Indicate retry state
         $log->debug('Retry of failed documents is ' . ($retry ? 'enabled' : 'disabled'));

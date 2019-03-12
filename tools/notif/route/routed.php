@@ -25,10 +25,11 @@ use Schoolbox\Realtime\Routing\DispatchResponder;
 use Schoolbox\Realtime\Routing\DispatchStrategy;
 use Schoolbox\Realtime\Routing\RouteTXRX;
 use Schoolbox\Realtime\Routing\Subscription;
+use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Routing', '', [], null, E_ALL);
+$kernel = new Daemon\Kernel('Routing', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
 
 // ROUTING APP
 $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags) {

@@ -22,9 +22,15 @@ use Schoolbox\Realtime\Schedule;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Trigger\Propagator;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$k = new \Schoolbox\Application\Daemon\Kernel('Schedule Reload-from-Cache', '', [], null, E_ALL);
+$k = new Daemon\Kernel(
+    'Schedule Reload-from-Cache',
+    [
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 try {
 

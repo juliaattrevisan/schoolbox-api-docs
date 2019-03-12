@@ -10,6 +10,7 @@
 use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
 use Alaress\Image\Transformation;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -26,7 +27,12 @@ $maxWorkers = (int)getenv('MAX_WORKERS', true) ?: MAX_WORKERS;
 $timeInterval = (int)getenv('TIME_INTERVAL', true) ?: TIME_INTERVAL;
 $limit = (int)getenv('LIMIT', true) ?: LIMIT;
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Image Processor', '', [], $logLevel);
+$kernel = new Daemon\Kernel(
+    'Image Processor',
+    [
+        Daemon\Kernel::OPTION_LEVEL => $logLevel,
+    ]
+);
 $logger = $kernel->logger();
 
 $logger->info(sprintf("[manager] Starting Image Processor (maxWorkers: %d)", $maxWorkers));

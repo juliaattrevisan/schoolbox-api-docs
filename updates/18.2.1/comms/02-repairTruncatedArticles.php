@@ -22,16 +22,18 @@ use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
-
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
-$opts   = getopt('p', ['perform']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Repair Truncated Articles',
-    'p',
-    ['perform'],
-    Monolog\Logger::DEBUG
+    [
+        Daemon\Kernel::OPTION_LEVEL          => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS         => E_ALL,
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'p',
+        Daemon\Kernel::OPTION_APP_LONG_OPTS  => ['perform'],
+    ]
 );
 
 /** @noinspection PhpUnhandledExceptionInspection */

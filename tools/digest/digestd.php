@@ -24,10 +24,16 @@ use Schoolbox\UserMapper;
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Digest', '', ['debug-interval:']);
+$kernel = new Daemon\Kernel(
+    'Digest',
+    [
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['debug-interval:'],
+    ]
+);
 
 // CREATE DIGEST APP
 $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags) {

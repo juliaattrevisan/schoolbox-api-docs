@@ -13,11 +13,17 @@ use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
+use Schoolbox\Application\Daemon;
 
 echo "[".date('Y-m-d H:i:s')."] Running sync script\n";
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('External DB Sync', '', ['perform-update', 'diagnostic', 'site-location:']);
+$kernel = new Daemon\Kernel(
+    'External DB Sync',
+    [
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['perform-update', 'diagnostic', 'site-location:'],
+    ]
+);
 
 $app = new class extends App{
     /**

@@ -12,10 +12,17 @@ use Predis\Collection\Iterator\Keyspace;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$k = new \Schoolbox\Application\Daemon\Kernel('TTL Reset', '', [], Monolog\Logger::INFO, E_ALL);
+$k = new Daemon\Kernel(
+    'TTL Reset',
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::INFO,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 try {
     $k->run(new class extends App {
@@ -31,9 +38,10 @@ try {
          * @param LoopInterface $loop
          * @param Logger        $log
          * @param array         $opts
+         * @param array         $flags
          * @return void
          */
-        public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
+        public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, array $flags): void
         {
             /** @var ClientInterface $redis */
             $redis = $di->get('redis');

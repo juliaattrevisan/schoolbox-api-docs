@@ -26,7 +26,12 @@ $limit   = isset($opts['n']) ? $opts['n'] : 1000;
 $perform = isset($opts['p']);
 
 require_once __DIR__ . '/../conf/core/require.php';
-new Daemon\Kernel('Storage Garbage Collection', '', [], null, E_ALL);
+new Daemon\Kernel(
+    'Storage Garbage Collection',
+    [
+        Daemon\Kernel::OPTION_ERRORS => E_ALL
+    ]
+);
 
 $pdo = Database::getInstance();
 

@@ -9,9 +9,15 @@
  * @version     SVN: $Id$
  */
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../conf/core/require.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Etherpad Sync', '', [], Monolog\Logger::INFO);
+$kernel = new Daemon\Kernel(
+    'Etherpad Sync',
+    [
+        Daemon\Kernel::OPTION_LEVEL => Monolog\Logger::INFO
+    ]
+);
 $logger = $kernel->logger();
 
 

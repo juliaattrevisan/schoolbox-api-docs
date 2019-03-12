@@ -13,6 +13,7 @@ use Alaress\Test\Redis\Async\TestListener;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Application\Daemon;
 
 $appShortOpts = 'd';
 $appLongOpts  = [ 'help', 'channel:', 'signal:', 'loop:' ];
@@ -29,7 +30,14 @@ EOL;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Redis pubsub signal test', $appShortOpts, $appLongOpts, Monolog\Logger::DEBUG);
+$kernel = Daemon\Kernel(
+    'Redis pubsub signal test',
+    [
+        Daemon\Kernel::OPTION_LEVEL          => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => $appShortOpts,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS  => $appLongOpts,
+    ]
+);
 
 if (!isset($opts['d'])) {
     // client (publish) mode

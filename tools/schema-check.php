@@ -13,7 +13,12 @@ use Schoolbox\Mapper;
 use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../conf/core/require.php';
-$kernel = new Daemon\Kernel(__FILE__, '', [], Monolog\Logger::DEBUG);
+$kernel = new Daemon\Kernel(
+    __FILE__,
+    [
+        Daemon\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG
+    ]
+);
 
 $log = $kernel->logger();
 $log->info("Unmapped:");

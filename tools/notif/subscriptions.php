@@ -18,9 +18,17 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
 use Schoolbox\Realtime\Routing\Cache\Redis\ReadCache;
 use Schoolbox\Realtime\Routing\Subscription\Test\NestTestResolver;
+use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('Subscription Reader', '', ['user:', 'pattern:'], Monolog\Logger::INFO, E_ALL);
+$kernel = new Daemon\Kernel(
+    'Subscription Reader',
+    [
+        Daemon\Kernel::OPTION_LEVEL         => Monolog\Logger::INFO,
+        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['user:', 'pattern:'],
+    ]
+);
 
 const HALP = <<<EOF
 Schoolbox Subscription Reader

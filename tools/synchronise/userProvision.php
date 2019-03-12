@@ -15,9 +15,16 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Sync\Provisioner\Provisioner;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('UPS', 'r:', ['perform-update', 'instance::']);
+$kernel = new Daemon\Kernel(
+    'UPS',
+    [
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'r:',
+        Daemon\Kernel::OPTION_APP_LONG_OPTS  => ['perform-update', 'instance::'],
+    ]
+);
 
 // Signal handling unique to the provisioner
 // (ticks required for pcntl_signal functions to work)

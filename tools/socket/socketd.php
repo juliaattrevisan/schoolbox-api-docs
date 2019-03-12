@@ -1,5 +1,13 @@
 #!/usr/bin/php
 <?php
+/**
+ * The Websocket Daemon.
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2013, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Redis\Async;
@@ -18,18 +26,9 @@ use Schoolbox\Realtime\Pipe\PipeManagerFactory;
 use Schoolbox\Realtime\Pipe\Server;
 use Schoolbox\Application\Daemon;
 
-/**
- * The Websocket Daemon.
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2013, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
- */
-
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Socket', 'p::c::');
+$kernel = new Daemon\Kernel('Socket', [Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'p::c::']);
 
 // CREATE WEBSOCKET APP
 $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags) use ($kernel) {

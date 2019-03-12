@@ -9,10 +9,17 @@
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Migrate portraits from filesystem into Storage', '', [], Monolog\Logger::DEBUG, E_ALL);
+$kernel = new Daemon\Kernel(
+    'Migrate portraits from filesystem into Storage',
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();

@@ -13,9 +13,15 @@ use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
 
-$opts = require __DIR__ . '/../../../conf/core/require.php';
+require __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Daemon\Kernel('Populate rubric_group_mark and associate to rubric_descriptor_mark', '', [], Monolog\Logger::DEBUG, E_ALL);
+$kernel = new Daemon\Kernel(
+    'Populate rubric_group_mark and associate to rubric_descriptor_mark',
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 /** @noinspection PhpUnhandledExceptionInspection */
 $kernel->run(

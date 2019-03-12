@@ -29,10 +29,11 @@ use Schoolbox\Realtime\Schedule;
 use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
 use Schoolbox\Realtime\Schedule\Scheduler;
 use Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Schedule', '', [], null, E_ALL);
+$kernel = new Daemon\Kernel('Schedule', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
 $sched = null;
 
 $kernel->registerCustomShutdown(function() use (&$sched) {

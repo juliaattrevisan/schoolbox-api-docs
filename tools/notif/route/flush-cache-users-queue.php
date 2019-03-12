@@ -20,10 +20,16 @@ use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
+use Schoolbox\Application\Daemon;
 
-$opts = require __DIR__ . '/../../../conf/core/require.php';
+require __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Flush Cache Users Queue', '', ['instance:']);
+$kernel = new Daemon\Kernel(
+    'Flush Cache Users Queue',
+    [
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['instance:'],
+    ]
+);
 
 $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
     // If no instance ID is provided, fall back to default if it exists

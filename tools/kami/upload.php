@@ -20,6 +20,7 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Resource\Storage;
 use Alaress\Random;
+use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../conf/core/require.php';
 
@@ -42,7 +43,13 @@ $appOpts = [
     'failure-rate:',
 ];
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Kami Uploader', '', $appOpts, null, E_ALL);
+$kernel = new Schoolbox\Application\Daemon\Kernel(
+    'Kami Uploader',
+    [
+        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => $appOpts,
+    ]
+);
 
 $options = getopt('', $appOpts);
 

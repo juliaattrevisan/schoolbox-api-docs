@@ -15,8 +15,9 @@ declare(strict_types=1);
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Application\Daemon;
 
-$fields = [
+$appOpts = [
     'help',
     'user:',
     'default-owner:',
@@ -27,7 +28,14 @@ $fields = [
 
 require __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Pastoral Import', '', $fields, Monolog\Logger::CRITICAL, E_ALL);
+$kernel = new Daemon\Kernel(
+    'Pastoral Import',
+    [
+        Daemon\Kernel::OPTION_LEVEL         => Monolog\Logger::CRITICAL,
+        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => $appOpts,
+    ]
+);
 
 /** @noinspection PhpUnhandledExceptionInspection */
 $kernel->run(function (
