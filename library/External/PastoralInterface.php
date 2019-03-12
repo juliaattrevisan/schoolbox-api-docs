@@ -30,9 +30,10 @@ interface External_PastoralInterface
      * @param bool $importParentAccess Flag indicating if parent contacts should be added to the pastoral_access table
      * @param bool $importRecords Flag indicating pastoral records should be imported from the SIS
      * @param bool $importAttachments Flag indicating pastoral record attachments should be imported from the SIS
+     * @param bool $deleteRecords Flag to indicate if records should be deleted and recreated, or skipped if already existing
      * @return bool
      */
-    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments);
+    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
 
     /**
      * Sync a schoolbox pastoral record with the remote system

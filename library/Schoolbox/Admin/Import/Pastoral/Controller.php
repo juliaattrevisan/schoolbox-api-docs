@@ -128,7 +128,7 @@ class Controller extends Base
             ],
             'postOutput' => [
                 function () use ($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments) {
-                    $this->importCallback($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments);
+                    $this->importCallback($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, true);
                 },
             ],
         ]);
@@ -141,11 +141,11 @@ class Controller extends Base
      * @param User $defaultOwner       Fallback owner when cannot be located in Schoolbox
      * @param bool $importParentAccess Flag indicating if parents should be imported to the pastoral_access table
      */
-    public function importCallback(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments)
+    public function importCallback(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords)
     {
         try {
             $pastoralExternal = new External_Pastoral();
-            $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments);
+            $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
         } catch (Exception $e) {
             //                                  .
             //                                 -|-
