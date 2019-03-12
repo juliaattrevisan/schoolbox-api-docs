@@ -8,6 +8,7 @@
  */
 
 require_once __DIR__ . '/../../../conf/core/require.php';
+$kernel = new Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 $component = array(
     'name'               => 'Student Awards',

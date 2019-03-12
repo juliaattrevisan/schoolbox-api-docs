@@ -26,35 +26,36 @@ function error($ec, $message="", $code = 400)
     throw ErrorMapper::getInstance()->generateException($ec, null, $message, $code);
 }
 
-/**
- * An HTTP-sensitive way to send a plaintext failure response.
- * @deprecated 17.5
- *
- * @param $code - the HTTP code to send
- * @param $message - if numeric, will be looked up in the error table on the DB, otherwise displayed as-is
- */
-function httpError($code, $message) {
-    if(is_numeric($message)) {
-        $msg = Database::getInstance()->query("SELECT message FROM error WHERE id = $message")->fetchColumn();
+if(PHP_SAPI !== 'cli') {
+    /**
+     * An HTTP-sensitive way to send a plaintext failure response.
+     *
+     * @deprecated 17.5
+     *
+     * @param $code    - the HTTP code to send
+     * @param $message - if numeric, will be looked up in the error table on the DB, otherwise displayed as-is
+     */
+    function httpError($code, $message)
+    {
+        if (is_numeric($message)) {
+            $msg = Database::getInstance()->query("SELECT message FROM error WHERE id = $message")->fetchColumn();
+        } else {
+            $msg = $message;
+        }
+        $codes = [
+            '400' => 'Bad Request',
+            '401' => 'Unauthorized',
+            '403' => 'Forbidden',
+            '405' => 'Method Not Allowed',
+        ];
+        if (isset($codes[$code])) {
+            http_response_code($code);
+        } else {
+            http_response_code(400);
+        }
+        die($msg);
     }
-    else {
-        $msg = $message;
-    }
-    $codes = array(
-        '400' => 'Bad Request',
-        '401' => 'Unauthorized',
-        '403' => 'Forbidden',
-        '405' => 'Method Not Allowed',
-    );
-    if(isset($codes[$code])) {
-        http_response_code($code);
-    }
-    else {
-        http_response_code(400);
-    }
-    die($msg);
 }
-
 
 /**
  * @param $camel

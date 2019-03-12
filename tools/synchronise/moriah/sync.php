@@ -11,7 +11,7 @@
 
 $options = getopt("v", array('perform-update', 'diagnostic'));
 
-require_once __DIR__ . '/../../../conf/core/require-cli.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
 require_once __DIR__ . '/../abstract/SynchroniseAbstract.php';
 
 $kernel = new \Schoolbox\Application\Daemon\Kernel('Moriah Sync');

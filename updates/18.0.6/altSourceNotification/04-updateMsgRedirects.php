@@ -9,7 +9,7 @@ declare(strict_types=1);
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Permission\Access\UserAccess;
 
-$opts = require __DIR__ . '/../../../conf/core/require-cli.php';
+$opts = require __DIR__ . '/../../../conf/core/require.php';
 $kernel = new Schoolbox\Application\Daemon\Kernel('Alt Source Linkup', [
     'verbose' => isset($opts['v']) ? $opts['v'] : null,
     'errors'  => E_ALL,

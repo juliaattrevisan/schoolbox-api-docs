@@ -6,7 +6,7 @@ use Alaress\Lumberjack\Logger;
 use Schoolbox\External\Importer;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 
-require_once __DIR__ . '/../../../conf/core/require-cli.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 // Manage options

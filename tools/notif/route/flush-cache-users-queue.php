@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 
-$opts = require __DIR__ . '/../../../conf/core/require-cli.php';
+$opts = require __DIR__ . '/../../../conf/core/require.php';
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Flush Cache Users Queue', [
     'verbose'  => isset($opts['v']) ? $opts['v'] : null,

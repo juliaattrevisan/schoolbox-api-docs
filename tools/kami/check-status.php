@@ -28,7 +28,7 @@ $fields = [
     'base-back-off:',
     'timeout:',
 ];
-$opts = require __DIR__ . '/../../conf/core/require-cli.php';
+$opts = require __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Kami Status Checker',

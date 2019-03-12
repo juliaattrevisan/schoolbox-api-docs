@@ -20,7 +20,7 @@ use Schoolbox\Realtime\Routing\Cache\WritableCache;
 
 $fields = [ 'userId:' ];
 
-$opts = require __DIR__ . '/../../../conf/core/require-cli.php';
+$opts = require __DIR__ . '/../../../conf/core/require.php';
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Binding Calculator', [
     'verbose'  => isset($opts['v']) ? $opts['v'] : null,

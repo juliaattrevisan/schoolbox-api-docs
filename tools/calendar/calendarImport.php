@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 
 $fields = ['help', 'campus:', 'role:', 'file:', 'owner:', 'source::'];
-$opts = require __DIR__ . '/../../conf/core/require-cli.php';
+$opts = require __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Calendar CSV Import', [

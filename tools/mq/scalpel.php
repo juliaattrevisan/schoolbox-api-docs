@@ -66,7 +66,7 @@ if (!count($args)) {
 echo "Starting search & destroy...\n";
 
 // ok, setup done, ready to do this
-require_once __DIR__ . '/../../conf/core/require-cli.php';
+require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 checkRedis($args, $regexMode);

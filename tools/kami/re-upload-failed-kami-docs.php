@@ -21,7 +21,7 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Alaress\Random;
 use Schoolbox\MapperFactory;
 
-$opts = require __DIR__ . '/../../conf/core/require-cli.php';
+$opts = require __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new Schoolbox\Application\Daemon\Kernel("'Re-queue kami conversion errors'", [
     'verbose' => $opts['v'] ?? [1, 2, 3],

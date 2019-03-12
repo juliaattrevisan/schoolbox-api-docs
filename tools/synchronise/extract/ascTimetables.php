@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 
-require_once __DIR__ . '/../../../conf/core/require-cli.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 $options = getopt('', ['structure', 'timetable', 'enrolment',]);

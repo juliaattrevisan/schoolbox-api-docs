@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
 
-$opts = require __DIR__ . '/../../../conf/core/require-cli.php';
+$opts = require __DIR__ . '/../../../conf/core/require.php';
 
 $kernel = new Daemon\Kernel('Populate rubric_group_mark and associate to rubric_descriptor_mark', [
     'verbose' => $opts['v'] ?? [1, 2, 3],

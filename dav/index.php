@@ -6,14 +6,12 @@
  * time: 9:56 pm
  */
 
-use Alaress\Application\Kernel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\WebDav\FileServer\Folder as WebDavFolder;
 use Schoolbox\WebDav\NameGenerator as WebDavNameGenerator;
 use Schoolbox\WebDav\SubjectServer\Server as WebDavSubjectList;
 
-/** @var Kernel $kernel */
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 

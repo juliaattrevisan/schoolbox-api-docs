@@ -4,7 +4,7 @@
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Redis;
 
-$opts = require __DIR__ . '/../../conf/core/require-cli.php';
+$opts = require __DIR__ . '/../../conf/core/require.php';
 new \Schoolbox\Application\Daemon\Kernel(__FILE__, $opts);
 
 $redis = Redis::getClientInstance();

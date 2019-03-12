@@ -17,7 +17,7 @@ use Schoolbox\Tile\Component\DashboardTileController;
 use Schoolbox\Tile\Component\HomepageTileController;
 
 
-$opts = require __DIR__ . '/../../../conf/core/require-cli.php';
+$opts = require __DIR__ . '/../../../conf/core/require.php';
 
 $kernel = new Schoolbox\Application\Daemon\Kernel("Associate Tiles", [
     'verbose' => [true, true, true],

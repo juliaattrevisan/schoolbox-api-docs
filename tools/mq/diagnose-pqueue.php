@@ -13,7 +13,7 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
  * @version     SVN: $Id$
  */
 
-require_once __DIR__ . '/../../conf/core/require-cli.php';
+require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 $d = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, 100);

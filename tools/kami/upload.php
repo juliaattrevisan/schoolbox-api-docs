@@ -39,7 +39,7 @@ $fields  = [
     'timeout:',
     'failure-rate:',
 ];
-$options = require __DIR__ . '/../../conf/core/require-cli.php';
+$options = require __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Kami Uploader',

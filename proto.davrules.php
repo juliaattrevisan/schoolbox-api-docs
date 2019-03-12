@@ -6,8 +6,6 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once __DIR__ . '/conf/core/require.php';
-
 // inputs:
 
 // (default)
@@ -24,13 +22,14 @@ require_once __DIR__ . '/conf/core/require.php';
 // paths
 
 
-use Alaress\Rules\Condition;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\WebDav\Rules\Ruleset;
 use Schoolbox\WebDav\Rules\UserCondition;
 
+require_once __DIR__ . '/conf/core/require.php';
+new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 /* OAKBURN */
 $set = new Ruleset('http://davusers.soc.tas.edu.au/', 'soc/{:username}');

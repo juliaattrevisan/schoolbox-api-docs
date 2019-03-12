@@ -9,7 +9,7 @@ if (count($argv) < 2) {
     die('Need one or more hash arguments, got ' . ($argc - 1) . "\n");
 }
 
-require_once __DIR__ . '/../../conf/core/require-cli.php';
+require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 for ($i = 1; $i < $argc; ++$i) {

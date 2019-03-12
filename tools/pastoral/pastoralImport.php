@@ -25,7 +25,7 @@ $fields = [
     'add-attachments',
 ];
 
-$opts = require __DIR__ . '/../../conf/core/require-cli.php';
+$opts = require __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Pastoral Import',

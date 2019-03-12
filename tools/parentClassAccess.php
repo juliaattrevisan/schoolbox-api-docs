@@ -10,7 +10,7 @@ use \Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Alaress\Lumberjack\Logger;
 
-require_once __DIR__ . '/../conf/core/require-cli.php';
+require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 // Use a debug-supporting logger
