@@ -2,7 +2,6 @@
 <?php
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Lumberjack\Logger;
 use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\ConfigurationReader;
 use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
@@ -30,20 +29,13 @@ use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$fields = Logger::getAvailableFields();
 $opts   = sb_getDaemonOpt([], 'p::c::');
-
-foreach ($fields as $k => $name) {
-    if (!isset($opts[$name])) {
-        unset($fields[$k]);
-    }
-}
-
-$flags = implode(' ', array_slice($argv, 1));
+$fields = sb_getDaemonLoggerFields($opts);
+$flags  = implode(' ', array_slice($argv, 1));
 
 $kernel = new Daemon\Kernel('Socket', [
     Daemon\Kernel::OPT_VERBOSE => isset($opts['v']) ? $opts['v'] : null,
-    Daemon\Kernel::OPT_FIELDS  => \array_values($fields),
+    Daemon\Kernel::OPT_FIELDS  => $fields,
     'port'                     => empty($opts['p']) ? 9081 : $opts['p'],
     'conf'                     => empty($opts['c']) ? 'socketd.conf' : $opts['c'],
     'flags'                    => $flags

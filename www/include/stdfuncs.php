@@ -71,6 +71,24 @@ if (PHP_SAPI === 'cli') {
     {
         return \getopt($shortOpts . 'v', \array_merge($longOpts, [Logger::OPT_PORCELAIN], Logger::getAvailableFields()));
     }
+
+    /**
+     * Uses the set of command line options to return the set of fields to prepend to each log item
+     *
+     * @param array $opts - Indexed by command line option name
+     * @return array
+     * @todo Daemon kernel should know how to read fields from command line
+     */
+    function sb_getDaemonLoggerFields(array $opts): array
+    {
+        $fields = Logger::getAvailableFields();
+        foreach ($fields as $key => $name) {
+            if (!isset($opts[$name])) {
+                unset($fields[$key]);
+            }
+        }
+        return $fields;
+    }
 }
 
 /**

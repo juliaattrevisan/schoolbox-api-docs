@@ -32,24 +32,16 @@ use Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy;
  * @version     SVN: $Id$
  */
 use Schoolbox\Application\Daemon;
-use Alaress\Lumberjack\Logger;
 
-$fields = Logger::getAvailableFields();
 $opts   = sb_getDaemonOpt();
-
-foreach($fields as $k => $name) {
-    if(!isset($opts[$name])) {
-        unset($fields[$k]);
-    }
-}
-
-$flags = implode(' ', array_slice($argv, 1));
+$fields = sb_getDaemonLoggerFields($opts);
+$flags  = implode(' ', array_slice($argv, 1));
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel('Schedule', [
     Daemon\Kernel::OPT_VERBOSE => isset($opts['v']) ? $opts['v'] : null,
     Daemon\Kernel::OPT_ERRORS  => E_ALL,
-    Daemon\Kernel::OPT_FIELDS  => \array_values($fields),
+    Daemon\Kernel::OPT_FIELDS  => $fields,
     'flags'                    => $flags
 ]);
 
