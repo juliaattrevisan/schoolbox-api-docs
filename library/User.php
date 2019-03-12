@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Config\ConfigMapper;
+
 class User extends DeprecatedModel
 {
     /**
@@ -231,7 +233,13 @@ class User extends DeprecatedModel
             $wherePart .= ' AND '.$searchFilter;
         }
 
-        // retreive results
+        /* Show disabled users only if ticked (hide when unticked)
+         */
+        if (!ConfigMapper::getInstance()->get('show_disabled_users')) {
+            $wherePart .= ' AND `user`.enabled = 1';
+        }
+
+        // retrieve results
         /* Allow search on synergy id
          */
         $query = "
