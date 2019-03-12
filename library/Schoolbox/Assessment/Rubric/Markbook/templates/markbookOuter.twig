@@ -67,10 +67,10 @@
                             </th>
 
                             {% for student in students %}
-                                {% set capability = student[assessmentId].capabilities[capabilityId] %}
+                                {% set capabilityMarkData = student[assessmentId].capabilities[capabilityId] %}
                                 {% set capabilityMark = '-' %}
-                                {% if capability.maxMark and capability.normalisedMark %}
-                                    {% set capabilityMark = capability.normalisedMark ~ '/' ~ capability.maxMark %}
+                                {% if capability.maxMark and capabilityMarkData.normalisedMark %}
+                                    {% set capabilityMark = capabilityMarkData.normalisedMark ~ '/' ~ capability.maxMark %}
                                 {% endif %}
                                 <td>
                                     {{ capabilityMark }}
@@ -86,12 +86,12 @@
                                 </th>
 
                                 {% for student in students %}
-                                    {% set indicator = student[assessmentId].capabilities[capabilityId].indicators[indicatorId] %}
+                                    {% set indicatorMarkData = student[assessmentId].capabilities[capabilityId].indicators[indicatorId] %}
                                     {% set indicatorMark = '-' %}
-                                    {% if indicator.maxMark and indicator.normalisedMark %}
-                                        {% set indicatorMark = indicator.normalisedMark ~ '/' ~ indicator.maxMark %}
+                                    {% if indicator.maxMark and indicatorMarkData.normalisedMark %}
+                                        {% set indicatorMark = indicatorMarkData.normalisedMark ~ '/' ~ indicator.maxMark %}
                                     {% endif %}
-                                    <td title="{{ indicator.selectedDescriptorText }}">
+                                    <td title="{{ indicatorMarkData.selectedDescriptorText }}">
                                         {{ indicatorMark }}
                                     </td>
                                 {% endfor %}
