@@ -21,10 +21,10 @@ use Schoolbox\Realtime\Routing\Subscription\Test\NestTestResolver;
 use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../conf/core/require.php';
+
 $kernel = new Daemon\Kernel(
     'Subscription Reader',
     [
-        Daemon\Kernel::OPTION_LEVEL         => Monolog\Logger::INFO,
         Daemon\Kernel::OPTION_ERRORS        => E_ALL,
         Daemon\Kernel::OPTION_APP_LONG_OPTS => ['user:', 'pattern:'],
     ]
