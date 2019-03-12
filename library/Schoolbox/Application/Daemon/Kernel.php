@@ -28,11 +28,12 @@ use React\Stomp;
 class Kernel extends \Alaress\Application\Kernel
 {
     // Command line options for this Daemon kernel
+    public const OPT_VERBOSE   = 'v';         // What log verbosity should be reported?
     public const OPT_ERRORS    = 'errors';    // What level of PHP errors should be reported?
-    public const OPT_VERBOSE   = 'verbose';   // What log verbosity should be reported?
     public const OPT_LEVEL     = 'level';     // What level of logs should be reported?
-    public const OPT_FIELDS    = 'fields';    // What extra fields should be prepended to each log entry?
     public const OPT_PORCELAIN = 'porcelain'; // Should log items be formatted for text file rather than TTL?
+
+    public const LOG_FIELDS    = 'fields';    // What extra fields should be prepended to each log entry?
 
     const RLIMIT_CORE_FILESIZE = 'core';
     const RLIMIT_CPU_TIME = 'cpu';
@@ -52,7 +53,7 @@ class Kernel extends \Alaress\Application\Kernel
     protected $loop;
 
     /** @var array */
-    protected $opts;
+    private $opts;
 
     /** @var LoggerInterface */
     protected $log;
@@ -68,13 +69,11 @@ class Kernel extends \Alaress\Application\Kernel
     /**
      * Initialise
      *
-     * $opts contains command line options. These may be recognised/used by:
-     * * This Kernel,
-     * * The App run by this Kernel
-     * * The Logger created by this Kernel
-     *
-     * @param string $name
-     * @param array  $opts
+     * @param string   $name               The name of this Daemon
+     * @param string   $appShortOpts       Short command line options used by the Daemon App
+     * @param array    $appLongOpts        Long command line options used by the Daemon App
+     * @param int|null $minLogLevel        Should we override the command-line log level?
+     * @param int|null $errorLevelOverride Should we override the command-line error level?
      * @throws RuntimeException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
@@ -83,9 +82,14 @@ class Kernel extends \Alaress\Application\Kernel
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\External\Exception
      */
-    public function __construct($name, $opts = [])
-    {
-        $this->setOpts($opts);
+    public function __construct(
+        string $name,
+        string $appShortOpts = '',
+        array $appLongOpts = [],
+        int $minLogLevel = null,
+        int $errorLevelOverride = null
+    ) {
+        $this->setOpts($appShortOpts, $appLongOpts, $minLogLevel, $errorLevelOverride);
         parent::__construct();
 
         pcntl_signal(SIGCHLD, SIG_IGN);
@@ -111,15 +115,49 @@ class Kernel extends \Alaress\Application\Kernel
 
 
     /**
-     * @param array $opts
+     * Processes command line options and any kernel-invocation overrides
+     *
+     * @param string   $appShortOpts
+     * @param array    $appLongOpts
+     * @param int|null $minLogLevel
+     * @param int|null $errorLevelOverride
      */
-    protected function setOpts($opts)
-    {
-        $this->opts = $opts;
-        // If level not set, logging level determined by verbose
-        if (!isset($this->opts[self::OPT_LEVEL])) {
-            $this->opts[self::OPT_LEVEL] = $this->getLoggingLevel();
+    private function setOpts(
+        string $appShortOpts = '',
+        array $appLongOpts = [],
+        int $minLogLevel = null,
+        int $errorLevelOverride = null
+    ): void {
+        // Get all Kernel, App, and Logger options from command line
+        $shortOpts = $appShortOpts . self::OPT_VERBOSE;
+        $longOpts  = \array_merge($appLongOpts, [self::OPT_LEVEL, Logger::OPT_PORCELAIN], Logger::getAvailableFields());
+        $opts      = \getopt($shortOpts, $longOpts);
+
+        // Derive the list of fields to prepend to log items
+        $fields = Logger::getAvailableFields();
+        foreach ($fields as $key => $field) {
+            if (!isset($opts[$field])) {
+                unset($fields[$key]);
+            }
         }
+        $opts[self::LOG_FIELDS] = $fields;
+
+        // Derive log verbosity
+        if (!isset($opts[self::OPT_LEVEL])) {
+            // If level not set, logging level determined by verbose
+            $opts[self::OPT_LEVEL] = $this->getLoggingLevel($opts);
+        }
+        if (null !== $minLogLevel) {
+            $opts[self::OPT_LEVEL] = min($opts[self::OPT_LEVEL], $minLogLevel);
+        }
+
+        // Derive error reporting
+        if(null !== $errorLevelOverride){
+            // Explicitly set by code in Kernel invocation
+            $opts[self::OPT_ERRORS] = $errorLevelOverride;
+        }
+
+        $this->opts = $opts;
     }
 
     /**
@@ -179,7 +217,9 @@ EOL;
         }
 
         try {
-            call_user_func($callable, $this->di, $this->loop, $this->logger(), $this->opts);
+            global $argv;
+            $flags = implode(' ', array_slice($argv, 1));
+            $callable($this->di, $this->loop, $this->logger(), $this->opts, $flags);
         } catch (\Schoolbox\External\Exception $e) {
             $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
             throw $e;
@@ -385,9 +425,9 @@ EOL;
      *
      * @return int
      */
-    public function getLoggingLevel()
+    public function getLoggingLevel(array $opts)
     {
-        $v = $this->getOpt(self::OPT_VERBOSE);
+        $v = $opts['v'] ?? null;
 
         $threshold = 0;
         if (isset($v)) {
@@ -415,7 +455,7 @@ EOL;
         if (!$this->log instanceof LoggerInterface) {
             // if verbose output is on
             $level     = $this->getOpt(self::OPT_LEVEL);
-            $fields    = $this->getOpt(self::OPT_FIELDS);
+            $fields    = $this->getOpt(self::LOG_FIELDS);
             $porcelain = \array_key_exists(Logger::OPT_PORCELAIN, $this->opts);
             $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 

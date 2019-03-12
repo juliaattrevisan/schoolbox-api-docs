@@ -25,25 +25,13 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\ProfessionalDevelopment;
 use Schoolbox\UserMapper;
-use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../conf/core/require.php';
-
-$opts   = sb_getDaemonOpt(['schoolCode:', 'host:']);
-$fields = sb_getDaemonLoggerFields($opts);
-
-$kernel = new Daemon\Kernel('Help User Provision', [
-    Daemon\Kernel::OPT_VERBOSE => $opts['v'] ?? null,
-    Daemon\Kernel::OPT_ERRORS  => E_ALL,
-    Daemon\Kernel::OPT_FIELDS  => $fields,
-    'schoolCode'               => $opts['schoolCode'] ?? null,
-    'host'                     => $opts['host'] ?? null,
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Help User Provision', '', ['schoolCode:', 'host:'], null, E_ALL);
 
 // ensure the help routes are registered, so we can do route lookups
 // will explode if you're actually on Help (thank goodness)
 (new API())->configure($kernel);
-
 
 // PROVISIONING APP
 $kernel->run(new class extends App {

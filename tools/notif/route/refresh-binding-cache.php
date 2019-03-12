@@ -18,32 +18,23 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 
-$fields = [ 'userId:' ];
-
 $opts = require __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Binding Calculator', [
-    'verbose'  => isset($opts['v']) ? $opts['v'] : null,
-    'fields'   => array_keys($opts),
-    'instance' => isset($opts['instance']) ? $opts['instance'] : null,
-    'userId'   => isset($opts['userId']) ? $opts['userId'] : null
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Binding Calculator', '', ['userId:', 'instance:']);
 
 $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
     // If no instance ID is provided, fall back to default if it exists
-    if(!isset($opts['instance'])) {
-        $opts['instance'] = INSTANCE_ID;
-    }
+    $instanceId = $opts['instance'] ?? INSTANCE_ID;
+    $userId     = $opts['userId'] ?? null;
 
     /** @var WritableCache $cache */
     $cache = $di->get('subscriptionCache');
 
-    if ($opts['userId']) {
-        $cache->cacheUsers($opts['instance'], [$opts['userId']]);
-
+    if ($userId) {
+        $cache->cacheUsers($instanceId, [$userId]);
     } else {
-        $cache->cacheAllUsers($opts['instance']);
+        $cache->cacheAllUsers($instanceId);
     }
 
 });

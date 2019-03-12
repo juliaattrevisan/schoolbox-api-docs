@@ -11,11 +11,7 @@ use External\Tass\Portal\SSO;
 use Schoolbox\Application\Daemon;
 
 $opts = require __DIR__ . '/../../conf/core/require.php';
-$kernel = new Daemon\Kernel('Insert SSO token generation strategy config', [
-    'verbose' => $opts['v'] ?? [1, 2, 3],
-    'errors'  => E_ALL,
-    'fields'  => array_keys($opts),
-]);
+$kernel = new Daemon\Kernel('Insert SSO token generation strategy config', '', [], Monolog\Logger::DEBUG, E_ALL);
 
 /** @var Alaress\Database\Connector\IConnector $db */
 /** @noinspection PhpUnhandledExceptionInspection */

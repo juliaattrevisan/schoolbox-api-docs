@@ -10,10 +10,7 @@
 use Psr\Log\LoggerInterface;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('Create Course Instances', [
-    'verbose' => [false, false, false],
-    'errors'  => E_ALL,
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Create Course Instances', '', [], Monolog\Logger::DEBUG, E_ALL);
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 

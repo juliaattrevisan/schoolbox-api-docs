@@ -17,11 +17,7 @@ use Alaress\Database;
 
 $opts = require __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Daemon\Kernel("Repair 'Custom Assessment Participation' (CAP)", [
-    'verbose' => $opts['v'] ?? [1, 2, 3],
-    'errors'  => E_ALL,
-    'fields'  => array_keys($opts),
-]);
+$kernel = new Daemon\Kernel("Repair 'Custom Assessment Participation' (CAP)", '', [], Monolog\Logger::DEBUG, E_ALL);
 
 /**
  * Relevant Business Rules:

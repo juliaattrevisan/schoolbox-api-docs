@@ -20,7 +20,6 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Resource\Storage;
 use Alaress\Random;
-use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../conf/core/require.php';
 
@@ -42,23 +41,10 @@ $appOpts = [
     'timeout:',
     'failure-rate:',
 ];
-$options = sb_getDaemonOpt($appOpts);
 
-$kernel = new Daemon\Kernel(
-    'Kami Uploader',
-    [
-        Daemon\Kernel::OPT_VERBOSE => $options['v'] ?? null,
-        Daemon\Kernel::OPT_ERRORS  => E_ALL,
-        'dryRun'                   => isset($options['dry-run']),
-        'retryFailed'              => isset($options['retry-failed']),
-        'batchSize'                => isset($options['batch-size']) ? (int)$options['batch-size'] : DEFAULT_BATCH_SIZE,
-        'maxAttempts'              => isset($options['max-attempts']) ? (int)$options['max-attempts'] : DEFAULT_MAX_ATTEMPTS,
-        'maxSkips'                 => isset($options['max-skips']) ? (int)$options['max-skips'] : DEFAULT_MAX_SKIPS,
-        'baseBackOff'              => isset($options['base-back-off']) ? (int)$options['base-back-off'] : DEFAULT_BASE_JITTER_BACK_OFF,
-        'timeout'                  => isset($options['timeout']) ? (int)$options['timeout'] : DEFAULT_TIMEOUT,
-        'failureRate'              => isset($options['failure-rate']) ? (float)$options['failure-rate'] : 0.0,
-    ]
-);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Kami Uploader', '', $appOpts, null, E_ALL);
+
+$options = getopt('', $appOpts);
 
 $colourRed   = "\033[0;31m";
 $colourWhite = "\033[0m";
@@ -113,14 +99,14 @@ $kernel->run(function (Di\Container $di,
     LoggerInterface $log,
     array $options
 ) {
-    $dryRun      = $options['dryRun'];
-    $retryFailed = $options['retryFailed'];
-    $batchSize   = $options['batchSize'];
-    $maxAttempts = $options['maxAttempts'];
-    $maxSkips    = $options['maxSkips'];
-    $baseBackOff = $options['baseBackOff'];
-    $timeout     = $options['timeout'];
-    $failureRate = $options['failureRate'];
+    $dryRun      = isset($options['dry-run']);
+    $retryFailed = isset($options['retry-failed']);
+    $batchSize   = isset($options['batch-size']) ? (int)$options['batch-size'] : DEFAULT_BATCH_SIZE;
+    $maxAttempts = isset($options['max-attempts']) ? (int)$options['max-attempts'] : DEFAULT_MAX_ATTEMPTS;
+    $maxSkips    = isset($options['max-skips']) ? (int)$options['max-skips'] : DEFAULT_MAX_SKIPS;
+    $baseBackOff = isset($options['base-back-off']) ? (int)$options['base-back-off'] : DEFAULT_BASE_JITTER_BACK_OFF;
+    $timeout     = isset($options['timeout']) ? (int)$options['timeout'] : DEFAULT_TIMEOUT;
+    $failureRate = isset($options['failure-rate']) ? (float)$options['failure-rate'] : 0.0;
 
     $dryRun
         ? $log->notice('Performing dry run - no documents will be uploaded to Kami or saved to Database')

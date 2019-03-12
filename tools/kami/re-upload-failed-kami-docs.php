@@ -20,16 +20,9 @@ use Schoolbox\Application\Daemon\App;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Alaress\Random;
 use Schoolbox\MapperFactory;
-use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../conf/core/require.php';
-$opts = sb_getDaemonOpt();
-
-$kernel = new Daemon\Kernel("'Re-queue kami conversion errors'", [
-    Daemon\Kernel::OPT_VERBOSE => $opts['v'] ?? [1, 2, 3],
-    Daemon\Kernel::OPT_ERRORS  => E_ALL,
-]);
-
+$kernel = new Schoolbox\Application\Daemon\Kernel("'Re-queue kami conversion errors'", '', [], null, E_ALL);
 
 $reQueue = new class() extends App
 {
@@ -41,11 +34,10 @@ $reQueue = new class() extends App
      * @param LoopInterface   $loop
      * @param LoggerInterface $log
      * @param array           $opts
+     * @param array           $flags
      * @return void
-     * @throws \InvalidArgumentException
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
+    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags): void
     {
         /**
          * @var MapperFactory  $mapperFactory

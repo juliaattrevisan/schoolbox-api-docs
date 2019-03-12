@@ -9,10 +9,7 @@ use Psr\Log\LoggerInterface;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Update dashboard feature tour', [
-    'verbose' => [false, false, false],
-    'errors'  => E_ALL,
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Update dashboard feature tour', '', [], Monolog\Logger::DEBUG, E_ALL);
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 

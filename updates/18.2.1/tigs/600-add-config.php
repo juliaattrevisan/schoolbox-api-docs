@@ -21,10 +21,7 @@ use Schoolbox\Pastoral\Type;
 $opts = require __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel("'Insert TIGS config'", [
-    'verbose' => $opts['v'] ?? null,
-    'errors'  => E_ALL,
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel("'Insert TIGS config'", '', [], Monolog\Logger::DEBUG, E_ALL);
 
 $app = new class extends App
 {

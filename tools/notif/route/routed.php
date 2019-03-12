@@ -25,26 +25,15 @@ use Schoolbox\Realtime\Routing\DispatchResponder;
 use Schoolbox\Realtime\Routing\DispatchStrategy;
 use Schoolbox\Realtime\Routing\RouteTXRX;
 use Schoolbox\Realtime\Routing\Subscription;
-use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../../conf/core/require.php';
 
-$opts   = sb_getDaemonOpt();
-$fields = sb_getDaemonLoggerFields($opts);
-$flags  = implode(' ', array_slice($argv, 1));
-
-$kernel = new Daemon\Kernel('Routing', [
-    Daemon\Kernel::OPT_VERBOSE => isset($opts['v']) ? $opts['v'] : null,
-    Daemon\Kernel::OPT_ERRORS  => E_ALL,
-    Daemon\Kernel::OPT_FIELDS  => $fields,
-    'flags'                    => $flags,
-]);
-
+$kernel = new Schoolbox\Application\Daemon\Kernel('Routing', '', [], null, E_ALL);
 
 // ROUTING APP
-$kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags) {
 
-    $di->get('stomp')->connect()->then(function (Client $client) use ($di, $loop, $log, $opts) {
+    $di->get('stomp')->connect()->then(function (Client $client) use ($di, $loop, $log, $opts, $flags) {
         try {
             $log->info('Connected to STOMP', [ 'char' => '+' ]);
 
@@ -59,7 +48,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $lo
 
             // also listen for signals
             $asyncRedis  = new Async\Client($di->get('config')->get('redis_url'), $loop);
-            $dispatcher  = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($opts['flags']));
+            $dispatcher  = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($flags));
 
             $cache = new Routing\Cache\Redis\ReadCache($redis, $log);
 

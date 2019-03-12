@@ -22,7 +22,7 @@
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel("Quiz Attempt Automatic Closer", array('level'=>200));
+$kernel = new \Schoolbox\Application\Daemon\Kernel("Quiz Attempt Automatic Closer", '', [], Monolog\Logger::INFO);
 
 $log             = $kernel->logger();
 $attemptMapper   = QuizAttemptMapper::getInstance();

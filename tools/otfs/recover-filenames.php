@@ -14,9 +14,7 @@ if ($argc != 2) {
 }
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$k = new Schoolbox\Application\Daemon\Kernel('File Recovery', [
-    'verbose' => [1,1,1]
-]);
+$k = new Schoolbox\Application\Daemon\Kernel('File Recovery', '', [], Monolog\Logger::DEBUG);
 
 // database name: you get alphanum and underscore, nothing else
 $backupDatabase = preg_replace('`[^a-z0-9_]`i', '', trim($argv[1]));

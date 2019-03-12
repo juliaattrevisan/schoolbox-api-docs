@@ -7,7 +7,7 @@
  */
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Skin Builder', array('level'=>200));
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Skin Builder', '', [], Monolog\Logger::INFO);
 $logger = $kernel->logger();
 pcntl_signal(SIGCHLD, SIG_DFL);
 

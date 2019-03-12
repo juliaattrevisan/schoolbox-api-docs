@@ -25,16 +25,9 @@ $fields = [
     'add-attachments',
 ];
 
-$opts = require __DIR__ . '/../../conf/core/require.php';
+require __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel(
-    'Pastoral Import',
-    [
-        'verbose' => $opts['v'] ?? [],
-        'errors'  => E_ALL,
-        'opts'    => $opts,
-    ]
-);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Pastoral Import', '', $fields, Monolog\Logger::CRITICAL, E_ALL);
 
 /** @noinspection PhpUnhandledExceptionInspection */
 $kernel->run(function (
@@ -42,17 +35,16 @@ $kernel->run(function (
     /** @noinspection PhpUnusedParameterInspection */
     LoopInterface $loop,
     LoggerInterface $log,
-    array $options
+    array $opts
 ) {
 
     /* command-line options
      */
-    $opts               = $options['opts'];
     $importParentAccess = isset($opts['parent-access']);
     $importRecords      = isset($opts['add-records']);
     $importAttachments  = isset($opts['add-attachments']);
-    $defaultOwner       = null;
-    $user               = null;
+    $defaultOwnerId     = array_key_exists('default-owner', $opts) ? (int)$opts['default-owner'] : false;
+    $userId             = array_key_exists('user', $opts) ? (int)$opts['user'] : false;
 
     /* Help
      */
@@ -76,7 +68,7 @@ HELP;
 
     /* The user conducting the import (used in logging)
      */
-    $userId = array_key_exists('user', $opts) ? (int)$opts['user'] : false;
+
 
     if (!$userId) {
         $log->critical('Invalid user id. Specify a user to whom the pastoral import is associated for logging purposes (typically a superuser)');
@@ -91,10 +83,6 @@ HELP;
         $log->critical('Invalid user id. User not found.');
         exit(0);
     }
-
-    /* The default owner of pastoral records
-     */
-    $defaultOwnerId = array_key_exists('default-owner', $opts) ? (int)$opts['default-owner'] : false;
 
     if (!$defaultOwnerId) {
         $log->critical('Invalid default owner id. Specify a user to whom pastoral records are assigned.');

@@ -3,12 +3,8 @@
 
 use Schoolbox\Resource\Storage;
 
-$options = getopt("v");
-
 require_once __DIR__ . '/../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('S3 Storage Migration', [
-    'verbose' => isset($options['v']) ? $options['v'] : null
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel('S3 Storage Migration');
 
 $kernel->run(function ($di, $loop, $log, $opts) {
 

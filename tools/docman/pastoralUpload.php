@@ -19,9 +19,7 @@ use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
 use Schoolbox\Pastoral\UploadQueue\Model as PastoralUploadQueueModel;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('DocMan', array(
-    'verbose' => array(false, false, false),
-));
+$kernel = new Schoolbox\Application\Daemon\Kernel('DocMan', '', [], Monolog\Logger::DEBUG);
 
 $kernel->run(function ($di, $loop, $log, $opts) {
 

@@ -14,10 +14,10 @@ use React\EventLoop\LoopInterface;
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Re-sequence Rubric Levels',
-    [
-        'verbose' => [false, false, false],
-        'errors'  => E_ALL,
-    ]
+    '',
+    [],
+    Monolog\Logger::DEBUG,
+    E_ALL
 );
 
 /** @noinspection PhpUnhandledExceptionInspection */

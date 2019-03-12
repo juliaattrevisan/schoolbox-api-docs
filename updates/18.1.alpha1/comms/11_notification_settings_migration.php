@@ -202,10 +202,7 @@ WHERE posted.msg_source_id = :posted and published.msg_source_id = :published;
 }
 
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Merge notification settings for school news and homepage news', [
-    'verbose' => [false, false, false],
-    'errors' => E_ALL,
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Merge notification settings for school news and homepage news', '', [], Monolog\Logger::DEBUG, E_ALL);
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();

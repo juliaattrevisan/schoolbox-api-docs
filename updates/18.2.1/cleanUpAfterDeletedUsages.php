@@ -42,15 +42,13 @@ use Schoolbox\Application\Daemon\App;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Zend\Uri\Uri;
 
-
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$opts   = getopt('vp');
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Rubric Usage Cleanup',
-    [
-        'verbose' => [true, true, true]
-    ]
+    '',
+    [],
+    Monolog\Logger::DEBUG
 );
 
 /** @noinspection PhpUnhandledExceptionInspection */
@@ -148,8 +146,9 @@ $kernel->run(new class extends App
      * @param LoopInterface $loop
      * @param Logger        $log
      * @param array         $opts
+     * @param array         $flags
      */
-    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
+    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, array $flags): void
     {
         // Install logger and DB
         $this->log     = $log;

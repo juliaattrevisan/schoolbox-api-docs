@@ -23,13 +23,7 @@ use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$opts   = getopt('v');
-$kernel = new Schoolbox\Application\Daemon\Kernel(
-    'Pastoral Export',
-    [
-        'verbose' => $opts['v'] ?? [],
-    ]
-);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Pastoral Export', '', [], Monolog\Logger::CRITICAL);
 
 $kernel->run(function ($di, $loop, $log, $opts) {
 

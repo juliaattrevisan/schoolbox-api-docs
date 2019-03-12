@@ -23,23 +23,8 @@ use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Trigger\Propagator;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
 
-$fields = array('porcelain', 'mem', 'truemem', 'pid');
-
-$opts = getopt('v', $fields);
-
-foreach($fields as $k => $name) {
-    if(!isset($opts[$name])) {
-        unset($fields[$k]);
-    }
-}
-
 require_once __DIR__ . '/../../conf/core/require.php';
-$k = new \Schoolbox\Application\Daemon\Kernel('Schedule Reload-from-Cache', [
-    'verbose' => isset($opts['v']) ? $opts['v'] : null,
-    'errors'  => E_ALL,
-    'fields'  => array_values($fields),
-]);
-
+$k = new \Schoolbox\Application\Daemon\Kernel('Schedule Reload-from-Cache', '', [], null, E_ALL);
 
 try {
 

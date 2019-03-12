@@ -14,10 +14,7 @@ use Psr\Log\LoggerInterface;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Update Timetable_External to Timetable_ExternalConstrained', [
-    'verbose' => [false, false, false],
-    'errors'  => E_ALL,
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Update Timetable_External to Timetable_ExternalConstrained', '', [], Monolog\Logger::DEBUG, E_ALL);
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();

@@ -19,7 +19,7 @@ use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\ReportTransa
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', ['level' => 200]);
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', '', [], Monolog\Logger::INFO);
 $log = $kernel->logger();
 
 $mapper = PlagscanMapper::getInstance();

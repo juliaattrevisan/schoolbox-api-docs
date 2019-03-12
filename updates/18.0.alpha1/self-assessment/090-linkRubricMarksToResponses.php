@@ -92,10 +92,10 @@ use React\EventLoop\LoopInterface;
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Link Rubric Marks to Responses',
-    [
-        'verbose' => [false, false, false],
-        'errors'  => E_ALL,
-    ]
+    '',
+    [],
+    Monolog\Logger::DEBUG,
+    E_ALL
 );
 
 $kernel->run(

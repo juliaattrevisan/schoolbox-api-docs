@@ -19,10 +19,7 @@ use Schoolbox\Application\Daemon\App;
 
 $opts = require __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel("'Backfill missing rubric_group_usage records'", [
-    'verbose' => $opts['v'] ?? [false, false, false],
-    'errors'  => E_ALL,
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel("'Backfill missing rubric_group_usage records'", '', [], Monolog\Logger::DEBUG, E_ALL);
 
 $backfiller = new class extends App
 {

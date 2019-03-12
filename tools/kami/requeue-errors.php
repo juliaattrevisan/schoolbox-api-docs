@@ -17,7 +17,6 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
 use Alaress\Random;
-use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../conf/core/require.php';
 
@@ -31,15 +30,8 @@ $appOpts = [
     'base-back-off:',
     'timeout:',
 ];
-$opts   = sb_getDaemonOpt($appOpts);
-$kernel = new Daemon\Kernel(
-    'Kami Error Re-Queue',
-    [
-        Daemon\Kernel::OPT_VERBOSE => $opts['v'] ?? [1,2,3],
-        Daemon\Kernel::OPT_ERRORS  => E_ALL,
-        'opts'                     => $opts,
-    ]
-);
+
+$kernel = new Schoolbox\Application\Daemon\Kernel('Kami Error Re-Queue', '', $appOpts, null, E_ALL);
 
 /** @noinspection PhpUnhandledExceptionInspection */
 $kernel->run(function (
@@ -47,9 +39,8 @@ $kernel->run(function (
     /** @noinspection PhpUnusedParameterInspection */
     LoopInterface $loop,
     LoggerInterface $log,
-    array $options
+    array $opts
 ) {
-    $opts         = $options['opts'];
     $displayHelp  = isset($opts['help']);
     $dryRun       = isset($opts['dry-run']);
     $perform      = isset($opts['perform']);

@@ -14,8 +14,10 @@ use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 
-$opts = getopt('d', [ 'help', 'channel:', 'signal:', 'loop:' ]);
+$appShortOpts = 'd';
+$appLongOpts  = [ 'help', 'channel:', 'signal:', 'loop:' ];
 
+$opts = getopt($appShortOpts, $appLongOpts);
 if (isset($opts['help'])) {
     echo <<<EOL
 
@@ -26,13 +28,8 @@ EOL;
 }
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$daemon = isset($opts['channel']) ? $opts['channel'] : (readline('Daemon name [test]: ') ?: 'test');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Redis pubsub signal test', [
-    'verbose' => [ false, false, false ],
-    'daemon'  => $daemon
-]);
-
+$kernel = new Schoolbox\Application\Daemon\Kernel('Redis pubsub signal test', $appShortOpts, $appLongOpts, Monolog\Logger::DEBUG);
 
 if (!isset($opts['d'])) {
     // client (publish) mode
@@ -78,8 +75,9 @@ if (!isset($opts['d'])) {
 // daemon (subscribe / consume) mode
 $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
+    $daemon = $opts['channel'] ?? (\readline('Daemon name [test]: ') ?: 'test');
+
     $client = new Redis\Async\Client($di->get('config')->get('redis_url'), $loop);
 
-    $client->subscribe($opts['daemon'], new TestListener($log));
-
+    $client->subscribe($daemon, new TestListener($log));
 });

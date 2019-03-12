@@ -15,19 +15,7 @@ use Schoolbox\Application\Daemon\App;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$fields = array('porcelain', 'mem', 'truemem', 'pid');
-
-foreach($fields as $k => $name) {
-    if(!isset($opts[$name])) {
-        unset($fields[$k]);
-    }
-}
-
-$k = new \Schoolbox\Application\Daemon\Kernel('TTL Reset', [
-    'verbose' => [true, true],
-    'errors'  => E_ALL,
-    'fields'  => array_values($fields),
-]);
+$k = new \Schoolbox\Application\Daemon\Kernel('TTL Reset', '', [], Monolog\Logger::INFO, E_ALL);
 
 try {
     $k->run(new class extends App {

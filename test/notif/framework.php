@@ -10,7 +10,6 @@ use Alaress\Async\Test\Framework;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Application\Daemon;
 
 // require root
 if (posix_getuid() !== 0) {
@@ -22,27 +21,27 @@ unset($_SERVER['REQUEST_TIME']);
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$opts = getopt('v', ['env:', 'logdir:', 'testcase:']);
-
-$kernel = new Daemon\Kernel('Notification Test Framework', [
-    Daemon\Kernel::OPT_VERBOSE => isset($opts['v']) ? $opts['v'] : [false, false, false],
-    Daemon\Kernel::OPT_ERRORS  => E_ALL,
-    'flags'                    => $opts,
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel(
+    'Notification Test Framework',
+    '',
+    ['env:', 'logdir:', 'testcase:'],
+    Monolog\Logger::DEBUG,
+    E_ALL
+);
 
 $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
-    $framework = new Framework($di, $loop, $log, $opts['flags']);
+    $framework = new Framework($di, $loop, $log, $opts['env'] ?? null, $opts['logdir'] ?? null);
 
     $framework->ensureDirectories();
     $framework->freezeHell();
 
     try {
         // find out the name of the test case, depending on whether or not it was supplied as a flag value
-        if (empty($opts['flags']['testcase'])) {
+        if (empty($opts['testcase'])) {
             $testClass = $framework->promptForTest();
         } else {
-            $testClass = $opts['flags']['testcase'];
+            $testClass = $opts['testcase'];
         }
 
         // construct the test case

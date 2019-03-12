@@ -9,6 +9,7 @@ $folderName = "Lost & Found";
 require_once __DIR__ . '/../conf/core/require.php';
 new \Schoolbox\Application\Daemon\Kernel("Orphaned Folder Cleanup");
 
+$options = getopt('porcelain');
 $db      = Database::getInstance();
 $logger  = new Alaress\Lumberjack\Logger(STDOUT, null, Monolog\Logger::INFO, [], isset($options['porcelain']));
 

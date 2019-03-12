@@ -29,10 +29,9 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $opts   = getopt('p', ['perform']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Repair Truncated Articles',
-    [
-        'verbose' => [true, true, true],
-        'perform' => true,
-    ]
+    'p',
+    ['perform'],
+    Monolog\Logger::DEBUG
 );
 
 /** @noinspection PhpUnhandledExceptionInspection */
@@ -100,14 +99,14 @@ $kernel->run(new class extends App
      * @param LoopInterface $loop
      * @param Logger        $log
      * @param array         $opts
+     * @param array         $flags
      */
-    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
+    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, array $flags): void
     {
         // Install logger and DB
         $this->log     = $log;
         $this->db      = $di->get('databaseInternal');
-        $this->perform = $opts['perform'] ?? false;
-
+        $this->perform = isset($opts['p']) || isset($opts['perform']);
 
         // log perform / dry run
         if ($this->perform) {

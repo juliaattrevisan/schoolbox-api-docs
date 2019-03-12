@@ -23,30 +23,13 @@ use Schoolbox\Realtime\Timetable\TimetableScheduler;
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-
-$fields = [ 'porcelain', 'mem', 'truemem', 'pid' ];
-$opts   = getopt('v', $fields);
-
-foreach ($fields as $k => $name) {
-    if (!isset($opts[$name])) {
-        unset($fields[$k]);
-    }
-}
-
-$flags = implode(' ', array_slice($argv, 1));
-
 require_once __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Bell', [
-    'verbose' => isset($opts['v']) ? $opts['v'] : null,
-    'fields'  => array_values($fields),
-    'flags'   => $flags
-]);
-
+$kernel = new Schoolbox\Application\Daemon\Kernel('Bell');
 
 
 // CREATE BELL APP
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags) {
 
     try {
         /** @var IConfigLoader $conf */
@@ -62,7 +45,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
         $campusList = $campusMapper->findByColumn('ext_timetable_code', 'SEN');
         $clock      = new Clock();
         $factory    = new TriggerFactory($clock);
-        $strat      = new DefaultDispatchStrategy($opts['flags']);
+        $strat      = new DefaultDispatchStrategy($flags);
 
         new TimetableScheduler($loop, $strat, $stomp, $log, $campusList, $factory, $conf, $clock);
 

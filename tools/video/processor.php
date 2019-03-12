@@ -24,10 +24,7 @@ use Schoolbox\Video\Queue;
 use Schoolbox\Video\QueueMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('Media Transcode', [
-    'verbose' => [false, false, false],
-]);
-
+$kernel = new Schoolbox\Application\Daemon\Kernel('Media Transcode', '', [], Monolog\Logger::DEBUG);
 
 $kernel->run(function ($di, $loop, $log, $opts) {
     /**

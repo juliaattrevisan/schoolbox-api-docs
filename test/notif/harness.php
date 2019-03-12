@@ -16,10 +16,7 @@ use Predis\ClientInterface as Redis;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Assessment Return Notifications', [
-    'verbose' => [ false, false, false ],
-    'errors'  => E_ALL,
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Assessment Return Notifications', '', [], Monolog\Logger::DEBUG, E_ALL);
 
 $kernel->run(function($di, $loop, $log, $opts) {
     /**

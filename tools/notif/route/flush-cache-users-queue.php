@@ -23,18 +23,13 @@ use Schoolbox\Realtime\Routing\Cache\WritableCache;
 
 $opts = require __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Flush Cache Users Queue', [
-    'verbose'  => isset($opts['v']) ? $opts['v'] : null,
-    'instance' => isset($opts['instance']) ? $opts['instance'] : null,
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Flush Cache Users Queue', '', ['instance:']);
 
 $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
     // If no instance ID is provided, fall back to default if it exists
-    if(!isset($opts['instance'])) {
-        $opts['instance'] = INSTANCE_ID;
-    }
+    $instanceId = $opts['instance'] ?? INSTANCE_ID;
 
     /** @var WritableCache $cache */
     $cache = $di->get('subscriptionCache');
-    $cache->flushCacheUsersQueue($opts['instance']);
+    $cache->flushCacheUsersQueue($instanceId);
 });

@@ -20,9 +20,7 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Media Migrator', [
-    'verbose' => [false, false, false],
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Media Migrator', '', [], Monolog\Logger::DEBUG);
 
 try {
     $kernel->run(function ($di, $loop, $log, $opts) {

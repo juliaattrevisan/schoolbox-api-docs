@@ -14,13 +14,9 @@
  */
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Mapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('Create Missing Resource Booking Calendar Configs', [
-    'verbose' => [false, false, false],
-    'errors'  => E_ALL,
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Create Missing Resource Booking Calendar Configs', '', [], Monolog\Logger::DEBUG, E_ALL);
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();

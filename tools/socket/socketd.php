@@ -29,42 +29,35 @@ use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$opts   = sb_getDaemonOpt([], 'p::c::');
-$fields = sb_getDaemonLoggerFields($opts);
-$flags  = implode(' ', array_slice($argv, 1));
-
-$kernel = new Daemon\Kernel('Socket', [
-    Daemon\Kernel::OPT_VERBOSE => isset($opts['v']) ? $opts['v'] : null,
-    Daemon\Kernel::OPT_FIELDS  => $fields,
-    'port'                     => empty($opts['p']) ? 9081 : $opts['p'],
-    'conf'                     => empty($opts['c']) ? 'socketd.conf' : $opts['c'],
-    'flags'                    => $flags
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel('Socket', 'p::c::');
 
 // CREATE WEBSOCKET APP
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) use ($kernel) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags) use ($kernel) {
+
+    $port = $opts['p'] ?? 9081;
+    $conf = $opts['c'] ?? 'socketd.conf';
 
     /** @var Redis|ClientInterface $redis */
     $redis = \Alaress\Redis::getClientInstance();
 
+    /** @var IConfigLoader $config */
+    $config = $di->get('config');
+
     // TODO put this in DI
-    $asyncRedis = new Async\Client($di->get('config')->get('redis_url'), $loop);
+    $asyncRedis = new Async\Client($config->get('redis_url'), $loop);
 
     /** @var IConnector $db */
     $db = $di->get('databaseInternal');
 
-    /** @var IConfigLoader $conf */
-    $conf = $di->get('config');
+    $stratBuilder = new ConfiguredDispatchStrategyBuilder((new ConfigurationReader($conf))->readConfig());
 
-    $stratBuilder = new ConfiguredDispatchStrategyBuilder((new ConfigurationReader($opts['conf']))->readConfig());
-
-    $delim = in_array('porcelain', $opts[ 'fields' ], false) ? ' ' : "\n    ";
+    $delim = \array_key_exists(Daemon\Kernel::OPT_PORCELAIN, $opts) ? ' ' : "\n    ";
 
     $log->info(implode($delim, [ 'Using strategy:' ] + $stratBuilder->summarise()), [ 'char' => '+' ]);
 
     $pipeManager = (new PipeManagerFactory(
-        $loop, new PhpHandler(), $log, $redis, $asyncRedis, $conf->get('session_length'),
-        $db, INSTANCE_ID, $stratBuilder->build($opts['flags']), $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS)
+        $loop, new PhpHandler(), $log, $redis, $asyncRedis, $config->get('session_length'),
+        $db, INSTANCE_ID, $stratBuilder->build($flags), $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS)
     ))->build();
 
     $wss = new Ratchet\WebSocket\WsServer($pipeManager);
@@ -74,8 +67,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $webSock = new Server($loop);
 
     try {
-        $webSock->listen($opts['port'], '0.0.0.0');
-        $log->info("Listening for incoming websockets on port {$opts['port']}...", [ 'char' => '+' ]);
+        $webSock->listen($port, '0.0.0.0');
+        $log->info("Listening for incoming websockets on port {$port}...", [ 'char' => '+' ]);
 
     } catch (ConnectionException $e) {
         $log->alert('Unable to launch: ' . $e->getMessage(), [ 'exception'=>$e ]);
