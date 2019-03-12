@@ -124,14 +124,6 @@ $kernel->run(new class extends App
         $this->perform = $opts['perform'] ?? false;
 
 
-        // log perform / dry run
-        if ($this->perform) {
-            $this->log->warning('Running in perform mode (-p): changes will be written to database');
-        } else {
-            $this->log->warning('Running in dry-run mode: use -p to write changes to database');
-        }
-
-
         // Update queries
         $updateBodyQuery = $this->db->prepareQuery(self::UPDATE_RUBRIC_MAX_MARK_QUERY);
 
