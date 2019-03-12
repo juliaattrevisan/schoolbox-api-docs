@@ -416,7 +416,7 @@ EOL;
             // if verbose output is on
             $level     = $this->getOpt(self::OPT_LEVEL);
             $fields    = $this->getOpt(self::OPT_FIELDS);
-            $porcelain = \array_key_exists(self::OPT_PORCELAIN, $this->opts);
+            $porcelain = \array_key_exists(Logger::OPT_PORCELAIN, $this->opts);
             $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
             // Add Sentry handler into logging system if possible

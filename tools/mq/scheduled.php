@@ -9,6 +9,7 @@ use Alaress\Redis;
 use Alaress\Scheduler\Cache\RedisCache;
 use Alaress\Scheduler\Stomp\ResolutionManager;
 use Aura\Di;
+use EOTC\ActivityLog\Log;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -30,11 +31,11 @@ use Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy;
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Application\Daemon;
+use Alaress\Lumberjack\Logger;
 
-
-$fields = [ 'porcelain', 'mem', 'truemem', 'pid' ];
-
-$opts = getopt('v', $fields);
+$fields = Logger::getAvailableFields();
+$opts   = sb_getDaemonOpt();
 
 foreach($fields as $k => $name) {
     if(!isset($opts[$name])) {
@@ -45,11 +46,11 @@ foreach($fields as $k => $name) {
 $flags = implode(' ', array_slice($argv, 1));
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('Schedule', [
-	'verbose' => isset($opts['v']) ? $opts['v'] : null,
-	'errors'  => E_ALL,
-    'fields'  => array_values($fields),
-    'flags'   => $flags
+$kernel = new Daemon\Kernel('Schedule', [
+    Daemon\Kernel::OPT_VERBOSE => isset($opts['v']) ? $opts['v'] : null,
+    Daemon\Kernel::OPT_ERRORS  => E_ALL,
+    Daemon\Kernel::OPT_FIELDS  => \array_values($fields),
+    'flags'                    => $flags
 ]);
 
 $sched = null;

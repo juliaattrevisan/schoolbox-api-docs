@@ -2,6 +2,7 @@
 <?php
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Lumberjack\Logger;
 use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\ConfigurationReader;
 use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
@@ -16,6 +17,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Pipe\HttpServer;
 use Schoolbox\Realtime\Pipe\PipeManagerFactory;
 use Schoolbox\Realtime\Pipe\Server;
+use Schoolbox\Application\Daemon;
 
 /**
  * The Websocket Daemon.
@@ -26,9 +28,10 @@ use Schoolbox\Realtime\Pipe\Server;
  * @version     SVN: $Id$
  */
 
-$fields = [ 'porcelain', 'mem', 'truemem', 'pid' ];
+require_once __DIR__ . '/../../conf/core/require.php';
 
-$opts = getopt('vp::c::', $fields);
+$fields = Logger::getAvailableFields();
+$opts   = sb_getDaemonOpt([], 'p::c::');
 
 foreach ($fields as $k => $name) {
     if (!isset($opts[$name])) {
@@ -38,14 +41,12 @@ foreach ($fields as $k => $name) {
 
 $flags = implode(' ', array_slice($argv, 1));
 
-
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('Socket', [
-    'verbose' => isset($opts['v']) ? $opts['v'] : null,
-    'port'    => empty($opts['p']) ? 9081 : $opts['p'],
-    'conf'    => empty($opts['c']) ? 'socketd.conf' : $opts['c'],
-    'fields'  => array_values($fields),
-    'flags'   => $flags
+$kernel = new Daemon\Kernel('Socket', [
+    Daemon\Kernel::OPT_VERBOSE => isset($opts['v']) ? $opts['v'] : null,
+    Daemon\Kernel::OPT_FIELDS  => \array_values($fields),
+    'port'                     => empty($opts['p']) ? 9081 : $opts['p'],
+    'conf'                     => empty($opts['c']) ? 'socketd.conf' : $opts['c'],
+    'flags'                    => $flags
 ]);
 
 // CREATE WEBSOCKET APP

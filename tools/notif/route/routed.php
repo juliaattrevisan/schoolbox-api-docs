@@ -16,7 +16,7 @@ use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\Transaction\DispatchTransaction;
 use Aura\Di;
 use Predis\ClientInterface;
-use Psr\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
 use Schoolbox\Realtime\MessageList\ListFactory;
@@ -25,20 +25,32 @@ use Schoolbox\Realtime\Routing\DispatchResponder;
 use Schoolbox\Realtime\Routing\DispatchStrategy;
 use Schoolbox\Realtime\Routing\RouteTXRX;
 use Schoolbox\Realtime\Routing\Subscription;
+use Schoolbox\Application\Daemon;
+use Alaress\Lumberjack\Logger;
+
+require __DIR__ . '/../../../conf/core/require.php';
+
+$fields = Logger::getAvailableFields();
+$opts   = sb_getDaemonOpt();
+
+foreach($fields as $k => $name) {
+    if(!isset($opts[$name])) {
+        unset($fields[$k]);
+    }
+}
 
 $flags = implode(' ', array_slice($argv, 1));
-$opts = require __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Routing', [
-    'verbose' => isset($opts['v']) ? $opts['v'] : null,
-    'errors'  => E_ALL,
-    'fields'  => array_keys($opts),
-    'flags'   => $flags,
+$kernel = new Daemon\Kernel('Routing', [
+    Daemon\Kernel::OPT_VERBOSE => isset($opts['v']) ? $opts['v'] : null,
+    Daemon\Kernel::OPT_ERRORS  => E_ALL,
+    Daemon\Kernel::OPT_FIELDS  => array_keys($fields),
+    'flags'                    => $flags,
 ]);
 
 
 // ROUTING APP
-$kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
+$kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
     $di->get('stomp')->connect()->then(function (Client $client) use ($di, $loop, $log, $opts) {
         try {

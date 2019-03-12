@@ -2,6 +2,7 @@
 <?php
 
 use Alaress\Date\Clock;
+use Alaress\Lumberjack\Logger;
 use Alaress\Redis\Async;
 use Aura\Di;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
@@ -15,7 +16,7 @@ use Schoolbox\Realtime\Digest\MailNotifier;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Schedule\Trigger\Factory\DigestTriggerFactory;
 use Schoolbox\UserMapper;
-
+use Schoolbox\Application\Daemon;
 
 /**
  * The Digest Daemon.
@@ -26,13 +27,10 @@ use Schoolbox\UserMapper;
  * @version     SVN: $Id$
  */
 
-/**
- * Shut UP, storm!
- * @var array $fields
- */
-$fields = [ 'porcelain', 'mem', 'truemem', 'pid', 'debug-interval:' ];
+require_once __DIR__ . '/../../conf/core/require.php';
 
-$opts = getopt('v', $fields);
+$fields = Logger::getAvailableFields();
+$opts   = sb_getDaemonOpt(['debug-interval:']);
 
 foreach($fields as $k => $name) {
     if(!isset($opts[$name])) {
@@ -42,12 +40,11 @@ foreach($fields as $k => $name) {
 
 $flags = implode(' ', array_slice($argv, 1));
 
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('Digest', [
-	'verbose'        => isset($opts['v']) ? $opts['v'] : null,
-    'fields'         => array_values($fields),
-    'flags'          => $flags,
-    'debug-interval' => isset($opts['debug-interval']) ? $opts['debug-interval'] : null
+$kernel = new Daemon\Kernel('Digest', [
+    Daemon\Kernel::OPT_VERBOSE => isset($opts['v']) ? $opts['v'] : null,
+    Daemon\Kernel::OPT_FIELDS  => array_values($fields),
+    'flags'                    => $flags,
+    'debug-interval'           => isset($opts['debug-interval']) ? $opts['debug-interval'] : null
 ]);
 
 

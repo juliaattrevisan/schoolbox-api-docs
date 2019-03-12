@@ -10,7 +10,6 @@
 
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Lumberjack\Logger;
-use Schoolbox\Application\Daemon;
 
 /**
  * Function for handling error conditions
@@ -63,14 +62,14 @@ if (PHP_SAPI === 'cli') {
     /**
      * Convenience helper to get CLI options suitable for the Daemon Kernel which uses the Lumberjack logger
      *
-     * @param string[]  $fields
-     * @param string $shortOpts
+     * @param string[] $longOpts
+     * @param string   $shortOpts
      * @return string[]|bool[]|string[][]|bool[][]
+     * @todo Daemon kernel should know how to read options from command line
      */
-    function sb_getDaemonOpt(array $fields = [], string $shortOpts = ''): array
+    function sb_getDaemonOpt(array $longOpts = [], string $shortOpts = ''): array
     {
-        $fields = \array_merge($fields, [Daemon\Kernel::OPT_PORCELAIN, Logger::FIELD_MEM, Logger::FIELD_TRUE_MEM, Logger::FIELD_PID]);
-        return \getopt($shortOpts . 'v', $fields);
+        return \getopt($shortOpts . 'v', \array_merge($longOpts, [Logger::OPT_PORCELAIN], Logger::getAvailableFields()));
     }
 }
 
