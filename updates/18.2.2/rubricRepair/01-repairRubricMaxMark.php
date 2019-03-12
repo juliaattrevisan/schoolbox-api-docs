@@ -1,15 +1,11 @@
 #!/usr/bin/php
 <?php
 /**
- * Repair script for repairing articles that were truncated in the migration
- * from homepage and school news to comms articles.
+ * Repair script for max marks for due works that use rubrics.
  *
- * Until now, comms articles have been stored as TEXT (2^16 bytes, ~64KB) when
- * the old tables were MEDIUMTEXT (2^24 bytes, ~16MB): this means that the new
- * comms articles will have been truncated.
- *
- * Fortunately the old tables and their data still exist, so their article
- * content can be migrated.
+ * This script tests that the actual max mark for the due work matches up with:
+ * * if it's mark-per-capability: the sum of its capabilities' max marks
+ * * otherwise: the sum of its indicators' highest value descriptors
  *
  * @copyright Copyright 2019, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -28,7 +24,7 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 
 $opts   = getopt('p', ['perform']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
-    'Repair Rubric Marks',
+    'Repair Due Work Max Marks',
     [
         'verbose' => [true, true, true],
         'perform' => true,
