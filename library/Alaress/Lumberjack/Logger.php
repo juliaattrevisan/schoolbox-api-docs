@@ -22,7 +22,6 @@ use Psr\Log\LoggerInterface;
 class Logger implements LoggerInterface {
 
     // Command line options
-    public const OPT_PORCELAIN  = 'porcelain';  // Should log items be formatted for text file rather than TTL?
     public const FIELD_MEM      = 'mem';        // Prepend a memory usage field to each log item
     public const FIELD_TRUE_MEM = 'truemem';    // Prepend a true memory usage field to each log item
     public const FIELD_PID      = 'pid';        // Prepend a PID field to each log item

@@ -123,7 +123,7 @@ class Kernel extends \Alaress\Application\Kernel
         $appLongOpts  = $options[self::OPTION_APP_LONG_OPTS] ?? [];
 
         $shortOpts  = $appShortOpts . self::OPT_VERBOSITY;
-        $longOpts   = \array_merge($appLongOpts, [Logger::OPT_PORCELAIN], Logger::getAvailableFields());
+        $longOpts   = \array_merge($appLongOpts, [self::OPT_PORCELAIN], Logger::getAvailableFields());
         $this->opts = \getopt($shortOpts, $longOpts);
     }
 
@@ -431,7 +431,7 @@ EOL;
                 }
             }
 
-            $porcelain = \array_key_exists(Logger::OPT_PORCELAIN, $this->opts);
+            $porcelain = \array_key_exists(self::OPT_PORCELAIN, $this->opts);
             $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
             // Add Sentry handler into logging system if possible
