@@ -12,6 +12,7 @@ SELECT
     marker.id       AS marker_id,
     sr.id           AS feedback_id,
     sr.published_at AS feedback_date,
+    sr.deleted_at AS feedback_deleted_at,
     sr.review_route AS feedback_type,
 
     -- Rubric capability fields
