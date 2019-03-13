@@ -111,13 +111,12 @@ class LogMapper extends Mapper {
 
 	}
 
-	/**
-	 * Return recent log entries
-	 *
-	 * @param int $limit
-	 * @return array
-	 */
-	public function findRecent($limit = 30)
+    /**
+     * @param int $limit
+     *
+     * @return array
+     */
+	public function findRecent(int $limit = 30): array
 	{
 		if (!is_numeric($limit)) {
 			$limit = 30;
@@ -125,13 +124,14 @@ class LogMapper extends Mapper {
 
 		$stmt = $this->database->prepare
 		("
-			(SELECT `date` occurred, login, ip, title, firstname, lastname FROM login_log LEFT JOIN `user` ON `user`.`username`=login_log.username AND `user`.`deleted_at` IS NULL ORDER BY DATE DESC LIMIT 0,40)
+			(SELECT `date` occurred, login, ip, title, firstname, lastname FROM login_log LEFT JOIN `user` ON `user`.`username`=login_log.username AND `user`.`deleted_at` IS NULL ORDER BY DATE DESC LIMIT 0, {$limit})
 			UNION
-			(SELECT `time` occurred, `action`, object, title, firstname, lastname FROM cmsLog LEFT JOIN `user` ON `user`.id=`cmsLog`.`user` AND `user`.`deleted_at` IS NULL ORDER BY `time` DESC LIMIT 0,40)
+			(SELECT `time` occurred, `action`, object, title, firstname, lastname FROM cmsLog LEFT JOIN `user` ON `user`.id=`cmsLog`.`user` AND `user`.`deleted_at` IS NULL ORDER BY `time` DESC LIMIT 0, {$limit})
 			ORDER BY occurred DESC LIMIT 0,{$limit}
 		");
 
 		$stmt->execute();
+
 		return $stmt->fetchAll();
 	}
 
