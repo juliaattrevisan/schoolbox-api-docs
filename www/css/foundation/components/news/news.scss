@@ -4,15 +4,24 @@
         justify-content: center;
         margin-bottom: 0;
     }
+    .article,
+    .comments {
+        margin: 0 auto;
+        max-width: 45rem;
+    }
     .article .meta {
         border-bottom: 1px solid #9a9a9a;
         margin: 0 0 2rem;
         padding-bottom: .5rem;
     }
-    .article,
     .comments {
-        margin: 0 auto;
-        max-width: 45rem;
+        border-top: 1px solid $body-bg;
+        margin-top: 2rem;
+        padding-top: 2rem;
+    }
+    .comments .checklist {
+        display: flex;
+        flex-flow: row-reverse;
     }
 }
 
