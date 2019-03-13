@@ -468,14 +468,16 @@ class Controller extends Base
         $studentMarks = [];
 
         foreach ($getAllAssessmentsInFolderQuery->getIterator() as $i => $row) {
-            $getGradeGroupId = $this->database->prepareQuery("SELECT sb.submission_grade_group_id
-                FROM submission_box sb
-                WHERE sb.assessment_id = :assessmentId");
-
-            $getGradeGroup = $this->database->prepareQuery("SELECT * 
+            $getGradeGroup = $this->database->prepareQuery(
+                "SELECT * 
                 FROM submission_grade sg
-                WHERE sg.submission_grade_group_id = :assessmentGradeGroupId");
-            
+                WHERE sg.submission_grade_group_id = (
+                    SELECT sb.submission_grade_group_id
+                    FROM submission_box sb
+                    WHERE sb.assessment_id = :assessmentId
+                )"
+            );
+
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
                 'name' => $row['assessment_name'],
