@@ -57,7 +57,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@rubricMarkbook/markbookOuter.twig',
                 [
-                    'students' => $studentMarks,
+                    'studentMarks' => $studentMarks,
                     'assessments' => $assessments,
                     'folder' => $folder
                 ]
@@ -458,6 +458,8 @@ class Controller extends Base
             vrm.assessment_mark_type,
             vrm.assessment_max_mark,
             vrm.student_id,
+            u.firstname AS student_firstname,
+            u.lastname AS student_lastname,
             vrm.capability_id,
             vrm.capability_name,
             vrm.capability_mark,
@@ -473,6 +475,7 @@ class Controller extends Base
             INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
             INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id
             INNER JOIN assessment a ON a.id = vmrf.assessment_id
+            INNER JOIN user u ON u.id = vrm.student_id
             WHERE      var.folder_id=:folderId and vrm.feedback_type='instructor'"
         );
 
@@ -537,7 +540,8 @@ class Controller extends Base
 
             // Stuff everything about the students marks into an array
             $studentMarks[$row['student_id']] = [
-                'name' => $row['student_name'],
+                'firstname' => $row['student_firstname'],
+                'lastname' => $row['student_lastname'],
                 $row['assessment_id'] => [
                     'capabilities' => [
                         $row['capability_id'] => [

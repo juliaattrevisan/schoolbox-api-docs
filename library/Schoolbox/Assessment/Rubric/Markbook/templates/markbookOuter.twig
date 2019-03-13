@@ -48,10 +48,12 @@
                 <tr class="rotate-headers" data-headers>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
-                    {% for student in students %}
+                    {% for studentId, student in studentMarks %}
                         <th>
                             <div>
-                                <span>{{ student.name }}</span>
+                                <span>
+                                    <span>{{ student.lastname ~ ', ' ~ student.firstname}}</span>
+                                </span>
                             </div>
                         </th>
                     {% endfor %}
@@ -83,7 +85,7 @@
                                 {{ capability.name }}
                             </th>
 
-                            {% for student in students %}
+                            {% for studentId, student in studentMarks %}
                                 {% set capabilityMark = student[assessmentId].capabilities[capabilityId].mark %}
                                 <td>
                                     {{ capabilityMark|default('-') }}
@@ -98,7 +100,7 @@
                                     {{ indicator.name }}
                                 </th>
 
-                                {% for student in students %}
+                                {% for studentId, student in studentMarks %}
                                     {% set indicatorMark = student[assessmentId].capabilities[capabilityId].indicators[indicatorId].mark %}
                                     {% set descriptorText = student[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
                                     <td title="{{ descriptorText|default('-No descriptor text-') }}">
