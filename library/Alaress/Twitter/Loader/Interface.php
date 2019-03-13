@@ -11,5 +11,14 @@
  * Interface to which all TwitterLoaders must adhere
  */
 interface Alaress_Twitter_Loader_Interface {
-	public function load();
+
+    /**
+     * Load results. Preprocess them to get rid of unwanted data and to format
+     * the return value in a uniform structure.
+     *
+     * @param null|string $resource
+     * @param null|array  $params
+     * @return array
+     */
+    public function load(?string $resource, ?array $params = null): array;
 }

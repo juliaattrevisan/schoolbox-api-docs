@@ -58,15 +58,20 @@ class Creational extends AbstractFactory
         $this->setUrlDetection(new UrlDetection($url));
     }
 
+
     /**
      * Produce an instance of SocialStream_Post_Abstract subclass
      * Populate it with the information from $_POST etc
      * Spawn metadata and thumbnails where appropriate
      *
-     * @param $data
+     * @param array $data
      * @return mixed|null
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    public function produce($data)
+    public function produce(array $data = null)
     {
 
         // if data contains an attachment

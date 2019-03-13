@@ -13,6 +13,11 @@ use Schoolbox\File\MimetypeMapper;
 class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 
     /**
+     * @var string
+     */
+    protected $type = 'url';
+
+    /**
      * Determine whether this should display an icon or something
      * via the image transform
      *

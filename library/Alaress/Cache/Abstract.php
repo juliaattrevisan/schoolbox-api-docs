@@ -64,14 +64,14 @@ abstract class Alaress_Cache_Abstract
      *
      * @var string
      */
-    private $lockFile = '';
+    protected $lockFile = '';
 
     /**
-     * A cached version of the url stream
+     * Path to a cached version of the url stream
      *
      * @var string
      */
-    private $cachedFile = '';
+    protected $cachedFile = '';
 
 
     /* These are for logging purposes, using the Observer Design Pattern
@@ -92,17 +92,6 @@ abstract class Alaress_Cache_Abstract
      */
     final public function __construct()
     {
-
-        /* Example usage with multiple settings
-        $cache = new Alaress_Cache_Locker_Abstract();
-
-        $contents = $cache->setCachedTime(7200)
-                        ->setLockTime(3600)
-                        ->setVerbose(true)
-                        ->init('http://www.google.com')
-                        ->getStreamContents();
-        */
-
         /* Allow subclasses to specify their own settings
          */
         $this->setup();
@@ -115,17 +104,19 @@ abstract class Alaress_Cache_Abstract
      */
     abstract protected function setup();
 
+
     /**
      * Setup method
      *
-     * @param string $url
+     * @param string     $url
      * @return self
-     * @param string $params
-     * @return $this
+     * @param null|array $params
+     * @return self
+     * @throws InvalidArgumentException
      */
-    public function init($url, $params = "")
+    public function init(string $url, ?array $params = null): \Alaress_Cache_Abstract
     {
-        $this->setUrl($url);
+        $this->url = $url;
 
         /* Logging class handles verbosity and any logging
          */
@@ -133,8 +124,8 @@ abstract class Alaress_Cache_Abstract
 
         /* Determine the filenames of files that could be used
          */
-        $this->setCachedFile($this->generateCachedFilename());
-        $this->setLockFile($this->generateLockFilename());
+        $this->cachedFile = $this->generateCachedFilename();
+        $this->lockFile = $this->generateLockFilename();
 
         /* Retrieve stream contents
          */
@@ -143,18 +134,21 @@ abstract class Alaress_Cache_Abstract
         return $this;
     }
 
+
     /**
      * Get contents of a stream using a lockfile-based mechanism
+     *
+     * @return void
+     * @throws InvalidArgumentException
      */
-    protected function retrieveStreamContents()
+    protected function retrieveStreamContents(): void
     {
-
         /* If the cached file exists, check its expiry
          */
-        if (file_exists($this->getCachedFile())) {
-            if ($this->isExpired($this->getCachedFile(), $this->getCachedTime())) {
-                if (file_exists($this->getLockFile())) {
-                    if ($this->isExpired($this->getLockFile(), $this->getLockTime())) {
+        if (file_exists($this->cachedFile)) {
+            if ($this->isExpired($this->cachedFile, $this->cachedTime)) {
+                if (file_exists($this->lockFile)) {
+                    if ($this->isExpired($this->lockFile, $this->lockTime)) {
 
                         /* Update cached version
                          */
@@ -163,7 +157,7 @@ abstract class Alaress_Cache_Abstract
                     } else {
                         /* Load content from cached version
                          */
-                        //$this->notifyObservers("Cache expired, lockfile still fresh. Loading from cache: {$this->getCachedFile()}, while in process of retrieving new stream contents.");
+                        //$this->notifyObservers("Cache expired, lockfile still fresh. Loading from cache: {$this->cachedFile}, while in process of retrieving new stream contents.");
                     }
                 } else {
                     /* Update cached version
@@ -174,27 +168,29 @@ abstract class Alaress_Cache_Abstract
             } else {
                 /* Load content from cached version
                  */
-                //$this->notifyObservers("Cached file exists and is still fresh. Loading from cache: {$this->getCachedFile()}");
+                //$this->notifyObservers("Cached file exists and is still fresh. Loading from cache: {$this->cachedFile}");
             }
-        } /* First load
-		 */
-        else {
+        } else {
+            /* First load
+             */
             $this->newCacheUpdate();
         }
     }
+
 
     /**
      * Sam's new cache update :P
      *
      * @return Alaress_Cache_Abstract
+     * @throws InvalidArgumentException
      */
-    protected function newCacheUpdate()
+    protected function newCacheUpdate(): \Alaress_Cache_Abstract
     {
 
         /* Remove lock files for this stream url
          */
         //$this->notifyObservers('Removing lock file.');
-        $this->remove($this->getLockFile());
+        $this->remove($this->lockFile);
 
         /* Create new lock file for this stream url
          */
@@ -210,7 +206,7 @@ abstract class Alaress_Cache_Abstract
         /* Remove lock file for this stream url
          */
         //$this->notifyObservers('Removing lock file.');
-        $this->remove($this->getLockFile());
+        $this->remove($this->lockFile);
 
         return $this;
     }
@@ -219,33 +215,38 @@ abstract class Alaress_Cache_Abstract
      * Save stream contents from the url
      *
      * @return bool
+     * @throws InvalidArgumentException
      */
-    protected function saveStreamContents()
+    protected function saveStreamContents(): bool
     {
         /* For images that existed in Storage since fopen can't
          * open relative urls
          */
-        if (preg_match('#^/#', $this->getUrl())) {
-            $url = "http://{$_SERVER['HTTP_HOST']}{$this->getUrl()}";
+        if (preg_match('#^/#', $this->url)) {
+            $url = "http://{$_SERVER['HTTP_HOST']}{$this->url}";
         } else {
-            $url = $this->getUrl();
+            $url = $this->url;
         }
 
         $httpClient = new GuzzleClient(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]);
 
         try {
-            $httpClient->get($url, ['headers' => ['User-Agent' => 'Mozilla/5.0 (Schoolbox)'], 'save_to' => $this->getCachedFile()]);
+            $httpClient->get($url, ['headers' => ['User-Agent' => 'Mozilla/5.0 (Schoolbox)'], 'save_to' => $this->cachedFile]);
         } catch (RequestException $e) {
             return false;
         }
+
+        return true;
     }
 
     /**
      * Create an empty file to indicate that a stream retrieval is in progress
+     *
+     * @return void
      */
-    private function createLockFile()
+    private function createLockFile(): void
     {
-        $filehandle = @fopen($this->getLockFile(), 'w');
+        $filehandle = @fopen($this->lockFile, 'w');
         fclose($filehandle);
     }
 
@@ -255,7 +256,7 @@ abstract class Alaress_Cache_Abstract
      * @param $file
      * @return Alaress_Cache_Abstract
      */
-    private function remove($file)
+    private function remove($file): \Alaress_Cache_Abstract
     {
         @unlink($file);
 
@@ -269,22 +270,22 @@ abstract class Alaress_Cache_Abstract
      * @param $duration
      * @return bool
      */
-    public function isExpired($file, $duration)
+    public function isExpired($file, $duration): bool
     {
         $now = $_SERVER['REQUEST_TIME'];
 
         /* Difference between now and when file was created
          */
-        $difference = $now - filectime($file);
+        $difference = $now - filemtime($file);
 
         /* How much time is remaining
          */
         $remaining = $duration - $difference;
 
         //$this->notifyObservers(get_class($this) . ' file expires in ' . $remaining . ' seconds.');
-        //$this->notifyObservers('[' . $difference . '] ' . $now . ' - ' . filectime($file));
+        //$this->notifyObservers('[' . $difference . '] ' . $now . ' - ' . filemtime($file));
 
-        if (filectime($file) < ($now - $duration)) {
+        if (filemtime($file) < ($now - $duration)) {
             //$this->notifyObservers($file . ' expired.');
             return true;
         }
@@ -297,9 +298,9 @@ abstract class Alaress_Cache_Abstract
      *
      * @return string
      */
-    protected function generateCachedFilename()
+    protected function generateCachedFilename(): string
     {
-        return Cfg::get('stream_dir') . '/' . $this->getCacheFilePrefix() . '_' . $this->encode($this->getUrl()) . '.txt';
+        return Cfg::get('stream_dir') . '/' . $this->cacheFilePrefix . '_' . $this->encode($this->url) . '.txt';
     }
 
     /**
@@ -307,9 +308,9 @@ abstract class Alaress_Cache_Abstract
      *
      * @return string
      */
-    protected function generateLockFilename()
+    protected function generateLockFilename(): string
     {
-        return Cfg::get('stream_dir') . '/' . $this->getCacheFilePrefix() . '_' . $this->encode($this->getUrl()) . '_lock.txt';
+        return Cfg::get('stream_dir') . '/' . $this->cacheFilePrefix . '_' . $this->encode($this->url) . '_lock.txt';
     }
 
     /**
@@ -319,7 +320,7 @@ abstract class Alaress_Cache_Abstract
      * @param $data
      * @return string
      */
-    protected function encode($data)
+    protected function encode($data): string
     {
         return md5($data);
     }
@@ -328,8 +329,9 @@ abstract class Alaress_Cache_Abstract
      * Add an observer
      *
      * @param $observer
+     * @return Alaress_Cache_Abstract
      */
-    private function registerObserver($observer)
+    private function registerObserver($observer): Alaress_Cache_Abstract
     {
         $this->observerRegistry[$observer] = new $observer($this->getVerbose());
     }
@@ -338,8 +340,9 @@ abstract class Alaress_Cache_Abstract
      * Remove an observer
      *
      * @param $observer
+     * @return void
      */
-    private function unregisterObserver($observer)
+    private function unregisterObserver($observer): void
     {
         unset($this->observerRegistry[$observer]);
     }
@@ -348,8 +351,9 @@ abstract class Alaress_Cache_Abstract
      * All observers - do something with data
      *
      * @param $text
+     * @return void
      */
-    protected function notifyObservers($text)
+    protected function notifyObservers($text): void
     {
         if (count($this->getObserverRegistry())) {
             foreach ($this->getObserverRegistry() as $key => $instance) {
@@ -362,41 +366,11 @@ abstract class Alaress_Cache_Abstract
      */
 
     /**
-     * Set cache file prefix
-     *
-     * @param string $cacheFilePrefix
-     */
-    protected function setCacheFilePrefix($cacheFilePrefix)
-    {
-        $this->cacheFilePrefix = $cacheFilePrefix;
-    }
-
-    /**
-     * Get cache file prefix
-     *
-     * @return string
-     */
-    protected function getCacheFilePrefix()
-    {
-        return $this->cacheFilePrefix;
-    }
-
-    /**
-     * Set cached file
-     *
-     * @param string $cachedFile
-     */
-    protected function setCachedFile($cachedFile)
-    {
-        $this->cachedFile = $cachedFile;
-    }
-
-    /**
      * Get cached file
      *
      * @return string
      */
-    public function getCachedFile()
+    public function getCachedFile(): string
     {
         return $this->cachedFile;
     }
@@ -407,7 +381,7 @@ abstract class Alaress_Cache_Abstract
      * @param null $cachedTime
      * @return \Alaress_Cache_Abstract
      */
-    public function setCachedTime($cachedTime)
+    public function setCachedTime($cachedTime): \Alaress_Cache_Abstract
     {
         $this->notifyObservers("Setting cached duration to $cachedTime");
 
@@ -419,70 +393,32 @@ abstract class Alaress_Cache_Abstract
     /**
      * Get cached time
      *
-     * @return null
+     * @return null|int void
      */
-    public function getCachedTime()
+    public function getCachedTime(): ?int
     {
         return $this->cachedTime;
     }
 
-    /**
-     * Set lock file
-     *
-     * @param string $lockFile
-     */
-    protected function setLockFile($lockFile)
-    {
-        $this->lockFile = $lockFile;
-    }
-
-    /**
-     * Get lock file
-     *
-     * @return string
-     */
-    protected function getLockFile()
-    {
-        return $this->lockFile;
-    }
 
     /**
      * Get stream contents
      *
      * @return string
      */
-    public function getStreamContents()
+    public function getStreamContents(): string
     {
-        return file_get_contents($this->getCachedFile());
+        return file_get_contents($this->cachedFile);
     }
 
-    /**
-     * Set url
-     *
-     * @param  $url
-     */
-    protected function setUrl($url)
-    {
-        $this->url = $url;
-    }
-
-    /**
-     * Get url
-     *
-     * @return string
-     */
-    public function getUrl()
-    {
-        return $this->url;
-    }
 
     /**
      * Set verbose
      *
      * @param boolean $verbose
-     * @return \Alaress_Cache_Locker_Abstract
+     * @return \Alaress_Cache_Abstract
      */
-    public function setVerbose($verbose)
+    public function setVerbose($verbose): \Alaress_Cache_Abstract
     {
         $this->verbose = $verbose;
 
@@ -494,7 +430,7 @@ abstract class Alaress_Cache_Abstract
      *
      * @return boolean
      */
-    public function getVerbose()
+    public function getVerbose(): bool
     {
         return $this->verbose;
     }
@@ -503,9 +439,9 @@ abstract class Alaress_Cache_Abstract
      * Set lock time
      *
      * @param int $lockTime
-     * @return \Alaress_Cache_Locker_Abstract
+     * @return \Alaress_Cache_Abstract
      */
-    public function setLockTime($lockTime)
+    public function setLockTime($lockTime): \Alaress_Cache_Abstract
     {
         $this->notifyObservers("Setting locked duration to $lockTime");
 
@@ -514,42 +450,13 @@ abstract class Alaress_Cache_Abstract
         return $this;
     }
 
-    /**
-     * Get lock time
-     *
-     * @return int
-     */
-    public function getLockTime()
-    {
-        return $this->lockTime;
-    }
-
-    /**
-     * Set lock time multiplier
-     *
-     * @param int $lockTimeMultiplier
-     */
-    protected function setLockTimeMultiplier($lockTimeMultiplier)
-    {
-        $this->lockTimeMultiplier = $lockTimeMultiplier;
-    }
-
-    /**
-     * Get lock time multiplier
-     *
-     * @return int
-     */
-    protected function getLockTimeMultiplier()
-    {
-        return $this->lockTimeMultiplier;
-    }
 
     /**
      * Get observer registry
      *
      * @return array
      */
-    private function getObserverRegistry()
+    private function getObserverRegistry(): array
     {
         return $this->observerRegistry;
     }
@@ -558,10 +465,11 @@ abstract class Alaress_Cache_Abstract
      * Clear cache file, if you dont like it and you would like it to be refetched,
      * be careful as this could endlessly request the file
      *
+     * @return void
      */
-    public function invalidateCache()
+    public function invalidateCache(): void
     {
-        $this->remove($this->getCachedFile());
+        $this->remove($this->cachedFile);
     }
 }
 

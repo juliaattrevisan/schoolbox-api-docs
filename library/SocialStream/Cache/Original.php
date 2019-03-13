@@ -34,28 +34,40 @@ class Original extends \Alaress_Cache_Abstract
     protected $cacheFilePrefix = 'socialstream_thumbnail';
 
     /**
+     * A Storage instance for a thumbnail image
+     *
+     * These aren't stored in the filesystem like other cached items
+     * such as tweeter streams, etc. they're stored in brownhole
+     *
+     * @var Storage\IStorage
+     */
+    private $file;
+
+    /**
      * Hook method
      *
      * @return mixed|void
      */
     protected function setup()
     {
-        $this->setCachedTime(\Cfg::get('xml_cache_timeout'));
-        $this->setLockTime($this->getLockTimeMultiplier() * $this->getCachedTime());
+        $this->cachedTime = \Cfg::get('xml_cache_timeout');
+        $this->lockTime = $this->lockTimeMultiplier * $this->cachedTime;
     }
 
 
     /**
      * @param SocialStream_Post_Abstract $post
      * @return self
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function initPost(SocialStream_Post_Abstract $post)
+    public function initPost(SocialStream_Post_Abstract $post): Original
     {
-        $this->setUrl($post->getThumbnail());
+        $this->url = $post->getThumbnail();
 
         $this->post = $post;
 
-        $this->setLockFile($this->generateLockFilename());
+        $this->lockFile = $this->generateLockFilename();
 
         /* Retrieve stream contents
         */
@@ -69,9 +81,9 @@ class Original extends \Alaress_Cache_Abstract
      *
      * @return string
      */
-    protected function generateCachedFilename()
+    protected function generateCachedFilename(): string
     {
-        $urlDetection = new \SocialStream\UrlDetection($this->getUrl());
+        $urlDetection = new \SocialStream\UrlDetection($this->url);
 
         /* Find what the file was called
          *
@@ -83,53 +95,64 @@ class Original extends \Alaress_Cache_Abstract
             return \Cfg::get('file_dir') . '/' . $urlDetection->getId() . '.dat';
         }
 
-        return \Cfg::get('stream_dir') . '/socialstream/' . $this->getCacheFilePrefix() . '_' . $this->encode($this->getUrl());
+        return \Cfg::get('stream_dir') . '/socialstream/' . $this->cacheFilePrefix . '_' . $this->encode($this->url);
     }
 
 
     /**
      * @return void
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
      */
-    protected function retrieveStreamContents()
+    protected function retrieveStreamContents(): void
     {
         // run cache detection
         if ($this->post->getCacheHash()) {
-            $file = Storage\Mapper::getInstance()->findByHash($this->post->getCacheHash());
-            $this->setCachedFile($file);
+            $this->file = Storage\Mapper::getInstance()->findByHash($this->post->getCacheHash());
 
         } else {
             $this->newCacheUpdate();
         }
     }
 
+
     /**
      * Save stream contents from the url
      *
-     * @return bool|void
+     * @return bool
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    protected function saveStreamContents()
+    protected function saveStreamContents(): bool
     {
-        $urlDetection = new \SocialStream\UrlDetection($this->getUrl());
+        $urlDetection = new \SocialStream\UrlDetection($this->url);
 
         if ($urlDetection->isLocalUrl()) {
 
             if ($urlDetection->isStorageUrl()) {
                 // it's in storage - just grab the hash and be done with it
-                $this->setCachedFile(Storage\Mapper::getInstance()->findByHash($urlDetection->getHash()));
+                $this->file = Storage\Mapper::getInstance()->findByHash($urlDetection->getHash());
             }
         } else {
-            $url = $this->getUrl();
-            $this->setResult($this->processUrl($url));
+            $url = $this->url;
+            $this->result = $this->processUrl($url);
         }
+
+        return true;
     }
+
 
     /**
      * Process url using fopen in the usual way
      *
      * @param $url
      * @return bool
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    private function processUrl($url)
+    private function processUrl($url): bool
     {
         $streamHandle = @fopen($url, 'r');
 
@@ -144,12 +167,23 @@ class Original extends \Alaress_Cache_Abstract
                 PostMapper::getInstance()->save($this->post);
             }
 
-            $this->setCachedFile($storage);
+            $this->file = $storage;
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
+    }
+
+
+    /**
+     * Get the storage instance representing this file
+     *
+     * @return Storage\IStorage
+     */
+    public function getFile(): Storage\IStorage
+    {
+        return $this->file;
     }
 
     /**
@@ -157,29 +191,6 @@ class Original extends \Alaress_Cache_Abstract
      */
     public function hasThumbnail()
     {
-        return $this->getResult() || $this->getCachedFile() instanceof Storage\Model;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set result
-     *
-     * @param boolean $result
-     */
-    protected function setResult($result)
-    {
-        $this->result = $result;
-    }
-
-    /**
-     * Get result
-     *
-     * @return boolean
-     */
-    protected function getResult()
-    {
-        return $this->result;
+        return $this->result || $this->file instanceof Storage\Model;
     }
 }
