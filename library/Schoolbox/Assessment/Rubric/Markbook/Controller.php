@@ -481,17 +481,6 @@ class Controller extends Base
         $studentMarks = [];
 
         foreach ($getAllAssessmentsInFolderQuery->getIterator() as $i => $row) {
-            $getGradeGroupIdQuery = $this->database->prepareQuery(
-                "SELECT sb.submission_grade_group_id
-                    FROM submission_box sb
-                    WHERE sb.assessment_id = :assessmentId
-                    LIMIT 1");
-            $getGradeGroupIdQuery->execute(['assessmentId' => (int)$row['assessment_id']]);
-            $gradeGroupId = $getGradeGroupIdQuery->fetchAll(PDO::FETCH_COLUMN)[0];
-
-            /** @var GradeGroup\Model $gradeGroup */
-            $gradeGroup = $this->gradeGroupMapper->findById($gradeGroupId);
-
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
                 'name' => $row['assessment_name'],
@@ -524,6 +513,17 @@ class Controller extends Base
                     $marktype = new MarkScheme\TotalMarkFractional($maxMark);
                     break;
                 case MarkType::TYPE_LETTER:
+                    $getGradeGroupIdQuery = $this->database->prepareQuery(
+                        "SELECT sb.submission_grade_group_id
+                    FROM submission_box sb
+                    WHERE sb.assessment_id = :assessmentId
+                    LIMIT 1");
+                    $getGradeGroupIdQuery->execute(['assessmentId' => (int)$row['assessment_id']]);
+                    $gradeGroupId = $getGradeGroupIdQuery->fetchAll(PDO::FETCH_COLUMN)[0];
+
+                    /** @var GradeGroup\Model $gradeGroup */
+                    $gradeGroup = $this->gradeGroupMapper->findById($gradeGroupId);
+
                     $marktype = new MarkScheme\LetterGrade($gradeGroup);
                     break;
                 default:
