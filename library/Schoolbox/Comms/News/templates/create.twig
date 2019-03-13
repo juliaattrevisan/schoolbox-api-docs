@@ -188,7 +188,7 @@
                                         <li class="active"><a>${ selectedAudienceOption.namePlural }</a></li>
                                     </ul>
 
-                                    <p class="meta">Select ${ selectedAudienceOption.namePlural } below, please note these include all members of the ${ selectedAudienceOption.nameLowerCase } including staff, parents and students.</p>
+                                    <p class="meta">${selectedAudienceOption.text}</p>
 
                                     <div class="empty-state" v-show="showEmptyState">
                                         <p>No ${ selectedAudienceOption.namePlural } found.</p>
@@ -607,20 +607,29 @@
      */
     var AudienceOption = function(entityType, name, namePlural, icon, selfModifier, ajaxRoute, hideFromModal, isMulti){
         this.entityType     = entityType;
-        this.name           =  name;
+        this.name           = name;
         this.namePlural     = namePlural;
         this.icon           = icon;
         this.selfModifier   = selfModifier;
         this.ajax           = ajaxRoute;
         this.hideFromModal  = hideFromModal;
         this.isMulti        = isMulti;
-        this.nameLowerCase   = name.toLowerCase();
+        this.nameLowerCase  = name.toLowerCase();
 
         // We'll populate these via ajax on first time this audience type is displayed in the modal
         this.isLoaded           = false;
         this.availableModifiers = undefined;
         this.canTargetNull      = undefined;
         this.valueLabels        = undefined;    // will maps encoded values to human-friendly labels
+        this.textPrefix         = 'Select ' + this.namePlural;
+
+        if (this.nameLowerCase === 'role') {
+            this.text = undefined;
+        } else if (this.nameLowerCase === 'campus') {
+            this.text = this.textPrefix + ' please note these include all members of the ' + this.nameLowerCase + ' including staff, parents and students.';
+        } else {
+            this.text = this.textPrefix + ' below, then choose whether you would like to include the users themselves, the parents of the users, the teachers of the users, or a combination.';
+        }
     };
 
     /** @var {AudienceOption[]|Object} audienceOptions */
