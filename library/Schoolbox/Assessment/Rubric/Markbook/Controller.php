@@ -453,27 +453,29 @@ class Controller extends Base
     private function getRawMarkbookData(int $folderId) : array
     {
         $data = [];
-        $getAllAssessmentsInFolderQuery = $this->database->prepareQuery("SELECT var.assessment_id,
-                    a.title AS assessment_name,
-                    vrm.assessment_mark_type,
-                    vrm.assessment_max_mark,
-                    vrm.student_id,
-                    vrm.capability_id,
-                    vrm.capability_name,
-                    vrm.capability_mark,
-                    vrm.capability_max_value,
-                    vrm.indicator_id,
-                    vrm.indicator_name,
-                    vrm.indicator_mark,
-                    vrm.indicator_max_value,
-                    vrm.descriptor_id,
-                    vrm.descriptor_name,
-                    vrm.descriptor_max_value
-                    FROM       v_rubric_mark vrm
-                    INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
-                    INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id
-                    INNER JOIN assessment a ON a.id = vmrf.assessment_id
-                    WHERE      var.folder_id=:folderId and vrm.feedback_type='instructor'");
+        $getAllAssessmentsInFolderQuery = $this->database->prepareQuery(
+    "SELECT var.assessment_id,
+            a.title AS assessment_name,
+            vrm.assessment_mark_type,
+            vrm.assessment_max_mark,
+            vrm.student_id,
+            vrm.capability_id,
+            vrm.capability_name,
+            vrm.capability_mark,
+            vrm.capability_max_value,
+            vrm.indicator_id,
+            vrm.indicator_name,
+            vrm.indicator_mark,
+            vrm.indicator_max_value,
+            vrm.descriptor_id,
+            vrm.descriptor_name,
+            vrm.descriptor_max_value
+            FROM       v_rubric_mark vrm
+            INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
+            INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id
+            INNER JOIN assessment a ON a.id = vmrf.assessment_id
+            WHERE      var.folder_id=:folderId and vrm.feedback_type='instructor'"
+        );
 
         $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
 
@@ -531,8 +533,8 @@ class Controller extends Base
             }
 
             $markScheme = new MarkScheme\Percentage();
-            $humanReadableCapabilityMark = $markScheme->getHumanReadableMark($capabilityMark);
-            $humanReadableIndicatorMark = $markScheme->getHumanReadableMark($indicatorMark);
+            $humanReadableCapabilityMark = $markScheme->getHumanReadableMark($row['capability_mark']);
+            $humanReadableIndicatorMark = $markScheme->getHumanReadableMark($row['indicator_mark']);
 
             // Stuff everything about the students marks into an array
             $studentMarks[$row['student_id']] = [
