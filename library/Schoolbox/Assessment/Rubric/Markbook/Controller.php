@@ -13,6 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
+use PDO;
 
 class Controller extends Base
 {
@@ -483,8 +484,12 @@ class Controller extends Base
             $getGradeGroupIdQuery = $this->database->prepareQuery(
                 "SELECT sb.submission_grade_group_id
                     FROM submission_box sb
-                    WHERE sb.assessment_id = :assessmentId");
-            $gradeGroupId = $getGradeGroupIdQuery->fetchAll(['assessmentId' => $row['assessment_id']]);
+                    WHERE sb.assessment_id = :assessmentId
+                    LIMIT 1");
+            $getGradeGroupIdQuery->execute(['assessmentId' => (int)$row['assessment_id']]);
+            $gradeGroupId = $getGradeGroupIdQuery->fetchAll(PDO::FETCH_COLUMN)[0];
+
+            /** @var GradeGroup\Model $gradeGroup */
             $gradeGroup = $this->gradeGroupMapper->findById($gradeGroupId);
 
             // Stuff everything about the assessment into an array
@@ -519,7 +524,6 @@ class Controller extends Base
                     $marktype = new MarkScheme\TotalMarkFractional($maxMark);
                     break;
                 case MarkType::TYPE_LETTER:
-                    // TODO how can we get the grade group?
                     $marktype = new MarkScheme\LetterGrade($gradeGroup);
                     break;
                 default:
