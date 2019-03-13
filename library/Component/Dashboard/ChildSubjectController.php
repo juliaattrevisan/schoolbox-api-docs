@@ -151,6 +151,19 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 $this->parse('custom_buttons_block', 'custom_buttons', true);
             }
 
+            // School-specific buttons
+            if ('tigs' === $this->getConfigMapper()->get('site_location')) {
+                $this->setBlock('student_block', 'continuous_report', 'continuous_report_block');
+                $route  = 'tigsParticipationReport.getReport';
+                $params = ['userId' => $userChild->getId(), 'user' => $userChild,];
+                if ($this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())) {
+                    $this->setVar('HREF_CONTINUOUS_REPORT', $this->getRouter()->generate($route, $params));
+                    $this->parse('continuous_report_block', 'continuous_report');
+                } else {
+                    $this->setVar('continuous_report_block');
+                }
+            }
+
             // Parse the parent block
             $this->parse("student_subjects", "student_block", true);
 

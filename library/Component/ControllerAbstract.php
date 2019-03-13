@@ -127,6 +127,17 @@ abstract class Component_ControllerAbstract
 
 
     /**
+     * @return Alaress\Authorizer\Authorizer|object
+     * @throws RuntimeException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getAuthorizer(): Alaress\Authorizer\Authorizer
+    {
+        return $this->getSitePage()->getDi()->get('authorizer');
+    }
+
+
+    /**
      * @return Router|object
      * @throws RuntimeException
      * @throws \Aura\Di\Exception\ServiceNotFound
