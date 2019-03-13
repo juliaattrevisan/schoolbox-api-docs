@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Config\ConfigMapper;
+
 class User extends DeprecatedModel
 {
     /**
@@ -231,7 +233,13 @@ class User extends DeprecatedModel
             $wherePart .= ' AND '.$searchFilter;
         }
 
-        // retreive results
+        /* Show disabled users only if ticked (hide when unticked)
+         */
+        if (!ConfigMapper::getInstance()->get('show_disabled_users')) {
+            $wherePart .= ' AND `user`.enabled = 1';
+        }
+
+        // retrieve results
         /* Allow search on synergy id
          */
         $query = "
@@ -251,6 +259,18 @@ class User extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
+
+    /**
+     * Search for exact matches, e.g. "zane" rather than LIKE
+     *
+     * @param        $keyword
+     * @param int    $offset
+     * @param int    $limit
+     * @param null   $count
+     * @param string $sort_by
+     * @param string $sort_dir
+     * @return array|bool
+     */
     public function searchExact(
         $keyword,
         $offset = 0,
@@ -266,6 +286,12 @@ class User extends DeprecatedModel
         $wherePart = ' AND user.deleted_at IS NULL';
         if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
             $wherePart .= ' AND '.$searchFilter;
+        }
+
+        /* Show disabled users only if ticked (hide when unticked)
+         */
+        if (!ConfigMapper::getInstance()->get('show_disabled_users')) {
+            $wherePart .= ' AND `user`.enabled = 1';
         }
 
         // retrieve results
