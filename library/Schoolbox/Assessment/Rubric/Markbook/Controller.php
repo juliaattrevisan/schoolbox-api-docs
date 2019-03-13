@@ -432,6 +432,7 @@ class Controller extends Base
     {
         $data = [];
         $getAllAssessmentsInFolderQuery = $this->database->prepareQuery("SELECT var.assessment_id,
+                    a.title AS assessment_name,
                     vrm.student_id,
                     vrm.capability_id,
                     vrm.capability_name,
@@ -445,6 +446,7 @@ class Controller extends Base
                     FROM       v_rubric_mark vrm
                     INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
                     INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id
+                    INNER JOIN assessment a ON a.id = vmrf.assessment_id
                     WHERE      var.folder_id=:folderId and vrm.feedback_type='instructor'");
 
         $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
@@ -455,7 +457,6 @@ class Controller extends Base
         foreach ($getAllAssessmentsInFolderQuery->getIterator() as $i => $row) {
 
             // Stuff everything about the assessment into an array
-            // TODO assessment name is not currently provided by the view; add it
             $assessments[$row['assessment_id']] = [
                 'name' => $row['assessment_name'],
                 'capabilities' => [
@@ -493,7 +494,7 @@ class Controller extends Base
                 ]
             ];
         }
-
+        
         return $data;
     }
 
