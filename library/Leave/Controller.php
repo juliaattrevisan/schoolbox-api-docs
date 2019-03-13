@@ -212,17 +212,16 @@ class Leave_Controller extends Controller
 
                 if ($request->isApproved()) {
                     $totalApproved++;
+                    if ($request->getStart()->isToday()) {
+                        $leavingToday++;
+                    }
+                    if ($request->getFinish()->isToday()) {
+                        $returningToday++;
+                    }
                 } elseif ($request->isRejected()) {
                     $totalRejected++;
                 } else {
                     $totalPending++;
-                }
-
-                if ($request->isApproved() && \Alaress_Date_Format::newLocal($request->getStart()) >= $today) {
-                    $leavingToday++;
-                }
-                if ($request->isApproved() && \Alaress_Date_Format::newLocal($request->getFinish()) >= $today) {
-                    $returningToday++;
                 }
             }
 
