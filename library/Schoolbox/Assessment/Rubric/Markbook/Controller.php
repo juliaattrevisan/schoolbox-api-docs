@@ -15,6 +15,7 @@ use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use PDO;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 class Controller extends Base
 {
@@ -145,36 +146,11 @@ class Controller extends Base
                 'capabilities' => $capabilities
             ];
 
-            $markScheme = null;
-            switch ($row['assessment_mark_type']) {
-                // Yes, I know these are deprecated, but we have to use them
-                case MarkType::TYPE_PERCENT:
-                    $markScheme = new MarkScheme\Percentage();
-                    break;
-                case MarkType::TYPE_NONE:
-                    $markScheme = new MarkScheme\None();
-                    break;
-                case MarkType::TYPE_TOTAL:
-                    $maxMark = $row['capability_max_value'] ?? $row['assessment_max_mark'];
-                    $markScheme = new MarkScheme\TotalMarkFractional($maxMark);
-                    break;
-                case MarkType::TYPE_LETTER:
-                    $getGradeGroupIdQuery = $this->database->prepareQuery(
-                        "SELECT sb.submission_grade_group_id
-                    FROM submission_box sb
-                    WHERE sb.assessment_id = :assessmentId
-                    LIMIT 1");
-                    $getGradeGroupIdQuery->execute(['assessmentId' => (int)$row['assessment_id']]);
-                    $gradeGroupId = $getGradeGroupIdQuery->fetchAll(PDO::FETCH_COLUMN)[0];
+            $markSchemeFactory = new MarkScheme\Factory();
 
-                    /** @var GradeGroup\Model $gradeGroup */
-                    $gradeGroup = $this->gradeGroupMapper->findById($gradeGroupId);
-
-                    $markScheme = new MarkScheme\LetterGrade($gradeGroup);
-                    break;
-                default:
-                    throw new \DomainException('Invalid MarkType for DueWork: ' . $row['assessment_name']);
-            }
+            // TODO hydrate assessment or something
+            $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($assessment, $row['capability_max_value']);
+            $assessmentMarkScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
 
             // TODO humanReadableMark is NOT right.
             $humanReadableCapabilityMark = $markScheme->getHumanReadableMark($row['capability_mark']);
