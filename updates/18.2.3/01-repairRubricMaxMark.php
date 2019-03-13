@@ -40,7 +40,6 @@ $kernel->run(new class extends App
         SELECT COUNT(*)
         FROM submission_box sb
         WHERE sb.use_rubric IS TRUE
-        AND   sb.mark_type  != 6 # Mark type none
     ";
 
     private const FIND_INCONSISTENT_DUE_WORKS_QUERY = "
@@ -64,7 +63,6 @@ $kernel->run(new class extends App
 
         WHERE sb.use_rubric         IS TRUE
         AND   sb.rubric_group_marks IS FALSE
-        AND   sb.mark_type          != 6 # Mark type none
         GROUP BY sb.assessment_id
         HAVING actual_max_mark != expected_max_mark
 
@@ -79,7 +77,6 @@ $kernel->run(new class extends App
         WHERE sb.use_rubric         IS TRUE
         AND   sb.rubric_group_marks IS TRUE
         AND   rg.deleted_at         IS NULL
-        AND   sb.mark_type          != 6 # Mark type none
         GROUP BY sb.assessment_id
         HAVING actual_max_mark != expected_max_mark
 
