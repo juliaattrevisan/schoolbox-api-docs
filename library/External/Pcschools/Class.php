@@ -84,6 +84,7 @@ class External_Pcschools_Class implements External_ClassInterface
                         tf.TEACHER
                     FROM TIMEFILE tf
                     WHERE $query
+                    AND tf.STATUS != 'S' 
                 ")
             )
         );
