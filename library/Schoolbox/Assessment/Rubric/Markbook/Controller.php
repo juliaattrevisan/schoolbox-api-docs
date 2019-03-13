@@ -129,18 +129,18 @@ class Controller extends Base
                 ]
             ];
 
-            $marktype = null;
+            $markScheme = null;
             switch ($row['assessment_mark_type']) {
                 // Yes, I know these are deprecated, but we have to use them
                 case MarkType::TYPE_PERCENT:
-                    $marktype = new MarkScheme\Percentage();
+                    $markScheme = new MarkScheme\Percentage();
                     break;
                 case MarkType::TYPE_NONE:
-                    $marktype = new MarkScheme\None();
+                    $markScheme = new MarkScheme\None();
                     break;
                 case MarkType::TYPE_TOTAL:
                     $maxMark = $row['capability_max_value'] ?? $row['assessment_max_mark'];
-                    $marktype = new MarkScheme\TotalMarkFractional($maxMark);
+                    $markScheme = new MarkScheme\TotalMarkFractional($maxMark);
                     break;
                 case MarkType::TYPE_LETTER:
                     $getGradeGroupIdQuery = $this->database->prepareQuery(
@@ -154,13 +154,12 @@ class Controller extends Base
                     /** @var GradeGroup\Model $gradeGroup */
                     $gradeGroup = $this->gradeGroupMapper->findById($gradeGroupId);
 
-                    $marktype = new MarkScheme\LetterGrade($gradeGroup);
+                    $markScheme = new MarkScheme\LetterGrade($gradeGroup);
                     break;
                 default:
                     throw new \DomainException('Invalid MarkType for DueWork: ' . $row['assessment_name']);
             }
 
-            $markScheme = new MarkScheme\Percentage();
             $humanReadableCapabilityMark = $markScheme->getHumanReadableMark($row['capability_mark']);
             $humanReadableIndicatorMark = $markScheme->getHumanReadableMark($row['indicator_mark']);
 
