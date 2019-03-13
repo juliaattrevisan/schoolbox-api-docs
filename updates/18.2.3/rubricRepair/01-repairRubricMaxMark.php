@@ -157,12 +157,11 @@ $kernel->run(new class extends App
         }
 
 
-        $this->db->rollBack();
-//        if ($this->perform) {
-//            $this->db->commit();
-//        } else {
-//            $this->db->rollBack();
-//        }
+        if ($this->perform) {
+            $this->db->commit();
+        } else {
+            $this->db->rollBack();
+        }
     }
 
 
