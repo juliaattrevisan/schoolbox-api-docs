@@ -40,80 +40,87 @@
     }
 </style>
 
-<div class="row">
-    <div class="small-12 island">
-        <table class="rubric-marksheet marksheet">
-            <thead>
-            {# TODO make the layout of this close together like the class markbook #}
-                <tr class="rotate-headers" data-headers>
-                    <th>&nbsp;</th>
-                    <th>&nbsp;</th>
-                    {% for studentId, student in studentMarks %}
-                        <th>
-                            <div>
-                                <span>
-                                    <span>{{ student.lastname ~ ', ' ~ student.firstname}}</span>
-                                </span>
-                            </div>
-                        </th>
-                    {% endfor %}
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for assessmentId, assessment in assessments %}
-                    {# Set up the rowspan for the assessment #}
-                    {% set capCount = assessment.capabilities|length %}
-                    {% set rowspan = capCount %}
-
-                    {% for capability in assessment.capabilities %}
-                        {% set indCount = capability.indicators|length %}
-                        {% set rowspan = rowspan + indCount %}
-                    {% endfor %}
-
-                    {# Render assessments #}
-                    <tr class="assessment">
-                        <th rowspan="{{ rowspan+1 }}" style="min-width: 200px;width: 200px;">
-                            {{ assessment.name }}
-                        </th>
-                    </tr>
-
-                    {# Render capabilities #}
-                    {% for capabilityId, capability in assessment.capabilities %}
-                        <tr class="capability">
-                            <th style="min-width: 200px;width: 200px;">
-                                {{ capability.name }}
+{% if studentMarks|length %}
+    <div class="row">
+        <div class="small-12 island">
+            <table class="rubric-marksheet marksheet">
+                <thead>
+                {# TODO make the layout of this close together like the class markbook #}
+                    <tr class="rotate-headers" data-headers>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                        {% for studentId, student in studentMarks %}
+                            <th>
+                                <div>
+                                    <span>
+                                        <span>{{ student.lastname ~ ', ' ~ student.firstname}}</span>
+                                    </span>
+                                </div>
                             </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
 
-                            {% for studentId, student in studentMarks %}
-                                {% set capabilityMark = student[assessmentId].capabilities[capabilityId].mark %}
-                                <td>
-                                    {{ capabilityMark|default('-') }}
-                                </td>
-                            {% endfor %}
+                <tbody>
+                    {% for assessmentId, assessment in assessments %}
+                        {# Set up the rowspan for the assessment #}
+                        {% set capCount = assessment.capabilities|length %}
+                        {% set rowspan = capCount %}
+
+                        {% for capability in assessment.capabilities %}
+                            {% set indCount = capability.indicators|length %}
+                            {% set rowspan = rowspan + indCount %}
+                        {% endfor %}
+
+                        {# Render assessments #}
+                        <tr class="assessment">
+                            <th rowspan="{{ rowspan+1 }}" style="min-width: 200px;width: 200px;">
+                                {{ assessment.name }}
+                            </th>
                         </tr>
 
-                        {# Render indicators #}
-                        {% for indicatorId, indicator in capability.indicators %}
-                            <tr class="indicator">
+                        {# Render capabilities #}
+                        {% for capabilityId, capability in assessment.capabilities %}
+                            <tr class="capability">
                                 <th style="min-width: 200px;width: 200px;">
-                                    {{ indicator.name }}
+                                    {{ capability.name }}
                                 </th>
 
                                 {% for studentId, student in studentMarks %}
-                                    {% set indicatorMark = student[assessmentId].capabilities[capabilityId].indicators[indicatorId].mark %}
-                                    {% set descriptorText = student[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
-                                    <td title="{{ descriptorText|default('-No descriptor text-') }}">
-                                        {{ indicatorMark|default('-') }}
+                                    {% set capabilityMark = student[assessmentId].capabilities[capabilityId].mark %}
+                                    <td>
+                                        {{ capabilityMark|default('-') }}
                                     </td>
                                 {% endfor %}
                             </tr>
+
+                            {# Render indicators #}
+                            {% for indicatorId, indicator in capability.indicators %}
+                                <tr class="indicator">
+                                    <th style="min-width: 200px;width: 200px;">
+                                        {{ indicator.name }}
+                                    </th>
+
+                                    {% for studentId, student in studentMarks %}
+                                        {% set indicatorMark = student[assessmentId].capabilities[capabilityId].indicators[indicatorId].mark %}
+                                        {% set descriptorText = student[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
+                                        <td title="{{ descriptorText|default('-No descriptor text-') }}">
+                                            {{ indicatorMark|default('-') }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
                         {% endfor %}
+
                     {% endfor %}
+                </tbody>
+            </table>
 
-                {% endfor %}
-            </tbody>
-        </table>
-
+        </div>
     </div>
-</div>
+{% else %}
+    <div class="empty-state">
+        <i class="icon-progress"></i>
+        <p>There are no rubric marks for this folder.</p>
+    </div>
+{% endif %}
