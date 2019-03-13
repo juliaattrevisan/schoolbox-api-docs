@@ -51,14 +51,14 @@ class Controller extends Base
      */
     public function getMarkbook(Folder\Model $folder): void
     {
-        $this->getRawMarkbookData($folder->getId());
+        [$assessments, $studentMarks] = $this->getMarkbookData($folder->getId());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@rubricMarkbook/markbookOuter.twig',
                 [
-                    'students' => $this->generateMockMarksPerStudent(),
-                    'assessments' => $this->generateMockAssessments(),
+                    'students' => $studentMarks,
+                    'assessments' => $assessments,
                     'folder' => $folder
                 ]
             )->setTab('submission')->setTitle('Rubric Markbook for ' . $folder->getName())
@@ -450,9 +450,8 @@ class Controller extends Base
      * @throws \InvalidArgumentException
      * @throws \RangeException
      */
-    private function getRawMarkbookData(int $folderId) : array
+    private function getMarkbookData(int $folderId) : array
     {
-        $data = [];
         $getAllAssessmentsInFolderQuery = $this->database->prepareQuery(
     "SELECT var.assessment_id,
             a.title AS assessment_name,
@@ -555,7 +554,7 @@ class Controller extends Base
             ];
         }
 
-        return $data;
+        return [$assessments, $studentMarks];
     }
 
 }
