@@ -182,6 +182,7 @@ class Controller extends Base
             $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $row['capability_max_value']);
             $assessmentMarkScheme = $markSchemeFactory->spawnMarkSchemeFor($stubAssessment);
 
+            // TODO human readable mark is NOT what it sounds like, this is wrong
             $humanReadableCapabilityMark = $capabilityMarkScheme->getHumanReadableMark($row['capability_mark']);
             $humanReadableIndicatorMark = $assessmentMarkScheme->getHumanReadableMark($row['indicator_mark']);
 
