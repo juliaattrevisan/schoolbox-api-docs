@@ -468,15 +468,12 @@ class Controller extends Base
         $studentMarks = [];
 
         foreach ($getAllAssessmentsInFolderQuery->getIterator() as $i => $row) {
-            $getGradeGroup = $this->database->prepareQuery(
-                "SELECT * 
-                FROM submission_grade sg
-                WHERE sg.submission_grade_group_id = (
-                    SELECT sb.submission_grade_group_id
+            $getGradeGroupIdQuery = $this->database->prepareQuery(
+                "SELECT sb.submission_grade_group_id
                     FROM submission_box sb
-                    WHERE sb.assessment_id = :assessmentId
-                )"
-            );
+                    WHERE sb.assessment_id = :assessmentId");
+            $gradeGroupId = $getGradeGroupIdQuery->fetchAll(['assessmentId' => $row['assessment_id']]);
+            $gradeGroup = $this->gradeGroupMapper->findById($gradeGroupId);
 
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
@@ -511,7 +508,7 @@ class Controller extends Base
                     break;
                 case MarkType::TYPE_LETTER:
                     // TODO how can we get the grade group?
-                    $marktype = new MarkScheme\LetterGrade($dueWork->getGradeGroup());
+                    $marktype = new MarkScheme\LetterGrade($gradeGroup);
                     break;
                 default:
                     throw new \DomainException('Invalid MarkType for DueWork: ' . $row['assessment_name']);
