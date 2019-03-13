@@ -148,13 +148,24 @@ class Controller extends Base
 
             $markSchemeFactory = new MarkScheme\Factory();
 
-            // TODO hydrate assessment or something
-            $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($assessment, $row['capability_max_value']);
-            $assessmentMarkScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
+            $stubAssessment = new DueWork();
+            $stubAssessment->setId($row['assessment_id']);
+            $stubAssessment->setMarkPerCapability($row['assessment_rubric_group_marks']);
+            $stubAssessment->setMaxMark($row['assessment_max_mark']);
+            /**
+             * @var GradeGroup\Model $gradeGroup
+             */
+            $gradeGroup = $this->gradeGroupMapper->findById($gradeGroupId); // TODO query for this
+            $stubAssessment->setGradeGroup($gradeGroup);
+            $markType = new MarkType();
+            $markType->setId($row['assessment_mark_type']);
+            $stubAssessment->setMarkType($markType);
 
-            // TODO humanReadableMark is NOT right.
-            $humanReadableCapabilityMark = $markScheme->getHumanReadableMark($row['capability_mark']);
-            $humanReadableIndicatorMark = $markScheme->getHumanReadableMark($row['indicator_mark']);
+            $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $row['capability_max_value']);
+            $assessmentMarkScheme = $markSchemeFactory->spawnMarkSchemeFor($stubAssessment);
+
+            $humanReadableCapabilityMark = $capabilityMarkScheme->getHumanReadableMark($row['capability_mark']);
+            $humanReadableIndicatorMark = $assessmentMarkScheme->getHumanReadableMark($row['indicator_mark']);
 
             // Stuff everything about the students marks into an array
             $studentMarks[$row['student_id']] = [
