@@ -110,6 +110,7 @@ class Controller extends Base
         $assessments = [];
         $studentMarks = [];
 
+        // TODO im not doing this right, caps/inds are being overwritten
         foreach ($getAllAssessmentsInFolderQuery->getIterator() as $i => $row) {
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
@@ -160,6 +161,7 @@ class Controller extends Base
                     throw new \DomainException('Invalid MarkType for DueWork: ' . $row['assessment_name']);
             }
 
+            // TODO humanReadableMark is NOT right.
             $humanReadableCapabilityMark = $markScheme->getHumanReadableMark($row['capability_mark']);
             $humanReadableIndicatorMark = $markScheme->getHumanReadableMark($row['indicator_mark']);
 
