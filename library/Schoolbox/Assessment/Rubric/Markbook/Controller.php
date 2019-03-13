@@ -12,6 +12,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 
 class Controller extends Base
 {
@@ -21,14 +22,22 @@ class Controller extends Base
      */
     private $database;
 
+
+    /**
+     * @var GradeGroup\Mapper
+     */
+    private $gradeGroupMapper;
+
     /**
      * Constructor
      *
      * @param IConnector $database
+     * @param GradeGroup\Mapper $gradeGroupMapper
      */
-    public function __construct(IConnector $database)
+    public function __construct(IConnector $database, GradeGroup\Mapper $gradeGroupMapper)
     {
         $this->database = $database;
+        $this->gradeGroupMapper = $gradeGroupMapper;
     }
 
     /**
@@ -433,6 +442,9 @@ class Controller extends Base
     /**
      * @param int $folderId
      * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Alaress\Database\Exception
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \RangeException
