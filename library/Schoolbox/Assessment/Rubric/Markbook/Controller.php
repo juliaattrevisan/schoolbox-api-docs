@@ -110,24 +110,39 @@ class Controller extends Base
         $assessments = [];
         $studentMarks = [];
 
-        // TODO im not doing this right, caps/inds are being overwritten
+        $capabilities = [];
+        $indicators = [];
+
+        $lastObservedAssessmentId = null;
+        $lastObservedCapabilityId = null;
+
         foreach ($getAllAssessmentsInFolderQuery->getIterator() as $i => $row) {
+            if ($lastObservedAssessmentId !== $row['assessment_id']) {
+                // Has the assessment we're looking at changed? Reset the capabilities
+                $capabilities = [];
+            }
+
+            if ($lastObservedCapabilityId !== $row['capability_id']) {
+                // Has the capability we're looking at changed? Reset the indicators
+                $indicators = [];
+            }
+
+            $indicators[$row['indicator_id']] = [
+                'name' => $row['indicator_name'],
+                'maxMark' => $row['indicator_max_value']
+            ];
+
+            $capabilities[$row['capability_id']] = [
+                'name' => $row['capability_name'],
+                'maxMark' => $row['capability_max_value'],
+                'indicators' => $indicators
+            ];
+
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
                 'name' => $row['assessment_name'],
                 'maxMark' => $row['assessment_max_mark'],
-                'capabilities' => [
-                    $row['capability_id'] => [
-                        'name' => $row['capability_name'],
-                        'maxMark' => $row['capability_max_value'],
-                        'indicators' => [
-                            $row['indicator_id'] => [
-                                'name' => $row['indicator_name'],
-                                'maxMark' => $row['indicator_max_value']
-                            ]
-                        ]
-                    ]
-                ]
+                'capabilities' => $capabilities
             ];
 
             $markScheme = null;
@@ -183,6 +198,9 @@ class Controller extends Base
                     ]
                 ]
             ];
+
+            $lastObservedAssessmentId = $row['assessment_id'];
+            $lastObservedCapabilityId = $row['capability_id'];
         }
 
         return [$assessments, $studentMarks];
