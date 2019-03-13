@@ -29,7 +29,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel
 {
 
     // Exit Statuses.
-    // Apps may use custom exit statuses so long as they don't collide with these
+    // Apps may use custom exit statuses so long as they don't collide with these, say starting at 100
     public const EXIT_STATUS_OK           = 0;   // The requested action was successfully performed.
     public const EXIT_STATUS_KERNEL_ERROR = 1;   // Problem in kernel, may have been caused by App
     public const EXIT_STATUS_APP_ERROR    = 2;   // Problem in App

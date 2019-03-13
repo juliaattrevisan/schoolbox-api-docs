@@ -81,8 +81,8 @@ class Kernel extends CliKernelAbstract
     /**
      * @param string[]  $appShortOpts
      * @param string[]  $appLongOpts
-     * @param null|bool $forcePerform     Allow invoking script to force the App to run in 'perform' mode
-     * @param int|null  $logLevelOverride Allow invoking script to force the App to log at a specific logging level
+     * @param null|bool $forcePerform Allow invoking script to force the App to run in 'perform' mode
+     * @param int|null  $minLogLevel  Allow invoking script to force the App to not log below this level
      * @param int|null  $errorLevelOverride
      * @throws InvalidArgumentException
      * @throws \Aura\Di\Exception
@@ -98,11 +98,11 @@ class Kernel extends CliKernelAbstract
         array $appShortOpts = [],
         array $appLongOpts = [],
         ?bool $forcePerform = false,
-        int $logLevelOverride = null,
+        int $minLogLevel = null,
         int $errorLevelOverride = null
     ) {
         $this->forcePerform       = $forcePerform;
-        $this->logLevelOverride   = $logLevelOverride;
+        $this->logLevelOverride   = $minLogLevel;
         $this->errorLevelOverride = $errorLevelOverride;
         $this->parseCommandLineOptions($appShortOpts, $appLongOpts);
         $this->setErrorReporting();

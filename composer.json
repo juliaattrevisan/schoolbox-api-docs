@@ -75,7 +75,8 @@
         "crell/api-problem": "^3.0",
         "knplabs/knp-snappy": "^1.1",
         "ext-redis": "*",
-        "ext-readline": "*"
+        "ext-readline": "*",
+        "ext-zip": "*"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
