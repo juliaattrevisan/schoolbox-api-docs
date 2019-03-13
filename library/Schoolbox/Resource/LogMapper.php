@@ -138,12 +138,14 @@ class LogMapper extends Mapper {
     /**
      * Return a collection of log items appropriate for aggregation
      *
-     * @param int $context
-     * @param int $limit
+     * @param     $context
+     * @param     $filter
+     * @param     $limit
      * @param int $offset
-     * @param string $filter
      * @param int $time
-     * @return Collection|Log[]
+     *
+     * @return Collection
+     * @throws Mapper\Exception
      */
     public function findForFeed($context, $filter, $limit, $offset = 0, $time = 0) {
         $time = date('Y-m-d H:i:s', $time ?: time());
@@ -233,8 +235,10 @@ class LogMapper extends Mapper {
 
 
     /**
-     * @param Link|File\Model|Folder\Model|Textbox\Model $object
-     * @param User                                       $user
+     * @param $object
+     * @param $user
+     *
+     * @throws Mapper\Exception
      */
     public function logCreate($object, $user)
     {
@@ -242,8 +246,10 @@ class LogMapper extends Mapper {
     }
 
     /**
-     * @param Link|File\Model|Folder\Model|Textbox\Model $object
-     * @param User                                       $user
+     * @param $object
+     * @param $user
+     *
+     * @throws Mapper\Exception
      */
     public function logRead($object, $user)
     {
@@ -251,8 +257,10 @@ class LogMapper extends Mapper {
     }
 
     /**
-     * @param Link|File\Model|Folder\Model|Textbox\Model $object
-     * @param User                                       $user
+     * @param $object
+     * @param $user
+     *
+     * @throws Mapper\Exception
      */
     public function logUpdate($object, $user)
     {
@@ -260,8 +268,10 @@ class LogMapper extends Mapper {
     }
 
     /**
-     * @param Link|File\Model|Folder\Model|Textbox\Model $object
-     * @param User                                       $user
+     * @param $object
+     * @param $user
+     *
+     * @throws Mapper\Exception
      */
     public function logDelete($object, $user)
     {
