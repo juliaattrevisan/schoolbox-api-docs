@@ -82,6 +82,7 @@ class Controller extends Base
         $getAllAssessmentsInFolderQuery = $this->database->prepareQuery(
     "SELECT var.assessment_id,
             a.title AS assessment_name,
+            sb.rubric_group_marks AS assessment_rubric_group_marks,
             vrm.assessment_mark_type,
             vrm.assessment_max_mark,
             vrm.student_id,
@@ -102,6 +103,7 @@ class Controller extends Base
             INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
             INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id
             INNER JOIN assessment a ON a.id = vmrf.assessment_id
+            INNER JOIN submission_box sb ON sb.assessment_id = vmrf.assessment_id
             INNER JOIN user u ON u.id = vrm.student_id
             WHERE      var.folder_id=:folderId and vrm.feedback_type='instructor'"
         );
@@ -148,18 +150,34 @@ class Controller extends Base
 
             $markSchemeFactory = new MarkScheme\Factory();
 
+            // Create some things the markscheme factory wants our Due Work to have
+            $gradeGroupIdQuery = $this->database->prepareQuery(
+            "SELECT sb.submission_grade_group_id
+                FROM submission_box sb
+                WHERE sb.assessment_id = :assessmentId"
+            );
+            $gradeGroupIdQuery->execute(['assessmentId' => $row['assessment_id']]);
+            $gradeGroupId = $gradeGroupIdQuery->fetchAll(PDO::FETCH_COLUMN);
+            try {
+                $gradeGroup = $this->gradeGroupMapper->findById($gradeGroupId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $gradeGroup = null;
+            }
+            $markType = new MarkType();
+            $markType->setId($row['assessment_mark_type']);
+
+            // Fill out a Due Work with the data we need for the markscheme factory to work
             $stubAssessment = new DueWork();
             $stubAssessment->setId($row['assessment_id']);
             $stubAssessment->setMarkPerCapability($row['assessment_rubric_group_marks']);
             $stubAssessment->setMaxMark($row['assessment_max_mark']);
-            /**
-             * @var GradeGroup\Model $gradeGroup
-             */
-            $gradeGroup = $this->gradeGroupMapper->findById($gradeGroupId); // TODO query for this
-            $stubAssessment->setGradeGroup($gradeGroup);
-            $markType = new MarkType();
-            $markType->setId($row['assessment_mark_type']);
             $stubAssessment->setMarkType($markType);
+            if ($gradeGroup !== null) {
+                /**
+                 * @var GradeGroup\Model $gradeGroup
+                 */
+                $stubAssessment->setGradeGroup($gradeGroup);
+            }
 
             $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $row['capability_max_value']);
             $assessmentMarkScheme = $markSchemeFactory->spawnMarkSchemeFor($stubAssessment);
