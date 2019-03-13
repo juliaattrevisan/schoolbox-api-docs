@@ -8,7 +8,9 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder;
 
 class Controller extends Base
@@ -428,18 +430,29 @@ class Controller extends Base
         return $studentMarks;
     }
 
+    /**
+     * @param int $folderId
+     * @return array
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \RangeException
+     */
     private function getRawMarkbookData(int $folderId) : array
     {
         $data = [];
         $getAllAssessmentsInFolderQuery = $this->database->prepareQuery("SELECT var.assessment_id,
                     a.title AS assessment_name,
+                    vrm.assessment_mark_type,
+                    vrm.assessment_max_mark,
                     vrm.student_id,
                     vrm.capability_id,
                     vrm.capability_name,
                     vrm.capability_mark,
+                    vrm.capability_max_value,
                     vrm.indicator_id,
                     vrm.indicator_name,
                     vrm.indicator_mark,
+                    vrm.indicator_max_value,
                     vrm.descriptor_id,
                     vrm.descriptor_name,
                     vrm.descriptor_max_value
@@ -459,33 +472,56 @@ class Controller extends Base
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
                 'name' => $row['assessment_name'],
+                'maxMark' => $row['assessment_max_mark'],
                 'capabilities' => [
                     $row['capability_id'] => [
-                        $row['capability_name'],
+                        'name' => $row['capability_name'],
+                        'maxMark' => $row['capability_max_value'],
                         'indicators' => [
                             $row['indicator_id'] => [
-                                $row['indicator_name']
+                                'name' => $row['indicator_name'],
+                                'maxMark' => $row['indicator_max_value']
                             ]
                         ]
                     ]
                 ]
             ];
 
+            $marktype = null;
+            switch ($row['assessment_mark_type']) {
+                // Yes, I know these are deprecated, but we have to use them
+                case MarkType::TYPE_PERCENT:
+                    $marktype = new MarkScheme\Percentage();
+                    break;
+                case MarkType::TYPE_NONE:
+                    $marktype = new MarkScheme\None();
+                    break;
+                case MarkType::TYPE_TOTAL:
+                    $maxMark = $row['capability_max_value'] ?? $row['assessment_max_mark'];
+                    $marktype = new MarkScheme\TotalMarkFractional($maxMark);
+                    break;
+                case MarkType::TYPE_LETTER:
+                    // TODO how can we get the grade group?
+                    $marktype = new MarkScheme\LetterGrade($dueWork->getGradeGroup());
+                    break;
+                default:
+                    throw new \DomainException('Invalid MarkType for DueWork: ' . $row['assessment_name']);
+            }
+
+            $markScheme = new MarkScheme\Percentage();
+            $humanReadableCapabilityMark = $markScheme->getHumanReadableMark($capabilityMark);
+            $humanReadableIndicatorMark = $markScheme->getHumanReadableMark($indicatorMark);
+
             // Stuff everything about the students marks into an array
-
-            // TODO calculate this using mark scheme
-            $capabilityMark = '1/10';
-            $indicatorMark = '1/10';
-
             $studentMarks[$row['student_id']] = [
                 'name' => $row['student_name'],
                 $row['assessment_id'] => [
                     'capabilities' => [
                         $row['capability_id'] => [
-                            'mark' => $capabilityMark,
+                            'mark' => $humanReadableCapabilityMark,
                             'indicators' => [
                                 $row['indicator_id'] => [
-                                    'mark' => $indicatorMark,
+                                    'mark' => $humanReadableIndicatorMark,
                                     'selectedDescriptorText' => $row['descriptor_name']
                                 ]
                             ]
@@ -494,7 +530,7 @@ class Controller extends Base
                 ]
             ];
         }
-        
+
         return $data;
     }
 
