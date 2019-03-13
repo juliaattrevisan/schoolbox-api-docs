@@ -112,16 +112,14 @@ class LogMapper extends Mapper {
     }
 
     /**
+     * Return recent log entries
+     *
      * @param int $limit
      *
      * @return array
      */
     public function findRecent(int $limit = 30): array
     {
-        if (!is_numeric($limit)) {
-            $limit = 30;
-        }
-
         $stmt = $this->database->prepare
         ("
             (SELECT `date` occurred, login, ip, title, firstname, lastname FROM login_log LEFT JOIN `user` ON `user`.`username`=login_log.username AND `user`.`deleted_at` IS NULL ORDER BY DATE DESC LIMIT 0, {$limit})
@@ -235,7 +233,7 @@ class LogMapper extends Mapper {
 
 
     /**
-     * @param $object
+     * @param Link|File\Model|Folder\Model|Textbox\Model $object
      * @param $user
      *
      * @throws Mapper\Exception
