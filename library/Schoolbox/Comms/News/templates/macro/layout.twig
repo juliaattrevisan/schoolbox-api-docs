@@ -1,3 +1,6 @@
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+
 {# Standard feature image plus text representation of news article
  # Shown in two columns; one for image, one for text
  #
@@ -112,6 +115,12 @@
                     <label for="allow-comments">Allow comments</label>
                 </div>
             </div>
+            <form action="/" method="post">
+                <label>
+                    <textarea id='comment-area' name='comment-area' rows="5"></textarea>
+                </label>
+                <input type="submit" value="Post" />
+            </form>
             <!-- Only show alert if comments are locked -->
             <div data-alert="" class="alert-box">
                 <span class="icon-locked">Comments are currently disabled for this article</span>
