@@ -76,26 +76,16 @@ class Controller extends Base
             sb.rubric_group_marks AS assessment_rubric_group_marks,
             vrm.assessment_mark_type,
             vrm.assessment_max_mark,
-            vrm.student_id,
-            u.firstname AS student_firstname,
-            u.lastname AS student_lastname,
             vrm.capability_id,
             vrm.capability_name,
-            vrm.capability_mark,
             vrm.capability_max_value,
             vrm.indicator_id,
             vrm.indicator_name,
-            vrm.indicator_mark,
-            vrm.indicator_max_value,
-            vrm.descriptor_id,
-            vrm.descriptor_name,
-            vrm.descriptor_max_value
+            vrm.indicator_max_value
             FROM       v_rubric_mark vrm
             INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
-            INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id
-            INNER JOIN assessment a ON a.id = vmrf.assessment_id
-            INNER JOIN submission_box sb ON sb.assessment_id = vmrf.assessment_id
-            INNER JOIN user u ON u.id = vrm.student_id
+            INNER JOIN assessment a ON a.id = vrm.assessment_id
+            INNER JOIN submission_box sb ON sb.assessment_id = vrm.assessment_id
             WHERE      var.folder_id=:folderId and vrm.feedback_type='instructor'"
         );
 
@@ -135,6 +125,7 @@ class Controller extends Base
                 'name' => $row['assessment_name'],
                 'maxMark' => $row['assessment_max_mark'],
                 'markType' => $row['assessment_mark_type'],
+                'markPerCap' => $row['assessment_rubric_group_marks'],
                 'capabilities' => $capabilities
             ];
 
