@@ -116,14 +116,19 @@
             </div>
             {{ article.body|purify }}
         </section>
+
+        {# Don't show comments if the article isn't publicly available #}
+        {% if article.public %}
         <section class="comments content">
             <div class="row">
                 <div class="small-6 columns">
                     <h2>Comments</h2>
                 </div>
                 <div class="checklist small-6 columns">
+                    {% if modifyRoute %}
                     <input id="allow-comments" type="checkbox">
                     <label for="allow-comments">Allow comments</label>
+                    {% endif %}
                 </div>
             </div>
             <form action="/" method="post">
@@ -132,10 +137,14 @@
                 </label>
                 <input type="submit" value="Post" />
             </form>
+
+            {% if not article.commentsAllowed %}
             <!-- Only show alert if comments are locked -->
             <div data-alert="" class="alert-box">
                 <span class="icon-locked">Comments are currently disabled for this article</span>
             </div>
+            {% endif %}
+
             <ul class="information-list social-stream">
                 <li class="actions-small-2">
                     <div class="list-item">
@@ -202,6 +211,7 @@
             </ul>
             <A href="#" class="button expand" title="Load more">Load more</A>
         </section>
+        {% endif %}
     </div>
 {% endmacro %}
 
