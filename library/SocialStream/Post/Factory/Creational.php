@@ -8,7 +8,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace SocialStream\Post\Factory;
@@ -17,7 +16,6 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model;
-use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
