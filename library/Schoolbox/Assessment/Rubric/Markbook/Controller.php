@@ -132,7 +132,7 @@ class Controller extends Base
 
             $indicators[$row['indicator_id']] = [
                 'name' => $row['indicator_name'],
-                'maxMark' => $row['indicator_max_value']
+                'maxMark' => $row['indicator_max_value'],
             ];
 
             $capabilities[$row['capability_id']] = [
@@ -145,8 +145,14 @@ class Controller extends Base
             $assessments[$row['assessment_id']] = [
                 'name' => $row['assessment_name'],
                 'maxMark' => $row['assessment_max_mark'],
+                'markType' => $row['assessment_mark_type'],
                 'capabilities' => $capabilities
             ];
+
+            $capabilityMark = round($row['capability_mark'], 2);
+            $indicatorMark = round($row['indicator_mark'], 2);
+            $capabilityMax = round($row['capability_max_value']);
+            $indicatorMax = round($row['indicator_max_value']);
 
             // Stuff everything about the students marks into an array
             $studentMarks[$row['student_id']] = [
@@ -155,10 +161,10 @@ class Controller extends Base
                 $row['assessment_id'] => [
                     'capabilities' => [
                         $row['capability_id'] => [
-                            'mark' => $row['capability_mark'] . '/' . $row['capability_max_value'],
+                            'mark' => $capabilityMark . '/' . $capabilityMax,
                             'indicators' => [
                                 $row['indicator_id'] => [
-                                    'mark' => $row['indicator_mark'] . '/' . $row['indicator_max_value'],
+                                    'mark' => $indicatorMark . '/' . $indicatorMax,
                                     'selectedDescriptorText' => $row['descriptor_name']
                                 ]
                             ]
@@ -170,6 +176,9 @@ class Controller extends Base
             $lastObservedAssessmentId = $row['assessment_id'];
             $lastObservedCapabilityId = $row['capability_id'];
         }
+
+        var_dump($assessments);
+        var_dump($studentMarks);
 
         return [$assessments, $studentMarks];
     }
