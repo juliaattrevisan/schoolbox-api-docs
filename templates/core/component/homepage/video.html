@@ -82,12 +82,9 @@
                             refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                             refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
                             showIfEmpty: false,
-                            addedfile: function (file) {
-                                $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
-                            },
                             sending: function (file, xhr, formData) {
                                 formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                formData.append('category', $(file.previewElement).data('node'));
+                                formData.append('category', {FILE_CAT_ID});
                                 formData.append('comment', '');
                                 formData.append('hidden', 0);
                                 $('#empty-state{COMPONENT_INSTANCE_ID}').hide();
@@ -197,12 +194,9 @@
                         dictDefaultMessage: 'You can drag videos into this space.',
                         refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                         refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
-                        addedfile: function (file) {
-                            $(file.previewElement).addClass('category-{FILE_CAT_ID}').data('node', {FILE_CAT_ID});
-                        },
                         sending: function (file, xhr, formData) {
                             formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                            formData.append('category', $(file.previewElement).data('node'));
+                            formData.append('category', {FILE_CAT_ID});
                             formData.append('comment', '');
                             formData.append('hidden', 0);
                         },

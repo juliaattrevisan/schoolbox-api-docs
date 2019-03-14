@@ -45,17 +45,12 @@
                             refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                             refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
                             showIfEmpty: false,
-
-                            addedfile: function (file) {
-                                $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
-                            },
                             sending: function (file, xhr, formData) {
 
                                 $('#empty-state{COMPONENT_INSTANCE_ID}').hide();
 
-
                                 formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                formData.append('category', $(file.previewElement).data('node'));
+                                formData.append('category', {IMAGEGALLERY_CATEGORY_ID});
                                 formData.append('comment', '');
                                 formData.append('hidden', 0);
                             },
@@ -124,13 +119,9 @@
                                     refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
                                     refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
                                     showIfEmpty: false,
-
-                                    addedfile: function (file) {
-                                        $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
-                                    },
                                     sending: function (file, xhr, formData) {
                                         formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                        formData.append('category', $(file.previewElement).data('node'));
+                                        formData.append('category', {IMAGEGALLERY_CATEGORY_ID});
                                         formData.append('comment', '');
                                         formData.append('hidden', 0);
                                     },
