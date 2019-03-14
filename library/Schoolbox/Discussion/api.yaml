@@ -334,6 +334,10 @@ components:
               $ref: '#/components/examples/postListOne'
             many:
               $ref: '#/components/examples/postListMany'
+        text/html:
+          schema:
+            type: string
+            description: The list of posts, rendered into HTML on the server.
 
 
   parameters:
