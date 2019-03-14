@@ -173,7 +173,7 @@ class Controller extends Base
         // Get logs
 
         $logs = [];
-        $logsRecent = LogMapper::getInstance()->findRecent(30);
+        $logsRecent = LogMapper::getInstance()->findRecent();
 
         foreach ($logsRecent as $log) {
             $action = '';
