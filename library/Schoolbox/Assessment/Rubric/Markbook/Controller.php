@@ -55,13 +55,13 @@ class Controller extends Base
     public function getMarkbook(Folder\Model $folder): void
     {
         $assessments = $this->retrieveAssessmentsInFolder($folder->getId());
-        $students = $this->retrieveMarksInFolder($folder->getId());
+        $studentMarks = $this->retrieveMarksInFolder($folder->getId());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@rubricMarkbook/markbookOuter.twig',
                 [
-                    'students' => $students,
+                    'studentMarks' => $studentMarks,
                     'assessments' => $assessments,
                     'folder' => $folder
                 ]
@@ -126,7 +126,7 @@ class Controller extends Base
                 'name' => $row['assessment_name'],
                 'maxMark' => $row['assessment_max_mark'],
                 'markType' => $row['assessment_mark_type'],
-                'markPerCap' => $row['assessment_rubric_group_marks'],
+                'usesMarkPerCap' => $row['assessment_rubric_group_marks'],
                 'capabilities' => $capabilities
             ];
 
@@ -212,38 +212,82 @@ class Controller extends Base
             $lastObservedStudentId = $row['student_id'];
         }
 
-        new Probe($students);
-
-        return $students;
+        return $this->generateHumanReadableMarks($students, $folderId);
     }
 
     /**
      * @return array
+     * @param array $students
      * @param int $folderId
      */
-    private function generateHumanReadableMarks(int $folderId) : array
+    private function generateHumanReadableMarks(array $students, int $folderId) : array
     {
         $assessmentsInFolder = $this->retrieveAssessmentsInFolder($folderId);
-        $studentMarks = $this->retrieveMarksInFolder($folderId);
 
-        foreach($studentMarks as $studentId => $student) {
+        foreach($students as $studentId => $student) {
 
             foreach($student['assessments'] as $assessmentId => $assessmentMarks) {
                 $assessmentMaxMark = $assessmentsInFolder[$assessmentId]['maxMark'];
+                $assessmentMarkType = $assessmentsInFolder[$assessmentId]['markType'];
+                $assessmentUsesMarkPerCap = $assessmentsInFolder[$assessmentId]['usesMarkPerCap'];
+
+                $markSchemeFactory = new MarkScheme\Factory();
+                // Create some things the markscheme factory wants our Due Work to have
+                $gradeGroupIdQuery = $this->database->prepareQuery(
+                    "SELECT sb.submission_grade_group_id
+                    FROM submission_box sb
+                    WHERE sb.assessment_id = :assessmentId"
+                );
+                $gradeGroupIdQuery->execute(['assessmentId' => $assessmentId]);
+                $gradeGroupId = $gradeGroupIdQuery->fetchAll(PDO::FETCH_COLUMN);
+                try {
+                    $gradeGroup = $this->gradeGroupMapper->findById($gradeGroupId);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $gradeGroup = null;
+                }
+                $markType = new MarkType();
+                $markType->setId($assessmentMarkType);
+
+                // Fill out a Due Work with the data we need for the markscheme factory to work
+                $stubAssessment = new DueWork();
+                $stubAssessment->setId($assessmentId);
+                $stubAssessment->setMarkPerCapability($assessmentUsesMarkPerCap);
+                $stubAssessment->setMaxMark($assessmentMaxMark);
+                $stubAssessment->setMarkType($markType);
+                if ($gradeGroup !== null) {
+                    /**
+                     * @var GradeGroup\Model $gradeGroup
+                     */
+                    $stubAssessment->setGradeGroup($gradeGroup);
+                }
 
                 foreach($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
                     $capabilityInFolder = $assessmentsInFolder[$assessmentId]['capabilities'][$capabilityId];
                     $capabilityMaxMark = $capabilityInFolder['maxMark'];
                     $capabilityNormalisedMark = $capabilityMarks['normalisedMark'];
 
+                    $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $capabilityMaxMark);
+
+                    $humanReadableCapabilityMark = $capabilityMarkScheme->getHumanReadableMark($capabilityNormalisedMark);
+                    $students[$studentId]['assessments'][$assessmentId]['capabilities']['humanReadableMark'] = $humanReadableCapabilityMark;
+
                     foreach($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
                         $indicatorInFolder = $capabilityInFolder['indicators'][$indicatorId];
                         $indicatorMaxMark = $indicatorInFolder['maxMark'];
                         $indicatorNormalisedMark = $indicatorMarks['normalisedMark'];
+
+                        // TODO this is probably wrong??? look at examples
+                        $assessmentMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $indicatorMaxMark);
+                        $humanReadableIndicatorMark = $assessmentMarkScheme->getHumanReadableMark($indicatorNormalisedMark);
+                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
                     }
                 }
             }
 
         }
+
+        new Probe($students);
+
+        return $students;
     }
 }

@@ -40,7 +40,7 @@
     }
 </style>
 
-{% if students|length %}
+{% if studentMarks|length %}
     <div class="row">
         <div class="small-12 island">
             <table class="rubric-marksheet marksheet">
@@ -49,7 +49,7 @@
                     <tr class="rotate-headers" data-headers>
                         <th>&nbsp;</th>
                         <th>&nbsp;</th>
-                        {% for studentId, student in students %}
+                        {% for studentId, student in studentMarks %}
                             <th>
                                 <div>
                                     <span>
@@ -86,8 +86,8 @@
                                     {{ capability.name }}
                                 </th>
 
-                                {% for studentId, student in students %}
-                                    {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].mark %}
+                                {% for studentId, student in studentMarks %}
+                                    {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}
                                     <td>
                                         {{ capabilityMark|default('-') }}
                                     </td>
@@ -101,8 +101,8 @@
                                         {{ indicator.name }}
                                     </th>
 
-                                    {% for studentId, student in students %}
-                                        {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].mark %}
+                                    {% for studentId, student in studentMarks %}
+                                        {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}
                                         {% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
                                         <td title="{{ descriptorText|default('-No descriptor text-') }}">
                                             {{ indicatorMark|default('-') }}
