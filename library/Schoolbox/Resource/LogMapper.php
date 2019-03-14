@@ -142,7 +142,7 @@ class LogMapper extends Mapper {
      * @param int $offset
      * @param int $time
      *
-     * @return Collection
+     * @return Collection|Log[]
      * @throws Mapper\Exception
      */
     public function findForFeed($context, $filter, $limit, $offset = 0, $time = 0) {
@@ -244,7 +244,7 @@ class LogMapper extends Mapper {
     }
 
     /**
-     * @param $object
+     * @param Link|File\Model|Folder\Model|Textbox\Model $object
      * @param $user
      *
      * @throws Mapper\Exception
@@ -255,7 +255,7 @@ class LogMapper extends Mapper {
     }
 
     /**
-     * @param $object
+     * @param Link|File\Model|Folder\Model|Textbox\Model $object
      * @param $user
      *
      * @throws Mapper\Exception
@@ -266,7 +266,7 @@ class LogMapper extends Mapper {
     }
 
     /**
-     * @param $object
+     * @param Link|File\Model|Folder\Model|Textbox\Model $object
      * @param $user
      *
      * @throws Mapper\Exception
