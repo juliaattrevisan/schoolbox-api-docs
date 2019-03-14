@@ -218,49 +218,32 @@ class Controller extends Base
     }
 
     /**
-     * @param array $row
      * @return array
+     * @param int $folderId
      */
-    private function generateHumanReadableMarks(array $row) : array
+    private function generateHumanReadableMarks(int $folderId) : array
     {
-        $markSchemeFactory = new MarkScheme\Factory();
+        $assessmentsInFolder = $this->retrieveAssessmentsInFolder($folderId);
+        $studentMarks = $this->retrieveMarksInFolder($folderId);
 
-        // Create some things the markscheme factory wants our Due Work to have
-        $gradeGroupIdQuery = $this->database->prepareQuery(
-        "SELECT sb.submission_grade_group_id
-            FROM submission_box sb
-            WHERE sb.assessment_id = :assessmentId"
-        );
-        $gradeGroupIdQuery->execute(['assessmentId' => $row['assessment_id']]);
-        $gradeGroupId = $gradeGroupIdQuery->fetchAll(PDO::FETCH_COLUMN);
-        try {
-            $gradeGroup = $this->gradeGroupMapper->findById($gradeGroupId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $gradeGroup = null;
+        foreach($studentMarks as $studentId => $student) {
+
+            foreach($student['assessments'] as $assessmentId => $assessmentMarks) {
+                $assessmentMaxMark = $assessmentsInFolder[$assessmentId]['maxMark'];
+
+                foreach($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
+                    $capabilityInFolder = $assessmentsInFolder[$assessmentId]['capabilities'][$capabilityId];
+                    $capabilityMaxMark = $capabilityInFolder['maxMark'];
+                    $capabilityNormalisedMark = $capabilityMarks['normalisedMark'];
+
+                    foreach($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
+                        $indicatorInFolder = $capabilityInFolder['indicators'][$indicatorId];
+                        $indicatorMaxMark = $indicatorInFolder['maxMark'];
+                        $indicatorNormalisedMark = $indicatorMarks['normalisedMark'];
+                    }
+                }
+            }
+
         }
-        $markType = new MarkType();
-        $markType->setId($row['assessment_mark_type']);
-
-        // Fill out a Due Work with the data we need for the markscheme factory to work
-        $stubAssessment = new DueWork();
-        $stubAssessment->setId($row['assessment_id']);
-        $stubAssessment->setMarkPerCapability($row['assessment_rubric_group_marks']);
-        $stubAssessment->setMaxMark($row['assessment_max_mark']);
-        $stubAssessment->setMarkType($markType);
-        if ($gradeGroup !== null) {
-            /**
-             * @var GradeGroup\Model $gradeGroup
-             */
-            $stubAssessment->setGradeGroup($gradeGroup);
-        }
-
-        $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $row['capability_max_value']);
-        $assessmentMarkScheme = $markSchemeFactory->spawnMarkSchemeFor($stubAssessment);
-
-        // TODO human readable mark is NOT what it sounds like, this is wrong
-        $humanReadableCapabilityMark = $capabilityMarkScheme->getHumanReadableMark($row['capability_mark']);
-        $humanReadableIndicatorMark = $assessmentMarkScheme->getHumanReadableMark($row['indicator_mark']);
-
-        return [$humanReadableCapabilityMark, $humanReadableIndicatorMark];
     }
 }
