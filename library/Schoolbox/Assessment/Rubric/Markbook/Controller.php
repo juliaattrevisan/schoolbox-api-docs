@@ -54,18 +54,102 @@ class Controller extends Base
      */
     public function getMarkbook(Folder\Model $folder): void
     {
-        [$assessments, $students] = $this->getMarkbookData($folder->getId());
+        $assessments = $this->retrieveAssessmentsInFolder($folder->getId());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@rubricMarkbook/markbookOuter.twig',
                 [
-                    'students' => $students,
+                    'students' => [],
                     'assessments' => $assessments,
                     'folder' => $folder
                 ]
             )->setTab('submission')->setTitle('Rubric Markbook for ' . $folder->getName())
         );
+    }
+
+    private function retrieveAssessmentsInFolder(int $folderId) : array
+    {
+        $getAllAssessmentsInFolderQuery = $this->database->prepareQuery(
+            "SELECT var.assessment_id,
+            a.title AS assessment_name,
+            sb.rubric_group_marks AS assessment_rubric_group_marks,
+            vrm.assessment_mark_type,
+            vrm.assessment_max_mark,
+            vrm.student_id,
+            u.firstname AS student_firstname,
+            u.lastname AS student_lastname,
+            vrm.capability_id,
+            vrm.capability_name,
+            vrm.capability_mark,
+            vrm.capability_max_value,
+            vrm.indicator_id,
+            vrm.indicator_name,
+            vrm.indicator_mark,
+            vrm.indicator_max_value,
+            vrm.descriptor_id,
+            vrm.descriptor_name,
+            vrm.descriptor_max_value
+            FROM       v_rubric_mark vrm
+            INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
+            INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id
+            INNER JOIN assessment a ON a.id = vmrf.assessment_id
+            INNER JOIN submission_box sb ON sb.assessment_id = vmrf.assessment_id
+            INNER JOIN user u ON u.id = vrm.student_id
+            WHERE      var.folder_id=:folderId and vrm.feedback_type='instructor'"
+        );
+
+        $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
+
+        $assessments = [];
+        $capabilities = [];
+        $indicators = [];
+
+        $lastObservedAssessmentId = null;
+        $lastObservedCapabilityId = null;
+
+        foreach ($getAllAssessmentsInFolderQuery->getIterator() as $i => $row) {
+            if ($lastObservedAssessmentId !== $row['assessment_id']) {
+                // Has the assessment we're looking at changed? Reset the capabilities
+                $capabilities = [];
+            }
+
+            if ($lastObservedCapabilityId !== $row['capability_id']) {
+                // Has the capability we're looking at changed? Reset the indicators
+                $indicators = [];
+            }
+
+            $indicators[$row['indicator_id']] = [
+                'name' => $row['indicator_name'],
+                'maxMark' => $row['indicator_max_value'],
+            ];
+
+            $capabilities[$row['capability_id']] = [
+                'name' => $row['capability_name'],
+                'maxMark' => $row['capability_max_value'],
+                'indicators' => $indicators
+            ];
+
+            // Stuff everything about the assessment into an array
+            $assessments[$row['assessment_id']] = [
+                'name' => $row['assessment_name'],
+                'maxMark' => $row['assessment_max_mark'],
+                'markType' => $row['assessment_mark_type'],
+                'capabilities' => $capabilities
+            ];
+
+            $lastObservedAssessmentId = $row['assessment_id'];
+            $lastObservedCapabilityId = $row['capability_id'];
+        }
+
+        new Probe($assessments);
+
+        return $assessments;
+    }
+
+    private function retrieveMarksInFolder(int $folderId) : array
+    {
+
     }
 
     /**
