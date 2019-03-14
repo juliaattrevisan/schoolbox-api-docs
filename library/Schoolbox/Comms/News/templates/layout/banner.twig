@@ -8,7 +8,10 @@
     {% endif %}
 
     <section class="article content">
-        <h1>{{ article.title |default("(untitled)") }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
+        <div class="title-section">
+            <h1>{{ article.title |default("(untitled)") }}</h1>
+            {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}
+        </div>
 
         {# TODO this metadata should be in a span tag, but that causes the audience-container to flip out #}
         <div class="meta">
