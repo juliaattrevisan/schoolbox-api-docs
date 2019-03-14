@@ -16,7 +16,10 @@ namespace SocialStream\Post\Factory;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\Mapper;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SocialStream\UrlDetection;
@@ -30,14 +33,14 @@ class Creational extends AbstractFactory
      *
      * @var string
      */
-    private $type = '';
+    private $type;
 
     /**
      * The object that was produced by the factory
      *
      * @var \SocialStream_Post_Abstract
      */
-    private $product = null;
+    private $product;
 
     /**
      * This class knows how to figure out which urls
@@ -45,7 +48,7 @@ class Creational extends AbstractFactory
      *
      * @var UrlDetection
      */
-    private $urlDetection = null;
+    private $urlDetection;
 
     /**
      * Constructor
@@ -55,7 +58,7 @@ class Creational extends AbstractFactory
     public function __construct($url)
     {
         $this->setUrl(trim($url));
-        $this->setUrlDetection(new UrlDetection($url));
+        $this->urlDetection = new UrlDetection($url);
     }
 
 
@@ -75,72 +78,78 @@ class Creational extends AbstractFactory
     {
 
         // if data contains an attachment
-        if (is_array($data['attachment'])) {
+        if (\is_array($data['attachment'])) {
             $factory = new CollectorFactory();
             try {
                 // posts (should) only have one attachment
-                /** @var Storage\Model $storage */
+                /** @var StorageModel $storage */
                 $storage = $factory->build($data['attachment'])->getFirst();
                 $this->parseStorageMetadata($storage, $data);
             } catch (\Schoolbox\Resource\Exception $e) {
                 // this means the user 'attached' a file that failed upload, but submitted the form anyway
                 // default back to plaintext
-                $this->setProduct($this->constructDefault());
+                $this->product = $this->constructDefault();
                 $this->populate($data);
             }
-        } /* Treat local urls differently as they should bypass the caching
-		 * stuff entirely - this applies to the Resource browser mainly,
-		 * but also when people input a local url manually
-		 */
-        elseif ($this->getUrlDetection()->isLocalUrl()) {
+        } elseif ($this->getUrlDetection()->isLocalUrl()) {
+
+            /* Treat local urls differently as they should bypass the caching
+             * stuff entirely - this applies to the Resource browser mainly,
+             * but also when people input a local url manually
+             */
+
             /* When a Resource url is provided
-			 */
-            if ($this->getUrlDetection()->isResourceUrl()) {
+             */
+            if ($this->urlDetection->isResourceUrl()) {
                 $resource = $this->constructFromResource($this->getUrl());
                 $this->populate($data);
 
                 /* Spawn additional stuff
-				 */
+                 */
                 $this->spawnMetadataFromResource($resource);
                 $this->spawnThumbnailFromResource($resource);
-            } // Homepage URLs: load the link from the website
-            elseif ($this->getUrlDetection()->isHomepageUrl()) {
+            } elseif ($this->urlDetection->isHomepageUrl()) {
+                // Homepage URLs: load the link from the website
                 $homepage = $this->constructFromHomepage($this->getUrl());
                 $this->populate($data);
                 $this->spawnMetadataFromHomepage($homepage);
                 $this->spawnThumbnailFromHomepage($homepage);
-            } /* When a Storage url is provided, manufacture metadata and thumbnail
-			 * as if they had been uploaded
-			 */
-            elseif ($this->getUrlDetection()->isStorageUrl()) {
-                $fileMapper = \Schoolbox\Resource\Storage\Mapper::getInstance();
-                $file = $fileMapper->findByHash($this->getUrlDetection()->getHash());
+            } elseif ($this->urlDetection->isStorageUrl()) {
+                /* When a Storage url is provided, manufacture metadata and thumbnail
+                 * as if they had been uploaded
+                 */
+                $fileMapper = Mapper::getInstance();
+                $file = $fileMapper->findByHash($this->urlDetection->getHash());
 
                 $uploadedFile = $this->constructFromUpload($file);
                 $this->populate($data);
 
                 /* Spawn additional stuff
-				 */
+                 */
                 $this->spawnMetadataFromUpload($uploadedFile);
                 $this->spawnThumbnailFromUpload($uploadedFile);
             }
-        } /* If upload option was chosen, extract metadata and thumbnail information
-		 * directly from already-known information (no curling needed)
-		 */
-        elseif (($this->getType() == 'upload') && ($_FILES['file']['size'] > 0)) {
+        } elseif (($this->type === 'upload') && ($_FILES['file']['size'] > 0)) {
+
+            /* If upload option was chosen, extract metadata and thumbnail information
+             * directly from already-known information (no curling needed)
+             */
             $fileArray = $_FILES['file'];
 
             try {
-                $resource = \Schoolbox\Resource\Storage\Mapper::getInstance()->accept($fileArray['name'], $fileArray['tmp_name'], $_SESSION['id']);
+                $resource = Mapper::getInstance()->accept($fileArray['name'], $fileArray['tmp_name'], $_SESSION['id']);
                 $this->parseStorageMetadata($resource, $data);
-            } catch (\Exception $ex) {
+            } catch (\Schoolbox\Mapper\Exception $e) {
+
+                // noop - don't do anything else if you can attach the file for some reason?
             }
-        } /* Try to process as a url instead
-		 */
-        else {
-            if (strlen($this->getUrl())) {
+        } else {
+
+            /* Try to process as a url instead
+             */
+            if ('' !== $this->getUrl()) {
                 /* Prepend Scheme before using
-				 */
+                 */
                 $url = new \Url($this->getUrl());
                 $url->prependScheme();
                 $this->setUrl($url->getUrl());
@@ -149,40 +158,43 @@ class Creational extends AbstractFactory
                 $this->populate($data);
 
                 /* Find thumbnail from the given url in one of the many
-				 * ways that they can exist, if applicable
-				 */
-                $curl = new \Alaress_Curl_Url($this->getProduct()->getUrl());
+                 * ways that they can exist, if applicable
+                 */
+                $curl = new \Alaress_Curl_Url($this->product->getUrl());
 
-                $curl->addOptions(array(
+                $curl->addOptions([
                     CURLOPT_FOLLOWLOCATION => true,
                     CURLOPT_USERAGENT => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36',
-                ));
+                ]);
 
                 $curl->exec();
 
                 /* Spawn additional stuff
-				 *
-				 * Optionally parse the curl result here into a dom parser
-				 * That would allow for attribute gathering
-				 */
+                 *
+                 * Optionally parse the curl result here into a dom parser
+                 * That would allow for attribute gathering
+                 */
                 $this->spawnMetadataFromCurl($curl);
                 $this->spawnThumbnailFromCurl($curl);
-            } /* Plain text messsage
-			 */
-            else {
-                $this->setProduct($this->constructDefault());
+            } else {
+                /* Plain text messsage
+                 */
+                $this->product = $this->constructDefault();
                 $this->populate($data);
             }
         }
-        return $this->getProduct();
+        return $this->product;
     }
 
 
     /**
-     * @param Storage\Model $storage
-     * @param array    $data
+     * @param StorageModel $storage
+     * @param array        $data
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    protected function parseStorageMetadata(Storage\Model $storage, array $data)
+    protected function parseStorageMetadata(StorageModel $storage, array $data)
     {
         $uploadedFile = $this->constructFromUpload($storage);
         $this->populate($data);
@@ -195,19 +207,20 @@ class Creational extends AbstractFactory
 
     /**
      * Construct a post from a link by doing url analysis
+     *
+     * @throws \UnexpectedValueException
      */
     private function constructFromUrl()
     {
 
         /* Figure out if it's a video
-		 */
+         */
         foreach ($this->getVideoSites() as $currentPattern) {
             if (preg_match($currentPattern, $this->getUrl())) {
                 $object = new \SocialStream_Post_Video();
-                $object->setType('video');
+                $object->setType(\SocialStream_Post_Video::TYPE);
 
-                $this->setProduct($object);
-
+                $this->product = $object;
                 return;
             }
         }
@@ -218,40 +231,41 @@ class Creational extends AbstractFactory
                 $file = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($filename);
                 if ($file->isImage()) {
                     $object = new \SocialStream_Post_Image();
-                    $object->setType('image');
-                    $this->setProduct($object);
+                    $object->setType(\SocialStream_Post_Image::TYPE);
+                    $this->product = $object;
                     return;
                 }
-            } catch (\Exception $e) {
+            } catch (\Schoolbox\File\Exception|\UnexpectedValueException $e) {
+                // noop when something went wrong with the file
             }
         }
 
         /* Alternatively it's just a link to the internet
-		 */
+         */
         $object = new \SocialStream_Post_Url();
-        $object->setType('url');
+        $object->setType(\SocialStream_Post_Url::TYPE);
 
-        $this->setProduct($object);
-
-        return;
+        $this->product = $object;
     }
+
 
     /**
      * Construct a post from a link by doing mimetype analysis
      *
-     * @param  Storage\Model $resource
-     * @return Storage\Model
+     * @param  StorageModel $resource
+     * @return StorageModel
+     * @throws \UnexpectedValueException
      */
-    private function constructFromUpload(Storage\Model $resource)
+    private function constructFromUpload(StorageModel $resource): StorageModel
     {
 
         /* Figure out if it's a video
-		 */
-        if ($resource->getMimeType()->isVideo()) {
+         */
+        if ($resource->getMimetype()->isVideo()) {
             $object = new \SocialStream_Post_Video();
             $object->setType('video');
         } /* Other files
-		 */
+         */
         elseif ($resource->getMimetype()->isImage()) {
             $object = new \SocialStream_Post_Image();
             $object->setType('image');
@@ -260,18 +274,22 @@ class Creational extends AbstractFactory
             $object->setType('url');
         }
 
-        $this->setProduct($object);
+        $this->product = $object;
 
         return $resource;
     }
 
+
     /**
      * Construct a post from an already-uploaded resource
      *
-     * @param $url
+     * @param string $url
      * @return \Schoolbox\Resource\File\Model
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \UnexpectedValueException
      */
-    private function constructFromResource($url)
+    private function constructFromResource(string $url): \Schoolbox\Resource\File\Model
     {
         $bits = parse_url($url);
         $query = $bits['query'];
@@ -282,7 +300,7 @@ class Creational extends AbstractFactory
         $fileMapper = new \Schoolbox\Resource\File\Mapper();
         $file = $fileMapper->findById($fileId);
 
-        if ($file->getMimeType()->isVideo()) {
+        if ($file->getMimetype()->isVideo()) {
             $object = new \SocialStream_Post_Video();
             $object->setType('video');
         } elseif ($file->getMimetype()->isImage()) {
@@ -293,32 +311,37 @@ class Creational extends AbstractFactory
             $object->setType('url');
         }
 
-        $this->setProduct($object);
+        $this->product = $object;
 
         return $file;
     }
+
 
     /**
      * Construct a post from a homepage URL
      *
      * @param  string $url
      * @return Folder
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \UnexpectedValueException
      */
-    private function constructFromHomepage($url)
-    {
+    private function constructFromHomepage(string $url): Model {
         $object = new \SocialStream_Post_Url();
         $object->setType('url');
-        $this->setProduct($object);
-        $homepageId = $this->getUrlDetection()->getHomepageIdFromUrl();
+        $this->product = $object;
+        $homepageId = $this->urlDetection->getHomepageIdFromUrl();
         return FolderMapper::getInstance()->findById($homepageId);
     }
+
 
     /**
      * If it was not a video, link to the internet, etc then assume it's
      * just a plain old text message
+     *
+     * @throws \UnexpectedValueException
      */
-    private function constructDefault()
-    {
+    private function constructDefault() {
         $object = new \SocialStream_Post_String();
         $object->setType('string');
 
@@ -333,9 +356,9 @@ class Creational extends AbstractFactory
      */
     private function populate($data)
     {
-        $this->getProduct()->setRootId($data['rootId']);
-        $this->getProduct()->setParentId($data['parentId']);
-        $this->getProduct()->setHomepageId($data['homepageId']);
+        $this->product->setRootId($data['rootId']);
+        $this->product->setParentId($data['parentId']);
+        $this->product->setHomepageId($data['homepageId']);
         // Owner ID is probably passed as an int value, convert to actual user
         $owner = $data['ownerId'];
         if (!$owner instanceof User) {
@@ -347,18 +370,18 @@ class Creational extends AbstractFactory
             }
         }
 
-        $this->getProduct()->setOwner($owner);
-        $this->getProduct()->setBody(trim($data['body']));
-        $this->getProduct()->setCreatedAt($data['requestTime']);
-        $this->getProduct()->setUpdatedAt($data['requestTime']);
+        $this->product->setOwner($owner);
+        $this->product->setBody(trim($data['body']));
+        $this->product->setCreatedAt($data['requestTime']);
+        $this->product->setUpdatedAt($data['requestTime']);
 
         /* This is set in a special way in socialstream/modifyForm.php
          */
-        $this->getProduct()->setUrl($this->getUrl());
+        $this->product->setUrl($this->getUrl());
     }
 
     /* Spawn metadata and thumbnails via different ways
-	 */
+     */
 
     /**
      * Get the title and description
@@ -367,10 +390,10 @@ class Creational extends AbstractFactory
      */
     private function spawnMetadataFromCurl($curl)
     {
-        $chain = new \SocialStream\Post\Metadata\Chain($curl, $this->getProduct()->getUrl());
+        $chain = new \SocialStream\Post\Metadata\Chain($curl, $this->product->getUrl());
 
-        $this->getProduct()->setExternalTitle($chain->getResult()->getTitle());
-        $this->getProduct()->setExternalBody($chain->getResult()->getDescription());
+        $this->product->setExternalTitle($chain->getResult()->getTitle());
+        $this->product->setExternalBody($chain->getResult()->getDescription());
     }
 
     /**
@@ -379,29 +402,29 @@ class Creational extends AbstractFactory
      */
     private function spawnThumbnailFromCurl($curl)
     {
-        $chain = new \SocialStream\Post\Thumbnail\Chain($curl, $this->getProduct()->getUrl());
+        $chain = new \SocialStream\Post\Thumbnail\Chain($curl, $this->product->getUrl());
 
         /* To prevent a double-curl, remember the place where a thumbnail was
-		 * located (this is used as the cached image transform filename hash)
-		 *
-		 * Avoid caching icons
-		 */
-        if (strlen($chain->getResult())) {
-            $this->getProduct()->setThumbnail($chain->getResult());
+         * located (this is used as the cached image transform filename hash)
+         *
+         * Avoid caching icons
+         */
+        if ('' !== $chain->getResult()) {
+            $this->product->setThumbnail($chain->getResult());
 
             /* Save the original in the cache location
-			 * but don't cache icons
-			 */
+             * but don't cache icons
+             */
             if (!preg_match('/^icon:/', $chain->getResult())) {
                 $cache = new \SocialStream\Cache\Original();
-                $cache->initPost($this->getProduct());
+                $cache->initPost($this->product);
 
                 /* Thumbnail metadata was found, but thumbnail itself
-				 * isn't there (broken link)
-				 */
+                 * isn't there (broken link)
+                 */
 
                 if (!$cache->hasThumbnail()) {
-                    $this->getProduct()->setThumbnail('');
+                    $this->product->setThumbnail('');
                 }
             }
         }
@@ -410,46 +433,51 @@ class Creational extends AbstractFactory
     /**
      * Get the title and description
      *
-     * @param Storage\Model $uploadedFile
+     * @param StorageModel $uploadedFile
      */
-    private function spawnMetadataFromUpload(Storage\Model $uploadedFile)
+    private function spawnMetadataFromUpload(StorageModel $uploadedFile)
     {
-        $this->getProduct()->setExternalTitle($uploadedFile->getBasename());
-        $this->getProduct()->setExternalBody('');
+        $this->product->setExternalTitle($uploadedFile->getBasename());
+        $this->product->setExternalBody('');
     }
+
 
     /**
      * Get the thumbnail usage
      *
-     * @param Storage\Model $uploadedFile
+     * @param StorageModel $uploadedFile
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
      */
-    private function spawnThumbnailFromUpload(Storage\Model $uploadedFile)
+    private function spawnThumbnailFromUpload(StorageModel $uploadedFile)
     {
 
         /* Set up video thumbnails
-		 */
-        if ($uploadedFile->getMimeType()->isVideo()) {
+         */
+        if ($uploadedFile->getMimetype()->isVideo()) {
             $url = "/cms/sendVideo.php?type=storage&id={$uploadedFile->getHash()}";
 
-            $this->getProduct()->setUrl($url);
-        } /* Set up image thumbnails
-		 */
-        elseif ($uploadedFile->getMimeType()->isImage()) {
+            $this->product->setUrl($url);
+        } elseif ($uploadedFile->getMimetype()->isImage()) {
+
+            /* Set up image thumbnails
+             */
             $url = "/storage/image.php?size=maxsize&hash={$uploadedFile->getHash()}";
 
-            $this->getProduct()->setThumbnail($url);
-            $this->getProduct()->setUrl($url);
+            $this->product->setThumbnail($url);
+            $this->product->setUrl($url);
 
             /* Save the original in the cache location
-			 */
+             */
             $cache = new \SocialStream\Cache\Original();
-            $cache->initPost($this->getProduct());
-        } /* Set up storage stream location and its icon thumbnails
-		 */
-        else {
+            $cache->initPost($this->product);
+        } else {
+
+            /* Set up storage stream location and its icon thumbnails
+             */
             $url = "/storage/fetch.php?hash={$uploadedFile->getHash()}";
-            $this->getProduct()->setUrl($url);
-            $this->getProduct()->setThumbnail('icon:'.$uploadedFile->getMimetype()->getIconFile());
+            $this->product->setUrl($url);
+            $this->product->setThumbnail('icon:'.$uploadedFile->getMimetype()->getIconFile());
         }
     }
 
@@ -460,9 +488,10 @@ class Creational extends AbstractFactory
      */
     private function spawnMetadataFromResource($file)
     {
-        $this->getProduct()->setExternalTitle($file->getFilename());
-        $this->getProduct()->setExternalBody('');
+        $this->product->setExternalTitle($file->getFilename());
+        $this->product->setExternalBody('');
     }
+
 
     /**
      * Get the thumbnail usage
@@ -476,40 +505,43 @@ class Creational extends AbstractFactory
      * Force an icon representation instead
      *
      * @param \Schoolbox\Resource\File\Model $file
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
      */
     private function spawnThumbnailFromResource($file)
     {
 
         /* Set up video thumbnails
-		 */
-        if ($file->getMimeType()->isVideo()) {
-        } /* Set up image thumbnails
-		 */
-        elseif ($file->getMimeType()->isImage()) {
+         */
+        if ($file->getMimetype()->isVideo()) {
+            // noop
+        } elseif ($file->getMimetype()->isImage()) {
+            /* Set up image thumbnails
+             */
             $url = "/send.php?id={$file->getId()}";
 
-            $this->getProduct()->setThumbnail($url);
-            $this->getProduct()->setUrl($url);
+            $this->product->setThumbnail($url);
+            $this->product->setUrl($url);
 
             /* Save the original in the cache location
-			 */
+             */
             $cache = new \SocialStream\Cache\Original();
-            $cache->initPost($this->getProduct());
-        } /* Set up icon thumbnails
-		 */
-        else {
+            $cache->initPost($this->product);
+        }  else {
+            /* Set up icon thumbnails
+             */
             $url = "/send.php?id={$file->getId()}";
-            $this->getProduct()->setUrl($url);
-            $this->getProduct()->setThumbnail('icon:'.$file->getMimetype()->getIconFile());
+            $this->product->setUrl($url);
+            $this->product->setThumbnail('icon:'.$file->getMimetype()->getIconFile());
         }
 
 //		/* Force icon representation for now
 //		 */
 //		$url = "/send.php?id={$file->getId()}&save=1";
-//		$this->getProduct()->setUrl($url);
+//		$this->product->setUrl($url);
 //
 //		$chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
-//		$this->getProduct()->setThumbnail($chain->getResult());
+//		$this->product->setThumbnail($chain->getResult());
     }
 
 
@@ -520,8 +552,8 @@ class Creational extends AbstractFactory
      */
     private function spawnMetadataFromHomepage($homepage)
     {
-        $this->getProduct()->setExternalTitle($homepage->getName());
-        $this->getProduct()->setExternalBody('');
+        $this->product->setExternalTitle($homepage->getName());
+        $this->product->setExternalBody('');
     }
 
     /**
@@ -536,69 +568,6 @@ class Creational extends AbstractFactory
         if ($homepage->hasHomepage()) {
             $thumbnailUrl = 'icon:home.png';
         }
-        $this->getProduct()->setThumbnail($thumbnailUrl);
-    }
-
-    /* Getters/Setters
-	 */
-
-    /**
-     * Set type
-     *
-     * @param string $type
-     */
-    private function setType($type)
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * Get type
-     *
-     * @return string
-     */
-    private function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * Set product
-     *
-     * @param \SocialStream_Post_Abstract $product
-     */
-    private function setProduct($product)
-    {
-        $this->product = $product;
-    }
-
-    /**
-     * Get product
-     *
-     * @return \SocialStream_Post_Abstract
-     */
-    private function getProduct()
-    {
-        return $this->product;
-    }
-
-    /**
-     * Set url detection
-     *
-     * @param UrlDetection $urlDetection
-     */
-    private function setUrlDetection($urlDetection)
-    {
-        $this->urlDetection = $urlDetection;
-    }
-
-    /**
-     * Get url detection
-     *
-     * @return UrlDetection
-     */
-    private function getUrlDetection()
-    {
-        return $this->urlDetection;
+        $this->product->setThumbnail($thumbnailUrl);
     }
 }
