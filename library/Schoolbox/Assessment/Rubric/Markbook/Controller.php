@@ -55,12 +55,13 @@ class Controller extends Base
     public function getMarkbook(Folder\Model $folder): void
     {
         $assessments = $this->retrieveAssessmentsInFolder($folder->getId());
+        $students = $this->retrieveMarksInFolder($folder->getId());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@rubricMarkbook/markbookOuter.twig',
                 [
-                    'students' => [],
+                    'students' => $students,
                     'assessments' => $assessments,
                     'folder' => $folder
                 ]
@@ -86,7 +87,7 @@ class Controller extends Base
             INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
             INNER JOIN assessment a ON a.id = vrm.assessment_id
             INNER JOIN submission_box sb ON sb.assessment_id = vrm.assessment_id
-            WHERE      var.folder_id=:folderId and vrm.feedback_type='instructor'"
+            WHERE      var.folder_id=:folderId"
         );
 
         $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
@@ -140,55 +141,25 @@ class Controller extends Base
 
     private function retrieveMarksInFolder(int $folderId) : array
     {
-
-    }
-
-    /**
-     * @param int $folderId
-     * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Alaress\Database\Exception
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \RangeException
-     */
-    private function getMarkbookData(int $folderId) : array
-    {
-        $getAllAssessmentsInFolderQuery = $this->database->prepareQuery(
-    "SELECT var.assessment_id,
-            a.title AS assessment_name,
-            sb.rubric_group_marks AS assessment_rubric_group_marks,
-            vrm.assessment_mark_type,
-            vrm.assessment_max_mark,
+        $getAuthoritativeMarksInFolderQuery = $this->database->prepareQuery(
+            "SELECT var.assessment_id,
             vrm.student_id,
             u.firstname AS student_firstname,
             u.lastname AS student_lastname,
             vrm.capability_id,
-            vrm.capability_name,
             vrm.capability_mark,
-            vrm.capability_max_value,
             vrm.indicator_id,
-            vrm.indicator_name,
             vrm.indicator_mark,
-            vrm.indicator_max_value,
-            vrm.descriptor_id,
-            vrm.descriptor_name,
-            vrm.descriptor_max_value
+            vrm.descriptor_name
             FROM       v_rubric_mark vrm
             INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
             INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id
-            INNER JOIN assessment a ON a.id = vmrf.assessment_id
-            INNER JOIN submission_box sb ON sb.assessment_id = vmrf.assessment_id
             INNER JOIN user u ON u.id = vrm.student_id
-            WHERE      var.folder_id=:folderId and vrm.feedback_type='instructor'"
+            WHERE      var.folder_id=:folderId and vrm.feedback_type='instructor'
+            ORDER BY vrm.student_id, var.assessment_id"
         );
 
-        $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
-
-        $assessments = [];
-        $capabilities = [];
-        $indicators = [];
+        $getAuthoritativeMarksInFolderQuery->execute(['folderId' => $folderId]);
 
         $students = [];
         $assessmentsForStudent = [];
@@ -199,43 +170,21 @@ class Controller extends Base
         $lastObservedCapabilityId = null;
         $lastObservedStudentId = null;
 
-        foreach ($getAllAssessmentsInFolderQuery->getIterator() as $i => $row) {
+        foreach ($getAuthoritativeMarksInFolderQuery->getIterator() as $i => $row) {
             if ($lastObservedAssessmentId !== $row['assessment_id']) {
                 // Has the assessment we're looking at changed? Reset the capabilities
-                $capabilities = [];
+                $capabilityMarks = [];
             }
 
             if ($lastObservedCapabilityId !== $row['capability_id']) {
                 // Has the capability we're looking at changed? Reset the indicators
-                $indicators = [];
+                $indicatorMarks = [];
             }
 
-            // TODO this approach won't work because the rows are sorted by assessment_id.
-            // We need to repeat the query sorted by student ID in order for this to work.
             if ($lastObservedStudentId !== $row['student_id']) {
                 // Has the student we're looking at changed? Reset the list of assessments for them
                 $assessmentsForStudent = [];
             }
-
-            $indicators[$row['indicator_id']] = [
-                'name' => $row['indicator_name'],
-//                'maxMark' => $row['indicator_max_value'],
-            ];
-
-            $capabilities[$row['capability_id']] = [
-                'name' => $row['capability_name'],
-//                'maxMark' => $row['capability_max_value'],
-                'indicators' => $indicators
-            ];
-
-            // Stuff everything about the assessment into an array
-            $assessments[$row['assessment_id']] = [
-                'name' => $row['assessment_name'],
-//                'maxMark' => $row['assessment_max_mark'],
-//                'markType' => $row['assessment_mark_type'],
-                'capabilities' => $capabilities
-            ];
-
 
             // Generate capability and indicator marks
             // TODO this is just mock data for now
@@ -270,10 +219,9 @@ class Controller extends Base
             $lastObservedStudentId = $row['student_id'];
         }
 
-        new Probe($assessments);
         new Probe($students);
 
-        return [$assessments, $students];
+        return $students;
     }
 
     /**
