@@ -269,7 +269,7 @@ class Controller extends Base
                     $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $capabilityMaxMark);
 
                     $humanReadableCapabilityMark = $capabilityMarkScheme->getHumanReadableMark($capabilityNormalisedMark);
-                    $students[$studentId]['assessments'][$assessmentId]['capabilities']['humanReadableMark'] = $humanReadableCapabilityMark;
+                    $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
 
                     foreach($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
                         $indicatorInFolder = $capabilityInFolder['indicators'][$indicatorId];
