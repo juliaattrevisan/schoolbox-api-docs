@@ -278,6 +278,10 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     /**
      * Returns whether this article is public (either published or archived)
      *
+     * TODO consider whether "public" is the right term
+     * ("Public" implies it's visible to all, whilst here it means it's only
+     *  visible to its prescribed audience.)
+     *
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
