@@ -53,16 +53,20 @@ class Controller extends BaseController
         $linkDecorator = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
         $jsonDecorator = new Decorator\PropertyDecorator(null, $linkDecorator);
 
-        $this->response->content->set(
-            $this->buildJsonOutput([
-                'data'     => $posts->jsonSerialize($jsonDecorator, $linkDecorator),
-                'metadata' => [
-                    'cursor' => [
-                        'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
-                        'next'    => $cursor->retrieveNextCursor($posts),
-                    ]
+        $responseData  = [
+            'data'     => $posts->jsonSerialize($jsonDecorator, $linkDecorator),
+            'metadata' => [
+                'cursor' => [
+                    'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
+                    'next'    => $cursor->retrieveNextCursor($posts),
                 ]
-            ])
+            ]
+        ];
+
+        $this->response->content->set(
+            $this->isJsonRequest()
+                ? $this->buildJsonOutput($responseData)
+                : $this->buildUnthemedHtmlOutput('@discussionPosts/list.twig', ['list' => $responseData])
         );
     }
 

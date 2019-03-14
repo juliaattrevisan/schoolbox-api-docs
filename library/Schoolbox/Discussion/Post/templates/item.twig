@@ -6,7 +6,6 @@
             </a>
             <p><a href="{{ item.author._links.profile }}" title="View Profile">{{ item.author.title }} {{ item.author.firstname }} {{ item.author.lastname }}</a></p>
             <p class="meta" title="{{ item.createdAt.json|date(LOCALE.date.longFormat) }}">
-                {# TODO output relative dates here #}
                 {{ item.createdAt.json|relativeDate }}
             </p>
         </div>
