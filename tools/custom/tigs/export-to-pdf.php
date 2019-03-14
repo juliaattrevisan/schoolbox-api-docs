@@ -19,5 +19,5 @@ require_once __DIR__ . '/../../../library/Autoloader.php';
 Autoloader::initialise();
 // TODO - END
 
-$kernel = new Schoolbox\Application\CliTool\Kernel(new CliPdfGenerator());
+$kernel = new Schoolbox\Application\CliTool\Kernel(new CliPdfGenerator(), null);
 $kernel->runApp();

@@ -11,6 +11,7 @@ use Aura\Router\Router;
 use External_UserInterface;
 use Knp\Snappy\Pdf;
 use RuntimeException;
+use Schoolbox\Collection;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
@@ -22,6 +23,7 @@ use Schoolbox\UserMapper;
 use GuzzleHttp\Client;
 use Schoolbox\User;
 use ZipArchive;
+use Schoolbox\Assessment\Term;
 
 /**
  * A CLI App for batch printing PDFs to an archive
@@ -133,6 +135,7 @@ class CliPdfGenerator extends CliTool\App
      * @throws \InvalidArgumentException
      * @throws \UnderflowException
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function run(): void
     {
@@ -229,6 +232,7 @@ class CliPdfGenerator extends CliTool\App
      * @throws \InvalidArgumentException
      * @throws \UnderflowException
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     private function execute(): void
     {
@@ -261,7 +265,7 @@ class CliPdfGenerator extends CliTool\App
             );
             $this->getLogger()->notice($message);
             try {
-                $pdfFilenames[]      = $this->generatePdf($student, $sessionHash, $excludedClassCodes, $tempDir);
+                $pdfFilenames[]      = $this->generatePdf($student, $externalStudent, $sessionHash, $excludedClassCodes, $tempDir);
                 $consecutiveFailures = 0;
             } catch (RuntimeException $e) {
                 $this->getLogger()->warning($e->getMessage());
@@ -315,7 +319,12 @@ class CliPdfGenerator extends CliTool\App
     private function getExcludedClassCodes(): array
     {
         // TODO Read and explode config value. See SA-8310
-        return ['12KayakA', '02EN2', 'U15CRIC_A', 'SSP', '02EN1'];
+        $excluded = ['12KayakA', '02EN2', 'U15CRIC_A', 'SSP', '02EN1'];
+        $wrap     = function (string $code): string {
+            return "'$code'";
+        };
+        $this->getLogger()->debug("Class code exclusions: " . \implode(', ', \array_map($wrap, $excluded)));
+        return $excluded;
     }
 
 
@@ -410,10 +419,11 @@ class CliPdfGenerator extends CliTool\App
      * @throws RuntimeException If unable to generate a PDF Report for this student
      * @throws \InvalidArgumentException
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    private function generatePdf(User $student, string $sessionHash, array $excludedClassCodes, string $tempDir): string
+    private function generatePdf(User $student, array $externalStudent, string $sessionHash, array $excludedClassCodes, string $tempDir): string
     {
-        $urls = $this->generateUrlsForStudent($student, $excludedClassCodes);
+        $urls = $this->generateUrlsForStudent($student, $externalStudent, $excludedClassCodes);
 
         $this->getLogger()->info("Generating PDF...");
         $javascriptDelayMs = $this->jsDelay;
@@ -449,11 +459,15 @@ class CliPdfGenerator extends CliTool\App
      * Generates the set of URLs to include in a student's PDF report
      *
      * @param User  $student
+     * @param array $externalStudent
      * @param array $excludedClassCodes
      * @return string[]
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
      */
-    private function generateUrlsForStudent(User $student, array $excludedClassCodes): array
+    private function generateUrlsForStudent(User $student, array $externalStudent, array $excludedClassCodes): array
     {
         $nowSuffix = $this->now ? "?now={$this->now}" : '';
         $data = ['userId' => $student->getId()];
@@ -461,16 +475,10 @@ class CliPdfGenerator extends CliTool\App
         $this->getLogger()->debug("Adding url '$participationReportUrl' to list");
         $urls = [$participationReportUrl];
 
-        $subjects         = $this->externalUser->getSubjectList($student);
-        $filteredSubjects = $this->filterSubjects($subjects, $excludedClassCodes);
+        $classFolders     = $this->getClassFolders($student, $externalStudent);
+        $filteredClasses  = $this->filterClasses($classFolders, $excludedClassCodes);
 
-        foreach ($filteredSubjects as $filteredSubject) {
-            try {
-                $folder = $this->folderMapper->findByCode($filteredSubject['code']);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $this->getLogger()->debug("No folder found for code '{$filteredSubject['code']}', skipping...");
-                continue;
-            }
+        foreach ($filteredClasses as $folder) {
             $data = [
                 'userId'   => $student->getId(),
                 'folderId' => $folder->getId(),
@@ -481,6 +489,32 @@ class CliPdfGenerator extends CliTool\App
         }
         return $urls;
     }
+
+
+    /**
+     * @param User  $student
+     * @param array $externalStudent
+     * @return Collection
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
+     */
+    private function getClassFolders(User $student, array $externalStudent): Collection
+    {
+        if (null === $this->now) {
+            return $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student));
+        }
+        $attributes    = new StudentAttributes($student, $externalStudent['StudentIBFlag'], $this->now);
+        $term          = (new Term\Model())
+            ->setStart($attributes->getCurriculumSemesterStart())
+            ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
+            ->setActualFinish($attributes->getCurriculumSemesterFinish());
+        $withResponses = $this->folderMapper->findFoldersWithResponses($student, $term);
+        $withFeedback  = $this->folderMapper->findFoldersWithFeedbackToStudent($student, $term);
+
+        return $this->folderMapper->createCollection()->mergeUnique($withResponses, 'id')->mergeUnique($withFeedback, 'id');
+    }
+
 
     /** @noinspection PhpDocRedundantThrowsInspection (the call to $snappy->getOutput() can throw) */
     /**
@@ -508,21 +542,30 @@ class CliPdfGenerator extends CliTool\App
 
 
     /**
-     * Removes any subjects that are in the exclusion list
+     * Returns a new collection with any excluded classes removed
      *
-     * @param string[][] $subjects
-     * @param string[]   $excludedClassCodes
-     * @return string[][]
+     * @param Collection|Folder\Model[] $classFolders
+     * @param string[]                  $excludedClassCodes
+     * @return Collection|Folder\Model[]
      */
-    private function filterSubjects(array $subjects, array $excludedClassCodes): array
+    private function filterClasses(Collection $classFolders, array $excludedClassCodes): Collection
     {
-        foreach ($subjects as $idx => $subject) {
-            if (\in_array($subject['code'], $excludedClassCodes, true)) {
-                $this->getLogger()->debug("'{$subject['code']}' is in class exclusion list, skipping...");
-                unset($subjects[$idx]);
+        $filtered = $classFolders->emptyClone();
+        foreach ($classFolders as $idx => $folder) {
+            $exclude = false;
+            foreach ($folder->getCodes() as $code) {
+                if (\in_array($code->getCode(), $excludedClassCodes, true)) {
+                    $this->getLogger()->debug("'{$code->getCode()}' is in class exclusion list, skipping folder {$folder->getId()}...");
+                    $exclude = true;
+                    break;
+                }
+            }
+            if (!$exclude) {
+                $this->getLogger()->debug("Folder {$folder->getId()} not excluded, added to filtered set.");
+                $filtered[$idx] = $folder;
             }
         }
-        return $subjects;
+        return $filtered;
     }
 
 
