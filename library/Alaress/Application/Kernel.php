@@ -20,6 +20,7 @@ use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
 use Alaress\Session\Session;
+use Alaress\Twig\Filter as TwigFilter;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Request\IsJson;
@@ -869,21 +870,7 @@ abstract class Kernel
                     );
 
                     // Relative date function
-                    $twig->addFilter(
-                        new Twig_SimpleFilter(
-                            'relativeDate',
-                            function ($date) {
-                                if ($date instanceof Alaress_Date_Format) {
-                                    $dateObject = $date;
-                                } elseif ($date instanceof \DateTimeInterface) {
-                                    $dateObject = Alaress_Date_Format::newFromTimestamp($date->getTimestamp());
-                                } else {
-                                    $dateObject = Alaress_Date_Format::newFromTimestamp(strtotime($date));
-                                }
-                                return $dateObject->getRelativeDay();
-                            }
-                        )
-                    );
+                    $twig->addFilter(new Twig_SimpleFilter('relativeDate', new TwigFilter\RelativeDate()));
 
                     // Global access to config object and localisation
                     // TODO capitalize globals
