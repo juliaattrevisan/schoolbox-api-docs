@@ -86,6 +86,7 @@ class Kernel extends \Alaress\Application\Kernel
      */
     public function __construct(string $name, array $options = [])
     {
+        $this->validateOptions($options);
         $this->parseCommandLineOpts($options);
         parent::__construct();
 
@@ -108,6 +109,27 @@ class Kernel extends \Alaress\Application\Kernel
     public function getLoop()
     {
         return $this->loop;
+    }
+
+
+    /**
+     * Check that all kernel options are valid
+     *
+     * @param array $options
+     * @throws \InvalidArgumentException If unrecognised kernel options are injected
+     */
+    private function validateOptions(array $options): void
+    {
+        $valid   = [self::OPTION_LEVEL, self::OPTION_ERRORS, self::OPTION_APP_SHORT_OPTS, self::OPTION_APP_LONG_OPTS];
+        $invalid = [];
+        foreach ($options as $key => $val) {
+            if (!\in_array($key, $valid, true)) {
+                $invalid[$key] = $val;
+            }
+        }
+        if (\count($invalid)) {
+            throw new \InvalidArgumentException("Unrecognised Kernel options: " . \print_r($invalid, true));
+        }
     }
 
 
