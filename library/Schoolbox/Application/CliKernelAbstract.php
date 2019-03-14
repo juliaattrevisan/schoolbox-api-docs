@@ -42,7 +42,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel
      * Returns this kernel's logger, creating a default logger if not already set
      *
      * @return LoggerInterface
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function logger(): LoggerInterface
     {
@@ -172,7 +171,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel
      * Creates a default logger, suitable for this Kernel
      *
      * @return LoggerInterface
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     abstract protected function createDefaultLogger(): LoggerInterface;
 

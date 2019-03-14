@@ -1332,6 +1332,43 @@ abstract class Kernel
     }
 
 
+    /**
+     * Globs over the Modules directory and initialises them so their routes can be used
+     *
+     * @throws Di\Exception\ServiceNotFound
+     */
+    protected function initModules(): void
+    {
+        // Initialise module configuration
+        require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
+        require_once SITE_root . '/conf/ModuleLoader.php';
+
+        $customModuleLocation = sprintf(
+            '/conf/modules/Custom/%s/',
+            ucfirst($this->getDependencyInjector()->get('config')->get('site_location'))
+        );
+        $modulePaths = array_merge(
+            glob(SITE_root . '/conf/modules/*.php'),
+            glob(SITE_root . $customModuleLocation . '*.php')
+        );
+
+        foreach ($modulePaths as $routePath) {
+            require_once $routePath;
+
+            // Get a route name out of this path
+            $path = preg_replace('/^'.preg_quote(SITE_root.'/conf/modules/', '/').'/', '', $routePath);
+            $path = preg_replace('/\\.php$/', '', $path);
+            $path = preg_replace('/\\//', '\\', $path);
+
+            $class = 'Config\\Modules\\' . $path;
+
+            if(class_exists($class, false)) {
+                /** @var ModuleConfigInterface $obj */
+                $obj = new $class();
+                $obj->configure($this);
+            }
+        }
+    }
 
 
     /**
