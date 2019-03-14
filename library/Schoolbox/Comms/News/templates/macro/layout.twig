@@ -56,6 +56,9 @@
  #}
 {% macro banner(article) %}
     {% import '@commsNews/macro/indicator.twig' as indicator %}
+    {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {article: article, articleId: article.id}) %}
+    {% set isAuthor    = USER.id == article.author.id %}
+
     <div class="small-12 island">
         {% if article.featureImage.hash %}
         <section class="banner content">
