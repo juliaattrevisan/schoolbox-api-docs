@@ -767,13 +767,13 @@ abstract class Kernel
         $di->params[TwigMethod\RequireModule::class]['di'] = $di;
         $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class));
 
-        $di->setters['Alaress\\Twig\\Method\\RouteLookup']['setRouter'] = $di->lazyGet('router');
-        $di->set('templateEngine:routeLookup', $di->lazyNew('Alaress\\Twig\\Method\\RouteLookup'));
+        $di->setters[TwigMethod\RouteLookup::class]['setRouter'] = $di->lazyGet('router');
+        $di->set('templateEngine:routeLookup', $di->lazyNew(TwigMethod\RouteLookup::class));
 
-        $di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setRouter']     = $di->lazyGet('router');
-        $di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setAuthorizer'] = $di->lazyGet('authorizer');
-        $di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setSession']    = $di->lazyGet('session');
-        $di->set('templateEngine:isRouteAuthorized', $di->lazyNew('Alaress\\Twig\\Method\\IsRouteAuthorized'));
+        $di->setters[TwigMethod\IsRouteAuthorized::class]['setRouter']     = $di->lazyGet('router');
+        $di->setters[TwigMethod\IsRouteAuthorized::class]['setAuthorizer'] = $di->lazyGet('authorizer');
+        $di->setters[TwigMethod\IsRouteAuthorized::class]['setSession']    = $di->lazyGet('session');
+        $di->set('templateEngine:isRouteAuthorized', $di->lazyNew(TwigMethod\IsRouteAuthorized::class));
 
         $di->params[TwigMethod\RouteLookupIfAuthorized::class]['routeLookup'] = $di->lazyGet('templateEngine:routeLookup');
         $di->params[TwigMethod\RouteLookupIfAuthorized::class]['isRouteAuthorized'] = $di->lazyGet('templateEngine:isRouteAuthorized');
