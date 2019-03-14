@@ -36,7 +36,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     private const STATE_EXPIRED              = 6;
 
     // Composite states
-    private const STATE_APPROVED =  [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
+    private const STATE_PUBLIC    = [self::STATE_PUBLISHED, self::STATE_EXPIRED];
+    private const STATE_APPROVED  = [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
     private const STATE_SUBMITTED = [self::STATE_AWAITING_MODERATION, self::STATE_REJECTED, self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED, self::STATE_EXPIRED];
 
     // Authoritative declaration of *possible* transitions.
@@ -271,6 +272,18 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
     public function isSubmitted(Alaress_Date_Format $now = null): bool
     {
         return \in_array($this->getDiscreteState($now), self::STATE_SUBMITTED, true);
+    }
+
+
+    /**
+     * Returns whether this article is public (either published or archived)
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return bool
+     */
+    public function isPublic(Alaress_Date_Format $now = null): bool
+    {
+        return \in_array($this->getDiscreteState($now), self::STATE_PUBLIC, true);
     }
 
 
