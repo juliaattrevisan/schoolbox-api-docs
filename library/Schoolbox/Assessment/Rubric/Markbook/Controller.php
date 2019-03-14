@@ -13,10 +13,14 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Assessment\Exception;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Assessment\Exception;
+use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
+use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use PDO;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Alaress_Probe as Probe;
+use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 
 class Controller extends Base
 {
@@ -266,9 +270,15 @@ class Controller extends Base
                     $capabilityMaxMark = $capabilityInFolder['maxMark'];
                     $capabilityNormalisedMark = $capabilityMarks['normalisedMark'];
 
-                    $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $capabilityMaxMark);
+                    $capabilityUsageModel = new CapabilityUsage(new Capability());
+                    $capabilityUsageModel->setMaxValue($capabilityMaxMark);
 
-                    $humanReadableCapabilityMark = $capabilityMarkScheme->getHumanReadableMark($capabilityNormalisedMark);
+                    $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $capabilityMaxMark);
+                    $capabilityMarkModel = new CapabilityMark($capabilityUsageModel, $capabilityMarkScheme);
+                    $capabilityMarkModel->setValue($capabilityNormalisedMark);
+
+                    // TODO the problem is getHumanReadableMark expects this value to ALREADY be a percentage
+                    $humanReadableCapabilityMark = $capabilityMarkModel->retrieveHumanReadableMark();
                     $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
 
                     foreach($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
