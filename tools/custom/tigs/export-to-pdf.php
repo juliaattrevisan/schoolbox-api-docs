@@ -19,8 +19,5 @@ require_once __DIR__ . '/../../../library/Autoloader.php';
 Autoloader::initialise();
 // TODO - END
 
-// Usage:
-//   ./export-to-pdf.php -vvv --username alaress --year-level 11  --js-delay=500 --now=2018-01-01 --curriculum=ib  -o /vagrant/vagrantcache/outfile.zip
-
-$kernel = new Schoolbox\Application\CliTool\Kernel(new CliPdfGenerator(), 100, E_ALL);
+$kernel = new Schoolbox\Application\CliTool\Kernel(new CliPdfGenerator());
 $kernel->runApp();

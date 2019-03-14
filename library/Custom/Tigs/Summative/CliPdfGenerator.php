@@ -270,7 +270,7 @@ class CliPdfGenerator extends CliTool\App
             }
         }
 
-        $this->createZipArchive($pdfFilenames);
+        $this->createZipArchive($pdfFilenames, $tempDir);
         $this->cleanUpTempFiles($pdfFilenames, $tempDir);
     }
 
@@ -287,7 +287,7 @@ class CliPdfGenerator extends CliTool\App
         foreach ($students as $student) {
             $maxUserId = \max($maxUserId, $student->getId());
         }
-        return (int)\max(1, ceil(log10($maxUserId + 1)));
+        return (int)\max(1, \ceil(\log10($maxUserId + 1)));
     }
 
 
@@ -300,7 +300,7 @@ class CliPdfGenerator extends CliTool\App
     private function createTempDir(): string
     {
         $tempDir = $this->getConfig()->get('zip_dir') . '/' . \time();
-        if (!mkdir($tempDir) && !is_dir($tempDir)) {
+        if (!\mkdir($tempDir) && !\is_dir($tempDir)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $tempDir));
         }
         return $tempDir;
@@ -355,19 +355,19 @@ class CliPdfGenerator extends CliTool\App
      */
     private function getStudents(): GenericCollection
     {
-        $message = sprintf("Fetching users from schoolbox with role type of '%s' and user.year between 7 and 12", Role::STUDENT);
+        $message = \sprintf("Fetching users from schoolbox with role type of '%s' and user.year between 7 and 12", Role::STUDENT);
         $pb      = $this->userMapper->getPredicateBuilder()
                                     ->equals('g.group_type', Role::STUDENT)
                                     ->in('year', ['7', '8', '9', '10', '11', '12']); // Cannot use BETWEEN as this is stored as a VARCHAR in database
 
         if ($this->studentId) {
             $pb->equals('id', $this->studentId);
-            $message .= sprintf(" and user.id of '%d'", $this->studentId);
+            $message .= \sprintf(" and user.id of '%d'", $this->studentId);
         }
 
         if ($this->yearLevel) {
             $pb->equals('year', $this->yearLevel);
-            $message .= sprintf(" and user.year of '%s'", $this->yearLevel);
+            $message .= \sprintf(" and user.year of '%s'", $this->yearLevel);
         }
         $this->getLogger()->info($message);
         $students = $this->userMapper->findByPredicates($pb);
@@ -501,7 +501,6 @@ class CliPdfGenerator extends CliTool\App
         $snappy = new Pdf('/usr/local/bin/wkhtmltopdf');
         $snappy->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
         $snappy->setOption('orientation', 'Landscape');
-//        $snappy->setOption('no-background', true); // need background for rubric marks
         $snappy->setOption('javascript-delay', $javascriptDelayMs);
 
         return $snappy->getOutput($urls);
@@ -531,10 +530,11 @@ class CliPdfGenerator extends CliTool\App
      * Create a single ZIP archive of all the PDF documents
      *
      * @param string[] $pdfFilenames
+     * @param string   $tempDir
      */
-    private function createZipArchive(array $pdfFilenames): void
+    private function createZipArchive(array $pdfFilenames, string $tempDir): void
     {
-        $zipFilename = \tempnam(\sys_get_temp_dir(), 'zip');
+        $zipFilename = \tempnam($tempDir, 'zip');
         $zipArchive  = new ZipArchive();
         $this->getLogger()->debug("Creating temp zip archive: $zipFilename");
         $zipArchive->open($zipFilename, ZipArchive::CREATE);
@@ -703,22 +703,77 @@ class CliPdfGenerator extends CliTool\App
      */
     private function printHelp(): void
     {
-        // TODO $this->setup() should take kernel options and print them here if relevant
-        $help = "
-CLI wrapper to generate a PDF Archive of Participation & Subject Reports
+        $file            = $_SERVER['PWD'] . ltrim($_SERVER['SCRIPT_NAME'], '.');
+        $defaultMaxFails = self::DEFAULT_MAX_FAILS;
+        $defaultJsDelay  = self::DEFAULT_JS_DELAY;
 
-By default, writes archive to STDOUT (1>) and writes log to STDERR (2>)
+        $green  = self::COLOUR_GREEN;
+        $white  = self::COLOUR_WHITE;
+        $yellow = self::COLOUR_YELLOW;
 
-This can be changed by providing an output and/or log file. If provided, tool will not write to STDOUT or STDERR, respectively.
+        $help = "$white
 
- Examples:
+NAME:
+    TIGS PDF Batch Printer - CLI wrapper to generate a PDF Archive of Participation & Subject Reports
+
+SYNOPSIS:
+    $green{$file} {$yellow}[OPTION]...$white
+
+DESCRIPTION
+    By default, writes archive to STDOUT (1>) and writes log to STDERR (2>)
+
+    This can be changed by providing an output and/or log file. If provided, tool will not write to STDOUT or STDERR, respectively.
+    
+    To authenticate the app, you can either provide a session hash, or a username + password. If the latter, this app will prompt you to
+    enter the password on STDIN and STDOUT.
+    
+    $yellow-h, --help$white
+        Print this help and exit
+        
+    $yellow-o=OUT_FILE$white
+        Filename to write archive to, eg '-o=output.zip'
+        
+    $yellow-l=LOG_FILE$white
+        Filename to append logs to, eg '-l=error.log'
+        
+    $yellow-v[v[v]]$white
+        Log verbosity. Max 3 levels, eg -vvv
+    
+    $yellow--hash=HASH$white
+        A valid session hash, you can extract this from a browser session
+        
+    $yellow--username=USERNAME$white
+        A username to run the tool as
+        
+    $yellow--student-id=ID$white
+        Just generate the report for this student
+        
+    $yellow--year-level=YEAR$white
+        Just generate reports for students in this year level
+        
+    $yellow--curriculum=[ib|hsc]$white
+        Just generate reports for students enrolled in this curriculum
+        
+    $yellow--max-fails=COUNT$white
+         If the tool fails for this many students in a row, exit immediately.
+         Defaults to $defaultMaxFails.
+         
+    $yellow--js-delay=COUNT$white
+         Number of milliseconds to wait before printing a page to allow javascript to execute.
+         Defaults to $defaultJsDelay.
+         
+    $yellow--now=NOW$white
+         Attempt to produce a report for some specific point in time.
+         Supports any format accepted by PHP's strtotime()
+
+EXAMPLES:
  * Write log to terminal, output to archive.zip
-      ./export.php 1> archive.zip
-      ./export.php -o archive.zip
+      $file 1> archive.zip
+      $file -o archive.zip
  * Append log to export.log, output to archive.zip
-      ./export.php 2>> export.log 1> archive.zip
-      ./export.php -l export.log -o archive.zip\n";
-
+      $file 2>> export.log 1> archive.zip
+      $file -l export.log -o archive.zip
+";
         \fwrite(STDOUT, $help);
     }
 }
