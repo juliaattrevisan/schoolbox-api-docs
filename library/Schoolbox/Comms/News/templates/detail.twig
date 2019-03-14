@@ -168,11 +168,13 @@ Data:
     <div class="small-12 island">
         <section>
             <div class="row">
-                {% if article.featureImage.hash %}
-                    {{ layout.banner(article) }}
-                {% else %}
-                    {{ layout.textonly(article) }}
-                {% endif %}
+                {# Always use the banner layout, as it has received the redesign and can trivially adapt to not having a banner #}
+                {{ layout.banner(article) }}
+                {#{% if article.featureImage.hash %}#}
+                    {#{{ layout.banner(article) }}#}
+                {#{% else %}#}
+                    {#{{ layout.textonly(article) }}#}
+                {#{% endif %}#}
             </div>
         </section>
     </div>

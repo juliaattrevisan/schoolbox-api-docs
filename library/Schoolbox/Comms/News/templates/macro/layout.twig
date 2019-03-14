@@ -56,9 +56,12 @@
  #}
 {% macro banner(article) %}
     <div class="small-12 island">
+        {% if article.featureImage.hash %}
         <section class="banner content">
             <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=coverPhoto" />
         </section>
+        {% endif %}
+
         <section class="article content">
             <h1>{{ article.title |default("(untitled)") }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
 
