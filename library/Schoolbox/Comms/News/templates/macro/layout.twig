@@ -55,6 +55,7 @@
  # Used when images are more important than words
  #}
 {% macro banner(article) %}
+    {% import '@commsNews/macro/indicator.twig' as indicator %}
     <div class="small-12 island">
         {% if article.featureImage.hash %}
         <section class="banner content">
