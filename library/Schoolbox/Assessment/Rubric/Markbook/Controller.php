@@ -296,8 +296,6 @@ class Controller extends Base
 
         }
 
-        new Probe($students);
-
         return $students;
     }
 }
