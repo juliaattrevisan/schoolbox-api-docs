@@ -374,7 +374,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
     public function createModel($row = null)
     {
         // default
-        $type = 'string';
+        $type = \SocialStream_Post_String::TYPE;
 
         foreach (array('p.type', 'type') as $t) {
             if (isset($row[$t])) {

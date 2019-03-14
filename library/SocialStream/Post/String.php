@@ -13,7 +13,7 @@ class SocialStream_Post_String extends SocialStream_Post_Abstract {
     /**
      * @var string
      */
-    protected $type = 'string';
+    public const TYPE = 'string';
 
     /**
 	 * Nothing to render here

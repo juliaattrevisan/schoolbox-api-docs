@@ -13,7 +13,7 @@ class SocialStream_Post_Image extends SocialStream_Post_Abstract {
     /**
      * @var string
      */
-    protected $type = 'image';
+    public const TYPE = 'image';
 
 	/**
 	 * Determine whether a thumbnail was successfully found

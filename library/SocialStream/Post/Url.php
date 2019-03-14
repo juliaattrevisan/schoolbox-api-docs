@@ -15,7 +15,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
     /**
      * @var string
      */
-    protected $type = 'url';
+    public const TYPE = 'url';
 
     /**
      * Determine whether this should display an icon or something
