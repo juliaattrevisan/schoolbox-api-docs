@@ -120,9 +120,9 @@ class Controller extends Base
         $capabilityMarks = [];
         $indicatorMarks = [];
 
-        $lastObservedStudentId = null;
         $lastObservedAssessmentId = null;
         $lastObservedCapabilityId = null;
+        $lastObservedStudentId = null;
 
         foreach ($getAllAssessmentsInFolderQuery->getIterator() as $i => $row) {
             if ($lastObservedAssessmentId !== $row['assessment_id']) {
@@ -135,6 +135,8 @@ class Controller extends Base
                 $indicators = [];
             }
 
+            // TODO this approach won't work because the rows are sorted by assessment_id.
+            // We need to repeat the query sorted by student ID in order for this to work.
             if ($lastObservedStudentId !== $row['student_id']) {
                 // Has the student we're looking at changed? Reset the list of assessments for them
                 $assessmentsForStudent = [];
@@ -190,6 +192,7 @@ class Controller extends Base
 
             $lastObservedAssessmentId = $row['assessment_id'];
             $lastObservedCapabilityId = $row['capability_id'];
+            $lastObservedStudentId = $row['student_id'];
         }
 
         new Probe($assessments);
