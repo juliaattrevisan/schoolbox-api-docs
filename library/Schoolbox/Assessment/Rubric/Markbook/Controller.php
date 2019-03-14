@@ -186,20 +186,13 @@ class Controller extends Base
                 $assessmentsForStudent = [];
             }
 
-            // Generate capability and indicator marks
-            // TODO this is just mock data for now
-            $capabilityMark = round($row['capability_mark'], 2);
-            $indicatorMark = round($row['indicator_mark'], 2);
-            $capabilityMax = round($row['capability_max_value']);
-            $indicatorMax = round($row['indicator_max_value']);
-
             $indicatorMarks[$row['indicator_id']] = [
-                'mark' => $indicatorMark . '/' . $indicatorMax,
+                'normalisedMark' => $row['indicator_mark'],
                 'selectedDescriptorText' => $row['descriptor_name']
             ];
 
             $capabilityMarks[$row['capability_id']] = [
-                'mark' => $capabilityMark . '/' . $capabilityMax,
+                'normalisedMark' => $row['capability_mark'],
                 'indicators' => $indicatorMarks
             ];
 
