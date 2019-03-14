@@ -346,11 +346,11 @@ class Creational extends AbstractFactory
                 // noop: retain blank user
             }
         }
+
         $this->getProduct()->setOwner($owner);
         $this->getProduct()->setBody(trim($data['body']));
         $this->getProduct()->setCreatedAt($data['requestTime']);
         $this->getProduct()->setUpdatedAt($data['requestTime']);
-        $this->getProduct()->setDeletedAt(null);
 
         /* This is set in a special way in socialstream/modifyForm.php
          */

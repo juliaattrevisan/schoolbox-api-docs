@@ -370,8 +370,9 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      *
      * @param array $row
      * @return SocialStream_Post_Abstract
+     * @throws \UnexpectedValueException
      */
-    public function createModel($row = null)
+    public function createModel($row = null): \SocialStream_Post_Abstract
     {
         // default
         $type = \SocialStream_Post_String::TYPE;
@@ -394,8 +395,9 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      * @param string   $alias
      * @param callable $callback
      * @return SocialStream_Post_Abstract
+     * @throws \UnexpectedValueException
      */
-    public function hydrate(array $row, $alias = '', $callback = null)
+    public function hydrate(array $row, $alias = '', $callback = null): \SocialStream_Post_Abstract
     {
         $model = $this->createModel($row);
 
@@ -407,12 +409,12 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
                 $columnName = "$alias.$columnName";
             }
 
-            $columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
+            $columnValue = $row[$columnName] ?? null;
             $this->setModelProperty($model, $propertyName, $columnValue);
         }
 
-        if (!empty($callback) && is_callable($callback)) {
-            $model = call_user_func($callback, $this, $model, $row);
+        if (!empty($callback) && \is_callable($callback)) {
+            $model = $callback($this, $model, $row);
         }
 
         return $model;

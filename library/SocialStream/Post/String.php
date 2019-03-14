@@ -22,6 +22,6 @@ class SocialStream_Post_String extends SocialStream_Post_Abstract {
 	 * @param SitePage $page
 	 * @return mixed|void
 	 */
-	public function renderThumbnail($context, SitePage $page) {
+	public function renderThumbnail(string $context, SitePage $page) {
 	}
 }

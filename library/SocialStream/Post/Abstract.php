@@ -8,16 +8,23 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\User;
 
 abstract class SocialStream_Post_Abstract implements ISoftDeletable
 {
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /**
      * Primary key
      *
-     * @var
+     * @var int
      */
     protected $postId;
 
@@ -39,14 +46,14 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
     /**
      * The homepage on which this post can be found
      *
-     * @var
+     * @var int
      */
     protected $homepageId;
 
     /**
      * The postId to which this post is subordinate
      *
-     * @var
+     * @var int
      */
     protected $parentId = 0;
 
@@ -57,7 +64,9 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
      */
     protected $thumbnail = '';
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $cacheHash;
 
     /**
@@ -105,37 +114,19 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
     /**
      * Children posts
      *
-     * @var null
+     * @var Collection
      */
-    protected $children = null;
+    protected $children;
 
-    /**
-     * Created at
-     *
-     * @var string
-     */
-    protected $createdAt = '';
-
-    /**
-     * Updated at
-     *
-     * @var string
-     */
-    protected $updatedAt = '';
-
-    /**
-     * Deleted at
-     *
-     * @var string
-     */
-    protected $deletedAt = '';
 
     /**
      * Constructor
+     *
+     * @throws UnexpectedValueException
      */
     public function __construct()
     {
-        $this->setChildren(new Schoolbox\Collection());
+        $this->setChildren(new Collection());
         $this->setOwner(new User());
     }
 
@@ -146,7 +137,7 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
      * @param SitePage $page
      * @return mixed
      */
-    abstract public function renderThumbnail($context, SitePage $page);
+    abstract public function renderThumbnail(string $context, SitePage $page);
 
     /* Getters/Setters
 	 */
@@ -154,159 +145,136 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
     /**
      * Set body
      *
-     * @param $body
+     * @param null|string $body
+     * @return SocialStream_Post_Abstract
      */
-    public function setBody($body)
+    public function setBody(?string $body): \SocialStream_Post_Abstract
     {
         $this->body = $body;
+        return $this;
     }
 
     /**
      * Get body
      *
-     * @return string
+     * @return null|string
      */
-    public function getBody()
+    public function getBody(): ?string
     {
         return $this->body;
     }
 
-    /**
-     * Set created at
-     *
-     * @param $createdAt
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    /**
-     * Get created at
-     *
-     * @return string
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Set deleted at
-     *
-     * @param $deletedAt
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-    }
-
-    /**
-     * Get deleted at
-     *
-     * @return string
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
 
     /**
      * Set homepage id
      *
-     * @param $homepageId
+     * @param null|int $homepageId
+     * @return SocialStream_Post_Abstract
      */
-    public function setHomepageId($homepageId)
+    public function setHomepageId(?int $homepageId): \SocialStream_Post_Abstract
     {
         $this->homepageId = $homepageId;
+        return $this;
     }
 
     /**
      * Get homepage id
      *
-     * @return mixed
+     * @return null|int
      */
-    public function getHomepageId()
+    public function getHomepageId(): ?int
     {
         return $this->homepageId;
     }
 
+
     /**
      * Set mimetype
      *
-     * @param $mimetype
+     * @param null|string $mimetype
+     * @return SocialStream_Post_Abstract
      */
-    public function setMimetype($mimetype)
+    public function setMimetype(?string $mimetype): \SocialStream_Post_Abstract
     {
         $this->mimetype = $mimetype;
+        return $this;
     }
 
     /**
      * Get mimetype
      *
-     * @return string
+     * @return null|string
      */
-    public function getMimetype()
+    public function getMimetype(): ?string
     {
         return $this->mimetype;
     }
 
+
     /**
      * Set owner
      *
-     * @param User $owner
+     * @param null|User $owner
+     * @return SocialStream_Post_Abstract
      */
-    public function setOwner($owner)
+    public function setOwner(?User $owner): \SocialStream_Post_Abstract
     {
         $this->owner = $owner;
+        return $this;
     }
 
     /**
      * Get owner
      *
-     * @return User
+     * @return null|User
      */
-    public function getOwner()
+    public function getOwner(): ?\Schoolbox\User
     {
         return $this->owner;
     }
 
+
     /**
      * Set parent id
      *
-     * @param $parentId
+     * @param null|int $parentId
+     * @return SocialStream_Post_Abstract
      */
-    public function setParentId($parentId)
+    public function setParentId(?int $parentId): \SocialStream_Post_Abstract
     {
         $this->parentId = $parentId;
+        return $this;
     }
 
     /**
      * Get parent id
      *
-     * @return mixed
+     * @return null|int
      */
-    public function getParentId()
+    public function getParentId(): ?int
     {
         return $this->parentId;
     }
 
+
     /**
      * Set post id
      *
-     * @param $postId
+     * @param null|int $postId
+     * @return SocialStream_Post_Abstract
      */
-    public function setPostId($postId)
+    public function setPostId(?int $postId): \SocialStream_Post_Abstract
     {
         $this->postId = $postId;
+        return $this;
     }
 
     /**
      * Get post id
      *
-     * @return mixed
+     * @return null|int
      */
-    public function getPostId()
+    public function getPostId(): ?int
     {
         return $this->postId;
     }
@@ -314,173 +282,173 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
     /**
      * Set type
      *
-     * @param $type
+     * @param null|string $type
+     * @return SocialStream_Post_Abstract
      */
-    public function setType($type)
+    public function setType(?string $type): \SocialStream_Post_Abstract
     {
         $this->type = $type;
+        return $this;
     }
 
     /**
      * Get type
      *
-     * @return string
+     * @return null|\Alaress_Date_Format
      */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    /**
-     * Set updated at
-     *
-     * @param $updatedAt
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    /**
-     * Get updated at
-     *
-     * @return string
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
 
     /**
      * Set url
      *
-     * @param $url
+     * @param null|string $url
+     * @return SocialStream_Post_Abstract
      */
-    public function setUrl($url)
+    public function setUrl(?string $url): \SocialStream_Post_Abstract
     {
         $this->url = $url;
+        return $this;
     }
 
     /**
      * Get url
      *
-     * @return string
+     * @return null|string
      */
-    public function getUrl()
+    public function getUrl(): ?string
     {
         return $this->url;
     }
 
+
     /**
      * Set children
      *
-     * @param null $children
+     * @param Collection $children
+     * @return SocialStream_Post_Abstract
      */
-    public function setChildren($children)
+    public function setChildren(Collection $children): \SocialStream_Post_Abstract
     {
         $this->children = $children;
+        return $this;
     }
 
     /**
      * Get children
      *
-     * @return SocialStream_Post_Abstract[]
+     * @return Collection|SocialStream_Post_Abstract[]
      */
-    public function getChildren()
+    public function getChildren(): Collection
     {
         return $this->children;
     }
 
+
     /**
      * Set root id
      *
-     * @param int $rootId
+     * @param null|int $rootId
+     * @return SocialStream_Post_Abstract
      */
-    public function setRootId($rootId)
+    public function setRootId(?int $rootId): \SocialStream_Post_Abstract
     {
         $this->rootId = $rootId;
+        return $this;
     }
 
     /**
      * Get root id
      *
-     * @return int
+     * @return null|int
      */
-    public function getRootId()
+    public function getRootId(): ?int
     {
         return $this->rootId;
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getCacheHash()
+    public function getCacheHash(): ?string
     {
         return $this->cacheHash;
     }
 
     /**
-     * @param string $cacheHash
+     * @param null|string $cacheHash
      * @return static
      */
-    public function setCacheHash($cacheHash)
+    public function setCacheHash(?string $cacheHash)
     {
         $this->cacheHash = $cacheHash;
         return $this;
     }
 
+
     /**
      * Set thumbnail
      *
-     * @param string $thumbnail
+     * @param null|string $thumbnail
+     * @return SocialStream_Post_Abstract
      */
-    public function setThumbnail($thumbnail)
+    public function setThumbnail(?string $thumbnail): \SocialStream_Post_Abstract
     {
         $this->thumbnail = $thumbnail;
+        return $this;
     }
 
     /**
      * Get thumbnail
      *
-     * @return string
+     * @return null|string
      */
-    public function getThumbnail()
+    public function getThumbnail(): ?string
     {
         return $this->thumbnail;
     }
 
+
     /**
-     * @param string $externalBody
+     * @param null|string $externalBody
+     * @return SocialStream_Post_Abstract
      */
-    public function setExternalBody($externalBody)
+    public function setExternalBody(?string $externalBody): \SocialStream_Post_Abstract
     {
         $this->externalBody = $externalBody;
+        return $this;
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getExternalBody()
+    public function getExternalBody(): ?string
     {
         return $this->externalBody;
     }
 
+
     /**
      * Set external title
      *
-     * @param string $externalTitle
+     * @param null|string $externalTitle
+     * @return SocialStream_Post_Abstract
      */
-    public function setExternalTitle($externalTitle)
+    public function setExternalTitle(?string $externalTitle): \SocialStream_Post_Abstract
     {
         $this->externalTitle = $externalTitle;
+        return $this;
     }
 
     /**
      * Get external title
      *
-     * @return string
+     * @return null|string
      */
-    public function getExternalTitle()
+    public function getExternalTitle(): ?string
     {
         return $this->externalTitle;
     }
@@ -490,7 +458,7 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
      *
      * @return bool
      */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
         return $this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull();
     }

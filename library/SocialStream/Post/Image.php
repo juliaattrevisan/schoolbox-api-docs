@@ -15,61 +15,47 @@ class SocialStream_Post_Image extends SocialStream_Post_Abstract {
      */
     public const TYPE = 'image';
 
-	/**
-	 * Determine whether a thumbnail was successfully found
-	 *
-	 * @return bool
-	 */
-	public function hasThumbnail() {
-		if (strlen($this->getThumbnail())) {
-			return true;
-		}
+    /**
+     * Determine whether a thumbnail was successfully found
+     *
+     * @return bool
+     */
+    public function hasThumbnail(): bool {
+        return '' !== $this->getThumbnail();
+    }
 
-		return false;
-	}
+    /**
+     * Contextually render thumbnail images
+     *
+     * @param string   $context
+     * @param SitePage $page
+     * @return bool
+     */
+    public function renderThumbnail(string $context, SitePage $page): bool {
 
-	/**
-	 * Contextually render thumbnail images
-	 *
-	 * @param string   $context
-	 * @param SitePage $page
-	 * @return bool|mixed
-	 */
-	public function renderThumbnail($context, SitePage $page) {
-
-		/* Determine which context to render blocks
-		 * Display a mime icon
-		 * Otherwise display thumbnail via image transform
-		 */
+        /* Determine which context to render blocks
+         * Display a mime icon
+         * Otherwise display thumbnail via image transform
+         */
         $returnValue = false;
 
-		if ($context == 'post') {
-	        if ($this->hasThumbnail()) {
-				$page->parse('socialstream_post_has_image_block', 'socialstream_post_has_image',false);
-				$returnValue = true;
-			}
-
-			return $returnValue;
-		}
-		else if ($context == 'comment') {
-
-
+        if ($context === 'post') {
             if ($this->hasThumbnail()) {
-                $page->parse('socialstream_comment_has_image_block', 'socialstream_comment_has_image',false);
+                $page->parse('socialstream_post_has_image_block', 'socialstream_post_has_image');
                 $returnValue = true;
             }
-
-			return $returnValue;
-		}
-		else if ($context == 'reply') {
-
+        } elseif ($context === 'comment') {
             if ($this->hasThumbnail()) {
-                $page->parse('socialstream_reply_has_image_block', 'socialstream_reply_has_image',false);
+                $page->parse('socialstream_comment_has_image_block', 'socialstream_comment_has_image');
                 $returnValue = true;
             }
-			return $returnValue;
-		}
+        } elseif ($context === 'reply') {
+            if ($this->hasThumbnail()) {
+                $page->parse('socialstream_reply_has_image_block', 'socialstream_reply_has_image');
+                $returnValue = true;
+            }
+        }
 
-		return false;
-	}
+        return $returnValue;
+    }
 }

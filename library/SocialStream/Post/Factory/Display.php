@@ -28,11 +28,13 @@ class Display extends AbstractFactory {
         $this->type = trim($type);
     }
 
+
     /**
      * Produce an instance of SocialStream_Post_Abstract subclass
      *
      * @param array $data
      * @return \SocialStream_Post_Abstract
+     * @throws \UnexpectedValueException
      */
     public function produce(array $data = null): \SocialStream_Post_Abstract
     {
