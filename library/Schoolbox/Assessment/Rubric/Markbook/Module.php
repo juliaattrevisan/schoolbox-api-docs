@@ -39,19 +39,14 @@ class Module extends BaseModule
 
         // Page should be visible to:
         // - Superusers
-        // - Staff with read+ perms
+        // - Staff
         // - Instructors of the class
         $canViewPage = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                // Allow staff with read+ access to the folder
-                new Rule\All(
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, function (array $params) : int {
-                        return (int)$params['folderId'];
-                    }, Access::getInstance())
-                ),
+                // Allow staff regardless of access level to the folder
+                new Rule\HasRole(Role::STAFF),
                 // Allow instructors (anyone with write+ access to folder)
                 new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function (array $params) : int {
                     return (int)$params['folderId'];
