@@ -24,18 +24,19 @@ use Schoolbox\Application\CliKernelAbstract;
 class Kernel extends CliKernelAbstract
 {
 
-    // Command line options recognised by this kernel
-    private const OPT_OUT_STREAM = 'o:'; // CLI option to allow output to be written to a file, rather than STDOUT
-    private const OPT_ERR_STREAM = 'l:'; // CLI option to allow logs to be written to a file, rather than STDERR
-    private const OPT_VERBOSITY  = 'v';  // CLI option that verbosity, unless overridden. @see Lumberjack\Logger::FIELD_LEVEL
-
-    // Command-line option to control what errors PHP should report
-    public const OPT_ERRORS  = 'errors:';
+    // Command line short options recognised by this kernel
+    private const OPT_SHORT_OUT_STREAM = 'o:'; // CLI option to allow output to be written to a file, rather than STDOUT
+    private const OPT_SHORT_ERR_STREAM = 'l:'; // CLI option to allow logs to be written to a file, rather than STDERR
+    private const OPT_SHORT_VERBOSITY  = 'v';  // CLI option that verbosity, unless overridden. @see Lumberjack\Logger::FIELD_LEVEL
+    private const OPT_SHORT_PERFORM    = 'p';  // CLI option to indicate the App short be run in 'perform' mode
 
     // By default, all apps run in 'dry-run' mode, unless either:
     // 1. this option is supplied on the command line, or
     // 2. the kernel is constructed from a script that instructs the kernel to 'forcePerform'
-    public const OPT_PERFORM = 'perform';
+    public const OPT_LONG_PERFORM = 'perform';
+
+    /** @var App */
+    private $app;
 
     /**
      * These control the kernel and default logger
@@ -68,22 +69,14 @@ class Kernel extends CliKernelAbstract
      */
     private $outStream;
 
-    /** @var bool */
-    private $forcePerform;
-
     /** @var null|int */
-    private $logLevelOverride;
-
-    /** @var null|int */
-    private $errorLevelOverride;
+    private $minLogLevel;
 
 
     /**
-     * @param string[]  $appShortOpts
-     * @param string[]  $appLongOpts
-     * @param null|bool $forcePerform Allow invoking script to force the App to run in 'perform' mode
-     * @param int|null  $minLogLevel  Allow invoking script to force the App to not log below this level
-     * @param int|null  $errorLevelOverride
+     * @param App      $app
+     * @param int|null $minLogLevel Allow invoking script to force the App to not log below this level
+     * @param int|null $errorLevel
      * @throws InvalidArgumentException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
@@ -92,40 +85,30 @@ class Kernel extends CliKernelAbstract
      * @throws \RuntimeException
      * @throws \Schoolbox\External\Exception
      * @throws \UnexpectedValueException
-     * @todo the apps's options should be passed into runApp(), not here. But that requires manual parsing of $argv
      */
-    public function __construct(
-        array $appShortOpts = [],
-        array $appLongOpts = [],
-        ?bool $forcePerform = false,
-        int $minLogLevel = null,
-        int $errorLevelOverride = null
-    ) {
-        $this->forcePerform       = $forcePerform;
-        $this->logLevelOverride   = $minLogLevel;
-        $this->errorLevelOverride = $errorLevelOverride;
-        $this->parseCommandLineOptions($appShortOpts, $appLongOpts);
-        $this->setErrorReporting();
+    public function __construct(App $app, int $minLogLevel = null, int $errorLevel = E_ALL ^ E_NOTICE)
+    {
+        $this->app         = $app;
+        $this->minLogLevel = $minLogLevel;
+        \error_reporting($errorLevel);
+        $this->checkServerApiEnvironment();
+        $this->parseCommandLineOptions($app);
+        $this->outStream = $this->getOutputStream();
 
         parent::__construct();
-
-        $this->checkServerApiEnvironment();
-        $this->outStream = $this->getOutputStream();
     }
 
 
     /**
-     * Run the app, passing it back any command line options passed into the Kernel's constructor
+     * Run the app
      *
-     * @param App $app
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @todo accept the app's CLI options here, using $argv to parse, and throw exception if invalid args detected, kernel will catch them.
+     * @param null|bool $forcePerform Allow invoking script to force the App to run in 'perform' mode
      */
-    public function runApp(App $app): void
+    public function runApp(bool $forcePerform = false): void
     {
-        $perform = $this->forcePerform || $this->getKernelOpt(self::OPT_PERFORM);
-
-        $app->setup($this->appOptions, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform)->run();
+        $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
+        $this->app->setup($this->appOptions, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
+        $this->app->run();
     }
 
 
@@ -185,7 +168,7 @@ class Kernel extends CliKernelAbstract
     protected function createDefaultLogger(): LoggerInterface
     {
         // Where should we send logs?
-        $outFile = $this->getKernelOpt(self::OPT_ERR_STREAM);
+        $outFile = $this->getKernelOpt(self::OPT_SHORT_ERR_STREAM);
         if (null !== $outFile) {
             $outStream = \fopen($outFile, 'ab');
             if (!$outStream) {
@@ -199,8 +182,8 @@ class Kernel extends CliKernelAbstract
         // 1. Kernel construction
         // 2. Log level command line option
         // 3. Verbosity command line option
-        if ($this->logLevelOverride) {
-            $level = $this->logLevelOverride;
+        if ($this->minLogLevel) {
+            $level = $this->minLogLevel;
         } else {
             $commandLineLevel = $this->getKernelOpt(Lumberjack\Logger::FIELD_LEVEL);
             $level            = $commandLineLevel !== null
@@ -228,7 +211,7 @@ class Kernel extends CliKernelAbstract
         // Order of preference:
         // 1. Command line option specifying a file to write to
         // 2. STDOUT
-        $outfile = $this->getKernelOpt(self::OPT_OUT_STREAM);
+        $outfile = $this->getKernelOpt(self::OPT_SHORT_OUT_STREAM);
         if (null === $outfile) {
             return STDOUT;
         }
@@ -239,26 +222,6 @@ class Kernel extends CliKernelAbstract
         return $outStream;
     }
 
-
-    /**
-     * Sets the PHP error reporting level
-     */
-    private function setErrorReporting(): void
-    {
-        // Order of preference:
-        // 1. Kernel construction
-        // 2. Command line option
-        // 3. Default
-        if (null !== $this->errorLevelOverride) {
-            $errorLevel = $this->errorLevelOverride;
-        } else {
-            $commandLineErrorLevel = $this->getKernelOpt(self::OPT_ERRORS);
-            $errorLevel            = $commandLineErrorLevel !== null
-                ? (int)$commandLineErrorLevel
-                : E_ALL ^ E_NOTICE;
-        }
-        \error_reporting($errorLevel);
-    }
 
 
     /**
@@ -272,7 +235,7 @@ class Kernel extends CliKernelAbstract
      */
     private function getLoggingLevelFromVerbosity(): int
     {
-        $v = $this->getKernelOpt(self::OPT_VERBOSITY);
+        $v = $this->getKernelOpt(self::OPT_SHORT_VERBOSITY);
 
         if (!$v) {
             $threshold = 0;
@@ -291,31 +254,42 @@ class Kernel extends CliKernelAbstract
         return $limits[$threshold];
     }
 
-
-    /**
-     * Parses the command line options, and splits into distinct sets to be used by the Kernel and App respectively.
-     *
-     * @param string[]  $appShortOpts
-     * @param string[]  $appLongOpts
-     * @throws InvalidArgumentException
-     */
-    private function parseCommandLineOptions(array $appShortOpts, array $appLongOpts): void
+    private function getKernelShortOpts(): array
     {
-        // Kernel uses these
-        $kernelShortOpts = [self::OPT_OUT_STREAM, self::OPT_ERR_STREAM, self::OPT_VERBOSITY,];
-        $kernelLongOpts  = [
-            self::OPT_ERRORS,
-            self::OPT_PERFORM,
+        return [self::OPT_SHORT_OUT_STREAM, self::OPT_SHORT_ERR_STREAM, self::OPT_SHORT_VERBOSITY, self::OPT_SHORT_PERFORM];
+    }
+
+    private function getKernelLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_PERFORM,
             Lumberjack\Logger::FIELD_MEM,
             Lumberjack\Logger::FIELD_TRUE_MEM,
             Lumberjack\Logger::FIELD_PID,
             Lumberjack\Logger::FIELD_LEVEL,
             Lumberjack\Logger::FIELD_PORCELAIN,
         ];
+    }
 
+
+    /**
+     * Parses the command line options, and splits into distinct sets to be used by the Kernel and App respectively.
+     *
+     * /tool.php -vvv -p -x=abc -x
+     *
+     * @param App $app
+     * @throws InvalidArgumentException
+     */
+    private function parseCommandLineOptions(App $app): void
+    {
         // Ensure app not attempting to use options that are already in use by kernel
-        $this->assertValidAppOptions($appShortOpts, $kernelShortOpts, true);
-        $this->assertValidAppOptions($appLongOpts, $kernelLongOpts, false);
+        $this->assertValidAppOptions($app, true);
+        $this->assertValidAppOptions($app, false);
+
+        $appShortOpts    = $app->getShortOpts();
+        $appLongOpts     = $app->getLongOpts();
+        $kernelShortOpts = $this->getKernelShortOpts();
+        $kernelLongOpts  = $this->getKernelLongOpts();
 
         // Get all opts from command line
         $allOpts = \getopt(
@@ -344,20 +318,33 @@ class Kernel extends CliKernelAbstract
 
 
     /**
-     * Checks that a CLI app is not attempting to use options that are in use by the kernel
+     * Checks that a CLI app's options are valid and are not reserved by the kernel
      *
-     * @param string[] $appOpts
-     * @param string[] $kernelOpts
-     * @param bool     $isShort Whether we are dealing with 'short' or 'long' options
+     * @param App  $app
+     * @param bool $isShort  Whether we are checking short or long options
      * @throws InvalidArgumentException
      */
-    private function assertValidAppOptions(array $appOpts, array $kernelOpts, bool $isShort): void
+    private function assertValidAppOptions(App $app, bool $isShort): void
     {
-        $type = $isShort ? 'short' : 'long';
-        foreach ($kernelOpts as $kernelShortOpt) {
-            if (\in_array($kernelShortOpt, $appOpts, true)) {
-                throw new InvalidArgumentException("Invalid app $type option collides with kernel $type option: '$kernelShortOpt'");
+        $pattern    = $isShort ? '/^[a-zA-Z]:{0,2}$/' : '/^[a-zA-Z]+[a-zA-Z-]*[a-zA-Z]*:{0,2}$/';
+        $appOpts    = $isShort ? $app->getShortOpts() : $app->getLongOpts();
+        $kernelOpts = $isShort ? $this->getKernelShortOpts() : $this->getKernelLongOpts();
+        $type       = $isShort ? 'short' : 'long';
+        $processed  = [];
+        foreach ($appOpts as $idx => $appOpt) {
+            if (!\preg_match($pattern, $appOpt)) {
+                throw new InvalidArgumentException("Invalid $type option detected at index $idx: '$appOpt'");
             }
+            $trimmed = \rtrim($appOpt, ':');
+            if (\in_array($trimmed, $processed, true)) {
+                throw new InvalidArgumentException("Duplicate $type option detected at index $idx: '$trimmed'");
+            }
+            foreach ($kernelOpts as $kernelOpt) {
+                if (\rtrim($kernelOpt, ':') === $trimmed) {
+                    throw new InvalidArgumentException("Invalid app $type option collides with kernel $type option: '$trimmed'");
+                }
+            }
+            $processed[] = $trimmed;
         }
     }
 
@@ -388,5 +375,20 @@ class Kernel extends CliKernelAbstract
 
         // Does not accept values, but specified at least once.
         return \is_array($this->kernelOptions[$name]) ? $this->kernelOptions[$name] : true;
+    }
+
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws \Aura\Di\Exception
+     * @throws \Aura\Di\Exception\ContainerLocked
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Di\Exception\ServiceNotObject
+     * @throws \RuntimeException
+     */
+    protected function installDependencies(): void
+    {
+        parent::installDependencies();
+        $this->initModules();
     }
 }

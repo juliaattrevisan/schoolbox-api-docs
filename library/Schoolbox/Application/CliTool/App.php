@@ -9,6 +9,7 @@ namespace Schoolbox\Application\CliTool;
 
 use Aura\Di;
 use Psr\Log\LoggerInterface;
+use Schoolbox\IConfigLoader;
 
 /**
  * An App is a job/task/application that can be run by the CLI Kernel
@@ -35,6 +36,34 @@ abstract class App
      */
     private $perform;
 
+    /** @var IConfigLoader */
+    private $config;
+
+
+    /**
+     * Returns the short options recognised by this App
+     *
+     * Will be validated by the kernel at runtime.
+     *
+     * @return string[]
+     */
+    public function getShortOpts(): array
+    {
+        return [];
+    }
+
+    /**
+     * Returns the long options recognised by this App
+     *
+     * Will be validated by the kernel at runtime.
+     *
+     * @return string[]
+     */
+    public function getLongOpts(): array
+    {
+        return [];
+    }
+
 
     /**
      * Common app setup implementation
@@ -45,14 +74,16 @@ abstract class App
      * @param LoggerInterface $logger
      * @param bool            $perform
      * @return $this
+     * @throws Di\Exception\ServiceNotFound
      */
     public function setup(array $appOptions, Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): self
     {
         $this->appOptions = $appOptions;
-        $this->di        = $di;
-        $this->outStream = $outStream;
-        $this->logger    = $logger;
-        $this->perform   = $perform;
+        $this->di         = $di;
+        $this->outStream  = $outStream;
+        $this->logger     = $logger;
+        $this->perform    = $perform;
+        $this->config     = $di->get('config');
 
         return $this;
     }
@@ -122,11 +153,21 @@ abstract class App
         return $this->logger;
     }
 
+
     /**
      * @return bool
      */
     protected function perform(): bool
     {
         return $this->perform;
+    }
+
+
+    /**
+     * @return IConfigLoader
+     */
+    protected function getConfig(): IConfigLoader
+    {
+        return $this->config;
     }
 }
