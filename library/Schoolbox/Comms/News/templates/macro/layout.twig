@@ -56,6 +56,8 @@
  #}
 {% macro banner(article) %}
     {% import '@commsNews/macro/indicator.twig' as indicator %}
+
+    {# TODO this layout is too large, and too reliant on defined vars, to be a macro: consider moving to template #}
     {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {article: article, articleId: article.id}) %}
     {% set isAuthor    = USER.id == article.author.id %}
 
@@ -70,7 +72,7 @@
             <h1>{{ article.title |default("(untitled)") }} {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}</h1>
 
             {# TODO this metadata should be in a span tag, but that causes the audience-container to flip out #}
-            <div class="meta">{{ indicator.byLine(article) }}
+            <div class="meta">
                 {# Topics #}
                 <span>By {{ article.author.fullName }}</span>
                 <span> &mdash; {{ article.publishAt.short }}</span>
