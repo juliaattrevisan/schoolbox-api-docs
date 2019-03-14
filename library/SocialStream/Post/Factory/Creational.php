@@ -91,7 +91,7 @@ class Creational extends AbstractFactory
                 $this->product = $this->constructDefault();
                 $this->populate($data);
             }
-        } elseif ($this->getUrlDetection()->isLocalUrl()) {
+        } elseif ($this->urlDetection->isLocalUrl()) {
 
             /* Treat local urls differently as they should bypass the caching
              * stuff entirely - this applies to the Resource browser mainly,
@@ -217,10 +217,7 @@ class Creational extends AbstractFactory
          */
         foreach ($this->getVideoSites() as $currentPattern) {
             if (preg_match($currentPattern, $this->getUrl())) {
-                $object = new \SocialStream_Post_Video();
-                $object->setType(\SocialStream_Post_Video::TYPE);
-
-                $this->product = $object;
+                $this->product = new \SocialStream_Post_Video();
                 return;
             }
         }
@@ -229,10 +226,9 @@ class Creational extends AbstractFactory
         if ($filename = pathinfo(parse_url($this->getUrl(), PHP_URL_PATH), PATHINFO_BASENAME)) {
             try {
                 $file = \Schoolbox\File\MimetypeMapper::getInstance()->getByFilename($filename);
+
                 if ($file->isImage()) {
-                    $object = new \SocialStream_Post_Image();
-                    $object->setType(\SocialStream_Post_Image::TYPE);
-                    $this->product = $object;
+                    $this->product = new \SocialStream_Post_Image();
                     return;
                 }
             } catch (\Schoolbox\File\Exception|\UnexpectedValueException $e) {
@@ -242,10 +238,7 @@ class Creational extends AbstractFactory
 
         /* Alternatively it's just a link to the internet
          */
-        $object = new \SocialStream_Post_Url();
-        $object->setType(\SocialStream_Post_Url::TYPE);
-
-        $this->product = $object;
+        $this->product = new \SocialStream_Post_Url();
     }
 
 
@@ -262,19 +255,12 @@ class Creational extends AbstractFactory
         /* Figure out if it's a video
          */
         if ($resource->getMimetype()->isVideo()) {
-            $object = new \SocialStream_Post_Video();
-            $object->setType('video');
-        } /* Other files
-         */
-        elseif ($resource->getMimetype()->isImage()) {
-            $object = new \SocialStream_Post_Image();
-            $object->setType('image');
+            $this->product = new \SocialStream_Post_Video();
+        } elseif ($resource->getMimetype()->isImage()) {
+            $this->product = new \SocialStream_Post_Image();
         } else {
-            $object = new \SocialStream_Post_Url();
-            $object->setType('url');
+            $this->product = new \SocialStream_Post_Url();
         }
-
-        $this->product = $object;
 
         return $resource;
     }
@@ -301,17 +287,12 @@ class Creational extends AbstractFactory
         $file = $fileMapper->findById($fileId);
 
         if ($file->getMimetype()->isVideo()) {
-            $object = new \SocialStream_Post_Video();
-            $object->setType('video');
+            $this->product = new \SocialStream_Post_Video();
         } elseif ($file->getMimetype()->isImage()) {
-            $object = new \SocialStream_Post_Image();
-            $object->setType('image');
+            $this->product = new \SocialStream_Post_Image();
         } else {
-            $object = new \SocialStream_Post_Url();
-            $object->setType('url');
+            $this->product = new \SocialStream_Post_Url();
         }
-
-        $this->product = $object;
 
         return $file;
     }
@@ -327,10 +308,10 @@ class Creational extends AbstractFactory
      * @throws \UnexpectedValueException
      */
     private function constructFromHomepage(string $url): Model {
-        $object = new \SocialStream_Post_Url();
-        $object->setType('url');
-        $this->product = $object;
+        $this->product = new \SocialStream_Post_Url();
+
         $homepageId = $this->urlDetection->getHomepageIdFromUrl();
+
         return FolderMapper::getInstance()->findById($homepageId);
     }
 
@@ -342,10 +323,7 @@ class Creational extends AbstractFactory
      * @throws \UnexpectedValueException
      */
     private function constructDefault() {
-        $object = new \SocialStream_Post_String();
-        $object->setType('string');
-
-        return $object;
+        return new \SocialStream_Post_String();
     }
 
     /**

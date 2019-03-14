@@ -16,6 +16,18 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
     public const TYPE = 'video';
 
     /**
+     * SocialStream_Post_Video constructor.
+     *
+     * @throws UnexpectedValueException
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->type = self::TYPE;
+    }
+
+    /**
      * Never render metadata for videos
      *
      * @param $curl

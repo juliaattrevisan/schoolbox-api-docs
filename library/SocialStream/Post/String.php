@@ -16,12 +16,24 @@ class SocialStream_Post_String extends SocialStream_Post_Abstract {
     public const TYPE = 'string';
 
     /**
-	 * Nothing to render here
-	 *
-	 * @param string   $context
-	 * @param SitePage $page
-	 * @return mixed|void
-	 */
-	public function renderThumbnail(string $context, SitePage $page) {
-	}
+     * SocialStream_Post_String constructor.
+     *
+     * @throws UnexpectedValueException
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->type = self::TYPE;
+    }
+
+    /**
+     * Nothing to render here
+     *
+     * @param string   $context
+     * @param SitePage $page
+     * @return mixed|void
+     */
+    public function renderThumbnail(string $context, SitePage $page) {
+    }
 }

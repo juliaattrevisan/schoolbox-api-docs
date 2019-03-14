@@ -18,6 +18,18 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
     public const TYPE = 'url';
 
     /**
+     * SocialStream_Post_Url constructor.
+     *
+     * @throws UnexpectedValueException
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->type = self::TYPE;
+    }
+
+    /**
      * Determine whether this should display an icon or something
      * via the image transform
      *

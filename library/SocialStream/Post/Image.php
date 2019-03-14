@@ -16,6 +16,18 @@ class SocialStream_Post_Image extends SocialStream_Post_Abstract {
     public const TYPE = 'image';
 
     /**
+     * SocialStream_Post_Image constructor.
+     *
+     * @throws UnexpectedValueException
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->type = self::TYPE;
+    }
+
+    /**
      * Determine whether a thumbnail was successfully found
      *
      * @return bool
