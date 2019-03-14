@@ -40,7 +40,7 @@
     }
 </style>
 
-{% if studentMarks|length %}
+{% if students|length %}
     <div class="row">
         <div class="small-12 island">
             <table class="rubric-marksheet marksheet">
@@ -49,7 +49,7 @@
                     <tr class="rotate-headers" data-headers>
                         <th>&nbsp;</th>
                         <th>&nbsp;</th>
-                        {% for studentId, student in studentMarks %}
+                        {% for studentId, student in students %}
                             <th>
                                 <div>
                                     <span>
@@ -86,8 +86,8 @@
                                     {{ capability.name }}
                                 </th>
 
-                                {% for studentId, student in studentMarks %}
-                                    {% set capabilityMark = student[assessmentId].capabilities[capabilityId].mark %}
+                                {% for studentId, student in students %}
+                                    {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].mark %}
                                     <td>
                                         {{ capabilityMark|default('-') }}
                                     </td>
@@ -101,9 +101,9 @@
                                         {{ indicator.name }}
                                     </th>
 
-                                    {% for studentId, student in studentMarks %}
-                                        {% set indicatorMark = student[assessmentId].capabilities[capabilityId].indicators[indicatorId].mark %}
-                                        {% set descriptorText = student[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
+                                    {% for studentId, student in students %}
+                                        {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].mark %}
+                                        {% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
                                         <td title="{{ descriptorText|default('-No descriptor text-') }}">
                                             {{ indicatorMark|default('-') }}
                                         </td>

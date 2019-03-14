@@ -16,6 +16,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use PDO;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Alaress_Probe as Probe;
 
 class Controller extends Base
 {
@@ -53,13 +54,13 @@ class Controller extends Base
      */
     public function getMarkbook(Folder\Model $folder): void
     {
-        [$assessments, $studentMarks] = $this->getMarkbookData($folder->getId());
+        [$assessments, $students] = $this->getMarkbookData($folder->getId());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@rubricMarkbook/markbookOuter.twig',
                 [
-                    'studentMarks' => $studentMarks,
+                    'students' => $students,
                     'assessments' => $assessments,
                     'folder' => $folder
                 ]
@@ -111,11 +112,15 @@ class Controller extends Base
         $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
 
         $assessments = [];
-        $studentMarks = [];
-
         $capabilities = [];
         $indicators = [];
 
+        $students = [];
+        $assessmentsForStudent = [];
+        $capabilityMarks = [];
+        $indicatorMarks = [];
+
+        $lastObservedStudentId = null;
         $lastObservedAssessmentId = null;
         $lastObservedCapabilityId = null;
 
@@ -130,57 +135,67 @@ class Controller extends Base
                 $indicators = [];
             }
 
+            if ($lastObservedStudentId !== $row['student_id']) {
+                // Has the student we're looking at changed? Reset the list of assessments for them
+                $assessmentsForStudent = [];
+            }
+
             $indicators[$row['indicator_id']] = [
                 'name' => $row['indicator_name'],
-                'maxMark' => $row['indicator_max_value'],
+//                'maxMark' => $row['indicator_max_value'],
             ];
 
             $capabilities[$row['capability_id']] = [
                 'name' => $row['capability_name'],
-                'maxMark' => $row['capability_max_value'],
+//                'maxMark' => $row['capability_max_value'],
                 'indicators' => $indicators
             ];
 
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
                 'name' => $row['assessment_name'],
-                'maxMark' => $row['assessment_max_mark'],
-                'markType' => $row['assessment_mark_type'],
+//                'maxMark' => $row['assessment_max_mark'],
+//                'markType' => $row['assessment_mark_type'],
                 'capabilities' => $capabilities
             ];
 
+
+            // Generate capability and indicator marks
+            // TODO this is just mock data for now
             $capabilityMark = round($row['capability_mark'], 2);
             $indicatorMark = round($row['indicator_mark'], 2);
             $capabilityMax = round($row['capability_max_value']);
             $indicatorMax = round($row['indicator_max_value']);
 
+            $indicatorMarks[$row['indicator_id']] = [
+                'mark' => $indicatorMark . '/' . $indicatorMax,
+                'selectedDescriptorText' => $row['descriptor_name']
+            ];
+
+            $capabilityMarks[$row['capability_id']] = [
+                'mark' => $capabilityMark . '/' . $capabilityMax,
+                'indicators' => $indicatorMarks
+            ];
+
+            $assessmentsForStudent[$row['assessment_id']] = [
+                'capabilities' => $capabilityMarks
+            ];
+
             // Stuff everything about the students marks into an array
-            $studentMarks[$row['student_id']] = [
+            $students[$row['student_id']] = [
                 'firstname' => $row['student_firstname'],
                 'lastname' => $row['student_lastname'],
-                $row['assessment_id'] => [
-                    'capabilities' => [
-                        $row['capability_id'] => [
-                            'mark' => $capabilityMark . '/' . $capabilityMax,
-                            'indicators' => [
-                                $row['indicator_id'] => [
-                                    'mark' => $indicatorMark . '/' . $indicatorMax,
-                                    'selectedDescriptorText' => $row['descriptor_name']
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
+                'assessments' => $assessmentsForStudent
             ];
 
             $lastObservedAssessmentId = $row['assessment_id'];
             $lastObservedCapabilityId = $row['capability_id'];
         }
 
-        var_dump($assessments);
-        var_dump($studentMarks);
+        new Probe($assessments);
+        new Probe($students);
 
-        return [$assessments, $studentMarks];
+        return [$assessments, $students];
     }
 
     /**
