@@ -33,7 +33,7 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
      *
      * @var int
      */
-    protected $rootId = 0;
+    protected $rootId;
 
     /**
      * The person who owns this post
@@ -54,7 +54,7 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
      *
      * @var int
      */
-    protected $parentId = 0;
+    protected $parentId;
 
     /**
      * The place where a thumbnail exists for this post
@@ -73,14 +73,14 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
      *
      * @var string
      */
-    protected $type = '';
+    protected $type;
 
     /**
      * The mime type of the resource
      *
      * @var string
      */
-    protected $mimetype = '';
+    protected $mimetype;
 
     /**
      * The url to the resource
@@ -94,21 +94,21 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
      *
      * @var string
      */
-    protected $externalTitle = '';
+    protected $externalTitle;
 
     /**
      * The description of the resource
      *
      * @var string
      */
-    protected $externalBody = '';
+    protected $externalBody;
 
     /**
      * What they typed into that box
      *
      * @var string
      */
-    protected $body = '';
+    protected $body;
 
     /**
      * Children posts
