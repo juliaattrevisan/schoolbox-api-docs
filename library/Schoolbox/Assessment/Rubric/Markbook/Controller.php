@@ -276,9 +276,9 @@ class Controller extends Base
                         $indicatorMaxMark = $indicatorInFolder['maxMark'];
                         $indicatorNormalisedMark = $indicatorMarks['normalisedMark'];
 
-                        // TODO this is probably wrong??? look at examples
-                        $assessmentMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $indicatorMaxMark);
-                        $humanReadableIndicatorMark = $assessmentMarkScheme->getHumanReadableMark($indicatorNormalisedMark);
+                        // Unless this is a letter grade (TODO),
+                        // it will always simply be the normalised mark
+                        $humanReadableIndicatorMark = round($indicatorNormalisedMark, 2) . ' / ' . round($indicatorMaxMark);
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
                     }
                 }
