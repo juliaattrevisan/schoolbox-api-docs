@@ -285,8 +285,9 @@ class Controller extends Base
                         $indicatorMaxMark = $indicatorInFolder['maxMark'];
                         $indicatorNormalisedMark = $indicatorMarks['normalisedMark'];
 
-                        // Unless this is a letter grade (TODO),
-                        // it will always simply be the normalised mark
+                        // This is always just a "total mark" type, so we can work this out ourselves
+                        // No need for creating all the models in order to calculate it -
+                        // and indeed the overhead in doing so is prohibitive
                         $humanReadableIndicatorMark = round($indicatorNormalisedMark, 2) . ' / ' . round($indicatorMaxMark);
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
                     }
