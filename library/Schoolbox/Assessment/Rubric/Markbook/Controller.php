@@ -277,7 +277,6 @@ class Controller extends Base
                     $capabilityMarkModel = new CapabilityMark($capabilityUsageModel, $capabilityMarkScheme);
                     $capabilityMarkModel->setValue($capabilityNormalisedMark);
 
-                    // TODO the problem is getHumanReadableMark expects this value to ALREADY be a percentage
                     $humanReadableCapabilityMark = $capabilityMarkModel->retrieveHumanReadableMark();
                     $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
 
