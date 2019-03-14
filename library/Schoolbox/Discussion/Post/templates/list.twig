@@ -1,12 +1,12 @@
-{% set class = class ?? 'social-stream' %}
-
-<ul class="information-list {{ class }}">
-    {% foreach item in list.data %}
-        {% include '@discussionPosts/item.twig' with {list: list} only %}
-    {% endforeach %}
-</ul>
+{% if list.data is not empty %}
+    <ul class="information-list {{ class ?? 'social-stream' }}">
+        {% foreach item in list.data %}
+            {% include '@discussionPosts/item.twig' with {list: list} only %}
+        {% endforeach %}
+    </ul>
+{% endif %}
 
 {# Output metadata #}
 {% if list.metadata.cursor %}
-<button rel="next" data-cursor="{{ list.metadata.cursor }}">Load more...</button>
+    <button rel="next" data-cursor="{{ list.metadata.cursor }}">Load more...</button>
 {% endif %}

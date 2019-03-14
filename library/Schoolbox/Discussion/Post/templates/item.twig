@@ -21,29 +21,9 @@
 
     {# Replies: not yet implemented #}
     {#
-    <ul class="information-list reply">
-        <li class="actions-small-1">
-            <div class="list-item">
-                <div class="card small-12">
-                    <a href="/search/user/22" title="View Profile">
-                        <img src="/portrait.php?userId=499&amp;size=square32" alt="Mr Jack Coles">
-                    </a>
-                    <p>
-                        <a href="#" title="View Profile">Mr Jack Coles</a>
-                        <span class="pipe meta" title="Wednesday March 13th 2019 2:42pm">Replied 1 minute ago</span>
-                    </p>
-                </div>
-            </div>
-            <nav>
-                <a class="icon-delete" href="#" title="Delete Comment"></a>
-            </nav>
-            <article>
-                <p>Cosmic ocean trillion Apollonius of Perga great turbulent clouds a still more glorious
-                    dawn awaits tesseract. Jean-François Champollion at the edge of forever Cambrian
-                    explosion courage of our questions gathered by gravity laws of physics.</p>
-            </article>
-        </li>
-    </ul>
-    <!-- Reply -->
+    {% include '@discussionPosts/list.twig' with {
+        list:  item.children,
+        class: 'reply'
+    } only %}
     #}
 </li>
