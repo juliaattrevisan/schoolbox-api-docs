@@ -1,0 +1,49 @@
+<li class="actions-small-2">
+    <div class="list-item">
+        <div class="card small-12">
+            <a href="{{ item.author._links.profile }}" title="View Profile">
+                <img src="{{ item.author._links.avatar }}" alt="{{ item.author.title }} {{ item.author.firstname }} {{ item.author.lastname }}">
+            </a>
+            <p><a href="{{ item.author._links.profile }}" title="View Profile">{{ item.author.title }} {{ item.author.firstname }} {{ item.author.lastname }}</a></p>
+            <p class="meta" title="{{ item.createdAt.json|date(LOCALE.date.longFormat) }}">
+                {# TODO output relative dates here #}
+                {{ item.createdAt.json|relativeDate }}
+            </p>
+        </div>
+    </div>
+    <nav>
+        <a href="#" class="icon-delete no-text" title="Delete post"></a>
+        <a href="#" class="icon-reply no-text" title="Add Reply"></a>
+    </nav>
+    <article>
+        {{ item.content|purify }}
+    </article>
+
+    {# Replies: not yet implemented #}
+    {#
+    <ul class="information-list reply">
+        <li class="actions-small-1">
+            <div class="list-item">
+                <div class="card small-12">
+                    <a href="/search/user/22" title="View Profile">
+                        <img src="/portrait.php?userId=499&amp;size=square32" alt="Mr Jack Coles">
+                    </a>
+                    <p>
+                        <a href="#" title="View Profile">Mr Jack Coles</a>
+                        <span class="pipe meta" title="Wednesday March 13th 2019 2:42pm">Replied 1 minute ago</span>
+                    </p>
+                </div>
+            </div>
+            <nav>
+                <a class="icon-delete" href="#" title="Delete Comment"></a>
+            </nav>
+            <article>
+                <p>Cosmic ocean trillion Apollonius of Perga great turbulent clouds a still more glorious
+                    dawn awaits tesseract. Jean-François Champollion at the edge of forever Cambrian
+                    explosion courage of our questions gathered by gravity laws of physics.</p>
+            </article>
+        </li>
+    </ul>
+    <!-- Reply -->
+    #}
+</li>
