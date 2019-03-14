@@ -21,11 +21,6 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
     use DeletedAtDate;
 
     /**
-     * Defined in subclasses
-     */
-    public const TYPE = '';
-
-    /**
      * Primary key
      *
      * @var int
