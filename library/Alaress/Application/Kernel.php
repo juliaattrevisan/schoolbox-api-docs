@@ -868,6 +868,23 @@ abstract class Kernel
                         )
                     );
 
+                    // Relative date function
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'relativeDate',
+                            function ($date) {
+                                if ($date instanceof Alaress_Date_Format) {
+                                    $dateObject = $date;
+                                } elseif ($date instanceof \DateTimeInterface) {
+                                    $dateObject = Alaress_Date_Format::newFromTimestamp($date->getTimestamp());
+                                } else {
+                                    $dateObject = Alaress_Date_Format::newFromTimestamp(strtotime($date));
+                                }
+                                return $dateObject->getRelativeDay();
+                            }
+                        )
+                    );
+
                     // Global access to config object and localisation
                     // TODO capitalize globals
                     $twig->addGlobal('config', $config);
