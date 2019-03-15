@@ -320,7 +320,7 @@ $app = new class extends App
      */
     private function updateTileLayoutHeading(array $component): void
     {
-        $heading = trim($component['componentname']);
+        $heading = trim($component['componentname'] ?? '');
         if ($heading === '') {
             $heading = 'Tiles';
             $this->log->notice(self::INDENT . sprintf('layout has no heading: setting to "%s"', $heading));
