@@ -137,9 +137,7 @@ class Controller extends Base
             $lastObservedAssessmentId = $row['assessment_id'];
             $lastObservedCapabilityId = $row['capability_id'];
         }
-
-        new Probe($assessments);
-
+        
         return $assessments;
     }
 
