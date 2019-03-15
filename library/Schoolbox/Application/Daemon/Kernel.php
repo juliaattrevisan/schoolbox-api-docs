@@ -64,6 +64,13 @@ class Kernel extends \Alaress\Application\Kernel
     protected $log;
 
     /**
+     * Was this kernel invoked at a specific log level?
+     *
+     * @var int|null
+     */
+    private $logLevel;
+
+    /**
      * Various process limits imposed by the operating system
      *
      * @var string[][]
@@ -88,6 +95,8 @@ class Kernel extends \Alaress\Application\Kernel
     {
         $this->validateOptions($options);
         $this->parseCommandLineOpts($options);
+        $this->logLevel = $options[self::OPTION_LEVEL] ?? null;
+
         parent::__construct();
 
         pcntl_signal(SIGCHLD, SIG_IGN);
@@ -414,7 +423,7 @@ EOL;
      *
      * @return int
      */
-    public function getLoggingLevel()
+    public function getLoggingLevel(): int
     {
         $v = $this->getOpt(self::OPT_VERBOSITY);
 
@@ -438,12 +447,13 @@ EOL;
 
     /**
      * @return LoggerInterface
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function logger()
+    public function logger(): LoggerInterface
     {
         if (!$this->log instanceof LoggerInterface) {
             // Derive log verbosity
-            $level = $this->getOpt(self::OPTION_LEVEL) ?? $this->getLoggingLevel();
+            $level = $this->logLevel ?? $this->getLoggingLevel();
 
             // Derive the list of fields to prepend to log items
             $fields = Logger::getAvailableFields();
