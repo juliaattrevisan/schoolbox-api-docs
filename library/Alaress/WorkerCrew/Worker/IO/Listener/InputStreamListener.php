@@ -126,7 +126,6 @@ class InputStreamListener extends AbstractIOStreamListener
         } catch(ErrorException $e) {
             $msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
             $this->log->warning($msg);
-            $this->log->warning($e->getTraceAsString());
             $this->writer->write($this->proto->cancel());
         } catch(PDOException $e) {
             $this->log->emergency("PDOException: " . $e->getMessage(), ['exception'=>$e]);
