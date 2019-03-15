@@ -46,7 +46,7 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
 
         /* If it was interpreted, embed that player
          */
-        if ('' !== $chain->getResult()) {
+        if (null !== $chain->getResult()) {
             if ($context === 'post') {
                 $page->setVar(array(
                     'SOCIALSTREAM_POST_URL'            => Scrub::text($chain->getResult()),
@@ -91,7 +91,7 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract {
                 $page->setVar(array(
                     'socialstream_comment_has_player_block' => ''
                 ));
-            } elseif ($context == 'reply') {
+            } elseif ($context === 'reply') {
                 $page->setVar(array(
                     'SOCIALSTREAM_REPLY_URL'            => Scrub::text($chain->getResult()),
                     'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()),
