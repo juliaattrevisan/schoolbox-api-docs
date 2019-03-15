@@ -188,7 +188,9 @@
                                         <li class="active"><a>${ selectedAudienceOption.namePlural }</a></li>
                                     </ul>
 
-                                    <p class="meta">${selectedAudienceOption.text}</p>
+                                    <template v-if="tooltipText">
+                                        <p class="meta">${tooltipText}</p>
+                                    </template>
 
                                     <div class="empty-state" v-show="showEmptyState">
                                         <p>No ${ selectedAudienceOption.namePlural } found.</p>
@@ -621,7 +623,6 @@
         this.availableModifiers = undefined;
         this.canTargetNull      = undefined;
         this.valueLabels        = undefined;    // will maps encoded values to human-friendly labels
-        this.textPrefix         = 'Select ' + this.namePlural;
 
         if (this.nameLowerCase === 'role') {
             this.text = undefined;
@@ -671,6 +672,12 @@
         self:        'Self',
         parents_of:  'Parents of students',
         teachers_of: 'Teachers of students'
+    };
+
+    var tooltipTextLabelMap = {
+        self:           'users themselves',
+        parents_of:     'the parents of the users',
+        teachers_of:    'the teachers of the users',
     };
 
     /**
@@ -1279,6 +1286,32 @@
                     }
                 }
                 return false;
+            },
+            tooltipText: function(){
+                var availableMods = [];
+                var tooltipPrefixText = '';
+                var tooltipSufixText = '';
+
+                for(var i in this.selectedAudienceOption.availableModifiers){
+                    availableMods.push(this.selectedAudienceOption.availableModifiers[i])
+                }
+
+                if (availableMods.length === 1 && availableMods[0] === 'self') {
+                    return false;
+                }
+
+                if (availableMods.length > 1){
+                    var selectedMods = [];
+                    availableMods.forEach(function(element) {
+                        selectedMods.push(tooltipTextLabelMap[element]);
+                    });
+
+                    tooltipPrefixText = 'Select ' + this.selectedAudienceOption.namePlural + ' below, then choose whether you would like to include the ';
+                    tooltipSufixText = ', or a combination.';
+
+                    return tooltipPrefixText + selectedMods.join(', ') + tooltipSufixText;
+
+                }
             }
         }
     });
